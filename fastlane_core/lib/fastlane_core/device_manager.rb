@@ -25,22 +25,22 @@ module FastlaneCore
         end
 
         output.split(/\n/).each do |line|
+          next if line =~ /unavailable/
           next if line =~ /^== /
           if line =~ /^-- /
             (os_type, os_version) = line.gsub(/-- (.*) --/, '\1').split
           else
-            # iPad 2 (0EDE6AFC-3767-425A-9658-AAA30A60F212) (Shutdown)
-            # iPad Air 2 (4F3B8059-03FD-4D72-99C0-6E9BBEE2A9CE) (Shutdown) (unavailable, device type profile not found)
-            if line.include?("inch)")
-              # For Xcode 8, where sometimes we have the # of inches in ()
-              # iPad Pro (12.9 inch) (CEF11EB3-79DF-43CB-896A-0F33916C8BDE) (Shutdown)
-              match = line.match(/\s+([^\(]+ \(.*inch\)) \(([-0-9A-F]+)\) \(([^\(]+)\)(.*unavailable.*)?/)
-            else
-              match = line.match(/\s+([^\(]+) \(([-0-9A-F]+)\) \(([^\(]+)\)(.*unavailable.*)?/)
-            end
 
-            if match && !match[4] && (os_type == requested_os_type || requested_os_type == "")
-              @devices << Device.new(name: match[1], os_type: os_type, os_version: os_version, udid: match[2], state: match[3], is_simulator: true)
+            # "    iPad (5th generation) (852A5796-63C3-4641-9825-65EBDC5C4259) (Shutdown)"
+            # This line will turn the above string into
+            # ["iPad", "(5th generation)", "(852A5796-63C3-4641-9825-65EBDC5C4259)", "(Shutdown)"]
+            matches = line.strip.scan(/(.*?) (\(.*?\))/).flatten.reject(&:empty?)
+            state = matches.pop.to_s.delete('(').delete(')')
+            udid = matches.pop.to_s.delete('(').delete(')')
+            name = matches.join(' ')
+
+            if matches.count && (os_type == requested_os_type || requested_os_type == "")
+              @devices << Device.new(name: name, os_type: os_type, os_version: os_version, udid: udid, state: state, is_simulator: true)
             end
           end
         end
@@ -254,7 +254,7 @@ module FastlaneCore
 
         logarchive_dst = Shellwords.escape(File.join(logs_destination_dir, "system_logs-#{log_identity}.logarchive"))
         FileUtils.rm_rf(logarchive_dst)
-        FileUtils.mkdir_p(logarchive_dst)
+        FileUtils.mkdir_p(File.expand_path("..", logarchive_dst))
         command = "xcrun simctl spawn #{device.udid} log collect --output #{logarchive_dst} 2>/dev/null"
         FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
       end

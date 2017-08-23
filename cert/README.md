@@ -80,7 +80,11 @@ In the gif I used `cert && sigh`, which will first create an iOS code signing ce
 
 # Usage
 
-    fastlane cert
+**Note**: It is recommended to use [match](https://github.com/fastlane/fastlane/tree/master/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use `cert` directly only if you want full control over what's going on and know more about codesigning.
+
+```
+fastlane cert
+```
 
 This will check if any of the available signing certificates is installed on your local machine.
 

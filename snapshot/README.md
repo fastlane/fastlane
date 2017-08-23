@@ -79,6 +79,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 
 # Features
 - Create hundreds of screenshots and videos in multiple languages on all simulators
+- Take screenshots in multiple device simulators concurrently to cut down execution time (Xcode 9 only)
 - Configure it once, store the configuration in git
 - Do something else, while the computer takes the screenshots for you
 - Integrates with [`fastlane`](https://fastlane.tools) and [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)
@@ -133,6 +134,7 @@ Here a few links to get started:
 - Create a new UI Test target in your Xcode project ([top part of this article](https://krausefx.com/blog/run-xcode-7-ui-tests-from-the-command-line))
 - Run `fastlane snapshot init` in your project folder
 - Add the ./SnapshotHelper.swift to your UI Test target (You can move the file anywhere you want)
+ - **Note:** if you're using Xcode 8, add the ./SnapshotHelperXcode8.swift to your UI Test target
 - (Objective C only) add the bridging header to your test class.
  - `#import "MYUITests-Swift.h"`
  - The bridging header is named after your test target with -Swift.h appended.
@@ -374,7 +376,7 @@ If you want to add frames around the screenshots and even put a title on top, ch
 
 ## Available language codes
 ```ruby
-ALL_LANGUAGES = ["da", "de-DE", "el", "en-AU", "en-CA", "en-GB", "en-US", "es-ES", "es-MX", "fi", "fr-CA", "fr-FR", "id", "it", "ja", "ko", "ms", "nl", "no", "pt-BR", "pt-PT", "ru", "sv", "th", "tr", "vi", "zh-Hans", "zh-Hant"]
+ALL_LANGUAGES = ["da", "de-DE", "el", "en-AU", "en-CA", "en-GB", "en-US", "es-ES", "es-MX", "fi", "fr-CA", "fr-FR", "id", "it", "ja", "ko", "ms", "nl-NL", "no", "pt-BR", "pt-PT", "ru", "sv", "th", "tr", "vi", "zh-Hans", "zh-Hant"]
 ```
 
 To get more information about language and locale codes please read [Internationalization and Localization Guide](https://developer.apple.com/library/ios/documentation/MacOSX/Conceptual/BPInternational/LanguageandLocaleIDs/LanguageandLocaleIDs.html).

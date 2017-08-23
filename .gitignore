@@ -53,6 +53,8 @@ spec/fixtures/*.itmsp/*.png
 **/report.xml
 **/.bundle
 fastlane/lib/fastlane/plugins/template/.rubocop.yml
+snapshot/example/fastlane/README.md
+snapshot/example/fastlane/screenshots
 
 # iOS specific ignores, used in sample projects inside the repo
 *.pbxuser

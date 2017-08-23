@@ -7,6 +7,8 @@ module Deliver
       find_folders(options)
       ensure_folders_created(options)
       find_version(options) unless skip_params[:skip_version]
+
+      verify_languages!(options)
     end
 
     def find_app_identifier(options)
@@ -65,6 +67,18 @@ module Deliver
         options[:platform] ||= FastlaneCore::IpaFileAnalyser.fetch_app_platform(options[:ipa])
       elsif options[:pkg]
         options[:platform] = 'osx'
+      end
+    end
+
+    def verify_languages!(options)
+      languages = options[:languages]
+      return unless languages
+
+      all_languages = Spaceship::Tunes.client.available_languages
+      diff = languages - all_languages
+
+      unless diff.empty?
+        UI.user_error!("The following languages are invalid and cannot be activated: #{diff.join(',')}\n\nValid languages are: #{all_languages}")
       end
     end
   end

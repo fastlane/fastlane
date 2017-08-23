@@ -55,6 +55,8 @@ module Deliver
     # Directory name it contains review information
     REVIEW_INFORMATION_DIR = "review_information"
 
+    ALL_META_SUB_DIRS = [TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR, REVIEW_INFORMATION_DIR]
+
     # rubocop:disable Metrics/PerceivedComplexity
 
     # Make sure to call `load_from_filesystem` before calling upload
@@ -140,8 +142,11 @@ module Deliver
 
     # If the user is using the 'default' language, then assign values where they are needed
     def assign_defaults(options)
+      # Normalizes languages keys from symbols to strings
+      normalize_language_keys(options)
+
       # Build a complete list of the required languages
-      enabled_languages = []
+      enabled_languages = detect_languages(options)
 
       # Get all languages used in existing settings
       (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
@@ -153,10 +158,9 @@ module Deliver
       end
 
       # Check folder list (an empty folder signifies a language is required)
-      Loader.language_folders(options[:metadata_path]).each do |lng_folder|
-        next unless File.directory?(lng_folder) # We don't want to read txt as they are non localised
-
-        language = File.basename(lng_folder)
+      Loader.language_folders(options[:metadata_path]).each do |lang_folder|
+        next unless File.directory?(lang_folder) # We don't want to read txt as they are non localised
+        language = File.basename(lang_folder)
         enabled_languages << language unless enabled_languages.include?(language)
       end
 
@@ -180,6 +184,33 @@ module Deliver
       end
     end
 
+    def detect_languages(options)
+      # Build a complete list of the required languages
+      enabled_languages = options[:languages] || []
+
+      # Get all languages used in existing settings
+      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
+        current = options[key]
+        next unless current && current.kind_of?(Hash)
+        current.each do |language, value|
+          enabled_languages << language unless enabled_languages.include?(language)
+        end
+      end
+
+      # Check folder list (an empty folder signifies a language is required)
+      Loader.language_folders(options[:metadata_path]).each do |lang_folder|
+        next unless File.directory?(lang_folder) # We don't want to read txt as they are non localised
+
+        language = File.basename(lang_folder)
+        enabled_languages << language unless enabled_languages.include?(language)
+      end
+
+      # Mapping to strings because :default symbol can be passed in
+      enabled_languages
+        .map(&:to_s)
+        .uniq
+    end
+
     # Makes sure all languages we need are actually created
     def verify_available_languages!(options)
       return if options[:skip_metadata]
@@ -190,7 +221,7 @@ module Deliver
       v = options[:app].edit_version
       UI.user_error!("Could not find a version to edit for app '#{options[:app].name}', the app metadata is read-only currently") unless v
 
-      enabled_languages = []
+      enabled_languages = options[:languages] || []
       LOCALISED_VERSION_VALUES.each do |key|
         current = options[key]
         next unless current && current.kind_of?(Hash)
@@ -199,6 +230,12 @@ module Deliver
           enabled_languages << language unless enabled_languages.include?(language)
         end
       end
+
+      # Reject "default" language from getting enabled
+      # because "default" is not an iTC language
+      enabled_languages = enabled_languages.reject do |lang|
+        lang == "default"
+      end.uniq
 
       if enabled_languages.count > 0
         v.create_languages(enabled_languages)
@@ -215,10 +252,10 @@ module Deliver
       return if options[:skip_metadata]
 
       # Load localised data
-      Loader.language_folders(options[:metadata_path]).each do |lng_folder|
-        language = File.basename(lng_folder)
+      Loader.language_folders(options[:metadata_path]).each do |lang_folder|
+        language = File.basename(lang_folder)
         (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
-          path = File.join(lng_folder, "#{key}.txt")
+          path = File.join(lang_folder, "#{key}.txt")
           next unless File.exist?(path)
 
           UI.message("Loading '#{path}'...")
@@ -260,6 +297,20 @@ module Deliver
     end
 
     private
+
+    # Normalizes languages keys from symbols to strings
+    def normalize_language_keys(options)
+      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
+        current = options[key]
+        next unless current && current.kind_of?(Hash)
+
+        current.keys.each do |language|
+          current[language.to_s] = current.delete(language)
+        end
+      end
+
+      options
+    end
 
     def set_trade_representative_contact_information(v, options)
       return unless options[:trade_representative_contact_information]

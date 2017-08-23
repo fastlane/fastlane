@@ -188,7 +188,7 @@ output = sh("pod update")
 ### Working directory
 
 `sh` action uses a different working directory than other _fastlane_ actions. As working directory, most _fastlane_ actions use the current directory as of the time when the `fastlane` command has been called. However, `sh` action uses `./fastlane/` subdirectory of the current directory as its working directory. Furthermore, shell environment variable PWD does not reflect the working directory, while retrieved within `sh` action.
-For further details refer to the related issue fastlane/fastlane#6982
+For further details refer to the related issue [fastlane/fastlane#6982](https://github.com/fastlane/fastlane/issues/6982)
 
 If you need to call a script present in the current directory, you can use the following notion:
 ```

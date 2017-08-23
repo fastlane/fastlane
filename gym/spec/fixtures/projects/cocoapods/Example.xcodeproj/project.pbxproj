@@ -36,8 +36,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		7F17E2E4DB202336112485AA /* Pods-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-Example/Pods-Example.release.xcconfig"; sourceTree = "<group>"; };
-		ACCA4067A20AE82A13A55B4D /* Pods-Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Example/Pods-Example.debug.xcconfig"; sourceTree = "<group>"; };
 		BDC4BE00FA30F698E5A28354 /* libPods-Example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAC1E1981B6A326100A8B23A /* ExampleProductName.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleProductName.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAC1E19C1B6A326100A8B23A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -94,8 +92,6 @@
 		BADC4719675AA7E88BB4142C /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				ACCA4067A20AE82A13A55B4D /* Pods-Example.debug.xcconfig */,
-				7F17E2E4DB202336112485AA /* Pods-Example.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -175,7 +171,6 @@
 				CAC1E1941B6A326100A8B23A /* Sources */,
 				CAC1E1951B6A326100A8B23A /* Frameworks */,
 				CAC1E1961B6A326100A8B23A /* Resources */,
-				5F43814BE018E11BE30B947A /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -238,10 +233,12 @@
 					};
 					CAC1E1B01B6A326100A8B23A = {
 						CreatedOnToolsVersion = 7.0;
+						ProvisioningStyle = Manual;
 						TestTargetID = CAC1E1971B6A326100A8B23A;
 					};
 					CAC1E1BB1B6A326200A8B23A = {
 						CreatedOnToolsVersion = 7.0;
+						ProvisioningStyle = Manual;
 						TestTargetID = CAC1E1971B6A326100A8B23A;
 					};
 				};
@@ -294,21 +291,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		5F43814BE018E11BE30B947A /* Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Example/Pods-Example-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		FD6E57C195D6DD9F5D5469C2 /* Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -470,7 +452,6 @@
 		};
 		CAC1E1C61B6A326200A8B23A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = ACCA4067A20AE82A13A55B4D /* Pods-Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
@@ -486,7 +467,6 @@
 		};
 		CAC1E1C71B6A326200A8B23A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7F17E2E4DB202336112485AA /* Pods-Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
@@ -504,10 +484,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ExampleTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.krausefx.ExampleTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "match AppStore family.wwdc.test.app";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Example.app/Example";
 			};
 			name = Debug;
@@ -516,10 +499,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ExampleTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.krausefx.ExampleTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "match AppStore family.wwdc.test.app";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Example.app/Example";
 			};
 			name = Release;
@@ -527,10 +513,13 @@
 		CAC1E1CC1B6A326200A8B23A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ExampleUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.krausefx.ExampleUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "match AppStore family.wwdc.uitest.app";
 				TEST_TARGET_NAME = Example;
 				USES_XCTRUNNER = YES;
 			};
@@ -539,10 +528,13 @@
 		CAC1E1CD1B6A326200A8B23A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ExampleUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.krausefx.ExampleUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "match AppStore family.wwdc.uitest.app";
 				TEST_TARGET_NAME = Example;
 				USES_XCTRUNNER = YES;
 			};

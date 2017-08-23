@@ -10,6 +10,10 @@ module Spaceship
     class ITunesConnectTemporaryError < ITunesConnectError
     end
 
+    # raised if the server failed to save, and it might be caused by an invisible server error
+    class ITunesConnectPotentialServerError < ITunesConnectError
+    end
+
     attr_reader :du_client
 
     def initialize
@@ -108,7 +112,9 @@ module Spaceship
     end
 
     # rubocop:disable Metrics/PerceivedComplexity
-    def handle_itc_response(raw)
+    # If the response is coming from a flaky api, set flaky_api_call to true so we retry a little.
+    # Patience is a virtue.
+    def handle_itc_response(raw, flaky_api_call: false)
       return unless raw
       return unless raw.kind_of? Hash
 
@@ -164,6 +170,8 @@ module Spaceship
           raise ITunesConnectTemporaryError.new, errors.first
         elsif errors.count == 1 and errors.first.include?("Forbidden")
           raise_insuffient_permission_error!
+        elsif flaky_api_call
+          raise ITunesConnectPotentialServerError.new, errors.join(' ')
         else
           raise ITunesConnectError.new, errors.join(' ')
         end
@@ -343,7 +351,7 @@ module Spaceship
           req.headers['Content-Type'] = 'application/json'
         end
 
-        handle_itc_response(r.body)
+        handle_itc_response(r.body, flaky_api_call: true)
       end
     end
 
@@ -872,19 +880,25 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def send_app_submission(app_id, data)
+    def send_app_submission(app_id, version, data)
       raise "app_id is required" unless app_id
 
       # ra/apps/1039164429/version/submit/complete
       r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/version/submit/complete"
+        req.url "ra/apps/#{app_id}/versions/#{version}/submit/complete"
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
 
       handle_itc_response(r.body)
 
-      if r.body.fetch('messages').fetch('info').last == "Successful POST"
+      # iTunes Connect still returns a success status code even the submission
+      # was failed because of Ad ID info.  This checks for any section error
+      # keys in returned adIdInfo and prints them out.
+      ad_id_error_keys = r.body.fetch('data').fetch('adIdInfo').fetch('sectionErrorKeys')
+      if ad_id_error_keys.any?
+        raise "Something wrong with your Ad ID information: #{ad_id_error_keys}."
+      elsif r.body.fetch('messages').fetch('info').last == "Successful POST"
         # success
       else
         raise "Something went wrong when submitting the app for review. Make sure to pass valid options to submit your app for review"
@@ -1309,7 +1323,7 @@ module Spaceship
 
     private
 
-    def with_tunes_retry(tries = 5, &_block)
+    def with_tunes_retry(tries = 5, potential_server_error_tries = 3, &_block)
       return yield
     rescue Spaceship::TunesClient::ITunesConnectTemporaryError => ex
       unless (tries -= 1).zero?
@@ -1320,6 +1334,15 @@ module Spaceship
         retry
       end
       raise ex # re-raise the exception
+    rescue Spaceship::TunesClient::ITunesConnectPotentialServerError => ex
+      unless (potential_server_error_tries -= 1).zero?
+        msg = "Potential server error received: '#{ex.message}'. Retrying after 10 seconds (remaining: #{tries})..."
+        puts msg
+        logger.warn msg
+        sleep 10 unless defined? SpecHelper # unless FastlaneCore::Helper.is_test?
+        retry
+      end
+      raise ex
     end
 
     def clear_user_cached_data
