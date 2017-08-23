@@ -9,8 +9,6 @@ module Snapshot
     # All the errors we experience while running snapshot
     attr_accessor :collected_errors
 
-    @recordingPid
-
     def work
       if File.exist?("./fastlane/snapshot.js") or File.exist?("./snapshot.js")
         UI.error "Found old snapshot configuration file 'snapshot.js'"
@@ -182,13 +180,13 @@ module Snapshot
         UI.header("#{device_type} - #{language}")
       end
 
-      device = TestCommandGenerator.find_device(device_type)
       dir_name = locale || language
-        
-      listener = CommandListener.new() do |command, args|
-        start_recording(dir_name, device_type, args["name"].first) if command == "startRecording"
-        stop_recording if command == "stopRecording"
+
+      listener = CommandListener.new do |cmd, args|
+        start_recording(dir_name, device_type, args["name"].first) if cmd == "startRecording"
+        stop_recording if cmd == "stopRecording"
       end
+      File.write(File.join(prefix, "Command_listener_port.txt"), listener.server.addr[1])
 
       prefix_hash = [
         {
@@ -206,8 +204,8 @@ module Snapshot
                                             loading: "Loading...",
                                               error: proc do |output, return_code|
                                                 ErrorHandler.handle_test_error(output, return_code)
-                                                listener.close()
-                                                stop_recording()
+                                                listener.close
+                                                stop_recording
 
                                                 # no exception raised... that means we need to retry
                                                 UI.error "Caught error... #{return_code}"
@@ -222,14 +220,15 @@ module Snapshot
                                               end)
 
       listener.close
-      stop_recording()
-        
+      stop_recording
+
       raw_output = File.read(TestCommandGenerator.xcodebuild_log_path(device_type: device_type, language: language, locale: locale))
 
       return Collector.fetch_screenshots(raw_output, dir_name, device_type, launch_arguments.first)
     end
 
     def start_recording(dir_name, device_type, name)
+      return unless @recording_pid.nil?
       UI.message("start_recording '#{name}'")
       language_folder = File.join(Snapshot.config[:video_output_directory], dir_name, device_type.delete(" "))
       FileUtils.mkdir_p(language_folder)
@@ -239,7 +238,7 @@ module Snapshot
                                         print_command: true,
                                               loading: "Recording video...",
                                            pidCreated: proc do |pid|
-                                                         @recordingPid = pid
+                                                         @recording_pid = pid
                                                        end,
                                                 error: proc do |output, return_code|
                                                          ErrorHandler.handle_test_error(output, return_code)
@@ -250,10 +249,10 @@ module Snapshot
     end
 
     def stop_recording
-      return if @recordingPid == nil
+      return if @recording_pid.nil?
       UI.message("stop_recording")
-      Process.kill("SIGINT", @recordingPid)
-      @recordingPid = nil
+      Process.kill("SIGINT", @recording_pid)
+      @recording_pid = nil
     end
 
     def open_simulator_for_device(device_name)

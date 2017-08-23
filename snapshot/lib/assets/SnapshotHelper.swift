@@ -41,7 +41,10 @@ func stopRecording() {
 }
 
 func sendCommand(commnad: String) {
-    if let url = URL(string: "http://localhost:2345/\(commnad)") {
+    guard let port = Snapshot.getCommandListenerPort() else {
+        return
+    }
+    if let url = URL(string: "http://localhost:\(port)/\(commnad)") {
         let (_, _, error) = URLSession.shared.synchronousDataTask(with: url)
         if (error != nil) {
             print("Error sending commnad: \(String(describing: error))")
@@ -55,6 +58,22 @@ open class Snapshot: NSObject {
         setLanguage(app)
         setLocale(app)
         setLaunchArguments(app)
+    }
+
+    class func getCommandListenerPort() -> String? {
+        guard let prefix = pathPrefix() else {
+            return nil
+        }
+        
+        let path = prefix.appendingPathComponent("Command_listener_port.txt")
+        var port: String?
+        do {
+            let trimCharacterSet = CharacterSet.whitespacesAndNewlines
+            port = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
+        } catch {
+            print("Couldn't get the command listener port...")
+        }
+        return port
     }
 
     class func setLanguage(_ app: XCUIApplication) {
