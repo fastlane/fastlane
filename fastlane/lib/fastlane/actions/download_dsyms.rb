@@ -17,6 +17,12 @@ module Fastlane
         version = params[:version]
         build_number = params[:build_number]
         platform = params[:platform]
+        save_directory = params[:save_directory]
+
+        # Make sure save_directory has a slash on the end
+        if save_directory && !save_directory.end_with?('/')
+          save_directory += '/'
+        end
 
         message = []
         message << "Looking for dSYM files for #{params[:app_identifier]}"
@@ -52,6 +58,9 @@ module Fastlane
             if download_url
               result = self.download download_url
               file_name = "#{app.bundle_id}-#{train_number}-#{build.build_version}.dSYM.zip"
+              if save_directory
+                file_name = save_directory + file_name
+              end
               File.write(file_name, result)
               UI.success("🔑  Successfully downloaded dSYM file for #{train_number} - #{build.build_version} to '#{file_name}'")
 
@@ -147,6 +156,11 @@ module Fastlane
                                        short_option: "-b",
                                        env_name: "DOWNLOAD_DSYMS_BUILD_NUMBER",
                                        description: "The app build_number for dSYMs you wish to download",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :save_directory,
+                                       short_option: "-s",
+                                       env_name: "DOWNLOAD_DSYMS_SAVE_DIRECTORY",
+                                       description: "Where to save the download DSYMs, defaults to the current path",
                                        optional: true)
         ]
       end
