@@ -198,7 +198,7 @@ module FastlaneCore
         app_identifier = ios_app_identifier(args)
         @platform = :ios if app_identifier
       end
-      app_identifier
+      return app_identifier
     end
 
     def self.send_launch_analytic_events_for(gem_name)
