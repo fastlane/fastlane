@@ -181,8 +181,8 @@ Optional: If _gym_ can't automatically detect the provisioning profiles to use, 
 export_options(
   method: "app-store",
   provisioningProfiles: { 
-    "com.example.bundleid": "Provisioning Profile Name",
-    "com.example.bundleid2": "Provisioning Profile Name 2"
+    "com.example.bundleid" => "Provisioning Profile Name",
+    "com.example.bundleid2" => "Provisioning Profile Name 2"
   }
 )
 ```
