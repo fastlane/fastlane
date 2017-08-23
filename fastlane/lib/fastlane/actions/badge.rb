@@ -52,7 +52,7 @@ module Fastlane
       end
 
       def self.category
-        :misc
+        :deprecated
       end
 
       def self.available_options
