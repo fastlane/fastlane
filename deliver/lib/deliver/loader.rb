@@ -12,7 +12,7 @@ module Deliver
 
     EXCEPTION_DIRECTORIES = UploadMetadata::ALL_META_SUB_DIRS.map(&:downcase).freeze
 
-    def self.language_folders(root)
+    def self.language_folders(root, ignore_validation)
       folders = Dir.glob(File.join(root, '*'))
 
       if Helper.is_test?
@@ -21,7 +21,8 @@ module Deliver
         available_languages = Spaceship::Tunes.client.available_languages.sort
       end
 
-      allowed_directory_names = (available_languages + SPECIAL_DIR_NAMES).map(&:downcase).freeze
+      allowed_directory_names_with_case = (available_languages + SPECIAL_DIR_NAMES)
+      allowed_directory_names = allowed_directory_names_with_case.map(&:downcase).freeze
 
       selected_folders = folders.select do |path|
         File.directory?(path) && allowed_directory_names.include?(File.basename(path).downcase)
@@ -33,9 +34,11 @@ module Deliver
         File.directory?(path) && !allowed_directory_names.include?(normalized_path) && !EXCEPTION_DIRECTORIES.include?(normalized_path)
       end.sort
 
-      unless rejected_folders.empty?
+      if !ignore_validation && !rejected_folders.empty?
         rejected_folders = rejected_folders.map { |path| File.basename(path) }
-        UI.user_error! "Unsupport directory name(s) for screenshots/metadata: #{rejected_folders.join(', ')}\n\nValid directory names are: #{allowed_directory_names}"
+        UI.user_error! "Unsupported directory name(s) for screenshots/metadata in '#{root}': #{rejected_folders.join(', ')}" \
+                       "\nValid directory names are: #{allowed_directory_names_with_case}" \
+                       "\n\nEnabled 'ignore_language_directory_validation' to prevent this validation from happening"
       end
 
       selected_folders
