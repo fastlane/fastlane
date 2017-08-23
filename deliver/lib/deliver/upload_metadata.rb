@@ -158,7 +158,8 @@ module Deliver
       end
 
       # Check folder list (an empty folder signifies a language is required)
-      Loader.language_folders(options[:metadata_path]).each do |lang_folder|
+      ignore_validation = options[:ignore_language_directory_validation]
+      Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
         next unless File.directory?(lang_folder) # We don't want to read txt as they are non localised
         language = File.basename(lang_folder)
         enabled_languages << language unless enabled_languages.include?(language)
@@ -198,7 +199,8 @@ module Deliver
       end
 
       # Check folder list (an empty folder signifies a language is required)
-      Loader.language_folders(options[:metadata_path]).each do |lang_folder|
+      ignore_validation = options[:ignore_language_directory_validation]
+      Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
         next unless File.directory?(lang_folder) # We don't want to read txt as they are non localised
 
         language = File.basename(lang_folder)
@@ -252,7 +254,8 @@ module Deliver
       return if options[:skip_metadata]
 
       # Load localised data
-      Loader.language_folders(options[:metadata_path]).each do |lang_folder|
+      ignore_validation = options[:ignore_language_directory_validation]
+      Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
         language = File.basename(lang_folder)
         (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
           path = File.join(lang_folder, "#{key}.txt")
