@@ -9,7 +9,7 @@ module Fastlane
         require 'faraday'
         require 'faraday_middleware'
 
-        connection = Faraday.new(url: "https://app.testfairy.com") do |builder|
+        connection = Faraday.new(url: "https://upload.testfairy.com") do |builder|
           builder.request :multipart
           builder.request :url_encoded
           builder.response :json, content_type: /\bjson$/
