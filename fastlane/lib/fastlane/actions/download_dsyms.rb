@@ -14,16 +14,31 @@ module Fastlane
         Spaceship::Tunes.select_team
         UI.message("Login successful")
 
+        # Get App
+        app = Spaceship::Application.find(params[:app_identifier])
+        unless app
+          UI.user_error!("Could not find app with bundle identifier '#{params[:app_identifier]}' on account #{params[:username]}")
+        end
+
+        # Process options
         version = params[:version]
         build_number = params[:build_number]
         platform = params[:platform]
         save_directory = params[:save_directory]
+
+        # Set version if it is latest
+        if version == 'latest'
+          latest_build = latest_build(app.latest_version.candidate_builds)
+          version = latest_build.train_version
+          build_number = latest_build.build_version
+        end
 
         # Make sure save_directory has a slash on the end
         if save_directory && !save_directory.end_with?('/')
           save_directory += '/'
         end
 
+        # Write a nice message
         message = []
         message << "Looking for dSYM files for #{params[:app_identifier]}"
         if version
@@ -35,11 +50,8 @@ module Fastlane
         end
 
         UI.message(message.join(" "))
-        app = Spaceship::Application.find(params[:app_identifier])
-        unless app
-          UI.user_error!("Could not find app with bundle identifier '#{params[:app_identifier]}' on account #{params[:username]}")
-        end
 
+        # Loop through all app versions and download their dSYM
         app.all_build_train_numbers(platform: platform).each do |train_number|
           if version && version != train_number
             next
@@ -83,6 +95,21 @@ module Fastlane
         http.use_ssl = (uri.scheme == "https")
         res = http.get(uri.request_uri)
         res.body
+      end
+
+      def self.latest_build(candidate_builds)
+        if (candidate_builds || []).count == 0
+          UI.user_error!("Could not find any available candidate builds on iTunes Connect to submit")
+        end
+
+        build = candidate_builds.first
+        candidate_builds.each do |b|
+          if b.upload_date > build.upload_date
+            build = b
+          end
+        end
+
+        return build
       end
 
       #####################################################
@@ -150,7 +177,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        short_option: "-v",
                                        env_name: "DOWNLOAD_DSYMS_VERSION",
-                                       description: "The app version for dSYMs you wish to download",
+                                       description: "The app version for dSYMs you wish to download, pass in 'latest' to download only the latest build's dSYMs",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :build_number,
                                        short_option: "-b",
@@ -160,7 +187,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :save_directory,
                                        short_option: "-s",
                                        env_name: "DOWNLOAD_DSYMS_SAVE_DIRECTORY",
-                                       description: "Where to save the download DSYMs, defaults to the current path",
+                                       description: "Where to save the download dSYMs, defaults to the current path",
                                        optional: true)
         ]
       end
