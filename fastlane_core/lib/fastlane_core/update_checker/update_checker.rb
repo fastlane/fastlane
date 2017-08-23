@@ -225,7 +225,7 @@ module FastlaneCore
     def self.event_for_p_hash(p_hash, tool, platform, timestamp_seconds)
       {
         event_source: {
-          oauth_app_name: 'fastlane-refresher',
+          oauth_app_name: oauth_app_name,
           product: 'fastlane'
         },
         actor: {
@@ -251,7 +251,7 @@ module FastlaneCore
     def self.event_for_launch(tool, ci, timestamp_seconds)
       {
         event_source: {
-          oauth_app_name: 'fastlane-refresher',
+          oauth_app_name: oauth_app_name,
           product: 'fastlane'
         },
         actor: {
@@ -309,7 +309,7 @@ module FastlaneCore
     def self.event_for_completion(tool, ci, duration, timestamp_seconds)
       {
         event_source: {
-          oauth_app_name: 'fastlane-refresher',
+          oauth_app_name: oauth_app_name,
           product: 'fastlane'
         },
         actor: {
@@ -335,7 +335,7 @@ module FastlaneCore
     def self.event_for_install_method(tool, ci, install_method, timestamp_seconds)
       {
         event_source: {
-          oauth_app_name: 'fastlane-refresher',
+          oauth_app_name: oauth_app_name,
           product: 'fastlane'
         },
         actor: {
@@ -360,6 +360,10 @@ module FastlaneCore
 
     def self.secondary_target_string(string)
       return string
+    end
+
+    def self.oauth_app_name
+      return 'fastlane-refresher'
     end
 
     def self.send_completion_events(tool, ci, install_method, duration, timestamp_seconds)
