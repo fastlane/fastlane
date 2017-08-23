@@ -34,6 +34,7 @@ module Fastlane
         select_regex = ensure_regex_is_not_string!(select_regex)
 
         exclude_regex = params[:exclude_regex]
+        exclude_regex = ensure_regex_is_not_string!(exclude_regex)
 
         files = JSON.parse(File.read(compile_commands)).map do |compile_command|
           file = compile_command['file']
