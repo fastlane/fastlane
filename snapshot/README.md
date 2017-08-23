@@ -78,7 +78,7 @@ Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.c
 <h5 align="center"><code>snapshot</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # Features
-- Create hundreds of screenshots in multiple languages on all simulators
+- Create hundreds of screenshots and videos in multiple languages on all simulators
 - Configure it once, store the configuration in git
 - Do something else, while the computer takes the screenshots for you
 - Integrates with [`fastlane`](https://fastlane.tools) and [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)
@@ -140,6 +140,9 @@ Here a few links to get started:
 - To take a snapshot, call the following between interactions
  -  Swift: `snapshot("01LoginScreen")`
  -  Objective C: `[Snapshot snapshot:@"01LoginScreen" waitForLoadingIndicator:YES];`
+- to record a video, call the following between interactions
+ - to start a recording: `startRecording(name: "video_name")`
+ - to stop the on going recording: `stopRecording()`
 - Add the following code to your `setUp()` method
 
 **Swift**
