@@ -177,6 +177,18 @@ module FastlaneCore
       return nil if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
       require 'credentials_manager'
 
+      app_identifier = app_id(args, gem_name)
+
+      if app_identifier
+        return Digest::SHA256.hexdigest("p#{app_identifier}fastlan3_SAlt") # hashed + salted the bundle identifier
+      end
+
+      return nil
+    rescue
+      return nil
+    end
+
+    def self.app_id(args, gem_name)
       # check if this is an android project first because some of the same params exist for iOS and Android tools
       app_identifier = android_app_identifier(args, gem_name)
       @platform = nil # since have a state in-between runs
@@ -186,14 +198,7 @@ module FastlaneCore
         app_identifier = ios_app_identifier(args)
         @platform = :ios if app_identifier
       end
-
-      if app_identifier
-        return Digest::SHA256.hexdigest("p#{app_identifier}fastlan3_SAlt") # hashed + salted the bundle identifier
-      end
-
-      return nil
-    rescue
-      return nil
+      return app_identifier
     end
 
     def self.send_launch_analytic_events_for(gem_name)
@@ -236,7 +241,7 @@ module FastlaneCore
         },
         secondary_target: {
           name: 'platform',
-          detail: platform || 'unknown'
+          detail: secondary_target_string(platform || 'unknown')
         },
         millis_since_epoch: timestamp_seconds * 1000,
         version: 1
@@ -259,6 +264,10 @@ module FastlaneCore
         primary_target: {
           name: 'ci',
           detail: ci
+        },
+        secondary_target: {
+          name: 'launch',
+          detail: secondary_target_string('')
         },
         millis_since_epoch: timestamp_seconds * 1000,
         version: 1
@@ -316,7 +325,7 @@ module FastlaneCore
         },
         secondary_target: {
           name: 'ci',
-          detail: ci
+          detail: secondary_target_string(ci)
         },
         millis_since_epoch: timestamp_seconds * 1000,
         version: 1
@@ -342,11 +351,15 @@ module FastlaneCore
         },
         secondary_target: {
           name: 'ci',
-          detail: ci
+          detail: secondary_target_string(ci)
         },
         millis_since_epoch: timestamp_seconds * 1000,
         version: 1
       }
+    end
+
+    def self.secondary_target_string(string)
+      return string
     end
 
     def self.send_completion_events(tool, ci, install_method, duration, timestamp_seconds)
