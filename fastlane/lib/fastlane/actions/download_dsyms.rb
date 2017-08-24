@@ -30,7 +30,6 @@ module Fastlane
         if version == 'latest'
           # Try to grab the live version first, else fallback to edit version
           latest_version = app.live_version(platform: platform) || app.edit_version(platform: platform)
-          UI.user_error!("Could not find a latest version of the app live or not.") unless latest_version
           version = latest_version.version
           build_number = latest_version.build_version
         end
