@@ -28,9 +28,11 @@ module Fastlane
 
         # Set version if it is latest
         if version == 'latest'
-          latest_build = latest_build(app.latest_version.candidate_builds)
-          version = latest_build.train_version
-          build_number = latest_build.build_version
+          # Try to grab the live version first, else fallback to edit version
+          latest_version = app.live_version(platform: platform) || app.edit_version(platform: platform)
+          UI.user_error!("Could not find a latest version of the app live or not.") unless latest_version
+          version = latest_version.version
+          build_number = latest_version.build_version
         end
 
         # Make sure save_directory has a slash on the end
@@ -95,21 +97,6 @@ module Fastlane
         http.use_ssl = (uri.scheme == "https")
         res = http.get(uri.request_uri)
         res.body
-      end
-
-      def self.latest_build(candidate_builds)
-        if (candidate_builds || []).count == 0
-          UI.user_error!("Could not find any available candidate builds on iTunes Connect to submit")
-        end
-
-        build = candidate_builds.first
-        candidate_builds.each do |b|
-          if b.upload_date > build.upload_date
-            build = b
-          end
-        end
-
-        return build
       end
 
       #####################################################
