@@ -51,7 +51,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'faraday-cookie_jar', '~> 0.0.6'
   spec.add_dependency 'fastimage', '>= 2.1.0', '< 3.0.0' # fetch the image sizes from the screenshots
   spec.add_dependency 'gh_inspector', '>= 1.0.1', '< 2.0.0' # search for issues on GitHub when something goes wrong
-  spec.add_dependency 'google-api-client', '>= 0.12.0', '< 1.0.0' # Google API Client to access Play Publishing API
   spec.add_dependency 'highline', '>= 1.7.2', '< 2.0.0' # user inputs (e.g. passwords)
   spec.add_dependency 'json', '< 3.0.0' # Because sometimes it's just not installed
   spec.add_dependency 'mini_magick', '~> 4.5.1' # To open, edit and export PSD files
@@ -64,6 +63,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'bundler', '>= 1.12.0', '< 2.0.0' # Used for fastlane plugins
   spec.add_dependency 'faraday', '~> 0.9' # Used for deploygate, hockey and testfairy actions
   spec.add_dependency 'faraday_middleware', '~> 0.9' # same as faraday
+
+  # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
+  # If you upgrade this gem, make sure to upgrade the users of it as well.
+  spec.add_dependency 'google-api-client', '>= 0.13.1', '< 0.14.0' # Google API Client to access Play Publishing API
 
   # Development only
   spec.add_development_dependency 'rake', '< 12'

@@ -333,7 +333,7 @@ module Supply
       ensure_active_edit!
 
       call_google_api do
-        android_publisher.deleteall_image(
+        android_publisher.delete_all_images(
           current_package_name,
           current_edit.id,
           language,
