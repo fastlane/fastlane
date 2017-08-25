@@ -32,26 +32,6 @@ func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
     Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator)
 }
 
-func startRecording(name: String) {
-    sendCommand(commnad: "startRecording?name=\(name)")
-}
-
-func stopRecording() {
-    sendCommand(commnad: "stopRecording")
-}
-
-func sendCommand(commnad: String) {
-    guard let port = Snapshot.getCommandListenerPort() else {
-        return
-    }
-    if let url = URL(string: "http://localhost:\(port)/\(commnad)") {
-        let (_, _, error) = URLSession.shared.synchronousDataTask(with: url)
-        if (error != nil) {
-            print("Error sending commnad: \(String(describing: error))")
-        }
-    }
-}
-
 enum SnapshotError: Error, CustomDebugStringConvertible {
     case cannotDetectUser
     case cannotFindHomeDirectory
@@ -68,6 +48,9 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
             return "Couldn't find simulator home location. Please, check SIMULATOR_HOST_HOME env variable."
         case .cannotAccessSimulatorHomeDirectory(let simulatorHostHome):
             return "Can't prepare environment. Simulator home location is inaccessible. Does \(simulatorHostHome) exist?"
+        }
+    }
+}
 
 open class Snapshot: NSObject {
     static var app: XCUIApplication!
@@ -87,22 +70,6 @@ open class Snapshot: NSObject {
         } catch let error {
             print(error)
         }
-    }
-
-    class func getCommandListenerPort() -> String? {
-        guard let prefix = pathPrefix() else {
-            return nil
-        }
-        
-        let path = prefix.appendingPathComponent("Command_listener_port.txt")
-        var port: String?
-        do {
-            let trimCharacterSet = CharacterSet.whitespacesAndNewlines
-            port = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
-        } catch {
-            print("Couldn't get the command listener port...")
-        }
-        return port
     }
 
     class func setLanguage(_ app: XCUIApplication) {
@@ -148,7 +115,7 @@ open class Snapshot: NSObject {
             print("Couldn't detect/set launch_arguments...")
         }
     }
-    
+
     open class func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
         if waitForLoadingIndicator {
             waitForLoadingIndicatorToDisappear()
@@ -220,29 +187,6 @@ extension XCUIElement {
             return false
         }
         return self.frame.size == CGSize(width: 10, height: 20)
-    }
-}
-
-extension URLSession {
-    func synchronousDataTask(with url: URL) -> (Data?, URLResponse?, Error?) {
-        var data: Data?
-        var response: URLResponse?
-        var error: Error?
-        
-        let semaphore = DispatchSemaphore(value: 0)
-        
-        let dataTask = self.dataTask(with: url) {
-            data = $0
-            response = $1
-            error = $2
-            
-            semaphore.signal()
-        }
-        dataTask.resume()
-        
-        _ = semaphore.wait(timeout: .distantFuture)
-        
-        return (data, response, error)
     }
 }
 
