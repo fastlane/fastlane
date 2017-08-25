@@ -62,6 +62,8 @@ module Deliver
         # so we save per language. See issue #349
         UI.message("Saving changes")
         v.save!
+        # Refresh app version to start clean again. See issue #9859
+        v = app.edit_version
       end
       UI.success("Successfully uploaded screenshots to iTunes Connect")
     end
