@@ -225,7 +225,7 @@ module Supply
       ensure_active_edit!
 
       call_google_api do
-        android_publisher.upload_deobfuscationfile(
+        android_publisher.upload_edit_deobfuscationfile(
           current_package_name,
           current_edit.id,
           apk_version_code,
@@ -346,7 +346,7 @@ module Supply
       ensure_active_edit!
 
       call_google_api do
-        android_publisher.upload_expansionfile(
+        android_publisher.upload_expansion_file(
           current_package_name,
           current_edit.id,
           apk_version_code,
