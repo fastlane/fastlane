@@ -1,6 +1,5 @@
 describe Supply do
   describe Supply::Client do
-
     describe "AndroidPublisher" do
       let(:subject) { Androidpublisher::AndroidPublisherService.new }
 
