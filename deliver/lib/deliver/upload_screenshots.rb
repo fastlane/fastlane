@@ -70,12 +70,10 @@ module Deliver
 
     def collect_screenshots(options)
       return [] if options[:skip_screenshots]
-      return collect_screenshots_for_languages(options)
+      return collect_screenshots_for_languages(options[:screenshots_path])
     end
 
-    def collect_screenshots_for_languages(options)
-      path = options[:screenshots_path]
-
+    def collect_screenshots_for_languages(path)
       screenshots = []
       extensions = '{png,jpg,jpeg}'
 
