@@ -5,9 +5,10 @@ module Fastlane
     end
 
     class SlatherAction < Action
-      # https://github.com/SlatherOrg/slather/blob/cbc5099cd25beb43fd978b7a3e5428f02230122d/lib/slather/command/coverage_command.rb#L24
+      # https://github.com/SlatherOrg/slather/blob/v2.4.2/lib/slather/command/coverage_command.rb
       ARGS_MAP = {
           travis: '--travis',
+          travis_pro: '--travis-pro',
           circleci: '--circleci',
           jenkins: '--jenkins',
           buildkite: '--buildkite',
@@ -161,6 +162,11 @@ Slather is available at https://github.com/SlatherOrg/slather
           FastlaneCore::ConfigItem.new(key: :travis,
                                        env_name: "FL_SLATHER_TRAVIS_ENABLED", # The name of the environment variable
                                        description: "Tell slather that it is running on TravisCI",
+                                       is_string: false,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :travis_pro,
+                                       env_name: "FL_SLATHER_TRAVIS_PRO_ENABLED", # The name of the environment variable
+                                       description: "Tell slather that it is running on TravisCI Pro",
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :circleci,
