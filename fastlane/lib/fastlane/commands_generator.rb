@@ -135,6 +135,19 @@ module Fastlane
         end
       end
 
+      command :socket_server do |c|
+        c.syntax = 'fastlane start_server'
+        c.description = 'Starts local socket server and enables only a single local connection'
+        c.action do |args, options|
+          require 'fastlane/server/socket_server'
+          require 'fastlane/server/socket_server_action_command_executor'
+          command_executor = SocketServerActionCommandExecutor.new
+          server = Fastlane::SocketServer.new(command_executor: command_executor)
+          result = server.start
+          UI.success "Result: #{result}" if result
+        end
+      end
+
       command :lanes do |c|
         c.syntax = 'fastlane lanes'
         c.description = 'Lists all available lanes and shows their description'
