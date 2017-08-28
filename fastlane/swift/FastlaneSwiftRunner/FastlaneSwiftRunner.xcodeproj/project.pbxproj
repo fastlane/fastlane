@@ -1,0 +1,291 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B33BAF791F52152A0001A751 /* CommandFileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF711F52152A0001A751 /* CommandFileProtocol.swift */; };
+		B33BAF7A1F52152A0001A751 /* EnvironmentVariables.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF721F52152A0001A751 /* EnvironmentVariables.swift */; };
+		B33BAF7B1F52152A0001A751 /* Fastlane.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF731F52152A0001A751 /* Fastlane.swift */; };
+		B33BAF7C1F52152A0001A751 /* RubyCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF741F52152A0001A751 /* RubyCommand.swift */; };
+		B33BAF7D1F52152A0001A751 /* Runner.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF751F52152A0001A751 /* Runner.swift */; };
+		B33BAF7E1F52152A0001A751 /* SocketClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF761F52152A0001A751 /* SocketClient.swift */; };
+		B33BAF7F1F52152A0001A751 /* SocketClientDelegateProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF771F52152A0001A751 /* SocketClientDelegateProtocol.swift */; };
+		B33BAF801F52152A0001A751 /* SocketResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF781F52152A0001A751 /* SocketResponse.swift */; };
+		B33BAF821F530CE90001A751 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF811F530CE90001A751 /* main.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B33BAF551F51F8D90001A751 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		B33BAF571F51F8D90001A751 /* FastlaneSwiftRunner */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FastlaneSwiftRunner; sourceTree = BUILT_PRODUCTS_DIR; };
+		B33BAF711F52152A0001A751 /* CommandFileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CommandFileProtocol.swift; path = ../../CommandFileProtocol.swift; sourceTree = "<group>"; };
+		B33BAF721F52152A0001A751 /* EnvironmentVariables.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EnvironmentVariables.swift; path = ../../EnvironmentVariables.swift; sourceTree = "<group>"; };
+		B33BAF731F52152A0001A751 /* Fastlane.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Fastlane.swift; path = ../../Fastlane.swift; sourceTree = "<group>"; };
+		B33BAF741F52152A0001A751 /* RubyCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RubyCommand.swift; path = ../../RubyCommand.swift; sourceTree = "<group>"; };
+		B33BAF751F52152A0001A751 /* Runner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Runner.swift; path = ../../Runner.swift; sourceTree = "<group>"; };
+		B33BAF761F52152A0001A751 /* SocketClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SocketClient.swift; path = ../../SocketClient.swift; sourceTree = "<group>"; };
+		B33BAF771F52152A0001A751 /* SocketClientDelegateProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SocketClientDelegateProtocol.swift; path = ../../SocketClientDelegateProtocol.swift; sourceTree = "<group>"; };
+		B33BAF781F52152A0001A751 /* SocketResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SocketResponse.swift; path = ../../SocketResponse.swift; sourceTree = "<group>"; };
+		B33BAF811F530CE90001A751 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = main.swift; path = ../../main.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B33BAF541F51F8D90001A751 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B33BAF4E1F51F8D90001A751 = {
+			isa = PBXGroup;
+			children = (
+				B33BAF591F51F8D90001A751 /* FastlaneSwiftRunner */,
+				B33BAF581F51F8D90001A751 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B33BAF581F51F8D90001A751 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B33BAF571F51F8D90001A751 /* FastlaneSwiftRunner */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B33BAF591F51F8D90001A751 /* FastlaneSwiftRunner */ = {
+			isa = PBXGroup;
+			children = (
+				B33BAF711F52152A0001A751 /* CommandFileProtocol.swift */,
+				B33BAF721F52152A0001A751 /* EnvironmentVariables.swift */,
+				B33BAF731F52152A0001A751 /* Fastlane.swift */,
+				B33BAF741F52152A0001A751 /* RubyCommand.swift */,
+				B33BAF751F52152A0001A751 /* Runner.swift */,
+				B33BAF761F52152A0001A751 /* SocketClient.swift */,
+				B33BAF771F52152A0001A751 /* SocketClientDelegateProtocol.swift */,
+				B33BAF781F52152A0001A751 /* SocketResponse.swift */,
+				B33BAF811F530CE90001A751 /* main.swift */,
+			);
+			path = FastlaneSwiftRunner;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B33BAF561F51F8D90001A751 /* FastlaneSwiftRunner */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B33BAF5E1F51F8D90001A751 /* Build configuration list for PBXNativeTarget "FastlaneSwiftRunner" */;
+			buildPhases = (
+				B33BAF531F51F8D90001A751 /* Sources */,
+				B33BAF541F51F8D90001A751 /* Frameworks */,
+				B33BAF551F51F8D90001A751 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FastlaneSwiftRunner;
+			productName = FastlaneSwiftRunner;
+			productReference = B33BAF571F51F8D90001A751 /* FastlaneSwiftRunner */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B33BAF4F1F51F8D90001A751 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0830;
+				LastUpgradeCheck = 0830;
+				ORGANIZATIONNAME = "Joshua Liebowitz";
+				TargetAttributes = {
+					B33BAF561F51F8D90001A751 = {
+						CreatedOnToolsVersion = 8.3.3;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = B33BAF521F51F8D90001A751 /* Build configuration list for PBXProject "FastlaneSwiftRunner" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = B33BAF4E1F51F8D90001A751;
+			productRefGroup = B33BAF581F51F8D90001A751 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B33BAF561F51F8D90001A751 /* FastlaneSwiftRunner */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B33BAF531F51F8D90001A751 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B33BAF7C1F52152A0001A751 /* RubyCommand.swift in Sources */,
+				B33BAF7F1F52152A0001A751 /* SocketClientDelegateProtocol.swift in Sources */,
+				B33BAF821F530CE90001A751 /* main.swift in Sources */,
+				B33BAF791F52152A0001A751 /* CommandFileProtocol.swift in Sources */,
+				B33BAF7E1F52152A0001A751 /* SocketClient.swift in Sources */,
+				B33BAF7D1F52152A0001A751 /* Runner.swift in Sources */,
+				B33BAF801F52152A0001A751 /* SocketResponse.swift in Sources */,
+				B33BAF7A1F52152A0001A751 /* EnvironmentVariables.swift in Sources */,
+				B33BAF7B1F52152A0001A751 /* Fastlane.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		B33BAF5C1F51F8D90001A751 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		B33BAF5D1F51F8D90001A751 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		B33BAF5F1F51F8D90001A751 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		B33BAF601F51F8D90001A751 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B33BAF521F51F8D90001A751 /* Build configuration list for PBXProject "FastlaneSwiftRunner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B33BAF5C1F51F8D90001A751 /* Debug */,
+				B33BAF5D1F51F8D90001A751 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B33BAF5E1F51F8D90001A751 /* Build configuration list for PBXNativeTarget "FastlaneSwiftRunner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B33BAF5F1F51F8D90001A751 /* Debug */,
+				B33BAF601F51F8D90001A751 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B33BAF4F1F51F8D90001A751 /* Project object */;
+}
