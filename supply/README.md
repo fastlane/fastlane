@@ -188,6 +188,14 @@ This can be done using the `--track_promote_to` parameter.  The `--track_promote
 
 Before performing a new APK upload you may want to check existing track version codes, or you may simply want to provide an informational lane that displays the currently promoted version codes for the production track. You can use the `google_play_track_version_codes` action to retrieve existing version codes for a package and track. For more information, see `fastlane action google_play_track_version_codes` help output.
 
+## Limitations
+
+Please note these limitations of `supply` at the current time:
+
+* `supply` doesn't support the creation of new apps (as `produce` does for iOS). You have to do the initial creation of new apps manually.
+* It also doesn't support all metadata fields available for apps in the Google Play Console. For example "Content Rating", "Application Type" or "Category" are not down- or uploaded and have to be set manually.
+
+
 ## Tips
 
 ### [`fastlane`](https://fastlane.tools) Toolchain
