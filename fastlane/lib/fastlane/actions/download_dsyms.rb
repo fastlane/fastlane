@@ -24,8 +24,9 @@ module Fastlane
         version = params[:version]
         build_number = params[:build_number]
         platform = params[:platform]
-        save_directory = params[:save_directory]
+        output_directory = params[:output_directory]
 
+        latest_version = nil # If this is set, use this instead of looping through apps
         # Set version if it is latest
         if version == 'latest'
           # Try to grab the live version first, else fallback to edit version
@@ -34,9 +35,9 @@ module Fastlane
           build_number = latest_version.build_version
         end
 
-        # Make sure save_directory has a slash on the end
-        if save_directory && !save_directory.end_with?('/')
-          save_directory += '/'
+        # Make sure output_directory has a slash on the end
+        if output_directory && !output_directory.end_with?('/')
+          output_directory += '/'
         end
 
         # Write a nice message
@@ -51,6 +52,9 @@ module Fastlane
         end
 
         UI.message(message.join(" "))
+
+        appsToLoop = [latest_version]
+        unless latest_version
 
         # Loop through all app versions and download their dSYM
         app.all_build_train_numbers(platform: platform).each do |train_number|
@@ -71,8 +75,8 @@ module Fastlane
             if download_url
               result = self.download download_url
               file_name = "#{app.bundle_id}-#{train_number}-#{build.build_version}.dSYM.zip"
-              if save_directory
-                file_name = save_directory + file_name
+              if output_directory
+                file_name = output_directory + file_name
               end
               File.write(file_name, result)
               UI.success("🔑  Successfully downloaded dSYM file for #{train_number} - #{build.build_version} to '#{file_name}'")
@@ -170,9 +174,9 @@ module Fastlane
                                        env_name: "DOWNLOAD_DSYMS_BUILD_NUMBER",
                                        description: "The app build_number for dSYMs you wish to download",
                                        optional: true),
-          FastlaneCore::ConfigItem.new(key: :save_directory,
+          FastlaneCore::ConfigItem.new(key: :output_directory,
                                        short_option: "-s",
-                                       env_name: "DOWNLOAD_DSYMS_SAVE_DIRECTORY",
+                                       env_name: "DOWNLOAD_DSYMS_OUTPUT_DIRECTORY",
                                        description: "Where to save the download dSYMs, defaults to the current path",
                                        optional: true)
         ]
