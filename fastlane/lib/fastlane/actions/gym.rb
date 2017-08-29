@@ -97,6 +97,10 @@ module Fastlane
         "The absolute path to the generated ipa file"
       end
 
+      def self.return_type
+        :string
+      end
+
       def self.author
         "KrauseFx"
       end

@@ -18,6 +18,14 @@ module Fastlane
       :deprecated # This should be the last item
     ]
 
+    RETURN_TYPES = [
+      :string,
+      :array_of_strings,
+      :hash_of_strings,
+      :bool,
+      :int
+    ]
+
     class << self
       attr_accessor :runner
     end
@@ -48,6 +56,11 @@ module Fastlane
       # [
       #   ['IPA_OUTPUT_PATH', 'The path to the newly generated ipa file']
       # ]
+      nil
+    end
+
+    def self.return_type
+      # Describes what type of data is expected to be returned, see RETURN_TYPES
       nil
     end
 

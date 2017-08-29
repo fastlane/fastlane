@@ -27,6 +27,10 @@ module Fastlane
         return "true if precheck passes, else, false"
       end
 
+      def self.return_type
+        :bool
+      end
+
       def self.authors
         ["taquitos"]
       end
