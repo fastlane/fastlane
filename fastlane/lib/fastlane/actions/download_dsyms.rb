@@ -26,7 +26,6 @@ module Fastlane
         platform = params[:platform]
         output_directory = params[:output_directory]
 
-        latest_version = nil # If this is set, use this instead of looping through apps
         # Set version if it is latest
         if version == 'latest'
           # Try to grab the live version first, else fallback to edit version
@@ -43,18 +42,9 @@ module Fastlane
         # Write a nice message
         message = []
         message << "Looking for dSYM files for #{params[:app_identifier]}"
-        if version
-          message << "v#{version}"
-        end
-
-        if build_number
-          message << "(#{build_number})"
-        end
-
+        message << "v#{version}" if version
+        message << "(#{build_number})" if build_number
         UI.message(message.join(" "))
-
-        appsToLoop = [latest_version]
-        unless latest_version
 
         # Loop through all app versions and download their dSYM
         app.all_build_train_numbers(platform: platform).each do |train_number|
