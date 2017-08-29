@@ -24,6 +24,10 @@ module Fastlane
         []
       end
 
+      def self.return_type
+        :bool
+      end
+
       def self.authors
         ["KrauseFx"]
       end
