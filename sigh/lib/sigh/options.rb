@@ -121,6 +121,16 @@ module Sigh
                                        value = value.to_s
                                        pt = %w(macos tvos ios)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :readonly,
+                                     env_name: "SIGH_READONLY",
+                                     description: "Only fetch existing profile, don't generate new ones",
+                                     optional: true,
+                                     is_string: false,
+                                     default_value: false,
+                                     conflicting_options: [:force],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't enable both :force and :readonly")
                                      end)
       ]
     end
