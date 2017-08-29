@@ -70,10 +70,10 @@ module Deliver
 
     def collect_screenshots(options)
       return [] if options[:skip_screenshots]
-      return collect_screenshots_for_languages(options[:screenshots_path])
+      return collect_screenshots_for_languages(options[:screenshots_path], options[:ignore_language_directory_validation])
     end
 
-    def collect_screenshots_for_languages(path)
+    def collect_screenshots_for_languages(path, ignore_validation)
       screenshots = []
       extensions = '{png,jpg,jpeg}'
 
@@ -81,7 +81,6 @@ module Deliver
         lang_hash[lang.downcase] = lang
       end
 
-      ignore_validation = options[:ignore_language_directory_validation]
       Loader.language_folders(path, ignore_validation).each do |lng_folder|
         language = File.basename(lng_folder)
 
