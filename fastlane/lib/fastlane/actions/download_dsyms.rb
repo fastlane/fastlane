@@ -14,26 +14,39 @@ module Fastlane
         Spaceship::Tunes.select_team
         UI.message("Login successful")
 
-        version = params[:version]
-        build_number = params[:build_number]
-        platform = params[:platform]
-
-        message = []
-        message << "Looking for dSYM files for #{params[:app_identifier]}"
-        if version
-          message << "v#{version}"
-        end
-
-        if build_number
-          message << "(#{build_number})"
-        end
-
-        UI.message(message.join(" "))
+        # Get App
         app = Spaceship::Application.find(params[:app_identifier])
         unless app
           UI.user_error!("Could not find app with bundle identifier '#{params[:app_identifier]}' on account #{params[:username]}")
         end
 
+        # Process options
+        version = params[:version]
+        build_number = params[:build_number]
+        platform = params[:platform]
+        output_directory = params[:output_directory]
+
+        # Set version if it is latest
+        if version == 'latest'
+          # Try to grab the live version first, else fallback to edit version
+          latest_version = app.live_version(platform: platform) || app.edit_version(platform: platform)
+          version = latest_version.version
+          build_number = latest_version.build_version
+        end
+
+        # Make sure output_directory has a slash on the end
+        if output_directory && !output_directory.end_with?('/')
+          output_directory += '/'
+        end
+
+        # Write a nice message
+        message = []
+        message << "Looking for dSYM files for #{params[:app_identifier]}"
+        message << "v#{version}" if version
+        message << "(#{build_number})" if build_number
+        UI.message(message.join(" "))
+
+        # Loop through all app versions and download their dSYM
         app.all_build_train_numbers(platform: platform).each do |train_number|
           if version && version != train_number
             next
@@ -52,6 +65,9 @@ module Fastlane
             if download_url
               result = self.download download_url
               file_name = "#{app.bundle_id}-#{train_number}-#{build.build_version}.dSYM.zip"
+              if output_directory
+                file_name = output_directory + file_name
+              end
               File.write(file_name, result)
               UI.success("🔑  Successfully downloaded dSYM file for #{train_number} - #{build.build_version} to '#{file_name}'")
 
@@ -141,12 +157,17 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        short_option: "-v",
                                        env_name: "DOWNLOAD_DSYMS_VERSION",
-                                       description: "The app version for dSYMs you wish to download",
+                                       description: "The app version for dSYMs you wish to download, pass in 'latest' to download only the latest build's dSYMs",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :build_number,
                                        short_option: "-b",
                                        env_name: "DOWNLOAD_DSYMS_BUILD_NUMBER",
                                        description: "The app build_number for dSYMs you wish to download",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :output_directory,
+                                       short_option: "-s",
+                                       env_name: "DOWNLOAD_DSYMS_OUTPUT_DIRECTORY",
+                                       description: "Where to save the download dSYMs, defaults to the current path",
                                        optional: true)
         ]
       end
