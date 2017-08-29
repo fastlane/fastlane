@@ -64,6 +64,10 @@ module Fastlane
         "The output of the adb command"
       end
 
+      def self.return_type
+        :string
+      end
+
       def self.authors
         ["hjanuschka"]
       end
