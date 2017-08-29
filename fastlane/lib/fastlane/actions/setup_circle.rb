@@ -27,7 +27,6 @@ module Fastlane
         circle_artifacts = ENV["CIRCLE_ARTIFACTS"]
 
         UI.message("Setting ouput directory for actions to Circle artifacts directory '#{circle_artifacts}'")
-        ENV["XCPRETTY_REPORT_HTML"] = circle_artifacts
         ENV["SCAN_OUTPUT_DIRECTORY"] = circle_artifacts
         ENV["BACKUP_XCARCHIVE_DESTINATION"] = circle_artifacts
         ENV["GYM_OUTPUT_DIRECTORY"] = circle_artifacts
