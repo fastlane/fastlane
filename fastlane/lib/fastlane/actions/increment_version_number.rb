@@ -116,6 +116,10 @@ module Fastlane
         ]
       end
 
+      def self.return_type
+        :string
+      end
+
       def self.return_value
         "The new version number"
       end

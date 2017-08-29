@@ -84,6 +84,10 @@ module Fastlane
         "The path to the output zip file"
       end
 
+      def self.return_type
+        :string
+      end
+
       def self.authors
         ["KrauseFx"]
       end

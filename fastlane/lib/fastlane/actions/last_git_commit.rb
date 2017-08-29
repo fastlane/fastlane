@@ -17,6 +17,10 @@ module Fastlane
         "Returns the following dict: {commit_hash: \"commit hash\", abbreviated_commit_hash: \"abbreviated commit hash\" author: \"Author\", message: \"commit message\"}"
       end
 
+      def self.return_type
+        :hash_of_strings
+      end
+
       def self.author
         "ngutman"
       end

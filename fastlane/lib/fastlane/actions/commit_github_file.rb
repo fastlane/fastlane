@@ -142,6 +142,10 @@ module Fastlane
         ]
       end
 
+      def self.return_type
+        :hash_of_strings
+      end
+
       def self.return_value
         [
           "A hash containing all relevant information for this commit",

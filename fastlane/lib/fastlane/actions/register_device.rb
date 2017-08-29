@@ -91,6 +91,10 @@ module Fastlane
         ]
       end
 
+      def self.return_type
+        :string
+      end
+
       def self.category
         :code_signing
       end

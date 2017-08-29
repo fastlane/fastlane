@@ -6,9 +6,9 @@ module Fastlane
     attr_accessor :param_descriptions
     attr_accessor :param_default_values
 
-    @reserved_words = %w[associativity break case catch class continue convenience default deinit didSet do else enum extension fallthrough false final for func get guard if in infix init inout internal lazy let mutating nil operator override postfix precedence prefix private public repeat required return self set static struct subscript super switch throws true try var weak where while willSet].to_set
+    @@reserved_words = %w[associativity break case catch class continue convenience default deinit didSet do else enum extension fallthrough false final for func get guard if in infix init inout internal lazy let mutating nil operator override postfix precedence prefix private public repeat required return self set static struct subscript super switch throws true try var weak where while willSet].to_set
 
-    def initialize(action_name: nil, keys: nil, key_descriptions: nil, key_default_values: nil, return_type: "Any")
+    def initialize(action_name: nil, keys: nil, key_descriptions: nil, key_default_values: nil, return_type: nil)
       @function_name = action_name
       @param_names = keys
       @param_descriptions = key_descriptions
@@ -17,17 +17,40 @@ module Fastlane
     end
 
     def sanitize_reserved_word(word: nil)
-      unless @reserved_words.include?(word)
+      unless @@reserved_words.include?(word)
         return word
       end
       return word + "🚀"
     end
 
     def return_declaration
+      expected_type = swift_type_for_return_type
+      unless expected_type.to_s.length > 0
+        return ""
+      end
+
+      return " -> #{expected_type}"
+    end
+
+    def swift_type_for_return_type
       unless @return_type
         return ""
       end
-      return " -> #{@return_type}"
+
+      case @return_type
+      when :string
+        return "String"
+      when :array_of_strings
+        return "[String]"
+      when :hash_of_strings
+        return "[String : String]"
+      when :bool
+        return "Bool"
+      when :int
+        return "Int"
+      else
+        return ""
+      end
     end
 
     def camel_case_lower(string: nil)
@@ -78,10 +101,24 @@ module Fastlane
       return argument_object_strings
     end
 
+    def return_statement
+      expected_type = swift_type_for_return_type
+
+      return_string = "_ = "
+      as_string = ""
+      if expected_type.length > 0
+        return_string = "return "
+        as_string = " as! #{expected_type}"
+
+      end
+      return "#{return_string}runner.executeCommand(command)#{as_string}"
+    end
+
     def implementation
       args = build_argument_list
+
       implm = "  let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: #{args})\n"
-      return implm + "  return runner.executeCommand(command)"
+      return implm + "  #{return_statement}"
     end
   end
 
@@ -105,7 +142,7 @@ module Fastlane
 
         file_content << swift_function.swift_code
       end
-
+      file_content << "\n" # newline because <reasons>
       file_content = file_content.join("\n")
 
       File.write(target_path, file_content)
@@ -140,7 +177,15 @@ module Fastlane
           # end
         end
       end
-      return SwiftFunction.new(action_name: action_name, keys: keys, key_descriptions: key_descriptions, key_default_values: key_default_values)
+      action_return_type = action.return_type
+
+      return SwiftFunction.new(
+        action_name: action_name,
+        keys: keys,
+        key_descriptions: key_descriptions,
+        key_default_values: key_default_values,
+        return_type: action_return_type
+      )
     end
   end
 end

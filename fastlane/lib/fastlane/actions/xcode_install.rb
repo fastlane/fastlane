@@ -76,6 +76,10 @@ module Fastlane
         "The path to the newly installed Xcode version"
       end
 
+      def self.return_type
+        :string
+      end
+
       def self.authors
         ["Krausefx"]
       end

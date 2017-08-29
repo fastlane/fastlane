@@ -134,6 +134,10 @@ module Fastlane
         "Returns a String containing your formatted git commits"
       end
 
+      def self.return_type
+        :string
+      end
+
       def self.author
         ['mfurtak', 'asfalcone', 'SiarheiFedartsou', 'allewun']
       end

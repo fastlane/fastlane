@@ -33,6 +33,10 @@ module Fastlane
         "The total number of all commits in current git branch"
       end
 
+      def self.return_type
+        :int
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :all,
