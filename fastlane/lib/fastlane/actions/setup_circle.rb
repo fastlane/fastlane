@@ -9,20 +9,20 @@ module Fastlane
         end
 
         # Create a temporary keychain
-        # password = "" # we don't need a password, as the keychain gets removed after each run anyway
-        # keychain_name = "fastlane_tmp_keychain"
-        # ENV["MATCH_KEYCHAIN_NAME"] = keychain_name
-        # ENV["MATCH_KEYCHAIN_PASSWORD"] = password
+        password = "" # we don't need a password, as the keychain gets removed after each run anyway
+        keychain_name = "fastlane_tmp_keychain"
+        ENV["MATCH_KEYCHAIN_NAME"] = keychain_name
+        ENV["MATCH_KEYCHAIN_PASSWORD"] = password
 
-        # UI.message "Creating temporary keychain: \"#{keychain_name}\"."
-        # Actions::CreateKeychainAction.run(
-        #   name: keychain_name,
-        #   default_keychain: true,
-        #   unlock: true,
-        #   timeout: 3600,
-        #   lock_when_sleeps: true,
-        #   password: password
-        # )
+        UI.message "Creating temporary keychain: \"#{keychain_name}\"."
+        Actions::CreateKeychainAction.run(
+          name: keychain_name,
+          default_keychain: true,
+          unlock: true,
+          timeout: 3600,
+          lock_when_sleeps: true,
+          password: password
+        )
 
         circle_artifacts = ENV["CIRCLE_ARTIFACTS"]
 
