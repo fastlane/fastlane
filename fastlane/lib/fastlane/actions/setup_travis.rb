@@ -3,7 +3,7 @@ module Fastlane
     class SetupTravisAction < Action
       def self.run(params)
         # Stop if not executed by CI
-        if !Helper.is_ci? && !params[:force] && ENV["TRAVIS"].to_s.length == 0
+        if !params[:force] && ENV["TRAVIS"].to_s.length == 0
           UI.message "Currently not running on Travis, skipping travis setup"
           return
         end

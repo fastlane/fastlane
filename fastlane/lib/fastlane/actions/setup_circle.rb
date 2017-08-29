@@ -3,7 +3,7 @@ module Fastlane
     class SetupCircleAction < Action
       def self.run(params)
         # Stop if not executed by CI
-        if !Helper.is_ci? && !params[:force] && ENV["CIRCLECI"].to_s.length == 0
+        if !params[:force] && ENV["CIRCLECI"].to_s.length == 0
           UI.message "Currently not running on Circle system, skipping circle setup"
           return
         end
