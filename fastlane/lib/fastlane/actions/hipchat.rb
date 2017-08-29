@@ -46,19 +46,19 @@ module Fastlane
           end
         else
           ########## running on V2 ##########
+          escaped_channel = URI.unescape(channel) == channel ? URI.escape(channel) : channel
           if user?(channel)
             params = { 'message' => message, 'message_format' => message_format }
             json_headers = { 'Content-Type' => 'application/json',
                              'Accept' => 'application/json', 'Authorization' => "Bearer #{api_token}" }
 
-            escaped_channel = URI.unescape(channel) == channel ? URI.escape(channel) : channel
             uri = URI.parse("https://#{api_host}/v2/user/#{escaped_channel}/message")
             http = Net::HTTP.new(uri.host, uri.port)
             http.use_ssl = true
 
             response = http.post(uri.path, params.to_json, json_headers)
           else
-            uri = URI.parse("https://#{api_host}/v2/room/#{channel}/notification")
+            uri = URI.parse("https://#{api_host}/v2/room/#{escaped_channel}/notification")
             response = Net::HTTP.post_form(uri, { 'from' => from,
                                                   'auth_token' => api_token,
                                                   'color' => color,
