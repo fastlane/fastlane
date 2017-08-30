@@ -46,6 +46,7 @@ module Fastlane
     def generate!(target_path: nil)
       require 'yaml'
       docs_dir = File.join(target_path, "docs")
+      custom_action_docs = "lib/fastlane/actions/docs/"
 
       # Generate actions.md
       template = File.join(Fastlane::ROOT, "lib/assets/Actions.md.erb")
@@ -56,6 +57,13 @@ module Fastlane
       all_actions_ref_yml = []
       FileUtils.mkdir_p(File.join(docs_dir, "actions"))
       ActionsList.all_actions do |action|
+        # check if there is a custom detail view in markdown available in the fastlane code base
+        custom_file_location = File.join(Fastlane::ROOT, custom_action_docs, "#{action.action_name}.md")
+        if File.exist?(custom_file_location)
+          UI.verbose("Using custom md file for action #{action.action_name}")
+          @custom_content = File.read(custom_file_location)
+        end
+
         template = File.join(Fastlane::ROOT, "lib/assets/ActionDetails.md.erb")
         @action = action # to provide a reference in the .html.erb template
         result = ERB.new(File.read(template), 0, '-').result(binding) # http://www.rrn.dk/rubys-erb-templating-system
@@ -73,6 +81,12 @@ module Fastlane
       hidden_actions_array = mkdocs_yml["pages"].find { |p| !p["_Actions"].nil? }
       hidden_actions_array["_Actions"] = all_actions_ref_yml
       File.write(mkdocs_yml_path, mkdocs_yml.to_yaml)
+
+      # Copy over the assets from the `actions/docs/assets` directory
+      Dir[File.join(custom_action_docs, "assets", "*")].each do |current_asset_path|
+        UI.message("Copying asset #{current_asset_path}")
+        FileUtils.cp(current_asset_path, File.join(docs_dir, "img", "actions", File.basename(current_asset_path)))
+      end
 
       UI.success("Generated new docs on path #{target_path}")
     end
