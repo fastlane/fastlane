@@ -13,7 +13,7 @@ describe Pilot::TesterManager do
           email: 'my@email.addr',
           groups: ['testers'],
           devices: ["d"],
-          full_version: '1.0 (21)',
+          latest_build: '1.0 (21)',
           pretty_install_date: '2016-01-01',
           something_else: 'blah'
         ),
@@ -23,7 +23,7 @@ describe Pilot::TesterManager do
           email: 'fabric-devtools@gmail.com',
           groups: ['testers'],
           devices: ["d", "d2"],
-          full_version: '1.1 (22)',
+          latest_build: '1.1 (22)',
           pretty_install_date: '2016-02-02',
           something_else: 'blah'
         )
@@ -128,7 +128,7 @@ describe Pilot::TesterManager do
             tester.email,
             tester.group_names,
             tester.devices.count,
-            tester.full_version,
+            tester.latest_build,
             tester.pretty_install_date
           ]
         end
