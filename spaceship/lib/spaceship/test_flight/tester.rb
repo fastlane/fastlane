@@ -68,7 +68,7 @@ module Spaceship::TestFlight
 
     class << self
       def factory(attrs)
-        attrs['statusModTime'] = Time.parse(attrs['statusModTime'])
+        attrs['statusModTime'] = Time.parse(attrs['statusModTime']) if attrs['statusModTime'].to_s.length > 0
         return self.new(attrs)
       end
     end
