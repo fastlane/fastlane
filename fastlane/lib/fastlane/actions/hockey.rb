@@ -46,6 +46,7 @@ module Fastlane
         end
 
         connection.post do |req|
+          req.options.timeout = options.delete(:timeout)
           if options[:public_identifier].nil?
             req.url("/api/2/apps/upload")
           else
@@ -100,6 +101,7 @@ module Fastlane
         end
 
         connection.put do |req|
+          req.options.timeout = options.delete(:timeout)
           req.url("/api/2/apps/#{app_id}/app_versions/#{app_version_id}")
           req.headers['X-HockeyAppToken'] = api_token
           req.body = options
@@ -301,6 +303,11 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Invalid value '#{value}' for key 'strategy'. Allowed values are 'add', 'replace'.") unless ['add', 'replace'].include?(value)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :timeout,
+                                      env_name: "FL_HOCKEY_TIMEOUT",
+                                      description: "Request timeout in seconds",
+                                      is_string: false,
+                                      optional: true),
           FastlaneCore::ConfigItem.new(key: :bypass_cdn,
                                       env_name: "FL_HOCKEY_BYPASS_CDN",
                                       description: "Flag to bypass Hockey CDN when it uploads successfully but reports error",
