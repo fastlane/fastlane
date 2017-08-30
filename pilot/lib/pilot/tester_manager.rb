@@ -204,7 +204,7 @@ module Pilot
           tester.email,
           tester.groups_list,
           tester.devices.count,
-          tester.full_version,
+          tester.latest_build,
           tester.pretty_install_date
         ]
       end
@@ -249,7 +249,7 @@ module Pilot
       end
 
       if tester.latest_install_date
-        rows << ["Latest Version", tester.full_version]
+        rows << ["Latest Version", tester.latest_build]
         rows << ["Latest Install Date", tester.pretty_install_date]
       end
 
