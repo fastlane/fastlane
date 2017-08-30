@@ -31,30 +31,6 @@ module Spaceship
       #    }]
       attr_accessor :groups
 
-      # @return (String)
-      # @example
-      #   "invited"
-      #   "installed"
-      #
-      attr_accessor :status
-
-      # @return (Integer) Date of the last modification of the status (e.g. invite sent)
-      attr_accessor :status_mod_time
-
-      # @return (Hash)
-      # @example
-      # {
-      #  "latestInstalledAppAdamId": "1222374686",
-      #  "latestInstalledBuildId": "20739770",
-      #  "latestInstalledDate": "1496866405755",
-      #  "latestInstalledShortVersion": "1.0",
-      #  "latestInstalledVersion": "68"
-      # }
-      attr_accessor :latest_install_info
-
-      # @return (Integer) Number of sessions
-      attr_accessor :session_count
-
       # @return (Array) An array of registered devices for this user
       # @example
       #    [{
@@ -89,11 +65,7 @@ module Spaceship
         'latestInstalledAppAdamId' => :latest_install_app_id,
         'latestInstalledDate' => :latest_install_date,
         'latestInstalledVersion' => :latest_installed_version_number,
-        'latestInstalledShortVersion' => :latest_installed_build_number,
-        'status' => :status,
-        'statusModTime' => :status_mod_time,
-        'latestInstallInfo' => :latest_install_info,
-        'sessionCount' => :session_count
+        'latestInstalledShortVersion' => :latest_installed_build_number
       )
 
       class << self
