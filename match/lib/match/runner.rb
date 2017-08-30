@@ -71,6 +71,51 @@ module Match
       GitHelper.clear_changes
     end
 
+    def import_certificate(args, params)
+      UI.user_error!("It's not allowed to import your certificate because you enabled `readonly` option.") if params[:readonly]
+      UI.warning("Enterprise profiles are currently not officially supported in _match_, you might run into issues") if params[:type] == "enterprise"
+
+      params[:import_certificate] = args[0] if params[:import_certificate].nil?
+      UI.user_error!("Missing path to the certificate to import") if params[:import_certificate].nil?
+
+      params[:import_certificate_password] = args[1] if params[:import_certificate_password].nil?
+      UI.warning "PKCS12 password not specified, assume ''" if params[:import_certificate_password].nil?
+
+      params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch])
+      self.spaceship = SpaceshipEnsure.new(params[:username])
+
+      # Load certificate
+      UI.message "Loading certificate to import..."
+      p12 = Utils.load_pkcs12_file(params[:import_certificate], params[:import_certificate_password])
+
+      # Lookup associated certificate in the Apple Develope Portal.
+      certificate_from_portal = spaceship.matching_certificate(p12.certificate)
+
+      # Write certificate to the repository.
+      cert_type = Match.cert_type_sym_from_cert(certificate_from_portal)
+      cert_path = Utils.cert_path(params[:workspace], cert_type, certificate_from_portal.id)
+      key_path = Utils.key_path(params[:workspace], cert_type, certificate_from_portal.id)
+
+      UI.message "Importing certificate to the repository..."
+
+      dir = File.dirname(cert_path)
+      FileUtils.mkdir_p(dir) unless File.directory?(dir)
+
+      File.write(cert_path, p12.certificate.to_der)
+      File.write(key_path, p12.key.to_pem)
+
+      # Install certificates
+      UI.message "Installing certificate..."
+      Utils.import(cert_path, params[:keychain_name])
+      Utils.import(key_path, params[:keychain_name])
+
+      # Done
+      message = GitHelper.generate_commit_message(params)
+      GitHelper.commit_changes(params[:workspace], message, params[:git_url], params[:git_branch])
+
+      UI.success "Your certificate has been successfully imported and installed 🙌".green
+    end
+
     def fetch_certificate(params: nil)
       cert_type = Match.cert_type_sym(params[:type])
 

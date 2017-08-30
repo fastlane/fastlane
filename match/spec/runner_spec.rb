@@ -90,5 +90,43 @@ describe Match do
       expect(ENV[Match::Utils.environment_variable_name_profile_path(app_identifier: "tools.fastlane.app",
                                                                      type: "appstore")]).to eql(profile_path)
     end
+
+    it "imports a p12 certificate" do
+      git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+      values = {
+        app_identifier: "tools.fastlane.app",
+        type: "development",
+        git_url: git_url,
+        shallow_clone: true
+      }
+
+      config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+      repo_dir = File.expand_path("../fixtures/existing", __FILE__)
+      imported_cert_path = File.expand_path("../fixtures/existing/certs/development/SELF_SIGNED_ID.cer", __FILE__)
+      imported_key_path = File.expand_path("../fixtures/existing/certs/development/SELF_SIGNED_ID.p12", __FILE__)
+      keychain = "login.keychain"
+
+      import_certificate = File.expand_path("../fixtures/existing-self-signed-for-import.p12", __FILE__)
+      import_password = 'fastlane'
+      p12 = OpenSSL::PKCS12.new(File.read(import_certificate), import_password)
+      found = OpenStruct.new(id: 'SELF_SIGNED_ID')
+
+      expect(Match::GitHelper).to receive(:clone).with(git_url, true, skip_docs: false, branch: "master").and_return(repo_dir)
+
+      spaceship = "spaceship"
+      expect(Match::Utils).to receive(:load_pkcs12_file).with(import_certificate, import_password).and_return(p12)
+      expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
+      expect(spaceship).to receive(:matching_certificate).with(p12.certificate).and_return(found)
+      expect(Match).to receive(:cert_type_sym_from_cert).with(found).and_return(:development)
+
+      expect(File).to receive(:write).with(imported_cert_path, p12.certificate.to_der)
+      expect(File).to receive(:write).with(imported_key_path, p12.key.to_pem)
+
+      expect(Match::Utils).to receive(:import).with(imported_key_path, keychain)
+      expect(Match::Utils).to receive(:import).with(imported_cert_path, keychain)
+
+      expect(Match::GitHelper).to receive(:commit_changes)
+      Match::Runner.new.import_certificate([import_certificate, import_password], config)
+    end
   end
 end

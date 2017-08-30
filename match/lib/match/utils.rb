@@ -63,5 +63,26 @@ module Match
         ["sigh", app_identifier, type, platform.to_s]
       end
     end
+
+    # Load a P12 certificate file as OpenSSL:PKCS12 object.
+    def self.load_pkcs12_file(path, password = "")
+      UI.user_error!("Certificate #{path} couldn't be found") unless File.exist?(path)
+
+      begin
+        OpenSSL::PKCS12.new(File.read(path), password)
+      rescue OpenSSL::PKCS12::PKCS12Error
+        UI.user_error!("The certificate password is either incorrect or missing")
+      rescue StandardError => e
+        UI.crash!("Certificate #{path} couldn't be loaded: #{e.message}")
+      end
+    end
+
+    def self.cert_path(workspace, cert_type, filename)
+      File.join(workspace, "certs", cert_type.to_s, "#{filename}.cer")
+    end
+
+    def self.key_path(workspace, cert_type, filename)
+      File.join(workspace, "certs", cert_type.to_s, "#{filename}.p12")
+    end
   end
 end

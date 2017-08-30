@@ -143,7 +143,17 @@ module Match
                                        value = value.to_s
                                        pt = %w(tvos ios)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :import_certificate,
+                                     env_name: "MATCH_IMPORT_CERTIFICATE",
+                                     description: "Path to the certificate to import",
+                                     optional: true,
+                                     is_string: true),
+        FastlaneCore::ConfigItem.new(key: :import_certificate_password,
+                                     env_name: "MATCH_IMPORT_CERTIFICATE_PASSWORD",
+                                     description: "The password for the certificate to import",
+                                     optional: true,
+                                     is_string: true)
       ]
     end
   end

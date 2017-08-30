@@ -50,6 +50,20 @@ module Match
       UI.user_error!("To reset the certificates of your Apple account, you can use the `fastlane match nuke` feature, more information on https://github.com/fastlane/fastlane/tree/master/match")
     end
 
+    def matching_certificate(sample_cert)
+      UI.message "Looking up availabe code signing certificates in the Apple Developer Portal..."
+
+      found = Spaceship.certificate.all.find do |cert|
+        next unless (cert.expires == sample_cert.not_after) && cert.can_download
+        UI.message "Found similar cert '#{cert.name}' [#{cert.id}/#{cert.type_display_id}]"
+        downloaded_cert = cert.download
+        (downloaded_cert.issuer == sample_cert.issuer) && (downloaded_cert.serial == sample_cert.serial)
+      end
+
+      return found if found
+      UI.user_error!("We could not find a matching certificate in the Apple Developer Portal")
+    end
+
     def profile_exists(username: nil, uuid: nil)
       found = Spaceship.provisioning_profile.all.find do |profile|
         profile.uuid == uuid
