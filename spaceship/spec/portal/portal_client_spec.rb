@@ -254,6 +254,13 @@ describe Spaceship::Client do
         expect(response.keys).to include('name', 'status', 'type', 'appId', 'deviceIds')
         expect(response['distributionMethod']).to eq('limited')
       end
+
+      it "works when template name is specified" do
+        template_name = 'Subscription Service iOS (dist)'
+        response = subject.create_provisioning_profile!("net.sunapps.106 limited", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], [], mac: false, sub_platform: nil, template_name: template_name)
+        expect(response.keys).to include('name', 'status', 'type', 'appId', 'deviceIds', 'template')
+        expect(response['template']['purposeDisplayName']).to eq(template_name)
+      end
     end
 
     describe '#delete_provisioning_profile!' do
