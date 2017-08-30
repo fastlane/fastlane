@@ -143,7 +143,12 @@ module Match
                                        value = value.to_s
                                        pt = %w(tvos ios)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :template,
+                                     env_name: "MATCH_TEMPLATE",
+                                     description: "The value of the entitlement that is used on the Apple Developer Portal",
+                                     optional: true,
+                                     default_value: nil)
       ]
     end
   end

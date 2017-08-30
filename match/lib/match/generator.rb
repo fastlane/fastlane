@@ -61,6 +61,7 @@ module Match
       values[:platform] = params[:platform]
       values[:adhoc] = true if prov_type == :adhoc
       values[:development] = true if prov_type == :development
+      values[:template] = params[:template] if params[:template]
 
       arguments = FastlaneCore::Configuration.create(Sigh::Options.available_options, values)
 
