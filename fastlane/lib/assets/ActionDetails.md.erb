@@ -12,6 +12,7 @@
 -----|----
 Supported platforms | <%= [:ios, :android, :mac].find_all { |a| action.is_supported?(a) }.join(", ") %>
 Author | @<%= Array(action.author || action.authors).join(", @") %>
+Category | <%= action.category %>
 <%- unless action.return_value.to_s.empty? -%>
 Returns | <%= action.return_value %>
 <%- end -%>
@@ -40,3 +41,5 @@ Key | Description
 <%- end %>
 
 <% end %><%# End of action.available_options... %>
+
+<a href="/actions"><b>Back to actions</b></a>
