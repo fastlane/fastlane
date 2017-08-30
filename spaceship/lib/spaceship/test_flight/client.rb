@@ -100,9 +100,20 @@ module Spaceship::TestFlight
 
     def testers_for_app(app_id: nil)
       assert_required_params(__method__, binding)
-      url = "providers/#{team_id}/apps/#{app_id}/testers?limit=10000"
-      response = request(:get, url)
-      handle_response(response)
+      page_size = 40 # that's enforced by the iTC servers
+      offset = nil
+      resulting_array = []
+
+      loop do
+        url = "providers/#{team_id}/apps/#{app_id}/testers?limit=#{page_size}&sort=status&order=asc"
+        url += "&offset=#{offset}" if offset
+        response = request(:get, url)
+        result = handle_response(response)
+        resulting_array += result
+        break if result.count == 0
+        offset = "invited%2C#{result.last['id']}"
+      end
+      return resulting_array
     end
 
     def delete_tester_from_app(app_id: nil, tester_id: nil)
