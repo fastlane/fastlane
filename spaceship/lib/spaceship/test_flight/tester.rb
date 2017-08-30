@@ -57,13 +57,20 @@ module Spaceship::TestFlight
 
     # @return (Array) Returns all beta testers available for this account
     def self.all(app_id: nil)
-      client.testers_for_app(app_id: app_id).map { |data| self.new(data) }
+      client.testers_for_app(app_id: app_id).map { |data| self.factory(data) }
     end
 
     # *DEPRECATED: Use `Spaceship::TestFlight::Tester.search` method instead*
     def self.find(app_id: nil, email: nil)
       testers = self.search(app_id: app_id, text: email, is_email_exact_match: true)
       return testers.first
+    end
+
+    class << self
+      def factory(attrs)
+        attrs['statusModTime'] = Time.parse(attrs['statusModTime'])
+        return self.new(attrs)
+      end
     end
 
     # @return (Spaceship::TestFlight::Tester) Returns the testers matching the parameter.
