@@ -1105,7 +1105,6 @@ module Spaceship
     def testers_by_app(tester, app_id)
       url = tester.url(app_id)[:index_by_app]
       r = request(:get, url)
-      require 'pry'; binding.pry
       parse_response(r, 'data')['users']
     end
 
