@@ -3,7 +3,9 @@ module Snapshot
   class Update
     # @return [Array] A list of helper files (usually just one)
     def self.find_helper
-      Dir["./**/SnapshotHelper.swift"] + Dir["./**/SnapshotHelperXcode8.swift"]
+      paths = Dir["./**/SnapshotHelper.swift"] + Dir["./**/SnapshotHelperXcode8.swift"]
+      # exclude assets in gym
+      paths.reject { |p| p.include?("snapshot/lib/assets/") }
     end
 
     def update
