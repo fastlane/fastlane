@@ -1,10 +1,10 @@
 module Fastlane
   module Actions
-    class SetupTravisAction < Action
+    class SetupCircleAction < Action
       def self.run(params)
         # Stop if not executed by CI
-        if !params[:force] && ENV["TRAVIS"].to_s.length == 0
-          UI.message "Currently not running on Travis, skipping travis setup"
+        if !params[:force] && ENV["CIRCLECI"].to_s.length == 0
+          UI.message "Currently not running on Circle system, skipping circle setup"
           return
         end
 
@@ -24,10 +24,18 @@ module Fastlane
           password: password
         )
 
+        circle_artifacts = ENV["CIRCLE_ARTIFACTS"]
+
+        UI.message("Setting ouput directory for actions to Circle artifacts directory '#{circle_artifacts}'")
+        ENV["SCAN_OUTPUT_DIRECTORY"] = circle_artifacts
+        ENV["BACKUP_XCARCHIVE_DESTINATION"] = circle_artifacts
+        ENV["GYM_OUTPUT_DIRECTORY"] = circle_artifacts
+        ENV["GYM_BUILD_PATH"] = circle_artifacts
+
         # Enable readonly mode for match by default
         # we don't want to generate new identities and
-        # profiles on Travis usually
-        UI.message("Enabling readonly mode for Travis")
+        # profiles on Circle usually
+        UI.message("Enabling readonly mode for Circle")
         ENV["MATCH_READONLY"] = true.to_s
       end
 
@@ -36,23 +44,22 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Setup the keychain and match to work with Travis CI"
+        "Setup match to work better with CircleCI"
       end
 
       def self.details
         [
-          "- Creates a new temporary keychain for use with match",
           "- Switches match to `readonly` mode to not create new profiles/cert on CI",
           "",
-          "This action helps with Travis integration, add this to the top of your Fastfile if you use Travis"
+          "This action helps with Circle integration, add this to the top of your Fastfile if you use Circle"
         ].join("\n")
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :force,
-                                       env_name: "FL_SETUP_TRAVIS_FORCE",
-                                       description: "Force setup, even if not executed by travis",
+                                       env_name: "FL_SETUP_CIRCLE_FORCE",
+                                       description: "Force setup, even if not executed by circle",
                                        is_string: false,
                                        default_value: false)
         ]
@@ -68,7 +75,7 @@ module Fastlane
 
       def self.example_code
         [
-          'setup_travis'
+          'setup_circle'
         ]
       end
 
