@@ -105,13 +105,13 @@ module Spaceship::TestFlight
       resulting_array = []
 
       loop do
-        url = "providers/#{team_id}/apps/#{app_id}/testers?limit=#{page_size}&sort=status&order=asc"
+        url = "providers/#{team_id}/apps/#{app_id}/testers?limit=#{page_size}&sort=email&order=asc"
         url += "&offset=#{offset}" if offset
         response = request(:get, url)
         result = handle_response(response)
         resulting_array += result
         break if result.count == 0
-        offset = "invited%2C#{result.last['id']}"
+        offset = "#{result.last['email']}%2C#{result.last['id']}"
       end
       return resulting_array
     end
