@@ -158,13 +158,6 @@ lane :verify_docs do
   end
 end
 
-desc "Generates the actions.md and other docs files that are used on https://docs.fastlane.tools"
-desc "This will NOT also automatically submit a pull request to fastlane/docs"
-desc "This SHOULD only be used for testing changes to the docs"
-lane :test_generate_docs do
-  generate_markdown_docs(target_path: "../docs")
-end
-
 desc "Update the actions.md on https://docs.fastlane.tools"
 desc "This will also automatically submit a pull request to fastlane/docs"
 lane :update_docs do
@@ -290,8 +283,10 @@ private_lane :validate_repo do
     sh 'find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +'
   end
 
-  test_generate_docs
-  ensure_code_samples
+  # Test if generating the docs is successful
+  clone_docs do
+    generate_markdown_docs(target_path: ".")
+  end
 
   # Verify docs are still working
   verify_docs
@@ -326,13 +321,6 @@ desc "Add a git tag in the fastlane repo for this release"
 private_lane :add_fastlane_git_tag do |options|
   `git tag -am #{options[:message].shellescape} #{options[:tag].shellescape}`
   push_git_tags
-end
-
-# Run the code samples, yo
-private_lane :ensure_code_samples do
-  UI.message "<U+1F557>  Verifying all code samples work with the latest fastlane release"
-  test_sample_code(path: File.expand_path("docs/Actions.md"))
-  UI.success "<U+2705>  All fastlane code samples work as expected"
 end
 
 desc "Ensure all the requirement environment variables are provided"
