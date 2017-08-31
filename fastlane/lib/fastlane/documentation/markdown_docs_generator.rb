@@ -59,6 +59,7 @@ module Fastlane
       ActionsList.all_actions do |action|
         # check if there is a custom detail view in markdown available in the fastlane code base
         custom_file_location = File.join(Fastlane::ROOT, custom_action_docs, "#{action.action_name}.md")
+        @custom_content = nil # important, as we're in a loop and using @ variables
         if File.exist?(custom_file_location)
           UI.verbose("Using custom md file for action #{action.action_name}")
           @custom_content = File.read(custom_file_location)
