@@ -90,11 +90,24 @@ To get a list of available options run
 fastlane action deliver
 ```
 
-
 Select a previously uploaded build and submit it for review.
 
 ```no-highlight
 fastlane deliver submit_build --build_number 830
+```
+
+### Use in a `Fastfile`
+
+```ruby
+deliver
+```
+
+```ruby
+deliver(
+  submit_for_review: true,
+  force: true,
+  metadata_path: "./metadata"
+)
 ```
 
 ## More options
@@ -122,7 +135,7 @@ Your Apple ID email address
 ##### ipa
 A path to a signed ipa file, which will be uploaded. If you don't provide this value, only app metadata will be uploaded. If you want to submit the app for review make sure to either use `fastlane deliver --submit_for_review` or add `submit_for_review true` to your `Deliverfile`
 
-```ruby
+```ruby-skip-tests
 ipa "App.ipa"
 ```
 
@@ -130,7 +143,7 @@ if you use [fastlane](https://fastlane.tools) the ipa file will automatically be
 
 ##### pkg
 A path to a signed pkg file, which will be uploaded. Submission logic of ipa applies to pkg files.
-```ruby
+```ruby-skip-tests
 pkg "MacApp.pkg"
 ```
 
@@ -138,7 +151,7 @@ pkg "MacApp.pkg"
 
 Optional, as it is usually automatically detected. Specify the version that should be created / edited on iTunes Connect:
 
-```ruby
+```ruby-skip-tests
 app_version "2.0"
 ```
 
@@ -152,7 +165,7 @@ This could be useful in the case if you are generating a lot of uploads while no
 
 The default value is false.
 
-```ruby
+```ruby-skip-tests
 skip_app_version_update true
 ```
 
@@ -160,7 +173,7 @@ skip_app_version_update true
 
 Add this to your `Deliverfile` to automatically submit the app for review after uploading metadata/binary. This will select the latest build.
 
-```ruby
+```ruby-skip-tests
 submit_for_review true
 ```
 
@@ -178,7 +191,7 @@ If you run `deliver init` this will automatically be created for you.
 
 ##### force
 
-```ruby
+```ruby-skip-tests
 force true
 ```
 If set to `true`, no HTML report will be generated before the actual upload. You can also pass `--force` when calling _deliver_.
@@ -186,14 +199,14 @@ If set to `true`, no HTML report will be generated before the actual upload. You
 
 ##### price_tier
 Pass the price tier as number. This will be active from the current day.
-```ruby
+```ruby-skip-tests
 price_tier 0
 ```
 ##### trade_representative_contact_information
 Trade Representative Contact information for Korean App Store. Available options: `first_name`, `last_name`, `address_line1`, `address_line2`, `address_line3`, `city_name`, `state`, `country`, `postal_code`, `phone_number`, `email_address`, `is_displayed_on_app_store`.
 
 
-```ruby
+```ruby-skip-tests
 trade_representative_contact_information(
   first_name: "Felix",
   last_name: "Krause",
@@ -217,7 +230,7 @@ You can also provide these values by creating files in a `metadata/trade_represe
 Contact information for the app review team. Available options: `first_name`, `last_name`, `phone_number`, `email_address`, `demo_user`, `demo_password`, `notes`. 
 
 
-```ruby
+```ruby-skip-tests
 app_review_information(
   first_name: "Felix",
   last_name: "Krause",
@@ -234,7 +247,7 @@ You can also provide these values by creating files in a `metadata/review_inform
 ##### submission_information 
 Must be a hash. This is used as the last step for the deployment process, where you define if you use third party content or use encryption. [A list of available options](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/tunes/app_submission.rb#L18-L69).
 
-```ruby
+```ruby-skip-tests
 submission_information({
   add_id_info_serves_ads: true,
   ...
@@ -244,7 +257,7 @@ submission_information({
 ##### automatic_release
 Should the app be released to all users once Apple approves it? If set to `false`, you'll have to manually release the update once it got approved.
 
-```ruby
+```ruby-skip-tests
 automatic_release true
 # or 
 automatic_release false
@@ -254,7 +267,7 @@ automatic_release false
 
 Enable or disable the phased releases feature of iTunes Connect. If set to `true`, the update will be released over a 7 day period. Default behavior is to leave whatever you defined on iTunes Connect.
 
-```ruby
+```ruby-skip-tests
 phased_release true
 # or 
 phased_release false
@@ -274,7 +287,7 @@ All options below are useful if you want to specify certain app metadata in your
 
 Localised values should be set like this
 
-```ruby
+```ruby-skip-tests
 description({
   'en-US' => "English Description here",
   'de-DE' => "Deutsche Beschreibung hier"
@@ -288,7 +301,7 @@ The title/name of the app
 
 Localised subtitle of the app
 
-```ruby
+```ruby-skip-tests
 subtitle(
   "en-US" => "Awesome English subtitle here",
   "de-DE" => "Jetzt mit deutschen Untertiteln!"
@@ -308,7 +321,7 @@ These URLs are shown in the AppStore
 
 Keywords separated using a comma.
 
-```ruby
+```ruby-skip-tests
 keywords(
   "en-US" => "Keyword1, Keyword2"
 )
@@ -318,7 +331,7 @@ keywords(
 
 Localised promotional text
 
-```ruby
+```ruby-skip-tests
 promotional_text(
   "en-US" => "Hey, you should totally buy our app, it's the best",
   "de-DE" => "App kaufen bitte"
@@ -327,13 +340,13 @@ promotional_text(
 
 ##### app_icon
 A path to a new app icon, which must be exactly 1024x1024px
-```ruby
+```ruby-skip-tests
 app_icon './AppIcon.png'
 ```
 
 ##### apple_watch_app_icon
 A path to a new app icon for the  Watch, which must be exactly 1024x1024px
-```ruby
+```ruby-skip-tests
 apple_watch_app_icon './AppleWatchAppIcon.png'
 ```
 
@@ -356,7 +369,7 @@ The available options:
 
 ##### copyright
 The up to date copyright information.
-```ruby
+```ruby-skip-tests
 copyright "#{Time.now.year} Felix Krause"
 ```
 
@@ -587,9 +600,9 @@ Imagine that you have localised data for the following language codes:  ```en-US
 
 You can set the following in your `Deliverfile`
 
-```ruby
+```ruby-skip-tests
 release_notes({
-  'default' => "Shiny and new”,
+  'default' => "Shiny and new",
   'de-DE' => "glaenzend und neu"
 })
 ```
