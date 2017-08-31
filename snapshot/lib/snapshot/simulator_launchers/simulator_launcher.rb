@@ -152,7 +152,7 @@ module Snapshot
           hash[name] = ["No tests were executed"]
         else
           tests = Array(summary.data.first[:tests])
-          hash[name] = tests.map { |test| test[:failures].map { |failure| failure[:failure_message] } }.flatten
+          hash[name] = tests.map { |test| Array(test[:failures]).map { |failure| failure[:failure_message] } }.flatten
         end
       end
     end
