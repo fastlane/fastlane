@@ -45,6 +45,7 @@ module Fastlane
 
     def generate!(target_path: nil)
       require 'yaml'
+      FileUtils.mkdir_p(target_path)
       docs_dir = File.join(target_path, "docs")
       custom_action_docs = "lib/fastlane/actions/docs/"
 

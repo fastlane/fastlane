@@ -46,7 +46,7 @@ From now on, you can run `fastlane deliver` to deploy a new update, or just uplo
 
 Check out your local `./fastlane/metadata` and `./fastlane/screenshots` folders (if you don't use [fastlane](https://fastlane.tools) it's `./metadata` instead)
 
-![/img/actions/metadata.png](/img/actions/metadata.png)
+![/img/actions/deliver_metadata.png](/img/actions/deliver_metadata.png)
 
 You'll see your metadata from iTunes Connect. Feel free to store the metadata in git (not the screenshots). You can now modify it locally and push the changes back to iTunes Connect.
 
