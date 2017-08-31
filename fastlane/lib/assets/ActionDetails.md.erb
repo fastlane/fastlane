@@ -1,7 +1,6 @@
+# <%= @action.action_name %>
+
 <% action = @action %>
-
-### <%= action.action_name %>
-
 <%= action.description %>
 
 <%= "> #{action.deprecated_notes.gsub("\n\n", "\n")}" unless action.deprecated_notes.to_s.empty? %>
@@ -50,6 +49,9 @@ To show the documentation in your terminal, run
 ```no-highlight
 fastlane action <%= action.action_name %>
 ```
+
+<a href="https://github.com/fastlane/fastlane/edit/master/fastlane/lib/fastlane/actions/<%= action.action_name %>.rb" target="_blank">View source code</a>
+
 <hr />
 
 <a href="/actions"><b>Back to actions</b></a>
