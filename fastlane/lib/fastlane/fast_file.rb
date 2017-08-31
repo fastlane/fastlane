@@ -217,7 +217,8 @@ module Fastlane
     # @param url [String] The git URL to clone the repository from
     # @param branch [String] The branch to checkout in the repository
     # @param path [String] The path to the Fastfile
-    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile')
+    # @param verion [String] Version of the required Fastlane version
+    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil)
       UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
 
       Actions.execute_action('import_from_git') do
@@ -239,7 +240,22 @@ module Fastlane
           UI.message "Cloning remote git repo..."
           Actions.sh(clone_command)
 
-          Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
+          if version != nil
+            clone_tags_command = "cd '#{clone_folder}' && GIT_TERMINAL_PROMPT=0 git fetch --all --tags"
+            UI.message "Fetching remote git tags..."
+            Actions.sh(clone_tags_command)
+
+            versionNumber = version.split(' ').last
+            lastDotIndex = versionNumber.rindex('.')
+            versionRange = versionNumber[0..lastDotIndex-1]
+
+            matchingVersions = Actions.sh("cd '#{clone_folder}' && git tag -l '#{versionRange}.*'")  
+            puts matchingVersions
+
+            # Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
+          elsif
+            Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
+          end
 
           # We also want to check out all the local actions of this fastlane setup
           containing = path.split(File::SEPARATOR)[0..-2]
