@@ -104,7 +104,7 @@ fastlane deliver submit_build --build_number 830
 
 ## Available options
 
-All the options below can easily be added to your `Deliverfile`. The great thing: if you use `fastlane` you can use all these options from your `Fastfile` too, for example:
+All the options below can easily be added to your `Deliverfile`. The great thing: if you use _fastlane_ you can use all these options from your `Fastfile` too, for example:
 
 ```ruby
 deliver(
@@ -144,7 +144,7 @@ app_version "2.0"
 
 ##### skip_app_version_update
 
-In the case if `deliver` uploads your application to iTunes Connect it will automatically update "Prepare for submission" app version (which could be found on iTunes Connect->My Apps->App Store page)
+In the case if _deliver_ uploads your application to iTunes Connect it will automatically update "Prepare for submission" app version (which could be found on iTunes Connect->My Apps->App Store page)
 
 The option allows uploading your app without updating "Prepare for submission" version. 
 
@@ -181,7 +181,7 @@ If you run `deliver init` this will automatically be created for you.
 ```ruby
 force true
 ```
-If set to `true`, no HTML report will be generated before the actual upload. You can also pass `--force` when calling `deliver`.
+If set to `true`, no HTML report will be generated before the actual upload. You can also pass `--force` when calling _deliver_.
 
 
 ##### price_tier
@@ -261,7 +261,7 @@ phased_release false
 ```
 
 ##### app_rating_config_path
-You can set the app age ratings using `deliver`. You'll have to create and store a `JSON` configuration file. Copy the [template](https://github.com/fastlane/fastlane/blob/master/deliver/assets/example_rating_config.json) to your project folder and pass the path to the `JSON` file using the `app_rating_config_path` option. 
+You can set the app age ratings using _deliver_. You'll have to create and store a `JSON` configuration file. Copy the [template](https://github.com/fastlane/fastlane/blob/master/deliver/assets/example_rating_config.json) to your project folder and pass the path to the `JSON` file using the `app_rating_config_path` option. 
 
 The keys/values on the top allow values from 0-2, and the items on the bottom allow only 0 or 1. More information in [#reference](#reference).
 
