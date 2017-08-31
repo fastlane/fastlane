@@ -245,14 +245,19 @@ module Fastlane
             UI.message "Fetching remote git tags..."
             Actions.sh(clone_tags_command)
 
-            versionNumber = version.split(' ').last
-            lastDotIndex = versionNumber.rindex('.')
+            #Remove optimistic operator from verion
+            versionNumber = version.split(" ").last
+
+            #Drop last specified digit in version
+            lastDotIndex = versionNumber.rindex('.') #
             versionRange = versionNumber[0..lastDotIndex-1]
 
-            matchingVersions = Actions.sh("cd '#{clone_folder}' && git tag -l '#{versionRange}.*'")  
-            puts matchingVersions
+            #Search matching version in repo
+            matchingVersionsString = Actions.sh("cd '#{clone_folder}' && git tag -l '#{versionRange}.*'")
+            matchinVersionsArray = matchingVersionsString.split("\n")
+            lastMatchingTag = matchinVersionsArray.last
 
-            # Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
+            Actions.sh("cd '#{clone_folder}' && git checkout #{lastMatchingTag} '#{path}'")
           elsif
             Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
           end
