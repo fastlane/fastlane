@@ -1,27 +1,13 @@
--------
-
 <p align="center">
-  <img src="/img/actions/gym.png" height="110">
+  <img src="/img/actions/gym.png" width="250">
 </p>
-
-gym
-============
-
-[![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/gym/LICENSE)
-
-###### Building your app has never been easier
-
-Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
 
 -------
 
 <p align="center">
     <a href="#whats-gym">Features</a> &bull;
-    <a href="#installation">Installation</a> &bull;
     <a href="#usage">Usage</a> &bull;
-    <a href="#tips">Tips</a> &bull;
-    <a href="#need-help">Need help?</a>
+    <a href="#tips">Tips</a>
 </p>
 
 -------
@@ -88,7 +74,7 @@ That's all you need to build your application. If you want more control, here ar
 fastlane gym --workspace "Example.xcworkspace" --scheme "AppName" --clean
 ```
 
-If you need to use a different xcode installation, use `xcode-select` or define `DEVELOPER_DIR`:
+If you need to use a different Xcode installation, use `xcode-select` or define `DEVELOPER_DIR`:
 
 ```no-highlight
 DEVELOPER_DIR="/Applications/Xcode6.2.app" fastlane gym
