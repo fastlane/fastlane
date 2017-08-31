@@ -25,15 +25,11 @@ For _fastlane_ plugins, check out the [available plugins](https://docs.fastlane.
 <%- @categories.each do |category, actions| %>
 # <%= category %>
 
+Action | Description
+---|---
 <%- actions.sort.to_h.each do |_number_of_launches, action| -%>
-<% link = "/actions/#{action.action_name}" %>
-
-### <a href="<%= link %>"><%= action.action_name %></a>
-
-<%= action.description %>
-
-<%= "> #{action.deprecated_notes.gsub("\n\n", "\n")}" unless action.deprecated_notes.to_s.empty? %>
-
-  <%- end %><%# End of actions.sort... %>
+<%- link = "/actions/#{action.action_name}" -%>
+<a href="<%= link %>"><%= action.action_name %></a> | <%= action.description %>
+<%- end %><%# End of actions.sort... %>
 
 <%- end %><%# End of categories.each %>
