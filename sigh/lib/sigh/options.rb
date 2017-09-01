@@ -131,7 +131,12 @@ module Sigh
                                      conflicting_options: [:force],
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't enable both :force and :readonly")
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :template_name,
+                                     env_name: "SIGH_PROVISIONING_PROFILE_TEMPLATE_NAME",
+                                     description: "The name of provisioning profile template. If the developer account has provisioning profile templates, template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile",
+                                     optional: true,
+                                     default_value: nil)
       ]
     end
   end

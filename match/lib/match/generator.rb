@@ -55,7 +55,8 @@ module Match
         cert_id: certificate_id,
         provisioning_name: profile_name,
         ignore_profiles_with_different_name: true,
-        team_id: params[:team_id]
+        team_id: params[:team_id],
+        template_name: params[:template_name]
       }
 
       values[:platform] = params[:platform]

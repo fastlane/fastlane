@@ -138,7 +138,8 @@ module Sigh
                                 bundle_id: bundle_id,
                               certificate: cert,
                                       mac: Sigh.config[:platform].to_s == 'macos',
-                             sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil)
+                             sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil,
+                            template_name: Sigh.config[:template_name])
       profile
     end
 

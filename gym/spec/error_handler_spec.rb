@@ -17,7 +17,7 @@ describe Gym do
     def mock_gym_path(content)
       log_path = "log_path"
       expect(File).to receive(:exist?).with(log_path).and_return(true)
-      expect(Gym::BuildCommandGenerator).to receive(:xcodebuild_log_path).and_return(log_path)
+      allow(Gym::BuildCommandGenerator).to receive(:xcodebuild_log_path).and_return(log_path)
       expect(File).to receive(:read).with(log_path).and_return(content)
     end
 
