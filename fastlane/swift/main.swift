@@ -8,16 +8,24 @@
 
 import Foundation
 
-print("Hello, World!")
+let args: [String] = CommandLine.arguments
 
-func laneContext() -> Bool {
-    return true
+// Dump the first arg which is the program name
+let fastlaneArgs = stride(from: 1, to: args.count - 1, by: 2).map {
+    RunnerArgument(name: args[$0], value: args[$0+1])
 }
 
-func laneContext(tacos: String) -> Bool {
-    return true
+let lanes = fastlaneArgs.filter { arg in
+    return arg.name.lowercased() == "lane"
 }
 
-func laneContext(tacos: Bool) -> Bool {
-    return true
+let fastlaneArgsMinusLanes = fastlaneArgs.filter { arg in
+    return arg.name.lowercased() != "lane"
 }
+
+guard lanes.count == 1 else {
+    fatalError("You must have exactly one lane specified as an arg, here's what I got: \(lanes)")
+}
+
+let lane = lanes.first!
+Fastfile.runLane(named: lane.value)
