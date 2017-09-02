@@ -7,15 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B33BAF791F52152A0001A751 /* CommandFileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF711F52152A0001A751 /* CommandFileProtocol.swift */; };
-		B33BAF7A1F52152A0001A751 /* EnvironmentVariables.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF721F52152A0001A751 /* EnvironmentVariables.swift */; };
-		B33BAF7B1F52152A0001A751 /* Fastlane.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF731F52152A0001A751 /* Fastlane.swift */; };
-		B33BAF7C1F52152A0001A751 /* RubyCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF741F52152A0001A751 /* RubyCommand.swift */; };
-		B33BAF7D1F52152A0001A751 /* Runner.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF751F52152A0001A751 /* Runner.swift */; };
-		B33BAF7E1F52152A0001A751 /* SocketClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF761F52152A0001A751 /* SocketClient.swift */; };
-		B33BAF7F1F52152A0001A751 /* SocketClientDelegateProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF771F52152A0001A751 /* SocketClientDelegateProtocol.swift */; };
-		B33BAF801F52152A0001A751 /* SocketResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF781F52152A0001A751 /* SocketResponse.swift */; };
-		B33BAF821F530CE90001A751 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33BAF811F530CE90001A751 /* main.swift */; };
+		B3BA65A51F5A269100B34850 /* EnvironmentVariables.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA659C1F5A269100B34850 /* EnvironmentVariables.swift */; };
+		B3BA65A61F5A269100B34850 /* Fastlane.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA659D1F5A269100B34850 /* Fastlane.swift */; };
+		B3BA65A71F5A269100B34850 /* LaneFileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA659E1F5A269100B34850 /* LaneFileProtocol.swift */; };
+		B3BA65A81F5A269100B34850 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA659F1F5A269100B34850 /* main.swift */; };
+		B3BA65A91F5A269100B34850 /* RubyCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65A01F5A269100B34850 /* RubyCommand.swift */; };
+		B3BA65AA1F5A269100B34850 /* Runner.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65A11F5A269100B34850 /* Runner.swift */; };
+		B3BA65AB1F5A269100B34850 /* SocketClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65A21F5A269100B34850 /* SocketClient.swift */; };
+		B3BA65AC1F5A269100B34850 /* SocketClientDelegateProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65A31F5A269100B34850 /* SocketClientDelegateProtocol.swift */; };
+		B3BA65AD1F5A269100B34850 /* SocketResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65A41F5A269100B34850 /* SocketResponse.swift */; };
+		B3BA65AF1F5A2D5C00B34850 /* RunnerArgument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65AE1F5A2D5C00B34850 /* RunnerArgument.swift */; };
+		B3BA65B61F5A333F00B34850 /* Fastfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65B51F5A333F00B34850 /* Fastfile.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,16 +33,18 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B33BAF571F51F8D90001A751 /* FastlaneSwiftRunner */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FastlaneSwiftRunner; sourceTree = BUILT_PRODUCTS_DIR; };
-		B33BAF711F52152A0001A751 /* CommandFileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CommandFileProtocol.swift; path = ../../CommandFileProtocol.swift; sourceTree = "<group>"; };
-		B33BAF721F52152A0001A751 /* EnvironmentVariables.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EnvironmentVariables.swift; path = ../../EnvironmentVariables.swift; sourceTree = "<group>"; };
-		B33BAF731F52152A0001A751 /* Fastlane.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Fastlane.swift; path = ../../Fastlane.swift; sourceTree = "<group>"; };
-		B33BAF741F52152A0001A751 /* RubyCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RubyCommand.swift; path = ../../RubyCommand.swift; sourceTree = "<group>"; };
-		B33BAF751F52152A0001A751 /* Runner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Runner.swift; path = ../../Runner.swift; sourceTree = "<group>"; };
-		B33BAF761F52152A0001A751 /* SocketClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SocketClient.swift; path = ../../SocketClient.swift; sourceTree = "<group>"; };
-		B33BAF771F52152A0001A751 /* SocketClientDelegateProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SocketClientDelegateProtocol.swift; path = ../../SocketClientDelegateProtocol.swift; sourceTree = "<group>"; };
-		B33BAF781F52152A0001A751 /* SocketResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SocketResponse.swift; path = ../../SocketResponse.swift; sourceTree = "<group>"; };
-		B33BAF811F530CE90001A751 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = main.swift; path = ../../main.swift; sourceTree = "<group>"; };
+		B33BAF571F51F8D90001A751 /* FastlaneRunner */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = FastlaneRunner; path = /Users/jliebowitz/dev/fastlane/fastlane/swift/FastlaneSwiftRunner/build/Debug/FastlaneRunner; sourceTree = "<absolute>"; };
+		B3BA659C1F5A269100B34850 /* EnvironmentVariables.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EnvironmentVariables.swift; path = ../EnvironmentVariables.swift; sourceTree = "<group>"; };
+		B3BA659D1F5A269100B34850 /* Fastlane.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Fastlane.swift; path = ../Fastlane.swift; sourceTree = "<group>"; };
+		B3BA659E1F5A269100B34850 /* LaneFileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LaneFileProtocol.swift; path = ../LaneFileProtocol.swift; sourceTree = "<group>"; };
+		B3BA659F1F5A269100B34850 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = main.swift; path = ../main.swift; sourceTree = "<group>"; };
+		B3BA65A01F5A269100B34850 /* RubyCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RubyCommand.swift; path = ../RubyCommand.swift; sourceTree = "<group>"; };
+		B3BA65A11F5A269100B34850 /* Runner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Runner.swift; path = ../Runner.swift; sourceTree = "<group>"; };
+		B3BA65A21F5A269100B34850 /* SocketClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SocketClient.swift; path = ../SocketClient.swift; sourceTree = "<group>"; };
+		B3BA65A31F5A269100B34850 /* SocketClientDelegateProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SocketClientDelegateProtocol.swift; path = ../SocketClientDelegateProtocol.swift; sourceTree = "<group>"; };
+		B3BA65A41F5A269100B34850 /* SocketResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SocketResponse.swift; path = ../SocketResponse.swift; sourceTree = "<group>"; };
+		B3BA65AE1F5A2D5C00B34850 /* RunnerArgument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RunnerArgument.swift; path = ../RunnerArgument.swift; sourceTree = "<group>"; };
+		B3BA65B51F5A333F00B34850 /* Fastfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Fastfile.swift; path = ../Fastfile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,41 +61,66 @@
 		B33BAF4E1F51F8D90001A751 = {
 			isa = PBXGroup;
 			children = (
-				B33BAF591F51F8D90001A751 /* FastlaneSwiftRunner */,
-				B33BAF581F51F8D90001A751 /* Products */,
+				B3BA65B01F5A324A00B34850 /* Fastlane Runner */,
 			);
 			sourceTree = "<group>";
 		};
-		B33BAF581F51F8D90001A751 /* Products */ = {
+		B3BA65B01F5A324A00B34850 /* Fastlane Runner */ = {
 			isa = PBXGroup;
 			children = (
-				B33BAF571F51F8D90001A751 /* FastlaneSwiftRunner */,
+				B3BA65B21F5A327B00B34850 /* Autogenerated API */,
+				B3BA65B31F5A329800B34850 /* Fastfile Components */,
+				B3BA65B11F5A325E00B34850 /* Networking */,
+				B3BA65B41F5A332C00B34850 /* Sample Fastfile */,
+				B3BA659F1F5A269100B34850 /* main.swift */,
+				B3BA65AE1F5A2D5C00B34850 /* RunnerArgument.swift */,
 			);
-			name = Products;
+			name = "Fastlane Runner";
 			sourceTree = "<group>";
 		};
-		B33BAF591F51F8D90001A751 /* FastlaneSwiftRunner */ = {
+		B3BA65B11F5A325E00B34850 /* Networking */ = {
 			isa = PBXGroup;
 			children = (
-				B33BAF711F52152A0001A751 /* CommandFileProtocol.swift */,
-				B33BAF721F52152A0001A751 /* EnvironmentVariables.swift */,
-				B33BAF731F52152A0001A751 /* Fastlane.swift */,
-				B33BAF741F52152A0001A751 /* RubyCommand.swift */,
-				B33BAF751F52152A0001A751 /* Runner.swift */,
-				B33BAF761F52152A0001A751 /* SocketClient.swift */,
-				B33BAF771F52152A0001A751 /* SocketClientDelegateProtocol.swift */,
-				B33BAF781F52152A0001A751 /* SocketResponse.swift */,
-				B33BAF811F530CE90001A751 /* main.swift */,
+				B3BA65A01F5A269100B34850 /* RubyCommand.swift */,
+				B3BA65A11F5A269100B34850 /* Runner.swift */,
+				B3BA65A21F5A269100B34850 /* SocketClient.swift */,
+				B3BA65A31F5A269100B34850 /* SocketClientDelegateProtocol.swift */,
+				B3BA65A41F5A269100B34850 /* SocketResponse.swift */,
 			);
-			path = FastlaneSwiftRunner;
+			name = Networking;
+			sourceTree = "<group>";
+		};
+		B3BA65B21F5A327B00B34850 /* Autogenerated API */ = {
+			isa = PBXGroup;
+			children = (
+				B3BA659D1F5A269100B34850 /* Fastlane.swift */,
+			);
+			name = "Autogenerated API";
+			sourceTree = "<group>";
+		};
+		B3BA65B31F5A329800B34850 /* Fastfile Components */ = {
+			isa = PBXGroup;
+			children = (
+				B3BA659C1F5A269100B34850 /* EnvironmentVariables.swift */,
+				B3BA659E1F5A269100B34850 /* LaneFileProtocol.swift */,
+			);
+			name = "Fastfile Components";
+			sourceTree = "<group>";
+		};
+		B3BA65B41F5A332C00B34850 /* Sample Fastfile */ = {
+			isa = PBXGroup;
+			children = (
+				B3BA65B51F5A333F00B34850 /* Fastfile.swift */,
+			);
+			name = "Sample Fastfile";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B33BAF561F51F8D90001A751 /* FastlaneSwiftRunner */ = {
+		B33BAF561F51F8D90001A751 /* FastlaneRunner */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B33BAF5E1F51F8D90001A751 /* Build configuration list for PBXNativeTarget "FastlaneSwiftRunner" */;
+			buildConfigurationList = B33BAF5E1F51F8D90001A751 /* Build configuration list for PBXNativeTarget "FastlaneRunner" */;
 			buildPhases = (
 				B33BAF531F51F8D90001A751 /* Sources */,
 				B33BAF541F51F8D90001A751 /* Frameworks */,
@@ -101,9 +130,9 @@
 			);
 			dependencies = (
 			);
-			name = FastlaneSwiftRunner;
+			name = FastlaneRunner;
 			productName = FastlaneSwiftRunner;
-			productReference = B33BAF571F51F8D90001A751 /* FastlaneSwiftRunner */;
+			productReference = B33BAF571F51F8D90001A751 /* FastlaneRunner */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -118,6 +147,7 @@
 				TargetAttributes = {
 					B33BAF561F51F8D90001A751 = {
 						CreatedOnToolsVersion = 8.3.3;
+						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -130,11 +160,11 @@
 				en,
 			);
 			mainGroup = B33BAF4E1F51F8D90001A751;
-			productRefGroup = B33BAF581F51F8D90001A751 /* Products */;
+			productRefGroup = B33BAF4E1F51F8D90001A751;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B33BAF561F51F8D90001A751 /* FastlaneSwiftRunner */,
+				B33BAF561F51F8D90001A751 /* FastlaneRunner */,
 			);
 		};
 /* End PBXProject section */
@@ -144,15 +174,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B33BAF7C1F52152A0001A751 /* RubyCommand.swift in Sources */,
-				B33BAF7F1F52152A0001A751 /* SocketClientDelegateProtocol.swift in Sources */,
-				B33BAF821F530CE90001A751 /* main.swift in Sources */,
-				B33BAF791F52152A0001A751 /* CommandFileProtocol.swift in Sources */,
-				B33BAF7E1F52152A0001A751 /* SocketClient.swift in Sources */,
-				B33BAF7D1F52152A0001A751 /* Runner.swift in Sources */,
-				B33BAF801F52152A0001A751 /* SocketResponse.swift in Sources */,
-				B33BAF7A1F52152A0001A751 /* EnvironmentVariables.swift in Sources */,
-				B33BAF7B1F52152A0001A751 /* Fastlane.swift in Sources */,
+				B3BA65A91F5A269100B34850 /* RubyCommand.swift in Sources */,
+				B3BA65A51F5A269100B34850 /* EnvironmentVariables.swift in Sources */,
+				B3BA65AC1F5A269100B34850 /* SocketClientDelegateProtocol.swift in Sources */,
+				B3BA65A71F5A269100B34850 /* LaneFileProtocol.swift in Sources */,
+				B3BA65B61F5A333F00B34850 /* Fastfile.swift in Sources */,
+				B3BA65AB1F5A269100B34850 /* SocketClient.swift in Sources */,
+				B3BA65AA1F5A269100B34850 /* Runner.swift in Sources */,
+				B3BA65AF1F5A2D5C00B34850 /* RunnerArgument.swift in Sources */,
+				B3BA65AD1F5A269100B34850 /* SocketResponse.swift in Sources */,
+				B3BA65A81F5A269100B34850 /* main.swift in Sources */,
+				B3BA65A61F5A269100B34850 /* Fastlane.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,7 +284,10 @@
 		B33BAF5F1F51F8D90001A751 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -260,6 +295,8 @@
 		B33BAF601F51F8D90001A751 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
@@ -277,13 +314,14 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B33BAF5E1F51F8D90001A751 /* Build configuration list for PBXNativeTarget "FastlaneSwiftRunner" */ = {
+		B33BAF5E1F51F8D90001A751 /* Build configuration list for PBXNativeTarget "FastlaneRunner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B33BAF5F1F51F8D90001A751 /* Debug */,
 				B33BAF601F51F8D90001A751 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
