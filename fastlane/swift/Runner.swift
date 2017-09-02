@@ -23,7 +23,7 @@ class Runner {
         startSocketThread()
     }
 
-    func executeCommand(_ command: RubyCommand) -> Any {
+    func executeCommand(_ command: RubyCommandable) -> Any {
         self.dispatchGroup.enter()
         socketClient.send(rubyCommand: command)
 
