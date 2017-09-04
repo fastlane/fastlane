@@ -5,19 +5,26 @@ module Fastlane
     attr_accessor :param_names
     attr_accessor :param_descriptions
     attr_accessor :param_default_values
+    attr_accessor :param_optionality_values
+    attr_accessor :reserved_words
 
-    @@reserved_words = %w[associativity break case catch class continue convenience default deinit didSet do else enum extension fallthrough false final for func get guard if in infix init inout internal lazy let mutating nil operator override postfix precedence prefix private public repeat required return self set static struct subscript super switch throws true try var weak where while willSet].to_set
-
-    def initialize(action_name: nil, keys: nil, key_descriptions: nil, key_default_values: nil, return_type: nil)
+    def initialize(action_name: nil, keys: nil, key_descriptions: nil, key_default_values: nil, key_optionality_values: nil, return_type: nil)
       @function_name = action_name
       @param_names = keys
       @param_descriptions = key_descriptions
       @param_default_values = key_default_values
+      @param_optionality_values = key_optionality_values
       @return_type = return_type
+
+      @reserved_words = %w[associativity break case catch class continue convenience default deinit didSet do else enum extension fallthrough false final for func get guard if in infix init inout internal lazy let mutating nil operator override postfix precedence prefix private public repeat required return self set static struct subscript super switch throws true try var weak where while willSet].to_set
+      @options_to_ignore = {
+        "cocoapods" => ["error_callback"],
+        "sh" => ["error_calback"]
+      }
     end
 
     def sanitize_reserved_word(word: nil)
-      unless @@reserved_words.include?(word)
+      unless @reserved_words.include?(word)
         return word
       end
       return word + "🚀"
@@ -62,20 +69,42 @@ module Fastlane
         return ""
       end
 
-      param_names_and_types = @param_names.zip(param_default_values).map do |param, default_value|
+      param_names_and_types = @param_names.zip(param_default_values, param_optionality_values).map do |param, default_value, optional|
         type = "String"
+        optional_specifier = ""
+
+        # if we are optional and don't have a default value, we'll need to use ?
+        optional_specifier = "?" if optional && default_value.nil?
+
+        # If we have a default value of true or false, we can infer it is a Bool
+        if default_value.class == FalseClass
+          type = "Bool"
+        elsif default_value.class == TrueClass
+          type = "Bool"
+        end
+
         unless default_value.nil?
           if default_value.kind_of?(Array)
             type = "[String]"
+            default_value = " = #{default_value}"
+          elsif type == "Bool"
             default_value = " = #{default_value}"
           else
             default_value = " = \"#{default_value}\""
           end
         end
+
+        # if we don't have a default value, but the param is options, just set a default value to nil
+        if optional
+          default_value ||= " = nil"
+        end
+
         default_value ||= "" # erase the default value from the swift param string since it's nil
+        # that's because it means we don't have a default value nor optional value so we must get one
+
         param = camel_case_lower(string: param)
         param = sanitize_reserved_word(word: param)
-        "#{param}: #{type}#{default_value}"
+        "#{param}: #{type}#{optional_specifier}#{default_value}"
       end
 
       return param_names_and_types.join(", ")
@@ -160,6 +189,7 @@ module Fastlane
       keys = []
       key_descriptions = []
       key_default_values = []
+      key_optionality_values = []
 
       if options.kind_of? Array
         options.each do |current|
@@ -167,6 +197,7 @@ module Fastlane
           keys << current.key.to_s
           key_descriptions << current.description
           key_default_values << current.default_value
+          key_optionality_values << current.optional
 
           # elsif current.kind_of? Array
           #   # Legacy actions that don't use the new config manager
@@ -184,6 +215,7 @@ module Fastlane
         keys: keys,
         key_descriptions: key_descriptions,
         key_default_values: key_default_values,
+        key_optionality_values: key_optionality_values,
         return_type: action_return_type
       )
     end
