@@ -15,11 +15,20 @@ protocol RubyCommandable {
 struct RubyCommand: RubyCommandable {
     struct Argument {
         let name: String
-        let value: Any
+        let value: Any?
+
+        var hasValue: Bool {
+            return nil != self.value
+        }
 
         var json: String {
             get {
-                return "{\"name\" : \"\(name)\", \"value\" : \"\(value)\"}"
+                if let someValue = value {
+                    return "{\"name\" : \"\(name)\", \"value\" : \"\(someValue)\"}"
+                } else {
+                    // Just exclude this arg if it doesn't have a value
+                    return ""
+                }
             }
         }
     }
