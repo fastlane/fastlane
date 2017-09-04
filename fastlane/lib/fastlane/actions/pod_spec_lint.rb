@@ -17,7 +17,7 @@ module Fastlane
           subspec = params[:subspec]
           command << "--subspec='#{subspec}'"
         end
-        
+
         if params[:swift_version]
           swift_version = params[:swift_version]
           command << "--swift-version=#{swift_version}"
@@ -29,8 +29,7 @@ module Fastlane
         command << "--use-libraries" if params[:use_libraries]
         command << "--fail-fast" if params[:fail_fast]
         command << "--private" if params[:private]
-        
-        
+
         result = Actions.sh(command.join(' '))
         UI.success("Pod spec lint Successfully ⬆️ ")
         return result
@@ -69,7 +68,7 @@ module Fastlane
                                        optional: true,
                                        is_string: true,
                                        verify_block: proc do |value|
-                                          UI.user_error!("Subspec must be a string.") unless value.kind_of?(String)
+                                         UI.user_error!("Subspec must be a string.") unless value.kind_of?(String)
                                        end),
           FastlaneCore::ConfigItem.new(key: :fail_fast,
                                        description: "Lint stops on the first failing platform or subspec",
@@ -84,7 +83,7 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
-                                          UI.user_error!("Sources must be an array.") unless value.kind_of?(Array)
+                                         UI.user_error!("Sources must be an array.") unless value.kind_of?(Array)
                                        end),
           FastlaneCore::ConfigItem.new(key: :private,
                                        description: "Lint skips checks that apply only to public specs",
@@ -95,12 +94,12 @@ module Fastlane
                                        optional: true,
                                        is_string: true,
                                        verify_block: proc do |value|
-                                          UI.user_error!("Swift version must be a string.") unless value.kind_of?(String)
+                                         UI.user_error!("Swift version must be a string.") unless value.kind_of?(String)
                                        end),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        description: "Allow output detail in console",
                                        optional: true,
-                                       is_string: false),
+                                       is_string: false)
         ]
       end
 
