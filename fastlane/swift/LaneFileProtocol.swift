@@ -9,13 +9,43 @@
 import Foundation
 
 public protocol LaneFileProtocol: class {
-    static var environmentVariables: EnvironmentVariables? { get }
+    var fastlaneVersion: String { get }
+    var environmentVariables: EnvironmentVariables { get }
+
     static func runLane(named: String)
+
+    func recordLaneDescriptions()
+    func beforeAll()
+    func afterAll(currentLane: String)
+    func onError(currentLane: String, errorInfo: String)
+}
+
+public extension LaneFileProtocol {
+    public var fastlaneVersion: String { return "" } // default "" because that means any is fine
+    public func beforeAll() { } // no op by default
+    public func afterAll(currentLane: String) { } // no op by default
+    public func onError(currentLane: String, errorInfo: String) {} // no op by default
+    public func recordLaneDescriptions() { } // no op by default
 }
 
 public class LaneFile: NSObject, LaneFileProtocol {
+    public var environmentVariables: EnvironmentVariables = EnvironmentVariables.instance
 
     public private(set) static var fastfileInstance: AnyObject?
+
+    private var laneDescriptionMapping: [Selector : String] = [:]
+
+    // Called before any lane is executed.
+    private func setupAllTheThings() {
+        // Step 1, add lange descriptions
+        recordLaneDescriptions()
+
+        // Step 2, send over environment variables to ruby process
+        _ = runner.executeCommand(self.environmentVariables)
+
+        // Step 3, run beforeAll() function
+        beforeAll()
+    }
 
     public static var lanes: [String : String] {
         var laneToMethodName: [String : String] = [:]
@@ -47,9 +77,12 @@ public class LaneFile: NSObject, LaneFileProtocol {
             self.fastfileInstance = currentFastfileInstance
         }
 
-        guard let fastfileInstance = self.fastfileInstance else {
+        guard let fastfileInstance: LaneFile = self.fastfileInstance as? LaneFile else {
             fatalError("Unable to instantiate class named: \(self.className())")
         }
+
+        // call all methods that need to be called before we start calling lanes
+        fastfileInstance.setupAllTheThings()
 
         let currentLanes = self.lanes
         let lowerCasedLaneRequested = named.lowercased()
@@ -58,10 +91,21 @@ public class LaneFile: NSObject, LaneFileProtocol {
             fatalError("unable to find lane named: \(named)")
         }
 
+        // We need to catch all possible errors here and display a nice message
         _ = fastfileInstance.perform(NSSelectorFromString(laneMethod))
+
+//        if error
+//        fastfileInstance.onError(currentLane: named, errorInfo: <#T##String#>)
+//        end
+
+        // only call on success
+        fastfileInstance.afterAll(currentLane: named)
     }
 
-    public static var environmentVariables: EnvironmentVariables? {
-        return EnvironmentVariables(variableMap: ["DELIVER_USER": "test@example.com"])
+    func addLaneDescription(lane: Selector, _ description: String) {
+        if laneDescriptionMapping[lane] != nil {
+            fatalError("Unable to add lane description for lane: \(lane) (\(description))\nbecause it already exists")
+        }
+        laneDescriptionMapping[lane] = description
     }
 }
