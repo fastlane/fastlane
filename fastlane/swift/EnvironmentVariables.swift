@@ -9,11 +9,23 @@
 import Foundation
 
 public struct EnvironmentVariables {
-    let variables: [String : String]
-    init(variableMap: [String : String]) {
-        self.variables = variableMap
-    }
 
+    static var instance: EnvironmentVariables = { EnvironmentVariables() }()
+
+    var variables: [String : String] = [ : ]
+
+    subscript(key: String) -> String? {
+        get {
+            return self.variables[key]
+        }
+
+        set (newValue) {
+            self.variables[key] = newValue
+        }
+    }
+}
+
+extension EnvironmentVariables: RubyCommandable {
     var json: String {
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: self.variables)
