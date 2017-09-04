@@ -113,7 +113,7 @@ deliver(
 ## More options
 
 <details>
-<summary>View all available options and its valid values</summary>
+<summary>View all available options and their valid values</summary>
 
 ## Available options
 
