@@ -416,6 +416,37 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
+    def update_member_roles!(member, roles: [], apps: [])
+      r = request(:get, "ra/users/itc/#{member.user_id}/roles")
+      data = parse_response(r, 'data')
+
+      roles << "admin" if roles.length == 0
+
+      data["user"]["roles"] = []
+      roles.each do |role|
+        # find role from template
+        data["roles"].each do |template_role|
+          if template_role["value"]["name"] == role
+            data["user"]["roles"] << template_role
+          end
+        end
+      end
+
+      if apps.length == 0
+        data["user"]["userSoftwares"] = { value: { grantAllSoftware: true, grantedSoftwareAdamIds: [] } }
+      else
+        data["user"]["userSoftwares"] = { value: { grantAllSoftware: false, grantedSoftwareAdamIds: apps } }
+      end
+
+      # send the changes back to Apple
+      r = request(:post) do |req|
+        req.url "ra/users/itc/#{member.user_id}/roles"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
+    end
+
     #####################################################
     # @!group Pricing
     #####################################################
