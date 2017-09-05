@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B30206651F5E3B0A00DE6EBD /* DefaultFileImplementations.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206641F5E3B0A00DE6EBD /* DefaultFileImplementations.swift */; };
+		B302067B1F5E3E9000DE6EBD /* SnapshotfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */; };
+		B302067C1F5E3E9000DE6EBD /* GymfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */; };
+		B302067D1F5E3E9000DE6EBD /* MatchfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206761F5E3E9000DE6EBD /* MatchfileProtocol.swift */; };
+		B302067E1F5E3E9000DE6EBD /* PrecheckfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206771F5E3E9000DE6EBD /* PrecheckfileProtocol.swift */; };
+		B302067F1F5E3E9000DE6EBD /* ScanfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206781F5E3E9000DE6EBD /* ScanfileProtocol.swift */; };
+		B30206801F5E3E9000DE6EBD /* ScreengrabfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206791F5E3E9000DE6EBD /* ScreengrabfileProtocol.swift */; };
+		B30206811F5E3E9000DE6EBD /* DeliverfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302067A1F5E3E9000DE6EBD /* DeliverfileProtocol.swift */; };
 		B3BA65A51F5A269100B34850 /* EnvironmentVariables.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA659C1F5A269100B34850 /* EnvironmentVariables.swift */; };
 		B3BA65A61F5A269100B34850 /* Fastlane.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA659D1F5A269100B34850 /* Fastlane.swift */; };
 		B3BA65A71F5A269100B34850 /* LaneFileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA659E1F5A269100B34850 /* LaneFileProtocol.swift */; };
@@ -33,7 +41,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B302061B1F5B080D00DE6EBD /* FastlaneRunner */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = FastlaneRunner; path = /Users/jliebowitz/dev/fastlane/fastlane/swift/FastlaneSwiftRunner/build/Debug/FastlaneRunner; sourceTree = "<absolute>"; };
+		B30206641F5E3B0A00DE6EBD /* DefaultFileImplementations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DefaultFileImplementations.swift; path = ../DefaultFileImplementations.swift; sourceTree = "<group>"; };
+		B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotfileProtocol.swift; path = ../SnapshotfileProtocol.swift; sourceTree = "<group>"; };
+		B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GymfileProtocol.swift; path = ../GymfileProtocol.swift; sourceTree = "<group>"; };
+		B30206761F5E3E9000DE6EBD /* MatchfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MatchfileProtocol.swift; path = ../MatchfileProtocol.swift; sourceTree = "<group>"; };
+		B30206771F5E3E9000DE6EBD /* PrecheckfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PrecheckfileProtocol.swift; path = ../PrecheckfileProtocol.swift; sourceTree = "<group>"; };
+		B30206781F5E3E9000DE6EBD /* ScanfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ScanfileProtocol.swift; path = ../ScanfileProtocol.swift; sourceTree = "<group>"; };
+		B30206791F5E3E9000DE6EBD /* ScreengrabfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ScreengrabfileProtocol.swift; path = ../ScreengrabfileProtocol.swift; sourceTree = "<group>"; };
+		B302067A1F5E3E9000DE6EBD /* DeliverfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DeliverfileProtocol.swift; path = ../DeliverfileProtocol.swift; sourceTree = "<group>"; };
 		B3BA659C1F5A269100B34850 /* EnvironmentVariables.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EnvironmentVariables.swift; path = ../EnvironmentVariables.swift; sourceTree = "<group>"; };
 		B3BA659D1F5A269100B34850 /* Fastlane.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Fastlane.swift; path = ../Fastlane.swift; sourceTree = "<group>"; };
 		B3BA659E1F5A269100B34850 /* LaneFileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LaneFileProtocol.swift; path = ../LaneFileProtocol.swift; sourceTree = "<group>"; };
@@ -45,6 +60,7 @@
 		B3BA65A41F5A269100B34850 /* SocketResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SocketResponse.swift; path = ../SocketResponse.swift; sourceTree = "<group>"; };
 		B3BA65AE1F5A2D5C00B34850 /* RunnerArgument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RunnerArgument.swift; path = ../RunnerArgument.swift; sourceTree = "<group>"; };
 		B3BA65B51F5A333F00B34850 /* Fastfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Fastfile.swift; path = ../Fastfile.swift; sourceTree = "<group>"; };
+		D5ACAEAE1F5F8448005FDA0A /* FastlaneRunner */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = FastlaneRunner; path = /Users/liebowitz/dev/fasterlane/fastlane/swift/FastlaneSwiftRunner/build/Debug/FastlaneRunner; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +110,14 @@
 			isa = PBXGroup;
 			children = (
 				B3BA659D1F5A269100B34850 /* Fastlane.swift */,
+				B302067A1F5E3E9000DE6EBD /* DeliverfileProtocol.swift */,
+				B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */,
+				B30206761F5E3E9000DE6EBD /* MatchfileProtocol.swift */,
+				B30206771F5E3E9000DE6EBD /* PrecheckfileProtocol.swift */,
+				B30206781F5E3E9000DE6EBD /* ScanfileProtocol.swift */,
+				B30206791F5E3E9000DE6EBD /* ScreengrabfileProtocol.swift */,
+				B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */,
+				B30206641F5E3B0A00DE6EBD /* DefaultFileImplementations.swift */,
 			);
 			name = "Autogenerated API";
 			sourceTree = "<group>";
@@ -132,7 +156,7 @@
 			);
 			name = FastlaneRunner;
 			productName = FastlaneSwiftRunner;
-			productReference = B302061B1F5B080D00DE6EBD /* FastlaneRunner */;
+			productReference = D5ACAEAE1F5F8448005FDA0A /* FastlaneRunner */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -176,12 +200,20 @@
 			files = (
 				B3BA65A91F5A269100B34850 /* RubyCommand.swift in Sources */,
 				B3BA65A51F5A269100B34850 /* EnvironmentVariables.swift in Sources */,
+				B302067D1F5E3E9000DE6EBD /* MatchfileProtocol.swift in Sources */,
 				B3BA65AC1F5A269100B34850 /* SocketClientDelegateProtocol.swift in Sources */,
 				B3BA65A71F5A269100B34850 /* LaneFileProtocol.swift in Sources */,
 				B3BA65B61F5A333F00B34850 /* Fastfile.swift in Sources */,
+				B302067F1F5E3E9000DE6EBD /* ScanfileProtocol.swift in Sources */,
+				B30206801F5E3E9000DE6EBD /* ScreengrabfileProtocol.swift in Sources */,
+				B302067C1F5E3E9000DE6EBD /* GymfileProtocol.swift in Sources */,
+				B302067B1F5E3E9000DE6EBD /* SnapshotfileProtocol.swift in Sources */,
+				B30206651F5E3B0A00DE6EBD /* DefaultFileImplementations.swift in Sources */,
 				B3BA65AB1F5A269100B34850 /* SocketClient.swift in Sources */,
+				B30206811F5E3E9000DE6EBD /* DeliverfileProtocol.swift in Sources */,
 				B3BA65AA1F5A269100B34850 /* Runner.swift in Sources */,
 				B3BA65AF1F5A2D5C00B34850 /* RunnerArgument.swift in Sources */,
+				B302067E1F5E3E9000DE6EBD /* PrecheckfileProtocol.swift in Sources */,
 				B3BA65AD1F5A269100B34850 /* SocketResponse.swift in Sources */,
 				B3BA65A81F5A269100B34850 /* main.swift in Sources */,
 				B3BA65A61F5A269100B34850 /* Fastlane.swift in Sources */,

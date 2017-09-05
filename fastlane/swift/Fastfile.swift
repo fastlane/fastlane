@@ -11,6 +11,8 @@
 
 import Foundation
 
+var appID: String { return "taco" }
+
 class Fastfile: LaneFile {
     let appleID = "myUsername@example.com"
     let appID = "my.app.id"

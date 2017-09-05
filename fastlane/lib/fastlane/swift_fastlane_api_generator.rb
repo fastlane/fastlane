@@ -1,182 +1,103 @@
+require 'fastlane/swift_fastlane_function.rb'
+
 module Fastlane
-  class SwiftFunction
-    attr_accessor :function_name
-    attr_accessor :return_type
-    attr_accessor :param_names
-    attr_accessor :param_descriptions
-    attr_accessor :param_default_values
-    attr_accessor :param_optionality_values
-    attr_accessor :reserved_words
-
-    def initialize(action_name: nil, keys: nil, key_descriptions: nil, key_default_values: nil, key_optionality_values: nil, return_type: nil)
-      @function_name = action_name
-      @param_names = keys
-      @param_descriptions = key_descriptions
-      @param_default_values = key_default_values
-      @param_optionality_values = key_optionality_values
-      @return_type = return_type
-
-      @reserved_words = %w[associativity break case catch class continue convenience default deinit didSet do else enum extension fallthrough false final for func get guard if in infix init inout internal lazy let mutating nil operator override postfix precedence prefix private public repeat required return self set static struct subscript super switch throws true try var weak where while willSet].to_set
-      @options_to_ignore = {
-        "cocoapods" => ["error_callback"],
-        "sh" => ["error_calback"]
-      }
-    end
-
-    def sanitize_reserved_word(word: nil)
-      unless @reserved_words.include?(word)
-        return word
-      end
-      return word + "🚀"
-    end
-
-    def return_declaration
-      expected_type = swift_type_for_return_type
-      unless expected_type.to_s.length > 0
-        return ""
-      end
-
-      return " -> #{expected_type}"
-    end
-
-    def swift_type_for_return_type
-      unless @return_type
-        return ""
-      end
-
-      case @return_type
-      when :string
-        return "String"
-      when :array_of_strings
-        return "[String]"
-      when :hash_of_strings
-        return "[String : String]"
-      when :bool
-        return "Bool"
-      when :int
-        return "Int"
-      else
-        return ""
-      end
-    end
-
-    def camel_case_lower(string: nil)
-      string.split('_').inject([]) { |buffer, e| buffer.push(buffer.empty? ? e : e.capitalize) }.join
-    end
-
-    def parameters
-      unless @param_names
-        return ""
-      end
-
-      param_names_and_types = @param_names.zip(param_default_values, param_optionality_values).map do |param, default_value, optional|
-        type = "String"
-        optional_specifier = ""
-
-        # if we are optional and don't have a default value, we'll need to use ?
-        optional_specifier = "?" if optional && default_value.nil?
-
-        # If we have a default value of true or false, we can infer it is a Bool
-        if default_value.class == FalseClass
-          type = "Bool"
-        elsif default_value.class == TrueClass
-          type = "Bool"
-        end
-
-        unless default_value.nil?
-          if default_value.kind_of?(Array)
-            type = "[String]"
-            default_value = " = #{default_value}"
-          elsif type == "Bool"
-            default_value = " = #{default_value}"
-          else
-            default_value = " = \"#{default_value}\""
-          end
-        end
-
-        # if we don't have a default value, but the param is options, just set a default value to nil
-        if optional
-          default_value ||= " = nil"
-        end
-
-        default_value ||= "" # erase the default value from the swift param string since it's nil
-        # that's because it means we don't have a default value nor optional value so we must get one
-
-        param = camel_case_lower(string: param)
-        param = sanitize_reserved_word(word: param)
-        "#{param}: #{type}#{optional_specifier}#{default_value}"
-      end
-
-      return param_names_and_types.join(", ")
-    end
-
-    def swift_code
-      function_name = camel_case_lower(string: self.function_name)
-      return "func #{function_name}(#{self.parameters})#{self.return_declaration} {\n#{self.implementation}\n}"
-    end
-
-    def build_argument_list
-      unless @param_names
-        return "[]" # return empty list for argument
-      end
-
-      argument_object_strings = @param_names.map do |name|
-        sanitized_name = camel_case_lower(string: name)
-        sanitized_name = sanitize_reserved_word(word: sanitized_name)
-        "RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name})"
-      end
-      argument_object_strings = argument_object_strings.join(", ")
-      argument_object_strings = "[#{argument_object_strings}]" # turn into swift array
-      return argument_object_strings
-    end
-
-    def return_statement
-      expected_type = swift_type_for_return_type
-
-      return_string = "_ = "
-      as_string = ""
-      if expected_type.length > 0
-        return_string = "return "
-        as_string = " as! #{expected_type}"
-
-      end
-      return "#{return_string}runner.executeCommand(command)#{as_string}"
-    end
-
-    def implementation
-      args = build_argument_list
-
-      implm = "  let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: #{args})\n"
-      return implm + "  #{return_statement}"
-    end
-  end
-
   class SwiftFastlaneAPIGenerator
-    attr_accessor :categories
+    attr_accessor :tools_with_option_file
+    attr_accessor :action_options_to_ignore
 
     def initialize
       require 'fastlane'
       require 'fastlane/documentation/actions_list'
       Fastlane.load_actions
+      # Tools that can be used with <Toolname>file, like Deliverfile, Screengrabfile
+      # this is important because we need to generate the proper api for these by creating a protocol
+      # with default implementation we can use in the Fastlane.swift API if people want to use
+      # <Toolname>file.swift files.
+      self.tools_with_option_file = ["snapshot", "screengrab", "scan", "precheck", "match", "gym", "deliver"].to_set
+      self.action_options_to_ignore = {
+        "cocoapods" => ["error_callback"].to_set,
+        "sh" => ["error_calback"].to_set
+      }
     end
 
     def generate_swift(target_path: "swift/Fastlane.swift")
       file_content = []
 
+      generated_tool_classes = []
+      generated_tool_protocols = []
       ActionsList.all_actions do |action|
         swift_function = process_action(action: action)
+        if defined?(swift_function.class_name)
+          generated_tool_classes << swift_function.class_name
+          generated_tool_protocols << swift_function.protocol_name
+        end
         unless swift_function
           next
         end
 
         file_content << swift_function.swift_code
       end
-      file_content << "\n" # newline because <reasons>
+      file_content << "\n" # newline because we're adding an extension
+
+      tool_objects = generate_lanefile_tool_objects(classes: generated_tool_classes)
+      file_content << tool_objects
+
       file_content = file_content.join("\n")
+      file_content << "\n" # newline because <reasons>
 
       File.write(target_path, file_content)
       UI.success(target_path)
-      # File.write(, swift_code)
+
+      generate_default_implementation(protocols: generated_tool_protocols, classes: generated_tool_classes)
+    end
+
+    def generate_default_implementation(protocols: nil, classes: nil)
+      class_defs = protocols.zip(classes).map do |protocol, class_name|
+        "class #{class_name}: #{protocol} {}"
+      end
+
+      class_defs << ""
+      file_content = class_defs.join("\n")
+
+      target_path = "swift/DefaultFileImplementations.swift"
+      File.write(target_path, file_content)
+      UI.success(target_path)
+    end
+
+    def generate_lanefile_tool_objects(classes: nil)
+      objects = classes.map do |filename|
+        "let #{filename.downcase}: #{filename} = #{filename}()"
+      end
+      return objects
+    end
+
+    def generate_tool_protocol(tool_swift_function: nil)
+      protocol_content_array = []
+      protocol_name = tool_swift_function.protocol_name
+
+      protocol_content_array << "protocol #{protocol_name}: class {"
+      protocol_content_array += tool_swift_function.swift_vars
+      protocol_content_array << "}"
+      protocol_content_array << ""
+
+      protocol_content_array << "extension #{protocol_name} {"
+      protocol_content_array += tool_swift_function.swift_default_implementations
+      protocol_content_array << "}"
+      protocol_content_array << ""
+
+      target_path = "swift/#{protocol_name}.swift"
+      file_content = protocol_content_array.join("\n")
+      File.write(target_path, file_content)
+      UI.success(target_path)
+    end
+
+    def ignore_param?(function_name: nil, param_name: nil)
+      option_set = @action_options_to_ignore[function_name]
+      unless option_set
+        return false
+      end
+
+      return option_set.include?(param_name)
     end
 
     def process_action(action: nil)
@@ -190,34 +111,47 @@ module Fastlane
       key_descriptions = []
       key_default_values = []
       key_optionality_values = []
+      key_type_overrides = []
 
       if options.kind_of? Array
         options.each do |current|
           next unless current.kind_of? FastlaneCore::ConfigItem
+          if ignore_param?(function_name: action_name, param_name: current.key)
+            next
+          end
+
           keys << current.key.to_s
           key_descriptions << current.description
           key_default_values << current.default_value
           key_optionality_values << current.optional
-
-          # elsif current.kind_of? Array
-          #   # Legacy actions that don't use the new config manager
-          #   UI.user_error!("Invalid number of elements in this row: #{current}. Must be 2 or 3") unless [2, 3].include? current.count
-          #   rows << current
-          #   rows.last[0] = rows.last.first.yellow # color it yellow :)
-          #   rows.last << nil while rows.last.count < 4 # to have a nice border in the table
-          # end
+          key_type_overrides << current.data_type
         end
       end
       action_return_type = action.return_type
 
-      return SwiftFunction.new(
-        action_name: action_name,
-        keys: keys,
-        key_descriptions: key_descriptions,
-        key_default_values: key_default_values,
-        key_optionality_values: key_optionality_values,
-        return_type: action_return_type
-      )
+      if self.tools_with_option_file.include?(action_name)
+        tool_swift_function = ToolSwiftFunction.new(
+          action_name: action_name,
+          keys: keys,
+          key_descriptions: key_descriptions,
+          key_default_values: key_default_values,
+          key_optionality_values: key_optionality_values,
+          key_type_overrides: key_type_overrides,
+          return_type: action_return_type
+        )
+        generate_tool_protocol(tool_swift_function: tool_swift_function)
+        return tool_swift_function
+      else
+        return SwiftFunction.new(
+          action_name: action_name,
+          keys: keys,
+          key_descriptions: key_descriptions,
+          key_default_values: key_default_values,
+          key_optionality_values: key_optionality_values,
+          key_type_overrides: key_type_overrides,
+          return_type: action_return_type
+        )
+      end
     end
   end
 end
