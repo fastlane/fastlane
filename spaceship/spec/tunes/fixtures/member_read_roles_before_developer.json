@@ -1,0 +1,406 @@
+{
+  "data": {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "value": null,
+    "user": {
+      "emailAddress": {
+        "value": "hjanuschka@gmail.com",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 100,
+        "minLength": 1
+      },
+      "firstName": {
+        "value": "firstname",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 32,
+        "minLength": 1
+      },
+      "lastName": {
+        "value": "lastname",
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 64,
+        "minLength": 1
+      },
+      "dsId": "10795390202",
+      "userName": "hjanuschka@gmail.com",
+      "roles": [
+        {
+          "value": {
+            "name": "finance",
+            "incompatibleRoles": [
+              "sales",
+              "manager"
+            ],
+            "activities": {
+              "EDIT": [
+                "UserManagementSelf",
+                "FinancialReports",
+                "SalesTopContent",
+                "SalesReports",
+                "AgreementsTaxAndBankingGeneral",
+                "CatalogReportApps",
+                "AnalyticsSalesInformation",
+                "AnalyticsEngagementInformation"
+              ],
+              "REPORT": [
+                "UserManagementSelf",
+                "FinancialReports",
+                "SalesTopContent",
+                "SalesReports",
+                "AgreementsTaxAndBankingGeneral",
+                "CatalogReportApps",
+                "AnalyticsSalesInformation",
+                "AnalyticsEngagementInformation"
+              ],
+              "VIEW": [
+                "PricingMatrix",
+                "UserManagementSelf",
+                "UserDetailsOthers",
+                "UserRolesOthers",
+                "UserNotificationsOthers",
+                "FinancialReports",
+                "SalesTopContent",
+                "SalesReports",
+                "AgreementsTaxAndBankingGeneral",
+                "Contracts",
+                "BankInformation",
+                "TaxInformation",
+                "CatalogReportApps",
+                "AnalyticsSalesInformation",
+                "AnalyticsEngagementInformation",
+                "HelpGeneral"
+              ]
+            },
+            "canBeSiloed": false
+          },
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null
+        }
+      ],
+      "canBeDeleted": true,
+      "preferredCurrency": {
+        "value": {
+          "name": "Euro",
+          "currencyCode": "EUR",
+          "countryName": "Austria",
+          "countryCode": "AUT",
+          "countryCode2d": "AT"
+        },
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "preferredCountry": null,
+      "activationExpiry": null,
+      "isActive": true,
+      "userSoftwares": {
+        "value": {
+          "grantAllSoftware": false,
+          "grantedSoftwareAdamIds": ["1197271676"]
+        },
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null
+      },
+      "isSiloable": true,
+      "access": null,
+      "notifications": {
+        "value": {},
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "artists": {
+        "value": null,
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "currentPassword": {
+        "value": null,
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "newPassword": {
+        "value": null,
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 32,
+        "minLength": 6
+      },
+      "confirmPassword": {
+        "value": null,
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 32,
+        "minLength": 6
+      },
+      "isInternalTester": {
+        "value": null,
+        "isEditable": false,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "testerId": null
+    },
+    "roles": [{
+      "value": {
+        "name": "admin",
+        "incompatibleRoles": ["technical", "finance", "readonly", "sales", "manager", "encoder", "marketing", "appmanager", "developer", "reports", "customersupport"],
+        "activities": {
+          "EDIT": ["AppCreation", "AppDeletion", "AppLocalization", "AppMetadata", "IAPMetadata", "IAPPriceMatrix", "VersionMetadata", "VersionScreenshotsAndPreviews", "AppUpload", "XMLFeed", "BinaryValidation", "AppStore", "AppResolutionCenter", "AppAddonCreationAndSubmission", "AppAddonCreation", "AppAddonSubmission", "AppAddonMetadata", "AppAddonSharedSecret", "GameCenterMetadata", "GameCenterTestData", "GameCenterFraud", "Newsstand", "iCloudDisplaySet", "TestFlightBuildDistribution", "TestFlightBetaReview", "TestFlightAppInternalTesterManagement", "TestFlightAppExternalTesterManagement", "BundleCreation", "BundleContent", "BundleSubmission", "BundleResolutionCenter", "IAPPricingMatrix", "Pricing", "PromoCodesAndArt", "ExportCompliance", "AppRatingsAndReviews", "UserManagementGeneral", "UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers", "UserCreation", "UserDeletion", "SandboxUser", "TestFlightProviderInternalTesterManagement", "TestFlightProviderExternalTesterManagement", "TestFlightTesterGroupManagement", "AppAccess", "FinancialReports", "SalesTopContent", "SalesReports", "AgreementsTaxAndBankingGeneral", "BankInformation", "TaxInformation", "CatalogReportApps", "AnalyticsSalesInformation", "AnalyticsEngagementInformation"],
+          "REPORT": ["AppStatusHistory", "AppCreation", "AppDeletion", "AppLocalization", "AppMetadata", "IAPMetadata", "IAPPriceMatrix", "VersionMetadata", "VersionScreenshotsAndPreviews", "AppUpload", "XMLFeed", "BinaryValidation", "BinaryCrashLogs", "AppStore", "AppResolutionCenter", "AppAddonList", "AppAddonCreationAndSubmission", "AppAddonCreation", "AppAddonSubmission", "AppAddonMetadata", "AppAddonSharedSecret", "GameCenterMetadata", "GameCenterTestData", "GameCenterFraud", "Newsstand", "iCloudDisplaySet", "TestFlightBuildDistribution", "TestFlightBetaReview", "TestFlightAppInternalTesterManagement", "TestFlightAppExternalTesterManagement", "BundleCreation", "BundleContent", "BundleSubmission", "BundleResolutionCenter", "IAPPricingMatrix", "Pricing", "PricingMatrix", "PromoCodesAndArt", "ExportCompliance", "RatingsAndReviews", "AppRatingsAndReviews", "UserManagementGeneral", "UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers", "UserCreation", "UserDeletion", "SandboxUser", "TestFlightProviderInternalTesterManagement", "TestFlightProviderExternalTesterManagement", "TestFlightTesterGroupManagement", "AppAccess", "FinancialReports", "SalesTopContent", "SalesReports", "AgreementsTaxAndBankingGeneral", "Contracts", "BankInformation", "TaxInformation", "CatalogReportApps", "AnalyticsSalesInformation", "AnalyticsEngagementInformation", "HelpApplicationLoader", "HelpTransporter", "HelpGeneral"],
+          "VIEW": ["AppStatusHistory", "AppCreation", "AppDeletion", "AppLocalization", "AppMetadata", "IAPMetadata", "IAPPriceMatrix", "VersionMetadata", "VersionScreenshotsAndPreviews", "AppUpload", "XMLFeed", "BinaryValidation", "BinaryCrashLogs", "AppStore", "AppResolutionCenter", "AppAddonList", "AppAddonCreationAndSubmission", "AppAddonCreation", "AppAddonSubmission", "AppAddonMetadata", "AppAddonSharedSecret", "GameCenterMetadata", "GameCenterTestData", "GameCenterFraud", "Newsstand", "iCloudDisplaySet", "TestFlightBuildDistribution", "TestFlightBetaReview", "TestFlightAppInternalTesterManagement", "TestFlightAppExternalTesterManagement", "BundleCreation", "BundleContent", "BundleSubmission", "BundleResolutionCenter", "IAPPricingMatrix", "Pricing", "PricingMatrix", "PromoCodesAndArt", "ExportCompliance", "RatingsAndReviews", "AppRatingsAndReviews", "UserManagementGeneral", "UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers", "UserCreation", "UserDeletion", "SandboxUser", "TestFlightProviderInternalTesterManagement", "TestFlightProviderExternalTesterManagement", "TestFlightTesterGroupManagement", "AppAccess", "FinancialReports", "SalesTopContent", "SalesReports", "AgreementsTaxAndBankingGeneral", "Contracts", "BankInformation", "TaxInformation", "CatalogReportApps", "AnalyticsSalesInformation", "AnalyticsEngagementInformation", "HelpApplicationLoader", "HelpTransporter", "HelpGeneral"]
+        },
+        "canBeSiloed": false
+      },
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    }, {
+      "value": {
+        "name": "finance",
+        "incompatibleRoles": ["sales", "manager"],
+        "activities": {
+          "EDIT": ["UserManagementSelf", "FinancialReports", "SalesTopContent", "SalesReports", "AgreementsTaxAndBankingGeneral", "CatalogReportApps", "AnalyticsSalesInformation", "AnalyticsEngagementInformation"],
+          "REPORT": ["PricingMatrix", "UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers", "FinancialReports", "SalesTopContent", "SalesReports", "AgreementsTaxAndBankingGeneral", "Contracts", "BankInformation", "TaxInformation", "CatalogReportApps", "AnalyticsSalesInformation", "AnalyticsEngagementInformation", "HelpGeneral"],
+          "VIEW": ["PricingMatrix", "UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers", "FinancialReports", "SalesTopContent", "SalesReports", "AgreementsTaxAndBankingGeneral", "Contracts", "BankInformation", "TaxInformation", "CatalogReportApps", "AnalyticsSalesInformation", "AnalyticsEngagementInformation", "HelpGeneral"]
+        },
+        "canBeSiloed": false
+      },
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    }, {
+      "value": {
+        "name": "legal",
+        "incompatibleRoles": null,
+        "activities": {
+          "EDIT": ["AppCreation", "AppDeletion", "AppLocalization", "AppTransfer", "AppMetadata", "IAPMetadata", "IAPPriceMatrix", "VersionMetadata", "VersionScreenshotsAndPreviews", "AppUpload", "XMLFeed", "BinaryValidation", "AppStore", "AppResolutionCenter", "AppAddonCreationAndSubmission", "AppAddonCreation", "AppAddonSubmission", "AppAddonMetadata", "AppAddonSharedSecret", "GameCenterMetadata", "GameCenterTestData", "GameCenterFraud", "Newsstand", "iCloudDisplaySet", "TestFlightBuildDistribution", "TestFlightBetaReview", "TestFlightAppInternalTesterManagement", "TestFlightAppExternalTesterManagement", "BundleCreation", "BundleContent", "BundleSubmission", "BundleResolutionCenter", "IAPPricingMatrix", "Pricing", "PromoCodesAndArt", "ExportCompliance", "AppRatingsAndReviews", "UserManagementGeneral", "UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers", "UserCreation", "UserDeletion", "SandboxUser", "TestFlightProviderInternalTesterManagement", "TestFlightProviderExternalTesterManagement", "TestFlightTesterGroupManagement", "AppAccess", "FinancialReports", "SalesTopContent", "SalesReports", "AgreementsTaxAndBankingGeneral", "Contracts", "BankInformation", "TaxInformation", "CatalogReportApps", "AnalyticsSalesInformation", "AnalyticsEngagementInformation"],
+          "REPORT": ["AppStatusHistory", "AppCreation", "AppDeletion", "AppLocalization", "AppTransfer", "AppMetadata", "IAPMetadata", "IAPPriceMatrix", "VersionMetadata", "VersionScreenshotsAndPreviews", "AppUpload", "XMLFeed", "BinaryValidation", "BinaryCrashLogs", "AppStore", "AppResolutionCenter", "AppAddonList", "AppAddonCreationAndSubmission", "AppAddonCreation", "AppAddonSubmission", "AppAddonMetadata", "AppAddonSharedSecret", "GameCenterMetadata", "GameCenterTestData", "GameCenterFraud", "Newsstand", "iCloudDisplaySet", "TestFlightBuildDistribution", "TestFlightBetaReview", "TestFlightAppInternalTesterManagement", "TestFlightAppExternalTesterManagement", "BundleCreation", "BundleContent", "BundleSubmission", "BundleResolutionCenter", "IAPPricingMatrix", "Pricing", "PricingMatrix", "PromoCodesAndArt", "ExportCompliance", "RatingsAndReviews", "AppRatingsAndReviews", "UserManagementGeneral", "UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers", "UserCreation", "UserDeletion", "SandboxUser", "TestFlightProviderInternalTesterManagement", "TestFlightProviderExternalTesterManagement", "TestFlightTesterGroupManagement", "AppAccess", "FinancialReports", "SalesTopContent", "SalesReports", "AgreementsTaxAndBankingGeneral", "Contracts", "BankInformation", "TaxInformation", "CatalogReportApps", "AnalyticsSalesInformation", "AnalyticsEngagementInformation", "HelpApplicationLoader", "HelpTransporter", "HelpGeneral"],
+          "VIEW": ["AppStatusHistory", "AppCreation", "AppDeletion", "AppLocalization", "AppTransfer", "AppMetadata", "IAPMetadata", "IAPPriceMatrix", "VersionMetadata", "VersionScreenshotsAndPreviews", "AppUpload", "XMLFeed", "BinaryValidation", "BinaryCrashLogs", "AppStore", "AppResolutionCenter", "AppAddonList", "AppAddonCreationAndSubmission", "AppAddonCreation", "AppAddonSubmission", "AppAddonMetadata", "AppAddonSharedSecret", "GameCenterMetadata", "GameCenterTestData", "GameCenterFraud", "Newsstand", "iCloudDisplaySet", "TestFlightBuildDistribution", "TestFlightBetaReview", "TestFlightAppInternalTesterManagement", "TestFlightAppExternalTesterManagement", "BundleCreation", "BundleContent", "BundleSubmission", "BundleResolutionCenter", "IAPPricingMatrix", "Pricing", "PricingMatrix", "PromoCodesAndArt", "ExportCompliance", "RatingsAndReviews", "AppRatingsAndReviews", "UserManagementGeneral", "UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers", "UserCreation", "UserDeletion", "SandboxUser", "TestFlightProviderInternalTesterManagement", "TestFlightProviderExternalTesterManagement", "TestFlightTesterGroupManagement", "AppAccess", "FinancialReports", "SalesTopContent", "SalesReports", "AgreementsTaxAndBankingGeneral", "Contracts", "BankInformation", "TaxInformation", "CatalogReportApps", "AnalyticsSalesInformation", "AnalyticsEngagementInformation", "HelpApplicationLoader", "HelpTransporter", "HelpGeneral"]
+        },
+        "canBeSiloed": false
+      },
+      "isEditable": false,
+      "isRequired": false,
+      "errorKeys": null
+    }, {
+      "value": {
+        "name": "sales",
+        "incompatibleRoles": ["finance", "manager"],
+        "activities": {
+          "EDIT": ["UserManagementSelf", "SalesTopContent", "AnalyticsSalesInformation", "AnalyticsEngagementInformation"],
+          "REPORT": ["UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers", "SalesTopContent", "SalesReports", "CatalogReportApps", "AnalyticsSalesInformation", "AnalyticsEngagementInformation", "HelpGeneral"],
+          "VIEW": ["UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers", "SalesTopContent", "AnalyticsSalesInformation", "AnalyticsEngagementInformation", "HelpGeneral"]
+        },
+        "canBeSiloed": true
+      },
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    }, {
+      "value": {
+        "name": "marketing",
+        "incompatibleRoles": ["readonly", "manager", "encoder"],
+        "activities": {
+          "EDIT": ["AppLocalization", "AppMetadata", "IAPMetadata", "IAPPriceMatrix", "VersionMetadata", "VersionScreenshotsAndPreviews", "AppAddonCreationAndSubmission", "AppAddonCreation", "AppAddonMetadata", "GameCenterMetadata", "TestFlightAppInternalTesterManagement", "BundleCreation", "BundleContent", "PromoCodesAndArt", "UserManagementSelf"],
+          "REPORT": ["AppStatusHistory", "AppLocalization", "AppMetadata", "IAPMetadata", "IAPPriceMatrix", "VersionMetadata", "VersionScreenshotsAndPreviews", "AppResolutionCenter", "AppAddonList", "AppAddonCreationAndSubmission", "AppAddonCreation", "AppAddonMetadata", "GameCenterMetadata", "TestFlightBuildDistribution", "TestFlightAppInternalTesterManagement", "TestFlightAppExternalTesterManagement", "BundleCreation", "BundleContent", "IAPPricingMatrix", "Pricing", "PricingMatrix", "PromoCodesAndArt", "RatingsAndReviews", "AppRatingsAndReviews", "UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers", "TestFlightTesterGroupManagement", "CatalogReportApps", "HelpGeneral"],
+          "VIEW": ["AppStatusHistory", "AppLocalization", "AppMetadata", "IAPMetadata", "IAPPriceMatrix", "VersionMetadata", "VersionScreenshotsAndPreviews", "AppResolutionCenter", "AppAddonList", "AppAddonCreationAndSubmission", "AppAddonCreation", "AppAddonMetadata", "GameCenterMetadata", "TestFlightBuildDistribution", "TestFlightAppInternalTesterManagement", "TestFlightAppExternalTesterManagement", "BundleCreation", "BundleContent", "IAPPricingMatrix", "Pricing", "PricingMatrix", "PromoCodesAndArt", "RatingsAndReviews", "AppRatingsAndReviews", "UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers", "TestFlightTesterGroupManagement", "HelpGeneral"]
+        },
+        "canBeSiloed": true
+      },
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    }, {
+      "value": {
+        "name": "appmanager",
+        "incompatibleRoles": ["developer", "marketing"],
+        "activities": {
+          "EDIT": ["AppCreation", "AppLocalization", "AppMetadata", "IAPMetadata", "IAPPriceMatrix", "VersionMetadata", "VersionScreenshotsAndPreviews", "AppUpload", "XMLFeed", "BinaryValidation", "AppStore", "AppResolutionCenter", "AppAddonCreationAndSubmission", "AppAddonCreation", "AppAddonSubmission", "AppAddonMetadata", "AppAddonSharedSecret", "GameCenterMetadata", "GameCenterTestData", "GameCenterFraud", "Newsstand", "iCloudDisplaySet", "TestFlightBuildDistribution", "TestFlightBetaReview", "TestFlightAppInternalTesterManagement", "TestFlightAppExternalTesterManagement", "BundleCreation", "BundleContent", "BundleSubmission", "BundleResolutionCenter", "IAPPricingMatrix", "Pricing", "PromoCodesAndArt", "ExportCompliance", "UserManagementGeneral", "UserManagementSelf", "UserCreation", "SandboxUser", "TestFlightTesterGroupManagement", "AppAccess"],
+          "REPORT": ["AppStatusHistory", "AppCreation", "AppLocalization", "AppMetadata", "IAPMetadata", "IAPPriceMatrix", "VersionMetadata", "VersionScreenshotsAndPreviews", "AppUpload", "XMLFeed", "BinaryValidation", "BinaryCrashLogs", "AppStore", "AppResolutionCenter", "AppAddonList", "AppAddonCreationAndSubmission", "AppAddonCreation", "AppAddonSubmission", "AppAddonMetadata", "AppAddonSharedSecret", "GameCenterMetadata", "GameCenterTestData", "GameCenterFraud", "Newsstand", "iCloudDisplaySet", "TestFlightBuildDistribution", "TestFlightBetaReview", "TestFlightAppInternalTesterManagement", "TestFlightAppExternalTesterManagement", "BundleCreation", "BundleContent", "BundleSubmission", "BundleResolutionCenter", "IAPPricingMatrix", "Pricing", "PricingMatrix", "PromoCodesAndArt", "ExportCompliance", "RatingsAndReviews", "AppRatingsAndReviews", "UserManagementGeneral", "UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers", "UserCreation", "SandboxUser", "TestFlightTesterGroupManagement", "AppAccess", "CatalogReportApps", "HelpApplicationLoader", "HelpTransporter", "HelpGeneral"],
+          "VIEW": ["AppStatusHistory", "AppCreation", "AppLocalization", "AppMetadata", "IAPMetadata", "IAPPriceMatrix", "VersionMetadata", "VersionScreenshotsAndPreviews", "AppUpload", "XMLFeed", "BinaryValidation", "BinaryCrashLogs", "AppStore", "AppResolutionCenter", "AppAddonList", "AppAddonCreationAndSubmission", "AppAddonCreation", "AppAddonSubmission", "AppAddonMetadata", "AppAddonSharedSecret", "GameCenterMetadata", "GameCenterTestData", "GameCenterFraud", "Newsstand", "iCloudDisplaySet", "TestFlightBuildDistribution", "TestFlightBetaReview", "TestFlightAppInternalTesterManagement", "TestFlightAppExternalTesterManagement", "BundleCreation", "BundleContent", "BundleSubmission", "BundleResolutionCenter", "IAPPricingMatrix", "Pricing", "PricingMatrix", "PromoCodesAndArt", "ExportCompliance", "RatingsAndReviews", "AppRatingsAndReviews", "UserManagementGeneral", "UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers", "UserCreation", "SandboxUser", "TestFlightTesterGroupManagement", "AppAccess", "HelpApplicationLoader", "HelpTransporter", "HelpGeneral"]
+        },
+        "canBeSiloed": true
+      },
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    }, {
+      "value": {
+        "name": "developer",
+        "incompatibleRoles": [],
+        "activities": {
+          "EDIT": ["AppUpload", "BinaryValidation", "AppAddonCreationAndSubmission", "AppAddonCreation", "GameCenterMetadata", "GameCenterTestData", "TestFlightAppInternalTesterManagement", "UserManagementSelf"],
+          "REPORT": ["AppStatusHistory", "AppMetadata", "IAPMetadata", "IAPPriceMatrix", "VersionMetadata", "VersionScreenshotsAndPreviews", "AppUpload", "BinaryValidation", "BinaryCrashLogs", "AppResolutionCenter", "AppAddonList", "AppAddonCreationAndSubmission", "AppAddonCreation", "AppAddonMetadata", "GameCenterMetadata", "GameCenterTestData", "TestFlightBuildDistribution", "TestFlightAppInternalTesterManagement", "TestFlightAppExternalTesterManagement", "ExportCompliance", "RatingsAndReviews", "AppRatingsAndReviews", "UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers", "TestFlightTesterGroupManagement", "CatalogReportApps", "HelpApplicationLoader", "HelpGeneral"],
+          "VIEW": ["AppStatusHistory", "AppMetadata", "IAPMetadata", "IAPPriceMatrix", "VersionMetadata", "VersionScreenshotsAndPreviews", "AppUpload", "BinaryValidation", "BinaryCrashLogs", "AppResolutionCenter", "AppAddonList", "AppAddonCreationAndSubmission", "AppAddonCreation", "AppAddonMetadata", "GameCenterMetadata", "GameCenterTestData", "TestFlightBuildDistribution", "TestFlightAppInternalTesterManagement", "TestFlightAppExternalTesterManagement", "ExportCompliance", "RatingsAndReviews", "AppRatingsAndReviews", "UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers", "TestFlightTesterGroupManagement", "HelpApplicationLoader", "HelpGeneral"]
+        },
+        "canBeSiloed": true
+      },
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    }, {
+      "value": {
+        "name": "reports",
+        "incompatibleRoles": ["technical"],
+        "activities": {
+          "EDIT": [],
+          "REPORT": [],
+          "VIEW": []
+        },
+        "canBeSiloed": false
+      },
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    }, {
+      "value": {
+        "name": "customersupport",
+        "incompatibleRoles": [],
+        "activities": {
+          "EDIT": ["AppRatingsAndReviews", "UserManagementSelf"],
+          "REPORT": ["AppMetadata", "AppRatingsAndReviews", "UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers"],
+          "VIEW": ["AppMetadata", "AppRatingsAndReviews", "UserManagementSelf", "UserDetailsOthers", "UserRolesOthers", "UserNotificationsOthers"]
+        },
+        "canBeSiloed": true
+      },
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    }],
+    "actions": {
+      "manageusers": {
+        "marketing": "NONE",
+        "reports": "NONE",
+        "legal": "READ_WRITE",
+        "customersupport": "NONE",
+        "admin": "READ_WRITE",
+        "developer": "NONE",
+        "appmanager": "NONE",
+        "finance": "READ_ONLY",
+        "sales": "READ_ONLY"
+      },
+      "managetestusers": {
+        "marketing": "NONE",
+        "reports": "NONE",
+        "legal": "READ_WRITE",
+        "customersupport": "NONE",
+        "admin": "READ_WRITE",
+        "developer": "NONE",
+        "appmanager": "NONE",
+        "finance": "NONE",
+        "sales": "NONE"
+      },
+      "manageyourapplications": {
+        "marketing": "NONE",
+        "reports": "NONE",
+        "legal": "READ_WRITE",
+        "customersupport": "NONE",
+        "admin": "READ_WRITE",
+        "developer": "NONE",
+        "appmanager": "NONE",
+        "finance": "NONE",
+        "sales": "NONE"
+      },
+      "salesandtrends": {
+        "marketing": "NONE",
+        "reports": "NONE",
+        "legal": "READ_WRITE",
+        "customersupport": "NONE",
+        "admin": "READ_WRITE",
+        "developer": "NONE",
+        "appmanager": "NONE",
+        "finance": "READ_WRITE",
+        "sales": "READ_WRITE"
+      },
+      "appanalytics": {
+        "marketing": "NONE",
+        "reports": "NONE",
+        "legal": "NONE",
+        "customersupport": "NONE",
+        "admin": "READ_WRITE",
+        "developer": "NONE",
+        "appmanager": "NONE",
+        "finance": "READ_WRITE",
+        "sales": "READ_WRITE"
+      },
+      "taxandbanking": {
+        "marketing": "NONE",
+        "reports": "NONE",
+        "legal": "READ_WRITE",
+        "customersupport": "NONE",
+        "admin": "READ_WRITE",
+        "developer": "NONE",
+        "appmanager": "NONE",
+        "finance": "READ_WRITE",
+        "sales": "NONE"
+      },
+      "contracts": {
+        "marketing": "NONE",
+        "reports": "NONE",
+        "legal": "READ_WRITE",
+        "customersupport": "NONE",
+        "admin": "READ_ONLY",
+        "developer": "NONE",
+        "appmanager": "NONE",
+        "finance": "READ_ONLY",
+        "sales": "NONE"
+      },
+      "paymentsandfinancialreports": {
+        "marketing": "NONE",
+        "reports": "NONE",
+        "legal": "READ_WRITE",
+        "customersupport": "NONE",
+        "admin": "READ_WRITE",
+        "developer": "NONE",
+        "appmanager": "NONE",
+        "finance": "READ_WRITE",
+        "sales": "NONE"
+      },
+      "marketing": {
+        "marketing": "READ_WRITE",
+        "reports": "NONE",
+        "legal": "NONE",
+        "customersupport": "NONE",
+        "admin": "READ_WRITE",
+        "developer": "NONE",
+        "appmanager": "NONE",
+        "finance": "NONE",
+        "sales": "NONE"
+      },
+      "contactus": {
+        "marketing": "READ_WRITE",
+        "reports": "NONE",
+        "legal": "READ_WRITE",
+        "customersupport": "NONE",
+        "admin": "READ_WRITE",
+        "developer": "NONE",
+        "appmanager": "NONE",
+        "finance": "READ_WRITE",
+        "sales": "READ_WRITE"
+      }
+    },
+    "providerFeatures": ["UserManagementGeneral", "AppAccess", "SandboxUser", "AgreementsTaxAndBankingGeneral", "Contracts", "FinancialReports", "CatalogReportApps"],
+    "appFeatures": ["AppCreation", "AppStore", "AppUpload", "AppMetadata", "PromoCodesAndArt", "TestFlightBuildDistribution", "TestFlightAppExternalTesterManagement", "TestFlightAppInternalTesterManagement", "Pricing", "AppAddonCreation", "AppAddonSubmission", "AppAddonMetadata", "GameCenterMetadata", "GameCenterFraud", "AnalyticsSalesInformation", "SalesTopContent", "SalesReports", "AppRatingsAndReviews"]
+  },
+  "messages": {
+    "warn": null,
+    "info": null,
+    "error": null
+  },
+  "statusCode": "SUCCESS"
+}
