@@ -31,7 +31,7 @@ public extension LaneFileProtocol {
 public class LaneFile: NSObject, LaneFileProtocol {
     public var environmentVariables: EnvironmentVariables = EnvironmentVariables.instance
 
-    public private(set) static var fastfileInstance: AnyObject?
+    public private(set) static var fastfileInstance: LaneFile?
 
     private var laneDescriptionMapping: [Selector : String] = [:]
 
@@ -73,11 +73,11 @@ public class LaneFile: NSObject, LaneFileProtocol {
         if self.fastfileInstance == nil {
             let fastfileType: AnyObject.Type = NSClassFromString(self.className())!
             let fastfileAsNSObjectType: NSObject.Type = fastfileType as! NSObject.Type
-            let currentFastfileInstance: AnyObject = fastfileAsNSObjectType.init()
+            let currentFastfileInstance: LaneFile? = fastfileAsNSObjectType.init() as? LaneFile
             self.fastfileInstance = currentFastfileInstance
         }
 
-        guard let fastfileInstance: LaneFile = self.fastfileInstance as? LaneFile else {
+        guard let fastfileInstance: LaneFile = self.fastfileInstance else {
             fatalError("Unable to instantiate class named: \(self.className())")
         }
 
