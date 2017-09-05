@@ -27,5 +27,22 @@ describe Spaceship::Tunes::Members do
         Spaceship::Members.create!(firstname: "Helmut", lastname: "Januschka", email_address: "helmut@januschka.com", roles: ["appmanager"], apps: ["898536088"])
       end
     end
+
+    describe "updates roles and apps for an existing member" do
+      it "role: admin, apps: all" do
+        member = Spaceship::Members.find("helmut@januschka.com")
+        Spaceship::Members.update_member_roles!(member, roles: [], apps: [])
+      end
+
+      it "role: developer apps: all" do
+        member = Spaceship::Members.find("hjanuschka@gmail.com")
+        Spaceship::Members.update_member_roles!(member, roles: ["developer"])
+      end
+
+      it "role: appmanager, apps: 898536088" do
+        member = Spaceship::Members.find("hjanuschka+no-accept@gmail.com")
+        Spaceship::Members.update_member_roles!(member, roles: ["appmanager"], apps: ["898536088"])
+      end
+    end
   end
 end
