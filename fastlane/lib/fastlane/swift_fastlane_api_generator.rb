@@ -16,12 +16,24 @@ module Fastlane
       self.tools_with_option_file = ["snapshot", "screengrab", "scan", "precheck", "match", "gym", "deliver"].to_set
       self.action_options_to_ignore = {
         "cocoapods" => ["error_callback"].to_set,
-        "sh" => ["error_calback"].to_set
+        "sh" => ["error_calback"].to_set,
+        "precheck" => [
+          "negative_apple_sentiment",
+          "placeholder_text",
+          "other_platforms",
+          "future_functionality",
+          "test_words",
+          "curse_words",
+          "custom_text",
+          "copyright_date",
+          "unreachable_urls"
+        ].to_set
       }
     end
 
     def generate_swift(target_path: "swift/Fastlane.swift")
       file_content = []
+      file_content << "import Foundation"
 
       generated_tool_classes = []
       generated_tool_protocols = []
@@ -37,13 +49,17 @@ module Fastlane
 
         file_content << swift_function.swift_code
       end
-      file_content << "\n" # newline because we're adding an extension
+      file_content << "" # newline because we're adding an extension
+      file_content << "// These are all the parsing functions needed to transform our data into the expected types"
+      file_content << generate_lanefile_parsing_functions
 
+      file_content << "// [TOOL_OBJECTS] These objects can potentially be replaced when we compile the user's Fastfile.swift"
       tool_objects = generate_lanefile_tool_objects(classes: generated_tool_classes)
       file_content << tool_objects
+      file_content << "// end of [TOOL_OBJECTS]"
+      file_content << "" # newline because it's the end of the file adding an extension
 
       file_content = file_content.join("\n")
-      file_content << "\n" # newline because <reasons>
 
       File.write(target_path, file_content)
       UI.success(target_path)
@@ -62,6 +78,45 @@ module Fastlane
       target_path = "swift/DefaultFileImplementations.swift"
       File.write(target_path, file_content)
       UI.success(target_path)
+    end
+
+    def generate_lanefile_parsing_functions
+      parsing_functions = 'func parseArray(fromString: String, function: String = #function) -> [String] {
+  verbose(message: "parsing an Array from data: \(fromString), from function: \(function)")
+  let potentialArray: String
+  if fromString.characters.count < 2 {
+    potentialArray = "[\(fromString)]"
+  } else {
+    potentialArray = fromString
+  }
+  let array: [String] = try! JSONSerialization.jsonObject(with: potentialArray.data(using: .utf8)!, options: []) as! [String]
+  return array
+}
+
+func parseDictionary(fromString: String, function: String = #function) -> [String : String] {
+  verbose(message: "parsing an Array from data: \(fromString), from function: \(function)")
+  let potentialDictionary: String
+  if fromString.characters.count < 2 {
+    verbose(message: "Dictionary value too small: \(fromString), from function: \(function)")
+    potentialDictionary = "{}"
+  } else {
+      potentialDictionary = fromString
+  }
+  let dictionary: [String : String] = try! JSONSerialization.jsonObject(with: potentialDictionary.data(using: .utf8)!, options: []) as! [String : String]
+  return dictionary
+}
+
+func parseBool(fromString: String, function: String = #function) -> Bool {
+  verbose(message: "parsing a Bool from data: \(fromString), from function: \(function)")
+  return NSString(string: fromString).boolValue
+}
+
+func parseInt(fromString: String, function: String = #function) -> Int {
+  verbose(message: "parsing a Bool from data: \(fromString), from function: \(function)")
+  return NSString(string: fromString).integerValue
+}
+      '
+      return parsing_functions
     end
 
     def generate_lanefile_tool_objects(classes: nil)
@@ -92,12 +147,12 @@ module Fastlane
     end
 
     def ignore_param?(function_name: nil, param_name: nil)
-      option_set = @action_options_to_ignore[function_name]
+      option_set = @action_options_to_ignore[function_name.to_s]
       unless option_set
         return false
       end
 
-      return option_set.include?(param_name)
+      return option_set.include?(param_name.to_s)
     end
 
     def process_action(action: nil)
@@ -116,6 +171,7 @@ module Fastlane
       if options.kind_of? Array
         options.each do |current|
           next unless current.kind_of? FastlaneCore::ConfigItem
+
           if ignore_param?(function_name: action_name, param_name: current.key)
             next
           end
@@ -129,7 +185,7 @@ module Fastlane
       end
       action_return_type = action.return_type
 
-      if self.tools_with_option_file.include?(action_name)
+      if self.tools_with_option_file.include?(action_name.to_s)
         tool_swift_function = ToolSwiftFunction.new(
           action_name: action_name,
           keys: keys,
