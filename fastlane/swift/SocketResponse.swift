@@ -12,7 +12,7 @@ struct SocketResponse {
     enum ResponseType {
         case parseFailure(failureInformation: [String])
         case failure(failureInformation: [String])
-        case readyForNext
+        case readyForNext(returnedObject: String?)
 
         init(statusDictionary: [String : Any]) {
             guard let status = statusDictionary["status"] as? String else {
@@ -21,7 +21,8 @@ struct SocketResponse {
             }
 
             if status == "ready_for_next" {
-                self = .readyForNext
+                let returnedObject = statusDictionary["return_object"] as? String
+                self = .readyForNext(returnedObject: returnedObject)
                 return
 
             } else if status == "failure" {
@@ -60,7 +61,7 @@ extension SocketResponse {
             do {
                 return try JSONSerialization.jsonObject(with: data, options: []) as? [String : Any]
             } catch {
-                print(error.localizedDescription)
+                log(message: error.localizedDescription)
             }
         }
         return nil

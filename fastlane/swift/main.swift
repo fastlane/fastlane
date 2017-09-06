@@ -23,9 +23,47 @@ let fastlaneArgsMinusLanes = fastlaneArgs.filter { arg in
     return arg.name.lowercased() != "lane"
 }
 
+let potentialLogMode = fastlaneArgsMinusLanes.filter { arg in
+    return arg.name.lowercased() == "logmode"
+}
+
+verbose(message: lanes.description)
+
 guard lanes.count == 1 else {
-    fatalError("You must have exactly one lane specified as an arg, here's what I got: \(lanes)")
+    log(message: "You must have exactly one lane specified as an arg, here's what I got: \(lanes)")
+    fatalError()
 }
 
 let lane = lanes.first!
-Fastfile.runLane(named: lane.value)
+
+if let logModeArg = potentialLogMode.first {
+    let logModeString = logModeArg.value
+    Logger.logMode = Logger.LogMode(logMode: logModeString)
+}
+
+class MainProcess {
+    var doneRunningLane = false
+    var thread: Thread!
+
+    @objc func connectToFastlaneAndRunLane() {
+        runner.startSocketThread()
+
+        Fastfile.runLane(named: lane.value)
+        runner.disconnectFromFastlaneProcess()
+
+        doneRunningLane = true
+    }
+
+    func startFastlaneThread() {
+        thread = Thread(target: self, selector: #selector(connectToFastlaneAndRunLane), object: nil)
+        thread.name = "worker thread"
+        thread.start()
+    }
+}
+
+let process: MainProcess = MainProcess()
+process.startFastlaneThread()
+
+while (!process.doneRunningLane && (RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date(timeIntervalSinceNow: 2)))) {
+// no op
+}

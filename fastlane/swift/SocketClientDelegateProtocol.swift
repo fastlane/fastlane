@@ -11,5 +11,5 @@ import Foundation
 protocol SocketClientDelegateProtocol: class {
     func connectionsOpened()
     func connectionsClosed()
-    func commandExecuted(error: SocketClientError?)
+    func commandExecuted(serverResponse: SocketClientResponse)
 }
