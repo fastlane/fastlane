@@ -76,7 +76,7 @@ Code signing is required for product type 'Application' in SDK 'iOS 11.0'
 
       Gym.config[:export_method] = 'enterprise'
       Gym.config[:export_options][:provisioningProfiles] = {
-        'com.sample.0' => 'In House Ad Hoc' # `enterprise` take precedence over `ad-hoc`
+        'com.sample.app' => 'In House Ad Hoc' # `enterprise` take precedence over `ad-hoc`
       }
 
       expect(UI).to receive(:error).with(/There seems to be a mismatch between/).never
