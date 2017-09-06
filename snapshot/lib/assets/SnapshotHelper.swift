@@ -32,6 +32,27 @@ func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
     Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator)
 }
 
+func startRecording(name: String) {
+    sendCommand(commnad: "startRecording",args: "name=\(name)")
+}
+
+func stopRecording() {
+    sendCommand(commnad: "stopRecording")
+}
+
+func sendCommand(commnad: String,args: String = "") {
+    guard var simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let port = Snapshot.getCommandListenerPort() else { return }
+    simulator = simulator.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
+    if let url = URL(string: "http://localhost:\(port)/\(commnad)?device=\(simulator)&\(args)") {
+        let (_, _, error) = URLSession.shared.synchronousDataTask(with: url)
+        if (error != nil) {
+            print("Error sending commnad: \(String(describing: error))")
+        }
+    } else {
+        print("Error sending commnad: bad URL")
+    }
+}
+
 enum SnapshotError: Error, CustomDebugStringConvertible {
     case cannotDetectUser
     case cannotFindHomeDirectory
@@ -58,7 +79,7 @@ open class Snapshot: NSObject {
     static var screenshotsDirectory: URL? {
         return cacheDirectory.appendingPathComponent("screenshots", isDirectory: true)
     }
-
+    
     open class func setupSnapshot(_ app: XCUIApplication) {
         do {
             let cacheDir = try pathPrefix()
@@ -71,10 +92,10 @@ open class Snapshot: NSObject {
             print(error)
         }
     }
-
+    
     class func setLanguage(_ app: XCUIApplication) {
         let path = cacheDirectory.appendingPathComponent("language.txt")
-
+        
         do {
             let trimCharacterSet = CharacterSet.whitespacesAndNewlines
             deviceLanguage = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
@@ -83,10 +104,10 @@ open class Snapshot: NSObject {
             print("Couldn't detect/set language...")
         }
     }
-
+    
     class func setLocale(_ app: XCUIApplication) {
         let path = cacheDirectory.appendingPathComponent("locale.txt")
-
+        
         do {
             let trimCharacterSet = CharacterSet.whitespacesAndNewlines
             locale = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
@@ -98,11 +119,11 @@ open class Snapshot: NSObject {
         }
         app.launchArguments += ["-AppleLocale", "\"\(locale)\""]
     }
-
+    
     class func setLaunchArguments(_ app: XCUIApplication) {
         let path = cacheDirectory.appendingPathComponent("snapshot-launch_arguments.txt")
         app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES", "-ui_testing"]
-
+        
         do {
             let launchArguments = try String(contentsOf: path, encoding: String.Encoding.utf8)
             let regex = try NSRegularExpression(pattern: "(\\\".+?\\\"|\\S+)", options: [])
@@ -116,15 +137,27 @@ open class Snapshot: NSObject {
         }
     }
 
+    class func getCommandListenerPort() -> String? {
+        let path = cacheDirectory.appendingPathComponent("Command_listener_port.txt")
+        var port: String?
+        do {
+            let trimCharacterSet = CharacterSet.whitespacesAndNewlines
+            port = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
+        } catch {
+            print("Couldn't get the command listener port...")
+        }
+        return port
+    }
+
     open class func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
         if waitForLoadingIndicator {
             waitForLoadingIndicatorToDisappear()
         }
-
+        
         print("snapshot: \(name)") // more information about this, check out https://github.com/fastlane/fastlane/tree/master/snapshot#how-does-it-work
-
+        
         sleep(1) // Waiting for the animation to be finished (kind of)
-
+        
         #if os(OSX)
             XCUIApplication().typeKey(XCUIKeyboardKeySecondaryFn, modifierFlags: [])
         #else
@@ -139,20 +172,20 @@ open class Snapshot: NSObject {
             }
         #endif
     }
-
+    
     class func waitForLoadingIndicatorToDisappear() {
         #if os(tvOS)
             return
         #endif
-
+        
         let query = XCUIApplication().statusBars.children(matching: .other).element(boundBy: 1).children(matching: .other)
-
+        
         while (0..<query.count).map({ query.element(boundBy: $0) }).contains(where: { $0.isLoadingIndicator }) {
             sleep(1)
             print("Waiting for loading indicator to disappear...")
         }
     }
-
+    
     class func pathPrefix() throws -> URL? {
         let homeDir: URL
         // on OSX config is stored in /Users/<username>/Library
@@ -161,11 +194,11 @@ open class Snapshot: NSObject {
             guard let user = ProcessInfo().environment["USER"] else {
                 throw SnapshotError.cannotDetectUser
             }
-
+            
             guard let usersDir =  FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
                 throw SnapshotError.cannotFindHomeDirectory
             }
-
+            
             homeDir = usersDir.appendingPathComponent(user)
         #else
             guard let simulatorHostHome = ProcessInfo().environment["SIMULATOR_HOST_HOME"] else {
@@ -190,6 +223,29 @@ extension XCUIElement {
     }
 }
 
+extension URLSession {
+    func synchronousDataTask(with url: URL) -> (Data?, URLResponse?, Error?) {
+        var data: Data?
+        var response: URLResponse?
+        var error: Error?
+        
+        let semaphore = DispatchSemaphore(value: 0)
+        
+        let dataTask = self.dataTask(with: url) {
+            data = $0
+            response = $1
+            error = $2
+            
+            semaphore.signal()
+        }
+        dataTask.resume()
+        
+        _ = semaphore.wait(timeout: .distantFuture)
+        
+        return (data, response, error)
+    }
+}
+
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.5]
+// SnapshotHelperVersion [1.6]
