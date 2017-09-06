@@ -2,6 +2,9 @@ module Fastlane
   module Actions
     class BadgeAction < Action
       def self.run(params)
+        UI.important('The badge action has been deprecated,')
+        UI.important('please checkout the badge plugin here:')
+        UI.important('https://github.com/HazAT/fastlane-plugin-badge')
         Actions.verify_gem!('badge')
         require 'badge'
         options = {
@@ -52,7 +55,7 @@ module Fastlane
       end
 
       def self.category
-        :misc
+        :deprecated
       end
 
       def self.available_options

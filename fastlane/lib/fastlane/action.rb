@@ -14,8 +14,8 @@ module Fastlane
       :production,
       :source_control,
       :notifications,
-      :deprecated,
-      :misc
+      :misc,
+      :deprecated # This should be the last item
     ]
 
     class << self

@@ -14,6 +14,7 @@ describe Fastlane do
             buildkite: true,
             jenkins: true,
             travis: true,
+            travis_pro: true,
             circleci: true,
             coveralls: true,
             teamcity: true,
@@ -37,6 +38,7 @@ describe Fastlane do
 
         expected = "slather coverage
                     --travis
+                    --travis-pro
                     --circleci
                     --jenkins
                     --buildkite
@@ -77,6 +79,7 @@ describe Fastlane do
             buildkite: true,
             jenkins: true,
             travis: true,
+            travis_pro: true,
             circleci: true,
             coveralls: true,
             simple_output: true,
@@ -96,6 +99,7 @@ describe Fastlane do
 
         expected = 'bundle exec slather coverage
                     --travis
+                    --travis-pro
                     --circleci
                     --jenkins
                     --buildkite

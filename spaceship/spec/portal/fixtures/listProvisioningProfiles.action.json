@@ -121,6 +121,25 @@
 
       ],
       "UUID": "58ce5b78-15f8-4ceb-83f1-a29f6c4d066f"
+    },
+    {
+      "provisioningProfileId": "PP00000007",
+      "name": "Profile with Template App Store",
+      "status": "Active",
+      "type": "iOS Distribution",
+      "distributionMethod": "store",
+      "proProPlatform": "ios",
+      "version":"3",
+      "dateExpire":"2021-06-16T04:15:00Z",
+      "managingApp": null,
+      "isTemplateProfile": "true",
+      "deviceIds": [
+
+      ],
+      "certificateIds": [
+
+      ],
+      "UUID":"f7a0ce31-6482-4daa-9a98-21cb9ccc7036"
     }
   ]
 }
