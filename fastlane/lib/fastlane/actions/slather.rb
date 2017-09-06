@@ -8,7 +8,7 @@ module Fastlane
       # https://github.com/SlatherOrg/slather/blob/v2.4.2/lib/slather/command/coverage_command.rb
       ARGS_MAP = {
           travis: '--travis',
-          travis_pro: '--travis-pro',
+          travis_pro: '--travispro',
           circleci: '--circleci',
           jenkins: '--jenkins',
           buildkite: '--buildkite',
