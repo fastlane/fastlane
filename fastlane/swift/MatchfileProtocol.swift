@@ -2,7 +2,7 @@ protocol MatchfileProtocol: class {
   var gitUrl: String { get }
   var gitBranch: String { get }
   var type: String { get }
-  var appIdentifier: String { get }
+  var appIdentifier: [String] { get }
   var username: String { get }
   var keychainName: String { get }
   var keychainPassword: String? { get }
@@ -27,7 +27,7 @@ extension MatchfileProtocol {
   var gitUrl: String { return "" }
   var gitBranch: String { return "master" }
   var type: String { return "development" }
-  var appIdentifier: String { return "" }
+  var appIdentifier: [String] { return [] }
   var username: String { return "" }
   var keychainName: String { return "login.keychain" }
   var keychainPassword: String? { return nil }

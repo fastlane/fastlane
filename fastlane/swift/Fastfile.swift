@@ -11,8 +11,6 @@
 
 import Foundation
 
-var appID: String { return "taco" }
-
 class Fastfile: LaneFile {
     let appleID = "myUsername@example.com"
     let appID = "my.app.id"
@@ -28,11 +26,12 @@ class Fastfile: LaneFile {
     }
 
     func testLane() {
-        scan()
+        let tag = lastGitTag()
+        log(message: "tag \(tag)")
     }
 
     func betaLane() {
-        match(gitUrl: "gitUrl", appIdentifier: appID, username: appleID)
+        match(gitUrl: "gitUrl", appIdentifier: [appID], username: appleID)
         // Build your app - more options available
         _ = gym(scheme: "[[SCHEME]]")
         pilot(username: appleID)
@@ -40,9 +39,9 @@ class Fastfile: LaneFile {
     }
 
     func releaseLane() {
-        match(gitUrl: "gitUrl", type: "appstore", appIdentifier: appID, username: appleID)
+        match(gitUrl: "gitUrl", type: "appstore", appIdentifier: [appID], username: appleID)
         // snapshot()
-        _ = gym(scheme: "[[SCHEME]]") // Build your app - more options available
+        _ = gym() // Build your app - more options available
         deliver(username: appleID, app: appID, force: true)
         // frameit()
     }
@@ -58,11 +57,11 @@ class Fastfile: LaneFile {
     }
 
     func onError(currentLane: String, errorInfo: String) {
-         slack(
+        slack(
             message: errorInfo,
             slackUrl: "slackUrl",
             success: false
-         )
+        )
     }
 
     // For printing out the lane details when you call $fastlane lanes
