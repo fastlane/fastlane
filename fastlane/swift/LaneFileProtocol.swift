@@ -31,6 +31,8 @@ public extension LaneFileProtocol {
 public class LaneFile: NSObject, LaneFileProtocol {
     public var environmentVariables: EnvironmentVariables = EnvironmentVariables.instance
 
+//    private static let laneQueue = DispatchQueue(label: "laneQueue")
+
     public private(set) static var fastfileInstance: LaneFile?
 
     private var laneDescriptionMapping: [Selector : String] = [:]
@@ -40,8 +42,10 @@ public class LaneFile: NSObject, LaneFileProtocol {
         // Step 1, add lange descriptions
         recordLaneDescriptions()
 
-        // Step 2, send over environment variables to ruby process
-        _ = runner.executeCommand(self.environmentVariables)
+        // Step 2, send over environment variables to ruby process if we have them
+        if self.environmentVariables.variables.count > 0 {
+            _ = runner.executeCommand(self.environmentVariables)
+        }
 
         // Step 3, run beforeAll() function
         beforeAll()
@@ -78,7 +82,8 @@ public class LaneFile: NSObject, LaneFileProtocol {
         }
 
         guard let fastfileInstance: LaneFile = self.fastfileInstance else {
-            fatalError("Unable to instantiate class named: \(self.className())")
+            log(message: "Unable to instantiate class named: \(self.className())")
+            fatalError()
         }
 
         // call all methods that need to be called before we start calling lanes
@@ -88,7 +93,8 @@ public class LaneFile: NSObject, LaneFileProtocol {
         let lowerCasedLaneRequested = named.lowercased()
 
         guard let laneMethod = currentLanes[lowerCasedLaneRequested] else {
-            fatalError("unable to find lane named: \(named)")
+            log(message: "unable to find lane named: \(named)")
+            fatalError()
         }
 
         // We need to catch all possible errors here and display a nice message

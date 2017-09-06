@@ -45,7 +45,7 @@ module Fastlane
       return_object = @command_executor.execute(command: command, target_object: nil)
       ## probably need to just return Strings, or ready_for_next with object isn't String
       print "if we returned an object, it would return:#{return_object}\n"
-      return '{"payload":{"status":"ready_for_next"}}'
+      return '{"payload":{"status":"ready_for_next", "return_object":"' + return_object + '"}}'
     rescue StandardError => e
       exception_array = []
       exception_array << "#{e.class}:"

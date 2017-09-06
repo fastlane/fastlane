@@ -49,7 +49,7 @@ protocol DeliverfileProtocol: class {
   var privacyUrl: String? { get }
   var supportUrl: String? { get }
   var marketingUrl: String? { get }
-  var languages: String? { get }
+  var languages: [String] { get }
   var ignoreLanguageDirectoryValidation: Bool { get }
 }
 
@@ -104,6 +104,6 @@ extension DeliverfileProtocol {
   var privacyUrl: String? { return nil }
   var supportUrl: String? { return nil }
   var marketingUrl: String? { return nil }
-  var languages: String? { return nil }
+  var languages: [String] { return [] }
   var ignoreLanguageDirectoryValidation: Bool { return false }
 }

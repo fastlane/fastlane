@@ -7,9 +7,9 @@ protocol ScreengrabfileProtocol: class {
   var skipOpenSummary: Bool { get }
   var appPackageName: String { get }
   var testsPackageName: String? { get }
-  var useTestsInPackages: String? { get }
-  var useTestsInClasses: String? { get }
-  var launchArguments: String? { get }
+  var useTestsInPackages: [String] { get }
+  var useTestsInClasses: [String] { get }
+  var launchArguments: [String] { get }
   var testInstrumentationRunner: String { get }
   var endingLocale: String { get }
   var appApkPath: String? { get }
@@ -29,9 +29,9 @@ extension ScreengrabfileProtocol {
   var skipOpenSummary: Bool { return false }
   var appPackageName: String { return "" }
   var testsPackageName: String? { return nil }
-  var useTestsInPackages: String? { return nil }
-  var useTestsInClasses: String? { return nil }
-  var launchArguments: String? { return nil }
+  var useTestsInPackages: [String] { return [] }
+  var useTestsInClasses: [String] { return [] }
+  var launchArguments: [String] { return [] }
   var testInstrumentationRunner: String { return "android.support.test.runner.AndroidJUnitRunner" }
   var endingLocale: String { return "en-US" }
   var appApkPath: String? { return nil }

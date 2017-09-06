@@ -8,13 +8,14 @@
 
 import Foundation
 
-public enum SocketClientError: Error {
+public enum SocketClientResponse: Error {
     case alreadyClosedSockets
     case malformedRequest
     case malformedResponse
     case serverError
     case commandTimeout(seconds: Int)
     case connectionFailure
+    case success(returnedObject: String?)
 }
 
 class SocketClient: NSObject {
@@ -24,8 +25,8 @@ class SocketClient: NSObject {
         case closed
     }
 
-    static let connectTimeoutSeconds = 1
-    static let commandTimeoutSeconds = 1
+    static let connectTimeoutSeconds = 3
+    static let commandTimeoutSeconds = 3
     static let doneToken = "done"
 
     fileprivate var inputStream: InputStream!
@@ -57,14 +58,14 @@ class SocketClient: NSObject {
         var readStream: Unmanaged<CFReadStream>?
         var writeStream: Unmanaged<CFWriteStream>?
 
-        self.streamQueue.sync {
+        self.streamQueue.async {
             CFStreamCreatePairWithSocketToHost(kCFAllocatorDefault, self.host as CFString, self.port, &readStream, &writeStream)
 
-            inputStream = readStream!.takeRetainedValue()
-            outputStream = writeStream!.takeRetainedValue()
+            self.inputStream = readStream!.takeRetainedValue()
+            self.outputStream = writeStream!.takeRetainedValue()
 
-            inputStream.delegate = self
-            outputStream.delegate = self
+            self.inputStream.delegate = self
+            self.outputStream.delegate = self
 
             self.inputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
             self.outputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
@@ -82,12 +83,14 @@ class SocketClient: NSObject {
 
         let secondsToWait = DispatchTimeInterval.seconds(SocketClient.connectTimeoutSeconds)
         let connectTimeout = DispatchTime.now() + secondsToWait
+
         let timeoutResult = self.dispatchGroup.wait(timeout: connectTimeout)
         let failureMessage = "Couldn't connect to ruby process within: \(SocketClient.connectTimeoutSeconds) seconds"
+
         let success = testDispatchTimeoutResult(timeoutResult, failureMessage: failureMessage, timeToWait: secondsToWait)
 
         guard success else {
-            self.socketDelegate?.commandExecuted(error: .connectionFailure)
+            self.socketDelegate?.commandExecuted(serverResponse: .connectionFailure)
             return
         }
 
@@ -112,10 +115,10 @@ class SocketClient: NSObject {
         case .success:
             return true
         case .timedOut:
-            print("Timeout: \(failureMessage)")
+            log(message: "Timeout: \(failureMessage)")
 
             if case .seconds(let seconds) = timeToWait {
-                socketDelegate?.commandExecuted(error: .commandTimeout(seconds: seconds))
+                socketDelegate?.commandExecuted(serverResponse: .commandTimeout(seconds: seconds))
             }
             return false
         }
@@ -133,7 +136,7 @@ class SocketClient: NSObject {
         guard !self.cleaningUpAfterDone else {
             // This will happen after we abort if there are commands waiting to be executed
             // Need to check state of SocketClient in command runner to make sure we can accept `send`
-            socketDelegate?.commandExecuted(error: .alreadyClosedSockets)
+            socketDelegate?.commandExecuted(serverResponse: .alreadyClosedSockets)
             return
         }
 
@@ -173,8 +176,8 @@ class SocketClient: NSObject {
 extension SocketClient: StreamDelegate {
     func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
         guard !self.cleaningUpAfterDone else {
-            // Still getting response from server eventhough we are done. 
-            // No big deal, we're closing the streams anyway. 
+            // Still getting response from server eventhough we are done.
+            // No big deal, we're closing the streams anyway.
             // That being said, we need to balance out the dispatchGroups
             self.dispatchGroup.leave()
             return
@@ -186,7 +189,7 @@ extension SocketClient: StreamDelegate {
                 self.dispatchGroup.leave()
 
             case Stream.Event.errorOccurred:
-                print("error occurred")
+                verbose(message: "input stream error occurred")
                 sendAbort()
 
             case Stream.Event.hasBytesAvailable:
@@ -201,7 +204,7 @@ extension SocketClient: StreamDelegate {
                 break
 
             default:
-                print("input stream caused unrecognized event: \(eventCode)")
+                verbose(message: "input stream caused unrecognized event: \(eventCode)")
             }
 
         } else if aStream === self.outputStream {
@@ -210,8 +213,9 @@ extension SocketClient: StreamDelegate {
                 self.dispatchGroup.leave()
 
             case Stream.Event.errorOccurred:
-                print("error occurred")
-                // safe to close all the things because Ruby already disconnected
+                // probably safe to close all the things because Ruby already disconnected
+                verbose(message: "output stream recevied error")
+                break
 
             case Stream.Event.endEncountered:
                 // nothing special here
@@ -222,7 +226,7 @@ extension SocketClient: StreamDelegate {
                 break
 
             default:
-                print("output stream caused unrecognized event: \(eventCode)")
+                verbose(message: "output stream caused unrecognized event: \(eventCode)")
             }
         }
     }
@@ -235,7 +239,7 @@ extension SocketClient: StreamDelegate {
             if bytesRead >= 0 {
                 output += NSString(bytes: UnsafePointer(buffer), length: bytesRead, encoding: String.Encoding.utf8.rawValue)! as String
             } else {
-                print("Stream read() error")
+                verbose(message: "Stream read() error")
             }
         }
 
@@ -243,7 +247,7 @@ extension SocketClient: StreamDelegate {
     }
 
     func handleFailure(message: [String]) {
-        print("Ruby process encountered a problem: \(message.joined(separator:"\n"))")
+        log(message: "Ruby process encountered a problem: \(message.joined(separator:"\n"))")
         sendAbort()
     }
 
@@ -255,18 +259,18 @@ extension SocketClient: StreamDelegate {
 
         let responseString = string.trimmingCharacters(in: .whitespacesAndNewlines)
         let socketResponse = SocketResponse(payload: responseString)
-        print("\(responseString)")
+        log(message: "response is: \(responseString)")
         switch socketResponse.responseType {
         case .failure(let failureInformation):
-            self.socketDelegate?.commandExecuted(error: .serverError)
+            self.socketDelegate?.commandExecuted(serverResponse: .serverError)
             self.handleFailure(message: failureInformation)
 
         case .parseFailure(let failureInformation):
-            self.socketDelegate?.commandExecuted(error: .malformedResponse)
+            self.socketDelegate?.commandExecuted(serverResponse: .malformedResponse)
             self.handleFailure(message: failureInformation)
 
-        case .readyForNext:
-            self.socketDelegate?.commandExecuted(error: nil)
+        case .readyForNext(let returnedObject):
+            self.socketDelegate?.commandExecuted(serverResponse: .success(returnedObject: returnedObject))
             // cool, ready for next command
             break
 

@@ -85,7 +85,7 @@ module Fastlane
       string.split('_').inject([]) { |buffer, e| buffer.push(buffer.empty? ? e : e.capitalize) }.join
     end
 
-    def determine_type_from_override(type_override: nil)
+    def determine_type_from_override(type_override: nil, default_type: nil)
       if type_override == Array
         return "[String]"
       elsif type_override == Hash
@@ -93,7 +93,7 @@ module Fastlane
       elsif type_override == Integer
         return "Int"
       else
-        return type_override
+        return default_type
       end
     end
 
@@ -185,16 +185,25 @@ module Fastlane
     end
 
     def return_statement
+      returned_object = "runner.executeCommand(command)"
+      case @return_type
+      when :array_of_strings
+        returned_object = "parseArray(fromString: #{returned_object})"
+      when :hash_of_strings
+        returned_object = "parseDictionary(fromString: #{returned_object})"
+      when :bool
+        returned_object = "parseBool(fromString: #{returned_object})"
+      when :int
+        returned_object = "parseInt(fromString: #{returned_object})"
+      end
+
       expected_type = swift_type_for_return_type
 
       return_string = "_ = "
-      as_string = ""
       if expected_type.length > 0
         return_string = "return "
-        as_string = " as! #{expected_type}"
-
       end
-      return "#{return_string}runner.executeCommand(command)#{as_string}"
+      return "#{return_string}#{returned_object}"
     end
 
     def implementation
@@ -242,9 +251,10 @@ module Fastlane
       unless @param_names
         return []
       end
-
-      swift_vars = @param_names.zip(param_default_values, param_optionality_values).map do |param, default_value, optional|
+      swift_vars = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
         type = get_type(param: param, default_value: default_value, optional: optional)
+        type = determine_type_from_override(type_override: param_type_override, default_type: type)
+
         param = camel_case_lower(string: param)
         param = sanitize_reserved_word(word: param)
         static_var_for_parameter_name = param
@@ -259,14 +269,20 @@ module Fastlane
         return []
       end
 
-      swift_implementations = @param_names.zip(param_default_values, param_optionality_values).map do |param, default_value, optional|
-        type = get_type(param: param, default_value: default_value, optional: optional)
+      swift_implementations = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
+        default_type = get_type(param: param, default_value: default_value, optional: optional)
+        type_overridden = false
+        type = determine_type_from_override(type_override: param_type_override, default_type: default_type)
+        if type != default_type
+          type_overridden = true
+        end
+
         param = camel_case_lower(string: param)
         param = sanitize_reserved_word(word: param)
-        static_var_for_parameter_name = param
+        var_for_parameter_name = param
 
         unless default_value.nil?
-          if type == "Bool" || default_value.kind_of?(Array)
+          if type == "Bool" || type == "[String]" || type == "Int" || default_value.kind_of?(Array)
             default_value = default_value.to_s
           else
             default_value = "\"#{default_value}\""
@@ -274,7 +290,7 @@ module Fastlane
         end
 
         # if we don't have a default value, but the param is options, just set a default value to nil
-        if optional
+        if optional && !type_overridden
           default_value ||= "nil"
         end
 
@@ -291,7 +307,7 @@ module Fastlane
           default_value ||= "[]"
         end
 
-        "  var #{static_var_for_parameter_name}: #{type} { return #{default_value} }"
+        "  var #{var_for_parameter_name}: #{type} { return #{default_value} }"
       end
 
       return swift_implementations
@@ -302,8 +318,10 @@ module Fastlane
         return ""
       end
 
-      param_names_and_types = @param_names.zip(param_default_values, param_optionality_values).map do |param, default_value, optional|
+      param_names_and_types = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
         type = get_type(param: param, default_value: default_value, optional: optional)
+        type = determine_type_from_override(type_override: param_type_override, default_type: type)
+
         param = camel_case_lower(string: param)
         param = sanitize_reserved_word(word: param)
         static_var_for_parameter_name = param
