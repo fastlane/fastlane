@@ -166,7 +166,10 @@ lane :update_docs do
   template_path = File.expand_path("./assets/render_plugin.md.erb")
   clone_docs do
     docs_path = generate_markdown_docs(target_path: ".")
-    actions_md_path = File.join(docs_path, "actions.md")
+    actions_md_path = File.expand_path(File.join(docs_path, "docs/actions.md"))
+    action_docs = Dir[File.join(docs_path, "actions", "*")].collect do |current|
+      File.expand_path(current)
+    end
 
     Bundler.with_clean_env do
       sh "bundle update"
@@ -176,7 +179,6 @@ lane :update_docs do
       UI.success("No changes in the actions.md ✅")
     else
       # Create a new branch
-      # TODO: update this to commit all the action md files
       sh "git checkout -b 'update-actions-md-#{Time.now.to_i}'"
       plugins_path = "docs/plugins/available-plugins.md"
       plugin_scores(template_path: template_path,
@@ -184,7 +186,7 @@ lane :update_docs do
 
       Dir.chdir("fastlane") do # this is an assumption of fastlane, that we have to .. when shelling out
         # Commit the changes
-        git_commit(path: [actions_md_path, "Gemfile.lock", plugins_path],
+        git_commit(path: [actions_md_path, "Gemfile.lock", plugins_path] + action_docs,
                 message: "Update actions.md for latest fastlane release 🚀")
         # Push them to the git remote
         push_to_git_remote
