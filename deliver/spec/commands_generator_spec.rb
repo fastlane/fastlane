@@ -107,7 +107,6 @@ describe Deliver::CommandsGenerator do
         description: 'My description',
         app_identifier: 'abcd',
         run_precheck_before_submit: false
-
       })
 
       expect_runner_new_with(expected_options)
