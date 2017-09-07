@@ -39,7 +39,7 @@ module Fastlane
 
         error_callback = proc do |error|
           clean_error = sanitizer.call(error)
-          UI.error(clean_error)
+          UI.user_error!(clean_error)
         end
 
         result = Actions.sh_control_output(

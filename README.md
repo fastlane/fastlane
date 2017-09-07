@@ -41,13 +41,13 @@ Then to deploy a new 'beta' version of your app just run
 :thought_balloon: | Never remember any difficult commands, just `fastlane`
 :tophat: | Easy setup assistant to get started in a few minutes
 :email: | Automatically pass on information from one build step to another (*e.g.* path to the `ipa` file)
-:page_with_curl: | Store **everything** in Git. Never lookup build commands in `Jenkins` configs again.
+:page_with_curl: | Store **everything** in Git. Never lookup build commands on your CI system again.
 :rocket: | Saves you **hours** for every app update you release
 :pencil2: | Flexible configuration using a fully customisable `Fastfile`
 :mountain_cableway: | Implement a fully working Continuous Delivery process
 :ghost: | [Jenkins Integration](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration): Show output directly in test results
 :book: | Automatically generate Markdown documentation of your lane configurations
-:hatching_chick: | Over 170 built-in integrations available
+:hatching_chick: | Over 170 built-in integrations and 170 plugins available
 :computer: | Support for iOS and Android apps
 :octocat: | Full Git and Mercurial support
 
@@ -94,6 +94,10 @@ Get started distributing your first app with fastlane within minutes:
 
 Want to learn more? Explore guides for [iOS](https://docs.fastlane.tools/getting-started/ios/setup/)
  or [Android](https://docs.fastlane.tools/getting-started/android/setup/).
+
+## System Requirements
+
+Currently, _fastlane_ is officially supported to run on macOS. Support for other operating systems is limited and untested at this point in time. _fastlane_ uses system APIs that may not be implemented on other platforms, for example, we use the Ruby `fork` method for sub-process management, which isn't available on Windows.
 
 ## Available Commands
 
@@ -157,13 +161,21 @@ You can easily opt-out of metrics collection by adding `opt_out_usage` at the to
 
 ## Crash Reporting
 
-In order to continuously improve stability, _fastlane_ will record crash reports with sanitized stacktraces. Sanitization removes personal information from the stacktrace and error message (including home directories, _fastlane_ path, gem paths, environment variables, and parameters).
+In order to continuously improve stability, _fastlane_ will record crash reports with sanitized stack traces. Sanitization removes personal information from the stack trace and error message (including home directories, _fastlane_ path, gem paths, environment variables, and parameters).
 
 You can easily opt-out of crash reporting by adding `opt_out_crash_reporting` at the top of your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_CRASH_REPORTING`. Just like metrics mentioned above, participating helps us provide the best possible support for _fastlane_, so we hope you'll consider it a plus! :heavy_plus_sign:
 
 ## Need Help?
 
-Please [submit an issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup.
+Before submitting a new GitHub issue, please make sure to
+
+- Check out [docs.fastlane.tools](https://docs.fastlane.tools)
+- Check out the README pages on [this repo](https://github.com/fastlane/fastlane)
+- Search for [existing GitHub issues](https://github.com/fastlane/fastlane/issues)
+
+If the above doesn't help, please [submit an issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup, in particular the output of the `fastlane env` command.
+
+**Note**: If you want to report a regression in _fastlane_ (something that has worked before, but broke with a new release), please mark your issue title as such using `[Regression] Your title here`. This enables us to quickly detect and fix regressions.
 
 ## Special Thanks
 

@@ -19,13 +19,16 @@ module Precheck
       "mentioning other platforms, like Android or Blackberry"
     end
 
+    def allowed_lowercased_words
+      ["google analytics"]
+    end
+
     def lowercased_words_to_look_for
       [
         "android",
         "google",
         "compuserve",
         "windows phone",
-        "tizen",
         "windows 10 mobile",
         "sailfish os",
         "windows universal app",

@@ -1,4 +1,5 @@
 # coding: utf-8
+
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require '<%= require_path %>/version'
@@ -6,10 +7,10 @@ require '<%= require_path %>/version'
 Gem::Specification.new do |spec|
   spec.name          = '<%= gem_name %>'
   spec.version       = Fastlane::<%= plugin_name.fastlane_class %>::VERSION
-  spec.author        = %q{<%= author %>}
-  spec.email         = %q{<%= email %>}
+  spec.author        = '<%= author %>'
+  spec.email         = '<%= email %>'
 
-  spec.summary       = %q{<%= summary %>}
+  spec.summary       = '<%= summary %>'
   # spec.homepage      = "https://github.com/<GITHUB_USERNAME>/<%= gem_name %>"
   spec.license       = "MIT"
 
@@ -27,5 +28,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rubocop'
+  spec.add_development_dependency 'simplecov'
   spec.add_development_dependency 'fastlane', '>= <%= Fastlane::VERSION %>'
 end

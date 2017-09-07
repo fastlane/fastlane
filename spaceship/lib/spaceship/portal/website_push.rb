@@ -41,16 +41,10 @@ module Spaceship
       )
 
       class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          self.new(attrs)
-        end
-
         # @param mac [Bool] Fetches Mac website push if true
         # @return (Array) Returns all website push available for this account
         def all(mac: false)
-          client.website_push(mac: mac).map { |website_push| self.factory(website_push) }
+          client.website_push(mac: mac).map { |website_push| self.new(website_push) }
         end
 
         # Creates a new Website Push ID on the Apple Dev Portal

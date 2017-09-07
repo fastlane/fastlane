@@ -37,7 +37,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :teamid,
                                        env_name: "FL_PROJECT_TEAM_ID",
-                                       description: "The Team ID  you want to use",
+                                       description: "The Team ID you want to use",
                                        default_value: ENV["TEAM_ID"] || CredentialsManager::AppfileConfig.try_fetch_value(:team_id))
         ]
       end

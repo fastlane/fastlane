@@ -10,12 +10,12 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :package_name,
                                      env_name: "SUPPLY_PACKAGE_NAME",
                                      short_option: "-p",
-                                     description: "The package name of the Application to modify",
+                                     description: "The package name of the application to use",
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:package_name)),
         FastlaneCore::ConfigItem.new(key: :track,
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",
-                                     description: "The Track to upload the Application to: #{valid_tracks.join(', ')}",
+                                     description: "The track of the application to use: #{valid_tracks.join(', ')}",
                                      default_value: 'production',
                                      verify_block: proc do |value|
                                        available = valid_tracks
@@ -24,11 +24,11 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
                                      description: "The percentage of the user fraction when uploading to the rollout track",
-                                     default_value: '0.1',
+                                     optional: true,
                                      verify_block: proc do |value|
-                                       min = 0.01
-                                       max = 0.5
-                                       UI.user_error! "Invalid value '#{value}', must be between #{min} and #{max}" unless value.to_f.between?(min, max)
+                                       min = 0.0
+                                       max = 1.0
+                                       UI.user_error! "Invalid value '#{value}', must be greater than #{min} and less than #{max}" unless value.to_f > min && value.to_f <= max
                                      end),
         FastlaneCore::ConfigItem.new(key: :metadata_path,
                                      env_name: "SUPPLY_METADATA_PATH",
@@ -60,7 +60,7 @@ module Supply
                                      env_name: "SUPPLY_JSON_KEY",
                                      short_option: "-j",
                                      conflicting_options: [:issuer, :key, :json_key_data],
-                                     optional: true, # this is shouldn't be optional but is until --key and --issuer are completely removed
+                                     optional: true, # this shouldn't be optional but is until --key and --issuer are completely removed
                                      description: "The service account json file used to authenticate with Google",
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
                                      verify_block: proc do |value|
@@ -133,7 +133,7 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :track_promote_to,
                                      env_name: "SUPPLY_TRACK_PROMOTE_TO",
                                      optional: true,
-                                     description: "The Track to promote to: #{valid_tracks.join(', ')}",
+                                     description: "The track to promote to: #{valid_tracks.join(', ')}",
                                      verify_block: proc do |value|
                                        available = valid_tracks
                                        UI.user_error! "Invalid value '#{value}', must be #{available.join(', ')}" unless available.include? value
@@ -141,7 +141,7 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :validate_only,
                                      env_name: "SUPPLY_VALIDATE_ONLY",
                                      optional: true,
-                                     description: "Indicate that changes will only be validated with Google Play rather than actually published",
+                                     description: "Only validate changes with Google Play rather than actually publish",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :mapping,

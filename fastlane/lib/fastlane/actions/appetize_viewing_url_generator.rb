@@ -5,7 +5,7 @@ module Fastlane
 
     class AppetizeViewingUrlGeneratorAction < Action
       def self.run(params)
-        link = "https://appetize.io/embed/#{params[:public_key]}"
+        link = "#{params[:base_url]}/#{params[:public_key]}"
 
         if params[:scale].nil? # sensible default values for scaling
           case params[:device].downcase.to_sym
@@ -26,6 +26,9 @@ module Fastlane
         url_params << "scale=#{params[:scale]}"
         url_params << "launchUrl=#{params[:launch_url]}" if params[:launch_url]
         url_params << "language=#{params[:language]}" if params[:language]
+        url_params << "osVersion=#{params[:os_version]}" if params[:os_version]
+        url_params << "params=#{CGI.escape params[:params]}" if params[:params]
+        url_params << "proxy=#{CGI.escape params[:proxy]}" if params[:proxy]
 
         return link + "?" + url_params.join("&")
       end
@@ -56,6 +59,12 @@ module Fastlane
                                            UI.user_error!("You provided a private key to appetize, please provide the public key")
                                          end
                                        end),
+          FastlaneCore::ConfigItem.new(key: :base_url,
+                                       env_name: "APPETIZE_VIEWING_URL_GENERATOR_BASE",
+                                       description: "Base URL of Appetize service",
+                                       is_string: true,
+                                       default_value: "https://appetize.io/embed",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :device,
                                        env_name: "APPETIZE_VIEWING_URL_GENERATOR_DEVICE",
                                        description: "Device type: iphone4s, iphone5s, iphone6, iphone6plus, ipadair, iphone6s, iphone6splus, ipadair2, nexus5, nexus7 or nexus9",
@@ -96,6 +105,21 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :launch_url,
                                        env_name: "APPETIZE_VIEWING_URL_GENERATOR_LAUNCH_URL",
                                        description: "Specify a deep link to open when your app is launched",
+                                       is_string: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :os_version,
+                                       env_name: "APPETIZE_VIEWING_URL_GENERATOR_OS_VERSION",
+                                       description: "The operating system version on which to run your app, e.g. 10.3, 8.0",
+                                       is_string: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :params,
+                                       env_name: "APPETIZE_VIEWING_URL_GENERATOR_PARAMS",
+                                       description: "Specifiy params value to be passed to Appetize",
+                                       is_string: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :proxy,
+                                       env_name: "APPETIZE_VIEWING_URL_GENERATOR_PROXY",
+                                       description: "Specify a HTTP proxy to be passed to Appetize",
                                        is_string: true,
                                        optional: true)
         ]

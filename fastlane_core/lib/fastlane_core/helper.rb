@@ -140,16 +140,25 @@ module FastlaneCore
 
     # @return The version of the currently used Xcode installation (e.g. "7.0")
     def self.xcode_version
-      return @xcode_version if @xcode_version
+      return nil unless self.is_mac?
+      return @xcode_version if @xcode_version && @developer_dir == ENV['DEVELOPER_DIR']
 
       begin
         output = `DEVELOPER_DIR='' "#{xcode_path}/usr/bin/xcodebuild" -version`
         @xcode_version = output.split("\n").first.split(' ')[1]
+        @developer_dir = ENV['DEVELOPER_DIR']
       rescue => ex
         UI.error(ex)
         UI.user_error!("Error detecting currently used Xcode installation, please ensure that you have Xcode installed and set it using `sudo xcode-select -s [path]`")
       end
       @xcode_version
+    end
+
+    # @return true if Xcode version is higher than 8.3
+    def self.xcode_at_least?(version)
+      FastlaneCore::UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if xcode_version.nil?
+      v = xcode_version
+      Gem::Version.new(v) >= Gem::Version.new(version)
     end
 
     def self.transporter_java_executable_path
@@ -211,13 +220,6 @@ module FastlaneCore
       keychain_path = keychain_paths.find { |path| File.file?(path) }
       UI.user_error!("Could not locate the provided keychain. Tried:\n\t#{keychain_paths.join("\n\t")}") unless keychain_path
       keychain_path
-    end
-
-    # @return true if XCode version is higher than 8.3
-    def self.xcode_at_least?(version)
-      FastlaneCore::UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if xcode_version.nil?
-      v = xcode_version
-      Gem::Version.new(v) >= Gem::Version.new(version)
     end
 
     # @return the full path to the iTMSTransporter executable

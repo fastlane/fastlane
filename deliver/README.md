@@ -153,7 +153,7 @@ Already using `deliver` and just updated to 1.0? Check out the [Migration Guide]
 
 A detailed description about how your credentials are handled is available in a [credentials_manager](https://github.com/fastlane/fastlane/tree/master/credentials_manager).
 
-### How does this thing even work? Is magic involved? 🎩###
+### How does this thing even work? Is magic involved? 🎩
 
 Your password will be stored in the macOS keychain, but can also be passed using environment variables. (More information available on [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager))
 
@@ -195,11 +195,15 @@ no, en-US, en-CA, fi, ru, zh-Hans, nl-NL, zh-Hant, en-AU, id, de-DE, sv, ko, ms,
 
 Deliver has a special `default` language code which allows you to provide values that are not localised, and which will be used as defaults when you don’t provide a specific localised value.
 
-You can use this either in json within your deliverfile, or as a folder in your metadata file.
+In order to use `default`, you will need to tell `deliver` which languages your app uses. You can do this in either of two ways:
+1. Create the folders named with the language in the metadata folder (i.e. fastlane/metadata/en-US or fastlane/metadata/de-DE)
+2. Add the following to your `Deliverfile` `languages(['en-US','de-DE'])` 
+
+You can use this either in json within your `Deliverfile` and/or as folders in your metadata folder. `deliver` will take the union of both language sets from the `Deliverfile` and from the metadata folder and create on single set of languages which will be enabled.
 
 Imagine that you have localised data for the following language codes:  ```en-US, de-DE, el, it```
 
-You can set the following in your deliverfile
+You can set the following in your `Deliverfile`
 
 ```ruby
 release_notes({
@@ -275,7 +279,14 @@ Apple has a limit of 150 binary uploads per day.
 Change syntax highlighting to *Ruby*.
 
 # Need help?
-Please submit an issue on GitHub and provide information about your setup
+
+Before submitting a new GitHub issue, please make sure to
+
+- Check out [docs.fastlane.tools](https://docs.fastlane.tools)
+- Check out the README pages on [this repo](https://github.com/fastlane/fastlane)
+- Search for [existing GitHub issues](https://github.com/fastlane/fastlane/issues)
+
+If the above doesn't help, please [submit an issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup, in particular the output of the `fastlane env` command.
 
 # Code of Conduct
 Help us keep `deliver` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).

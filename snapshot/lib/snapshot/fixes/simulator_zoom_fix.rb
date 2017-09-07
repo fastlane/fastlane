@@ -7,7 +7,7 @@ module Snapshot
 
     class SimulatorZoomFix
       def self.patch
-        UI.message "Patching '#{config_path}' to scale simulator to 100%"
+        UI.message "Patching all simulators '#{config_path}' to scale to 100%"
 
         FastlaneCore::DeviceManager.simulators.each do |simulator|
           simulator_name = simulator.name.tr("\s", "-")

@@ -45,11 +45,13 @@ module Fastlane
       def self.upload_options(params)
         file_path = dsym_path(params).shellescape
 
+        # rubocop: disable Style/FormatStringToken
         options = []
         options << "--write-out %{http_code} --silent --output /dev/null"
         options << "-F dsym=@#{file_path}"
         options << "-F key=#{params[:api_key].shellescape}"
         options
+        # rubocop: enable Style/FormatStringToken
       end
 
       #####################################################

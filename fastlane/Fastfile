@@ -136,7 +136,6 @@ lane :release do
   end
 
   clubmate
-  donate_food
 
   puts "You can now tweet:".green
   releases_url = "https://github.com/fastlane/fastlane/releases/tag/#{version}"
@@ -159,25 +158,18 @@ lane :verify_docs do
   end
 end
 
-desc "Generates the actions.md that will get used on https://docs.fastlane.tools"
-desc "This will NOT also automatically submit a pull request to fastlane/docs"
-desc "This SHOULD only be used for testing changes to the docs"
-lane :test_generate_docs do
-  ENV['USE_ENHANCE_TEST_DATA'] = "true"
-  generate_markdown_docs
-  ENV.delete("USE_ENHANCE_TEST_DATA")
-end
-
 desc "Update the actions.md on https://docs.fastlane.tools"
 desc "This will also automatically submit a pull request to fastlane/docs"
 lane :update_docs do
-  if ENV["ENHANCER_USER"].to_s.length == 0 || ENV["ENHANCER_PASSWORD"].to_s.length == 0
-    UI.error("No ENHANCER_USER or ENHANCER_PASSWORD environment variables found, which are required to generate a new Actions.md")
-    next
-  end
+  verify_env_variables
 
+  template_path = File.expand_path("./assets/render_plugin.md.erb")
   clone_docs do
-    actions_md_path = generate_markdown_docs
+    docs_path = generate_markdown_docs(target_path: ".")
+    actions_md_path = File.expand_path(File.join(docs_path, "docs/actions.md"))
+    action_docs = Dir[File.join(docs_path, "actions", "*")].collect do |current|
+      File.expand_path(current)
+    end
 
     Bundler.with_clean_env do
       sh "bundle update"
@@ -188,10 +180,14 @@ lane :update_docs do
     else
       # Create a new branch
       sh "git checkout -b 'update-actions-md-#{Time.now.to_i}'"
+      plugins_path = "docs/plugins/available-plugins.md"
+      plugin_scores(template_path: template_path,
+                      output_path: plugins_path)
 
       Dir.chdir("fastlane") do # this is an assumption of fastlane, that we have to .. when shelling out
         # Commit the changes
-        git_commit(path: [actions_md_path, "Gemfile.lock"], message: "Update actions.md for latest fastlane release 🚀")
+        git_commit(path: [actions_md_path, "Gemfile.lock", plugins_path] + action_docs,
+                message: "Update actions.md for latest fastlane release 🚀")
         # Push them to the git remote
         push_to_git_remote
 
@@ -208,12 +204,10 @@ lane :update_docs do
   end
 end
 
-def generate_markdown_docs
+def generate_markdown_docs(target_path: nil)
   require 'fastlane/documentation/markdown_docs_generator'
-  actions_md_path = File.expand_path("docs/actions.md")
-  Fastlane::MarkdownDocsGenerator.new.generate!(target_path: actions_md_path)
-
-  return actions_md_path
+  Fastlane::MarkdownDocsGenerator.new.generate!(target_path: File.expand_path(target_path))
+  return target_path
 end
 
 def clone_docs
@@ -291,8 +285,10 @@ private_lane :validate_repo do
     sh 'find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +'
   end
 
-  test_generate_docs
-  ensure_code_samples
+  # Test if generating the docs is successful
+  clone_docs do
+    generate_markdown_docs(target_path: ".")
+  end
 
   # Verify docs are still working
   verify_docs
@@ -329,19 +325,11 @@ private_lane :add_fastlane_git_tag do |options|
   push_git_tags
 end
 
-# Run the code samples, yo
-private_lane :ensure_code_samples do
-  UI.message "<U+1F557>  Verifying all code samples work with the latest fastlane release"
-  test_sample_code(path: File.expand_path("docs/Actions.md"))
-  UI.success "<U+2705>  All fastlane code samples work as expected"
-end
-
-lane :donate_food do
-  if ENV["SHARETHEMEAL_USERHASH"].to_s.length > 0
-    sharethemeal(
-      amount: "0.5",
-      currency: "USD",
-      team_id: "fastlane"
-    )
+desc "Ensure all the requirement environment variables are provided"
+desc "this way the deployment script will fail early (and often)"
+private_lane :verify_env_variables do
+  ["GITHUB_USER_NAME", "GITHUB_API_TOKEN"].each do |variable|
+    next if ENV[variable].to_s.length > 0
+    UI.user_error!("Missing ENV variables #{variable}, make sure to provide one for fastlane to be successful")
   end
 end

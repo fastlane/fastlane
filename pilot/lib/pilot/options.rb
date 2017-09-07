@@ -34,6 +34,7 @@ module Pilot
                                      description: "Path to the ipa file to upload",
                                      default_value: Dir["*.ipa"].first,
                                      verify_block: proc do |value|
+                                       value = File.expand_path(value)
                                        UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist? value
                                        UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with? ".ipa"
                                      end),
@@ -41,7 +42,7 @@ module Pilot
                                      short_option: "-w",
                                      optional: true,
                                      env_name: "PILOT_CHANGELOG",
-                                     description: "Provide the what's new text when uploading a new build"),
+                                     description: "Provide the 'what's new' text when uploading a new build"),
         FastlaneCore::ConfigItem.new(key: :beta_app_description,
                                      short_option: "-d",
                                      optional: true,

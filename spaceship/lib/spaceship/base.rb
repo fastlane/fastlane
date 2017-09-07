@@ -43,6 +43,10 @@ module Spaceship
         ref[last] = value
       end
 
+      def delete(key)
+        @hash.delete(key)
+      end
+
       def lookup(keys)
         head, *tail = *keys
         if tail.empty?

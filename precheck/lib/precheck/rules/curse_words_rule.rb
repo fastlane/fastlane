@@ -22,8 +22,12 @@ module Precheck
     def rule_block
       return lambda { |text|
         return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:passed]) if text.to_s.strip.empty?
+        text = text.downcase
+        split_words = text.split
+        split_words_without_punctuation = text.gsub(/\W/, ' ').split
 
-        all_metadata_words_list = text.to_s.downcase.split
+        # remove punctuation and add only unique words
+        all_metadata_words_list = (split_words + split_words_without_punctuation).uniq
         metadata_word_hashes = all_metadata_words_list.map { |word| Digest::SHA256.hexdigest(word) }
         curse_hashes_set = hashed_curse_word_set
 

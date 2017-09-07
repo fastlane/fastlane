@@ -88,7 +88,7 @@ module Fastlane
 
         corrections = []
 
-        if !Gem.loaded_specs["did_you_mean"].nil? && Gem.loaded_specs["did_you_mean"].version >= Gem::Version.new('1.1.0')
+        if defined?(DidYouMean::SpellChecker)
           spell_checker = DidYouMean::SpellChecker.new(dictionary: action_names)
           corrections << spell_checker.correct(filter).compact
         end

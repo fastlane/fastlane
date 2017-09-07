@@ -53,7 +53,7 @@ module Fastlane
       beta_info_groups = @beta_info.groups_valid? ? "['#{@beta_info.groups.join("', '")}']" : "nil"
       beta_info_emails = @beta_info.emails_valid? ? "['#{@beta_info.emails.join("', '")}']" : "nil"
 
-# rubocop:disable Style/IndentationConsistency
+# rubocop:disable Layout/IndentationConsistency
 %{  #
   # Learn more here: https://docs.fastlane.tools/getting-started/ios/beta-deployment/
   #             and: https://docs.fastlane.tools/getting-started/android/beta-deployment/
@@ -82,7 +82,7 @@ module Fastlane
     #   message: "Successfully uploaded a beta release - see it at https://fabric.io/_/beta"
     # )
   end}
-      # rubocop:enable Style/IndentationConsistency
+      # rubocop:enable Layout/IndentationConsistency
     end
 
     def expanded_paths_equal?(path1, path2)

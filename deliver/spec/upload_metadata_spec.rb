@@ -133,4 +133,143 @@ describe Deliver::UploadMetadata do
       end
     end
   end
+
+  context "with phased_release" do
+    let(:app) { double('app') }
+    let(:version) { double('version') }
+    let(:details) { double('details') }
+    before do
+      allow(uploader).to receive(:verify_available_languages!)
+      allow(version).to receive(:save!)
+      allow(version).to receive(:release_on_approval=)
+      allow(version).to receive(:toggle_phased_release)
+      allow(app).to receive(:edit_version).and_return(version)
+      allow(app).to receive(:details).and_return(details)
+      allow(details).to receive(:save!)
+    end
+
+    context 'with true' do
+      it "toggle_phased_release is called" do
+        uploader.upload(phased_release: true, app: app)
+        expect(version).to have_received(:toggle_phased_release).with(enabled: true)
+      end
+    end
+
+    context 'with false' do
+      it "toggle_phased_release is called" do
+        uploader.upload(phased_release: false, app: app)
+        expect(version).to have_received(:toggle_phased_release).with(enabled: false)
+      end
+    end
+
+    context 'without value' do
+      it "toggle_phased_release is not called" do
+        uploader.upload(app: app)
+        expect(version).not_to have_received(:toggle_phased_release).with(enabled: false)
+      end
+    end
+  end
+
+  describe "#languages" do
+    let(:options) { { metadata_path: tmpdir } }
+
+    def create_metadata(path, text)
+      File.open(File.join(path), 'w') do |f|
+        f.write(text)
+      end
+    end
+
+    def create_filesystem_language(name)
+      require 'fileutils'
+      FileUtils.mkdir_p "#{tmpdir}/#{name}"
+    end
+
+    context "detected languages with only file system" do
+      it "languages are 'de-DE', 'el', 'en-US'" do
+        options[:languages] = []
+
+        create_filesystem_language('en-US')
+        create_filesystem_language('de-DE')
+        create_filesystem_language('el')
+
+        uploader.load_from_filesystem(options)
+        languages = uploader.detect_languages(options)
+
+        expect(languages.sort).to eql(['de-DE', 'el', 'en-US'])
+      end
+    end
+
+    context "detected languages with only config options" do
+      it "languages are 'en-AU', 'en-CA', 'en-GB'" do
+        options[:languages] = ['en-AU', 'en-CA', 'en-GB']
+
+        uploader.load_from_filesystem(options)
+        languages = uploader.detect_languages(options)
+
+        expect(languages.sort).to eql(['en-AU', 'en-CA', 'en-GB'])
+      end
+    end
+
+    context "detected languages with only release notes" do
+      it "languages are 'default', 'es-MX'" do
+        options[:languages] = []
+
+        options[:release_notes] = {
+          'default' => 'something',
+          'es-MX' => 'something else'
+        }
+
+        uploader.load_from_filesystem(options)
+        languages = uploader.detect_languages(options)
+
+        expect(languages.sort).to eql(['default', 'es-MX'])
+      end
+    end
+
+    context "detected languages with both file system and config options and release notes" do
+      it "languages are 'de-DE', 'default', 'el', 'en-AU', 'en-CA', 'en-GB', 'en-US', 'es-MX'" do
+        options[:languages] = ['en-AU', 'en-CA', 'en-GB']
+        options[:release_notes] = {
+          'default' => 'something',
+          'en-US' => 'something else',
+          'es-MX' => 'something else else'
+        }
+
+        create_filesystem_language('en-US')
+        create_filesystem_language('de-DE')
+        create_filesystem_language('el')
+
+        uploader.load_from_filesystem(options)
+        languages = uploader.detect_languages(options)
+
+        expect(languages.sort).to eql(['de-DE', 'default', 'el', 'en-AU', 'en-CA', 'en-GB', 'en-US', 'es-MX'])
+      end
+    end
+
+    context "with localized version values for release notes" do
+      it "default value set for unspecified languages" do
+        options[:languages] = ['en-AU', 'en-CA', 'en-GB']
+        options[:release_notes] = {
+          'default' => 'something',
+          'en-US' => 'something else',
+          'es-MX' => 'something else else'
+        }
+
+        create_filesystem_language('en-US')
+        create_filesystem_language('de-DE')
+        create_filesystem_language('el')
+
+        uploader.load_from_filesystem(options)
+        uploader.assign_defaults(options)
+
+        expect(options[:release_notes]["en-US"]).to eql('something else')
+        expect(options[:release_notes]["es-MX"]).to eql('something else else')
+        expect(options[:release_notes]["en-AU"]).to eql('something')
+        expect(options[:release_notes]["en-CA"]).to eql('something')
+        expect(options[:release_notes]["en-GB"]).to eql('something')
+        expect(options[:release_notes]["de-DE"]).to eql('something')
+        expect(options[:release_notes]["el"]).to eql('something')
+      end
+    end
+  end
 end

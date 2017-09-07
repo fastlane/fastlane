@@ -54,7 +54,7 @@ module Fastlane
         command = []
         command << File.expand_path(params[:binary_path]).shellescape
         command << "-a #{params[:api_token]}"
-        command << "-p #{params[:platform]}"
+        command << "-p #{params[:platform] == 'appletvos' ? 'tvos' : params[:platform]}"
         command << File.expand_path(path).shellescape
         begin
           Actions.sh(command.join(" "), log: false)
@@ -77,7 +77,7 @@ module Fastlane
 
       def self.find_binary_path(params)
         params[:binary_path] ||= (Dir["/Applications/Fabric.app/**/upload-symbols"] + Dir["./Pods/**/upload-symbols"]).last
-        UI.user_error!("Please provide a path to the binary using binary_path:") unless params[:binary_path]
+        UI.user_error!("Failed to find Fabric's upload_symbols binary at /Applications/Fabric.app/**/upload-symbols or ./Pods/**/upload-symbols. Please specify the location of the binary explicitly by using the binary_path option") unless params[:binary_path]
 
         params[:binary_path] = File.expand_path(params[:binary_path])
       end

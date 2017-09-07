@@ -66,7 +66,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :use_webhook_configured_username_and_icon,
                                        env_name: "FL_SLACK_USE_WEBHOOK_CONFIGURED_USERNAME_AND_ICON",
-                                       description: "Use webook's default username and icon settings? (true/false)",
+                                       description: "Use webhook's default username and icon settings? (true/false)",
                                        default_value: false,
                                        is_string: false,
                                        optional: true),
@@ -79,13 +79,13 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "FL_SLACK_USERNAME",
-                                       description: "Overrides the webook's username property if use_webhook_configured_username_and_icon is false",
+                                       description: "Overrides the webhook's username property if use_webhook_configured_username_and_icon is false",
                                        default_value: "fastlane",
                                        is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :icon_url,
                                        env_name: "FL_SLACK_ICON_URL",
-                                       description: "Overrides the webook's image property if use_webhook_configured_username_and_icon is false",
+                                       description: "Overrides the webhook's image property if use_webhook_configured_username_and_icon is false",
                                        default_value: "https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png",
                                        is_string: true,
                                        optional: true),
@@ -129,7 +129,7 @@ module Fastlane
               "Built by" => "Jenkins",
             },
             default_payloads: [:git_branch, :git_author], # Optional, lets you specify a whitelist of default payloads to include. Pass an empty array to suppress all the default payloads.
-                                                          # Don\'t add this key, or pass nil, if you want all the default payloads. The available default payloads are: `lane`, `test_result`, `git_branch`, `git_author`, `last_git_commit_message`.
+                                                          # Don\'t add this key, or pass nil, if you want all the default payloads. The available default payloads are: `lane`, `test_result`, `git_branch`, `git_author`, `last_git_commit_message`, `last_git_commit_hash`.
             attachment_properties: { # Optional, lets you specify any other properties available for attachments in the slack API (see https://api.slack.com/docs/attachments).
                                      # This hash is deep merged with the existing properties set using the other properties above. This allows your own fields properties to be appended to the existing fields that were created using the `payload` property for instance.
               thumb_url: "http://example.com/path/to/thumb.png",
@@ -222,6 +222,15 @@ module Fastlane
           slack_attachment[:fields] << {
             title: 'Git Commit',
             value: Actions.last_git_commit_message,
+            short: false
+          }
+        end
+
+        # last_git_commit_hash
+        if Actions.last_git_commit_hash(true) && should_add_payload[:last_git_commit_hash]
+          slack_attachment[:fields] << {
+            title: 'Git Commit Hash',
+            value: Actions.last_git_commit_hash(short: true),
             short: false
           }
         end

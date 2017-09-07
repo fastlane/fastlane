@@ -8,7 +8,6 @@ module Gym
     # @return (String) The path to the resulting ipa
     def run
       unless Gym.config[:skip_build_archive]
-        clear_old_files
         build_app
       end
       verify_archive
@@ -19,7 +18,6 @@ module Gym
         return BuildCommandGenerator.archive_path if Gym.config[:skip_package_ipa]
 
         package_app
-        fix_package
         compress_and_move_dsym
         path = move_ipa
         move_manifest
@@ -35,7 +33,7 @@ module Gym
         end
         copy_files_from_path(File.join(BuildCommandGenerator.archive_path, "Products/usr/local/bin/*")) if Gym.project.command_line_tool?
       end
-      path
+      return path
     end
 
     #####################################################
@@ -71,23 +69,9 @@ module Gym
     # @!group The individual steps
     #####################################################
 
-    def clear_old_files
-      return unless Gym.config[:use_legacy_build_api]
-      if File.exist?(PackageCommandGenerator.ipa_path)
-        File.delete(PackageCommandGenerator.ipa_path)
-      end
-    end
-
     def fix_generic_archive
       return unless FastlaneCore::Env.truthy?("GYM_USE_GENERIC_ARCHIVE_FIX")
       Gym::XcodebuildFixes.generic_archive_fix
-    end
-
-    def fix_package
-      return unless Gym.config[:use_legacy_build_api]
-      Gym::XcodebuildFixes.swift_library_fix
-      Gym::XcodebuildFixes.watchkit_fix
-      Gym::XcodebuildFixes.watchkit2_fix
     end
 
     def mark_archive_as_built_by_gym(archive_path)
@@ -239,11 +223,7 @@ module Gym
     end
 
     def find_archive_path
-      if Gym.config[:use_legacy_build_api]
-        BuildCommandGenerator.archive_path
-      else
-        Dir.glob(File.join(BuildCommandGenerator.build_path, "*.ipa")).last
-      end
+      Dir.glob(File.join(BuildCommandGenerator.build_path, "*.ipa")).last
     end
   end
 end

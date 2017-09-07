@@ -10,6 +10,14 @@ unless Object.const_defined?("Faraday")
   end
 end
 
+unless Object.const_defined?("OpenSSL")
+  module OpenSSL
+    module SSL
+      class SSLError < StandardError; end
+    end
+  end
+end
+
 module Commander
   # This class override the run method with our custom stack trace handling
   # In particular we want to distinguish between user_error! and crash! (one with, one without stack trace)
@@ -34,7 +42,24 @@ module Commander
       parse_global_options
       remove_global_options options, @args
 
+      xcode_outdated = false
       begin
+        unless FastlaneCore::Helper.xcode_at_least?(Fastlane::MINIMUM_XCODE_RELEASE)
+          xcode_outdated = true
+        end
+      rescue
+        # We don't care about exceptions here
+        # We'll land here if the user doesn't have Xcode at all for example
+        # which is fine for someone who uses fastlane just for Android project
+        # What we *do* care about is when someone links an old version of Xcode
+      end
+
+      begin
+        if xcode_outdated
+          # We have to raise that error within this `begin` block to show a nice user error without a stack trace
+          FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_RELEASE}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
+        end
+
         collector.did_launch_action(@program[:name])
         run_active_command
       rescue InvalidCommandError => e
@@ -84,7 +109,7 @@ module Commander
         rescue_fastlane_error(e)
       rescue Errno::ENOENT => e
         rescue_file_error(e)
-      rescue Faraday::SSLError => e # SSL issues are very common
+      rescue Faraday::SSLError, OpenSSL::SSL::SSLError => e # SSL issues are very common
         handle_ssl_error!(e)
       rescue Faraday::ConnectionFailed => e
         rescue_connection_failed_error(e)
@@ -100,7 +125,7 @@ module Commander
     end
 
     def rescue_file_error(e)
-      # We're also printing the new-lines, as otherwise the message is not very visible in-between the error and the stacktrace
+      # We're also printing the new-lines, as otherwise the message is not very visible in-between the error and the stack trace
       puts ""
       FastlaneCore::UI.important("Error accessing file, this might be due to fastlane's directory handling")
       FastlaneCore::UI.important("Check out https://docs.fastlane.tools/advanced/#directory-behavior for more details")
@@ -161,16 +186,13 @@ module Commander
       ui.error ""
       ui.error "The best solution is to use the self-contained fastlane version."
       ui.error "Which ships with a bundled OpenSSL,ruby and all gems - so you don't depend on system libraries"
-      ui.error " - Use One-Click-Installer:"
-      ui.error "    - download fastlane at https://download.fastlane.tools"
-      ui.error "-----------------------------------------------------------"
-      ui.error "    - extract the archive and double click the `install`"
-      ui.error "-----------------------------------------------------------"
       ui.error " - Use Homebrew"
       ui.error "    - update brew with `brew update`"
-      ui.error "    - install fastlane:"
-      ui.error "-----------------------------------------------------------"
-      ui.error "      - 🚀 `brew cask install fastlane` 🚀"
+      ui.error "    - install fastlane using:"
+      ui.error "      - `brew cask install fastlane`"
+      ui.error " - Use One-Click-Installer:"
+      ui.error "    - download fastlane at https://download.fastlane.tools"
+      ui.error "    - extract the archive and double click the `install`"
       ui.error "-----------------------------------------------------------"
       ui.error "for more details on ways to install fastlane please refer the documentation:"
       ui.error "-----------------------------------------------------------"

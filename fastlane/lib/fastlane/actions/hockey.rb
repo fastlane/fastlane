@@ -1,9 +1,3 @@
-if ENV["SPACESHIP_DEBUG"]
-  require 'openssl'
-  # this has to be on top of this file, since the value can't be changed later
-  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
-end
-
 module Fastlane
   module Actions
     module SharedValues
@@ -26,15 +20,6 @@ module Fastlane
           builder.response :json, content_type: /\bjson$/
           builder.use FaradayMiddleware::FollowRedirects
           builder.adapter :net_http
-          if ENV['SPACESHIP_DEBUG']
-            # for debugging only
-            # This enables tracking of networking requests using Charles Web Proxy
-            builder.proxy "https://127.0.0.1:8888"
-          end
-
-          if ENV["DEBUG"]
-            puts "To run _spaceship_ through a local proxy, use SPACESHIP_DEBUG"
-          end
         end
       end
 
@@ -61,6 +46,7 @@ module Fastlane
         end
 
         connection.post do |req|
+          req.options.timeout = options.delete(:timeout)
           if options[:public_identifier].nil?
             req.url("/api/2/apps/upload")
           else
@@ -115,6 +101,7 @@ module Fastlane
         end
 
         connection.put do |req|
+          req.options.timeout = options.delete(:timeout)
           req.url("/api/2/apps/#{app_id}/app_versions/#{app_version_id}")
           req.headers['X-HockeyAppToken'] = api_token
           req.body = options
@@ -316,6 +303,11 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Invalid value '#{value}' for key 'strategy'. Allowed values are 'add', 'replace'.") unless ['add', 'replace'].include?(value)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :timeout,
+                                      env_name: "FL_HOCKEY_TIMEOUT",
+                                      description: "Request timeout in seconds",
+                                      is_string: false,
+                                      optional: true),
           FastlaneCore::ConfigItem.new(key: :bypass_cdn,
                                       env_name: "FL_HOCKEY_BYPASS_CDN",
                                       description: "Flag to bypass Hockey CDN when it uploads successfully but reports error",

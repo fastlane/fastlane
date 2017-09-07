@@ -13,7 +13,7 @@ module Fastlane
       def self.details
         [
           "By default, fastlane will send a report when it crashes",
-          "The stacktrace is sanitized so no personal information is sent.",
+          "The stack trace is sanitized so no personal information is sent.",
           "Learn more at https://github.com/fastlane/fastlane#crash-reporting",
           "Add `opt_out_crash_reporting` at the top of your Fastfile to disable crash reporting"
         ].join(' ')

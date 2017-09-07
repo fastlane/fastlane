@@ -18,8 +18,8 @@ module Fastlane
         require "fastlane" # this might take a long time if there is no Gemfile :(
 
         # We want to avoid printing output other than the version number if we are running `fastlane -v`
-        if Time.now - before_import_time > 3 && !running_version_command?
-          print_slow_fastlane_warning
+        unless running_version_command?
+          print_bundle_exec_warning(is_slow: (Time.now - before_import_time > 3))
         end
 
         FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
@@ -78,22 +78,23 @@ module Fastlane
         }[tool_name] || tool_name
       end
 
-      def print_slow_fastlane_warning
-        # `BUNDLE_BIN_PATH` is used when the user uses `bundle exec`
-        return if FastlaneCore::Env.truthy?('BUNDLE_BIN_PATH') || FastlaneCore::Env.truthy?('SKIP_SLOW_FASTLANE_WARNING') || FastlaneCore::Helper.contained_fastlane?
+      def print_bundle_exec_warning(is_slow: false)
+        return if FastlaneCore::Helper.bundler? # user is alread using bundler
+        return if FastlaneCore::Env.truthy?('SKIP_SLOW_FASTLANE_WARNING') # user disabled the warnings
+        return if FastlaneCore::Helper.contained_fastlane? # user uses the bundled fastlane
 
         gemfile_path = PluginManager.new.gemfile_path
         if gemfile_path
-          # The user has a Gemfile, but fastlane is still slow
+          # The user has a Gemfile, but forgot to use `bundle exec`
           # Let's tell the user how to use `bundle exec`
-          UI.important "Seems like launching fastlane takes a while"
-          UI.important "fastlane detected a Gemfile in this directory"
+          # We show this warning no matter if the command is slow or not
+          UI.important "fastlane detected a Gemfile in the current directory"
           UI.important "however it seems like you don't use `bundle exec`"
           UI.important "to launch fastlane faster, please use"
           UI.message ""
           UI.command "bundle exec fastlane #{ARGV.join(' ')}"
           UI.message ""
-        else
+        elsif is_slow
           # fastlane is slow and there is no Gemfile
           # Let's tell the user how to use `gem cleanup` and how to
           # start using a Gemfile
@@ -111,9 +112,9 @@ module Fastlane
           UI.message ""
           UI.important "After creating the Gemfile and Gemfile.lock, commit those files into version control"
         end
-        UI.important "For more information, check out https://guides.cocoapods.org/using/a-gemfile.html"
+        UI.important "Get started using a Gemfile for fastlane https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile"
 
-        sleep 1
+        sleep 2 # napping is life, otherwise the user might not see this message
       end
 
       # Returns an array of symbols for the available lanes for the Fastfile

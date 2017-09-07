@@ -13,18 +13,12 @@ module Gym
       # Detect the project
       FastlaneCore::Project.detect_projects(config)
       Gym.project = FastlaneCore::Project.new(config)
-      detect_provisioning_profile
+
+      detect_selected_provisioning_profiles
 
       # Go into the project's folder, as there might be a Gymfile there
       Dir.chdir(File.expand_path("..", Gym.project.path)) do
         config.load_configuration_file(Gym.gymfile_name)
-      end
-
-      config[:use_legacy_build_api] = true if Xcode.pre_7?
-
-      if config[:use_legacy_build_api]
-        UI.deprecated("the use_legacy_build_api option is deprecated")
-        UI.deprecated("it should not be used anymore - e.g.: if you use app-extensions")
       end
 
       detect_scheme
@@ -62,25 +56,28 @@ module Gym
       CFPropertyList.native_types(CFPropertyList::List.new(file: path).value)
     end
 
-    def self.detect_provisioning_profile
-      if Gym.config[:provisioning_profile_path].nil?
-        return unless Gym.config[:use_legacy_build_api] # we only want to auto-detect the profile when using the legacy build API
+    # Since Xcode 9 you need to provide the explicit mapping of what provisioning profile to use for
+    # each target of your app
+    def self.detect_selected_provisioning_profiles
+      Gym.config[:export_options] ||= {}
+      hash_to_use = (Gym.config[:export_options][:provisioningProfiles] || {}).dup || {} # dup so we can show the original values in `verbose` mode
 
-        Dir.chdir(File.expand_path("..", Gym.project.path)) do
-          profiles = Dir["*.mobileprovision"]
-          if profiles.count == 1
-            profile = File.expand_path(profiles.last)
-          elsif profiles.count > 1
-            UI.message "Found more than one provisioning profile in the project directory:"
-            profile = choose(*profiles)
-          end
+      mapping_object = CodeSigningMapping.new(project: Gym.project)
+      hash_to_use = mapping_object.merge_profile_mapping(primary_mapping: hash_to_use,
+                                                           export_method: Gym.config[:export_method])
 
-          Gym.config[:provisioning_profile_path] = profile
-        end
-      end
-
-      if Gym.config[:provisioning_profile_path]
-        FastlaneCore::ProvisioningProfile.install(Gym.config[:provisioning_profile_path])
+      return if hash_to_use.count == 0 # We don't want to set a mapping if we don't have one
+      Gym.config[:export_options][:provisioningProfiles] = hash_to_use
+      UI.message("Detected provisioning profile mapping: #{hash_to_use}")
+    rescue => ex
+      # We don't want to fail the build if the automatic detection doesn't work
+      # especially since the mapping is optional for pre Xcode 9 setups
+      if Helper.xcode_at_least?("9.0")
+        UI.error("Couldn't automatically detect the provisioning profile mapping")
+        UI.error("Since Xcode 9 you need to provide an explicit mapping of what")
+        UI.error("provisioning profile to use for each target of your app")
+        UI.error(ex)
+        UI.verbose(ex.backtrace.join("\n"))
       end
     end
 
@@ -89,7 +86,7 @@ module Gym
     end
 
     def self.min_xcode8?
-      Helper.xcode_version.split(".").first.to_i >= 8
+      Helper.xcode_at_least?("8.0")
     end
 
     # Is it an iOS device or a Mac?

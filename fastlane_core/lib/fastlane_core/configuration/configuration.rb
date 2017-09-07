@@ -49,7 +49,7 @@ module FastlaneCore
 
       # if we are in captured output mode - keep a array of sensitive option values
       # those will be later - replaced by ####
-      if $capture_output
+      if FastlaneCore::Globals.capture_output?
         available_options.each do |element|
           next unless element.sensitive
           self.class.sensitive_strings << values[element.key]

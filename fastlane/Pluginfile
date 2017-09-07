@@ -2,5 +2,4 @@
 
 gem 'fastlane-plugin-ruby'
 gem 'fastlane-plugin-clubmate'
-gem 'fastlane-plugin-sharethemeal'
 gem 'fastlane-plugin-slack_train', ">= 0.2.0"

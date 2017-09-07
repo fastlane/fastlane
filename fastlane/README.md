@@ -85,13 +85,13 @@ fastlane release
 :thought_balloon: | Never remember any difficult commands, just `fastlane`
 :tophat: | Easy setup assistant to get started in a few minutes
 :email: | Automatically pass on information from one build step to another (e.g. path to the `ipa` file)
-:page_with_curl: | Store **everything** in git. Never again lookup the build commands in the `Jenkins` configs
+:page_with_curl: | Store **everything** in Git. Never lookup build commands on your CI system again.
 :rocket: | Saves you **hours** for every app update you release
 :pencil2: | Very flexible configuration using a fully customisable `Fastfile`
 :mountain_cableway: | Implement a fully working Continuous Delivery process
 :ghost: | [Jenkins Integration](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration): Show the output directly in the Jenkins test results
 :book: | Automatically generate a markdown documentation of your lane config
-:hatching_chick: | Over 170 built-in integrations available
+:hatching_chick: | Over 170 built-in integrations and 170 plugins available
 :computer: | Support for iOS and Android apps
 :octocat: | Full git and mercurial support
 
@@ -190,7 +190,14 @@ See how [Wikipedia](https://github.com/fastlane/examples#wikipedia-by-wikimedia-
 A detailed description about how `fastlane` stores your credentials is available on a [separate repo](https://github.com/fastlane/fastlane/tree/master/credentials_manager).
 
 ## Need help?
-Please submit an issue on GitHub and provide information about your setup
+
+Before submitting a new GitHub issue, please make sure to
+
+- Check out [docs.fastlane.tools](https://docs.fastlane.tools)
+- Check out the README pages on [this repo](https://github.com/fastlane/fastlane)
+- Search for [existing GitHub issues](https://github.com/fastlane/fastlane/issues)
+
+If the above doesn't help, please [submit an issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup, in particular the output of the `fastlane env` command.
 
 ## Special Thanks
 

@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = Dir["*/lib"]
 
   spec.add_dependency 'slack-notifier', '>= 1.3', '< 2.0.0' # Slack notifications
-  spec.add_dependency 'xcodeproj', '>= 1.4.4', '< 2.0.0' # Needed for commit_version_bump action
+  spec.add_dependency 'xcodeproj', '>= 1.5.0', '< 2.0.0' # Needed for commit_version_bump action
   spec.add_dependency 'xcpretty', '>= 0.2.4', '< 1.0.0' # prettify xcodebuild output
   spec.add_dependency 'terminal-notifier', '>= 1.6.2', '< 2.0.0' # macOS notifications
   spec.add_dependency 'terminal-table', '>= 1.4.5', '< 2.0.0' # Actions documentation
@@ -41,17 +41,18 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'multipart-post', '~> 2.0.0' # Needed for uploading builds to appetize
   spec.add_dependency 'word_wrap', '~> 1.0.0' # to add line breaks for tables with long strings
 
+  spec.add_dependency 'public_suffix', '~> 2.0.0' # https://github.com/fastlane/fastlane/issues/10162
+
   # TTY dependencies
   spec.add_dependency 'tty-screen', '~> 0.5.0' # detect the terminal width
 
   spec.add_dependency 'babosa', '>= 1.0.2', "< 2.0.0"
   spec.add_dependency 'colored' # coloured terminal output
-  spec.add_dependency 'commander-fastlane', '>= 4.4.0', '< 5.0.0' # CLI parser
+  spec.add_dependency 'commander-fastlane', '>= 4.4.5', '< 5.0.0' # CLI parser
   spec.add_dependency 'excon', '>= 0.45.0', '< 1.0.0' # Great HTTP Client
   spec.add_dependency 'faraday-cookie_jar', '~> 0.0.6'
-  spec.add_dependency 'fastimage', '>= 1.6' # fetch the image sizes from the screenshots, note: we also support > 2.0
+  spec.add_dependency 'fastimage', '>= 2.1.0', '< 3.0.0' # fetch the image sizes from the screenshots
   spec.add_dependency 'gh_inspector', '>= 1.0.1', '< 2.0.0' # search for issues on GitHub when something goes wrong
-  spec.add_dependency 'google-api-client', '>= 0.12.0', '< 0.13.0' # Google API Client to access Play Publishing API
   spec.add_dependency 'highline', '>= 1.7.2', '< 2.0.0' # user inputs (e.g. passwords)
   spec.add_dependency 'json', '< 3.0.0' # Because sometimes it's just not installed
   spec.add_dependency 'mini_magick', '~> 4.5.1' # To open, edit and export PSD files
@@ -65,6 +66,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'faraday', '~> 0.9' # Used for deploygate, hockey and testfairy actions
   spec.add_dependency 'faraday_middleware', '~> 0.9' # same as faraday
 
+  # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
+  # If you upgrade this gem, make sure to upgrade the users of it as well.
+  spec.add_dependency 'google-api-client', '>= 0.13.1', '< 0.14.0' # Google API Client to access Play Publishing API
+
   # Development only
   spec.add_development_dependency 'rake', '< 12'
   spec.add_development_dependency 'rspec', '~> 3.5.0'
@@ -76,9 +81,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 2.3.2'
   spec.add_development_dependency 'coveralls', '~> 0.8.13'
-  spec.add_development_dependency 'rubocop', '0.48.1'
+  spec.add_development_dependency 'rubocop', '0.49.1'
   spec.add_development_dependency 'rb-readline' # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
-  spec.add_development_dependency 'rest-client', '~> 1.6.7'
+  spec.add_development_dependency 'rest-client', '>= 1.8.0'
   spec.add_development_dependency 'fakefs', '~> 0.8.1'
   spec.add_development_dependency 'sinatra', '~> 1.4.8'
 end

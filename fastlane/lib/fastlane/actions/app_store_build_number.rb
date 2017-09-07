@@ -30,7 +30,7 @@ module Fastlane
             if testflight_version
               version_number = testflight_version
             else
-              version_number = UI.input("You have to specify a new version number")
+              version_number = UI.input("You have to specify a new version number, as there are multiple to choose from")
             end
 
           end

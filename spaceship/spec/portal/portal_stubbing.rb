@@ -75,6 +75,10 @@ class PortalStubbing
         with(body: { "provisioningProfileId" => "PP00000005", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileDevelopment.action.json'), headers: { 'Content-Type' => 'application/json' })
 
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
+        with(body: { "provisioningProfileId" => "PP00000007", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileWithTemplateiOSAppStore.action.json'), headers: { 'Content-Type' => 'application/json' })
+
       # Create Profiles
 
       # Name is free
@@ -86,6 +90,11 @@ class PortalStubbing
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
         with(body: { "appIdId" => "R9YNDTPLJX", "certificateIds" => "C8DL7464RQ", "deviceIds" => "C8DLAAAARQ", "distributionType" => "limited", "provisioningProfileName" => "taken", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file("create_profile_name_taken.txt"))
+
+      # Profile with template
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
+        with(body: { "appIdId" => "R9YNDTPLJX", "certificateIds" => "C8DL7464RQ", "distributionType" => "limited", "provisioningProfileName" => "net.sunapps.106 limited", "teamId" => "XXXXXXXXXX", "template" => "Subscription Service iOS (dist)" }).
+        to_return(status: 200, body: adp_read_fixture_file('create_profile_with_template_success.json'), headers: { 'Content-Type' => 'application/json' })
 
       # Repair Profiles
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/regenProvisioningProfile.action").
@@ -231,6 +240,11 @@ class PortalStubbing
         with(body: "{\"invites\":[{\"recipientEmail\":\"helmut@januschka.com\",\"recipientRole\":\"admin\"}],\"teamId\":\"XXXXXXXXXX\"}").
         to_return(status: 200, body: "", headers: {})
 
+      # get invites
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/getInvites").
+        with(body: "{\"teamId\":\"XXXXXXXXXX\"}").
+        to_return(status: 200, body: adp_read_fixture_file("inviteList.json"), headers: { 'Content-Type' => 'application/json' })
+
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/removeTeamMembers").
         with(body: "{\"teamId\":\"XXXXXXXXXX\",\"teamMemberIds\":[\"5M8TWKRZ3J\"]}").
         to_return(status: 200, body: "", headers: {})
@@ -252,6 +266,32 @@ class PortalStubbing
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/deleteApplicationGroup.action").
         with(body: { "applicationGroup" => "2GKKV64NUG", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('deleteApplicationGroup.action.json'), headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def adp_stub_passbooks
+      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listPassTypeIds.action').
+        with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
+        to_return(status: 200, body: adp_read_fixture_file('listPassTypeIds.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/listPassTypeIds.action").
+        with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "name=asc", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('listPassTypeIds.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addPassTypeId.action").
+        with(body: { "name" => "Fastlane Passbook", "identifier" => "pass.com.fastlane.example", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('addPassTypeId.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/addPassTypeId.action").
+        with(body: { "name" => "Fastlane Passbook", "identifier" => "web.com.fastlane.example", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('addPassTypeId.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/deletePassTypeId.action").
+        with(body: { "passTypeId" => "R7878HDXC3", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('deletePassTypeId.action.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/deletePassTypeId.action").
+        with(body: { "passTypeId" => "R7878HDXC3", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('deletePassTypeId.action.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
     def adp_stub_website_pushes

@@ -10,6 +10,10 @@ module Spaceship
     class ITunesConnectTemporaryError < ITunesConnectError
     end
 
+    # raised if the server failed to save, and it might be caused by an invisible server error
+    class ITunesConnectPotentialServerError < ITunesConnectError
+    end
+
     attr_reader :du_client
 
     def initialize
@@ -86,6 +90,12 @@ module Spaceship
           puts "#{i + 1}) \"#{team['contentProvider']['name']}\" (#{team['contentProvider']['contentProviderId']})"
         end
 
+        unless Spaceship::Client::UserInterface.interactive?
+          puts "Multiple teams found on iTunes Connect, Your Terminal is running in non-interactive mode! Cannot continue from here."
+          puts "Please check that you set FASTLANE_ITC_TEAM_ID or FASTLANE_ITC_TEAM_NAME to the right value."
+          raise "Multiple iTunes Connect Teams found; unable to choose, terminal not ineractive!"
+        end
+
         selected = ($stdin.gets || '').strip.to_i - 1
         team_to_use = teams[selected] if selected >= 0
 
@@ -102,7 +112,9 @@ module Spaceship
     end
 
     # rubocop:disable Metrics/PerceivedComplexity
-    def handle_itc_response(raw)
+    # If the response is coming from a flaky api, set flaky_api_call to true so we retry a little.
+    # Patience is a virtue.
+    def handle_itc_response(raw, flaky_api_call: false)
       return unless raw
       return unless raw.kind_of? Hash
 
@@ -158,6 +170,8 @@ module Spaceship
           raise ITunesConnectTemporaryError.new, errors.first
         elsif errors.count == 1 and errors.first.include?("Forbidden")
           raise_insuffient_permission_error!
+        elsif flaky_api_call
+          raise ITunesConnectPotentialServerError.new, errors.join(' ')
         else
           raise ITunesConnectError.new, errors.join(' ')
         end
@@ -204,7 +218,7 @@ module Spaceship
     # @param sku (String): A unique ID for your app that is not visible on the App Store.
     # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It
     #   can't be changed after you submit your first build.
-    def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil)
+    def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil, itunes_connect_users: nil)
       puts "The `version` parameter is deprecated. Use `Spaceship::Tunes::Application.ensure_version!` method instead" if version
 
       # First, we need to fetch the data from Apple, which we then modify with the user's values
@@ -226,6 +240,11 @@ module Spaceship
 
       data['initialPlatform'] = platform
       data['enabledPlatformsForCreation'] = { value: [platform] }
+
+      unless itunes_connect_users.nil?
+        data['iTunesConnectUsers']['grantedAllUsers'] = false
+        data['iTunesConnectUsers']['grantedUsers'] = data['iTunesConnectUsers']['availableUsers'].select { |user| itunes_connect_users.include? user['username'] }
+      end
 
       # Now send back the modified hash
       r = request(:post) do |req|
@@ -258,22 +277,28 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def get_ratings(app_id, platform, versionId = '', storefront = '')
-      # if storefront or versionId is empty api fails
+    def get_ratings(app_id, platform, version_id = '', storefront = '')
+      # if storefront or version_id is empty api fails
       rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews/summary?"
       rating_url << "storefront=#{storefront}" unless storefront.empty?
-      rating_url << "versionId=#{versionId}" unless versionId.empty?
+      rating_url << "version_id=#{version_id}" unless version_id.empty?
 
       r = request(:get, rating_url)
       parse_response(r, 'data')
     end
 
-    def get_reviews(app_id, platform, storefront, versionId = '')
+    def get_reviews(app_id, platform, storefront, version_id)
       index = 0
       per_page = 100 # apple default
       all_reviews = []
       loop do
-        r = request(:get, "ra/apps/#{app_id}/platforms/#{platform}/reviews?storefront=#{storefront}&versionId=#{versionId}&index=#{index}")
+        rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews?"
+        rating_url << "sort=REVIEW_SORT_ORDER_MOST_RECENT"
+        rating_url << "&index=#{index}"
+        rating_url << "&storefront=#{storefront}" unless storefront.empty?
+        rating_url << "&version_id=#{version_id}" unless version_id.empty?
+
+        r = request(:get, rating_url)
         all_reviews.concat(parse_response(r, 'data')['reviews'])
         if all_reviews.count < parse_response(r, 'data')['reviewCount']
           index += per_page
@@ -326,7 +351,7 @@ module Spaceship
           req.headers['Content-Type'] = 'application/json'
         end
 
-        handle_itc_response(r.body)
+        handle_itc_response(r.body, flaky_api_call: true)
       end
     end
 
@@ -385,6 +410,37 @@ module Spaceship
       # send the changes back to Apple
       r = request(:post) do |req|
         req.url "ra/users/itc/create"
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_itc_response(r.body)
+    end
+
+    def update_member_roles!(member, roles: [], apps: [])
+      r = request(:get, "ra/users/itc/#{member.user_id}/roles")
+      data = parse_response(r, 'data')
+
+      roles << "admin" if roles.length == 0
+
+      data["user"]["roles"] = []
+      roles.each do |role|
+        # find role from template
+        data["roles"].each do |template_role|
+          if template_role["value"]["name"] == role
+            data["user"]["roles"] << template_role
+          end
+        end
+      end
+
+      if apps.length == 0
+        data["user"]["userSoftwares"] = { value: { grantAllSoftware: true, grantedSoftwareAdamIds: [] } }
+      else
+        data["user"]["userSoftwares"] = { value: { grantAllSoftware: false, grantedSoftwareAdamIds: apps } }
+      end
+
+      # send the changes back to Apple
+      r = request(:post) do |req|
+        req.url "ra/users/itc/#{member.user_id}/roles"
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
@@ -855,19 +911,25 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def send_app_submission(app_id, data)
+    def send_app_submission(app_id, version, data)
       raise "app_id is required" unless app_id
 
       # ra/apps/1039164429/version/submit/complete
       r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/version/submit/complete"
+        req.url "ra/apps/#{app_id}/versions/#{version}/submit/complete"
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
 
       handle_itc_response(r.body)
 
-      if r.body.fetch('messages').fetch('info').last == "Successful POST"
+      # iTunes Connect still returns a success status code even the submission
+      # was failed because of Ad ID info.  This checks for any section error
+      # keys in returned adIdInfo and prints them out.
+      ad_id_error_keys = r.body.fetch('data').fetch('adIdInfo').fetch('sectionErrorKeys')
+      if ad_id_error_keys.any?
+        raise "Something wrong with your Ad ID information: #{ad_id_error_keys}."
+      elsif r.body.fetch('messages').fetch('info').last == "Successful POST"
         # success
       else
         raise "Something went wrong when submitting the app for review. Make sure to pass valid options to submit your app for review"
@@ -1292,7 +1354,7 @@ module Spaceship
 
     private
 
-    def with_tunes_retry(tries = 5, &_block)
+    def with_tunes_retry(tries = 5, potential_server_error_tries = 3, &_block)
       return yield
     rescue Spaceship::TunesClient::ITunesConnectTemporaryError => ex
       unless (tries -= 1).zero?
@@ -1303,6 +1365,15 @@ module Spaceship
         retry
       end
       raise ex # re-raise the exception
+    rescue Spaceship::TunesClient::ITunesConnectPotentialServerError => ex
+      unless (potential_server_error_tries -= 1).zero?
+        msg = "Potential server error received: '#{ex.message}'. Retrying after 10 seconds (remaining: #{tries})..."
+        puts msg
+        logger.warn msg
+        sleep 10 unless defined? SpecHelper # unless FastlaneCore::Helper.is_test?
+        retry
+      end
+      raise ex
     end
 
     def clear_user_cached_data

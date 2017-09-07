@@ -28,7 +28,7 @@ module Sigh
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_install,
                                      env_name: "SIGH_SKIP_INSTALL",
-                                     description: "By default, the certificate will be added on your local machine. Setting this flag will skip this action",
+                                     description: "By default, the certificate will be added to your local machine. Setting this flag will skip this action",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :force,
@@ -121,7 +121,12 @@ module Sigh
                                        value = value.to_s
                                        pt = %w(macos tvos ios)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :template_name,
+                                     env_name: "SIGH_PROVISIONING_PROFILE_TEMPLATE_NAME",
+                                     description: "The name of provisioning profile template. If the developer account has provisioning profile templates, template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile",
+                                     optional: true,
+                                     default_value: nil)
       ]
     end
   end

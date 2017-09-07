@@ -33,7 +33,7 @@ If you experiennce slow launch times of `fastlane`, there are 2 solutions to sol
 
 ##### Use a Gemfile
 
-Follow the [CocoaPods Gemfile Guide](https://guides.cocoapods.org/using/a-gemfile.html) to set up your initial Gemfile. From then on launch `fastlane` using:
+Follow the [Gemfile Guide](https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile) to set up your initial Gemfile. From then on launch `fastlane` using:
 
 ```
 bundle exec fastlane ...
@@ -48,6 +48,14 @@ For more information about the recommended setup with Jenkins open the [Jenkins 
 ### Code signing issues
 
 Check out the [codesigning.guide](https://codesigning.guide) website for more information on how to properly setup code-signing in your team using [match](https://github.com/fastlane/fastlane/tree/master/match).
+
+### When should I use _cert_, _sigh_ and _match_?
+
+- _cert_ allows you to create a new code signing certificate + private key (note that the private key is only stored on your machine and won't be synced to any other mac)
+- _sigh_ allows you to create and download a provisioning profile (those are synced via the  developer portal)
+- _match_ uses those 2 tools in combination with a git repo you provide, to sync all private key, certificates and provisioning profiles across all your team's Macs and CI servers
+
+We recommend using _match_ as it removes the complexity out of code signing, while still being in full control. This way you can sync all the signing identities across your team and your CI server. For more information check out [codesigning.guide](https://codesigning.guide).
 
 ### Multiple targets of the same underlying app
 

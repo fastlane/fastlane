@@ -43,12 +43,6 @@ module Spaceship
         'clearedForSale.value' => :cleared_for_sale
       })
 
-      class << self
-        def factory(attrs)
-          return self.new(attrs)
-        end
-      end
-
       # @return (Hash) Hash of languages
       # @example: {
       #   'de-DE': {

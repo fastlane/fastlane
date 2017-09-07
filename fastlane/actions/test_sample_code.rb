@@ -84,7 +84,8 @@ module Fastlane
           :refresh_dsyms,
           :lane,
           :before_all,
-          :verify_xcode
+          :verify_xcode,
+          :error
         ]
       end
 

@@ -84,7 +84,7 @@ class TunesStubbing
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/reviews/summary?storefront=US").
         to_return(status: 200, body: itc_read_fixture_file('ratings_US.json'), headers: { 'Content-Type' => 'application/json' })
 
-      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/reviews?index=0&storefront=US&versionId=").
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/reviews?index=0&sort=REVIEW_SORT_ORDER_MOST_RECENT&storefront=US").
         to_return(status: 200, body: itc_read_fixture_file('review_by_storefront.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
@@ -140,7 +140,7 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file('app_submission/start_success.json'), headers: { 'Content-Type' => 'application/json' })
 
       # Complete app submission
-      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/version/submit/complete").
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/812106519/submit/complete").
         to_return(status: 200, body: itc_read_fixture_file('app_submission/complete_success.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
@@ -150,7 +150,7 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file('app_submission/start_success.json'), headers: { 'Content-Type' => 'application/json' })
 
       # Complete app submission
-      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/version/submit/complete").
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/812106519/submit/complete").
         to_return(status: 200, body: itc_read_fixture_file('app_submission/complete_failed.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
@@ -440,6 +440,36 @@ class TunesStubbing
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/create").
         to_return(status: 200, body: itc_read_fixture_file(File.join('member_template.json')),
                   headers: { "Content-Type" => "application/json" })
+
+      # read member roles default (admin, all-apps)
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/283226505/roles").
+        to_return(status: 200, body: itc_read_fixture_file(File.join('member_read_roles.json')),
+                  headers: { "Content-Type" => "application/json" })
+
+      # update member default (admin, all-apps)
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/283226505/roles").
+        with(body: JSON.parse(itc_read_fixture_file("member_update_roles.json"))).
+        to_return(status: 200, body: "", headers: {})
+
+      # read member roles before role: developer, apps: all
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/10795390202/roles").
+        to_return(status: 200, body: itc_read_fixture_file(File.join('member_read_roles_before_developer.json')),
+                  headers: { "Content-Type" => "application/json" })
+
+      # update member role: developer, apps: all
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/10795390202/roles").
+        with(body: JSON.parse(itc_read_fixture_file("member_update_roles_developer.json"))).
+        to_return(status: 200, body: "", headers: {})
+
+      # read member roles before role: appmanager, apps: 12345
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/10791511390202/roles").
+        to_return(status: 200, body: itc_read_fixture_file(File.join('member_read_roles_before_appmanager_single_app.json')),
+                  headers: { "Content-Type" => "application/json" })
+
+      # update member role: appmanager, apps: 12345
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/10791511390202/roles").
+        with(body: JSON.parse(itc_read_fixture_file("member_update_roles_appmanager_single_app.json"))).
+        to_return(status: 200, body: "", headers: {})
 
       # Load member list
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc").

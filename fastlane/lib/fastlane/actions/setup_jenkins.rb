@@ -158,7 +158,7 @@ module Fastlane
                                        default_value: "./output"),
           FastlaneCore::ConfigItem.new(key: :derived_data_path,
                                        env_name: "FL_SETUP_JENKINS_DERIVED_DATA_PATH",
-                                       description: "The directory where build products and other derived data will go",
+                                       description: "The directory where built products and other derived data will go",
                                        is_string: true,
                                        default_value: "./derivedData"),
           FastlaneCore::ConfigItem.new(key: :result_bundle,
