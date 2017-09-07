@@ -90,7 +90,8 @@ describe Deliver::CommandsGenerator do
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
         description: 'My description',
-        username: 'me@it.com'
+        username: 'me@it.com',
+        run_precheck_before_submit: false
       })
 
       expect_runner_new_with(expected_options)
@@ -104,7 +105,8 @@ describe Deliver::CommandsGenerator do
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
         description: 'My description',
-        app_identifier: 'abcd'
+        app_identifier: 'abcd',
+        run_precheck_before_submit: false
       })
 
       expect_runner_new_with(expected_options)
