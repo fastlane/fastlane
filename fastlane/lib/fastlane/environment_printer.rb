@@ -258,7 +258,7 @@ module Fastlane
         env_output << "\n"
         env_output << "```ruby\n"
         env_output <<  File.read(fastlane_path)
-        env_output <<  "```\n"
+        env_output <<  "\n```\n"
         env_output << "</details>"
       else
         env_output << "**No Fastfile found**\n"
@@ -272,7 +272,7 @@ module Fastlane
         env_output << "\n"
         env_output << "```ruby\n"
         env_output <<  File.read(appfile_path)
-        env_output <<  "```\n"
+        env_output <<  "\n```\n"
         env_output << "</details>"
       else
         env_output << "**No Appfile found**\n"
