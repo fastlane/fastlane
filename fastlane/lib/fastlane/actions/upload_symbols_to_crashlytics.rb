@@ -22,7 +22,7 @@ module Fastlane
         dsym_paths = dsym_paths.collect { |a| File.expand_path(a) }
         dsym_paths.uniq!
 
-        max_worker_threads = Integer(params[:dsym_worker_threads]) || 1
+        max_worker_threads = params[:dsym_worker_threads]
         if max_worker_threads > 1
           UI.message("Using #{max_worker_threads} threads for Crashlytics dSYM upload 🏎")
         end
@@ -162,14 +162,15 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :dsym_worker_threads,
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DSYM_WORKER_THREADS",
-                                       default_value: '1',
+                                       type: Integer,
+                                       default_value: 1,
                                        optional: true,
                                        description: "The number of threads to use for simultaneous dSYM upload",
                                        verify_block: proc do |value|
                                          min_threads = 1
                                          max_threads = 15
-                                         UI.user_error!("Too few threads (#{value}) minimum number of threads: #{min_threads}") unless Integer(value) >= min_threads
-                                         UI.user_error!("Too many threads (#{value}) maximum number of threads: #{max_threads}") unless Integer(value) <= max_threads
+                                         UI.user_error!("Too few threads (#{value}) minimum number of threads: #{min_threads}") unless value >= min_threads
+                                         UI.user_error!("Too many threads (#{value}) maximum number of threads: #{max_threads}") unless value <= max_threads
                                        end)
         ]
       end
