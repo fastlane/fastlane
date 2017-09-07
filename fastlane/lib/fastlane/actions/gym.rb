@@ -61,7 +61,7 @@ module Fastlane
             self.show_xcode_9_warning
           end
         end
-        
+
         gym_output_path = Gym::Manager.new.work(values)
         if gym_output_path.nil?
           UI.important("No output path received from gym")
