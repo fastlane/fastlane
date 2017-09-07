@@ -99,7 +99,6 @@ module Precheck
           else
             UI.important message
           end
-
         else
           UI.message "✅  Passed: #{rule.class.friendly_name}"
         end
