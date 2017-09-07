@@ -61,7 +61,7 @@ module FastlaneCore
       filename = file.path
       keychain = wwdr_keychain
       keychain = "-k #{keychain.shellescape}" unless keychain.empty?
-      Helper.backticks("curl -o #{filename} #{url} && security import #{filename} #{keychain}", print: FastlaneCore::Globals.verbose?)
+      Helper.backticks("curl -f -o #{filename} #{url} && security import #{filename} #{keychain}", print: FastlaneCore::Globals.verbose?)
       UI.user_error!("Could not install WWDR certificate") unless $?.success?
     end
 

@@ -34,7 +34,7 @@ describe FastlaneCore do
         # We have to execute *something* using ` since otherwise we set expectations to `nil`, which is not healthy
         `ls`
 
-        cmd = %r{curl -o (/.+?) https://developer\.apple\.com/certificationauthority/AppleWWDRCA.cer && security import \1 -k keychain\\ with\\ spaces\.keychain}
+        cmd = %r{curl -f -o (/.+?) https://developer\.apple\.com/certificationauthority/AppleWWDRCA.cer && security import \1 -k keychain\\ with\\ spaces\.keychain}
 
         expect(FastlaneCore::Helper).to receive(:backticks).with(cmd, { print: nil }).and_return("")
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
