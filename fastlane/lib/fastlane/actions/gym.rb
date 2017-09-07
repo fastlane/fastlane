@@ -61,7 +61,14 @@ module Fastlane
             self.show_xcode_9_warning
           end
         end
-        absolute_ipa_path = File.expand_path(Gym::Manager.new.work(values))
+-
+ -        gym_output_path = Gym::Manager.new.work(values)
+ -        if gym_output_path.nil?
+ -          UI.important("No output path received from gym")
+ -          return nil
+ -        end
+ -
+ -        absolute_ipa_path = File.expand_path(gym_output_path)
         absolute_dsym_path = absolute_ipa_path.gsub(".ipa", ".app.dSYM.zip")
 
         # This might be the mac app path, so we don't want to set it here
