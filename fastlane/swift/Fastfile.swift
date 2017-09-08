@@ -21,8 +21,9 @@ class Fastfile: LaneFile {
 
     func beforeAll() {
         // environmentVariables["SLACK_URL"] = "https://hooks.slack.com/services/..."
-        cocoapods()
-        carthage()
+//        cocoapods()
+//        carthage()
+        log(message: "before all called")
     }
 
     func testLane() {
@@ -49,11 +50,7 @@ class Fastfile: LaneFile {
     // You can define as many lanes as you want
 
     func afterAll(currentLane: String) {
-        //This block is called, only if the executed lane was successful
-        //slack(
-        //    message: "Successfully deployed new App Update.",
-        //    slackUrl: "slackURL"
-        //)
+        log(message: "after all called")
     }
 
     func onError(currentLane: String, errorInfo: String) {

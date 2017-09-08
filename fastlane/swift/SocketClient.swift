@@ -259,7 +259,7 @@ extension SocketClient: StreamDelegate {
 
         let responseString = string.trimmingCharacters(in: .whitespacesAndNewlines)
         let socketResponse = SocketResponse(payload: responseString)
-        log(message: "response is: \(responseString)")
+        verbose(message: "response is: \(responseString)")
         switch socketResponse.responseType {
         case .failure(let failureInformation):
             self.socketDelegate?.commandExecuted(serverResponse: .serverError)

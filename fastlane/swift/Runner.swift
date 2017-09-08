@@ -101,7 +101,7 @@ extension Runner : SocketClientDelegateProtocol {
     func commandExecuted(serverResponse: SocketClientResponse) {
         switch serverResponse {
         case .success(let returnedObject):
-            log(message: "command executed")
+            verbose(message: "command executed")
             self.returnValue = returnedObject
 
         case .alreadyClosedSockets, .connectionFailure, .malformedRequest, .malformedResponse, .serverError:
@@ -116,7 +116,7 @@ extension Runner : SocketClientDelegateProtocol {
 
     func connectionsOpened() {
         DispatchQueue.main.async {
-            log(message: "connected!")
+            verbose(message: "connected!")
         }
     }
 
@@ -125,7 +125,7 @@ extension Runner : SocketClientDelegateProtocol {
             self.thread?.cancel()
             self.thread = nil
             self.socketClient = nil
-            log(message: "connection closed!")
+            verbose(message: "connection closed!")
             if self.shouldLeaveDispatchGroupDuringDisconnect {
                 self.dispatchGroup.leave()
             }

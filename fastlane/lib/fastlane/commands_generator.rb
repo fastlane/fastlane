@@ -124,6 +124,16 @@ module Fastlane
         end
       end
 
+      command :init_swift do |c|
+        c.syntax = 'fastlane init_swift'
+        c.description = 'Helps you with your initial fastlane setup for Swift'
+        c.option '-u STRING', '--user STRING', String, 'iOS projects only: Your Apple ID'
+
+        c.action do |args, options|
+          Fastlane::Setup.new.run(user: options.user, is_swift_fastfile: true)
+        end
+      end
+
       command :new_action do |c|
         c.syntax = 'fastlane new_action'
         c.description = 'Create a new custom action for fastlane.'

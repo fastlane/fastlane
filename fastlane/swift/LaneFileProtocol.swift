@@ -21,11 +21,11 @@ public protocol LaneFileProtocol: class {
 }
 
 public extension LaneFileProtocol {
-    public var fastlaneVersion: String { return "" } // default "" because that means any is fine
-    public func beforeAll() { } // no op by default
-    public func afterAll(currentLane: String) { } // no op by default
-    public func onError(currentLane: String, errorInfo: String) {} // no op by default
-    public func recordLaneDescriptions() { } // no op by default
+    var fastlaneVersion: String { return "" } // default "" because that means any is fine
+    func beforeAll() { } // no op by default
+    func afterAll(currentLane: String) { } // no op by default
+    func onError(currentLane: String, errorInfo: String) {} // no op by default
+    func recordLaneDescriptions() { } // no op by default
 }
 
 public class LaneFile: NSObject, LaneFileProtocol {
@@ -33,7 +33,7 @@ public class LaneFile: NSObject, LaneFileProtocol {
 
 //    private static let laneQueue = DispatchQueue(label: "laneQueue")
 
-    public private(set) static var fastfileInstance: LaneFile?
+    private(set) static var fastfileInstance: Fastfile?
 
     private var laneDescriptionMapping: [Selector : String] = [:]
 
@@ -43,12 +43,13 @@ public class LaneFile: NSObject, LaneFileProtocol {
         recordLaneDescriptions()
 
         // Step 2, send over environment variables to ruby process if we have them
-        if self.environmentVariables.variables.count > 0 {
+        if LaneFile.fastfileInstance!.environmentVariables.variables.count > 0 {
             _ = runner.executeCommand(self.environmentVariables)
         }
 
         // Step 3, run beforeAll() function
-        beforeAll()
+
+        LaneFile.fastfileInstance!.beforeAll()
     }
 
     public static var lanes: [String : String] {
@@ -74,14 +75,15 @@ public class LaneFile: NSObject, LaneFileProtocol {
     }
 
     public static func runLane(named: String) {
+        log(message: "Running lane: \(named)")
         if self.fastfileInstance == nil {
             let fastfileType: AnyObject.Type = NSClassFromString(self.className())!
             let fastfileAsNSObjectType: NSObject.Type = fastfileType as! NSObject.Type
-            let currentFastfileInstance: LaneFile? = fastfileAsNSObjectType.init() as? LaneFile
+            let currentFastfileInstance: Fastfile? = fastfileAsNSObjectType.init() as? Fastfile
             self.fastfileInstance = currentFastfileInstance
         }
 
-        guard let fastfileInstance: LaneFile = self.fastfileInstance else {
+        guard let fastfileInstance: Fastfile = self.fastfileInstance else {
             log(message: "Unable to instantiate class named: \(self.className())")
             fatalError()
         }
@@ -106,6 +108,7 @@ public class LaneFile: NSObject, LaneFileProtocol {
 
         // only call on success
         fastfileInstance.afterAll(currentLane: named)
+        log(message: "Done running lane: \(named) 🚀")
     }
 
     func addLaneDescription(lane: Selector, _ description: String) {
