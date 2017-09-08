@@ -309,17 +309,6 @@ module Spaceship
       all_reviews
     end
 
-    def send_review_response(app_id, platform, review_id, response_text)
-      r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/platforms/#{platform}/reviews/#{review_id}/responses"
-        req.body = {
-          responseText: response_text,
-          reviewId: review_id
-        }.to_json
-        req.headers['Content-Type'] = 'application/json'
-      end
-      data = parse_response(r, 'messages')['info']
-    end
     #####################################################
     # @!group AppVersions
     #####################################################

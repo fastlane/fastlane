@@ -51,14 +51,6 @@ module Spaceship
           AppReview.factory(review["value"])
         end
       end
-
-      def sendResponse(review_id, response_text)
-        result = client.send_review_response(application.apple_id, application.platform, review_id, response_text)
-      end
-
-      # TODO: Add 'edit response' API
-
-      # TODO: Add 'delete response' API
     end
 
     class DeveloperResponse < TunesBase
