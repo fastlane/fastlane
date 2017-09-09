@@ -108,7 +108,7 @@ module Spaceship::TestFlight
         url = "providers/#{team_id}/apps/#{app_id}/testers?limit=#{page_size}&sort=email&order=asc"
         url += "&offset=#{offset}" if offset
         response = request(:get, url)
-        result = handle_response(response)
+        result = Array(handle_response(response))
         resulting_array += result
         break if result.count == 0
         offset = "#{result.last['email']}%2C#{result.last['id']}"

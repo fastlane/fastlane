@@ -66,11 +66,8 @@ module Spaceship::TestFlight
       return testers.first
     end
 
-    class << self
-      def factory(attrs)
-        attrs['statusModTime'] = Time.parse(attrs['statusModTime']) if attrs['statusModTime'].to_s.length > 0
-        return self.new(attrs)
-      end
+    def status_mod_time
+      Time.parse(super) if super.to_s.length > 0
     end
 
     # @return (Spaceship::TestFlight::Tester) Returns the testers matching the parameter.

@@ -126,6 +126,14 @@ describe Spaceship::TestFlight::Client do
   # @!group Testers API
   ##
 
+  context '#testers_for_app' do
+    it 'executes the request' do
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/testers') {}
+      subject.testers_for_app(app_id: app_id)
+      expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/testers?limit=40&order=asc&sort=email')
+    end
+  end
+
   context '#search_for_tester_in_app' do
     it 'executes the request' do
       MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/testers') {}
