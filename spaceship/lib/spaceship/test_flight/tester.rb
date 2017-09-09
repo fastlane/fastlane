@@ -10,20 +10,64 @@ module Spaceship::TestFlight
     #   "tester@spaceship.com"
     attr_accessor :email
 
+    # @return (String) The first name of this tester
+    # @example
+    #   "Cary"
+    attr_accessor :first_name
+
+    # @return (String) The last name of this tester
+    # @example
+    #   "Bennett"
+    attr_accessor :last_name
+
+    # @return (String)
+    # @example
+    #   "invited"
+    #   "installed"
+    #
+    attr_accessor :status
+
+    # @return (Integer) Date of the last modification of the status (e.g. invite sent)
+    attr_accessor :status_mod_time
+
+    # @return (Hash)
+    # @example
+    # {
+    #  "latestInstalledAppAdamId": "1222374686",
+    #  "latestInstalledBuildId": "20739770",
+    #  "latestInstalledDate": "1496866405755",
+    #  "latestInstalledShortVersion": "1.0",
+    #  "latestInstalledVersion": "68"
+    # }
+    attr_accessor :latest_install_info
+
+    # @return (Integer) Number of sessions
+    attr_accessor :session_count
+
     attr_mapping(
       'id' => :tester_id,
-      'email' => :email
+      'email' => :email,
+      'status' => :status,
+      'statusModTime' => :status_mod_time,
+      'latestInstallInfo' => :latest_install_info,
+      'sessionCount' => :session_count,
+      'firstName' => :first_name,
+      'lastName' => :last_name
     )
 
     # @return (Array) Returns all beta testers available for this account
     def self.all(app_id: nil)
-      client.testers_for_app(app_id: app_id).map { |data| self.new(data) }
+      client.testers_for_app(app_id: app_id).map { |data| self.factory(data) }
     end
 
     # *DEPRECATED: Use `Spaceship::TestFlight::Tester.search` method instead*
     def self.find(app_id: nil, email: nil)
       testers = self.search(app_id: app_id, text: email, is_email_exact_match: true)
       return testers.first
+    end
+
+    def status_mod_time
+      Time.parse(super) if super.to_s.length > 0
     end
 
     # @return (Spaceship::TestFlight::Tester) Returns the testers matching the parameter.
