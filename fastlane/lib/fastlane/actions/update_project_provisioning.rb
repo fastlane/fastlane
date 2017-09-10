@@ -64,6 +64,7 @@ module Fastlane
             end
 
             build_configuration.build_settings["PROVISIONING_PROFILE"] = data["UUID"]
+            build_configuration.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = data["Name"]
           end
         end
 
