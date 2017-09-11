@@ -64,14 +64,14 @@ describe Fastlane do
 
     describe "Call another action from an action" do
       it "allows the user to call it using `other_action.rocket`" do
-        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(Dir.pwd)
         Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileActionFromAction')
         Fastlane::Actions.executed_actions.clear
 
         response = {
           rocket: "🚀",
-          pwd: Dir.pwd
+          pwd: File.expand_path('..', Dir.pwd)
         }
         expect(ff.runner.execute(:something, :ios)).to eq(response)
         expect(Fastlane::Actions.executed_actions.map { |a| a[:name] }).to eq(['from'])
