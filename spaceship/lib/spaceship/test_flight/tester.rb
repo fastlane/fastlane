@@ -57,7 +57,7 @@ module Spaceship::TestFlight
 
     # @return (Array) Returns all beta testers available for this account
     def self.all(app_id: nil)
-      client.testers_for_app(app_id: app_id).map { |data| self.factory(data) }
+      client.testers_for_app(app_id: app_id).map { |data| self.new(data) }
     end
 
     # *DEPRECATED: Use `Spaceship::TestFlight::Tester.search` method instead*
