@@ -13,7 +13,7 @@ module Deliver
     # If the user also uses `supply` in the same project, an 'android' folder might exist
     SUPPLY_DIR_NAME = "android".freeze
 
-    EXCEPTION_DIRECTORIES = (UploadMetadata::ALL_META_SUB_DIRS.map(&:downcase) + SUPPLY_DIR_NAME).freeze
+    EXCEPTION_DIRECTORIES = (UploadMetadata::ALL_META_SUB_DIRS.map(&:downcase) << SUPPLY_DIR_NAME).freeze
 
     def self.language_folders(root, ignore_validation)
       folders = Dir.glob(File.join(root, '*'))
