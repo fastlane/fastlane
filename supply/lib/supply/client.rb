@@ -161,7 +161,12 @@ module Supply
 
       result = call_google_api { android_publisher.list_apks(current_package_name, current_edit.id) }
 
-      return result.apks.map(&:version_code)
+      # If developers delete all APKs in the Google Play Developer Console, result.apks will be nil.
+      if result.apks.nil?
+        return {}
+      else
+        return result.apks.map(&:version_code)
+      end
     end
 
     # Get a list of all apk listings (changelogs) - returns the list
