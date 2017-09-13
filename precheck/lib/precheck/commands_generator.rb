@@ -46,7 +46,7 @@ module Precheck
           is_swift_fastfile = args.include?("swift")
           if is_swift_fastfile
             path = File.join(containing, Precheck.precheckfile_name + ".swift")
-            UI.user_error! "Precheckfile already exists" if File.exist?(path)
+            UI.user_error! "Precheckfile.swift already exists" if File.exist?(path)
           end
 
           if is_swift_fastfile
