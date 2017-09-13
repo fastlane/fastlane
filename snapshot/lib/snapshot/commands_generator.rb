@@ -45,7 +45,8 @@ module Snapshot
         c.action do |args, options|
           require 'snapshot/setup'
           path = Snapshot::Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
-          Snapshot::Setup.create(path)
+          is_swift_fastfile = args.include?("swift")
+          Snapshot::Setup.create(path, is_swift_fastfile: is_swift_fastfile)
         end
       end
 
