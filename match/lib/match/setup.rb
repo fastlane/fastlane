@@ -1,7 +1,11 @@
 module Match
   class Setup
-    def run(path)
-      template = File.read("#{Match::ROOT}/lib/assets/MatchfileTemplate")
+    def run(path, is_swift_fastfile: false)
+      if is_swift_fastfile
+        template = File.read("#{Match::ROOT}/lib/assets/MatchfileTemplate.swift")
+      else
+        template = File.read("#{Match::ROOT}/lib/assets/MatchfileTemplate")
+      end
 
       UI.important "Please create a new, private git repository"
       UI.important "to store the certificates and profiles there"
