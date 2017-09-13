@@ -12,45 +12,44 @@
 import Foundation
 
 class Fastfile: LaneFile {
-    let appleID = "myUsername@example.com"
-    let appID = "my.app.id"
-
     // This is the minimum version number required.
     // Update this, if you use features of a newer version
     var fastlaneVersion: String { return "[[FASTLANE_VERSION]]" }
 
     func beforeAll() {
         // environmentVariables["SLACK_URL"] = "https://hooks.slack.com/services/..."
-//        cocoapods()
-//        carthage()
-        log(message: "before all called")
+        // cocoapods()
+        // carthage()
     }
 
     func testLane() {
-        let tag = lastGitTag()
-        log(message: "tag \(tag)")
+        scan()
     }
 
     func betaLane() {
-        match(gitUrl: "gitUrl", appIdentifier: [appID], username: appleID)
+        match(gitUrl: "gitUrl", appIdentifier: [appIdentifier], username: appleID)
         // Build your app - more options available
-        _ = gym(scheme: "[[SCHEME]]")
+        _ = gym([[SCHEME]])
         pilot(username: appleID)
         // You can also use other beta testing services here (run `fastlane actions`)
     }
 
     func releaseLane() {
-        match(gitUrl: "gitUrl", type: "appstore", appIdentifier: [appID], username: appleID)
+        match(gitUrl: "gitUrl", type: "appstore", appIdentifier: [appIdentifier], username: appleID)
         // snapshot()
-        _ = gym() // Build your app - more options available
-        deliver(username: appleID, app: appID, force: true)
+        _ = gym([[SCHEME]]) // Build your app - more options available
+        deliver(username: appleID, app: appIdentifier, force: true)
         // frameit()
     }
 
     // You can define as many lanes as you want
 
     func afterAll(currentLane: String) {
-        log(message: "after all called")
+        //This block is called, only if the executed lane was successful
+        //slack(
+        //    message: "Successfully deployed new App Update.",
+        //    slackUrl: "slackURL"
+        //)
     }
 
     func onError(currentLane: String, errorInfo: String) {
