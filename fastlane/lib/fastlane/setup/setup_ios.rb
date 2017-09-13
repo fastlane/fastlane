@@ -16,7 +16,10 @@ module Fastlane
     attr_accessor :app_identifier
     attr_accessor :app_name
 
-    def run(user: nil)
+    attr_accessor :is_swift_fastfile
+
+    def run(user: nil, is_swift_fastfile: false)
+      self.is_swift_fastfile = is_swift_fastfile
       self.apple_id = user
       show_infos
 
@@ -110,6 +113,11 @@ module Fastlane
       end
       enable_deliver
       generate_fastfile(manually: false)
+
+      if self.is_swift_fastfile
+        update_swift_runner
+      end
+
       show_analytics
     end
 
@@ -119,6 +127,11 @@ module Fastlane
       detect_installed_tools # after copying the existing files
       ask_to_enable_other_tools
       generate_fastfile(manually: true)
+
+      if self.is_swift_fastfile
+        update_swift_runner
+      end
+
       show_analytics
     end
 
@@ -197,21 +210,25 @@ module Fastlane
     end
 
     def generate_appfile(manually: false)
-      template = File.read("#{Fastlane::ROOT}/lib/assets/AppfileTemplate")
+      template = File.read(appfile_template_path)
       if manually
         ask_for_app_identifier
         ask_for_apple_id
       end
 
       template.gsub!('[[DEV_PORTAL_TEAM_ID]]', self.dev_portal_team) if self.dev_portal_team
-
-      itc_team = self.itc_team ? "itc_team_id \"#{self.itc_team}\" # iTunes Connect Team ID\n" : ""
-      template.gsub!('[[ITC_TEAM]]', itc_team)
-
       template.gsub!('[[APP_IDENTIFIER]]', self.app_identifier)
       template.gsub!('[[APPLE_ID]]', self.apple_id)
 
-      path = File.join(folder, 'Appfile')
+      if self.is_swift_fastfile
+        itc_team = self.itc_team ? "\"#{self.itc_team}\"" : "nil"
+        path = File.join(folder, 'Appfile.swift')
+      else
+        itc_team = self.itc_team ? "itc_team_id \"#{self.itc_team}\" # iTunes Connect Team ID\n" : ""
+        path = File.join(folder, 'Appfile')
+      end
+      template.gsub!('[[ITC_TEAM]]', itc_team)
+
       File.write(path, template)
       UI.success("Created new file '#{path}'. Edit it to manage your preferred app metadata information.")
     end
@@ -255,6 +272,7 @@ module Fastlane
     def detect_installed_tools
       self.tools = {}
       self.tools[:snapshot] = File.exist?(File.join(folder, 'Snapfile'))
+      self.tools[:snapshot] ||= File.exist?(File.join(folder, 'Snapfile.swift'))
       self.tools[:cocoapods] = File.exist?(File.join(File.expand_path('..', folder), 'Podfile'))
       self.tools[:carthage] = File.exist?(File.join(File.expand_path('..', folder), 'Cartfile'))
     end
@@ -267,38 +285,75 @@ module Fastlane
       options[:run_precheck_before_submit] = false # precheck doesn't need to run during init
 
       Deliver::Runner.new(options) # to login...
-      Deliver::Setup.new.run(options)
+      Deliver::Setup.new.run(options, is_swift: self.is_swift_fastfile)
     end
 
     def generate_fastfile(manually: false)
       scheme = self.project.schemes.first unless manually
 
-      template = File.read("#{Fastlane::ROOT}/lib/assets/DefaultFastfileTemplate")
+      template = File.read(fastfile_template_path)
 
       scheme = UI.input("Optional: The scheme name of your app (If you don't need one, just hit Enter): ") unless scheme
       if scheme.length > 0
-        template.gsub!('[[SCHEME]]', "(scheme: \"#{scheme}\")")
+        if self.is_swift_fastfile
+          template.gsub!('[[SCHEME]]', "scheme: \"#{scheme}\"")
+        else
+          template.gsub!('[[SCHEME]]', "(scheme: \"#{scheme}\")")
+        end
       else
         template.gsub!('[[SCHEME]]', "")
       end
 
-      template.gsub!('snapshot', '# snapshot') unless self.tools[:snapshot]
-      template.gsub!('cocoapods', '# cocoapods') unless self.tools[:cocoapods]
-      template.gsub!('carthage', '# carthage') unless self.tools[:carthage]
       template.gsub!('[[FASTLANE_VERSION]]', Fastlane::VERSION)
+
+      if self.is_swift_fastfile
+        template.gsub!('snapshot()', '// snapshot') unless self.tools[:snapshot]
+        template.gsub!('cocoapods()', '') unless self.tools[:cocoapods]
+        template.gsub!('carthage()', '') unless self.tools[:carthage]
+        path = File.join(folder, 'Fastfile.swift')
+      else
+        template.gsub!('snapshot', '# snapshot') unless self.tools[:snapshot]
+        template.gsub!('cocoapods', '') unless self.tools[:cocoapods]
+        template.gsub!('carthage', '') unless self.tools[:carthage]
+        path = File.join(folder, 'Fastfile')
+      end
 
       self.tools.each do |key, value|
         UI.message("'#{key}' enabled.".magenta) if value
         UI.important("'#{key}' not enabled.") unless value
       end
 
-      path = File.join(folder, 'Fastfile')
       File.write(path, template)
       UI.success("Created new file '#{path}'. Edit it to manage your own deployment lanes.")
     end
 
     def folder
       FastlaneCore::FastlaneFolder.path
+    end
+
+    def appfile_template_path
+      if self.is_swift_fastfile
+        return "#{Fastlane::ROOT}/lib/assets/AppfileTemplate.swift"
+      else
+        return "#{Fastlane::ROOT}/lib/assets/AppfileTemplate"
+      end
+    end
+
+    def fastfile_template_path
+      if self.is_swift_fastfile
+        return "#{Fastlane::ROOT}/lib/assets/DefaultFastfileTemplate.swift"
+      else
+        return "#{Fastlane::ROOT}/lib/assets/DefaultFastfileTemplate"
+      end
+    end
+
+    def update_swift_runner
+      runner_source_resources = "#{Fastlane::ROOT}/swift/."
+
+      destination_path = File.expand_path('swift', FastlaneCore::FastlaneFolder.path)
+      FileUtils.cp_r(runner_source_resources, destination_path)
+
+      UI.success("Copied Swift fastlane runner project to '#{destination_path}'.")
     end
 
     def restore_previous_state
