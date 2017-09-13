@@ -119,7 +119,8 @@ module Fastlane
             beta_info = CrashlyticsBetaCommandLineHandler.info_from_options(options)
             Fastlane::CrashlyticsBeta.new(beta_info, Fastlane::CrashlyticsBetaUi.new).run
           else
-            Fastlane::Setup.new.run(user: options.user)
+            is_swift_fastfile = args.include?("swift")
+            Fastlane::Setup.new.run(user: options.user, is_swift_fastfile: is_swift_fastfile)
           end
         end
       end

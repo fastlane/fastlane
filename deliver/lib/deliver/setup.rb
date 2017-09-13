@@ -2,9 +2,17 @@ require 'fastlane_core'
 
 module Deliver
   class Setup
-    def run(options)
+    attr_accessor :is_swift
+
+    def run(options, is_swift: false)
       containing = FastlaneCore::Helper.fastlane_enabled_folder_path
-      file_path = File.join(containing, 'Deliverfile')
+      self.is_swift = is_swift
+
+      if is_swift
+        file_path = File.join(containing, 'Deliverfile.swift')
+      else
+        file_path = File.join(containing, 'Deliverfile')
+      end
       data = generate_deliver_file(containing, options)
       setup_deliver(file_path, data, containing, options)
     end
@@ -30,10 +38,18 @@ module Deliver
       generate_metadata_files(v, File.join(deliver_path, 'metadata'))
 
       # Generate the final Deliverfile here
-      deliver = File.read("#{Deliver::ROOT}/lib/assets/DeliverfileDefault")
+      deliver = File.read(deliverfile_path)
       deliver.gsub!("[[APP_IDENTIFIER]]", options[:app].bundle_id)
       deliver.gsub!("[[USERNAME]]", Spaceship::Tunes.client.user)
       return deliver
+    end
+
+    def deliverfile_path
+      if self.is_swift
+        return "#{Deliver::ROOT}/lib/assets/DeliverfileDefault.swift"
+      else
+        return "#{Deliver::ROOT}/lib/assets/DeliverfileDefault"
+      end
     end
 
     def generate_metadata_files(v, path)
