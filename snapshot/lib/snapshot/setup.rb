@@ -1,14 +1,20 @@
 module Snapshot
   class Setup
     # This method will take care of creating a Snapfile and other necessary files
-    def self.create(path)
-      snapfile_path = File.join(path, 'Snapfile')
+    def self.create(path, is_swift_fastfile: false)
+      if is_swift_fastfile
+        template_path = "#{Snapshot::ROOT}/lib/assets/SnapfileTemplate.swift"
+        snapfile_path = File.join(path, 'Snapfile.swift')
+      else
+        template_path = "#{Snapshot::ROOT}/lib/assets/SnapfileTemplate"
+        snapfile_path = File.join(path, 'Snapfile')
+      end
 
       if File.exist?(snapfile_path)
         UI.user_error!("Snapfile already exists at path '#{snapfile_path}'. Run 'fastlane snapshot' to generate screenshots.")
       end
 
-      File.write(snapfile_path, File.read("#{Snapshot::ROOT}/lib/assets/SnapfileTemplate"))
+      File.write(snapfile_path, File.read(template_path))
       snapshot_helper_filename = "SnapshotHelperXcode8.swift"
       if Helper.xcode_at_least?("9.0")
         snapshot_helper_filename = "SnapshotHelper.swift"
