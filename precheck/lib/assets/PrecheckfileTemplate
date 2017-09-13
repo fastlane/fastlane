@@ -13,7 +13,7 @@
 # :warn
 # when triggered, this rule will warn you of a potential problem
 
-# :fail
+# :error
 # when triggered, this rule will cause an error to be displayed and it will prevent any further fastlane commands from running after precheck finishes
 
 # Examples:
