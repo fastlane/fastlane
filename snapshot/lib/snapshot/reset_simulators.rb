@@ -21,7 +21,7 @@ module Snapshot
         FastlaneCore::Simulator.delete_all
       end
 
-      all_runtime_type = `xcrun simctl list runtimes`.scan(/(.*)\s\(.*\((.*)\)/)
+      all_runtime_type = `xcrun simctl list runtimes`.scan(/(.*)\s\(\d.*(com\.apple[^)\s]*)/)
       # == Runtimes ==
       # iOS 9.3 (9.3 - 13E233) (com.apple.CoreSimulator.SimRuntime.iOS-9-3)
       # iOS 10.0 (10.0 - 14A345) (com.apple.CoreSimulator.SimRuntime.iOS-10-0)
