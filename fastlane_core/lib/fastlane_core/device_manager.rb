@@ -180,6 +180,13 @@ module FastlaneCore
         `xcrun simctl erase #{self.udid}`
         return
       end
+
+      def delete
+        UI.message("Deleting #{self}")
+        `xcrun simctl shutdown #{self.udid}` if self.state == "Booted"
+        `xcrun simctl delete #{self.udid}`
+        return
+      end
     end
   end
 
@@ -204,6 +211,16 @@ module FastlaneCore
       def reset(udid: nil, name: nil, os_version: nil)
         match = all.detect { |device| device.udid == udid || device.name == name && device.os_version == os_version }
         match.reset if match
+      end
+
+      # Delete all simulators of this type
+      def delete_all
+        all.each(&:delete)
+      end
+
+      def delete_all_by_version(os_version: nil)
+        return false unless os_version
+        all.select { |device| device.os_version == os_version }.each(&:delete)
       end
 
       def clear_cache

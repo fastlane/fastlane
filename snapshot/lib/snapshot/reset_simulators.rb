@@ -15,10 +15,10 @@ module Snapshot
 
       UI.abort_with_message!("User cancelled action") unless sure
 
-      devices.each do |device|
-        _, name, id = device
-        puts "Removing device #{name} (#{id})"
-        `xcrun simctl delete #{id}`
+      if ios_versions
+        FastlaneCore::Simulator.delete_all_by_version(ios_versions)
+      else
+        FastlaneCore::Simulator.delete_all
       end
 
       all_runtime_type = `xcrun simctl list runtimes`.scan(/(.*)\s\(.*\((.*)\)/)
