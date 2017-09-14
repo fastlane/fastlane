@@ -29,6 +29,12 @@ module Snapshot
       # iOS 10.2 (10.2 - 14C89) (com.apple.CoreSimulator.SimRuntime.iOS-10-2)
       # tvOS 10.1 (10.1 - 14U591) (com.apple.CoreSimulator.SimRuntime.tvOS-10-1)
       # watchOS 3.1 (3.1 - 14S471a) (com.apple.CoreSimulator.SimRuntime.watchOS-3-1)
+      #
+      # Xcode 9 changed the format
+      # == Runtimes ==
+      # iOS 11.0 (11.0 - 15A5361a) - com.apple.CoreSimulator.SimRuntime.iOS-11-0
+      # tvOS 11.0 (11.0 - 15J5368a) - com.apple.CoreSimulator.SimRuntime.tvOS-11-0
+      # watchOS 4.0 (4.0 - 15R5363a) - com.apple.CoreSimulator.SimRuntime.watchOS-4-0
       ios_versions_ids = filter_runtimes(all_runtime_type, 'iOS', ios_versions)
       tv_version_ids = filter_runtimes(all_runtime_type, 'tvOS')
       watch_versions_ids = filter_runtimes(all_runtime_type, 'watchOS')
