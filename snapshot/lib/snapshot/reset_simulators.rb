@@ -18,18 +18,13 @@ module Snapshot
       if ios_versions
         ios_versions.each do |version|
           FastlaneCore::Simulator.delete_all_by_version(os_version: version)
-          FastlaneCore::SimulatorTV.delete_all_by_version(os_version: version)
-        end
-        if version.include?('11')
-          FastlaneCore::SimulatorWatch.delete_all_by_version(os_version: '4.0')
-        else
-          FastlaneCore::SimulatorWatch.delete_all_by_version(os_version: '3.2')
         end
       else
         FastlaneCore::Simulator.delete_all
-        FastlaneCore::SimulatorTV.delete_all
-        FastlaneCore::SimulatorWatch.delete_all
       end
+
+      FastlaneCore::SimulatorTV.delete_all
+      FastlaneCore::SimulatorWatch.delete_all
 
       all_runtime_type = `xcrun simctl list runtimes`.scan(/(.*)\s\(\d.*(com\.apple[^)\s]*)/)
       # == Runtimes ==
