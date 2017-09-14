@@ -130,6 +130,11 @@ module Gym
                                      description: "Export ipa from previously built xarchive. Uses archive_path as source",
                                      is_string: false,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :skip_archive,
+                                     env_name: "GYM_SKIP_ARCHIVE",
+                                     description: "After building, don't archive, effectively not including -archivePath param",
+                                     is_string: false,
+                                     optional: true),
         # Very optional
         FastlaneCore::ConfigItem.new(key: :build_path,
                                      env_name: "GYM_BUILD_PATH",

@@ -48,9 +48,9 @@
 		B3BA65A31F5A269100B34850 /* SocketClientDelegateProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SocketClientDelegateProtocol.swift; path = ../SocketClientDelegateProtocol.swift; sourceTree = "<group>"; };
 		B3BA65A41F5A269100B34850 /* SocketResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SocketResponse.swift; path = ../SocketResponse.swift; sourceTree = "<group>"; };
 		B3BA65AE1F5A2D5C00B34850 /* RunnerArgument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RunnerArgument.swift; path = ../RunnerArgument.swift; sourceTree = "<group>"; };
-		D529C7261F68BAF60036536D /* FastlaneRunner */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = FastlaneRunner; path = /Users/liebowitz/dev/ios/fastlane/swift/FastlaneSwiftRunner/build/Debug/FastlaneRunner; sourceTree = "<absolute>"; };
 		D529C7271F68BB060036536D /* Appfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Appfile.swift; path = ../../Appfile.swift; sourceTree = "<group>"; };
 		D529C7281F68BB060036536D /* Fastfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Fastfile.swift; path = ../../Fastfile.swift; sourceTree = "<group>"; };
+		D556D6A91F6A08F5003108E3 /* FastlaneRunner */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FastlaneRunner; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +68,7 @@
 			isa = PBXGroup;
 			children = (
 				B3BA65B01F5A324A00B34850 /* Fastlane Runner */,
+				D556D6A91F6A08F5003108E3 /* FastlaneRunner */,
 			);
 			sourceTree = "<group>";
 		};
@@ -139,7 +140,7 @@
 			);
 			name = FastlaneRunner;
 			productName = FastlaneSwiftRunner;
-			productReference = D529C7261F68BAF60036536D /* FastlaneRunner */;
+			productReference = D556D6A91F6A08F5003108E3 /* FastlaneRunner */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -188,7 +189,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${SRCROOT}\ncd ..\ncp ${TARGET_BUILD_DIR}/${EXECUTABLE_PATH} .";
+			shellScript = "cd ${SRCROOT}\ncd ../..\ncp ${TARGET_BUILD_DIR}/${EXECUTABLE_PATH} .";
 		};
 /* End PBXShellScriptBuildPhase section */
 

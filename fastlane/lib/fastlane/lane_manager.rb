@@ -1,5 +1,7 @@
+require_relative 'lane_manager_base.rb'
+
 module Fastlane
-  class LaneManager
+  class LaneManager < LaneManagerBase
     # @param platform The name of the platform to execute
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
@@ -170,74 +172,6 @@ module Fastlane
       else
         UI.user_error! "Run `fastlane` the next time you need to build, test or release your app 🚀"
       end
-    end
-
-    # @param env_cl_param [String] an optional list of dotenv environment names separated by commas, without space
-    def self.load_dot_env(env_cl_param)
-      base_path = find_dotenv_directory
-
-      return unless base_path
-
-      load_dot_envs_from(env_cl_param, base_path)
-    end
-
-    # finds the first directory of [fastlane, its parent] containing dotenv files
-    def self.find_dotenv_directory
-      path = FastlaneCore::FastlaneFolder.path
-      search_paths = [path]
-      search_paths << path + "/.." unless path.nil?
-      search_paths.compact!
-      search_paths.find do |dir|
-        Dir.glob(File.join(dir, '*.env*'), File::FNM_DOTMATCH).count > 0
-      end
-    end
-
-    # loads the dotenvs. First the .env and .env.default and
-    # then override with all speficied extra environments
-    def self.load_dot_envs_from(env_cl_param, base_path)
-      require 'dotenv'
-
-      # Making sure the default '.env' and '.env.default' get loaded
-      env_file = File.join(base_path, '.env')
-      env_default_file = File.join(base_path, '.env.default')
-      Dotenv.load(env_file, env_default_file)
-
-      return unless env_cl_param
-
-      Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env_cl_param
-
-      # multiple envs?
-      envs = env_cl_param.split(",")
-
-      # Loads .env file for the environment(s) passed in through options
-      envs.each do |env|
-        env_file = File.join(base_path, ".env.#{env}")
-        UI.success "Loading from '#{env_file}'"
-        Dotenv.overload(env_file)
-      end
-    end
-
-    private_class_method :find_dotenv_directory, :load_dot_envs_from
-
-    def self.print_lane_context
-      return if Actions.lane_context.empty?
-
-      if FastlaneCore::Globals.verbose?
-        UI.important 'Lane Context:'.yellow
-        UI.message Actions.lane_context
-        return
-      end
-
-      # Print a nice table unless in FastlaneCore::Globals.verbose? mode
-      rows = Actions.lane_context.collect do |key, content|
-        [key, content.to_s]
-      end
-
-      require 'terminal-table'
-      puts Terminal::Table.new({
-        title: "Lane Context".yellow,
-        rows: FastlaneCore::PrintTable.transform_output(rows)
-      })
     end
   end
 end
