@@ -16,7 +16,7 @@ module Snapshot
       UI.abort_with_message!("User cancelled action") unless sure
 
       if ios_versions
-        FastlaneCore::Simulator.delete_all_by_version(ios_versions)
+        FastlaneCore::Simulator.delete_all_by_version(os_version: ios_versions)
       else
         FastlaneCore::Simulator.delete_all
       end
