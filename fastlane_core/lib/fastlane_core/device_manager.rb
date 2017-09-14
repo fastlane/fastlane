@@ -183,7 +183,7 @@ module FastlaneCore
 
       def delete
         UI.message("Deleting #{self}")
-        `xcrun simctl shutdown #{self.udid}` if self.state == "Booted"
+        `xcrun simctl shutdown #{self.udid}` unless self.state == "Shutdown"
         `xcrun simctl delete #{self.udid}`
         return
       end
