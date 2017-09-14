@@ -27,7 +27,12 @@ module Fastlane
       end
 
       dot_env = Helper.is_test? ? nil : options.env
-      Fastlane::LaneManager.cruise_lane(platform, lane, lane_parameters, dot_env)
+
+      if FastlaneCore::FastlaneFolder.swift?
+        Fastlane::SwiftLaneManager.cruise_lane(lane, lane_parameters, dot_env)
+      else
+        Fastlane::LaneManager.cruise_lane(platform, lane, lane_parameters, dot_env)
+      end
     end
 
     # Helper to convert into the right data type
