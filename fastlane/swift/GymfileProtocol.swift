@@ -15,6 +15,7 @@ protocol GymfileProtocol: class {
   var exportOptions: String? { get }
   var exportXcargs: String? { get }
   var skipBuildArchive: String? { get }
+  var skipArchive: String? { get }
   var buildPath: String? { get }
   var archivePath: String? { get }
   var derivedDataPath: String? { get }
@@ -54,6 +55,7 @@ extension GymfileProtocol {
   var exportOptions: String? { return nil }
   var exportXcargs: String? { return nil }
   var skipBuildArchive: String? { return nil }
+  var skipArchive: String? { return nil }
   var buildPath: String? { return nil }
   var archivePath: String? { return nil }
   var derivedDataPath: String? { return nil }
