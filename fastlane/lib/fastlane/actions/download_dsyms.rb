@@ -28,9 +28,9 @@ module Fastlane
 
         # Set version if it is latest
         if version == 'latest'
-          # Try to grab the live version first, else fallback to edit version
-          latest_version = app.live_version(platform: platform) || app.edit_version(platform: platform)
-          version = latest_version.version
+          # Try to grab the edit version first, else fallback to live version
+          latest_version = app.edit_version(platform: platform) || app.live_version(platform: platform)
+          version = nil
           build_number = latest_version.build_version
         end
 
@@ -73,6 +73,7 @@ module Fastlane
 
               Actions.lane_context[SharedValues::DSYM_PATHS] ||= []
               Actions.lane_context[SharedValues::DSYM_PATHS] << File.expand_path(file_name)
+              return if build_number 
             else
               UI.message("No dSYM URL for #{build.build_version} (#{build.train_version})")
             end
