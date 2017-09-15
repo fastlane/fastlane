@@ -240,6 +240,7 @@ Slather is available at https://github.com/SlatherOrg/slather
           FastlaneCore::ConfigItem.new(key: :source_files,
                                        env_name: "FL_SLATHER_SOURCE_FILES",
                                        description: "A Dir.glob compatible pattern used to limit the lookup to specific source files. Ignored in gcov mode",
+                                       is_string: false,
                                        default_value: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :decimals,
