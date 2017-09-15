@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B30206651F5E3B0A00DE6EBD /* DefaultFileImplementations.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206641F5E3B0A00DE6EBD /* DefaultFileImplementations.swift */; };
 		B302067B1F5E3E9000DE6EBD /* SnapshotfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */; };
 		B302067C1F5E3E9000DE6EBD /* GymfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */; };
 		B302067D1F5E3E9000DE6EBD /* MatchfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206761F5E3E9000DE6EBD /* MatchfileProtocol.swift */; };
@@ -27,10 +26,16 @@
 		B3BA65AF1F5A2D5C00B34850 /* RunnerArgument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65AE1F5A2D5C00B34850 /* RunnerArgument.swift */; };
 		D529C7291F68BB060036536D /* Appfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D529C7271F68BB060036536D /* Appfile.swift */; };
 		D529C72A1F68BB060036536D /* Fastfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D529C7281F68BB060036536D /* Fastfile.swift */; };
+		D55B28C31F6C588300DC42C5 /* Deliverfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28BC1F6C588300DC42C5 /* Deliverfile.swift */; };
+		D55B28C41F6C588300DC42C5 /* Gymfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28BD1F6C588300DC42C5 /* Gymfile.swift */; };
+		D55B28C51F6C588300DC42C5 /* Matchfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28BE1F6C588300DC42C5 /* Matchfile.swift */; };
+		D55B28C61F6C588300DC42C5 /* Precheckfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28BF1F6C588300DC42C5 /* Precheckfile.swift */; };
+		D55B28C71F6C588300DC42C5 /* Scanfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28C01F6C588300DC42C5 /* Scanfile.swift */; };
+		D55B28C81F6C588300DC42C5 /* Screengrabfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28C11F6C588300DC42C5 /* Screengrabfile.swift */; };
+		D55B28C91F6C588300DC42C5 /* Snapshotfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28C21F6C588300DC42C5 /* Snapshotfile.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		B30206641F5E3B0A00DE6EBD /* DefaultFileImplementations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DefaultFileImplementations.swift; path = ../DefaultFileImplementations.swift; sourceTree = "<group>"; };
 		B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotfileProtocol.swift; path = ../SnapshotfileProtocol.swift; sourceTree = "<group>"; };
 		B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GymfileProtocol.swift; path = ../GymfileProtocol.swift; sourceTree = "<group>"; };
 		B30206761F5E3E9000DE6EBD /* MatchfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MatchfileProtocol.swift; path = ../MatchfileProtocol.swift; sourceTree = "<group>"; };
@@ -51,6 +56,13 @@
 		D529C7271F68BB060036536D /* Appfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Appfile.swift; path = ../../Appfile.swift; sourceTree = "<group>"; };
 		D529C7281F68BB060036536D /* Fastfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Fastfile.swift; path = ../../Fastfile.swift; sourceTree = "<group>"; };
 		D556D6A91F6A08F5003108E3 /* FastlaneRunner */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FastlaneRunner; sourceTree = BUILT_PRODUCTS_DIR; };
+		D55B28BC1F6C588300DC42C5 /* Deliverfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Deliverfile.swift; path = ../Deliverfile.swift; sourceTree = "<group>"; };
+		D55B28BD1F6C588300DC42C5 /* Gymfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Gymfile.swift; path = ../Gymfile.swift; sourceTree = "<group>"; };
+		D55B28BE1F6C588300DC42C5 /* Matchfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Matchfile.swift; path = ../Matchfile.swift; sourceTree = "<group>"; };
+		D55B28BF1F6C588300DC42C5 /* Precheckfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Precheckfile.swift; path = ../Precheckfile.swift; sourceTree = "<group>"; };
+		D55B28C01F6C588300DC42C5 /* Scanfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Scanfile.swift; path = ../Scanfile.swift; sourceTree = "<group>"; };
+		D55B28C11F6C588300DC42C5 /* Screengrabfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Screengrabfile.swift; path = ../Screengrabfile.swift; sourceTree = "<group>"; };
+		D55B28C21F6C588300DC42C5 /* Snapshotfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Snapshotfile.swift; path = ../Snapshotfile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +113,7 @@
 		B3BA65B21F5A327B00B34850 /* Autogenerated API */ = {
 			isa = PBXGroup;
 			children = (
+				D55B28CA1F6C588800DC42C5 /* Tool Configs */,
 				B3BA659D1F5A269100B34850 /* Fastlane.swift */,
 				B302067A1F5E3E9000DE6EBD /* DeliverfileProtocol.swift */,
 				B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */,
@@ -109,7 +122,6 @@
 				B30206781F5E3E9000DE6EBD /* ScanfileProtocol.swift */,
 				B30206791F5E3E9000DE6EBD /* ScreengrabfileProtocol.swift */,
 				B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */,
-				B30206641F5E3B0A00DE6EBD /* DefaultFileImplementations.swift */,
 			);
 			name = "Autogenerated API";
 			sourceTree = "<group>";
@@ -121,6 +133,20 @@
 				B3BA659E1F5A269100B34850 /* LaneFileProtocol.swift */,
 			);
 			name = "Fastfile Components";
+			sourceTree = "<group>";
+		};
+		D55B28CA1F6C588800DC42C5 /* Tool Configs */ = {
+			isa = PBXGroup;
+			children = (
+				D55B28BC1F6C588300DC42C5 /* Deliverfile.swift */,
+				D55B28BD1F6C588300DC42C5 /* Gymfile.swift */,
+				D55B28BE1F6C588300DC42C5 /* Matchfile.swift */,
+				D55B28BF1F6C588300DC42C5 /* Precheckfile.swift */,
+				D55B28C01F6C588300DC42C5 /* Scanfile.swift */,
+				D55B28C11F6C588300DC42C5 /* Screengrabfile.swift */,
+				D55B28C21F6C588300DC42C5 /* Snapshotfile.swift */,
+			);
+			name = "Tool Configs";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -199,17 +225,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				B3BA65A91F5A269100B34850 /* RubyCommand.swift in Sources */,
+				D55B28C41F6C588300DC42C5 /* Gymfile.swift in Sources */,
 				B3BA65A51F5A269100B34850 /* EnvironmentVariables.swift in Sources */,
 				B302067D1F5E3E9000DE6EBD /* MatchfileProtocol.swift in Sources */,
 				B3BA65AC1F5A269100B34850 /* SocketClientDelegateProtocol.swift in Sources */,
 				B3BA65A71F5A269100B34850 /* LaneFileProtocol.swift in Sources */,
+				D55B28C61F6C588300DC42C5 /* Precheckfile.swift in Sources */,
 				B302067F1F5E3E9000DE6EBD /* ScanfileProtocol.swift in Sources */,
+				D55B28C51F6C588300DC42C5 /* Matchfile.swift in Sources */,
 				B30206801F5E3E9000DE6EBD /* ScreengrabfileProtocol.swift in Sources */,
 				D529C72A1F68BB060036536D /* Fastfile.swift in Sources */,
 				B302067C1F5E3E9000DE6EBD /* GymfileProtocol.swift in Sources */,
 				D529C7291F68BB060036536D /* Appfile.swift in Sources */,
 				B302067B1F5E3E9000DE6EBD /* SnapshotfileProtocol.swift in Sources */,
-				B30206651F5E3B0A00DE6EBD /* DefaultFileImplementations.swift in Sources */,
+				D55B28C31F6C588300DC42C5 /* Deliverfile.swift in Sources */,
 				B3BA65AB1F5A269100B34850 /* SocketClient.swift in Sources */,
 				B30206811F5E3E9000DE6EBD /* DeliverfileProtocol.swift in Sources */,
 				B3BA65AA1F5A269100B34850 /* Runner.swift in Sources */,
@@ -217,7 +246,10 @@
 				B302067E1F5E3E9000DE6EBD /* PrecheckfileProtocol.swift in Sources */,
 				B3BA65AD1F5A269100B34850 /* SocketResponse.swift in Sources */,
 				B3BA65A81F5A269100B34850 /* main.swift in Sources */,
+				D55B28C71F6C588300DC42C5 /* Scanfile.swift in Sources */,
+				D55B28C91F6C588300DC42C5 /* Snapshotfile.swift in Sources */,
 				B3BA65A61F5A269100B34850 /* Fastlane.swift in Sources */,
+				D55B28C81F6C588300DC42C5 /* Screengrabfile.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
