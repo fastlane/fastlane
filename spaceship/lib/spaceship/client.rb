@@ -208,8 +208,8 @@ module Spaceship
         }
       end
 
-      result = available_teams.find do |available_team_id|
-        team_id.to_s == available_team_id.to_s
+      result = available_teams.find do |available_team|
+        team_id.to_s == available_team[:team_id].to_s
       end
 
       unless result
