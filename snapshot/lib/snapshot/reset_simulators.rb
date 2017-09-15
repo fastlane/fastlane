@@ -26,7 +26,7 @@ module Snapshot
       FastlaneCore::SimulatorTV.delete_all
       FastlaneCore::SimulatorWatch.delete_all
 
-      all_runtime_type = `xcrun simctl list runtimes`.scan(/(.*)\s\(\d.*(com\.apple[^)\s]*)/)
+      all_runtime_type = runtimes()
       # == Runtimes ==
       # iOS 9.3 (9.3 - 13E233) (com.apple.CoreSimulator.SimRuntime.iOS-9-3)
       # iOS 10.0 (10.0 - 14A345) (com.apple.CoreSimulator.SimRuntime.iOS-10-0)
@@ -89,6 +89,10 @@ module Snapshot
       end
 
       result.select { |parsed| parsed.length == 3 } # we don't care about those headers
+    end
+
+    def self.runtimes
+      all_runtime_type = Helper.backticks('xcrun simctl list runtimes', print: FastlaneCore::Globals.verbose?).scan(/(.*)\s\(\d.*(com\.apple[^)\s]*)/)
     end
 
     def self.make_phone_watch_pair
