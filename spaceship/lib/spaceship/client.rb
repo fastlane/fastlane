@@ -202,7 +202,10 @@ module Spaceship
       #     invalid content provider id
       #
       available_teams = teams.collect do |team|
-        (team["contentProvider"] || {})["contentProviderId"]
+        {
+          team_id: (team["contentProvider"] || {})["contentProviderId"],
+          team_name: (team["contentProvider"] || {})["name"]
+        }
       end
 
       result = available_teams.find do |available_team_id|
@@ -210,7 +213,7 @@ module Spaceship
       end
 
       unless result
-        raise TunesClient::ITunesConnectError.new, "Could not set team ID to '#{team_id}', only found the following available teams: #{available_teams.join(', ')}"
+        raise TunesClient::ITunesConnectError.new, "Could not set team ID to '#{team_id}', only found the following available teams: #{available_teams.map { |team| "#{team[:team_id]} (#{team[:team_name]})" }.join(",")}"
       end
 
       response = request(:post) do |req|
