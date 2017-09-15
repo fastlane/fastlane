@@ -3,10 +3,10 @@ require 'tempfile'
 module FastlaneCore
   # This class checks if a specific certificate is installed on the current mac
   class CertChecker
-    def self.installed?(path)
+    def self.installed?(path, keychain = nil, password = nil)
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
-      ids = installed_identies
+      ids = installed_identies(keychain, password)
       finger_print = sha1_fingerprint(path)
 
       return ids.include? finger_print
@@ -17,10 +17,10 @@ module FastlaneCore
       installed?(path)
     end
 
-    def self.installed_identies
+    def self.installed_identies(keychain, password)
       install_wwdr_certificate unless wwdr_certificate_installed?
 
-      available = list_available_identities
+      available = list_available_identities(keychain, password)
       # Match for this text against word boundaries to avoid edge cases around multiples of 10 identities!
       if /\b0 valid identities found\b/ =~ available
         UI.error([
@@ -44,8 +44,13 @@ module FastlaneCore
       return ids
     end
 
-    def self.list_available_identities
-      `security find-identity -v -p codesigning`
+    def self.list_available_identities(keychain, password)
+      keychain = File.expand_path(keychain)
+      locked = keychain and !system("security show-keychain-info #{keychain} >/dev/null 2>/dev/null")
+      `security unlock -p #{password} #{keychain}` if locked
+      `security find-identity -v -p codesigning #{keychain}`
+    ensure
+      `security lock #{keychain}` if locked
     end
 
     def self.wwdr_certificate_installed?
@@ -61,7 +66,7 @@ module FastlaneCore
       filename = file.path
       keychain = wwdr_keychain
       keychain = "-k #{keychain.shellescape}" unless keychain.empty?
-      Helper.backticks("curl -o #{filename} #{url} && security import #{filename} #{keychain}", print: FastlaneCore::Globals.verbose?)
+      Helper.backticks("curl -f -o #{filename} #{url} && security import #{filename} #{keychain}", print: FastlaneCore::Globals.verbose?)
       UI.user_error!("Could not install WWDR certificate") unless $?.success?
     end
 

@@ -64,13 +64,14 @@ module Fastlane
             end
 
             build_configuration.build_settings["PROVISIONING_PROFILE"] = data["UUID"]
+            build_configuration.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = data["Name"]
           end
         end
 
         project.save
 
         # complete
-        UI.success("Successfully updated project settings in'#{params[:xcodeproj]}'")
+        UI.success("Successfully updated project settings in '#{params[:xcodeproj]}'")
       end
 
       def self.description
@@ -79,7 +80,7 @@ module Fastlane
 
       def self.details
         [
-          "You should check out the code signing gide before using this action: https://docs.fastlane.tools/codesigning/getting-started/",
+          "You should check out the code signing guide before using this action: https://docs.fastlane.tools/codesigning/getting-started/",
           "This action retrieves a provisioning profile UUID from a provisioning profile (.mobileprovision) to set",
           "up the xcode projects' code signing settings in *.xcodeproj/project.pbxproj",
           "The `target_filter` value can be used to only update code signing for specified targets",

@@ -3,7 +3,8 @@ module Fastlane
     class ResetSimulatorContentsAction < Action
       def self.run(params)
         if Helper.xcode_at_least?("9")
-          UI.user_error!("resetting simulators currently doesn't work with Xcode 9, stay tuned as we are working to add support for all new tools.")
+          UI.important("Resetting simulators currently doesn't work with Xcode 9, stay tuned as we are working to add support for all new tools.")
+          return
         end
 
         if params[:ios]

@@ -214,8 +214,9 @@ module Gym
       def print_environment_information
         if Gym.config[:export_method].to_s == "development"
           UI.message("")
-          UI.error("Your `export_method` in gym is defined as `:development`")
-          UI.error("which can't be used for `ipa` files for beta or App Store distribution")
+          UI.error("Your `export_method` in gym is defined as `development`")
+          UI.error("which might cause problems when signing your application")
+          UI.error("Are you sure want to build and export for development?")
           UI.error("Please make sure to define the correct export methods when calling")
           UI.error("gym in your Fastfile or from the command line")
           UI.message("")

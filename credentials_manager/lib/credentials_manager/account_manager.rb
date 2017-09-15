@@ -33,7 +33,9 @@ module CredentialsManager
     end
 
     def fetch_password_from_env
-      ENV["FASTLANE_PASSWORD"] || ENV["DELIVER_PASSWORD"]
+      password = ENV["FASTLANE_PASSWORD"] || ENV["DELIVER_PASSWORD"]
+      return password if password.to_s.length > 0
+      return nil
     end
 
     def password(ask_if_missing: true)
