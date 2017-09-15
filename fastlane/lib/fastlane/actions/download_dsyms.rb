@@ -64,16 +64,12 @@ module Fastlane
 
             if download_url
               result = self.download download_url
-              file_name = "#{app.bundle_id}-#{train_number}-#{build.build_version}.dSYM.zip"
-              if output_directory
-                file_name = output_directory + file_name
-              end
-              File.write(file_name, result)
-              UI.success("🔑  Successfully downloaded dSYM file for #{train_number} - #{build.build_version} to '#{file_name}'")
+              path   = write_dsym(result, app.bundle_id, train_number, build_number, output_directory)
+              UI.success("🔑  Successfully downloaded dSYM file for #{train_number} - #{build_number} to '#{path}'")
 
               Actions.lane_context[SharedValues::DSYM_PATHS] ||= []
-              Actions.lane_context[SharedValues::DSYM_PATHS] << File.expand_path(file_name)
-              return if build_number 
+              Actions.lane_context[SharedValues::DSYM_PATHS] << File.expand_path(path)
+              break if build_number
             else
               UI.message("No dSYM URL for #{build.build_version} (#{build.train_version})")
             end
@@ -83,6 +79,15 @@ module Fastlane
         if (Actions.lane_context[SharedValues::DSYM_PATHS] || []).count == 0
           UI.error("No dSYM files found on iTunes Connect - this usually happens when no recompling happened yet")
         end
+      end
+
+      def self.write_dsym(data, bundle_id, train_number, build_number, output_directory)
+        file_name = "#{bundle_id}-#{train_number}-#{build_number}.dSYM.zip"
+        if output_directory
+          file_name = output_directory + file_name
+        end
+        File.write(file_name, data)
+        file_name
       end
 
       def self.download(url)
