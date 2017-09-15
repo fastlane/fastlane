@@ -53,10 +53,8 @@ module Fastlane
       file_content << "// These are all the parsing functions needed to transform our data into the expected types"
       file_content << generate_lanefile_parsing_functions
 
-      file_content << "// [TOOL_OBJECTS] These objects can potentially be replaced when we compile the user's Fastfile.swift"
       tool_objects = generate_lanefile_tool_objects(classes: generated_tool_classes)
       file_content << tool_objects
-      file_content << "// end of [TOOL_OBJECTS]"
       file_content << "" # newline because it's the end of the file adding an extension
 
       file_content = file_content.join("\n")
@@ -67,17 +65,28 @@ module Fastlane
       generate_default_implementation(protocols: generated_tool_protocols, classes: generated_tool_classes)
     end
 
-    def generate_default_implementation(protocols: nil, classes: nil)
-      class_defs = protocols.zip(classes).map do |protocol, class_name|
-        "class #{class_name}: #{protocol} {}"
-      end
+    def write_lanefile(lanefile_implementation: nil, class_name: nil)
+      disclaimer = []
+      disclaimer << "// This class is automatically included in FastlaneRunner during build"
+      disclaimer << "// If you have a custom #{class_name}.swift, this file will be replaced by it"
+      disclaimer << "// Modify this file unless you are familiar with how fastlane's swift code generation works"
+      disclaimer << "// *** This file will be overwritten or replaced during build time ***"
+      disclaimer << ""
+      disclaimer << lanefile_implementation
+      disclaimer << ""
 
-      class_defs << ""
-      file_content = class_defs.join("\n")
+      file_content = disclaimer.join("\n")
 
-      target_path = "swift/DefaultFileImplementations.swift"
+      target_path = "swift/#{class_name}.swift"
       File.write(target_path, file_content)
       UI.success(target_path)
+    end
+
+    def generate_default_implementation(protocols: nil, classes: nil)
+      protocols.zip(classes).each do |protocol, class_name|
+        lanefile_implementation = "class #{class_name}: #{protocol} {}"
+        write_lanefile(lanefile_implementation: lanefile_implementation, class_name: class_name)
+      end
     end
 
     def generate_lanefile_parsing_functions
