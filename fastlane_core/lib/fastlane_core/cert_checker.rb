@@ -45,7 +45,7 @@ module FastlaneCore
     end
 
     def self.list_available_identities(keychain, password)
-      keychain = File.expand_path(keychain)
+      keychain = File.expand_path(keychain) if keychain
       locked = keychain and !system("security show-keychain-info #{keychain} >/dev/null 2>/dev/null")
       `security unlock -p #{password} #{keychain}` if locked
       `security find-identity -v -p codesigning #{keychain}`
