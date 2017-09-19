@@ -149,6 +149,7 @@ module Precheck
 
     def self.generate_text_items_to_check(app: nil, app_version: nil)
       items = []
+
       items << TextItemToCheck.new(app_version.copyright, :copyright, "copyright")
 
       items += collect_text_items_from_language_item(hash: app_version.keywords,
@@ -175,6 +176,30 @@ module Precheck
                                                 item_name: :app_subtitle,
                                     friendly_name_postfix: "app name subtitle",
                                               is_optional: true)
+
+      should_include_iap = Precheck.config[:include_in_app_purchases]
+      if should_include_iap
+        UI.message "Reading in-app purchases. If you have alot, this might take a while"
+        UI.message "You can disable IAP checking by adding the include_in_app_purchases flag"
+        in_app_purchases = app.in_app_purchases.all
+        in_app_purchases ||= []
+        in_app_purchases.each do |purchase|
+          items += self.collect_iap_language_items(purchase_edit_versions: purchase.edit.versions)
+        end
+        UI.message "Done reading in-app purchases"
+      end
+
+      return items
+    end
+
+    def self.collect_iap_language_items(purchase_edit_versions: nil, is_optional: false)
+      items = []
+      purchase_edit_versions.each do |language_key, hash|
+        name = hash[:name]
+        description = hash[:description]
+        items << TextItemToCheck.new(name, :in_app_purchase, "in-app purchase name: #{name}: (#{language_key})", is_optional)
+        items << TextItemToCheck.new(description, :in_app_purchase, "in-app purchase desc: #{description}: (#{language_key})", is_optional)
+      end
       return items
     end
 
