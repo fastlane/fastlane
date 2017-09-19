@@ -86,7 +86,7 @@ module Match
         cert_path = certs.last
         UI.message "Installing certificate..."
 
-        if FastlaneCore::CertChecker.installed?(cert_path)
+        if FastlaneCore::CertChecker.installed?(cert_path, params[:keychain_name], params[:keychain_password])
           UI.verbose "Certificate '#{File.basename(cert_path)}' is already installed on this machine"
         else
           Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
