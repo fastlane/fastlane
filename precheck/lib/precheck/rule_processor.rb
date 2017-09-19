@@ -179,7 +179,7 @@ module Precheck
 
       should_include_iap = Precheck.config[:include_in_app_purchases]
       if should_include_iap
-        UI.message "Reading in-app purchases. If you have alot, this might take a while"
+        UI.message "Reading in-app purchases. If you have a lot, this might take a while"
         UI.message "You can disable IAP checking by adding the include_in_app_purchases flag"
         in_app_purchases = app.in_app_purchases.all
         in_app_purchases ||= []
@@ -203,7 +203,7 @@ module Precheck
       return items
     end
 
-    #   # a few attributes are LanguageItem this method creates a TextItemToCheck for each pair
+    # a few attributes are LanguageItem this method creates a TextItemToCheck for each pair
     def self.collect_text_items_from_language_item(hash: nil, item_name: nil, friendly_name_postfix: nil, is_optional: false)
       items = []
       hash.each do |key, value|
