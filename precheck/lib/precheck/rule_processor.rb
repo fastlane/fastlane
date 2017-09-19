@@ -180,11 +180,11 @@ module Precheck
       should_include_iap = Precheck.config[:include_in_app_purchases]
       if should_include_iap
         UI.message "Reading in-app purchases. If you have a lot, this might take a while"
-        UI.message "You can disable IAP checking by adding the include_in_app_purchases flag"
+        UI.message "You can disable IAP checking by setting the `include_in_app_purchases` flag to `false`"
         in_app_purchases = app.in_app_purchases.all
         in_app_purchases ||= []
         in_app_purchases.each do |purchase|
-          items += self.collect_iap_language_items(purchase_edit_versions: purchase.edit.versions)
+          items += collect_iap_language_items(purchase_edit_versions: purchase.edit.versions)
         end
         UI.message "Done reading in-app purchases"
       end
