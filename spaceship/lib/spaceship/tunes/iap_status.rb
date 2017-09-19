@@ -25,6 +25,9 @@ module Spaceship
       # In-app purchase rejected for whatever reason
       REJECTED = "Rejected"
 
+      # The developer took the app from the App Store
+      DEVELOPER_REMOVED_FROM_SALE = "Developer Removed From Sale"
+
       # Get the iap status matching based on a string (given by iTunes Connect)
       def self.get_from_string(text)
         mapping = {
@@ -34,7 +37,8 @@ module Spaceship
           'inReview' => IN_REVIEW,
           'readyForSale' => APPROVED,
           'deleted' => DELETED,
-          'rejected' => REJECTED
+          'rejected' => REJECTED,
+          'developerRemovedFromSale' => DEVELOPER_REMOVED_FROM_SALE
         }
 
         mapping.each do |itc_status, readable_status|

@@ -55,7 +55,7 @@ module Precheck
       rules.each do |rule|
         rule_config = Precheck.config[rule.key]
         rule_level = rule_config[:level].to_sym unless rule_config.nil?
-        rule_level ||= Precheck.config[:default_rule_level]
+        rule_level ||= Precheck.config[:default_rule_level].to_sym
 
         if rule_level == RULE_LEVELS[:skip]
           skipped_rules << rule
@@ -87,13 +87,18 @@ module Precheck
 
           # if we passed, then go to the next item, otherwise, recode the failure
           next unless result.status == VALIDATION_STATES[:failed]
-          add_new_result_to_rule_hash(rule_hash: error_results, result: result) if rule_level == RULE_LEVELS[:error]
-          add_new_result_to_rule_hash(rule_hash: warning_results, result: result) if rule_level == RULE_LEVELS[:warn]
+          error_results = add_new_result_to_rule_hash(rule_hash: error_results, result: result) if rule_level == RULE_LEVELS[:error]
+          warning_results = add_new_result_to_rule_hash(rule_hash: warning_results, result: result) if rule_level == RULE_LEVELS[:warn]
           rule_failed_at_least_once = true
         end
 
         if rule_failed_at_least_once
-          UI.error "😵  Failed: #{rule.class.friendly_name}-> #{rule.description}"
+          message = "😵  Failed: #{rule.class.friendly_name}-> #{rule.description}"
+          if rule_level == RULE_LEVELS[:error]
+            UI.error message
+          else
+            UI.important message
+          end
         else
           UI.message "✅  Passed: #{rule.class.friendly_name}"
         end
@@ -109,9 +114,12 @@ module Precheck
 
     # hash will be { rule: [result, result, result] }
     def self.add_new_result_to_rule_hash(rule_hash: nil, result: nil)
-      result_array = rule_hash[result.rule] ||= []
-      result_array << result
-      rule_hash[result.rule] = result_array
+      unless rule_hash.include?(result.rule)
+        rule_hash[result.rule] = []
+      end
+      rule_results = rule_hash[result.rule]
+      rule_results << result
+      return rule_hash
     end
 
     def self.generate_url_items_to_check(app: nil, app_version: nil)

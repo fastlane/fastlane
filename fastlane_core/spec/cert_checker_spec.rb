@@ -1,20 +1,23 @@
 describe FastlaneCore do
   describe FastlaneCore::CertChecker do
     describe '#installed_identies' do
+      keychain = "something.keychain"
+      password = "12345678"
+
       it 'should print an error when no local code signing identities are found' do
         allow(FastlaneCore::CertChecker).to receive(:wwdr_certificate_installed?).and_return(true)
-        allow(FastlaneCore::CertChecker).to receive(:list_available_identities).and_return("     0 valid identities found\n")
+        allow(FastlaneCore::CertChecker).to receive(:list_available_identities).with(keychain, password).and_return("     0 valid identities found\n")
         expect(FastlaneCore::UI).to receive(:error).with(/There are no local code signing identities found/)
 
-        FastlaneCore::CertChecker.installed_identies
+        FastlaneCore::CertChecker.installed_identies(keychain, password)
       end
 
       it 'should not be fooled by 10 local code signing identities available' do
         allow(FastlaneCore::CertChecker).to receive(:wwdr_certificate_installed?).and_return(true)
-        allow(FastlaneCore::CertChecker).to receive(:list_available_identities).and_return("     10 valid identities found\n")
+        allow(FastlaneCore::CertChecker).to receive(:list_available_identities).with(keychain, password).and_return("     10 valid identities found\n")
         expect(FastlaneCore::UI).not_to receive(:error)
 
-        FastlaneCore::CertChecker.installed_identies
+        FastlaneCore::CertChecker.installed_identies(keychain, password)
       end
     end
 
@@ -34,7 +37,7 @@ describe FastlaneCore do
         # We have to execute *something* using ` since otherwise we set expectations to `nil`, which is not healthy
         `ls`
 
-        cmd = %r{curl -o (/.+?) https://developer\.apple\.com/certificationauthority/AppleWWDRCA.cer && security import \1 -k keychain\\ with\\ spaces\.keychain}
+        cmd = %r{curl -f -o (/.+?) https://developer\.apple\.com/certificationauthority/AppleWWDRCA.cer && security import \1 -k keychain\\ with\\ spaces\.keychain}
 
         expect(FastlaneCore::Helper).to receive(:backticks).with(cmd, { print: nil }).and_return("")
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
