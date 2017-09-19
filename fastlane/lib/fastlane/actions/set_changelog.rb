@@ -60,6 +60,8 @@ module Fastlane
         v.release_notes.languages.each do |lang|
           v.release_notes[lang] = changelog
         end
+
+        UI.message("Found and updated changelog for the following languages: #{v.release_notes.languages.join(', ')}")
         UI.message("Uploading changes to iTunes Connect...")
         v.save!
 
