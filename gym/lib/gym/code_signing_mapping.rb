@@ -105,9 +105,10 @@ module Gym
     end
 
     def other_platform?(build_settings)
-      Gym.config[:destination].slice! "generic/platform="
+      destination = Gym.config[:destination].dup
+      destination.slice! "generic/platform="
       sdkroot = ""
-      case Gym.config[:destination]
+      case destination
       when "macosx"
         sdkroot = "macosx"
       when "iOS" 
