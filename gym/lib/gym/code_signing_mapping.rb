@@ -111,9 +111,9 @@ module Gym
       case destination
       when "macosx"
         sdkroot = "macosx"
-      when "iOS" 
+      when "iOS"
         sdkroot = "iphoneos"
-      when "tvOS" 
+      when "tvOS"
         sdkroot = "appletvos"
       end
       return build_settings["SDKROOT"] != sdkroot
