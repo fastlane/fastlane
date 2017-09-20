@@ -34,8 +34,8 @@ module FastlaneCore
     private
 
     def copy_ipa(ipa_path)
-      ipa_file_name = "#{File.basename(ipa_path, '.ipa')}(#{Digest::SHA256.file(ipa_path).hexdigest}).ipa"
-      resulting_path = File.join(self.package_path, ipa_file_name)
+      ipa_file_name = Digest::MD5.hexdigest(ipa_path)
+      resulting_path = File.join(self.package_path, "#{ipa_file_name}.ipa")
       FileUtils.cp(ipa_path, resulting_path)
 
       return resulting_path
