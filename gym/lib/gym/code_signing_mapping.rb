@@ -104,6 +104,20 @@ module Gym
       return (!build_settings["TEST_TARGET_NAME"].nil? || !build_settings["TEST_HOST"].nil?)
     end
 
+    def other_platform?(build_settings)
+      Gym.config[:destination].slice! "generic/platform="
+      sdkroot = ""
+      case Gym.config[:destination]
+      when "macosx"
+        sdkroot = "macosx"
+      when "iOS" 
+        sdkroot = "iphoneos"
+      when "tvOS" 
+        sdkroot = "appletvos"
+      end
+      return(build_settings["SDKROOT"] != sdkroot)
+    end
+
     def detect_project_profile_mapping
       provisioning_profile_mapping = {}
       specified_configuration = Gym.config[:configuration] || Gym.project.default_build_settings(key: "CONFIGURATION")
@@ -122,6 +136,7 @@ module Gym
             target.build_configuration_list.build_configurations.each do |build_configuration|
               current = build_configuration.build_settings
               next if test_target?(current)
+              next if other_platform?(current)
               next unless specified_configuration == build_configuration.name
 
               bundle_identifier = build_configuration.resolve_build_setting("PRODUCT_BUNDLE_IDENTIFIER")

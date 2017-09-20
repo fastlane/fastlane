@@ -14,8 +14,6 @@ module Gym
       FastlaneCore::Project.detect_projects(config)
       Gym.project = FastlaneCore::Project.new(config)
 
-      detect_selected_provisioning_profiles
-
       # Go into the project's folder, as there might be a Gymfile there
       Dir.chdir(File.expand_path("..", Gym.project.path)) do
         config.load_configuration_file(Gym.gymfile_name)
@@ -23,6 +21,7 @@ module Gym
 
       detect_scheme
       detect_platform # we can only do that *after* we have the scheme
+      detect_selected_provisioning_profiles # we can only do that *aftet* we have the platform
       detect_configuration
       detect_toolchain
 
