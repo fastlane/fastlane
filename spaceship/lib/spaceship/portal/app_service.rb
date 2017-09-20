@@ -94,6 +94,22 @@ module Spaceship
         def vpn_configuration
           self::VPNConfiguration
         end
+
+        def network_extension
+          self::NetworkExtension
+        end
+
+        def hotspot
+          self::Hotspot
+        end
+
+        def multipath
+          self::Multipath
+        end
+
+        def nfc_tag_reading
+          self::NFCTagReading
+        end
       end
 
       def ==(other)
@@ -271,6 +287,46 @@ module Spaceship
 
         def self.on
           AppService.new("V66P55NK2I", true)
+        end
+      end
+
+      module NetworkExtension
+        def self.off
+          AppService.new("NWEXT04537", false)
+        end
+
+        def self.on
+          AppService.new("NWEXT04537", true)
+        end
+      end
+
+      module Hotspot
+        def self.off
+          AppService.new("HSC639VEI8", false)
+        end
+
+        def self.on
+          AppService.new("HSC639VEI8", true)
+        end
+      end
+
+      module Multipath
+        def self.off
+          AppService.new("MP49FN762P", false)
+        end
+
+        def self.on
+          AppService.new("MP49FN762P", true)
+        end
+      end
+
+      module NFCTagReading
+        def self.off
+          AppService.new("NFCTRMAY17", false)
+        end
+
+        def self.on
+          AppService.new("NFCTRMAY17", true)
         end
       end
     end
