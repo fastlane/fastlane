@@ -116,7 +116,7 @@ module Gym
       when "tvOS" 
         sdkroot = "appletvos"
       end
-      return(build_settings["SDKROOT"] != sdkroot)
+      return build_settings["SDKROOT"] != sdkroot
     end
 
     def detect_project_profile_mapping
