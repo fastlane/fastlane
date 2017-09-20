@@ -17,4 +17,14 @@ module Fastlane
     :gym,
     :precheck
   ]
+
+  TOOLS_WITH_OPTIONS = [
+    :snapshot,
+    :screengrab,
+    :scan,
+    :precheck,
+    :match,
+    :gym,
+    :deliver
+  ]
 end

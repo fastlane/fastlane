@@ -54,6 +54,107 @@ module Fastlane
       end
     end
 
+    def self.swap_paths_in_target(target: nil, file_refs_to_swap: nil, expected_path_to_replacement_path_tuples: nil)
+      made_project_updates = false
+
+      file_refs_to_swap.each do |file_ref|
+        expected_path_to_replacement_path_tuples.each do |preinstalled_config_relative_path, user_config_relative_path|
+          next unless file_ref.path.include?(preinstalled_config_relative_path)
+
+          file_ref.path = user_config_relative_path
+          made_project_updates = true
+        end
+      end
+      return made_project_updates
+    end
+
+    # Find all the config files we care about (Deliverfile, Gymfile, etc), and build tuples of what file we'll look for
+    # in the Xcode project, and what file paths we'll need to swap (since we have to inject the user's configs)
+    #
+    # Return a mapping of what file paths we're looking => new file pathes we'll need to inject
+    def self.collect_tool_paths_for_replacement(all_user_tool_file_paths: nil, look_for_new_configs: nil)
+      new_user_tool_file_paths = all_user_tool_file_paths.select do |user_config, preinstalled_config_relative_path, user_config_relative_path|
+        if look_for_new_configs
+          File.exist?(user_config)
+        else
+          !File.exist?(user_config)
+        end
+      end
+
+      # Now strip out the fastlane-relative path and leave us with xcodeproj relative paths
+      new_user_tool_file_paths = new_user_tool_file_paths.map do |user_config, preinstalled_config_relative_path, user_config_relative_path|
+        if look_for_new_configs
+          [preinstalled_config_relative_path, user_config_relative_path]
+        else
+          [user_config_relative_path, preinstalled_config_relative_path]
+        end
+      end
+      return new_user_tool_file_paths
+    end
+
+    # Open fastlane runner project and return the FastlaneRunner build target
+    def self.target_for_fastlane_runner
+      runner_project_path = FastlaneCore::FastlaneFolder.swift_runner_project_path
+      require 'xcodeproj'
+      project = Xcodeproj::Project.open(runner_project_path)
+      fastlane_runner_array = project.targets.select do |target|
+        target.name == "FastlaneRunner"
+      end
+
+      # get runner target
+      runner_target = fastlane_runner_array.first
+      return runner_target
+    end
+
+    def self.target_source_file_refs(target: nil)
+      return target.source_build_phase.files.to_a.map(&:file_ref)
+    end
+
+    def self.link_user_configs_to_project
+      tool_files_folder = FastlaneCore::FastlaneFolder.path
+
+      # All the tools that could have <tool name>file.swift their paths, and where we expect to find the user's tool files.
+      all_user_tool_file_paths = TOOLS_WITH_OPTIONS.map do |tool_name|
+        [
+          File.join(tool_files_folder, "#{tool_name.to_s.capitalize}file.swift"),
+          "../#{tool_name.to_s.capitalize}file.swift",
+          "../../#{tool_name.to_s.capitalize}file.swift"
+        ]
+      end
+
+      # Tool files the user now provides
+      new_user_tool_file_paths = collect_tool_config_paths(all_user_tool_file_paths: all_user_tool_file_paths, look_for_new_configs: true)
+
+      # Tool files we provide AND the user doesn't provide
+      user_tool_files_possibly_removed = collect_tool_config_paths(all_user_tool_file_paths: all_user_tool_file_paths, look_for_new_configs: false)
+
+      runner_target = target_for_fastlane_runner
+      target_source_file_refs = target_source_file_refs
+
+      # Swap in all new user supplied configs into the project
+      project_modified = swap_paths_in_target(
+        target: runner_target,
+        file_refs_to_swap: target_source_file_refs,
+        expected_path_to_replacement_path_tuples: new_user_tool_file_paths
+      )
+
+      # Swap out any configs the user has removed, inserting fastlane defaults
+      project_modified ||= swap_paths_in_target(
+        target: runner_target,
+        file_refs_to_swap: target_source_file_refs,
+        expected_path_to_replacement_path_tuples: user_tool_files_possibly_removed
+      )
+
+      if project_modified
+        project.save
+        UI.success("Updated #{FastlaneCore::FastlaneFolder.swift_runner_project_path}")
+      else
+        UI.success("FastlaneSwiftRunner project is up-to-date")
+      end
+
+      return project_modified
+    end
+
     def self.start_socket_thread
       require 'fastlane/server/socket_server'
       require 'fastlane/server/socket_server_action_command_executor'
@@ -66,21 +167,32 @@ module Fastlane
     end
 
     def self.ensure_runner_built!
+      UI.verbose("Checking for new user-provided tool configuration files")
+      # if self.link_user_configs_to_project returns true, that means we need to rebuild the runner
+      runner_needs_building = self.link_user_configs_to_project
+
       if FastlaneCore::FastlaneFolder.swift_runner_built?
         runner_last_modified_age = File.mtime(FastlaneCore::FastlaneFolder.swift_runner_path).to_i
         fastfile_last_modified_age = File.mtime(FastlaneCore::FastlaneFolder.fastfile_path).to_i
 
         if runner_last_modified_age < fastfile_last_modified_age
           # It's older than the Fastfile, so build it again
-          self.build_runner!
+          UI.verbose("Found changes to user's Fastfile.swift, setting re-build runner flag")
+          runner_needs_building = true
         end
       else
         # Runner isn't built yet, so build it
+        UI.verbose("No runner found, setting re-build runner flag")
+        runner_needs_building = true
+      end
+
+      if runner_needs_building
         self.build_runner!
       end
     end
 
     def self.build_runner!
+      UI.verbose("Building FastlaneSwiftRunner")
       require 'fastlane_core'
       require 'gym'
       require 'gym/generators/build_command_generator'

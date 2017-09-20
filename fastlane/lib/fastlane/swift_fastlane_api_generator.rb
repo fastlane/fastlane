@@ -13,7 +13,8 @@ module Fastlane
       # this is important because we need to generate the proper api for these by creating a protocol
       # with default implementation we can use in the Fastlane.swift API if people want to use
       # <Toolname>file.swift files.
-      self.tools_with_option_file = ["snapshot", "screengrab", "scan", "precheck", "match", "gym", "deliver"].to_set
+      self.tools_with_option_file = TOOLS_WITH_OPTIONS.map(&:to_s).to_set
+
       self.action_options_to_ignore = {
         "cocoapods" => ["error_callback"].to_set,
         "sh" => ["error_calback"].to_set,

@@ -720,7 +720,6 @@ func parseInt(fromString: String, function: String = #function) -> Int {
   return NSString(string: fromString).integerValue
 }
 
-// [TOOL_OBJECTS] These objects can potentially be replaced when we compile the user's Fastfile.swift
 let deliverfile: Deliverfile = Deliverfile()
 let gymfile: Gymfile = Gymfile()
 let matchfile: Matchfile = Matchfile()
@@ -728,4 +727,3 @@ let precheckfile: Precheckfile = Precheckfile()
 let scanfile: Scanfile = Scanfile()
 let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
-// end of [TOOL_OBJECTS]
