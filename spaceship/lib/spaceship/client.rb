@@ -609,6 +609,8 @@ module Spaceship
       if body["messages"] && body["messages"]["error"].include?("Forbidden")
         raise_insuffient_permission_error!
       elsif body["messages"] && body["messages"]["error"].include?("insufficient privileges")
+        # Passing a specific `caller_location` here to make sure we return the correct method
+        # With the default location the error would say that `parse_response` is the caller
         raise_insuffient_permission_error!(caller_location: 3)
       elsif body.to_s.include?("Internal Server Error - Read")
         raise InternalServerError, "Received an internal server error from iTunes Connect / Developer Portal, please try again later"
