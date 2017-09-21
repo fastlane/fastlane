@@ -104,19 +104,19 @@ module Gym
       return (!build_settings["TEST_TARGET_NAME"].nil? || !build_settings["TEST_HOST"].nil?)
     end
 
-    def other_platform?(build_settings)
+    def other_platform?(sdkroot)
       destination = Gym.config[:destination].dup
       destination.slice! "generic/platform="
-      sdkroot = ""
+      destination_sdkroot = ""
       case destination
       when "macosx"
-        sdkroot = "macosx"
+        destination_sdkroot = "macosx"
       when "iOS"
-        sdkroot = "iphoneos"
+        destination_sdkroot = "iphoneos"
       when "tvOS"
-        sdkroot = "appletvos"
+        destination_sdkroot = "appletvos"
       end
-      return build_settings["SDKROOT"] != sdkroot
+      return sdkroot != destination_sdkroot
     end
 
     def detect_project_profile_mapping
@@ -137,7 +137,8 @@ module Gym
             target.build_configuration_list.build_configurations.each do |build_configuration|
               current = build_configuration.build_settings
               next if test_target?(current)
-              next if other_platform?(current)
+              sdkroot = build_configuration.resolve_build_setting("SDKROOT")
+              next if other_platform?(sdkroot)
               next unless specified_configuration == build_configuration.name
 
               bundle_identifier = build_configuration.resolve_build_setting("PRODUCT_BUNDLE_IDENTIFIER")
