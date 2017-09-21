@@ -179,6 +179,10 @@ module Spaceship::TestFlight
       client.post_for_testflight_review(app_id: app_id, build_id: id, build: self)
     end
 
+    def expire!
+      client.expire_build(app_id: app_id, build_id: id, build: self)
+    end
+
     def add_group!(group)
       client.add_group_to_build(app_id: app_id, group_id: group.id, build_id: id)
     end
