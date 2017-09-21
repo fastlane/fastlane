@@ -608,6 +608,10 @@ module Spaceship
       # Check if the failure is due to missing permissions (iTunes Connect)
       if body["messages"] && body["messages"]["error"].include?("Forbidden")
         raise_insuffient_permission_error!
+      elsif body["messages"] && body["messages"]["error"].include?("insufficient privileges")
+        # Passing a specific `caller_location` here to make sure we return the correct method
+        # With the default location the error would say that `parse_response` is the caller
+        raise_insuffient_permission_error!(caller_location: 3)
       elsif body.to_s.include?("Internal Server Error - Read")
         raise InternalServerError, "Received an internal server error from iTunes Connect / Developer Portal, please try again later"
       elsif (body["resultString"] || "").include?("Program License Agreement")
@@ -616,12 +620,12 @@ module Spaceship
     end
 
     # This also gets called from subclasses
-    def raise_insuffient_permission_error!(additional_error_string: nil)
+    def raise_insuffient_permission_error!(additional_error_string: nil, caller_location: 2)
       # get the method name of the request that failed
       # `block in` is used very often for requests when surrounded for paging or retrying blocks
       # The ! is part of some methods when they modify or delete a resource, so we don't want to show it
       # Using `sub` instead of `delete` as we don't want to allow multiple matches
-      calling_method_name = caller_locations(2, 2).first.label.sub("block in", "").delete("!").strip
+      calling_method_name = caller_locations(caller_location, 2).first.label.sub("block in", "").delete("!").strip
       begin
         team_id = "(Team ID #{self.team_id}) "
       rescue
