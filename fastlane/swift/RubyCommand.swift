@@ -16,6 +16,7 @@ struct RubyCommand: RubyCommandable {
     struct Argument {
         let name: String
         let value: Any?
+        let type: String? = nil
 
         var hasValue: Bool {
             return nil != self.value

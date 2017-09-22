@@ -56,7 +56,6 @@ module Fastlane
 
     def self.swap_paths_in_target(target: nil, file_refs_to_swap: nil, expected_path_to_replacement_path_tuples: nil)
       made_project_updates = false
-
       file_refs_to_swap.each do |file_ref|
         expected_path_to_replacement_path_tuples.each do |preinstalled_config_relative_path, user_config_relative_path|
           next unless file_ref.path.include?(preinstalled_config_relative_path)
@@ -92,12 +91,17 @@ module Fastlane
       return new_user_tool_file_paths
     end
 
-    # Open fastlane runner project and return the FastlaneRunner build target
-    def self.target_for_fastlane_runner
+    # open and return the swift project
+    def self.runner_project
       runner_project_path = FastlaneCore::FastlaneFolder.swift_runner_project_path
       require 'xcodeproj'
       project = Xcodeproj::Project.open(runner_project_path)
-      fastlane_runner_array = project.targets.select do |target|
+      return project
+    end
+
+    # return the FastlaneRunner build target
+    def self.target_for_fastlane_runner_project(runner_project: nil)
+      fastlane_runner_array = runner_project.targets.select do |target|
         target.name == "FastlaneRunner"
       end
 
@@ -123,30 +127,31 @@ module Fastlane
       end
 
       # Tool files the user now provides
-      new_user_tool_file_paths = collect_tool_config_paths(all_user_tool_file_paths: all_user_tool_file_paths, look_for_new_configs: true)
+      new_user_tool_file_paths = collect_tool_paths_for_replacement(all_user_tool_file_paths: all_user_tool_file_paths, look_for_new_configs: true)
 
       # Tool files we provide AND the user doesn't provide
-      user_tool_files_possibly_removed = collect_tool_config_paths(all_user_tool_file_paths: all_user_tool_file_paths, look_for_new_configs: false)
+      user_tool_files_possibly_removed = collect_tool_paths_for_replacement(all_user_tool_file_paths: all_user_tool_file_paths, look_for_new_configs: false)
 
-      runner_target = target_for_fastlane_runner
-      target_source_file_refs = target_source_file_refs
+      fastlane_runner_project = self.runner_project
+      runner_target = target_for_fastlane_runner_project(runner_project: fastlane_runner_project)
+      target_file_refs = target_source_file_refs(target: runner_target)
 
       # Swap in all new user supplied configs into the project
       project_modified = swap_paths_in_target(
         target: runner_target,
-        file_refs_to_swap: target_source_file_refs,
+        file_refs_to_swap: target_file_refs,
         expected_path_to_replacement_path_tuples: new_user_tool_file_paths
       )
 
       # Swap out any configs the user has removed, inserting fastlane defaults
       project_modified ||= swap_paths_in_target(
         target: runner_target,
-        file_refs_to_swap: target_source_file_refs,
+        file_refs_to_swap: target_file_refs,
         expected_path_to_replacement_path_tuples: user_tool_files_possibly_removed
       )
 
       if project_modified
-        project.save
+        fastlane_runner_project.save
         UI.success("Updated #{FastlaneCore::FastlaneFolder.swift_runner_project_path}")
       else
         UI.success("FastlaneSwiftRunner project is up-to-date")
