@@ -5,6 +5,7 @@ module Fastlane
     def initialize(json: nil)
       @name = json['name']
       @value = json['value']
+      @value_type = json['value_type']
     end
 
     def is_named
@@ -13,14 +14,15 @@ module Fastlane
 
     def inspect
       if is_named
-        return "named argument: #{name}, value: #{value}"
+        return "named argument: #{name}, value: #{value}, type: #{value_type}"
       else
-        return "unnamed argument value: #{value}"
+        return "unnamed argument value: #{value}, type: #{value_type}"
       end
     end
 
     attr_reader :name
     attr_reader :value
+    attr_reader :value_type
   end
 
   class Command
@@ -54,5 +56,17 @@ module Fastlane
     attr_reader :args # always present
     attr_reader :method_name # always present
     attr_reader :class_name # only present when executing a class-method
+  end
+
+  class CommandReturn
+    attr_reader :return_value
+    attr_reader :return_value_type
+    attr_reader :closure_argument_value
+
+    def initialize(return_value: nil, return_value_type: nil, closure_argument_value: nil)
+      @return_value = return_value
+      @closure_argument_value = closure_argument_value
+      @return_value_type = return_value_type
+    end
   end
 end
