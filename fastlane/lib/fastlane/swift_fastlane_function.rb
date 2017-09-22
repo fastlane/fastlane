@@ -92,18 +92,21 @@ module Fastlane
         return "[String : String]"
       elsif type_override == Integer
         return "Int"
+      elsif type_override == :string_callback
+        return "((String) -> Void)"
       else
         return default_type
       end
     end
 
     def override_default_value_if_not_correct_type(param_type: nil, default_value: nil)
-      # \[\w*\]
       return "[]" if param_type == "[String]" && default_value == ""
+      return "{_ in }" if param_type == "((String) -> Void)"
 
       return default_value
     end
 
+    # rubocop:disable Metrics/PerceivedComplexity
     def parameters
       unless @param_names
         return ""
@@ -121,7 +124,7 @@ module Fastlane
 
         optional_specifier = ""
         # if we are optional and don't have a default value, we'll need to use ?
-        optional_specifier = "?" if optional && default_value.nil?
+        optional_specifier = "?" if (optional && default_value.nil?) && type != "((String) -> Void)"
 
         # If we have a default value of true or false, we can infer it is a Bool
         if default_value.class == FalseClass
@@ -137,7 +140,7 @@ module Fastlane
         default_value = override_default_value_if_not_correct_type(param_type: type, default_value: default_value)
 
         unless default_value.nil?
-          if type == "Bool" || type == "[String]" || type == "Int"
+          if type == "Bool" || type == "[String]" || type == "Int" || type == "((String) -> Void)"
             default_value = " = #{default_value}"
           elsif type == "[String : String]"
             # we can't handle default values for Hashes, yet
@@ -163,6 +166,7 @@ module Fastlane
 
       return param_names_and_types.join(", ")
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     def swift_code
       function_name = camel_case_lower(string: self.function_name)
@@ -174,10 +178,12 @@ module Fastlane
         return "[]" # return empty list for argument
       end
 
-      argument_object_strings = @param_names.map do |name|
+      argument_object_strings = @param_names.zip(param_type_overrides).map do |name, type_override|
         sanitized_name = camel_case_lower(string: name)
         sanitized_name = sanitize_reserved_word(word: sanitized_name)
-        "RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name})"
+        type_string = type_override == :string_callback ? ", type: .stringClosure" : nil
+
+        "RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}#{type_string})"
       end
       argument_object_strings = argument_object_strings.join(", ")
       argument_object_strings = "[#{argument_object_strings}]" # turn into swift array
