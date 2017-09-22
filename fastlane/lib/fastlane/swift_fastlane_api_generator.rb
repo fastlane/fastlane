@@ -16,8 +16,7 @@ module Fastlane
       self.tools_with_option_file = TOOLS_WITH_OPTIONS.map(&:to_s).to_set
 
       self.action_options_to_ignore = {
-        "cocoapods" => ["error_callback"].to_set,
-        "sh" => ["error_calback"].to_set,
+
         "precheck" => [
           "negative_apple_sentiment",
           "placeholder_text",

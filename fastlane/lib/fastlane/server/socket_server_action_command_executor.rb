@@ -13,15 +13,30 @@ module Fastlane
     def execute(command: nil, target_object: nil)
       action_name = command.method_name
       parameter_map = {}
+      closure_argument_value = nil
+
       command.args.each do |arg|
-        parameter_map[arg.name.to_sym] = arg.value
+        arg_value = arg.value
+        if arg.value_type.to_s.to_sym == :string_closure
+          closure = proc { |string_value| closure_argument_value = string_value }
+          arg_value = closure
+        end
+        parameter_map[arg.name.to_sym] = arg_value
       end
 
-      run(action: action_name, parameter_map: parameter_map)
+      action_class_ref = class_ref_for_action(named: action_name)
+      action_return = run(action_named: action_name, action_class_ref: action_class_ref, parameter_map: parameter_map)
+
+      command_return = CommandReturn.new(
+        return_value: action_return,
+        return_value_type: action_class_ref.return_type,
+        closure_argument_value: closure_argument_value
+      )
+      return command_return
     end
 
-    def run(action: nil, parameter_map: nil)
-      class_ref = Actions.action_class_ref(action)
+    def class_ref_for_action(named: nil)
+      class_ref = Actions.action_class_ref(named)
       unless class_ref
         if Fastlane::Actions.formerly_bundled_actions.include?(action)
           # This was a formerly bundled action which is now a plugin.
@@ -33,7 +48,12 @@ module Fastlane
         end
       end
 
-      runner.execute_action(action, class_ref, [parameter_map], custom_dir: '.')
+      return class_ref
+    end
+
+    def run(action_named: nil, action_class_ref: nil, parameter_map: nil)
+      action_return = runner.execute_action(action_named, action_class_ref, [parameter_map], custom_dir: '.')
+      return action_return
     end
   end
 end

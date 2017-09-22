@@ -100,6 +100,7 @@ module Fastlane
                                        description: 'A callback invoked with the command output if there is a non-zero exit status',
                                        optional: true,
                                        is_string: false,
+                                       type: :string_callback,
                                        default_value: nil),
           FastlaneCore::ConfigItem.new(key: :try_repo_update_on_error,
                                        env_name: "FL_COCOAPODS_TRY_REPO_UPDATE_ON_ERROR",
