@@ -5,12 +5,6 @@ module Fastlane
     class ShAction < Action
       def self.run(params)
         # this is implemented in the sh_helper.rb
-        Actions.sh_control_output(
-          params[:command],
-          print_command: params[:log],
-          print_command_output: params[:log],
-          error_callback: params[:error_callback]
-        )
       end
 
       #####################################################
