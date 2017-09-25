@@ -159,9 +159,16 @@ module Fastlane
       UI.crash!('No key given') unless key
 
       return false if self.runner.lanes.fetch(nil, {}).fetch(key.to_sym, nil)
-      return true if self.runner.lanes[key.to_sym].kind_of? Hash
+      return true if self.runner.lanes[key.to_sym].kind_of?(Hash)
 
-      UI.user_error!("Could not find '#{key}'. Available lanes: #{self.runner.available_lanes.join(', ')}")
+      if key.to_sym == :update
+        # The user ran `fastlane update`, instead of `fastlane update_fastlane`
+        # We're gonna be nice and understand what the user is trying to do
+        require 'fastlane/one_off'
+        Fastlane::OneOff.run(action: "update_fastlane", parameters: {})
+      else
+        UI.user_error!("Could not find '#{key}'. Available lanes: #{self.runner.available_lanes.join(', ')}")
+      end
     end
 
     def actions_path(path)
