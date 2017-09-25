@@ -63,7 +63,9 @@ module Fastlane
         return_value_type: return_value_type
       )
 
-      unless closure_arg.nil?
+      if closure_arg.nil?
+        closure_arg = closure_arg.to_s
+      else
         closure_arg = return_value_processor.prepare_object(
           return_value: closure_arg,
           return_value_type: :string # always assume string for closure error_callback
