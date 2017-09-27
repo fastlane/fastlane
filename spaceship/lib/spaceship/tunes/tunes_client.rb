@@ -692,7 +692,7 @@ module Spaceship
     # so we cache it
     # @return [UserDetail] the response
     def user_detail_data
-      @_cached_user_detail_data ||= Spaceship::Tunes::UserDetail.factory(user_details_data)
+      @_cached_user_detail_data ||= Spaceship::Tunes::UserDetail.factory(user_details_data, existing_client: self)
     end
 
     #####################################################
