@@ -114,15 +114,23 @@ module Fastlane
       return target.source_build_phase.files.to_a.map(&:file_ref)
     end
 
-    def self.link_user_configs_to_project
+    def self.first_time_setup
+      setup_message = ["fastlane is now configured to use a swift-based Fastfile (Fastfile.swift) 🦅"]
+      setup_message << "To edit your new Fastfile.swift, type: `open #{FastlaneCore::FastlaneFolder.swift_runner_project_path}`"
+
+      # Go through and link up whatever we generated during `fastlane init swift` so the user can edit them easily
+      self.link_user_configs_to_project(updated_message: setup_message.join("\n"))
+    end
+
+    def self.link_user_configs_to_project(updated_message: nil)
       tool_files_folder = FastlaneCore::FastlaneFolder.path
 
       # All the tools that could have <tool name>file.swift their paths, and where we expect to find the user's tool files.
-      all_user_tool_file_paths = TOOLS_WITH_OPTIONS.map do |tool_name|
+      all_user_tool_file_paths = TOOL_CONFIG_FILES.map do |tool_name|
         [
-          File.join(tool_files_folder, "#{tool_name.to_s.capitalize}file.swift"),
-          "../#{tool_name.to_s.capitalize}file.swift",
-          "../../#{tool_name.to_s.capitalize}file.swift"
+          File.join(tool_files_folder, "#{tool_name}.swift"),
+          "../#{tool_name}.swift",
+          "../../#{tool_name}.swift"
         ]
       end
 
@@ -152,7 +160,8 @@ module Fastlane
 
       if project_modified
         fastlane_runner_project.save
-        UI.success("Updated #{FastlaneCore::FastlaneFolder.swift_runner_project_path}")
+        updated_message ||= "Updated #{FastlaneCore::FastlaneFolder.swift_runner_project_path}"
+        UI.success(updated_message)
       else
         UI.success("FastlaneSwiftRunner project is up-to-date")
       end

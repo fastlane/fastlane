@@ -6,4 +6,4 @@ class Matchfile: MatchfileProtocol {
 }
 
 // For all available options run `fastlane match --help`
-// Remove the # in the beginning of the line to enable the other options
+// Remove the // in the beginning of the line to enable the other options

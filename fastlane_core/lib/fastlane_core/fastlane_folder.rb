@@ -22,8 +22,12 @@ module FastlaneCore
       return self.fastfile_path.downcase.end_with?(".swift")
     end
 
+    def self.swift_folder_path
+      return File.join(self.path, 'swift')
+    end
+
     def self.swift_runner_project_path
-      return File.join(self.path, 'swift', 'FastlaneSwiftRunner', 'FastlaneSwiftRunner.xcodeproj')
+      return File.join(self.swift_folder_path, 'FastlaneSwiftRunner', 'FastlaneSwiftRunner.xcodeproj')
     end
 
     def self.swift_runner_built?

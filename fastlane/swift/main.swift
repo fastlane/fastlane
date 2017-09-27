@@ -24,14 +24,26 @@ let fastlaneArgsMinusLanes = fastlaneArgs.filter { arg in
 }
 
 let potentialLogMode = fastlaneArgsMinusLanes.filter { arg in
-    return arg.name.lowercased() == "logmode"
+    return arg.name.lowercased() == "logMode"
+}
+
+// Configure logMode since we might need to use it before we finish parsing
+if let logModeArg = potentialLogMode.first {
+    let logModeString = logModeArg.value
+    Logger.logMode = Logger.LogMode(logMode: logModeString)
+}
+
+// User might have configured a timeout for the socket connection
+let potentialTimeout = fastlaneArgsMinusLanes.filter { arg in
+    return arg.name.lowercased() == "timeoutSeconds"
 }
 
 verbose(message: lanes.description)
 
 guard lanes.count == 1 else {
-    log(message: "You must have exactly one lane specified as an arg, here's what I got: \(lanes)")
-    fatalError()
+    let message = "You must have exactly one lane specified as an arg, here's what I got: \(lanes)"
+    log(message: message)
+    fatalError(message)
 }
 
 let lane = lanes.first!
@@ -39,6 +51,14 @@ let lane = lanes.first!
 if let logModeArg = potentialLogMode.first {
     let logModeString = logModeArg.value
     Logger.logMode = Logger.LogMode(logMode: logModeString)
+}
+
+let timeout: Int
+if let timeoutArg = potentialTimeout.first {
+    let timeoutString = timeoutArg.value
+    timeout = (timeoutString as NSString).integerValue
+} else {
+    timeout = SocketClient.defaultCommandTimeoutSeconds
 }
 
 class MainProcess {
