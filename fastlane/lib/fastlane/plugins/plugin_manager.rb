@@ -186,7 +186,9 @@ module Fastlane
       puts "Updating plugin dependencies..."
       ensure_plugins_attached!
       with_clean_bundler_env do
+        plugins = available_plugins
         cmd = "bundle update"
+        cmd << " #{plugins.join(" ")}"
         cmd << " --quiet" unless FastlaneCore::Globals.verbose?
         cmd << " && echo 'Successfully updated plugins'"
         UI.command(cmd) if FastlaneCore::Globals.verbose?
