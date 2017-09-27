@@ -213,7 +213,8 @@ module Spaceship
       end
 
       unless result
-        raise TunesClient::ITunesConnectError.new, "Could not set team ID to '#{team_id}', only found the following available teams: #{available_teams.map { |team| "#{team[:team_id]} (#{team[:team_name]})" }.join(',')}"
+        error_string = "Could not set team ID to '#{team_id}', only found the following available teams:\n\n#{available_teams.map { |team| "- #{team[:team_id]} (#{team[:team_name]})" }.join("\n")}\n"
+        raise TunesClient::ITunesConnectError.new, error_string
       end
 
       response = request(:post) do |req|
