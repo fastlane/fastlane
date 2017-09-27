@@ -276,8 +276,8 @@ module Fastlane
       end
 
       template.gsub!('snapshot', '# snapshot') unless self.tools[:snapshot]
-      template.gsub!('cocoapods', '') unless self.tools[:cocoapods]
-      template.gsub!('carthage', '') unless self.tools[:carthage]
+      template.gsub!('cocoapods', '# cocoapods') unless self.tools[:cocoapods]
+      template.gsub!('carthage', '# carthage') unless self.tools[:carthage]
       template.gsub!('[[FASTLANE_VERSION]]', Fastlane::VERSION)
 
       self.tools.each do |key, value|
