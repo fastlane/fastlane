@@ -18,13 +18,16 @@ module Fastlane
     :precheck
   ]
 
-  TOOLS_WITH_OPTIONS = [
-    :snapshot,
-    :screengrab,
-    :scan,
-    :precheck,
-    :match,
-    :gym,
-    :deliver
+  # a list of all the config files we currently expect
+  TOOL_CONFIG_FILES = [
+    "Appfile",
+    "Deliverfile",
+    "Fastfile",
+    "Gymfile",
+    "Matchfile",
+    "Precheckfile",
+    "Scanfile",
+    "Screengrabfile",
+    "Snapshotfile"
   ]
 end

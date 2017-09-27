@@ -28,10 +28,9 @@ public extension LaneFileProtocol {
     func recordLaneDescriptions() { } // no op by default
 }
 
+@objcMembers
 public class LaneFile: NSObject, LaneFileProtocol {
     public var environmentVariables: EnvironmentVariables = EnvironmentVariables.instance
-
-//    private static let laneQueue = DispatchQueue(label: "laneQueue")
 
     private(set) static var fastfileInstance: Fastfile?
 
@@ -58,18 +57,15 @@ public class LaneFile: NSObject, LaneFileProtocol {
         let methodList = class_copyMethodList(self, &methodCount)
         for i in 0..<Int(methodCount) {
             let selName = sel_getName(method_getName(methodList![i]))
-
-            if let selName = selName {
-                let name = String(cString: selName)
-                let lowercasedName = name.lowercased()
-                guard lowercasedName.hasSuffix("lane") else {
-                    continue
-                }
-
-                laneToMethodName[lowercasedName] = name
-                let lowercasedNameNoLane = String(lowercasedName.characters.prefix(lowercasedName.characters.count - 4))
-                laneToMethodName[lowercasedNameNoLane] = name
+            let name = String(cString: selName)
+            let lowercasedName = name.lowercased()
+            guard lowercasedName.hasSuffix("lane") else {
+                continue
             }
+
+            laneToMethodName[lowercasedName] = name
+            let lowercasedNameNoLane = String(lowercasedName.characters.prefix(lowercasedName.characters.count - 4))
+            laneToMethodName[lowercasedNameNoLane] = name
         }
         return laneToMethodName
     }
@@ -84,8 +80,9 @@ public class LaneFile: NSObject, LaneFileProtocol {
         }
 
         guard let fastfileInstance: Fastfile = self.fastfileInstance else {
-            log(message: "Unable to instantiate class named: \(self.className())")
-            fatalError()
+            let message = "Unable to instantiate class named: \(self.className())"
+            log(message: message)
+            fatalError(message)
         }
 
         // call all methods that need to be called before we start calling lanes
@@ -95,16 +92,13 @@ public class LaneFile: NSObject, LaneFileProtocol {
         let lowerCasedLaneRequested = named.lowercased()
 
         guard let laneMethod = currentLanes[lowerCasedLaneRequested] else {
-            log(message: "unable to find lane named: \(named)")
-            fatalError()
+            let message = "unable to find lane named: \(named)"
+            log(message: message)
+            fatalError(message)
         }
 
         // We need to catch all possible errors here and display a nice message
         _ = fastfileInstance.perform(NSSelectorFromString(laneMethod))
-
-//        if error
-//        fastfileInstance.onError(currentLane: named, errorInfo: <#T##String#>)
-//        end
 
         // only call on success
         fastfileInstance.afterAll(currentLane: named)
