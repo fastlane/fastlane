@@ -4,6 +4,7 @@ describe Gym do
 
     describe 'Xcode config handling', :stuff do
       it "fetches the custom build path from the Xcode config" do
+        expect(Gym::DetectValues).to receive(:set_additional_default_values)
         expect(Gym::DetectValues).to receive(:xcode_preferences_dictionary).and_return({ "IDECustomDistributionArchivesLocation" => "/test/path" })
 
         options = { project: "./gym/examples/multipleSchemes/Example.xcodeproj" }
@@ -14,6 +15,7 @@ describe Gym do
       end
 
       it "fetches the default build path from the Xcode config when preference files exists but not archive location defined" do
+        expect(Gym::DetectValues).to receive(:set_additional_default_values)
         expect(Gym::DetectValues).to receive(:xcode_preferences_dictionary).and_return({})
 
         options = { project: "./gym/examples/multipleSchemes/Example.xcodeproj" }
@@ -25,6 +27,7 @@ describe Gym do
       end
 
       it "fetches the default build path from the Xcode config when missing Xcode preferences plit" do
+        expect(Gym::DetectValues).to receive(:set_additional_default_values)
         expect(Gym::DetectValues).to receive(:xcode_preference_plist_path).and_return(nil)
 
         options = { project: "./gym/examples/multipleSchemes/Example.xcodeproj" }
