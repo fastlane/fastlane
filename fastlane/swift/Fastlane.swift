@@ -111,8 +111,12 @@ func cloc(binaryPath: String = "/usr/local/bin/cloc", excludeDir: String? = nil,
   let command = RubyCommand(commandID: "", methodName: "cloc", className: nil, args: [RubyCommand.Argument(name: "binary_path", value: binaryPath), RubyCommand.Argument(name: "exclude_dir", value: excludeDir), RubyCommand.Argument(name: "output_directory", value: outputDirectory), RubyCommand.Argument(name: "source_directory", value: sourceDirectory), RubyCommand.Argument(name: "xml", value: xml)])
   _ = runner.executeCommand(command)
 }
-func cocoapods(clean: Bool = true, integrate: Bool = true, repoUpdate: Bool = false, silent: Bool = false, verbose: Bool = false, ansi: Bool = true, useBundleExec: Bool = true, podfile: String? = nil) {
-  let command = RubyCommand(commandID: "", methodName: "cocoapods", className: nil, args: [RubyCommand.Argument(name: "clean", value: clean), RubyCommand.Argument(name: "integrate", value: integrate), RubyCommand.Argument(name: "repo_update", value: repoUpdate), RubyCommand.Argument(name: "silent", value: silent), RubyCommand.Argument(name: "verbose", value: verbose), RubyCommand.Argument(name: "ansi", value: ansi), RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec), RubyCommand.Argument(name: "podfile", value: podfile)])
+func clubmate() {
+  let command = RubyCommand(commandID: "", methodName: "clubmate", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
+func cocoapods(clean: Bool = true, integrate: Bool = true, repoUpdate: Bool = false, silent: Bool = false, verbose: Bool = false, ansi: Bool = true, useBundleExec: Bool = true, podfile: String? = nil, errorCallback: ((String) -> Void) = {_ in }) {
+  let command = RubyCommand(commandID: "", methodName: "cocoapods", className: nil, args: [RubyCommand.Argument(name: "clean", value: clean), RubyCommand.Argument(name: "integrate", value: integrate), RubyCommand.Argument(name: "repo_update", value: repoUpdate), RubyCommand.Argument(name: "silent", value: silent), RubyCommand.Argument(name: "verbose", value: verbose), RubyCommand.Argument(name: "ansi", value: ansi), RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec), RubyCommand.Argument(name: "podfile", value: podfile), RubyCommand.Argument(name: "error_callback", value: errorCallback, type: .stringClosure)])
   _ = runner.executeCommand(command)
 }
 func commitGithubFile(repositoryName: String, serverUrl: String = "https://api.github.com", apiToken: String, branch: String = "master", path: String, message: String? = nil, secure: Bool = true) -> [String : String] {
@@ -407,15 +411,15 @@ func podioItem(clientId: String, clientSecret: String, appId: String, appToken: 
   let command = RubyCommand(commandID: "", methodName: "podio_item", className: nil, args: [RubyCommand.Argument(name: "client_id", value: clientId), RubyCommand.Argument(name: "client_secret", value: clientSecret), RubyCommand.Argument(name: "app_id", value: appId), RubyCommand.Argument(name: "app_token", value: appToken), RubyCommand.Argument(name: "identifying_field", value: identifyingField), RubyCommand.Argument(name: "identifying_value", value: identifyingValue), RubyCommand.Argument(name: "other_fields", value: otherFields)])
   _ = runner.executeCommand(command)
 }
-func precheck(appIdentifier: String = precheckfile.appIdentifier, username: String = precheckfile.username, teamId: String? = precheckfile.teamId, teamName: String? = precheckfile.teamName, defaultRuleLevel: String = precheckfile.defaultRuleLevel) -> Bool {
-  let command = RubyCommand(commandID: "", methodName: "precheck", className: nil, args: [RubyCommand.Argument(name: "app_identifier", value: appIdentifier), RubyCommand.Argument(name: "username", value: username), RubyCommand.Argument(name: "team_id", value: teamId), RubyCommand.Argument(name: "team_name", value: teamName), RubyCommand.Argument(name: "default_rule_level", value: defaultRuleLevel)])
+func precheck(appIdentifier: String = precheckfile.appIdentifier, username: String = precheckfile.username, teamId: String? = precheckfile.teamId, teamName: String? = precheckfile.teamName, defaultRuleLevel: String = precheckfile.defaultRuleLevel, includeInAppPurchases: Bool = precheckfile.includeInAppPurchases, freeStuffInIap: String? = precheckfile.freeStuffInIap) -> Bool {
+  let command = RubyCommand(commandID: "", methodName: "precheck", className: nil, args: [RubyCommand.Argument(name: "app_identifier", value: appIdentifier), RubyCommand.Argument(name: "username", value: username), RubyCommand.Argument(name: "team_id", value: teamId), RubyCommand.Argument(name: "team_name", value: teamName), RubyCommand.Argument(name: "default_rule_level", value: defaultRuleLevel), RubyCommand.Argument(name: "include_in_app_purchases", value: includeInAppPurchases), RubyCommand.Argument(name: "free_stuff_in_iap", value: freeStuffInIap)])
   return parseBool(fromString: runner.executeCommand(command))
 }
 func produce(username: String, appIdentifier: String, bundleIdentifierSuffix: String? = nil, appName: String, appVersion: String? = nil, sku: String, platform: String = "ios", language: String = "English", companyName: String? = nil, skipItc: Bool = false, itcUsers: [String]? = nil, enabledFeatures: String = "{}", enableServices: String = "{}", skipDevcenter: Bool = false, teamId: String? = nil, teamName: String? = nil, itcTeamId: String? = nil, itcTeamName: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "produce", className: nil, args: [RubyCommand.Argument(name: "username", value: username), RubyCommand.Argument(name: "app_identifier", value: appIdentifier), RubyCommand.Argument(name: "bundle_identifier_suffix", value: bundleIdentifierSuffix), RubyCommand.Argument(name: "app_name", value: appName), RubyCommand.Argument(name: "app_version", value: appVersion), RubyCommand.Argument(name: "sku", value: sku), RubyCommand.Argument(name: "platform", value: platform), RubyCommand.Argument(name: "language", value: language), RubyCommand.Argument(name: "company_name", value: companyName), RubyCommand.Argument(name: "skip_itc", value: skipItc), RubyCommand.Argument(name: "itc_users", value: itcUsers), RubyCommand.Argument(name: "enabled_features", value: enabledFeatures), RubyCommand.Argument(name: "enable_services", value: enableServices), RubyCommand.Argument(name: "skip_devcenter", value: skipDevcenter), RubyCommand.Argument(name: "team_id", value: teamId), RubyCommand.Argument(name: "team_name", value: teamName), RubyCommand.Argument(name: "itc_team_id", value: itcTeamId), RubyCommand.Argument(name: "itc_team_name", value: itcTeamName)])
   _ = runner.executeCommand(command)
 }
-func prompt(text: String = "Please enter a text: ", ciInput: String = "", boolean: Bool = false, multiLineEndKeyword: String? = nil) -> String {
+func prompt(text: String = "Please enter some text: ", ciInput: String = "", boolean: Bool = false, multiLineEndKeyword: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "prompt", className: nil, args: [RubyCommand.Argument(name: "text", value: text), RubyCommand.Argument(name: "ci_input", value: ciInput), RubyCommand.Argument(name: "boolean", value: boolean), RubyCommand.Argument(name: "multi_line_end_keyword", value: multiLineEndKeyword)])
   return runner.executeCommand(command)
 }
@@ -463,8 +467,16 @@ func rocket() -> String {
   let command = RubyCommand(commandID: "", methodName: "rocket", className: nil, args: [])
   return runner.executeCommand(command)
 }
+func rspec() {
+  let command = RubyCommand(commandID: "", methodName: "rspec", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
 func rsync(extra: String = "-av", source: String, destination: String) {
   let command = RubyCommand(commandID: "", methodName: "rsync", className: nil, args: [RubyCommand.Argument(name: "extra", value: extra), RubyCommand.Argument(name: "source", value: source), RubyCommand.Argument(name: "destination", value: destination)])
+  _ = runner.executeCommand(command)
+}
+func rubocop() {
+  let command = RubyCommand(commandID: "", methodName: "rubocop", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
 func s3(ipa: String? = nil, dsym: String? = nil, uploadMetadata: Bool = true, plistTemplatePath: String? = nil, plistFileName: String? = nil, htmlTemplatePath: String? = nil, htmlFileName: String? = nil, versionTemplatePath: String? = nil, versionFileName: String? = nil, accessKey: String? = nil, secretAccessKey: String? = nil, bucket: String? = nil, region: String? = nil, path: String = "v{CFBundleShortVersionString}_b{CFBundleVersion}/", source: String? = nil, acl: String = "public_read") {
@@ -511,9 +523,9 @@ func setupTravis(force: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "setup_travis", className: nil, args: [RubyCommand.Argument(name: "force", value: force)])
   _ = runner.executeCommand(command)
 }
-func sh(command: String, log: Bool = true, errorCallback: String? = nil) {
-  let command = RubyCommand(commandID: "", methodName: "sh", className: nil, args: [RubyCommand.Argument(name: "command", value: command), RubyCommand.Argument(name: "log", value: log), RubyCommand.Argument(name: "error_callback", value: errorCallback)])
-  _ = runner.executeCommand(command)
+func sh(command: String, log: Bool = true, errorCallback: ((String) -> Void) = {_ in }) -> String {
+  let command = RubyCommand(commandID: "", methodName: "sh", className: nil, args: [RubyCommand.Argument(name: "command", value: command), RubyCommand.Argument(name: "log", value: log), RubyCommand.Argument(name: "error_callback", value: errorCallback, type: .stringClosure)])
+  return runner.executeCommand(command)
 }
 func sigh(adhoc: Bool = false, development: Bool = false, skipInstall: Bool = false, force: Bool = false, appIdentifier: String, username: String, teamId: String? = nil, teamName: String? = nil, provisioningName: String? = nil, ignoreProfilesWithDifferentName: Bool = false, outputPath: String = ".", certId: String? = nil, certOwnerName: String? = nil, filename: String? = nil, skipFetchProfiles: Bool = false, skipCertificateVerification: Bool = false, platform: String = "ios", templateName: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "sigh", className: nil, args: [RubyCommand.Argument(name: "adhoc", value: adhoc), RubyCommand.Argument(name: "development", value: development), RubyCommand.Argument(name: "skip_install", value: skipInstall), RubyCommand.Argument(name: "force", value: force), RubyCommand.Argument(name: "app_identifier", value: appIdentifier), RubyCommand.Argument(name: "username", value: username), RubyCommand.Argument(name: "team_id", value: teamId), RubyCommand.Argument(name: "team_name", value: teamName), RubyCommand.Argument(name: "provisioning_name", value: provisioningName), RubyCommand.Argument(name: "ignore_profiles_with_different_name", value: ignoreProfilesWithDifferentName), RubyCommand.Argument(name: "output_path", value: outputPath), RubyCommand.Argument(name: "cert_id", value: certId), RubyCommand.Argument(name: "cert_owner_name", value: certOwnerName), RubyCommand.Argument(name: "filename", value: filename), RubyCommand.Argument(name: "skip_fetch_profiles", value: skipFetchProfiles), RubyCommand.Argument(name: "skip_certificate_verification", value: skipCertificateVerification), RubyCommand.Argument(name: "platform", value: platform), RubyCommand.Argument(name: "template_name", value: templateName)])
@@ -521,6 +533,14 @@ func sigh(adhoc: Bool = false, development: Bool = false, skipInstall: Bool = fa
 }
 func slack(message: String? = nil, channel: String? = nil, useWebhookConfiguredUsernameAndIcon: Bool = false, slackUrl: String, username: String = "fastlane", iconUrl: String = "https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png", payload: String = "{}", defaultPayloads: [String]? = nil, attachmentProperties: String = "{}", success: Bool = true) {
   let command = RubyCommand(commandID: "", methodName: "slack", className: nil, args: [RubyCommand.Argument(name: "message", value: message), RubyCommand.Argument(name: "channel", value: channel), RubyCommand.Argument(name: "use_webhook_configured_username_and_icon", value: useWebhookConfiguredUsernameAndIcon), RubyCommand.Argument(name: "slack_url", value: slackUrl), RubyCommand.Argument(name: "username", value: username), RubyCommand.Argument(name: "icon_url", value: iconUrl), RubyCommand.Argument(name: "payload", value: payload), RubyCommand.Argument(name: "default_payloads", value: defaultPayloads), RubyCommand.Argument(name: "attachment_properties", value: attachmentProperties), RubyCommand.Argument(name: "success", value: success)])
+  _ = runner.executeCommand(command)
+}
+func slackTrain() {
+  let command = RubyCommand(commandID: "", methodName: "slack_train", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
+func slackTrainStart(distance: Int = 5, train: String = "🚝", rail: String = "=", reverseDirection: Bool = false) {
+  let command = RubyCommand(commandID: "", methodName: "slack_train_start", className: nil, args: [RubyCommand.Argument(name: "distance", value: distance), RubyCommand.Argument(name: "train", value: train), RubyCommand.Argument(name: "rail", value: rail), RubyCommand.Argument(name: "reverse_direction", value: reverseDirection)])
   _ = runner.executeCommand(command)
 }
 func slather(buildDirectory: String? = nil, proj: String? = nil, workspace: String? = nil, scheme: String? = nil, configuration: String? = nil, inputFormat: String? = nil, buildkite: String? = nil, teamcity: String? = nil, jenkins: String? = nil, travis: String? = nil, travisPro: String? = nil, circleci: String? = nil, coveralls: String? = nil, simpleOutput: String? = nil, gutterJson: String? = nil, coberturaXml: String? = nil, html: String? = nil, show: Bool = false, sourceDirectory: String? = nil, outputDirectory: String? = nil, ignore: String? = nil, verbose: String? = nil, useBundleExec: Bool = false, binaryBasename: Bool = false, binaryFile: Bool = false, sourceFiles: Bool = false, decimals: Bool = false) {
@@ -719,7 +739,7 @@ func parseInt(fromString: String, function: String = #function) -> Int {
   verbose(message: "parsing a Bool from data: \(fromString), from function: \(function)")
   return NSString(string: fromString).integerValue
 }
-
+      
 let deliverfile: Deliverfile = Deliverfile()
 let gymfile: Gymfile = Gymfile()
 let matchfile: Matchfile = Matchfile()

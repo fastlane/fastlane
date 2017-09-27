@@ -32,8 +32,9 @@ extension EnvironmentVariables: RubyCommandable {
             let jsonString = NSString(data: jsonData, encoding: String.Encoding.utf8.rawValue)!
             return jsonString as String
         } catch {
-            log(message: "Unable to parse environment variables: \(error.localizedDescription)")
-            fatalError()
+            let message = "Unable to parse environment variables: \(error.localizedDescription)"
+            log(message: message)
+            fatalError(message)
         }
     }
 }

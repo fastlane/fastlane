@@ -4,6 +4,8 @@ protocol PrecheckfileProtocol: class {
   var teamId: String? { get }
   var teamName: String? { get }
   var defaultRuleLevel: String { get }
+  var includeInAppPurchases: Bool { get }
+  var freeStuffInIap: String? { get }
 }
 
 extension PrecheckfileProtocol {
@@ -12,4 +14,6 @@ extension PrecheckfileProtocol {
   var teamId: String? { return nil }
   var teamName: String? { return nil }
   var defaultRuleLevel: String { return "error" }
+  var includeInAppPurchases: Bool { return true }
+  var freeStuffInIap: String? { return nil }
 }

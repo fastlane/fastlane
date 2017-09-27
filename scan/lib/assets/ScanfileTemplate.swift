@@ -4,7 +4,7 @@
 // In general, you can use the options available
 // fastlane scan --help
 
-// Remove the # in front of the line to enable the option
+// Remove the // in front of the line to enable the option
 
 class Scanfile: ScanfileProtocol {
     //var scheme: String? { return "Example" }
