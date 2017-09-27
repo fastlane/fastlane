@@ -3,11 +3,11 @@
 // All available actions: https://docs.fastlane.tools/actions
 // can also be listed using the `fastlane actions` command
 
-// Change the syntax highlighting to Ruby
+// Change the syntax highlighting to Swift
 // All lines starting with // are ignored when running `fastlane`
 
 // If you want to automatically update fastlane if a new version is available:
-// update_fastlane
+// updateFastlane()
 
 import Foundation
 

@@ -308,13 +308,13 @@ module Fastlane
 
       if self.is_swift_fastfile
         template.gsub!('snapshot()', '// snapshot') unless self.tools[:snapshot]
-        template.gsub!('cocoapods()', '') unless self.tools[:cocoapods]
-        template.gsub!('carthage()', '') unless self.tools[:carthage]
+        template.gsub!('cocoapods()', '// cocoapods()') unless self.tools[:cocoapods]
+        template.gsub!('carthage()', '// carthage()') unless self.tools[:carthage]
         path = File.join(folder, 'Fastfile.swift')
       else
         template.gsub!('snapshot', '# snapshot') unless self.tools[:snapshot]
-        template.gsub!('cocoapods', '') unless self.tools[:cocoapods]
-        template.gsub!('carthage', '') unless self.tools[:carthage]
+        template.gsub!('cocoapods', '# cocoapods') unless self.tools[:cocoapods]
+        template.gsub!('carthage', '# cocoapods') unless self.tools[:carthage]
         path = File.join(folder, 'Fastfile')
       end
 
