@@ -4,8 +4,10 @@ module Fastlane
   class SwiftFastlaneAPIGenerator
     attr_accessor :tools_with_option_file
     attr_accessor :action_options_to_ignore
+    attr_accessor :target_output_path
 
-    def initialize
+    def initialize(target_output_path: "swift")
+      @target_output_path = File.expand_path(target_output_path)
       require 'fastlane'
       require 'fastlane/documentation/actions_list'
       Fastlane.load_actions
@@ -31,7 +33,7 @@ module Fastlane
       }
     end
 
-    def generate_swift(target_path: "swift/Fastlane.swift")
+    def generate_swift
       file_content = []
       file_content << "import Foundation"
 
@@ -58,7 +60,7 @@ module Fastlane
       file_content << "" # newline because it's the end of the file adding an extension
 
       file_content = file_content.join("\n")
-
+      target_path = File.join(@target_output_path, "Fastlane.swift")
       File.write(target_path, file_content)
       UI.success(target_path)
 
@@ -69,7 +71,7 @@ module Fastlane
       disclaimer = []
       disclaimer << "// This class is automatically included in FastlaneRunner during build"
       disclaimer << "// If you have a custom #{class_name}.swift, this file will be replaced by it"
-      disclaimer << "// Modify this file unless you are familiar with how fastlane's swift code generation works"
+      disclaimer << "// Don't modify this file unless you are familiar with how fastlane's swift code generation works"
       disclaimer << "// *** This file will be overwritten or replaced during build time ***"
       disclaimer << ""
       disclaimer << lanefile_implementation
@@ -77,7 +79,7 @@ module Fastlane
 
       file_content = disclaimer.join("\n")
 
-      target_path = "swift/#{class_name}.swift"
+      target_path = File.join(@target_output_path, "#{class_name}.swift")
       File.write(target_path, file_content)
       UI.success(target_path)
     end
@@ -149,7 +151,7 @@ func parseInt(fromString: String, function: String = #function) -> Int {
       protocol_content_array << "}"
       protocol_content_array << ""
 
-      target_path = "swift/#{protocol_name}.swift"
+      target_path = File.join(@target_output_path, "#{protocol_name}.swift")
       file_content = protocol_content_array.join("\n")
       File.write(target_path, file_content)
       UI.success(target_path)

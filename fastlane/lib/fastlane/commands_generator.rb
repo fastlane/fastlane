@@ -121,6 +121,7 @@ module Fastlane
           else
             is_swift_fastfile = args.include?("swift")
             Fastlane::Setup.new.run(user: options.user, is_swift_fastfile: is_swift_fastfile)
+            Fastlane::SwiftLaneManager.first_time_setup
           end
         end
       end
@@ -132,6 +133,7 @@ module Fastlane
 
         c.action do |args, options|
           Fastlane::Setup.new.run(user: options.user, is_swift_fastfile: true)
+          Fastlane::SwiftLaneManager.first_time_setup
         end
       end
 
