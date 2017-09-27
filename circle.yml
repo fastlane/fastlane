@@ -3,7 +3,7 @@ machine:
     FL_BUILDLOG_PATH: ~/Library/Logs
     SCAN_INCLUDE_SIMULATOR_LOGS: false
   xcode:
-    version: "8.3"
+    version: "9.0"
 dependencies:
   pre:
     - brew install shellcheck
