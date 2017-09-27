@@ -125,6 +125,7 @@ module Gym
               next unless specified_configuration == build_configuration.name
 
               bundle_identifier = build_configuration.resolve_build_setting("PRODUCT_BUNDLE_IDENTIFIER")
+              next unless bundle_identifier
               provisioning_profile_specifier = build_configuration.resolve_build_setting("PROVISIONING_PROFILE_SPECIFIER")
               provisioning_profile_uuid = build_configuration.resolve_build_setting("PROVISIONING_PROFILE")
 

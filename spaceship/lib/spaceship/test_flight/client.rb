@@ -68,6 +68,17 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
+    def expire_build(app_id: nil, build_id: nil, build: nil)
+      assert_required_params(__method__, binding)
+
+      response = request(:post) do |req|
+        req.url "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}/expire"
+        req.body = build.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_response(response)
+    end
+
     ##
     # @!group Groups API
     ##

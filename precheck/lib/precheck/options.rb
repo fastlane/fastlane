@@ -12,6 +12,7 @@ module Precheck
         FutureFunctionalityRule,
         TestWordsRule,
         CurseWordsRule,
+        FreeStuffIAPRule,
         CustomTextRule,
         CopyrightDateRule,
         UnreachableURLRule
@@ -56,7 +57,14 @@ module Precheck
                                      env_name: "PRECHECK_DEFAULT_RULE_LEVEL",
                                      description: "The default rule level unless otherwise configured",
                                      is_string: false,
-                                     default_value: RULE_LEVELS[:error])
+                                     default_value: RULE_LEVELS[:error]),
+        FastlaneCore::ConfigItem.new(key: :include_in_app_purchases,
+                                     short_option: "-i",
+                                     env_name: "PRECHECK_INCLUDE_IN_APP_PURCHASES",
+                                     description: "Should check in-app purchases?",
+                                     is_string: false,
+                                     optional: true,
+                                     default_value: true)
       ] + rules
     end
   end

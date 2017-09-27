@@ -29,7 +29,12 @@ describe Fastlane do
 
       it "raises an exception if key doesn't exist at all" do
         expect(UI).to receive(:user_error!).with("Could not find 'asdf'. Available lanes: test, anotherroot, mac beta, ios beta, ios release, android beta, android witherror, android unsupported_action")
-        @ff.is_platform_block? "asdf"
+        @ff.is_platform_block?("asdf")
+      end
+
+      it "has an alias for `update`, if there is no lane called `update`" do
+        expect(Fastlane::OneOff).to receive(:run).with({ action: "update_fastlane", parameters: {} })
+        @ff.is_platform_block?("update")
       end
     end
 
