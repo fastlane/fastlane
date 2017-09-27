@@ -56,6 +56,10 @@ passbook.(on|off)
 push_notification.(on|off)
 siri_kit.(on|off)
 vpn_configuration.(on|off)
+network_extension.(on|off)
+hotspot.(on|off)
+multipath.(on|off)
+nfc_tag_reading.(on|off)
 ```
 
 Examples:

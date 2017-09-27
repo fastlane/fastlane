@@ -60,6 +60,8 @@ module Fastlane
         v.release_notes.languages.each do |lang|
           v.release_notes[lang] = changelog
         end
+
+        UI.message("Found and updated changelog for the following languages: #{v.release_notes.languages.join(', ')}")
         UI.message("Uploading changes to iTunes Connect...")
         v.save!
 
@@ -81,7 +83,8 @@ module Fastlane
       def self.details
         [
           "This is useful if you have only one changelog for all languages.",
-          "You can store the changelog in `#{default_changelog_path}` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same \"What's new\"-text for all languages."
+          "You can store the changelog in `#{default_changelog_path}` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same \"What's new\"-text for all languages.",
+          "Defining the version is optional, fastlane will try to automatically detect it if you don't provide one"
         ].join("\n")
       end
 
@@ -140,7 +143,8 @@ module Fastlane
 
       def self.example_code
         [
-          'set_changelog(app_identifier: "com.krausefx.app", version: "1.0", changelog: "All Languages")'
+          'set_changelog(changelog: "Changelog for all Languages")',
+          'set_changelog(app_identifier: "com.krausefx.app", version: "1.0", changelog: "Changelog for all Languages")'
         ]
       end
 
