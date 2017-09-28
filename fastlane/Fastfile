@@ -17,6 +17,7 @@ lane :generate_swift_api do |options|
     project: File.expand_path("swift/FastlaneSwiftRunner/FastlaneSwiftRunner.xcodeproj"),
     skip_package_ipa: true
   )
+  sh("rm ../FastlaneRunner")
 end
 
 desc "Increment the version number of this gem and autogenerate Swift API"
