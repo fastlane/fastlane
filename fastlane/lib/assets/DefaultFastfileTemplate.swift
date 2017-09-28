@@ -1,4 +1,4 @@
-// Customise this file, documentation can be found here:
+// Customize this file, documentation can be found here:
 // https://github.com/fastlane/fastlane/tree/master/fastlane/docs
 // All available actions: https://docs.fastlane.tools/actions
 // can also be listed using the `fastlane actions` command
@@ -64,7 +64,7 @@ class Fastfile: LaneFile {
     // You'll need to annotate each lane by adding entry in recordLaneDescriptions()
     func recordLaneDescriptions() {
         addLaneDescription(lane: #selector(testLane), "Runs all the tests")
-        addLaneDescription(lane: #selector(betaLane), "Submit a new Beta Build to Apple TestFlight\nThis will also make sure the profile is up-to-date")
+        addLaneDescription(lane: #selector(betaLane), "Submit a new Beta Build to Apple TestFlight. This will also make sure the profile is up-to-date")
         addLaneDescription(lane: #selector(releaseLane), "Deploy a new version to the App Store")
     }
 
