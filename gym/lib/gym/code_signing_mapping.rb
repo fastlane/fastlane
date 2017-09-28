@@ -106,7 +106,7 @@ module Gym
 
     def same_platform?(sdkroot)
       destination = Gym.config[:destination].dup
-      destination.slice! "generic/platform="
+      destination.slice!("generic/platform=")
       destination_sdkroot = []
       case destination
       when "macosx"
@@ -116,7 +116,7 @@ module Gym
       when "tvOS"
         destination_sdkroot = ["appletvos"]
       end
-      return destination_sdkroot.include? sdkroot
+      return destination_sdkroot.include?(sdkroot)
     end
 
     def detect_project_profile_mapping
