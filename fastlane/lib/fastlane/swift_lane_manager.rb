@@ -43,7 +43,16 @@ module Fastlane
       finish_fastlane(nil, duration, e)
     end
 
+    def self.display_lanes
+      self.ensure_runner_built!
+      Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lanes))
+    end
+
     def self.cruise_swift_lane_in_thread(lane, parameters = nil)
+      if parameters.nil?
+        parameters = {}
+      end
+
       parameter_string = ""
       parameters.each do |key, value|
         parameter_string += " #{key} #{value}"
