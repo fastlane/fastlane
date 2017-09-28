@@ -556,7 +556,7 @@ module Spaceship
       @csrf_tokens || {}
     end
 
-    def request(method, url_or_path = nil, params = nil, headers = {}, &block)
+    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
       headers.merge!(csrf_tokens)
       headers['User-Agent'] = USER_AGENT
 
@@ -569,7 +569,11 @@ module Spaceship
         params, headers = encode_params(params, headers)
       end
 
-      response = send_request(method, url_or_path, params, headers, &block)
+      response = if auto_paginate
+                   send_request_auto_paginate(method, url_or_path, params, headers, &block)
+                 else
+                   send_request(method, url_or_path, params, headers, &block)
+                 end
 
       log_response(method, url_or_path, response)
 
@@ -698,6 +702,24 @@ module Spaceship
         end
         return response
       end
+    end
+
+    def send_request_auto_paginate(method, url_or_path, params, headers, &block)
+      response = send_request(method, url_or_path, params, headers, &block)
+      return response if response.body.nil? || response.body['data'].class != Array
+      page = response
+      loop do
+        link = page.headers['link']
+        break if link.nil?
+        link_match = link.match(/<(.*)>/)
+        break if link_match.nil?
+        rel = link_match.captures.first
+        page = send_request(method, rel, params, headers, &block)
+        break if page.body.nil? || page.body['data'].class != Array
+        response.body['data'].concat(page.body['data'])
+        break if page.headers['link'].nil? || page.headers['link'].include?('rel="next"')
+      end
+      response
     end
 
     def encode_params(params, headers)
