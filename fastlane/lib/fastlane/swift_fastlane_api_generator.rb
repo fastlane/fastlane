@@ -2,7 +2,7 @@ require 'fastlane/swift_fastlane_function.rb'
 
 module Fastlane
   class SwiftFastlaneAPIGenerator
-    attr_accessor :tools_with_option_file
+    attr_accessor :tools_option_files
     attr_accessor :action_options_to_ignore
     attr_accessor :target_output_path
 
@@ -15,7 +15,7 @@ module Fastlane
       # this is important because we need to generate the proper api for these by creating a protocol
       # with default implementation we can use in the Fastlane.swift API if people want to use
       # <Toolname>file.swift files.
-      self.tools_with_option_file = TOOLS_WITH_OPTIONS.map(&:to_s).to_set
+      self.tools_option_files = TOOL_CONFIG_FILES.map { |config_file| config_file.downcase.chomp("file") }.to_set
 
       self.action_options_to_ignore = {
 
@@ -73,6 +73,7 @@ module Fastlane
       disclaimer << "// If you have a custom #{class_name}.swift, this file will be replaced by it"
       disclaimer << "// Don't modify this file unless you are familiar with how fastlane's swift code generation works"
       disclaimer << "// *** This file will be overwritten or replaced during build time ***"
+      disclaimer << "// Generated at #{Time.now.strftime('%H:%M:%S on %m-%d-%Y')} with fastlane #{Fastlane::VERSION}"
       disclaimer << ""
       disclaimer << lanefile_implementation
       disclaimer << ""
@@ -196,7 +197,7 @@ func parseInt(fromString: String, function: String = #function) -> Int {
       end
       action_return_type = action.return_type
 
-      if self.tools_with_option_file.include?(action_name.to_s)
+      if self.tools_option_files.include?(action_name.to_s.downcase)
         tool_swift_function = ToolSwiftFunction.new(
           action_name: action_name,
           keys: keys,

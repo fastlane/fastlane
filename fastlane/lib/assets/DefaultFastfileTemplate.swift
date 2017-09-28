@@ -60,14 +60,6 @@ class Fastfile: LaneFile {
         )
     }
 
-    // For printing out the lane details when you call $fastlane lanes
-    // You'll need to annotate each lane by adding entry in recordLaneDescriptions()
-    func recordLaneDescriptions() {
-        addLaneDescription(lane: #selector(testLane), "Runs all the tests")
-        addLaneDescription(lane: #selector(betaLane), "Submit a new Beta Build to Apple TestFlight. This will also make sure the profile is up-to-date")
-        addLaneDescription(lane: #selector(releaseLane), "Deploy a new version to the App Store")
-    }
-
     // More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md
     // All available actions: https://docs.fastlane.tools/actions
 
