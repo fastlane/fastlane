@@ -24,7 +24,11 @@ module Fastlane
         updater.options[:prerelease] = true if options[:nightly]
         cleaner = Gem::CommandManager.instance[:cleanup]
 
-        sudo_needed = !File.writable?(Gem.dir)
+        gem_dir = ENV['GEM_HOME']
+        unless gem_dir
+          gem_dir = Gem.dir
+        end
+        sudo_needed = !File.writable?(gem_dir)
 
         if sudo_needed
           UI.important("It seems that your Gem directory is not writable by your current User.")
