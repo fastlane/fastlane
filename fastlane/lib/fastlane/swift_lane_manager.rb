@@ -58,7 +58,7 @@ module Fastlane
       made_project_updates = false
       file_refs_to_swap.each do |file_ref|
         expected_path_to_replacement_path_tuples.each do |preinstalled_config_relative_path, user_config_relative_path|
-          next unless file_ref.path.include?(preinstalled_config_relative_path)
+          next unless file_ref.path == preinstalled_config_relative_path
 
           file_ref.path = user_config_relative_path
           made_project_updates = true

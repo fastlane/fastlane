@@ -33,6 +33,7 @@
 		D55B28C91F6C588300DC42C5 /* Snapshotfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28C21F6C588300DC42C5 /* Snapshotfile.swift */; };
 		D5A7C48F1F7C4DAF00A91DE6 /* Appfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A7C48D1F7C4DAF00A91DE6 /* Appfile.swift */; };
 		D5A7C4901F7C4DAF00A91DE6 /* Fastfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A7C48E1F7C4DAF00A91DE6 /* Fastfile.swift */; };
+		D5BAFD121F7DAAFC0030B324 /* ArgumentProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5BAFD111F7DAAFC0030B324 /* ArgumentProcessor.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,6 +64,7 @@
 		D55B28C21F6C588300DC42C5 /* Snapshotfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Snapshotfile.swift; path = ../Snapshotfile.swift; sourceTree = "<group>"; };
 		D5A7C48D1F7C4DAF00A91DE6 /* Appfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Appfile.swift; path = ../Appfile.swift; sourceTree = "<group>"; };
 		D5A7C48E1F7C4DAF00A91DE6 /* Fastfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Fastfile.swift; path = ../Fastfile.swift; sourceTree = "<group>"; };
+		D5BAFD111F7DAAFC0030B324 /* ArgumentProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ArgumentProcessor.swift; path = ../ArgumentProcessor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -143,6 +145,7 @@
 		D512BA011F7C7F40000D2137 /* Runner Code */ = {
 			isa = PBXGroup;
 			children = (
+				D5BAFD111F7DAAFC0030B324 /* ArgumentProcessor.swift */,
 				B3BA659F1F5A269100B34850 /* main.swift */,
 				B3BA65AE1F5A2D5C00B34850 /* RunnerArgument.swift */,
 			);
@@ -234,6 +237,7 @@
 				B302067F1F5E3E9000DE6EBD /* ScanfileProtocol.swift in Sources */,
 				D55B28C51F6C588300DC42C5 /* Matchfile.swift in Sources */,
 				B30206801F5E3E9000DE6EBD /* ScreengrabfileProtocol.swift in Sources */,
+				D5BAFD121F7DAAFC0030B324 /* ArgumentProcessor.swift in Sources */,
 				B302067C1F5E3E9000DE6EBD /* GymfileProtocol.swift in Sources */,
 				B302067B1F5E3E9000DE6EBD /* SnapshotfileProtocol.swift in Sources */,
 				D55B28C31F6C588300DC42C5 /* Deliverfile.swift in Sources */,
