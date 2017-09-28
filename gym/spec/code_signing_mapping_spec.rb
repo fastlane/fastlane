@@ -41,6 +41,12 @@ describe Gym::CodeSigningMapping do
       return_value = csm.app_identifier_contains?("Ad-HocValue", "ad-hoc")
       expect(return_value).to eq(true)
     end
+
+    it "Replace the inhouse keyword for enterprise profiles" do
+      csm = Gym::CodeSigningMapping.new(project: nil)
+      return_value = csm.app_identifier_contains?("match InHouse bundle", "enterprise")
+      expect(return_value).to eq(true)
+    end
   end
 
   describe "#detect_project_profile_mapping" do
