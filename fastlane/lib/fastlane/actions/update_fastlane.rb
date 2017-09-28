@@ -24,10 +24,7 @@ module Fastlane
         updater.options[:prerelease] = true if options[:nightly]
         cleaner = Gem::CommandManager.instance[:cleanup]
 
-        gem_dir = ENV['GEM_HOME']
-        unless gem_dir
-          gem_dir = Gem.dir
-        end
+        gem_dir = ENV['GEM_HOME'] || Gem.dir
         sudo_needed = !File.writable?(gem_dir)
 
         if sudo_needed
