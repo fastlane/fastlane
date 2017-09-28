@@ -18,12 +18,21 @@ struct ArgumentProcessor {
             // short circuit
             Fastfile.loadFastfile()
             Fastfile.fastfileInstance?.recordLaneDescriptions()
+            
+            let laneNames = Fastfile.lanes
+            var lanesWithDescriptions: [String : String] = [ : ]
+            
             if let laneDescriptions = Fastfile.fastfileInstance?.laneDescriptionMapping {
                 laneDescriptions.forEach { (selector, laneDescription) in
                     let methodName = selector.description
-                    let laneName = String(methodName.characters.prefix(methodName.characters.count - 4))
-                    log(message: "lane: '\(laneName)' - \(laneDescription)")
+                    let laneName: String = String(methodName.characters.prefix(methodName.characters.count - 4))
+                    lanesWithDescriptions[laneName] = laneDescription
                 }
+            }
+            
+            laneNames.forEach { laneName, laneMethodName in
+                let laneDescription = lanesWithDescriptions[laneName] ?? "<no description given>"
+                log(message: "lane: '\(laneName)' - \(laneDescription)")
             }
             exit(0)
         }
@@ -66,7 +75,7 @@ struct ArgumentProcessor {
         let potentialTimeout = fastlaneArgsMinusLanes.filter { arg in
             return arg.name.lowercased() == "timeoutSeconds"
         }
-     
+        
         if let logModeArg = potentialLogMode.first {
             let logModeString = logModeArg.value
             Logger.logMode = Logger.LogMode(logMode: logModeString)
@@ -80,3 +89,4 @@ struct ArgumentProcessor {
         }
     }
 }
+

@@ -1,6 +1,6 @@
 //
 //  SocketClient.swift
-//  SwiftRubyRPC
+//  FastlaneSwiftRunner
 //
 //  Created by Joshua Liebowitz on 7/30/17.
 //  Copyright © 2017 Joshua Liebowitz. All rights reserved.

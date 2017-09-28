@@ -515,6 +515,10 @@ func setPodKey(useBundleExec: Bool = true, key: String, value: String, project: 
   let command = RubyCommand(commandID: "", methodName: "set_pod_key", className: nil, args: [RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec), RubyCommand.Argument(name: "key", value: key), RubyCommand.Argument(name: "value", value: value), RubyCommand.Argument(name: "project", value: project)])
   _ = runner.executeCommand(command)
 }
+func setupCircleCi(force: Bool = false) {
+  let command = RubyCommand(commandID: "", methodName: "setup_circle_ci", className: nil, args: [RubyCommand.Argument(name: "force", value: force)])
+  _ = runner.executeCommand(command)
+}
 func setupJenkins(force: Bool = false, unlockKeychain: Bool = true, addKeychainToSearchList: String = "replace", setDefaultKeychain: Bool = true, keychainPath: String? = nil, keychainPassword: String = "", setCodeSigningIdentity: Bool = true, codeSigningIdentity: String? = nil, outputDirectory: String = "./output", derivedDataPath: String = "./derivedData", resultBundle: Bool = true) {
   let command = RubyCommand(commandID: "", methodName: "setup_jenkins", className: nil, args: [RubyCommand.Argument(name: "force", value: force), RubyCommand.Argument(name: "unlock_keychain", value: unlockKeychain), RubyCommand.Argument(name: "add_keychain_to_search_list", value: addKeychainToSearchList), RubyCommand.Argument(name: "set_default_keychain", value: setDefaultKeychain), RubyCommand.Argument(name: "keychain_path", value: keychainPath), RubyCommand.Argument(name: "keychain_password", value: keychainPassword), RubyCommand.Argument(name: "set_code_signing_identity", value: setCodeSigningIdentity), RubyCommand.Argument(name: "code_signing_identity", value: codeSigningIdentity), RubyCommand.Argument(name: "output_directory", value: outputDirectory), RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath), RubyCommand.Argument(name: "result_bundle", value: resultBundle)])
   _ = runner.executeCommand(command)
@@ -635,7 +639,7 @@ func updateUrlSchemes(path: String, urlSchemes: String) {
   let command = RubyCommand(commandID: "", methodName: "update_url_schemes", className: nil, args: [RubyCommand.Argument(name: "path", value: path), RubyCommand.Argument(name: "url_schemes", value: urlSchemes)])
   _ = runner.executeCommand(command)
 }
-func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/Themoji.dSYM", apiToken: String? = nil, binaryPath: String? = nil, platform: String = "ios", dsymWorkerThreads: Int = 1) {
+func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/Themoji.dSYM.zip", apiToken: String? = nil, binaryPath: String? = nil, platform: String = "ios", dsymWorkerThreads: Int = 1) {
   let command = RubyCommand(commandID: "", methodName: "upload_symbols_to_crashlytics", className: nil, args: [RubyCommand.Argument(name: "dsym_path", value: dsymPath), RubyCommand.Argument(name: "api_token", value: apiToken), RubyCommand.Argument(name: "binary_path", value: binaryPath), RubyCommand.Argument(name: "platform", value: platform), RubyCommand.Argument(name: "dsym_worker_threads", value: dsymWorkerThreads)])
   _ = runner.executeCommand(command)
 }
