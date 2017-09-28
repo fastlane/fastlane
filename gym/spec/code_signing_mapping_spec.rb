@@ -56,7 +56,19 @@ describe Gym::CodeSigningMapping do
         workspace: workspace_path
       })
       csm = Gym::CodeSigningMapping.new(project: project)
-      expect(csm.detect_project_profile_mapping).to eq({ "family.wwdc.app" => "match AppStore family.wwdc.app" })
+      expect(csm.detect_project_profile_mapping).to eq({ "family.wwdc.app" => "match AppStore family.wwdc.app", "family.wwdc.app.watchkitapp" => "match AppStore family.wwdc.app.watchkitapp", "family.wwdc.app.watchkitapp.watchkitextension" => "match AppStore family.wwdc.app.watchkitappextension" })
+    end
+  end
+
+  describe "#detect_project_profile_mapping_for_tv_os" do
+    it "returns the mapping of the selected provisioning profiles for tv_os" do
+      workspace_path = "gym/spec/fixtures/projects/cocoapods/Example.xcworkspace"
+      project = FastlaneCore::Project.new({
+        workspace: workspace_path
+      })
+      csm = Gym::CodeSigningMapping.new(project: project)
+      Gym.config[:destination] = "generic/platform=tvOS"
+      expect(csm.detect_project_profile_mapping).to eq({ "family.wwdc.app" => "match AppStore family.wwdc.app.tvos" })
     end
   end
 
