@@ -36,7 +36,7 @@ describe Match do
         git_url,
         "master",
         [
-          "/var/folders/px/bz2kts9n69g8crgv4jpjh6b40000gn/T/d20170925-39148-1i9t5f2/something",
+          File.join(repo_dir, "something"),
           "./match/spec/fixtures/test.mobileprovision"
         ]
       )
