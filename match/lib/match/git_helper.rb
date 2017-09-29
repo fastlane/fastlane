@@ -93,6 +93,7 @@ module Match
         return if `git status`.include?("nothing to commit")
 
         Encrypt.new.encrypt_repo(path: path, git_url: git_url)
+        commands = []
 
         if files_to_commmit.count > 0 # e.g. for nuke this is treated differently
           if !File.exist?(MATCH_VERSION_FILE_NAME) || File.read(MATCH_VERSION_FILE_NAME) != Fastlane::VERSION.to_s
@@ -106,14 +107,17 @@ module Match
             files_to_commmit << readme_path
             File.write(readme_path, template)
           end
-        end
 
-        commands = []
-        if files_to_commmit.count > 0
+          # `git add` each file we want to commit
+          #   - Fixes https://github.com/fastlane/fastlane/issues/8917
+          #   - Fixes https://github.com/fastlane/fastlane/issues/8793
+          #   - Replaces, closes and fixes https://github.com/fastlane/fastlane/pull/8919
           commands += files_to_commmit.map do |current_file|
             "git add #{current_file.shellescape}"
           end
         else
+          # No specific list given, e.g. this happens on `fastlane match nuke`
+          # We just want to run `git add -A` to commit everything
           commands << "git add -A"
         end
         commands << "git commit -m #{message.shellescape}"
