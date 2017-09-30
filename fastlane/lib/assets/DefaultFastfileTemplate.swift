@@ -23,10 +23,13 @@ class Fastfile: LaneFile {
     }
 
     func testLane() {
+        desc("Runs all the tests")
         scan()
     }
 
     func betaLane() {
+        desc("Submit a new Beta Build to Apple TestFlight. This will also make sure the profile is up to date")
+
         match(gitUrl: "gitUrl", appIdentifier: [appIdentifier], username: appleID)
         // Build your app - more options available
         _ = gym([[SCHEME]])
@@ -35,6 +38,8 @@ class Fastfile: LaneFile {
     }
 
     func releaseLane() {
+        desc("Deploy a new version to the App Store")
+
         match(gitUrl: "gitUrl", type: "appstore", appIdentifier: [appIdentifier], username: appleID)
         // snapshot()
         _ = gym([[SCHEME]]) // Build your app - more options available
@@ -45,19 +50,19 @@ class Fastfile: LaneFile {
     // You can define as many lanes as you want
 
     func afterAll(currentLane: String) {
-        //This block is called, only if the executed lane was successful
-        //slack(
-        //    message: "Successfully deployed new App Update.",
-        //    slackUrl: "slackURL"
-        //)
+        // This block is called, only if the executed lane was successful
+        // slack(
+        //     message: "Successfully deployed new App Update.",
+        //     slackUrl: "slackURL"
+        // )
     }
 
     func onError(currentLane: String, errorInfo: String) {
-        slack(
-            message: errorInfo,
-            slackUrl: "slackUrl",
-            success: false
-        )
+        // slack(
+        //     message: errorInfo,
+        //     slackUrl: "slackUrl",
+        //     success: false
+        // )
     }
 
     // More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md
