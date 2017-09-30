@@ -13,30 +13,7 @@ struct ArgumentProcessor {
     let currentLane: String
     let commandTimeout: Int
     
-    init(args: [String]) {
-        if args[1].lowercased() == "lanes" {
-            // short circuit
-            Fastfile.loadFastfile()
-            Fastfile.fastfileInstance?.recordLaneDescriptions()
-            
-            let laneNames = Fastfile.lanes
-            var lanesWithDescriptions: [String : String] = [ : ]
-            
-            if let laneDescriptions = Fastfile.fastfileInstance?.laneDescriptionMapping {
-                laneDescriptions.forEach { (selector, laneDescription) in
-                    let methodName = selector.description
-                    let laneName: String = String(methodName.characters.prefix(methodName.characters.count - 4))
-                    lanesWithDescriptions[laneName] = laneDescription
-                }
-            }
-            
-            laneNames.forEach { laneName, laneMethodName in
-                let laneDescription = lanesWithDescriptions[laneName] ?? "<no description given>"
-                log(message: "lane: '\(laneName)' - \(laneDescription)")
-            }
-            exit(0)
-        }
-        
+    init(args: [String]) {        
         // Dump the first arg which is the program name
         let fastlaneArgs = stride(from: 1, to: args.count - 1, by: 2).map {
             RunnerArgument(name: args[$0], value: args[$0+1])
