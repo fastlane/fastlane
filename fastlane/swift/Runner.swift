@@ -16,6 +16,10 @@ let runner: Runner = {
     return Runner()
 }()
 
+func desc(_ laneDescription: String) {
+    // no-op, this is handled in fastlane/lane_list.rb
+}
+
 class Runner {
     fileprivate var thread: Thread!
     fileprivate var socketClient: SocketClient!
