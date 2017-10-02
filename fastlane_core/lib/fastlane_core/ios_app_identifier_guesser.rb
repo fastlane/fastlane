@@ -1,0 +1,57 @@
+module FastlaneCore
+  class IOSAppIdentifierGuesser
+    class << self
+      def guess_app_identifier_from_args(args)
+        # args example: ["-a", "com.krausefx.app", "--team_id", "5AA97AAHK2"]
+        args.each_with_index do |current, index|
+          if current == "-a" || current == "--app_identifier"
+            return args[index + 1] if args.count > index
+          end
+        end
+        nil
+      end
+
+      def guess_app_identifier_from_environment
+        ["FASTLANE", "DELIVER", "PILOT", "PRODUCE", "PEM", "SIGH", "SNAPSHOT", "MATCH"].each do |current|
+          return ENV["#{current}_APP_IDENTIFIER"] if FastlaneCore::Env.truthy?("#{current}_APP_IDENTIFIER")
+        end
+        nil
+      end
+
+      def guess_app_identifier_from_appfile
+        CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+      end
+
+      def fetch_app_identifier_from_file(file_name)
+        genericfile_options = [FastlaneCore::ConfigItem.new(key: :app_identifier)]
+        options = FastlaneCore::Configuration.create(genericfile_options, {})
+        options.load_configuration_file(file_name, proc {}, true)
+        return options[:app_identifier]
+      rescue
+        # any option/file error here should just be treated as identifier not found
+        nil
+      end
+
+      def guess_app_identifier_from_config_files
+        ["Deliverfile", "Gymfile", "Snapfile", "Matchfile"].each do |current|
+          app_identifier = self.fetch_app_identifier_from_file(current)
+          return app_identifier if app_identifier
+        end
+        nil
+      end
+
+      # make a best-guess for the app_identifier for this project, using most-reliable signals
+      #  first and then using less accurate ones afterwards; because this method only returns
+      #  a GUESS for the app_identifier, it is only useful for metrics or other places where
+      #  absolute accuracy is not required
+      def guess_app_identifier(args)
+        app_identifier = nil
+        app_identifier ||= guess_app_identifier_from_args(args)
+        app_identifier ||= guess_app_identifier_from_environment
+        app_identifier ||= guess_app_identifier_from_appfile
+        app_identifier ||= guess_app_identifier_from_config_files
+        app_identifier
+      end
+    end
+  end
+end
