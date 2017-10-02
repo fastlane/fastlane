@@ -12,13 +12,12 @@ module FastlaneCore
         # args example: ["-a", "com.krausefx.app"]
         package_name = nil
         args.each_with_index do |current, index|
-          if android_package_name_arg?(gem_name, current)
-            # argument names are followed by argument values in the args array;
-            # use [index + 1] to find the package name (range check the array
-            # to avoid array bounds errors)
-            package_name = args[index + 1] if args.count > index
-            break
-          end
+          next unless android_package_name_arg?(gem_name, current)
+          # argument names are followed by argument values in the args array;
+          # use [index + 1] to find the package name (range check the array
+          # to avoid array bounds errors)
+          package_name = args[index + 1] if args.count > index
+          break
         end
         package_name
       end

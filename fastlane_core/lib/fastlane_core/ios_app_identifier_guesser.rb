@@ -4,12 +4,11 @@ module FastlaneCore
       def guess_app_identifier_from_args(args)
         # args example: ["-a", "com.krausefx.app", "--team_id", "5AA97AAHK2"]
         args.each_with_index do |current, index|
-          if current == "-a" || current == "--app_identifier"
-            # argument names are followed by argument values in the args array;
-            # use [index + 1] to find the package name (range check the array
-            # to avoid array bounds errors)
-            return args[index + 1] if args.count > index
-          end
+          next unless current == "-a" || current == "--app_identifier"
+          # argument names are followed by argument values in the args array;
+          # use [index + 1] to find the package name (range check the array
+          # to avoid array bounds errors)
+          return args[index + 1] if args.count > index
         end
         nil
       end
