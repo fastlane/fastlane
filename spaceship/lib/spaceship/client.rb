@@ -6,6 +6,7 @@ require 'logger'
 require 'spaceship/babosa_fix'
 require 'spaceship/helper/net_http_generic_request'
 require 'spaceship/helper/plist_middleware'
+require 'spaceship/helper/rels_middleware'
 require 'spaceship/ui'
 require 'tmpdir'
 require 'cgi'
@@ -259,6 +260,7 @@ module Spaceship
         c.response :xml, content_type: /\bxml$/
         c.response :plist, content_type: /\bplist$/
         c.use :cookie_jar, jar: @cookie
+        c.use FaradayMiddleware::RelsMiddleware
         c.adapter Faraday.default_adapter
 
         if ENV['SPACESHIP_DEBUG']
@@ -706,20 +708,18 @@ module Spaceship
 
     def send_request_auto_paginate(method, url_or_path, params, headers, &block)
       response = send_request(method, url_or_path, params, headers, &block)
-      return response if response.body.nil? || response.body['data'].class != Array
-      page = response
-      loop do
-        link = page.headers['link']
-        break if link.nil?
-        link_match = link.match(/<(.*)>/)
-        break if link_match.nil?
-        rel = link_match.captures.first
-        page = send_request(method, rel, params, headers, &block)
-        break if page.body.nil? || page.body['data'].class != Array
-        response.body['data'].concat(page.body['data'])
-        break if page.headers['link'].nil? || page.headers['link'].include?('rel="next"')
+      return response unless should_process_next_rel?(response)
+      last_response = response
+      while last_response.env.rels[:next]
+        last_response = send_request(method, last_response.env.rels[:next], params, headers, &block)
+        break unless should_process_next_rel?(last_response)
+        response.body['data'].concat(last_response.body['data'])
       end
       response
+    end
+
+    def should_process_next_rel?(response)
+      response.body.kind_of?(Hash) && response.body['data'].kind_of?(Array)
     end
 
     def encode_params(params, headers)
