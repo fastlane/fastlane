@@ -69,7 +69,7 @@ module Gym
     # We do some `gsub`bing, because we can't really know the profile type, so we'll just look at the name and see if it includes
     # the export method (which it usually does, but with different notations)
     def app_identifier_contains?(str, contains)
-      return str.to_s.gsub("-", "").gsub(" ", "").downcase.include?(contains.to_s.gsub("-", "").gsub(" ", "").downcase)
+      return str.to_s.gsub("-", "").gsub(" ", "").gsub("InHouse", "enterprise").downcase.include?(contains.to_s.gsub("-", "").gsub(" ", "").downcase)
     end
 
     # Array of paths to all project files
@@ -104,6 +104,21 @@ module Gym
       return (!build_settings["TEST_TARGET_NAME"].nil? || !build_settings["TEST_HOST"].nil?)
     end
 
+    def same_platform?(sdkroot)
+      destination = Gym.config[:destination].dup
+      destination.slice!("generic/platform=")
+      destination_sdkroot = []
+      case destination
+      when "macosx"
+        destination_sdkroot = ["macosx"]
+      when "iOS"
+        destination_sdkroot = ["iphoneos", "watchos"]
+      when "tvOS"
+        destination_sdkroot = ["appletvos"]
+      end
+      return destination_sdkroot.include?(sdkroot)
+    end
+
     def detect_project_profile_mapping
       provisioning_profile_mapping = {}
       specified_configuration = Gym.config[:configuration] || Gym.project.default_build_settings(key: "CONFIGURATION")
@@ -122,9 +137,12 @@ module Gym
             target.build_configuration_list.build_configurations.each do |build_configuration|
               current = build_configuration.build_settings
               next if test_target?(current)
+              sdkroot = build_configuration.resolve_build_setting("SDKROOT")
+              next unless same_platform?(sdkroot)
               next unless specified_configuration == build_configuration.name
 
               bundle_identifier = build_configuration.resolve_build_setting("PRODUCT_BUNDLE_IDENTIFIER")
+              next unless bundle_identifier
               provisioning_profile_specifier = build_configuration.resolve_build_setting("PROVISIONING_PROFILE_SPECIFIER")
               provisioning_profile_uuid = build_configuration.resolve_build_setting("PROVISIONING_PROFILE")
 

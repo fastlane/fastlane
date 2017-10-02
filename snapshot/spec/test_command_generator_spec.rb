@@ -16,6 +16,29 @@ describe Snapshot do
       fake_out_xcode_project_loading
     end
 
+    describe '#verify_devices_share_os' do
+      before(:each) do
+        @test_command_generator = Snapshot::TestCommandGenerator.new
+      end
+      it "returns true with only iOS devices" do
+        devices = ["iPhone 8", "iPad Air 2", "iPhone X", "iPhone 8 plus"]
+        result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
+        expect(result).to be(true)
+      end
+
+      it "returns true with only Apple TV devices" do
+        devices = ["Apple TV 1080p", "Apple TV 4K", "Apple TV 4K (at 1080p)"]
+        result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
+        expect(result).to be(true)
+      end
+
+      it "returns false with mixed device OS" do
+        devices = ["Apple TV 1080p", "iPad Air 2", "iPhone 8"]
+        result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
+        expect(result).to be(false)
+      end
+    end
+
     describe '#find_device' do
       it 'finds a device that has a matching name and OS version' do
         found = Snapshot::TestCommandGenerator.find_device('iPhone 6', '9.0')

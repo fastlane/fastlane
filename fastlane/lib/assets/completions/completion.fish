@@ -34,4 +34,6 @@ for line in $commands
   end
 end
 
+set commands_string "$commands_string update_fastlane"
+
 complete -c fastlane -n '__fish_fastlane_needs_subcommand' -a (string trim $commands_string) -f
