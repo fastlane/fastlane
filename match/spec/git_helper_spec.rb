@@ -54,7 +54,7 @@ describe Match do
 
         result = Match::GitHelper.clone(git_url, shallow_clone)
         expect(File.directory?(result)).to eq(true)
-        expect(File.exist?(File.join(result, 'README.md'))).to eq(true)
+        expect(File.exist?(File.join(result, 'README.md'))).to eq(false) # because the README is being added when committing the changes now
       end
 
       it "clones the repo (not shallow)" do
@@ -76,7 +76,7 @@ describe Match do
 
         result = Match::GitHelper.clone(git_url, shallow_clone)
         expect(File.directory?(result)).to eq(true)
-        expect(File.exist?(File.join(result, 'README.md'))).to eq(true)
+        expect(File.exist?(File.join(result, 'README.md'))).to eq(false) # because the README is being added when committing the changes now
       end
 
       it "checks out a branch" do
@@ -136,7 +136,7 @@ describe Match do
         result = Match::GitHelper.clone(git_url, shallow_clone, branch: git_branch)
 
         expect(File.directory?(result)).to eq(true)
-        expect(File.exist?(File.join(result, 'README.md'))).to eq(true)
+        expect(File.exist?(File.join(result, 'README.md'))).to eq(false) # because the README is being added when committing the changes now
       end
 
       after(:each) do
