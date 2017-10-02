@@ -1,5 +1,6 @@
 module Match
   class GitHelper
+    # rubocop:disable Metrics/PerceivedComplexity
     def self.clone(git_url,
                    shallow_clone,
                    manual_password: nil,
@@ -7,7 +8,8 @@ module Match
                    branch: "master",
                    git_full_name: nil,
                    git_user_email: nil,
-                   clone_branch_directly: false)
+                   clone_branch_directly: false,
+                   disable_encryption: false)
       # Note: if you modify the parameters above, don't forget to also update the method call in
       # - runner.rb
       # - nuke.rb
@@ -46,6 +48,29 @@ module Match
         UI.user_error!("Error cloning certificates git repo, please make sure you have access to the repository - see instructions above")
       end
 
+      # if there is a encryption state marker file
+      if File.exist?(File.join(@dir, "match_crypted.txt"))
+        # repo is crypted but user requested to run match in disabled_encryption mode
+        # files cannot be read.
+        if GitHelper.encrypted?(@dir) && disable_encryption
+          remote_is_encrypted!
+        end
+
+        # repo is not crypted, but match is run with enabled encryption
+        if !GitHelper.encrypted?(@dir) && !disable_encryption
+          UI.error("Encryption enabled, but remote repository is currently decrypted.")
+          UI.error("See: https://github.com/fastlane/fastlane/pull/8919 for details on how to convert your existing repository")
+          UI.user_error!("remote_decrypted")
+        end
+      else
+        # existing repo has `match_version.txt` - but no encryption state marker but unencrypted request
+        if File.exist?(File.join(@dir, "match_version.txt")) && disable_encryption
+          UI.error("You requested to disable encryption on a repo that is not up-to-date")
+          UI.error("Please run match atleast once with the current version")
+          remote_is_encrypted!
+        end
+      end
+
       add_user_config(git_full_name, git_user_email)
 
       UI.user_error!("Error cloning repo, make sure you have access to it '#{git_url}'") unless File.directory?(@dir)
@@ -63,9 +88,16 @@ module Match
       end
 
       copy_readme(@dir) unless skip_docs
-      Encrypt.new.decrypt_repo(path: @dir, git_url: git_url, manual_password: manual_password)
+      Encrypt.new.decrypt_repo(path: @dir, git_url: git_url, manual_password: manual_password, disable_encryption: disable_encryption)
 
       return @dir
+    end
+    # rubocop:enable Metrics/PerceivedComplexity
+
+    def self.remote_is_encrypted!
+      UI.error("Encryption disabled, but remote repository is currently encrypted.")
+      UI.error("See: https://github.com/fastlane/fastlane/pull/8919 for details on how to convert your existing repository")
+      UI.user_error!("remote_encrypted")
     end
 
     def self.generate_commit_message(params)
@@ -79,6 +111,19 @@ module Match
       ].join(" ")
     end
 
+    def self.encrypted?(workspace)
+      path = File.join(workspace, "match_crypted.txt")
+      # if file does not exist -> return true (default match behaviour)
+      return true unless File.exist?(path)
+      is_crypted = File.read(path).chomp
+      # if "true" it is crypted
+      if is_crypted.to_s == "true"
+        return true
+      else
+        return false
+      end
+    end
+
     def self.match_version(workspace)
       path = File.join(workspace, "match_version.txt")
       if File.exist?(path)
@@ -86,12 +131,14 @@ module Match
       end
     end
 
-    def self.commit_changes(path, message, git_url, branch = "master")
+    def self.commit_changes(path, message, git_url, branch = "master", disable_encryption = false)
       Dir.chdir(path) do
         return if `git status`.include?("nothing to commit")
 
-        Encrypt.new.encrypt_repo(path: path, git_url: git_url)
+        Encrypt.new.encrypt_repo(path: path, git_url: git_url, disable_encryption: disable_encryption)
         File.write("match_version.txt", Fastlane::VERSION) # unencrypted
+        # store the state of encryption
+        File.write("match_crypted.txt", (!disable_encryption).to_s)
 
         commands = []
         commands << "git add -A"

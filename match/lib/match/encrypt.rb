@@ -40,7 +40,11 @@ module Match
       Security::InternetPassword.delete(server: server_name(git_url))
     end
 
-    def encrypt_repo(path: nil, git_url: nil)
+    def encrypt_repo(path: nil, git_url: nil, disable_encryption: false)
+      if disable_encryption
+        no_encryption_note
+        return
+      end
       iterate(path) do |current|
         crypt(path: current,
           password: password(git_url),
@@ -50,7 +54,17 @@ module Match
       UI.success "🔒  Successfully encrypted certificates repo"
     end
 
-    def decrypt_repo(path: nil, git_url: nil, manual_password: nil)
+    def no_encryption_note
+      UI.important "You request to disable encryption"
+      UI.important "this is strongly discouraged - beware that your certificates including keys, and your profiles"
+      UI.important "are not encrypted - be sure to keep your git repository safe and non-public"
+    end
+
+    def decrypt_repo(path: nil, git_url: nil, manual_password: nil, disable_encryption: false)
+      if disable_encryption
+        no_encryption_note
+        return
+      end
       iterate(path) do |current|
         begin
           crypt(path: current,

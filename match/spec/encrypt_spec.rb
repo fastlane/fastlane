@@ -12,6 +12,25 @@ describe Match do
       @e = Match::Encrypt.new
     end
 
+    it "allows to disable encryption" do
+      @e = Match::Encrypt.new
+
+      expect(@e).to receive(:no_encryption_note).exactly(2).times
+
+      @e.encrypt_repo(path: @directory, git_url: @git_url, disable_encryption: true)
+      expect(File.read(@full_path)).to eq(@content)
+
+      @e.decrypt_repo(path: @directory, git_url: @git_url, disable_encryption: true)
+      expect(File.read(@full_path)).to eq(@content)
+    end
+
+    it "raises no exception if no password is supplied" do
+      ENV["MATCH_PASSWORD"] = ""
+      expect do
+        @e.encrypt_repo(path: @directory, git_url: @git_url, disable_encryption: true)
+      end.to_not raise_error
+    end
+
     it "encrypt" do
       @e = Match::Encrypt.new
       @e.encrypt_repo(path: @directory, git_url: @git_url)

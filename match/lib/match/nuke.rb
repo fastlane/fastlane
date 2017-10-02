@@ -17,7 +17,8 @@ module Match
                                            branch: params[:git_branch],
                                            git_full_name: params[:git_full_name],
                                            git_user_email: params[:git_user_email],
-                                           clone_branch_directly: params[:clone_branch_directly])
+                                           clone_branch_directly: params[:clone_branch_directly],
+                                           disable_encryption: params[:disable_encryption])
 
       had_app_identifier = self.params.fetch(:app_identifier, ask: false)
       self.params[:app_identifier] = '' # we don't really need a value here
@@ -157,7 +158,7 @@ module Match
 
       # Now we need to commit and push all this too
       message = ["[fastlane]", "Nuked", "files", "for", type.to_s].join(" ")
-      GitHelper.commit_changes(params[:workspace], message, self.params[:git_url], params[:git_branch])
+      GitHelper.commit_changes(params[:workspace], message, self.params[:git_url], params[:git_branch], params[:disable_encryption])
     end
 
     private
