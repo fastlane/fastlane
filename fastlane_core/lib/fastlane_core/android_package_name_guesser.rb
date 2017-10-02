@@ -44,7 +44,7 @@ module FastlaneCore
         # 3rd parameter "true" disables the printout of the contents of the
         # configuration file, which is noisy and confusing in this case
         options.load_configuration_file(file_name, proc {}, true)
-        return options[package_name_key]
+        return options.fetch(package_name_key, ask: false)
       rescue
         # any option/file error here should just be treated as identifier not found
         nil
