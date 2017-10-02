@@ -2,6 +2,8 @@ require 'excon'
 require 'digest'
 
 require 'fastlane_core/update_checker/changelog'
+require 'fastlane_core/ios_app_identifier_guesser'
+require 'fastlane_core/android_package_name_guesser'
 
 module FastlaneCore
   # Verifies, the user runs the latest version of this gem
@@ -121,18 +123,7 @@ module FastlaneCore
 
     # (optional) Returns the app identifier for the current tool
     def self.ios_app_identifier(args)
-      # args example: ["-a", "com.krausefx.app", "--team_id", "5AA97AAHK2"]
-      args.each_with_index do |current, index|
-        if current == "-a" || current == "--app_identifier"
-          return args[index + 1] if args.count > index
-        end
-      end
-
-      ["FASTLANE", "DELIVER", "PILOT", "PRODUCE", "PEM", "SIGH", "SNAPSHOT", "MATCH"].each do |current|
-        return ENV["#{current}_APP_IDENTIFIER"] if FastlaneCore::Env.truthy?("#{current}_APP_IDENTIFIER")
-      end
-
-      return CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+      return FastlaneCore::IOSAppIdentifierGuesser.guess_app_identifier(args)
     rescue
       nil # we don't want this method to cause a crash
     end
@@ -143,30 +134,12 @@ module FastlaneCore
     #   fastlane supply --skip_upload_screenshots -a beta -p com.test.app should return com.test.app
     #   screengrab -a com.test.app should return com.test.app
     def self.android_app_identifier(args, gem_name)
-      app_identifier = nil
-      # args example: ["-a", "com.krausefx.app"]
-      args.each_with_index do |current, index|
-        if android_app_identifier_arg?(gem_name, current)
-          app_identifier = args[index + 1] if args.count > index
-          break
-        end
-      end
-
-      app_identifier ||= ENV["SUPPLY_PACKAGE_NAME"] if FastlaneCore::Env.truthy?("SUPPLY_PACKAGE_NAME")
-      app_identifier ||= ENV["SCREENGRAB_APP_PACKAGE_NAME"] if FastlaneCore::Env.truthy?("SCREENGRAB_APP_PACKAGE_NAME")
-      app_identifier ||= CredentialsManager::AppfileConfig.try_fetch_value(:package_name)
+      app_identifier = FastlaneCore::AndroidPackageNameGuesser.guess_package_name(gem_name, args)
 
       # Add Android prefix to prevent collisions if there is an iOS app with the same identifier
       app_identifier ? "android_project_#{app_identifier}" : nil
     rescue
       nil # we don't want this method to cause a crash
-    end
-
-    def self.android_app_identifier_arg?(gem_name, arg)
-      return arg == "--package_name" ||
-             arg == "--app_package_name" ||
-             (arg == '-p' && gem_name == 'supply') ||
-             (arg == '-a' && gem_name == 'screengrab')
     end
 
     # To not count the same projects multiple time for the number of launches
