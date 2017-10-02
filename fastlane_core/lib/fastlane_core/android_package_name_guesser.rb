@@ -34,8 +34,15 @@ module FastlaneCore
       end
 
       def fetch_package_name_from_file(file_name, package_name_key)
+        # we only care about the package name item in the configuration file, so
+        # build an options array & Configuration with just that one key and it will
+        # be fetched if it is present in the config file
         genericfile_options = [FastlaneCore::ConfigItem.new(key: package_name_key)]
         options = FastlaneCore::Configuration.create(genericfile_options, {})
+        # pass the empty proc to disable options validation, otherwise this will fail
+        # when the other (non-package name) keys are encountered in the config file;
+        # 3rd parameter "true" disables the printout of the contents of the
+        # configuration file, which is noisy and confusing in this case
         options.load_configuration_file(file_name, proc {}, true)
         return options[package_name_key]
       rescue

@@ -25,8 +25,15 @@ module FastlaneCore
       end
 
       def fetch_app_identifier_from_file(file_name)
+        # we only care about the app_identifier item in the configuration file, so
+        # build an options array & Configuration with just that one key and it will
+        # be fetched if it is present in the config file
         genericfile_options = [FastlaneCore::ConfigItem.new(key: :app_identifier)]
         options = FastlaneCore::Configuration.create(genericfile_options, {})
+        # pass the empty proc to disable options validation, otherwise this will fail
+        # when the other (non-app_identifier) keys are encountered in the config file;
+        # 3rd parameter "true" disables the printout of the contents of the
+        # configuration file, which is noisy and confusing in this case
         options.load_configuration_file(file_name, proc {}, true)
         return options[:app_identifier]
       rescue
