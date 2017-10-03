@@ -71,7 +71,7 @@ module Fastlane
 
       def self.details
         [
-          "This action will validate the session cookie for 'Two-Step verification for Apple ID'"
+          "This action will validate the session cookie for 'Two-Step verification for Apple ID'",
           "and display the remaining days until an expiration date."
         ].join(' ')
       end
