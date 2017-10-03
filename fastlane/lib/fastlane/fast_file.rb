@@ -246,22 +246,25 @@ module Fastlane
             UI.message "Fetching remote git tags..."
             Actions.sh(clone_tags_command)
 
-            #Remove optimistic operator from verion
+            #Separate version from optimistic operator
             splitVersion = version.split(" ")
             versionNumber = splitVersion.last
             operator = splitVersion.first
 
-            #All git tags
+            #Fetch all possible tags
             git_tags_string = Actions.sh("cd '#{clone_folder}' && git tag -l")
             git_tags = git_tags_string.split("\n")
 
+            #Delete tags that are not a real version number
             git_tags.delete_if { |version|
               Gem::Version.correct?(version) != 0
             }
             
+            #Sort tags based on their version number
             git_tags.sort_by{ |version| Gem::Version.new(version) }
-            #TODO filter real version numbers + sort
 
+            #~> should select the latest version withing constraints.
+            #-> should select a specific version without fallback.
             if operator == "~>" 
               #Drop last specified digit in version
               lastDotIndex = versionNumber.rindex('.')
@@ -273,8 +276,8 @@ module Fastlane
               end
 
               checkout_param = matchingGitTags.last
-            elsif operator == "->" || splitVersion.count == 1
 
+            elsif operator == "->" || splitVersion.count == 1
               #Search matching version in array
               matchingGitTags = git_tags.select do |version|
                 version == versionNumber
