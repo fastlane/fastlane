@@ -13,7 +13,7 @@
   },
   "primary_target": {
     "name": "status",
-    "detail": "success"
+    "detail": "user_error"
   },
   "millis_since_epoch": 1507043076,
   "version": 1
