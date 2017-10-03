@@ -276,7 +276,7 @@ module Fastlane
               end
 
               UI.user_error!("No version found within the \"#{versionRange}.*\" range") if matchingGitTags.count == 0
-              UI.user_error!("Specified version \"#{versionNumber}\" is to high. Latest version within this range is: \"#{matchingGitTags.last}\" range") if Gem::Version.new(matchingGitTags.last) < Gem::Version.new(versionNumber)
+              UI.user_error!("Specified version \"#{versionNumber}\" is to high. Latest version within this range is: \"#{matchingGitTags.last}\"") if Gem::Version.new(matchingGitTags.last) < Gem::Version.new(versionNumber)
               checkout_param = matchingGitTags.last
 
             elsif operator == "->" || splitVersion.count == 1
