@@ -7,7 +7,8 @@ module Fastlane
         begin
           Spaceship::Tunes.login(user)
         rescue Spaceship::Client::InvalidUserCredentialsError => e
-          UI.user_error!(e.preferred_error_info)
+          # Invalid username and password combination
+          UI.user_error!(e.message)
         rescue
           UI.user_error!('Your session cookie has been expired.')
         end
@@ -37,25 +38,24 @@ module Fastlane
       end
 
       def self.check_expiration_time(cookie)
-        return unless cookie
         cookie.each do |content|
           next unless content.domain == 'idmsa.apple.com' && content.max_age.to_s.length > 0
           next unless content.created_at.to_s =~ /([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/
-          year = Regexp.last_match(1)
-          month = Regexp.last_match(2)
-          day = Regexp.last_match(3)
-          hour = Regexp.last_match(4)
-          min = Regexp.last_match(5)
-          sec = Regexp.last_match(6)
+          year = Regexp.last_match(1).to_i
+          month = Regexp.last_match(2).to_i
+          day = Regexp.last_match(3).to_i
+          hour = Regexp.last_match(4).to_i
+          min = Regexp.last_match(5).to_i
+          sec = Regexp.last_match(6).to_i
 
-          created_date = DateTime.new(year.to_i, month.to_i, day.to_i, hour.to_i, min.to_i, sec.to_i)
-          expire_date = created_date + Rational(content.max_age, 24 * 60 * 60)
-          remain = (expire_date - DateTime.now).to_i
+          created_date = DateTime.new(year, month, day, hour, min, sec)
+          expiration_date = created_date + Rational(content.max_age, 24 * 60 * 60)
+          remaining_days = (expiration_date - DateTime.now).to_i
 
-          if remain > 0
-            UI.important("Your session cookie will expire at #{expire_date.strftime('%Y-%m-%d %H:%M:%S')} (#{remain} days left).")
+          if remaining_days > 0
+            UI.important("Your session cookie will expire at #{expiration_date.strftime('%Y-%m-%d %H:%M:%S')} (#{remaining_days} days left).")
           else
-            UI.error("Your session cookie is due to expire today!") if remain == 0
+            UI.error("Your session cookie is due to expire today!")
           end
           break
         end
@@ -70,7 +70,10 @@ module Fastlane
       end
 
       def self.details
-        "Verifies the session cookie for 'Two-Step verification for Apple ID'"
+        [
+          "This action will validate the session cookie for 'Two-Step verification for Apple ID'"
+          "and display the remaining days by expiration date."
+        ].join(' ')
       end
 
       def self.available_options
