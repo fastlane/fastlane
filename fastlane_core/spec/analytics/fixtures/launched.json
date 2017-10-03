@@ -1,5 +1,4 @@
 [
-  // launched
   {
     "event_source": {
       "oauth_app_name": "fastlane",
@@ -20,7 +19,6 @@
     "millis_since_epoch": 1507043076,
     "version": 1
   },
-  // install method
   {
     "event_source": {
       "oauth_app_name": "fastlane",
@@ -41,7 +39,6 @@
     "millis_since_epoch": 1507043076,
     "version": 1
   },
-  // operating system
   {
     "event_source": {
       "oauth_app_name": "fastlane",
@@ -66,7 +63,6 @@
     "millis_since_epoch": 1507043076,
     "version": 1
   },
-  // IDE version (Android Studio or Xcode version)
   {
     "event_source": {
       "oauth_app_name": "fastlane",
@@ -87,7 +83,6 @@
     "millis_since_epoch": 1507043076,
     "version": 1
   },
-  // CI
   {
     "event_source": {
       "oauth_app_name": "fastlane",
@@ -108,7 +103,6 @@
     "millis_since_epoch": 1507043076,
     "version": 1
   },
-  // using a Fastfile (include FastfileID if from web onboarding)
   {
     "event_source": {
       "oauth_app_name": "fastlane",
@@ -133,7 +127,6 @@
     "millis_since_epoch": 1507043076,
     "version": 1
   },
-  // iOS or Android
   {
     "event_source": {
       "oauth_app_name": "fastlane",
@@ -154,7 +147,6 @@
     "millis_since_epoch": 1507043076,
     "version": 1
   },
-  // ruby version
   {
     "event_source": {
       "oauth_app_name": "fastlane",
