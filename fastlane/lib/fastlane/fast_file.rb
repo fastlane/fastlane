@@ -228,6 +228,7 @@ module Fastlane
 
         # Checkout the repo
         repo_name = url.split("/").last
+        checkout_param = branch
 
         Dir.mktmpdir("fl_clone") do |tmp_path|
           clone_folder = File.join(tmp_path, repo_name)
@@ -246,28 +247,54 @@ module Fastlane
             Actions.sh(clone_tags_command)
 
             #Remove optimistic operator from verion
-            versionNumber = version.split(" ").last
+            splitVersion = version.split(" ")
+            versionNumber = splitVersion.last
+            operator = splitVersion.first
 
-            #Drop last specified digit in version
-            lastDotIndex = versionNumber.rindex('.') #
-            versionRange = versionNumber[0..lastDotIndex-1]
+            #All git tags
+            git_tags_string = Actions.sh("cd '#{clone_folder}' && git tag -l")
+            git_tags = git_tags_string.split("\n")
 
-            #Search matching version in repo
-            matchingVersionsString = Actions.sh("cd '#{clone_folder}' && git tag -l '#{versionRange}.*'")
-            matchinVersionsArray = matchingVersionsString.split("\n")
-            lastMatchingTag = matchinVersionsArray.last
+            git_tags.delete_if { |version|
+              Gem::Version.correct?(version) != 0
+            }
+            
+            git_tags.sort_by{ |version| Gem::Version.new(version) }
+            #TODO filter real version numbers + sort
 
-            Actions.sh("cd '#{clone_folder}' && git checkout #{lastMatchingTag} '#{path}'")
-          elsif
-            Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
+            if operator == "~>" 
+              #Drop last specified digit in version
+              lastDotIndex = versionNumber.rindex('.')
+              versionRange = versionNumber[0..lastDotIndex-1]
+
+              #Search matching version in array
+              matchingGitTags = git_tags.select do |version|
+                version.start_with?(versionRange)
+              end
+
+              checkout_param = matchingGitTags.last
+            elsif operator == "->" || splitVersion.count == 1
+
+              #Search matching version in array
+              matchingGitTags = git_tags.select do |version|
+                version == versionNumber
+              end
+
+              UI.user_error!("The specified version \"#{versionNumber}\" doesn't exist") if matchingGitTags.count == 0
+              checkout_param = matchingGitTags.last
+            else
+              UI.user_error!("The specified operator \"#{operator}\" in \"#{version}\" is unknown. Please use one of these '~> ->'")
+            end
           end
+            
+          Actions.sh("cd '#{clone_folder}' && git checkout #{checkout_param} '#{path}'")
 
           # We also want to check out all the local actions of this fastlane setup
           containing = path.split(File::SEPARATOR)[0..-2]
           containing = "." if containing.count == 0
           actions_folder = File.join(containing, "actions")
           begin
-            Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{actions_folder}'")
+            Actions.sh("cd '#{clone_folder}' && git checkout #{checkout_param} '#{actions_folder}'")
           rescue
             # We don't care about a failure here, as local actions are optional
           end
