@@ -1,5 +1,5 @@
 module FastlaneCore
-  class ActionLaunchContext
+  class ActionLaunchContext < AnalyticContext
     attr_accessor :action_name
     attr_accessor :fastlane_version
     attr_accessor :install_method
