@@ -275,6 +275,7 @@ module Fastlane
                 version.start_with?(versionRange)
               end
 
+              UI.user_error!("No version found within the \"#{versionRange}.*\" range") if matchingGitTags.count == 0
               checkout_param = matchingGitTags.last
 
             elsif operator == "->" || splitVersion.count == 1
