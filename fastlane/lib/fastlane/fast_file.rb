@@ -233,18 +233,14 @@ module Fastlane
         Dir.mktmpdir("fl_clone") do |tmp_path|
           clone_folder = File.join(tmp_path, repo_name)
 
-          branch_option = ""
           branch_option = "--branch #{branch}" if branch != 'HEAD'
 
-          clone_command = "GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
-
           UI.message "Cloning remote git repo..."
-          Actions.sh(clone_command)
+          Actions.sh("GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}")
 
           if version != nil
-            clone_tags_command = "cd '#{clone_folder}' && GIT_TERMINAL_PROMPT=0 git fetch --all --tags"
             UI.message "Fetching remote git tags..."
-            Actions.sh(clone_tags_command)
+            Actions.sh("cd '#{clone_folder}' && GIT_TERMINAL_PROMPT=0 git fetch --all --tags -q")
 
             #Separate version from optimistic operator
             splitVersion = version.split(" ")
