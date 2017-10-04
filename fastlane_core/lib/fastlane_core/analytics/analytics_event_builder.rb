@@ -115,14 +115,11 @@ module FastlaneCore
       return platform_event
     end
 
-    def ruby_version_launched_event(ruby_version: nil, timestamp: nil)
-      ruby_version_event = base_launch_hash.dup
-      ruby_version_event[:primary_target] = {
-        name: 'ruby_version',
-        detail: ruby_version
-      }
-      ruby_version_event[:millis_since_epoch] = timestamp
-      return ruby_version_event
+    def new_event(event_key: nil, event_dictionary: nil, timestamp_millis: nil)
+      event = base_launch_hash.dup
+      event[event_key] = event_dictionary
+      event[:millis_since_epoch] = timestamp_millis
+      return event
     end
 
     def completed_event(status: nil, timestamp: nil)

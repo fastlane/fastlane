@@ -58,9 +58,15 @@ module FastlaneCore
         timestamp: timestamp_millis
       )
 
-      ruby_version_event = builder.ruby_version_launched_event(
-        ruby_version: action_launched_context.ruby_version,
-        timestamp: timestamp_millis
+      ruby_version_details = {
+        name: 'ruby_version',
+        detail: action_launched_context.ruby_version
+      }
+
+      ruby_version_event = builder.new_event(
+        event_key: :primary_target,
+        event_dictionary: ruby_version_details,
+        timestamp_millis: timestamp_millis
       )
 
       return events + [
