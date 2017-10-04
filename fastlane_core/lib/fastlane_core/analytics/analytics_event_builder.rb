@@ -48,6 +48,8 @@ module FastlaneCore
     end
 
     def completed_event(status: nil, timestamp: nil)
+      raise 'Need timestamp_millis' if timestamp_millis.nil?
+      raise 'Need status for completion' if status.nil?
       completed_event = base_completion_hash.dup
       completed_event[:primary_target] = {
         name: 'status',
