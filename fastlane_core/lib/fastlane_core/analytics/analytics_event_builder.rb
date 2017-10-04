@@ -12,29 +12,28 @@ module FastlaneCore
           name: p_hash,
           detail: session_id
         },
+        timestamp_millis: Time.now.to_i * 1000,
         version: 1
       }
     end
 
-    def launched_event(primary_target_hash: nil, secondary_target_hash: nil, timestamp_millis: nil)
+    def launched_event(primary_target_hash: nil, secondary_target_hash: nil)
       return new_event(
         stage: 'launched',
         primary_target_hash: primary_target_hash,
-        secondary_target_hash: secondary_target_hash,
-        timestamp_millis: timestamp_millis
+        secondary_target_hash: secondary_target_hash
       )
     end
 
-    def completed_event(primary_target_hash: nil, secondary_target_hash: nil, timestamp_millis: nil)
+    def completed_event(primary_target_hash: nil, secondary_target_hash: nil)
       return new_event(
         stage: 'completed',
         primary_target_hash: primary_target_hash,
-        secondary_target_hash: secondary_target_hash,
-        timestamp_millis: timestamp_millis
+        secondary_target_hash: secondary_target_hash
       )
     end
 
-    def new_event(stage: nil, primary_target_hash: nil, secondary_target_hash: nil, timestamp_millis: nil)
+    def new_event(stage: nil, primary_target_hash: nil, secondary_target_hash: nil)
       raise 'Need timestamp_millis' if timestamp_millis.nil?
       raise 'Need at least a primary_target_hash' if primary_target_hash.nil?
       event = base_hash.dup
@@ -44,7 +43,6 @@ module FastlaneCore
       }
       event[:primary_target] = primary_target_hash
       event[:secondary_target] = secondary_target_hash unless secondary_target_hash.nil?
-      event[:millis_since_epoch] = timestamp_millis
       return event
     end
   end
