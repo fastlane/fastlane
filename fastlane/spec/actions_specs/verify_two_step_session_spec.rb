@@ -21,15 +21,28 @@ describe Fastlane do
       end
 
       describe '#check_expiration_time' do
+        let(:expect_date) do
+          expect_jst = Time.new("2017", "11", "02", "13", "14", "27", "+09:00")
+          utc_offset = Time.new.strftime('%:z')
+          expect_jst.getlocal(utc_offset).to_s
+        end
+
         before do
-          ENV['TZ'] = 'Asia/Tokyo'
           allow(Spaceship::Tunes).to receive(:login).and_return(true)
           allow(FastlaneCore::UI).to receive(:success)
           date = Time.new(2017, 10, 3, 1, 23, 45, '+09:00').utc
           allow(Time).to receive(:now).and_return(date)
         end
 
+        # create: 2017-09-21 13:14:27 +09:00
+        # expire: 2017-10-21 09:35:31 +09:00
+        # now   : 2017-10-30 10:23:45 +09:00
         context 'when loading cookie from environment variables' do
+          let(:expect_date) do
+            expect_jst = Time.new("2017", "10", "21", "9", "35", "31", "+09:00")
+            utc_offset = Time.new.strftime('%:z')
+            expect_jst.getlocal(utc_offset).to_s
+          end
           it 'displays the expiration date and the remaining day.' do
             cookie = YAML.safe_load(
               File.read('fastlane/spec/fixtures/actions/cookie_env').gsub("\\n", "\n"),
@@ -37,11 +50,14 @@ describe Fastlane do
               [],
               true
             )
-            expect(FastlaneCore::UI).to receive(:important).with(/expire at 2017-10-21 09:35:31 \+0900 \(18 days left\)./)
+            expect(FastlaneCore::UI).to receive(:important).with("Your session cookie will expire at #{expect_date} (18 days left).")
             Fastlane::Actions::VerifyTwoStepSessionAction.check_expiration_time(cookie)
           end
         end
 
+        # create: 2017-10-03 13:14:27 +09:00
+        # expire: 2017-11-02 13:14:27 +09:00
+        # now   : 2017-10-30 10:23:45 +09:00
         context 'when loading cookie from file' do
           it 'displays the expiration date and the remaining day.' do
             cookie = YAML.safe_load(
@@ -50,7 +66,7 @@ describe Fastlane do
               [],
               true
             )
-            expect(FastlaneCore::UI).to receive(:important).with(/expire at 2017-11-02 13:14:27 \+0900 \(30 days left\)./)
+            expect(FastlaneCore::UI).to receive(:important).with("Your session cookie will expire at #{expect_date} (30 days left).")
             Fastlane::Actions::VerifyTwoStepSessionAction.check_expiration_time(cookie)
           end
         end
@@ -71,7 +87,7 @@ describe Fastlane do
               true
             )
 
-            expect(FastlaneCore::UI).to receive(:important).with(/expire at 2017-11-02 13:14:27 \+0900 \(3 days left\)./)
+            expect(FastlaneCore::UI).to receive(:important).with("Your session cookie will expire at #{expect_date} (3 days left).")
             Fastlane::Actions::VerifyTwoStepSessionAction.check_expiration_time(cookie)
           end
         end
@@ -92,7 +108,7 @@ describe Fastlane do
               true
             )
 
-            expect(FastlaneCore::UI).to receive(:important).with(/expire at 2017-11-02 13:14:27 \+0900 \(2 hours left\)./)
+            expect(FastlaneCore::UI).to receive(:important).with("Your session cookie will expire at #{expect_date} (2 hours left).")
             expect(FastlaneCore::UI).to receive(:error).with("Your session cookie is due to expire today!")
             Fastlane::Actions::VerifyTwoStepSessionAction.check_expiration_time(cookie)
           end
