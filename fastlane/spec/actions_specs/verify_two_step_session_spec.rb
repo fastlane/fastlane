@@ -1,4 +1,3 @@
-ENV['TZ'] = 'America/Los_Angeles'
 describe Fastlane do
   describe Fastlane::FastFile do
     describe 'VerifyTwoStepSessionAction' do
