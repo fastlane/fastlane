@@ -59,6 +59,7 @@ module FastlaneCore
         app_identifier ||= guess_app_identifier_from_environment
         app_identifier ||= guess_app_identifier_from_appfile
         app_identifier ||= guess_app_identifier_from_config_files
+
         app_identifier
       end
     end

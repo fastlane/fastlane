@@ -60,6 +60,9 @@ module Commander
           FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_RELEASE}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
         end
 
+        # TODO: here's where we can get the p_hash
+        # p_hash = FastlaneCore::AppIdentifierGuesser.p_hash(args: ARGV)
+
         collector.did_launch_action(@program[:name])
         run_active_command
       rescue InvalidCommandError => e
