@@ -63,7 +63,7 @@ module FastlaneCore
         timestamp: timestamp_millis
       )
 
-      events += [
+      return events + [
         version_event,
         install_method_event,
         os_version_event,
@@ -82,7 +82,7 @@ module FastlaneCore
         session_id: session.session_id,
         action_name: completion_context.action_name
       )
-      events += builder.completed_event(
+      return events + builder.completed_event(
         status: completion_context.status,
         timestamp: Time.now.to_i * 1000
       )
@@ -91,6 +91,5 @@ module FastlaneCore
     def finalize_session
       client.post_events(events)
     end
-
   end
 end

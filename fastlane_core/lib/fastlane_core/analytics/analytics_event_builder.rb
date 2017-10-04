@@ -1,6 +1,5 @@
 module FastlaneCore
   class AnalyticsEventBuilder
-
     attr_accessor :base_launch_hash
     attr_accessor :base_completion_hash
 
@@ -17,7 +16,7 @@ module FastlaneCore
         action: {
           name: 'launched',
           detail: action_name
-        }
+        },
         version: 1
       }
 
@@ -33,7 +32,7 @@ module FastlaneCore
         action: {
           name: 'completed',
           detail: action_name
-        }
+        },
         version: 1
       }
     end
