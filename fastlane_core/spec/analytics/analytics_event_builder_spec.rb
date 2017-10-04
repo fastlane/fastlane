@@ -5,15 +5,18 @@ describe FastlaneCore::AnalyticsEventBuilder do
   let(:action_name) { 'some_action' }
   let(:timestamp_millis) { 1_507_142_046_000 }
 
+  let(:builder) do
+    FastlaneCore::AnalyticsEventBuilder.new(
+      oauth_app_name: oauth_app_name,
+      p_hash: p_hash,
+      session_id: session_id,
+      action_name: action_name,
+      timestamp_millis: timestamp_millis
+    )
+  end
+
   context '#launched_event' do
     it 'creates a new launched event with primary target' do
-      builder = FastlaneCore::AnalyticsEventBuilder.new(
-        oauth_app_name: oauth_app_name,
-        p_hash: p_hash,
-        session_id: session_id,
-        action_name: action_name,
-        timestamp_millis: timestamp_millis
-      )
       event = builder.launched_event(
         primary_target_hash: {
           name: 'primary target name',
@@ -45,13 +48,6 @@ describe FastlaneCore::AnalyticsEventBuilder do
     end
 
     it 'creates a new launched event with primary and secondary targets' do
-      builder = FastlaneCore::AnalyticsEventBuilder.new(
-        oauth_app_name: oauth_app_name,
-        p_hash: p_hash,
-        session_id: session_id,
-        action_name: action_name,
-        timestamp_millis: timestamp_millis
-      )
       event = builder.launched_event(
         primary_target_hash: {
           name: 'primary target name',
@@ -83,6 +79,39 @@ describe FastlaneCore::AnalyticsEventBuilder do
           secondary_target: {
             name: 'secondary target name',
             detail: 'secondary target detail'
+          },
+          timestamp_millis: timestamp_millis,
+          version: 1
+        }
+      )
+    end
+  end
+
+  context '#completed_event' do
+    it 'creates a completed_event with a primary target' do
+      event = builder.completed_event(
+        primary_target_hash: {
+          name: 'primary target name',
+          detail: 'primary target detail'
+        }
+      )
+      expect(event).to eq(
+        {
+          event_source: {
+            oauth_app_name: oauth_app_name,
+            product: 'fastlane'
+          },
+          actor: {
+            name: p_hash,
+            detail: session_id
+          },
+          action: {
+            name: 'completed',
+            detail: action_name
+          },
+          primary_target: {
+            name: 'primary target name',
+            detail: 'primary target detail'
           },
           timestamp_millis: timestamp_millis,
           version: 1

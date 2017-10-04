@@ -21,8 +21,7 @@ module FastlaneCore
         oauth_app_name: oauth_app_name,
         p_hash: p_hash,
         session_id: session_id,
-        action_name: action_launched_context.action_name,
-        timestamp_millis: Time.now.to_i * 1000
+        action_name: action_launched_context.action_name
       )
 
       version_event = builder.launched_event(
@@ -106,8 +105,7 @@ module FastlaneCore
         oauth_app_name: oauth_app_name,
         p_hash: p_hash,
         session_id: session_id,
-        action_name: completion_context.action_name,
-        timestamp_millis: Time.now.to_i * 1000
+        action_name: completion_context.action_name
       )
       return events + builder.completed_event(
         primary_target_hash: {

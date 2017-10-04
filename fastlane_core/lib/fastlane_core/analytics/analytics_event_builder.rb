@@ -3,7 +3,7 @@ module FastlaneCore
     attr_accessor :base_hash
     attr_accessor :action_name
 
-    def initialize(oauth_app_name: nil, p_hash: nil, session_id: nil, action_name: nil, timestamp_millis: nil)
+    def initialize(oauth_app_name: nil, p_hash: nil, session_id: nil, action_name: nil, timestamp_millis: Time.now.to_i * 1000)
       @action_name = action_name
       @base_hash = {
         event_source: {
