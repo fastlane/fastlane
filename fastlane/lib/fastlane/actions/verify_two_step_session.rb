@@ -43,19 +43,17 @@ module Fastlane
           next unless content.created_at.to_s =~ /[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}/
           require 'time'
           time = Time.parse(content.created_at.to_s)
-          utc_offset = time.strftime("%:z")
-
           created_date = time.getutc
           expiration_date = created_date + content.max_age
           remaining_sec = expiration_date - Time.now.utc
           remaining_hours = (remaining_sec / (60 * 60)).floor
-          local_expiration_date = expiration_date.getlocal(utc_offset)
+          local_expiration_date = expiration_date.getlocal
 
           if remaining_hours >= 48
             remaining_days = remaining_hours / 24
-            UI.important("Your session cookie will expire at #{local_expiration_date.strftime('%Y-%m-%d %H:%M:%S')} (#{remaining_days} days left).")
+            UI.important("Your session cookie will expire at #{local_expiration_date} (#{remaining_days} days left).")
           else
-            UI.important("Your session cookie will expire at #{local_expiration_date.strftime('%Y-%m-%d %H:%M:%S')} (#{remaining_hours} hours left).")
+            UI.important("Your session cookie will expire at #{local_expiration_date} (#{remaining_hours} hours left).")
           end
 
           UI.error("Your session cookie is due to expire today!") if remaining_hours <= 24
