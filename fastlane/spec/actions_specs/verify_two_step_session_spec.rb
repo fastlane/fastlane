@@ -96,7 +96,6 @@ describe Fastlane do
             Fastlane::Actions::VerifyTwoStepSessionAction.check_expiration_time(cookie)
           end
         end
-
       end
     end
   end
