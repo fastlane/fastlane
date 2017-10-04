@@ -1,8 +1,10 @@
 module FastlaneCore
   class AnalyticsEventBuilder
     attr_accessor :base_hash
+    attr_accessor :action_name
 
-    def initialize(oauth_app_name: nil, p_hash: nil, session_id: nil, action_name: nil)
+    def initialize(oauth_app_name: nil, p_hash: nil, session_id: nil, action_name: nil, timestamp_millis: nil)
+      @action_name = action_name
       @base_hash = {
         event_source: {
           oauth_app_name: oauth_app_name,
@@ -12,7 +14,7 @@ module FastlaneCore
           name: p_hash,
           detail: session_id
         },
-        timestamp_millis: Time.now.to_i * 1000,
+        timestamp_millis: timestamp_millis,
         version: 1
       }
     end
@@ -34,7 +36,6 @@ module FastlaneCore
     end
 
     def new_event(stage: nil, primary_target_hash: nil, secondary_target_hash: nil)
-      raise 'Need timestamp_millis' if timestamp_millis.nil?
       raise 'Need at least a primary_target_hash' if primary_target_hash.nil?
       event = base_hash.dup
       event[:action] = {

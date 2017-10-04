@@ -5,7 +5,7 @@ module FastlaneCore
     USER_ERROR = 'user_error'
   end
 
-  class ActionCompletionContext < AnalyticContext
+  class ActionCompletionContext < AnalyticsContext
     attr_accessor :action_name
     attr_accessor :status
   end

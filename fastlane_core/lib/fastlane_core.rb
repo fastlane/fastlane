@@ -40,6 +40,12 @@ require 'fastlane_core/ui/errors/fastlane_crash'
 require 'fastlane_core/ui/errors/fastlane_shell_error'
 require 'fastlane_core/ui/errors/fastlane_common_error'
 require 'fastlane_core/test_parser'
+require 'fastlane_core/analytics/analytics_context'
+require 'fastlane_core/analytics/action_completion_context'
+require 'fastlane_core/analytics/action_launch_context'
+require 'fastlane_core/analytics/analytics_event_builder'
+require 'fastlane_core/analytics/analytics_ingester_client'
+require 'fastlane_core/analytics/analytics_session'
 
 # Third Party code
 require 'colored'
