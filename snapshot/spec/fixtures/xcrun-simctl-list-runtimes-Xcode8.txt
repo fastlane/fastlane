@@ -1,0 +1,4 @@
+== Runtimes ==
+iOS 10.3 (10.3.1 - 14E8301) (com.apple.CoreSimulator.SimRuntime.iOS-10-3)
+tvOS 10.2 (10.2 - 14W260) (com.apple.CoreSimulator.SimRuntime.tvOS-10-2)
+watchOS 3.2 (3.2 - 14V243) (com.apple.CoreSimulator.SimRuntime.watchOS-3-2)

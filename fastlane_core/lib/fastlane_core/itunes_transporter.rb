@@ -32,6 +32,7 @@ module FastlaneCore
 
       @errors = []
       @warnings = []
+      @all_lines = []
 
       if hide_output
         # Show a one time message instead
@@ -43,6 +44,7 @@ module FastlaneCore
         PTY.spawn(command) do |stdin, stdout, pid|
           begin
             stdin.each do |line|
+              @all_lines << line
               parse_line(line, hide_output) # this is where the parsing happens
             end
           rescue Errno::EIO
@@ -69,7 +71,12 @@ module FastlaneCore
         raise TransporterRequiresApplicationSpecificPasswordError
       end
 
-      if @errors.count > 0
+      if @errors.count > 0 && @all_lines.count > 0
+        # Print out the last 15 lines, this is key for non-verbose mode
+        @all_lines.last(15).each do |line|
+          UI.important("[iTMSTransporter] #{line}")
+        end
+        UI.message("iTunes Transporter output above ^")
         UI.error(@errors.join("\n"))
       end
 
@@ -93,7 +100,7 @@ module FastlaneCore
 
       re = Regexp.union(SKIP_ERRORS)
       if line.match(re)
-        # Those lines will not be handle like errors or warnings
+        # Those lines will not be handled like errors or warnings
 
       elsif line =~ ERROR_REGEX
         @errors << $1
@@ -107,7 +114,7 @@ module FastlaneCore
             CredentialsManager::AccountManager.new(user: @user).invalid_credentials
             UI.error("Please run this tool again to apply the new password")
           end
-        elsif $1.include? "Redundant Binary Upload. There already exists a binary upload with build"
+        elsif $1.include?("Redundant Binary Upload. There already exists a binary upload with build")
           UI.error($1)
           UI.error("You have to change the build number of your app to upload your ipa file")
         end

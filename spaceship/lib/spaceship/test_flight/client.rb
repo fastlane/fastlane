@@ -30,7 +30,7 @@ module Spaceship::TestFlight
     def get_builds_for_train(app_id: nil, platform: "ios", train_version: nil, retry_count: 0)
       assert_required_params(__method__, binding)
       with_retry(retry_count) do
-        response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains/#{train_version}/builds")
+        response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains/#{train_version}/builds", nil, {}, true)
         handle_response(response)
       end
     end
@@ -62,6 +62,17 @@ module Spaceship::TestFlight
 
       response = request(:post) do |req|
         req.url "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}/review"
+        req.body = build.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_response(response)
+    end
+
+    def expire_build(app_id: nil, build_id: nil, build: nil)
+      assert_required_params(__method__, binding)
+
+      response = request(:post) do |req|
+        req.url "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}/expire"
         req.body = build.to_json
         req.headers['Content-Type'] = 'application/json'
       end

@@ -55,9 +55,17 @@ module Snapshot
         end
         # Return true if all devices are iOS devices
         return true unless all_ios.include?(false)
+
+        all_tvos = devices.map do |device|
+          device = device.downcase
+          device.start_with?('apple tv')
+        end
+        # Return true if all devices are iOS devices
+        return true unless all_tvos.include?(false)
+
         # There should only be more than 1 device type if
-        # it is iOS, therefore, if there is more than 1
-        # device in the array, and they are not all iOS
+        # it is iOS or tvOS, therefore, if there is more than 1
+        # device in the array, and they are not all iOS or tvOS
         # as checked above, that would imply that this is a mixed bag
         return devices.count == 1
       end

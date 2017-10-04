@@ -72,7 +72,7 @@ module Scan
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :code_coverage,
-                                     description: "Should code coverage be generated (Xcode 7 only)?",
+                                     description: "Should code coverage be generated? (Xcode 7 and up)",
                                      is_string: false,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :address_sanitizer,

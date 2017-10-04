@@ -102,6 +102,15 @@ describe Spaceship::TestFlight::Client do
     end
   end
 
+  context '#expire_build' do
+    let(:build) { double('Build', to_json: "") }
+    it 'executes the request' do
+      MockAPI::TestFlightServer.post('/testflight/v2/providers/fake-team-id/apps/some-app-id/builds/1/expire') {}
+      subject.expire_build(app_id: app_id, build_id: 1, build: build)
+      expect(WebMock).to have_requested(:post, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/builds/1/expire')
+    end
+  end
+
   ##
   # @!group Groups API
   ##

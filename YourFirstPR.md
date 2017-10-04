@@ -75,7 +75,12 @@ bundle show fastlane
 
 which should print out the path to your local development environment.
 
-From now on, every time you introduce a change to your local _fastlane_ code base, you can immediately test it by running `bundle exec fastlane …`
+From now on, every time you introduce a change to your local _fastlane_ code base, you can immediately test it by running `bundle exec fastlane …`.
+
+If you want to run a command with your normal _fastlane_ installation, simply do not run the command with the `bundle exec` prefix.
+
+To fully remove your local _fastlane_ from your local project again, delete the `Gemfile` you created above.
+
 
 ## Submitting the PR
 

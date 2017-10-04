@@ -44,7 +44,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :text,
                                        description: "The text that will be displayed to the user",
-                                       default_value: "Please enter a text: "),
+                                       default_value: "Please enter some text: "),
           FastlaneCore::ConfigItem.new(key: :ci_input,
                                        description: "The default text that will be used when being executed on a CI service",
                                        default_value: ''),

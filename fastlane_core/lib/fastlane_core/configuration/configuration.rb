@@ -158,7 +158,7 @@ module FastlaneCore
     # @param config_file_name [String] The name of the configuration file to use (optional)
     # @param block_for_missing [Block] A ruby block that is called when there is an unknown method
     #   in the configuration file
-    def load_configuration_file(config_file_name = nil, block_for_missing = nil)
+    def load_configuration_file(config_file_name = nil, block_for_missing = nil, skip_printing_values = false)
       return unless config_file_name
 
       self.config_file_name = config_file_name
@@ -171,7 +171,7 @@ module FastlaneCore
       return if paths.count == 0
 
       path = paths.first
-      configuration_file = ConfigurationFile.new(self, path, block_for_missing)
+      configuration_file = ConfigurationFile.new(self, path, block_for_missing, skip_printing_values)
       verify_conflicts # important, since user can set conflicting options in configuration file
       configuration_file
     end
