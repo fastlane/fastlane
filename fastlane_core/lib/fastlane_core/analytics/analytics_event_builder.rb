@@ -1,10 +1,9 @@
 module FastlaneCore
   class AnalyticsEventBuilder
-    attr_accessor :base_launch_hash
-    attr_accessor :base_completion_hash
+    attr_accessor :base_hash
 
     def initialize(oauth_app_name: nil, p_hash: nil, session_id: nil, action_name: nil)
-      @base_launch_hash = {
+      @base_hash = {
         event_source: {
           oauth_app_name: oauth_app_name,
           product: 'fastlane'
@@ -12,51 +11,41 @@ module FastlaneCore
         actor: {
           name: p_hash,
           detail: session_id
-        },
-        action: {
-          name: 'launched',
-          detail: action_name
-        },
-        version: 1
-      }
-
-      @base_completion_hash = {
-        event_source: {
-          oauth_app_name: oauth_app_name,
-          product: 'fastlane'
-        },
-        actor: {
-          name: p_hash,
-          detail: session_id
-        },
-        action: {
-          name: 'completed',
-          detail: action_name
         },
         version: 1
       }
     end
 
-    def new_event(primary_target_hash: nil, secondary_target_hash: nil, timestamp_millis: nil)
+    def launched_event(primary_target_hash: nil, secondary_target_hash: nil, timestamp_millis: nil)
+      return new_event(
+        stage: 'launched',
+        primary_target_hash: primary_target_hash,
+        secondary_target_hash: secondary_target_hash,
+        timestamp_millis: timestamp_millis
+      )
+    end
+
+    def completed_event(primary_target_hash: nil, secondary_target_hash: nil, timestamp_millis: nil)
+      return new_event(
+        stage: 'completed',
+        primary_target_hash: primary_target_hash,
+        secondary_target_hash: secondary_target_hash,
+        timestamp_millis: timestamp_millis
+      )
+    end
+
+    def new_event(stage: nil, primary_target_hash: nil, secondary_target_hash: nil, timestamp_millis: nil)
       raise 'Need timestamp_millis' if timestamp_millis.nil?
       raise 'Need at least a primary_target_hash' if primary_target_hash.nil?
-      event = base_launch_hash.dup
+      event = base_hash.dup
+      event[:action] = {
+          name: stage,
+          detail: action_name
+      }
       event[:primary_target] = primary_target_hash
       event[:secondary_target] = secondary_target_hash unless secondary_target_hash.nil?
       event[:millis_since_epoch] = timestamp_millis
       return event
-    end
-
-    def completed_event(status: nil, timestamp: nil)
-      raise 'Need timestamp_millis' if timestamp_millis.nil?
-      raise 'Need status for completion' if status.nil?
-      completed_event = base_completion_hash.dup
-      completed_event[:primary_target] = {
-        name: 'status',
-        detail: status
-      }
-      completed_event[:millis_since_epoch] = timestamp
-      return completed_event
     end
   end
 end

@@ -21,7 +21,7 @@ module FastlaneCore
 
       timestamp_millis = Time.now.to_i * 1000
 
-      version_event = builder.new_event(
+      version_event = builder.launched_event(
         primary_target_hash: {
           name: 'fastlane_version',
           detail: action_launched_context.fastlane_version
@@ -29,7 +29,7 @@ module FastlaneCore
         timestamp_millis: timestamp_millis
       )
 
-      install_method_event = builder.new_event(
+      install_method_event = builder.launched_event(
         primary_target_hash: {
           name: 'install_method',
           detail: action_launched_context.install_method
@@ -37,7 +37,7 @@ module FastlaneCore
         timestamp_millis: timestamp_millis
       )
 
-      os_version_event = builder.new_event(
+      os_version_event = builder.launched_event(
         primary_target_hash: {
           name: 'operating_system',
           detail: action_launched_context.operating_system
@@ -49,7 +49,7 @@ module FastlaneCore
         timestamp_millis: timestamp_millis
       )
 
-      ide_version_event = builder.new_event(
+      ide_version_event = builder.launched_event(
         primary_target_hash: {
           name: 'ide_version',
           detail: action_launched_context.ide_version
@@ -57,7 +57,7 @@ module FastlaneCore
         timestamp_millis: timestamp_millis
       )
 
-      ci_event = builder.new_event(
+      ci_event = builder.launched_event(
         primary_target_hash: {
           name: 'ci',
           detail: action_launched_context.ci
@@ -65,7 +65,7 @@ module FastlaneCore
         timestamp_millis: timestamp_millis
       )
 
-      fastfile_event = builder.new_event(
+      fastfile_event = builder.launched_event(
         primary_target_hash: {
           name: 'fastfile',
           detail: action_launched_context.fastfile
@@ -77,7 +77,7 @@ module FastlaneCore
         timestamp_millis: timestamp_millis
       )
 
-      platform_event = builder.new_event(
+      platform_event = builder.launched_event(
         primary_target_hash: {
           name: 'platform',
           detail: action_launched_context.platform
@@ -85,7 +85,7 @@ module FastlaneCore
         timestamp_millis: timestamp_millis
       )
 
-      ruby_version_event = builder.new_event(
+      ruby_version_event = builder.launched_event(
         primary_target_hash: {
           name: 'ruby_version',
           detail: action_launched_context.ruby_version
@@ -113,7 +113,10 @@ module FastlaneCore
         action_name: completion_context.action_name
       )
       return events + builder.completed_event(
-        status: completion_context.status,
+        primary_target_hash: {
+          name: 'status',
+          detail: completion_context.status
+        },
         timestamp: Time.now.to_i * 1000
       )
     end
