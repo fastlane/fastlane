@@ -40,24 +40,26 @@ module Fastlane
       def self.check_expiration_time(cookie)
         cookie.each do |content|
           next unless content.domain == 'idmsa.apple.com' && content.max_age.to_s.length > 0
-          next unless content.created_at.to_s =~ /([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/
+          next unless content.created_at.to_s =~ /([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}) \+([0-9]{2})([0-9]{2})/
           year = Regexp.last_match(1).to_i
           month = Regexp.last_match(2).to_i
           day = Regexp.last_match(3).to_i
           hour = Regexp.last_match(4).to_i
           min = Regexp.last_match(5).to_i
           sec = Regexp.last_match(6).to_i
+          utc_offset = "+#{Regexp.last_match(7)}:#{Regexp.last_match(8)}"
 
           created_date = Time.new(year, month, day, hour, min, sec).getutc
           expiration_date = created_date + content.max_age
           remaining_sec = expiration_date - Time.now.utc
           remaining_hours = (remaining_sec / (60 * 60)).floor
+          expiration_date_with_local = expiration_date.getlocal(utc_offset)
 
           if remaining_hours >= 48
             remaining_days = remaining_hours / 24
-            UI.important("Your session cookie will expire at #{expiration_date.getlocal.strftime('%Y-%m-%d %H:%M:%S')} (#{remaining_days} days left).")
+            UI.important("Your session cookie will expire at #{expiration_date_with_local.strftime('%Y-%m-%d %H:%M:%S')} (#{remaining_days} days left).")
           else
-            UI.important("Your session cookie will expire at #{expiration_date.getlocal.strftime('%Y-%m-%d %H:%M:%S')} (#{remaining_hours} hours left).")
+            UI.important("Your session cookie will expire at #{expiration_date_with_local.strftime('%Y-%m-%d %H:%M:%S')} (#{remaining_hours} hours left).")
           end
 
           UI.error("Your session cookie is due to expire today!") if remaining_hours <= 24
