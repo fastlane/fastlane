@@ -6,6 +6,7 @@ require 'logger'
 require 'spaceship/babosa_fix'
 require 'spaceship/helper/net_http_generic_request'
 require 'spaceship/helper/plist_middleware'
+require 'spaceship/helper/rels_middleware'
 require 'spaceship/ui'
 require 'tmpdir'
 require 'cgi'
@@ -259,6 +260,7 @@ module Spaceship
         c.response :xml, content_type: /\bxml$/
         c.response :plist, content_type: /\bplist$/
         c.use :cookie_jar, jar: @cookie
+        c.use FaradayMiddleware::RelsMiddleware
         c.adapter Faraday.default_adapter
 
         if ENV['SPACESHIP_DEBUG']
@@ -556,7 +558,7 @@ module Spaceship
       @csrf_tokens || {}
     end
 
-    def request(method, url_or_path = nil, params = nil, headers = {}, &block)
+    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
       headers.merge!(csrf_tokens)
       headers['User-Agent'] = USER_AGENT
 
@@ -569,7 +571,11 @@ module Spaceship
         params, headers = encode_params(params, headers)
       end
 
-      response = send_request(method, url_or_path, params, headers, &block)
+      response = if auto_paginate
+                   send_request_auto_paginate(method, url_or_path, params, headers, &block)
+                 else
+                   send_request(method, url_or_path, params, headers, &block)
+                 end
 
       log_response(method, url_or_path, response)
 
@@ -698,6 +704,22 @@ module Spaceship
         end
         return response
       end
+    end
+
+    def send_request_auto_paginate(method, url_or_path, params, headers, &block)
+      response = send_request(method, url_or_path, params, headers, &block)
+      return response unless should_process_next_rel?(response)
+      last_response = response
+      while last_response.env.rels[:next]
+        last_response = send_request(method, last_response.env.rels[:next], params, headers, &block)
+        break unless should_process_next_rel?(last_response)
+        response.body['data'].concat(last_response.body['data'])
+      end
+      response
+    end
+
+    def should_process_next_rel?(response)
+      response.body.kind_of?(Hash) && response.body['data'].kind_of?(Array)
     end
 
     def encode_params(params, headers)
