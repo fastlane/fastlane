@@ -43,12 +43,13 @@ module Fastlane
           next unless content.created_at.to_s =~ /[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}/
           require 'time'
           time = Time.parse(content.created_at.to_s)
+          utc_offset = time.strftime("%:z")
 
           created_date = time.getutc
           expiration_date = created_date + content.max_age
           remaining_sec = expiration_date - Time.now.utc
           remaining_hours = (remaining_sec / (60 * 60)).floor
-          local_expiration_date = expiration_date.getlocal(time.utc_offset)
+          local_expiration_date = expiration_date.getlocal(utc_offset)
 
           if remaining_hours >= 48
             remaining_days = remaining_hours / 24
