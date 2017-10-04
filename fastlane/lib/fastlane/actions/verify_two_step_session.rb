@@ -48,15 +48,19 @@ module Fastlane
           min = Regexp.last_match(5).to_i
           sec = Regexp.last_match(6).to_i
 
-          created_date = DateTime.new(year, month, day, hour, min, sec)
-          expiration_date = created_date + Rational(content.max_age, 24 * 60 * 60)
-          remaining_days = (expiration_date - DateTime.now).to_i
+          created_date = Time.new(year, month, day, hour, min, sec).getutc
+          expiration_date = created_date + content.max_age
+          remaining_sec = expiration_date - Time.now.utc
+          remaining_hours = (remaining_sec / (60 * 60)).floor
 
-          if remaining_days > 0
-            UI.important("Your session cookie will expire at #{expiration_date.strftime('%Y-%m-%d %H:%M:%S')} (#{remaining_days} days left).")
+          if remaining_hours >= 48
+            remaining_days = remaining_hours / 24
+            UI.important("Your session cookie will expire at #{expiration_date.getlocal.strftime('%Y-%m-%d %H:%M:%S')} (#{remaining_days} days left).")
           else
-            UI.error("Your session cookie is due to expire today!")
+            UI.important("Your session cookie will expire at #{expiration_date.getlocal.strftime('%Y-%m-%d %H:%M:%S')} (#{remaining_hours} hours left).")
           end
+
+          UI.error("Your session cookie is due to expire today!") if remaining_hours <= 24
           break
         end
       end
