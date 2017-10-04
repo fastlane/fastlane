@@ -21,51 +21,75 @@ module FastlaneCore
 
       timestamp_millis = Time.now.to_i * 1000
 
-      version_event = builder.fastlane_version_launched_event(
-        fastlane_version: action_launched_context.fastlane_version,
-        timestamp: timestamp_millis
+      version_event = builder.new_event(
+        primary_target_hash: {
+          name: 'fastlane_version',
+          detail: action_launched_context.fastlane_version
+        },
+        timestamp_millis: timestamp_millis
       )
 
-      install_method_event = builder.install_method_launched_event(
-        install_method: action_launched_context.install_method,
-        timestamp: timestamp_millis
+      install_method_event = builder.new_event(
+        primary_target_hash: {
+          name: 'install_method',
+          detail: action_launched_context.install_method
+        },
+        timestamp_millis: timestamp_millis
       )
 
-      os_version_event = builder.os_version_launched_event(
-        operating_system: action_launched_context.operating_system,
-        version: action_launched_context.operating_system_version,
-        timestamp: timestamp_millis
+      os_version_event = builder.new_event(
+        primary_target_hash: {
+          name: 'operating_system',
+          detail: action_launched_context.operating_system
+        },
+        secondary_target_hash: {
+          name: 'version',
+          detail: action_launched_context.operating_system_version
+        },
+        timestamp_millis: timestamp_millis
       )
 
-      ide_version_event = builder.ide_version_launched_event(
-        ide_version: action_launched_context.ide_version,
-        timestamp: timestamp_millis
+      ide_version_event = builder.new_event(
+        primary_target_hash: {
+          name: 'ide_version',
+          detail: action_launched_context.ide_version
+        },
+        timestamp_millis: timestamp_millis
       )
 
-      ci_event = builder.ci_launched_event(
-        ci: action_launched_context.ci,
-        timestamp: timestamp_millis
+      ci_event = builder.new_event(
+        primary_target_hash: {
+          name: 'ci',
+          detail: action_launched_context.ci
+        },
+        timestamp_millis: timestamp_millis
       )
 
-      fastfile_event = builder.fastfile_launched_event(
-        fastfile: action_launched_context.fastfile,
-        fastfile_id: action_launched_context.fastfile_id,
-        timestamp: timestamp_millis
+      fastfile_event = builder.new_event(
+        primary_target_hash: {
+          name: 'fastfile',
+          detail: action_launched_context.fastfile
+        },
+        secondary_target_hash: {
+          name: 'fastfile_id',
+          detail: action_launched_context.fastfile_id
+        },
+        timestamp_millis: timestamp_millis
       )
 
-      platform_event = builder.platform_launched_event(
-        platform: action_launched_context.platform,
-        timestamp: timestamp_millis
+      platform_event = builder.new_event(
+        primary_target_hash: {
+          name: 'platform',
+          detail: action_launched_context.platform
+        },
+        timestamp_millis: timestamp_millis
       )
-
-      ruby_version_details = {
-        name: 'ruby_version',
-        detail: action_launched_context.ruby_version
-      }
 
       ruby_version_event = builder.new_event(
-        event_key: :primary_target,
-        event_dictionary: ruby_version_details,
+        primary_target_hash: {
+          name: 'ruby_version',
+          detail: action_launched_context.ruby_version
+        },
         timestamp_millis: timestamp_millis
       )
 

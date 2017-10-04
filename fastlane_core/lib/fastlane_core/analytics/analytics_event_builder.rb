@@ -37,87 +37,12 @@ module FastlaneCore
       }
     end
 
-    def fastlane_version_launched_event(fastlane_version: nil, timestamp: nil)
-      version_event = base_launch_hash.dup
-      version_event[:primary_target] = {
-        name: 'fastlane_version',
-        detail: fastlane_version
-      }
-      version_event[:millis_since_epoch] = timestamp
-      return version_event
-    end
-
-    def install_method_launched_event(install_method: nil, timestamp: nil)
-      install_method_event = base_launch_hash.dup
-      install_method_event[:primary_target] = {
-        name: 'install_method',
-        detail: install_method
-      }
-      install_method_event[:millis_since_epoch] = timestamp
-      return install_method_event
-    end
-
-    def os_version_launched_event(operating_system: nil, version: nil, timestamp: nil)
-      os_version_event = base_launch_hash.dup
-      os_version_event[:primary_target] = {
-        name: 'operating_system',
-        detail: operating_system
-      }
-      os_version_event[:secondary_target] = {
-        name: 'version',
-        detail: version
-      }
-      os_version_event[:millis_since_epoch] = timestamp
-      return os_version_event
-    end
-
-    def ide_version_launched_event(ide_version: nil, timestamp: nil)
-      ide_version_event = base_launch_hash.dup
-      ide_version_event[:primary_target] = {
-        name: 'ide_version',
-        detail: ide_version
-      }
-      ide_version_event[:millis_since_epoch] = timestamp
-      return ide_version_event
-    end
-
-    def ci_launched_event(ci: nil, timestamp: nil)
-      ci_event = base_launch_hash.dup
-      ci_event[:primary_target] = {
-        name: 'ci',
-        detail: ci
-      }
-      ci_event[:millis_since_epoch] = timestamp
-      return ci_event
-    end
-
-    def fastfile_launched_event(fastfile: nil, fastfile_id: nil, timestamp: nil)
-      fastfile_event = base_launch_hash.dup
-      fastfile_event[:primary_target] = {
-        name: 'fastfile',
-        detail: fastfile
-      }
-      fastfile_event[:secondary_target] = {
-        name: 'fastfile_id',
-        detail: fastfile_id
-      }
-      fastfile_event[:millis_since_epoch] = timestamp
-      return fastfile_event
-    end
-
-    def platform_launched_event(platform: nil, timestamp: nil)
-      platform_event = base_launch_hash.dup
-      platform_event[:primary_target] = {
-        name: 'platform',
-        detail: platform
-      }
-      platform_event[:millis_since_epoch] = timestamp
-      return platform_event
-    end
-
-    def new_event(event_key: nil, event_dictionary: nil, timestamp_millis: nil)
+    def new_event(primary_target_hash: nil, secondary_target_hash: nil, timestamp_millis: nil)
+      raise 'Need timestamp_millis' if timestamp_millis.nil?
+      raise 'Need at least a primary_target_hash' if primary_target_hash.nil?
       event = base_launch_hash.dup
-      event[event_key] = event_dictionary
+      event[:primary_target] = primary_target_hash
+      event[:secondary_target] = secondary_target_hash unless secondary_target_hash.nil?
       event[:millis_since_epoch] = timestamp_millis
       return event
     end
