@@ -19,8 +19,7 @@ module FastlaneCore
     end
 
     def post_events(events: nil)
-    	# post the events to the endpoint
-
+      # post the events to the endpoint
     end
 
     def action_completed_events(action_completed_context: nil, session: nil)
@@ -31,8 +30,8 @@ module FastlaneCore
           product: 'fastlane'
         },
         actor: {
-          name: 'p_hash',
-          detail: session.p_hash
+          name: session.p_hash,
+          detail: session.session_id
         },
         action: {
           name: 'completed',
@@ -57,8 +56,8 @@ module FastlaneCore
           product: 'fastlane'
         },
         actor: {
-          name: 'p_hash',
-          detail: session.p_hash
+          name: session.p_hash,
+          detail: session.session_id
         },
         action: {
           name: 'launched',
@@ -78,8 +77,8 @@ module FastlaneCore
           product: 'fastlane'
         },
         actor: {
-          name: 'p_hash',
-          detail: session.p_hash
+          name: session.p_hash,
+          detail: session.session_id
         },
         action: {
           name: 'launched',
@@ -99,8 +98,8 @@ module FastlaneCore
           product: 'fastlane'
         },
         actor: {
-          name: 'p_hash',
-          detail: session.p_hash
+          name: session.p_hash,
+          detail: session.session_id
         },
         action: {
           name: 'launched',
@@ -124,8 +123,8 @@ module FastlaneCore
           product: 'fastlane'
         },
         actor: {
-          name: 'p_hash',
-          detail: session.p_hash
+          name: session.p_hash,
+          detail: session.session_id
         },
         action: {
           name: 'launched',
@@ -145,8 +144,8 @@ module FastlaneCore
           product: 'fastlane'
         },
         actor: {
-          name: 'p_hash',
-          detail: session.p_hash
+          name: session.p_hash,
+          detail: session.session_id
         },
         action: {
           name: 'launched',
@@ -166,8 +165,8 @@ module FastlaneCore
           product: 'fastlane'
         },
         actor: {
-          name: 'p_hash',
-          detail: session.p_hash
+          name: session.p_hash,
+          detail: session.session_id
         },
         action: {
           name: 'launched',
@@ -191,8 +190,8 @@ module FastlaneCore
           product: 'fastlane'
         },
         actor: {
-          name: 'p_hash',
-          detail: session.p_hash
+          name: session.p_hash,
+          detail: session.session_id
         },
         action: {
           name: 'launched',
@@ -212,8 +211,8 @@ module FastlaneCore
           product: 'fastlane'
         },
         actor: {
-          name: 'p_hash',
-          detail: session.p_hash
+          name: session.p_hash,
+          detail: session.session_id
         },
         action: {
           name: 'launched',
