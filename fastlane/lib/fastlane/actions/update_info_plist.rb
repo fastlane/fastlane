@@ -134,10 +134,6 @@ module Fastlane
               urlScheme[:CFBundleURLSchemes] = ["acme-production"]
             }
           )',
-          'zip(
-            path: "MyApp.app",
-            output_path: "Latest.app.zip"
-          )'
         ]
       end
 
