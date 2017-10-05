@@ -198,8 +198,10 @@ module Fastlane
         # Actually switch lane now
         self.current_lane = new_lane
 
-        # is_fastfile == true
-        FastlaneCore.session.action_launched(:lane_switch)
+        guesser = AppIdentifierGuesser.new(args: ARGV)
+        launch_context = ActionLaunchContext.new(action_name: :lane_switch.to_s, p_hash: guesser.p_hash)
+        FastlaneCore.session.is_fastfile = true
+        FastlaneCore.session.action_launched(launch_context: launch_context)
         result = block.call(parameters.first || {}) # to always pass a hash
         self.current_lane = original_lane
 
