@@ -8,6 +8,7 @@ describe FastlaneCore::AnalyticsSession do
   context 'event completion' do
     let(:completion_context) do
       context = FastlaneCore::ActionCompletionContext.new(
+        p_hash: p_hash,
         status: FastlaneCore::CompletionStatus::SUCCESS,
         action_name: action_name
       )
@@ -17,7 +18,7 @@ describe FastlaneCore::AnalyticsSession do
       expect(SecureRandom).to receive(:uuid).and_return(session_id)
       expect(Time).to receive(:now).and_return(timestamp_millis)
 
-      session = FastlaneCore::AnalyticsSession.new(p_hash: p_hash)
+      session = FastlaneCore::AnalyticsSession.new
       expect(session).to receive(:oauth_app_name).and_return(oauth_app_name)
 
       session.action_completed(completion_context: completion_context)

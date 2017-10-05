@@ -1,7 +1,5 @@
 module FastlaneCore
   class AnalyticsSession
-    # TODO: remove p_hash here because each action can have a different p_hash
-    attr_accessor :p_hash
     attr_accessor :session_id
     attr_accessor :client
     attr_accessor :events
@@ -11,12 +9,18 @@ module FastlaneCore
       return 'fastlane'
     end
 
-    def initialize(p_hash: nil, analytics_ingester_client: nil)
+    def initialize(analytics_ingester_client: nil)
       require 'securerandom'
       @session_id = SecureRandom.uuid
-      @p_hash = p_hash
       @client = analytics_ingester_client
       @events = []
+    end
+
+    def backfill_p_hashes(p_hash: nil)
+      return if p_hash.nil? || events.count == 0
+      events.reverse_each do |event|
+        event[:actor][:name].nil? ? event[:actor][:name] = p_hash : break
+      end
     end
 
     def action_launched(launch_context: nil)
@@ -28,9 +32,11 @@ module FastlaneCore
       # action 3, no app_id
       # action 4, different app_id than action 2 (we should backfill action 3 with the new action? I dunno, maybe we don't backfill, but instead, rely on the session_id to tie them together because we can't know which action belongs more closely with what app_id)
 
+      backfill_p_hashes(p_hash: launch_context.p_hash)
+
       builder = AnalyticsEventBuilder.new(
         oauth_app_name: oauth_app_name,
-        p_hash: p_hash,
+        p_hash: launch_context.p_hash,
         session_id: session_id,
         action_name: action_launched_context.action_name
       )
@@ -116,7 +122,7 @@ module FastlaneCore
       # If we have an event in self.events, we'll need to check and see if they have a p_hash, if not, back fill and then advance to the previous event and check again
       builder = AnalyticsEventBuilder.new(
         oauth_app_name: oauth_app_name,
-        p_hash: p_hash,
+        p_hash: completion_context.p_hash,
         session_id: session_id,
         action_name: completion_context.action_name
       )
