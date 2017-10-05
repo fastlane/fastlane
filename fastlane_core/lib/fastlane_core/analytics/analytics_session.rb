@@ -1,3 +1,5 @@
+require 'fastlane_core/analytics/analytics_ingester_client'
+
 module FastlaneCore
   class AnalyticsSession
     attr_accessor :session_id
@@ -9,7 +11,7 @@ module FastlaneCore
       return 'fastlane'
     end
 
-    def initialize(analytics_ingester_client: nil)
+    def initialize(analytics_ingester_client: AnalyticsIngesterClient.new)
       require 'securerandom'
       @session_id = SecureRandom.uuid
       @client = analytics_ingester_client
