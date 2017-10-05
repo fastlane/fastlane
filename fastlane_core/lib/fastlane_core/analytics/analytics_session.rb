@@ -24,14 +24,6 @@ module FastlaneCore
     end
 
     def action_launched(launch_context: nil)
-      # TODO:
-      # If we have an event in self.events, we'll need to check and see if they have a p_hash, if not, back fill and then advance to the previous event and check again
-      # we could get a bunch of actions that don't have app_ids, or app_ids change half-way through
-      # eg: action 1, no app_id
-      # action 2, app_id (we should backfill action 1 with action 2's app id)
-      # action 3, no app_id
-      # action 4, different app_id than action 2 (we should backfill action 3 with the new action? I dunno, maybe we don't backfill, but instead, rely on the session_id to tie them together because we can't know which action belongs more closely with what app_id)
-
       backfill_p_hashes(p_hash: launch_context.p_hash)
 
       builder = AnalyticsEventBuilder.new(
@@ -118,8 +110,8 @@ module FastlaneCore
     end
 
     def action_completed(completion_context: nil)
-      # TODO:
-      # If we have an event in self.events, we'll need to check and see if they have a p_hash, if not, back fill and then advance to the previous event and check again
+      backfill_p_hashes(p_hash: completion_context.p_hash)
+
       builder = AnalyticsEventBuilder.new(
         oauth_app_name: oauth_app_name,
         p_hash: completion_context.p_hash,
