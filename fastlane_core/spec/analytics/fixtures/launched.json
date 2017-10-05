@@ -98,7 +98,7 @@
     },
     "primary_target": {
       "name": "ci",
-      "detail": true
+      "detail": "true"
     },
     "millis_since_epoch": 1507043076,
     "version": 1
@@ -118,11 +118,11 @@
     },
     "primary_target": {
       "name": "fastfile",
-      "detail": true
+      "detail": "true"
     },
     "secondary_target": {
       "name": "fastfileID",
-      "detail": null
+      "detail": "some fastfile id"
     },
     "millis_since_epoch": 1507043076,
     "version": 1
