@@ -138,6 +138,10 @@ module FastlaneCore
     end
 
     def finalize_session
+      # If our users want to opt out of usage metrics, don't post the events.
+      # Learn more at https://github.com/fastlane/fastlane#metrics
+      return if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
+
       client.post_events(events)
     end
 

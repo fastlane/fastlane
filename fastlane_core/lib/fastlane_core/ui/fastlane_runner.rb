@@ -146,12 +146,31 @@ module Commander
 
     def rescue_unknown_error(e)
       FastlaneCore::CrashReporter.report_crash(exception: e)
-      FastlaneCore.session.did_crash(@program[:name]) if e.fastlane_should_report_metrics?
+
+      if e.fastlane_should_report_metrics?
+        app_id_guesser = FastlaneCore::AppIdentifierGuesser(args: ARGV)
+        action_completion_context = FastlaneCore::ActionCompletionContext.new(
+          p_hash: app_id_guesser.p_hash,
+          action_name: @program[:name],
+          status: FastlaneCore::ActionCompletionStatus.FAILED # Is `FAILED` correct?
+        )
+        FastlaneCore.session.action_completed(completion_context: action_completion_context)
+      end
+
       handle_unknown_error!(e)
     end
 
     def rescue_fastlane_error(e)
-      FastlaneCore.session.did_raise_error(@program[:name]) if e.fastlane_should_report_metrics?
+      if e.fastlane_should_report_metrics?
+        app_id_guesser = FastlaneCore::AppIdentifierGuesser(args: ARGV)
+        action_completion_context = FastlaneCore::ActionCompletionContext.new(
+          p_hash: app_id_guesser.p_hash,
+          action_name: @program[:name],
+          status: FastlaneCore::ActionCompletionStatus.USER_ERROR # USER_ERROR because FastlaneCore::Interface::FastlaneError # user_error!
+        )
+        FastlaneCore.session.action_completed(completion_context: action_completion_context)
+      end
+
       show_github_issues(e.message) if e.show_github_issues
       FastlaneCore::CrashReporter.report_crash(exception: e)
       display_user_error!(e, e.message)

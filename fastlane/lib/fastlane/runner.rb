@@ -262,13 +262,30 @@ module Fastlane
         raise e
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         FastlaneCore::CrashReporter.report_crash(exception: e)
-        FastlaneCore.session.did_raise_error(method_sym) if e.fastlane_should_report_metrics?
+        if e.fastlane_should_report_metrics?
+          app_id_guesser = FastlaneCore::AppIdentifierGuesser(args: ARGV)
+          action_completion_context = FastlaneCore::ActionCompletionContext.new(
+            p_hash: app_id_guesser.p_hash,
+            action_name: method_sym.to_s,
+            status: FastlaneCore::ActionCompletionStatus.USER_ERROR
+          )
+          FastlaneCore.session.action_completed(completion_context: action_completion_context)
+        end
         raise e
       rescue Exception => e # rubocop:disable Lint/RescueException
         # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         # Catches all exceptions, since some plugins might use system exits to get out
         FastlaneCore::CrashReporter.report_crash(exception: e)
-        FastlaneCore.session.did_crash(method_sym) if e.fastlane_should_report_metrics?
+
+        if e.fastlane_should_report_metrics?
+          app_id_guesser = FastlaneCore::AppIdentifierGuesser(args: ARGV)
+          action_completion_context = FastlaneCore::ActionCompletionContext.new(
+            p_hash: app_id_guesser.p_hash,
+            action_name: method_sym.to_s,
+            status: FastlaneCore::ActionCompletionStatus.FAILED # Is `FAILED` correct?
+          )
+          FastlaneCore.session.action_completed(completion_context: action_completion_context)
+        end
         raise e
       end
     end
