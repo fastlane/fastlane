@@ -9,6 +9,7 @@ module Fastlane
       end
 
       puts env_info
+      UI.important("Take notice that this output may contain sensitive information, or simply information that you don't want to make public.")
       if FastlaneCore::Helper.mac? && UI.interactive? && UI.confirm("🙄  Wow, that's a lot of markdown text... should fastlane put it into your clipboard, so you can easily paste it on GitHub?")
         copy_to_clipboard(env_info)
         UI.success("Successfully copied markdown into your clipboard 🎨")
