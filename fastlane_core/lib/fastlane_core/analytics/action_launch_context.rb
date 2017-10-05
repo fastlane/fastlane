@@ -5,9 +5,9 @@ module FastlaneCore
     attr_accessor :action_name
     attr_accessor :ide_version
     attr_accessor :platform
-    attr_accessor :fastfile
+    attr_accessor :is_fastfile
+    alias fastfile? is_fastfile
     attr_accessor :fastfile_id
-    alias fastfile? fastfile
 
     def fastlane_version
       return Fastlane::VERSION
