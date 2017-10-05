@@ -12,6 +12,8 @@ module FastlaneCore
     end
 
     def initialize(p_hash: nil, analytics_ingester_client: nil)
+      require 'securerandom'
+      @session_id = SecureRandom.uuid
       @p_hash = p_hash
       @client = analytics_ingester_client
       @events = []
@@ -118,7 +120,7 @@ module FastlaneCore
         session_id: session_id,
         action_name: completion_context.action_name
       )
-      return events + builder.completed_event(
+      return events << builder.completed_event(
         primary_target_hash: {
           name: 'status',
           detail: completion_context.status

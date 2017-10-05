@@ -7,7 +7,9 @@ module FastlaneCore
     attr_accessor :operating_system_version
     attr_accessor :ide_version
     attr_accessor :ci
+    alias ci? ci
     attr_accessor :fastfile
+    alias fastfile? fastfile
     attr_accessor :fastfile_id
     attr_accessor :platform
     attr_accessor :ruby_version
