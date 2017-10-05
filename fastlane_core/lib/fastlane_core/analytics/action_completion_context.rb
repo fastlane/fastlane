@@ -6,6 +6,7 @@ module FastlaneCore
   end
 
   class ActionCompletionContext < AnalyticsContext
+    attr_accessor :p_hash
     attr_accessor :action_name
     attr_accessor :status
   end
