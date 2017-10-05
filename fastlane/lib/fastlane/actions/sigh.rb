@@ -5,6 +5,7 @@ module Fastlane
       SIGH_PROFILE_PATHS = :SIGH_PROFILE_PATHS
       SIGH_UDID = :SIGH_UDID # deprecated
       SIGH_UUID = :SIGH_UUID
+      SIGH_NAME = :SIGH_NAME
       SIGH_PROFILE_TYPE = :SIGH_PROFILE_TYPE
     end
 
@@ -22,7 +23,9 @@ module Fastlane
         Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] << path
 
         uuid = ENV["SIGH_UUID"] || ENV["SIGH_UDID"] # the UUID of the profile
+        name = ENV["SIGH_NAME"] # the name of the profile
         Actions.lane_context[SharedValues::SIGH_UUID] = Actions.lane_context[SharedValues::SIGH_UDID] = uuid if uuid
+        Actions.lane_context[SharedValues::SIGH_NAME] = Actions.lane_context[SharedValues::SIGH_NAME] = name if name
 
         set_profile_type(values, ENV["SIGH_PROFILE_ENTERPRISE"])
 
