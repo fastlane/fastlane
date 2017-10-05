@@ -213,7 +213,6 @@ module Fastlane
       actions_path = File.join(File.expand_path("..", path), 'actions')
       Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
 
-    
       FastlaneCore.session.action_launched(:import)
       parse(File.read(path), path)
     end
