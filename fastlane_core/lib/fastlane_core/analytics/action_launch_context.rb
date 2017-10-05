@@ -4,10 +4,10 @@ module FastlaneCore
   class ActionLaunchContext < AnalyticsContext
     attr_accessor :action_name
     attr_accessor :ide_version
-    attr_accessor :fastfile
-    alias fastfile? fastfile
-    attr_accessor :fastfile_id
     attr_accessor :platform
+    attr_accessor :fastfile
+    attr_accessor :fastfile_id
+    alias fastfile? fastfile
 
     def fastlane_version
       return Fastlane::VERSION

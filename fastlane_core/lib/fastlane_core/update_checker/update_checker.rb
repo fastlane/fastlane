@@ -123,7 +123,8 @@ module FastlaneCore
     def self.send_launch_analytic_events_for(gem_name)
       return if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
       ci = Helper.is_ci?.to_s
-      project_hash = AppIdentifierGuesser.p_hash(args: ARGV, gem_name: gem_name)
+      app_id_guesser = AppIdentifierGuesser.new(args: ARGV, gem_name: gem_name)
+      project_hash = app_id_guesser.p_hash
       p_hash = project_hash if project_hash
       platform = @platform if @platform # this has to be called after `p_hash`
 
