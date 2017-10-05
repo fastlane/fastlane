@@ -6,7 +6,6 @@ module FastlaneCore
     attr_accessor :client
     attr_accessor :events
     attr_accessor :ide_version
-    attr_accessor :platform
     attr_accessor :fastfile_id
     attr_accessor :is_fastfile
     alias fastfile? is_fastfile
@@ -41,7 +40,7 @@ module FastlaneCore
         oauth_app_name: oauth_app_name,
         p_hash: launch_context.p_hash,
         session_id: session_id,
-        action_name: action_launched_context.action_name
+        action_name: launch_context.action_name
       )
 
       version_event = builder.launched_event(
@@ -97,7 +96,7 @@ module FastlaneCore
       platform_event = builder.launched_event(
         primary_target_hash: {
           name: 'platform',
-          detail: platform
+          detail: launch_context.platform
         }
       )
 

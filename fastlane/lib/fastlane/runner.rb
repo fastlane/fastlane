@@ -198,8 +198,12 @@ module Fastlane
         # Actually switch lane now
         self.current_lane = new_lane
 
-        guesser = AppIdentifierGuesser.new(args: ARGV)
-        launch_context = ActionLaunchContext.new(action_name: :lane_switch.to_s, p_hash: guesser.p_hash)
+        app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
+        launch_context = FastlaneCore::ActionLaunchContext.new(
+          action_name: "lane_switch",
+          p_hash: app_id_guesser.p_hash,
+          platform: app_id_guesser.platform
+        )
         FastlaneCore.session.is_fastfile = true
         FastlaneCore.session.action_launched(launch_context: launch_context)
         result = block.call(parameters.first || {}) # to always pass a hash
@@ -222,7 +226,7 @@ module Fastlane
         custom_dir ||= ".."
       end
 
-      FastlaneCore.session.action_launched(method_sym)
+      #      FastlaneCore.session.action_launched(method_sym)
 
       verify_supported_os(method_sym, class_ref)
 
@@ -263,11 +267,11 @@ module Fastlane
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         FastlaneCore::CrashReporter.report_crash(exception: e)
         if e.fastlane_should_report_metrics?
-          app_id_guesser = FastlaneCore::AppIdentifierGuesser(args: ARGV)
+          app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
           action_completion_context = FastlaneCore::ActionCompletionContext.new(
             p_hash: app_id_guesser.p_hash,
             action_name: method_sym.to_s,
-            status: FastlaneCore::ActionCompletionStatus.USER_ERROR
+            status: FastlaneCore::ActionCompletionStatus::USER_ERROR
           )
           FastlaneCore.session.action_completed(completion_context: action_completion_context)
         end
@@ -278,11 +282,11 @@ module Fastlane
         FastlaneCore::CrashReporter.report_crash(exception: e)
 
         if e.fastlane_should_report_metrics?
-          app_id_guesser = FastlaneCore::AppIdentifierGuesser(args: ARGV)
+          app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
           action_completion_context = FastlaneCore::ActionCompletionContext.new(
             p_hash: app_id_guesser.p_hash,
             action_name: method_sym.to_s,
-            status: FastlaneCore::ActionCompletionStatus.FAILED # Is `FAILED` correct?
+            status: FastlaneCore::ActionCompletionStatus::FAILED # Is `FAILED` correct?
           )
           FastlaneCore.session.action_completed(completion_context: action_completion_context)
         end

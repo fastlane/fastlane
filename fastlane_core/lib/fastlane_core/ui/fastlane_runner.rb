@@ -60,11 +60,12 @@ module Commander
           FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_RELEASE}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
         end
 
-        guesser = AppIdentifierGuesser.new(args: ARGV)
-        action_launch_context = FastlaneCore::ActionLaunchContext.new
-        action_launch_context.action_name = @program[:name]
-        action_launch_context.platform = guesser.platform # need to update this to work even when we don't have an app_id
-
+        app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
+        action_launch_context = FastlaneCore::ActionLaunchContext.new(
+          action_name: @program[:name],
+          p_hash: app_id_guesser.p_hash,
+          platform: app_id_guesser.platform # need to update this to work even when we don't have an app_id
+        )
         FastlaneCore.session.action_launched(launch_context: action_launch_context)
         run_active_command
       rescue InvalidCommandError => e
@@ -148,11 +149,11 @@ module Commander
       FastlaneCore::CrashReporter.report_crash(exception: e)
 
       if e.fastlane_should_report_metrics?
-        app_id_guesser = FastlaneCore::AppIdentifierGuesser(args: ARGV)
+        app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
         action_completion_context = FastlaneCore::ActionCompletionContext.new(
           p_hash: app_id_guesser.p_hash,
           action_name: @program[:name],
-          status: FastlaneCore::ActionCompletionStatus.FAILED # Is `FAILED` correct?
+          status: FastlaneCore::ActionCompletionStatus::FAILED # Is `FAILED` correct?
         )
         FastlaneCore.session.action_completed(completion_context: action_completion_context)
       end
@@ -162,11 +163,11 @@ module Commander
 
     def rescue_fastlane_error(e)
       if e.fastlane_should_report_metrics?
-        app_id_guesser = FastlaneCore::AppIdentifierGuesser(args: ARGV)
+        app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
         action_completion_context = FastlaneCore::ActionCompletionContext.new(
           p_hash: app_id_guesser.p_hash,
           action_name: @program[:name],
-          status: FastlaneCore::ActionCompletionStatus.USER_ERROR # USER_ERROR because FastlaneCore::Interface::FastlaneError # user_error!
+          status: FastlaneCore::ActionCompletionStatus::USER_ERROR # USER_ERROR because FastlaneCore::Interface::FastlaneError # user_error!
         )
         FastlaneCore.session.action_completed(completion_context: action_completion_context)
       end
