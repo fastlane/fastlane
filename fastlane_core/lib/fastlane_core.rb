@@ -57,6 +57,10 @@ require 'fastlane_core/ui/fastlane_runner' # monkey patch
 module FastlaneCore
   ROOT = Pathname.new(File.expand_path('../..', __FILE__))
 
+  def self.session
+    SESSION ||= AnalyticsSession.new
+  end
+
   # A directory that's being used to user-wide fastlane configs
   # This directory is also used for the bundled fastlane
   # Since we don't want to access FastlaneCore from spaceship

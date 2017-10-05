@@ -150,10 +150,6 @@ module Fastlane
     # @!group Other things
     #####################################################
 
-    def collector
-      runner.collector
-    end
-
     # Is the given key a platform block or a lane?
     def is_platform_block?(key)
       UI.crash!('No key given') unless key
@@ -217,7 +213,8 @@ module Fastlane
       actions_path = File.join(File.expand_path("..", path), 'actions')
       Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
 
-      collector.did_launch_action(:import)
+    
+      FastlaneCore.session.action_launched(:import)
       parse(File.read(path), path)
     end
 
@@ -230,7 +227,7 @@ module Fastlane
       Actions.execute_action('import_from_git') do
         require 'tmpdir'
 
-        collector.did_launch_action(:import_from_git)
+        FastlaneCore.session.action_launched(:import_from_git)
 
         # Checkout the repo
         repo_name = url.split("/").last
@@ -272,7 +269,7 @@ module Fastlane
       # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
       value ||= yield
       Actions.execute_action('say') do
-        collector.did_launch_action(:say)
+        FastlaneCore.session.action_launched(:say)
         Fastlane::Actions::SayAction.run([value])
       end
     end
@@ -280,7 +277,7 @@ module Fastlane
     def puts(value)
       # Overwrite this, since there is already a 'puts' method defined in the Ruby standard library
       value ||= yield if block_given?
-      collector.did_launch_action(:puts)
+      FastlaneCore.session.action_launched(:puts)
       Fastlane::Actions::PutsAction.run([value])
     end
 

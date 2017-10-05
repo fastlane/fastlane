@@ -60,9 +60,12 @@ module Commander
           FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_RELEASE}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
         end
 
-        # p_hash = FastlaneCore::AppIdentifierGuesser.p_hash(args: ARGV)
+        guesser = AppIdentifierGuesser.new(args: ARGV)
+        action_launch_context = FastlaneCore::ActionLaunchContext.new
+        action_launch_context.action_name = @program[:name]
+        action_launch_context.platform = guesser.platform # need to update this to work even when we don't have an app_id
 
-        collector.did_launch_action(@program[:name])
+        FastlaneCore.session.action_launched(launch_context: action_launch_context)
         run_active_command
       rescue InvalidCommandError => e
         # calling `abort` makes it likely that tests stop without failing, so
@@ -118,12 +121,8 @@ module Commander
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         rescue_unknown_error(e)
       ensure
-        collector.did_finish
+        FastlaneCore.session.finalize_session
       end
-    end
-
-    def collector
-      @collector ||= FastlaneCore::ToolCollector.new
     end
 
     def rescue_file_error(e)
@@ -147,12 +146,12 @@ module Commander
 
     def rescue_unknown_error(e)
       FastlaneCore::CrashReporter.report_crash(exception: e)
-      collector.did_crash(@program[:name]) if e.fastlane_should_report_metrics?
+      FastlaneCore.session.did_crash(@program[:name]) if e.fastlane_should_report_metrics?
       handle_unknown_error!(e)
     end
 
     def rescue_fastlane_error(e)
-      collector.did_raise_error(@program[:name]) if e.fastlane_should_report_metrics?
+      FastlaneCore.session.did_raise_error(@program[:name]) if e.fastlane_should_report_metrics?
       show_github_issues(e.message) if e.show_github_issues
       FastlaneCore::CrashReporter.report_crash(exception: e)
       display_user_error!(e, e.message)

@@ -3,11 +3,15 @@ require 'fastlane_core/helper'
 module FastlaneCore
   class ActionLaunchContext < AnalyticsContext
     attr_accessor :action_name
-    attr_accessor :ide_version
     attr_accessor :platform
+    attr_accessor :fastfile_id
     attr_accessor :is_fastfile
     alias fastfile? is_fastfile
-    attr_accessor :fastfile_id
+
+    def ide_version
+      # need to update to include android studio
+      return FastlaneCore::Helper.xcode_version
+    end
 
     def fastlane_version
       return Fastlane::VERSION

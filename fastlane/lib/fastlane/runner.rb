@@ -197,7 +197,9 @@ module Fastlane
 
         # Actually switch lane now
         self.current_lane = new_lane
-        collector.did_launch_action(:lane_switch)
+
+        # is_fastfile == true
+        FastlaneCore.session.action_launched(:lane_switch)
         result = block.call(parameters.first || {}) # to always pass a hash
         self.current_lane = original_lane
 
@@ -218,7 +220,7 @@ module Fastlane
         custom_dir ||= ".."
       end
 
-      collector.did_launch_action(method_sym)
+      FastlaneCore.session.action_launched(method_sym)
 
       verify_supported_os(method_sym, class_ref)
 
@@ -258,13 +260,13 @@ module Fastlane
         raise e
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         FastlaneCore::CrashReporter.report_crash(exception: e)
-        collector.did_raise_error(method_sym) if e.fastlane_should_report_metrics?
+        FastlaneCore.session.did_raise_error(method_sym) if e.fastlane_should_report_metrics?
         raise e
       rescue Exception => e # rubocop:disable Lint/RescueException
         # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         # Catches all exceptions, since some plugins might use system exits to get out
         FastlaneCore::CrashReporter.report_crash(exception: e)
-        collector.did_crash(method_sym) if e.fastlane_should_report_metrics?
+        FastlaneCore.session.did_crash(method_sym) if e.fastlane_should_report_metrics?
         raise e
       end
     end
@@ -287,13 +289,9 @@ module Fastlane
       end
     end
 
-    def collector
-      @collector ||= ActionCollector.new
-    end
-
     # Fastfile was finished executing
     def did_finish
-      collector.did_finish
+      FastlaneCore.session.finalize_session
     end
 
     # Called internally to setup the runner object
