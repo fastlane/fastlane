@@ -39,7 +39,7 @@ module Gym
           # specify signingStyle in export_options if we have provisioningProfiles map
           if config[:export_options][:provisioningProfiles]
             Gym.config[:export_options][:signingStyle] = 'manual'
-          else if !config[:export_xcargs] || !config[:export_xcargs].include?("-allowProvisioningUpdates")
+          elsif !config[:export_xcargs] || !config[:export_xcargs].include?("-allowProvisioningUpdates")
             options << "-allowProvisioningUpdates"
           end
         end
