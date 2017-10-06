@@ -4,7 +4,7 @@
 
 ###### Command line tool for updating Android apps and their metadata on the Google Play Store
 
-`supply` uploads app metadata, screenshots and binaries to Google Play. You can also select tracks for builds and promote builds to production.
+_supply_ uploads app metadata, screenshots and binaries to Google Play. You can also select tracks for builds and promote builds to production.
 
 -------
 
@@ -72,13 +72,13 @@ The previous p12 configuration is still currently supported.
 - `fastlane supply init`: download metadata for an existing app to a local directory
 - `fastlane action supply`: show information on available commands, arguments and environment variables
 
-You can either run `supply` on its own and use it interactively, or you can pass arguments or specify environment variables for all the options to skip the questions.
+You can either run _supply_ on its own and use it interactively, or you can pass arguments or specify environment variables for all the options to skip the questions.
 
 ## Uploading an APK
 
 To upload a new binary to Google Play, simply run
 
-```
+```no-highlight
 fastlane supply --apk path/to/app.apk
 ```
 
@@ -86,7 +86,7 @@ This will also upload app metadata if you previously ran `fastlane supply init`.
 
 To gradually roll out a new build use
 
-```
+```no-highlight
 fastlane supply --apk path/app.apk --track rollout --rollout 0.5
 ```
 
@@ -120,7 +120,7 @@ Note that these will replace the current images and screenshots on the play stor
 
 You can add changelog files under the `changelogs/` directory for each locale. The filename should exactly match the version code of the APK that it represents. `fastlane supply init` will populate changelog files from existing data on Google Play if no `metadata/` directory exists when it is run.
 
-```
+```no-highlight
 └── fastlane
     └── metadata
         └── android

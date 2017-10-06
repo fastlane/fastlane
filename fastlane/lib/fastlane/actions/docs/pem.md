@@ -4,11 +4,11 @@
 
 ###### Automatically generate and renew your push notification profiles
 
-Tired of manually creating and maintaining your push notification profiles for your iOS apps? Tired of generating a `pem` file for your server?
+Tired of manually creating and maintaining your push notification profiles for your iOS apps? Tired of generating a _pem_ file for your server?
 
-`pem` does all that for you, just by simply running `pem`.
+_pem_ does all that for you, just by simply running _pem_.
 
-`pem` creates new .pem, .cer, and .p12 files to be uploaded to your push server if a valid push notification profile is needed. `pem` does not cover uploading the file to your server.
+_pem_ creates new .pem, .cer, and .p12 files to be uploaded to your push server if a valid push notification profile is needed. _pem_ does not cover uploading the file to your server.
 
 To automate iOS Provisioning profiles you can use [match](https://github.com/fastlane/fastlane/tree/master/match).
 
@@ -27,7 +27,7 @@ To automate iOS Provisioning profiles you can use [match](https://github.com/fas
 <h5 align="center"><code>pem</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # Features
-Well, it's actually just one: Generate the ```pem``` file for your server.
+Well, it's actually just one: Generate the ``_pem_`` file for your server.
 
 Check out this gif:
 
@@ -46,9 +46,9 @@ This does the following:
 - Downloads the certificate
 - Generates a new ```.pem``` file in the current working directory, which you can upload to your server
 
-Note that ```pem``` will never revoke your existing certificates. `pem` can't download any of your existing push certificates, as the private key is only available on the machine it was created on. 
+Note that ``_pem_`` will never revoke your existing certificates. _pem_ can't download any of your existing push certificates, as the private key is only available on the machine it was created on. 
 
-If you already have a push certificate enabled, which is active for at least 30 more days, `pem` will not create a new certificate. If you still want to create one, use the `force`:
+If you already have a push certificate enabled, which is active for at least 30 more days, _pem_ will not create a new certificate. If you still want to create one, use the `force`:
 
     fastlane pem --force
 
@@ -75,14 +75,14 @@ To get a list of available options run:
 
 ### Note about empty `p12` passwords and Keychain Access.app
 
-`pem` will produce a valid `p12` without specifying a password, or using the empty-string as the password.
+_pem_ will produce a valid `p12` without specifying a password, or using the empty-string as the password.
 While the file is valid, the Mac's Keychain Access will not allow you to open the file without specifying a passphrase.
 
 Instead, you may verify the file is valid using OpenSSL:
 
     openssl pkcs12 -info -in my.p12
 
-If you need the `p12` in your keychain, perhaps to test push with an app like [Knuff](https://github.com/KnuffApp/Knuff) or [Pusher](https://github.com/noodlewerk/NWPusher), you can use `openssl` to export the `p12` to `pem` and back to `p12`:
+If you need the `p12` in your keychain, perhaps to test push with an app like [Knuff](https://github.com/KnuffApp/Knuff) or [Pusher](https://github.com/noodlewerk/NWPusher), you can use `openssl` to export the `p12` to _pem_ and back to `p12`:
 
     % openssl pkcs12 -in my.p12 -out my.pem
     Enter Import Password:
@@ -106,15 +106,15 @@ Run `fastlane action pem` to get a list of available environment variables.
 
 # How does it work?
 
-`pem` uses [spaceship](https://spaceship.airforce) to communicate with the Apple Developer Portal to request a new push certificate for you.
+_pem_ uses [spaceship](https://spaceship.airforce) to communicate with the Apple Developer Portal to request a new push certificate for you.
 
 ## How is my password stored?
-```pem``` uses the [password manager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/fastlane/fastlane/tree/master/credentials_manager) for more information.
+``_pem_`` uses the [password manager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from _fastlane_. Take a look the [CredentialsManager README](https://github.com/fastlane/fastlane/tree/master/credentials_manager) for more information.
 
 # Tips
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
 
-It will show you the ```pem``` files like this:
+It will show you the ``_pem_`` files like this:
 ![img/actions/QuickLookScreenshot.png](assets/QuickLookScreenshot.png)

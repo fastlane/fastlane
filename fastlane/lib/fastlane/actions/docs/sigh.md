@@ -33,26 +33,26 @@ To automate iOS Push profiles you can use [pem](https://github.com/fastlane/fast
 
 ### Why not let Xcode do the work?
 
-- ```sigh``` can easily be integrated into your CI-server (e.g. Jenkins)
+- _sigh_ can easily be integrated into your CI-server (e.g. Jenkins)
 - Xcode sometimes invalidates [all existing profiles](assets/SignErrors.png)
 - You have control over what happens
 - You still get to have the signing files, which you can then use for your build scripts or store in git
 
-See ```sigh``` in action:
+See _sigh_ in action:
 
 ![img/actions/sighRecording.gif](assets/sighRecording.gif)
 
 # Usage
 
-**Note**: It is recommended to use [match](https://github.com/fastlane/fastlane/tree/master/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use `sigh` directly only if you want full control over what's going on and know more about codesigning.
+**Note**: It is recommended to use [match](https://github.com/fastlane/fastlane/tree/master/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use _sigh_ directly only if you want full control over what's going on and know more about codesigning.
 
-```
+```no-highlight
 fastlane sigh
 ```
 
 Yes, that's the whole command!
 
-`sigh` will create, repair and download profiles for the App Store by default.
+_sigh_ will create, repair and download profiles for the App Store by default.
 
 You can pass your bundle identifier and username like this:
 
@@ -82,7 +82,7 @@ For a list of available parameters and commands run
 
 ### Advanced
 
-By default, ```sigh``` will install the downloaded profile on your machine. If you just want to generate the profile and skip the installation, use the following flag:
+By default, _sigh_ will install the downloaded profile on your machine. If you just want to generate the profile and skip the installation, use the following flag:
 
     fastlane sigh --skip_install
 
@@ -90,7 +90,7 @@ To save the provisioning profile under a specific name, use the -q option:
 
     fastlane sigh -a com.krausefx.app -u username -q "myProfile.mobileprovision"
 
-If for some reason you don't want `sigh` to verify that the code signing identity is installed on your local machine:
+If for some reason you don't want _sigh_ to verify that the code signing identity is installed on your local machine:
 
     fastlane sigh --skip_certificate_verification
 
@@ -98,7 +98,7 @@ If you need the provisioning profile to be renewed regardless of its state use t
 
     fastlane sigh --force
 
-By default, `sigh` will include all certificates on development profiles, and first certificate on other types. If you need to specify which certificate to use you can either use the environment variable `SIGH_CERTIFICATE`, or pass the name or expiry date of the certificate as argument:
+By default, _sigh_ will include all certificates on development profiles, and first certificate on other types. If you need to specify which certificate to use you can either use the environment variable `SIGH_CERTIFICATE`, or pass the name or expiry date of the certificate as argument:
 
     fastlane sigh -c "SunApps GmbH"
 
@@ -107,9 +107,9 @@ For a list of available parameters and commands run
     fastlane action sigh
 
 
-### Use with [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane)
+### Use with [_fastlane_](https://github.com/fastlane/fastlane/tree/master/fastlane)
 
-`sigh` becomes really interesting when used in [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane) in combination with [`cert`](https://github.com/fastlane/fastlane/tree/master/cert).
+_sigh_ becomes really interesting when used in [_fastlane_](https://github.com/fastlane/fastlane/tree/master/fastlane) in combination with [_cert_](https://github.com/fastlane/fastlane/tree/master/cert).
 
 Update your `Fastfile` to contain the following code:
 
@@ -121,12 +121,12 @@ end
 ```
 
 `force: true` will make sure to re-generate the provisioning profile on each run.
-This will result in `sigh` always using the correct signing certificate, which is installed on the local machine.
+This will result in _sigh_ always using the correct signing certificate, which is installed on the local machine.
 
 
 # Repair
 
-`sigh` can automatically repair all your existing provisioning profiles which are expired or just invalid.
+_sigh_ can automatically repair all your existing provisioning profiles which are expired or just invalid.
 
     fastlane sigh repair
 
@@ -136,7 +136,7 @@ If you generated your `ipa` file but want to apply a different code signing onto
 
     fastlane sigh resign
 
-`sigh` will find the ipa file and the provisioning profile for you if they are located in the current folder.
+_sigh_ will find the ipa file and the provisioning profile for you if they are located in the current folder.
 
 You can pass more information using the command line:
 
@@ -158,16 +158,16 @@ Or delete all `iOS Team Provisioning Profile` by using a regular expression
 
 ## Environment Variables
 
-Run `fastlane sigh --help` to get a list of all available environment variables.
+Run `fastlane action sigh` to get a list of all available environment variables.
 
-If you're using [cert](https://github.com/fastlane/fastlane/tree/master/cert) in combination with [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) the signing certificate will automatically be selected for you. (make sure to run `cert` before `sigh`)
+If you're using [cert](https://github.com/fastlane/fastlane/tree/master/cert) in combination with [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) the signing certificate will automatically be selected for you. (make sure to run _cert_ before _sigh_)
 
 # How does it work?
 
-`sigh` will access the `iOS Dev Center` to download, renew or generate the `.mobileprovision` file. It uses [spaceship](https://spaceship.airforce) to communicate with Apple's web services.
+_sigh_ will access the `iOS Dev Center` to download, renew or generate the `.mobileprovision` file. It uses [spaceship](https://spaceship.airforce) to communicate with Apple's web services.
 
 ## How is my password stored?
-`sigh` uses the [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from `fastlane`.
+_sigh_ uses the [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from _fastlane_.
 
 # Tips
 
@@ -184,4 +184,4 @@ If you also want to create a new App Identifier on the Apple Developer Portal, c
 
 ## What happens to my Xcode managed profiles?
 
-`sigh` will never touch or use the profiles which are created and managed by Xcode. Instead `sigh` will manage its own set of provisioning profiles.
+_sigh_ will never touch or use the profiles which are created and managed by Xcode. Instead _sigh_ will manage its own set of provisioning profiles.

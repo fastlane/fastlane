@@ -4,7 +4,7 @@
 
 ###### Quickly put your screenshots into the right device frames
 
-`frameit` allows you to put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Use `frameit` to prepare perfect screenshots for the App Store, your website, QA or emails.
+_frameit_ allows you to put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Use _frameit_ to prepare perfect screenshots for the App Store, your website, QA or emails.
 
 -------
 
@@ -28,7 +28,7 @@ Put a gorgeous device frame around your iOS and macOS screenshots just by runnin
 
 The complete and updated list of supported devices and colors can be found [here](https://github.com/fastlane/frameit-frames/tree/gh-pages/latest)
 
-Here is a nice gif, that shows ```frameit``` in action:
+Here is a nice gif, that shows ``_frameit_`` in action:
 
 ![img/actions/FrameitGit.gif](assets/FrameitGit.gif?raw=1)
 
@@ -47,7 +47,7 @@ Here is a nice gif, that shows ```frameit``` in action:
 <h5 align="center">The <code>frameit</code> 2.0 update was kindly sponsored by <a href="https://mindnode.com/">MindNode</a>, seen in the screenshots above.
 
 
-The first time that ```frameit``` is executed the frames will be downloaded automatically. Originally the frames are coming from [Facebook frameset](http://facebook.design/devices) and they are kept on this repo: https://github.com/fastlane/frameit-frames
+The first time that ``_frameit_`` is executed the frames will be downloaded automatically. Originally the frames are coming from [Facebook frameset](http://facebook.design/devices) and they are kept on this repo: https://github.com/fastlane/frameit-frames
 
 More information about this process and how to update the frames can be found [here](https://github.com/fastlane/fastlane/tree/master/frameit/frames_generator)
 
@@ -67,11 +67,11 @@ To download the latest frames
 
     fastlane frameit download_frames
 
-When using `frameit` without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store.
+When using _frameit_ without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store.
 
 # Titles and Background (optional)
 
-With `frameit` 2.0 you are now able to add a custom background, title and text colors to your screenshots.
+With _frameit_ 2.0 you are now able to add a custom background, title and text colors to your screenshots.
 
 A working example can be found in the [fastlane examples](https://github.com/fastlane/examples/tree/master/MindNode/screenshots) project.
 
@@ -125,11 +125,11 @@ Use it to define the general information:
   ]
 }
 ```
-The `stack_title` value specifies whether `frameit` should display the keyword above the title when both keyword and title are defined.
+The `stack_title` value specifies whether _frameit_ should display the keyword above the title when both keyword and title are defined.
 
-The `show_complete_frame` value specifies whether `frameit` should shrink the device and frame so that they show in full in the framed screenshot. If it is false, then they can hang over the bottom of the screenshot.
+The `show_complete_frame` value specifies whether _frameit_ should shrink the device and frame so that they show in full in the framed screenshot. If it is false, then they can hang over the bottom of the screenshot.
 
-The `title_below_image` value specifies whether `frameit` should place the title below the screenshot. If it is false, it will be placed above the screenshot.
+The `title_below_image` value specifies whether _frameit_ should place the title below the screenshot. If it is false, it will be placed above the screenshot.
 
 The `filter` value is a part of the screenshot named for which the given option should be used. If a screenshot is named `iPhone5_Brainstorming.png` the first entry in the `data` array will be used.
 
@@ -145,7 +145,7 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 
 **Note:** These `.strings` files **MUST** be utf-16 encoded (UTF-16 BE with BOM).  They also must begin with an empty line. If you are having trouble see [issue #1740](https://github.com/fastlane/fastlane/issues/1740)
 
-**Note:** You **MUST** provide a background if you want titles. `frameit` will not add the tiles if a background is not specified.
+**Note:** You **MUST** provide a background if you want titles. _frameit_ will not add the tiles if a background is not specified.
 
 #### Uploading screenshots to iTC
 
@@ -153,9 +153,9 @@ Use [deliver](https://github.com/fastlane/fastlane/tree/master/deliver) to uploa
 
 ### Mac
 
-With `frameit` 2.0 it's possible to also frame macOS Application screenshots. You have to provide the following:
+With _frameit_ 2.0 it's possible to also frame macOS Application screenshots. You have to provide the following:
 
-- The `offset` information so `frameit` knows where to put your screenshots
+- The `offset` information so _frameit_ knows where to put your screenshots
 - A path to a `background`, which should contain both the background and the Mac
 - `titleHeight`: The height in px that should be used for the title
 
@@ -188,7 +188,7 @@ Check out the [MindNode example project](https://github.com/fastlane/examples/tr
 # Tips
 
 ## Generate localized screenshots
-Check out [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot) to automatically generate screenshots using ```UI Automation```.
+Check out [_snapshot_](https://github.com/fastlane/fastlane/tree/master/snapshot) to automatically generate screenshots using ```UI Automation```.
 
 ## Alternative location to store device_frames
 

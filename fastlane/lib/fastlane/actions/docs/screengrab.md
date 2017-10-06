@@ -4,7 +4,7 @@
 
 ###### Automated localized screenshots of your Android app on every device
 
-`screengrab` generates localized screenshots of your Android app for different device types and languages for Google Play and can be uploaded using [`supply`](https://fastlane.tools/supply).
+_screengrab_ generates localized screenshots of your Android app for different device types and languages for Google Play and can be uploaded using [_supply_](https://fastlane.tools/supply).
 
 <img src="/img/actions/running-screengrab.gif" width="640">
 
@@ -14,13 +14,13 @@
 - Easily verify that localizations fit into labels on all screen dimensions to find UI mistakes before you ship
 - You only need to configure it once for anyone on your team to run it
 - Keep your screenshots perfectly up-to-date with every app update. Your customers deserve it!
-- Fully integrates with [`fastlane`](https://fastlane.tools) and [`supply`](https://fastlane.tools/supply)
+- Fully integrates with [_fastlane_](https://fastlane.tools) and [_supply_](https://fastlane.tools/supply)
 
 # Installation
 
 Install the gem
 
-```
+```no-highlight
 sudo gem install fastlane
 ```
 
@@ -58,11 +58,11 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
   - You can create your APKs with `./gradlew assembleDebug assembleAndroidTest`
 - Once complete run `fastlane screengrab` in your app project directory to generate screenshots
     - You will be prompted to provide any required parameters which are not in your **Screengrabfile** or provided as command line arguments
-- Your screenshots will be saved to `fastlane/metadata/android` in the directory where you ran `screengrab`
+- Your screenshots will be saved to `fastlane/metadata/android` in the directory where you ran _screengrab_
 
 ## Improved screenshot capture with UI Automator
 
-As of `screengrab` 0.5.0, you can specify different strategies to control the way `screengrab` captures screenshots. The newer strategy delegates to [UI Automator](https://developer.android.com/topic/libraries/testing-support-library/index.html#UIAutomator) which fixes a number of problems compared to the original strategy:
+As of _screengrab_ 0.5.0, you can specify different strategies to control the way _screengrab_ captures screenshots. The newer strategy delegates to [UI Automator](https://developer.android.com/topic/libraries/testing-support-library/index.html#UIAutomator) which fixes a number of problems compared to the original strategy:
 
 * Shadows/elevation are correctly captured for Material UI
 * Multi-window situations are correctly captured (dialogs, etc.)
@@ -97,7 +97,7 @@ clear_previous_screenshots true
 
 For more information about all available options run
 
-```
+```no-highlight
 fastlane action screengrab
 ```
 

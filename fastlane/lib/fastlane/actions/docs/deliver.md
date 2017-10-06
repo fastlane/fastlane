@@ -410,7 +410,7 @@ _deliver_ uses the following techniques under the hood:
 # Tips
 
 ## Available language codes
-```
+```no-highlight
 no, en-US, en-CA, fi, ru, zh-Hans, nl-NL, zh-Hant, en-AU, id, de-DE, sv, ko, ms, pt-BR, el, es-ES, it, fr-CA, es-MX, pt-PT, vi, th, ja, fr-FR, da, tr, en-GB
 ```
 

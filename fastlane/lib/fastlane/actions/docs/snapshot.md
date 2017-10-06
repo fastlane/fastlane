@@ -10,7 +10,7 @@
 </h4>
 <hr />
 
-_snapshot_ generates localized iOS and tvOS screenshots for different device types and languages for the App Store and can be uploaded using ([`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)).
+_snapshot_ generates localized iOS and tvOS screenshots for different device types and languages for the App Store and can be uploaded using ([_deliver_](https://github.com/fastlane/fastlane/tree/master/deliver)).
 
 You have to manually create 20 (languages) x 6 (devices) x 5 (screenshots) = **600 screenshots**.
 
@@ -20,7 +20,7 @@ It's hard to get everything right!
 - No loading indicators
 - Same content / screens
 - [Clean Status Bar](#use-a-clean-status-bar)
-- Uploading screenshots ([`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver) is your friend)
+- Uploading screenshots ([_deliver_](https://github.com/fastlane/fastlane/tree/master/deliver) is your friend)
 
 More information about [creating perfect screenshots](https://krausefx.com/blog/creating-perfect-app-store-screenshots-of-your-ios-app).
 
@@ -44,7 +44,7 @@ _snapshot_ runs completely in the background - you can do something else, while 
 - Take screenshots in multiple device simulators concurrently to cut down execution time (Xcode 9 only)
 - Configure it once, store the configuration in git
 - Do something else, while the computer takes the screenshots for you
-- Integrates with [`fastlane`](https://fastlane.tools) and [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver)
+- Integrates with [_fastlane_](https://fastlane.tools) and [_deliver_](https://github.com/fastlane/fastlane/tree/master/deliver)
 - Generates a beautiful web page, which shows all screenshots on all devices. This is perfect to send to QA or the marketing team
 - _snapshot_ automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
 
@@ -118,7 +118,7 @@ To quick start your UI tests, you can use the UI Test recorder. You only have to
 
 # Usage
 
-```sh
+```no-highlight
 fastlane snapshot
 ```
 
@@ -130,44 +130,44 @@ New with Xcode 9, *snapshot* can run multiple simulators concurrently. This is t
 
 If any error occurs while running the snapshot script on a device, that device will not have any screenshots, and _snapshot_ will continue with the next device or language. To stop the flow after the first error, run
 
-```sh
+```no-highlight
 fastlane snapshot --stop_after_first_error
 ```
 
 Also by default, _snapshot_ will open the HTML after all is done. This can be skipped with the following command
 
 
-```sh
+```no-highlight
 fastlane snapshot --stop_after_first_error --skip_open_summary
 ```
 
 There are a lot of options available that define how to build your app, for example
 
-```sh
+```no-highlight
 fastlane snapshot --scheme "UITests" --configuration "Release"  --sdk "iphonesimulator"
 ```
 
 Reinstall the app before running _snapshot_
 
-```sh
+```no-highlight
 fastlane snapshot --reinstall_app --app_identifier "tools.fastlane.app"
 ```
 
 By default _snapshot_ automatically retries running UI Tests if they fail. This is due to randomly failing UI Tests (e.g. [#372](https://github.com/fastlane/snapshot/issues/372)). You can adapt this number using
 
-```sh
+```no-highlight
 fastlane snapshot --number_of_retries 3
 ```
 
 Add photos and/or videos to the simulator before running _snapshot_
 
-```sh
+```no-highlight
 fastlane snapshot --add_photos MyTestApp/Assets/demo.jpg --add_videos MyTestApp/Assets/demo.mp4
 ```
 
 For a list for all available options run
 
-```sh
+```no-highlight
 fastlane action snapshot
 ```
 
@@ -216,7 +216,7 @@ add_photos ["MyTestApp/Assets/demo.jpg"]
 
 You can run this command in the terminal to delete and re-create all iOS and tvOS simulators:
 
-```
+```no-highlight
 fastlane snapshot reset_simulators
 ```
 
@@ -230,7 +230,7 @@ Some updates require the helper files to be updated. _snapshot_ will automatical
 
 Basically you can run
 
-```
+```no-highlight
 fastlane snapshot update
 ```
 

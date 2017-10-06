@@ -22,7 +22,7 @@ _gym_ is a replacement for [shenzhen](https://github.com/nomad/shenzhen).
 
 ### Before _gym_
 
-```
+```no-highlight
 xcodebuild clean archive -archivePath build/MyApp \
                          -scheme MyApp
 xcodebuild -exportArchive \
@@ -34,7 +34,7 @@ xcodebuild -exportArchive \
 
 ### With _gym_
 
-```
+```no-highlight
 fastlane gym
 ```
 
@@ -82,7 +82,7 @@ DEVELOPER_DIR="/Applications/Xcode6.2.app" fastlane gym
 
 For a list of all available parameters use
 
-```
+```no-highlight
 fastlane action gym
 ```
 
@@ -207,7 +207,7 @@ When you run _gym_ without the `--silent` mode it will print out every command i
 
 To build the archive _gym_ uses the following command:
 
-```
+```no-highlight
 set -o pipefail && \
 xcodebuild -scheme 'Example' \
 -project './Example.xcodeproj' \
@@ -223,7 +223,7 @@ _gym_ automatically chooses a different packaging method depending on the versio
 
 ### Xcode 7 and above
 
-```
+```no-highlight
 /usr/bin/xcrun path/to/xcbuild-safe.sh -exportArchive \
 -exportOptionsPlist '/tmp/gym_config_1442852529.plist' \
 -archivePath '/Users/fkrause/Library/Developer/Xcode/Archives/2015-09-21/App 2015-09-21 09.21.56.xcarchive' \

@@ -22,7 +22,7 @@ In the gif we used `cert && sigh`, which will first create an iOS code signing c
 
 **Note**: It is recommended to use [match](/actions/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.
 
-```
+```no-highlight
 fastlane cert
 ```
 

@@ -91,7 +91,7 @@ end
 
 # How does it work?
 
-`precheck` will access `iTunes Connect` to download your app's metadata. It uses [spaceship](https://spaceship.airforce) to communicate with Apple's web services.
+_precheck_ will access `iTunes Connect` to download your app's metadata. It uses [spaceship](https://spaceship.airforce) to communicate with Apple's web services.
 
 # Want to improve precheck's rules?
 Please submit an issue on GitHub and provide information about your App Store rejection! Make sure you scrub out any personally identifiable information since this will be public.

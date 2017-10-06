@@ -4,7 +4,7 @@
 
 ###### Create new iOS apps on iTunes Connect and Dev Portal using your command line
 
-`produce` creates new iOS apps on both the Apple Developer Portal and iTunes Connect with the minimum required information.
+_produce_ creates new iOS apps on both the Apple Developer Portal and iTunes Connect with the minimum required information.
 
 -------
 
@@ -36,7 +36,7 @@ To get a list of all available parameters:
 
     fastlane produce --help
 
-```
+```no-highlight
   Commands: (* default)
     associate_group      Associate with a group, which is created if needed or simply located otherwise
     associate_merchant   Associate with a merchant for use with Apple Pay. Apple Pay will be enabled for this app
@@ -93,9 +93,11 @@ If you want to associate an app with an App Group:
 
 Get a list of all available options using
 
-    fastlane produce enable_services --help
-
+```no-highlight
+fastlane produce enable_services --help
 ```
+
+```no-highlight
     --app-group          Enable App Groups
     --apple-pay          Enable Apple Pay
     --associated-domains Enable Associated Domains
@@ -113,7 +115,9 @@ Get a list of all available options using
     --vpn-conf           Enable VPN Configuration
 ```
 
-    fastlane produce disable_services --help
+```no-highlight
+fastlane produce disable_services --help
+```
 
 ```
     --app-group          Disable App Groups
@@ -137,7 +141,7 @@ Get a list of all available options using
 
 If you want to create a new Apple Pay Merchant Identifier:
 
-```
+```no-highlight
 fastlane produce merchant -o merchant.com.example.production -r "Example Merchant Production"
 ```
 
@@ -148,19 +152,19 @@ fastlane produce merchant --help
 
 If you want to associate an app with a Merchant Identifier:
 
-```
+```no-highlight
 fastlane produce associate_merchant -a com.krausefx.app merchant.com.example.production
 ```
 
 If you want to associate an app with multiple Merchant Identifiers:
 
-```
+```no-highlight
 fastlane produce associate_merchant -a com.krausefx.app merchant.com.example.production merchant.com.example.sandbox
 ```
 
 Use --help for more information about all available parameters
 
-```
+```no-highlight
 fastlane produce associate_merchant --help
 ```
 
@@ -171,6 +175,7 @@ All available values can also be passed using environment variables, run `fastla
 ## _fastlane_ Integration
 
 Your `Fastfile` should look like this
+
 ```ruby
 lane :release do
   produce(
@@ -207,16 +212,16 @@ lane :release do
 end
 ```
 
-To use the newly generated app in `deliver`, you need to add this line to your `Deliverfile`:
+To use the newly generated app in _deliver_, you need to add this line to your `Deliverfile`:
 
 ```ruby
 apple_id ENV['PRODUCE_APPLE_ID']
 ```
 
-This will tell `deliver`, which `App ID` to use, since the app is not yet available in the App Store.
+This will tell _deliver_, which `App ID` to use, since the app is not yet available in the App Store.
 
 You'll still have to fill out the remaining information (like screenshots, app description and pricing). You can use [deliver](https://github.com/fastlane/fastlane/tree/master/deliver) to upload your app metadata using a CLI
 
 ## How is my password stored?
 
-`produce` uses the [password manager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from `fastlane`. Take a look the [CredentialsManager README](https://github.com/fastlane/fastlane/tree/master/credentials_manager) for more information.
+_produce_ uses the [password manager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from _fastlane_. Take a look the [CredentialsManager README](https://github.com/fastlane/fastlane/tree/master/credentials_manager) for more information.

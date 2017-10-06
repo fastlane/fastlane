@@ -4,7 +4,7 @@
 
 ###### The easiest way to run tests of your iOS and Mac app
 
-`scan` makes it easy to run tests of your iOS and Mac app on a simulator or connected device.
+_scan_ makes it easy to run tests of your iOS and Mac app on a simulator or connected device.
 
 -------
 
@@ -20,9 +20,9 @@
 
 ![https://pbs.twimg.com/media/CURcEpuWoAArE3d.png:large](https://pbs.twimg.com/media/CURcEpuWoAArE3d.png:large)
 
-### Before `scan`
+### Before _scan_
 
-```sh
+```no-highlight
 xcodebuild \
   -workspace MyApp.xcworkspace \
   -scheme "MyApp" \
@@ -33,7 +33,7 @@ xcodebuild \
 
 As the output will look like this
 
-```
+```no-highlight
 /Users/felixkrause/Library/Developer/Xcode/DerivedData/Example-fhlmxikmujknefgidqwqvtbatohi/Build/Intermediates/ArchiveIntermediates/Example/IntermediateBuildFilesPath/Example.build/Release-iphoneos/Example.build/Objects-normal/arm64/main.o Example/main.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
     cd /Users/felixkrause/Developer/fastlane/gym/example/cocoapods
     export LANG=en_US.US-ASCII
@@ -42,7 +42,7 @@ As the output will look like this
 ```
 you'll probably want to use something like [xcpretty](https://github.com/supermarin/xcpretty), which will look like this:
 
-```sh
+```no-highlight
 set -o pipefail &&
   xcodebuild \
     -workspace MyApp.xcworkspace \
@@ -55,24 +55,24 @@ set -o pipefail &&
     -o "tests.html"
 ```
 
-### With `scan`
+### With _scan_
 
-```
+```no-highlight
 fastlane scan
 ```
 
-### Why `scan`?
+### Why _scan_?
 
-`scan` uses the latest APIs and tools to make running tests plain simple and offer a great integration into your existing workflow, like [fastlane](https://fastlane.tools) or Jenkins.
+_scan_ uses the latest APIs and tools to make running tests plain simple and offer a great integration into your existing workflow, like [fastlane](https://fastlane.tools) or Jenkins.
 
 |          |  scan Features  |
 |----------|-----------------|
 :checkered_flag: | Beautiful inline build output while running the tests
 :mountain_cableway: | Sensible defaults: Automatically detect the project, schemes and more
 :bar_chart: | Support for HTML, JSON and JUnit reports
-:mag: | Xcode duplicated your simulators again? `scan` will handle this for you
+:mag: | Xcode duplicated your simulators again? _scan_ will handle this for you
 :link:  | Works perfectly with [fastlane](https://fastlane.tools) and other tools
-:bullettrain_side: | Don't remember any complicated build commands, just `scan`
+:bullettrain_side: | Don't remember any complicated build commands, just _scan_
 :wrench:  | Easy and dynamic configuration using parameters and environment variables
 :loudspeaker: | Beautiful slack notifications of the test results
 :floppy_disk:   | Store common build settings in a `Scanfile`
@@ -81,7 +81,7 @@ fastlane scan
 :man:      | Automatically switches to the [travis formatter](https://github.com/kattrali/xcpretty-travis-formatter) when running on Travis
 :book:     | Helps you resolve common test errors like simulator not responding
 
-`scan` uses a plain `xcodebuild` command, therefore keeping 100% compatible with `xcodebuild`. To generate the nice output, `scan` uses [xcpretty](https://github.com/supermarin/xcpretty). You can alway access the raw output in `~/Library/Logs/scan`.
+_scan_ uses a plain `xcodebuild` command, therefore keeping 100% compatible with `xcodebuild`. To generate the nice output, _scan_ uses [xcpretty](https://github.com/supermarin/xcpretty). You can alway access the raw output in `~/Library/Logs/scan`.
 
 ![img/actions/scanScreenshot.png](assets/scanScreenshot.png)
 ![img/actions/slack.png](assets/slack.png)
@@ -100,7 +100,7 @@ If you need to use a different xcode install, use `xcode-select` or define `DEVE
 
     DEVELOPER_DIR="/Applications/Xcode6.2.app" scan
 
-To run `scan` on multiple devices via [fastlane](https://fastlane.tools), add this to your `Fastfile`:
+To run _scan_ on multiple devices via [fastlane](https://fastlane.tools), add this to your `Fastfile`:
 
 ```ruby
 scan(
@@ -132,9 +132,9 @@ output_types "html"
 
 # Automating the whole process
 
-`scan` works great together with [fastlane](https://fastlane.tools), which connects all deployment tools into one streamlined workflow.
+_scan_ works great together with [fastlane](https://fastlane.tools), which connects all deployment tools into one streamlined workflow.
 
-Using `fastlane` you can define a configuration like
+Using _fastlane_ you can define a configuration like
 
 ```ruby
 lane :test do
