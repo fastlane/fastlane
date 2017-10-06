@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://docs.fastlane.tools/actions/cert">
-    <img src="https://raw.githubusercontent.com/fastlane/fastlane/master/deliver/assets/cert.png" height="110">
+    <img src="https://raw.githubusercontent.com/fastlane/fastlane/master/cert/assets/cert.png" height="110">
   </a>
 </p>
 
