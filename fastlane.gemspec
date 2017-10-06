@@ -43,6 +43,8 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'public_suffix', '~> 2.0.0' # https://github.com/fastlane/fastlane/issues/10162
 
+  spec.add_dependency 'bootsnap', '>= 1.1.7', '< 2.0.0'
+
   # TTY dependencies
   spec.add_dependency 'tty-screen', '~> 0.6.3' # detect the terminal width
 
