@@ -113,7 +113,7 @@ fastlane new_plugin [plugin_name]
 
 ##### New plugin for existing gem
 
-If you already have an exiting gem you want to provide a `fastlane` plugin for, you'll still have to create a new Ruby gem. The reason for that is the way plugins are imported.
+If you already have an existing gem you want to provide a `fastlane` plugin for, you'll still have to create a new Ruby gem. The reason for that is the way plugins are imported.
 
 The example project [xcake](https://github.com/jcampbell05/xcake) contains a folder named `fastlane-plugin-xcake`.
 
