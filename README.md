@@ -10,17 +10,13 @@ fastlane
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](https://rubygems.org/gems/fastlane)
 [![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
 
-#### ✨ Check out [docs.fastlane.tools](https://docs.fastlane.tools) on how to get started with fastlane ✨
-
 `fastlane` is a tool for iOS and Android developers to automate tedious tasks like generating screenshots, dealing with provisioning profiles, and releasing your application.
 
 <hr />
 <h4 align="center">
-  Check out the new <a href="https://docs.fastlane.tools/">fastlane docs</a>
+  ✨ Check out the new <a href="https://docs.fastlane.tools/">fastlane docs</a> ✨
 </h4>
 <hr />
-
-##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools).
 
 ## Need Help?
 
@@ -32,6 +28,10 @@ Before submitting a new GitHub issue, please make sure to
 If the above doesn't help, please [submit an issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup, in particular the output of the `fastlane env` command.
 
 **Note**: If you want to report a regression in _fastlane_ (something that has worked before, but broke with a new release), please mark your issue title as such using `[Regression] Your title here`. This enables us to quickly detect and fix regressions.
+
+## Contribute to _fastlane_
+
+Check out [CONTRIBUTING.md](CONTRIBUTING.md) for more information on how to help with _fastlane_.
 
 ## Code of Conduct
 
