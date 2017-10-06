@@ -157,7 +157,9 @@ end
 desc "Update the actions.md on https://docs.fastlane.tools"
 desc "This will also automatically submit a pull request to fastlane/docs"
 lane :update_docs do |options|
-  verify_env_variables
+  if !options[:skip_pr] && !env_variables_provided    
+    UI.user_error!("Missing ENV variables, make sure to provide one for fastlane docs to be successful")
+  end
 
   template_path = File.expand_path("./assets/render_plugin.md.erb")
   clone_docs do
@@ -181,8 +183,10 @@ lane :update_docs do |options|
     end
 
     plugins_path = "docs/plugins/available-plugins.md"
-    plugin_scores(template_path: template_path,
-                    output_path: plugins_path)
+    if env_variables_provided
+      plugin_scores(template_path: template_path,
+                      output_path: plugins_path)
+    end
 
     if `git status --porcelain`.length == 0
       UI.success("No changes the docs ✅")
@@ -332,9 +336,10 @@ end
 
 desc "Ensure all the requirement environment variables are provided"
 desc "this way the deployment script will fail early (and often)"
-private_lane :verify_env_variables do
+private_lane :env_variables_provided do
   ["GITHUB_USER_NAME", "GITHUB_API_TOKEN"].each do |variable|
     next if ENV[variable].to_s.length > 0
-    UI.user_error!("Missing ENV variables #{variable}, make sure to provide one for fastlane to be successful")
+    return false
   end
+  return true
 end
