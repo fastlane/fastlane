@@ -13,9 +13,9 @@ fastlane
 `fastlane` is a tool for iOS and Android developers to automate tedious tasks like generating screenshots, dealing with provisioning profiles, and releasing your application.
 
 <hr />
-<h4 align="center">
-  ✨ Check out the new <a href="https://docs.fastlane.tools/">fastlane docs</a> ✨
-</h4>
+<h2 align="center">
+  ✨ All _fastlane_ docs were moved to <a href="https://docs.fastlane.tools/">docs.fastlane.tools</a> ✨
+</h2>
 <hr />
 
 ## Need Help?
