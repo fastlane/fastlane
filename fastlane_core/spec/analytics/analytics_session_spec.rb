@@ -51,6 +51,12 @@ describe FastlaneCore::AnalyticsSession do
         )
       end
 
+      let(:fixture_data) do
+        event = JSON.parse(File.read(File.join(fixture_dirname, '/completed_success.json')))
+        event["action"]["detail"] = action_name
+        event
+      end
+
       it 'appends a completion event to the events array' do
         expect(SecureRandom).to receive(:uuid).and_return(session_id)
         expect(Time).to receive(:now).and_return(timestamp_millis)
@@ -58,28 +64,7 @@ describe FastlaneCore::AnalyticsSession do
         expect(session).to receive(:oauth_app_name).and_return(oauth_app_name)
 
         session.action_completed(completion_context: completion_context)
-        expect(session.events.last).to eq(
-          {
-            event_source: {
-              oauth_app_name: oauth_app_name,
-              product: 'fastlane'
-            },
-            actor: {
-              name: p_hash,
-              detail: session_id
-            },
-            action: {
-              name: 'completed',
-              detail: action_name
-            },
-            primary_target: {
-              name: 'status',
-              detail: 'success'
-            },
-            millis_since_epoch: timestamp_millis * 1000,
-            version: 1
-          }
-        )
+        expect(JSON.parse(session.events.last.to_json)).to eq(fixture_data)
       end
     end
   end
