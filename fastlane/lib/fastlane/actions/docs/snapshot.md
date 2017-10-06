@@ -26,8 +26,6 @@ More information about [creating perfect screenshots](https://krausefx.com/blog/
 
 _snapshot_ runs completely in the background - you can do something else, while your computer takes the screenshots for you.
 
-Get in contact with the developer on Twitter: [@FastlaneTools](https://twitter.com/FastlaneTools)
-
 -------
 
 <p align="center">
