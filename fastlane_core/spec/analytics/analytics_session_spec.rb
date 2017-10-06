@@ -19,31 +19,23 @@ describe FastlaneCore::AnalyticsSession do
       JSON.parse(File.read(File.join(dirname, './fixtures/launched.json')))
     end
 
+
+
     it "adds all events to the session's events array" do
       expect(SecureRandom).to receive(:uuid).and_return(session_id)
       allow(Time).to receive(:now).and_return(timestamp_millis)
 
       session = FastlaneCore::AnalyticsSession.new
+
+      # Stub out calls related to the execution environment
       session.is_fastfile = true
       allow(session).to receive(:oauth_app_name).and_return(oauth_app_name)
+      expect(session).to receive(:fastlane_version).and_return('2.5.0')
+      expect(session).to receive(:ruby_version).and_return('2.4.0')
+      expect(session).to receive(:operating_system_version).and_return('10.12')
+      expect(session).to receive(:ide_version).and_return('Xcode 9')
+
       session.action_launched(launch_context: launch_context)
-
-      fixture_data.each do |event|
-        event['millis_since_epoch'] = timestamp_millis * 1000
-        if event['primary_target']['name'] == 'fastlane_version'
-          event['primary_target']['detail'] = session.fastlane_version
-        end
-        if event['primary_target']['name'] == 'ruby_version'
-          event['primary_target']['detail'] = session.ruby_version
-        end
-        if event['primary_target']['name'] == 'operating_system'
-          event['secondary_target']['detail'] = session.operating_system_version
-        end
-        if event['primary_target']['name'] == 'ide_version'
-          event['primary_target']['detail'] = nil
-        end
-      end
-
       expect(JSON.parse(session.events.to_json)).to match_array(fixture_data)
     end
   end

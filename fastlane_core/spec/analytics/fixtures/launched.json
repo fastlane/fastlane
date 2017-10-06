@@ -16,7 +16,7 @@
       "name": "fastlane_version",
       "detail": "2.5.0"
     },
-    "millis_since_epoch": 1507043076,
+    "millis_since_epoch": 1507142046000,
     "version": 1
   },
   {
@@ -36,7 +36,7 @@
       "name": "install_method",
       "detail": "bundler"
     },
-    "millis_since_epoch": 1507043076,
+    "millis_since_epoch": 1507142046000,
     "version": 1
   },
   {
@@ -60,7 +60,7 @@
       "name": "version",
       "detail": "10.12"
     },
-    "millis_since_epoch": 1507043076,
+    "millis_since_epoch": 1507142046000,
     "version": 1
   },
   {
@@ -80,7 +80,7 @@
       "name": "ide_version",
       "detail": "Xcode 9"
     },
-    "millis_since_epoch": 1507043076,
+    "millis_since_epoch": 1507142046000,
     "version": 1
   },
   {
@@ -100,7 +100,7 @@
       "name": "ci",
       "detail": "false"
     },
-    "millis_since_epoch": 1507043076,
+    "millis_since_epoch": 1507142046000,
     "version": 1
   },
   {
@@ -124,7 +124,7 @@
       "name": "fastfile_id",
       "detail": null
     },
-    "millis_since_epoch": 1507043076,
+    "millis_since_epoch": 1507142046000,
     "version": 1
   },
   {
@@ -144,7 +144,7 @@
       "name": "platform",
       "detail": "ios"
     },
-    "millis_since_epoch": 1507043076,
+    "millis_since_epoch": 1507142046000,
     "version": 1
   },
   {
@@ -164,7 +164,7 @@
       "name": "ruby_version",
       "detail": "2.4.0"
     },
-    "millis_since_epoch": 1507043076,
+    "millis_since_epoch": 1507142046000,
     "version": 1
   }
 ]
