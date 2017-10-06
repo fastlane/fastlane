@@ -47,16 +47,16 @@ Before starting to use _match_, make sure to read the [codesigning.guide](https:
 
 |          |  match  |
 |----------|---------|
-:arrows_counterclockwise:  | Automatically sync your iOS keys and profiles across all your team members using git
-:package:  | Handle all the heavy lifting of creating and storing your certificates and profiles
-:computer:  | Setup codesigning on a new machine in under a minute
-:dart:  | Designed to work with apps with multiple targets and bundle identifiers
-:lock: | You have full control over your files and Git repo, no third party service involved
-:sparkles: | Provisioning profile will always match the correct certificate
-:boom:  | Easily reset your existing profiles and certificates if your current account has expired or invalid profiles
-:recycle:  | Automatically renew your provisioning profiles to include all your devices using the `--force` option
-:busts_in_silhouette:  | Support for multiple Apple accounts and multiple teams
-:sparkles: | Tightly integrated with [fastlane](https://fastlane.tools) to work seamlessly with [gym](https://github.com/fastlane/fastlane/tree/master/gym) and other build tools
+🔄  | Automatically sync your iOS keys and profiles across all your team members using git
+📦  | Handle all the heavy lifting of creating and storing your certificates and profiles
+💻  | Setup codesigning on a new machine in under a minute
+🎯 | Designed to work with apps with multiple targets and bundle identifiers
+🔒 | You have full control over your files and Git repo, no third party service involved
+✨ | Provisioning profile will always match the correct certificate
+💥  | Easily reset your existing profiles and certificates if your current account has expired or invalid profiles
+♻️  | Automatically renew your provisioning profiles to include all your devices using the `--force` option
+👥  | Support for multiple Apple accounts and multiple teams
+✨ | Tightly integrated with [fastlane](https://fastlane.tools) to work seamlessly with [gym](https://github.com/fastlane/fastlane/tree/master/gym) and other build tools
 
 For more information about the concept, visit [codesigning.guide](https://codesigning.guide).
 
@@ -232,7 +232,7 @@ By using the `force_for_new_devices` parameter, _match_ will check if the device
 
 _**Important:** The `force_for_new_devices` parameter is ignored for App Store provisioning profiles since they don't contain any device information._
 
-If you're not using _fastlane_, you can also use the `force_for_new_devices` option from the command line:
+If you're not using `fastlane`, you can also use the `force_for_new_devices` option from the command line:
 
 ```no-highlight
 fastlane match adhoc --force_for_new_devices

@@ -67,19 +67,19 @@ _scan_ uses the latest APIs and tools to make running tests plain simple and off
 
 |          |  scan Features  |
 |----------|-----------------|
-:checkered_flag: | Beautiful inline build output while running the tests
-:mountain_cableway: | Sensible defaults: Automatically detect the project, schemes and more
-:bar_chart: | Support for HTML, JSON and JUnit reports
-:mag: | Xcode duplicated your simulators again? _scan_ will handle this for you
-:link:  | Works perfectly with [fastlane](https://fastlane.tools) and other tools
-:bullettrain_side: | Don't remember any complicated build commands, just _scan_
-:wrench:  | Easy and dynamic configuration using parameters and environment variables
-:loudspeaker: | Beautiful slack notifications of the test results
-:floppy_disk:   | Store common build settings in a `Scanfile`
-:outbox_tray: | The raw `xcodebuild` outputs are stored in `~/Library/Logs/scan`
-:computer: | Supports both iOS and Mac applications
-:man:      | Automatically switches to the [travis formatter](https://github.com/kattrali/xcpretty-travis-formatter) when running on Travis
-:book:     | Helps you resolve common test errors like simulator not responding
+🏁 | Beautiful inline build output while running the tests
+🚠 | Sensible defaults: Automatically detect the project, schemes and more
+📊 | Support for HTML, JSON and JUnit reports
+🔎 | Xcode duplicated your simulators again? _scan_ will handle this for you
+🔗  | Works perfectly with [fastlane](https://fastlane.tools) and other tools
+🚅 | Don't remember any complicated build commands, just _scan_
+🔧  | Easy and dynamic configuration using parameters and environment variables
+📢 | Beautiful slack notifications of the test results
+💾   | Store common build settings in a `Scanfile`
+📤 | The raw `xcodebuild` outputs are stored in `~/Library/Logs/scan`
+💻 | Supports both iOS and Mac applications
+👱      | Automatically switches to the [travis formatter](https://github.com/kattrali/xcpretty-travis-formatter) when running on Travis
+📖     | Helps you resolve common test errors like simulator not responding
 
 _scan_ uses a plain `xcodebuild` command, therefore keeping 100% compatible with `xcodebuild`. To generate the nice output, _scan_ uses [xcpretty](https://github.com/supermarin/xcpretty). You can alway access the raw output in `~/Library/Logs/scan`.
 

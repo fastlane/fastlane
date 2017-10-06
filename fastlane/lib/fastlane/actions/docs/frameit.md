@@ -149,7 +149,7 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 
 #### Uploading screenshots to iTC
 
-Use [deliver](https://github.com/fastlane/fastlane/tree/master/deliver) to upload all screenshots to iTunes Connect completely automatically :rocket:
+Use [deliver](https://github.com/fastlane/fastlane/tree/master/deliver) to upload all screenshots to iTunes Connect completely automatically 🚀
 
 ### Mac
 

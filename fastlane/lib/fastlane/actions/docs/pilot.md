@@ -11,7 +11,7 @@ Pilot makes it easier to manage your app on Apple’s TestFlight. You can:
 - Retrieve information about testers & devices
 - Import/export all available testers
 
-_pilot_ uses [spaceship.airforce](https://spaceship.airforce) to interact with iTunes Connect :rocket:
+_pilot_ uses [spaceship.airforce](https://spaceship.airforce) to interact with iTunes Connect 🚀
 
 -------
 
