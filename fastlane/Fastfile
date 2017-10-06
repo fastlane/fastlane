@@ -337,9 +337,10 @@ end
 desc "Ensure all the requirement environment variables are provided"
 desc "this way the deployment script will fail early (and often)"
 private_lane :env_variables_provided do
+  result = true
   ["GITHUB_USER_NAME", "GITHUB_API_TOKEN"].each do |variable|
     next if ENV[variable].to_s.length > 0
-    return false
+    result = false
   end
-  return true
+  result
 end
