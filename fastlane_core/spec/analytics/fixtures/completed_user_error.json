@@ -1,6 +1,6 @@
 {
   "event_source": {
-    "oauth_app_name": "fastlane",
+    "oauth_app_name": "fastlane-test",
     "product": "fastlane"
   },
   "actor": {
