@@ -29,7 +29,7 @@ module FastlaneCore
         # to be sent to analytics ingester.
         # If they are nil, we want to fill them in until we reach
         # an event that already has a p_hash.
-        @event[:actor][:name].nil? ? @event[:actor][:name] = p_hash : break
+        event[:actor][:name].nil? ? event[:actor][:name] = p_hash : break
       end
     end
 
