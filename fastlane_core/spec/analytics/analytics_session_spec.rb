@@ -5,6 +5,8 @@ describe FastlaneCore::AnalyticsSession do
   let(:action_name) { 'some_action' }
   let(:timestamp_millis) { 1_507_142_046 }
 
+  let(:session) { FastlaneCore::AnalyticsSession.new }
+
   context 'action launch' do
     let(:launch_context) do
       FastlaneCore::ActionLaunchContext.new(
@@ -19,13 +21,11 @@ describe FastlaneCore::AnalyticsSession do
       JSON.parse(File.read(File.join(dirname, './fixtures/launched.json')))
     end
 
-
-
     it "adds all events to the session's events array" do
       expect(SecureRandom).to receive(:uuid).and_return(session_id)
       allow(Time).to receive(:now).and_return(timestamp_millis)
 
-      session = FastlaneCore::AnalyticsSession.new
+
 
       # Stub out calls related to the execution environment
       session.is_fastfile = true
@@ -53,7 +53,6 @@ describe FastlaneCore::AnalyticsSession do
       expect(SecureRandom).to receive(:uuid).and_return(session_id)
       expect(Time).to receive(:now).and_return(timestamp_millis)
 
-      session = FastlaneCore::AnalyticsSession.new
       expect(session).to receive(:oauth_app_name).and_return(oauth_app_name)
 
       session.action_completed(completion_context: completion_context)
