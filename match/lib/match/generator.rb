@@ -30,6 +30,7 @@ module Match
       Dir[File.join(params[:workspace], "**", "*.certSigningRequest")].each { |path| File.delete(path) }
 
       # we need to return the path
+      # Inside this directory, there is the `.p12` file and the `.cer` file with the same name, but different extension
       return cert_path
     end
 
