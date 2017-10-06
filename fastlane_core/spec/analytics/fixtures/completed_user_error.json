@@ -9,7 +9,7 @@
   },
   "action": {
     "name": "completed",
-    "action_name": "deliver"
+    "detail": "deliver"
   },
   "primary_target": {
     "name": "status",

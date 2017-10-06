@@ -9,7 +9,7 @@
   },
   "action": {
     "name": "completed",
-    "action_name": "fastlane"
+    "detail": "fastlane"
   },
   "primary_target": {
     "name": "status",
