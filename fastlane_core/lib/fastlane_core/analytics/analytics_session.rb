@@ -23,13 +23,13 @@ module FastlaneCore
     end
 
     def backfill_p_hashes(p_hash: nil)
-      return if p_hash.nil? || events.count == 0
-      events.reverse_each do |event|
+      return if p_hash.nil? || @events.count == 0
+      @events.reverse_each do |event|
         # event[:actor][:name] is the field in which we store the p_hash
         # to be sent to analytics ingester.
         # If they are nil, we want to fill them in until we reach
         # an event that already has a p_hash.
-        event[:actor][:name].nil? ? event[:actor][:name] = p_hash : break
+        @event[:actor][:name].nil? ? @event[:actor][:name] = p_hash : break
       end
     end
 
@@ -43,21 +43,21 @@ module FastlaneCore
         action_name: launch_context.action_name
       )
 
-      version_event = builder.launched_event(
+      @events << builder.launched_event(
         primary_target_hash: {
           name: 'fastlane_version',
           detail: fastlane_version
         }
       )
 
-      install_method_event = builder.launched_event(
+      @events << builder.launched_event(
         primary_target_hash: {
           name: 'install_method',
           detail: install_method
         }
       )
 
-      os_version_event = builder.launched_event(
+      @events << builder.launched_event(
         primary_target_hash: {
           name: 'operating_system',
           detail: operating_system
@@ -68,21 +68,21 @@ module FastlaneCore
         }
       )
 
-      ide_version_event = builder.launched_event(
+      @events << builder.launched_event(
         primary_target_hash: {
           name: 'ide_version',
           detail: ide_version
         }
       )
 
-      ci_event = builder.launched_event(
+      @events << builder.launched_event(
         primary_target_hash: {
           name: 'ci',
           detail: ci?.to_s
         }
       )
 
-      fastfile_event = builder.launched_event(
+      @events << builder.launched_event(
         primary_target_hash: {
           name: 'fastfile',
           detail: fastfile?.to_s
@@ -93,30 +93,19 @@ module FastlaneCore
         }
       )
 
-      platform_event = builder.launched_event(
+      @events << builder.launched_event(
         primary_target_hash: {
           name: 'platform',
           detail: launch_context.platform
         }
       )
 
-      ruby_version_event = builder.launched_event(
+      @events << builder.launched_event(
         primary_target_hash: {
           name: 'ruby_version',
           detail: ruby_version
         }
       )
-
-      return events + [
-        version_event,
-        install_method_event,
-        os_version_event,
-        ide_version_event,
-        ci_event,
-        fastfile_event,
-        platform_event,
-        ruby_version_event
-      ]
     end
 
     def action_completed(completion_context: nil)
@@ -128,7 +117,8 @@ module FastlaneCore
         session_id: session_id,
         action_name: completion_context.action_name
       )
-      return events << builder.completed_event(
+
+      @events << builder.completed_event(
         primary_target_hash: {
           name: 'status',
           detail: completion_context.status
@@ -141,7 +131,7 @@ module FastlaneCore
       # Learn more at https://github.com/fastlane/fastlane#metrics
       return if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
 
-      client.post_events(events)
+      client.post_events(@events)
     end
 
     def fastlane_version

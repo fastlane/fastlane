@@ -1,16 +1,16 @@
 [
   {
     "event_source": {
-      "oauth_app_name": "fastlane",
+      "oauth_app_name": "fastlane-tests",
       "product": "fastlane"
     },
     "actor": {
-      "name": "p_hash",
-      "detail": "sessionID"
+      "name": "some.phash.value",
+      "detail": "s0m3s3ss10n1D"
     },
     "action": {
       "name": "launched",
-      "action_name": "fastlane"
+      "detail": "some_action"
     },
     "primary_target": {
       "name": "fastlane_version",
@@ -21,40 +21,40 @@
   },
   {
     "event_source": {
-      "oauth_app_name": "fastlane",
+      "oauth_app_name": "fastlane-tests",
       "product": "fastlane"
     },
     "actor": {
-      "name": "p_hash",
-      "detail": "sessionID"
+      "name": "some.phash.value",
+      "detail": "s0m3s3ss10n1D"
     },
     "action": {
       "name": "launched",
-      "action_name": "fastlane"
+      "detail": "some_action"
     },
     "primary_target": {
       "name": "install_method",
-      "detail": "gem"
+      "detail": "bundler"
     },
     "millis_since_epoch": 1507043076,
     "version": 1
   },
   {
     "event_source": {
-      "oauth_app_name": "fastlane",
+      "oauth_app_name": "fastlane-tests",
       "product": "fastlane"
     },
     "actor": {
-      "name": "p_hash",
-      "detail": "sessionID"
+      "name": "some.phash.value",
+      "detail": "s0m3s3ss10n1D"
     },
     "action": {
       "name": "launched",
-      "action_name": "fastlane"
+      "detail": "some_action"
     },
     "primary_target": {
       "name": "operating_system",
-      "detail": "mac"
+      "detail": "macOS"
     },
     "secondary_target": {
       "name": "version",
@@ -65,16 +65,16 @@
   },
   {
     "event_source": {
-      "oauth_app_name": "fastlane",
+      "oauth_app_name": "fastlane-tests",
       "product": "fastlane"
     },
     "actor": {
-      "name": "p_hash",
-      "detail": "sessionID"
+      "name": "some.phash.value",
+      "detail": "s0m3s3ss10n1D"
     },
     "action": {
       "name": "launched",
-      "action_name": "fastlane"
+      "detail": "some_action"
     },
     "primary_target": {
       "name": "ide_version",
@@ -85,80 +85,80 @@
   },
   {
     "event_source": {
-      "oauth_app_name": "fastlane",
+      "oauth_app_name": "fastlane-tests",
       "product": "fastlane"
     },
     "actor": {
-      "name": "p_hash",
-      "detail": "sessionID"
+      "name": "some.phash.value",
+      "detail": "s0m3s3ss10n1D"
     },
     "action": {
       "name": "launched",
-      "action_name": "fastlane"
+      "detail": "some_action"
     },
     "primary_target": {
       "name": "ci",
-      "detail": "true"
+      "detail": "false"
     },
     "millis_since_epoch": 1507043076,
     "version": 1
   },
   {
     "event_source": {
-      "oauth_app_name": "fastlane",
+      "oauth_app_name": "fastlane-tests",
       "product": "fastlane"
     },
     "actor": {
-      "name": "p_hash",
-      "detail": "sessionID"
+      "name": "some.phash.value",
+      "detail": "s0m3s3ss10n1D"
     },
     "action": {
       "name": "launched",
-      "action_name": "fastlane"
+      "detail": "some_action"
     },
     "primary_target": {
       "name": "fastfile",
       "detail": "true"
     },
     "secondary_target": {
-      "name": "fastfileID",
-      "detail": "some fastfile id"
+      "name": "fastfile_id",
+      "detail": null
     },
     "millis_since_epoch": 1507043076,
     "version": 1
   },
   {
     "event_source": {
-      "oauth_app_name": "fastlane",
+      "oauth_app_name": "fastlane-tests",
       "product": "fastlane"
     },
     "actor": {
-      "name": "p_hash",
-      "detail": "sessionID"
+      "name": "some.phash.value",
+      "detail": "s0m3s3ss10n1D"
     },
     "action": {
       "name": "launched",
-      "action_name": "fastlane"
+      "detail": "some_action"
     },
     "primary_target": {
       "name": "platform",
-      "detail": "iOS"
+      "detail": "ios"
     },
     "millis_since_epoch": 1507043076,
     "version": 1
   },
   {
     "event_source": {
-      "oauth_app_name": "fastlane",
+      "oauth_app_name": "fastlane-tests",
       "product": "fastlane"
     },
     "actor": {
-      "name": "p_hash",
-      "detail": "sessionID"
+      "name": "some.phash.value",
+      "detail": "s0m3s3ss10n1D"
     },
     "action": {
       "name": "launched",
-      "action_name": "fastlane"
+      "detail": "some_action"
     },
     "primary_target": {
       "name": "ruby_version",

@@ -14,7 +14,7 @@ module FastlaneCore
           name: p_hash,
           detail: session_id
         },
-        timestamp_millis: timestamp_millis,
+        millis_since_epoch: timestamp_millis,
         version: 1
       }
     end
