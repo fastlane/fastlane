@@ -1,5 +1,5 @@
 <h3 align="center">
-  <img src="fastlane/assets/fastlane_text.png" alt="fastlane Logo" />
+  <img src="fastlane/assets/fastlane_text.png" alt="fastlane Logo" width=500 />
 </h3>
 
 fastlane
@@ -14,22 +14,6 @@ fastlane
 
 `fastlane` is a tool for iOS and Android developers to automate tedious tasks like generating screenshots, dealing with provisioning profiles, and releasing your application.
 
-Use a lane to define your process:
-
-```ruby
-lane :beta do
-  increment_build_number
-  cocoapods
-  match
-  testflight
-  sh "./customScript.sh"
-  slack
-end
-```
-
-Then to deploy a new 'beta' version of your app just run
-`fastlane beta` :rocket:
-
 <hr />
 <h4 align="center">
   Check out the new <a href="https://docs.fastlane.tools/">fastlane docs</a>
@@ -37,19 +21,6 @@ Then to deploy a new 'beta' version of your app just run
 <hr />
 
 ##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools).
-
-## Quick Start
-
-Get started distributing your first app with fastlane within minutes:
-
-Want to learn more? Explore guides for [iOS](https://docs.fastlane.tools/getting-started/ios/setup/)
- or [Android](https://docs.fastlane.tools/getting-started/android/setup/).
-
-<hr />
-<h4 align="center">
-  Check out the new <a href="https://docs.fastlane.tools/">fastlane docs</a>
-</h4>
-<hr />
 
 ## Need Help?
 
