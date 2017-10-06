@@ -158,10 +158,7 @@ describe FastlaneCore::AnalyticsSession do
         session.action_completed(completion_context: action_2_completion_context)
 
         expected_final_array = fixture_data_action_1_launched + [fixture_data_action_1_completed] + fixture_data_action_2_launched + [fixture_data_action_2_completed]
-        # expect(JSON.parse(session.events.to_json)).to match_array(expected_final_array)
-        expected_final_array.each_with_index do |event, index|
-          expect(JSON.parse(session.events.to_json)[index]).to eq(event)
-        end
+        expect(JSON.parse(session.events.to_json)).to match_array(expected_final_array)
       end
     end
   end
