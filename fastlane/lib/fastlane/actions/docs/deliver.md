@@ -28,8 +28,6 @@ _deliver_ uploads screenshots, metadata and binaries to iTunes Connect. Use _del
 
 To upload builds to TestFlight check out [pilot](/actions/pilot).
 
-##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
-
 # Quick Start
 
 The guide will create all the necessary files for you, using the existing app metadata from iTunes Connect.

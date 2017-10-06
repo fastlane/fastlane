@@ -12,7 +12,6 @@
     <a href="#features">Features</a> &bull;
     <a href="#usage">Usage</a> &bull;
     <a href="#tips">Tips</a> &bull;
-    <a href="#need-help">Need help?</a>
 </p>
 
 -------
@@ -28,8 +27,6 @@ Put a gorgeous device frame around your iOS and macOS screenshots just by runnin
 - Several colors
 
 The complete and updated list of supported devices and colors can be found [here](https://github.com/fastlane/frameit-frames/tree/gh-pages/latest)
-
-##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
 
 Here is a nice gif, that shows ```frameit``` in action:
 
