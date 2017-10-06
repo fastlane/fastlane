@@ -248,17 +248,6 @@ describe Fastlane do
           expect(File.read("/tmp/deliver_result.txt")).to eq("Lane 2 + parameter")
         end
 
-        it "properly tracks the lane switches" do
-          ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
-          ff.runner.execute(:lane1, :ios)
-
-          expect(ff.collector.launches).to eq({
-            lane_switch: 1
-          })
-
-          expect(Fastlane::ActionCollector.new.is_official?(:lane_switch)).to eq(true)
-        end
-
         it "use case 2: passing no parameter to a lane that takes parameters" do
           ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           ff.runner.execute(:lane3, :ios)

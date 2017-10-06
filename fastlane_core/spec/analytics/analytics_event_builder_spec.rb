@@ -41,7 +41,7 @@ describe FastlaneCore::AnalyticsEventBuilder do
             name: 'primary target name',
             detail: 'primary target detail'
           },
-          timestamp_millis: timestamp_millis,
+          millis_since_epoch: timestamp_millis,
           version: 1
         }
       )
@@ -80,7 +80,7 @@ describe FastlaneCore::AnalyticsEventBuilder do
             name: 'secondary target name',
             detail: 'secondary target detail'
           },
-          timestamp_millis: timestamp_millis,
+          millis_since_epoch: timestamp_millis,
           version: 1
         }
       )
@@ -113,7 +113,7 @@ describe FastlaneCore::AnalyticsEventBuilder do
             name: 'primary target name',
             detail: 'primary target detail'
           },
-          timestamp_millis: timestamp_millis,
+          millis_since_epoch: timestamp_millis,
           version: 1
         }
       )
