@@ -264,7 +264,7 @@ This is useful when installing your application on your device using the Develop
 
 You can statically select the right provisioning profile in your Xcode project (the name will be `match Development tools.fastlane.app`).
 
-[Docs on how to set up your Xcode project](/fastlane/docs/Codesigning/XcodeProject.md)
+[Docs on how to set up your Xcode project](/codesigning/xcode-project/.md)
 
 ### Continuous Integration
 
