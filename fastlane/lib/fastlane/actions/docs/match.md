@@ -82,7 +82,7 @@ This will create a `Matchfile` in your current directory (or in your `./fastlane
 
 Example content (for more advanced setups check out the [fastlane section](#fastlane)):
 
-```ruby
+```ruby-skip-tests
 git_url "https://github.com/fastlane/fastlane/tree/master/certificates"
 
 app_identifier "tools.fastlane.app"
@@ -198,23 +198,23 @@ Additionally, _match_ creates a nice repo `README.md` for you, making it easy to
 
 Add _match_ to your `Fastfile` to automatically fetch the latest code signing certificates with [fastlane](https://fastlane.tools).
 
-```ruby
+```
 match(type: "appstore")
 
-match(git_url: "https://github.com/fastlane/fastlane/tree/master/certificates",
+match(git_url: "https://github.com/fastlane/certificates",
       type: "development")
 
-match(git_url: "https://github.com/fastlane/fastlane/tree/master/certificates",
+match(git_url: "https://github.com/fastlane/certificates",
       type: "adhoc",
       app_identifier: "tools.fastlane.app")
 
-match(git_url: "https://github.com/fastlane/fastlane/tree/master/certificates",
+match(git_url: "https://github.com/fastlane/certificates",
       type: "enterprise",
       app_identifier: "tools.fastlane.app")
 
 # _match_ should be called before building the app with _gym_
 gym
-...
+# ...
 ```
 
 ##### Registering new devices
@@ -232,7 +232,7 @@ By using the `force_for_new_devices` parameter, _match_ will check if the device
 
 _**Important:** The `force_for_new_devices` parameter is ignored for App Store provisioning profiles since they don't contain any device information._
 
-If you're not using `fastlane`, you can also use the `force_for_new_devices` option from the command line:
+If you're not using _fastlane_, you can also use the `force_for_new_devices` option from the command line:
 
 ```no-highlight
 fastlane match adhoc --force_for_new_devices
