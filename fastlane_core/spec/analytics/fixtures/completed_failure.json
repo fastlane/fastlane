@@ -4,8 +4,8 @@
     "product": "fastlane"
   },
   "actor": {
-    "name": "p_hash",
-    "detail": "sessionID"
+    "name": "some.phash.value",
+    "detail": "s0m3s3ss10n1D"
   },
   "action": {
     "name": "completed",
