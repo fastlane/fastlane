@@ -83,7 +83,10 @@ module Match
         UI.important "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
         UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
         cert_path = Generator.generate_certificate(params, cert_type)
+        private_key_path = cert_path.gsub(".cer", ".p12")
+
         self.files_to_commmit << cert_path
+        self.files_to_commmit << private_key_path
       else
         cert_path = certs.last
         UI.message "Installing certificate..."
