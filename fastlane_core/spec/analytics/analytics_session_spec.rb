@@ -3,6 +3,10 @@ describe FastlaneCore::AnalyticsSession do
   let(:p_hash) { 'some.phash.value' }
   let(:session_id) { 's0m3s3ss10n1D' }
   let(:timestamp_millis) { 1_507_142_046 }
+  let(:fixture_dirname) do
+    dirname = File.expand_path(File.dirname(__FILE__))
+    File.join(dirname, './fixtures/')
+  end
 
   context 'single action execution' do
     let(:session) { FastlaneCore::AnalyticsSession.new }
@@ -18,8 +22,7 @@ describe FastlaneCore::AnalyticsSession do
       end
 
       let(:fixture_data) do
-        dirname = File.expand_path(File.dirname(__FILE__))
-        JSON.parse(File.read(File.join(dirname, './fixtures/launched.json')))
+        JSON.parse(File.read(File.join(fixture_dirname, '/launched.json')))
       end
 
       it "adds all events to the session's events array" do
@@ -116,26 +119,22 @@ describe FastlaneCore::AnalyticsSession do
         )
       end
       let(:fixture_data_action_1_launched) do
-        dirname = File.expand_path(File.dirname(__FILE__))
-        events = JSON.parse(File.read(File.join(dirname, './fixtures/launched.json')))
+        events = JSON.parse(File.read(File.join(fixture_dirname, '/launched.json')))
         events.each { |event| event["action"]["detail"] = action_1_name }
         events
       end
       let(:fixture_data_action_2_launched) do
-        dirname = File.expand_path(File.dirname(__FILE__))
-        events = JSON.parse(File.read(File.join(dirname, './fixtures/launched.json')))
+        events = JSON.parse(File.read(File.join(fixture_dirname, '/launched.json')))
         events.each { |event| event["action"]["detail"] = action_2_name }
         events
       end
       let(:fixture_data_action_1_completed) do
-        dirname = File.expand_path(File.dirname(__FILE__))
-        event = JSON.parse(File.read(File.join(dirname, './fixtures/completed_success.json')))
+        event = JSON.parse(File.read(File.join(fixture_dirname, '/completed_success.json')))
         event["action"]["detail"] = action_1_name
         event
       end
       let(:fixture_data_action_2_completed) do
-        dirname = File.expand_path(File.dirname(__FILE__))
-        event = JSON.parse(File.read(File.join(dirname, './fixtures/completed_success.json')))
+        event = JSON.parse(File.read(File.join(fixture_dirname, '/completed_success.json')))
         event["action"]["detail"] = action_2_name
         event
       end
