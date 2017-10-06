@@ -41,7 +41,7 @@ describe FastlaneCore::AnalyticsSession do
 
     context 'action completion' do
       let(:completion_context) do
-        context = FastlaneCore::ActionCompletionContext.new(
+        FastlaneCore::ActionCompletionContext.new(
           p_hash: p_hash,
           status: FastlaneCore::ActionCompletionStatus::SUCCESS,
           action_name: action_name
@@ -94,6 +94,13 @@ describe FastlaneCore::AnalyticsSession do
           platform: 'ios'
         )
       end
+      let(:action_1_completion_context) do
+        FastlaneCore::ActionCompletionContext.new(
+          p_hash: p_hash,
+          status: FastlaneCore::ActionCompletionStatus::SUCCESS,
+          action_name: action_1_name
+        )
+      end
       let(:action_2_launch_context) do
         FastlaneCore::ActionLaunchContext.new(
           action_name: action_2_name,
@@ -101,18 +108,36 @@ describe FastlaneCore::AnalyticsSession do
           platform: 'ios'
         )
       end
-
-      let(:fixture_data_action_1) do
+      let(:action_2_completion_context) do
+        FastlaneCore::ActionCompletionContext.new(
+          p_hash: p_hash,
+          status: FastlaneCore::ActionCompletionStatus::SUCCESS,
+          action_name: action_2_name
+        )
+      end
+      let(:fixture_data_action_1_launched) do
         dirname = File.expand_path(File.dirname(__FILE__))
         events = JSON.parse(File.read(File.join(dirname, './fixtures/launched.json')))
         events.each { |event| event["action"]["detail"] = action_1_name }
         events
       end
-      let(:fixture_data_action_2) do
+      let(:fixture_data_action_2_launched) do
         dirname = File.expand_path(File.dirname(__FILE__))
         events = JSON.parse(File.read(File.join(dirname, './fixtures/launched.json')))
         events.each { |event| event["action"]["detail"] = action_2_name }
         events
+      end
+      let(:fixture_data_action_1_completed) do
+        dirname = File.expand_path(File.dirname(__FILE__))
+        event = JSON.parse(File.read(File.join(dirname, './fixtures/completed_success.json')))
+        event["action"]["detail"] = action_1_name
+        event
+      end
+      let(:fixture_data_action_2_completed) do
+        dirname = File.expand_path(File.dirname(__FILE__))
+        event = JSON.parse(File.read(File.join(dirname, './fixtures/completed_success.json')))
+        event["action"]["detail"] = action_2_name
+        event
       end
 
       it "adds all events to the session's events array" do
@@ -128,8 +153,15 @@ describe FastlaneCore::AnalyticsSession do
         expect(session).to receive(:ide_version).and_return('Xcode 9').twice
 
         session.action_launched(launch_context: action_1_launch_context)
+        session.action_completed(completion_context: action_1_completion_context)
         session.action_launched(launch_context: action_2_launch_context)
-        expect(JSON.parse(session.events.to_json)).to match_array(fixture_data_action_1 + fixture_data_action_2)
+        session.action_completed(completion_context: action_2_completion_context)
+
+        expected_final_array = fixture_data_action_1_launched + [fixture_data_action_1_completed] + fixture_data_action_2_launched + [fixture_data_action_2_completed]
+        # expect(JSON.parse(session.events.to_json)).to match_array(expected_final_array)
+        expected_final_array.each_with_index do |event, index|
+          expect(JSON.parse(session.events.to_json)[index]).to eq(event)
+        end
       end
     end
   end
