@@ -157,7 +157,7 @@ end
 desc "Update the actions.md on https://docs.fastlane.tools"
 desc "This will also automatically submit a pull request to fastlane/docs"
 lane :update_docs do |options|
-  if !options[:skip_pr] && !env_variables_provided    
+  if !options[:skip_pr] && !env_variables_provided
     UI.user_error!("Missing ENV variables, make sure to provide one for fastlane docs to be successful")
   end
 
