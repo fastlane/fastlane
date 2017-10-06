@@ -47,7 +47,7 @@ fastlane cert -u cert@krausefx.com
 For a list of available commands run
 
 ```no-highlight
-fastlane cert --help
+fastlane action cert
 ```
 
 Keep in mind, there is no way for _cert_ to download existing certificates + private keys from the Apple Developer Portal, as the private key never leaves your computer.

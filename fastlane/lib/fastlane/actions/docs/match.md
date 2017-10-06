@@ -127,7 +127,7 @@ fastlane match --verbose
 For a list of all available options run
 
 ```
-fastlane match --help
+fastlane action match
 ```
 
 #### Handle multiple targets

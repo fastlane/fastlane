@@ -70,7 +70,7 @@ You can specify a name for the output file:
 
 To get a list of available options run:
 
-    fastlane pem --help
+    fastlane action pem
 
 
 ### Note about empty `p12` passwords and Keychain Access.app
@@ -102,7 +102,7 @@ If you need the `p12` in your keychain, perhaps to test push with an app like [K
 
 ## Environment Variables
 
-Run `fastlane pem --help` to get a list of available environment variables.
+Run `fastlane action pem` to get a list of available environment variables.
 
 # How does it work?
 

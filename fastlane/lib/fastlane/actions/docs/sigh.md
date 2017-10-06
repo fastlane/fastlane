@@ -104,7 +104,7 @@ By default, `sigh` will include all certificates on development profiles, and fi
 
 For a list of available parameters and commands run
 
-    fastlane sigh --help
+    fastlane action sigh
 
 
 ### Use with [`fastlane`](https://github.com/fastlane/fastlane/tree/master/fastlane)

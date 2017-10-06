@@ -181,7 +181,7 @@ All of the available options can also be stored in a configuration file called t
 
 First make sure to have a `Snapfile` (you get it for free when running `fastlane snapshot init`)
 
-The `Snapfile` can contain all the options that are also available on `fastlane snapshot --help`
+The `Snapfile` can contain all the options that are also available on `fastlane action snapshot`
 
 
 ```ruby

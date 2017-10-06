@@ -70,7 +70,7 @@ The previous p12 configuration is still currently supported.
 
 - `fastlane supply`: update an app with metadata, a build, images and screenshots
 - `fastlane supply init`: download metadata for an existing app to a local directory
-- `fastlane supply --help`: show information on available commands, arguments and environment variables
+- `fastlane action supply`: show information on available commands, arguments and environment variables
 
 You can either run `supply` on its own and use it interactively, or you can pass arguments or specify environment variables for all the options to skip the questions.
 

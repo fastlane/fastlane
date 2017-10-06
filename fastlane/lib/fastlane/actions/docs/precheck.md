@@ -41,7 +41,7 @@ Run _fastlane precheck_ to check the app metadata from iTunes Connect
 
 To get a list of available options run
     
-    fastlane precheck --help
+    fastlane action precheck
 
 <img src="/img/actions/precheck.gif" />
     

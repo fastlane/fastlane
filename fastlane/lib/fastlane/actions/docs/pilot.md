@@ -41,7 +41,7 @@ This will automatically look for an `ipa` in your current directory and tries to
 You'll be asked for any missing information. Additionally, you can pass all kinds of parameters:
 
 ```
-fastlane pilot --help
+fastlane action pilot
 ```
 
 You can pass a changelog using

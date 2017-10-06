@@ -98,7 +98,7 @@ clear_previous_screenshots true
 For more information about all available options run
 
 ```
-fastlane screengrab --help
+fastlane action screengrab
 ```
 
 # Tips
