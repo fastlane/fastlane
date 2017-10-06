@@ -14,7 +14,6 @@ A new approach to iOS code signing: Share one code signing identity across your 
 
 <p align="center">
     <a href="#why-match">Why?</a> &bull;
-    <a href="#installation">Installation</a> &bull;
     <a href="#usage">Usage</a> &bull;
     <a href="#is-this-secure">Is this secure?</a> &bull;
     <a href="#need-help">Need help?</a>
@@ -61,16 +60,6 @@ Before starting to use `match`, make sure to read the [codesigning.guide](https:
 :sparkles: | Tightly integrated with [fastlane](https://fastlane.tools) to work seamlessly with [gym](https://github.com/fastlane/fastlane/tree/master/gym) and other build tools
 
 For more information about the concept, visit [codesigning.guide](https://codesigning.guide).
-
-## Installation
-
-```
-sudo gem install fastlane
-```
-
-Make sure you have the latest version of the Xcode command line tools installed:
-
-    xcode-select --install
 
 ## Usage
 
