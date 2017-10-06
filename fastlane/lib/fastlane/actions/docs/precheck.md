@@ -15,7 +15,7 @@ Apple rejects builds for many avoidable metadata issues like including swear wor
     <a href="#features">Features</a> &bull;
     <a href="#usage">Usage</a> &bull;
     <a href="#example">Example</a> &bull;
-    <a href="#how-does-it-work">How does it work?</a> &bull;
+    <a href="#how-does-it-work">How does it work?</a>
 </p>
 
 -------

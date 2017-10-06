@@ -11,7 +11,7 @@
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#usage">Usage</a> &bull;
-    <a href="#tips">Tips</a> &bull;
+    <a href="#tips">Tips</a>
 </p>
 
 -------

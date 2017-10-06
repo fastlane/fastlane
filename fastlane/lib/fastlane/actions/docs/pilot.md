@@ -17,7 +17,7 @@ Pilot makes it easier to manage your app on Apple’s TestFlight. You can:
 
 <p align="center">
     <a href="#usage">Usage</a> &bull;
-    <a href="#tips">Tips</a> &bull;
+    <a href="#tips">Tips</a>
 </p>
 
 -------
