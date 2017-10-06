@@ -14,7 +14,7 @@ fastlane
 
 <hr />
 <h2 align="center">
-  ✨ All _fastlane_ docs were moved to <a href="https://docs.fastlane.tools/">docs.fastlane.tools</a> ✨
+  ✨ All <i>fastlane</i> docs were moved to <a href="https://docs.fastlane.tools/">docs.fastlane.tools</a> ✨
 </h2>
 <hr />
 
