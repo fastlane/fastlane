@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/pem.png" height="110">
+  <img src="/img/actions/pem.png" height="110">
 </p>
 
 ###### Automatically generate and renew your push notification profiles
@@ -31,7 +31,7 @@ Well, it's actually just one: Generate the ```pem``` file for your server.
 
 Check out this gif:
 
-![assets/PEMRecording.gif](assets/PEMRecording.gif)
+![img/actions/PEMRecording.gif](assets/PEMRecording.gif)
 
 # Usage
 
@@ -117,4 +117,4 @@ Run `fastlane pem --help` to get a list of available environment variables.
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
 
 It will show you the ```pem``` files like this:
-![assets/QuickLookScreenshot.png](assets/QuickLookScreenshot.png)
+![img/actions/QuickLookScreenshot.png](assets/QuickLookScreenshot.png)

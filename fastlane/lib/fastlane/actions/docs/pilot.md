@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/PilotTextTransparentSmall.png" width="500">
+  <img src="/img/actions/PilotTextTransparentSmall.png" width="500">
 </p>
 
 ###### The best way to manage your TestFlight testers and builds from your terminal

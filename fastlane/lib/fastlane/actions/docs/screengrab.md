@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="assets/screengrab.png" height="110">
+  <img src="/img/actions/screengrab.png" height="110">
 </p>
 
 ###### Automated localized screenshots of your Android app on every device
 
 `screengrab` generates localized screenshots of your Android app for different device types and languages for Google Play and can be uploaded using [`supply`](https://fastlane.tools/supply).
 
-<img src="assets/running-screengrab.gif" width="640">
+<img src="/img/actions/running-screengrab.gif" width="640">
 
 ### Why should I automate this process?
 

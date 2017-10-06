@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/snapshot.png" height="110">
+  <img src="/img/actions/snapshot.png" height="110">
 </p>
 
 ###### Automate taking localized screenshots of your iOS and tvOS apps on every device
@@ -50,7 +50,7 @@ _snapshot_ runs completely in the background - you can do something else, while 
 
 After _snapshot_ successfully created new screenshots, it will generate a beautiful HTML file to get a quick overview of all screens:
 
-![assets/htmlPagePreviewFade.jpg](assets/htmlPagePreviewFade.jpg)
+![img/actions/htmlPagePreviewFade.jpg](assets/htmlPagePreviewFade.jpg)
 
 ## Why?
 
@@ -110,7 +110,7 @@ XCUIApplication *app = [[XCUIApplication alloc] init];
 
 _Make sure you only have one `launch` call in your test class, as Xcode adds one automatically on new test files._
 
-![assets/snapshot.gif](assets/snapshot.gif)
+![img/actions/snapshot.gif](assets/snapshot.gif)
 
 You can try the _snapshot_ [example project](https://github.com/fastlane/fastlane/tree/master/snapshot/example) by cloning this repo.
 
@@ -173,7 +173,7 @@ fastlane action snapshot
 
 After running _snapshot_ you will get a nice summary:
 
-<img src="assets/testSummary.png" width="500">
+<img src="/img/actions/testSummary.png" width="500">
 
 ## Snapfile
 

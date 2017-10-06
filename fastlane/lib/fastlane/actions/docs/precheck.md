@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/precheck.png" height="110">
+  <img src="/img/actions/precheck.png" height="110">
 </p>
 
 Precheck
@@ -43,7 +43,7 @@ To get a list of available options run
     
     fastlane precheck --help
 
-<img src="assets/precheck.gif" />
+<img src="/img/actions/precheck.gif" />
     
 # Example
 

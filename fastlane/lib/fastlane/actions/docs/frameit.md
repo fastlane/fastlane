@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/frameit.png" height="110">
+  <img src="/img/actions/frameit.png" height="110">
 </p>
 
 ###### Quickly put your screenshots into the right device frames
@@ -30,19 +30,19 @@ The complete and updated list of supported devices and colors can be found [here
 
 Here is a nice gif, that shows ```frameit``` in action:
 
-![assets/FrameitGit.gif](assets/FrameitGit.gif?raw=1)
+![img/actions/FrameitGit.gif](assets/FrameitGit.gif?raw=1)
 
 ### Results
 
-![assets/ScreenshotsBig.png](assets/ScreenshotsBig.png?raw=1)
+![img/actions/ScreenshotsBig.png](assets/ScreenshotsBig.png?raw=1)
 
 -------
 
-![assets/ScreenshotsOverview.png](assets/ScreenshotsOverview.png?raw=1)
+![img/actions/ScreenshotsOverview.png](assets/ScreenshotsOverview.png?raw=1)
 
 -------
 
-![assets/MacExample.png](assets/MacExample.png?raw=1)
+![img/actions/MacExample.png](assets/MacExample.png?raw=1)
 
 <h5 align="center">The <code>frameit</code> 2.0 update was kindly sponsored by <a href="https://mindnode.com/">MindNode</a>, seen in the screenshots above.
 

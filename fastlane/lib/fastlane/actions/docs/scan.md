@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/scan.png" height="110">
+  <img src="/img/actions/scan.png" height="110">
 </p>
 
 ###### The easiest way to run tests of your iOS and Mac app
@@ -83,10 +83,10 @@ fastlane scan
 
 `scan` uses a plain `xcodebuild` command, therefore keeping 100% compatible with `xcodebuild`. To generate the nice output, `scan` uses [xcpretty](https://github.com/supermarin/xcpretty). You can alway access the raw output in `~/Library/Logs/scan`.
 
-![assets/scanScreenshot.png](assets/scanScreenshot.png)
-![assets/slack.png](assets/slack.png)
-![assets/scanHTML.png](assets/scanHTML.png)
-![assets/scanHTMLFailing.png](assets/scanHTMLFailing.png)
+![img/actions/scanScreenshot.png](assets/scanScreenshot.png)
+![img/actions/slack.png](assets/slack.png)
+![img/actions/scanHTML.png](assets/scanHTML.png)
+![img/actions/scanHTMLFailing.png](assets/scanHTMLFailing.png)
 
 # Usage
 

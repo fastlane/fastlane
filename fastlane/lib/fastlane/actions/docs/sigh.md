@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/sigh.png" height="110">
+  <img src="/img/actions/sigh.png" height="110">
 </p>
 
 ###### Because you would rather spend your time building stuff than fighting provisioning
@@ -40,7 +40,7 @@ To automate iOS Push profiles you can use [pem](https://github.com/fastlane/fast
 
 See ```sigh``` in action:
 
-![assets/sighRecording.gif](assets/sighRecording.gif)
+![img/actions/sighRecording.gif](assets/sighRecording.gif)
 
 # Usage
 
@@ -176,7 +176,7 @@ If you're using [cert](https://github.com/fastlane/fastlane/tree/master/cert) in
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
 
 It will show you the `mobileprovision` files like this:
-![assets/QuickLookScreenshot.png](assets/QuickLookScreenshot.png)
+![img/actions/QuickLookScreenshot.png](assets/QuickLookScreenshot.png)
 
 ## App Identifier couldn't be found
 

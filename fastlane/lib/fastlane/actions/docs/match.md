@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/match.png" height="110">
+  <img src="/img/actions/match.png" height="110">
 </p>
 
 ###### Easily sync your certificates and profiles across your team using git
@@ -74,7 +74,7 @@ For more information about the concept, visit [codesigning.guide](https://codesi
 fastlane match init
 ```
 
-<img src="assets/match_init.gif" width="550" />
+<img src="/img/actions/match_init.gif" width="550" />
 
 You'll be asked to enter the URL to your Git repo. This can be either a `https://` or a `git` URL. (If your machine is currently using SSH to authenticate with Github, you'll want to use a `git` URL, otherwise you may see an authentication error when you attempt to use match.) `fastlane match init` won't read or modify your certificates or profiles.
 
@@ -112,7 +112,7 @@ fastlane match appstore
 fastlane match development
 ```
 
-<img src="assets/match_appstore_small.gif" width="550" />
+<img src="/img/actions/match_appstore_small.gif" width="550" />
 
 This will create a new certificate and provisioning profile (if required) and store them in your Git repo. If you previously ran `match` it will automatically install the existing profiles from the Git repo.
 
@@ -191,7 +191,7 @@ After running `match` for the first time, your Git repo will contain 2 directori
 Additionally, `match` creates a nice repo `README.md` for you, making it easy to onboard new team members:
 
 <p align="center">
-  <img src="assets/github_repo.png" width="700" />
+  <img src="/img/actions/github_repo.png" width="700" />
 </p>
 
 #### fastlane
@@ -294,7 +294,7 @@ fastlane match nuke development
 fastlane match nuke distribution
 ```
 
-<img src="assets/match_nuke.gif" width="550" />
+<img src="/img/actions/match_nuke.gif" width="550" />
 
 You'll have to confirm a list of profiles / certificates that will be deleted.
 
