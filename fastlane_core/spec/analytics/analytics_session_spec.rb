@@ -8,6 +8,11 @@ describe FastlaneCore::AnalyticsSession do
     File.join(dirname, './fixtures/')
   end
 
+  before(:each) do
+    # This value needs to be set or our event fixtures will not match
+    allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
+  end
+
   context 'single action execution' do
     let(:session) { FastlaneCore::AnalyticsSession.new }
     let(:action_name) { 'some_action' }
@@ -38,7 +43,11 @@ describe FastlaneCore::AnalyticsSession do
         expect(session).to receive(:ide_version).and_return('Xcode 9')
 
         session.action_launched(launch_context: launch_context)
-        expect(JSON.parse(session.events.to_json)).to match_array(fixture_data)
+
+        parsed_events = JSON.parse(session.events.to_json)
+        parsed_events.zip(fixture_data).each do |parsed, fixture|
+          expect(parsed).to eq(fixture)
+        end
       end
     end
 
@@ -142,7 +151,11 @@ describe FastlaneCore::AnalyticsSession do
         session.action_completed(completion_context: action_2_completion_context)
 
         expected_final_array = fixture_data_action_1_launched + [fixture_data_action_1_completed] + fixture_data_action_2_launched + [fixture_data_action_2_completed]
-        expect(JSON.parse(session.events.to_json)).to match_array(expected_final_array)
+        parsed_events = JSON.parse(session.events.to_json)
+
+        parsed_events.zip(expected_final_array).each do |parsed, fixture|
+          expect(parsed).to eq(fixture)
+        end
       end
     end
   end
