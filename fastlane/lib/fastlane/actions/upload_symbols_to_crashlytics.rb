@@ -98,6 +98,7 @@ module Fastlane
             next unless result
             next unless result.kind_of?(Hash)
             params[:api_token] ||= result["APIKey"]
+            UI.verbose("found an APIKey in #{current}")
           end
         end
         UI.user_error!("Please provide an api_token using api_token:") unless params[:api_token]
