@@ -32,14 +32,6 @@ module Gym
         options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
         options << config[:export_xcargs] if config[:export_xcargs]
 
-        if Helper.xcode_at_least?("9.0")
-          # xcodebuild will not use provisioning profiles
-          # if we doens't specify signingStyle as manual
-          if config[:export_options][:provisioningProfiles]
-            Gym.config[:export_options][:signingStyle] = 'manual'
-          end
-        end
-
         options
       end
 
@@ -173,6 +165,13 @@ module Gym
           hash[:uploadSymbols] = (Gym.config[:include_symbols] ? true : false) unless Gym.config[:include_symbols].nil?
           hash[:uploadBitcode] = (Gym.config[:include_bitcode] ? true : false) unless Gym.config[:include_bitcode].nil?
         end
+
+        # xcodebuild will not use provisioning profiles
+        # if we doens't specify signingStyle as manual
+        if Helper.xcode_at_least?("9.0") && hash[:provisioningProfiles]
+            hash[:signingStyle] = 'manual'
+        end
+
         hash[:teamID] = Gym.config[:export_team_id] if Gym.config[:export_team_id]
 
         UI.important("Generated plist file with the following values:")
