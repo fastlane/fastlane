@@ -33,14 +33,10 @@ module Gym
         options << config[:export_xcargs] if config[:export_xcargs]
 
         if Helper.xcode_at_least?("9.0")
-          # With Xcode 9, we should allow ProvisioningUpdate, since this enables Xcode
-          # to use the team provisioning profiles.
-          # OR
-          # specify signingStyle in export_options if we have provisioningProfiles map
+          # xcodebuild will not use provisioning profiles
+          # if we doens't specify signingStyle as manual
           if config[:export_options][:provisioningProfiles]
             Gym.config[:export_options][:signingStyle] = 'manual'
-          elsif !config[:export_xcargs] || !config[:export_xcargs].include?("-allowProvisioningUpdates")
-            options << "-allowProvisioningUpdates"
           end
         end
 
