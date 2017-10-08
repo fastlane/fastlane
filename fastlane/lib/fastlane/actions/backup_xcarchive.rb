@@ -34,10 +34,10 @@ module Fastlane
             xcarchive_folder = File.expand_path(File.dirname(xcarchive))
             xcarchive_file = File.basename(xcarchive)
             zip_file = if zip_filename
-              File.join(dir, "#{zip_filename}.xcarchive.zip")
-            else
-              File.join(dir, "#{xcarchive_file}.zip")
-            end
+                         File.join(dir, "#{zip_filename}.xcarchive.zip")
+                       else
+                         File.join(dir, "#{xcarchive_file}.zip")
+                       end
 
             # Create zip
             Actions.sh(%(cd "#{xcarchive_folder}" && zip -r -X "#{zip_file}" "#{xcarchive_file}" > /dev/null))
