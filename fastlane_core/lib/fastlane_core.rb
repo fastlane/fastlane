@@ -67,6 +67,10 @@ module FastlaneCore
     return @session
   end
 
+  def self.reset_session
+    @session = nil
+  end
+
   # A directory that's being used to user-wide fastlane configs
   # This directory is also used for the bundled fastlane
   # Since we don't want to access FastlaneCore from spaceship

@@ -159,21 +159,57 @@ describe FastlaneCore::AnalyticsSession do
       end
     end
   end
+
+  context 'mock Fastfile executions' do
+    before(:each) do
+      FastlaneCore.reset_session
+    end
+
+    let(:fixture_data) do
+      events = JSON.parse(File.read(File.join(fixture_dirname, '/launched.json')))
+      events.each { |event| event["action"]["detail"] = 'lane_switch' }
+      events
+    end
+
+    let(:guesser) { FastlaneCore::AppIdentifierGuesser.new }
+
+    it "properly tracks the lane switches", :tagged do
+      allow(UI).to receive(:success)
+      allow(UI).to receive(:header)
+      allow(UI).to receive(:message)
+
+      allow(Time).to receive(:now).and_return(timestamp_millis)
+
+      expect(FastlaneCore::AppIdentifierGuesser).to receive(:new).and_return(guesser)
+      allow(guesser).to receive(:p_hash).and_return(p_hash)
+      allow(guesser).to receive(:platform).and_return('ios')
+
+      FastlaneCore.session.is_fastfile = true
+      allow(FastlaneCore.session).to receive(:oauth_app_name).and_return(oauth_app_name)
+      expect(FastlaneCore.session).to receive(:fastlane_version).and_return('2.5.0')
+      expect(FastlaneCore.session).to receive(:ruby_version).and_return('2.4.0')
+      expect(FastlaneCore.session).to receive(:operating_system_version).and_return('10.12')
+      expect(FastlaneCore.session).to receive(:ide_version).and_return('Xcode 9')
+      expect(FastlaneCore.session).to receive(:session_id).and_return(session_id)
+
+      ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
+      ff.runner.execute(:lane1, :ios)
+
+      parsed_events = JSON.parse(FastlaneCore.session.events.to_json)
+      parsed_events.zip(fixture_data).each do |parsed, fixture|
+        expect(parsed).to eq(fixture)
+      end
+    end
+
+    # it 'records more than one action from a Fastfile' do
+    #   ff = Fastlane::LaneManager.cruise_lane('ios', 'beta')
+    #   expect(ff.collector.launches).to eq({ default_platform: 1, frameit: 1, team_id: 2 })
+    # end
+  end
 end
 
 # here are a bunch of tests we should also have
 # these were scattered around, but I think we should put them in one place
-
-# it "properly tracks the lane switches" do
-#   ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
-#   ff.runner.execute(:lane1, :ios)
-
-#   expect(ff.collector.launches).to eq({
-#     lane_switch: 1
-#   })
-
-#   expect(Fastlane::ActionCollector.new.is_official?(:lane_switch)).to eq(true)
-# end
 
 # it "Successfully collected all actions" do
 #   ff = Fastlane::LaneManager.cruise_lane('ios', 'beta')
