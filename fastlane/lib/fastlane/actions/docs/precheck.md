@@ -51,7 +51,7 @@ Since you might want to manually trigger _precheck_ but don't want to specify al
 
 Run `fastlane precheck init` to create a new configuration file. Example:
 
-```ruby
+```ruby-skip-tests
 # indicates that your metadata will not be checked by this rule
 negative_apple_sentiment(level: :skip)
 
@@ -74,12 +74,14 @@ Update your `Fastfile` to contain the following code:
 
 ```ruby
 lane :production do
-  ...
+  # ...
+
   # by default deliver will call precheck and warn you of any problems
   # if you want precheck to halt submitting to app review, you can pass
   # precheck_default_rule_level: :error
   deliver(precheck_default_rule_level: :error)
-  ...
+
+  # ...
 end
 
 # or if you prefer, you can run precheck alone

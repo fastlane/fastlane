@@ -185,25 +185,25 @@ lane :release do
     language: 'English',
     app_version: '1.0',
     sku: '123',
-    team_name: 'SunApps GmbH' # only necessary when in multiple teams
+    team_name: 'SunApps GmbH', # only necessary when in multiple teams
     
     # Optional
     # App services can be enabled during app creation
     enable_services: {
-      app_group: "on"               # Valid values: "on", "off"
-      apple_pay: "on"               # Valid values: "on", "off"
-      associated_domains: "on"      # Valid values: "on", "off"
-      data_protection: "complete"   # Valid values: "complete", "unlessopen", "untilfirstauth"
-      game_center: "on"             # Valid values: "on", "off"
-      health_kit: "on"              # Valid values: "on", "off"
-      home_kit: "on"                # Valid values: "on", "off"
-      wireless_accessory: "on"      # Valid values: "on", "off"
-      icloud: "cloudkit"            # Valid values: "legacy", "cloudkit"
-      in_app_purchase: "on"         # Valid values: "on", "off"
-      inter_app_audio: "on"         # Valid values: "on", "off"
-      passbook: "on"                # Valid values: "on", "off"
-      push_notification: "on"       # Valid values: "on", "off"
-      siri_kit: "on"                # Valid values: "on", "off"
+      app_group: "on",               # Valid values: "on", "off"
+      apple_pay: "on",               # Valid values: "on", "off"
+      associated_domains: "on",      # Valid values: "on", "off"
+      data_protection: "complete",   # Valid values: "complete", "unlessopen", "untilfirstauth",
+      game_center: "on",             # Valid values: "on", "off"
+      health_kit: "on",              # Valid values: "on", "off"
+      home_kit: "on",                # Valid values: "on", "off"
+      wireless_accessory: "on",      # Valid values: "on", "off"
+      icloud: "cloudkit",            # Valid values: "legacy", "cloudkit"
+      in_app_purchase: "on",         # Valid values: "on", "off"
+      inter_app_audio: "on",         # Valid values: "on", "off"
+      passbook: "on",                # Valid values: "on", "off"
+      push_notification: "on",       # Valid values: "on", "off"
+      siri_kit: "on",                # Valid values: "on", "off"
       vpn_configuration: "on"       # Valid values: "on", "off"
     }
   )
@@ -214,7 +214,7 @@ end
 
 To use the newly generated app in _deliver_, you need to add this line to your `Deliverfile`:
 
-```ruby
+```ruby-skip-tests
 apple_id ENV['PRODUCE_APPLE_ID']
 ```
 
