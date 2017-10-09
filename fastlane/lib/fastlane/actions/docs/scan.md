@@ -83,10 +83,10 @@ _scan_ uses the latest APIs and tools to make running tests plain simple and off
 
 _scan_ uses a plain `xcodebuild` command, therefore keeping 100% compatible with `xcodebuild`. To generate the nice output, _scan_ uses [xcpretty](https://github.com/supermarin/xcpretty). You can alway access the raw output in `~/Library/Logs/scan`.
 
-![img/actions/scanScreenshot.png](assets/scanScreenshot.png)
-![img/actions/slack.png](assets/slack.png)
-![img/actions/scanHTML.png](assets/scanHTML.png)
-![img/actions/scanHTMLFailing.png](assets/scanHTMLFailing.png)
+![img/actions/scanScreenshot.png](/img/actions/scanScreenshot.png)
+![img/actions/slack.png](/img/actions/slack.png)
+![img/actions/scanHTML.png](/img/actions/scanHTML.png)
+![img/actions/scanHTMLFailing.png](/img/actions/scanHTMLFailing.png)
 
 # Usage
 

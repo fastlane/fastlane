@@ -30,19 +30,19 @@ The complete and updated list of supported devices and colors can be found [here
 
 Here is a nice gif, that shows ``_frameit_`` in action:
 
-![img/actions/FrameitGit.gif](assets/FrameitGit.gif?raw=1)
+![img/actions/FrameitGit.gif](/img/actions/FrameitGit.gif?raw=1)
 
 ### Results
 
-![img/actions/ScreenshotsBig.png](assets/ScreenshotsBig.png?raw=1)
+![img/actions/ScreenshotsBig.png](/img/actions/ScreenshotsBig.png?raw=1)
 
 -------
 
-![img/actions/ScreenshotsOverview.png](assets/ScreenshotsOverview.png?raw=1)
+![img/actions/ScreenshotsOverview.png](/img/actions/ScreenshotsOverview.png?raw=1)
 
 -------
 
-![img/actions/MacExample.png](assets/MacExample.png?raw=1)
+![img/actions/MacExample.png](/img/actions/MacExample.png?raw=1)
 
 <h5 align="center">The <code>frameit</code> 2.0 update was kindly sponsored by <a href="https://mindnode.com/">MindNode</a>, seen in the screenshots above.
 

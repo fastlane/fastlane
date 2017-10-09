@@ -34,13 +34,13 @@ To automate iOS Push profiles you can use [pem](https://github.com/fastlane/fast
 ### Why not let Xcode do the work?
 
 - _sigh_ can easily be integrated into your CI-server (e.g. Jenkins)
-- Xcode sometimes invalidates [all existing profiles](assets/SignErrors.png)
+- Xcode sometimes invalidates [all existing profiles](/img/actions/SignErrors.png)
 - You have control over what happens
 - You still get to have the signing files, which you can then use for your build scripts or store in git
 
 See _sigh_ in action:
 
-![img/actions/sighRecording.gif](assets/sighRecording.gif)
+![img/actions/sighRecording.gif](/img/actions/sighRecording.gif)
 
 # Usage
 
@@ -176,7 +176,7 @@ _sigh_ uses the [CredentialsManager](https://github.com/fastlane/fastlane/tree/m
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
 
 It will show you the `mobileprovision` files like this:
-![img/actions/QuickLookScreenshot.png](assets/QuickLookScreenshot.png)
+![img/actions/QuickLookScreenshot.png](/img/actions/QuickLookScreenshot.png)
 
 ## App Identifier couldn't be found
 
