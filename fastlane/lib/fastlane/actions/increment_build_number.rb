@@ -36,10 +36,16 @@ module Fastlane
           raise "Apple Generic Versioning is not enabled." unless agv_enabled
         end
 
+        if params[:use_ci_build_number]
+          build_number = Actions::CiBuildNumberAction.run({})
+        else
+          build_number = params[:build_number]
+        end
+
         command = [
           command_prefix,
           'agvtool',
-          params[:build_number] ? "new-version -all #{params[:build_number].to_s.strip}" : 'next-version -all',
+          build_number ? "new-version -all #{build_number.to_s.strip}" : 'next-version -all',
           command_suffix
         ].join(' ')
 
@@ -67,7 +73,16 @@ module Fastlane
                                        env_name: "FL_BUILD_NUMBER_BUILD_NUMBER",
                                        description: "Change to a specific version",
                                        optional: true,
-                                       is_string: false),
+                                       is_string: false,
+                                       conflicting_options: [:use_ci_build_number]),
+          FastlaneCore::ConfigItem.new(key: :use_ci_build_number,
+          env_name: "FL_BUILD_NUMBER_USE_CI_BUILD_NUMBER",
+          description: "Use build number returned by ci_build_number action",
+          optional: true,
+          is_string: false,
+          default_value: false,
+          conflicting_options: [:build_number]),
+
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
                                        env_name: "FL_BUILD_NUMBER_PROJECT",
                                        description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
