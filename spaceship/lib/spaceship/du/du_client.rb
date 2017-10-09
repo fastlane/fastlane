@@ -38,8 +38,8 @@ module Spaceship
       upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/purple-video', content_provider_id: content_provider_id, sso_token: sso_token_for_video)
     end
 
-    def upload_trailer_preview(app_version, upload_file, content_provider_id, sso_token_for_image)
-      upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/app-screenshot-image', content_provider_id: content_provider_id, sso_token: sso_token_for_image)
+    def upload_trailer_preview(app_version, upload_file, content_provider_id, sso_token_for_image, device)
+      upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: screenshot_picture_type(device, nil))
     end
 
     private
