@@ -672,12 +672,14 @@ module Spaceship
     # Uploads the trailer preview
     # @param app_version (AppVersion): The version of your app
     # @param upload_trailer_preview (UploadFile): The trailer preview to upload
+    # @param device (string): The target device
     # @return [JSON] the response
-    def upload_trailer_preview(app_version, upload_trailer_preview)
+    def upload_trailer_preview(app_version, upload_trailer_preview, device)
       raise "app_version is required" unless app_version
       raise "upload_trailer_preview is required" unless upload_trailer_preview
+      raise "device is required" unless device
 
-      du_client.upload_trailer_preview(app_version, upload_trailer_preview, content_provider_id, sso_token_for_image)
+      du_client.upload_trailer_preview(app_version, upload_trailer_preview, content_provider_id, sso_token_for_image, device)
     end
 
     # Fetches the App Version Reference information from ITC
