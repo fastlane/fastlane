@@ -80,7 +80,7 @@ Running `fastlane screengrab init` generated a Screengrabfile which can store al
 
 The `Screengrabfile` is written in Ruby, so you may find it helpful to use an editor that highlights Ruby syntax to modify this file.
 
-```ruby
+```ruby-skip-tests
 # remove the leading '#' to uncomment lines
 
 # app_package_name 'your.app.package'
