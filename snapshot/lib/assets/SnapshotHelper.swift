@@ -23,7 +23,6 @@ func setupSnapshot(_ app: XCUIApplication) {
     Snapshot.setupSnapshot(app)
 }
 
-@available(*, deprecated, renamed: "snapshot(_:timeWaitingForIdle:)")
 func snapshot(_ name: String, waitForLoadingIndicator: Bool) {
     if waitForLoadingIndicator {
         Snapshot.snapshot(name)
@@ -44,7 +43,7 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
     case cannotFindHomeDirectory
     case cannotFindSimulatorHomeDirectory
     case cannotAccessSimulatorHomeDirectory(String)
-    
+
     var debugDescription: String {
         switch self {
         case .cannotDetectUser:
@@ -186,30 +185,28 @@ open class Snapshot: NSObject {
 
 private extension XCUIElementAttributes {
     var isNetworkLoadingIndicator: Bool {
-        let oldLoadingIndicatorSize = CGSize(width: 10, height: 20)
-        
-        let hasOldLoadingIndicatorSize = frame.size == oldLoadingIndicatorSize
+        if hasWhiteListedIdentifier { return false }
+
+        let hasOldLoadingIndicatorSize = frame.size == CGSize(width: 10, height: 20)
         let hasNewLoadingIndicatorSize = frame.size.width.isBetween(46, and: 47) && frame.size.height.isBetween(2, and: 3)
-        
-        return !hasWhiteListedIdentifier && (hasOldLoadingIndicatorSize || hasNewLoadingIndicatorSize)
+
+        return hasOldLoadingIndicatorSize || hasNewLoadingIndicatorSize
     }
-    
+
     var hasWhiteListedIdentifier: Bool {
         let whiteListedIdentifiers = ["GeofenceLocationTrackingOn", "StandardLocationTrackingOn"]
-        
+
         return whiteListedIdentifiers.contains(identifier)
     }
-    
+
     func isStatusBar(_ deviceWidth: CGFloat) -> Bool {
-        if elementType == .statusBar {
-            return true
-        }
-        
-        let positionedAtTopLeft = frame.origin == .zero
-        let hasOldStatusBarSize = frame.size == CGSize(width: deviceWidth, height: 20)
-        let hasNewStatusBarSize = frame.size == CGSize(width: deviceWidth, height: 44)
-        
-        return positionedAtTopLeft && (hasOldStatusBarSize || hasNewStatusBarSize)
+        if elementType == .statusBar { return true }
+        guard frame.origin == .zero else { return false }
+
+        let oldStatusBarSize = CGSize(width: deviceWidth, height: 20)
+        let newStatusBarSize = CGSize(width: deviceWidth, height: 44)
+
+        return [oldStatusBarSize, newStatusBarSize].contains(frame.size)
     }
 }
 
@@ -220,19 +217,19 @@ private extension XCUIElementQuery {
 
             return element.isNetworkLoadingIndicator
         }
-        
+
         return self.containing(isNetworkLoadingIndicator)
     }
-    
+
     var deviceStatusBars: XCUIElementQuery {
         let deviceWidth = XCUIApplication().frame.width
-        
+
         let isStatusBar = NSPredicate { (evaluatedObject, _) in
             guard let element = evaluatedObject as? XCUIElementAttributes else { return false }
 
             return element.isStatusBar(deviceWidth)
         }
-        
+
         return self.containing(isStatusBar)
     }
 }
