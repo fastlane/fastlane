@@ -22,6 +22,7 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p $CIRCLE_TEST_RESULTS
+            echo "2.3" > .ruby-version
 
       - run:
           name: Check PR Metadata
