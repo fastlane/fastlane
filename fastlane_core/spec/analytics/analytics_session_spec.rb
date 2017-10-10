@@ -201,10 +201,21 @@ describe FastlaneCore::AnalyticsSession do
       end
     end
 
-    # it 'records more than one action from a Fastfile' do
-    #   ff = Fastlane::LaneManager.cruise_lane('ios', 'beta')
-    #   expect(ff.collector.launches).to eq({ default_platform: 1, frameit: 1, team_id: 2 })
-    # end
+    it 'records more than one action from a Fastfile' do
+      allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(File.absolute_path('./fastlane/spec/fixtures/fastfiles/'))
+      ff = Fastlane::LaneManager.cruise_lane('ios', 'beta')
+      version_events = FastlaneCore.session.events.select do |event|
+        event[:primary_target][:name] == 'fastlane_version'
+      end
+      expect(version_events.count).to eq(4)
+      action_names = version_events.map { |event| event[:action][:detail] }
+      expect(action_names).to match_array([
+        'default_platform',
+        'frameit',
+        'team_id',
+        'team_id'
+      ])
+    end
   end
 end
 

@@ -226,11 +226,17 @@ module Fastlane
         custom_dir ||= ".."
       end
 
-      #      FastlaneCore.session.action_launched(method_sym)
-
       verify_supported_os(method_sym, class_ref)
 
       begin
+        app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
+        launch_context = FastlaneCore::ActionLaunchContext.new(
+          action_name: method_sym.to_s,
+          p_hash: app_id_guesser.p_hash,
+          platform: app_id_guesser.platform
+        )
+        FastlaneCore.session.is_fastfile = true
+        FastlaneCore.session.action_launched(launch_context: launch_context)
         Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
           # If another action is calling this action, we shouldn't show it in the summary
           # (see https://github.com/fastlane/fastlane/issues/4546)
