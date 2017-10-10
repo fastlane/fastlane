@@ -6,6 +6,7 @@ jobs:
       xcode: "9.0.0"
     environment:
       CIRCLE_TEST_RESULTS: $HOME/test-results
+    shell: /bin/bash --login -eo pipefail
     steps:
       - checkout
 
@@ -20,7 +21,7 @@ jobs:
             brew install shellcheck
             bundle check || bundle install --jobs=4 --retry=3 --path .bundle
       - save_cache:
-          key: v1-gems={{ checksum "Gemfile" }}-{{ checksum "Gemfile.lock" }}
+          key: v1-gems-{{ checksum "Gemfile" }}
           paths:
             - .bundle
 
