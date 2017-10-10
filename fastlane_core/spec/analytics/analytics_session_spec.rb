@@ -210,11 +210,27 @@ describe FastlaneCore::AnalyticsSession do
       expect(version_events.count).to eq(4)
       action_names = version_events.map { |event| event[:action][:detail] }
       expect(action_names).to match_array([
-        'default_platform',
-        'frameit',
-        'team_id',
-        'team_id'
-      ])
+                                            'default_platform',
+                                            'frameit',
+                                            'team_id',
+                                            'team_id'
+                                          ])
+    end
+
+    it 'has a completion event for each action' do
+      allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(File.absolute_path('./fastlane/spec/fixtures/fastfiles/'))
+      ff = Fastlane::LaneManager.cruise_lane('ios', 'beta')
+      completion_events = FastlaneCore.session.events.select do |event|
+        event[:action][:name] == 'completed'
+      end
+      expect(completion_events.count).to eq(4)
+      action_names = completion_events.map { |event| event[:action][:detail] }
+      expect(action_names).to match_array([
+                                            'default_platform',
+                                            'frameit',
+                                            'team_id',
+                                            'team_id'
+                                          ])
     end
   end
 end

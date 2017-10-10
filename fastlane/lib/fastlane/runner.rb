@@ -263,7 +263,15 @@ module Fastlane
             end
 
             class_ref.runner = self # needed to call another action form an action
-            class_ref.run(arguments)
+            return_value = class_ref.run(arguments)
+            app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
+            action_completion_context = FastlaneCore::ActionCompletionContext.new(
+              p_hash: app_id_guesser.p_hash,
+              action_name: method_sym.to_s,
+              status: FastlaneCore::ActionCompletionStatus::SUCCESS
+            )
+            FastlaneCore.session.action_completed(completion_context: action_completion_context)
+            return return_value
           end
         end
       rescue Interrupt => e
