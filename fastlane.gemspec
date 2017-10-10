@@ -47,7 +47,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'tty-screen', '~> 0.5.0' # detect the terminal width
 
   spec.add_dependency 'babosa', '>= 1.0.2', "< 2.0.0"
-  spec.add_dependency 'colored' # coloured terminal output
+  spec.add_dependency 'colored' # colored terminal output
   spec.add_dependency 'commander-fastlane', '>= 4.4.5', '< 5.0.0' # CLI parser
   spec.add_dependency 'excon', '>= 0.45.0', '< 1.0.0' # Great HTTP Client
   spec.add_dependency 'faraday-cookie_jar', '~> 0.0.6'

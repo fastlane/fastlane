@@ -887,7 +887,7 @@ module Spaceship
       build_info = get_build_info_for_review(app_id: app_id, train: train, build_number: build_number, platform: platform)
       # Now fill in the values provided by the user
 
-      # First the localised values:
+      # First the localized values:
       build_info['details'].each do |current|
         current['whatsNew']['value'] = changelog if changelog
         current['description']['value'] = description if description
