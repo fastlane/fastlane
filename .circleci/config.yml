@@ -9,20 +9,19 @@ jobs:
     steps:
       - checkout
 
-      - run: brew install shellcheck
       - restore_cache:
           key: v1-gems-{{ checksum "Gemfile" }}
-      - run: bundle check || bundle install --jobs=4 --retry=3 --path .bundle
-      - save_cache:
-          key: v1-gems={{ checksum "Gemfile" }}-{{ checksum "Gemfile.lock" }}
-          paths:
-            - .bundle
-
       - run:
           name: Setup Build
           command: |
             mkdir -p $CIRCLE_TEST_RESULTS
             echo "2.3" > .ruby-version
+            brew install shellcheck
+            bundle check || bundle install --jobs=4 --retry=3 --path .bundle
+      - save_cache:
+          key: v1-gems={{ checksum "Gemfile" }}-{{ checksum "Gemfile.lock" }}
+          paths:
+            - .bundle
 
       - run:
           name: Check PR Metadata
