@@ -204,7 +204,7 @@ module Fastlane
           p_hash: app_id_guesser.p_hash,
           platform: app_id_guesser.platform
         )
-        FastlaneCore.session.is_fastfile = true
+
         FastlaneCore.session.action_launched(launch_context: launch_context)
         result = block.call(parameters.first || {}) # to always pass a hash
         self.current_lane = original_lane
@@ -235,7 +235,6 @@ module Fastlane
           p_hash: app_id_guesser.p_hash,
           platform: app_id_guesser.platform
         )
-        FastlaneCore.session.is_fastfile = true
         FastlaneCore.session.action_launched(launch_context: launch_context)
         Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
           # If another action is calling this action, we shouldn't show it in the summary

@@ -12,7 +12,7 @@ module FastlaneCore
 
     # make this a method so that we can override it in monkey patches
     def oauth_app_name
-      return 'fastlane'
+      return 'fastlane-metrics-test-data-v2'
     end
 
     def initialize(analytics_ingester_client: AnalyticsIngesterClient.new)
@@ -20,6 +20,7 @@ module FastlaneCore
       @session_id = SecureRandom.uuid
       @client = analytics_ingester_client
       @events = []
+      @is_fastfile = false
     end
 
     def backfill_p_hashes(p_hash: nil)
@@ -106,6 +107,17 @@ module FastlaneCore
           detail: ruby_version
         }
       )
+    end
+
+    def is_fastfile=(value)
+      if value
+        # If true, update all of the events to reflect
+        # that the execution is running within a Fastfile context
+        @events.reverse_each do |event|
+          event[:primary_target][:name] == 'fastfile' ? event[:primary_target][:detail] = value.to_s : next
+        end
+      end
+      @is_fastfile = value
     end
 
     def action_completed(completion_context: nil)

@@ -3,6 +3,7 @@ module FastlaneCore
     SUCCESS = 'success'
     FAILED = 'failed' # fastlane crashes unrelated to user_error!
     USER_ERROR = 'user_error' # Anytime a user_error! is triggered
+    INTERRUPTED = 'interrupted'
   end
 
   class ActionCompletionContext
