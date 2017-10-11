@@ -14,7 +14,6 @@ describe FastlaneCore::AnalyticsSession do
   end
 
   context 'single action execution' do
-    let(:session) { FastlaneCore::AnalyticsSession.new }
     let(:action_name) { 'some_action' }
 
     context 'action launch' do
@@ -35,6 +34,7 @@ describe FastlaneCore::AnalyticsSession do
         allow(Time).to receive(:now).and_return(timestamp_millis)
 
         # Stub out calls related to the execution environment
+        session = FastlaneCore::AnalyticsSession.new
         session.is_fastfile = true
         allow(session).to receive(:oauth_app_name).and_return(oauth_app_name)
         expect(session).to receive(:fastlane_version).and_return('2.5.0')
@@ -48,6 +48,25 @@ describe FastlaneCore::AnalyticsSession do
         parsed_events.zip(fixture_data).each do |parsed, fixture|
           expect(parsed).to eq(fixture)
         end
+      end
+
+      it 'is not executed via Fastfile' do
+        expect(SecureRandom).to receive(:uuid).and_return(session_id)
+        allow(Time).to receive(:now).and_return(timestamp_millis)
+
+        # Stub out calls related to the execution environment
+        session = FastlaneCore::AnalyticsSession.new
+        allow(session).to receive(:oauth_app_name).and_return(oauth_app_name)
+        expect(session).to receive(:fastlane_version).and_return('2.5.0')
+        expect(session).to receive(:ruby_version).and_return('2.4.0')
+        expect(session).to receive(:operating_system_version).and_return('10.12')
+        expect(session).to receive(:ide_version).and_return('Xcode 9')
+
+        session.action_launched(launch_context: launch_context)
+
+        fastfile_events = session.events.select { |event| event[:primary_target][:name] == 'fastfile' }
+        expect(fastfile_events.count).to eq(1)
+        expect(fastfile_events.first[:primary_target][:detail]).to eq(false.to_s)
       end
     end
 
@@ -70,6 +89,7 @@ describe FastlaneCore::AnalyticsSession do
         expect(SecureRandom).to receive(:uuid).and_return(session_id)
         expect(Time).to receive(:now).and_return(timestamp_millis)
 
+        session = FastlaneCore::AnalyticsSession.new
         expect(session).to receive(:oauth_app_name).and_return(oauth_app_name)
 
         session.action_completed(completion_context: completion_context)
