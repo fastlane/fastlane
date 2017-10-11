@@ -232,6 +232,17 @@ describe FastlaneCore::AnalyticsSession do
                                             'team_id'
                                           ])
     end
+
+    it 'has a fastfile value of true for each event' do
+      allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(File.absolute_path('./fastlane/spec/fixtures/fastfiles/'))
+      ff = Fastlane::LaneManager.cruise_lane('ios', 'beta')
+      fastfile_events = FastlaneCore.session.events.select do |event|
+        event[:primary_target][:name] == 'fastfile'
+      end
+      expect(fastfile_events.count).to eq(4)
+      fastfile_values = fastfile_events.map { |event| event[:primary_target][:detail] }
+      expect(fastfile_values).to all(be == "true")
+    end
   end
 end
 
