@@ -5,7 +5,7 @@ module FastlaneCore
     attr_accessor :session_id
     attr_accessor :client
     attr_accessor :events
-    attr_accessor :ide_version
+    attr_accessor :build_tool_version
     attr_accessor :fastfile_id
     attr_accessor :is_fastfile
     alias fastfile? is_fastfile
@@ -71,8 +71,8 @@ module FastlaneCore
 
       @events << builder.launched_event(
         primary_target_hash: {
-          name: 'ide_version',
-          detail: ide_version
+          name: 'build_tool_version',
+          detail: launch_context.build_tool_version
         }
       )
 
@@ -97,7 +97,7 @@ module FastlaneCore
       @events << builder.launched_event(
         primary_target_hash: {
           name: 'platform',
-          detail: launch_context.platform
+          detail: launch_context.platform.to_s
         }
       )
 

@@ -77,7 +77,7 @@
       "detail": "some_action"
     },
     "primary_target": {
-      "name": "ide_version",
+      "name": "build_tool_version",
       "detail": "Xcode 9"
     },
     "millis_since_epoch": 1507142046000,
