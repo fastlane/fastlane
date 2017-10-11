@@ -9,6 +9,24 @@ describe Gym do
   end
 
   describe Gym::PackageCommandGeneratorXcode7 do
+    it "passes xcargs through to xcode build wrapper " do
+      options = {
+        project: "./gym/examples/standard/Example.xcodeproj",
+        xcargs: "-allowProvisioningUpdates"
+      }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      result = Gym::PackageCommandGeneratorXcode7.generate
+      expect(result).to eq([
+                             "/usr/bin/xcrun #{Gym::PackageCommandGeneratorXcode7.wrap_xcodebuild.shellescape} -exportArchive",
+                             "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                             "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
+                             "-allowProvisioningUpdates",
+                             ""
+                           ])
+    end
+
     it "works with the example project with no additional parameters" do
       options = { project: "./gym/examples/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
