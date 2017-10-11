@@ -78,8 +78,6 @@ module Fastlane
 
     # All the finishing up that needs to be done
     def self.finish_fastlane(ff, duration, error)
-      ff.runner.did_finish
-
       # Finished with all the lanes
       Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
       print_table(Fastlane::Actions.executed_actions)

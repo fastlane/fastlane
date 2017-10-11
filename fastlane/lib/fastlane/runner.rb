@@ -325,11 +325,6 @@ module Fastlane
       end
     end
 
-    # Fastfile was finished executing
-    def did_finish
-      FastlaneCore.session.finalize_session
-    end
-
     # Called internally to setup the runner object
     #
 
