@@ -3,7 +3,7 @@ module FastlaneCore
     def post_events(events)
       unless Helper.test?
         fork do
-          send_request(json: events.to_json)
+          send_request(json: { :analytics => events }.to_json)
         end
       end
       return true
