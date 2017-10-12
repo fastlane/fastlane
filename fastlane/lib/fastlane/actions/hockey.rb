@@ -119,7 +119,7 @@ module Fastlane
         else
 
           if build_file.nil?
-            UI.user_error!("You have to provide a build file")
+            UI.user_error!("You have to provide a build file (params 'apk' or 'ipa')")
           end
 
           if options[:ipa].to_s.end_with?(".ipa")
