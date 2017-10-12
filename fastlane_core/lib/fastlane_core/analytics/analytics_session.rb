@@ -111,7 +111,9 @@ module FastlaneCore
     def is_fastfile=(value)
       if value
         # If true, update all of the events to reflect
-        # that the execution is running within a Fastfile context
+        # that the execution is running within a Fastfile context.
+        # We don't want to update if this is false because once we
+        # detect a true value, that is the one to be trusted
         @events.reverse_each do |event|
           event[:primary_target][:name] == 'fastfile' ? event[:primary_target][:detail] = value.to_s : next
         end

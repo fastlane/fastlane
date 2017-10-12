@@ -18,6 +18,8 @@ module FastlaneCore
 
     def post_request(body: nil)
       require 'excon'
+      output_file = File.new("#{ENV['HOME']}/Desktop/mock_analytics-#{Time.now.to_i}.json", 'w')
+      output_file.write(body)
       url = ENV["FASTLANE_METRICS_URL"] || "https://fastlane-metrics.fabric.io/public"
       Excon.post(
         url,
