@@ -122,7 +122,7 @@
     },
     "secondary_target": {
       "name": "fastfile_id",
-      "detail": null
+      "detail": ""
     },
     "millis_since_epoch": 1507142046000,
     "version": 1

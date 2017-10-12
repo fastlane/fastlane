@@ -40,6 +40,7 @@ describe FastlaneCore::AnalyticsSession do
         expect(session).to receive(:fastlane_version).and_return('2.5.0')
         expect(session).to receive(:ruby_version).and_return('2.4.0')
         expect(session).to receive(:operating_system_version).and_return('10.12')
+        expect(session).to receive(:fastfile_id).and_return('')
 
         session.action_launched(launch_context: launch_context)
 
@@ -161,6 +162,7 @@ describe FastlaneCore::AnalyticsSession do
         expect(session).to receive(:fastlane_version).and_return('2.5.0').twice
         expect(session).to receive(:ruby_version).and_return('2.4.0').twice
         expect(session).to receive(:operating_system_version).and_return('10.12').twice
+        expect(session).to receive(:fastfile_id).and_return('').twice
 
         session.action_launched(launch_context: action_1_launch_context)
         session.action_completed(completion_context: action_1_completion_context)
@@ -207,6 +209,7 @@ describe FastlaneCore::AnalyticsSession do
       expect(FastlaneCore.session).to receive(:ruby_version).and_return('2.4.0')
       expect(FastlaneCore.session).to receive(:operating_system_version).and_return('10.12')
       expect(FastlaneCore.session).to receive(:session_id).and_return(session_id)
+      expect(FastlaneCore.session).to receive(:fastfile_id).and_return('')
 
       ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
       ff.runner.execute(:lane1, :ios)
