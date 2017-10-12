@@ -268,20 +268,6 @@ end
 # here are a bunch of tests we should also have
 # these were scattered around, but I think we should put them in one place
 
-# it "Successfully collected all actions" do
-#   ff = Fastlane::LaneManager.cruise_lane('ios', 'beta')
-#   expect(ff.collector.launches).to eq({ default_platform: 1, frameit: 1, team_id: 2 })
-# end
-
-#       let(:collector) { FastlaneCore::ToolCollector.new }
-
-# it "keeps track of what tools get invoked" do
-#   collector.did_launch_action(:scan)
-
-#   expect(collector.launches[:scan]).to eq(1)
-#   expect(collector.launches[:gym]).to eq(0)
-# end
-
 # it "tracks which tool raises an error" do
 #   collector.did_raise_error(:scan)
 
@@ -300,17 +286,6 @@ end
 #   with_env_values('FASTLANE_OPT_OUT_USAGE' => '1') do
 #     collector.did_launch_action(:scan)
 #     expect(collector.finalize_session).to eq(false)
-#   end
-# end
-
-# describe "#name_to_track" do
-#   it "returns the original name when it's a built-in action" do
-#     expect(collector.name_to_track(:fastlane)).to eq(:fastlane)
-#   end
-
-#   it "returns nil when it's an external action" do
-#     expect(collector).to receive(:is_official?).and_return(false)
-#     expect(collector.name_to_track(:fastlane)).to eq(nil)
 #   end
 # end
 
@@ -390,95 +365,5 @@ end
 #     expect(analytics.find_all { |a| a['primary_target']['detail'] == '1' && a['actor']['detail'] == 'fastlane' }.size).to eq(1)
 #     expect(analytics.find_all { |a| a['event_source']['product'] != 'fastlane_web_onboarding' && a['secondary_target']['detail'] == Fastlane::VERSION && a['actor']['detail'] == 'fastlane' }.size).to eq(2)
 #     expect(analytics.find_all { |a| a['action']['name'] == 'fastfile_executed' && a['primary_target']['detail'] == 'error' && a['actor']['detail'] == 'fastfile_id' }.size).to eq(1)
-#   end
-# end
-
-#   let(:mock_tool_collector) { FastlaneCore::AnalyticsSession.new }
-
-#   before(:each) do
-#     allow(Commander::Runner).to receive(:instance).and_return(Commander::Runner.new)
-#     expect(FastlaneCore::AnalyticsSession).to receive(:new).and_return(mock_tool_collector)
-#   end
-
-#   it "calls the tool collector lifecycle methods for a successful run" do
-#     expect(mock_tool_collector).to receive(:did_launch_action).with("tool_name").and_call_original
-#     expect(mock_tool_collector).to receive(:did_finish).and_call_original
-
-#     CommandsGenerator.new.run
-#   end
-
-#   it "calls the tool collector lifecycle methods for a crash" do
-#     expect(mock_tool_collector).to receive(:did_launch_action).with("tool_name").and_call_original
-#     expect(mock_tool_collector).to receive(:did_crash).with("tool_name").and_call_original
-
-#     expect do
-#       CommandsGenerator.new(raise_error: StandardError).run
-#     end.to raise_error(StandardError)
-#   end
-
-#   it "calls the tool collector lifecycle methods for a user error" do
-#     expect(mock_tool_collector).to receive(:did_launch_action).with("tool_name").and_call_original
-#     expect(mock_tool_collector).to receive(:did_raise_error).with("tool_name").and_call_original
-
-#     stdout, stderr = capture_stds do
-#       expect do
-#         CommandsGenerator.new(raise_error: FastlaneCore::Interface::FastlaneError).run
-#       end.to raise_error(SystemExit)
-#     end
-#     expect(stderr).to eq("\n[!] FastlaneCore::Interface::FastlaneError".red + "\n")
-#   end
-
-#   it "calls the tool collector lifecycle methods for a test failure" do
-#     expect(mock_tool_collector).to receive(:did_launch_action).with("tool_name").and_call_original
-#     # Notice how we don't expect `:did_raise_error` to be called here
-#     # TestFailures don't count as failures/crashes
-
-#     stdout, stderr = capture_stds do
-#       expect do
-#         CommandsGenerator.new(raise_error: FastlaneCore::Interface::FastlaneTestFailure).run
-#       end.to raise_error(SystemExit)
-#     end
-#     expect(stderr).to eq("\n[!] FastlaneCore::Interface::FastlaneTestFailure".red + "\n")
-#   end
-
-# describe Fastlane::ActionCollector do
-#   it "properly tracks the actions" do
-#     ENV.delete("FASTLANE_OPT_OUT_USAGE")
-
-#     ff = nil
-#     begin
-#       ff = Fastlane::FastFile.new.parse("lane :test do
-#         add_git_tag(build_number: 0)
-#         add_git_tag(build_number: 1)
-#       end")
-#     rescue
-#     end
-
-#     result = ff.runner.execute(:test)
-
-#     expect(ff.collector.launches).to eq({
-#       add_git_tag: 2
-#     })
-#   end
-
-#   it "doesn't track unofficial actions" do
-#     ENV.delete("FASTLANE_OPT_OUT_USAGE")
-
-#     Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions") # load custom actions
-
-#     ff = nil
-#     begin
-#       ff = Fastlane::FastFile.new.parse("lane :test do
-#         add_git_tag(build_number: 1)
-#         example_action
-#       end")
-#     rescue
-#     end
-
-#     result = ff.runner.execute(:test)
-
-#     expect(ff.collector.launches).to eq({
-#       add_git_tag: 1
-#     })
 #   end
 # end

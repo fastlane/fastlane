@@ -3,7 +3,7 @@ module FastlaneCore
     def post_events(events)
       unless Helper.test?
         fork do
-          send_request(json: { :analytics => events }.to_json)
+          send_request(json: { analytics: events }.to_json)
         end
       end
       return true
@@ -11,7 +11,7 @@ module FastlaneCore
 
     def send_request(json: nil, retries: 2)
       post_request(body: json)
-    rescue => e
+    rescue
       retries -= 1
       retry if retries >= 0
     end
@@ -30,7 +30,7 @@ module FastlaneCore
           conn.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
         end
       end
-      response = connection.post do |req|
+      connection.post do |req|
         req.url '/public'
         req.headers['Content-Type'] = 'application/json'
         req.body = body
