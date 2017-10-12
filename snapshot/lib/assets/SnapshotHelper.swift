@@ -19,17 +19,23 @@ import XCTest
 var deviceLanguage = ""
 var locale = ""
 
-@available(*, deprecated, message: "use setupSnapshot: instead")
-func setLanguage(_ app: XCUIApplication) {
-    setupSnapshot(app)
-}
-
 func setupSnapshot(_ app: XCUIApplication) {
     Snapshot.setupSnapshot(app)
 }
 
-func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
-    Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator)
+func snapshot(_ name: String, waitForLoadingIndicator: Bool) {
+    if waitForLoadingIndicator {
+        Snapshot.snapshot(name)
+    } else {
+        Snapshot.snapshot(name, timeWaitingForIdle: 0)
+    }
+}
+
+/// - Parameters:
+///   - name: The name of the snapshot
+///   - timeout: Amount of seconds to wait until the network loading indicator disappears. Pass `0` if you don't want to wait.
+func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20) {
+    Snapshot.snapshot(name, timeWaitingForIdle: timeout)
 }
 
 enum SnapshotError: Error, CustomDebugStringConvertible {
@@ -37,7 +43,7 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
     case cannotFindHomeDirectory
     case cannotFindSimulatorHomeDirectory
     case cannotAccessSimulatorHomeDirectory(String)
-    
+
     var debugDescription: String {
         switch self {
         case .cannotDetectUser:
@@ -116,9 +122,9 @@ open class Snapshot: NSObject {
         }
     }
 
-    open class func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
-        if waitForLoadingIndicator {
-            waitForLoadingIndicatorToDisappear()
+    open class func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20) {
+        if timeout > 0 {
+            waitForLoadingIndicatorToDisappear(within: timeout)
         }
 
         print("snapshot: \(name)") // more information about this, check out https://github.com/fastlane/fastlane/tree/master/snapshot#how-does-it-work
@@ -140,17 +146,14 @@ open class Snapshot: NSObject {
         #endif
     }
 
-    class func waitForLoadingIndicatorToDisappear() {
+    class func waitForLoadingIndicatorToDisappear(within timeout: TimeInterval) {
         #if os(tvOS)
             return
         #endif
 
-        let query = XCUIApplication().statusBars.children(matching: .other).element(boundBy: 1).children(matching: .other)
-
-        while (0..<query.count).map({ query.element(boundBy: $0) }).contains(where: { $0.isLoadingIndicator }) {
-            sleep(1)
-            print("Waiting for loading indicator to disappear...")
-        }
+        let networkLoadingIndicator = XCUIApplication().otherElements.deviceStatusBars.networkLoadingIndicators.element
+        let networkLoadingIndicatorDisappeared = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: networkLoadingIndicator)
+        XCTWaiter.wait(for: [networkLoadingIndicatorDisappeared], timeout: timeout)
     }
 
     class func pathPrefix() throws -> URL? {
@@ -180,16 +183,63 @@ open class Snapshot: NSObject {
     }
 }
 
-extension XCUIElement {
-    var isLoadingIndicator: Bool {
-        let whiteListedLoaders = ["GeofenceLocationTrackingOn", "StandardLocationTrackingOn"]
-        if whiteListedLoaders.contains(self.identifier) {
-            return false
+private extension XCUIElementAttributes {
+    var isNetworkLoadingIndicator: Bool {
+        if hasWhiteListedIdentifier { return false }
+
+        let hasOldLoadingIndicatorSize = frame.size == CGSize(width: 10, height: 20)
+        let hasNewLoadingIndicatorSize = frame.size.width.isBetween(46, and: 47) && frame.size.height.isBetween(2, and: 3)
+
+        return hasOldLoadingIndicatorSize || hasNewLoadingIndicatorSize
+    }
+
+    var hasWhiteListedIdentifier: Bool {
+        let whiteListedIdentifiers = ["GeofenceLocationTrackingOn", "StandardLocationTrackingOn"]
+
+        return whiteListedIdentifiers.contains(identifier)
+    }
+
+    func isStatusBar(_ deviceWidth: CGFloat) -> Bool {
+        if elementType == .statusBar { return true }
+        guard frame.origin == .zero else { return false }
+
+        let oldStatusBarSize = CGSize(width: deviceWidth, height: 20)
+        let newStatusBarSize = CGSize(width: deviceWidth, height: 44)
+
+        return [oldStatusBarSize, newStatusBarSize].contains(frame.size)
+    }
+}
+
+private extension XCUIElementQuery {
+    var networkLoadingIndicators: XCUIElementQuery {
+        let isNetworkLoadingIndicator = NSPredicate { (evaluatedObject, _) in
+            guard let element = evaluatedObject as? XCUIElementAttributes else { return false }
+
+            return element.isNetworkLoadingIndicator
         }
-        return self.frame.size == CGSize(width: 10, height: 20)
+
+        return self.containing(isNetworkLoadingIndicator)
+    }
+
+    var deviceStatusBars: XCUIElementQuery {
+        let deviceWidth = XCUIApplication().frame.width
+
+        let isStatusBar = NSPredicate { (evaluatedObject, _) in
+            guard let element = evaluatedObject as? XCUIElementAttributes else { return false }
+
+            return element.isStatusBar(deviceWidth)
+        }
+
+        return self.containing(isStatusBar)
+    }
+}
+
+private extension CGFloat {
+    func isBetween(_ numberA: CGFloat, and numberB: CGFloat) -> Bool {
+        return numberA...numberB ~= self
     }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.5]
+// SnapshotHelperVersion [1.6]
