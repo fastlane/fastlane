@@ -11,7 +11,7 @@ module FastlaneCore
 
     # make this a method so that we can override it in monkey patches
     def oauth_app_name
-      return 'fastlane-metrics-test-data-v2'
+      return 'fastlane-metrics-test-data-v3'
     end
 
     def initialize(analytics_ingester_client: AnalyticsIngesterClient.new)
@@ -89,7 +89,7 @@ module FastlaneCore
         },
         secondary_target_hash: {
           name: 'fastfile_id',
-          detail: fastfile_id
+          detail: fastfile_id.to_s
         }
       )
 
