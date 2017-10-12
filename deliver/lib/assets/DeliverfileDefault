@@ -1,6 +1,6 @@
 ###################### More Options ######################
 # If you want to have even more control, check out the documentation
-# https://github.com/fastlane/fastlane/blob/master/deliver/Deliverfile.md
+# https://docs.fastlane.tools/actions/deliver
 
 
 ###################### Automatically generated ######################
