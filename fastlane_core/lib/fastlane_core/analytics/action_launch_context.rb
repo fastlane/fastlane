@@ -11,5 +11,13 @@ module FastlaneCore
       @p_hash = p_hash
       @platform = platform
     end
+
+    def build_tool_version
+      if platform == :android
+        return 'android'
+      else
+        return "Xcode #{Helper.xcode_version}"
+      end
+    end
   end
 end

@@ -5,7 +5,6 @@ module FastlaneCore
     attr_accessor :session_id
     attr_accessor :client
     attr_accessor :events
-    attr_accessor :build_tool_version
     attr_accessor :fastfile_id
     attr_accessor :is_fastfile
     alias fastfile? is_fastfile

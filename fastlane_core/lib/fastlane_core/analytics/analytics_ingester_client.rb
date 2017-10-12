@@ -29,7 +29,7 @@ module FastlaneCore
 
   class MockAnalyticsIngesterClient < AnalyticsIngesterClient
     def post_request(body: nil)
-      output_file = File.new("#{ENV['HOME']}/Desktop/mock_analytics.json", 'w')
+      output_file = File.new("#{ENV['HOME']}/Desktop/mock_analytics-#{Time.now.to_i}.json", 'w')
       output_file.write(body)
     end
   end
