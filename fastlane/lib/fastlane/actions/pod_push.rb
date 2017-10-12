@@ -18,6 +18,11 @@ module Fastlane
           command << " --sources='#{sources}'"
         end
 
+        if params[:swift_version]
+          swift_version = params[:swift_version]
+          command << " --swift-version=#{swift_version}"
+        end
+
         if params[:allow_warnings]
           command << " --allow-warnings"
         end
@@ -74,6 +79,10 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Sources must be an array.") unless value.kind_of?(Array)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :swift_version,
+                                       description: "The SWIFT_VERSION that should be used to lint the spec. This takes precedence over a .swift-version file",
+                                       optional: true,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        description: "Show more debugging information",
                                        optional: true,
