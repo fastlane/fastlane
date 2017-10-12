@@ -111,6 +111,30 @@ module Spaceship
       send_shared_login_request(user, password)
     end
 
+    # Sometimes we get errors or info nested in our data
+    # This method allows you to pass in a set of keys to check for
+    # along with the name of the sub_section of your original data
+    # where we should check
+    # Returns a mapping of keys to data array if we find anything, otherwise, empty map
+    def fetch_errors_in_data(data_section: nil, sub_section_name: nil, keys: nil)
+      if data_section && sub_section_name
+        sub_section = data_section[sub_section_name]
+      else
+        sub_section = data_section
+      end
+
+      unless sub_section
+        return {}
+      end
+
+      error_map = {}
+      keys.each do |key|
+        errors = sub_section.fetch(key, [])
+        error_map[key] = errors if errors.count > 0
+      end
+      return error_map
+    end
+
     # rubocop:disable Metrics/PerceivedComplexity
     # If the response is coming from a flaky api, set flaky_api_call to true so we retry a little.
     # Patience is a virtue.
@@ -119,12 +143,17 @@ module Spaceship
       return unless raw.kind_of? Hash
 
       data = raw['data'] || raw # sometimes it's with data, sometimes it isn't
+      error_keys_to_check = [
+        "sectionErrorKeys",
+        "sectionInfoKeys",
+        "sectionWarningKeys",
+        "validationErrors"
+      ]
+      errors_in_data = fetch_errors_in_data(data_section: data, keys: error_keys_to_check)
+      errors_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: error_keys_to_check)
 
-      if data.fetch('sectionErrorKeys', []).count == 0 and
-         data.fetch('sectionInfoKeys', []).count == 0 and
-         data.fetch('sectionWarningKeys', []).count == 0 and
-         data.fetch('validationErrors', []).count == 0
-
+      # If we have any errors or "info" we need to treat them as warnings or errors
+      if errors_in_data.count == 0 && errors_in_version_info.count == 0
         logger.debug("Request was successful")
       end
 
@@ -154,8 +183,15 @@ module Spaceship
       end
 
       errors = handle_response_hash.call(data)
-      errors += data.fetch('sectionErrorKeys', [])
-      errors += data.fetch('validationErrors', [])
+
+      # Search at data level, as well as "versionInfo" level for errors
+      error_keys = ["sectionErrorKeys", "validationErrors"]
+      errors_in_data = fetch_errors_in_data(data_section: data, keys: error_keys)
+      errors_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: error_keys)
+
+      errors += errors_in_data.values if errors_in_data.values
+      errors += errors_in_version_info.values if errors_in_version_info.values
+      errors = errors.flat_map { |value| value }
 
       # Sometimes there is a different kind of error in the JSON response
       # e.g. {"warn"=>nil, "error"=>["operation_failed"], "info"=>nil}
@@ -177,8 +213,18 @@ module Spaceship
         end
       end
 
-      puts data['sectionInfoKeys'] if data['sectionInfoKeys']
-      puts data['sectionWarningKeys'] if data['sectionWarningKeys']
+      # Search at data level, as well as "versionInfo" level for info and warnings
+      info_keys = ["sectionInfoKeys", "sectionWarningKeys"]
+      info_in_data = fetch_errors_in_data(data_section: data, keys: info_keys)
+      info_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: info_keys)
+
+      info_in_data.each do |info_key, info_value|
+        puts(info_value)
+      end
+
+      info_in_version_info.each do |info_key, info_value|
+        puts(info_value)
+      end
 
       return data
     end
