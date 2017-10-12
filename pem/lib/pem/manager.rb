@@ -87,6 +87,8 @@ module PEM
       def certificate
         if PEM.config[:development]
           Spaceship.certificate.development_push
+        elsif PEM.config[:website_push]
+          Spaceship.certificate.website_push
         else
           Spaceship.certificate.production_push
         end
