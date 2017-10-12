@@ -67,7 +67,9 @@ module Commander
           platform: app_id_guesser.platform # need to update this to work even when we don't have an app_id
         )
         FastlaneCore.session.action_launched(launch_context: action_launch_context)
+
         return_value = run_active_command
+
         app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
         action_completion_context = FastlaneCore::ActionCompletionContext.new(
           p_hash: app_id_guesser.p_hash,

@@ -213,7 +213,8 @@ module Fastlane
       actions_path = File.join(File.expand_path("..", path), 'actions')
       Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
 
-      #      FastlaneCore.session.action_launched(:import)
+      action_launched('import_from_git')
+
       parse(File.read(path), path)
     end
 
@@ -226,7 +227,7 @@ module Fastlane
       Actions.execute_action('import_from_git') do
         require 'tmpdir'
 
-        #        FastlaneCore.session.action_launched(:import_from_git)
+        action_launched('import_from_git')
 
         # Checkout the repo
         repo_name = url.split("/").last
@@ -268,7 +269,7 @@ module Fastlane
       # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
       value ||= yield
       Actions.execute_action('say') do
-        #        FastlaneCore.session.action_launched(:say)
+        action_launched('say')
         Fastlane::Actions::SayAction.run([value])
       end
     end
@@ -276,13 +277,25 @@ module Fastlane
     def puts(value)
       # Overwrite this, since there is already a 'puts' method defined in the Ruby standard library
       value ||= yield if block_given?
-      #      FastlaneCore.session.action_launched(:puts)
+
+      action_launched('puts')
+
       Fastlane::Actions::PutsAction.run([value])
     end
 
     def test(params = {})
       # Overwrite this, since there is already a 'test' method defined in the Ruby standard library
       self.runner.try_switch_to_lane(:test, [params])
+    end
+
+    def action_launched(action_name)
+      app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
+      action_launch_context = FastlaneCore::ActionLaunchContext.new(
+        action_name: action_name,
+        p_hash: app_id_guesser.p_hash,
+        platform: app_id_guesser.platform
+      )
+      FastlaneCore.session.action_launched(launch_context: action_launch_context)
     end
   end
 end
