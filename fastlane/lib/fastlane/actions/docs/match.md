@@ -250,13 +250,13 @@ _match_ can even use the same one Git repository for all bundle identifiers.
 
 ### Setup Xcode project
 
-[Docs on how to set up your Xcode project](https://docs.fastlane.tools/codesigning/XcodeProject/)
+[Docs on how to set up your Xcode project](/codesigning/xcode-project/)
 
 #### To build from the command line using [fastlane](https://fastlane.tools)
 
 _match_ automatically pre-fills environment variables with the UUIDs of the correct provisioning profiles, ready to be used in your Xcode project.
 
-More information about how to setup your Xcode project can be found [here](https://docs.fastlane.tools/codesigning/XcodeProject/)
+More information about how to setup your Xcode project can be found [here](/codesigning/xcode-project/)
 
 #### To build from Xcode manually
 
@@ -264,7 +264,7 @@ This is useful when installing your application on your device using the Develop
 
 You can statically select the right provisioning profile in your Xcode project (the name will be `match Development tools.fastlane.app`).
 
-[Docs on how to set up your Xcode project](/codesigning/xcode-project/.md)
+[Docs on how to set up your Xcode project](/codesigning/xcode-project/)
 
 ### Continuous Integration
 
