@@ -46,7 +46,7 @@ This does the following:
 - Downloads the certificate
 - Generates a new ```.pem``` file in the current working directory, which you can upload to your server
 
-Note that ``_pem_`` will never revoke your existing certificates. _pem_ can't download any of your existing push certificates, as the private key is only available on the machine it was created on. 
+Note that ``_pem_`` will never revoke your existing certificates. _pem_ can't download any of your existing push certificates, as the private key is only available on the machine it was created on.
 
 If you already have a push certificate enabled, which is active for at least 30 more days, _pem_ will not create a new certificate. If you still want to create one, use the `force`:
 
@@ -59,6 +59,10 @@ You can pass parameters like this:
 If you want to generate a development certificate instead:
 
     fastlane pem --development
+
+If you want to generate a Website Push certificate:
+
+    fastlane pem --website_push
 
 Set a password for your `p12` file:
 
@@ -90,7 +94,7 @@ If you need the `p12` in your keychain, perhaps to test push with an app like [K
     MAC verified OK
     Enter PEM pass phrase:
       <enter a temporary password to encrypt the pem file>
-      
+
     % openssl pkcs12 -export -in my.pem -out my-with-passphrase.p12
     Enter pass phrase for temp.pem:
       <enter the temporary password to decrypt the pem file>
