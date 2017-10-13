@@ -16,5 +16,14 @@ module FastlaneCore
       @action_name = action_name
       @status = status
     end
+
+    def self.context_for_action_name(action_name, args: nil, status: nil)
+      app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: args)
+      return self.new(
+        action_name: action_name,
+        p_hash: app_id_guesser.p_hash,
+        status: status
+      )
+    end
   end
 end

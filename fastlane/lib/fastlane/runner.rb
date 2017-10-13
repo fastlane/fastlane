@@ -198,14 +198,9 @@ module Fastlane
         # Actually switch lane now
         self.current_lane = new_lane
 
-        app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
-        launch_context = FastlaneCore::ActionLaunchContext.new(
-          action_name: "lane_switch",
-          p_hash: app_id_guesser.p_hash,
-          platform: app_id_guesser.platform
-        )
-
+        launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name('lane_switch', args: ARGV)
         FastlaneCore.session.action_launched(launch_context: launch_context)
+
         result = block.call(parameters.first || {}) # to always pass a hash
         self.current_lane = original_lane
 
@@ -229,13 +224,9 @@ module Fastlane
       verify_supported_os(method_sym, class_ref)
 
       begin
-        app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
-        launch_context = FastlaneCore::ActionLaunchContext.new(
-          action_name: method_sym.to_s,
-          p_hash: app_id_guesser.p_hash,
-          platform: app_id_guesser.platform
-        )
+        launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(method_sym.to_s, args: ARGV)
         FastlaneCore.session.action_launched(launch_context: launch_context)
+
         Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
           # If another action is calling this action, we shouldn't show it in the summary
           # (see https://github.com/fastlane/fastlane/issues/4546)
@@ -263,13 +254,9 @@ module Fastlane
 
             class_ref.runner = self # needed to call another action form an action
             return_value = class_ref.run(arguments)
-            app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
-            action_completion_context = FastlaneCore::ActionCompletionContext.new(
-              p_hash: app_id_guesser.p_hash,
-              action_name: method_sym.to_s,
-              status: FastlaneCore::ActionCompletionStatus::SUCCESS
-            )
-            FastlaneCore.session.action_completed(completion_context: action_completion_context)
+
+            action_completed(method_sym.to_s, status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+
             return return_value
           end
         end
@@ -279,31 +266,22 @@ module Fastlane
         raise e
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         FastlaneCore::CrashReporter.report_crash(exception: e)
-        if e.fastlane_should_report_metrics?
-          app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
-          action_completion_context = FastlaneCore::ActionCompletionContext.new(
-            p_hash: app_id_guesser.p_hash,
-            action_name: method_sym.to_s,
-            status: FastlaneCore::ActionCompletionStatus::USER_ERROR
-          )
-          FastlaneCore.session.action_completed(completion_context: action_completion_context)
-        end
+        action_completed(method_sym.to_s, status: FastlaneCore::ActionCompletionStatus::USER_ERROR, exception: e)
         raise e
       rescue Exception => e # rubocop:disable Lint/RescueException
         # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         # Catches all exceptions, since some plugins might use system exits to get out
         FastlaneCore::CrashReporter.report_crash(exception: e)
 
-        if e.fastlane_should_report_metrics?
-          app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
-          action_completion_context = FastlaneCore::ActionCompletionContext.new(
-            p_hash: app_id_guesser.p_hash,
-            action_name: method_sym.to_s,
-            status: FastlaneCore::ActionCompletionStatus::FAILED # Is `FAILED` correct?
-          )
-          FastlaneCore.session.action_completed(completion_context: action_completion_context)
-        end
+        action_completed(method_sym.to_s, status: FastlaneCore::ActionCompletionStatus::FAILED, exception: e)
         raise e
+      end
+    end
+
+    def action_completed(action_name, status: nil, exception: nil)
+      if exception.nil? || exception.fastlane_should_report_metrics?
+        action_completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV, status: status)
+        FastlaneCore.session.action_completed(completion_context: action_completion_context)
       end
     end
 

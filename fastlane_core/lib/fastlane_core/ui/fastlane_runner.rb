@@ -60,23 +60,12 @@ module Commander
           FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_RELEASE}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
         end
 
-        app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
-        action_launch_context = FastlaneCore::ActionLaunchContext.new(
-          action_name: @program[:name],
-          p_hash: app_id_guesser.p_hash,
-          platform: app_id_guesser.platform # need to update this to work even when we don't have an app_id
-        )
+        action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(@program[:name], args: ARGV)
         FastlaneCore.session.action_launched(launch_context: action_launch_context)
 
         return_value = run_active_command
 
-        app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
-        action_completion_context = FastlaneCore::ActionCompletionContext.new(
-          p_hash: app_id_guesser.p_hash,
-          action_name: @program[:name],
-          status: FastlaneCore::ActionCompletionStatus::SUCCESS
-        )
-        FastlaneCore.session.action_completed(completion_context: action_completion_context)
+        action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::SUCCESS)
         return return_value
       rescue InvalidCommandError => e
         # calling `abort` makes it likely that tests stop without failing, so
@@ -92,15 +81,7 @@ module Commander
         if FastlaneCore::Globals.verbose?
           raise e
         else
-          if e.fastlane_should_report_metrics?
-            app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
-            action_completion_context = FastlaneCore::ActionCompletionContext.new(
-              p_hash: app_id_guesser.p_hash,
-              action_name: @program[:name],
-              status: FastlaneCore::ActionCompletionStatus::INTERRUPTED
-            )
-            FastlaneCore.session.action_completed(completion_context: action_completion_context)
-          end
+          action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::INTERRUPTED, exception: e)
           puts "\nCancelled... use --verbose to show the stack trace"
         end
       rescue \
@@ -145,6 +126,13 @@ module Commander
       end
     end
 
+    def action_completed(action_name, status: nil, exception: nil)
+      if exception.nil? || exception.fastlane_should_report_metrics?
+        action_completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV, status: status)
+        FastlaneCore.session.action_completed(completion_context: action_completion_context)
+      end
+    end
+
     def rescue_file_error(e)
       # We're also printing the new-lines, as otherwise the message is not very visible in-between the error and the stack trace
       puts ""
@@ -167,29 +155,13 @@ module Commander
     def rescue_unknown_error(e)
       FastlaneCore::CrashReporter.report_crash(exception: e)
 
-      if e.fastlane_should_report_metrics?
-        app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
-        action_completion_context = FastlaneCore::ActionCompletionContext.new(
-          p_hash: app_id_guesser.p_hash,
-          action_name: @program[:name],
-          status: FastlaneCore::ActionCompletionStatus::FAILED # Is `FAILED` correct?
-        )
-        FastlaneCore.session.action_completed(completion_context: action_completion_context)
-      end
+      action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::FAILED, exception: e)
 
       handle_unknown_error!(e)
     end
 
     def rescue_fastlane_error(e)
-      if e.fastlane_should_report_metrics?
-        app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
-        action_completion_context = FastlaneCore::ActionCompletionContext.new(
-          p_hash: app_id_guesser.p_hash,
-          action_name: @program[:name],
-          status: FastlaneCore::ActionCompletionStatus::USER_ERROR # USER_ERROR because FastlaneCore::Interface::FastlaneError # user_error!
-        )
-        FastlaneCore.session.action_completed(completion_context: action_completion_context)
-      end
+      action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::USER_ERROR, exception: e)
 
       show_github_issues(e.message) if e.show_github_issues
       FastlaneCore::CrashReporter.report_crash(exception: e)
@@ -287,15 +259,7 @@ module Commander
         reraise_formatted!(e, message)
       else
         # without stack trace
-        if e.fastlane_should_report_metrics?
-          app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
-          action_completion_context = FastlaneCore::ActionCompletionContext.new(
-            p_hash: app_id_guesser.p_hash,
-            action_name: @program[:name],
-            status: FastlaneCore::ActionCompletionStatus::USER_ERROR # USER_ERROR because FastlaneCore::Interface::FastlaneError # user_error!
-          )
-          FastlaneCore.session.action_completed(completion_context: action_completion_context)
-        end
+        action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::USER_ERROR, exception: e)
         abort "\n[!] #{message}".red
       end
     end

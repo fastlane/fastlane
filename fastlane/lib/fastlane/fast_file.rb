@@ -289,12 +289,7 @@ module Fastlane
     end
 
     def action_launched(action_name)
-      app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV)
-      action_launch_context = FastlaneCore::ActionLaunchContext.new(
-        action_name: action_name,
-        p_hash: app_id_guesser.p_hash,
-        platform: app_id_guesser.platform
-      )
+      action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name, args: ARGV)
       FastlaneCore.session.action_launched(launch_context: action_launch_context)
     end
   end

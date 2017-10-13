@@ -150,30 +150,6 @@ describe FastlaneCore do
 
         FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
       end
-
-      describe "#platform" do
-        # it "ios" do
-        #   FastlaneSpec::Env.with_ARGV(["--app_identifier", "yolo.app"]) do
-        #     expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
-        #       expect(analytics.size).to eq(2)
-        #       expect(analytics.find_all { |a| a[:action][:name] == 'update_checked' && a[:secondary_target][:detail] == :ios }.size).to eq(1)
-        #     end
-
-        #     FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
-        #   end
-        # end
-
-        # it "android" do
-        #   FastlaneSpec::Env.with_ARGV(["--app_package_name", "yolo.android.app"]) do
-        #     expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
-        #       expect(analytics.size).to eq(2)
-        #       expect(analytics.find_all { |a| a[:action][:name] == 'update_checked' && a[:secondary_target][:detail] == :android }.size).to eq(1)
-        #     end
-
-        #     FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
-        #   end
-        # end
-      end
     end
 
     describe "#send_completion_events_for" do

@@ -12,6 +12,15 @@ module FastlaneCore
       @platform = platform
     end
 
+    def self.context_for_action_name(action_name, args: nil)
+      app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: args)
+      return self.new(
+        action_name: action_name,
+        p_hash: app_id_guesser.p_hash,
+        platform: app_id_guesser.platform
+      )
+    end
+
     def build_tool_version
       if platform == :android
         return 'android'
