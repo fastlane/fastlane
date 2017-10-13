@@ -58,7 +58,7 @@ module PEM
         end
 
         x509_certificate = cert.download
-        certificate_type = (PEM.config[:development] ? 'development' : 'production')
+
         filename_base = PEM.config[:pem_name] || "#{certificate_type}_#{PEM.config[:app_identifier]}"
         filename_base = File.basename(filename_base, ".pem") # strip off the .pem if it was provided.
 
@@ -85,12 +85,16 @@ module PEM
       end
 
       def certificate
+        Spaceship.certificate.public_send("#{certificate_type}_push")
+      end
+
+      def certificate_type
         if PEM.config[:development]
-          Spaceship.certificate.development_push
+          'development'
         elsif PEM.config[:website_push]
-          Spaceship.certificate.website_push
+          'website'
         else
-          Spaceship.certificate.production_push
+          'production'
         end
       end
 
