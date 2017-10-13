@@ -118,11 +118,7 @@ module Spaceship
 
       # Abstract class for push certificates. Check out the subclasses
       # DevelopmentPush, ProductionPush, WebsitePush and VoipPush
-      class PushCertificate < Certificate
-        def self.portal_type
-          Spaceship::App
-        end
-      end
+      class PushCertificate < Certificate; end
 
       # A push notification certificate for development environment
       class DevelopmentPush < PushCertificate; end
@@ -310,6 +306,12 @@ module Spaceship
           # munge the response to make it work for the factory
           response['certificateTypeDisplayId'] = response['certificateType']['certificateTypeDisplayId']
           self.new(response)
+        end
+
+        # Default portal class to use when finding by bundle_id
+        # @return (Class): The class this type of certificate belongs to
+        def portal_type
+          Spaceship::App
         end
       end
 

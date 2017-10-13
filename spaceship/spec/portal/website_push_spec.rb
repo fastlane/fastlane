@@ -18,6 +18,7 @@ describe Spaceship::Portal::WebsitePush do
       expect(website_push.name).to eq("First Website Push")
       expect(website_push.status).to eq("current")
       expect(website_push.website_id).to eq("44V62UZ8L7")
+      expect(website_push.app_id).to eq("44V62UZ8L7")
       expect(website_push.prefix).to eq("9J57U9392R")
     end
 
