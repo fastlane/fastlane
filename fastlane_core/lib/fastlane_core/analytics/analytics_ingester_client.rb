@@ -37,9 +37,9 @@ module FastlaneCore
       end
     end
 
+    # This method is only for debugging purposes
     def write_json(body)
-      output_file = File.new("#{ENV['HOME']}/Desktop/mock_analytics-#{Time.now.to_i}.json", 'w')
-      output_file.write(body)
+      File.write("#{ENV['HOME']}/Desktop/mock_analytics-#{Time.now.to_i}.json", body)
     end
   end
 

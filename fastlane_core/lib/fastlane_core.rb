@@ -61,10 +61,8 @@ module FastlaneCore
   # You can confirm this by observing how we use the environment variable: FASTLANE_OPT_OUT_USAGE
   # Specifically, in AnalyticsSession.finalize_session
   # Learn more at https://github.com/fastlane/fastlane#metrics
-  @session = nil
   def self.session
     @session ||= AnalyticsSession.new
-    return @session
   end
 
   def self.reset_session

@@ -213,7 +213,7 @@ module Fastlane
       actions_path = File.join(File.expand_path("..", path), 'actions')
       Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
 
-      action_launched('import_from_git')
+      action_launched('import')
 
       parse(File.read(path), path)
     end

@@ -263,6 +263,22 @@ describe FastlaneCore::AnalyticsSession do
       expect(fastfile_values).to all(be == "true")
     end
   end
+
+  context 'opt out' do
+    it "does not post the collected data if the opt-out ENV var is set" do
+      with_env_values('FASTLANE_OPT_OUT_USAGE' => '1') do
+        FastlaneCore.reset_session
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(File.absolute_path('./fastlane/spec/fixtures/fastfiles/'))
+        ff = Fastlane::LaneManager.cruise_lane('ios', 'beta')
+        completion_events = FastlaneCore.session.events.select do |event|
+          event[:action][:name] == 'completed'
+        end
+        expect(completion_events.count).to eq(4)
+        expect(FastlaneCore.session.client).not_to receive(:post_events)
+        FastlaneCore.session.finalize_session
+      end
+    end
+  end
 end
 
 # here are a bunch of tests we should also have
@@ -280,13 +296,6 @@ end
 
 #   expect(collector.error).to eq(:scan)
 #   expect(collector.crash).to be(true)
-# end
-
-# it "does not post the collected data if the opt-out ENV var is set" do
-#   with_env_values('FASTLANE_OPT_OUT_USAGE' => '1') do
-#     collector.did_launch_action(:scan)
-#     expect(collector.finalize_session).to eq(false)
-#   end
 # end
 
 # it "posts the collected data with a crash when finished" do

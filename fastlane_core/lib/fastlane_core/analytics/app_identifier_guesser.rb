@@ -1,4 +1,3 @@
-
 require 'fastlane_core/android_package_name_guesser'
 require 'fastlane_core/ios_app_identifier_guesser'
 
