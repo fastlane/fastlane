@@ -1,5 +1,5 @@
 import Foundation
-func adb(serial: String = "", command: String? = nil, adbPath: String = "adb") -> String {
+@discardableResult func adb(serial: String = "", command: String? = nil, adbPath: String = "adb") -> String {
   let command = RubyCommand(commandID: "", methodName: "adb", className: nil, args: [RubyCommand.Argument(name: "serial", value: serial), RubyCommand.Argument(name: "command", value: command), RubyCommand.Argument(name: "adb_path", value: adbPath)])
   return runner.executeCommand(command)
 }
@@ -59,8 +59,8 @@ func backupFile(path: String) {
   let command = RubyCommand(commandID: "", methodName: "backup_file", className: nil, args: [RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
 }
-func backupXcarchive(xcarchive: String, destination: String, zip: Bool = true, versioned: Bool = true) {
-  let command = RubyCommand(commandID: "", methodName: "backup_xcarchive", className: nil, args: [RubyCommand.Argument(name: "xcarchive", value: xcarchive), RubyCommand.Argument(name: "destination", value: destination), RubyCommand.Argument(name: "zip", value: zip), RubyCommand.Argument(name: "versioned", value: versioned)])
+func backupXcarchive(xcarchive: String, destination: String, zip: Bool = true, zipFilename: String? = nil, versioned: Bool = true) {
+  let command = RubyCommand(commandID: "", methodName: "backup_xcarchive", className: nil, args: [RubyCommand.Argument(name: "xcarchive", value: xcarchive), RubyCommand.Argument(name: "destination", value: destination), RubyCommand.Argument(name: "zip", value: zip), RubyCommand.Argument(name: "zip_filename", value: zipFilename), RubyCommand.Argument(name: "versioned", value: versioned)])
   _ = runner.executeCommand(command)
 }
 func badge(dark: String? = nil, custom: String? = nil, noBadge: String? = nil, shield: String? = nil, alpha: String? = nil, path: String = ".", shieldIoTimeout: String? = nil, glob: String? = nil, alphaChannel: String? = nil, shieldGravity: String? = nil, shieldNoResize: String? = nil) {
@@ -83,7 +83,7 @@ func cert(development: Bool = false, force: Bool = false, username: String, team
   let command = RubyCommand(commandID: "", methodName: "cert", className: nil, args: [RubyCommand.Argument(name: "development", value: development), RubyCommand.Argument(name: "force", value: force), RubyCommand.Argument(name: "username", value: username), RubyCommand.Argument(name: "team_id", value: teamId), RubyCommand.Argument(name: "team_name", value: teamName), RubyCommand.Argument(name: "output_path", value: outputPath), RubyCommand.Argument(name: "keychain_path", value: keychainPath), RubyCommand.Argument(name: "keychain_password", value: keychainPassword), RubyCommand.Argument(name: "platform", value: platform)])
   _ = runner.executeCommand(command)
 }
-func changelogFromGitCommits(between: String? = nil, commitsCount: Int? = nil, pretty: String = "%B", dateFormat: String? = nil, ancestryPath: Bool = false, tagMatchPattern: String? = nil, matchLightweightTag: Bool = true, includeMerges: String? = nil, mergeCommitFiltering: String = "include_merges") -> String {
+@discardableResult func changelogFromGitCommits(between: String? = nil, commitsCount: Int? = nil, pretty: String = "%B", dateFormat: String? = nil, ancestryPath: Bool = false, tagMatchPattern: String? = nil, matchLightweightTag: Bool = true, includeMerges: String? = nil, mergeCommitFiltering: String = "include_merges") -> String {
   let command = RubyCommand(commandID: "", methodName: "changelog_from_git_commits", className: nil, args: [RubyCommand.Argument(name: "between", value: between), RubyCommand.Argument(name: "commits_count", value: commitsCount), RubyCommand.Argument(name: "pretty", value: pretty), RubyCommand.Argument(name: "date_format", value: dateFormat), RubyCommand.Argument(name: "ancestry_path", value: ancestryPath), RubyCommand.Argument(name: "tag_match_pattern", value: tagMatchPattern), RubyCommand.Argument(name: "match_lightweight_tag", value: matchLightweightTag), RubyCommand.Argument(name: "include_merges", value: includeMerges), RubyCommand.Argument(name: "merge_commit_filtering", value: mergeCommitFiltering)])
   return runner.executeCommand(command)
 }
@@ -115,11 +115,11 @@ func clubmate() {
   let command = RubyCommand(commandID: "", methodName: "clubmate", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
-func cocoapods(clean: Bool = true, integrate: Bool = true, repoUpdate: Bool = false, silent: Bool = false, verbose: Bool = false, ansi: Bool = true, useBundleExec: Bool = true, podfile: String? = nil, errorCallback: ((String) -> Void) = {_ in }) {
-  let command = RubyCommand(commandID: "", methodName: "cocoapods", className: nil, args: [RubyCommand.Argument(name: "clean", value: clean), RubyCommand.Argument(name: "integrate", value: integrate), RubyCommand.Argument(name: "repo_update", value: repoUpdate), RubyCommand.Argument(name: "silent", value: silent), RubyCommand.Argument(name: "verbose", value: verbose), RubyCommand.Argument(name: "ansi", value: ansi), RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec), RubyCommand.Argument(name: "podfile", value: podfile), RubyCommand.Argument(name: "error_callback", value: errorCallback, type: .stringClosure)])
+func cocoapods(clean: Bool = true, integrate: Bool = true, repoUpdate: Bool = false, silent: Bool = false, verbose: Bool = false, ansi: Bool = true, useBundleExec: Bool = true, podfile: String? = nil, errorCallback: ((String) -> Void) = {_ in }, tryRepoUpdateOnError: Bool = true) {
+  let command = RubyCommand(commandID: "", methodName: "cocoapods", className: nil, args: [RubyCommand.Argument(name: "clean", value: clean), RubyCommand.Argument(name: "integrate", value: integrate), RubyCommand.Argument(name: "repo_update", value: repoUpdate), RubyCommand.Argument(name: "silent", value: silent), RubyCommand.Argument(name: "verbose", value: verbose), RubyCommand.Argument(name: "ansi", value: ansi), RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec), RubyCommand.Argument(name: "podfile", value: podfile), RubyCommand.Argument(name: "error_callback", value: errorCallback, type: .stringClosure), RubyCommand.Argument(name: "try_repo_update_on_error", value: tryRepoUpdateOnError)])
   _ = runner.executeCommand(command)
 }
-func commitGithubFile(repositoryName: String, serverUrl: String = "https://api.github.com", apiToken: String, branch: String = "master", path: String, message: String? = nil, secure: Bool = true) -> [String : String] {
+@discardableResult func commitGithubFile(repositoryName: String, serverUrl: String = "https://api.github.com", apiToken: String, branch: String = "master", path: String, message: String? = nil, secure: Bool = true) -> [String : String] {
   let command = RubyCommand(commandID: "", methodName: "commit_github_file", className: nil, args: [RubyCommand.Argument(name: "repository_name", value: repositoryName), RubyCommand.Argument(name: "server_url", value: serverUrl), RubyCommand.Argument(name: "api_token", value: apiToken), RubyCommand.Argument(name: "branch", value: branch), RubyCommand.Argument(name: "path", value: path), RubyCommand.Argument(name: "message", value: message), RubyCommand.Argument(name: "secure", value: secure)])
   return parseDictionary(fromString: runner.executeCommand(command))
 }
@@ -263,7 +263,7 @@ func gradle(task: String, flavor: String? = nil, buildType: String? = nil, flags
   let command = RubyCommand(commandID: "", methodName: "gradle", className: nil, args: [RubyCommand.Argument(name: "task", value: task), RubyCommand.Argument(name: "flavor", value: flavor), RubyCommand.Argument(name: "build_type", value: buildType), RubyCommand.Argument(name: "flags", value: flags), RubyCommand.Argument(name: "project_dir", value: projectDir), RubyCommand.Argument(name: "gradle_path", value: gradlePath), RubyCommand.Argument(name: "properties", value: properties), RubyCommand.Argument(name: "serial", value: serial), RubyCommand.Argument(name: "print_command", value: printCommand), RubyCommand.Argument(name: "print_command_output", value: printCommandOutput)])
   _ = runner.executeCommand(command)
 }
-func gym(workspace: String? = gymfile.workspace, project: String? = gymfile.project, scheme: String? = gymfile.scheme, clean: Bool = gymfile.clean, outputDirectory: String = gymfile.outputDirectory, outputName: String? = gymfile.outputName, configuration: String? = gymfile.configuration, silent: Bool = gymfile.silent, codesigningIdentity: String? = gymfile.codesigningIdentity, skipPackageIpa: Bool = gymfile.skipPackageIpa, includeSymbols: String? = gymfile.includeSymbols, includeBitcode: String? = gymfile.includeBitcode, exportMethod: String? = gymfile.exportMethod, exportOptions: String? = gymfile.exportOptions, exportXcargs: String? = gymfile.exportXcargs, skipBuildArchive: String? = gymfile.skipBuildArchive, skipArchive: String? = gymfile.skipArchive, buildPath: String? = gymfile.buildPath, archivePath: String? = gymfile.archivePath, derivedDataPath: String? = gymfile.derivedDataPath, resultBundle: String? = gymfile.resultBundle, buildlogPath: String = gymfile.buildlogPath, sdk: String? = gymfile.sdk, toolchain: String? = gymfile.toolchain, destination: String? = gymfile.destination, exportTeamId: String? = gymfile.exportTeamId, xcargs: String? = gymfile.xcargs, xcconfig: String? = gymfile.xcconfig, suppressXcodeOutput: String? = gymfile.suppressXcodeOutput, disableXcpretty: String? = gymfile.disableXcpretty, xcprettyTestFormat: String? = gymfile.xcprettyTestFormat, xcprettyFormatter: String? = gymfile.xcprettyFormatter, xcprettyReportJunit: String? = gymfile.xcprettyReportJunit, xcprettyReportHtml: String? = gymfile.xcprettyReportHtml, xcprettyReportJson: String? = gymfile.xcprettyReportJson, analyzeBuildTime: String? = gymfile.analyzeBuildTime, xcprettyUtf: String? = gymfile.xcprettyUtf) -> String {
+@discardableResult func gym(workspace: String? = gymfile.workspace, project: String? = gymfile.project, scheme: String? = gymfile.scheme, clean: Bool = gymfile.clean, outputDirectory: String = gymfile.outputDirectory, outputName: String? = gymfile.outputName, configuration: String? = gymfile.configuration, silent: Bool = gymfile.silent, codesigningIdentity: String? = gymfile.codesigningIdentity, skipPackageIpa: Bool = gymfile.skipPackageIpa, includeSymbols: String? = gymfile.includeSymbols, includeBitcode: String? = gymfile.includeBitcode, exportMethod: String? = gymfile.exportMethod, exportOptions: String? = gymfile.exportOptions, exportXcargs: String? = gymfile.exportXcargs, skipBuildArchive: String? = gymfile.skipBuildArchive, skipArchive: String? = gymfile.skipArchive, buildPath: String? = gymfile.buildPath, archivePath: String? = gymfile.archivePath, derivedDataPath: String? = gymfile.derivedDataPath, resultBundle: String? = gymfile.resultBundle, buildlogPath: String = gymfile.buildlogPath, sdk: String? = gymfile.sdk, toolchain: String? = gymfile.toolchain, destination: String? = gymfile.destination, exportTeamId: String? = gymfile.exportTeamId, xcargs: String? = gymfile.xcargs, xcconfig: String? = gymfile.xcconfig, suppressXcodeOutput: String? = gymfile.suppressXcodeOutput, disableXcpretty: String? = gymfile.disableXcpretty, xcprettyTestFormat: String? = gymfile.xcprettyTestFormat, xcprettyFormatter: String? = gymfile.xcprettyFormatter, xcprettyReportJunit: String? = gymfile.xcprettyReportJunit, xcprettyReportHtml: String? = gymfile.xcprettyReportHtml, xcprettyReportJson: String? = gymfile.xcprettyReportJson, analyzeBuildTime: String? = gymfile.analyzeBuildTime, xcprettyUtf: String? = gymfile.xcprettyUtf) -> String {
   let command = RubyCommand(commandID: "", methodName: "gym", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace), RubyCommand.Argument(name: "project", value: project), RubyCommand.Argument(name: "scheme", value: scheme), RubyCommand.Argument(name: "clean", value: clean), RubyCommand.Argument(name: "output_directory", value: outputDirectory), RubyCommand.Argument(name: "output_name", value: outputName), RubyCommand.Argument(name: "configuration", value: configuration), RubyCommand.Argument(name: "silent", value: silent), RubyCommand.Argument(name: "codesigning_identity", value: codesigningIdentity), RubyCommand.Argument(name: "skip_package_ipa", value: skipPackageIpa), RubyCommand.Argument(name: "include_symbols", value: includeSymbols), RubyCommand.Argument(name: "include_bitcode", value: includeBitcode), RubyCommand.Argument(name: "export_method", value: exportMethod), RubyCommand.Argument(name: "export_options", value: exportOptions), RubyCommand.Argument(name: "export_xcargs", value: exportXcargs), RubyCommand.Argument(name: "skip_build_archive", value: skipBuildArchive), RubyCommand.Argument(name: "skip_archive", value: skipArchive), RubyCommand.Argument(name: "build_path", value: buildPath), RubyCommand.Argument(name: "archive_path", value: archivePath), RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath), RubyCommand.Argument(name: "result_bundle", value: resultBundle), RubyCommand.Argument(name: "buildlog_path", value: buildlogPath), RubyCommand.Argument(name: "sdk", value: sdk), RubyCommand.Argument(name: "toolchain", value: toolchain), RubyCommand.Argument(name: "destination", value: destination), RubyCommand.Argument(name: "export_team_id", value: exportTeamId), RubyCommand.Argument(name: "xcargs", value: xcargs), RubyCommand.Argument(name: "xcconfig", value: xcconfig), RubyCommand.Argument(name: "suppress_xcode_output", value: suppressXcodeOutput), RubyCommand.Argument(name: "disable_xcpretty", value: disableXcpretty), RubyCommand.Argument(name: "xcpretty_test_format", value: xcprettyTestFormat), RubyCommand.Argument(name: "xcpretty_formatter", value: xcprettyFormatter), RubyCommand.Argument(name: "xcpretty_report_junit", value: xcprettyReportJunit), RubyCommand.Argument(name: "xcpretty_report_html", value: xcprettyReportHtml), RubyCommand.Argument(name: "xcpretty_report_json", value: xcprettyReportJson), RubyCommand.Argument(name: "analyze_build_time", value: analyzeBuildTime), RubyCommand.Argument(name: "xcpretty_utf", value: xcprettyUtf)])
   return runner.executeCommand(command)
 }
@@ -299,11 +299,11 @@ func importFromGit(url: String, branch: String = "HEAD", path: String = "fastlan
   let command = RubyCommand(commandID: "", methodName: "import_from_git", className: nil, args: [RubyCommand.Argument(name: "url", value: url), RubyCommand.Argument(name: "branch", value: branch), RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
 }
-func incrementBuildNumber(buildNumber: String? = nil, xcodeproj: String? = nil) -> String {
+@discardableResult func incrementBuildNumber(buildNumber: String? = nil, xcodeproj: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "increment_build_number", className: nil, args: [RubyCommand.Argument(name: "build_number", value: buildNumber), RubyCommand.Argument(name: "xcodeproj", value: xcodeproj)])
   return runner.executeCommand(command)
 }
-func incrementVersionNumber(bumpType: String = "patch", versionNumber: String? = nil, xcodeproj: String? = nil) -> String {
+@discardableResult func incrementVersionNumber(bumpType: String = "patch", versionNumber: String? = nil, xcodeproj: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "increment_version_number", className: nil, args: [RubyCommand.Argument(name: "bump_type", value: bumpType), RubyCommand.Argument(name: "version_number", value: versionNumber), RubyCommand.Argument(name: "xcodeproj", value: xcodeproj)])
   return runner.executeCommand(command)
 }
@@ -323,7 +323,7 @@ func ipa(workspace: String? = nil, project: String? = nil, configuration: String
   let command = RubyCommand(commandID: "", methodName: "ipa", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace), RubyCommand.Argument(name: "project", value: project), RubyCommand.Argument(name: "configuration", value: configuration), RubyCommand.Argument(name: "scheme", value: scheme), RubyCommand.Argument(name: "clean", value: clean), RubyCommand.Argument(name: "archive", value: archive), RubyCommand.Argument(name: "destination", value: destination), RubyCommand.Argument(name: "embed", value: embed), RubyCommand.Argument(name: "identity", value: identity), RubyCommand.Argument(name: "sdk", value: sdk), RubyCommand.Argument(name: "ipa", value: ipa), RubyCommand.Argument(name: "xcconfig", value: xcconfig), RubyCommand.Argument(name: "xcargs", value: xcargs)])
   _ = runner.executeCommand(command)
 }
-func isCi() -> Bool {
+@discardableResult func isCi() -> Bool {
   let command = RubyCommand(commandID: "", methodName: "is_ci", className: nil, args: [])
   return parseBool(fromString: runner.executeCommand(command))
 }
@@ -339,11 +339,11 @@ func laneContext() {
   let command = RubyCommand(commandID: "", methodName: "lane_context", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
-func lastGitTag() -> String {
+@discardableResult func lastGitTag() -> String {
   let command = RubyCommand(commandID: "", methodName: "last_git_tag", className: nil, args: [])
   return runner.executeCommand(command)
 }
-func latestTestflightBuildNumber(live: Bool = false, appIdentifier: String, username: String, version: String? = nil, initialBuildNumber: String = "1", teamId: String? = nil, teamName: String? = nil) -> Int {
+@discardableResult func latestTestflightBuildNumber(live: Bool = false, appIdentifier: String, username: String, version: String? = nil, initialBuildNumber: String = "1", teamId: String? = nil, teamName: String? = nil) -> Int {
   let command = RubyCommand(commandID: "", methodName: "latest_testflight_build_number", className: nil, args: [RubyCommand.Argument(name: "live", value: live), RubyCommand.Argument(name: "app_identifier", value: appIdentifier), RubyCommand.Argument(name: "username", value: username), RubyCommand.Argument(name: "version", value: version), RubyCommand.Argument(name: "initial_build_number", value: initialBuildNumber), RubyCommand.Argument(name: "team_id", value: teamId), RubyCommand.Argument(name: "team_name", value: teamName)])
   return parseInt(fromString: runner.executeCommand(command))
 }
@@ -375,7 +375,7 @@ func notification(title: String = "fastlane", subtitle: String? = nil, message: 
   let command = RubyCommand(commandID: "", methodName: "notification", className: nil, args: [RubyCommand.Argument(name: "title", value: title), RubyCommand.Argument(name: "subtitle", value: subtitle), RubyCommand.Argument(name: "message", value: message), RubyCommand.Argument(name: "sound", value: sound), RubyCommand.Argument(name: "activate", value: activate), RubyCommand.Argument(name: "app_icon", value: appIcon), RubyCommand.Argument(name: "content_image", value: contentImage), RubyCommand.Argument(name: "open", value: open), RubyCommand.Argument(name: "execute", value: execute)])
   _ = runner.executeCommand(command)
 }
-func numberOfCommits(all: String? = nil) -> Int {
+@discardableResult func numberOfCommits(all: String? = nil) -> Int {
   let command = RubyCommand(commandID: "", methodName: "number_of_commits", className: nil, args: [RubyCommand.Argument(name: "all", value: all)])
   return parseInt(fromString: runner.executeCommand(command))
 }
@@ -411,7 +411,7 @@ func podioItem(clientId: String, clientSecret: String, appId: String, appToken: 
   let command = RubyCommand(commandID: "", methodName: "podio_item", className: nil, args: [RubyCommand.Argument(name: "client_id", value: clientId), RubyCommand.Argument(name: "client_secret", value: clientSecret), RubyCommand.Argument(name: "app_id", value: appId), RubyCommand.Argument(name: "app_token", value: appToken), RubyCommand.Argument(name: "identifying_field", value: identifyingField), RubyCommand.Argument(name: "identifying_value", value: identifyingValue), RubyCommand.Argument(name: "other_fields", value: otherFields)])
   _ = runner.executeCommand(command)
 }
-func precheck(appIdentifier: String = precheckfile.appIdentifier, username: String = precheckfile.username, teamId: String? = precheckfile.teamId, teamName: String? = precheckfile.teamName, defaultRuleLevel: String = precheckfile.defaultRuleLevel, includeInAppPurchases: Bool = precheckfile.includeInAppPurchases, freeStuffInIap: String? = precheckfile.freeStuffInIap) -> Bool {
+@discardableResult func precheck(appIdentifier: String = precheckfile.appIdentifier, username: String = precheckfile.username, teamId: String? = precheckfile.teamId, teamName: String? = precheckfile.teamName, defaultRuleLevel: String = precheckfile.defaultRuleLevel, includeInAppPurchases: Bool = precheckfile.includeInAppPurchases, freeStuffInIap: String? = precheckfile.freeStuffInIap) -> Bool {
   let command = RubyCommand(commandID: "", methodName: "precheck", className: nil, args: [RubyCommand.Argument(name: "app_identifier", value: appIdentifier), RubyCommand.Argument(name: "username", value: username), RubyCommand.Argument(name: "team_id", value: teamId), RubyCommand.Argument(name: "team_name", value: teamName), RubyCommand.Argument(name: "default_rule_level", value: defaultRuleLevel), RubyCommand.Argument(name: "include_in_app_purchases", value: includeInAppPurchases), RubyCommand.Argument(name: "free_stuff_in_iap", value: freeStuffInIap)])
   return parseBool(fromString: runner.executeCommand(command))
 }
@@ -419,7 +419,7 @@ func produce(username: String, appIdentifier: String, bundleIdentifierSuffix: St
   let command = RubyCommand(commandID: "", methodName: "produce", className: nil, args: [RubyCommand.Argument(name: "username", value: username), RubyCommand.Argument(name: "app_identifier", value: appIdentifier), RubyCommand.Argument(name: "bundle_identifier_suffix", value: bundleIdentifierSuffix), RubyCommand.Argument(name: "app_name", value: appName), RubyCommand.Argument(name: "app_version", value: appVersion), RubyCommand.Argument(name: "sku", value: sku), RubyCommand.Argument(name: "platform", value: platform), RubyCommand.Argument(name: "language", value: language), RubyCommand.Argument(name: "company_name", value: companyName), RubyCommand.Argument(name: "skip_itc", value: skipItc), RubyCommand.Argument(name: "itc_users", value: itcUsers), RubyCommand.Argument(name: "enabled_features", value: enabledFeatures), RubyCommand.Argument(name: "enable_services", value: enableServices), RubyCommand.Argument(name: "skip_devcenter", value: skipDevcenter), RubyCommand.Argument(name: "team_id", value: teamId), RubyCommand.Argument(name: "team_name", value: teamName), RubyCommand.Argument(name: "itc_team_id", value: itcTeamId), RubyCommand.Argument(name: "itc_team_name", value: itcTeamName)])
   _ = runner.executeCommand(command)
 }
-func prompt(text: String = "Please enter some text: ", ciInput: String = "", boolean: Bool = false, multiLineEndKeyword: String? = nil) -> String {
+@discardableResult func prompt(text: String = "Please enter some text: ", ciInput: String = "", boolean: Bool = false, multiLineEndKeyword: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "prompt", className: nil, args: [RubyCommand.Argument(name: "text", value: text), RubyCommand.Argument(name: "ci_input", value: ciInput), RubyCommand.Argument(name: "boolean", value: boolean), RubyCommand.Argument(name: "multi_line_end_keyword", value: multiLineEndKeyword)])
   return runner.executeCommand(command)
 }
@@ -431,7 +431,7 @@ func pushToGitRemote(localBranch: String? = nil, remoteBranch: String? = nil, fo
   let command = RubyCommand(commandID: "", methodName: "push_to_git_remote", className: nil, args: [RubyCommand.Argument(name: "local_branch", value: localBranch), RubyCommand.Argument(name: "remote_branch", value: remoteBranch), RubyCommand.Argument(name: "force", value: force), RubyCommand.Argument(name: "tags", value: tags), RubyCommand.Argument(name: "remote", value: remote)])
   _ = runner.executeCommand(command)
 }
-func readPodspec(path: String) -> [String : String] {
+@discardableResult func readPodspec(path: String) -> [String : String] {
   let command = RubyCommand(commandID: "", methodName: "read_podspec", className: nil, args: [RubyCommand.Argument(name: "path", value: path)])
   return parseDictionary(fromString: runner.executeCommand(command))
 }
@@ -439,7 +439,7 @@ func recreateSchemes(project: String) {
   let command = RubyCommand(commandID: "", methodName: "recreate_schemes", className: nil, args: [RubyCommand.Argument(name: "project", value: project)])
   _ = runner.executeCommand(command)
 }
-func registerDevice(name: String, udid: String, teamId: String? = nil, teamName: String? = nil, username: String) -> String {
+@discardableResult func registerDevice(name: String, udid: String, teamId: String? = nil, teamName: String? = nil, username: String) -> String {
   let command = RubyCommand(commandID: "", methodName: "register_device", className: nil, args: [RubyCommand.Argument(name: "name", value: name), RubyCommand.Argument(name: "udid", value: udid), RubyCommand.Argument(name: "team_id", value: teamId), RubyCommand.Argument(name: "team_name", value: teamName), RubyCommand.Argument(name: "username", value: username)])
   return runner.executeCommand(command)
 }
@@ -463,7 +463,7 @@ func restoreFile(path: String) {
   let command = RubyCommand(commandID: "", methodName: "restore_file", className: nil, args: [RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
 }
-func rocket() -> String {
+@discardableResult func rocket() -> String {
   let command = RubyCommand(commandID: "", methodName: "rocket", className: nil, args: [])
   return runner.executeCommand(command)
 }
@@ -503,7 +503,7 @@ func setChangelog(appIdentifier: String, username: String, version: String? = ni
   let command = RubyCommand(commandID: "", methodName: "set_changelog", className: nil, args: [RubyCommand.Argument(name: "app_identifier", value: appIdentifier), RubyCommand.Argument(name: "username", value: username), RubyCommand.Argument(name: "version", value: version), RubyCommand.Argument(name: "changelog", value: changelog), RubyCommand.Argument(name: "team_id", value: teamId), RubyCommand.Argument(name: "team_name", value: teamName)])
   _ = runner.executeCommand(command)
 }
-func setGithubRelease(repositoryName: String, serverUrl: String = "https://api.github.com", apiToken: String, tagName: String, name: String? = nil, commitish: String? = nil, description: String? = nil, isDraft: Bool = false, isPrerelease: Bool = false, uploadAssets: String? = nil) -> [String : String] {
+@discardableResult func setGithubRelease(repositoryName: String, serverUrl: String = "https://api.github.com", apiToken: String, tagName: String, name: String? = nil, commitish: String? = nil, description: String? = nil, isDraft: Bool = false, isPrerelease: Bool = false, uploadAssets: String? = nil) -> [String : String] {
   let command = RubyCommand(commandID: "", methodName: "set_github_release", className: nil, args: [RubyCommand.Argument(name: "repository_name", value: repositoryName), RubyCommand.Argument(name: "server_url", value: serverUrl), RubyCommand.Argument(name: "api_token", value: apiToken), RubyCommand.Argument(name: "tag_name", value: tagName), RubyCommand.Argument(name: "name", value: name), RubyCommand.Argument(name: "commitish", value: commitish), RubyCommand.Argument(name: "description", value: description), RubyCommand.Argument(name: "is_draft", value: isDraft), RubyCommand.Argument(name: "is_prerelease", value: isPrerelease), RubyCommand.Argument(name: "upload_assets", value: uploadAssets)])
   return parseDictionary(fromString: runner.executeCommand(command))
 }
@@ -527,11 +527,11 @@ func setupTravis(force: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "setup_travis", className: nil, args: [RubyCommand.Argument(name: "force", value: force)])
   _ = runner.executeCommand(command)
 }
-func sh(command: String, log: Bool = true, errorCallback: ((String) -> Void) = {_ in }) -> String {
+@discardableResult func sh(command: String, log: Bool = true, errorCallback: ((String) -> Void) = {_ in }) -> String {
   let command = RubyCommand(commandID: "", methodName: "sh", className: nil, args: [RubyCommand.Argument(name: "command", value: command), RubyCommand.Argument(name: "log", value: log), RubyCommand.Argument(name: "error_callback", value: errorCallback, type: .stringClosure)])
   return runner.executeCommand(command)
 }
-func sigh(adhoc: Bool = false, development: Bool = false, skipInstall: Bool = false, force: Bool = false, appIdentifier: String, username: String, teamId: String? = nil, teamName: String? = nil, provisioningName: String? = nil, ignoreProfilesWithDifferentName: Bool = false, outputPath: String = ".", certId: String? = nil, certOwnerName: String? = nil, filename: String? = nil, skipFetchProfiles: Bool = false, skipCertificateVerification: Bool = false, platform: String = "ios", templateName: String? = nil) -> String {
+@discardableResult func sigh(adhoc: Bool = false, development: Bool = false, skipInstall: Bool = false, force: Bool = false, appIdentifier: String, username: String, teamId: String? = nil, teamName: String? = nil, provisioningName: String? = nil, ignoreProfilesWithDifferentName: Bool = false, outputPath: String = ".", certId: String? = nil, certOwnerName: String? = nil, filename: String? = nil, skipFetchProfiles: Bool = false, skipCertificateVerification: Bool = false, platform: String = "ios", templateName: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "sigh", className: nil, args: [RubyCommand.Argument(name: "adhoc", value: adhoc), RubyCommand.Argument(name: "development", value: development), RubyCommand.Argument(name: "skip_install", value: skipInstall), RubyCommand.Argument(name: "force", value: force), RubyCommand.Argument(name: "app_identifier", value: appIdentifier), RubyCommand.Argument(name: "username", value: username), RubyCommand.Argument(name: "team_id", value: teamId), RubyCommand.Argument(name: "team_name", value: teamName), RubyCommand.Argument(name: "provisioning_name", value: provisioningName), RubyCommand.Argument(name: "ignore_profiles_with_different_name", value: ignoreProfilesWithDifferentName), RubyCommand.Argument(name: "output_path", value: outputPath), RubyCommand.Argument(name: "cert_id", value: certId), RubyCommand.Argument(name: "cert_owner_name", value: certOwnerName), RubyCommand.Argument(name: "filename", value: filename), RubyCommand.Argument(name: "skip_fetch_profiles", value: skipFetchProfiles), RubyCommand.Argument(name: "skip_certificate_verification", value: skipCertificateVerification), RubyCommand.Argument(name: "platform", value: platform), RubyCommand.Argument(name: "template_name", value: templateName)])
   return runner.executeCommand(command)
 }
@@ -679,11 +679,11 @@ func xcexport() {
   let command = RubyCommand(commandID: "", methodName: "xcexport", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
-func xcodeInstall(version: String, username: String, teamId: String? = nil) -> String {
+@discardableResult func xcodeInstall(version: String, username: String, teamId: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "xcode_install", className: nil, args: [RubyCommand.Argument(name: "version", value: version), RubyCommand.Argument(name: "username", value: username), RubyCommand.Argument(name: "team_id", value: teamId)])
   return runner.executeCommand(command)
 }
-func xcodeServerGetAssets(host: String, botName: String, integrationNumber: String? = nil, username: String = "", password: String = "", targetFolder: String = "./xcs_assets", keepAllAssets: Bool = false, trustSelfSignedCerts: Bool = true) -> [String] {
+@discardableResult func xcodeServerGetAssets(host: String, botName: String, integrationNumber: String? = nil, username: String = "", password: String = "", targetFolder: String = "./xcs_assets", keepAllAssets: Bool = false, trustSelfSignedCerts: Bool = true) -> [String] {
   let command = RubyCommand(commandID: "", methodName: "xcode_server_get_assets", className: nil, args: [RubyCommand.Argument(name: "host", value: host), RubyCommand.Argument(name: "bot_name", value: botName), RubyCommand.Argument(name: "integration_number", value: integrationNumber), RubyCommand.Argument(name: "username", value: username), RubyCommand.Argument(name: "password", value: password), RubyCommand.Argument(name: "target_folder", value: targetFolder), RubyCommand.Argument(name: "keep_all_assets", value: keepAllAssets), RubyCommand.Argument(name: "trust_self_signed_certs", value: trustSelfSignedCerts)])
   return parseArray(fromString: runner.executeCommand(command))
 }
@@ -703,7 +703,7 @@ func xcversion(version: String) {
   let command = RubyCommand(commandID: "", methodName: "xcversion", className: nil, args: [RubyCommand.Argument(name: "version", value: version)])
   _ = runner.executeCommand(command)
 }
-func zip(path: String, outputPath: String? = nil, verbose: Bool = true) -> String {
+@discardableResult func zip(path: String, outputPath: String? = nil, verbose: Bool = true) -> String {
   let command = RubyCommand(commandID: "", methodName: "zip", className: nil, args: [RubyCommand.Argument(name: "path", value: path), RubyCommand.Argument(name: "output_path", value: outputPath), RubyCommand.Argument(name: "verbose", value: verbose)])
   return runner.executeCommand(command)
 }
