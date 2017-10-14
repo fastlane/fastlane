@@ -32,7 +32,7 @@ class Fastfile: LaneFile {
 
         match(gitUrl: "gitUrl", appIdentifier: [appIdentifier], username: appleID)
         // Build your app - more options available
-        _ = gym([[SCHEME]])
+        gym([[SCHEME]])
         pilot(username: appleID)
         // You can also use other beta testing services here (run `fastlane actions`)
     }
@@ -42,7 +42,7 @@ class Fastfile: LaneFile {
 
         match(gitUrl: "gitUrl", type: "appstore", appIdentifier: [appIdentifier], username: appleID)
         snapshot()
-        _ = gym([[SCHEME]]) // Build your app - more options available
+        gym([[SCHEME]]) // Build your app - more options available
         deliver(username: appleID, app: appIdentifier, force: true)
         // frameit()
     }
