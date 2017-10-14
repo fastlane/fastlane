@@ -18,8 +18,8 @@ class Fastfile: LaneFile {
 
     func beforeAll() {
         // environmentVariables["SLACK_URL"] = "https://hooks.slack.com/services/..."
-        // cocoapods()
-        // carthage()
+        cocoapods()
+        carthage()
     }
 
     func testLane() {
@@ -41,7 +41,7 @@ class Fastfile: LaneFile {
         desc("Deploy a new version to the App Store")
 
         match(gitUrl: "gitUrl", type: "appstore", appIdentifier: [appIdentifier], username: appleID)
-        // snapshot()
+        snapshot()
         _ = gym([[SCHEME]]) // Build your app - more options available
         deliver(username: appleID, app: appIdentifier, force: true)
         // frameit()
