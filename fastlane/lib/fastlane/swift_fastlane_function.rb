@@ -170,7 +170,9 @@ module Fastlane
 
     def swift_code
       function_name = camel_case_lower(string: self.function_name)
-      return "func #{function_name}(#{self.parameters})#{self.return_declaration} {\n#{self.implementation}\n}"
+      function_return_declaration = self.return_declaration
+      discardable_result = "@discardableResult " if function_return_declaration.length > 0
+      return "#{discardable_result}func #{function_name}(#{self.parameters})#{function_return_declaration} {\n#{self.implementation}\n}"
     end
 
     def build_argument_list
