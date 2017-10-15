@@ -380,6 +380,30 @@ function add_provision {
     add_provision_for_bundle_id "$PROVISION" "$BUNDLE_ID"
 }
 
+# returns value from plist
+# plist_vale $PLIST $KEY
+function plist_value {
+  local PLIST=$1
+  local KEY=$2
+
+  echo "$(PlistBuddy -c "Print :$KEY" "$PLIST")"
+}
+
+# changes key in plist
+# change_plist_key $PLIST $KEY $VALUE
+function change_plist_value {
+  local PLIST=$1
+  local KEY=$2
+  local VALUE=$3
+  
+  if [[ -n "$VALUE" ]];
+  then
+      CURRENT_VALUE="$(plist_value "$PLIST" $KEY)"
+      log "Updating the $KEY from '$CURRENT_VALUE' to '$VALUE'"
+      PlistBuddy -c "Set :$KEY $VALUE" "$PLIST"
+  fi
+}
+
 # Load bundle identifiers from provisioning profiles
 for ARG in "${RAW_PROVISIONS[@]}"; do
     add_provision "$ARG"
@@ -446,15 +470,7 @@ function resign {
     log "Current bundle identifier is: '$CURRENT_BUNDLE_IDENTIFIER'"
     log "New bundle identifier will be: '$BUNDLE_IDENTIFIER'"
 
-    # Update the CFBundleDisplayName property in the Info.plist if a new name has been provided
-    if [ "${DISPLAY_NAME}" != "" ];
-    then
-        if [ "${DISPLAY_NAME}" != "${CURRENT_NAME}" ];
-        then
-            log "Changing display name from '$CURRENT_NAME' to '$DISPLAY_NAME'"
-            PlistBuddy -c "Set :CFBundleDisplayName $DISPLAY_NAME" "$INFO_PLIST"
-        fi
-    fi
+    change_plist_value "$INFO_PLIST" "CFBundleDisplayName" "$DISPLAY_NAME"
 
     # Replace the embedded mobile provisioning profile
     log "Validating the new provisioning profile: $NEW_PROVISION"
@@ -499,43 +515,13 @@ function resign {
     # Replace embedded provisioning profile with new file
     cp -f "$NEW_PROVISION" "$APP_PATH/embedded.mobileprovision"
 
-    #if the current bundle identifier is different from the new one in the provisioning profile, then change it.
-    if [ "$CURRENT_BUNDLE_IDENTIFIER" != "$BUNDLE_IDENTIFIER" ];
-    then
-        log "Updating the bundle identifier from '$CURRENT_BUNDLE_IDENTIFIER' to '$BUNDLE_IDENTIFIER'"
-        PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_IDENTIFIER" "$INFO_PLIST"
-        checkStatus
-    fi
+    change_plist_value "$INFO_PLIST" "CFBundleIdentifier" "$BUNDLE_IDENTIFIER"
 
-    # Update the version number properties in the Info.plist if a version number has been provided
-    if [ "$VERSION_NUMBER" != "" ];
-    then
-        CURRENT_VERSION_NUMBER=$(PlistBuddy -c "Print :CFBundleVersion" "$INFO_PLIST")
-        if [ "$VERSION_NUMBER" != "$CURRENT_VERSION_NUMBER" ];
-        then
-            log "Updating the version from '$CURRENT_VERSION_NUMBER' to '$VERSION_NUMBER'"
-            PlistBuddy -c "Set :CFBundleVersion $VERSION_NUMBER" "$INFO_PLIST"
-            PlistBuddy -c "Set :CFBundleShortVersionString $VERSION_NUMBER" "$INFO_PLIST"
-        fi
-    fi
+    change_plist_value "$INFO_PLIST" "CFBundleVersion" "$VERSION_NUMBER"
+    change_plist_value "$INFO_PLIST" "CFBundleShortVersionString" "$VERSION_NUMBER"
 
-    # Update short version string in the Info.plist if provided
-    if [[ -n "$SHORT_VERSION" ]];
-    then
-        CURRENT_VALUE="$(PlistBuddy -c "Print :CFBundleShortVersionString" "$INFO_PLIST")"
-        # Even if the old value is same - just update, less code, less debugging
-        log "Updating the short version string (CFBundleShortVersionString) from '$CURRENT_VALUE' to '$SHORT_VERSION'"
-        PlistBuddy -c "Set :CFBundleShortVersionString $SHORT_VERSION" "$INFO_PLIST"
-    fi
-
-    # Update bundle version in the Info.plist if provided
-    if [[ -n "$BUNDLE_VERSION" ]];
-    then
-        CURRENT_VALUE="$(PlistBuddy -c "Print :CFBundleVersion" "$INFO_PLIST")"
-        # Even if the old value is same - just update, less code, less debugging
-        log "Updating the bundle version (CFBundleVersion) from '$CURRENT_VALUE' to '$BUNDLE_VERSION'"
-        PlistBuddy -c "Set :CFBundleVersion $BUNDLE_VERSION" "$INFO_PLIST"
-    fi
+    change_plist_value "$INFO_PLIST" "CFBundleVersion" "$SHORT_VERSION"
+    change_plist_value "$INFO_PLIST" "CFBundleShortVersionString" "$BUNDLE_VERSION"
 
     # Check for and resign any embedded frameworks (new feature for iOS 8 and above apps)
     FRAMEWORKS_DIR="$APP_PATH/Frameworks"
