@@ -394,6 +394,8 @@ function resign {
     local NEW_PROVISION="$NEW_PROVISION"
     local APP_IDENTIFIER_PREFIX=""
     local TEAM_IDENTIFIER=""
+    
+    local INFO_PLIST="$APP_PATH/Info.plist"
 
     if [[ "$NESTED" == NESTED ]]; then
         # Ignore bundle identifier for nested applications
@@ -401,17 +403,14 @@ function resign {
     fi
 
     # Make sure that the Info.plist file is where we expect it
-    if [ ! -e "$APP_PATH/Info.plist" ];
+    if [ ! -e "$INFO_PLIST" ];
     then
-        error "Expected file does not exist: '$APP_PATH/Info.plist'"
+        error "Expected file does not exist: '$INFO_PLIST'"
     fi
 
-    # Make a copy of old Info.plist, it will come handy later to extract some old values
-    cp -f "$APP_PATH/Info.plist" "$TEMP_DIR/oldInfo.plist"
-
     # Read in current values from the app
-    local CURRENT_NAME=$(PlistBuddy -c "Print :CFBundleDisplayName" "$APP_PATH/Info.plist")
-    local CURRENT_BUNDLE_IDENTIFIER=$(PlistBuddy -c "Print :CFBundleIdentifier" "$APP_PATH/Info.plist")
+    local CURRENT_NAME=$(PlistBuddy -c "Print :CFBundleDisplayName" "$INFO_PLIST")
+    local CURRENT_BUNDLE_IDENTIFIER=$(PlistBuddy -c "Print :CFBundleIdentifier" "$INFO_PLIST")
     local NEW_PROVISION=$(provision_for_bundle_id "${BUNDLE_IDENTIFIER:-$CURRENT_BUNDLE_IDENTIFIER}")
 
     if [[ "$NEW_PROVISION" == "" && "$NESTED" != NESTED ]]; then
@@ -453,7 +452,7 @@ function resign {
         if [ "${DISPLAY_NAME}" != "${CURRENT_NAME}" ];
         then
             log "Changing display name from '$CURRENT_NAME' to '$DISPLAY_NAME'"
-            PlistBuddy -c "Set :CFBundleDisplayName $DISPLAY_NAME" "$APP_PATH/Info.plist"
+            PlistBuddy -c "Set :CFBundleDisplayName $DISPLAY_NAME" "$INFO_PLIST"
         fi
     fi
 
@@ -477,7 +476,7 @@ function resign {
     fi
 
     # Set new app identifer prefix if such entry exists in plist file
-    PlistBuddy -c "Set :AppIdentifierPrefix $APP_IDENTIFIER_PREFIX." "$APP_PATH/Info.plist" 2>/dev/null
+    PlistBuddy -c "Set :AppIdentifierPrefix $APP_IDENTIFIER_PREFIX." "$INFO_PLIST" 2>/dev/null
 
     TEAM_IDENTIFIER=$(PlistBuddy -c "Print :Entitlements:com.apple.developer.team-identifier" "$TEMP_DIR/profile.plist" | tr -d '\n')
     if [ "$TEAM_IDENTIFIER" == "" ];
@@ -503,38 +502,38 @@ function resign {
     if [ "$CURRENT_BUNDLE_IDENTIFIER" != "$BUNDLE_IDENTIFIER" ];
     then
         log "Updating the bundle identifier from '$CURRENT_BUNDLE_IDENTIFIER' to '$BUNDLE_IDENTIFIER'"
-        PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_IDENTIFIER" "$APP_PATH/Info.plist"
+        PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_IDENTIFIER" "$INFO_PLIST"
         checkStatus
     fi
 
     # Update the version number properties in the Info.plist if a version number has been provided
     if [ "$VERSION_NUMBER" != "" ];
     then
-        CURRENT_VERSION_NUMBER=$(PlistBuddy -c "Print :CFBundleVersion" "$APP_PATH/Info.plist")
+        CURRENT_VERSION_NUMBER=$(PlistBuddy -c "Print :CFBundleVersion" "$INFO_PLIST")
         if [ "$VERSION_NUMBER" != "$CURRENT_VERSION_NUMBER" ];
         then
             log "Updating the version from '$CURRENT_VERSION_NUMBER' to '$VERSION_NUMBER'"
-            PlistBuddy -c "Set :CFBundleVersion $VERSION_NUMBER" "$APP_PATH/Info.plist"
-            PlistBuddy -c "Set :CFBundleShortVersionString $VERSION_NUMBER" "$APP_PATH/Info.plist"
+            PlistBuddy -c "Set :CFBundleVersion $VERSION_NUMBER" "$INFO_PLIST"
+            PlistBuddy -c "Set :CFBundleShortVersionString $VERSION_NUMBER" "$INFO_PLIST"
         fi
     fi
 
     # Update short version string in the Info.plist if provided
     if [[ -n "$SHORT_VERSION" ]];
     then
-        CURRENT_VALUE="$(PlistBuddy -c "Print :CFBundleShortVersionString" "$APP_PATH/Info.plist")"
+        CURRENT_VALUE="$(PlistBuddy -c "Print :CFBundleShortVersionString" "$INFO_PLIST")"
         # Even if the old value is same - just update, less code, less debugging
         log "Updating the short version string (CFBundleShortVersionString) from '$CURRENT_VALUE' to '$SHORT_VERSION'"
-        PlistBuddy -c "Set :CFBundleShortVersionString $SHORT_VERSION" "$APP_PATH/Info.plist"
+        PlistBuddy -c "Set :CFBundleShortVersionString $SHORT_VERSION" "$INFO_PLIST"
     fi
 
     # Update bundle version in the Info.plist if provided
     if [[ -n "$BUNDLE_VERSION" ]];
     then
-        CURRENT_VALUE="$(PlistBuddy -c "Print :CFBundleVersion" "$APP_PATH/Info.plist")"
+        CURRENT_VALUE="$(PlistBuddy -c "Print :CFBundleVersion" "$INFO_PLIST")"
         # Even if the old value is same - just update, less code, less debugging
         log "Updating the bundle version (CFBundleVersion) from '$CURRENT_VALUE' to '$BUNDLE_VERSION'"
-        PlistBuddy -c "Set :CFBundleVersion $BUNDLE_VERSION" "$APP_PATH/Info.plist"
+        PlistBuddy -c "Set :CFBundleVersion $BUNDLE_VERSION" "$INFO_PLIST"
     fi
 
     # Check for and resign any embedded frameworks (new feature for iOS 8 and above apps)
@@ -566,7 +565,7 @@ function resign {
     log "Fixing nested app and extension references"
     for key in "${NESTED_APP_REFERENCE_KEYS[@]}"; do
         # Check if Info.plist has a reference to another app or extension
-        REF_BUNDLE_ID=$(PlistBuddy -c "Print ${key}" "$APP_PATH/Info.plist" 2>/dev/null)
+        REF_BUNDLE_ID=$(PlistBuddy -c "Print ${key}" "$INFO_PLIST" 2>/dev/null)
         if [ -n "$REF_BUNDLE_ID" ];
         then
             # Found a reference bundle id, now get the corresponding provisioning profile for this bundle id
@@ -578,7 +577,7 @@ function resign {
             if [[ "$REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" ]] && ! [[ "$NEW_REF_BUNDLE_ID" =~ \* ]];
             then
                 log "Updating nested app or extension reference for ${key} key from ${REF_BUNDLE_ID} to ${NEW_REF_BUNDLE_ID}"
-                PlistBuddy -c "Set ${key} $NEW_REF_BUNDLE_ID" "$APP_PATH/Info.plist"
+                PlistBuddy -c "Set ${key} $NEW_REF_BUNDLE_ID" "$INFO_PLIST"
             fi
         fi
     done
@@ -721,11 +720,9 @@ function resign {
         done
 
         # Replace old bundle ID with new bundle ID in patched entitlements
-        # Read old bundle ID from the old Info.plist which was saved for this purpose
-        OLD_BUNDLE_ID="$(PlistBuddy -c "Print :CFBundleIdentifier" "$TEMP_DIR/oldInfo.plist")"
         NEW_BUNDLE_ID="$(bundle_id_for_provison "$NEW_PROVISION")"
-        log "Replacing old bundle ID '$OLD_BUNDLE_ID' with new bundle ID '$NEW_BUNDLE_ID' in patched entitlements"
-        sed -i .bak "s/$OLD_BUNDLE_ID/$NEW_BUNDLE_ID/g" "$PATCHED_ENTITLEMENTS"
+        log "Replacing old bundle ID '$CURRENT_BUNDLE_IDENTIFIER' with new bundle ID '$NEW_BUNDLE_ID' in patched entitlements"
+        sed -i .bak "s/$CURRENT_BUNDLE_IDENTIFIER/$NEW_BUNDLE_ID/g" "$PATCHED_ENTITLEMENTS"
 
         log "Removing blacklisted keys from patched profile"
         # See https://github.com/facebook/buck/issues/798 and https://github.com/facebook/buck/pull/802/files
@@ -782,7 +779,6 @@ function resign {
     rm -r "$TEMP_DIR/old-embedded-profile.plist"
     rm -f "$TEMP_DIR/profile.plist"
     rm -f "$TEMP_DIR/old-embedded.mobileprovision"
-    rm -f "$TEMP_DIR/oldInfo.plist"
 }
 
 # Sign nested applications and app extensions
