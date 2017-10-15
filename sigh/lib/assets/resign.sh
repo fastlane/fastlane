@@ -380,6 +380,27 @@ function add_provision {
     add_provision_for_bundle_id "$PROVISION" "$BUNDLE_ID"
 }
 
+# codesign app and frameworks
+# codesign_bundle $BUNDLE_PATH (optional $ENTITLEMENTS)
+function codesign_bundle {
+  local BUNDLE_PATH=$1
+  local LOCAL_ENTITLEMENTS="$2"
+  
+  log "Resigning '$BUNDLE_PATH'"
+  log "using certificate: '$CERTIFICATE'"
+  
+  if [[ -n "$LOCAL_ENTITLEMENTS" ]]; then
+    log "and entitlements: $LOCAL_ENTITLEMENTS"
+    cp -f "$LOCAL_ENTITLEMENTS" "$BUNDLE_PATH/archived-expanded-entitlements.xcent"
+    local LOCAL_ENTITLEMENTS="--entitlements $LOCAL_ENTITLEMENTS"
+  fi
+  
+  # Must not qote KEYCHAIN_FLAG or $ENTITLEMENTS because it needs to be unwrapped and passed to codesign with spaces
+  # shellcheck disable=SC2086
+  /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" ${LOCAL_ENTITLEMENTS} "$BUNDLE_PATH"
+  checkStatus
+}
+
 # Load bundle identifiers from provisioning profiles
 for ARG in "${RAW_PROVISIONS[@]}"; do
     add_provision "$ARG"
@@ -551,11 +572,7 @@ function resign {
         do
             if [[ "$framework" == *.framework || "$framework" == *.dylib ]]
             then
-                log "Resigning '$framework'"
-                # Must not qote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
-                # shellcheck disable=SC2086
-                /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$framework"
-                checkStatus
+                codesign_bundle "$framework"
             else
                 log "Ignoring non-framework: $framework"
             fi
@@ -611,11 +628,7 @@ function resign {
             fi
         fi
 
-        log "Resigning application using certificate: '$CERTIFICATE'"
-        log "and entitlements: $ENTITLEMENTS"
-        cp -f "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
-        /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
-        checkStatus
+        codesign_bundle "$APP_PATH" "$ENTITLEMENTS"
     elif  [[ -n "${USE_APP_ENTITLEMENTS}" ]];
     then
         # Extract entitlements from provisioning profile and from the app binary
@@ -754,27 +767,20 @@ function resign {
             PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
         done
 
-        log "Resigning application using certificate: '$CERTIFICATE'"
         log "and patched entitlements:"
         log "$(cat "$PATCHED_ENTITLEMENTS")"
-        cp -f "$PATCHED_ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
-        /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
-        checkStatus
+
+        codesign_bundle "$APP_PATH" "$PATCHED_ENTITLEMENTS"
     else
         log "Extracting entitlements from provisioning profile"
-        PlistBuddy -x -c "Print Entitlements" "$TEMP_DIR/profile.plist" > "$TEMP_DIR/newEntitlements"
+        PROFILE_ENTITLEMENTS="$TEMP_DIR/profileEntitlements"
+        PlistBuddy -x -c "Print Entitlements" "$TEMP_DIR/profile.plist" > "$PROFILE_ENTITLEMENTS"
         checkStatus
-        log "Resigning application using certificate: '$CERTIFICATE'"
-        log "and entitlements from provisioning profile: $NEW_PROVISION"
-        cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
-        # Must not qote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
-        # shellcheck disable=SC2086
-        /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
-        checkStatus
+        
+        codesign_bundle "$APP_PATH" "$PROFILE_ENTITLEMENTS"
     fi
 
     # Remove the temporary files if they were created before generating ipa
-    rm -f "$TEMP_DIR/newEntitlements"
     rm -f "$PROFILE_ENTITLEMENTS"
     rm -f "$APP_ENTITLEMENTS"
     rm -f "$PATCHED_ENTITLEMENTS"
