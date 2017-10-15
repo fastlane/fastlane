@@ -458,13 +458,14 @@ function resign {
 
     # Replace the embedded mobile provisioning profile
     log "Validating the new provisioning profile: $NEW_PROVISION"
-    security cms -D -i "$NEW_PROVISION" > "$TEMP_DIR/profile.plist"
+    PROFILE_PLIST="$TEMP_DIR/profile.plist"
+    security cms -D -i "$NEW_PROVISION" > "$PROFILE_PLIST"
     checkStatus
 
-    APP_IDENTIFIER_PREFIX=$(PlistBuddy -c "Print :Entitlements:application-identifier" "$TEMP_DIR/profile.plist" | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
+    APP_IDENTIFIER_PREFIX=$(PlistBuddy -c "Print :Entitlements:application-identifier" "$PROFILE_PLIST" | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
     if [ "$APP_IDENTIFIER_PREFIX" == "" ];
     then
-        APP_IDENTIFIER_PREFIX=$(PlistBuddy -c "Print :ApplicationIdentifierPrefix:0" "$TEMP_DIR/profile.plist")
+        APP_IDENTIFIER_PREFIX=$(PlistBuddy -c "Print :ApplicationIdentifierPrefix:0" "$PROFILE_PLIST")
         if [ "$APP_IDENTIFIER_PREFIX" == "" ];
         then
             error "Failed to extract any app identifier prefix from '$NEW_PROVISION'"
@@ -478,10 +479,10 @@ function resign {
     # Set new app identifer prefix if such entry exists in plist file
     PlistBuddy -c "Set :AppIdentifierPrefix $APP_IDENTIFIER_PREFIX." "$INFO_PLIST" 2>/dev/null
 
-    TEAM_IDENTIFIER=$(PlistBuddy -c "Print :Entitlements:com.apple.developer.team-identifier" "$TEMP_DIR/profile.plist" | tr -d '\n')
+    TEAM_IDENTIFIER=$(PlistBuddy -c "Print :Entitlements:com.apple.developer.team-identifier" "$PROFILE_PLIST" | tr -d '\n')
     if [ "$TEAM_IDENTIFIER" == "" ];
     then
-        TEAM_IDENTIFIER=$(PlistBuddy -c "Print :TeamIdentifier:0" "$TEMP_DIR/profile.plist")
+        TEAM_IDENTIFIER=$(PlistBuddy -c "Print :TeamIdentifier:0" "$PROFILE_PLIST")
         if [ "$TEAM_IDENTIFIER" == "" ];
         then
             warning "Failed to extract team identifier from '$NEW_PROVISION', resigned ipa may fail on iOS 8 and higher"
@@ -622,7 +623,7 @@ function resign {
 
         log "Extracting entitlements from provisioning profile"
         PROFILE_ENTITLEMENTS="$TEMP_DIR/profileEntitlements"
-        PlistBuddy -x -c "Print Entitlements" "$TEMP_DIR/profile.plist" > "$PROFILE_ENTITLEMENTS"
+        PlistBuddy -x -c "Print Entitlements" "$PROFILE_PLIST" > "$PROFILE_ENTITLEMENTS"
         checkStatus
 
         log "Extracting entitlements from the app"
@@ -759,7 +760,7 @@ function resign {
         checkStatus
     else
         log "Extracting entitlements from provisioning profile"
-        PlistBuddy -x -c "Print Entitlements" "$TEMP_DIR/profile.plist" > "$TEMP_DIR/newEntitlements"
+        PlistBuddy -x -c "Print Entitlements" "$PROFILE_PLIST" > "$TEMP_DIR/newEntitlements"
         checkStatus
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and entitlements from provisioning profile: $NEW_PROVISION"
@@ -777,7 +778,7 @@ function resign {
     rm -f "$PATCHED_ENTITLEMENTS"
     rm -f "$PATCHED_ENTITLEMENTS.bak"
     rm -r "$TEMP_DIR/old-embedded-profile.plist"
-    rm -f "$TEMP_DIR/profile.plist"
+    rm -f "$PROFILE_PLIST"
     rm -f "$TEMP_DIR/old-embedded.mobileprovision"
 }
 
