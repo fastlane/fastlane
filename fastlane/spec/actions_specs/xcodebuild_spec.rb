@@ -22,7 +22,7 @@ describe Fastlane do
             alltargets: true,
             archive_path: './build/MyApp.xcarchive',
             configuration: 'Debug',
-            derivedDataPath: '/derived/data/path',
+            derived_data_path: '/derived/data/path',
             destination: 'name=iPhone 5s,OS=8.1',
             destination_timeout: 240,
             dry_run: true,

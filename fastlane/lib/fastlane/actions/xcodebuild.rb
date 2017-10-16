@@ -25,7 +25,7 @@ module Fastlane
         arch: "-arch",
         archive_path: "-archivePath",
         configuration: "-configuration",
-        derivedDataPath: "-derivedDataPath",
+        derived_data_path: "-derivedDataPath",
         destination_timeout: "-destination-timeout",
         dry_run: "-dry-run",
         enableAddressSanitizer: "-enableAddressSanitizer",
@@ -88,8 +88,8 @@ module Fastlane
         buildlog_path = ENV["XCODE_BUILDLOG_PATH"]
 
         # Set derived data path.
-        params[:derivedDataPath] ||= ENV["XCODE_DERIVED_DATA_PATH"]
-        Actions.lane_context[SharedValues::XCODEBUILD_DERIVED_DATA_PATH] = params[:derivedDataPath]
+        params[:derived_data_path] ||= ENV["XCODE_DERIVED_DATA_PATH"]
+        Actions.lane_context[SharedValues::XCODEBUILD_DERIVED_DATA_PATH] = params[:derived_data_path]
 
         # Append slash to build path, if needed
         if build_path && !build_path.end_with?("/")
