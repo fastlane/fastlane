@@ -215,9 +215,11 @@ module Fastlane
 
       action_launched('import')
 
-      parse(File.read(path), path)
+      return_value = parse(File.read(path), path)
 
       action_completed('import', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+
+      return return_value
     end
 
     # @param url [String] The git URL to clone the repository from
@@ -257,9 +259,11 @@ module Fastlane
             # We don't care about a failure here, as local actions are optional
           end
 
-          import(File.join(clone_folder, path))
+          return_value = import(File.join(clone_folder, path))
 
           action_completed('import_from_git', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+
+          return return_value
         end
       end
     end
@@ -274,8 +278,9 @@ module Fastlane
       value ||= yield
       Actions.execute_action('say') do
         action_launched('say')
-        Fastlane::Actions::SayAction.run([value])
+        return_value = Fastlane::Actions::SayAction.run([value])
         action_completed('say', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+        return return_value
       end
     end
 
@@ -284,8 +289,9 @@ module Fastlane
       value ||= yield if block_given?
 
       action_launched('puts')
-      Fastlane::Actions::PutsAction.run([value])
+      return_value = Fastlane::Actions::PutsAction.run([value])
       action_completed('puts', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+      return return_value
     end
 
     def test(params = {})
