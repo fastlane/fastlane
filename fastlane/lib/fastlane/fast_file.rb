@@ -216,6 +216,8 @@ module Fastlane
       action_launched('import')
 
       parse(File.read(path), path)
+
+      action_completed('import', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
     end
 
     # @param url [String] The git URL to clone the repository from
@@ -256,6 +258,8 @@ module Fastlane
           end
 
           import(File.join(clone_folder, path))
+
+          action_completed('import_from_git', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
         end
       end
     end
@@ -271,6 +275,7 @@ module Fastlane
       Actions.execute_action('say') do
         action_launched('say')
         Fastlane::Actions::SayAction.run([value])
+        action_completed('say', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
       end
     end
 
@@ -279,8 +284,8 @@ module Fastlane
       value ||= yield if block_given?
 
       action_launched('puts')
-
       Fastlane::Actions::PutsAction.run([value])
+      action_completed('puts', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
     end
 
     def test(params = {})
@@ -291,6 +296,11 @@ module Fastlane
     def action_launched(action_name)
       action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name, args: ARGV)
       FastlaneCore.session.action_launched(launch_context: action_launch_context)
+    end
+
+    def action_completed(action_name, status: nil)
+      completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV, status: status)
+      FastlaneCore.session.action_completed(completion_context: completion_context)
     end
   end
 end
