@@ -42,10 +42,4 @@ module FastlaneCore
       File.write("#{ENV['HOME']}/Desktop/mock_analytics-#{Time.now.to_i}.json", body)
     end
   end
-
-  class MockAnalyticsIngesterClient < AnalyticsIngesterClient
-    def post_request(body: nil)
-      write_json(body)
-    end
-  end
 end
