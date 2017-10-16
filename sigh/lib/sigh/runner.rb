@@ -33,6 +33,8 @@ module Sigh
           profile.delete!
           profile = create_profile!
         end
+      elsif Sigh.config[:skip_profile_creation]
+        UI.user_error!("No existing profiles found, that match the certificates you have installed locally!")
       else
         UI.user_error!("No matching provisioning profile found and can not create a new one because you enabled `readonly`") if Sigh.config[:readonly]
         UI.important("No existing profiles found, that match the certificates you have installed locally! Creating a new provisioning profile for you")
