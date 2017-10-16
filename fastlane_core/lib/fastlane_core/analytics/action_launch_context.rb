@@ -2,11 +2,13 @@ require 'fastlane_core/helper'
 
 module FastlaneCore
   class ActionLaunchContext
+    UNKNOWN_P_HASH = 'unknown'
+
     attr_accessor :action_name
     attr_accessor :p_hash
     attr_accessor :platform
 
-    def initialize(action_name: nil, p_hash: nil, platform: nil)
+    def initialize(action_name: nil, p_hash: UNKNOWN_P_HASH, platform: nil)
       @action_name = action_name
       @p_hash = p_hash
       @platform = platform

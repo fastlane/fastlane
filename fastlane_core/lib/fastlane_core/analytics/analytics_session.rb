@@ -23,13 +23,17 @@ module FastlaneCore
     end
 
     def backfill_p_hashes(p_hash: nil)
-      return if p_hash.nil? || @events.count == 0
+      return if p_hash.nil? || p_hash == ActionLaunchContext::UNKNOWN_P_HASH || @events.count == 0
       @events.reverse_each do |event|
         # event[:actor][:name] is the field in which we store the p_hash
         # to be sent to analytics ingester.
         # If they are nil, we want to fill them in until we reach
         # an event that already has a p_hash.
-        event[:actor][:name].nil? ? event[:actor][:name] = p_hash : break
+        if event[:actor][:name].nil? || event[:actor][:name] == ActionLaunchContext::UNKNOWN_P_HASH
+          event[:actor][:name] = p_hash
+        else
+          break
+        end
       end
     end
 
