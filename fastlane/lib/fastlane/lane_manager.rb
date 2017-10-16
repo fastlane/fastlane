@@ -38,6 +38,8 @@ module Fastlane
 
       platform, lane = choose_lane(ff, platform) unless lane
 
+      FastlaneCore.session.is_fastfile = true
+
       # xcodeproj has a bug in certain versions that causes it to change directories
       # and not return to the original working directory
       # https://github.com/CocoaPods/Xcodeproj/issues/426
@@ -76,8 +78,6 @@ module Fastlane
 
     # All the finishing up that needs to be done
     def self.finish_fastlane(ff, duration, error)
-      ff.runner.did_finish
-
       # Finished with all the lanes
       Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
       print_table(Fastlane::Actions.executed_actions)

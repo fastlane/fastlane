@@ -40,6 +40,11 @@ require 'fastlane_core/ui/errors/fastlane_crash'
 require 'fastlane_core/ui/errors/fastlane_shell_error'
 require 'fastlane_core/ui/errors/fastlane_common_error'
 require 'fastlane_core/test_parser'
+require 'fastlane_core/analytics/action_completion_context'
+require 'fastlane_core/analytics/action_launch_context'
+require 'fastlane_core/analytics/analytics_event_builder'
+require 'fastlane_core/analytics/analytics_ingester_client'
+require 'fastlane_core/analytics/analytics_session'
 
 # Third Party code
 require 'colored'
@@ -50,6 +55,19 @@ require 'fastlane_core/ui/fastlane_runner' # monkey patch
 
 module FastlaneCore
   ROOT = Pathname.new(File.expand_path('../..', __FILE__))
+
+  # Session is used to report usage metrics.
+  # If you opt out, we will not send anything.
+  # You can confirm this by observing how we use the environment variable: FASTLANE_OPT_OUT_USAGE
+  # Specifically, in AnalyticsSession.finalize_session
+  # Learn more at https://github.com/fastlane/fastlane#metrics
+  def self.session
+    @session ||= AnalyticsSession.new
+  end
+
+  def self.reset_session
+    @session = nil
+  end
 
   # A directory that's being used to user-wide fastlane configs
   # This directory is also used for the bundled fastlane

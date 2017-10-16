@@ -150,10 +150,6 @@ module Fastlane
     # @!group Other things
     #####################################################
 
-    def collector
-      runner.collector
-    end
-
     # Is the given key a platform block or a lane?
     def is_platform_block?(key)
       UI.crash!('No key given') unless key
@@ -217,8 +213,13 @@ module Fastlane
       actions_path = File.join(File.expand_path("..", path), 'actions')
       Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
 
-      collector.did_launch_action(:import)
-      parse(File.read(path), path)
+      action_launched('import')
+
+      return_value = parse(File.read(path), path)
+
+      action_completed('import', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+
+      return return_value
     end
 
     # @param url [String] The git URL to clone the repository from
@@ -230,7 +231,7 @@ module Fastlane
       Actions.execute_action('import_from_git') do
         require 'tmpdir'
 
-        collector.did_launch_action(:import_from_git)
+        action_launched('import_from_git')
 
         # Checkout the repo
         repo_name = url.split("/").last
@@ -258,7 +259,11 @@ module Fastlane
             # We don't care about a failure here, as local actions are optional
           end
 
-          import(File.join(clone_folder, path))
+          return_value = import(File.join(clone_folder, path))
+
+          action_completed('import_from_git', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+
+          return return_value
         end
       end
     end
@@ -272,21 +277,36 @@ module Fastlane
       # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
       value ||= yield
       Actions.execute_action('say') do
-        collector.did_launch_action(:say)
-        Fastlane::Actions::SayAction.run([value])
+        action_launched('say')
+        return_value = Fastlane::Actions::SayAction.run([value])
+        action_completed('say', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+        return return_value
       end
     end
 
     def puts(value)
       # Overwrite this, since there is already a 'puts' method defined in the Ruby standard library
       value ||= yield if block_given?
-      collector.did_launch_action(:puts)
-      Fastlane::Actions::PutsAction.run([value])
+
+      action_launched('puts')
+      return_value = Fastlane::Actions::PutsAction.run([value])
+      action_completed('puts', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+      return return_value
     end
 
     def test(params = {})
       # Overwrite this, since there is already a 'test' method defined in the Ruby standard library
       self.runner.try_switch_to_lane(:test, [params])
+    end
+
+    def action_launched(action_name)
+      action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name, args: ARGV)
+      FastlaneCore.session.action_launched(launch_context: action_launch_context)
+    end
+
+    def action_completed(action_name, status: nil)
+      completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV, status: status)
+      FastlaneCore.session.action_completed(completion_context: completion_context)
     end
   end
 end
