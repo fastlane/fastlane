@@ -297,4 +297,3 @@ end
 #   expect(collector.error).to eq(:scan)
 #   expect(collector.crash).to be(true)
 # end
-
