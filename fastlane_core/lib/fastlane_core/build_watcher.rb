@@ -7,16 +7,24 @@ module FastlaneCore
         watched_build = watching_build(app_id: app_id, platform: platform)
         UI.crash!("Could not find a build for app: #{app_id} on platform: #{platform}") if watched_build.nil?
 
+        parse_errors_count = 0
         loop do
-          matched_build = matching_build(watched_build: watched_build, app_id: app_id, platform: platform)
+          begin
+            UI.crash!("Internal server error while querying build status. Error threshold met") if parse_errors_count >= 10
 
-          report_status(build: matched_build)
+            matched_build = matching_build(watched_build: watched_build, app_id: app_id, platform: platform)
 
-          if matched_build && matched_build.processed?
-            return matched_build
+            report_status(build: matched_build)
+
+            if matched_build && matched_build.processed?
+              return matched_build
+            end
+
+            sleep poll_interval
+          rescue Faraday::ParsingError
+            parse_errors_count += 1
+            UI.message("Internal server error while querying build status. Number of errors: #{parse_errors_count}")
           end
-
-          sleep poll_interval
         end
       end
 
