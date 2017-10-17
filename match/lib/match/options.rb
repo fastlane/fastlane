@@ -125,7 +125,7 @@ module Match
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :force_for_new_devices,
                                      env_name: "MATCH_FORCE_FOR_NEW_DEVICES",
-                                     description: "Renew the provisioning profiles if the device count on the developer portal has changed",
+                                     description: "Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile type 'appstore'",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_docs,
@@ -143,7 +143,12 @@ module Match
                                        value = value.to_s
                                        pt = %w(tvos ios)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :template_name,
+                                     env_name: "MATCH_PROVISIONING_PROFILE_TEMPLATE_NAME",
+                                     description: "The name of provisioning profile template. If the developer account has provisioning profile templates, template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile",
+                                     optional: true,
+                                     default_value: nil)
       ]
     end
   end

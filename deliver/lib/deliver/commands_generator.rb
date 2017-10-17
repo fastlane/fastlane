@@ -102,7 +102,10 @@ module Deliver
           end
 
           require 'deliver/setup'
+
           options = FastlaneCore::Configuration.create(deliverfile_options, options.__hash__)
+          options[:run_precheck_before_submit] = false # precheck doesn't need to run during init
+
           Deliver::Runner.new(options) # to login...
           Deliver::Setup.new.run(options)
         end

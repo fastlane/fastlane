@@ -56,6 +56,17 @@ module Gym
         print_full_log_path
         print_environment_information
         print_build_error_instructions
+
+        # This error is rather common and should be below the other (a little noisy) output
+        case output
+        when /Code signing is required for product/
+          print "Seems like Xcode is not happy with the code signing setup"
+          print "Please make sure to check out the raw `xcodebuild` output"
+          UI.important(Gym::BuildCommandGenerator.xcodebuild_log_path)
+          print "The very bottom of the file will tell you the raw Xcode error message"
+          print "indicating on why the code signing step failed"
+        end
+
         UI.build_failure!("Error building the application - see the log above", error_info: output)
       end
 
@@ -203,8 +214,9 @@ module Gym
       def print_environment_information
         if Gym.config[:export_method].to_s == "development"
           UI.message("")
-          UI.error("Your `export_method` in gym is defined as `:development`")
-          UI.error("which can't be used for `ipa` files for beta or App Store distribution")
+          UI.error("Your `export_method` in gym is defined as `development`")
+          UI.error("which might cause problems when signing your application")
+          UI.error("Are you sure want to build and export for development?")
           UI.error("Please make sure to define the correct export methods when calling")
           UI.error("gym in your Fastfile or from the command line")
           UI.message("")

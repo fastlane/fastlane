@@ -24,7 +24,26 @@ module Fastlane
         cmd << '--verbose' if params[:verbose]
         cmd << '--no-ansi' unless params[:ansi]
 
-        Actions.sh(cmd.join(' '), error_callback: params[:error_callback])
+        Actions.sh(cmd.join(' '), error_callback: lambda { |result|
+          if params[:try_repo_update_on_error]
+            cmd << '--repo-update'
+            Actions.sh(cmd.join(' '), error_callback: lambda { |retry_result|
+              call_error_callback(params, retry_result)
+            })
+          else
+            call_error_callback(params, result)
+          end
+        })
+      end
+
+      def self.call_error_callback(params, result)
+        if params[:error_callback]
+          Dir.chdir(FastlaneCore::FastlaneFolder.path) do
+            params[:error_callback].call(result)
+          end
+        else
+          UI.shell_error!(result)
+        end
       end
 
       def self.description
@@ -47,7 +66,8 @@ module Fastlane
                                        env_name: "FL_COCOAPODS_REPO_UPDATE",
                                        description: "Run `pod repo update` before install",
                                        is_string: false,
-                                       default_value: false),
+                                       default_value: false,
+                                       conflicting_options: [:try_repo_update_on_error]),
           FastlaneCore::ConfigItem.new(key: :silent,
                                        env_name: "FL_COCOAPODS_SILENT",
                                        description: "Execute command without logging output",
@@ -80,7 +100,14 @@ module Fastlane
                                        description: 'A callback invoked with the command output if there is a non-zero exit status',
                                        optional: true,
                                        is_string: false,
-                                       default_value: nil)
+                                       default_value: nil),
+          FastlaneCore::ConfigItem.new(key: :try_repo_update_on_error,
+                                       env_name: "FL_COCOAPODS_TRY_REPO_UPDATE_ON_ERROR",
+                                       description: 'Retry with --repo-update if action was finished with error',
+                                       optional: true,
+                                       is_string: false,
+                                       default_value: true,
+                                       conflicting_options: [:repo_update])
         ]
         # Please don't add a version parameter to the `cocoapods` action. If you need to specify a version when running
         # `cocoapods`, please start using a Gemfile and lock the version there

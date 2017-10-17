@@ -43,14 +43,54 @@ module Fastlane
       @_launches ||= JSON.parse(File.read(File.join(Fastlane::ROOT, "assets/action_ranking.json"))) # root because we're in a temporary directory here
     end
 
-    def generate!(target_path: "docs/Actions.md")
+    def generate!(target_path: nil)
+      require 'yaml'
+      FileUtils.mkdir_p(target_path)
+      docs_dir = File.join(target_path, "docs")
+      custom_action_docs = "lib/fastlane/actions/docs/"
+
+      # Generate actions.md
       template = File.join(Fastlane::ROOT, "lib/assets/Actions.md.erb")
-
       result = ERB.new(File.read(template), 0, '-').result(binding) # http://www.rrn.dk/rubys-erb-templating-system
-      UI.verbose(result)
+      File.write(File.join(docs_dir, "actions.md"), result)
 
-      File.write(target_path, result)
-      UI.success(target_path)
+      # Generate actions sub pages (e.g. actions/slather.md, actions/scan.md)
+      all_actions_ref_yml = []
+      FileUtils.mkdir_p(File.join(docs_dir, "actions"))
+      ActionsList.all_actions do |action|
+        # check if there is a custom detail view in markdown available in the fastlane code base
+        custom_file_location = File.join(Fastlane::ROOT, custom_action_docs, "#{action.action_name}.md")
+        @custom_content = nil # important, as we're in a loop and using @ variables
+        if File.exist?(custom_file_location)
+          UI.verbose("Using custom md file for action #{action.action_name}")
+          @custom_content = File.read(custom_file_location)
+        end
+
+        template = File.join(Fastlane::ROOT, "lib/assets/ActionDetails.md.erb")
+        @action = action # to provide a reference in the .html.erb template
+        result = ERB.new(File.read(template), 0, '-').result(binding) # http://www.rrn.dk/rubys-erb-templating-system
+
+        file_name = File.join("actions", "#{action.action_name}.md")
+        File.write(File.join(docs_dir, file_name), result)
+
+        all_actions_ref_yml << { action.action_name => file_name }
+      end
+
+      # Modify the mkdocs.yml to list all the actions
+      mkdocs_yml_path = File.join(target_path, "mkdocs.yml")
+      raise "Could not find mkdocs.yml in #{target_path}, make sure to point to the fastlane/docs repo" unless File.exist?(mkdocs_yml_path)
+      mkdocs_yml = YAML.load_file(mkdocs_yml_path)
+      hidden_actions_array = mkdocs_yml["pages"].find { |p| !p["_Actions"].nil? }
+      hidden_actions_array["_Actions"] = all_actions_ref_yml
+      File.write(mkdocs_yml_path, mkdocs_yml.to_yaml)
+
+      # Copy over the assets from the `actions/docs/assets` directory
+      Dir[File.join(custom_action_docs, "assets", "*")].each do |current_asset_path|
+        UI.message("Copying asset #{current_asset_path}")
+        FileUtils.cp(current_asset_path, File.join(docs_dir, "img", "actions", File.basename(current_asset_path)))
+      end
+
+      UI.success("Generated new docs on path #{target_path}")
     end
 
     private

@@ -73,11 +73,6 @@ describe Fastlane do
           allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(File.absolute_path('./fastlane/spec/fixtures/fastfiles/'))
         end
 
-        it "Successfully collected all actions" do
-          ff = Fastlane::LaneManager.cruise_lane('ios', 'beta')
-          expect(ff.collector.launches).to eq({ default_platform: 1, frameit: 1, team_id: 2 })
-        end
-
         it "Successfully handles exceptions" do
           expect do
             ff = Fastlane::LaneManager.cruise_lane('ios', 'crashy')

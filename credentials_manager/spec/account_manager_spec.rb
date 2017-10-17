@@ -52,6 +52,20 @@ describe CredentialsManager do
       ENV.delete('FASTLANE_USER')
     end
 
+    it "loads the password from the keychain if empty password is stored by env" do
+      ENV['FASTLANE_USER'] = user
+      ENV['FASTLANE_PASSWORD'] = ''
+      c = CredentialsManager::AccountManager.new
+
+      dummy = Object.new
+      expect(dummy).to receive(:password).and_return("Yeah! Pass!")
+
+      expect(Security::InternetPassword).to receive(:find).with(server: "deliver.felix@krausefx.com").and_return(dummy)
+      expect(c.password).to eq("Yeah! Pass!")
+      ENV.delete('FASTLANE_USER')
+      ENV.delete('FASTLANE_PASSWORD')
+    end
+
     it "removes the Keychain item if the user agrees when the credentials are invalid" do
       expect(Security::InternetPassword).to receive(:delete).with(server: "deliver.felix@krausefx.com").and_return(nil)
 

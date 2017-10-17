@@ -40,8 +40,12 @@ module Precheck
       end
 
       if processor_result.should_trigger_user_error?
-        UI.user_error!("precheck found one or more potential problems that must be addressed before submitting to review")
+        UI.user_error!("precheck 👮‍♀️ 👮  found one or more potential problems that must be addressed before submitting to review")
         return false
+      end
+
+      if processor_result.has_errors_or_warnings?
+        UI.important "precheck 👮‍♀️ 👮  found one or more potential metadata problems, but this won't prevent fastlane from completing 👍".yellow
       end
 
       if !processor_result.has_errors_or_warnings? && !processor_result.items_not_checked?
@@ -77,8 +81,14 @@ module Precheck
       if rows.length == 0
         return nil
       else
+        title_text = "Potential problems"
+        if error_results.length > 0
+          title_text = title_text.red
+        else
+          title_text = title_text.yellow
+        end
         return Terminal::Table.new(
-          title: "Potential problems".red,
+          title: title_text,
           headings: ["Field", "Failure reason"],
           rows: FastlaneCore::PrintTable.transform_output(rows)
         ).to_s

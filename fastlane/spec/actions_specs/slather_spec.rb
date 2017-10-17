@@ -38,7 +38,7 @@ describe Fastlane do
 
         expected = "slather coverage
                     --travis
-                    --travis-pro
+                    --travispro
                     --circleci
                     --jenkins
                     --buildkite
@@ -99,7 +99,7 @@ describe Fastlane do
 
         expected = 'bundle exec slather coverage
                     --travis
-                    --travis-pro
+                    --travispro
                     --circleci
                     --jenkins
                     --buildkite

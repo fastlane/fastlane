@@ -55,6 +55,9 @@ module Spaceship
       # @return [Integer] The version number of the last installed build
       attr_accessor :latest_installed_version_number
 
+      # @return [String] The full version of the last installed build
+      attr_accessor :latest_build
+
       attr_mapping(
         'testerId' => :tester_id,
         'emailAddress.value' => :email,
@@ -63,9 +66,10 @@ module Spaceship
         'groups' => :groups,
         'devices' => :devices,
         'latestInstalledAppAdamId' => :latest_install_app_id,
-        'latestInstalledDate' => :latest_install_date,
-        'latestInstalledVersion' => :latest_installed_version_number,
-        'latestInstalledShortVersion' => :latest_installed_build_number
+        'latestInstallByPlatform.ios.installDate' => :latest_install_date,
+        'latestInstallByPlatform.ios.shortVersion' => :latest_installed_version_number,
+        'latestInstallByPlatform.ios.version' => :latest_installed_build_number,
+        'latestBuild' => :latest_build
       )
 
       class << self

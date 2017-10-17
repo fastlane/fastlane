@@ -14,8 +14,6 @@ module Gym
       FastlaneCore::Project.detect_projects(config)
       Gym.project = FastlaneCore::Project.new(config)
 
-      detect_selected_provisioning_profiles
-
       # Go into the project's folder, as there might be a Gymfile there
       Dir.chdir(File.expand_path("..", Gym.project.path)) do
         config.load_configuration_file(Gym.gymfile_name)
@@ -23,6 +21,7 @@ module Gym
 
       detect_scheme
       detect_platform # we can only do that *after* we have the scheme
+      detect_selected_provisioning_profiles # we can only do that *aftet* we have the platform
       detect_configuration
       detect_toolchain
 
@@ -37,10 +36,9 @@ module Gym
       day = Time.now.strftime("%F") # e.g. 2015-08-07
       archive_path = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}/")
 
-      path = xcode_preference_plist_path
-      return archive_path unless File.exist?(path.to_s) # this file only exists when you edit the Xcode preferences to set custom values
+      return archive_path unless has_xcode_preferences_plist?
 
-      custom_archive_path = xcode_preferences_dictionary(path)['IDECustomDistributionArchivesLocation']
+      custom_archive_path = xcode_preferences_dictionary['IDECustomDistributionArchivesLocation']
       return archive_path if custom_archive_path.to_s.length == 0
 
       return File.join(custom_archive_path, day)
@@ -48,11 +46,16 @@ module Gym
 
     # Helper Methods
 
+    # this file only exists when you edit the Xcode preferences to set custom values
+    def self.has_xcode_preferences_plist?
+      File.exist?(xcode_preference_plist_path)
+    end
+
     def self.xcode_preference_plist_path
       File.expand_path("~/Library/Preferences/com.apple.dt.Xcode.plist")
     end
 
-    def self.xcode_preferences_dictionary(path)
+    def self.xcode_preferences_dictionary(path = xcode_preference_plist_path)
       CFPropertyList.native_types(CFPropertyList::List.new(file: path).value)
     end
 
@@ -62,9 +65,11 @@ module Gym
       Gym.config[:export_options] ||= {}
       hash_to_use = (Gym.config[:export_options][:provisioningProfiles] || {}).dup || {} # dup so we can show the original values in `verbose` mode
 
-      mapping_object = CodeSigningMapping.new(project: Gym.project)
-      hash_to_use = mapping_object.merge_profile_mapping(primary_mapping: hash_to_use,
+      unless Gym.config[:skip_profile_detection]
+        mapping_object = CodeSigningMapping.new(project: Gym.project)
+        hash_to_use = mapping_object.merge_profile_mapping(primary_mapping: hash_to_use,
                                                            export_method: Gym.config[:export_method])
+      end
 
       return if hash_to_use.count == 0 # We don't want to set a mapping if we don't have one
       Gym.config[:export_options][:provisioningProfiles] = hash_to_use

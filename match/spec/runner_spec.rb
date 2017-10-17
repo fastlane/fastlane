@@ -19,7 +19,7 @@ describe Match do
 
       config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
       repo_dir = Dir.mktmpdir
-      cert_path = File.join(repo_dir, "something")
+      cert_path = File.join(repo_dir, "something.cer")
       profile_path = "./match/spec/fixtures/test.mobileprovision"
       destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
 
@@ -30,7 +30,17 @@ describe Match do
                                                                        certificate_id: "something",
                                                                        app_identifier: values[:app_identifier]).and_return(profile_path)
       expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path).and_return(destination)
-      expect(Match::GitHelper).to receive(:commit_changes).with(repo_dir, "[fastlane] Updated appstore and platform ios", git_url, "master")
+      expect(Match::GitHelper).to receive(:commit_changes).with(
+        repo_dir,
+        "[fastlane] Updated appstore and platform ios",
+        git_url,
+        "master",
+        [
+          File.join(repo_dir, "something.cer"),
+          File.join(repo_dir, "something.p12"), # this is important, as a cert consists out of 2 files
+          "./match/spec/fixtures/test.mobileprovision"
+        ]
+      )
 
       spaceship = "spaceship"
       expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)

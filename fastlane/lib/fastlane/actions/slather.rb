@@ -8,7 +8,7 @@ module Fastlane
       # https://github.com/SlatherOrg/slather/blob/v2.4.2/lib/slather/command/coverage_command.rb
       ARGS_MAP = {
           travis: '--travis',
-          travis_pro: '--travis-pro',
+          travis_pro: '--travispro',
           circleci: '--circleci',
           jenkins: '--jenkins',
           buildkite: '--buildkite',
@@ -240,6 +240,7 @@ Slather is available at https://github.com/SlatherOrg/slather
           FastlaneCore::ConfigItem.new(key: :source_files,
                                        env_name: "FL_SLATHER_SOURCE_FILES",
                                        description: "A Dir.glob compatible pattern used to limit the lookup to specific source files. Ignored in gcov mode",
+                                       is_string: false,
                                        default_value: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :decimals,
