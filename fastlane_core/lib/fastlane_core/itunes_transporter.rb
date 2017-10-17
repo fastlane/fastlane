@@ -252,7 +252,7 @@ module FastlaneCore
     end
 
     def java_code_option
-      if Helper.xcode_at_least?(9)
+      if Helper.is_mac? && Helper.xcode_at_least?(9)
         return "-jar #{Helper.transporter_java_jar_path.shellescape}"
       else
         return "-classpath #{Helper.transporter_java_jar_path.shellescape} com.apple.transporter.Application"

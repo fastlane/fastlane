@@ -60,8 +60,13 @@ module Commander
           FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_RELEASE}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
         end
 
-        collector.did_launch_action(@program[:name])
-        run_active_command
+        action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(@program[:name], args: ARGV)
+        FastlaneCore.session.action_launched(launch_context: action_launch_context)
+
+        return_value = run_active_command
+
+        action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+        return return_value
       rescue InvalidCommandError => e
         # calling `abort` makes it likely that tests stop without failing, so
         # we'll disable that during tests.
@@ -76,6 +81,7 @@ module Commander
         if FastlaneCore::Globals.verbose?
           raise e
         else
+          action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::INTERRUPTED, exception: e)
           puts "\nCancelled... use --verbose to show the stack trace"
         end
       rescue \
@@ -116,12 +122,15 @@ module Commander
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         rescue_unknown_error(e)
       ensure
-        collector.did_finish
+        FastlaneCore.session.finalize_session
       end
     end
 
-    def collector
-      @collector ||= FastlaneCore::ToolCollector.new
+    def action_completed(action_name, status: nil, exception: nil)
+      if exception.nil? || exception.fastlane_should_report_metrics?
+        action_completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV, status: status)
+        FastlaneCore.session.action_completed(completion_context: action_completion_context)
+      end
     end
 
     def rescue_file_error(e)
@@ -145,12 +154,15 @@ module Commander
 
     def rescue_unknown_error(e)
       FastlaneCore::CrashReporter.report_crash(exception: e)
-      collector.did_crash(@program[:name]) if e.fastlane_should_report_metrics?
+
+      action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::FAILED, exception: e)
+
       handle_unknown_error!(e)
     end
 
     def rescue_fastlane_error(e)
-      collector.did_raise_error(@program[:name]) if e.fastlane_should_report_metrics?
+      action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::USER_ERROR, exception: e)
+
       show_github_issues(e.message) if e.show_github_issues
       FastlaneCore::CrashReporter.report_crash(exception: e)
       display_user_error!(e, e.message)
@@ -247,6 +259,7 @@ module Commander
         reraise_formatted!(e, message)
       else
         # without stack trace
+        action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::USER_ERROR, exception: e)
         abort "\n[!] #{message}".red
       end
     end

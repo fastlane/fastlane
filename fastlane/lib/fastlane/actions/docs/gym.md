@@ -16,13 +16,13 @@
 
 # What's gym?
 
-_gym_ builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` or `app` file :muscle:
+_gym_ builds and packages iOS apps for you. It takes care of all the heavy lifting and makes it super easy to generate a signed `ipa` or `app` file 💪
 
 _gym_ is a replacement for [shenzhen](https://github.com/nomad/shenzhen).
 
 ### Before _gym_
 
-```
+```no-highlight
 xcodebuild clean archive -archivePath build/MyApp \
                          -scheme MyApp
 xcodebuild -exportArchive \
@@ -34,7 +34,7 @@ xcodebuild -exportArchive \
 
 ### With _gym_
 
-```
+```no-highlight
 fastlane gym
 ```
 
@@ -44,17 +44,17 @@ _gym_ uses the latest APIs to build and sign your application which results in m
 
 |          |  Gym Features  |
 |----------|----------------|
-:rocket:            | _gym_ builds 30% faster than other build tools like [shenzhen](https://github.com/nomad/shenzhen)
-:checkered_flag: | Beautiful inline build output
-:book:     | Helps you resolve common build errors like code signing issues
-:mountain_cableway: | Sensible defaults: Automatically detect the project, its schemes and more
-:link:  | Works perfectly with [fastlane](https://fastlane.tools) and other tools
-:package: | Automatically generates an `ipa` and a compressed `dSYM` file
-:bullettrain_side: | Don't remember any complicated build commands, just _gym_
-:wrench:  | Easy and dynamic configuration using parameters and environment variables
-:floppy_disk:   | Store common build settings in a `Gymfile`
-:outbox_tray: | All archives are stored and accessible in the Xcode Organizer
-:computer: | Supports both iOS and Mac applications
+🚀            | _gym_ builds 30% faster than other build tools like [shenzhen](https://github.com/nomad/shenzhen)
+🏁 | Beautiful inline build output
+📖    | Helps you resolve common build errors like code signing issues
+🚠 | Sensible defaults: Automatically detect the project, its schemes and more
+🔗  | Works perfectly with [fastlane](https://fastlane.tools) and other tools
+📦 | Automatically generates an `ipa` and a compressed `dSYM` file
+🚅 | Don't remember any complicated build commands, just _gym_
+🔧  | Easy and dynamic configuration using parameters and environment variables
+💾   | Store common build settings in a `Gymfile`
+📤 | All archives are stored and accessible in the Xcode Organizer
+💻 | Supports both iOS and Mac applications
 
 ![/img/actions/gymScreenshot.png](/img/actions/gymScreenshot.png)
 
@@ -82,7 +82,7 @@ DEVELOPER_DIR="/Applications/Xcode6.2.app" fastlane gym
 
 For a list of all available parameters use
 
-```
+```no-highlight
 fastlane action gym
 ```
 
@@ -207,7 +207,7 @@ When you run _gym_ without the `--silent` mode it will print out every command i
 
 To build the archive _gym_ uses the following command:
 
-```
+```no-highlight
 set -o pipefail && \
 xcodebuild -scheme 'Example' \
 -project './Example.xcodeproj' \
@@ -223,7 +223,7 @@ _gym_ automatically chooses a different packaging method depending on the versio
 
 ### Xcode 7 and above
 
-```
+```no-highlight
 /usr/bin/xcrun path/to/xcbuild-safe.sh -exportArchive \
 -exportOptionsPlist '/tmp/gym_config_1442852529.plist' \
 -archivePath '/Users/fkrause/Library/Developer/Xcode/Archives/2015-09-21/App 2015-09-21 09.21.56.xcarchive' \

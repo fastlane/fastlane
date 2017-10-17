@@ -136,7 +136,7 @@ module Spaceship::TestFlight
 
     # Getting builds from BuildTrains only gets a partial Build object
     # We are then requesting the full build from iTC when we need to access
-    # any of the variables below, because they are not inlcuded in the partial Build objects
+    # any of the variables below, because they are not included in the partial Build objects
     #
     # `super` here calls `beta_review_info` as defined by the `attr_mapping` above.
     # @return (Spaceship::TestFlight::BetaReviewInfo)

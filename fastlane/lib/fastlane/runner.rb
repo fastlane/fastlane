@@ -197,7 +197,10 @@ module Fastlane
 
         # Actually switch lane now
         self.current_lane = new_lane
-        collector.did_launch_action(:lane_switch)
+
+        launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name('lane_switch', args: ARGV)
+        FastlaneCore.session.action_launched(launch_context: launch_context)
+
         result = block.call(parameters.first || {}) # to always pass a hash
         self.current_lane = original_lane
 
@@ -218,11 +221,12 @@ module Fastlane
         custom_dir ||= ".."
       end
 
-      collector.did_launch_action(method_sym)
-
       verify_supported_os(method_sym, class_ref)
 
       begin
+        launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(method_sym.to_s, args: ARGV)
+        FastlaneCore.session.action_launched(launch_context: launch_context)
+
         Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
           # If another action is calling this action, we shouldn't show it in the summary
           # (see https://github.com/fastlane/fastlane/issues/4546)
@@ -249,7 +253,11 @@ module Fastlane
             end
 
             class_ref.runner = self # needed to call another action form an action
-            class_ref.run(arguments)
+            return_value = class_ref.run(arguments)
+
+            action_completed(method_sym.to_s, status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+
+            return return_value
           end
         end
       rescue Interrupt => e
@@ -258,14 +266,22 @@ module Fastlane
         raise e
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         FastlaneCore::CrashReporter.report_crash(exception: e)
-        collector.did_raise_error(method_sym) if e.fastlane_should_report_metrics?
+        action_completed(method_sym.to_s, status: FastlaneCore::ActionCompletionStatus::USER_ERROR, exception: e)
         raise e
       rescue Exception => e # rubocop:disable Lint/RescueException
         # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         # Catches all exceptions, since some plugins might use system exits to get out
         FastlaneCore::CrashReporter.report_crash(exception: e)
-        collector.did_crash(method_sym) if e.fastlane_should_report_metrics?
+
+        action_completed(method_sym.to_s, status: FastlaneCore::ActionCompletionStatus::FAILED, exception: e)
         raise e
+      end
+    end
+
+    def action_completed(action_name, status: nil, exception: nil)
+      if exception.nil? || exception.fastlane_should_report_metrics?
+        action_completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV, status: status)
+        FastlaneCore.session.action_completed(completion_context: action_completion_context)
       end
     end
 
@@ -285,15 +301,6 @@ module Fastlane
           end
         end
       end
-    end
-
-    def collector
-      @collector ||= ActionCollector.new
-    end
-
-    # Fastfile was finished executing
-    def did_finish
-      collector.did_finish
     end
 
     # Called internally to setup the runner object
