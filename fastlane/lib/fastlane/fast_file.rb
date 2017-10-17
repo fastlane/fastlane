@@ -238,56 +238,54 @@ module Fastlane
           UI.message "Cloning remote git repo..."
           Actions.sh("GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}")
 
-          if version != nil
+          unless version.nil?
             UI.message "Fetching remote git tags..."
             Actions.sh("cd '#{clone_folder}' && GIT_TERMINAL_PROMPT=0 git fetch --all --tags -q")
 
-            #Separate version from optimistic operator
-            splitVersion = version.split(" ")
-            versionNumber = splitVersion.last
-            operator = splitVersion.first
+            # Separate version from optimistic operator
+            split_version = version.split(" ")
+            version_number = split_version.last
+            operator = split_version.first
 
-            #Fetch all possible tags
+            # Fetch all possible tags
             git_tags_string = Actions.sh("cd '#{clone_folder}' && git tag -l")
             git_tags = git_tags_string.split("\n")
 
-            #Delete tags that are not a real version number
-            git_tags.delete_if { |version|
-              Gem::Version.correct?(version) != 0
-            }
-            
-            #Sort tags based on their version number
-            git_tags.sort_by{ |version| Gem::Version.new(version) }
+            # Delete tags that are not a real version number
+            git_tags.delete_if { |tag| Gem::Version.correct?(tag) != 0 }
 
-            #~> should select the latest version withing constraints.
-            #-> should select a specific version without fallback.
-            if operator == "~>" 
-              #Drop last specified digit in version
-              lastDotIndex = versionNumber.rindex('.')
-              versionRange = versionNumber[0..lastDotIndex-1]
+            # Sort tags based on their version number
+            git_tags.sort_by { |tag| Gem::Version.new(tag) }
 
-              #Search matching version in array
-              matchingGitTags = git_tags.select do |version|
-                version.start_with?(versionRange)
+            # ~> should select the latest version withing constraints.
+            # -> should select a specific version without fallback.
+            if operator == "~>"
+              # Drop last specified digit in version
+              last_dot_index = version_number.rindex('.')
+              version_range = version_number[0..last_dot_index - 1]
+
+              # Search matching version in array
+              matching_git_tags = git_tags.select do |tag|
+                tag.start_with?(version_range)
               end
 
-              UI.user_error!("No version found within the \"#{versionRange}.*\" range") if matchingGitTags.count == 0
-              UI.user_error!("Specified version \"#{versionNumber}\" is to high. Latest version within this range is: \"#{matchingGitTags.last}\"") if Gem::Version.new(matchingGitTags.last) < Gem::Version.new(versionNumber)
-              checkout_param = matchingGitTags.last
+              UI.user_error!("No version found within the \"#{version_range}.*\" range") if matching_git_tags.count == 0
+              UI.user_error!("Specified version \"#{version_number}\" is to high. Latest version within this range is: \"#{matching_git_tags.last}\"") if Gem::Version.new(matching_git_tags.last) < Gem::Version.new(version_number)
+              checkout_param = matching_git_tags.last
 
-            elsif operator == "->" || splitVersion.count == 1
-              #Search matching version in array
-              matchingGitTags = git_tags.select do |version|
-                version == versionNumber
+            elsif operator == "->" || split_version.count == 1
+              # Search matching version in array
+              matching_git_tags = git_tags.select do |tag|
+                tag == version_number
               end
 
-              UI.user_error!("The specified version \"#{versionNumber}\" doesn't exist") if matchingGitTags.count == 0
-              checkout_param = matchingGitTags.last
+              UI.user_error!("The specified version \"#{version_number}\" doesn't exist") if matching_git_tags.count == 0
+              checkout_param = matching_git_tags.last
             else
               UI.user_error!("The specified operator \"#{operator}\" in \"#{version}\" is unknown. Please use one of these '~> ->'")
             end
           end
-            
+
           Actions.sh("cd '#{clone_folder}' && git checkout #{checkout_param} '#{path}'")
 
           # We also want to check out all the local actions of this fastlane setup

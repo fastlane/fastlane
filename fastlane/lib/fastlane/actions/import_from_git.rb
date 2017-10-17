@@ -34,7 +34,7 @@ module Fastlane
                                        default_value: 'fastlane/Fastfile',
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :version,
-                                       description: "The version to checkout on the respository. Optimistic operator can be used to select the latest version within constraints.",
+                                       description: "The version to checkout on the respository. Optimistic operator can be used to select the latest version within constraints",
                                        default_value: nil,
                                        optional: true)
         ]
