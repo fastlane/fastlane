@@ -191,7 +191,7 @@ module FastlaneCore
       os = self.operating_system
       case os
       when "macOS"
-        return `sw_vers -productVersion`.strip
+        system('sw_vers') ? return `sw_vers -productVersion`.strip : ''
       else
         # Need to test in Windows and Linux... not sure this is enough
         return Gem::Platform.local.version
