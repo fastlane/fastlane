@@ -2,7 +2,7 @@ require 'fastlane_core'
 require 'credentials_manager'
 
 module Deliver
-  class Options
+  class Options # rubocop:disable Metrics/ClassLength
     def self.available_options
       user = CredentialsManager::AppfileConfig.try_fetch_value(:itunes_connect_id)
       user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
@@ -205,6 +205,20 @@ module Deliver
                                      is_string: false,
                                      default_value: :warn),
 
+        # Territory availability
+        FastlaneCore::ConfigItem.new(key: :availability_all_territories,
+                                     description: "Set availability to all territories",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :availability_territories,
+                                     description: "List of country codes for territories to be enabled for sale",
+                                     type: Array,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :availability_exclude_territories,
+                                     description: "List of country codes for territories to be disabled for sale",
+                                     type: Array,
+                                     optional: true),
+
         # App Metadata
         # Non Localised
         FastlaneCore::ConfigItem.new(key: :app_icon,
@@ -325,5 +339,5 @@ module Deliver
                                      is_string: false)
       ]
     end
-  end
+  end # rubocop:enable ClassLength
 end

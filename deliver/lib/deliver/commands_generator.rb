@@ -1,5 +1,6 @@
 require 'commander'
 require 'deliver/download_screenshots'
+require 'deliver/availability'
 require 'fastlane/version'
 
 HighLine.track_eof = false
@@ -168,6 +169,24 @@ module Deliver
           end
 
           Deliver::Setup.new.generate_metadata_files(v, path)
+        end
+      end
+
+      command :download_availability do |c|
+        c.syntax = 'fastlane deliver download_availability'
+        c.description = "Downloads all territory availability from iTunes Connect and stores them in the metadata folder"
+
+        FastlaneCore::CommanderGenerator.new.generate(deliverfile_options, command: c)
+
+        c.action do |args, options|
+          options = FastlaneCore::Configuration.create(deliverfile_options(skip_verification: true), options.__hash__)
+          options.load_configuration_file("Deliverfile")
+          Deliver::Runner.new(options, skip_version: true) # to login...
+
+          path = File.join(options[:metadata_path], "territories.yml")
+          availability = Deliver::Availability.from_itunes_connect(options[:app])
+          availability.save_to_file(path)
+          UI.message("Downloaded territory availability")
         end
       end
 

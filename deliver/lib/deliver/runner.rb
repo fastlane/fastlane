@@ -23,6 +23,7 @@ module Deliver
     def run
       verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
       upload_metadata
+      upload_availability
 
       has_binary = (options[:ipa] || options[:pkg])
       if !options[:skip_binary_upload] && !options[:build_number] && has_binary
@@ -109,6 +110,30 @@ module Deliver
       upload_screenshots.upload(options, screenshots)
       UploadPriceTier.new.upload(options)
       UploadAssets.new.upload(options) # e.g. app icon
+    end
+
+    def upload_availability
+      file_path = File.join(options[:metadata_path], "territories.yml")
+
+      if options[:availability_all_territories] || options[:availability_territories] || options[:availability_exclude_territories]
+        config = Availability.from_options(options)
+      elsif File.exist?(file_path)
+        config = Availability.from_file(file_path)
+      else
+        return # skip if availability has not been set
+      end
+
+      config.validate
+      app = options[:app]
+      all_territories = app.client.supported_territories.map(&:code)
+      territories = config.territories(all_territories)
+
+      # convert country code format territories to Spaceship tunes availability for upload
+      tunes_territories = territories.map { |territory| Spaceship::Tunes::Territory.from_code(territory) }
+      availability = Spaceship::Tunes::Availability.from_territories(tunes_territories)
+      app.update_availability!(availability)
+
+      UI.success("Successfully set availability for #{territories.count} of #{all_territories.count} territories")
     end
 
     # If options[:app_icon]/options[:apple_watch_app_icon]
