@@ -54,8 +54,6 @@ describe Fastlane do
         end
 
         def ensure_dot_env_value_from_folders(folders, envs, expected_values)
-          # current limitation in FastlaneFolder.
-          allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
           folders.each do |dir|
             expected_values.each do |k, v|
               ENV.delete(k.to_s)
@@ -70,14 +68,9 @@ describe Fastlane do
         end
       end
 
-      describe "successfull init" do
+      describe "successful init" do
         before do
           allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(File.absolute_path('./fastlane/spec/fixtures/fastfiles/'))
-        end
-
-        it "Successfully collected all actions" do
-          ff = Fastlane::LaneManager.cruise_lane('ios', 'beta')
-          expect(ff.collector.launches).to eq({ default_platform: 1, frameit: 1, team_id: 2 })
         end
 
         it "Successfully handles exceptions" do

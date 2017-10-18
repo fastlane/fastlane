@@ -16,7 +16,9 @@ module Match
 
       unless password
         if !UI.interactive?
-          UI.error "No password found neither in environment nor in local keychain. Bailing out as in non interactive mode."
+          UI.error "Neither the MATCH_PASSWORD environment variable nor the local keychain contained a password."
+          UI.error "Bailing out instead of asking for a password, since this is non-interactive mode."
+          UI.user_error!("Try setting the MATCH_PASSWORD environment variable, or temporarily enable interactive mode to store a password.")
         else
           UI.important "Enter the passphrase that should be used to encrypt/decrypt your certificates"
           UI.important "This passphrase is specific per repository and will be stored in your local keychain"

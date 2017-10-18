@@ -493,7 +493,7 @@ function resign {
         log "Profile team identifier is '$TEAM_IDENTIFIER'"
     fi
 
-    # Make a copy of old embedded provisioning profile for futher use
+    # Make a copy of old embedded provisioning profile for further use
     cp -f "$APP_PATH/embedded.mobileprovision" "$TEMP_DIR/old-embedded.mobileprovision"
 
     # Replace embedded provisioning profile with new file
@@ -729,6 +729,9 @@ function resign {
 
         log "Removing blacklisted keys from patched profile"
         # See https://github.com/facebook/buck/issues/798 and https://github.com/facebook/buck/pull/802/files
+
+        # Update in https://github.com/facebook/buck/commit/99c0fbc3ab5ecf04d186913374f660683deccdef
+        # Update in https://github.com/facebook/buck/commit/36db188da9f6acbb9df419dc1904315ab00c4e19
         BLACKLISTED_KEYS=(\
             "com.apple.developer.icloud-container-development-container-identifiers" \
             "com.apple.developer.icloud-container-environment" \
@@ -741,10 +744,7 @@ function resign {
             "com.apple.developer.homekit" \
             "com.apple.developer.healthkit" \
             "com.apple.developer.in-app-payments" \
-            "com.apple.developer.associated-domains" \
-            "com.apple.security.application-groups" \
             "com.apple.developer.maps" \
-            "com.apple.developer.networking.vpn.api" \
             "com.apple.external-accessory.wireless-configuration"
         )
 

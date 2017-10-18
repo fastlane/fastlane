@@ -68,7 +68,6 @@ describe Spaceship::Application do
     describe "#create!" do
       it "works with valid data and defaults to English" do
         Spaceship::Tunes::Application.create!(name: "My name",
-                                              version: "1.0",
                                               sku: "SKU123",
                                               bundle_id: "net.sunapps.123")
       end
@@ -77,7 +76,6 @@ describe Spaceship::Application do
         TunesStubbing.itc_stub_broken_create
         expect do
           Spaceship::Tunes::Application.create!(name: "My Name",
-                                                version: "1.0",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.123")
         end.to raise_error "You must choose a primary language. You must choose a primary language."
@@ -87,7 +85,6 @@ describe Spaceship::Application do
         TunesStubbing.itc_stub_broken_create_wildcard
         expect do
           Spaceship::Tunes::Application.create!(name: "My Name",
-                                                version: "1.0",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.*")
         end.to raise_error "You must enter a Bundle ID Suffix. You must enter a Bundle ID Suffix."
@@ -98,7 +95,6 @@ describe Spaceship::Application do
       it "works with valid data and defaults to English" do
         TunesStubbing.itc_stub_applications_first_create
         Spaceship::Tunes::Application.create!(name: "My Name",
-                                              version: "1.0",
                                               sku: "SKU123",
                                               bundle_id: "net.sunapps.123",
                                               company_name: "SunApps GmbH")
@@ -108,7 +104,6 @@ describe Spaceship::Application do
         TunesStubbing.itc_stub_applications_broken_first_create
         expect do
           Spaceship::Tunes::Application.create!(name: "My Name",
-                                                version: "1.0",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.123")
         end.to raise_error "You must provide a company name to use on the App Store. You must provide a company name to use on the App Store."

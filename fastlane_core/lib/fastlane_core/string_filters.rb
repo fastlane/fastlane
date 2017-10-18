@@ -31,4 +31,21 @@ class String
 
     "#{self[0, stop]}#{omission}"
   end
+
+  # Base taken from: https://www.ruby-forum.com/topic/57805
+  def wordwrap(length = 80)
+    return [] if length == 0
+    self.gsub!(/(\S{#{length}})(?=\S)/, '\1 ')
+    self.scan(/.{1,#{length}}(?:\s+|$)/)
+  end
+
+  # Base taken from: http://stackoverflow.com/a/12202205/1945875
+  def middle_truncate(length = 20, options = {})
+    omission = options[:omission] || '...'
+    return self if self.length <= length + omission.length
+    return self[0..length] if length < omission.length
+    len = (length - omission.length) / 2
+    s_len = len - length % 2
+    self[0..s_len] + omission + self[self.length - len..self.length]
+  end
 end

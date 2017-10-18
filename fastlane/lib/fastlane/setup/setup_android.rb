@@ -1,7 +1,7 @@
 module Fastlane
   class SetupAndroid < Setup
     def run
-      response = agree('Do you have everything commited in version control? If not please do so now! (y/n)'.yellow, true)
+      response = UI.confirm('Do you have everything committed in version control? If not please do so now!')
       return unless response
 
       FastlaneCore::FastlaneFolder.create_folder! unless Helper.is_test?
@@ -49,7 +49,7 @@ module Fastlane
       question = "Do you plan on uploading metadata, screenshots and builds to Google Play using fastlane?".yellow
       UI.message(question)
       UI.message("This will download your existing metadata and screenshots into the `fastlane` folder")
-      if agree(question + " (y/n) ", true)
+      if UI.confirm(question)
         begin
           require 'supply'
           require 'supply/setup'

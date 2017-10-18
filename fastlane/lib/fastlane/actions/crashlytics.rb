@@ -39,7 +39,7 @@ module Fastlane
 
         error_callback = proc do |error|
           clean_error = sanitizer.call(error)
-          UI.error(clean_error)
+          UI.user_error!(clean_error)
         end
 
         result = Actions.sh_control_output(
@@ -65,7 +65,7 @@ module Fastlane
         platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
 
         if platform == :ios or platform.nil?
-          ipa_path_default = Dir["*.ipa"].last
+          ipa_path_default = Dir["*.ipa"].sort_by { |x| File.mtime(x) }.last
         end
 
         if platform == :android

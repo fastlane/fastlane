@@ -33,8 +33,8 @@ module Spaceship
       # @return (Hash) Feature details
       attr_accessor :features
 
-      # @return (Array) List of enabled features
-      attr_accessor :enabled_features
+      # @return (Array) List of enabled services
+      attr_accessor :enable_services
 
       # @return (Bool) Development Push Enabled?
       attr_accessor :dev_push_enabled
@@ -51,6 +51,9 @@ module Spaceship
       # @return (Fixnum) Number of associated identifiers
       attr_accessor :identifiers_count
 
+      # @return (Array of Spaceship::Portal::AppGroup) Associated groups
+      attr_accessor :associated_groups
+
       attr_mapping(
         'appIdId' => :app_id,
         'name' => :name,
@@ -59,7 +62,7 @@ module Spaceship
         'identifier' => :bundle_id,
         'isWildCard' => :is_wildcard,
         'features' => :features,
-        'enabledFeatures' => :enabled_features,
+        'enabledFeatures' => :enable_services,
         'isDevPushEnabled' => :dev_push_enabled,
         'isProdPushEnabled' => :prod_push_enabled,
         'associatedApplicationGroupsCount' => :app_groups_count,
@@ -71,7 +74,7 @@ module Spaceship
         # @param mac [Bool] Fetches Mac apps if true
         # @return (Array) Returns all apps available for this account
         def all(mac: false)
-          client.apps(mac: mac).map { |app| self.factory(app) }
+          client.apps(mac: mac).map { |app| self.new(app) }
         end
 
         # Creates a new App ID on the Apple Dev Portal
@@ -81,14 +84,14 @@ module Spaceship
         # @param name [String] the name of the App
         # @param mac [Bool] is this a Mac app?
         # @return (App) The app you just created
-        def create!(bundle_id: nil, name: nil, mac: false, enabled_features: {})
+        def create!(bundle_id: nil, name: nil, mac: false, enable_services: {})
           if bundle_id.end_with?('*')
             type = :wildcard
           else
             type = :explicit
           end
 
-          new_app = client.create_app!(type, name, bundle_id, mac: mac, enabled_features: enabled_features)
+          new_app = client.create_app!(type, name, bundle_id, mac: mac, enable_services: enable_services)
           self.new(new_app)
         end
 
@@ -96,9 +99,18 @@ module Spaceship
         # @param mac [Bool] Searches Mac apps if true
         # @return (App) The app you're looking for. This is nil if the app can't be found.
         def find(bundle_id, mac: false)
+          raise "`bundle_id` parameter must not be nil" if bundle_id.nil?
           all(mac: mac).find do |app|
             return app if app.bundle_id.casecmp(bundle_id) == 0
           end
+        end
+      end
+
+      def associated_groups
+        return unless raw_data.key?('associatedApplicationGroups')
+
+        @associated_groups ||= raw_data['associatedApplicationGroups'].map do |info|
+          Spaceship::Portal::AppGroup.new(info)
         end
       end
 
@@ -129,6 +141,13 @@ module Spaceship
       def associate_groups(groups)
         raise "`associate_groups` not available for Mac apps" if mac?
         app = client.associate_groups_with_app(self, groups)
+        self.class.factory(app)
+      end
+
+      # Associate specific merchants with this app
+      # @return (App) The updated detailed app. This is nil if the app couldn't be found
+      def associate_merchants(merchants)
+        app = client.associate_merchants_with_app(self, merchants, mac?)
         self.class.factory(app)
       end
 

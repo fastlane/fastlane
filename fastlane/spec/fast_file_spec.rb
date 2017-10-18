@@ -29,7 +29,12 @@ describe Fastlane do
 
       it "raises an exception if key doesn't exist at all" do
         expect(UI).to receive(:user_error!).with("Could not find 'asdf'. Available lanes: test, anotherroot, mac beta, ios beta, ios release, android beta, android witherror, android unsupported_action")
-        @ff.is_platform_block? "asdf"
+        @ff.is_platform_block?("asdf")
+      end
+
+      it "has an alias for `update`, if there is no lane called `update`" do
+        expect(Fastlane::OneOff).to receive(:run).with({ action: "update_fastlane", parameters: {} })
+        @ff.is_platform_block?("update")
       end
     end
 
@@ -155,7 +160,7 @@ describe Fastlane do
       end
 
       it "prints a warning if a lane is called like an action" do
-        expect(UI).to receive(:error).with("Name of the lane 'cocoapods' is already taken by the action named 'cocoapods'")
+        expect(UI).to receive(:important).with("Name of the lane 'cocoapods' is already taken by the action named 'cocoapods'")
         Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileLaneNameEqualsActionName')
       end
 
@@ -227,7 +232,7 @@ describe Fastlane do
       it "Exception in error block are swallowed and shown, and original exception is re-raised" do
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileErrorInError')
 
-        expect(FastlaneCore::UI).to receive(:error).with("An error occured while executing the `error` block:")
+        expect(FastlaneCore::UI).to receive(:error).with("An error occurred while executing the `error` block:")
         expect(FastlaneCore::UI).to receive(:error).with("Error in error")
 
         expect do
@@ -241,17 +246,6 @@ describe Fastlane do
           ff.runner.execute(:lane1, :ios)
 
           expect(File.read("/tmp/deliver_result.txt")).to eq("Lane 2 + parameter")
-        end
-
-        it "properly tracks the lane switches" do
-          ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
-          ff.runner.execute(:lane1, :ios)
-
-          expect(ff.collector.launches).to eq({
-            lane_switch: 1
-          })
-
-          expect(Fastlane::ActionCollector.new.is_official?(:lane_switch)).to eq(true)
         end
 
         it "use case 2: passing no parameter to a lane that takes parameters" do
@@ -327,6 +321,7 @@ describe Fastlane do
       end
 
       it "properly shows an error message when there is a syntax error in the Fastfile" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileSytnaxError')
       end
@@ -340,6 +335,7 @@ describe Fastlane do
       end
 
       it "properly shows an error message when there is a syntax error in the imported Fastfile" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile')
         expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
         ff.import('./FastfileSytnaxError')
@@ -365,6 +361,7 @@ describe Fastlane do
       end
 
       it "runs pod install" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect(Fastlane::Actions).to receive(:verify_gem!).with("cocoapods")
 
         result = Fastlane::FastFile.new.parse("lane :test do

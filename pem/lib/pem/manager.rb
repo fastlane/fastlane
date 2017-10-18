@@ -9,18 +9,18 @@ module PEM
         FastlaneCore::PrintTable.print_values(config: PEM.config, hide_keys: [:new_profile], title: "Summary for PEM #{Fastlane::VERSION}")
         login
 
-        existing_certificate = certificate.all.detect do |c|
+        existing_certificate = certificate_sorted.detect do |c|
           c.owner_name == PEM.config[:app_identifier]
         end
 
         if existing_certificate
           remaining_days = (existing_certificate.expires - Time.now) / 60 / 60 / 24
           UI.message "Existing push notification profile for '#{existing_certificate.owner_name}' is valid for #{remaining_days.round} more days."
-          if remaining_days > 30
+          if remaining_days > PEM.config[:active_days_limit]
             if PEM.config[:force]
               UI.success "You already have an existing push certificate, but a new one will be created since the --force option has been set."
             else
-              UI.success "You already have a push certificate, which is active for more than 30 more days. No need to create a new one"
+              UI.success "You already have a push certificate, which is active for more than #{PEM.config[:active_days_limit]} more days. No need to create a new one"
               UI.success "If you still want to create a new one, use the --force option when running PEM."
               return false
             end
@@ -87,6 +87,10 @@ module PEM
         else
           Spaceship.certificate.production_push
         end
+      end
+
+      def certificate_sorted
+        certificate.all.sort { |x, y| y.expires <=> x.expires }
       end
     end
   end

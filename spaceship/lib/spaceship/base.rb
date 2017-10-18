@@ -20,8 +20,14 @@ module Spaceship
   # When you want to instantiate a model pass in the parsed response: `Widget.new(widget_json)`
   class Base
     class DataHash
+      include Enumerable
+
       def initialize(hash)
         @hash = hash || {}
+      end
+
+      def key?(key)
+        @hash.key?(key)
       end
 
       def get(*keys)
@@ -37,6 +43,10 @@ module Spaceship
         ref[last] = value
       end
 
+      def delete(key)
+        @hash.delete(key)
+      end
+
       def lookup(keys)
         head, *tail = *keys
         if tail.empty?
@@ -46,10 +56,18 @@ module Spaceship
         end
       end
 
+      def each(&block)
+        @hash.each(&block)
+      end
+
       def to_json(*a)
         h = @hash.dup
         h.delete(:application)
         h.to_json(*a)
+      end
+
+      def to_h
+        @hash.dup
       end
     end
 

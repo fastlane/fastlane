@@ -9,7 +9,8 @@ describe Match::Generator do
         force: true,
         username: 'username',
         team_id: 'team_id',
-        keychain_path: FastlaneCore::Helper.keychain_path("login.keychain")
+        keychain_path: FastlaneCore::Helper.keychain_path("login.keychain"),
+        keychain_password: 'password'
       })
 
       # This is the important part. We need to see the right configuration come through
@@ -27,7 +28,8 @@ describe Match::Generator do
         workspace: 'workspace',
         username: 'username',
         team_id: 'team_id',
-        keychain_name: 'login.keychain'
+        keychain_name: 'login.keychain',
+        keychain_password: 'password'
       }
 
       Match::Generator.generate_certificate(params, 'development')
@@ -46,7 +48,8 @@ describe Match::Generator do
         provisioning_name: 'match Development app_identifier',
         ignore_profiles_with_different_name: true,
         team_id: 'team_id',
-        platform: :ios
+        platform: :ios,
+        template_name: 'template_name'
       })
 
       # This is the important part. We need to see the right configuration come through
@@ -63,7 +66,8 @@ describe Match::Generator do
         workspace: 'workspace',
         username: 'username',
         team_id: 'team_id',
-        platform: :ios
+        platform: :ios,
+        template_name: 'template_name'
       }
       Match::Generator.generate_provisioning_profile(params: params, prov_type: :development, certificate_id: 'fake_cert_id', app_identifier: params[:app_identifier])
     end

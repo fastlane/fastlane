@@ -24,6 +24,11 @@ module FastlaneCore
       defined? SpecHelper
     end
 
+    # @return true if it is enabled to execute external commands
+    def self.sh_enabled?
+      !self.test?
+    end
+
     # removes ANSI colors from string
     def self.strip_ansi_colors(str)
       str.gsub(/\e\[([;\d]+)?m/, '')
@@ -118,11 +123,6 @@ module FastlaneCore
       FastlaneCore::Env.truthy?("TERM_PROGRAM_VERSION")
     end
 
-    # Does the user use iTerm?
-    def self.iterm?
-      FastlaneCore::Env.truthy?("ITERM_SESSION_ID")
-    end
-
     # Logs base directory
     def self.buildlog_path
       return ENV["FL_BUILDLOG_PATH"] || "~/Library/Logs"
@@ -140,16 +140,25 @@ module FastlaneCore
 
     # @return The version of the currently used Xcode installation (e.g. "7.0")
     def self.xcode_version
-      return @xcode_version if @xcode_version
+      return nil unless self.is_mac?
+      return @xcode_version if @xcode_version && @developer_dir == ENV['DEVELOPER_DIR']
 
       begin
         output = `DEVELOPER_DIR='' "#{xcode_path}/usr/bin/xcodebuild" -version`
         @xcode_version = output.split("\n").first.split(' ')[1]
+        @developer_dir = ENV['DEVELOPER_DIR']
       rescue => ex
         UI.error(ex)
         UI.user_error!("Error detecting currently used Xcode installation, please ensure that you have Xcode installed and set it using `sudo xcode-select -s [path]`")
       end
       @xcode_version
+    end
+
+    # @return true if Xcode version is higher than 8.3
+    def self.xcode_at_least?(version)
+      FastlaneCore::UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if xcode_version.nil?
+      v = xcode_version
+      Gem::Version.new(v) >= Gem::Version.new(version)
     end
 
     def self.transporter_java_executable_path
@@ -178,7 +187,7 @@ module FastlaneCore
     end
 
     def self.keychain_path(name)
-      # Existing code expects that a keychain name will be expanded into a default path to Libary/Keychains
+      # Existing code expects that a keychain name will be expanded into a default path to Library/Keychains
       # in the user's home directory. However, this will not allow the user to pass an absolute path
       # for the keychain value
       #
@@ -208,7 +217,7 @@ module FastlaneCore
         keychain_paths << "#{location}.keychain"
       end
 
-      keychain_path = keychain_paths.find { |path| File.exist?(path) }
+      keychain_path = keychain_paths.find { |path| File.file?(path) }
       UI.user_error!("Could not locate the provided keychain. Tried:\n\t#{keychain_paths.join("\n\t")}") unless keychain_path
       keychain_path
     end
@@ -230,7 +239,12 @@ module FastlaneCore
 
     def self.fastlane_enabled?
       # This is called from the root context on the first start
-      @enabled ||= (File.directory?("./fastlane") || File.directory?("./.fastlane"))
+      @enabled ||= !FastlaneCore::FastlaneFolder.path.nil?
+    end
+
+    # Checks if fastlane is enabled for this project and returns the folder where the configuration lives
+    def self.fastlane_enabled_folder_path
+      fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
     end
 
     # <b>DEPRECATED:</b> Use the `ROOT` constant from the appropriate tool module instead

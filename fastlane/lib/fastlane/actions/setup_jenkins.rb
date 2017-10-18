@@ -5,6 +5,7 @@ module Fastlane
         "BACKUP_XCARCHIVE_DESTINATION",
         "DERIVED_DATA_PATH",
         "FL_CARTHAGE_DERIVED_DATA",
+        "FL_SLATHER_BUILD_DIRECTORY",
         "GYM_BUILD_PATH",
         "GYM_CODE_SIGNING_IDENTITY",
         "GYM_DERIVED_DATA_PATH",
@@ -67,6 +68,7 @@ module Fastlane
           ENV['GYM_DERIVED_DATA_PATH'] = derived_data_path
           ENV['SCAN_DERIVED_DATA_PATH'] = derived_data_path
           ENV['FL_CARTHAGE_DERIVED_DATA'] = derived_data_path
+          ENV['FL_SLATHER_BUILD_DIRECTORY'] = derived_data_path
         end
 
         # Set result bundle
@@ -156,7 +158,7 @@ module Fastlane
                                        default_value: "./output"),
           FastlaneCore::ConfigItem.new(key: :derived_data_path,
                                        env_name: "FL_SETUP_JENKINS_DERIVED_DATA_PATH",
-                                       description: "The directory where build products and other derived data will go",
+                                       description: "The directory where built products and other derived data will go",
                                        is_string: true,
                                        default_value: "./derivedData"),
           FastlaneCore::ConfigItem.new(key: :result_bundle,

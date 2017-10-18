@@ -18,8 +18,8 @@ describe Scan do
     iPad Retina (07773A11-417D-4D4C-BC25-1C3444D50836) (Shutdown)
     iPad Air (2ABEAF08-E480-4617-894F-6BAB587E7963) (Shutdown)
     iPad Air 2 (DA6C7D10-564B-4563-884D-834EF4F10FB9) (Shutdown)
-    iPad Pro (9.7 inch) (C051C63B-EDF7-4871-860A-BF975B517E94) (Shutdown)
-    iPad Pro (12.9 inch) (EED6BFB4-5DD9-48AB-8573-5172EF6F2A93) (Shutdown)
+    iPad Pro (9.7-inch) (C051C63B-EDF7-4871-860A-BF975B517E94) (Shutdown)
+    iPad Pro (12.9-inch) (EED6BFB4-5DD9-48AB-8573-5172EF6F2A93) (Shutdown)
 -- iOS 9.3 --
     iPhone 4s (238767C4-AF29-4485-878C-7011B98DCB87) (Shutdown)
     iPhone 5 (B8E05CCB-B97A-41FC-A8A8-2771711690B5) (Shutdown)
@@ -69,6 +69,10 @@ describe Scan do
   end
 
   describe Scan::TestCommandGenerator do
+    before(:each) do
+      @test_command_generator = Scan::TestCommandGenerator.new
+    end
+
     it "raises an exception when project path wasn't found" do
       expect do
         options = { project: "/notExistent" }
@@ -78,6 +82,7 @@ describe Scan do
 
     describe "Supports toolchain" do
       it "should fail if :xctestrun and :toolchain is set" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(".")
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             scan(
@@ -93,7 +98,7 @@ describe Scan do
         options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", toolchain: "com.apple.dt.toolchain.Swift_2_3" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-        result = Scan::TestCommandGenerator.generate
+        result = @test_command_generator.generate
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",
@@ -116,7 +121,7 @@ describe Scan do
       options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", xcargs: xcargs }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-      result = Scan::TestCommandGenerator.generate
+      result = @test_command_generator.generate
       expect(result).to start_with([
                                      "set -o pipefail &&",
                                      "env NSUnbufferedIO=YES xcodebuild",
@@ -135,7 +140,7 @@ describe Scan do
       options = { formatter: "custom-formatter", project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0" }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-      result = Scan::TestCommandGenerator.generate
+      result = @test_command_generator.generate
       expect(result.last).to include("| xcpretty -f `custom-formatter`")
     end
 
@@ -148,7 +153,7 @@ describe Scan do
       it "uses the correct build command with the example project with no additional parameters" do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-        result = Scan::TestCommandGenerator.generate
+        result = @test_command_generator.generate
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",
@@ -162,12 +167,12 @@ describe Scan do
       end
 
       it "#project_path_array" do
-        result = Scan::TestCommandGenerator.project_path_array
+        result = @test_command_generator.project_path_array
         expect(result).to eq(["-scheme app", "-project ./scan/examples/standard/app.xcodeproj"])
       end
 
       it "#build_path" do
-        result = Scan::TestCommandGenerator.build_path
+        result = @test_command_generator.build_path
         regex = %r{Library/Developer/Xcode/Archives/\d\d\d\d\-\d\d\-\d\d}
         expect(result).to match(regex)
       end
@@ -175,12 +180,12 @@ describe Scan do
       it "#buildlog_path is used when provided" do
         options = { project: "./scan/examples/standard/app.xcodeproj", buildlog_path: "/tmp/my/path" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-        result = Scan::TestCommandGenerator.xcodebuild_log_path
+        result = @test_command_generator.xcodebuild_log_path
         expect(result).to include("/tmp/my/path")
       end
 
       it "#buildlog_path is not used when not provided" do
-        result = Scan::TestCommandGenerator.xcodebuild_log_path
+        result = @test_command_generator.xcodebuild_log_path
         expect(result.to_s).to include(File.expand_path("#{FastlaneCore::Helper.buildlog_path}/scan"))
       end
     end
@@ -194,7 +199,7 @@ describe Scan do
       it "uses the correct build command with the example project" do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-        result = Scan::TestCommandGenerator.generate
+        result = @test_command_generator.generate
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",
@@ -217,33 +222,27 @@ describe Scan do
             devices: ["iPhone 6s", "iPad Air"],
             project: './scan/examples/standard/app.xcodeproj'
           })
-          expect(FileUtils).to receive(:cp_r).with(/.*/, /system_logs-iPhone 6s_iOS_10.0.logarchive/)
-          expect(FileUtils).to receive(:cp_r).with(/.*/, /system_logs-iPad Air_iOS_10.0.logarchive/)
+          Scan.cache[:temp_junit_report] = './scan/spec/fixtures/boring.log'
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
-            with(command: "xcrun simctl getenv 021A465B-A294-4D9E-AD07-6BDC8E186343 SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true).
-            and_return("/tmp/folder")
+            with(command: "xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect --output /tmp/scan_results/system_logs-iPhone\\ 6s_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
-            with(command: "xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect 2>/dev/null", print_all: false, print_command: true).
-            and_return("/tmp/folder")
+            with(command: "xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect --output /tmp/scan_results/system_logs-iPad\\ Air_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
 
-          expect(FastlaneCore::CommandExecutor).
-            to receive(:execute).
-            with(command: "xcrun simctl getenv 2ABEAF08-E480-4617-894F-6BAB587E7963 SIMULATOR_SHARED_RESOURCES_DIRECTORY 2>/dev/null", print_all: false, print_command: true).
-            and_return("/tmp/folder")
-
-          expect(FastlaneCore::CommandExecutor).
-            to receive(:execute).
-            with(command: "xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect 2>/dev/null", print_all: false, print_command: true).
-            and_return("/tmp/folder")
+          mock_test_result_parser = Object.new
+          allow(Scan::TestResultParser).to receive(:new).and_return(mock_test_result_parser)
+          allow(mock_test_result_parser).to receive(:parse_result).and_return({ tests: 100, failures: 0 })
 
           mock_slack_poster = Object.new
           allow(Scan::SlackPoster).to receive(:new).and_return(mock_slack_poster)
           allow(mock_slack_poster).to receive(:run)
-          allow(Scan::TestCommandGenerator).to receive(:xcodebuild_log_path).and_return('./scan/spec/fixtures/boring.log')
+
+          mock_test_command_generator = Object.new
+          allow(Scan::TestCommandGenerator).to receive(:new).and_return(mock_test_command_generator)
+          allow(mock_test_command_generator).to receive(:xcodebuild_log_path).and_return('./scan/spec/fixtures/boring.log')
 
           Scan::Runner.new.handle_results(0)
         end
@@ -257,7 +256,7 @@ describe Scan do
         options = { project: "./scan/examples/standard/app.xcodeproj", result_bundle: true, scheme: 'app' }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-        result = Scan::TestCommandGenerator.generate
+        result = @test_command_generator.generate
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",
@@ -280,7 +279,7 @@ describe Scan do
                     only_testing: %w(TestBundleA/TestSuiteB TestBundleC) }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-        result = Scan::TestCommandGenerator.generate
+        result = @test_command_generator.generate
 
         expect(result).to start_with([
                                        "set -o pipefail &&",
@@ -303,7 +302,7 @@ describe Scan do
                     only_testing: 'TestBundleA/TestSuiteB' }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-        result = Scan::TestCommandGenerator.generate
+        result = @test_command_generator.generate
 
         expect(result).to start_with([
                                        "set -o pipefail &&",
@@ -325,7 +324,7 @@ describe Scan do
                     skip_testing: %w(TestBundleA/TestSuiteB TestBundleC) }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-        result = Scan::TestCommandGenerator.generate
+        result = @test_command_generator.generate
 
         expect(result).to start_with([
                                        "set -o pipefail &&",
@@ -348,7 +347,7 @@ describe Scan do
                     skip_testing: 'TestBundleA/TestSuiteB' }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-        result = Scan::TestCommandGenerator.generate
+        result = @test_command_generator.generate
 
         expect(result).to start_with([
                                        "set -o pipefail &&",
@@ -368,7 +367,7 @@ describe Scan do
       options = { project: "./scan/examples/standard/app.xcodeproj", device: "iPhone 6s" }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-      result = Scan::TestCommandGenerator.generate
+      result = @test_command_generator.generate
       expect(result).to start_with([
                                      "set -o pipefail &&",
                                      "env NSUnbufferedIO=YES xcodebuild",
@@ -386,7 +385,7 @@ describe Scan do
       options = { project: "./scan/examples/standard/app.xcodeproj", device: "iPhone 5 (8.4)" }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-      result = Scan::TestCommandGenerator.generate
+      result = @test_command_generator.generate
       # FIXME: expect UI error starting "No simulators found that are equal to the version of specifier"
     end
 
@@ -401,7 +400,7 @@ describe Scan do
 
       it "should build-for-testing" do
         Scan.config[:build_for_testing] = true
-        result = Scan::TestCommandGenerator.generate
+        result = @test_command_generator.generate
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",
@@ -415,7 +414,7 @@ describe Scan do
       end
       it "should test-without-building" do
         Scan.config[:test_without_building] = true
-        result = Scan::TestCommandGenerator.generate
+        result = @test_command_generator.generate
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",
@@ -428,6 +427,7 @@ describe Scan do
                                      ])
       end
       it "should raise an exception if two build_modes are set" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(".")
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             scan(
@@ -441,7 +441,7 @@ describe Scan do
 
       it "should run tests from xctestrun file" do
         Scan.config[:xctestrun] = "/folder/mytests.xctestrun"
-        result = Scan::TestCommandGenerator.generate
+        result = @test_command_generator.generate
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",
@@ -462,7 +462,7 @@ describe Scan do
         ] }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-        result = Scan::TestCommandGenerator.generate
+        result = @test_command_generator.generate
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",
@@ -483,7 +483,7 @@ describe Scan do
         ] }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-        result = Scan::TestCommandGenerator.generate
+        result = @test_command_generator.generate
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",
@@ -504,7 +504,7 @@ describe Scan do
         ] }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-        result = Scan::TestCommandGenerator.generate
+        result = @test_command_generator.generate
         expect(result).to start_with([
                                        "set -o pipefail &&",
                                        "env NSUnbufferedIO=YES xcodebuild",

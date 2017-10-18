@@ -16,10 +16,23 @@ module Spaceship
         'name.value' => :name
       })
 
-      class << self
-        def factory(attrs)
-          return self.new(attrs)
+      def versions=(value = {})
+        if value.kind_of?(Array)
+          # input that comes from iTC api
+          return
         end
+        new_versions = []
+        value.each do |language, current_version|
+          new_versions << {
+            "value" =>   {
+              "subscriptionName" =>  { "value" => current_version[:subscription_name] },
+              "name" =>  { "value" => current_version[:name] },
+              "localeCode" => { "value" => language }
+            }
+          }
+        end
+
+        raw_data.set(["details"], { "value" => new_versions })
       end
 
       # @return (Hash) localized names
@@ -42,15 +55,15 @@ module Spaceship
         versions_array = []
         versions.each do |language_code, value|
           versions_array << {
-                               value: {
-                                 subscriptionName: { value: value[:subscription_name] },
-                                 name: { value: value[:name] },
-                                 localeCode: { value: language_code.to_s }
+                               "value" => {
+                                 "subscriptionName" => { "value" => value[:subscription_name] },
+                                 "name" => { "value" => value[:name] },
+                                 "localeCode" => { "value" => language_code.to_s }
                                }
                             }
         end
 
-        raw_data.set(["details"], { value: versions_array })
+        raw_data.set(["details"], { "value" => versions_array })
 
         client.update_iap_family!(app_id: application.apple_id, family_id: self.family_id, data: raw_data)
       end

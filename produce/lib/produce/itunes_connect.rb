@@ -21,15 +21,14 @@ module Produce
         UI.success "Creating new app '#{Produce.config[:app_name]}' on iTunes Connect"
 
         Produce.config[:bundle_identifier_suffix] = '' unless wildcard_bundle?
-
         generated_app = Spaceship::Tunes::Application.create!(name: Produce.config[:app_name],
                                                               primary_language: language,
-                                                              version: Produce.config[:app_version] || "1.0",
                                                               sku: Produce.config[:sku].to_s, # might be an int
                                                               bundle_id: app_identifier,
                                                               bundle_id_suffix: Produce.config[:bundle_identifier_suffix],
                                                               company_name: Produce.config[:company_name],
-                                                              platform: Produce.config[:platform])
+                                                              platform: Produce.config[:platform],
+                                                              itunes_connect_users: Produce.config[:itc_users])
 
         UI.crash!("Something went wrong when creating the new app on iTC") if generated_app["adamId"].to_s.empty?
 
@@ -47,6 +46,9 @@ module Produce
         end
 
         UI.crash!("Something went wrong when creating the new app - it's not listed in the App's list") unless application
+
+        UI.message("Ensuring version number")
+        application.ensure_version!(Produce.config[:app_version], platform: Produce.config[:platform]) if Produce.config[:app_version]
 
         UI.success "Successfully created new app '#{Produce.config[:app_name]}' on iTunes Connect with ID #{application.apple_id}"
       end

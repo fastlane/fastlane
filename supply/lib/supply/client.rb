@@ -40,7 +40,7 @@ module Supply
     # Initializes the android_publisher and its auth_client using the specified information
     # @param service_account_json: The raw service account Json data
     # @param path_to_key: The path to your p12 file (@deprecated)
-    # @param issuer: Email addresss for oauth (@deprecated)
+    # @param issuer: Email address for oauth (@deprecated)
     def initialize(path_to_key: nil, issuer: nil, service_account_json: nil)
       scope = Androidpublisher::AUTH_ANDROIDPUBLISHER
 
@@ -68,12 +68,17 @@ module Supply
 
       Google::Apis::ClientOptions.default.application_name = "fastlane - supply"
       Google::Apis::ClientOptions.default.application_version = Fastlane::VERSION
-      Google::Apis::RequestOptions.default.timeout_sec = 300
-      Google::Apis::RequestOptions.default.open_timeout_sec = 300
+      Google::Apis::ClientOptions.default.read_timeout_sec = 300
+      Google::Apis::ClientOptions.default.open_timeout_sec = 300
       Google::Apis::RequestOptions.default.retries = 5
 
       self.android_publisher = Androidpublisher::AndroidPublisherService.new
       self.android_publisher.authorization = auth_client
+      if Supply.config[:root_url]
+        # Google's client expects the root_url string to end with "/".
+        Supply.config[:root_url] << '/' unless Supply.config[:root_url].end_with?('/')
+        self.android_publisher.root_url = Supply.config[:root_url]
+      end
     end
 
     #####################################################
@@ -156,7 +161,7 @@ module Supply
 
       result = call_google_api { android_publisher.list_apks(current_package_name, current_edit.id) }
 
-      return result.apks.map(&:version_code)
+      return Array(result.apks).map(&:version_code)
     end
 
     # Get a list of all apk listings (changelogs) - returns the list
@@ -257,15 +262,17 @@ module Supply
     def track_version_codes(track)
       ensure_active_edit!
 
-      result = call_google_api do
-        android_publisher.get_track(
+      begin
+        result = android_publisher.get_track(
           current_package_name,
           current_edit.id,
           track
         )
+        return result.version_codes
+      rescue Google::Apis::ClientError => e
+        return [] if e.status_code == 404 && e.to_s.include?("trackEmpty")
+        raise
       end
-
-      return result.version_codes
     end
 
     def update_apk_listing_for_language(apk_listing)

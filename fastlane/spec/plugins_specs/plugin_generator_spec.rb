@@ -225,6 +225,7 @@ describe Fastlane::PluginGenerator do
           Gem::Dependency.new("rspec", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("rake", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("rubocop", Gem::Requirement.new([">= 0"]), :development),
+          Gem::Dependency.new("simplecov", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("fastlane", Gem::Requirement.new([">= #{Fastlane::VERSION}"]), :development)
         )
       end
@@ -273,36 +274,37 @@ describe Fastlane::PluginGenerator do
     end
 
     describe "All tests and style validation of the new plugin are passing" do
+      before (:all) do
+        # let(:gem_name) is not available in before(:all), so pass the directory
+        # in explicitly once instead of making this a before(:each)
+        plugin_sh 'bundle install', 'fastlane-plugin-tester_thing'
+      end
+
       it "rspec tests are passing" do
         # Actually run our generated spec as part of this spec #yodawg
-        Dir.chdir(gem_name) do
-          Bundler.setup do
-            `rspec &> /dev/null`
-            expect($?.exitstatus).to be(0)
-          end
-        end
+        plugin_sh 'bundle exec rspec'
+        expect($?.exitstatus).to eq(0)
       end
 
       it "rubocop validations are passing" do
         # Actually run our generated spec as part of this spec #yodawg
-        Dir.chdir(gem_name) do
-          Bundler.setup do
-            `rubocop &> /dev/null`
-            expect($?.exitstatus).to be(0)
-          end
-        end
+        plugin_sh 'bundle exec rubocop'
+        expect($?.exitstatus).to eq(0)
       end
 
       it "`rake` runs both rspec and rubocop" do
-        Dir.chdir(gem_name) do
-          Bundler.setup do
-            result = `rake`
-            expect($?.exitstatus).to be(0)
-            expect(result).to include("no offenses detected") # rubocop
-            expect(result).to include("example, 0 failures") # rspec
-          end
-        end
+        # Actually run our generated spec as part of this spec #yodawg
+        result = plugin_sh 'bundle exec rake'
+        expect($?.exitstatus).to eq(0)
+        expect(result).to include("no offenses detected") # rubocop
+        expect(result).to include("example, 0 failures") # rspec
       end
     end
+  end
+
+  private
+
+  def plugin_sh(command, plugin_path = gem_name)
+    Dir.chdir(plugin_path) { |path| `#{command}` }
   end
 end

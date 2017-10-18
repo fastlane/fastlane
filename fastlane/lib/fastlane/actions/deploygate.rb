@@ -30,9 +30,9 @@ module Fastlane
           file: Faraday::UploadIO.new(binary, 'application/octet-stream'),
           message: options[:message] || ''
         })
+        options[:disable_notify] = 'yes' if options[:disable_notify]
 
         connection.post("/api/users/#{user_name}/apps", options)
-
       rescue Faraday::Error::TimeoutError
         UI.crash! "Timed out while uploading build. Check https://deploygate.com/ to see if the upload was completed."
       end

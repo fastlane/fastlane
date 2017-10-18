@@ -67,7 +67,7 @@ module Screengrab
 
       number_of_screenshots = pull_screenshots_from_device(device_serial, device_screenshots_paths, device_type_dir_name)
 
-      open_screenshots_summary(device_type_dir_name)
+      ReportsGenerator.new.generate
 
       UI.success "Captured #{number_of_screenshots} screenshots! 📷✨"
     end
@@ -77,11 +77,12 @@ module Screengrab
       # the first output by adb devices is "List of devices attached" so remove that and any adb startup output
       devices.reject! do |device|
         [
-          'server is out of date',   # The adb server is out of date and must be restarted
-          'unauthorized',            # The device has not yet accepted ADB control
-          'offline',                 # The device is offline, skip it
-          '* daemon',                # Messages printed when the daemon is starting up
-          'List of devices attached' # Header of table for data we want
+          'server is out of date',    # The adb server is out of date and must be restarted
+          'unauthorized',             # The device has not yet accepted ADB control
+          'offline',                  # The device is offline, skip it
+          '* daemon',                 # Messages printed when the daemon is starting up
+          'List of devices attached', # Header of table for data we want
+          "doesn't match this client" # Message printed when there is an ADB client/server version mismatch
         ].any? { |status| device.include? status }
       end
 
@@ -249,10 +250,12 @@ module Screengrab
                                     print_all: true,
                                     print_command: true)
 
-      if @config[:exit_on_test_failure]
-        UI.user_error!("Tests failed", show_github_issues: false) if test_output.include?("FAILURES!!!")
-      else
-        UI.error("Tests failed") if test_output.include?("FAILURES!!!")
+      if test_output.include?("FAILURES!!!")
+        if @config[:exit_on_test_failure]
+          UI.test_failure!("Tests failed for locale #{locale} on device #{device_serial}")
+        else
+          UI.error("Tests failed")
+        end
       end
     end
 
@@ -289,7 +292,7 @@ module Screengrab
       # success based on whether there are more screenshots there than when we started.
       if starting_screenshot_count == ending_screenshot_count
         UI.error "Make sure you've used Screengrab.screenshot() in your tests and that your expected tests are being run."
-        UI.user_error! "No screenshots were detected 📷❌"
+        UI.abort_with_message! "No screenshots were detected 📷❌"
       end
 
       ending_screenshot_count - starting_screenshot_count
@@ -338,16 +341,6 @@ module Screengrab
     rescue
       # Some versions of ADB will have a non-zero exit status for this, which will cause the executor to raise.
       # We can safely ignore that and treat it as if it returned 'No such file'
-    end
-
-    def open_screenshots_summary(device_type_dir_name)
-      unless @config[:skip_open_summary]
-        UI.message "Opening screenshots summary"
-        # MCF: this isn't OK on any platform except Mac
-        run_adb_command("open #{@config[:output_directory]}/*/images/#{device_type_dir_name}/*.png",
-                        print_all: false,
-                        print_command: true)
-      end
     end
 
     def run_adb_command(command, print_all: false, print_command: false)

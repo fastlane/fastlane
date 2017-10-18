@@ -1,3 +1,5 @@
+require 'tempfile'
+
 module FastlaneCore
   # This class checks if a specific certificate is installed on the current mac
   class CertChecker
@@ -54,14 +56,13 @@ module FastlaneCore
     end
 
     def self.install_wwdr_certificate
-      Dir.chdir('/tmp') do
-        url = 'https://developer.apple.com/certificationauthority/AppleWWDRCA.cer'
-        filename = File.basename(url)
-        keychain = wwdr_keychain
-        keychain = "-k #{keychain.shellescape}" unless keychain.empty?
-        Helper.backticks("curl -O #{url} && security import #{filename} #{keychain}", print: FastlaneCore::Globals.verbose?)
-        UI.user_error!("Could not install WWDR certificate") unless $?.success?
-      end
+      url = 'https://developer.apple.com/certificationauthority/AppleWWDRCA.cer'
+      file = Tempfile.new('AppleWWDRCA')
+      filename = file.path
+      keychain = wwdr_keychain
+      keychain = "-k #{keychain.shellescape}" unless keychain.empty?
+      Helper.backticks("curl -f -o #{filename} #{url} && security import #{filename} #{keychain}", print: FastlaneCore::Globals.verbose?)
+      UI.user_error!("Could not install WWDR certificate") unless $?.success?
     end
 
     def self.wwdr_keychain

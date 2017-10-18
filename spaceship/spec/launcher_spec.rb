@@ -39,7 +39,7 @@ describe Spaceship do
     end
 
     it "ProvisioningProfile" do
-      expect(spaceship1.provisioning_profile.all.count).to eq(6)
+      expect(spaceship1.provisioning_profile.all.count).to eq(7)
     end
 
     it "App" do
@@ -57,7 +57,21 @@ describe Spaceship do
       it "shouldn't fail if provisioning_profile is invoked before app and device" do
         clean_launcher = Spaceship::Launcher.new
         clean_launcher.login(username, password)
-        expect(clean_launcher.provisioning_profile.all.count).to eq(6)
+        expect(clean_launcher.provisioning_profile.all.count).to eq(7)
+      end
+
+      it "shouldn't fail if trying to create new apns_certificate before app is invoked" do
+        clean_launcher = Spaceship::Launcher.new
+        clean_launcher.login(username, password)
+
+        expect(clean_launcher.client).to receive(:create_certificate!).with('BKLRAVXMGM', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA', false) do
+          JSON.parse(PortalStubbing.adp_read_fixture_file('certificateCreate.certRequest.json'))
+        end
+
+        csr, pkey = Spaceship::Portal::Certificate.create_certificate_signing_request
+        expect do
+          clean_launcher.certificate.development_push.create!(csr: csr, bundle_id: 'net.sunapps.151')
+        end.to_not raise_error
       end
     end
   end

@@ -10,6 +10,7 @@ require 'spaceship/portal/spaceship'
 # iTunes Connect
 require 'spaceship/tunes/tunes'
 require 'spaceship/tunes/spaceship'
+require 'spaceship/test_flight'
 
 # To support legacy code
 module Spaceship
@@ -21,8 +22,10 @@ module Spaceship
   Device = Spaceship::Portal::Device
   App = Spaceship::Portal::App
   AppGroup = Spaceship::Portal::AppGroup
+  Passbook = Spaceship::Portal::Passbook
   WebsitePush = Spaceship::Portal::WebsitePush
   AppService = Spaceship::Portal::AppService
+  Merchant = Spaceship::Portal::Merchant
 
   # iTunes Connect
   AppVersion = Spaceship::Tunes::AppVersion

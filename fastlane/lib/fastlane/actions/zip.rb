@@ -4,16 +4,26 @@ module Fastlane
       def self.run(params)
         UI.message "Compressing #{params[:path]}..."
 
-        params[:output_path] ||= "#{params[:path]}.zip"
+        params[:output_path] ||= params[:path]
+
+        absolute_output_path = File.expand_path(params[:output_path])
+
+        # Appends ".zip" if path does not end in ".zip"
+        unless absolute_output_path.end_with?(".zip")
+          absolute_output_path += ".zip"
+        end
+
+        absolute_output_dir = File.expand_path("..", absolute_output_path)
+        FileUtils.mkdir_p(absolute_output_dir)
 
         Dir.chdir(File.expand_path("..", params[:path])) do # required to properly zip
           zip_options = params[:verbose] ? "r" : "rq"
 
-          Actions.sh "zip -#{zip_options} #{params[:output_path].shellescape} #{File.basename(params[:path]).shellescape}"
+          Actions.sh "zip -#{zip_options} #{absolute_output_path.shellescape} #{File.basename(params[:path]).shellescape}"
         end
 
-        UI.success "Successfully generated zip file at path '#{File.expand_path(params[:output_path])}'"
-        return File.expand_path(params[:output_path])
+        UI.success "Successfully generated zip file at path '#{File.expand_path(absolute_output_path)}'"
+        return File.expand_path(absolute_output_path)
       end
 
       #####################################################

@@ -3,13 +3,15 @@ module Fastlane
     class CrashlyticsHelper
       class << self
         def discover_default_crashlytics_path
-          Dir["./Pods/iOS/Crashlytics/Crashlytics.framework"].last || Dir["./**/Crashlytics.framework"].last
+          path = Dir["./Pods/iOS/Crashlytics/Crashlytics.framework"].last || Dir["./**/Crashlytics.framework"].last
+          unless path
+            UI.user_error!("Couldn't find Crashlytics.framework in current directory. Make sure to add the 'Crashlytics' pod to your 'Podfile' and run `pod update`")
+          end
+          return path
         end
 
         def generate_ios_command(params)
-          unless params[:crashlytics_path]
-            params[:crashlytics_path] = discover_default_crashlytics_path
-          end
+          params[:crashlytics_path] ||= discover_default_crashlytics_path
 
           UI.user_error!("No value found for 'crashlytics_path'") unless params[:crashlytics_path]
           submit_binary = Dir[File.join(params[:crashlytics_path], '**', 'submit')].last
@@ -51,7 +53,7 @@ module Fastlane
 
           # Optional
           command << "-betaDistributionEmails '#{params[:emails]}'" if params[:emails]
-          command << "-betaDistributionReleaseNotesFilePath '#{params[:notes_path]}'" if params[:notes_path]
+          command << "-betaDistributionReleaseNotesFilePath '#{File.expand_path(params[:notes_path])}'" if params[:notes_path]
           command << "-betaDistributionGroupAliases '#{params[:groups]}'" if params[:groups]
           command << "-betaDistributionNotifications #{(params[:notifications] ? 'true' : 'false')}"
 
@@ -84,9 +86,9 @@ module Fastlane
             # Now unzip the file
             Action.sh "unzip '#{zip_path}' -d '#{containing}'"
 
-            UI.user_error!("Coulnd't find 'crashlytics-devtools.jar'") unless File.exist?(jar_path)
+            UI.user_error!("Couldn't find 'crashlytics-devtools.jar'") unless File.exist?(jar_path)
 
-            UI.success "Succesfully downloaded Crashlytics Support Library to '#{jar_path}'"
+            UI.success "Successfully downloaded Crashlytics Support Library to '#{jar_path}'"
           rescue => ex
             UI.user_error!("Error fetching remote file: #{ex}")
           end

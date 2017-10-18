@@ -17,6 +17,7 @@ module Fastlane
       report.issues[0..(NUMBER_OF_ISSUES_INLINE - 1)].each { |issue| print_issue_full(issue) }
 
       if report.issues.count > NUMBER_OF_ISSUES_INLINE
+        report.url.sub!('\'', '%27')
         puts "and #{report.total_results - NUMBER_OF_ISSUES_INLINE} more at: #{report.url}"
         puts ""
       end
@@ -45,8 +46,8 @@ module Fastlane
       status = (resolved ? issue.state.green : issue.state.red)
 
       puts "➡️  #{issue.title.yellow}"
-      puts "   #{issue.html_url} [#{status}] #{issue.comments} 💬"
-      puts "   #{Time.parse(issue.updated_at).to_pretty}"
+      puts "    #{issue.html_url} [#{status}] #{issue.comments} 💬"
+      puts "    #{Time.parse(issue.updated_at).to_pretty}"
       puts ""
     end
 

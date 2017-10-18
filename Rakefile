@@ -1,13 +1,12 @@
 require "bundler/gem_tasks"
 
 GEMS = %w(fastlane danger-device_grid)
-RAILS = %w(boarding refresher enhancer)
 
 SECONDS_PER_DAY = 60 * 60 * 24
 
 task :rubygems_admins do
-  names = ["KrauseFx", "ohayon", "asfalcone", "mpirri", "mfurtak", "milch"]
-  (GEMS + ["krausefx-shenzhen"]).each do |gem_name|
+  names = ["KrauseFx", "ohayon", "mpirri", "taquitos"]
+  (GEMS + ["krausefx-shenzhen", "commander-fastlane"]).each do |gem_name|
     names.each do |name|
       puts `gem owner #{gem_name} -a #{name}`
     end

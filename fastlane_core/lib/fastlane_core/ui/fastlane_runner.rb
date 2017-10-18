@@ -10,11 +10,22 @@ unless Object.const_defined?("Faraday")
   end
 end
 
+unless Object.const_defined?("OpenSSL")
+  module OpenSSL
+    module SSL
+      class SSLError < StandardError; end
+    end
+  end
+end
+
 module Commander
   # This class override the run method with our custom stack trace handling
   # In particular we want to distinguish between user_error! and crash! (one with, one without stack trace)
   class Runner
     # Code taken from https://github.com/commander-rb/commander/blob/master/lib/commander/runner.rb#L50
+
+    attr_accessor :collector
+
     def run!
       require_program :version, :description
       trap('INT') { abort program(:int_message) } if program(:int_message)
@@ -31,24 +42,46 @@ module Commander
       parse_global_options
       remove_global_options options, @args
 
-      collector = FastlaneCore::ToolCollector.new
+      xcode_outdated = false
+      begin
+        unless FastlaneCore::Helper.xcode_at_least?(Fastlane::MINIMUM_XCODE_RELEASE)
+          xcode_outdated = true
+        end
+      rescue
+        # We don't care about exceptions here
+        # We'll land here if the user doesn't have Xcode at all for example
+        # which is fine for someone who uses fastlane just for Android project
+        # What we *do* care about is when someone links an old version of Xcode
+      end
 
       begin
-        collector.did_launch_action(@program[:name])
-        run_active_command
+        if xcode_outdated
+          # We have to raise that error within this `begin` block to show a nice user error without a stack trace
+          FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_RELEASE}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
+        end
+
+        action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(@program[:name], args: ARGV)
+        FastlaneCore.session.action_launched(launch_context: action_launch_context)
+
+        return_value = run_active_command
+
+        action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+        return return_value
       rescue InvalidCommandError => e
         # calling `abort` makes it likely that tests stop without failing, so
         # we'll disable that during tests.
         if FastlaneCore::Helper.test?
           raise e
         else
+          FastlaneCore::CrashReporter.report_crash(exception: e)
           abort "#{e}. Use --help for more information"
         end
-      rescue Interrupt => ex
+      rescue Interrupt => e
         # We catch it so that the stack trace is hidden by default when using ctrl + c
         if FastlaneCore::Globals.verbose?
-          raise ex
+          raise e
         else
+          action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::INTERRUPTED, exception: e)
           puts "\nCancelled... use --verbose to show the stack trace"
         end
       rescue \
@@ -60,26 +93,79 @@ module Commander
         if FastlaneCore::Helper.test?
           raise e
         else
-          abort e.to_s
+          FastlaneCore::CrashReporter.report_crash(exception: e)
+          if self.active_command.name == "help" && @default_command == :help # need to access directly via @
+            # This is a special case, for example for pilot
+            # when the user runs `fastlane pilot -u user@google.com`
+            # This would be confusing, as the user probably wanted to use `pilot list`
+            # or some other command. Because `-u` isn't available for the `pilot --help`
+            # command it would show this very confusing error message otherwise
+            abort "Please ensure to use one of the available commands (#{self.commands.keys.join(', ')})".red
+          else
+            # This would print something like
+            #
+            #   invalid option: -u
+            #
+            abort e.to_s
+          end
         end
+      rescue FastlaneCore::Interface::FastlaneCommonException => e # these are exceptions that we dont count as crashes
+        display_user_error!(e, e.to_s)
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
-        collector.did_raise_error(@program[:name])
-        show_github_issues(e.message) if e.show_github_issues
-        display_user_error!(e, e.message)
-      rescue Faraday::SSLError => e # SSL issues are very common
+        rescue_fastlane_error(e)
+      rescue Errno::ENOENT => e
+        rescue_file_error(e)
+      rescue Faraday::SSLError, OpenSSL::SSL::SSLError => e # SSL issues are very common
         handle_ssl_error!(e)
       rescue Faraday::ConnectionFailed => e
-        if e.message.include? 'Connection reset by peer - SSL_connect'
-          handle_tls_error!(e)
-        else
-          handle_unknown_error!(e)
-        end
+        rescue_connection_failed_error(e)
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
-        collector.did_crash(@program[:name])
-        handle_unknown_error!(e)
+        rescue_unknown_error(e)
       ensure
-        collector.did_finish
+        FastlaneCore.session.finalize_session
       end
+    end
+
+    def action_completed(action_name, status: nil, exception: nil)
+      if exception.nil? || exception.fastlane_should_report_metrics?
+        action_completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV, status: status)
+        FastlaneCore.session.action_completed(completion_context: action_completion_context)
+      end
+    end
+
+    def rescue_file_error(e)
+      # We're also printing the new-lines, as otherwise the message is not very visible in-between the error and the stack trace
+      puts ""
+      FastlaneCore::UI.important("Error accessing file, this might be due to fastlane's directory handling")
+      FastlaneCore::UI.important("Check out https://docs.fastlane.tools/advanced/#directory-behavior for more details")
+      puts ""
+      FastlaneCore::CrashReporter.report_crash(exception: e)
+      raise e
+    end
+
+    def rescue_connection_failed_error(e)
+      if e.message.include? 'Connection reset by peer - SSL_connect'
+        handle_tls_error!(e)
+      else
+        FastlaneCore::CrashReporter.report_crash(exception: e)
+        handle_unknown_error!(e)
+      end
+    end
+
+    def rescue_unknown_error(e)
+      FastlaneCore::CrashReporter.report_crash(exception: e)
+
+      action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::FAILED, exception: e)
+
+      handle_unknown_error!(e)
+    end
+
+    def rescue_fastlane_error(e)
+      action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::USER_ERROR, exception: e)
+
+      show_github_issues(e.message) if e.show_github_issues
+      FastlaneCore::CrashReporter.report_crash(exception: e)
+      display_user_error!(e, e.message)
     end
 
     def handle_tls_error!(e)
@@ -112,16 +198,13 @@ module Commander
       ui.error ""
       ui.error "The best solution is to use the self-contained fastlane version."
       ui.error "Which ships with a bundled OpenSSL,ruby and all gems - so you don't depend on system libraries"
-      ui.error " - Use One-Click-Installer:"
-      ui.error "    - download fastlane at https://download.fastlane.tools"
-      ui.error "-----------------------------------------------------------"
-      ui.error "    - extract the archive and double click the `install`"
-      ui.error "-----------------------------------------------------------"
       ui.error " - Use Homebrew"
       ui.error "    - update brew with `brew update`"
-      ui.error "    - install fastlane:"
-      ui.error "-----------------------------------------------------------"
-      ui.error "      - 🚀 `brew cask install fastlane` 🚀"
+      ui.error "    - install fastlane using:"
+      ui.error "      - `brew cask install fastlane`"
+      ui.error " - Use One-Click-Installer:"
+      ui.error "    - download fastlane at https://download.fastlane.tools"
+      ui.error "    - extract the archive and double click the `install`"
       ui.error "-----------------------------------------------------------"
       ui.error "for more details on ways to install fastlane please refer the documentation:"
       ui.error "-----------------------------------------------------------"
@@ -176,6 +259,7 @@ module Commander
         reraise_formatted!(e, message)
       else
         # without stack trace
+        action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::USER_ERROR, exception: e)
         abort "\n[!] #{message}".red
       end
     end

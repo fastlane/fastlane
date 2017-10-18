@@ -384,7 +384,7 @@ module Fastlane
                                        default_value: ENV['AWS_REGION']),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "S3_PATH",
-                                       description: "S3 'path'. Values from Info.plist will be substituded for keys wrapped in {}  ",
+                                       description: "S3 'path'. Values from Info.plist will be substituted for keys wrapped in {}  ",
                                        optional: true,
                                        default_value: 'v{CFBundleShortVersionString}_b{CFBundleVersion}/'),
           FastlaneCore::ConfigItem.new(key: :source,

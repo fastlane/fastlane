@@ -11,7 +11,13 @@ module Match
       self.params = params
       self.type = type
 
-      params[:workspace] = GitHelper.clone(params[:git_url], params[:shallow_clone], skip_docs: params[:skip_docs], branch: params[:git_branch])
+      params[:workspace] = GitHelper.clone(params[:git_url],
+                                           params[:shallow_clone],
+                                           skip_docs: params[:skip_docs],
+                                           branch: params[:git_branch],
+                                           git_full_name: params[:git_full_name],
+                                           git_user_email: params[:git_user_email],
+                                           clone_branch_directly: params[:clone_branch_directly])
 
       had_app_identifier = self.params.fetch(:app_identifier, ask: false)
       self.params[:app_identifier] = '' # we don't really need a value here
@@ -35,7 +41,7 @@ module Match
           UI.error "Warning: The :app_identifier value will be ignored - this will delete all profiles for all your apps!" if had_app_identifier
           UI.error "---"
         end
-        if params[:skip_confirmation] || agree("(y/n)", true)
+        if params[:skip_confirmation] || UI.confirm("Do you really want to nuke everything listed above?")
           nuke_it_now!
           UI.success "Successfully cleaned your account ♻️"
         else
@@ -81,39 +87,42 @@ module Match
     def print_tables
       puts ""
       if self.certs.count > 0
+        rows = self.certs.collect { |c| [c.name, c.id, c.class.to_s.split("::").last, c.expires.strftime("%Y-%m-%d")] }
         puts Terminal::Table.new({
           title: "Certificates that are going to be revoked".green,
           headings: ["Name", "ID", "Type", "Expires"],
-          rows: self.certs.collect { |c| [c.name, c.id, c.class.to_s.split("::").last, c.expires.strftime("%Y-%m-%d")] }
+          rows: FastlaneCore::PrintTable.transform_output(rows)
         })
         puts ""
       end
 
       if self.profiles.count > 0
+        rows = self.profiles.collect do |p|
+          status = p.status == 'Active' ? p.status.green : p.status.red
+
+          [p.name, p.id, status, p.type, p.expires.strftime("%Y-%m-%d")]
+        end
         puts Terminal::Table.new({
           title: "Provisioning Profiles that are going to be revoked".green,
           headings: ["Name", "ID", "Status", "Type", "Expires"],
-          rows: self.profiles.collect do |p|
-            status = p.status == 'Active' ? p.status.green : p.status.red
-
-            [p.name, p.id, status, p.type, p.expires.strftime("%Y-%m-%d")]
-          end
+          rows: FastlaneCore::PrintTable.transform_output(rows)
         })
         puts ""
       end
 
       if self.files.count > 0
+        rows = self.files.collect do |f|
+          components = f.split(File::SEPARATOR)[-3..-1]
+
+          # from "...1o7xtmh/certs/distribution/8K38XUY3AY.cer" to "distribution cert"
+          file_type = components[0..1].reverse.join(" ")[0..-2]
+
+          [file_type, components[2]]
+        end
         puts Terminal::Table.new({
           title: "Files that are going to be deleted".green,
           headings: ["Type", "File Name"],
-          rows: self.files.collect do |f|
-            components = f.split(File::SEPARATOR)[-3..-1]
-
-            # from "...1o7xtmh/certs/distribution/8K38XUY3AY.cer" to "distribution cert"
-            file_type = components[0..1].reverse.join(" ")[0..-2]
-
-            [file_type, components[2]]
-          end
+          rows: rows
         })
         puts ""
       end

@@ -43,6 +43,13 @@ module Fastlane
         return if blacklist.include?(method_sym)
 
         class_ref = self.runner.class_reference_from_action_name(method_sym)
+        unless class_ref
+          alias_found = self.runner.find_alias(method_sym.to_s)
+          if alias_found
+            class_ref = self.runner.class_reference_from_action_name(alias_found.to_sym)
+          end
+        end
+
         UI.user_error!("Could not find method or action named '#{method_sym}'") if class_ref.nil?
         available_options = class_ref.available_options
 
@@ -77,7 +84,8 @@ module Fastlane
           :refresh_dsyms,
           :lane,
           :before_all,
-          :verify_xcode
+          :verify_xcode,
+          :error
         ]
       end
 

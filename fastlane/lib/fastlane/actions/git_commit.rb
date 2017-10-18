@@ -29,16 +29,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :path,
                                        description: "The file you want to commit",
-                                       is_string: false,
-                                       verify_block: proc do |value|
-                                         if value.kind_of?(String)
-                                           UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
-                                         else
-                                           value.each do |x|
-                                             UI.user_error!("Couldn't find file at path '#{x}'") unless File.exist?(x)
-                                           end
-                                         end
-                                       end),
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :message,
                                        description: "The commit message that should be used")
         ]
@@ -62,7 +53,8 @@ module Fastlane
       def self.example_code
         [
           'git_commit(path: "./version.txt", message: "Version Bump")',
-          'git_commit(path: ["./version.txt", "./changelog.txt"], message: "Version Bump")'
+          'git_commit(path: ["./version.txt", "./changelog.txt"], message: "Version Bump")',
+          'git_commit(path: ["./*.txt", "./*.md"], message: "Update documentation")'
         ]
       end
 

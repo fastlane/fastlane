@@ -5,9 +5,10 @@ module Fastlane
     end
 
     class SlatherAction < Action
-      # https://github.com/SlatherOrg/slather/blob/cbc5099cd25beb43fd978b7a3e5428f02230122d/lib/slather/command/coverage_command.rb#L24
+      # https://github.com/SlatherOrg/slather/blob/v2.4.2/lib/slather/command/coverage_command.rb
       ARGS_MAP = {
           travis: '--travis',
+          travis_pro: '--travispro',
           circleci: '--circleci',
           jenkins: '--jenkins',
           buildkite: '--buildkite',
@@ -28,6 +29,7 @@ module Fastlane
 
           input_format: '--input-format',
           scheme: '--scheme',
+          configuration: '--configuration',
           workspace: '--workspace',
           binary_file: '--binary-file',
           binary_basename: '--binary-basename',
@@ -52,7 +54,20 @@ module Fastlane
         File.file?('.slather.yml')
       end
 
+      def self.slather_version
+        require 'slather'
+        Slather::VERSION
+      end
+
+      def self.configuration_available?
+        Gem::Version.new('2.4.1') <= Gem::Version.new(slather_version)
+      end
+
       def self.validate_params!(params)
+        if params[:configuration]
+          UI.user_error!('configuration option is available since version 2.4.1') unless configuration_available?
+        end
+
         if params[:proj] || has_config_file
           true
         else
@@ -121,6 +136,10 @@ Slather is available at https://github.com/SlatherOrg/slather
                                        env_name: "FL_SLATHER_SCHEME", # The name of the environment variable
                                        description: "Scheme to use when calling slather",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :configuration,
+                                       env_name: "FL_SLATHER_CONFIGURATION", # The name of the environment variable
+                                       description: "Configuration to use when calling slather (since slather-2.4.1)",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :input_format,
                                        env_name: "FL_SLATHER_INPUT_FORMAT", # The name of the environment variable
                                        description: "The input format that slather should look for",
@@ -143,6 +162,11 @@ Slather is available at https://github.com/SlatherOrg/slather
           FastlaneCore::ConfigItem.new(key: :travis,
                                        env_name: "FL_SLATHER_TRAVIS_ENABLED", # The name of the environment variable
                                        description: "Tell slather that it is running on TravisCI",
+                                       is_string: false,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :travis_pro,
+                                       env_name: "FL_SLATHER_TRAVIS_PRO_ENABLED", # The name of the environment variable
+                                       description: "Tell slather that it is running on TravisCI Pro",
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :circleci,
@@ -204,16 +228,19 @@ Slather is available at https://github.com/SlatherOrg/slather
                                       is_string: false,
                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :binary_basename,
-                                      env_name: "FL_SLATHER_BINARY_BASENAME",
-                                      description: "Basename of the binary file, this should match the name of your bundle excluding its extension (i.e. YourApp [for YourApp.app bundle])",
-                                      default_value: false),
+                                       env_name: "FL_SLATHER_BINARY_BASENAME",
+                                       description: "Basename of the binary file, this should match the name of your bundle excluding its extension (i.e. YourApp [for YourApp.app bundle])",
+                                       is_string: false,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :binary_file,
-                                      env_name: "FL_SLATHER_BINARY_FILE",
-                                      description: "Binary file name to be used for code coverage",
-                                      default_value: false),
+                                       env_name: "FL_SLATHER_BINARY_FILE",
+                                       description: "Binary file name to be used for code coverage",
+                                       is_string: false,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :source_files,
                                        env_name: "FL_SLATHER_SOURCE_FILES",
                                        description: "A Dir.glob compatible pattern used to limit the lookup to specific source files. Ignored in gcov mode",
+                                       is_string: false,
                                        default_value: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :decimals,

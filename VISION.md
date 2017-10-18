@@ -14,7 +14,7 @@ Since errors are inevitable, _fastlane_ should show empathy and provide a sugges
 
 _fastlane_ saw a lot of early growth through a wide number of actions that meet a variety of needs. Actions can trigger built-in _fastlane_ tools, talk to external tools and services, and more. However, with more than 170 built-in actions, further growth here will make _fastlane_ harder to understand and get started with. Another consideration is that actions which ship with _fastlane_ represent a maintenance cost for the _fastlane_ core team.
 
-With these challenges in mind, [_fastlane_ plugin system](https://fabric.io/blog/introducing-fastlane-plugins/) allows anyone to develop, share, and use new actions built and maintained by the awesome _fastlane_ community. If you have an idea for a new _fastlane_ action, [create it as a plugin](https://docs.fastlane.tools/plugins/create-plugin/) and it’ll be automatically listed in the [_fastlane_ plugin registry](https://docs.fastlane.tools/actions/#plugins). The most impactful and commonly used plugins could be adopted into _fastlane_ in the future.
+With these challenges in mind, [_fastlane_ plugin system](https://fabric.io/blog/introducing-fastlane-plugins/) allows anyone to develop, share, and use new actions built and maintained by the awesome _fastlane_ community. If you have an idea for a new _fastlane_ action, [create it as a plugin](https://docs.fastlane.tools/plugins/create-plugin/) and it’ll be automatically listed in the [_fastlane_ plugin registry](https://docs.fastlane.tools/plugins/available-plugins). The most impactful and commonly used plugins could be adopted into _fastlane_ in the future.
 
 ## _fastlane_ Tool Responsibilities
 
@@ -35,11 +35,12 @@ Each _fastlane_ tool has a specific purpose and should be kept focused on the fu
 * [gym](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
 * [match](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using Git
 * [scan](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
+* [precheck](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
 
-## _fastlane_’s Relationship with [Twitter](https://twitter.com) and [Fabric](https://get.fabric.io/)
+## _fastlane_’s Relationship with [Google](https://google.com) and [Fabric](https://get.fabric.io/)
 
-Twitter supports app development teams with the best tools for building, understanding, and growing their mobile app businesses through [Fabric](https://get.fabric.io/).
+Google supports app development teams with the best tools for building, understanding, and growing their mobile app businesses through [Fabric](https://get.fabric.io/).
 
-Twitter has recognized _fastlane_ as the best tool for tackling tough beta and release deployment challenges. In 2015 Twitter acquired the project, and [Felix Krause](https://twitter.com/krausefx) joined the Fabric team. The team’s mission is to make _fastlane_ the de facto tool to automate beta deployments and app store releases for iOS and Android apps.
+Google has recognized _fastlane_ as the best tool for tackling tough beta and release deployment challenges. The team’s mission is to make _fastlane_ the de facto tool to automate beta deployments and app store releases for iOS and Android apps.
 
-Twitter intends to keep _fastlane_ open source and available as a standalone tool for users who are not using Fabric. Twitter is also committed to increasing use of _fastlane_ by promoting it through Fabric products and websites, and developing integrations with Fabric tools to help them work better together.
+Google intends to keep _fastlane_ open source and available as a standalone tool for users who are not using Fabric. Google is also committed to increasing use of _fastlane_ by promoting it through Fabric products and websites, and developing integrations with Fabric tools to help them work better together.

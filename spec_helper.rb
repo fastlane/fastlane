@@ -7,6 +7,11 @@ WebMock.disable_net_connect!(allow: 'coveralls.io')
 require "fastlane"
 UI = FastlaneCore::UI
 
+unless ENV["DEBUG"]
+  $stdout.puts "Changing stdout to /tmp/fastlane_tests, set `DEBUG` environment variable to print to stdout (e.g. when using `pry`)"
+  $stdout = File.open("/tmp/fastlane_tests", "w")
+end
+
 xcode_path = FastlaneCore::Helper.xcode_path
 unless xcode_path.include?("Contents/Developer")
   UI.error("Seems like you didn't set the developer tools path correctly")
@@ -30,6 +35,12 @@ end
 my_main = self
 RSpec.configure do |config|
   config.before(:each) do |current_test|
+    # We don't want to call the RubyGems API at any point
+    # This was a request that was added with Ruby 2.4.0
+    allow(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).and_return(nil)
+
+    ENV['FASTLANE_PLATFORM_NAME'] = nil
+
     tool_name = current_test.id.match(%r{\.\/(\w+)\/})[1]
     method_name = "before_each_#{tool_name}".to_sym
     begin

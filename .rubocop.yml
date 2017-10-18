@@ -1,6 +1,29 @@
+Style/MultipleComparison:
+  Enabled: false
+
+Style/PercentLiteralDelimiters:
+  Enabled: false
+
 # kind_of? is a good way to check a type
 Style/ClassCheck:
   EnforcedStyle: kind_of?
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# This doesn't work with older versions of Ruby (pre 2.4.0)
+Style/SafeNavigation:
+  Enabled: false
+
+# This doesn't work with older versions of Ruby (pre 2.4.0)
+Performance/RegexpMatch:
+  Enabled: false
+
+# This suggests use of `tr` instead of `gsub`. While this might be more performant,
+# these methods are not at all interchangable, and behave very differently. This can
+# lead to people making the substitution without considering the differences.
+Performance/StringReplacement:
+  Enabled: false
 
 # .length == 0 is also good, we don't always want .zero?
 Style/NumericPredicate:
@@ -9,7 +32,7 @@ Style/NumericPredicate:
 # this would cause errors with long lanes
 Metrics/BlockLength:
   Enabled: false
-  
+
 # this is a bit buggy
 Metrics/ModuleLength:
   Enabled: false
@@ -22,27 +45,32 @@ Style/VariableNumber:
 Style/MethodMissing:
   Enabled: false
 
-# 
+# This rule isn't useful, lots of discussion happening around it also
+# e.g. https://github.com/bbatsov/rubocop/issues/2338
+MultilineBlockChain:
+  Enabled: false
+
+#
 #   File.chmod(0777, f)
-# 
+#
 # is easier to read than
-# 
+#
 #   File.chmod(0o777, f)
-# 
+#
 Style/NumericLiteralPrefix:
   Enabled: false
 
-# 
+#
 # command = (!clean_expired.nil? || !clean_pattern.nil?) ? CLEANUP : LIST
-# 
+#
 # is easier to read than
-# 
+#
 # command = !clean_expired.nil? || !clean_pattern.nil? ? CLEANUP : LIST
-# 
+#
 Style/TernaryParentheses:
   Enabled: false
 
-# sometimes it is usefull to have those empty methods
+# sometimes it is useful to have those empty methods
 Style/EmptyMethod:
   Enabled: false
 
@@ -56,19 +84,32 @@ Lint/UselessAssignment:
     - '**/spec/**/*'
 
 # We could potentially enable the 2 below:
-Style/IndentHash:
+Layout/IndentHash:
   Enabled: false
 
-Style/AlignHash:
+Layout/AlignHash:
   Enabled: false
 
 # HoundCI doesn't like this rule
-Style/DotPosition:
+Layout/DotPosition:
   Enabled: false
 
 # We allow !! as it's an easy way to convert ot boolean
 Style/DoubleNegation:
   Enabled: false
+
+# Prevent to replace [] into %i
+Style/SymbolArray:
+  Enabled: false
+
+# We still support Ruby 2.0.0
+Layout/IndentHeredoc:
+  Enabled: false
+
+# This cop would not work fine with rspec
+Style/MixinGrouping:
+  Exclude:
+    - '**/spec/**/*'
 
 # Sometimes we allow a rescue block that doesn't contain code
 Lint/HandleExceptions:
@@ -76,6 +117,9 @@ Lint/HandleExceptions:
 
 # Cop supports --auto-correct.
 Lint/UnusedBlockArgument:
+  Enabled: false
+
+Lint/AmbiguousBlockAssociation:
   Enabled: false
 
 # Needed for $verbose
@@ -173,16 +217,30 @@ Style/PerlBackrefs:
   Enabled: false
 
 # Disable '+ should be surrounded with a single space' for xcodebuild_spec.rb
-Style/SpaceAroundOperators:
+Layout/SpaceAroundOperators:
   Exclude:
     - '**/spec/actions_specs/xcodebuild_spec.rb'
 
 AllCops:
+  TargetRubyVersion: 2.0
   Include:
     - '**/fastlane/Fastfile'
   Exclude:
     - '**/lib/assets/custom_action_template.rb'
     - './vendor/**/*'
+
+# They have not to be snake_case
+Style/FileName:
+  Exclude:
+    - '**/Dangerfile'
+    - '**/Brewfile'
+    - '**/Gemfile'
+    - '**/Podfile'
+    - '**/Rakefile'
+    - '**/Fastfile'
+    - '**/Deliverfile'
+    - '**/Snapfile'
+    - '**/*.gemspec'
 
 # We're not there yet
 Style/Documentation:

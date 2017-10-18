@@ -1,4 +1,5 @@
 # coding: utf-8
+
 module Fastlane
   module Actions
     module SharedValues
@@ -46,10 +47,10 @@ module Fastlane
 
         project = Xcodeproj::Project.open(folder)
         project.targets.each do |target|
-          if !target_filter || target.product_name.match(target_filter) || (target.respond_to?(:product_type) && target.product_type.match(target_filter))
-            UI.success("Updating target #{target.product_name}...")
+          if !target_filter || target.name.match(target_filter) || (target.respond_to?(:product_type) && target.product_type.match(target_filter))
+            UI.success("Updating target #{target.name}...")
           else
-            UI.important("Skipping target #{target.product_name} as it doesn't match the filter '#{target_filter}'")
+            UI.important("Skipping target #{target.name} as it doesn't match the filter '#{target_filter}'")
             next
           end
 
@@ -63,13 +64,14 @@ module Fastlane
             end
 
             build_configuration.build_settings["PROVISIONING_PROFILE"] = data["UUID"]
+            build_configuration.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = data["Name"]
           end
         end
 
         project.save
 
         # complete
-        UI.success("Successfully updated project settings in'#{params[:xcodeproj]}'")
+        UI.success("Successfully updated project settings in '#{params[:xcodeproj]}'")
       end
 
       def self.description
@@ -78,7 +80,7 @@ module Fastlane
 
       def self.details
         [
-          "You should check out the code signing gide before using this action: https://docs.fastlane.tools/codesigning/getting-started/",
+          "You should check out the code signing guide before using this action: https://docs.fastlane.tools/codesigning/getting-started/",
           "This action retrieves a provisioning profile UUID from a provisioning profile (.mobileprovision) to set",
           "up the xcode projects' code signing settings in *.xcodeproj/project.pbxproj",
           "The `target_filter` value can be used to only update code signing for specified targets",
@@ -107,7 +109,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :target_filter,
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_TARGET_FILTER",
                                        description: "A filter for the target name. Use a standard regex",
-                                       optional: true),
+                                       optional: true,
+                                       is_string: false,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("target_filter should be Regexp or String") unless [Regexp, String].any? { |type| value.kind_of?(type) }
+                                       end),
           FastlaneCore::ConfigItem.new(key: :build_configuration_filter,
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_FILTER",
                                        description: "Legacy option, use 'target_filter' instead",
@@ -115,7 +121,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :build_configuration,
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_BUILD_CONFIGURATION",
                                        description: "A filter for the build configuration name. Use a standard regex. Applied to all configurations if not specified",
-                                       optional: true),
+                                       optional: true,
+                                       is_string: false,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("build_configuration should be Regexp or String") unless [Regexp, String].any? { |type| value.kind_of?(type) }
+                                       end),
           FastlaneCore::ConfigItem.new(key: :certificate,
                                        env_name: "FL_PROJECT_PROVISIONING_CERTIFICATE_PATH",
                                        description: "Path to apple root certificate",

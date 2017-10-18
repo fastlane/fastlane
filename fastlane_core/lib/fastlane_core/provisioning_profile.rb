@@ -28,14 +28,18 @@ module FastlaneCore
         if (plist || []).count > 5
           plist
         else
-          UI.error("Error parsing provisioning profile at path '#{path}'")
-          nil
+          UI.crash!("Error parsing provisioning profile at path '#{path}'")
         end
       end
 
       # @return [String] The UUID of the given provisioning profile
       def uuid(path)
         parse(path).fetch("UUID")
+      end
+
+      # @return [String] The Name of the given provisioning profile
+      def name(path)
+        parse(path).fetch("Name")
       end
 
       def profiles_path

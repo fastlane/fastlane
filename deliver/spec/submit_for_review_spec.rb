@@ -1,6 +1,4 @@
 require 'deliver/submit_for_review'
-require 'active_support/core_ext/numeric/time.rb'
-require 'active_support/core_ext/time/calculations.rb'
 require 'ostruct'
 
 describe Deliver::SubmitForReview do
@@ -10,7 +8,7 @@ describe Deliver::SubmitForReview do
   # the builds will be in date ascending order
   def make_fake_builds(number_of_builds)
     (0...number_of_builds).map do |num|
-      OpenStruct.new({ upload_date: num.minutes.from_now })
+      OpenStruct.new({ upload_date: Time.now.utc + 60 * num }) # minutes_from_now
     end
   end
 
@@ -26,7 +24,9 @@ describe Deliver::SubmitForReview do
     context 'no builds' do
       let(:fake_builds) { make_fake_builds(0) }
       it 'throws a UI error' do
-        expect { review_submitter.find_build(fake_builds) }.to raise_error FastlaneCore::Interface::FastlaneCrash
+        expect do
+          review_submitter.find_build(fake_builds)
+        end.to raise_error FastlaneCore::Interface::FastlaneError, "Could not find any available candidate builds on iTunes Connect to submit"
       end
     end
 

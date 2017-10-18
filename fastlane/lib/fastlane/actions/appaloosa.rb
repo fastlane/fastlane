@@ -24,16 +24,20 @@ module Fastlane
         uri = URI("#{APPALOOSA_SERVER}/upload_services/presign_form")
         params = { file: file_name, store_id: store_id, group_ids: group_ids }
         uri.query = URI.encode_www_form(params)
-        presign_form_response = Net::HTTP.get_response(uri)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+        presign_form_response = http.request(Net::HTTP::Get.new(uri.request_uri))
         json_res = JSON.parse(presign_form_response.body)
         return if error_detected json_res['errors']
         s3_sign = json_res['s3_sign']
         path = json_res['path']
         uri = URI.parse(Base64.decode64(s3_sign))
         File.open(file, 'rb') do |f|
-          Net::HTTP.start(uri.host) do |http|
-            http.send_request('PUT', uri.request_uri, f.read, 'content-type' => '')
-          end
+          http = Net::HTTP.new(uri.host)
+          put = Net::HTTP::Put.new(uri.request_uri)
+          put.body = f.read
+          put['content-type'] = ''
+          http.request(put)
         end
         path
       end
@@ -42,7 +46,9 @@ module Fastlane
         uri = URI("#{APPALOOSA_SERVER}/#{store_id}/upload_services/url_for_download")
         params = { store_id: store_id, api_key: api_key, key: path }
         uri.query = URI.encode_www_form(params)
-        url_for_download_response = Net::HTTP.get_response(uri)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+        url_for_download_response = http.request(Net::HTTP::Get.new(uri.request_uri))
         if invalid_response?(url_for_download_response)
           UI.user_error!("ERROR: A problem occurred with your API token and your store id. Please try again.")
         end
@@ -201,12 +207,12 @@ module Fastlane
                                        default_value: Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]),
           FastlaneCore::ConfigItem.new(key: :locale,
                                        env_name: 'FL_APPALOOSA_LOCALE',
-                                       description: 'Select the folder locale for yours screenshots',
+                                       description: 'Select the folder locale for your screenshots',
                                        default_value: 'en-US',
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :device,
                                        env_name: 'FL_APPALOOSA_DEVICE',
-                                       description: 'Select the device format for yours screenshots',
+                                       description: 'Select the device format for your screenshots',
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :description,
                                        env_name: 'FL_APPALOOSA_DESCRIPTION',

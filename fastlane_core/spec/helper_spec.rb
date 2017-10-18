@@ -58,6 +58,35 @@ describe FastlaneCore do
       end
     end
 
+    describe "#keychain_path" do
+      it "finds file in current directory" do
+        allow(File).to receive(:file?).and_return(false)
+
+        found = File.expand_path("test.keychain")
+        allow(File).to receive(:file?).with(found).and_return(true)
+
+        expect(FastlaneCore::Helper.keychain_path("test.keychain")).to eq File.expand_path(found)
+      end
+
+      it "finds file in current directory with -db" do
+        allow(File).to receive(:file?).and_return(false)
+
+        found = File.expand_path("test-db")
+        allow(File).to receive(:file?).with(found).and_return(true)
+
+        expect(FastlaneCore::Helper.keychain_path("test.keychain")).to eq File.expand_path(found)
+      end
+
+      it "finds file in current directory with spaces and \"" do
+        allow(File).to receive(:file?).and_return(false)
+
+        found = File.expand_path('\\"\\ test\\ \\".keychain')
+        allow(File).to receive(:file?).with(found).and_return(true)
+
+        expect(FastlaneCore::Helper.keychain_path('\\"\\ test\\ \\".keychain')).to eq File.expand_path(found)
+      end
+    end
+
     # macOS only (to work on Linux)
     if FastlaneCore::Helper.is_mac?
       describe "Xcode" do

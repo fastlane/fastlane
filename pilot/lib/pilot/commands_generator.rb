@@ -20,7 +20,7 @@ module Pilot
 
     def handle_multiple(action, args, options)
       mgr = Pilot::TesterManager.new
-      config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+      config = create_config(options)
       args.push(config[:email]) if config[:email] && args.empty?
       args.push(UI.input("Email address of the tester: ")) if args.empty?
       failures = []
@@ -29,7 +29,8 @@ module Pilot
         begin
           mgr.public_send(action, config)
         rescue => ex
-          message = "[#{address}]: #{ex}"
+          # no need to show the email address in the message if only one specified
+          message = (args.count > 1) ? "[#{address}]: #{ex}" : ex
           failures << message
           UI.error(message)
         end
@@ -55,7 +56,7 @@ module Pilot
         FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
 
         c.action do |args, options|
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          config = create_config(options)
           Pilot::BuildManager.new.upload(config)
         end
       end
@@ -67,7 +68,7 @@ module Pilot
         FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
 
         c.action do |args, options|
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          config = create_config(options)
           Pilot::BuildManager.new.distribute(config)
         end
       end
@@ -79,7 +80,7 @@ module Pilot
         FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
 
         c.action do |args, options|
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          config = create_config(options)
           Pilot::BuildManager.new.list(config)
         end
       end
@@ -102,7 +103,7 @@ module Pilot
         FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
 
         c.action do |args, options|
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          config = create_config(options)
           Pilot::TesterManager.new.list_testers(config)
         end
       end
@@ -136,7 +137,7 @@ module Pilot
         FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
 
         c.action do |args, options|
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          config = create_config(options)
           Pilot::TesterExporter.new.export_testers(config)
         end
       end
@@ -148,7 +149,7 @@ module Pilot
         FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
 
         c.action do |args, options|
-          config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+          config = create_config(options)
           Pilot::TesterImporter.new.import_testers(config)
         end
       end
@@ -156,6 +157,11 @@ module Pilot
       default_command :help
 
       run!
+    end
+
+    def create_config(options)
+      config = FastlaneCore::Configuration.create(Pilot::Options.available_options, convert_options(options))
+      return config
     end
   end
 end

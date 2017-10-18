@@ -8,7 +8,7 @@ Before you start working on _fastlane_, you should have [Bundler][bundler] insta
 
 The core team usually tags issues that are ready to be worked on and easily accessible for new contributors with the [“you can do this” label][you can do this]. If you’ve never contributed to _fastlane_ before, these are a great place to start!
 
-If you want to work on something else, e.g. new functionality or fixing a bug, if would be helpful if you submit a new issue, so that we can have a chance to discuss it first. We might have some pointers for you on how to get started, or how to best integrate it with existing solutions.
+If you want to work on something else, e.g. new functionality or fixing a bug, it would be helpful if you submit a new issue, so that we can have a chance to discuss it first. We might have some pointers for you on how to get started, or how to best integrate it with existing solutions.
 
 ## Checking out the _fastlane_ repo
 
@@ -17,7 +17,6 @@ If you want to work on something else, e.g. new functionality or fixing a bug, i
   - `git clone git@github.com:<YOUR_GITHUB_USER>/fastlane.git`
 - Install dependencies:
   - Run `bundle install` in the project root
-  - You also might need to run `bundle install` in each of the tool's subdirectories, e.g. `cd gym && bundle install`
   - If there are dependency errors, you might also need to run `bundle update`
 - Create a new branch to work on:
   - `git checkout -b <YOUR_BRANCH_NAME>`
@@ -76,13 +75,17 @@ bundle show fastlane
 
 which should print out the path to your local development environment.
 
-From now on, every time you introduce a change to your local _fastlane_ code base, you can immediately test it by running `bundle exec fastlane …`
+From now on, every time you introduce a change to your local _fastlane_ code base, you can immediately test it by running `bundle exec fastlane …`.
+
+If you want to run a command with your normal _fastlane_ installation, simply do not run the command with the `bundle exec` prefix.
+
+To fully remove your local _fastlane_ from your local project again, delete the `Gemfile` you created above.
+
 
 ## Submitting the PR
 
 When the coding is done and you’re finished testing your changes, you are ready to submit the PR to the [_fastlane_ main repo][fastlane]. Everything you need to know about submitting the PR itself is inside our [Pull Request Template][pr template]. Some best practices are:
 
-- Create a separate PR for each tool that you’ve worked on
 - Use a descriptive title
 - Link the issues that are related to your PR in the body
 

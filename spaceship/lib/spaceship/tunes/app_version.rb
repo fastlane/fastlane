@@ -72,6 +72,48 @@ module Spaceship
       attr_accessor :transit_app_file
 
       ####
+      # Trade Representative Contact Information
+      ####
+      # @return (String) Trade Representative Contact Information Trade Name. This attribute isn't editable
+      attr_accessor :trade_representative_trade_name
+
+      # @return (String) Trade Representative Contact Information First Name
+      attr_accessor :trade_representative_first_name
+
+      # @return (String) Trade Representative Contact Information Last Name
+      attr_accessor :trade_representative_last_name
+
+      # @return (String) Trade Representative Contact Information Address Line 1
+      attr_accessor :trade_representative_address_line_1
+
+      # @return (String) Trade Representative Contact Information Address Line 2
+      attr_accessor :trade_representative_address_line_2
+
+      # @return (String) Trade Representative Contact Information Address Line 3
+      attr_accessor :trade_representative_address_line_3
+
+      # @return (String) Trade Representative Contact Information City Name
+      attr_accessor :trade_representative_city_name
+
+      # @return (String) Trade Representative Contact Information State
+      attr_accessor :trade_representative_state
+
+      # @return (String) Trade Representative Contact Information Country
+      attr_accessor :trade_representative_country
+
+      # @return (String) Trade Representative Contact Information Postal Code
+      attr_accessor :trade_representative_postal_code
+
+      # @return (String) Trade Representative Contact Information Phone Number
+      attr_accessor :trade_representative_phone_number
+
+      # @return (String) Trade Representative Contact Information Email Address
+      attr_accessor :trade_representative_email
+
+      # @return (Boolean) Display Trade Representative Contact Information on the Korean App Store or not
+      attr_accessor :trade_representative_is_displayed_on_app_store
+
+      ####
       # App Review Information
       ####
       # @return (String) App Review Information First Name
@@ -110,6 +152,9 @@ module Spaceship
       # @return (Hash) A hash representing the keywords in all languages
       attr_reader :keywords
 
+      # @return (Hash) A hash representing the promotionalText in all languages
+      attr_reader :promotional_text
+
       # @return (Hash) A hash representing the description in all languages
       attr_reader :description
 
@@ -127,6 +172,28 @@ module Spaceship
 
       # @return (Hash) Represents the trailers of this app version (read-only)
       attr_reader :trailers
+
+      # @return (Hash) Represents the phased_release hash (read-only)
+      #   For now, please use the `toggle_phased_release` method and call `.save!`
+      #   as the API will probably change in the future
+      attr_reader :phased_release
+
+      # Currently phased_release doesn't seem to have all the features enabled
+      #
+      #     => {"state"=>{"value"=>"NOT_STARTED", "isEditable"=>true, "isRequired"=>false, "errorKeys"=>nil},
+      #        "startDate"=>nil,
+      #        "lastPaused"=>nil,
+      #        "pausedDuration"=>nil,
+      #        "totalPauseDays"=>30,
+      #        "currentDayNumber"=>nil,
+      #        "dayPercentageMap"=>{"1"=>1, "2"=>2, "3"=>5, "4"=>10, "5"=>20, "6"=>50, "7"=>100},
+      #        "isEnabled"=>true}
+      #
+      def toggle_phased_release(enabled: false)
+        state = (enabled ? "INACTIVE" : "NOT_STARTED")
+
+        self.phased_release["state"]["value"] = state
+      end
 
       attr_mapping({
         'appType' => :app_type,
@@ -146,9 +213,26 @@ module Spaceship
         'supportsAppleWatch' => :supports_apple_watch,
         'versionId' => :version_id,
         'version.value' => :version,
+        'phasedRelease' => :phased_release,
 
         # GeoJson
         # 'transitAppFile.value' => :transit_app_file
+
+        # Trade Representative Contact Information
+
+        'appStoreInfo.tradeName.value' => :trade_representative_trade_name,
+        'appStoreInfo.firstName.value' => :trade_representative_first_name,
+        'appStoreInfo.lastName.value' => :trade_representative_last_name,
+        'appStoreInfo.addressLine1.value' => :trade_representative_address_line_1,
+        'appStoreInfo.addressLine2.value' => :trade_representative_address_line_2,
+        'appStoreInfo.addressLine3.value' => :trade_representative_address_line_3,
+        'appStoreInfo.cityName.value' => :trade_representative_city_name,
+        'appStoreInfo.state.value' => :trade_representative_state,
+        'appStoreInfo.country.value' => :trade_representative_country,
+        'appStoreInfo.postalCode.value' => :trade_representative_postal_code,
+        'appStoreInfo.phoneNumber.value' => :trade_representative_phone_number,
+        'appStoreInfo.emailAddress.value' => :trade_representative_email,
+        'appStoreInfo.shouldDisplayInStore.value' => :trade_representative_is_displayed_on_app_store,
 
         # App Review Information
         'appReviewInfo.firstName.value' => :review_first_name,
@@ -313,9 +397,9 @@ module Spaceship
 
       # Private methods
       def setup
-        # Properly parse the AppStatus
         status = raw_data['status']
         @app_status = Tunes::AppStatus.get_from_string(status)
+
         setup_large_app_icon
         setup_watch_app_icon
         setup_transit_app_file if supports_app_transit?
@@ -432,30 +516,34 @@ module Spaceship
         setup_screenshots
       end
 
-      # Uploads, removes a trailer video or change its preview image
+      # Uploads, removes a trailer video
       #
       # A preview image for the video is required by ITC and is usually automatically extracted by your browser.
-      # This method will either automatically extract it from the video (using `ffmpeg) or allow you
+      # This method will either automatically extract it from the video (using `ffmpeg`) or allow you
       # to specify it using +preview_image_path+.
-      # If the preview image is specified, ffmpeg` will ot be used. The image resolution will be checked against
+      # If the preview image is specified, `ffmpeg` will not be used. The image resolution will be checked against
       # expectations (which might be different from the trailer resolution.
       #
       # It is recommended to extract the preview image using the spaceship related tools in order to ensure
       # the appropriate format and resolution are used.
       #
-      # Note: if the video is already set, the +trailer_path+ is only used to grab the preview screenshot.
       # Note: to extract its resolution and a screenshot preview, the `ffmpeg` tool will be used
       #
-      # @param icon_path (String): The path to the screenshot. Use nil to remove it
+      # @param trailer_path (String): The path to the trailer. Use nil to remove it
       # @param sort_order (Fixnum): The sort_order, from 1 to 5
       # @param language (String): The language for this screenshot
       # @param device (String): The device for this screenshot
       # @param timestamp (String): The optional timestamp of the screenshot to grab
-      def upload_trailer!(trailer_path, language, device, timestamp = "05.00", preview_image_path = nil)
+      # @param preview_image_path (String): The optional image path for the video preview
+      def upload_trailer!(trailer_path, sort_order, language, device, timestamp = "05.00", preview_image_path = nil)
         raise "No app trailer supported for iphone35" if device == 'iphone35'
+        raise "sort_order must be higher than 0" unless sort_order > 0
+        raise "sort_order must not be > 3" if sort_order > 3
 
-        device_lang_trailer = trailer_data_for_language_and_device(language, device, is_messages)
-        if trailer_path # adding / replacing trailer / replacing preview
+        device_lang_trailers = trailer_data_for_language_and_device(language, device)["value"]
+        existing_sort_orders = device_lang_trailers.map { |s| s["value"]["sortPosition"] }
+
+        if trailer_path # adding / replacing trailer
           raise "Invalid timestamp #{timestamp}" if (timestamp =~ /^[0-9][0-9].[0-9][0-9]$/).nil?
 
           if preview_image_path
@@ -467,33 +555,38 @@ module Spaceship
             video_preview_path = Utilities.grab_video_preview(trailer_path, timestamp, video_preview_resolution)
           end
           video_preview_file = UploadFile.from_path video_preview_path
-          video_preview_data = client.upload_trailer_preview(self, video_preview_file)
+          video_preview_data = client.upload_trailer_preview(self, video_preview_file, device)
 
-          trailer = device_lang_trailer["value"]
-          if trailer.nil? # add trailer
-            upload_file = UploadFile.from_path trailer_path
-            trailer_data = client.upload_trailer(self, upload_file)
-            trailer_data = trailer_data['responses'][0]
-            trailer = {
-                "videoAssetToken" => trailer_data["token"],
-                "descriptionXML" => trailer_data["descriptionDoc"],
-                "contentType" => upload_file.content_type
-            }
-            device_lang_trailer["value"] = trailer
-          end
-          # add / update preview
-          # different format required
+          upload_file = UploadFile.from_path trailer_path
+          trailer_data = client.upload_trailer(self, upload_file)
+
           ts = "00:00:#{timestamp}"
           ts[8] = ':'
 
-          trailer.merge!({
-            "pictureAssetToken" => video_preview_data["token"],
-            "previewFrameTimeCode" => ts.to_s,
-            "isPortrait" => Utilities.portrait?(video_preview_path)
-          })
+          new_trailer = {
+            "value" => {
+              "videoAssetToken" => trailer_data["responses"][0]["token"],
+              "descriptionXML" => trailer_data["responses"][0]["descriptionDoc"],
+              "contentType" => upload_file.content_type,
+              "sortPosition" => sort_order,
+              "size" => video_preview_data["length"],
+              "width" => video_preview_data["width"],
+              "height" => video_preview_data["height"],
+              "checksum" => video_preview_data["md5"],
+              "pictureAssetToken" => video_preview_data["token"],
+              "previewFrameTimeCode" => ts.to_s,
+              "isPortrait" => Utilities.portrait?(video_preview_path)
+            }
+          }
+
+          if existing_sort_orders.include?(sort_order) # replace
+            device_lang_trailers[existing_sort_orders.index(sort_order)] = new_trailer
+          else # add
+            device_lang_trailers << new_trailer
+          end
         else # removing trailer
-          raise "cannot remove non existing trailer" if device_lang_trailer["value"].nil?
-          device_lang_trailer["value"] = nil
+          raise "cannot remove trailer with non existing sort_order" unless existing_sort_orders.include?(sort_order)
+          device_lang_trailers.delete_at(existing_sort_orders.index(sort_order))
         end
         setup_trailers
       end
@@ -503,9 +596,10 @@ module Spaceship
         {
           keywords: :keywords,
           description: :description,
-          supportURL: :support_url,
-          marketingURL: :marketing_url,
-          releaseNotes: :release_notes
+          supportUrl: :support_url,
+          marketingUrl: :marketing_url,
+          releaseNotes: :release_notes,
+          promotionalText: :promotional_text
         }.each do |json, attribute|
           instance_variable_set("@#{attribute}".to_sym, LanguageItem.new(json, languages))
         end
@@ -572,7 +666,7 @@ module Spaceship
       end
 
       def trailer_data_for_language_and_device(language, device)
-        container_data_for_language_and_device("appTrailers", language, device)
+        container_data_for_language_and_device("trailers", language, device)
       end
 
       def container_data_for_language_and_device(data_field, language, device)
@@ -584,7 +678,7 @@ module Spaceship
         lang_details = languages[0]
         display_families = lang_details["displayFamilies"]["value"]
         device_details = display_families.find { |display_family| display_family['name'] == device }
-        raise "Couldn't find device familiy for #{device}" if device_details.nil?
+        raise "Couldn't find device family for #{device}" if device_details.nil?
         raise "Unexpected state: missing device details for #{device}" unless device_details.key?(data_field)
         return device_details[data_field]
       rescue => ex
@@ -592,8 +686,24 @@ module Spaceship
       end
 
       def setup_screenshots
-        @screenshots = {}
+        # Enable Scaling for all screen sizes that don't have at least one screenshot
+        # We automatically disable scaling once we upload at least one screenshot
+        language_details = raw_data_details.each do |current_language|
+          language_details = (current_language["displayFamilies"] || {})["value"]
+          (language_details || []).each do |device_language_details|
+            next if device_language_details["screenshots"].nil?
+            next if device_language_details["screenshots"]["value"].count > 0
 
+            # The current row includes screenshots for all device types
+            # so we need to enable scaling for both iOS and watchOS apps
+            device_language_details["scaled"]["value"] = true if device_language_details["scaled"]
+            device_language_details["messagesScaled"]["value"] = true if device_language_details["messagesScaled"]
+            # we unset `scaled` or `messagesScaled` as soon as we upload a
+            # screenshot for this device/language combination
+          end
+        end
+
+        @screenshots = {}
         raw_data_details.each do |row|
           # Now that's one language right here
           @screenshots[row['language']] = setup_screenshots_for(row) + setup_messages_screenshots_for(row)
@@ -737,13 +847,14 @@ module Spaceship
         result = []
 
         display_families.each do |display_family|
-          trailer_data = display_family.fetch("trailer", {}).fetch("value")
-          next if trailer_data.nil?
-          data = {
-            device_type: display_family['name'],
-            language: row["language"]
-          }.merge(trailer_data)
-          result << Tunes::AppTrailer.factory(data)
+          display_family.fetch("trailers", {}).fetch("value", []).each do |trailer|
+            trailer_data = trailer["value"]
+            data = {
+              device_type: display_family['name'],
+              language: row["language"]
+            }.merge(trailer_data)
+            result << Tunes::AppTrailer.factory(data)
+          end
         end
 
         return result

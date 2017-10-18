@@ -14,8 +14,8 @@ module Fastlane
       :production,
       :source_control,
       :notifications,
-      :deprecated,
-      :misc
+      :misc,
+      :deprecated # This should be the last item
     ]
 
     class << self
@@ -98,7 +98,7 @@ module Fastlane
       Fastlane::Actions.sh_control_output(command, print_command: print_command, print_command_output: print_command_output, error_callback: error_callback)
     end
 
-    # Documentation category, availabe values defined in AVAILABLE_CATEGORIES
+    # Documentation category, available values defined in AVAILABLE_CATEGORIES
     def self.category
       :undefined
     end
@@ -115,7 +115,7 @@ module Fastlane
     # Allows the user to call an action from an action
     def self.method_missing(method_sym, *arguments, &_block)
       UI.error("Unknown method '#{method_sym}'")
-      UI.user_error!("To call another action from an action use `OtherAction.#{method_sym}` instead")
+      UI.user_error!("To call another action from an action use `other_action.#{method_sym}` instead")
     end
 
     # When shelling out from the actoin, should we use `bundle exec`?

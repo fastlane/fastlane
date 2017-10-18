@@ -64,6 +64,16 @@ module Match
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
+        FastlaneCore::ConfigItem.new(key: :git_full_name,
+                                     env_name: "MATCH_GIT_FULL_NAME",
+                                     description: "git user full name to commit",
+                                     optional: true,
+                                     default_value: nil),
+        FastlaneCore::ConfigItem.new(key: :git_user_email,
+                                     env_name: "MATCH_GIT_USER_EMAIL",
+                                     description: "git user email to commit",
+                                     optional: true,
+                                     default_value: nil),
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-l",
                                      env_name: "FASTLANE_TEAM_NAME",
@@ -96,6 +106,11 @@ module Match
                                      description: "Make a shallow clone of the repository (truncate the history to 1 revision)",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :clone_branch_directly,
+                                     env_name: "MATCH_CLONE_BRANCH_DIRECTLY",
+                                     description: "Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail",
+                                     is_string: false,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :workspace,
                                      description: nil,
                                      verify_block: proc do |value|
@@ -110,7 +125,7 @@ module Match
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :force_for_new_devices,
                                      env_name: "MATCH_FORCE_FOR_NEW_DEVICES",
-                                     description: "Renew the provisioning profiles if the device count on the developer portal has changed",
+                                     description: "Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile type 'appstore'",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_docs,
@@ -128,7 +143,12 @@ module Match
                                        value = value.to_s
                                        pt = %w(tvos ios)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :template_name,
+                                     env_name: "MATCH_PROVISIONING_PROFILE_TEMPLATE_NAME",
+                                     description: "The name of provisioning profile template. If the developer account has provisioning profile templates, template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile",
+                                     optional: true,
+                                     default_value: nil)
       ]
     end
   end

@@ -7,18 +7,21 @@ module Fastlane
     # Raises an exception and stop the lane execution if the repo is not in a clean state
     class EnsureGitStatusCleanAction < Action
       def self.run(params)
-        repo_clean = `git status --porcelain`.empty?
+        repo_status = Actions.sh("git status --porcelain")
+        repo_clean = repo_status.empty?
 
         if repo_clean
           UI.success('Git status is clean, all good! 💪')
           Actions.lane_context[SharedValues::GIT_REPO_WAS_CLEAN_ON_START] = true
         else
-          UI.user_error!("Git repository is dirty! Please ensure the repo is in a clean state by commiting/stashing/discarding all changes first.")
+          error_message = "Git repository is dirty! Please ensure the repo is in a clean state by committing/stashing/discarding all changes first."
+          error_message += "\nUncommitted changes:\n#{repo_status}" if params[:show_uncommitted_changes]
+          UI.user_error!(error_message)
         end
       end
 
       def self.description
-        "Raises an exception if there are uncommited git changes"
+        "Raises an exception if there are uncommitted git changes"
       end
 
       def self.details
@@ -38,11 +41,22 @@ module Fastlane
       end
 
       def self.author
-        "lmirosevic"
+        ["lmirosevic", "antondomashnev"]
       end
 
       def self.example_code
         ['ensure_git_status_clean']
+      end
+
+      def self.available_options
+        [
+          FastlaneCore::ConfigItem.new(key: :show_uncommitted_changes,
+                                       env_name: "FL_ENSURE_GIT_STATUS_CLEAN_SHOW_UNCOMMITTED_CHANGES",
+                                       description: "The flag whether to show uncommitted changes if the repo is dirty",
+                                       optional: true,
+                                       default_value: false,
+                                       is_string: false)
+        ]
       end
 
       def self.category

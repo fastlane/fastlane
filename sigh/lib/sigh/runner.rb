@@ -61,7 +61,9 @@ module Sigh
     # Fetches a profile matching the user's search requirements
     def fetch_profiles
       UI.message "Fetching profiles..."
-      results = profile_type.find_by_bundle_id(Sigh.config[:app_identifier], mac: Sigh.config[:platform].to_s == 'macos')
+      results = profile_type.find_by_bundle_id(bundle_id: Sigh.config[:app_identifier],
+                                                     mac: Sigh.config[:platform].to_s == 'macos',
+                                            sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil)
       results = results.find_all do |current_profile|
         if current_profile.valid? || Sigh.config[:force]
           true
@@ -72,45 +74,48 @@ module Sigh
       end
 
       # Take the provisioning profile name into account
-      if Sigh.config[:provisioning_name].to_s.length > 0
-        filtered = results.select { |p| p.name.strip == Sigh.config[:provisioning_name].strip }
-        if Sigh.config[:ignore_profiles_with_different_name]
-          results = filtered
-        elsif (filtered || []).count > 0
-          results = filtered
-        end
-      end
+      results = filter_profiles_by_name(results) if Sigh.config[:provisioning_name].to_s.length > 0
 
       # Since September 20, 2016 spaceship doesn't distinguish between AdHoc and AppStore profiles
       # any more, since it requires an additional request
       # Instead we only call is_adhoc? on the matching profiles to speed up spaceship
 
-      results = results.find_all do |current_profile|
-        if profile_type == Spaceship.provisioning_profile.ad_hoc
-          current_profile.is_adhoc?
-        elsif profile_type == Spaceship.provisioning_profile.app_store
-          !current_profile.is_adhoc?
-        else
-          true
-        end
-      end
+      results = filter_profiles_for_adhoc_or_app_store(results)
 
       return results if Sigh.config[:skip_certificate_verification]
 
-      return results.find_all do |a|
-        # Also make sure we have the certificate installed on the local machine
+      UI.message "Verifying certificates..."
+      return results.find_all do |current_profile|
         installed = false
-        a.certificates.each do |cert|
+
+        # Attempts to download all certificates from this profile
+        # for checking if they are installed.
+        # `cert.download_raw` can fail if the user is a
+        # "member" and not an a "admin"
+        raw_certs = current_profile.certificates.map do |cert|
+          begin
+            raw_cert = cert.download_raw
+          rescue => error
+            UI.important("Cannot download cert #{cert.id} - #{error.message}")
+            raw_cert = nil
+          end
+          { downloaded: raw_cert, cert: cert }
+        end
+
+        # Makes sure we have the certificate installed on the local machine
+        raw_certs.each do |current_cert|
+          # Skip certificates that failed to download
+          next unless current_cert[:downloaded]
           file = Tempfile.new('cert')
-          file.write(cert.download_raw)
+          file.write(current_cert[:downloaded])
           file.close
           if FastlaneCore::CertChecker.installed?(file.path)
             installed = true
           else
-            UI.message("Certificate for Provisioning Profile '#{a.name}' not available locally: #{cert.id}, skipping this one...")
+            UI.message("Certificate for Provisioning Profile '#{current_profile.name}' not available locally: #{current_cert[:cert].id}, skipping this one...")
           end
         end
-        installed && a.certificate_valid?
+        installed && current_profile.certificate_valid?
       end
     end
 
@@ -132,8 +137,31 @@ module Sigh
                                 bundle_id: bundle_id,
                               certificate: cert,
                                       mac: Sigh.config[:platform].to_s == 'macos',
-                             sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil)
+                             sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil,
+                            template_name: Sigh.config[:template_name])
       profile
+    end
+
+    def filter_profiles_by_name(profiles)
+      filtered = profiles.select { |p| p.name.strip == Sigh.config[:provisioning_name].strip }
+      if Sigh.config[:ignore_profiles_with_different_name]
+        profiles = filtered
+      elsif (filtered || []).count > 0
+        profiles = filtered
+      end
+      profiles
+    end
+
+    def filter_profiles_for_adhoc_or_app_store(profiles)
+      profiles.find_all do |current_profile|
+        if profile_type == Spaceship.provisioning_profile.ad_hoc
+          current_profile.is_adhoc?
+        elsif profile_type == Spaceship.provisioning_profile.app_store
+          !current_profile.is_adhoc?
+        else
+          true
+        end
+      end
     end
 
     def certificates_for_profile_and_platform

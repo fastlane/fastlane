@@ -1,6 +1,10 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Pod Push action" do
+      before :each do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+      end
+
       it "generates the correct pod push command with no parameters" do
         result = Fastlane::FastFile.new.parse("lane :test do
           pod_push
@@ -23,6 +27,14 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq("pod repo push MyRepo './fastlane/spec/fixtures/podspecs/test.podspec'")
+      end
+
+      it "generates the correct pod push command with a repo parameter with the swift version flag" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_push(path: './fastlane/spec/fixtures/podspecs/test.podspec', repo: 'MyRepo', swift_version: 4.0)
+        end").runner.execute(:test)
+
+        expect(result).to eq("pod repo push MyRepo './fastlane/spec/fixtures/podspecs/test.podspec' --swift-version=4.0")
       end
 
       it "generates the correct pod push command with a repo parameter with the allow warnings and use libraries flags" do

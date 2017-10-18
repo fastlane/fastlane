@@ -1,4 +1,5 @@
 require 'commander'
+require 'fastlane_core'
 require 'fastlane/version'
 
 HighLine.track_eof = false
@@ -18,7 +19,7 @@ module Match
       program :description, Match::DESCRIPTION
       program :help, 'Author', 'Felix Krause <match@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/match'
+      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/match#readme'
       program :help_formatter, :compact
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
@@ -31,7 +32,7 @@ module Match
 
         c.action do |args, options|
           if args.count > 0
-            FastlaneCore::UI.user_error!("Please run `fastlane match [type]`, allowed values: development, adhoc or appstore")
+            FastlaneCore::UI.user_error!("Please run `fastlane match [type]`, allowed values: development, adhoc, enterprise  or appstore")
           end
 
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
@@ -60,7 +61,7 @@ module Match
         c.syntax = 'fastlane match init'
         c.description = 'Create the Matchfile for you'
         c.action do |args, options|
-          containing = (File.directory?("fastlane") ? 'fastlane' : '.')
+          containing = FastlaneCore::Helper.fastlane_enabled_folder_path
           path = File.join(containing, "Matchfile")
 
           if File.exist?(path)
@@ -96,7 +97,10 @@ module Match
         c.action do |args, options|
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
           params.load_configuration_file("Matchfile")
-          decrypted_repo = Match::GitHelper.clone(params[:git_url], params[:shallow_clone], branch: params[:git_branch])
+          decrypted_repo = Match::GitHelper.clone(params[:git_url],
+                                                  params[:shallow_clone],
+                                                  branch: params[:git_branch],
+                                                  clone_branch_directly: params[:clone_branch_directly])
           UI.success "Repo is at: '#{decrypted_repo}'"
         end
       end

@@ -1,3 +1,5 @@
+require 'tempfile'
+
 module Spaceship
   class Client
     def handle_two_step(response)
@@ -6,9 +8,7 @@ module Spaceship
 
       r = request(:get) do |req|
         req.url "https://idmsa.apple.com/appleauth/auth"
-        req.headers["scnt"] = @scnt
-        req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
-        req.headers["Accept"] = "application/json"
+        update_request_headers(req)
       end
 
       if r.body.kind_of?(Hash) && r.body["trustedDevices"].kind_of?(Array)
@@ -45,8 +45,14 @@ module Spaceship
     def handle_two_factor(response)
       two_factor_url = "https://github.com/fastlane/fastlane/tree/master/spaceship#2-step-verification"
       puts "Two Factor Authentication for account '#{self.user}' is enabled"
-      puts "If you're running this in a non-interactive session (e.g. server or CI)"
-      puts "check out #{two_factor_url}"
+
+      if !File.exist?(persistent_cookie_path) && self.class.spaceship_session_env.to_s.length.zero?
+        puts "If you're running this in a non-interactive session (e.g. server or CI)"
+        puts "check out #{two_factor_url}"
+      else
+        # If the cookie is set but still required, the cookie is expired
+        puts "Your session cookie has been expired."
+      end
 
       security_code = response.body["securityCode"]
       # {"length"=>6,
@@ -60,11 +66,10 @@ module Spaceship
       # Send securityCode back to server to get a valid session
       r = request(:post) do |req|
         req.url "https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode"
-        req.headers["Accept"] = "application/json"
         req.headers['Content-Type'] = 'application/json'
-        req.headers["scnt"] = @scnt
-        req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
         req.body = { "securityCode" => { "code" => code.to_s } }.to_json
+
+        update_request_headers(req)
       end
 
       # we use `Spaceship::TunesClient.new.handle_itc_response`
@@ -115,9 +120,7 @@ module Spaceship
       # Request Token
       r = request(:put) do |req|
         req.url "https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode"
-        req.headers["Accept"] = "application/json"
-        req.headers["scnt"] = @scnt
-        req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
+        update_request_headers(req)
       end
 
       # we use `Spaceship::TunesClient.new.handle_itc_response`
@@ -131,11 +134,10 @@ module Spaceship
       # Send token back to server to get a valid session
       r = request(:post) do |req|
         req.url "https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode"
-        req.headers["Accept"] = "application/json"
-        req.headers["scnt"] = @scnt
-        req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
         req.body = { "code" => code.to_s }.to_json
         req.headers['Content-Type'] = 'application/json'
+
+        update_request_headers(req)
       end
 
       begin
@@ -187,14 +189,23 @@ module Spaceship
 
       request(:get) do |req|
         req.url "https://idmsa.apple.com/appleauth/auth/2sv/trust"
-        req.headers["scnt"] = @scnt
-        req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
+
+        update_request_headers(req)
       end
       # This request will fail if the user isn't added to a team on iTC
       # However we don't really care, this request will still return the
       # correct DES... cookie
 
       self.store_cookie
+    end
+
+    # Responsible for setting all required header attributes for the requests
+    # to succeed
+    def update_request_headers(req)
+      req.headers["X-Apple-Id-Session-Id"] = @x_apple_id_session_id
+      req.headers["X-Apple-Widget-Key"] = self.itc_service_key
+      req.headers["Accept"] = "application/json"
+      req.headers["scnt"] = @scnt
     end
   end
 end

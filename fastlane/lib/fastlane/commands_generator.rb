@@ -91,7 +91,6 @@ module Fastlane
         FastlaneCore::Globals.verbose = true
       end
       global_option('--troubleshoot', 'Enables extended verbose mode. Use with caution, as this even includes ALL sensitive data. Cannot be used on CI.')
-      global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
 
       always_trace!
 
@@ -111,6 +110,8 @@ module Fastlane
         c.syntax = 'fastlane init'
         c.description = 'Helps you with your initial fastlane setup'
 
+        c.option '-u STRING', '--user STRING', String, 'iOS projects only: Your Apple ID'
+
         CrashlyticsBetaCommandLineHandler.apply_options(c)
 
         c.action do |args, options|
@@ -118,7 +119,7 @@ module Fastlane
             beta_info = CrashlyticsBetaCommandLineHandler.info_from_options(options)
             Fastlane::CrashlyticsBeta.new(beta_info, Fastlane::CrashlyticsBetaUi.new).run
           else
-            Fastlane::Setup.new.run
+            Fastlane::Setup.new.run(user: options.user)
           end
         end
       end
@@ -176,7 +177,7 @@ module Fastlane
         c.action do |args, options|
           if ensure_fastfile
             ff = Fastlane::FastFile.new(File.join(FastlaneCore::FastlaneFolder.path || '.', 'Fastfile'))
-            UI.message "You don't need to run `fastlane docs` manually any more, this will be done automatically for you."
+            UI.message "You don't need to run `fastlane docs` manually any more, this will be done automatically for you when running a lane."
             Fastlane::DocsGenerator.run(ff)
           end
         end
@@ -309,7 +310,7 @@ module Fastlane
     def ensure_fastfile
       return true if FastlaneCore::FastlaneFolder.setup?
 
-      create = UI.confirm('Could not find fastlane in current directory. Would you like to set it up?')
+      create = UI.confirm('Could not find fastlane in current directory. Make sure to have your fastlane configuration files inside a folder called "fastlane". Would you like to set fastlane up?')
       Fastlane::Setup.new.run if create
       return false
     end

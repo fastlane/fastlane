@@ -94,7 +94,7 @@ module Fastlane
                                      optional: true),
           FastlaneCore::ConfigItem.new(key: :notes_path,
                                      env_name: "TRYOUTS_NOTES_PATH",
-                                     description: "Release notes text file path. Overrides the :notes paramether",
+                                     description: "Release notes text file path. Overrides the :notes parameter",
                                      verify_block: proc do |value|
                                        UI.user_error!("Couldn't find notes file at path '#{value}'") unless File.exist?(value)
                                      end,
@@ -127,7 +127,7 @@ module Fastlane
       end
 
       def self.category
-        :misc
+        :beta
       end
 
       def self.output

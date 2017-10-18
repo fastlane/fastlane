@@ -26,12 +26,15 @@ module Fastlane
         end
 
         if params[:select_reqex]
-          UI.important("'select_reqex' paramter is deprecated. Please use 'select_regex' instead.")
+          UI.important("'select_reqex' parameter is deprecated. Please use 'select_regex' instead.")
           select_regex = params[:select_reqex]
         end
 
         select_regex = params[:select_regex] if params[:select_regex] # Overwrite deprecated select_reqex
+        select_regex = ensure_regex_is_not_string!(select_regex)
+
         exclude_regex = params[:exclude_regex]
+        exclude_regex = ensure_regex_is_not_string!(exclude_regex)
 
         files = JSON.parse(File.read(compile_commands)).map do |compile_command|
           file = compile_command['file']
@@ -43,7 +46,7 @@ module Fastlane
           file_ruby = file.gsub('\ ', ' ')
           File.exist?(file_ruby) and
             (!select_regex or file_ruby =~ select_regex) and
-            (!exclude_regex or !(file_ruby =~ exclude_regex))
+            (!exclude_regex or file_ruby !~ exclude_regex)
         end
 
         command_prefix = [
@@ -88,6 +91,13 @@ module Fastlane
         Actions.lane_context[SharedValues::FL_OCLINT_REPORT_PATH] = File.expand_path(report_path)
 
         return Action.sh(command)
+      end
+
+      # return a proper regex object if regex string is single-quoted
+      def self.ensure_regex_is_not_string!(regex)
+        return regex unless regex.kind_of?(String)
+
+        Regexp.new(regex)
       end
 
       #####################################################

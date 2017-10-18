@@ -1,6 +1,10 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "OCLint Integration" do
+      before :each do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+      end
+
       it "raises an exception when the default compile_commands.json is not present" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -87,7 +91,18 @@ describe Fastlane do
         expect(result).to include('"fastlane/spec/fixtures/oclint/src/AppDelegate.m"')
       end
 
-      it "worsk with exclude regex" do
+      it "works with select regex when regex is string" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            oclint(
+              compile_commands: './fastlane/spec/fixtures/oclint/compile_commands.json',
+              select_regex: \"\/AppDelegate\"
+            )
+          end").runner.execute(:test)
+
+        expect(result).to include('"fastlane/spec/fixtures/oclint/src/AppDelegate.m"')
+      end
+
+      it "works with exclude regex" do
         result = Fastlane::FastFile.new.parse("lane :test do
             oclint(
               compile_commands: './fastlane/spec/fixtures/oclint/compile_commands.json',

@@ -55,7 +55,7 @@ module Fastlane
         # If we didn't build, then we return now, as it makes no sense to search for apk's in a non-`assemble` scenario
         return result unless task =~ /\b(assemble)/
 
-        apk_search_path = File.join(project_dir, '**', 'build', 'outputs', 'apk', '*.apk')
+        apk_search_path = File.join(project_dir, '**', 'build', 'outputs', 'apk', '**', '*.apk')
 
         # Our apk is now built, but there might actually be multiple ones that were built if a flavor was not specified in a multi-flavor project (e.g. `assembleRelease`), however we're not interested in unaligned apk's...
         new_apks = Dir[apk_search_path].reject { |path| path =~ /^.*-unaligned.apk$/i }
@@ -127,7 +127,7 @@ module Fastlane
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :serial,
                                        env_name: 'FL_ANDROID_SERIAL',
-                                       description: 'Android serial, wich device should be used for this command',
+                                       description: 'Android serial, which device should be used for this command',
                                        is_string: true,
                                        default_value: ''),
           FastlaneCore::ConfigItem.new(key: :print_command,
@@ -161,7 +161,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :android || platform == :ios
+        [:ios, :android].include?(platform) # we support iOS as cross platforms apps might want to call `gradle` also
       end
 
       def self.example_code

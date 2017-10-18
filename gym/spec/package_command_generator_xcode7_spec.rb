@@ -9,13 +9,31 @@ describe Gym do
   end
 
   describe Gym::PackageCommandGeneratorXcode7 do
+    it "passes xcargs through to xcode build wrapper " do
+      options = {
+        project: "./gym/examples/standard/Example.xcodeproj",
+        xcargs: "-allowProvisioningUpdates"
+      }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      result = Gym::PackageCommandGeneratorXcode7.generate
+      expect(result).to eq([
+                             "/usr/bin/xcrun #{Gym::PackageCommandGeneratorXcode7.wrap_xcodebuild.shellescape} -exportArchive",
+                             "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                             "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
+                             "-allowProvisioningUpdates",
+                             ""
+                           ])
+    end
+
     it "works with the example project with no additional parameters" do
       options = { project: "./gym/examples/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
       result = Gym::PackageCommandGeneratorXcode7.generate
       expect(result).to eq([
-                             "/usr/bin/xcrun #{Gym::XcodebuildFixes.wrap_xcodebuild.shellescape} -exportArchive",
+                             "/usr/bin/xcrun #{Gym::PackageCommandGeneratorXcode7.wrap_xcodebuild.shellescape} -exportArchive",
                              "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
                              "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                              "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
@@ -31,7 +49,7 @@ describe Gym do
 
       result = Gym::PackageCommandGeneratorXcode7.generate
       expect(result).to eq([
-                             "/usr/bin/xcrun #{Gym::XcodebuildFixes.wrap_xcodebuild.shellescape} -exportArchive",
+                             "/usr/bin/xcrun #{Gym::PackageCommandGeneratorXcode7.wrap_xcodebuild.shellescape} -exportArchive",
                              "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
                              "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                              "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
@@ -44,7 +62,7 @@ describe Gym do
       options = { project: "./gym/examples/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
-      allow(Gym::XcodebuildFixes).to receive(:wrap_xcodebuild).and_return("/tmp/path with spaces")
+      allow(Gym::PackageCommandGeneratorXcode7).to receive(:wrap_xcodebuild).and_return("/tmp/path with spaces")
 
       result = Gym::PackageCommandGeneratorXcode7.generate
       expect(result).to eq([
@@ -65,7 +83,7 @@ describe Gym do
 
       result = Gym::PackageCommandGeneratorXcode7.generate
       expect(result).to eq([
-                             "/usr/bin/xcrun #{Gym::XcodebuildFixes.wrap_xcodebuild.shellescape} -exportArchive",
+                             "/usr/bin/xcrun #{Gym::PackageCommandGeneratorXcode7.wrap_xcodebuild.shellescape} -exportArchive",
                              "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
                              "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                              "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
@@ -82,9 +100,7 @@ describe Gym do
       config_path = Gym::PackageCommandGeneratorXcode7.config_path
 
       expect(Plist.parse_xml(config_path)).to eq({
-        'method' => "app-store",
-        'uploadBitcode' => false,
-        'uploadSymbols' => true
+        'method' => "app-store"
       })
     end
 
@@ -108,6 +124,24 @@ describe Gym do
       expect(Gym.config[:include_symbols]).to be_nil
       expect(Gym.config[:include_bitcode]).to be_nil
       expect(Gym.config[:export_team_id]).to be_nil
+    end
+
+    it "defaults to the correct export type if :export_options parameter is provided" do
+      options = {
+        project: "./gym/examples/standard/Example.xcodeproj",
+        export_options: {
+          include_symbols: true
+        }
+      }
+
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      result = Gym::PackageCommandGeneratorXcode7.generate
+      config_path = Gym::PackageCommandGeneratorXcode7.config_path
+
+      content = Plist.parse_xml(config_path)
+      expect(content["include_symbols"]).to eq(true)
+      expect(content["method"]).to eq('app-store')
     end
 
     it "reads user export plist and override some parameters" do

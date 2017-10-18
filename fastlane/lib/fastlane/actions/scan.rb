@@ -9,6 +9,7 @@ module Fastlane
     class ScanAction < Action
       def self.run(values)
         require 'scan'
+        plist_files_before = []
 
         begin
           destination = values[:destination] # save destination value which can be later overridden
@@ -78,13 +79,13 @@ module Fastlane
             scheme: "MyTests",
             clean: false
           )',
-          '#Build For Testing
-           scan(
+          '# Build For Testing
+          scan(
              derived_data_path: "my_folder",
              build_for_testing: true
           )',
           '# run tests using derived data from prev. build
-           scan(
+          scan(
              derived_data_path: "my_folder",
              test_without_building: true
           )',

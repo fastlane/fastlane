@@ -5,7 +5,7 @@ module CredentialsManager
   class AccountManager
     DEFAULT_PREFIX = "deliver"
     # @param prefix [String] Very optional, is used for the
-    #   iTunes Transporter which uses application specofic passwords
+    #   iTunes Transporter which uses application specific passwords
     # @param note [String] An optional note that will be shown next
     #   to the password and username prompt
     def initialize(user: nil, password: nil, prefix: nil, note: nil)
@@ -16,7 +16,7 @@ module CredentialsManager
       @note = note
     end
 
-    # Is the that default prefix "deliver"
+    # Is the default prefix "deliver"
     def default_prefix?
       @prefix == DEFAULT_PREFIX
     end
@@ -33,7 +33,9 @@ module CredentialsManager
     end
 
     def fetch_password_from_env
-      ENV["FASTLANE_PASSWORD"] || ENV["DELIVER_PASSWORD"]
+      password = ENV["FASTLANE_PASSWORD"] || ENV["DELIVER_PASSWORD"]
+      return password if password.to_s.length > 0
+      return nil
     end
 
     def password(ask_if_missing: true)
@@ -50,7 +52,7 @@ module CredentialsManager
     end
 
     # Call this method to ask the user to re-enter the credentials
-    # @param force: if false the user is asked before it gets deleted
+    # @param force: if false, the user is asked before it gets deleted
     # @return: Did the user decide to remove the old entry and enter a new password?
     def invalid_credentials(force: false)
       puts "The login credentials for '#{user}' seem to be wrong".red
@@ -117,7 +119,7 @@ module CredentialsManager
         prompt_text += " (#{@note})" if @note
         prompt_text += ": "
         @user = ask(prompt_text) while @user.to_s.length == 0
-        # we return here, as only the username was asked for now, we'll get called for the pw again anyway
+        # Returning here since only the username was asked for. This method will be called again when a password is needed.
         return
       end
 

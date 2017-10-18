@@ -17,7 +17,7 @@ module Snapshot
       program :description, 'CLI for \'snapshot\' - Automate taking localized screenshots of your iOS app on every device'
       program :help, 'Author', 'Felix Krause <snapshot@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/snapshot'
+      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/snapshot#readme'
       program :help_formatter, :compact
 
       global_option('--verbose', 'Shows a more verbose output') { FastlaneCore::Globals.verbose = true }
@@ -44,7 +44,7 @@ module Snapshot
 
         c.action do |args, options|
           require 'snapshot/setup'
-          path = (Snapshot::Helper.fastlane_enabled? ? './fastlane' : '.')
+          path = Snapshot::Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
           Snapshot::Setup.create(path)
         end
       end

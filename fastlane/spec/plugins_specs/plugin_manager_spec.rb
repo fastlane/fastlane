@@ -82,6 +82,18 @@ describe Fastlane do
       end
     end
 
+    describe "#update_dependencies!" do
+      before do
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./fastlane/spec/fixtures/plugins/Pluginfile1")
+      end
+
+      it "execs out the correct command" do
+        expect(plugin_manager).to receive(:ensure_plugins_attached!)
+        expect(plugin_manager).to receive(:exec).with("bundle update fastlane-plugin-xcversion --quiet && echo 'Successfully updated plugins'")
+        plugin_manager.update_dependencies!
+      end
+    end
+
     describe "#gem_dependency_suffix" do
       it "default to RubyGems if gem is available" do
         expect(Fastlane::PluginManager).to receive(:fetch_gem_info_from_rubygems).and_return({ anything: :really })
@@ -133,6 +145,7 @@ describe Fastlane do
       end
 
       it "runs the action as expected if the plugin is available" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         # We don't need to set this, since this method shouldn't even be called when the plugin is available
         # expect(Fastlane::Actions).to receive(:formerly_bundled_actions).and_return(["crashlytics"])
 
@@ -201,6 +214,7 @@ describe Fastlane do
       end
 
       it "shows an appropriate error message when a plugin is really broken" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         ex = ScriptError.new
         pm = Fastlane::PluginManager.new
         plugin_name = "broken"
