@@ -25,4 +25,5 @@
 # test_words(level: :error)
 # unreachable_urls(level: :error)
 # custom_text(data: ["fabric"], level: :warn)
+# pre_release_apple_sw_hw(level: warn)
 
