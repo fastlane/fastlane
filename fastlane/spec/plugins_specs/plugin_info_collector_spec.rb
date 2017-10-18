@@ -259,13 +259,6 @@ describe Fastlane::PluginInfoCollector do
 
       expect(collector.collect_details).to eq('details')
     end
-
-    it "accepts a valid details after rejecting an invalid details" do
-      expect(test_ui).to receive(:input).and_return('')
-      expect(test_ui).to receive(:input).and_return('details')
-
-      expect(collector.collect_details).to eq('details')
-    end
   end
 
   describe '#collect_info' do
