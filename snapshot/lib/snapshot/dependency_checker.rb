@@ -33,7 +33,7 @@ module Snapshot
       if FastlaneCore::Simulator.all.count == 0
         UI.error '#############################################################'
         UI.error "# You have to add new simulators using Xcode"
-        UI.error "# You can let snapshot create new simulators: 'snapshot reset_simulators'"
+        UI.error "# You can let snapshot create new simulators: 'fastlane snapshot reset_simulators'"
         UI.error "# Manually: Xcode => Window => Devices"
         UI.error "# Please run `instruments -s` to verify your xcode path"
         UI.error '#############################################################'
