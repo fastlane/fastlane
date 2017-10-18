@@ -15,4 +15,5 @@ test:
   override:
     - bundle exec danger || echo "danger failed, moving on" # for quick, instant feedback of PR body and title
     - bundle exec fastlane test
+    - bundle exec fastlane lint
     - bundle exec danger || echo "danger failed, moving on" # for posting the test results to GitHub

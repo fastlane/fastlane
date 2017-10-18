@@ -269,6 +269,7 @@ private_lane :validate_repo do
   ensure_no_debug_code(text: " UI\\.", path: "credentials_manager/lib", extension: ".rb", exclude_dirs: ["\.bundle"])
 
   rubocop
+  swiftlint(strict: true)
 
   # Verifying the --help command
   #
