@@ -137,7 +137,7 @@ open class Snapshot: NSObject {
                 return nil
             }
 
-            guard let usersDir =  FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
+            guard let usersDir = FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
                 print("Couldn't find Snapshot configuration files - can't detect `Users` dir")
                 return nil
             }
