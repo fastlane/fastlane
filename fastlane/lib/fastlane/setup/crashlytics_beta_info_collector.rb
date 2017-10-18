@@ -113,7 +113,7 @@ module Fastlane
 
     def prompt_for_api_key(info)
       loop do
-        info.api_key = @ui.input("\nPlease provide your Fabric organization's API Key:").strip
+        info.api_key = @ui.input("Please provide your Fabric organization's API Key:").strip
         break if info.api_key_valid?
         @ui.message "The API Key you provided was invalid (must be 40 characters)."
       end
@@ -121,7 +121,7 @@ module Fastlane
 
     def prompt_for_build_secret(info)
       loop do
-        info.build_secret = @ui.input("\nPlease provide your Fabric organization's Build Secret:").strip
+        info.build_secret = @ui.input("Please provide your Fabric organization's Build Secret:").strip
         break if info.build_secret_valid?
         @ui.message "The Build Secret you provided was invalid (must be 64 characters)."
       end
@@ -129,7 +129,7 @@ module Fastlane
 
     def prompt_for_crashlytics_path(info)
       loop do
-        info.crashlytics_path = @ui.input("\nPlease provide the path to Crashlytics.framework:").strip
+        info.crashlytics_path = @ui.input("Please provide the path to Crashlytics.framework:").strip
         break if info.crashlytics_path_valid?
         @ui.message "A submit binary could not be found at the framework path you provided."
       end
@@ -137,7 +137,7 @@ module Fastlane
 
     def prompt_for_email(info)
       loop do
-        info.emails = [@ui.input("\nPlease enter an email address to distribute the beta to:").strip]
+        info.emails = [@ui.input("Please enter an email address to distribute the beta to:").strip]
         break if info.emails_valid?
         @ui.message "You must provide an email address."
       end
@@ -147,7 +147,7 @@ module Fastlane
       current_schemes = info.schemes
       if current_schemes.nil? || current_schemes.empty?
         loop do
-          info.schemes = [@ui.input("\nPlease enter the name of the scheme you would like to use:").strip]
+          info.schemes = [@ui.input("Please enter the name of the scheme you would like to use:").strip]
           break if info.schemes_valid?
           @ui.message "You must provide a scheme name."
         end
