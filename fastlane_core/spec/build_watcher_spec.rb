@@ -63,18 +63,6 @@ describe FastlaneCore::BuildWatcher do
       )
     end
 
-    it 'continues after receiving internal server error' do
-      expect(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([])
-      expect(Spaceship::TestFlight::Build).to receive(:latest).and_return(ready_build)
-      allow(Spaceship::TestFlight::Build).to receive(:builds_for_train) { raise Faraday::ParsingError, 'Boom!' }
-
-      expect(UI).to receive(:message).with(/Internal server error while querying build status. Number of errors: /).exactly(10).times
-      begin
-        FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios)
-      rescue
-      end
-    end
-
     it 'returns an already-active build' do
       expect(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([])
       expect(Spaceship::TestFlight::Build).to receive(:latest).and_return(active_build)
