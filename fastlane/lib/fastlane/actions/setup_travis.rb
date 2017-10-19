@@ -10,6 +10,10 @@ module Fastlane
 
         # Create a temporary keychain
         password = "" # we don't need a password, as the keychain gets removed after each run anyway
+        if params[:random_password] # random password can be created optionally
+          password = SecureRandom.base64(12)
+        end
+
         keychain_name = "fastlane_tmp_keychain"
         ENV["MATCH_KEYCHAIN_NAME"] = keychain_name
         ENV["MATCH_KEYCHAIN_PASSWORD"] = password
@@ -53,6 +57,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_SETUP_TRAVIS_FORCE",
                                        description: "Force setup, even if not executed by travis",
+                                       is_string: false,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :random_password,
+                                       env_name: "FL_SETUP_TRAVIS_RANDOM_PASSWORD",
+                                       description: "Generate a secure random password when creating keychain",
                                        is_string: false,
                                        default_value: false)
         ]
