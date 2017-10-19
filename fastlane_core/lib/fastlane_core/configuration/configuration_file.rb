@@ -67,6 +67,14 @@ module FastlaneCore
         # This silently prevents a value from having its value set more than once.
         return unless self.config._values[method_sym].to_s.empty?
 
+        if ENV[self.config.option_for_key(method_sym).env_name].to_s.length > 0
+          # This fixes https://github.com/fastlane/fastlane/issues/10640
+          # where values taken from the config file will take priority over
+          # env variables
+          # https://docs.fastlane.tools/advanced/#priorities-of-parameters-and-options
+          return
+        end
+
         value = arguments.first
         value = yield if value.nil? && block_given?
 
