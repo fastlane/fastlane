@@ -568,7 +568,7 @@ describe FastlaneCore do
           it "raises an error if this option does not exist" do
             expect do
               @config[:asdfasdf]
-            end.to raise_error "Could not find option for key :asdfasdf. Available keys: cert_name, output, wait_processing_interval"
+            end.to raise_error "Could not find option 'asdfasdf' in the list of available options: cert_name, output, wait_processing_interval"
           end
 
           it "returns the value for the given key if given" do
