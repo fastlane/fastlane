@@ -527,6 +527,7 @@ module Spaceship
     rescue \
         Faraday::Error::ConnectionFailed,
         Faraday::Error::TimeoutError,
+        Faraday::ParsingError, # <h2>Internal Server Error</h2> with content type json
         AppleTimeoutError,
         InternalServerError => ex # New Faraday version: Faraday::TimeoutError => ex
       tries -= 1

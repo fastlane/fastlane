@@ -42,7 +42,8 @@ describe Spaceship::Client do
   describe 'retry' do
     [
       Faraday::Error::TimeoutError,
-      Faraday::Error::ConnectionFailed
+      Faraday::Error::ConnectionFailed,
+      Faraday::ParsingError
     ].each do |thrown|
       it "re-raises when retry limit reached throwing #{thrown}" do
         stub_client_request(thrown, 6, 200, nil)

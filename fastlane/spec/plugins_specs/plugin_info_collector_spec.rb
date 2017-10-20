@@ -259,27 +259,6 @@ describe Fastlane::PluginInfoCollector do
 
       expect(collector.collect_details).to eq('details')
     end
-
-    it "accepts a valid details after rejecting an invalid details" do
-      expect(test_ui).to receive(:input).and_return('')
-      expect(test_ui).to receive(:input).and_return('details')
-
-      expect(collector.collect_details).to eq('details')
-    end
-  end
-
-  describe "#details_valid?" do
-    it "handles valid details" do
-      expect(collector.details_valid?('details')).to be_truthy
-    end
-
-    it "handles an empty details" do
-      expect(collector.details_valid?('')).to be_falsey
-    end
-
-    it "handles all-spaces details" do
-      expect(collector.details_valid?('    ')).to be_falsey
-    end
   end
 
   describe '#collect_info' do
