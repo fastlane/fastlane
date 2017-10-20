@@ -44,7 +44,7 @@ Here is a nice gif, that shows ``_frameit_`` in action:
 
 ![img/actions/MacExample.png](/img/actions/MacExample.png?raw=1)
 
-<h5 align="center">The <code>frameit</code> 2.0 update was kindly sponsored by <a href="https://mindnode.com/">MindNode</a>, seen in the screenshots above.
+<h5 align="center">The <code>frameit</code> 2.0 update was kindly sponsored by <a href="https://mindnode.com/">MindNode</a>, seen in the screenshots above.</h5>
 
 
 The first time that ``_frameit_`` is executed the frames will be downloaded automatically. Originally the frames are coming from [Facebook frameset](http://facebook.design/devices) and they are kept on this repo: https://github.com/fastlane/frameit-frames
