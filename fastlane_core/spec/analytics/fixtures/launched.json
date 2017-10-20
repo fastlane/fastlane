@@ -78,7 +78,7 @@
     },
     "primary_target": {
       "name": "build_tool_version",
-      "detail": "Xcode 9.0"
+      "detail": "Xcode 9.0.1"
     },
     "millis_since_epoch": 1507142046000,
     "version": 1
