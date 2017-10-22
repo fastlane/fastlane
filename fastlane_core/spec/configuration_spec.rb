@@ -607,6 +607,55 @@ describe FastlaneCore do
             expect(@config[:output]).to eq(new_val)
           end
         end
+
+        describe "Parameter priority order" do
+          it "prioritizes CLI values over everything else" do
+            ENV["abc"] = "val env"
+            config_item = FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", default_value: "val default")
+            config = FastlaneCore::Configuration.create([config_item], { item: "val cli" })
+            config.config_file_options = { item: "val config" }
+
+            expect(config[:item]).to eq("val cli")
+            ENV.delete("abc")
+          end
+
+          it "prioritizes ENV values after CLI" do
+            ENV["abc"] = "val env"
+            config_item = FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", default_value: "val default")
+            config = FastlaneCore::Configuration.create([config_item], {})
+            config.config_file_options = { item: "val config" }
+
+            expect(config[:item]).to eq("val env")
+            ENV.delete("abc")
+          end
+
+          it "prioritizes config file values after ENV" do
+            config_item = FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", default_value: "val default")
+            config = FastlaneCore::Configuration.create([config_item], {})
+            config.config_file_options = { item: "val config" }
+
+            expect(config[:item]).to eq("val config")
+          end
+
+          it "prioritizes default values last" do
+            config_item = FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", default_value: "val default")
+            config = FastlaneCore::Configuration.create([config_item], {})
+
+            expect(config[:item]).to eq("val default")
+          end
+
+          it "asks if no other option" do
+            allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
+            allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
+            allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
+
+            config_item = FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", optional: false)
+            config = FastlaneCore::Configuration.create([config_item], {})
+
+            expect(FastlaneCore::UI).to receive(:input).and_return("val ask")
+            expect(config[:item]).to eq("val ask")
+          end
+        end
       end
     end
   end
