@@ -9,7 +9,7 @@ module FastlaneCore
 
     # @param config [FastlaneCore::Configuration] is stored to save the resulting values
     # @param path [String] The path to the configuration file to use
-    def initialize(config, path, block_for_missing)
+    def initialize(config, path, block_for_missing, skip_printing_values = false)
       self.config = config
       self.configfile_path = path
 
@@ -29,7 +29,7 @@ module FastlaneCore
         eval(content) # this is okay in this case
         # rubocop:enable Security/Eval
 
-        print_resulting_config_values # only on success
+        print_resulting_config_values unless skip_printing_values # only on success
       rescue SyntaxError => ex
         line = ex.to_s.match(/\(eval\):(\d+)/)[1]
         UI.user_error!("Syntax error in your configuration file '#{path}' on line #{line}: #{ex}")

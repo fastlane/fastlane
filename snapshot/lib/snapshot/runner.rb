@@ -118,7 +118,7 @@ module Snapshot
         unless content.include?(current_version)
           UI.error "Your '#{path}' is outdated, please run `fastlane snapshot update`"
           UI.error "to update your Helper file"
-          UI.user_error!("Please update your Snapshot Helper file")
+          UI.user_error!("Please update your Snapshot Helper file using `fastlane snapshot update`")
         end
       end
     end

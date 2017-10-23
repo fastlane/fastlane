@@ -1,4 +1,5 @@
 require 'fastlane_core/update_checker/update_checker'
+require 'fastlane_core/analytics/app_identifier_guesser'
 
 describe FastlaneCore do
   describe FastlaneCore::UpdateChecker do
@@ -85,17 +86,22 @@ describe FastlaneCore do
 
       it "chooses the correct param for package name for supply" do
         args = ["--skip_upload_screenshots", "-a", "beta", "-p", package_name]
-        expect(FastlaneCore::UpdateChecker.p_hash(args, 'supply')).to eq(android_hash_of(package_name))
+        guesser = FastlaneCore::AppIdentifierGuesser.new(args: args, gem_name: 'supply')
+
+        expect(guesser.p_hash).to eq(android_hash_of(package_name))
       end
 
       it "chooses the correct param for package name for screengrab" do
         args = ["--skip_open_summary", "-a", package_name, "-p", "com.test.app.test"]
-        expect(FastlaneCore::UpdateChecker.p_hash(args, 'screengrab')).to eq(android_hash_of(package_name))
+
+        guesser = FastlaneCore::AppIdentifierGuesser.new(args: args, gem_name: 'screengrab')
+        expect(guesser.p_hash).to eq(android_hash_of(package_name))
       end
 
       it "chooses the correct param for package name for gym" do
         args = ["--clean", "-a", package_name, "-p", "test.xcodeproj"]
-        expect(FastlaneCore::UpdateChecker.p_hash(args, 'gym')).to eq(hash_of(package_name))
+        guesser = FastlaneCore::AppIdentifierGuesser.new(args: args, gem_name: 'gym')
+        expect(guesser.p_hash).to eq(hash_of(package_name))
       end
     end
 
@@ -143,30 +149,6 @@ describe FastlaneCore do
         end
 
         FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
-      end
-
-      describe "#platform" do
-        it "ios" do
-          FastlaneSpec::Env.with_ARGV(["--app_identifier", "yolo.app"]) do
-            expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
-              expect(analytics.size).to eq(2)
-              expect(analytics.find_all { |a| a[:action][:name] == 'update_checked' && a[:secondary_target][:detail] == :ios }.size).to eq(1)
-            end
-
-            FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
-          end
-        end
-
-        it "android" do
-          FastlaneSpec::Env.with_ARGV(["--app_package_name", "yolo.android.app"]) do
-            expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
-              expect(analytics.size).to eq(2)
-              expect(analytics.find_all { |a| a[:action][:name] == 'update_checked' && a[:secondary_target][:detail] == :android }.size).to eq(1)
-            end
-
-            FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
-          end
-        end
       end
     end
 
