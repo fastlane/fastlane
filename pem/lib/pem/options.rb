@@ -5,7 +5,9 @@ module PEM
   class Options
     def self.available_options
       user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
+      puts "user 1: #{user}"
       user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+      puts "user 2: #{user}"
 
       [
         FastlaneCore::ConfigItem.new(key: :development,
