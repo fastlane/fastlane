@@ -1,0 +1,73 @@
+---
+- !ruby/object:HTTP::Cookie
+  name: aa
+  value: aaaaaaaaaaaaaaaaaa
+  domain: idmsa.apple.com
+  for_domain: true
+  path: "/"
+  secure: true
+  httponly: true
+  expires: 
+  max_age: 
+  created_at: 2017-10-03 13:14:04.083170000 +09:00
+  accessed_at: &4 2017-10-03 13:14:26.580261000 +09:00
+- !ruby/object:HTTP::Cookie
+  name: DESbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  value: ccccccccccccccccccccccc/ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd/eeeeee
+  domain: idmsa.apple.com
+  for_domain: true
+  path: "/"
+  secure: true
+  httponly: true
+  expires: 
+  max_age: 2592000
+  created_at: &1 2017-10-03 13:14:27.302907000 +09:00
+  accessed_at: *1
+- !ruby/object:HTTP::Cookie
+  name: dslang
+  value: US-EN
+  domain: apple.com
+  for_domain: true
+  path: "/"
+  secure: true
+  httponly: true
+  expires: 
+  max_age: 
+  created_at: &2 2017-10-03 13:14:27.302501000 +09:00
+  accessed_at: *2
+- !ruby/object:HTTP::Cookie
+  name: site
+  value: USA
+  domain: apple.com
+  for_domain: true
+  path: "/"
+  secure: true
+  httponly: true
+  expires: 
+  max_age: 
+  created_at: &3 2017-10-03 13:14:27.302757000 +09:00
+  accessed_at: *3
+- !ruby/object:HTTP::Cookie
+  name: acn01
+  value: 7qX/8VZC/909909090909090909090909090909090909090909=
+  domain: apple.com
+  for_domain: true
+  path: "/"
+  secure: true
+  httponly: true
+  expires: 
+  max_age: 31536000
+  created_at: 2017-10-03 13:14:04.083624000 +09:00
+  accessed_at: *4
+- !ruby/object:HTTP::Cookie
+  name: myacinfo
+  value: DAWTKNV000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111111111111111111111111111111111111111111111111111111111111111222222222222222222222222222222222222222222222222222222223333333333333333333333333333333333333333333333333333333333333333333444444444444444444444444444444444444444444444444444444444555555555555555555555555555555555555555555555555555555555555555555566666666666666666666666666666666666666666666666666666777777777777777777777777777777777777777777777777777777778888888888888888888888888888888888888888888888888888888888888888889999999999999999999999999999999999999999999990000000000000000000000
+  domain: apple.com
+  for_domain: true
+  path: "/"
+  secure: true
+  httponly: true
+  expires: 
+  max_age: 
+  created_at: &5 2017-10-03 13:14:27.303133000 +09:00
+  accessed_at: *5
