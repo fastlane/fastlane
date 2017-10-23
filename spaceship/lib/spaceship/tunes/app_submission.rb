@@ -16,7 +16,9 @@ module Spaceship
 
       # To pass from the user
 
+      # @deprecated Setted automatically by <tt>add_id_info_uses_idfa</tt> usage
       # @return (Boolean) Ad ID Info - Limits ads tracking
+      # <b>DEPRECATED:</b> Use <tt>add_id_info_uses_idfa</tt> instead.
       attr_accessor :add_id_info_limits_tracking
 
       # @return (Boolean) Ad ID Info - Serves ads
@@ -69,7 +71,7 @@ module Spaceship
 
       attr_mapping({
         # Ad ID Info Section
-        'adIdInfo.limitsTracking.value' => :add_id_info_limits_tracking,
+        'adIdInfo.limitsTracking.value' => :add_id_info_uses_idfa,
         'adIdInfo.servesAds.value' => :add_id_info_serves_ads,
         'adIdInfo.tracksAction.value' => :add_id_info_tracks_action,
         'adIdInfo.tracksInstall.value' => :add_id_info_tracks_install,

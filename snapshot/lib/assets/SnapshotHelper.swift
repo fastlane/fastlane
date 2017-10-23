@@ -19,38 +19,23 @@ import XCTest
 var deviceLanguage = ""
 var locale = ""
 
-@available(*, deprecated, message: "use setupSnapshot: instead")
-func setLanguage(_ app: XCUIApplication) {
-    setupSnapshot(app)
-}
-
 func setupSnapshot(_ app: XCUIApplication) {
     Snapshot.setupSnapshot(app)
 }
 
-func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
-    Snapshot.snapshot(name, waitForLoadingIndicator: waitForLoadingIndicator)
-}
-
-func startRecording(name: String) {
-    sendCommand(commnad: "startRecording",args: "name=\(name)")
-}
-
-func stopRecording() {
-    sendCommand(commnad: "stopRecording")
-}
-
-func sendCommand(commnad: String,args: String = "") {
-    guard var simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let port = Snapshot.getCommandListenerPort() else { return }
-    simulator = simulator.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
-    if let url = URL(string: "http://localhost:\(port)/\(commnad)?device=\(simulator)&\(args)") {
-        let (_, _, error) = URLSession.shared.synchronousDataTask(with: url)
-        if (error != nil) {
-            print("Error sending commnad: \(String(describing: error))")
-        }
+func snapshot(_ name: String, waitForLoadingIndicator: Bool) {
+    if waitForLoadingIndicator {
+        Snapshot.snapshot(name)
     } else {
-        print("Error sending commnad: bad URL")
+        Snapshot.snapshot(name, timeWaitingForIdle: 0)
     }
+}
+
+/// - Parameters:
+///   - name: The name of the snapshot
+///   - timeout: Amount of seconds to wait until the network loading indicator disappears. Pass `0` if you don't want to wait.
+func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20) {
+    Snapshot.snapshot(name, timeWaitingForIdle: timeout)
 }
 
 enum SnapshotError: Error, CustomDebugStringConvertible {
@@ -58,7 +43,7 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
     case cannotFindHomeDirectory
     case cannotFindSimulatorHomeDirectory
     case cannotAccessSimulatorHomeDirectory(String)
-    
+
     var debugDescription: String {
         switch self {
         case .cannotDetectUser:
@@ -79,7 +64,7 @@ open class Snapshot: NSObject {
     static var screenshotsDirectory: URL? {
         return cacheDirectory.appendingPathComponent("screenshots", isDirectory: true)
     }
-    
+
     open class func setupSnapshot(_ app: XCUIApplication) {
         do {
             let cacheDir = try pathPrefix()
@@ -92,10 +77,10 @@ open class Snapshot: NSObject {
             print(error)
         }
     }
-    
+
     class func setLanguage(_ app: XCUIApplication) {
         let path = cacheDirectory.appendingPathComponent("language.txt")
-        
+
         do {
             let trimCharacterSet = CharacterSet.whitespacesAndNewlines
             deviceLanguage = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
@@ -104,10 +89,10 @@ open class Snapshot: NSObject {
             print("Couldn't detect/set language...")
         }
     }
-    
+
     class func setLocale(_ app: XCUIApplication) {
         let path = cacheDirectory.appendingPathComponent("locale.txt")
-        
+
         do {
             let trimCharacterSet = CharacterSet.whitespacesAndNewlines
             locale = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
@@ -119,11 +104,11 @@ open class Snapshot: NSObject {
         }
         app.launchArguments += ["-AppleLocale", "\"\(locale)\""]
     }
-    
+
     class func setLaunchArguments(_ app: XCUIApplication) {
         let path = cacheDirectory.appendingPathComponent("snapshot-launch_arguments.txt")
         app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES", "-ui_testing"]
-        
+
         do {
             let launchArguments = try String(contentsOf: path, encoding: String.Encoding.utf8)
             let regex = try NSRegularExpression(pattern: "(\\\".+?\\\"|\\S+)", options: [])
@@ -137,27 +122,15 @@ open class Snapshot: NSObject {
         }
     }
 
-    class func getCommandListenerPort() -> String? {
-        let path = cacheDirectory.appendingPathComponent("Command_listener_port.txt")
-        var port: String?
-        do {
-            let trimCharacterSet = CharacterSet.whitespacesAndNewlines
-            port = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
-        } catch {
-            print("Couldn't get the command listener port...")
+    open class func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20) {
+        if timeout > 0 {
+            waitForLoadingIndicatorToDisappear(within: timeout)
         }
-        return port
-    }
 
-    open class func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
-        if waitForLoadingIndicator {
-            waitForLoadingIndicatorToDisappear()
-        }
-        
         print("snapshot: \(name)") // more information about this, check out https://github.com/fastlane/fastlane/tree/master/snapshot#how-does-it-work
-        
+
         sleep(1) // Waiting for the animation to be finished (kind of)
-        
+
         #if os(OSX)
             XCUIApplication().typeKey(XCUIKeyboardKeySecondaryFn, modifierFlags: [])
         #else
@@ -172,20 +145,17 @@ open class Snapshot: NSObject {
             }
         #endif
     }
-    
-    class func waitForLoadingIndicatorToDisappear() {
+
+    class func waitForLoadingIndicatorToDisappear(within timeout: TimeInterval) {
         #if os(tvOS)
             return
         #endif
-        
-        let query = XCUIApplication().statusBars.children(matching: .other).element(boundBy: 1).children(matching: .other)
-        
-        while (0..<query.count).map({ query.element(boundBy: $0) }).contains(where: { $0.isLoadingIndicator }) {
-            sleep(1)
-            print("Waiting for loading indicator to disappear...")
-        }
+
+        let networkLoadingIndicator = XCUIApplication().otherElements.deviceStatusBars.networkLoadingIndicators.element
+        let networkLoadingIndicatorDisappeared = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: networkLoadingIndicator)
+        let _ = XCTWaiter.wait(for: [networkLoadingIndicatorDisappeared], timeout: timeout)
     }
-    
+
     class func pathPrefix() throws -> URL? {
         let homeDir: URL
         // on OSX config is stored in /Users/<username>/Library
@@ -194,11 +164,11 @@ open class Snapshot: NSObject {
             guard let user = ProcessInfo().environment["USER"] else {
                 throw SnapshotError.cannotDetectUser
             }
-            
+
             guard let usersDir =  FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
                 throw SnapshotError.cannotFindHomeDirectory
             }
-            
+
             homeDir = usersDir.appendingPathComponent(user)
         #else
             guard let simulatorHostHome = ProcessInfo().environment["SIMULATOR_HOST_HOME"] else {
@@ -213,36 +183,60 @@ open class Snapshot: NSObject {
     }
 }
 
-extension XCUIElement {
-    var isLoadingIndicator: Bool {
-        let whiteListedLoaders = ["GeofenceLocationTrackingOn", "StandardLocationTrackingOn"]
-        if whiteListedLoaders.contains(self.identifier) {
-            return false
-        }
-        return self.frame.size == CGSize(width: 10, height: 20)
+private extension XCUIElementAttributes {
+    var isNetworkLoadingIndicator: Bool {
+        if hasWhiteListedIdentifier { return false }
+
+        let hasOldLoadingIndicatorSize = frame.size == CGSize(width: 10, height: 20)
+        let hasNewLoadingIndicatorSize = frame.size.width.isBetween(46, and: 47) && frame.size.height.isBetween(2, and: 3)
+
+        return hasOldLoadingIndicatorSize || hasNewLoadingIndicatorSize
+    }
+
+    var hasWhiteListedIdentifier: Bool {
+        let whiteListedIdentifiers = ["GeofenceLocationTrackingOn", "StandardLocationTrackingOn"]
+
+        return whiteListedIdentifiers.contains(identifier)
+    }
+
+    func isStatusBar(_ deviceWidth: CGFloat) -> Bool {
+        if elementType == .statusBar { return true }
+        guard frame.origin == .zero else { return false }
+
+        let oldStatusBarSize = CGSize(width: deviceWidth, height: 20)
+        let newStatusBarSize = CGSize(width: deviceWidth, height: 44)
+
+        return [oldStatusBarSize, newStatusBarSize].contains(frame.size)
     }
 }
 
-extension URLSession {
-    func synchronousDataTask(with url: URL) -> (Data?, URLResponse?, Error?) {
-        var data: Data?
-        var response: URLResponse?
-        var error: Error?
-        
-        let semaphore = DispatchSemaphore(value: 0)
-        
-        let dataTask = self.dataTask(with: url) {
-            data = $0
-            response = $1
-            error = $2
-            
-            semaphore.signal()
+private extension XCUIElementQuery {
+    var networkLoadingIndicators: XCUIElementQuery {
+        let isNetworkLoadingIndicator = NSPredicate { (evaluatedObject, _) in
+            guard let element = evaluatedObject as? XCUIElementAttributes else { return false }
+
+            return element.isNetworkLoadingIndicator
         }
-        dataTask.resume()
-        
-        _ = semaphore.wait(timeout: .distantFuture)
-        
-        return (data, response, error)
+
+        return self.containing(isNetworkLoadingIndicator)
+    }
+
+    var deviceStatusBars: XCUIElementQuery {
+        let deviceWidth = XCUIApplication().frame.width
+
+        let isStatusBar = NSPredicate { (evaluatedObject, _) in
+            guard let element = evaluatedObject as? XCUIElementAttributes else { return false }
+
+            return element.isStatusBar(deviceWidth)
+        }
+
+        return self.containing(isStatusBar)
+    }
+}
+
+private extension CGFloat {
+    func isBetween(_ numberA: CGFloat, and numberB: CGFloat) -> Bool {
+        return numberA...numberB ~= self
     }
 }
 

@@ -234,7 +234,13 @@ module Gym
                                      env_name: "XCPRETTY_UTF",
                                      description: "Have xcpretty use unicode encoding when reporting builds",
                                      optional: true,
-                                     is_string: false)
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :skip_profile_detection,
+                                     env_name: "GYM_SKIP_PROFILE_DETECTION",
+                                     description: "Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used",
+                                     optional: true,
+                                     is_string: false,
+                                     default_value: false)
       ]
     end
   end

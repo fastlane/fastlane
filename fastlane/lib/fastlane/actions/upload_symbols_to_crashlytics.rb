@@ -83,7 +83,9 @@ module Fastlane
         command << "-p #{params[:platform] == 'appletvos' ? 'tvos' : params[:platform]}"
         command << File.expand_path(path).shellescape
         begin
-          Actions.sh(command.join(" "), log: false)
+          command_to_execute = command.join(" ")
+          UI.verbose("upload_dsym using command: #{command_to_execute}")
+          Actions.sh(command_to_execute, log: false)
         rescue => ex
           UI.error ex.to_s # it fails, however we don't want to fail everything just for this
         end
@@ -96,6 +98,7 @@ module Fastlane
             next unless result
             next unless result.kind_of?(Hash)
             params[:api_token] ||= result["APIKey"]
+            UI.verbose("found an APIKey in #{current}")
           end
         end
         UI.user_error!("Please provide an api_token using api_token:") unless params[:api_token]
@@ -131,7 +134,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :dsym_path,
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DSYM_PATH",
                                        description: "Path to the DSYM file or zip to upload",
-                                       default_value: ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] || (Dir["./**/*.dSYM"] + Dir["./**/*.dSYM.zip"]).first,
+                                       default_value: ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] || (Dir["./**/*.dSYM"] + Dir["./**/*.dSYM.zip"]).sort_by { |f| File.mtime(f) }.last,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find file at path '#{File.expand_path(value)}'") unless File.exist?(value)

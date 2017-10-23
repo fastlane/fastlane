@@ -88,6 +88,7 @@ module Snapshot
         'Apple TV 1080p' => 'Apple TV',
         'Apple TV 4K (at 1080p)' => 'Apple TV 4K (at 1080p)',
         'Apple TV 4K' => 'Apple TV 4K',
+        'Apple TV' => 'Apple TV',
         'Mac' => 'Mac'
       }
     end

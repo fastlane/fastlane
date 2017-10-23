@@ -1,0 +1,20 @@
+{
+  "event_source": {
+    "oauth_app_name": "fastlane-tests",
+    "product": "fastlane"
+  },
+  "actor": {
+    "name": "some.phash.value",
+    "detail": "s0m3s3ss10n1D"
+  },
+  "action": {
+    "name": "completed",
+    "detail": "fastlane"
+  },
+  "primary_target": {
+    "name": "status",
+    "detail": "failed"
+  },
+  "millis_since_epoch": 1507142046000,
+  "version": 1
+}
