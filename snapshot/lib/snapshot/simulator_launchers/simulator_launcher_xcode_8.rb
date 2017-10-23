@@ -122,7 +122,7 @@ module Snapshot
                                             print_all: true,
                                         print_command: true,
                                               loading: "Recording video...",
-                                           pidCreated: proc do |pid|
+                                          pid_created: proc do |pid|
                                                          @recording_pid = pid
                                                        end,
                                                 error: proc do |output, return_code|

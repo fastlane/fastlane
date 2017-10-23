@@ -33,21 +33,21 @@ func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
 }
 
 func startRecording(name: String) {
-    sendCommand(commnad: "startRecording?name=\(name)")
+    sendCommand(command: "startRecording?name=\(name)")
 }
 
 func stopRecording() {
-    sendCommand(commnad: "stopRecording")
+    sendCommand(command: "stopRecording")
 }
 
-func sendCommand(commnad: String) {
+func sendCommand(command: String) {
     guard let port = Snapshot.getCommandListenerPort() else {
         return
     }
-    if let url = URL(string: "http://localhost:\(port)/\(commnad)") {
+    if let url = URL(string: "http://localhost:\(port)/\(command)") {
         let (_, _, error) = URLSession.shared.synchronousDataTask(with: url)
         if (error != nil) {
-            print("Error sending commnad: \(String(describing: error))")
+            print("Error sending command: \(String(describing: error))")
         }
     }
 }
