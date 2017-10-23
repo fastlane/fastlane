@@ -198,9 +198,6 @@ module Fastlane
         # Actually switch lane now
         self.current_lane = new_lane
 
-        launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name('lane_switch', args: ARGV)
-        FastlaneCore.session.action_launched(launch_context: launch_context)
-
         result = block.call(parameters.first || {}) # to always pass a hash
         self.current_lane = original_lane
 
