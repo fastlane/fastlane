@@ -154,3 +154,14 @@ gem "fastlane-plugin-[plugin_name]", git: "https://github.com/[user]/[plugin_nam
 #### Multiple actions in one plugin
 
 Let's assume you work on a `fastlane` plugin for project management software. You could call it `fastlane-plugin-pm` and it may contain any number of actions and helpers, just add them to your `actions` folder. Make sure to mention the available actions in your plugin's `README.md`.
+
+##### Calling another action in an action
+
+Unless there is a very good reason for it, you should not do this. But, to call another action from within your action, you can use the same code you would use in a `Fastfile` and prepend the action name with `other_action`:
+
+```ruby
+other_action.deliver(text: "Please input your password:", 
+                      key: 123)
+```
+
+In general, think twice before you do this, most of the times, the action should be separate and only called by the user's `Fastfile`.
