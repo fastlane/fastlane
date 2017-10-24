@@ -6,7 +6,6 @@ module Fastlane
     class SetInfoPlistValueAction < Action
       def self.run(params)
         require 'plist'
-        require 'deep_merge'
 
         begin
           path = File.expand_path(params[:path])
@@ -16,7 +15,7 @@ module Fastlane
             if params[:replace]
               plist = stringified_hash
             else
-              plist = plist.deep_merge!(stringified_hash, { merge_hash_arrays: true })
+              plist = deep_merge(plist, stringified_hash)
             end
           elsif params[:subkey]
             if plist[params[:key]]
@@ -43,6 +42,40 @@ module Fastlane
           UI.error(ex)
           UI.user_error!("Unable to set value to plist file at '#{path}'")
         end
+      end
+
+      # Adapted from https://stackoverflow.com/a/30225093/158525
+      # rubocop:disable Style/CaseEquality
+      # rubocop:disable Style/MultilineTernaryOperator
+      # rubocop:disable Style/NestedTernaryOperator
+      def self.deep_merge(a, b)
+        merger = proc do |key, v1, v2|
+          Hash === v1 && Hash === v2 ?
+                 v1.merge(v2, &merger) : Array === v1 && Array === v2 ?
+                   array_deep_merge(v1, v2) : [:undefined, nil, :nil].include?(v2) ? v1 : v2
+        end
+        a.merge(b, &merger)
+      end
+      # rubocop:enable Style/CaseEquality
+      # rubocop:enable Style/MultilineTernaryOperator
+      # rubocop:enable Style/NestedTernaryOperator
+
+      # Adapted from https://github.com/danielsdeleo/deep_merge/blob/86f15a04bc6cee3723125de6165a6b43b55f1cde/lib/deep_merge/core.rb#L174-L186
+      def self.array_deep_merge(source, dest)
+        source_all_hashes = source.all? { |i| i.kind_of?(Hash) }
+        dest_all_hashes = dest.all? { |i| i.kind_of?(Hash) }
+        if source_all_hashes && dest_all_hashes
+          # merge hashes in lists
+          list = []
+          dest.each_index do |i|
+            list[i] = deep_merge(source[i] || {}, dest[i])
+          end
+          list += source[dest.count..-1] if source.count > dest.count
+          dest = list
+        else
+          dest = source | dest
+        end
+        dest
       end
 
       def self.deep_stringify(obj)
