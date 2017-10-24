@@ -1,6 +1,3 @@
-# rubocop:disable Style/CaseEquality
-# rubocop:disable Style/MultilineTernaryOperator
-# rubocop:disable Style/NestedTernaryOperator
 module Fastlane
   module Actions
     class SlackAction < Action
@@ -155,7 +152,10 @@ module Fastlane
       # @!group Helper
       #####################################################
 
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.generate_slack_attachments(options)
+        require 'deep_merge'
+
         color = (options[:success] ? 'good' : 'danger')
         should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].join(" ").include?(payload_name.to_s) }
 
@@ -236,21 +236,9 @@ module Fastlane
         end
 
         # merge additional properties
-        deep_merge(slack_attachment, options[:attachment_properties])
+        slack_attachment.deep_merge!(options[:attachment_properties] || {})
       end
-
-      # Adapted from https://stackoverflow.com/a/30225093/158525
-      def self.deep_merge(a, b)
-        merger = proc do |key, v1, v2|
-          Hash === v1 && Hash === v2 ?
-                 v1.merge(v2, &merger) : Array === v1 && Array === v2 ?
-                   v1 | v2 : [:undefined, nil, :nil].include?(v2) ? v1 : v2
-        end
-        a.merge(b, &merger)
-      end
+      # rubocop:enable Metrics/PerceivedComplexity
     end
   end
 end
-# rubocop:enable Style/CaseEquality
-# rubocop:enable Style/MultilineTernaryOperator
-# rubocop:enable Style/NestedTernaryOperator

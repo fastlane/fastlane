@@ -41,12 +41,3 @@ module Frameit
     return @frames_version
   end
 end
-
-# rubocop:disable all
-class ::Hash
-  def fastlane_deep_merge(second)
-    merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
-    self.merge(second, &merger)
-  end
-end
-# rubocop:enable all
