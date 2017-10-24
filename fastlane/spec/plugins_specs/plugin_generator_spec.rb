@@ -1,4 +1,3 @@
-require 'fastlane/plugins/plugin_info'
 require 'rubygems'
 
 initialized = false
