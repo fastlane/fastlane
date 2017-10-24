@@ -201,7 +201,7 @@ describe Fastlane do
           result = Fastlane::FastFile.new.parse("lane :test do
             my_custom_plugin
           end").runner.execute(:test)
-        end.to raise_exception("Plugin 'my_custom_plugin' was not properly loaded, make sure to follow the plugin docs for troubleshooting: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/PluginsTroubleshooting.md")
+        end.to raise_exception("Plugin 'my_custom_plugin' was not properly loaded, make sure to follow the plugin docs for troubleshooting: https://docs.fastlane.tools/plugins/plugins-troubleshooting/")
       end
 
       it "shows an appropriate error message when an action is not available, which is not a plugin" do
