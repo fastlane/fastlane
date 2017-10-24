@@ -122,6 +122,16 @@ module Sigh
                                        pt = %w(macos tvos ios)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
                                      end),
+        FastlaneCore::ConfigItem.new(key: :readonly,
+                                     env_name: "SIGH_READONLY",
+                                     description: "Only fetch existing profile, don't generate new ones",
+                                     optional: true,
+                                     is_string: false,
+                                     default_value: false,
+                                     conflicting_options: [:force],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't enable both :force and :readonly")
+                                     end),
         FastlaneCore::ConfigItem.new(key: :template_name,
                                      env_name: "SIGH_PROVISIONING_PROFILE_TEMPLATE_NAME",
                                      description: "The name of provisioning profile template. If the developer account has provisioning profile templates, template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile",
