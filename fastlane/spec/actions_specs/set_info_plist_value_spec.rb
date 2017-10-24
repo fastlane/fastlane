@@ -16,16 +16,18 @@ describe Fastlane do
       let (:version) { '9.9.9' }
       let (:capabilities) { ['arm64'] }
       let (:expected_capabilities) { ['armv7', 'arm64'] }
-      let (:types) { 
+      let (:types) do
         [{
-          CFBundleURLName: 'com.krausefx.app123',
+          CFBundleURLName: 'com.krausefx.app123'
         }]
-      }
-      let (:expected_types) {
-        [{"CFBundleTypeRole"=>"Viewer",
-        "CFBundleURLName"=>"com.krausefx.app123",
-        "CFBundleURLSchemes"=>["com.krausefx.app"]}]
-      }
+      end
+      let (:expected_types) do
+        [{
+          "CFBundleTypeRole" => "Viewer",
+          "CFBundleURLName" => "com.krausefx.app123",
+          "CFBundleURLSchemes" => ["com.krausefx.app"]
+        }]
+      end
 
       it "stores changes in the plist file" do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
@@ -79,7 +81,7 @@ describe Fastlane do
         ret = Fastlane::FastFile.new.parse("lane :test do
           set_info_plist_value(
             path: '#{plist_path}',
-            map: {
+            hash: {
               CFBundleIdentifier: '#{identifier}',
               CFBundleShortVersionString: '#{version}',
               UIRequiredDeviceCapabilities: #{capabilities},
@@ -111,7 +113,7 @@ describe Fastlane do
         # check unchanged values
         expect(new_name).to eq(expected_name)
         expect(new_modes).to eq(expected_modes)
-        
+
         # check changed values
         expect(new_identifier).to eq(identifier)
         expect(new_version).to eq(version)
@@ -121,7 +123,7 @@ describe Fastlane do
         ret = Fastlane::FastFile.new.parse("lane :test do
           set_info_plist_value(
             path: '#{plist_path}',
-            map: #{old_plist},
+            hash: #{old_plist},
             replace: true,
             output_file_name: '#{output_file}'
           )

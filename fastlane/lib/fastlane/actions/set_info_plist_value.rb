@@ -10,20 +10,10 @@ module Fastlane
         begin
           path = File.expand_path(params[:path])
           plist = Plist.parse_xml(path)
-          if params[:map]
-            stringified_hash = deep_stringify(params[:map])
-            if params[:replace]
-              plist = stringified_hash
-            else
-              plist = deep_merge(plist, stringified_hash)
-            end
+          if params[:hash]
+            plist = hash(plist, params[:hash], params[:replace])
           elsif params[:subkey]
-            if plist[params[:key]]
-              plist[params[:key]][params[:subkey]] = params[:value]
-            else
-              UI.message "Key doesn't exist, going to create new one ..."
-              plist[params[:key]] = { params[:subkey] => params[:value] }
-            end
+            plist = subkey(plist, params[:key], params[:subkey], params[:value])
           else
             plist[params[:key]] = params[:value]
           end
@@ -36,12 +26,32 @@ module Fastlane
             File.write(path, new_plist)
           end
 
-          return plist if params[:map]
+          return plist if params[:hash]
           return params[:value]
         rescue => ex
           UI.error(ex)
           UI.user_error!("Unable to set value to plist file at '#{path}'")
         end
+      end
+
+      def self.hash(plist, hash, replace = false)
+        stringified_hash = deep_stringify(hash)
+        if replace
+          plist = stringified_hash
+        else
+          plist = deep_merge(plist, stringified_hash)
+        end
+        plist
+      end
+
+      def self.subkey(plist, key, subkey, value)
+        if plist[key]
+          plist[key][subkey] = value
+        else
+          UI.message "Key doesn't exist, going to create new one ..."
+          plist[key] = { subkey => value }
+        end
+        plist
       end
 
       # Adapted from https://stackoverflow.com/a/30225093/158525
@@ -105,22 +115,22 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :key,
                                        env_name: "FL_SET_INFO_PLIST_PARAM_NAME",
                                        description: "Name of key in plist",
-                                       conflicting_options: [:map],
+                                       conflicting_options: [:hash],
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :subkey,
                                        env_name: "FL_SET_INFO_PLIST_SUBPARAM_NAME",
                                        description: "Name of subkey in plist",
-                                       conflicting_options: [:map],
+                                       conflicting_options: [:hash],
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :value,
                                        env_name: "FL_SET_INFO_PLIST_PARAM_VALUE",
                                        description: "Value to setup",
                                        is_string: false,
-                                       conflicting_options: [:map],
+                                       conflicting_options: [:hash],
                                        optional: true),
-          FastlaneCore::ConfigItem.new(key: :map,
-                                       env_name: "FL_SET_INFO_PLIST_PARAM_MAP",
-                                       description: "Map of keys and values in plist to be merged",
+          FastlaneCore::ConfigItem.new(key: :hash,
+                                       env_name: "FL_SET_INFO_PLIST_PARAM_HASH",
+                                       description: "Hash of keys and values to be merged into plist",
                                        type: Hash,
                                        conflicting_options: [:key, :subkey, :value],
                                        optional: true),
@@ -169,7 +179,7 @@ module Fastlane
           )',
           'set_info_plist_value(
             path: "./Info.plist",
-            map: {
+            hash: {
               CFBundleIdentifier: "com.example.fastlane",
               CFBundleShortVersionString: "1.1.1",
               CFBundleVersion: "9999",
