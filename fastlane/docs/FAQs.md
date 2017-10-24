@@ -43,11 +43,11 @@ bundle exec fastlane ...
 
 This is usually caused when running Jenkins as its own user. While this is possible, you'll have to take care of creating a temporary Keychain, filling it and then using it when building your application. 
 
-For more information about the recommended setup with Jenkins open the [Jenkins Guide](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md).
+For more information about the recommended setup with Jenkins open the [Jenkins Guide](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration).
 
 ### Code signing issues
 
-Check out the [codesigning.guide](https://codesigning.guide) website for more information on how to properly setup code-signing in your team using [match](https://github.com/fastlane/fastlane/tree/master/match).
+Check out the [codesigning.guide](https://codesigning.guide) website for more information on how to properly setup code-signing in your team using [match](https://fastlane.tools/match).
 
 ### When should I use _cert_, _sigh_ and _match_?
 

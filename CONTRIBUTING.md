@@ -73,6 +73,6 @@ This project is licensed under the terms of the MIT license. See the [LICENSE][l
 [tools and debugging]: ToolsAndDebugging.md
 [vision]: VISION.md
 [responding to prs]: RespondingToIssuesAndPullRequests.md
-[plugins]: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Plugins.md#readme
+[plugins]: https://docs.fastlane.tools/plugins/create-plugin/
 [firstpr]: YourFirstPR.md
-[submit action]: fastlane/docs/Plugins.md#submitting-the-action-to-the-fastlane-main-repo
+[submit action]: https://docs.fastlane.tools/plugins/create-plugin/#submitting-the-action-to-the-fastlane-main-repo
