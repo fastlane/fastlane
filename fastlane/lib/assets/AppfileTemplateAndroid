@@ -1,2 +1,2 @@
-json_key_file "[[JSON_KEY_FILE]]" # Path to the json secret file - Follow https://github.com/fastlane/supply#setup to get one
+json_key_file "[[JSON_KEY_FILE]]" # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
 package_name "[[PACKAGE_NAME]]" # e.g. com.krausefx.app

@@ -29,7 +29,7 @@ languages([
 # project "./Project.xcodeproj"
 # workspace "./Project.xcworkspace"
 
-# Arguments to pass to the app on launch. See https://github.com/fastlane/fastlane/tree/master/snapshot#launch-arguments
+# Arguments to pass to the app on launch. See https://docs.fastlane.tools/actions/snapshot/#launch-arguments
 # launch_arguments(["-favColor red"])
 
 # For more information about all available options run
