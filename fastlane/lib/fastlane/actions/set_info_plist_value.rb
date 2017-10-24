@@ -5,12 +5,20 @@ module Fastlane
 
     class SetInfoPlistValueAction < Action
       def self.run(params)
-        require "plist"
+        require 'plist'
+        require 'deep_merge'
 
         begin
           path = File.expand_path(params[:path])
           plist = Plist.parse_xml(path)
-          if params[:subkey]
+          if params[:map]
+            stringified_hash = deep_stringify(params[:map])
+            if params[:replace]
+              plist = stringified_hash
+            else
+              plist = plist.deep_merge!(stringified_hash, { merge_hash_arrays: true })
+            end
+          elsif params[:subkey]
             if plist[params[:key]]
               plist[params[:key]][params[:subkey]] = params[:value]
             else
@@ -29,11 +37,30 @@ module Fastlane
             File.write(path, new_plist)
           end
 
+          return plist if params[:map]
           return params[:value]
         rescue => ex
           UI.error(ex)
           UI.user_error!("Unable to set value to plist file at '#{path}'")
         end
+      end
+
+      def self.deep_stringify(obj)
+        if obj.kind_of?(Hash)
+          stringified_hash ||= {}
+          obj.each do |k, v|
+            stringified_hash[k.to_s] = deep_stringify(v)
+          end
+          return stringified_hash
+        end
+        if obj.kind_of?(Array)
+          stringified_array ||= []
+          obj.each do |v|
+            stringified_array << deep_stringify(v)
+          end
+          return stringified_array
+        end
+        obj
       end
 
       def self.description
@@ -45,16 +72,32 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :key,
                                        env_name: "FL_SET_INFO_PLIST_PARAM_NAME",
                                        description: "Name of key in plist",
-                                       optional: false),
+                                       conflicting_options: [:map],
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :subkey,
                                        env_name: "FL_SET_INFO_PLIST_SUBPARAM_NAME",
                                        description: "Name of subkey in plist",
+                                       conflicting_options: [:map],
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :value,
                                        env_name: "FL_SET_INFO_PLIST_PARAM_VALUE",
                                        description: "Value to setup",
                                        is_string: false,
-                                       optional: false),
+                                       conflicting_options: [:map],
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :map,
+                                       env_name: "FL_SET_INFO_PLIST_PARAM_MAP",
+                                       description: "Map of keys and values in plist to be merged",
+                                       type: Hash,
+                                       conflicting_options: [:key, :subkey, :value],
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :replace,
+                                       env_name: "FL_SET_INFO_PLIST_PARAM_REPLACE",
+                                       description: "Replace plist with map instead of merging",
+                                       is_string: false,
+                                       default_value: false,
+                                       conflicting_options: [:key, :subkey, :value],
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_SET_INFO_PLIST_PATH",
                                        description: "Path to plist file you want to update",
@@ -70,7 +113,7 @@ module Fastlane
       end
 
       def self.authors
-        ["kohtenko", "uwehollatz"]
+        ["kohtenko", "uwehollatz", "casz"]
       end
 
       def self.is_supported?(platform)
@@ -79,8 +122,26 @@ module Fastlane
 
       def self.example_code
         [
-          'set_info_plist_value(path: "./Info.plist", key: "CFBundleIdentifier", value: "com.krausefx.app.beta")',
-          'set_info_plist_value(path: "./MyApp-Info.plist", key: "NSAppTransportSecurity", subkey: "NSAllowsArbitraryLoads", value: true, output_file_name: "./Info.plist")'
+          'set_info_plist_value(
+            path: "./Info.plist",
+            key: "CFBundleIdentifier",
+            value: "com.krausefx.app.beta"
+          )',
+          'set_info_plist_value(
+            path: "./MyApp-Info.plist",
+            key: "NSAppTransportSecurity",
+            subkey: "NSAllowsArbitraryLoads",
+            value: true,
+            output_file_name: "./Info.plist"
+          )',
+          'set_info_plist_value(
+            path: "./Info.plist",
+            map: {
+              CFBundleIdentifier: "com.example.fastlane",
+              CFBundleShortVersionString: "1.1.1",
+              CFBundleVersion: "9999",
+            }
+          )'
         ]
       end
 
