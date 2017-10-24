@@ -46,7 +46,7 @@ module Snapshot
 
     # Returns true if it succeeded
     def launch_one_at_a_time(language, locale, device_type, launch_arguments)
-      prepare_for_launch(language, locale, launch_arguments)
+      prepare_for_launch([device_type], language, locale, launch_arguments)
 
       add_media([device_type], :photo, launcher_config.add_photos) if launcher_config.add_photos
       add_media([device_type], :video, launcher_config.add_videos) if launcher_config.add_videos

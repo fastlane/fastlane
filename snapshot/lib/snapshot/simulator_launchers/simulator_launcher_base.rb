@@ -18,7 +18,7 @@ module Snapshot
       @current_number_of_retries_due_to_failing_simulator || 0
     end
 
-    def prepare_for_launch(language, locale, launch_arguments)
+    def prepare_for_launch(device_types, language, locale, launch_arguments)
       screenshots_path = TestCommandGenerator.derived_data_path
       FileUtils.rm_rf(File.join(screenshots_path, "Logs"))
       FileUtils.rm_rf(screenshots_path) if launcher_config.clean
@@ -31,10 +31,10 @@ module Snapshot
       File.write(File.join(CACHE_DIR, "locale.txt"), locale || "")
       File.write(File.join(CACHE_DIR, "snapshot-launch_arguments.txt"), launch_arguments.last)
 
-      prepare_simulators_for_launch(language: language, locale: locale)
+      prepare_simulators_for_launch(device_types, language: language, locale: locale)
     end
 
-    def prepare_simulators_for_launch(language: nil, locale: nil)
+    def prepare_simulators_for_launch(device_types, language: nil, locale: nil)
       # Kill and shutdown all currently running simulators so that the following settings
       # changes will be picked up when they are started again.
       Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
@@ -43,8 +43,7 @@ module Snapshot
       Fixes::SimulatorZoomFix.patch
       Fixes::HardwareKeyboardFix.patch
 
-      devices = launcher_config.devices || []
-      devices.each do |type|
+      device_types.each do |type|
         if launcher_config.erase_simulator || launcher_config.localize_simulator
           erase_simulator(type)
           if launcher_config.localize_simulator
