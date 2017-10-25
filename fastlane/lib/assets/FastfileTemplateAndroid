@@ -1,4 +1,4 @@
-# Customise this file, documentation can be found here:
+# Customize this file, documentation can be found here:
 # https://docs.fastlane.tools/actions/
 # All available actions: https://docs.fastlane.tools/actions
 # can also be listed using the `fastlane actions` command
@@ -57,7 +57,6 @@ platform :android do
     # )
   end
 end
-
 
 # More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md
 # All available actions: https://docs.fastlane.tools/actions
