@@ -46,13 +46,11 @@ module Fastlane
         require 'pem'
         require 'pem/options'
 
-        unless @options
-          @options = PEM::Options.available_options
-          @options << FastlaneCore::ConfigItem.new(key: :new_profile,
-                                       description: "Block that is called if there is a new profile",
-                                       optional: true,
-                                       is_string: false)
-        end
+        @options = PEM::Options.available_options
+        @options << FastlaneCore::ConfigItem.new(key: :new_profile,
+                                     description: "Block that is called if there is a new profile",
+                                     optional: true,
+                                     is_string: false)
         @options
       end
 
