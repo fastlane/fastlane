@@ -15,7 +15,8 @@ module Precheck
         FreeStuffIAPRule,
         CustomTextRule,
         CopyrightDateRule,
-        UnreachableURLRule
+        UnreachableURLRule,
+        PreReleaseAppleSoftwareHardware
       ].map(&:new)
     end
 
