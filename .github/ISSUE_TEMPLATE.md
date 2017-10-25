@@ -7,8 +7,8 @@
 
 ### Issue Description
 
-<!--- Complete output when running fastlane, including the stack trace and command used
-You can use: `--capture_output` as the last commandline argument to get that collected for you--->
+##### Complete output when running fastlane, including the stack trace and command used
+<!--- You can use: `--capture_output` as the last commandline argument to get that collected for you--->
 
 [INSERT OUTPUT HERE]
 
