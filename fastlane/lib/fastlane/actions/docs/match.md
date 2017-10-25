@@ -76,7 +76,7 @@ fastlane match init
 
 <img src="/img/actions/match_init.gif" width="550" />
 
-You'll be asked to enter the URL to your Git repo. This can be either a `https://` or a `git` URL. (If your machine is currently using SSH to authenticate with Github, you'll want to use a `git` URL, otherwise you may see an authentication error when you attempt to use match.) `fastlane match init` won't read or modify your certificates or profiles.
+You'll be asked to enter the URL to your Git repo. This can be either a `https://` or a `git` URL. (If your machine is currently using SSH to authenticate with GitHub, you'll want to use a `git` URL, otherwise you may see an authentication error when you attempt to use match.) `fastlane match init` won't read or modify your certificates or profiles.
 
 This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder).
 

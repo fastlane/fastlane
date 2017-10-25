@@ -162,7 +162,7 @@ module Fastlane
         def append_github_data
           # e.g. https://api.github.com/repos/fastlane/fastlane
           url = self.homepage.gsub("github.com/", "api.github.com/repos/")
-          url = url[0..-2] if url.end_with?("/") # what is this, 2001? We got to remove the trailing `/` otherwise Github will fail
+          url = url[0..-2] if url.end_with?("/") # what is this, 2001? We got to remove the trailing `/` otherwise GitHub will fail
           puts "Fetching #{url}"
           conn = Faraday.new(url: url) do |builder|
             # The order below IS important

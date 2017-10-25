@@ -158,7 +158,7 @@ module Fastlane
           "- All .plist files",
           "- The `.xcodeproj/project.pbxproj` file",
           "Then commits those files to the repo.",
-          "Customise the message with the `:message` option, defaults to 'Version Bump'",
+          "Customize the message with the `:message` option, defaults to 'Version Bump'",
           "If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the [`clean_build_artifacts`](#clean_build_artifacts) action to clean those temporary files up before running this action."
         ].join("\n")
       end

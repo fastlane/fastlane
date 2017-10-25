@@ -20,7 +20,7 @@ module Fastlane
       output << "<tr>"
       output << "<th width=\"33%\"><a href=\"http://brew.sh\">Homebrew</a></td>"
       output << "<th width=\"33%\">Installer Script</td>"
-      output << "<th width=\"33%\">Rubygems</td>"
+      output << "<th width=\"33%\">RubyGems</td>"
       output << "</tr>"
       output << "<tr>"
       output << "<td width=\"33%\" align=\"center\">macOS</td>"
