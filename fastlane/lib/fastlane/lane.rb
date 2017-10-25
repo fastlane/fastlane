@@ -51,6 +51,7 @@ module Fastlane
           UI.error "It is recommended to not use '#{name}' as the name of your lane"
           # We still allow it, because we're nice
           # Otherwise we might break existing setups
+          return
         end
 
         self.ensure_name_not_conflicts(name.to_s)
