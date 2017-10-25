@@ -19,7 +19,7 @@ module Fastlane
       end
 
       def self.description
-        "Generate new localised screenshots on multiple devices"
+        "Generate new localized screenshots on multiple devices"
       end
 
       def self.available_options

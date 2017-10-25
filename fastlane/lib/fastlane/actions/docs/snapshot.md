@@ -64,7 +64,7 @@ This tool automatically switches the language and device type and runs UI Tests 
 - Easy verification that localizations fit into labels on all screen dimensions
 - It is an integration test: You can test for UI elements and other things inside your scripts
 - Be so nice, and provide new screenshots with every App Store update. Your customers deserve it
-- You realise, there is a spelling mistake in one of the screens? Well, just correct it and re-run the script
+- You realize, there is a spelling mistake in one of the screens? Well, just correct it and re-run the script
 
 # UI Tests
 

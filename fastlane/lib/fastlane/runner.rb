@@ -57,7 +57,7 @@ module Fastlane
         return return_val
       rescue => ex
         Dir.chdir(path_to_use) do
-          # Provide error block exception without colour code
+          # Provide error block exception without color code
           begin
             error_blocks[current_platform].call(current_lane, ex, parameters) if current_platform && error_blocks[current_platform]
             error_blocks[nil].call(current_lane, ex, parameters) if error_blocks[nil]

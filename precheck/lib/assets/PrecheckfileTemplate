@@ -25,4 +25,3 @@
 # test_words(level: :error)
 # unreachable_urls(level: :error)
 # custom_text(data: ["fabric"], level: :warn)
-

@@ -18,7 +18,7 @@ _deliver_ uploads screenshots, metadata and binaries to iTunes Connect. Use _del
 <h5 align="center"><code>deliver</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # Features
-- Upload hundreds of localised screenshots completely automatically
+- Upload hundreds of localized screenshots completely automatically
 - Upload a new ipa/pkg file to iTunes Connect without Xcode from any Mac
 - Maintain your app metadata locally and push changes back to iTunes Connect
 - Easily implement a real Continuous Deployment process using [fastlane](https://fastlane.tools)
@@ -157,7 +157,7 @@ app_version "2.0"
 
 In the case if _deliver_ uploads your application to iTunes Connect it will automatically update "Prepare for submission" app version (which could be found on iTunes Connect->My Apps->App Store page)
 
-The option allows uploading your app without updating "Prepare for submission" version. 
+The option allows uploading your app without updating "Prepare for submission" version.
 
 This could be useful in the case if you are generating a lot of uploads while not submitting the latest build for Apple review.
 
@@ -225,7 +225,7 @@ You can also provide these values by creating files in a `metadata/trade_represe
 `is_displayed_on_app_store` is the option on iTunes Connect described as: `Display Trade Representative Contact Information on the Korean App Store`
 
 ##### app_review_information
-Contact information for the app review team. Available options: `first_name`, `last_name`, `phone_number`, `email_address`, `demo_user`, `demo_password`, `notes`. 
+Contact information for the app review team. Available options: `first_name`, `last_name`, `phone_number`, `email_address`, `demo_user`, `demo_password`, `notes`.
 
 
 ```ruby-skip-tests
@@ -242,7 +242,7 @@ app_review_information(
 
 You can also provide these values by creating files in a `metadata/review_information/` directory. The file names must match the pattern `<key>.txt` (e.g. `first_name.txt`, `notes.txt` etc.). The contents of each file will be used as the value for the matching key. Values provided in the `Deliverfile` or `Fastfile` will be take priority over values from these files.
 
-##### submission_information 
+##### submission_information
 Must be a hash. This is used as the last step for the deployment process, where you define if you use third party content or use encryption. [A list of available options](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/tunes/app_submission.rb#L18-L69).
 
 ```ruby-skip-tests
@@ -257,7 +257,7 @@ Should the app be released to all users once Apple approves it? If set to `false
 
 ```ruby-skip-tests
 automatic_release true
-# or 
+# or
 automatic_release false
 ```
 
@@ -267,12 +267,12 @@ Enable or disable the phased releases feature of iTunes Connect. If set to `true
 
 ```ruby-skip-tests
 phased_release true
-# or 
+# or
 phased_release false
 ```
 
 ##### app_rating_config_path
-You can set the app age ratings using _deliver_. You'll have to create and store a `JSON` configuration file. Copy the [template](https://github.com/fastlane/fastlane/blob/master/deliver/assets/example_rating_config.json) to your project folder and pass the path to the `JSON` file using the `app_rating_config_path` option. 
+You can set the app age ratings using _deliver_. You'll have to create and store a `JSON` configuration file. Copy the [template](https://github.com/fastlane/fastlane/blob/master/deliver/assets/example_rating_config.json) to your project folder and pass the path to the `JSON` file using the `app_rating_config_path` option.
 
 The keys/values on the top allow values from 0-2, and the items on the bottom allow only 0 or 1. More information in [#reference](#reference).
 
@@ -281,9 +281,9 @@ The keys/values on the top allow values from 0-2, and the items on the bottom al
 
 All options below are useful if you want to specify certain app metadata in your `Deliverfile` or `Fastfile`
 
-### Localised
+### Localized
 
-Localised values should be set like this
+Localized values should be set like this
 
 ```ruby-skip-tests
 description({
@@ -297,7 +297,7 @@ The title/name of the app
 
 ##### subtitle
 
-Localised subtitle of the app
+Localized subtitle of the app
 
 ```ruby-skip-tests
 subtitle(
@@ -327,7 +327,7 @@ keywords(
 
 ##### promotional_text
 
-Localised promotional text
+Localized promotional text
 
 ```ruby-skip-tests
 promotional_text(
@@ -350,20 +350,20 @@ apple_watch_app_icon './AppleWatchAppIcon.png'
 
 ##### platform
 
-The platform of your application (a.e. ios, osx). 
+The platform of your application (a.e. ios, osx).
 
 This option is optional. The default value is "ios" and deliver should be able to figure out the platform from your binary.
 
 However, in the case if multiple binaries present, you can specify a platform which you want to deliver explicitly.
 
-The available options: 
+The available options:
 
 - 'ios'
 - 'appletvos'
 - 'osx'
 
 
-### Non-Localised
+### Non-Localized
 
 ##### copyright
 The up to date copyright information.
@@ -586,15 +586,15 @@ You can always prefix the category using `MZGenre.` (e.g. `MZGenre.Book`). _deli
 
 ## Default values
 
-Deliver has a special `default` language code which allows you to provide values that are not localised, and which will be used as defaults when you don’t provide a specific localised value.
+Deliver has a special `default` language code which allows you to provide values that are not localized, and which will be used as defaults when you don’t provide a specific localized value.
 
 In order to use `default`, you will need to tell _deliver_ which languages your app uses. You can do this in either of two ways:
 1. Create the folders named with the language in the metadata folder (i.e. fastlane/metadata/en-US or fastlane/metadata/de-DE)
-2. Add the following to your `Deliverfile` `languages(['en-US','de-DE'])` 
+2. Add the following to your `Deliverfile` `languages(['en-US','de-DE'])`
 
 You can use this either in json within your `Deliverfile` and/or as folders in your metadata folder. _deliver_ will take the union of both language sets from the `Deliverfile` and from the metadata folder and create on single set of languages which will be enabled.
 
-Imagine that you have localised data for the following language codes:  ```en-US, de-DE, el, it```
+Imagine that you have localized data for the following language codes:  ```en-US, de-DE, el, it```
 
 You can set the following in your `Deliverfile`
 
@@ -629,7 +629,7 @@ You can do the same with folders
       description.txt
 ```
 
-In this case, default values for keywords, urls, name and release notes are used in all localisations, but each language has a fully localised description
+In this case, default values for keywords, urls, name and release notes are used in all localizations, but each language has a fully localized description
 
 
 
