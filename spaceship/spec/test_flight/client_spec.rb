@@ -79,6 +79,15 @@ describe Spaceship::TestFlight::Client do
       subject.get_builds_for_train(app_id: app_id, platform: platform, train_version: '1.0')
       expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/platforms/ios/trains/1.0/builds')
     end
+
+    it 'retries requests' do
+      allow(subject).to receive(:request) { raise Faraday::ParsingError, 'Boom!' }
+      expect(subject).to receive(:request).exactly(2).times
+      begin
+        subject.get_builds_for_train(app_id: app_id, platform: platform, train_version: '1.0', retry_count: 2)
+      rescue
+      end
+    end
   end
 
   ##
