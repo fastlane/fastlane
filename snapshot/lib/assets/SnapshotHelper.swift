@@ -153,7 +153,7 @@ open class Snapshot: NSObject {
 
         let networkLoadingIndicator = XCUIApplication().otherElements.deviceStatusBars.networkLoadingIndicators.element
         let networkLoadingIndicatorDisappeared = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: networkLoadingIndicator)
-        XCTWaiter.wait(for: [networkLoadingIndicatorDisappeared], timeout: timeout)
+        let _ = XCTWaiter.wait(for: [networkLoadingIndicatorDisappeared], timeout: timeout)
     }
 
     class func pathPrefix() throws -> URL? {

@@ -350,7 +350,7 @@ module Spaceship
       # })
       #
       # Available Values
-      # https://github.com/fastlane/fastlane/blob/master/deliver/Reference.md
+      # https://docs.fastlane.tools/actions/deliver/#reference
       def update_rating(hash)
         raise "Must be a hash" unless hash.kind_of?(Hash)
 

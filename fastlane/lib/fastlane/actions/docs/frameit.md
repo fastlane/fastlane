@@ -28,7 +28,7 @@ Put a gorgeous device frame around your iOS and macOS screenshots just by runnin
 
 The complete and updated list of supported devices and colors can be found [here](https://github.com/fastlane/frameit-frames/tree/gh-pages/latest)
 
-Here is a nice gif, that shows ``_frameit_`` in action:
+Here is a nice gif, that shows ```frameit``` in action:
 
 ![img/actions/FrameitGit.gif](/img/actions/FrameitGit.gif?raw=1)
 
@@ -47,7 +47,7 @@ Here is a nice gif, that shows ``_frameit_`` in action:
 <h5 align="center">The <code>frameit</code> 2.0 update was kindly sponsored by <a href="https://mindnode.com/">MindNode</a>, seen in the screenshots above.</h5>
 
 
-The first time that ``_frameit_`` is executed the frames will be downloaded automatically. Originally the frames are coming from [Facebook frameset](http://facebook.design/devices) and they are kept on this repo: https://github.com/fastlane/frameit-frames
+The first time that ```frameit``` is executed the frames will be downloaded automatically. Originally the frames are coming from [Facebook frameset](http://facebook.design/devices) and they are kept on this repo: https://github.com/fastlane/frameit-frames
 
 More information about this process and how to update the frames can be found [here](https://github.com/fastlane/fastlane/tree/master/frameit/frames_generator)
 
