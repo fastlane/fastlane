@@ -80,8 +80,8 @@ module Spaceship::TestFlight
       self.new(attrs)
     end
 
-    def self.all(app_id: nil, platform: nil)
-      trains = BuildTrains.all(app_id: app_id, platform: platform)
+    def self.all(app_id: nil, platform: nil, retry_count: 0)
+      trains = BuildTrains.all(app_id: app_id, platform: platform, retry_count: retry_count)
       trains.values.flatten
     end
 
@@ -91,8 +91,8 @@ module Spaceship::TestFlight
     end
 
     # Just the builds, as a flat array, that are still processing
-    def self.all_processing_builds(app_id: nil, platform: nil)
-      all(app_id: app_id, platform: platform).find_all(&:processing?)
+    def self.all_processing_builds(app_id: nil, platform: nil, retry_count: 0)
+      all(app_id: app_id, platform: platform, retry_count: retry_count).find_all(&:processing?)
     end
 
     def self.latest(app_id: nil, platform: nil)
