@@ -8,7 +8,7 @@ module Fastlane
         elsif params[:path]
           if params[:path].kind_of?(String)
             paths = params[:path]
-          else
+          elsif params[:path].kind_of?(Array)
             paths = params[:path].join(' ')
           end
           UI.success("Successfully added \"#{paths}\" 💾.")
