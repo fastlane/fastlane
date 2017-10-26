@@ -7,11 +7,6 @@
 
 # Documentation
 
-- [FAQs](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/FAQs.md) for frequently asked questions
-- [Advanced.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Advanced.md) for more advanced settings and tips
-- [Platforms.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md) for more information about the cross-platform support of `fastlane`.
-- [Appfile.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Appfile.md) describes the `Appfile`
-- [Android.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Android.md) Getting started with fastlane for Android
 
 ### Plugins
 
