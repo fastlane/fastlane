@@ -17,11 +17,7 @@
 - [Gitignore.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Gitignore.md) Recommended content for your `.gitignore` file
 - [UI.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md) More information about how to print out text and ask the user for inputs
 
-### Plugins
 
-- [Plugins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Plugins.md) Getting started with using and building fastlane plugins
-- [AvailablePlugins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/AvailablePlugins.md) A list of all available fastlane plugins
-- [PluginsTroubleshooting.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/PluginsTroubleshooting.md) for help when plugins don't work
 
 ### CI Systems
 
