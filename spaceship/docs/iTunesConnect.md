@@ -129,6 +129,7 @@ attr_accessor :can_reject_version
 attr_accessor :can_prepare_for_upload
 attr_accessor :can_send_version_live
 attr_accessor :release_on_approval
+attr_accessor :ratings_reset
 attr_accessor :can_beta_test
 attr_accessor :supports_apple_watch
 attr_accessor :app_icon_url
