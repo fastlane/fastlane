@@ -80,6 +80,11 @@ module Fastlane
           dsym_io = Faraday::UploadIO.new(dsym, 'application/octet-stream') if dsym and File.exist?(dsym)
         end
 
+        # https://support.hockeyapp.net/discussions/problems/83559
+        # Should not set status to "2" (downloadable) until after the app is uploaded.
+        final_status = options[:status]
+        options[:status] = "1"
+
         response = connection.get do |req|
           req.url("/api/2/apps/#{app_id}/app_versions/new")
           req.headers['X-HockeyAppToken'] = api_token
@@ -99,6 +104,8 @@ module Fastlane
         if dsym
           options[:dsym] = dsym_io
         end
+
+        options[:status] = final_status
 
         connection.put do |req|
           req.options.timeout = options.delete(:timeout)
