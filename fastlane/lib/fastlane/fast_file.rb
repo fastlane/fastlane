@@ -225,7 +225,8 @@ module Fastlane
     # @param url [String] The git URL to clone the repository from
     # @param branch [String] The branch to checkout in the repository
     # @param path [String] The path to the Fastfile
-    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile')
+    # @param verion [String] Version of the required Fastlane version
+    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil)
       UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
 
       Actions.execute_action('import_from_git') do
@@ -235,26 +236,34 @@ module Fastlane
 
         # Checkout the repo
         repo_name = url.split("/").last
+        checkout_param = branch
 
         Dir.mktmpdir("fl_clone") do |tmp_path|
           clone_folder = File.join(tmp_path, repo_name)
 
-          branch_option = ""
           branch_option = "--branch #{branch}" if branch != 'HEAD'
 
-          clone_command = "GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
-
           UI.message "Cloning remote git repo..."
-          Actions.sh(clone_command)
+          Actions.sh("GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}")
 
-          Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
+          unless version.nil?
+            git_tags = fetch_remote_tags(folder: clone_folder)
+
+            # Separate version from optimistic operator
+            version_number = version(version_string: version)
+            operator = operator(version_string: version)
+
+            checkout_param = checkout_param_for_operator(operator: operator, version: version_number, git_tags: git_tags)
+          end
+
+          Actions.sh("cd '#{clone_folder}' && git checkout #{checkout_param} '#{path}'")
 
           # We also want to check out all the local actions of this fastlane setup
           containing = path.split(File::SEPARATOR)[0..-2]
           containing = "." if containing.count == 0
           actions_folder = File.join(containing, "actions")
           begin
-            Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{actions_folder}'")
+            Actions.sh("cd '#{clone_folder}' && git checkout #{checkout_param} '#{actions_folder}'")
           rescue
             # We don't care about a failure here, as local actions are optional
           end
@@ -266,6 +275,89 @@ module Fastlane
           return return_value
         end
       end
+    end
+
+    #####################################################
+    # @!group Versioning helpers
+    #####################################################
+
+    def fetch_remote_tags(folder: nil)
+      UI.message "Fetching remote git tags..."
+      Actions.sh("cd '#{folder}' && GIT_TERMINAL_PROMPT=0 git fetch --all --tags -q")
+
+      # Fetch all possible tags
+      git_tags_string = Actions.sh("cd '#{folder}' && git tag -l")
+      git_tags = git_tags_string.split("\n")
+
+      # Delete tags that are not a real version number
+      git_tags.delete_if { |tag| Gem::Version.correct?(tag) != 0 }
+
+      # Sort tags based on their version number
+      git_tags.sort_by { |tag| Gem::Version.new(tag) }
+
+      return git_tags
+    end
+
+    def checkout_param_for_operator(operator: nil, version: nil, git_tags: nil)
+      # ~> should select the latest version withing constraints.
+      # -> should select a specific version without fallback.
+      if operator == "~>"
+        return checkout_param_twiddle_wakka(version: version, git_tags: git_tags)
+
+      elsif operator == "->" || operator.nil?
+        return checkout_param_specific_version(version: version, git_tags: git_tags)
+
+      else
+        UI.user_error!("The specified operator \"#{operator}\" in \"#{version}\" is unknown. Please use one of these '~> ->'")
+      end
+    end
+
+    def checkout_param_specific_version(version: nil, git_tags: nil)
+      # Search matching version in array
+      matching_git_tags = git_tags.select do |tag|
+        tag == version
+      end
+
+      UI.user_error!("The specified version \"#{version}\" doesn't exist") if matching_git_tags.count == 0
+      return matching_git_tags.last
+    end
+
+    def checkout_param_twiddle_wakka(version: nil, git_tags: nil)
+      # Drop last specified digit in version
+      last_dot_index = version.rindex('.')
+      version_range = version[0..last_dot_index - 1]
+
+      # Search matching version in array
+      matching_git_tags = git_tags.select do |tag|
+        tag.start_with?(version_range)
+      end
+
+      UI.user_error!("No version found within the \"#{version_range}.*\" range") if matching_git_tags.count == 0
+
+      return matching_git_tags.last
+    end
+
+    def operator(version_string: nil)
+      version_info = version_range_info(version_string: version_string)
+
+      # version_info will have 2 elements if an optimistic operator is specified.
+      if version_info.count > 1
+
+        # Optimistic operator is always the first part. e.g.: ["~>", "2.0.0"]
+        return version_info.first
+      end
+
+      return nil
+    end
+
+    def version(version_string: nil)
+      version_info = version_range_info(version_string: version_string)
+      return version_info.last
+    end
+
+    def version_range_info(version_string: nil)
+      # Separate version from optimistic operator
+      return version_string.split(" ")
     end
 
     #####################################################
