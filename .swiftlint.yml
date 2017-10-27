@@ -1,0 +1,7 @@
+disabled_rules:
+  - line_length
+
+custom_rules:
+  equal_sign_whitespace:
+    message: "Expected only one space before and after ="
+    regex: "(([ ]{2,}=)|(=[ ]{2,}))"

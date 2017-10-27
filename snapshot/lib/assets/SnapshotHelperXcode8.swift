@@ -86,7 +86,7 @@ open class Snapshot: NSObject {
         do {
             let launchArguments = try String(contentsOf: path, encoding: String.Encoding.utf8)
             let regex = try NSRegularExpression(pattern: "(\\\".+?\\\"|\\S+)", options: [])
-            let matches = regex.matches(in: launchArguments, options: [], range: NSRange(location:0, length:launchArguments.characters.count))
+            let matches = regex.matches(in: launchArguments, options: [], range: NSRange(location: 0, length: launchArguments.characters.count))
             let results = matches.map { result -> String in
                 (launchArguments as NSString).substring(with: result.range)
             }
@@ -137,7 +137,7 @@ open class Snapshot: NSObject {
                 return nil
             }
 
-            guard let usersDir =  FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
+            guard let usersDir = FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
                 print("Couldn't find Snapshot configuration files - can't detect `Users` dir")
                 return nil
             }
