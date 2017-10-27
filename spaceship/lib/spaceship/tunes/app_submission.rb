@@ -71,7 +71,6 @@ module Spaceship
 
       attr_mapping({
         # Ad ID Info Section
-        'adIdInfo.limitsTracking.value' => :add_id_info_uses_idfa,
         'adIdInfo.servesAds.value' => :add_id_info_serves_ads,
         'adIdInfo.tracksAction.value' => :add_id_info_tracks_action,
         'adIdInfo.tracksInstall.value' => :add_id_info_tracks_install,
@@ -109,7 +108,14 @@ module Spaceship
               }
             }
           end
-
+          if attrs.dig("adIdInfo", "usesIdfa", "value") == true
+            attrs["adIdInfo"]["limitsTracking"] = {
+              "value" => true,
+              "isEditable" => false,
+              "isRequired" => false,
+              "errorKeys" => nil
+            }
+          end
           obj = self.new(attrs)
           return obj
         end
