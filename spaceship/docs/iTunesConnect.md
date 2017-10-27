@@ -58,7 +58,7 @@ details.save!
 To change the price of the app (it's not necessary to call `save!` when updating the price)
 
 ```ruby
-version.update_price_tier("3")
+app.update_price_tier!("3")
 ```
 
 ## AppVersions
@@ -91,7 +91,7 @@ v.copyright = "#{Time.now.year} Felix Krause"
 # Get a list of available languages for this app
 v.description.languages # => ["German", "English"]
 
-# Update localised app metadata
+# Update localized app metadata
 v.description["en-US"] = "App Description"
 
 # set the app age rating

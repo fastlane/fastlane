@@ -422,6 +422,30 @@ describe Fastlane do
           eq("carthage update TestDependency1 TestDependency2")
       end
 
+      it "builds with a single dependency" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'build',
+              dependencies: ['TestDependency']
+            )
+          end").runner.execute(:test)
+
+        expect(result).to \
+          eq("carthage build TestDependency")
+      end
+
+      it "builds with multiple dependencies" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'build',
+              dependencies: ['TestDependency1', 'TestDependency2']
+            )
+          end").runner.execute(:test)
+
+        expect(result).to \
+          eq("carthage build TestDependency1 TestDependency2")
+      end
+
       it "works with no parameters" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
