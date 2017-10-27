@@ -108,14 +108,7 @@ module Spaceship
               }
             }
           end
-          if attrs.dig("adIdInfo", "usesIdfa", "value") == true
-            attrs["adIdInfo"]["limitsTracking"] = {
-              "value" => true,
-              "isEditable" => false,
-              "isRequired" => false,
-              "errorKeys" => nil
-            }
-          end
+
           obj = self.new(attrs)
           return obj
         end
@@ -137,6 +130,13 @@ module Spaceship
           raw_data_clone.set(["contentRights"], nil)
         end
         raw_data_clone.delete("version")
+
+        if !self.add_id_info_uses_idfa.nil? && self.add_id_info_uses_idfa == true
+          raw_data_clone.set(
+            ["adIdInfo", "limitsTracking", "value"],
+            true
+          )
+        end
 
         client.send_app_submission(application.apple_id, application.edit_version.version_id, raw_data_clone)
         @submitted_for_review = true
