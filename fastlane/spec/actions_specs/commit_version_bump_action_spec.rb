@@ -8,8 +8,8 @@ describe Fastlane::Actions::CommitVersionBumpAction do
     end
 
     it 'returns the param if an Array' do
-      settings_plists = action.settings_plists_from_param %w{About.plist Root.plist}
-      expect(settings_plists).to eq %w{About.plist Root.plist}
+      settings_plists = action.settings_plists_from_param ["About.plist", "Root.plist"]
+      expect(settings_plists).to eq ["About.plist", "Root.plist"]
     end
 
     it 'returns ["Root.plist"] for any other input' do
