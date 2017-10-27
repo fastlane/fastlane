@@ -197,7 +197,6 @@ module Spaceship
       # e.g. {"warn"=>nil, "error"=>["operation_failed"], "info"=>nil}
       different_error = raw.fetch('messages', {}).fetch('error', nil)
       errors << different_error if different_error
-
       if errors.count > 0 # they are separated by `.` by default
         # Sample `error` content: [["Forbidden"]]
         if errors.count == 1 and errors.first == "You haven't made any changes."
@@ -208,6 +207,8 @@ module Spaceship
           raise_insuffient_permission_error!
         elsif flaky_api_call
           raise ITunesConnectPotentialServerError.new, errors.join(' ')
+        elsif errors.count == 1 and errors.first.first.include?("Problem processing review submission.")
+          # This could be because the app is in "Waiting for review" status on itc
         else
           raise ITunesConnectError.new, errors.join(' ')
         end
@@ -959,7 +960,7 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def send_app_submission(app_id, version, data)
+    def send_app_submission(app_id, version, data, reject_if_waiting_for_review=false)
       raise "app_id is required" unless app_id
 
       # ra/apps/1039164429/version/submit/complete
@@ -970,6 +971,17 @@ module Spaceship
       end
 
       handle_itc_response(r.body)
+      
+      require 'pry'
+      binding.pry
+      if r.body['messages'].key?("error") and r.body['messages']["error"].first.include?("Problem processing review submission.")
+        if reject_if_waiting_for_review
+          reject_app_submission(app_id, version)
+          send_app_submission(app_id, version, data)
+        else
+          raise ITunesConnectError.new, r.body['messages']["error"].first
+        end
+      end
 
       # iTunes Connect still returns a success status code even the submission
       # was failed because of Ad ID info.  This checks for any section error
@@ -993,13 +1005,15 @@ module Spaceship
       raise "app_id is required" unless app_id
       
       r = request(:post) do |req|
+        req.url "ra/apps/#{app_id}/versions/#{version}/reject"
+        req.headers['Content-Type'] = 'application/json'
       end
 
       handle_itc_response(r.body)
 
       parse_response(r, 'data')
     end
-    
+
     #####################################################
     # @!group release
     #####################################################

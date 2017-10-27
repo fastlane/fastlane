@@ -22,7 +22,12 @@ module Deliver
       end
 
       # Finalize app submission
-      submission.complete!
+      if options[:reject_if_waiting_for_review]
+        submission.complete(reject_if_waiting_for_review)
+      else
+        submission.complete(false)
+      end
+      
 
       UI.success("Successfully submitted the app for review!")
     end
