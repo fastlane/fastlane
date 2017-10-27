@@ -132,7 +132,7 @@ module Spaceship
         end
         raw_data_clone.delete("version")
 
-        client.send_app_submission(application.apple_id, application.edit_version.version_id, raw_data_clone)
+        # client.send_app_submission(application.apple_id, application.edit_version.version_id, raw_data_clone)
         @submitted_for_review = true
       end
 
