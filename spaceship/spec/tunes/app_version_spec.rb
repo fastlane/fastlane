@@ -23,6 +23,7 @@ describe Spaceship::AppVersion, all: true do
       expect(version.can_send_version_live).to eq(false)
       expect(version.release_on_approval).to eq(true)
       expect(version.auto_release_date).to eq(nil)
+      expect(version.ratings_reset).to eq(false)
       expect(version.can_beta_test).to eq(true)
       expect(version.version).to eq('0.9.13')
       expect(version.supports_apple_watch).to eq(false)
