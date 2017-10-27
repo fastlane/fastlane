@@ -44,11 +44,11 @@ module Spaceship
 
     def get_picture_type(upload_file)
       resolution = Utilities.resolution(upload_file.file_path)
-      result = device_resolution_map.find { |key, resolutions| 
+      result = device_resolution_map.find do |key, resolutions|
         resolutions.include? resolution
-      }
-      raise "Unknown device for screen resolution #{resolution}" unless result != nil
-      
+      end
+      raise "Unknown device for screen resolution #{resolution}" if result.nil?
+
       picture_type_map[result[0]]
     end
 
