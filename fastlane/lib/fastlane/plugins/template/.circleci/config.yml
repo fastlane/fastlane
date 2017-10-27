@@ -23,19 +23,17 @@ jobs:
 
       - run:
           name: install dependencies
-          command: |
-            bundle install --jobs=4 --retry=3 --path vendor/bundle
+          command: bundle install --jobs=4 --retry=3 --path vendor/bundle
 
       - save_cache:
           paths:
-            - ./venv
+            - ./vendor
           key: v1-dependencies-{{ checksum "Gemfile" }}
 
       # run tests!
       - run:
           name: run tests
-          command: |
-            bundle exec rake
+          command: bundle exec rake
 
       # collect reports
       - store_test_results:
