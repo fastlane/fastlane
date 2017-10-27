@@ -47,7 +47,7 @@ module Spaceship
       result = device_resolution_map.find { |key, resolutions| 
         resolutions.include? resolution
       }
-      raise "Unknown picture type for resolution #{resolution}" unless result != nil
+      raise "Unknown device for screen resolution #{resolution}" unless result != nil
       
       picture_type_map[result[0]]
     end
