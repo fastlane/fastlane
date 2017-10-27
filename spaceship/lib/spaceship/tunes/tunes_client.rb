@@ -987,6 +987,20 @@ module Spaceship
     end
 
     #####################################################
+    # @!group Reject App Submission
+    #####################################################
+    def reject_app_submission(app_id, version)
+      raise "app_id is required" unless app_id
+      
+      r = request(:post) do |req|
+      end
+
+      handle_itc_response(r.body)
+
+      parse_response(r, 'data')
+    end
+    
+    #####################################################
     # @!group release
     #####################################################
 
