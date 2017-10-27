@@ -58,7 +58,7 @@ details.save!
 To change the price of the app (it's not necessary to call `save!` when updating the price)
 
 ```ruby
-version.update_price_tier("3")
+app.update_price_tier!("3")
 ```
 
 ## AppVersions
