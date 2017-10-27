@@ -30,6 +30,7 @@ module Fastlane
           file: Faraday::UploadIO.new(binary, 'application/octet-stream'),
           message: options[:message] || ''
         })
+        options[:disable_notify] = 'yes' if options[:disable_notify]
 
         connection.post("/api/users/#{user_name}/apps", options)
       rescue Faraday::Error::TimeoutError

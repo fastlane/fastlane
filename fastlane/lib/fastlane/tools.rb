@@ -14,6 +14,7 @@ module Fastlane
     :sigh,
     :match,
     :scan,
-    :gym
+    :gym,
+    :precheck
   ]
 end

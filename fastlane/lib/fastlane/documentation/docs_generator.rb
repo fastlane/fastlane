@@ -20,7 +20,7 @@ module Fastlane
       output << "<tr>"
       output << "<th width=\"33%\"><a href=\"http://brew.sh\">Homebrew</a></td>"
       output << "<th width=\"33%\">Installer Script</td>"
-      output << "<th width=\"33%\">Rubygems</td>"
+      output << "<th width=\"33%\">RubyGems</td>"
       output << "</tr>"
       output << "<tr>"
       output << "<td width=\"33%\" align=\"center\">macOS</td>"
@@ -63,8 +63,13 @@ module Fastlane
       output << "The documentation of fastlane can be found on [docs.fastlane.tools](https://docs.fastlane.tools)."
       output << ""
 
-      File.write(output_path, output.join("\n"))
-      UI.success "Successfully generated documentation at path '#{File.expand_path(output_path)}'" if FastlaneCore::Globals.verbose?
+      begin
+        File.write(output_path, output.join("\n"))
+        UI.success "Successfully generated documentation at path '#{File.expand_path(output_path)}'" if FastlaneCore::Globals.verbose?
+      rescue => ex
+        UI.error(ex)
+        UI.error("Couldn't save fastlane documentation at path '#{File.expand_path(output_path)}', make sure you have write access to the containing directory.")
+      end
     end
 
     #####################################################

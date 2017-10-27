@@ -1,9 +1,11 @@
 module Match
   class Runner
-    attr_accessor :changes_to_commit
+    attr_accessor :files_to_commmit
     attr_accessor :spaceship
 
     def run(params)
+      self.files_to_commmit = []
+
       FastlaneCore::PrintTable.print_values(config: params,
                                          hide_keys: [:workspace],
                                              title: "Summary for match #{Fastlane::VERSION}")
@@ -50,9 +52,9 @@ module Match
       end
 
       # Done
-      if self.changes_to_commit and !params[:readonly]
+      if self.files_to_commmit.count > 0 and !params[:readonly]
         message = GitHelper.generate_commit_message(params)
-        GitHelper.commit_changes(params[:workspace], message, params[:git_url], params[:git_branch])
+        GitHelper.commit_changes(params[:workspace], message, params[:git_url], params[:git_branch], self.files_to_commmit)
       end
 
       # Print a summary table for each app_identifier
@@ -81,7 +83,10 @@ module Match
         UI.important "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
         UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
         cert_path = Generator.generate_certificate(params, cert_type)
-        self.changes_to_commit = true
+        private_key_path = cert_path.gsub(".cer", ".p12")
+
+        self.files_to_commmit << cert_path
+        self.files_to_commmit << private_key_path
       else
         cert_path = certs.last
         UI.message "Installing certificate..."
@@ -120,7 +125,14 @@ module Match
       profile = profiles.last
 
       if params[:force_for_new_devices] && !params[:readonly]
-        params[:force] = device_count_different?(profile: profile) unless params[:force]
+        if prov_type != :appstore
+          params[:force] = device_count_different?(profile: profile) unless params[:force]
+        else
+          # App Store provisioning profiles don't contain device identifiers and
+          # thus shouldn't be renewed if the device count has changed.
+          UI.important "Warning: `force_for_new_devices` is set but is ignored for App Store provisioning profiles."
+          UI.important "You can safely stop specifying `force_for_new_devices` when running Match for type 'appstore'."
+        end
       end
 
       if profile.nil? or params[:force]
@@ -137,7 +149,7 @@ module Match
                                                        prov_type: prov_type,
                                                   certificate_id: certificate_id,
                                                   app_identifier: app_identifier)
-        self.changes_to_commit = true
+        self.files_to_commmit << profile
       end
 
       installed_profile = FastlaneCore::ProvisioningProfile.install(profile)
@@ -148,7 +160,7 @@ module Match
       if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
         # This profile is invalid, let's remove the local file and generate a new one
         File.delete(profile)
-        self.changes_to_commit = true
+        # This method will be called again, no need to modify `files_to_commmit`
         return nil
       end
 

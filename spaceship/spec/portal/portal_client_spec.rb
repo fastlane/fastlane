@@ -1,3 +1,5 @@
+require_relative '../mock_servers'
+
 describe Spaceship::Client do
   before { Spaceship.login }
   subject { Spaceship.client }
@@ -252,6 +254,13 @@ describe Spaceship::Client do
         expect(response.keys).to include('name', 'status', 'type', 'appId', 'deviceIds')
         expect(response['distributionMethod']).to eq('limited')
       end
+
+      it "works when template name is specified" do
+        template_name = 'Subscription Service iOS (dist)'
+        response = subject.create_provisioning_profile!("net.sunapps.106 limited", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], [], mac: false, sub_platform: nil, template_name: template_name)
+        expect(response.keys).to include('name', 'status', 'type', 'appId', 'deviceIds', 'template')
+        expect(response['template']['purposeDisplayName']).to eq(template_name)
+      end
     end
 
     describe '#delete_provisioning_profile!' do
@@ -273,6 +282,88 @@ describe Spaceship::Client do
       it 'makes a revoke request and returns the revoked certificate' do
         response = subject.revoke_certificate!('XC5PH8DAAA', 'R58UK2EAAA')
         expect(response.first.keys).to include('certificateId', 'certificateType', 'certificate')
+      end
+    end
+  end
+
+  describe 'keys api' do
+    let(:api_root) { 'https://developer.apple.com/services-account/QH65B2/account/auth/key' }
+    before do
+      MockAPI::DeveloperPortalServer.post('/services-account/QH65B2/account/auth/key/:action') do
+        {
+          keys: []
+        }
+      end
+    end
+
+    describe '#list_keys' do
+      it 'lists keys' do
+        subject.list_keys
+        expect(WebMock).to have_requested(:post, api_root + '/list')
+      end
+    end
+
+    describe '#get_key' do
+      it 'gets a key' do
+        subject.get_key(id: '123')
+        expect(WebMock).to have_requested(:post, api_root + '/get')
+      end
+    end
+
+    describe '#download_key' do
+      it 'downloads a key' do
+        MockAPI::DeveloperPortalServer.get('/services-account/QH65B2/account/auth/key/download') do
+          '----- BEGIN PRIVATE KEY -----'
+        end
+        subject.download_key(id: '123')
+        expect(WebMock).to have_requested(:get, api_root + '/download?keyId=123&teamId=XXXXXXXXXX')
+      end
+    end
+
+    describe '#create_key!' do
+      it 'creates a key' do
+        subject.create_key!(name: 'some name', service_configs: [])
+        expect(WebMock).to have_requested(:post, api_root + '/create')
+      end
+    end
+
+    describe 'revoke_key!' do
+      it 'revokes a key' do
+        subject.revoke_key!(id: '123')
+        expect(WebMock).to have_requested(:post, api_root + '/revoke')
+      end
+    end
+  end
+
+  describe 'merchant api' do
+    let(:api_root) { 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/' }
+    before do
+      MockAPI::DeveloperPortalServer.post('/services-account/QH65B2/account/ios/identifiers/:action') do
+        {
+          identifierList: [],
+          omcId: []
+        }
+      end
+    end
+
+    describe '#merchants' do
+      it 'lists merchants' do
+        subject.merchants
+        expect(WebMock).to have_requested(:post, api_root + 'listOMCs.action')
+      end
+    end
+
+    describe '#create_merchant!' do
+      it 'creates a merchant' do
+        subject.create_merchant!('ExampleApp Production', 'merchant.com.example.app.production')
+        expect(WebMock).to have_requested(:post, api_root + 'addOMC.action').with(body: { name: 'ExampleApp Production', identifier: 'merchant.com.example.app.production', teamId: 'XXXXXXXXXX' })
+      end
+    end
+
+    describe '#delete_merchant!' do
+      it 'deletes a merchant' do
+        subject.delete_merchant!('LM3IY56BXC')
+        expect(WebMock).to have_requested(:post, api_root + 'deleteOMC.action').with(body: { omcId: 'LM3IY56BXC', teamId: 'XXXXXXXXXX' })
       end
     end
   end

@@ -35,12 +35,18 @@ module Fastlane
       #   }
       #
       def self.define_provisioning_profile_mapping(params)
-        env_variable_name = Match::Utils.environment_variable_name_profile_name(app_identifier: params[:app_identifier],
-                                                                                          type: Match.profile_type_sym(params[:type]),
-                                                                                      platform: params[:platform])
-
         mapping = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING] || {}
-        mapping[params[:app_identifier]] = ENV[env_variable_name]
+
+        # Array (...) to make sure it's an Array, Ruby is magic, try this
+        #   Array(1)      # => [1]
+        #   Array([1, 2]) # => [1, 2]
+        Array(params[:app_identifier]).each do |app_identifier|
+          env_variable_name = Match::Utils.environment_variable_name_profile_name(app_identifier: app_identifier,
+                                                                                            type: Match.profile_type_sym(params[:type]),
+                                                                                        platform: params[:platform])
+          mapping[app_identifier] = ENV[env_variable_name]
+        end
+
         Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING] = mapping
       end
 

@@ -29,6 +29,26 @@ describe Fastlane do
 
           expect(result).to eq("swiftlint lint --strict")
         end
+
+        it "adds strict option for custom executable" do
+          CUSTOM_EXECUTABLE_NAME = "custom_executable"
+
+          # Override the already overridden swiftlint_version method to check
+          # that the correct exectuable is being passed in as a parameter.
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version) { |params|
+            expect(params[:executable]).to eq(CUSTOM_EXECUTABLE_NAME)
+            swiftlint_gem_version
+          }
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              strict: true,
+              executable: '#{CUSTOM_EXECUTABLE_NAME}'
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("#{CUSTOM_EXECUTABLE_NAME} lint --strict")
+        end
       end
 
       context "when specify false for strict option" do

@@ -90,7 +90,11 @@ module Deliver
                                      description: "The version that should be edited or created",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_metadata,
-                                     description: "Don't upload the metadata (e.g. title, description), this will still upload screenshots",
+                                     description: "Don't upload the metadata (e.g. title, description). This will still upload screenshots",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_app_version_update,
+                                     description: "Don't update app version for submission",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :force,
@@ -107,6 +111,11 @@ module Deliver
                                      description: "Should the app be automatically released once it's approved?",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :phased_release,
+                                     description: "Enable the phased release feature of iTC",
+                                     optional: true,
+                                     is_string: false,
+                                     default_value: nil),
         FastlaneCore::ConfigItem.new(key: :price_tier,
                                      short_option: "-r",
                                      description: "The price tier of this application",
@@ -172,15 +181,29 @@ module Deliver
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
+        # rubocop:disable Metrics/LineLength
         FastlaneCore::ConfigItem.new(key: :itc_provider,
                                      env_name: "DELIVER_ITC_PROVIDER",
-                                     description: "The provider short name to be used with the iTMSTransporter to identify your team",
+                                     description: "The provider short name to be used with the iTMSTransporter to identify your team. To get provider short name run `pathToXcode.app/Contents/Applications/Application\\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column",
                                      optional: true),
+        # rubocop:enable Metrics/LineLength
         FastlaneCore::ConfigItem.new(key: :overwrite_screenshots,
                                      env_name: "DELIVER_OVERWRITE_SCREENSHOTS",
                                      description: "Clear all previously uploaded screenshots before uploading the new ones",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :run_precheck_before_submit,
+                                     short_option: "-x",
+                                     env_name: "DELIVER_RUN_PRECHECK_BEFORE_SUBMIT",
+                                     description: "Run precheck before submitting to app review",
+                                     is_string: false,
+                                     default_value: true),
+        FastlaneCore::ConfigItem.new(key: :precheck_default_rule_level,
+                                     short_option: "-d",
+                                     env_name: "DELIVER_PRECHECK_DEFAULT_RULE_LEVEL",
+                                     description: "The default rule level unless otherwise configured",
+                                     is_string: false,
+                                     default_value: :warn),
 
         # App Metadata
         # Non Localised
@@ -205,27 +228,27 @@ module Deliver
                                      optional: true,
                                      is_string: true),
         FastlaneCore::ConfigItem.new(key: :primary_category,
-                                     description: "Metadata: The english name of the primary category(e.g. `Business`, `Books`)",
+                                     description: "Metadata: The english name of the primary category (e.g. `Business`, `Books`)",
                                      optional: true,
                                      is_string: true),
         FastlaneCore::ConfigItem.new(key: :secondary_category,
-                                     description: "Metadata: The english name of the secondary category(e.g. `Business`, `Books`)",
+                                     description: "Metadata: The english name of the secondary category (e.g. `Business`, `Books`)",
                                      optional: true,
                                      is_string: true),
         FastlaneCore::ConfigItem.new(key: :primary_first_sub_category,
-                                     description: "Metadata: The english name of the primary first sub category(e.g. `Educational`, `Puzzle`)",
+                                     description: "Metadata: The english name of the primary first sub category (e.g. `Educational`, `Puzzle`)",
                                      optional: true,
                                      is_string: true),
         FastlaneCore::ConfigItem.new(key: :primary_second_sub_category,
-                                     description: "Metadata: The english name of the primary second sub category(e.g. `Educational`, `Puzzle`)",
+                                     description: "Metadata: The english name of the primary second sub category (e.g. `Educational`, `Puzzle`)",
                                      optional: true,
                                      is_string: true),
         FastlaneCore::ConfigItem.new(key: :secondary_first_sub_category,
-                                     description: "Metadata: The english name of the secondary first sub category(e.g. `Educational`, `Puzzle`)",
+                                     description: "Metadata: The english name of the secondary first sub category (e.g. `Educational`, `Puzzle`)",
                                      optional: true,
                                      is_string: true),
         FastlaneCore::ConfigItem.new(key: :secondary_second_sub_category,
-                                     description: "Metadata: The english name of the secondary second sub category(e.g. `Educational`, `Puzzle`)",
+                                     description: "Metadata: The english name of the secondary second sub category (e.g. `Educational`, `Puzzle`)",
                                      optional: true,
                                      is_string: true),
         FastlaneCore::ConfigItem.new(key: :trade_representative_contact_information,
@@ -250,20 +273,20 @@ module Deliver
                                      optional: true,
                                      is_string: false,
                                      verify_block: proc do |value|
-                                       UI.user_error!(":subtitle must be a Hash, with the language being the key") unless value.kind_of?(Hash)
+                                       UI.user_error!(":subtitle must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                      end),
         FastlaneCore::ConfigItem.new(key: :keywords,
                                      description: "Metadata: An array of localised keywords",
                                      optional: true,
                                      is_string: false,
                                      verify_block: proc do |value|
-                                       UI.user_error!(":keywords must be a Hash, with the language being the key") unless value.kind_of?(Hash)
+                                       UI.user_error!(":keywords must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                        value.each do |language, keywords|
                                          # Auto-convert array to string
                                          keywords = keywords.join(", ") if keywords.kind_of?(Array)
                                          value[language] = keywords
 
-                                         UI.user_error!(":keywords must be a hash with all values being strings") unless keywords.kind_of?(String)
+                                         UI.user_error!("keywords must be a hash with all values being strings") unless keywords.kind_of?(String)
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :promotional_text,
@@ -271,7 +294,7 @@ module Deliver
                                      optional: true,
                                      is_string: false,
                                      verify_block: proc do |value|
-                                       UI.user_error!(":keywords must be a Hash, with the language being the key") unless value.kind_of?(Hash)
+                                       UI.user_error!(":keywords must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                      end),
         FastlaneCore::ConfigItem.new(key: :release_notes,
                                      description: "Metadata: Localised release notes for this version",
@@ -288,6 +311,17 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :marketing_url,
                                      description: "Metadata: Localised marketing url",
                                      optional: true,
+                                     is_string: false),
+        # The verify_block has been removed from here and verification now happens in Deliver::DetectValues
+        # Verification needed Spaceship::Tunes.client which required the Deliver::Runner to already by started
+        FastlaneCore::ConfigItem.new(key: :languages,
+                                     description: "Metadata: List of languages to activate",
+                                     type: Array,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :ignore_language_directory_validation,
+                                     env_name: "DELIVER_IGNORE_LANGUAGE_DIRECTORY_VALIDATION",
+                                     description: "Ignore errors when invalid languages are found in metadata and screeenshot directories",
+                                     default_value: false,
                                      is_string: false)
       ]
     end

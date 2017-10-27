@@ -63,6 +63,36 @@ describe Fastlane do
           File.delete(File.join(destination_path, zip_file))
         end
       end
+
+      context "zipped backup with custom filename" do
+        let(:custom_zip_filename) { "App_1.0.0" }
+        let(:zip_file) { "#{custom_zip_filename}.xcarchive.zip" }
+        before :each do
+          FileUtils.mkdir_p(source_path)
+          FileUtils.mkdir_p(destination_path)
+          File.write(File.join(source_path, xcarchive_file), file_content)
+          File.write(File.join(tmp_path, zip_file), file_content)
+          expect(Dir).to receive(:mktmpdir).with("backup_xcarchive").and_yield(tmp_path)
+        end
+
+        it "make zip with custom filename and copy to destination" do
+          allow(Fastlane::Actions).to receive(:sh).with("cd \"#{source_path}\" && zip -r -X \"#{tmp_path}/#{custom_zip_filename}.xcarchive.zip\" \"#{xcarchive_file}\" > /dev/null").and_return("")
+          result = Fastlane::FastFile.new.parse("lane :test do
+            backup_xcarchive(
+              versioned: false,
+              xcarchive: '#{source_xcarchive_path}',
+              destination: '#{destination_path}',
+              zip: true,
+              zip_filename: '#{custom_zip_filename}'
+            )
+          end").runner.execute(:test)
+        end
+
+        after :each do
+          File.delete(File.join(source_path, xcarchive_file))
+          File.delete(File.join(destination_path, zip_file))
+        end
+      end
     end
   end
 end

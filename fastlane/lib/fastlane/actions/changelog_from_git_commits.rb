@@ -30,9 +30,9 @@ module Fastlane
         end
 
         if params[:commits_count]
-          changelog = Actions.git_log_last_commits(params[:pretty], params[:commits_count], merge_commit_filtering, params[:date_format])
+          changelog = Actions.git_log_last_commits(params[:pretty], params[:commits_count], merge_commit_filtering, params[:date_format], params[:ancestry_path])
         else
-          changelog = Actions.git_log_between(params[:pretty], from, to, merge_commit_filtering, params[:date_format])
+          changelog = Actions.git_log_between(params[:pretty], from, to, merge_commit_filtering, params[:date_format], params[:ancestry_path])
         end
         changelog = changelog.gsub("\n\n", "\n") if changelog # as there are duplicate newlines
         Actions.lane_context[SharedValues::FL_CHANGELOG] = changelog
@@ -94,6 +94,12 @@ module Fastlane
                                        description: 'The date format applied to each commit while generating the collected value',
                                        optional: true,
                                        is_string: true),
+          FastlaneCore::ConfigItem.new(key: :ancestry_path,
+                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_ANCESTRY_PATH',
+                                       description: 'Whether or not to use ancestry-path param',
+                                       optional: true,
+                                       default_value: false,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :tag_match_pattern,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_TAG_MATCH_PATTERN',
                                        description: 'A glob(7) pattern to match against when finding the last git tag',

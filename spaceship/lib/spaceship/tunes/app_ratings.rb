@@ -44,8 +44,8 @@ module Spaceship
       end
 
       # @return (Array) of Review Objects
-      def reviews(store_front, versionId = '')
-        raw_reviews = client.get_reviews(application.apple_id, application.platform, store_front, versionId)
+      def reviews(store_front = '', version_id = '')
+        raw_reviews = client.get_reviews(application.apple_id, application.platform, store_front, version_id)
         raw_reviews.map do |review|
           review["value"]["application"] = self.application
           AppReview.factory(review["value"])
@@ -98,8 +98,8 @@ module Spaceship
         'lastModified' => :last_modified,
         'helpfulViews' => :helpful_views,
         'totalViews' => :total_views,
-        'developerResponse' => :raw_developer_response,
-        'edited' => :edited
+        'edited' => :edited,
+        'developerResponse' => :raw_developer_response
       })
       class << self
         # Create a new object based on a hash.

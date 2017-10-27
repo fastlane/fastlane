@@ -23,7 +23,7 @@ module FastlaneCore
       private
 
       def watching_build(app_id: nil, platform: nil)
-        processing_builds = Spaceship::TestFlight::Build.all_processing_builds(app_id: app_id, platform: platform)
+        processing_builds = Spaceship::TestFlight::Build.all_processing_builds(app_id: app_id, platform: platform, retry_count: 2)
 
         watched_build = processing_builds.sort_by(&:upload_date).last
         watched_build || Spaceship::TestFlight::Build.latest(app_id: app_id, platform: platform)
@@ -35,13 +35,13 @@ module FastlaneCore
       end
 
       def report_status(build: nil)
-        # Due to iTunes Connect, builds disappear from the build list alltogether
+        # Due to iTunes Connect, builds disappear from the build list altogether
         # after they finished processing. Before returning this build, we have to
         # wait for the build to appear in the build list again
         # As this method is very often used to wait for a build, and then do something
         # with it, we have to be sure that the build actually is ready
         if build.nil?
-          UI.message("Build doesn't show up in the build list any more, waiting for it to appear again")
+          UI.message("Build doesn't show up in the build list anymore, waiting for it to appear again")
         elsif build.active?
           UI.success("Build #{build.train_version} - #{build.build_version} is already being tested")
         elsif build.ready_to_submit? || build.export_compliance_missing?

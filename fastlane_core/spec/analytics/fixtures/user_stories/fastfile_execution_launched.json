@@ -1,0 +1,170 @@
+[
+  {
+    "event_source": {
+      "oauth_app_name": "fastlane",
+      "product": "fastlane"
+    },
+    "actor": {
+      "name": "p_hash",
+      "detail": "sessionID"
+    },
+    "action": {
+      "name": "launched",
+      "action_name": "deliver"
+    },
+    "primary_target": {
+      "name": "fastlane_version",
+      "detail": "2.5.0"
+    },
+    "millis_since_epoch": 1507043076,
+    "version": 1
+  },
+  {
+    "event_source": {
+      "oauth_app_name": "fastlane",
+      "product": "fastlane"
+    },
+    "actor": {
+      "name": "p_hash",
+      "detail": "sessionID"
+    },
+    "action": {
+      "name": "launched",
+      "action_name": "deliver"
+    },
+    "primary_target": {
+      "name": "install_method",
+      "detail": "gem"
+    },
+    "millis_since_epoch": 1507043076,
+    "version": 1
+  },
+  {
+    "event_source": {
+      "oauth_app_name": "fastlane",
+      "product": "fastlane"
+    },
+    "actor": {
+      "name": "p_hash",
+      "detail": "sessionID"
+    },
+    "action": {
+      "name": "launched",
+      "action_name": "deliver"
+    },
+    "primary_target": {
+      "name": "operating_system",
+      "detail": "mac"
+    },
+    "secondary_target": {
+      "name": "version",
+      "detail": "10.12"
+    },
+    "millis_since_epoch": 1507043076,
+    "version": 1
+  },
+  {
+    "event_source": {
+      "oauth_app_name": "fastlane",
+      "product": "fastlane"
+    },
+    "actor": {
+      "name": "p_hash",
+      "detail": "sessionID"
+    },
+    "action": {
+      "name": "launched",
+      "action_name": "deliver"
+    },
+    "primary_target": {
+      "name": "build_tool_version",
+      "detail": "Xcode 9.0"
+    },
+    "millis_since_epoch": 1507043076,
+    "version": 1
+  },
+  {
+    "event_source": {
+      "oauth_app_name": "fastlane",
+      "product": "fastlane"
+    },
+    "actor": {
+      "name": "p_hash",
+      "detail": "sessionID"
+    },
+    "action": {
+      "name": "launched",
+      "action_name": "deliver"
+    },
+    "primary_target": {
+      "name": "ci",
+      "detail": "true"
+    },
+    "millis_since_epoch": 1507043076,
+    "version": 1
+  },
+  {
+    "event_source": {
+      "oauth_app_name": "fastlane",
+      "product": "fastlane"
+    },
+    "actor": {
+      "name": "p_hash",
+      "detail": "sessionID"
+    },
+    "action": {
+      "name": "launched",
+      "action_name": "deliver"
+    },
+    "primary_target": {
+      "name": "fastfile",
+      "detail": "false"
+    },
+    "secondary_target": {
+      "name": "fastfileID",
+      "detail": "some_fastfile_id"
+    },
+    "millis_since_epoch": 1507043076,
+    "version": 1
+  },
+  {
+    "event_source": {
+      "oauth_app_name": "fastlane",
+      "product": "fastlane"
+    },
+    "actor": {
+      "name": "p_hash",
+      "detail": "sessionID"
+    },
+    "action": {
+      "name": "launched",
+      "action_name": "deliver"
+    },
+    "primary_target": {
+      "name": "platform",
+      "detail": "iOS"
+    },
+    "millis_since_epoch": 1507043076,
+    "version": 1
+  },
+  {
+    "event_source": {
+      "oauth_app_name": "fastlane",
+      "product": "fastlane"
+    },
+    "actor": {
+      "name": "p_hash",
+      "detail": "sessionID"
+    },
+    "action": {
+      "name": "launched",
+      "action_name": "deliver"
+    },
+    "primary_target": {
+      "name": "ruby_version",
+      "detail": "2.4.0"
+    },
+    "millis_since_epoch": 1507043076,
+    "version": 1
+  }
+]

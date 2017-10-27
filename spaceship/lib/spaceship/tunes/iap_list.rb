@@ -17,7 +17,7 @@ module Spaceship
       attr_accessor :duration_days
       attr_accessor :versions
       attr_accessor :purple_apple_id
-      attr_accessor :last_modfied_date
+      attr_accessor :last_modified_date
       attr_accessor :is_news_subscription
       attr_accessor :number_of_codes
       attr_accessor :maximum_number_of_codes
@@ -34,7 +34,7 @@ module Spaceship
         'durationDays' => :duration_days,
         'versions' => :versions,
         'purpleSoftwareAdamIds' => :purple_apple_id,
-        'lastModifiedDate' => :last_modfied_date,
+        'lastModifiedDate' => :last_modified_date,
         'isNewsSubscription' => :is_news_subscription,
         'numberOfCodes' => :number_of_codes,
         'maximumNumberOfCodes' => :maximum_number_of_codes,
@@ -43,12 +43,6 @@ module Spaceship
         'isRequired' => :is_required,
         'canDeleteAddOn' => :can_delete_addon
       })
-
-      class << self
-        def factory(attrs)
-          return self.new(attrs)
-        end
-      end
 
       def type
         Tunes::IAPType.get_from_string(raw_data["addOnType"])
@@ -61,7 +55,7 @@ module Spaceship
       def edit
         attrs = client.load_iap(app_id: application.apple_id, purchase_id: self.purchase_id)
         attrs[:application] = application
-        Tunes::IAPDetail.factory(attrs)
+        Tunes::IAPDetail.new(attrs)
       end
 
       def delete!

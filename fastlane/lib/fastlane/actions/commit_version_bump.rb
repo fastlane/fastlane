@@ -57,7 +57,6 @@ module Fastlane
         pbxproj_path = pbxproj_pathname.relative_path_from(repo_pathname).to_s
 
         # find the info_plist files
-        # rubocop:disable Style/MultilineBlockChain
         project = Xcodeproj::Project.open(xcodeproj_path)
         info_plist_files = project.objects.select do |object|
           object.isa == 'XCBuildConfiguration'
@@ -70,7 +69,6 @@ module Fastlane
         end.uniq.map do |info_plist_path|
           Pathname.new(File.expand_path(File.join(xcodeproj_path, '..', info_plist_path))).relative_path_from(repo_pathname).to_s
         end
-        # rubocop:enable Style/MultilineBlockChain
 
         # Removes .plist files that matched the given expression in the 'ignore' parameter
         ignore_expression = params[:ignore]
@@ -198,7 +196,7 @@ module Fastlane
           "",
           "Then commits those files to the repo.",
           "",
-          "Customise the message with the `:message` option, defaults to 'Version Bump'",
+          "Customize the message with the `:message` option, defaults to 'Version Bump'",
           "",
           "If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the `clean_build_artifacts` action to clean those temporary files up before running this action."
         ].join("\n")

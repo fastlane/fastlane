@@ -7,6 +7,7 @@ require 'gym/error_handler'
 require 'gym/options'
 require 'gym/detect_values'
 require 'gym/xcode'
+require 'gym/code_signing_mapping'
 
 require 'fastlane_core'
 require 'terminal-table'
@@ -32,11 +33,7 @@ module Gym
 
     def init_libs
       # Import all the fixes
-      require 'gym/xcodebuild_fixes/swift_fix'
-      require 'gym/xcodebuild_fixes/watchkit_fix'
-      require 'gym/xcodebuild_fixes/watchkit2_fix'
       require 'gym/xcodebuild_fixes/generic_archive_fix'
-      require 'gym/xcodebuild_fixes/package_application_fix'
     end
   end
 

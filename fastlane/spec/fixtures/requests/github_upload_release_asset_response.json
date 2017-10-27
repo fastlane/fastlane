@@ -1,0 +1,32 @@
+{
+  "url": "https://api.github.com/repos/fastlane/fastlane/releases/assets/1",
+  "browser_download_url": "https://github.com/fastlane/fastlane/releases/download/v1.0.0/TEST_FILE.md",
+  "id": 1,
+  "name": "TEST_FILE.md",
+  "label": "short description",
+  "state": "uploaded",
+  "content_type": "text/plain",
+  "size": 1024,
+  "download_count": 42,
+  "created_at": "2013-02-27T19:35:32Z",
+  "updated_at": "2013-02-27T19:35:32Z",
+  "uploader": {
+    "login": "fastlane",
+    "id": 1,
+    "avatar_url": "https://github.com/images/error/fastlane_happy.gif",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fastlane",
+    "html_url": "https://github.com/fastlane",
+    "followers_url": "https://api.github.com/users/fastlane/followers",
+    "following_url": "https://api.github.com/users/fastlane/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fastlane/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fastlane/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fastlane/subscriptions",
+    "organizations_url": "https://api.github.com/users/fastlane/orgs",
+    "repos_url": "https://api.github.com/users/fastlane/repos",
+    "events_url": "https://api.github.com/users/fastlane/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fastlane/received_events",
+    "type": "User",
+    "site_admin": false
+  }
+}

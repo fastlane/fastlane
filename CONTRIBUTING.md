@@ -2,7 +2,13 @@
 
 ## I want to report a problem or ask a question
 
-We use GitHub as support system, please submit a [new issue](https://github.com/fastlane/fastlane/issues/new) to ask questions or to report a problem.
+Before submitting a new GitHub issue, please make sure to
+
+- Check out [docs.fastlane.tools](https://docs.fastlane.tools)
+- Check out the README pages on [this repo](https://github.com/fastlane/fastlane)
+- Search for [existing GitHub issues](https://github.com/fastlane/fastlane/issues)
+
+If the above doesn't help, please [submit an issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup, in particular the output of the `fastlane env` command.
 
 **Note**: If you want to report a regression in _fastlane_ (something that has worked before, but broke with a new release), please mark your issue title as such using `[Regression] Your title here`. This enables us to quickly detect and fix regressions.
 
@@ -67,6 +73,6 @@ This project is licensed under the terms of the MIT license. See the [LICENSE][l
 [tools and debugging]: ToolsAndDebugging.md
 [vision]: VISION.md
 [responding to prs]: RespondingToIssuesAndPullRequests.md
-[plugins]: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Plugins.md#readme
+[plugins]: https://docs.fastlane.tools/plugins/create-plugin/
 [firstpr]: YourFirstPR.md
-[submit action]: fastlane/docs/Plugins.md#submitting-the-action-to-the-fastlane-main-repo
+[submit action]: https://docs.fastlane.tools/plugins/create-plugin/#submitting-the-action-to-the-fastlane-main-repo

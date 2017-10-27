@@ -259,6 +259,8 @@ module Fastlane
       require 'deliver'
       require 'deliver/setup'
       options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
+      options[:run_precheck_before_submit] = false # precheck doesn't need to run during init
+
       Deliver::Runner.new(options) # to login...
       Deliver::Setup.new.run(options)
     end
@@ -276,8 +278,8 @@ module Fastlane
       end
 
       template.gsub!('snapshot', '# snapshot') unless self.tools[:snapshot]
-      template.gsub!('cocoapods', '') unless self.tools[:cocoapods]
-      template.gsub!('carthage', '') unless self.tools[:carthage]
+      template.gsub!('cocoapods', '# cocoapods') unless self.tools[:cocoapods]
+      template.gsub!('carthage', '# carthage') unless self.tools[:carthage]
       template.gsub!('[[FASTLANE_VERSION]]', Fastlane::VERSION)
 
       self.tools.each do |key, value|

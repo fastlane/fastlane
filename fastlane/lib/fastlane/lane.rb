@@ -51,6 +51,7 @@ module Fastlane
           UI.error "It is recommended to not use '#{name}' as the name of your lane"
           # We still allow it, because we're nice
           # Otherwise we might break existing setups
+          return
         end
 
         self.ensure_name_not_conflicts(name.to_s)
@@ -85,7 +86,7 @@ module Fastlane
       def ensure_name_not_conflicts(name)
         # First, check if there is a predefined method in the actions folder
         return unless Actions.action_class_ref(name)
-        UI.error("Name of the lane '#{name}' is already taken by the action named '#{name}'")
+        UI.important("Name of the lane '#{name}' is already taken by the action named '#{name}'")
       end
     end
   end

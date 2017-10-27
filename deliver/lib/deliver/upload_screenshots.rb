@@ -62,16 +62,18 @@ module Deliver
         # so we save per language. See issue #349
         UI.message("Saving changes")
         v.save!
+        # Refresh app version to start clean again. See issue #9859
+        v = app.edit_version
       end
       UI.success("Successfully uploaded screenshots to iTunes Connect")
     end
 
     def collect_screenshots(options)
       return [] if options[:skip_screenshots]
-      return collect_screenshots_for_languages(options[:screenshots_path])
+      return collect_screenshots_for_languages(options[:screenshots_path], options[:ignore_language_directory_validation])
     end
 
-    def collect_screenshots_for_languages(path)
+    def collect_screenshots_for_languages(path, ignore_validation)
       screenshots = []
       extensions = '{png,jpg,jpeg}'
 
@@ -79,12 +81,12 @@ module Deliver
         lang_hash[lang.downcase] = lang
       end
 
-      Loader.language_folders(path).each do |lng_folder|
+      Loader.language_folders(path, ignore_validation).each do |lng_folder|
         language = File.basename(lng_folder)
 
         # Check to see if we need to traverse multiple platforms or just a single platform
         if language == Loader::APPLE_TV_DIR_NAME || language == Loader::IMESSAGE_DIR_NAME
-          screenshots.concat(collect_screenshots_for_languages(File.join(path, language)))
+          screenshots.concat(collect_screenshots_for_languages(File.join(path, language), ignore_validation))
           next
         end
 

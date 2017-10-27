@@ -150,18 +150,21 @@ module Fastlane
     # @!group Other things
     #####################################################
 
-    def collector
-      runner.collector
-    end
-
     # Is the given key a platform block or a lane?
     def is_platform_block?(key)
       UI.crash!('No key given') unless key
 
       return false if self.runner.lanes.fetch(nil, {}).fetch(key.to_sym, nil)
-      return true if self.runner.lanes[key.to_sym].kind_of? Hash
+      return true if self.runner.lanes[key.to_sym].kind_of?(Hash)
 
-      UI.user_error!("Could not find '#{key}'. Available lanes: #{self.runner.available_lanes.join(', ')}")
+      if key.to_sym == :update
+        # The user ran `fastlane update`, instead of `fastlane update_fastlane`
+        # We're gonna be nice and understand what the user is trying to do
+        require 'fastlane/one_off'
+        Fastlane::OneOff.run(action: "update_fastlane", parameters: {})
+      else
+        UI.user_error!("Could not find '#{key}'. Available lanes: #{self.runner.available_lanes.join(', ')}")
+      end
     end
 
     def actions_path(path)
@@ -210,50 +213,151 @@ module Fastlane
       actions_path = File.join(File.expand_path("..", path), 'actions')
       Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
 
-      collector.did_launch_action(:import)
-      parse(File.read(path), path)
+      action_launched('import')
+
+      return_value = parse(File.read(path), path)
+
+      action_completed('import', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+
+      return return_value
     end
 
     # @param url [String] The git URL to clone the repository from
     # @param branch [String] The branch to checkout in the repository
     # @param path [String] The path to the Fastfile
-    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile')
+    # @param verion [String] Version of the required Fastlane version
+    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil)
       UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
 
       Actions.execute_action('import_from_git') do
         require 'tmpdir'
 
-        collector.did_launch_action(:import_from_git)
+        action_launched('import_from_git')
 
         # Checkout the repo
         repo_name = url.split("/").last
+        checkout_param = branch
 
         Dir.mktmpdir("fl_clone") do |tmp_path|
           clone_folder = File.join(tmp_path, repo_name)
 
-          branch_option = ""
           branch_option = "--branch #{branch}" if branch != 'HEAD'
 
-          clone_command = "GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
-
           UI.message "Cloning remote git repo..."
-          Actions.sh(clone_command)
+          Actions.sh("GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}")
 
-          Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
+          unless version.nil?
+            git_tags = fetch_remote_tags(folder: clone_folder)
+
+            # Separate version from optimistic operator
+            version_number = version(version_string: version)
+            operator = operator(version_string: version)
+
+            checkout_param = checkout_param_for_operator(operator: operator, version: version_number, git_tags: git_tags)
+          end
+
+          Actions.sh("cd '#{clone_folder}' && git checkout #{checkout_param} '#{path}'")
 
           # We also want to check out all the local actions of this fastlane setup
           containing = path.split(File::SEPARATOR)[0..-2]
           containing = "." if containing.count == 0
           actions_folder = File.join(containing, "actions")
           begin
-            Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{actions_folder}'")
+            Actions.sh("cd '#{clone_folder}' && git checkout #{checkout_param} '#{actions_folder}'")
           rescue
             # We don't care about a failure here, as local actions are optional
           end
 
-          import(File.join(clone_folder, path))
+          return_value = import(File.join(clone_folder, path))
+
+          action_completed('import_from_git', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+
+          return return_value
         end
       end
+    end
+
+    #####################################################
+    # @!group Versioning helpers
+    #####################################################
+
+    def fetch_remote_tags(folder: nil)
+      UI.message "Fetching remote git tags..."
+      Actions.sh("cd '#{folder}' && GIT_TERMINAL_PROMPT=0 git fetch --all --tags -q")
+
+      # Fetch all possible tags
+      git_tags_string = Actions.sh("cd '#{folder}' && git tag -l")
+      git_tags = git_tags_string.split("\n")
+
+      # Delete tags that are not a real version number
+      git_tags.delete_if { |tag| Gem::Version.correct?(tag) != 0 }
+
+      # Sort tags based on their version number
+      git_tags.sort_by { |tag| Gem::Version.new(tag) }
+
+      return git_tags
+    end
+
+    def checkout_param_for_operator(operator: nil, version: nil, git_tags: nil)
+      # ~> should select the latest version withing constraints.
+      # -> should select a specific version without fallback.
+      if operator == "~>"
+        return checkout_param_twiddle_wakka(version: version, git_tags: git_tags)
+
+      elsif operator == "->" || operator.nil?
+        return checkout_param_specific_version(version: version, git_tags: git_tags)
+
+      else
+        UI.user_error!("The specified operator \"#{operator}\" in \"#{version}\" is unknown. Please use one of these '~> ->'")
+      end
+    end
+
+    def checkout_param_specific_version(version: nil, git_tags: nil)
+      # Search matching version in array
+      matching_git_tags = git_tags.select do |tag|
+        tag == version
+      end
+
+      UI.user_error!("The specified version \"#{version}\" doesn't exist") if matching_git_tags.count == 0
+      return matching_git_tags.last
+    end
+
+    def checkout_param_twiddle_wakka(version: nil, git_tags: nil)
+      # Drop last specified digit in version
+      last_dot_index = version.rindex('.')
+      version_range = version[0..last_dot_index - 1]
+
+      # Search matching version in array
+      matching_git_tags = git_tags.select do |tag|
+        tag.start_with?(version_range)
+      end
+
+      UI.user_error!("No version found within the \"#{version_range}.*\" range") if matching_git_tags.count == 0
+
+      return matching_git_tags.last
+    end
+
+    def operator(version_string: nil)
+      version_info = version_range_info(version_string: version_string)
+
+      # version_info will have 2 elements if an optimistic operator is specified.
+      if version_info.count > 1
+
+        # Optimistic operator is always the first part. e.g.: ["~>", "2.0.0"]
+        return version_info.first
+      end
+
+      return nil
+    end
+
+    def version(version_string: nil)
+      version_info = version_range_info(version_string: version_string)
+      return version_info.last
+    end
+
+    def version_range_info(version_string: nil)
+      # Separate version from optimistic operator
+      return version_string.split(" ")
     end
 
     #####################################################
@@ -265,21 +369,36 @@ module Fastlane
       # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
       value ||= yield
       Actions.execute_action('say') do
-        collector.did_launch_action(:say)
-        Fastlane::Actions::SayAction.run([value])
+        action_launched('say')
+        return_value = Fastlane::Actions::SayAction.run([value])
+        action_completed('say', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+        return return_value
       end
     end
 
     def puts(value)
       # Overwrite this, since there is already a 'puts' method defined in the Ruby standard library
       value ||= yield if block_given?
-      collector.did_launch_action(:puts)
-      Fastlane::Actions::PutsAction.run([value])
+
+      action_launched('puts')
+      return_value = Fastlane::Actions::PutsAction.run([value])
+      action_completed('puts', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+      return return_value
     end
 
     def test(params = {})
       # Overwrite this, since there is already a 'test' method defined in the Ruby standard library
       self.runner.try_switch_to_lane(:test, [params])
+    end
+
+    def action_launched(action_name)
+      action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name, args: ARGV)
+      FastlaneCore.session.action_launched(launch_context: action_launch_context)
+    end
+
+    def action_completed(action_name, status: nil)
+      completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV, status: status)
+      FastlaneCore.session.action_completed(completion_context: completion_context)
     end
   end
 end

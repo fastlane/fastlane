@@ -71,18 +71,10 @@ module Spaceship
       )
 
       class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          obj = self.new(attrs)
-          obj.unfold_associated_groups(attrs['associatedApplicationGroups'])
-          return obj
-        end
-
         # @param mac [Bool] Fetches Mac apps if true
         # @return (Array) Returns all apps available for this account
         def all(mac: false)
-          client.apps(mac: mac).map { |app| self.factory(app) }
+          client.apps(mac: mac).map { |app| self.new(app) }
         end
 
         # Creates a new App ID on the Apple Dev Portal
@@ -114,10 +106,12 @@ module Spaceship
         end
       end
 
-      def unfold_associated_groups(attrs)
-        return unless attrs
-        unfolded_associated_groups = attrs.map { |info| Spaceship::Portal::AppGroup.new(info) }
-        instance_variable_set(:@associated_groups, unfolded_associated_groups)
+      def associated_groups
+        return unless raw_data.key?('associatedApplicationGroups')
+
+        @associated_groups ||= raw_data['associatedApplicationGroups'].map do |info|
+          Spaceship::Portal::AppGroup.new(info)
+        end
       end
 
       # Delete this App ID. This action will most likely fail if the App ID is already in the store
@@ -147,6 +141,13 @@ module Spaceship
       def associate_groups(groups)
         raise "`associate_groups` not available for Mac apps" if mac?
         app = client.associate_groups_with_app(self, groups)
+        self.class.factory(app)
+      end
+
+      # Associate specific merchants with this app
+      # @return (App) The updated detailed app. This is nil if the app couldn't be found
+      def associate_merchants(merchants)
+        app = client.associate_merchants_with_app(self, merchants, mac?)
         self.class.factory(app)
       end
 

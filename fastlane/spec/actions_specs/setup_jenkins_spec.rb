@@ -62,7 +62,7 @@ describe Fastlane do
 
       it "works inside CI" do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
-        stub_const("ENV", { "TRAVIS" => true })
+        stub_const("ENV", { "JENKINS_URL" => "123" })
 
         Fastlane::FastFile.new.parse("lane :test do
           setup_jenkins
@@ -88,32 +88,7 @@ describe Fastlane do
 
       describe "under CI" do
         before :each do
-          stub_const("ENV", { "TRAVIS" => true })
-        end
-
-        it "don't unlock keychain" do
-          expect(UI).to receive(:message).with(/Set output directory path to:/)
-          expect(UI).to receive(:message).with(/Set derived data path to:/)
-          expect(UI).to receive(:message).with("Set result bundle.")
-
-          Fastlane::FastFile.new.parse("lane :test do
-            setup_jenkins
-          end").runner.execute(:test)
-        end
-
-        it "unlock keychain" do
-          keychain_path = Tempfile.new("foo").path
-          ENV["KEYCHAIN_PATH"] = keychain_path
-
-          expect(UI).to receive(:message).with("Unlocking keychain: \"#{keychain_path}\".")
-          expect(UI).to receive(:message).with("Unlocking keychain at path: #{File.expand_path(keychain_path).shellescape}")
-          expect(UI).to receive(:message).with(/Set output directory path to:/)
-          expect(UI).to receive(:message).with(/Set derived data path to:/)
-          expect(UI).to receive(:message).with("Set result bundle.")
-
-          Fastlane::FastFile.new.parse("lane :test do
-            setup_jenkins
-          end").runner.execute(:test)
+          stub_const("ENV", { "JENKINS_URL" => "123" })
         end
 
         it "disable keychain unlock" do

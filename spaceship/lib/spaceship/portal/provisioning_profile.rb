@@ -134,6 +134,29 @@ module Spaceship
       # more information on this issue https://github.com/fastlane/fastlane/issues/6137
       attr_accessor :profile_details
 
+      # @return (Bool) Does the profile use a template (has extended entitlements)?
+      #
+      # @example
+      #   false
+      attr_accessor :is_template_profile
+
+      # @return (Spaceship::Portal::ProvisioningProfileTemplate)
+      #   Model representation of the provisioning profile template.
+      #   This will be always nil if is_template_profile returns false
+      #
+      # @example Example Value
+      #  <Spaceship::Portal::ProvisioningProfileTemplate
+      #    @template_description="Subscription Service iOS (dist)",
+      #    @entitlements=nil,
+      #    @purpose_description="Generic Provisioning Profile Template for App: com.apple.smoot.subscriptionservice",
+      #    @purpose_display_name="Subscription Service iOS (dist)",
+      #    @purpose_name="Subscription Service iOS (dist)",
+      #    @version=1>
+      #
+      # @example Usage
+      #  profile.template.purpose_display_name
+      attr_accessor :template
+
       attr_mapping({
         'provisioningProfileId' => :id,
         'UUID' => :uuid,
@@ -146,7 +169,9 @@ module Spaceship
         'proProPlatform' => :platform,
         'proProSubPlatform' => :sub_platform,
         'managingApp' => :managing_app,
-        'appId' => :app
+        'appId' => :app,
+        'isTemplateProfile' => :is_template_profile,
+        'template' => :template
       })
 
       class << self
@@ -182,6 +207,18 @@ module Spaceship
           attrs['dateExpire'] = (Time.parse(attrs['dateExpire']) rescue attrs['dateExpire'])
           # rubocop:enable Style/RescueModifier
 
+          # When a profile is created with a template name, the response
+          # (provisioning profiles info) already contains the data about
+          # template, which is used to instantiate the
+          # ProvisioningProfileTemplate model.
+          # Doing so saves an API call needed to fetch profile details.
+          #
+          # Verify if `attrs` contains the info needed to instantiate a template.
+          # If not, the template will be lazily loaded.
+          if attrs['profile'] && attrs['profile']['description']
+            attrs['template'] = ProvisioningProfileTemplate.factory(attrs['template'])
+          end
+
           klass.client = @client
           obj = klass.new(attrs)
 
@@ -209,8 +246,11 @@ module Spaceship
         #  and Development profiles and add none for AppStore and Enterprise Profiles
         # @param mac (Bool) (optional): Pass true if you're making a Mac provisioning profile
         # @param sub_platform (String) Used to create tvOS profiles at the moment. Value should equal 'tvOS' or nil.
+        # @param template_name (String) (optional): The name of the provisioning profile template.
+        #  The value can be found by inspecting the Entitlements drop-down when creating/editing a
+        #  provisioning profile in Developer Portal.
         # @return (ProvisioningProfile): The profile that was just created
-        def create!(name: nil, bundle_id: nil, certificate: nil, devices: [], mac: false, sub_platform: nil)
+        def create!(name: nil, bundle_id: nil, certificate: nil, devices: [], mac: false, sub_platform: nil, template_name: nil)
           raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
           raise "Missing required parameter 'certificate'. e.g. use `Spaceship::Certificate::Production.all.first`" if certificate.to_s.empty?
 
@@ -253,7 +293,8 @@ module Spaceship
                                                 certificate_parameter,
                                                 devices.map(&:id),
                                                 mac: mac,
-                                                sub_platform: sub_platform)
+                                                sub_platform: sub_platform,
+                                                template_name: template_name)
           end
 
           self.new(profile)
@@ -316,9 +357,12 @@ module Spaceship
         #   profiles matching the bundle identifier
         #   Returns [] if no profiles were found
         #   This may also contain invalid or expired profiles
-        def find_by_bundle_id(bundle_id, mac: false)
+        def find_by_bundle_id(bundle_id: nil, mac: false, sub_platform: nil)
+          raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
+          raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? and sub_platform != 'tvOS'
+          find_tvos_profiles = sub_platform == 'tvOS'
           all(mac: mac).find_all do |profile|
-            profile.app.bundle_id == bundle_id
+            profile.app.bundle_id == bundle_id && profile.tvos? == find_tvos_profiles
           end
         end
       end
@@ -420,7 +464,8 @@ module Spaceship
             certificates.map(&:id),
             devices.map(&:id),
             mac: mac?,
-            sub_platform: tvos? ? 'tvOS' : nil
+            sub_platform: tvos? ? 'tvOS' : nil,
+            template_name: template_name
           )
         end
 
@@ -508,6 +553,22 @@ module Spaceship
         # Since 15th September 2016 certificates and devices are hidden behind another request
         # see https://github.com/fastlane/fastlane/issues/6137 for more information
         @profile_details ||= client.provisioning_profile_details(provisioning_profile_id: self.id, mac: mac?)
+      end
+
+      # Lazily instantiates the provisioning profile template model
+      #
+      # @return (Bool) The template model if the provisioning profile has a
+      #   template or nil if provisioning profile doesn't have a template
+      def template
+        return nil unless is_template_profile
+
+        @template ||= ProvisioningProfileTemplate.factory(profile_details['template'])
+      end
+
+      # @return (String) The name of the template (as displayed in Dev Portal)
+      #   or nil if provisioning profile doesn't have a template
+      def template_name
+        is_template_profile ? template.purpose_display_name : nil
       end
     end
   end

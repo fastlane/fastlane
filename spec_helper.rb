@@ -39,6 +39,8 @@ RSpec.configure do |config|
     # This was a request that was added with Ruby 2.4.0
     allow(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).and_return(nil)
 
+    ENV['FASTLANE_PLATFORM_NAME'] = nil
+
     tool_name = current_test.id.match(%r{\.\/(\w+)\/})[1]
     method_name = "before_each_#{tool_name}".to_sym
     begin

@@ -29,7 +29,12 @@ describe Fastlane do
 
       it "raises an exception if key doesn't exist at all" do
         expect(UI).to receive(:user_error!).with("Could not find 'asdf'. Available lanes: test, anotherroot, mac beta, ios beta, ios release, android beta, android witherror, android unsupported_action")
-        @ff.is_platform_block? "asdf"
+        @ff.is_platform_block?("asdf")
+      end
+
+      it "has an alias for `update`, if there is no lane called `update`" do
+        expect(Fastlane::OneOff).to receive(:run).with({ action: "update_fastlane", parameters: {} })
+        @ff.is_platform_block?("update")
       end
     end
 
@@ -155,7 +160,7 @@ describe Fastlane do
       end
 
       it "prints a warning if a lane is called like an action" do
-        expect(UI).to receive(:error).with("Name of the lane 'cocoapods' is already taken by the action named 'cocoapods'")
+        expect(UI).to receive(:important).with("Name of the lane 'cocoapods' is already taken by the action named 'cocoapods'")
         Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileLaneNameEqualsActionName')
       end
 
@@ -241,17 +246,6 @@ describe Fastlane do
           ff.runner.execute(:lane1, :ios)
 
           expect(File.read("/tmp/deliver_result.txt")).to eq("Lane 2 + parameter")
-        end
-
-        it "properly tracks the lane switches" do
-          ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
-          ff.runner.execute(:lane1, :ios)
-
-          expect(ff.collector.launches).to eq({
-            lane_switch: 1
-          })
-
-          expect(Fastlane::ActionCollector.new.is_official?(:lane_switch)).to eq(true)
         end
 
         it "use case 2: passing no parameter to a lane that takes parameters" do

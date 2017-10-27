@@ -14,6 +14,7 @@ describe Fastlane do
             buildkite: true,
             jenkins: true,
             travis: true,
+            travis_pro: true,
             circleci: true,
             coveralls: true,
             teamcity: true,
@@ -27,7 +28,7 @@ describe Fastlane do
             output_directory: '123',
             ignore: 'nothing',
             proj: 'foo.xcodeproj',
-            binary_basename: 'YourApp',
+            binary_basename: ['YourApp', 'YourFramework'],
             binary_file: 'you',
             workspace: 'foo.xcworkspace',
             source_files: '*.swift',
@@ -37,6 +38,7 @@ describe Fastlane do
 
         expected = "slather coverage
                     --travis
+                    --travispro
                     --circleci
                     --jenkins
                     --buildkite
@@ -58,6 +60,7 @@ describe Fastlane do
                     --workspace foo.xcworkspace
                     --binary-file you
                     --binary-basename YourApp
+                    --binary-basename YourFramework
                     --source-files \\*.swift
                     --decimals 2 foo.xcodeproj".gsub(/\s+/, ' ')
         expect(result).to eq(expected)
@@ -76,6 +79,7 @@ describe Fastlane do
             buildkite: true,
             jenkins: true,
             travis: true,
+            travis_pro: true,
             circleci: true,
             coveralls: true,
             simple_output: true,
@@ -87,7 +91,7 @@ describe Fastlane do
             output_directory: '123',
             ignore: 'nothing',
             proj: 'foo.xcodeproj',
-            binary_basename: 'YourApp',
+            binary_basename: ['YourApp', 'YourFramework'],
             binary_file: 'you',
             workspace: 'foo.xcworkspace'
           })
@@ -95,6 +99,7 @@ describe Fastlane do
 
         expected = 'bundle exec slather coverage
                     --travis
+                    --travispro
                     --circleci
                     --jenkins
                     --buildkite
@@ -113,7 +118,8 @@ describe Fastlane do
                     --configuration Bar
                     --workspace foo.xcworkspace
                     --binary-file you
-                    --binary-basename YourApp foo.xcodeproj'.gsub(/\s+/, ' ')
+                    --binary-basename YourApp
+                    --binary-basename YourFramework foo.xcodeproj'.gsub(/\s+/, ' ')
         expect(result).to eq(expected)
       end
 

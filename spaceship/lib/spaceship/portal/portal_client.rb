@@ -132,6 +132,18 @@ module Spaceship
       details_for_app(app)
     end
 
+    def associate_merchants_with_app(app, merchants, mac)
+      ensure_csrf(Spaceship::Merchant)
+
+      request(:post, "account/#{platform_slug(mac)}/identifiers/assignOMCToAppId.action", {
+        teamId: team_id,
+        appIdId: app.app_id,
+        omcIds: merchants.map(&:merchant_id)
+      })
+
+      details_for_app(app)
+    end
+
     def valid_name_for(input)
       latinized = input.to_slug.transliterate
       latinized = latinized.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
@@ -200,6 +212,43 @@ module Spaceship
     end
 
     #####################################################
+    # @!group Passbook
+    #####################################################
+
+    def passbooks
+      paging do |page_number|
+        r = request(:post, "account/ios/identifiers/listPassTypeIds.action", {
+          teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc'
+        })
+        parse_response(r, 'passTypeIdList')
+      end
+    end
+
+    def create_passbook!(name, bundle_id)
+      ensure_csrf(Spaceship::Passbook)
+
+      r = request(:post, "account/ios/identifiers/addPassTypeId.action", {
+          name: name,
+          identifier: bundle_id,
+          teamId: team_id
+      })
+      parse_response(r, 'passTypeId')
+    end
+
+    def delete_passbook!(passbook_id)
+      ensure_csrf(Spaceship::Passbook)
+
+      r = request(:post, "account/ios/identifiers/deletePassTypeId.action", {
+          teamId: team_id,
+          passTypeId: passbook_id
+      })
+      parse_response(r)
+    end
+
+    #####################################################
     # @!group Website Push
     #####################################################
 
@@ -232,6 +281,43 @@ module Spaceship
       r = request(:post, "account/#{platform_slug(mac)}/identifiers/deleteWebsitePushId.action", {
           teamId: team_id,
           websitePushId: website_id
+      })
+      parse_response(r)
+    end
+
+    #####################################################
+    # @!group Merchant
+    #####################################################
+
+    def merchants(mac: false)
+      paging do |page_number|
+        r = request(:post, "account/#{platform_slug(mac)}/identifiers/listOMCs.action", {
+            teamId: team_id,
+            pageNumber: page_number,
+            pageSize: page_size,
+            sort: 'name=asc'
+        })
+        parse_response(r, 'identifierList')
+      end
+    end
+
+    def create_merchant!(name, bundle_id, mac: false)
+      ensure_csrf(Spaceship::Merchant)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/addOMC.action", {
+          name: name,
+          identifier: bundle_id,
+          teamId: team_id
+      })
+      parse_response(r, 'omcId')
+    end
+
+    def delete_merchant!(merchant_id, mac: false)
+      ensure_csrf(Spaceship::Merchant)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/deleteOMC.action", {
+          teamId: team_id,
+          omcId: merchant_id
       })
       parse_response(r)
     end
@@ -279,6 +365,17 @@ module Spaceship
     def team_members
       response = request(:post) do |req|
         req.url "/services-account/#{PROTOCOL_VERSION}/account/getTeamMembers"
+        req.body = {
+          teamId: team_id
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      parse_response(response)
+    end
+
+    def team_invited
+      response = request(:post) do |req|
+        req.url "/services-account/#{PROTOCOL_VERSION}/account/getInvites"
         req.body = {
           teamId: team_id
         }.to_json
@@ -491,7 +588,7 @@ module Spaceship
       parse_response(r, 'provisioningProfile')
     end
 
-    def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
+    def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil, template_name: nil)
       ensure_csrf(Spaceship::ProvisioningProfile) do
         fetch_csrf_token_for_provisioning
       end
@@ -505,6 +602,9 @@ module Spaceship
         deviceIds: device_ids
       }
       params[:subPlatform] = sub_platform if sub_platform
+
+      # if `template_name` is nil, Default entitlements will be used
+      params[:template] = template_name if template_name
 
       r = request(:post, "account/#{platform_slug(mac)}/profile/createProvisioningProfile.action", params)
       parse_response(r, 'provisioningProfile')
@@ -539,7 +639,7 @@ module Spaceship
       parse_response(r)
     end
 
-    def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil)
+    def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil, template_name: nil)
       ensure_csrf(Spaceship::ProvisioningProfile) do
         fetch_csrf_token_for_provisioning
       end
@@ -554,10 +654,60 @@ module Spaceship
           deviceIds: device_ids
       }
       params[:subPlatform] = sub_platform if sub_platform
+      # if `template_name` is nil, Default entitlements will be used
+      params[:template] = template_name if template_name
 
       r = request(:post, "account/#{platform_slug(mac)}/profile/regenProvisioningProfile.action", params)
 
       parse_response(r, 'provisioningProfile')
+    end
+
+    #####################################################
+    # @!group Keys
+    #####################################################
+
+    def list_keys
+      paging do |page_number|
+        response = request(:post, 'account/auth/key/list', {
+          teamId: team_id,
+          pageNumber: page_number,
+          pageSize: page_size,
+          sort: 'name=asc'
+        })
+        parse_response(response, 'keys')
+      end
+    end
+
+    def get_key(id: nil)
+      response = request(:post, 'account/auth/key/get', { teamId: team_id, keyId: id })
+      # response contains a list of keys with 1 item
+      parse_response(response, 'keys').first
+    end
+
+    def download_key(id: nil)
+      response = request(:get, 'account/auth/key/download', { teamId: team_id, keyId: id })
+      parse_response(response)
+    end
+
+    def create_key!(name: nil, service_configs: nil)
+      params = {
+        name: name,
+        serviceConfigurations: service_configs,
+        teamId: team_id
+      }
+
+      response = request(:post, 'account/auth/key/create') do |req|
+        req.headers['Content-Type'] = 'application/json'
+        req.body = params.to_json
+      end
+
+      # response contains a list of keys with 1 item
+      parse_response(response, 'keys').first
+    end
+
+    def revoke_key!(id: nil)
+      response = request(:post, 'account/auth/key/revoke', { teamId: team_id, keyId: id })
+      parse_response(response)
     end
 
     private

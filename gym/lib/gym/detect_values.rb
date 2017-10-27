@@ -13,22 +13,15 @@ module Gym
       # Detect the project
       FastlaneCore::Project.detect_projects(config)
       Gym.project = FastlaneCore::Project.new(config)
-      detect_provisioning_profile
 
       # Go into the project's folder, as there might be a Gymfile there
       Dir.chdir(File.expand_path("..", Gym.project.path)) do
         config.load_configuration_file(Gym.gymfile_name)
       end
 
-      config[:use_legacy_build_api] = true if Xcode.pre_7?
-
-      if config[:use_legacy_build_api]
-        UI.deprecated("the use_legacy_build_api option is deprecated")
-        UI.deprecated("it should not be used anymore - e.g.: if you use app-extensions")
-      end
-
       detect_scheme
       detect_platform # we can only do that *after* we have the scheme
+      detect_selected_provisioning_profiles # we can only do that *aftet* we have the platform
       detect_configuration
       detect_toolchain
 
@@ -43,10 +36,9 @@ module Gym
       day = Time.now.strftime("%F") # e.g. 2015-08-07
       archive_path = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}/")
 
-      path = xcode_preference_plist_path
-      return archive_path unless File.exist?(path.to_s) # this file only exists when you edit the Xcode preferences to set custom values
+      return archive_path unless has_xcode_preferences_plist?
 
-      custom_archive_path = xcode_preferences_dictionary(path)['IDECustomDistributionArchivesLocation']
+      custom_archive_path = xcode_preferences_dictionary['IDECustomDistributionArchivesLocation']
       return archive_path if custom_archive_path.to_s.length == 0
 
       return File.join(custom_archive_path, day)
@@ -54,33 +46,43 @@ module Gym
 
     # Helper Methods
 
+    # this file only exists when you edit the Xcode preferences to set custom values
+    def self.has_xcode_preferences_plist?
+      File.exist?(xcode_preference_plist_path)
+    end
+
     def self.xcode_preference_plist_path
       File.expand_path("~/Library/Preferences/com.apple.dt.Xcode.plist")
     end
 
-    def self.xcode_preferences_dictionary(path)
+    def self.xcode_preferences_dictionary(path = xcode_preference_plist_path)
       CFPropertyList.native_types(CFPropertyList::List.new(file: path).value)
     end
 
-    def self.detect_provisioning_profile
-      if Gym.config[:provisioning_profile_path].nil?
-        return unless Gym.config[:use_legacy_build_api] # we only want to auto-detect the profile when using the legacy build API
+    # Since Xcode 9 you need to provide the explicit mapping of what provisioning profile to use for
+    # each target of your app
+    def self.detect_selected_provisioning_profiles
+      Gym.config[:export_options] ||= {}
+      hash_to_use = (Gym.config[:export_options][:provisioningProfiles] || {}).dup || {} # dup so we can show the original values in `verbose` mode
 
-        Dir.chdir(File.expand_path("..", Gym.project.path)) do
-          profiles = Dir["*.mobileprovision"]
-          if profiles.count == 1
-            profile = File.expand_path(profiles.last)
-          elsif profiles.count > 1
-            UI.message "Found more than one provisioning profile in the project directory:"
-            profile = choose(*profiles)
-          end
-
-          Gym.config[:provisioning_profile_path] = profile
-        end
+      unless Gym.config[:skip_profile_detection]
+        mapping_object = CodeSigningMapping.new(project: Gym.project)
+        hash_to_use = mapping_object.merge_profile_mapping(primary_mapping: hash_to_use,
+                                                           export_method: Gym.config[:export_method])
       end
 
-      if Gym.config[:provisioning_profile_path]
-        FastlaneCore::ProvisioningProfile.install(Gym.config[:provisioning_profile_path])
+      return if hash_to_use.count == 0 # We don't want to set a mapping if we don't have one
+      Gym.config[:export_options][:provisioningProfiles] = hash_to_use
+      UI.message("Detected provisioning profile mapping: #{hash_to_use}")
+    rescue => ex
+      # We don't want to fail the build if the automatic detection doesn't work
+      # especially since the mapping is optional for pre Xcode 9 setups
+      if Helper.xcode_at_least?("9.0")
+        UI.error("Couldn't automatically detect the provisioning profile mapping")
+        UI.error("Since Xcode 9 you need to provide an explicit mapping of what")
+        UI.error("provisioning profile to use for each target of your app")
+        UI.error(ex)
+        UI.verbose(ex.backtrace.join("\n"))
       end
     end
 
@@ -89,7 +91,7 @@ module Gym
     end
 
     def self.min_xcode8?
-      Helper.xcode_version.split(".").first.to_i >= 8
+      Helper.xcode_at_least?("8.0")
     end
 
     # Is it an iOS device or a Mac?

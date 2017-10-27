@@ -115,7 +115,6 @@ module FastlaneCore
         analytics << event_for_completion(action, action_completion_status, action_version, timestamp_seconds)
         analytics << event_for_count(action, count, action_version, timestamp_seconds)
       end
-
       { analytics: analytics }.to_json
     end
 
@@ -217,7 +216,7 @@ module FastlaneCore
     def event_for_web_onboarding(fastfile_id, completion_status, timestamp_seconds)
       {
         event_source: {
-          oauth_app_name: 'fastlane-enhancer',
+          oauth_app_name: oauth_app_name,
           product: 'fastlane_web_onboarding'
         },
         actor: {
@@ -231,6 +230,10 @@ module FastlaneCore
           name: 'fastlane_completion_status',
           detail: completion_status
         },
+        secondary_target: {
+          name: 'executed',
+          detail: secondary_target_string('')
+        },
         millis_since_epoch: timestamp_seconds * 1000,
         version: 1
       }
@@ -239,7 +242,7 @@ module FastlaneCore
     def event_for_completion(action, completion_status, version, timestamp_seconds)
       {
         event_source: {
-          oauth_app_name: 'fastlane-enhancer',
+          oauth_app_name: oauth_app_name,
           product: 'fastlane'
         },
         actor: {
@@ -255,7 +258,7 @@ module FastlaneCore
         },
         secondary_target: {
           name: 'version',
-          detail: version
+          detail: secondary_target_string(version)
         },
         millis_since_epoch: timestamp_seconds * 1000,
         version: 1
@@ -265,7 +268,7 @@ module FastlaneCore
     def event_for_count(action, count, version, timestamp_seconds)
       {
         event_source: {
-          oauth_app_name: 'fastlane-enhancer',
+          oauth_app_name: oauth_app_name,
           product: 'fastlane'
         },
         actor: {
@@ -281,11 +284,19 @@ module FastlaneCore
         },
         secondary_target: {
           name: 'version',
-          detail: version
+          detail: secondary_target_string(version)
         },
         millis_since_epoch: timestamp_seconds * 1000,
         version: 1
       }
+    end
+
+    def oauth_app_name
+      return 'fastlane-enhancer'
+    end
+
+    def secondary_target_string(string)
+      return string
     end
   end
 end

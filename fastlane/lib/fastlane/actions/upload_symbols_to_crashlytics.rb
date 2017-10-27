@@ -1,3 +1,5 @@
+require 'thread'
+
 module Fastlane
   module Actions
     class UploadSymbolsToCrashlyticsAction < Action
@@ -20,8 +22,13 @@ module Fastlane
         dsym_paths = dsym_paths.collect { |a| File.expand_path(a) }
         dsym_paths.uniq!
 
+        max_worker_threads = params[:dsym_worker_threads]
+        if max_worker_threads > 1
+          UI.message("Using #{max_worker_threads} threads for Crashlytics dSYM upload 🏎")
+        end
+
         dsym_paths.each do |current_path|
-          handle_dsym(params, current_path)
+          handle_dsym(params, current_path, max_worker_threads)
         end
 
         UI.success("Successfully uploaded dSYM files to Crashlytics 💯")
@@ -29,7 +36,7 @@ module Fastlane
 
       # @param current_path this is a path to either a dSYM or a zipped dSYM
       #   this might also be either nested or not, we're flexible
-      def self.handle_dsym(params, current_path)
+      def self.handle_dsym(params, current_path, max_worker_threads)
         if current_path.end_with?(".dSYM")
           upload_dsym(params, current_path)
         elsif current_path.end_with?(".zip")
@@ -39,9 +46,11 @@ module Fastlane
           Dir.mktmpdir do |dir|
             Dir.chdir(dir) do
               Actions.sh("unzip -qo #{current_path.shellescape}")
+              work_q = Queue.new
               Dir["*.dSYM"].each do |sub|
-                handle_dsym(params, sub)
+                work_q.push sub
               end
+              execute_uploads(params, max_worker_threads, work_q)
             end
           end
         else
@@ -49,15 +58,34 @@ module Fastlane
         end
       end
 
+      def self.execute_uploads(params, max_worker_threads, work_q)
+        number_of_threads = [max_worker_threads, work_q.size].min
+        workers = (0...number_of_threads).map do
+          Thread.new do
+            begin
+              while work_q.size > 0
+                current_path = work_q.pop(true)
+                upload_dsym(params, current_path)
+              end
+            rescue => ex
+              UI.error ex.to_s
+            end
+          end
+        end
+        workers.map(&:join)
+      end
+
       def self.upload_dsym(params, path)
         UI.message("Uploading '#{path}'...")
         command = []
         command << File.expand_path(params[:binary_path]).shellescape
         command << "-a #{params[:api_token]}"
-        command << "-p #{params[:platform]}"
+        command << "-p #{params[:platform] == 'appletvos' ? 'tvos' : params[:platform]}"
         command << File.expand_path(path).shellescape
         begin
-          Actions.sh(command.join(" "), log: false)
+          command_to_execute = command.join(" ")
+          UI.verbose("upload_dsym using command: #{command_to_execute}")
+          Actions.sh(command_to_execute, log: false)
         rescue => ex
           UI.error ex.to_s # it fails, however we don't want to fail everything just for this
         end
@@ -70,6 +98,7 @@ module Fastlane
             next unless result
             next unless result.kind_of?(Hash)
             params[:api_token] ||= result["APIKey"]
+            UI.verbose("found an APIKey in #{current}")
           end
         end
         UI.user_error!("Please provide an api_token using api_token:") unless params[:api_token]
@@ -77,7 +106,7 @@ module Fastlane
 
       def self.find_binary_path(params)
         params[:binary_path] ||= (Dir["/Applications/Fabric.app/**/upload-symbols"] + Dir["./Pods/**/upload-symbols"]).last
-        UI.user_error!("Please provide a path to the binary using binary_path:") unless params[:binary_path]
+        UI.user_error!("Failed to find Fabric's upload_symbols binary at /Applications/Fabric.app/**/upload-symbols or ./Pods/**/upload-symbols. Please specify the location of the binary explicitly by using the binary_path option") unless params[:binary_path]
 
         params[:binary_path] = File.expand_path(params[:binary_path])
       end
@@ -105,7 +134,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :dsym_path,
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DSYM_PATH",
                                        description: "Path to the DSYM file or zip to upload",
-                                       default_value: ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] || (Dir["./**/*.dSYM"] + Dir["./**/*.dSYM.zip"]).first,
+                                       default_value: ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] || (Dir["./**/*.dSYM"] + Dir["./**/*.dSYM.zip"]).sort_by { |f| File.mtime(f) }.last,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find file at path '#{File.expand_path(value)}'") unless File.exist?(value)
@@ -133,6 +162,18 @@ module Fastlane
                                        verify_block: proc do |value|
                                          available = ['ios', 'appletvos', 'mac']
                                          UI.user_error!("Invalid platform '#{value}', must be #{available.join(', ')}") unless available.include?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :dsym_worker_threads,
+                                       env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DSYM_WORKER_THREADS",
+                                       type: Integer,
+                                       default_value: 1,
+                                       optional: true,
+                                       description: "The number of threads to use for simultaneous dSYM upload",
+                                       verify_block: proc do |value|
+                                         min_threads = 1
+                                         max_threads = 15
+                                         UI.user_error!("Too few threads (#{value}) minimum number of threads: #{min_threads}") unless value >= min_threads
+                                         UI.user_error!("Too many threads (#{value}) maximum number of threads: #{max_threads}") unless value <= max_threads
                                        end)
         ]
       end

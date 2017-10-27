@@ -1,3 +1,6 @@
+Style/MultipleComparison:
+  Enabled: false
+
 Style/PercentLiteralDelimiters:
   Enabled: false
 
@@ -42,6 +45,11 @@ Style/VariableNumber:
 Style/MethodMissing:
   Enabled: false
 
+# This rule isn't useful, lots of discussion happening around it also
+# e.g. https://github.com/bbatsov/rubocop/issues/2338
+MultilineBlockChain:
+  Enabled: false
+
 #
 #   File.chmod(0777, f)
 #
@@ -76,14 +84,14 @@ Lint/UselessAssignment:
     - '**/spec/**/*'
 
 # We could potentially enable the 2 below:
-Style/IndentHash:
+Layout/IndentHash:
   Enabled: false
 
-Style/AlignHash:
+Layout/AlignHash:
   Enabled: false
 
 # HoundCI doesn't like this rule
-Style/DotPosition:
+Layout/DotPosition:
   Enabled: false
 
 # We allow !! as it's an easy way to convert ot boolean
@@ -95,7 +103,7 @@ Style/SymbolArray:
   Enabled: false
 
 # We still support Ruby 2.0.0
-Style/IndentHeredoc:
+Layout/IndentHeredoc:
   Enabled: false
 
 # This cop would not work fine with rspec
@@ -209,11 +217,12 @@ Style/PerlBackrefs:
   Enabled: false
 
 # Disable '+ should be surrounded with a single space' for xcodebuild_spec.rb
-Style/SpaceAroundOperators:
+Layout/SpaceAroundOperators:
   Exclude:
     - '**/spec/actions_specs/xcodebuild_spec.rb'
 
 AllCops:
+  TargetRubyVersion: 2.0
   Include:
     - '**/fastlane/Fastfile'
   Exclude:
@@ -231,6 +240,7 @@ Style/FileName:
     - '**/Fastfile'
     - '**/Deliverfile'
     - '**/Snapfile'
+    - '**/*.gemspec'
 
 # We're not there yet
 Style/Documentation:

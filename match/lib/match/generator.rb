@@ -11,7 +11,8 @@ module Match
         force: true, # we don't need a certificate without its private key, we only care about a new certificate
         username: params[:username],
         team_id: params[:team_id],
-        keychain_path: FastlaneCore::Helper.keychain_path(params[:keychain_name])
+        keychain_path: FastlaneCore::Helper.keychain_path(params[:keychain_name]),
+        keychain_password: params[:keychain_password]
       })
 
       Cert.config = arguments
@@ -30,6 +31,7 @@ module Match
       Dir[File.join(params[:workspace], "**", "*.certSigningRequest")].each { |path| File.delete(path) }
 
       # we need to return the path
+      # Inside this directory, there is the `.p12` file and the `.cer` file with the same name, but different extension
       return cert_path
     end
 
@@ -55,7 +57,8 @@ module Match
         cert_id: certificate_id,
         provisioning_name: profile_name,
         ignore_profiles_with_different_name: true,
-        team_id: params[:team_id]
+        team_id: params[:team_id],
+        template_name: params[:template_name]
       }
 
       values[:platform] = params[:platform]
