@@ -972,8 +972,6 @@ module Spaceship
 
       handle_itc_response(r.body)
       
-      require 'pry'
-      binding.pry
       if r.body['messages'].key?("error") and r.body['messages']["error"].first.include?("Problem processing review submission.")
         if reject_if_waiting_for_review
           reject_app_submission(app_id, version)
