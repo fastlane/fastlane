@@ -22,7 +22,7 @@ describe Spaceship::AppSubmission do
       submission.content_rights_contains_third_party_content = true
       submission.content_rights_has_rights = true
       submission.add_id_info_uses_idfa = false
-      submission.complete!
+      submission.complete(false)
 
       expect(submission.submitted_for_review).to eq(true)
     end
@@ -43,7 +43,7 @@ describe Spaceship::AppSubmission do
       submission.add_id_info_uses_idfa = false
 
       expect do
-        submission.complete!
+        submission.complete(false)
       end.to raise_exception("Problem processing review submission.")
       expect(submission.submitted_for_review).to eq(false)
     end
