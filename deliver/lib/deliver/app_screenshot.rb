@@ -13,6 +13,8 @@ module Deliver
       IOS_47 = "iOS-4.7-in"
       # iPhone 6 Plus
       IOS_55 = "iOS-5.5-in"
+      # iPhone X
+      IOS_58 = "iOS-5.8-in"
       # iPad
       IOS_IPAD = "iOS-iPad"
       # iPad Pro
@@ -64,6 +66,7 @@ module Deliver
         ScreenSize::IOS_40 => "iphone4",
         ScreenSize::IOS_47 => "iphone6",
         ScreenSize::IOS_55 => "iphone6Plus",
+        ScreenSize::IOS_58 => "iphone58",
         ScreenSize::IOS_IPAD => "ipad",
         ScreenSize::IOS_IPAD_PRO => "ipadPro",
         ScreenSize::IOS_40_MESSAGES => "iphone4",
@@ -85,6 +88,7 @@ module Deliver
         ScreenSize::IOS_40 => "iPhone 5",
         ScreenSize::IOS_47 => "iPhone 6",
         ScreenSize::IOS_55 => "iPhone 6 Plus",
+        ScreenSize::IOS_58 => "iPhone X",
         ScreenSize::IOS_IPAD => "iPad",
         ScreenSize::IOS_IPAD_PRO => "iPad Pro",
         ScreenSize::IOS_40_MESSAGES => "iPhone 5 (iMessage)",
@@ -112,6 +116,10 @@ module Deliver
 
     def self.device_messages
       return {
+        ScreenSize::IOS_58_MESSAGES => [
+          [1125, 2436],
+          [2436, 1125]
+        ],
         ScreenSize::IOS_55_MESSAGES => [
           [1080, 1920],
           [1242, 2208]
@@ -143,6 +151,10 @@ module Deliver
 
     def self.devices
       return {
+        ScreenSize::IOS_58 => [
+          [1125, 2436],
+          [2436, 1125]
+        ],
         ScreenSize::IOS_55 => [
           [1080, 1920],
           [1242, 2208]
