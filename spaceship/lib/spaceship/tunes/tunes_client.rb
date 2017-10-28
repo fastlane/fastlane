@@ -960,7 +960,7 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def send_app_submission(app_id, version, data, reject_if_waiting_for_review=false)
+    def send_app_submission(app_id, version, data, reject_if_waiting_for_review = false)
       raise "app_id is required" unless app_id
 
       # ra/apps/1039164429/version/submit/complete
@@ -971,7 +971,7 @@ module Spaceship
       end
 
       handle_itc_response(r.body)
-      
+
       if r.body['messages'].key?("error") and r.body['messages']["error"].first.include?("Problem processing review submission.")
         if reject_if_waiting_for_review
           reject_app_submission(app_id, version)
@@ -1001,7 +1001,7 @@ module Spaceship
     #####################################################
     def reject_app_submission(app_id, version)
       raise "app_id is required" unless app_id
-      
+
       r = request(:post) do |req|
         req.url "ra/apps/#{app_id}/versions/#{version}/reject"
         req.headers['Content-Type'] = 'application/json'

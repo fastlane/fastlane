@@ -27,7 +27,6 @@ module Deliver
       else
         submission.complete(false)
       end
-      
 
       UI.success("Successfully submitted the app for review!")
     end

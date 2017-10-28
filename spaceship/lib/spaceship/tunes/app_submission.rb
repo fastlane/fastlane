@@ -131,7 +131,7 @@ module Spaceship
           raw_data_clone.set(["contentRights"], nil)
         end
         raw_data_clone.delete("version")
-        
+
         client.send_app_submission(application.apple_id, application.edit_version.version_id, raw_data_clone, reject_if_waiting_for_review)
         @submitted_for_review = true
       end
