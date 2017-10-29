@@ -972,7 +972,10 @@ module Spaceship
 
       handle_itc_response(r.body)
 
-      if r.body['messages'].key?("error") and r.body['messages']["error"].first.include?("Problem processing review submission.")
+      messages = r.body.fetch("messages", {})
+      errors = messages.fetch('error', nil)
+
+      if !errors.nil? and !errors.empty? and errors.first.include?("Problem processing review submission.")
         if reject_if_waiting_for_review
           reject_app_submission(app_id, version)
           send_app_submission(app_id, version, data)
