@@ -93,6 +93,7 @@ module Spaceship
         ipadPro:      "MZPFT.SortedJ99ScreenShot",
         iphone6:      "MZPFT.SortedN61ScreenShot",
         iphone6Plus:  "MZPFT.SortedN56ScreenShot",
+        iphone58:     "MZPFT.SortedD22ScreenShot",
         iphone4:      "MZPFT.SortedN41ScreenShot",
         iphone35:     "MZPFT.SortedScreenShot",
         appleTV:      "MZPFT.SortedATVScreenShot",
@@ -107,6 +108,7 @@ module Spaceship
         ipadPro:      "MZPFT.SortedJ99MessagesScreenShot",
         iphone6:      "MZPFT.SortedN61MessagesScreenShot",
         iphone6Plus:  "MZPFT.SortedN56MessagesScreenShot",
+        iphone58:     "MZPFT.SortedD22MessagesScreenShot",
         iphone4:      "MZPFT.SortedN41MessagesScreenShot"
       }
     end
