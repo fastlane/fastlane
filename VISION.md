@@ -1,5 +1,5 @@
 # _fastlane_’s Philosophy
-
+My fastlane philosophy
 _fastlane_ automates the beta and release deployment process for your iOS or Android apps, including build, code signing, automatic screenshot capture, and distribution of your app binaries.
 
 _fastlane_ will continue to evolve in ways that make it indispensable for, and focused on these needs.
