@@ -208,11 +208,11 @@ module FastlaneCore
       option = verify_options_key!(key)
 
       # Same order as https://docs.fastlane.tools/advanced/#priorities-of-parameters-and-options
-      value = if @values.key? key and !@values[key].nil?
+      value = if @values.key?(key) and !@values[key].nil?
                 @values[key]
               elsif option.env_name and !ENV[option.env_name].nil?
                 ENV[option.env_name].dup
-              elsif self.config_file_options.key? key
+              elsif self.config_file_options.key?(key)
                 self.config_file_options[key]
               else
                 option.default_value

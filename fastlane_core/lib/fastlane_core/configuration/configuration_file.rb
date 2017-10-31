@@ -79,7 +79,7 @@ module FastlaneCore
 
     def method_missing(method_sym, *arguments, &block)
       # First, check if the key is actually available
-      return if self.options.key? method_sym
+      return if self.options.key?(method_sym)
 
       if self.available_keys.include?(method_sym)
 
