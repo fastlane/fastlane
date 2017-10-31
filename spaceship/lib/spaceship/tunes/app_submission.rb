@@ -131,6 +131,8 @@ module Spaceship
         end
         raw_data_clone.delete("version")
 
+        # Check whether the application makes use of IDFA or not
+        # and automatically set the mandatory limitsTracking value in the request JSON accordingly.
         if !self.add_id_info_uses_idfa.nil? && self.add_id_info_uses_idfa == true
           raw_data_clone.set(
             ["adIdInfo", "limitsTracking", "value"],
