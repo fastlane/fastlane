@@ -79,7 +79,7 @@ module Fastlane
         end
 
         extra_files = params[:include]
-        extra_files += modified_files_relative_to_repo_root repo_path
+        extra_files += modified_files_relative_to_repo_root(repo_path)
 
         # create our list of files that we expect to have changed, they should all be relative to the project root, which should be equal to the git workdir root
         expected_changed_files = extra_files
