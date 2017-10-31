@@ -78,6 +78,7 @@ module Snapshot
         'iPhone 6' => "iPhone 6 (4.7-Inch)",
         'iPhone 5s' => "iPhone 5 (4-Inch)",
         'iPhone SE' => "iPhone SE",
+        'iPhone 4s' => "iPhone 4 (3.5-Inch)",
         'iPad Air' => 'iPad Air',
         'iPad Air 2' => 'iPad Air 2',
         'iPad (5th generation)' => 'iPad (5th generation)',
