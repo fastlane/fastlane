@@ -1,10 +1,27 @@
+require 'pathname'
+
 module Fastlane
   module Actions
+    module SharedValues
+      MODIFIED_FILES = :MODIFIED_FILES
+    end
+
+    class << self
+      # Add an array of paths relative to the repo root or absolute paths that have been modified by
+      # an action.
+      #
+      # :files: An array of paths relative to the repo root or absolute paths
+      def add_modified_files(files)
+        modified_files = lane_context[SharedValues::MODIFIED_FILES] || Set.new
+        modified_files += files
+        lane_context[SharedValues::MODIFIED_FILES] = modified_files
+      end
+    end
+
     # Commits the current changes in the repo as a version bump, checking to make sure only files which contain version information have been changed.
     class CommitVersionBumpAction < Action
       def self.run(params)
         require 'xcodeproj'
-        require 'pathname'
         require 'set'
         require 'shellwords'
 
@@ -61,8 +78,11 @@ module Fastlane
           end
         end
 
+        extra_files = params[:include]
+        extra_files += modified_files_relative_to_repo_root(repo_path)
+
         # create our list of files that we expect to have changed, they should all be relative to the project root, which should be equal to the git workdir root
-        expected_changed_files = []
+        expected_changed_files = extra_files
         expected_changed_files << pbxproj_path
         expected_changed_files << info_plist_files
 
@@ -154,7 +174,12 @@ module Fastlane
                                        description: "A regular expression used to filter matched plist files to be modified",
                                        optional: true,
                                        default_value: nil,
-                                       is_string: false)
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :include,
+                                       description: "A list of extra files to be included in the version bump (string array or comma-separated string)",
+                                       optional: true,
+                                       default_value: [],
+                                       type: Array)
         ]
       end
 
@@ -197,6 +222,12 @@ module Fastlane
           )',
           'commit_version_bump(
             settings: %w[About.plist Root.plist] # Include more than one plist from Settings.bundle
+          )',
+          'commit_version_bump(
+            include: %w[package.json custom.cfg] # include other updated files as part of the version bump
+          )',
+          'commit_version_bump(
+            ignore: /OtherProject/ # ignore files matching a regular expression
           )'
         ]
       end
@@ -208,22 +239,33 @@ module Fastlane
       class << self
         def settings_plists_from_param(param)
           if param.kind_of? String
-            # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: "About.plist"
+            # commit_version_bump settings: "About.plist"
             return [param]
           elsif param.kind_of? Array
-            # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: [ "Root.plist", "About.plist" ]
+            # commit_version_bump settings: ["Root.plist", "About.plist"]
             return param
+          else
+            # commit_version_bump settings: true # Root.plist
+            return ["Root.plist"]
           end
-
-          # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: true # Root.plist
-          ["Root.plist"]
         end
 
         def settings_bundle_file_path(project, settings_file_name)
           settings_bundle = project.files.find { |f| f.path =~ /Settings.bundle/ }
           raise "No Settings.bundle in project" if settings_bundle.nil?
 
-          File.join(settings_bundle.real_path, settings_file_name)
+          return File.join(settings_bundle.real_path, settings_file_name)
+        end
+
+        def modified_files_relative_to_repo_root(repo_root)
+          return [] if Actions.lane_context[SharedValues::MODIFIED_FILES].nil?
+
+          root_pathname = Pathname.new repo_root
+          all_modified_files = Actions.lane_context[SharedValues::MODIFIED_FILES].map do |path|
+            next path unless path =~ %r{^/}
+            Pathname.new(path).relative_path_from(root_pathname).to_s
+          end
+          return all_modified_files.uniq
         end
       end
     end
