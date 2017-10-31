@@ -240,13 +240,13 @@ module Fastlane
         def settings_plists_from_param(param)
           if param.kind_of? String
             # commit_version_bump settings: "About.plist"
-            [param]
+            return [param]
           elsif param.kind_of? Array
             # commit_version_bump settings: ["Root.plist", "About.plist"]
-            param
+            return param
           else
             # commit_version_bump settings: true # Root.plist
-            ["Root.plist"]
+            return ["Root.plist"]
           end
         end
 
@@ -254,7 +254,7 @@ module Fastlane
           settings_bundle = project.files.find { |f| f.path =~ /Settings.bundle/ }
           raise "No Settings.bundle in project" if settings_bundle.nil?
 
-          File.join(settings_bundle.real_path, settings_file_name)
+          return File.join(settings_bundle.real_path, settings_file_name)
         end
 
         def modified_files_relative_to_repo_root(repo_root)
@@ -265,7 +265,7 @@ module Fastlane
             next path unless path =~ %r{^/}
             Pathname.new(path).relative_path_from(root_pathname).to_s
           end
-          all_modified_files.uniq
+          return all_modified_files.uniq
         end
       end
     end
