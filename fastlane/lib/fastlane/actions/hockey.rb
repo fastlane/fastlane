@@ -82,8 +82,8 @@ module Fastlane
 
         # https://support.hockeyapp.net/discussions/problems/83559
         # Should not set status to "2" (downloadable) until after the app is uploaded.
-        final_status = options[:status]
-        options[:status] = "1"
+        update_status = options[:status]
+        options[:status] = options[:create_status]
 
         response = connection.get do |req|
           req.url("/api/2/apps/#{app_id}/app_versions/new")
@@ -105,7 +105,7 @@ module Fastlane
           options[:dsym] = dsym_io
         end
 
-        options[:status] = final_status
+        options[:status] = update_status
 
         connection.put do |req|
           req.options.timeout = options.delete(:timeout)
@@ -245,6 +245,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :status,
                                        env_name: "FL_HOCKEY_STATUS",
                                        description: "Download status: \"1\" = No user can download; \"2\" = Available for download (only possible with full-access token)",
+                                       default_value: "2"),
+          FastlaneCore::ConfigItem.new(key: :create_status,
+                                       env_name: "FL_HOCKEY_CREATE_STATUS",
+                                       description: "Download status for initial version creation when create_update is true: \"1\" = No user can download; \"2\" = Available for download (only possible with full-access token)",
                                        default_value: "2"),
           FastlaneCore::ConfigItem.new(key: :notes_type,
                                       env_name: "FL_HOCKEY_NOTES_TYPE",
