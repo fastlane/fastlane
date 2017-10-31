@@ -81,7 +81,8 @@ module Fastlane
         end
 
         # https://support.hockeyapp.net/discussions/problems/83559
-        # Should not set status to "2" (downloadable) until after the app is uploaded.
+        # Should not set status to "2" (downloadable) until after the app is uploaded, so allow the caller
+        # to specify a different status for the `create` step
         update_status = options[:status]
         options[:status] = options[:create_status]
 
