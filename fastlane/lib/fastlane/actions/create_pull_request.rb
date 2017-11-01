@@ -84,7 +84,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :api_url,
                                        env_name: "GITHUB_PULL_REQUEST_API_URL",
-                                       description: "The URL of Github API - used when the Enterprise (default to `https://api.github.com`)",
+                                       description: "The URL of GitHub API - used when the Enterprise (default to `https://api.github.com`)",
                                        is_string: true,
                                        default_value: 'https://api.github.com',
                                        optional: true)
@@ -112,7 +112,7 @@ module Fastlane
             head: "my-feature",                 # optional, defaults to current branch name
             base: "master",                     # optional, defaults to "master"
             body: "Please pull this in!",       # optional
-            api_url: "http://yourdomain/api/v3" # optional, for Github Enterprise, defaults to "https://api.github.com"
+            api_url: "http://yourdomain/api/v3" # optional, for GitHub Enterprise, defaults to "https://api.github.com"
           )'
         ]
       end

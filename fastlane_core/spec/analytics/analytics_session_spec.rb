@@ -42,6 +42,8 @@ describe FastlaneCore::AnalyticsSession do
         expect(session).to receive(:operating_system_version).and_return('10.12')
         expect(session).to receive(:fastfile_id).and_return('')
 
+        expect(FastlaneCore::Helper).to receive(:xcode_version).and_return('9.0.1')
+
         session.action_launched(launch_context: launch_context)
 
         parsed_events = JSON.parse(session.events.to_json)
@@ -164,6 +166,8 @@ describe FastlaneCore::AnalyticsSession do
         expect(session).to receive(:operating_system_version).and_return('10.12').twice
         expect(session).to receive(:fastfile_id).and_return('').twice
 
+        expect(FastlaneCore::Helper).to receive(:xcode_version).and_return('9.0.1').twice
+
         session.action_launched(launch_context: action_1_launch_context)
         session.action_completed(completion_context: action_1_completion_context)
         session.action_launched(launch_context: action_2_launch_context)
@@ -191,34 +195,6 @@ describe FastlaneCore::AnalyticsSession do
     end
 
     let(:guesser) { FastlaneCore::AppIdentifierGuesser.new }
-
-    it "properly tracks the lane switches", :tagged do
-      allow(UI).to receive(:success)
-      allow(UI).to receive(:header)
-      allow(UI).to receive(:message)
-
-      allow(Time).to receive(:now).and_return(timestamp_millis)
-
-      expect(FastlaneCore::AppIdentifierGuesser).to receive(:new).and_return(guesser)
-      allow(guesser).to receive(:p_hash).and_return(p_hash)
-      allow(guesser).to receive(:platform).and_return('ios')
-
-      FastlaneCore.session.is_fastfile = true
-      allow(FastlaneCore.session).to receive(:oauth_app_name).and_return(oauth_app_name)
-      expect(FastlaneCore.session).to receive(:fastlane_version).and_return('2.5.0')
-      expect(FastlaneCore.session).to receive(:ruby_version).and_return('2.4.0')
-      expect(FastlaneCore.session).to receive(:operating_system_version).and_return('10.12')
-      expect(FastlaneCore.session).to receive(:session_id).and_return(session_id)
-      expect(FastlaneCore.session).to receive(:fastfile_id).and_return('')
-
-      ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
-      ff.runner.execute(:lane1, :ios)
-
-      parsed_events = JSON.parse(FastlaneCore.session.events.to_json)
-      parsed_events.zip(fixture_data).each do |parsed, fixture|
-        expect(parsed).to eq(fixture)
-      end
-    end
 
     it 'records more than one action from a Fastfile' do
       allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(File.absolute_path('./fastlane/spec/fixtures/fastfiles/'))

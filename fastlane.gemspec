@@ -47,7 +47,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'tty-screen', '~> 0.5.0' # detect the terminal width
 
   spec.add_dependency 'babosa', '>= 1.0.2', "< 2.0.0"
-  spec.add_dependency 'colored' # coloured terminal output
+  spec.add_dependency 'colored' # colored terminal output
   spec.add_dependency 'commander-fastlane', '>= 4.4.5', '< 5.0.0' # CLI parser
   spec.add_dependency 'excon', '>= 0.45.0', '< 1.0.0' # Great HTTP Client
   spec.add_dependency 'faraday-cookie_jar', '~> 0.0.6'
@@ -81,7 +81,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.8.7.4'
   spec.add_development_dependency 'webmock', '~> 2.3.2'
   spec.add_development_dependency 'coveralls', '~> 0.8.13'
-  spec.add_development_dependency 'rubocop', '0.49.1'
+  spec.add_development_dependency 'rubocop', Fastlane::RUBOCOP_REQUIREMENT
   spec.add_development_dependency 'rb-readline' # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
   spec.add_development_dependency 'rest-client', '>= 1.8.0'
   spec.add_development_dependency 'fakefs', '~> 0.8.1'

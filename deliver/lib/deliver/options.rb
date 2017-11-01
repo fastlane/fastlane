@@ -322,7 +322,13 @@ module Deliver
                                      env_name: "DELIVER_IGNORE_LANGUAGE_DIRECTORY_VALIDATION",
                                      description: "Ignore errors when invalid languages are found in metadata and screeenshot directories",
                                      default_value: false,
-                                     is_string: false)
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :precheck_include_in_app_purchases,
+                                     env_name: "PRECHECK_INCLUDE_IN_APP_PURCHASES",
+                                     description: "Should precheck check in-app purchases?",
+                                     is_string: false,
+                                     optional: true,
+                                     default_value: true)
       ]
     end
   end

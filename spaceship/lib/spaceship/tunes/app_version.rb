@@ -50,6 +50,9 @@ module Spaceship
       #   for release_on_approval to be used.
       attr_accessor :auto_release_date
 
+      # @return (Bool) Should the rating of the app be reset?
+      attr_accessor :ratings_reset
+
       # @return (Bool)
       attr_accessor :can_beta_test
 
@@ -208,6 +211,7 @@ module Spaceship
         'largeAppIcon.value.url' => :app_icon_url,
         'releaseOnApproval.value' => :release_on_approval,
         'autoReleaseDate.value' => :auto_release_date,
+        'ratingsReset.value' => :ratings_reset,
         'status' => :raw_status,
         'preReleaseBuild.buildVersion' => :build_version,
         'supportsAppleWatch' => :supports_apple_watch,
@@ -350,7 +354,7 @@ module Spaceship
       # })
       #
       # Available Values
-      # https://github.com/fastlane/fastlane/blob/master/deliver/Reference.md
+      # https://docs.fastlane.tools/actions/deliver/#reference
       def update_rating(hash)
         raise "Must be a hash" unless hash.kind_of?(Hash)
 

@@ -223,8 +223,9 @@ describe Fastlane::PluginGenerator do
           Gem::Dependency.new("pry", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("bundler", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("rspec", Gem::Requirement.new([">= 0"]), :development),
+          Gem::Dependency.new("rspec_junit_formatter", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("rake", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rubocop", Gem::Requirement.new([">= 0"]), :development),
+          Gem::Dependency.new("rubocop", Gem::Requirement.new([Fastlane::RUBOCOP_REQUIREMENT]), :development),
           Gem::Dependency.new("simplecov", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("fastlane", Gem::Requirement.new([">= #{Fastlane::VERSION}"]), :development)
         )
