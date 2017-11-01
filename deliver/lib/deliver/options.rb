@@ -2,6 +2,7 @@ require 'fastlane_core'
 require 'credentials_manager'
 
 module Deliver
+  # rubocop:disable Metrics/ClassLength
   class Options
     def self.available_options
       user = CredentialsManager::AppfileConfig.try_fetch_value(:itunes_connect_id)
@@ -111,6 +112,15 @@ module Deliver
                                      description: "Should the app be automatically released once it's approved?",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :auto_release_date,
+                                     env_name: "DELIVER_AUTO_RELEASE_DATE",
+                                     description: "Date in milliseconds for automatically releasing on pending approval",
+                                     is_string: false,
+                                     optional: true,
+                                     conflicting_options: [:automatic_release],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'auto_release_date' and '#{value.key}' options together.")
+                                     end),
         FastlaneCore::ConfigItem.new(key: :phased_release,
                                      description: "Enable the phased release feature of iTC",
                                      optional: true,
@@ -332,4 +342,5 @@ module Deliver
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
