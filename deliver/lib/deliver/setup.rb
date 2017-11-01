@@ -20,6 +20,8 @@ module Deliver
         File.write(File.join(deliver_path, 'screenshots', 'README.txt'), File.read("#{Deliver::ROOT}/lib/assets/ScreenshotsHelp"))
       end
 
+      generate_territories_file(options)
+
       UI.success("Successfully created new Deliverfile at path '#{file_path}'")
     end
 
@@ -106,6 +108,12 @@ module Deliver
         File.write(watch_icon_path, open(v.watch_app_icon.url).read)
         UI.success("Successfully downloaded watch icon")
       end
+    end
+
+    def generate_territories_file(options)
+      availability = Deliver::Availability.from_itunes_connect(options[:app])
+      availability.save_to_file(path)
+      UI.message("Downloaded territory availability")
     end
 
     def download_screenshots(deliver_path, options)
