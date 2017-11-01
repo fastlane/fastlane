@@ -69,7 +69,8 @@ module Spaceship::TestFlight
       active: 'testflight.build.state.testing.active',
       ready_to_submit: 'testflight.build.state.submit.ready',
       ready_to_test: 'testflight.build.state.testing.ready',
-      export_compliance_missing: 'testflight.build.state.export.compliance.missing'
+      export_compliance_missing: 'testflight.build.state.export.compliance.missing',
+      review_rejected: 'testflight.build.state.review.rejected'
     }
 
     # Find a Build by `build_id`.
@@ -130,8 +131,12 @@ module Spaceship::TestFlight
       external_state == BUILD_STATES[:export_compliance_missing]
     end
 
+    def review_rejected?
+      external_state == BUILD_STATES[:review_rejected]
+    end
+
     def processed?
-      active? || ready_to_submit? || export_compliance_missing?
+      active? || ready_to_submit? || export_compliance_missing? || review_rejected?
     end
 
     # Getting builds from BuildTrains only gets a partial Build object
