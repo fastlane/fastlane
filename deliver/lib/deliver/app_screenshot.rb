@@ -115,11 +115,21 @@ module Deliver
     end
 
     def is_messages?
-      return [ScreenSize::IOS_40_MESSAGES, ScreenSize::IOS_47_MESSAGES, ScreenSize::IOS_55_MESSAGES, ScreenSize::IOS_58_MESSAGES, ScreenSize::IOS_IPAD_MESSAGES, ScreenSize::IOS_IPAD_PRO_MESSAGES].include?(self.screen_size)
+      return [
+        ScreenSize::IOS_40_MESSAGES,
+        ScreenSize::IOS_47_MESSAGES,
+        ScreenSize::IOS_55_MESSAGES,
+        ScreenSize::IOS_58_MESSAGES,
+        ScreenSize::IOS_IPAD_MESSAGES,
+        ScreenSize::IOS_IPAD_PRO_MESSAGES
+      ].include?(self.screen_size)
     end
 
     def self.device_messages
       return {
+        ScreenSize::IOS_58_MESSAGES => [
+          [1125, 2436]
+        ],
         ScreenSize::IOS_55_MESSAGES => [
           [1080, 1920],
           [1242, 2208]

@@ -21,6 +21,8 @@ module Frameit
     def device_name
       sizes = Deliver::AppScreenshot::ScreenSize
       case @screen_size
+      when sizes::IOS_58
+        return 'iPhone X'
       when sizes::IOS_55
         return Frameit.config[:use_legacy_iphone6s] ? 'iPhone 6s Plus' : 'iPhone 7 Plus'
       when sizes::IOS_47
@@ -49,9 +51,9 @@ module Frameit
       return @color
     end
 
-    # Is the device a 3x device? (e.g. 6 Plus)
+    # Is the device a 3x device? (e.g. iPhone 6 Plus, iPhone X)
     def triple_density?
-      (screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55)
+      (screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || screen_size == Deliver::AppScreenshot::ScreenSize::IOS_58)
     end
 
     # Super old devices (iPhone 4)

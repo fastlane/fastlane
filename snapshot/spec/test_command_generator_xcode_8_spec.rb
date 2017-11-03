@@ -7,13 +7,23 @@ describe Snapshot do
     let(:iphone6_9_2) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 6", os_version: '9.2', udid: "11111", state: "Don't Care", is_simulator: true) }
     let(:iphone6_10_1) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 6 (10.1)", os_version: '10.1', udid: "33333", state: "Don't Care", is_simulator: true) }
     let(:iphone6s_10_1) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 6s (10.1)", os_version: '10.1', udid: "98765", state: "Don't Care", is_simulator: true) }
+    let(:iphone4s_9_0) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 4s", os_version: '9.0', udid: "4444", state: "Don't Care", is_simulator: true) }
     let(:ipad_air_9_1) { FastlaneCore::DeviceManager::Device.new(name: "iPad Air", os_version: '9.1', udid: "12345", state: "Don't Care", is_simulator: true) }
     let(:appleTV) { FastlaneCore::DeviceManager::Device.new(name: "Apple TV 1080p", os_version: os_version, udid: "22222", state: "Don't Care", is_simulator: true) }
 
     before do
       allow(Snapshot::LatestOsVersion).to receive(:version).and_return(os_version)
-      allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([iphone6_9_0, iphone6_9_3, iphone6_9_2, appleTV, iphone6_9_3_2, iphone6_10_1, iphone6s_10_1, ipad_air_9_1])
+      allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([iphone6_9_0, iphone6_9_3, iphone6_9_2, appleTV, iphone6_9_3_2, iphone6_10_1, iphone6s_10_1, iphone4s_9_0, ipad_air_9_1])
       fake_out_xcode_project_loading
+    end
+
+    describe '#destination' do
+      it "returns the highest version available for device if no match for the specified/latest os_version" do
+        allow(Snapshot).to receive(:config).and_return({ ios_version: os_version })
+        device = "iPhone 4s"
+        result = Snapshot::TestCommandGeneratorXcode8.destination(device)
+        expect(result).to eq ["-destination 'platform=iOS Simulator,id=4444,OS=9.0'"]
+      end
     end
 
     describe '#find_device' do
