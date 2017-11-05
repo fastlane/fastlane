@@ -29,6 +29,7 @@ module Spaceship
             'iphone4' => [1136, 640],
             'iphone6' => [1334, 750],
             'iphone6Plus' => [2208, 1242],
+            'iphone58' => [2436, 1125],
             'ipad' => [1024, 768],
             'ipadPro' => [2732, 2048]
         }
