@@ -170,7 +170,8 @@ module Frameit
       background = MiniMagick::Image.open(fetch_config['background'])
 
       if background.height != screenshot.size[1]
-        background.resize "#{screenshot.size[0]}x#{screenshot.size[1]}!" # `!` says it should ignore the ratio
+        background.resize "#{screenshot.size[0]}x#{screenshot.size[1]}^" # `^` says it should fill area
+        background.merge! ["-gravity", "center", "-crop", "#{screenshot.size[0]}x#{screenshot.size[1]}+0+0"] # crop from center
       end
       background
     end
