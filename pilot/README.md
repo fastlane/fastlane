@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://docs.fastlane.tools/actions/pilot">
-    <img src="https://raw.githubusercontent.com/fastlane/fastlane/master/pilot/assets/pilot.png" height="110">
+    <img src="https://raw.githubusercontent.com/fastlane/fastlane/master/pilot/assets/PilotTextTransparent.png" height="110">
   </a>
 </p>
 
