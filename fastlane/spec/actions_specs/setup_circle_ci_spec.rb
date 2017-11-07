@@ -56,7 +56,7 @@ describe Fastlane do
         it "skips the setup process" do
           stub_const("ENV", { "MATCH_KEYCHAIN_NAME" => "anything" })
           expect(Fastlane::UI).to receive(:message).with "Skipping Keychain setup as a keychain was already specified"
-          described_class.setup_keychain
+          described_class.setup_keychain(false)
         end
       end
 
@@ -67,17 +67,17 @@ describe Fastlane do
         end
 
         it "sets the MATCH_KEYCHAIN_NAME env var" do
-          described_class.setup_keychain
+          described_class.setup_keychain(false)
           expect(ENV["MATCH_KEYCHAIN_NAME"]).to eql("fastlane_tmp_keychain")
         end
 
         it "sets the MATCH_KEYCHAIN_PASSWORD env var" do
-          described_class.setup_keychain
+          described_class.setup_keychain(false)
           expect(ENV["MATCH_KEYCHAIN_PASSWORD"]).to eql("")
         end
 
         it "sets the MATCH_READONLY env var" do
-          described_class.setup_keychain
+          described_class.setup_keychain(false)
           expect(ENV["MATCH_READONLY"]).to eql("true")
         end
       end
