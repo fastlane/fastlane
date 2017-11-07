@@ -489,10 +489,6 @@ module Spaceship
       end
     end
 
-    def logout
-      request(:get, "https://itunesconnect.apple.com/logout")
-    end
-
     def itc_service_key
       return @service_key if @service_key
 
