@@ -420,12 +420,6 @@ module Spaceship
       # If this is a CI, the user can pass the session via environment variable
       load_session_from_env
 
-      data = {
-        accountName: user,
-        password: password,
-        rememberMe: true
-      }
-
       begin
         # The below workaround is only needed for 2 step verified machines
         # Due to escaping of cookie values we have a little workaround here
@@ -447,12 +441,10 @@ module Spaceship
         end
 
         response = request(:post) do |req|
-          req.url "https://idmsa.apple.com/appleauth/auth/signin"
-          req.body = data.to_json
-          req.headers['Content-Type'] = 'application/json'
-          req.headers['X-Requested-With'] = 'XMLHttpRequest'
-          req.headers['X-Apple-Widget-Key'] = self.itc_service_key
-          req.headers['Accept'] = 'application/json, text/javascript'
+          req.url "https://idmsa.apple.com/IDMSWebAuth/authenticate"
+          req.body = "appIdKey=891bd3417a7776362562d2197f89480a8547b108fd934911bcbea0110d07f757&appleId=#{user}&accountPassword=#{password}"
+          req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+          req.headers['Accept-Encoding'] = 'deflate, gzip'
           req.headers["Cookie"] = modified_cookie if modified_cookie
         end
       rescue UnauthorizedAccessError
@@ -464,7 +456,7 @@ module Spaceship
       case response.status
       when 403
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
-      when 200
+      when 200, 302
         fetch_olympus_session
         return response
       when 409
@@ -488,13 +480,17 @@ module Spaceship
 
     # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
     def fetch_olympus_session
-      response = request(:get, "https://olympus.itunes.apple.com/v1/session")
+      response = request(:get, "https://itunesconnect.apple.com/olympus/v1/session")
       if response.body
         user_map = response.body["user"]
         if user_map
           self.user_email = user_map["emailAddress"]
         end
       end
+    end
+
+    def logout
+      request(:get, "https://itunesconnect.apple.com/logout")
     end
 
     def itc_service_key
@@ -504,7 +500,7 @@ module Spaceship
       itc_service_key_path = "/tmp/spaceship_itc_service_key.txt"
       return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
 
-      response = request(:get, "https://olympus.itunes.apple.com/v1/app/config?hostname=itunesconnect.apple.com")
+      response = request(:get, "https://itunesconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com")
       @service_key = response.body["authServiceKey"].to_s
 
       raise "Service key is empty" if @service_key.length == 0
