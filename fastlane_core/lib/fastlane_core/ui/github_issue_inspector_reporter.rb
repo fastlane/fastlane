@@ -15,8 +15,8 @@ module Fastlane
       puts("")
     end
 
-    # Called once the inspector has recieved a report with more than one issue.
-    def inspector_successfully_recieved_report(report, inspector)
+    # Called once the inspector has received a report with more than one issue.
+    def inspector_successfully_received_report(report, inspector)
       report.issues[0..(NUMBER_OF_ISSUES_INLINE - 1)].each { |issue| print_issue_full(issue) }
 
       if report.issues.count > NUMBER_OF_ISSUES_INLINE
