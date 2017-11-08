@@ -440,11 +440,15 @@ module Spaceship
           modified_cookie.gsub!(unescaped_important_cookie, escaped_important_cookie)
         end
 
+        require 'uri'
+        encoded_password = URI.encode(password)
+        encoded_apple_id = URI.encode(user)
+
         response = request(:post) do |req|
           req.url "https://idmsa.apple.com/IDMSWebAuth/authenticate"
-          req.body = "appIdKey=891bd3417a7776362562d2197f89480a8547b108fd934911bcbea0110d07f757&appleId=#{user}&accountPassword=#{password}"
+          # appIdKey is hardcoded because that seems to the be an internal SSO service identifier.
+          req.body = "appIdKey=891bd3417a7776362562d2197f89480a8547b108fd934911bcbea0110d07f757&appleId=#{encoded_apple_id}&accountPassword=#{encoded_password}"
           req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-          # req.headers['Accept-Encoding'] = 'deflate, gzip'
           req.headers['Accept'] = 'application/json, text/javascript'
           req.headers["Cookie"] = modified_cookie if modified_cookie
         end
@@ -464,6 +468,7 @@ module Spaceship
         fetch_olympus_session
         return response
       when 302
+        # on success, 302 redirect to idmsa.apple.com happens
         fetch_olympus_session
         return response
       when 409

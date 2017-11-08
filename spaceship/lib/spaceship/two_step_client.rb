@@ -81,10 +81,17 @@ module Spaceship
       code = ask("Please enter the 4 digit code: ")
       puts "Requesting session..."
 
+      request_body = []
+      code.each_char.with_index do |c, index|
+        n = index + 1
+        request_body << "digit#{n}=#{c}"
+      end
+      request_body << "scnt=#{scnt}"
+
       # Send code back to server to get a valid session
       response = request(:post) do |req|
         req.url "https://idmsa.apple.com/IDMSWebAuth/validateSecurityCode"
-        req.body = "digit1=#{code[0]}&digit2=#{code[1]}&digit3=#{code[2]}&digit4=#{code[3]}&scnt=#{scnt}"
+        req.body = body.join('&')
         req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
         req.headers['Accept'] = 'application/json, text/javascript'
       end
