@@ -31,13 +31,13 @@ class TunesStubbing
       # Actual login
       stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").
         with(body: { "accountPassword" => "bad-password", "appIdKey" => "891bd3417a7776362562d2197f89480a8547b108fd934911bcbea0110d07f757", "appleId" => "bad-username" },
-          headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'deflate, gzip', 'Content-Type' => 'application/x-www-form-urlencoded' }).
+          headers: { 'Accept' => 'application/json, text/javascript', 'Content-Type' => 'application/x-www-form-urlencoded' }).
         to_return(status: 401, body: "", headers: { 'Set-Cookie' => 'session=invalid' })
 
       stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").
         with(body: { "accountPassword" => "so_secret", "appIdKey" => "891bd3417a7776362562d2197f89480a8547b108fd934911bcbea0110d07f757", "appleId" => "spaceship@krausefx.com" },
-          headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'deflate, gzip', 'Content-Type' => 'application/x-www-form-urlencoded' }).
-        to_return(status: 200, body: "", headers: { 'Set-Cookie' => "myacinfo=abcdef;" })
+          headers: { 'Accept' => 'application/json, text/javascript', 'Content-Type' => 'application/x-www-form-urlencoded' }).
+        to_return(status: 302, body: "", headers: { 'Set-Cookie' => "myacinfo=abcdef;" })
     end
 
     def itc_stub_applications

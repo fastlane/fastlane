@@ -444,7 +444,8 @@ module Spaceship
           req.url "https://idmsa.apple.com/IDMSWebAuth/authenticate"
           req.body = "appIdKey=891bd3417a7776362562d2197f89480a8547b108fd934911bcbea0110d07f757&appleId=#{user}&accountPassword=#{password}"
           req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-          req.headers['Accept-Encoding'] = 'deflate, gzip'
+          # req.headers['Accept-Encoding'] = 'deflate, gzip'
+          req.headers['Accept'] = 'application/json, text/javascript'
           req.headers["Cookie"] = modified_cookie if modified_cookie
         end
       rescue UnauthorizedAccessError
@@ -456,10 +457,17 @@ module Spaceship
       case response.status
       when 403
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
-      when 200, 302
+      when 200
+        # 2 factor requires HTML parsing now...
+        # When 2 factor is needed, it's a 200 instead of a 302 redirect
+        handle_two_step(response)
+        fetch_olympus_session
+        return response
+      when 302
         fetch_olympus_session
         return response
       when 409
+        # Can probably remove this
         # 2 factor is enabled for this account, first handle that
         # and then get the olympus session
         handle_two_step(response)
