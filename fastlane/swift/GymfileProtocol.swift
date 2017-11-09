@@ -36,6 +36,7 @@ protocol GymfileProtocol: class {
   var xcprettyReportJson: String? { get }
   var analyzeBuildTime: String? { get }
   var xcprettyUtf: String? { get }
+  var skipProfileDetection: Bool { get }
 }
 
 extension GymfileProtocol {
@@ -76,4 +77,5 @@ extension GymfileProtocol {
   var xcprettyReportJson: String? { return nil }
   var analyzeBuildTime: String? { return nil }
   var xcprettyUtf: String? { return nil }
+  var skipProfileDetection: Bool { return false }
 }
