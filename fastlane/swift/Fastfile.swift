@@ -5,4 +5,4 @@
 
 import Foundation
 
-class Fastfile: LaneFile {}
+class Fastfile: LaneFile { }

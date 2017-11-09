@@ -16,6 +16,7 @@ protocol DeliverfileProtocol: class {
   var force: Bool { get }
   var submitForReview: Bool { get }
   var automaticRelease: Bool { get }
+  var autoReleaseDate: String? { get }
   var phasedRelease: String? { get }
   var priceTier: String? { get }
   var buildNumber: String? { get }
@@ -51,6 +52,7 @@ protocol DeliverfileProtocol: class {
   var marketingUrl: String? { get }
   var languages: [String] { get }
   var ignoreLanguageDirectoryValidation: Bool { get }
+  var precheckIncludeInAppPurchases: Bool { get }
 }
 
 extension DeliverfileProtocol {
@@ -71,6 +73,7 @@ extension DeliverfileProtocol {
   var force: Bool { return false }
   var submitForReview: Bool { return false }
   var automaticRelease: Bool { return false }
+  var autoReleaseDate: String? { return nil }
   var phasedRelease: String? { return nil }
   var priceTier: String? { return nil }
   var buildNumber: String? { return nil }
@@ -106,4 +109,5 @@ extension DeliverfileProtocol {
   var marketingUrl: String? { return nil }
   var languages: [String] { return [] }
   var ignoreLanguageDirectoryValidation: Bool { return false }
+  var precheckIncludeInAppPurchases: Bool { return true }
 }

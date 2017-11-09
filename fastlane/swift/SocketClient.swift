@@ -100,10 +100,6 @@ class SocketClient: NSObject {
         self.socketDelegate?.connectionsOpened()
     }
     
-    public func send(environmentVariables: EnvironmentVariables) {
-        send(string: environmentVariables.json)
-    }
-    
     public func send(rubyCommand: RubyCommandable) {
         send(string: rubyCommand.json)
     }

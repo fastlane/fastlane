@@ -10,8 +10,6 @@ import Foundation
 
 public protocol LaneFileProtocol: class {
     var fastlaneVersion: String { get }
-    var environmentVariables: EnvironmentVariables { get }
-    
     static func runLane(named: String)
     
     func recordLaneDescriptions()
@@ -30,8 +28,6 @@ public extension LaneFileProtocol {
 
 @objcMembers
 public class LaneFile: NSObject, LaneFileProtocol {
-    public var environmentVariables: EnvironmentVariables = EnvironmentVariables.instance
-    
     private(set) static var fastfileInstance: Fastfile?
     
     private(set) var laneDescriptionMapping: [Selector : String] = [:]
@@ -41,13 +37,7 @@ public class LaneFile: NSObject, LaneFileProtocol {
         // Step 1, add lange descriptions
         (self as! Fastfile).recordLaneDescriptions()
         
-        // Step 2, send over environment variables to ruby process if we have them
-        if LaneFile.fastfileInstance!.environmentVariables.variables.count > 0 {
-            _ = runner.executeCommand(self.environmentVariables)
-        }
-        
-        // Step 3, run beforeAll() function
-        
+        // Step 2, run beforeAll() function
         LaneFile.fastfileInstance!.beforeAll()
     }
     

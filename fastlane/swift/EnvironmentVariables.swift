@@ -8,33 +8,33 @@
 
 import Foundation
 
+typealias ENV = EnvironmentVariables
+
 public struct EnvironmentVariables {
-
-    static var instance: EnvironmentVariables = { EnvironmentVariables() }()
-
-    var variables: [String : String] = [ : ]
+    public static var instance = EnvironmentVariables()
 
     subscript(key: String) -> String? {
         get {
-            return self.variables[key]
+            return EnvironmentVariables.get(key)
         }
 
         set (newValue) {
-            self.variables[key] = newValue
+            if let newValue = newValue {
+                EnvironmentVariables.set(key: key, value: newValue)
+            } else {
+                EnvironmentVariables.remove(key)
+            }
         }
     }
-}
-
-extension EnvironmentVariables: RubyCommandable {
-    var json: String {
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: self.variables)
-            let jsonString = NSString(data: jsonData, encoding: String.Encoding.utf8.rawValue)!
-            return jsonString as String
-        } catch {
-            let message = "Unable to parse environment variables: \(error.localizedDescription)"
-            log(message: message)
-            fatalError(message)
-        }
+    public static func get(_ key: String) -> String {
+        return environmentVariable(get🚀: key)
+    }
+    
+    public static func set(key: String, value: String) {
+        environmentVariable(set🚀: [key : value] )
+    }
+    
+    public static func remove(_ key: String) {
+        environmentVariable(remove: key)
     }
 }
