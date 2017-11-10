@@ -5,7 +5,7 @@ module Fastlane
 
       def self.run(config)
         UI.message "Generating a provisining profile via sigh"
-        super.run(config)
+        super(config)
       end
 
       #####################################################
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Generates a provisioning profile; stores the profile in the current folder (via sigh)"
+        "Generates a provisioning profile (via sigh)"
       end
     end
   end

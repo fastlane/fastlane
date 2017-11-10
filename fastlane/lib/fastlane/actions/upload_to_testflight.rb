@@ -5,7 +5,7 @@ module Fastlane
 
       def self.run(config)
         UI.message "Uploading a binary to TestFlight using pilot"
-        super.run(config)
+        super(config)
       end
 
       #####################################################

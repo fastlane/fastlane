@@ -5,7 +5,7 @@ module Fastlane
 
       def self.run(config)
         UI.message "Framing screenshots using frameit"
-        super.run(config)
+        super(config)
       end
 
       #####################################################

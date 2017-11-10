@@ -5,7 +5,7 @@ module Fastlane
 
       def self.run(config)
         UI.message "Building your app using gym"
-        super.run(config)
+        super(config)
       end
 
       #####################################################

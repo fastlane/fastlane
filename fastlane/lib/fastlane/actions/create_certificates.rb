@@ -5,7 +5,7 @@ module Fastlane
 
       def self.run(config)
         UI.message "Creating signing certificates using cert"
-        super.run(config)
+        super(config)
       end
 
       #####################################################

@@ -5,7 +5,7 @@ module Fastlane
 
       def self.run(config)
         UI.message "Creating a new app using produce"
-        super.run(config)
+        super(config)
       end
 
       #####################################################

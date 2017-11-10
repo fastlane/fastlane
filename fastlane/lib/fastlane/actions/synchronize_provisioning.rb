@@ -5,7 +5,7 @@ module Fastlane
 
       def self.run(config)
         UI.message "Syncronizing certificates and profiles using match"
-        super.run(config)
+        super(config)
       end
 
       #####################################################
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Easily sync your certificates and profiles across your team using git (via match)"
+        "Easily sync your certificates and profiles across your team (via match)"
       end
     end
   end

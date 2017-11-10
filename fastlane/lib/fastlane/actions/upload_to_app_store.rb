@@ -5,7 +5,7 @@ module Fastlane
 
       def self.run(config)
         UI.message "Uploading metadata and binary to iTunes Connect using deliver"
-        super.run(config)
+        super(config)
       end
 
       #####################################################

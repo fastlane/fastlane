@@ -5,7 +5,7 @@ module Fastlane
 
       def self.run(config)
         UI.message "Making sure a valid push profile is active and creating a new one if needed using pem"
-        super.run(config)
+        super(config)
       end
 
       #####################################################
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Makes sure a valid push profile is active and creates a new one if needed (via pem)"
+        "Makes sure a valid push profile is active (via pem)"
       end
     end
   end

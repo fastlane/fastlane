@@ -5,7 +5,7 @@ module Fastlane
 
       def self.run(config)
         UI.message "Running tests of your app using scan"
-        super.run(config)
+        super(config)
       end
 
       #####################################################

@@ -5,7 +5,7 @@ module Fastlane
 
       def self.run(config)
         UI.message "Taking screenshots using sceengrab"
-        super.run(config)
+        super(config)
       end
 
       #####################################################

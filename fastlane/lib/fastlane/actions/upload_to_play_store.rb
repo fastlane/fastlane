@@ -5,7 +5,7 @@ module Fastlane
 
       def self.run(config)
         UI.message "Uploading metadata, screenshots, and binaries to Google Play using supply"
-        super.run(config)
+        super(config)
       end
 
       #####################################################

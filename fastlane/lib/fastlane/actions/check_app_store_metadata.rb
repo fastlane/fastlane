@@ -5,7 +5,7 @@ module Fastlane
 
       def self.run(config)
         UI.message "Checking App Store metadata using precheck"
-        super.run(config)
+        super(config)
       end
 
       #####################################################
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Check your app using a community driven set of App Store review rules to avoid being rejected (via precheck)"
+        "Check your app's metadata to avoid being rejected (via precheck)"
       end
     end
   end
