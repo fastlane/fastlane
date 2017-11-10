@@ -19,7 +19,7 @@ module Spaceship
     end
 
     def upload_purchase_review_screenshot(app_id, upload_file, content_provider_id, sso_token_for_image)
-      upload_file(app_id: app_id, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: 'MZPFT.SortedScreenShot')
+      upload_file(app_id: app_id, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: get_picture_type(upload_file))
     end
 
     def upload_large_icon(app_version, upload_file, content_provider_id, sso_token_for_image)
@@ -40,6 +40,16 @@ module Spaceship
 
     def upload_trailer_preview(app_version, upload_file, content_provider_id, sso_token_for_image, device)
       upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: screenshot_picture_type(device, nil))
+    end
+
+    def get_picture_type(upload_file)
+      resolution = Utilities.resolution(upload_file.file_path)
+      result = device_resolution_map.find do |key, resolutions|
+        resolutions.include? resolution
+      end
+      raise "Unknown device for screen resolution #{resolution}" if result.nil?
+
+      picture_type_map[result[0]]
     end
 
     private
@@ -110,6 +120,21 @@ module Spaceship
         iphone6Plus:  "MZPFT.SortedN56MessagesScreenShot",
         iphone58:     "MZPFT.SortedD22MessagesScreenShot",
         iphone4:      "MZPFT.SortedN41MessagesScreenShot"
+      }
+    end
+
+    def device_resolution_map
+      # rubocop:enable Layout/ExtraSpacing
+      {
+        watch:        [[312, 390]],
+        ipad:         [[1024, 748], [1024, 768], [2048, 1496], [2048, 1536], [768, 1004], [768, 1024], [1536, 2008], [1536, 2048]],
+        ipadPro:      [[2048, 2732], [2732, 2048]],
+        iphone6:      [[750, 1334], [1334, 750]],
+        iphone6Plus:  [[1242, 2208], [2208, 1242]],
+        iphone4:      [[640, 1096], [640, 1136], [1136, 600], [1136, 640]],
+        iphone35:     [[640, 960], [640, 920], [960, 600], [960, 640]],
+        appleTV:      [[1920, 1080]],
+        desktop:      [[1280, 800], [1440, 900], [2560, 1600], [2880, 1800]]
       }
     end
 
