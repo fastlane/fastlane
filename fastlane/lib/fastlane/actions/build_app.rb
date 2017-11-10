@@ -2,7 +2,6 @@ module Fastlane
   module Actions
     require 'fastlane/actions/gym'
     class BuildAppAction < GymAction
-
       def self.run(config)
         UI.message "Building your app using gym"
         super(config)

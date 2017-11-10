@@ -2,7 +2,6 @@ module Fastlane
   module Actions
     require 'fastlane/actions/frameit'
     class FrameScreenshotsAction < FrameitAction
-
       def self.run(config)
         UI.message "Framing screenshots using frameit"
         super(config)

@@ -2,7 +2,6 @@ module Fastlane
   module Actions
     require 'fastlane/actions/match'
     class SynchronizeProvisioningAction < MatchAction
-
       def self.run(config)
         UI.message "Syncronizing certificates and profiles using match"
         super(config)

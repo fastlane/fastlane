@@ -2,7 +2,6 @@ module Fastlane
   module Actions
     require 'fastlane/actions/precheck'
     class CheckAppStoreMetadataAction < PrecheckAction
-
       def self.run(config)
         UI.message "Checking App Store metadata using precheck"
         super(config)

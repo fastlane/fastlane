@@ -2,7 +2,6 @@ module Fastlane
   module Actions
     require 'fastlane/actions/screengrab'
     class CreateAndroidScreenshotsAction < ScreengrabAction
-
       def self.run(config)
         UI.message "Taking screenshots using sceengrab"
         super(config)

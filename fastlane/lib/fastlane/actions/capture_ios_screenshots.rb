@@ -2,7 +2,6 @@ module Fastlane
   module Actions
     require 'fastlane/actions/snapshot'
     class CaptureIOSScreenshotsAction < SnapshotAction
-
       def self.run(config)
         UI.message "Taking screenshots using snapshot"
         super(config)

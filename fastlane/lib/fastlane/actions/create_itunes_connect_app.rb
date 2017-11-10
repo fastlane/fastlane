@@ -2,7 +2,6 @@ module Fastlane
   module Actions
     require 'fastlane/actions/produce'
     class CreateItunesConnectAppAction < ProduceAction
-
       def self.run(config)
         UI.message "Creating a new app using produce"
         super(config)
