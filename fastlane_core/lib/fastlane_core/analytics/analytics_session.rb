@@ -56,6 +56,13 @@ module FastlaneCore
 
       @events << builder.launched_event(
         primary_target_hash: {
+          name: 'configuration_language',
+          detail: launch_context.configuration_language
+        }
+      )
+
+      @events << builder.launched_event(
+        primary_target_hash: {
           name: 'install_method',
           detail: install_method
         }

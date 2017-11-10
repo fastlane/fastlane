@@ -212,7 +212,7 @@ module Fastlane
       end
     end
 
-    def execute_action(method_sym, class_ref, arguments, custom_dir: nil, from_action: false)
+    def execute_action(method_sym, class_ref, arguments, custom_dir: nil, from_action: false, configuration_language: nil)
       if custom_dir.nil?
         custom_dir ||= "." if Helper.test?
         custom_dir ||= ".."
@@ -221,7 +221,7 @@ module Fastlane
       verify_supported_os(method_sym, class_ref)
 
       begin
-        launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(method_sym.to_s, args: ARGV)
+        launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(method_sym.to_s, configuration_language: configuration_language, args: ARGV)
         FastlaneCore.session.action_launched(launch_context: launch_context)
 
         Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder

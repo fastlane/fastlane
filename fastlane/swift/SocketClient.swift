@@ -250,7 +250,7 @@ extension SocketClient: StreamDelegate {
     }
     
     func processResponse(string: String) {
-        guard string.characters.count > 0 else {
+        guard string.count > 0 else {
             self.handleFailure(message: ["empty response from ruby process"])
             return
         }

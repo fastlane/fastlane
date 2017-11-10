@@ -396,7 +396,7 @@ module Fastlane
     end
 
     def action_launched(action_name)
-      action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name, args: ARGV)
+      action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name, configuration_language: "ruby", args: ARGV)
       FastlaneCore.session.action_launched(launch_context: action_launch_context)
     end
 

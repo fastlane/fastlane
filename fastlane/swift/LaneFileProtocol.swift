@@ -54,7 +54,7 @@ public class LaneFile: NSObject, LaneFileProtocol {
             }
             
             laneToMethodName[lowercasedName] = name
-            let lowercasedNameNoLane = String(lowercasedName.characters.prefix(lowercasedName.characters.count - 4))
+            let lowercasedNameNoLane = String(lowercasedName.prefix(lowercasedName.count - 4))
             laneToMethodName[lowercasedNameNoLane] = name
         }
         return laneToMethodName
