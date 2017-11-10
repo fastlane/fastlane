@@ -15,6 +15,8 @@ module Fastlane
       # Setting this environment variable causes xcodeproj to work around the problem
       ENV["FORK_XCODE_WRITING"] = "true"
 
+      FastlaneCore.session.is_fastfile = true
+
       load_dot_env(env)
 
       started = Time.now
