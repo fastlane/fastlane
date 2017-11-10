@@ -1,10 +1,10 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/deliver'
-    class AppstoreAction < DeliverAction
+    require 'fastlane/actions/precheck'
+    class CheckAppStoreMetadataAction < PrecheckAction
 
       def self.run(config)
-        UI.message "Uploading to the App Store using deliver"
+        UI.message "Checking App Store metadata using precheck"
         super.run(config)
       end
 
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the deliver action"
+        "Check your app using a community driven set of App Store review rules to avoid being rejected (via precheck)"
       end
     end
   end

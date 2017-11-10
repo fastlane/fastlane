@@ -1,10 +1,10 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/deliver'
-    class AppstoreAction < DeliverAction
+    require 'fastlane/actions/produce'
+    class CreateItunesConnectAppAction < ProduceAction
 
       def self.run(config)
-        UI.message "Uploading to the App Store using deliver"
+        UI.message "Creating a new app using produce"
         super.run(config)
       end
 
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the deliver action"
+        "Creates a new app on iTunes Connect and the Apple Developer Portal (via produce)"
       end
     end
   end

@@ -1,10 +1,10 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/deliver'
-    class AppstoreAction < DeliverAction
+    require 'fastlane/actions/scan'
+    class RunTestsAction < ScanAction
 
       def self.run(config)
-        UI.message "Uploading to the App Store using deliver"
+        UI.message "Running tests of your app using scan"
         super.run(config)
       end
 
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the deliver action"
+        "Run tests of your iOS and Mac app (via scan)"
       end
     end
   end

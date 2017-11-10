@@ -1,10 +1,10 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/deliver'
-    class AppstoreAction < DeliverAction
+    require 'fastlane/actions/snapshot'
+    class CaptureIOSScreenshotsAction < SnapshotAction
 
       def self.run(config)
-        UI.message "Uploading to the App Store using deliver"
+        UI.message "Taking screenshots using snapshot"
         super.run(config)
       end
 
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the deliver action"
+        "Take new screenshots (via snapshot), based on the Snapfile"
       end
     end
   end

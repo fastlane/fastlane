@@ -1,10 +1,10 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/deliver'
-    class AppstoreAction < DeliverAction
+    require 'fastlane/actions/supply'
+    class UploadToPlayStoreAction < SupplyAction
 
       def self.run(config)
-        UI.message "Uploading to the App Store using deliver"
+        UI.message "Uploading metadata, screenshots, and binaries to Google Play using supply"
         super.run(config)
       end
 
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the deliver action"
+        "Upload metadata, screenshots, and binaries to Google Play (via supply)"
       end
     end
   end

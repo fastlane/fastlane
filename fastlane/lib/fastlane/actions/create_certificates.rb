@@ -1,10 +1,10 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/deliver'
-    class AppstoreAction < DeliverAction
+    require 'fastlane/actions/cert'
+    class CreateCertificatesAction < CertAction
 
       def self.run(config)
-        UI.message "Uploading to the App Store using deliver"
+        UI.message "Creating signing certificates using cert"
         super.run(config)
       end
 
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the deliver action"
+        "Create new iOS code signing certificates (via cert)"
       end
     end
   end

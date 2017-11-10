@@ -1,10 +1,10 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/deliver'
-    class AppstoreAction < DeliverAction
+    require 'fastlane/actions/sigh'
+    class GenerateProvisioningProfileAction < SighAction
 
       def self.run(config)
-        UI.message "Uploading to the App Store using deliver"
+        UI.message "Generating a provisining profile via sigh"
         super.run(config)
       end
 
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the deliver action"
+        "Generates a provisioning profile; stores the profile in the current folder (via sigh)"
       end
     end
   end

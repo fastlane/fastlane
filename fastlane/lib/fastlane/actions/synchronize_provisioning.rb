@@ -1,10 +1,10 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/deliver'
-    class AppstoreAction < DeliverAction
+    require 'fastlane/actions/match'
+    class SynchronizeProvisioningAction < MatchAction
 
       def self.run(config)
-        UI.message "Uploading to the App Store using deliver"
+        UI.message "Syncronizing certificates and profiles using match"
         super.run(config)
       end
 
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the deliver action"
+        "Easily sync your certificates and profiles across your team using git (via match)"
       end
     end
   end

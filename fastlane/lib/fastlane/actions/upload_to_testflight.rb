@@ -1,10 +1,10 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/deliver'
-    class AppstoreAction < DeliverAction
+    require 'fastlane/actions/pilot'
+    class UploadToTestflightAction < PilotAction
 
       def self.run(config)
-        UI.message "Uploading to the App Store using deliver"
+        UI.message "Uploading a binary to TestFlight using pilot"
         super.run(config)
       end
 
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the deliver action"
+        "Uploads a new binary to Apple TestFlight (via pilot)"
       end
     end
   end

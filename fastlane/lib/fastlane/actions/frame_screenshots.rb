@@ -1,10 +1,10 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/deliver'
-    class AppstoreAction < DeliverAction
+    require 'fastlane/actions/frameit'
+    class FrameScreenshotsAction < FrameitAction
 
       def self.run(config)
-        UI.message "Uploading to the App Store using deliver"
+        UI.message "Framing screenshots using frameit"
         super.run(config)
       end
 
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the deliver action"
+        "Adds a black frame around all screenshots (via frameit)"
       end
     end
   end

@@ -1,10 +1,10 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/deliver'
-    class AppstoreAction < DeliverAction
+    require 'fastlane/actions/gym'
+    class BuildAppAction < GymAction
 
       def self.run(config)
-        UI.message "Uploading to the App Store using deliver"
+        UI.message "Building your app using gym"
         super.run(config)
       end
 
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the deliver action"
+        "Build your iOS/macOS app (via gym)"
       end
     end
   end

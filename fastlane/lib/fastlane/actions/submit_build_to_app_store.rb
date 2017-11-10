@@ -1,10 +1,10 @@
 module Fastlane
   module Actions
     require 'fastlane/actions/deliver'
-    class AppstoreAction < DeliverAction
+    class SubmitBuildToAppStoreAction < DeliverAction
 
       def self.run(config)
-        UI.message "Uploading to the App Store using deliver"
+        UI.message "Uploading metadata and binary to iTunes Connect using deliver"
         super.run(config)
       end
 
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the deliver action"
+        "Upload metadata and binary to iTunes Connect (via deliver)"
       end
     end
   end
