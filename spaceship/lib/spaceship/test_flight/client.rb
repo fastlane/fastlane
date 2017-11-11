@@ -90,6 +90,20 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
+    def add_group_to_app(app_id: nil, group_name: nil)
+      assert_required_params(__method__, binding)
+
+      body = {
+        'name' => group_name
+      }
+      response = request(:post) do |req|
+        req.url "providers/#{team_id}/apps/#{app_id}/groups"
+        req.body = body.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+      handle_response(response)
+    end
+
     def add_group_to_build(app_id: nil, group_id: nil, build_id: nil)
       assert_required_params(__method__, binding)
 

@@ -154,6 +154,18 @@ module Pilot
         end
       end
 
+      command :group do |c|
+        c.syntax = "fastlane pilot group"
+        c.description = "Create external testers groups"
+
+        FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
+
+        c.action do |args, options|
+          config = create_config(options)
+          Pilot::GroupManager.new.create_group(config)
+        end
+      end
+
       default_command :help
 
       run!
