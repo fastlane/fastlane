@@ -4,7 +4,8 @@ module Precheck
   class XcodeEnv
     class << self
       def run_as_build_phase?
-        return true if ENV["PROJECT_FILE_PATH"].to_s.length > 0 && ENV["INFOPLIST_PATH"].to_s.length > 0
+        return true if ENV["PROJECT_FILE_PATH"].to_s.length > 0 && ENV["INFOPLIST_FILE"].to_s.length > 0
+        false
       end
 
       def project_path
@@ -15,8 +16,8 @@ module Precheck
         ENV["PROJECT_NAME"]
       end
 
-      def info_plist
-        ENV["INFOPLIST_PATH"]
+      def info_plist_path
+        ENV["INFOPLIST_FILE"]
       end
     end
   end

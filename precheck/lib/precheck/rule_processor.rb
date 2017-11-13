@@ -40,8 +40,12 @@ module Precheck
   class RuleProcessor
     def self.process_app_and_version(app: nil, app_version: nil, rules: nil)
       items_to_check = []
-      items_to_check += generate_text_items_to_check(app: app, app_version: app_version)
-      items_to_check += generate_url_items_to_check(app: app, app_version: app_version)
+      if app
+        items_to_check += generate_text_items_to_check(app: app, app_version: app_version)
+        items_to_check += generate_url_items_to_check(app: app, app_version: app_version)
+      else
+        items_to_check = [TextItemToCheck.new("Xcode Project", :xcode_project, "XcodeProject")]
+      end
 
       return process_rules(items_to_check: items_to_check, rules: rules)
     end

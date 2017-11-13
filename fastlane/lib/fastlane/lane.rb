@@ -76,6 +76,7 @@ module Fastlane
           help
           env
           update_fastlane
+          verify_firebase
         )
       end
 

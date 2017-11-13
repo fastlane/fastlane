@@ -16,7 +16,7 @@ module Precheck
                                          hide_keys: [:output_path],
                                              title: "Summary for precheck #{Fastlane::VERSION}")
 
-      unless Spaceship::Tunes.client
+      if Spaceship::Tunes.client.nil? && !XcodeEnv.run_as_build_phase?
         UI.message "Starting login with user '#{Precheck.config[:username]}'"
         Spaceship::Tunes.login(Precheck.config[:username])
         Spaceship::Tunes.select_team
@@ -26,7 +26,9 @@ module Precheck
 
       UI.message "Checking app for precheck rule violations"
 
-      ensure_app_exists!
+      unless XcodeEnv.run_as_build_phase?
+        ensure_app_exists!
+      end
 
       processor_result = check_for_rule_violations(app: app, app_version: latest_app_version)
 
@@ -158,10 +160,12 @@ module Precheck
     end
 
     def app
+      return nil if XcodeEnv.run_as_build_phase?
       Spaceship::Tunes::Application.find(Precheck.config[:app_identifier])
     end
 
     def latest_app_version
+      return nil if XcodeEnv.run_as_build_phase?
       @latest_version ||= app.latest_version
     end
 
