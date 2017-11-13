@@ -36,6 +36,7 @@ module Fastlane
         flags = []
         flags << "-p #{project_dir.shellescape}"
         flags << params[:properties].map { |k, v| "-P#{k.to_s.shellescape}=#{v.to_s.shellescape}" }.join(' ') unless params[:properties].nil?
+        flags << params[:system_properties].map { |k, v| "-D#{k.to_s.shellescape}=#{v.to_s.shellescape}" }.join(' ') unless params[:system_properties].nil?
         flags << params[:flags] unless params[:flags].nil?
 
         # Run the actual gradle task
@@ -123,6 +124,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :properties,
                                        env_name: 'FL_GRADLE_PROPERTIES',
                                        description: 'Gradle properties to be exposed to the gradle script',
+                                       optional: true,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :system_properties,
+                                       env_name: 'FL_GRADLE_SYSTEM_PROPERTIES',
+                                       description: 'Gradle system properties to be exposed to the gradle script',
                                        optional: true,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :serial,
