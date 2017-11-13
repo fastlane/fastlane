@@ -133,6 +133,12 @@ module Spaceship
         Tunes::IAPStatus.get_from_string(raw_data["versions"].first["status"])
       end
 
+      # @return (Hash) Hash containing existing review screenshot data
+      def review_screenshot
+        return nil unless raw_data && raw_data["versions"] && raw_data["versions"].first && raw_data["versions"].first["reviewScreenshot"] && raw_data['versions'].first["reviewScreenshot"]["value"]
+        raw_data['versions'].first['reviewScreenshot']['value']
+      end
+
       # Saves the current In-App-Purchase
       def save!
         # Transform localization versions back to original format.
