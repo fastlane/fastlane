@@ -17,6 +17,13 @@ module FastlaneCore
       return nil
     end
 
+    # Fetches the app build number from the given ipa file.
+    def self.fetch_app_build(path)
+      plist = self.fetch_info_plist_file(path)
+      return plist['CFBundleVersion'] if plist
+      return nil
+    end
+
     # Fetches the app platform from the given ipa file.
     def self.fetch_app_platform(path)
       plist = self.fetch_info_plist_file(path)
