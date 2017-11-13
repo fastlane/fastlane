@@ -115,6 +115,7 @@ module Fastlane
         c.description = 'Helps you with your initial fastlane setup'
 
         c.option('-u STRING', '--user STRING', String, 'iOS projects only: Your Apple ID')
+        c.option('--swift', 'Generates fastlane configuration files in Swift instead of Ruby')
 
         # CrashlyticsBetaCommandLineHandler.apply_options(c)
 
@@ -123,7 +124,7 @@ module Fastlane
           #   beta_info = CrashlyticsBetaCommandLineHandler.info_from_options(options)
           #   Fastlane::CrashlyticsBeta.new(beta_info, Fastlane::CrashlyticsBetaUi.new).run
           # else
-          is_swift_fastfile = args.include?("swift")
+          is_swift_fastfile = options.swift || false
           Fastlane::Setup.start(user: options.user, is_swift_fastfile: is_swift_fastfile)
           # end
         end

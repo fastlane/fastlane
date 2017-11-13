@@ -67,5 +67,12 @@ module FastlaneCore
       FileUtils.mkdir_p(path)
       UI.success("Created new folder '#{path}'.")
     end
+
+    def self.append_old!
+      return unless File.directory?(path)
+      # for Ruby-to-Swift migrations
+      FileUtils.move(path, 'fastlane.old')
+      FileUtils.chdir('..') if self.setup?
+    end
   end
 end

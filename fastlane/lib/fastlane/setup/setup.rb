@@ -35,15 +35,7 @@ module Fastlane
     # rubocop:disable Metrics/BlockNesting
     def self.start(user: nil, is_swift_fastfile: false)
       if FastlaneCore::FastlaneFolder.setup? and !Helper.test?
-        require 'fastlane/lane_list'
-        Fastlane::LaneList.output(FastlaneCore::FastlaneFolder.fastfile_path)
-        UI.important("------------------")
-        UI.important("fastlane is already set up at path `#{FastlaneCore::FastlaneFolder.path}`, see the available lanes above")
-        UI.message("")
-
-        setup_ios = self.new
-        setup_ios.add_or_update_gemfile(update_gemfile_if_needed: false)
-        setup_ios.suggest_next_steps
+        self.already_set_up(user: user, is_swift_fastfile: is_swift_fastfile)
         return
       end
 
@@ -122,6 +114,33 @@ module Fastlane
       end
     end
     # rubocop:enable Metrics/BlockNesting
+
+    def self.already_set_up(user: nil, is_swift_fastfile: false)
+      if is_swift_fastfile && !FastlaneCore::FastlaneFolder.swift?
+        UI.important("fastlane is already configured using Ruby.")
+        UI.message("If you want to switch to Swift, I can reinitialize your fastlane project:")
+        UI.message(" 1️⃣  The fastlane directory (at #{FastlaneCore::FastlaneFolder.path}) would be renamed `fastlane.old`")
+        UI.message(" 2️⃣  I would run the fastlane Swift initialization")
+        UI.message(" 3️⃣  You'd need to port your customizations from Ruby to Swift by hand.")
+        if UI.confirm("Should I rename your folder \"fastlane.old\" and initialize a new Swift fastlane project?")
+          FastlaneCore::FastlaneFolder.append_old!
+          self.start(user: user, is_swift_fastfile: is_swift_fastfile)
+        else
+          UI.important("OK, I didn't change anything.")
+        end
+        return
+      end
+
+      require 'fastlane/lane_list'
+      Fastlane::LaneList.output(FastlaneCore::FastlaneFolder.fastfile_path)
+      UI.important("------------------")
+      UI.important("fastlane is already set up at path `#{FastlaneCore::FastlaneFolder.path}`, see the available lanes above")
+      UI.message("")
+
+      setup_ios = self.new
+      setup_ios.add_or_update_gemfile(update_gemfile_if_needed: false)
+      setup_ios.suggest_next_steps
+    end
 
     def initialize(is_swift_fastfile: nil, user: nil, project_path: nil, had_multiple_projects_to_choose_from: nil, preferred_setup_method: nil)
       self.is_swift_fastfile = is_swift_fastfile
