@@ -639,7 +639,7 @@ module Spaceship
       calling_method_name = caller_locations(caller_location, 2).first.label.sub("block in", "").delete("!").strip
 
       # calling the computed property self.team_id can get us into an exception handling loop
-      unless @current_team_id.nil? 
+      unless @current_team_id.nil?
         team_id = "(Team ID #{@current_team_id}) "
       end
       team_id ||= ""
