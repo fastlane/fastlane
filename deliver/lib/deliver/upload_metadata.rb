@@ -115,6 +115,7 @@ module Deliver
       end
 
       v.release_on_approval = options[:automatic_release]
+      v.auto_release_date = options[:auto_release_date] unless options[:auto_release_date].nil?
       v.toggle_phased_release(enabled: !!options[:phased_release]) unless options[:phased_release].nil?
 
       set_trade_representative_contact_information(v, options)

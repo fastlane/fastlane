@@ -51,6 +51,18 @@ describe Snapshot do
         result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
         expect(result).to be(false)
       end
+
+      it "returns true with custom named iOS devices" do
+        devices = ["11.0 - iPhone X", "11.0 - iPad Air 2"]
+        result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
+        expect(result).to be(true)
+      end
+
+      it "returns true with custom named Apple TV devices" do
+        devices = ["11.0 - Apple TV 1080p", "11.0 - Apple TV 4K", "11.0 - Apple TV 4K (at 1080p)"]
+        result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
+        expect(result).to be(true)
+      end
     end
 
     describe '#find_device' do
