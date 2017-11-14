@@ -639,7 +639,10 @@ module Spaceship
       calling_method_name = caller_locations(caller_location, 2).first.label.sub("block in", "").delete("!").strip
 
       # calling the computed property self.team_id can get us into an exception handling loop
-      team_id = @current_team_id || ""
+      unless @current_team_id.nil? 
+        team_id = "(Team ID #{@current_team_id}) "
+      end
+      team_id ||= ""
 
       error_message = "User #{self.user} #{team_id}doesn't have enough permission for the following action: #{calling_method_name}"
       error_message += " (#{additional_error_string})" if additional_error_string.to_s.length > 0
