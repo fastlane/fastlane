@@ -44,7 +44,7 @@ module Precheck
         items_to_check += generate_text_items_to_check(app: app, app_version: app_version)
         items_to_check += generate_url_items_to_check(app: app, app_version: app_version)
       else
-        items_to_check = [TextItemToCheck.new("Xcode Project", :xcode_project, "XcodeProject")]
+        items_to_check = [XcodeProjectItemToCheck.new(XcodeEnv.project_path, :xcode_project, "XcodeProject")]
       end
 
       return process_rules(items_to_check: items_to_check, rules: rules)

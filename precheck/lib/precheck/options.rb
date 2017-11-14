@@ -7,7 +7,10 @@ module Precheck
     def self.rules
       if Precheck::XcodeEnv.run_as_build_phase?
         # These are the Build phase / Firebase specific rules
-        return [VerifyPlistRule].map(&:new)
+        return [
+            VerifyPlistRule,
+            VerifyProjectRule
+        ].map(&:new)
       else
         # These are the default rules for app metadata & screenshots
         return [

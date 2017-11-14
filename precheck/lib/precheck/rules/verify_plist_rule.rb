@@ -34,7 +34,7 @@ module Precheck
         content = Plist.parse_xml(plist_path)
         puts "Plist content: #{content}"
         if content.count == 0
-          RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Info.plist damanged")
+          RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Info.plist damaged")
         end
 
         # TODO: insert actual checks here

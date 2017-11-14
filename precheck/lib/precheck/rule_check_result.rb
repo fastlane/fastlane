@@ -15,5 +15,9 @@ module Precheck
     def status
       rule_return.validation_state
     end
+
+    def failure_data
+      rule_return.failure_data
+    end
   end
 end

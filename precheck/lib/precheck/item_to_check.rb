@@ -41,6 +41,19 @@ module Precheck
     end
   end
 
+  class XcodeProjectItemToCheck < ItemToCheck
+    attr_accessor :project_path
+
+    def initialize(project_path, item_name, friendly_name, is_optional = false)
+      @project_path = project_path
+      super(item_name, friendly_name, is_optional)
+    end
+
+    def item_data
+      return project_path
+    end
+  end
+
   # if the data point we want to check is a URL field (like 'marketing_url'), we'll use this object to encapsulate it
   # this includes the url, the property name, and what that name maps to in plain english so that we can print out nice, friendly messages.
   class URLItemToCheck < ItemToCheck
