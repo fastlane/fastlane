@@ -662,9 +662,21 @@ module Spaceship
     # Uploads an In-App-Purchase Review screenshot
     # @param app_id (AppId): The id of the app
     # @param upload_image (UploadFile): The icon to upload
-    # @return [JSON] the response
+    # @return [JSON] the screenshot data, ready to be added to an In-App-Purchase
     def upload_purchase_review_screenshot(app_id, upload_image)
-      du_client.upload_purchase_review_screenshot(app_id, upload_image, content_provider_id, sso_token_for_image)
+      data = du_client.upload_purchase_review_screenshot(app_id, upload_image, content_provider_id, sso_token_for_image)
+      {
+          "value" => {
+              "assetToken" => data["token"],
+              "sortOrder" => 0,
+              "type" => du_client.get_picture_type(upload_image),
+              "originalFileName" => upload_image.file_name,
+              "size" => data["length"],
+              "height" => data["height"],
+              "width" => data["width"],
+              "checksum" => data["md5"]
+          }
+      }
     end
 
     # Uploads a screenshot
@@ -1148,20 +1160,7 @@ module Spaceship
         # Upload Screenshot:
         upload_file = UploadFile.from_path review_screenshot
         screenshot_data = upload_purchase_review_screenshot(app_id, upload_file)
-        new_screenshot = {
-          "value" => {
-            "assetToken" => screenshot_data["token"],
-            "sortOrder" => 0,
-            "type" => "SortedScreenShot",
-            "originalFileName" => upload_file.file_name,
-            "size" => screenshot_data["length"],
-            "height" => screenshot_data["height"],
-            "width" => screenshot_data["width"],
-            "checksum" => screenshot_data["md5"]
-          }
-        }
-
-        data["versions"][0]["reviewScreenshot"] = new_screenshot
+        data["versions"][0]["reviewScreenshot"] = screenshot_data
       end
 
       # Now send back the modified hash

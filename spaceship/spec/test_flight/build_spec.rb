@@ -217,6 +217,15 @@ describe Spaceship::TestFlight::Build do
         end
         expect(build).to be_processed
       end
+
+      it 'is processed on review rejected' do
+        mock_client_response(:get_build) do
+          {
+            'externalState' => 'testflight.build.state.review.rejected'
+          }
+        end
+        expect(build).to be_processed
+      end
     end
 
     context '#upload_date' do

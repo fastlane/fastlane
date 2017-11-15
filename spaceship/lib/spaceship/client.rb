@@ -642,14 +642,10 @@ module Spaceship
       # The ! is part of some methods when they modify or delete a resource, so we don't want to show it
       # Using `sub` instead of `delete` as we don't want to allow multiple matches
       calling_method_name = caller_locations(caller_location, 2).first.label.sub("block in", "").delete("!").strip
-      begin
-        team_id = "(Team ID #{self.team_id}) "
-      rescue
-        # Showing the team ID is something that's nice to have, however it might cause an exception
-        # when the user doesn't have any permission at all (e.g. failing at login)
-        # we still want the error message to show the actual string, but without the team_id in that case
-        team_id = ""
-      end
+
+      # calling the computed property self.team_id can get us into an exception handling loop
+      team_id = @current_team_id ? "(Team ID #{@current_team_id}) " : ""
+
       error_message = "User #{self.user} #{team_id}doesn't have enough permission for the following action: #{calling_method_name}"
       error_message += " (#{additional_error_string})" if additional_error_string.to_s.length > 0
       raise InsufficientPermissions, error_message

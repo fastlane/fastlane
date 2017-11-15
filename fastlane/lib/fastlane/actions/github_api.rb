@@ -97,7 +97,7 @@ module Fastlane
                                          default_value: "GET",
                                          optional: true,
                                          verify_block: proc do |value|
-                                           unless %w(GET POST PUT DELETE HEAD CONNECT).include?(value.to_s.upcase)
+                                           unless %w(GET POST PUT DELETE HEAD CONNECT PATCH).include?(value.to_s.upcase)
                                              UI.user_error!("Unrecognised HTTP method")
                                            end
                                          end),
