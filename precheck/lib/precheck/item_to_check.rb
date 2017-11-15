@@ -43,14 +43,18 @@ module Precheck
 
   class XcodeProjectItemToCheck < ItemToCheck
     attr_accessor :project_path
+    attr_accessor :target_name
+    attr_accessor :configuration
 
-    def initialize(project_path, item_name, friendly_name, is_optional = false)
+    def initialize(project_path, target_name, configuration, item_name, friendly_name, is_optional = false)
       @project_path = project_path
+      @target_name = target_name
+      @configuration = configuration
       super(item_name, friendly_name, is_optional)
     end
 
     def item_data
-      return project_path
+      return self
     end
   end
 
