@@ -2,7 +2,7 @@ require 'precheck/rule'
 require 'xcodeproj'
 
 module Precheck
-  class VerifyProjectRule < URLRule
+  class VerifyFirebaseProjectRule < URLRule
     def self.key
       :verify_project
     end
@@ -28,10 +28,10 @@ module Precheck
     end
 
     def rule_block
-      return lambda { |item|
-        puts "Project path: #{item.project_path}"
+      return lambda { |xcode_project_item|
+        puts "Project path: #{xcode_project_item.project_path}"
 
-        project = Xcodeproj::Project.open(item.project_path)
+        project = xcode_project_item.get_project()
 
         google_service_plist_entry = project.files.select{|x| x.path == 'GoogleService-Info.plist'}[0]
         if google_service_plist_entry.nil?
@@ -40,12 +40,12 @@ module Precheck
 
         google_service_plist = Xcodeproj::Plist.read_from_path(GetFullPath(project, google_service_plist_entry.path))
 
-        target = project.native_targets.detect { |target| target.name == item.target_name }
+        target = xcode_project_item.get_target()
         if target.nil?
           return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to locate a target for #{item.target_name}.")
         end
 
-        build_configuration = target.build_configurations.detect { |configuration | configuration .name = item.configuration }
+        build_configuration = xcode_project_item.get_configuration()
         if build_configuration.nil?
           return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to locate a build configuration #{configuration} for target #{target_name}.")
         end
@@ -55,14 +55,10 @@ module Precheck
           return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to find an INFOPLIST_FILE in a build configuration #{configuration} for target #{target_name}.")
         end
 
-        plist = Xcodeproj::Plist.read_from_path(GetFullPath(project, infoplist_file))
         product_bundle_identifier = build_configuration.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
-
         if product_bundle_identifier != google_service_plist['BUNDLE_ID']
           return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "The project bundle id #{product_bundle_identifier} does not match the GoogleService-Info.plist bundle id #{google_service_plist['BUNDLE_ID']}.")
         end
-
-        # puts 'REVERSED_CLIENT_ID: ' + google_service_plist['REVERSED_CLIENT_ID']
 
         return RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
       }

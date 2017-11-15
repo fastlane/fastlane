@@ -2,8 +2,8 @@ require 'precheck'
 
 module Precheck
   describe Precheck do
-    describe Precheck::VerifyProjectRule do
-      let(:rule) { VerifyProjectRule.new }
+    describe Precheck::VerifyFirebaseProjectRule do
+      let(:rule) { VerifyFirebaseProjectRule.new }
       let(:minimal_xcode_project) {XcodeProjectItemToCheck.new("./spec/fixtures/MinimalApp/MinimalApp.xcodeproj", "MinimalApp", "Release", :xcode_project, "XcodeProject")}
       let(:mismatched_xcode_project) {XcodeProjectItemToCheck.new("./spec/fixtures/MismatchedApp/MismatchedApp.xcodeproj", "MismatchedApp", "Release", :xcode_project, "XcodeProject")}
       let(:good_xcode_project) {XcodeProjectItemToCheck.new("./spec/fixtures/GoodApp/GoodApp.xcodeproj", "GoodApp", "Release", :xcode_project, "XcodeProject")}

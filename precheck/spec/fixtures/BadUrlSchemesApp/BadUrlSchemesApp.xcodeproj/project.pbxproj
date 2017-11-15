@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		66746A3BC758262D40A93DEA /* libPods-GoodApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5271355C847480244504A863 /* libPods-GoodApp.a */; };
+		66746A3BC758262D40A93DEA /* libPods-BadUrlSchemesApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5271355C847480244504A863 /* libPods-BadUrlSchemesApp.a */; };
 		E905B00F1FBBA9ED0061E0AE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E905B00E1FBBA9ED0061E0AE /* AppDelegate.m */; };
 		E905B0171FBBA9ED0061E0AE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E905B0161FBBA9ED0061E0AE /* Assets.xcassets */; };
 		E905B01D1FBBA9ED0061E0AE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E905B01C1FBBA9ED0061E0AE /* main.m */; };
@@ -16,10 +16,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		16711F0C1E565E7A6A1FE70B /* Pods-GoodApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GoodApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-GoodApp/Pods-GoodApp.debug.xcconfig"; sourceTree = "<group>"; };
-		5271355C847480244504A863 /* libPods-GoodApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-GoodApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		682634CD4CC5D839762F9739 /* Pods-GoodApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GoodApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-GoodApp/Pods-GoodApp.release.xcconfig"; sourceTree = "<group>"; };
-		E905B00A1FBBA9ED0061E0AE /* GoodApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GoodApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		16711F0C1E565E7A6A1FE70B /* Pods-BadUrlSchemesApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BadUrlSchemesApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BadUrlSchemesApp/Pods-BadUrlSchemesApp.debug.xcconfig"; sourceTree = "<group>"; };
+		5271355C847480244504A863 /* libPods-BadUrlSchemesApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BadUrlSchemesApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		682634CD4CC5D839762F9739 /* Pods-BadUrlSchemesApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BadUrlSchemesApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-BadUrlSchemesApp/Pods-BadUrlSchemesApp.release.xcconfig"; sourceTree = "<group>"; };
+		E905B00A1FBBA9ED0061E0AE /* BadUrlSchemesApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BadUrlSchemesApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E905B00D1FBBA9ED0061E0AE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E905B00E1FBBA9ED0061E0AE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		E905B0161FBBA9ED0061E0AE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -34,7 +34,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				66746A3BC758262D40A93DEA /* libPods-GoodApp.a in Frameworks */,
+				66746A3BC758262D40A93DEA /* libPods-BadUrlSchemesApp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,8 +44,8 @@
 		3C986DBC972488AE2825987C /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				16711F0C1E565E7A6A1FE70B /* Pods-GoodApp.debug.xcconfig */,
-				682634CD4CC5D839762F9739 /* Pods-GoodApp.release.xcconfig */,
+				16711F0C1E565E7A6A1FE70B /* Pods-BadUrlSchemesApp.debug.xcconfig */,
+				682634CD4CC5D839762F9739 /* Pods-BadUrlSchemesApp.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -53,7 +53,7 @@
 		A3EA8648702616C303047A0A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				5271355C847480244504A863 /* libPods-GoodApp.a */,
+				5271355C847480244504A863 /* libPods-BadUrlSchemesApp.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -63,7 +63,7 @@
 			children = (
 				E905B0251FBBC66A0061E0AE /* GoogleService-Info.plist */,
 				E905B0231FBBAA990061E0AE /* Default-568h@2x.png */,
-				E905B00C1FBBA9ED0061E0AE /* GoodApp */,
+				E905B00C1FBBA9ED0061E0AE /* BadUrlSchemesApp */,
 				E905B00B1FBBA9ED0061E0AE /* Products */,
 				3C986DBC972488AE2825987C /* Pods */,
 				A3EA8648702616C303047A0A /* Frameworks */,
@@ -73,12 +73,12 @@
 		E905B00B1FBBA9ED0061E0AE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E905B00A1FBBA9ED0061E0AE /* GoodApp.app */,
+				E905B00A1FBBA9ED0061E0AE /* BadUrlSchemesApp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		E905B00C1FBBA9ED0061E0AE /* GoodApp */ = {
+		E905B00C1FBBA9ED0061E0AE /* BadUrlSchemesApp */ = {
 			isa = PBXGroup;
 			children = (
 				E905B00D1FBBA9ED0061E0AE /* AppDelegate.h */,
@@ -87,15 +87,15 @@
 				E905B01B1FBBA9ED0061E0AE /* Info.plist */,
 				E905B01C1FBBA9ED0061E0AE /* main.m */,
 			);
-			path = GoodApp;
+			path = BadUrlSchemesApp;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E905B0091FBBA9ED0061E0AE /* GoodApp */ = {
+		E905B0091FBBA9ED0061E0AE /* BadUrlSchemesApp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E905B0201FBBA9ED0061E0AE /* Build configuration list for PBXNativeTarget "GoodApp" */;
+			buildConfigurationList = E905B0201FBBA9ED0061E0AE /* Build configuration list for PBXNativeTarget "BadUrlSchemesApp" */;
 			buildPhases = (
 				FD5E5EC6A60C5AB7899F525F /* [CP] Check Pods Manifest.lock */,
 				E905B0061FBBA9ED0061E0AE /* Sources */,
@@ -108,9 +108,9 @@
 			);
 			dependencies = (
 			);
-			name = GoodApp;
-			productName = GoodApp;
-			productReference = E905B00A1FBBA9ED0061E0AE /* GoodApp.app */;
+			name = BadUrlSchemesApp;
+			productName = BadUrlSchemesApp;
+			productReference = E905B00A1FBBA9ED0061E0AE /* BadUrlSchemesApp.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -128,7 +128,7 @@
 					};
 				};
 			};
-			buildConfigurationList = E905B0051FBBA9ED0061E0AE /* Build configuration list for PBXProject "GoodApp" */;
+			buildConfigurationList = E905B0051FBBA9ED0061E0AE /* Build configuration list for PBXProject "BadUrlSchemesApp" */;
 			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -141,7 +141,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E905B0091FBBA9ED0061E0AE /* GoodApp */,
+				E905B0091FBBA9ED0061E0AE /* BadUrlSchemesApp */,
 			);
 		};
 /* End PBXProject section */
@@ -172,7 +172,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-GoodApp/Pods-GoodApp-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BadUrlSchemesApp/Pods-BadUrlSchemesApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F9310200CB0EF673F05664A7 /* [CP] Copy Pods Resources */ = {
@@ -187,7 +187,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-GoodApp/Pods-GoodApp-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BadUrlSchemesApp/Pods-BadUrlSchemesApp-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD5E5EC6A60C5AB7899F525F /* [CP] Check Pods Manifest.lock */ = {
@@ -201,7 +201,7 @@
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-GoodApp-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-BadUrlSchemesApp-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -329,11 +329,11 @@
 		};
 		E905B0211FBBA9ED0061E0AE /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 16711F0C1E565E7A6A1FE70B /* Pods-GoodApp.debug.xcconfig */;
+			baseConfigurationReference = 16711F0C1E565E7A6A1FE70B /* Pods-BadUrlSchemesApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = GoodApp/Info.plist;
+				INFOPLIST_FILE = BadUrlSchemesApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.google.firebase.test.MinimalApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -343,13 +343,13 @@
 		};
 		E905B0221FBBA9ED0061E0AE /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 682634CD4CC5D839762F9739 /* Pods-GoodApp.release.xcconfig */;
+			baseConfigurationReference = 682634CD4CC5D839762F9739 /* Pods-BadUrlSchemesApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = GoodApp/Info.plist;
+				INFOPLIST_FILE = BadUrlSchemesApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.google.firebase.test.GoodApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.google.firebase.test.BadUrlSchemesApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -358,7 +358,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E905B0051FBBA9ED0061E0AE /* Build configuration list for PBXProject "GoodApp" */ = {
+		E905B0051FBBA9ED0061E0AE /* Build configuration list for PBXProject "BadUrlSchemesApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E905B01E1FBBA9ED0061E0AE /* Debug */,
@@ -367,7 +367,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E905B0201FBBA9ED0061E0AE /* Build configuration list for PBXNativeTarget "GoodApp" */ = {
+		E905B0201FBBA9ED0061E0AE /* Build configuration list for PBXNativeTarget "BadUrlSchemesApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E905B0211FBBA9ED0061E0AE /* Debug */,

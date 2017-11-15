@@ -1,3 +1,5 @@
+require 'cocoapods-core'
+
 module Precheck
   # each attribute on a app version is a single item.
   # for example: .name, .keywords, .description, will all have a single item to represent them
@@ -46,11 +48,63 @@ module Precheck
     attr_accessor :target_name
     attr_accessor :configuration
 
+    def GetFullPath(relative_path)
+      return File.join(@project.path, '..', relative_path)
+    end
+
     def initialize(project_path, target_name, configuration, item_name, friendly_name, is_optional = false)
       @project_path = project_path
       @target_name = target_name
       @configuration = configuration
       super(item_name, friendly_name, is_optional)
+
+      @project = Xcodeproj::Project.open(@project_path)
+    end
+
+    def get_project
+      return @project
+    end
+
+    def get_google_service_plist
+      google_service_plist_entry = @project.files.select{|x| x.path == 'GoogleService-Info.plist'}[0]
+      if google_service_plist_entry.nil?
+        return nil
+      end
+
+      return Xcodeproj::Plist.read_from_path(GetFullPath(google_service_plist_entry.path))
+    end
+
+    def get_podfile
+      podfile_path = File.join(File.dirname(@project_path), "Podfile")
+      return nil unless File.exist?(podfile_path)
+
+      return Pod::Podfile.from_file(podfile_path)
+    end
+
+    def get_target
+      return @project.native_targets.detect { |target| target.name == @target_name }
+    end
+
+    def get_configuration
+      target = get_target()
+      if target.nil?
+        return nil
+      end
+
+      return target.build_configurations.detect { |configuration | configuration .name = @configuration }
+    end
+
+    def get_info_plist
+      configuration = get_configuration()
+      if configuration.nil?
+        return nil
+      end
+      infoplist_file = configuration.build_settings['INFOPLIST_FILE']
+      if infoplist_file.nil?
+        return nil
+      end
+
+      return Xcodeproj::Plist.read_from_path(GetFullPath(infoplist_file))
     end
 
     def item_data
