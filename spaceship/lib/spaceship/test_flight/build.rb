@@ -45,6 +45,12 @@ module Spaceship::TestFlight
 
     attr_accessor :upload_date
 
+    attr_accessor :dsym_url
+    attr_accessor :build_sdk
+    attr_accessor :include_symbols
+    attr_accessor :number_of_asset_packs
+    attr_accessor :contains_odr
+
     attr_mapping({
       'appAdamId' => :app_id,
       'providerId' => :provider_id,
@@ -61,7 +67,12 @@ module Spaceship::TestFlight
       'crashCount' => :crash_count,
       'didNotify' => :did_notify,
       'uploadDate' => :upload_date,
-      'id' => :id
+      'id' => :id,
+      'dSYMUrl' => :dsym_url,
+      'buildSdk' => :build_sdk,
+      'includesSymbols' => :include_symbols,
+      'numberOfAssetPacks' => :number_of_asset_packs,
+      'containsODR' => :contains_odr
     })
 
     BUILD_STATES = {
