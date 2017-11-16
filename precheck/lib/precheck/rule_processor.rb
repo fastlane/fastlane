@@ -113,7 +113,7 @@ module Precheck
             end
           else
             if run_from_Xcode
-              UI.message "warning: #{message}"
+              UI.message "warning: #{error_results[rule].first.failure_data}"
             else
               UI.important message
             end
