@@ -19,6 +19,7 @@
 		16711F0C1E565E7A6A1FE70B /* Pods-GoodApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GoodApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-GoodApp/Pods-GoodApp.debug.xcconfig"; sourceTree = "<group>"; };
 		5271355C847480244504A863 /* libPods-GoodApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-GoodApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		682634CD4CC5D839762F9739 /* Pods-GoodApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GoodApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-GoodApp/Pods-GoodApp.release.xcconfig"; sourceTree = "<group>"; };
+		C8F320DF1FBDEE7200D664ED /* verify-firebase.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "verify-firebase.sh"; sourceTree = "<group>"; };
 		E905B00A1FBBA9ED0061E0AE /* GoodApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GoodApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E905B00D1FBBA9ED0061E0AE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E905B00E1FBBA9ED0061E0AE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -86,6 +87,7 @@
 				E905B0161FBBA9ED0061E0AE /* Assets.xcassets */,
 				E905B01B1FBBA9ED0061E0AE /* Info.plist */,
 				E905B01C1FBBA9ED0061E0AE /* main.m */,
+				C8F320DF1FBDEE7200D664ED /* verify-firebase.sh */,
 			);
 			path = GoodApp;
 			sourceTree = "<group>";
@@ -98,6 +100,7 @@
 			buildConfigurationList = E905B0201FBBA9ED0061E0AE /* Build configuration list for PBXNativeTarget "GoodApp" */;
 			buildPhases = (
 				FD5E5EC6A60C5AB7899F525F /* [CP] Check Pods Manifest.lock */,
+				C82C87641FBDEAC80011B645 /* ShellScript */,
 				E905B0061FBBA9ED0061E0AE /* Sources */,
 				E905B0071FBBA9ED0061E0AE /* Frameworks */,
 				E905B0081FBBA9ED0061E0AE /* Resources */,
@@ -174,6 +177,19 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-GoodApp/Pods-GoodApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		C82C87641FBDEAC80011B645 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "${SRCROOT}/../Common/verify-firebase.sh";
 		};
 		F9310200CB0EF673F05664A7 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
