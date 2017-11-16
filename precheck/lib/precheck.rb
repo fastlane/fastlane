@@ -1,5 +1,6 @@
 require 'fastlane_core'
 require 'precheck/runner'
+require 'precheck/xcode_env'
 require 'precheck/options'
 
 module Precheck
