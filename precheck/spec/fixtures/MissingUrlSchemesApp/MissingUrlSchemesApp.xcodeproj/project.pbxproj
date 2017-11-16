@@ -27,6 +27,7 @@
 		E905B01C1FBBA9ED0061E0AE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E905B0231FBBAA990061E0AE /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		E905B0251FBBC66A0061E0AE /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		E90F7A8F1FBE20BE00C4E065 /* MissingUrlSchemesApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MissingUrlSchemesApp.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +82,7 @@
 		E905B00C1FBBA9ED0061E0AE /* MissingUrlSchemesApp */ = {
 			isa = PBXGroup;
 			children = (
+				E90F7A8F1FBE20BE00C4E065 /* MissingUrlSchemesApp.entitlements */,
 				E905B00D1FBBA9ED0061E0AE /* AppDelegate.h */,
 				E905B00E1FBBA9ED0061E0AE /* AppDelegate.m */,
 				E905B0161FBBA9ED0061E0AE /* Assets.xcassets */,
@@ -126,6 +128,11 @@
 					E905B0091FBBA9ED0061E0AE = {
 						CreatedOnToolsVersion = 9.1;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.SafariKeychain = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -346,7 +353,9 @@
 			baseConfigurationReference = 16711F0C1E565E7A6A1FE70B /* Pods-MissingUrlSchemesApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MissingUrlSchemesApp/MissingUrlSchemesApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = MissingUrlSchemesApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.google.firebase.test.MinimalApp;
@@ -360,7 +369,9 @@
 			baseConfigurationReference = 682634CD4CC5D839762F9739 /* Pods-MissingUrlSchemesApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MissingUrlSchemesApp/MissingUrlSchemesApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = MissingUrlSchemesApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.google.firebase.test.MissingUrlSchemesApp;
