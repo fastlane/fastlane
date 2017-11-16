@@ -81,7 +81,7 @@ module FastlaneCore
             # So we tell the user that they can provide a value
             warning = ["In the config file '#{self.configfile_path}'"]
             warning << "you have the line #{method_sym}, but didn't provide"
-            warning << "any value. Make sure to append a value rght after the"
+            warning << "any value. Make sure to append a value right after the"
             warning << "option name. Make sure to check the docs for more information"
             UI.important(warning.join(" "))
           end
