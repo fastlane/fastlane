@@ -106,7 +106,8 @@ module Precheck
           message = "😵  Failed: #{rule.class.friendly_name}-> #{rule.description}"
           if rule_level == RULE_LEVELS[:error]
             if run_from_Xcode
-              UI.message "error: #{message}"
+              # Force warning for Xcode to avoid awkward messaging in build logs.
+              UI.message "warning: #{error_results[rule].first.failure_data}"
             else
               UI.error message
             end
