@@ -1,18 +1,53 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/snapshot'
-    class CaptureIOSScreenshotsAction < SnapshotAction
-      def self.run(config)
-        UI.message "Taking screenshots using snapshot"
-        super(config)
+    module SharedValues
+      SNAPSHOT_SCREENSHOTS_PATH = :SNAPSHOT_SCREENSHOTS_PATH
+    end
+
+    class CaptureIOSScreenshotsAction < Action
+      def self.run(params)
+        return nil unless Helper.mac?
+        require 'snapshot'
+
+        Snapshot.config = params
+        Snapshot::DependencyChecker.check_simulators
+        Snapshot::Runner.new.work
+
+        Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = File.expand_path(params[:output_directory]) # absolute URL
+
+        true
       end
 
-      #####################################################
-      # @!group Documentation
-      #####################################################
-
       def self.description
-        "Take new screenshots (via snapshot), based on the Snapfile"
+        "Generate new localized screenshots on multiple devices (via `snapshot`)"
+      end
+
+      def self.available_options
+        return [] unless Helper.mac?
+        require 'snapshot'
+        Snapshot::Options.available_options
+      end
+
+      def self.author
+        "KrauseFx"
+      end
+
+      def self.is_supported?(platform)
+        [:ios, :mac].include? platform
+      end
+
+      def self.example_code
+        [
+          'capture_ios_screenshots',
+          'capture_ios_screenshots(
+            skip_open_summary: true,
+            clean: true
+          )'
+        ]
+      end
+
+      def self.category
+        :screenshots
       end
     end
   end

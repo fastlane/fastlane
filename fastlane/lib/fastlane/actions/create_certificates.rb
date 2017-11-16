@@ -1,18 +1,67 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/cert'
-    class CreateCertificatesAction < CertAction
-      def self.run(config)
-        UI.message "Creating signing certificates using cert"
-        super(config)
+    module SharedValues
+      CERT_FILE_PATH = :CERT_FILE_PATH
+      CERT_CERTIFICATE_ID = :CERT_CERTIFICATE_ID
+    end
+
+    class CreateCertificatesAction < Action
+      def self.run(params)
+        require 'cert'
+
+        return if Helper.test?
+
+        begin
+          Cert.config = params # we alread have the finished config
+
+          Cert::Runner.new.launch
+          cert_file_path = ENV["CER_FILE_PATH"]
+          certificate_id = ENV["CER_CERTIFICATE_ID"]
+          Actions.lane_context[SharedValues::CERT_FILE_PATH] = cert_file_path
+          Actions.lane_context[SharedValues::CERT_CERTIFICATE_ID] = certificate_id
+
+          UI.success("Use signing certificate '#{certificate_id}' from now on!")
+
+          ENV["SIGH_CERTIFICATE_ID"] = certificate_id # for further use in the sigh action
+        end
       end
 
-      #####################################################
-      # @!group Documentation
-      #####################################################
-
       def self.description
-        "Create new iOS code signing certificates (via cert)"
+        "Create new iOS code signing certificates (via `cert`)"
+      end
+
+      def self.details
+        [
+          "**Important**: It is recommended to use [match](https://github.com/fastlane/fastlane/tree/master/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.",
+          "Use this action to download the latest code signing identity"
+        ].join("\n")
+      end
+
+      def self.available_options
+        require 'cert'
+        Cert::Options.available_options
+      end
+
+      def self.author
+        "KrauseFx"
+      end
+
+      def self.is_supported?(platform)
+        platform == :ios
+      end
+
+      def self.example_code
+        [
+          'create_certificates',
+          'create_certificates(
+            development: true,
+            username: "user@email.com"
+          )'
+        ]
+      end
+
+      def self.category
+        :code_signing
       end
     end
   end

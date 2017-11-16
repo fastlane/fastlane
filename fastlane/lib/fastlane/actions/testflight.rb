@@ -1,18 +1,13 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/pilot'
-    class TestflightAction < PilotAction
-      def self.run(config)
-        UI.message "Uploading to TestFlight using pilot"
-        super(config)
-      end
-
+    require 'fastlane/actions/upload_to_testflight'
+    class TestflightAction < UploadToTestflightAction
       #####################################################
       # @!group Documentation
       #####################################################
 
       def self.description
-        "Alias for the pilot action"
+        "Alias for the `upload_to_testflight` action"
       end
     end
   end

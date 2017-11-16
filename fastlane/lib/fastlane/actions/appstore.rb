@@ -1,18 +1,13 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/deliver'
-    class AppstoreAction < DeliverAction
-      def self.run(config)
-        UI.message "Uploading to the App Store using deliver"
-        super(config)
-      end
-
+    require 'fastlane/actions/upload_to_app_store'
+    class AppstoreAction < UploadToAppStoreAction
       #####################################################
       # @!group Documentation
       #####################################################
 
       def self.description
-        "Alias for the deliver action"
+        "Alias for the `upload_to_app_store` action"
       end
     end
   end
