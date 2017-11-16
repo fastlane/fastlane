@@ -1,5 +1,3 @@
-require 'cocoapods-core'
-
 module Precheck
   # each attribute on a app version is a single item.
   # for example: .name, .keywords, .description, will all have a single item to represent them
@@ -74,11 +72,11 @@ module Precheck
       return Xcodeproj::Plist.read_from_path(GetFullPath(google_service_plist_entry.path))
     end
 
-    def get_podfile
-      podfile_path = File.join(File.dirname(@project_path), "Podfile")
+    def podfile_includes?(pod_name)
+      podfile_path = File.join(File.dirname(@project_path), "Podfile.lock")
       return nil unless File.exist?(podfile_path)
-
-      return Pod::Podfile.from_file(podfile_path)
+      content = File.read(podfile_path)
+      return content.include?(pod_name)
     end
 
     def get_target

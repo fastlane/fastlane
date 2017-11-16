@@ -35,17 +35,8 @@ module Precheck
           return RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
         end
 
-        podfile = xcode_project_item.get_podfile()
-        # Cannot check Dynamic Links if Podfile is missing
-        if podfile.nil?
-          return RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
-        end
-
-        dependency = podfile.dependencies.detect { |dep| dep.name == 'Firebase/DynamicLinks' || dep.name == 'Firebase/Invites' }
-
-        # We need an Dynamic Link or Invites dependency to proceed
-        if dependency.nil?
-          return RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
+        if xcode_project_item.podfile_includes?("Firebase/DynamicLinks").nil? && xcode_project_item.podfile_includes?("Firebase/Invites").nil?
+          return RuleReturn.new(validation_state: VALIDATION_STATES[:failed], failure_data: "Couldn't find Firebase/DynamicLinks or Firebase/Invites in your Podfile.lock")
         end
 
         entitlements = xcode_project_item.get_entitlements()

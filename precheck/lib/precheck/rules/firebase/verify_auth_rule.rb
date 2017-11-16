@@ -35,17 +35,9 @@ module Precheck
           return RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
         end
 
-        podfile = xcode_project_item.get_podfile()
-        # Cannot check Auth if Podfile is missing
-        if podfile.nil?
-          return RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
-        end
-
-        auth_dependency = podfile.dependencies.detect { |dep| dep.name == 'Firebase/Auth' }
-
         # We need an Auth dependency to proceed
-        if auth_dependency.nil?
-          return RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
+        unless xcode_project_item.podfile_includes?("Firebase/Auth")
+          return RuleReturn.new(validation_state: VALIDATION_STATES[:failed], failure_data: "Couldn't find Firebase/Auth in your Podfile.lock")
         end
 
         expected_client_id = google_service_plist['REVERSED_CLIENT_ID']
