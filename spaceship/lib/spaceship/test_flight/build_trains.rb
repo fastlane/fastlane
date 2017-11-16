@@ -32,5 +32,9 @@ module Spaceship::TestFlight
     def values
       @trains.values
     end
+
+    def versions
+      @trains.keys
+    end
   end
 end

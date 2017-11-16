@@ -261,7 +261,7 @@ module Spaceship
       # TestFlight: A reference to all the build trains
       # @return [Hash] a hash, the version number and platform being the key
       def build_trains(platform: nil)
-        Tunes::BuildTrain.all(self, self.apple_id, platform: platform)
+        TestFlight::BuildTrains.all(app_id: self.apple_id, platform: platform)
       end
 
       # The numbers of all build trains that were uploaded
@@ -284,6 +284,7 @@ module Spaceship
       end
 
       # @return [Array]A list of binaries which are in the invalid state
+      # TODO: FIX THIS METHOD!
       def all_invalid_builds(platform: nil)
         builds = []
 
@@ -297,26 +298,15 @@ module Spaceship
       # @return [Array] This will return an array of *all* processing builds
       #   this include pre-processing or standard processing
       def all_processing_builds(platform: nil)
-        builds = []
-
-        self.build_trains(platform: platform).each do |version_number, train|
-          builds.concat(train.processing_builds)
-        end
-
-        return builds
+        return TestFlight::Build.all_processing_builds(app_id: self.apple_id, platform: platform)
       end
 
       # Get all builds that are already processed for all build trains
       # You can either use the return value (array) or pass a block
       def builds(platform: nil)
-        all_builds = []
-        self.build_trains(platform: platform).each do |version_number, train|
-          train.builds.each do |build|
-            yield(build) if block_given?
-            all_builds << build unless block_given?
-          end
-        end
-        all_builds
+        all = TestFlight::Build.all(app_id: self.apple_id, platform: platform)
+        return all unless block_given?
+        all.each { |build| yield(build) }
       end
 
       #####################################################
