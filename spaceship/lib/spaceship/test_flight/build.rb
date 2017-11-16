@@ -99,7 +99,7 @@ module Spaceship::TestFlight
       trains.values.flatten
     end
 
-    def self.builds_for_train(app_id: nil, platform: nil, train_version: nil, retry_count: 0)
+    def self.builds_for_train(app_id: nil, platform: nil, train_version: nil, retry_count: 3)
       builds_data = client.get_builds_for_train(app_id: app_id, platform: platform, train_version: train_version, retry_count: retry_count)
       builds_data.map { |data| self.new(data) }
     end
