@@ -3,7 +3,7 @@ require 'xcodeproj'
 
 module Precheck
   class VerifyFirebaseDynamicLinksRule < URLRule
-    @@details_message = "Please see https://firebase.google.com/docs/dynamic-links/ios/create for details."
+    DETAILS_MESSAGE = "Please see https://firebase.google.com/docs/dynamic-links/ios/create for details."
 
     def self.key
       :verify_firebase_dynamic_links
@@ -27,8 +27,7 @@ module Precheck
 
     def rule_block
       return lambda { |xcode_project_item|
-
-        google_service_plist = xcode_project_item.get_google_service_plist()
+        google_service_plist = xcode_project_item.google_service_plist
 
         # Cannot check Dynamic Links if plist is missing
         if google_service_plist.nil?
@@ -39,14 +38,14 @@ module Precheck
           return RuleReturn.new(validation_state: VALIDATION_STATES[:failed], failure_data: "Couldn't find Firebase/DynamicLinks or Firebase/Invites in your Podfile.lock")
         end
 
-        entitlements = xcode_project_item.get_entitlements()
+        entitlements = xcode_project_item.get_entitlements
         if entitlements.nil?
-          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Your project is using Firebase Dynamic Links but you are missing the entitlements file. #{@@details_message}")
+          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Your project is using Firebase Dynamic Links but you are missing the entitlements file. #{DETAILS_MESSAGE}")
         end
 
         associated_domains = entitlements["com.apple.developer.associated-domains"]
         if associated_domains.nil? or associated_domains.length == 0
-          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Your project is using Firebase Dynamic Links but your entitlements file does not specify any associated domains. #{@@details_message}")
+          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Your project is using Firebase Dynamic Links but your entitlements file does not specify any associated domains. #{DETAILS_MESSAGE}")
         end
 
         has_app_links = false
@@ -59,7 +58,7 @@ module Precheck
           end
         end
 
-        return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Your project is using is using Firebase Dynamic Links but none of the associated domains specifies an applink pointing to *.app.goo.gl. #{@@details_message}") unless has_app_links
+        return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Your project is using is using Firebase Dynamic Links but none of the associated domains specifies an applink pointing to *.app.goo.gl. #{DETAILS_MESSAGE}") unless has_app_links
 
         return RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
       }

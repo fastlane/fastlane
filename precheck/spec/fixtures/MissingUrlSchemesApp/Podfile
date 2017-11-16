@@ -6,7 +6,6 @@ target 'MissingUrlSchemesApp' do
   # use_frameworks!
 
   # Pods for MissingUrlSchemesApp
-	pod 'Firebase/Auth'
-	pod 'Firebase/DynamicLinks'
-
+  pod 'Firebase/Auth'
+  pod 'Firebase/DynamicLinks'
 end

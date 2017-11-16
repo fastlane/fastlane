@@ -5,8 +5,8 @@ module Precheck
     class << self
       def run_as_build_phase?
         return true if ENV["PROJECT_FILE_PATH"].to_s.length > 0 &&
-            ENV["TARGET_NAME"].to_s.length > 0 &&
-            ENV["CONFIGURATION"].to_s.length > 0
+                       ENV["TARGET_NAME"].to_s.length > 0 &&
+                       ENV["CONFIGURATION"].to_s.length > 0
         false
       end
 

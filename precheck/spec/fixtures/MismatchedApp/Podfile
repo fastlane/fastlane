@@ -6,7 +6,6 @@ target 'MismatchedApp' do
   # use_frameworks!
 
   # Pods for MismatchedApp
-	pod 'Firebase/Auth'
-	pod 'Firebase/DynamicLinks'
-
+  pod 'Firebase/Auth'
+  pod 'Firebase/DynamicLinks'
 end

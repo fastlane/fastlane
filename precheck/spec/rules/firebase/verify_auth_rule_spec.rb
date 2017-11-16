@@ -4,9 +4,9 @@ module Precheck
   describe Precheck do
     describe Precheck::VerifyFirebaseAuthRule do
       let(:rule) { VerifyFirebaseAuthRule.new }
-      let(:missing_url_schemes_xcode_project) {XcodeProjectItemToCheck.new("./spec/fixtures/MissingUrlSchemesApp/MissingUrlSchemesApp.xcodeproj", "MissingUrlSchemesApp", "Release", :xcode_project, "XcodeProject")}
-      let(:bad_url_schemes_xcode_project) {XcodeProjectItemToCheck.new("./spec/fixtures/BadUrlSchemesApp/BadUrlSchemesApp.xcodeproj", "BadUrlSchemesApp", "Release", :xcode_project, "XcodeProject")}
-      let(:good_xcode_project) {XcodeProjectItemToCheck.new("./spec/fixtures/GoodApp/GoodApp.xcodeproj", "GoodApp", "Release", :xcode_project, "XcodeProject")}
+      let(:missing_url_schemes_xcode_project) { XcodeProjectItemToCheck.new("./spec/fixtures/MissingUrlSchemesApp/MissingUrlSchemesApp.xcodeproj", "MissingUrlSchemesApp", "Release", :xcode_project, "XcodeProject") }
+      let(:bad_url_schemes_xcode_project) { XcodeProjectItemToCheck.new("./spec/fixtures/BadUrlSchemesApp/BadUrlSchemesApp.xcodeproj", "BadUrlSchemesApp", "Release", :xcode_project, "XcodeProject") }
+      let(:good_xcode_project) { XcodeProjectItemToCheck.new("./spec/fixtures/GoodApp/GoodApp.xcodeproj", "GoodApp", "Release", :xcode_project, "XcodeProject") }
 
       it "fails for missing URL Schemes" do
         result = rule.check_item(missing_url_schemes_xcode_project)
@@ -24,7 +24,6 @@ module Precheck
         result = rule.check_item(good_xcode_project)
         expect(result.status).to eq(VALIDATION_STATES[:passed])
       end
-
     end
   end
 end

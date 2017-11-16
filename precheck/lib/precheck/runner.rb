@@ -12,13 +12,15 @@ module Precheck
     def run
       Precheck.config.load_configuration_file(Precheck.precheckfile_name)
 
-      run_from_Xcode = XcodeEnv.run_as_build_phase?
+      run_from_xcode = XcodeEnv.run_as_build_phase?
 
-      FastlaneCore::PrintTable.print_values(config: Precheck.config,
-                                         hide_keys: [:output_path],
-                                             title: "Summary for precheck #{Fastlane::VERSION}") unless run_from_Xcode
+      unless run_from_xcode
+        FastlaneCore::PrintTable.print_values(config: Precheck.config,
+                                           hide_keys: [:output_path],
+                                               title: "Summary for precheck #{Fastlane::VERSION}")
+      end
 
-      if Spaceship::Tunes.client.nil? && !run_from_Xcode
+      if Spaceship::Tunes.client.nil? && !run_from_xcode
         UI.message "Starting login with user '#{Precheck.config[:username]}'"
         Spaceship::Tunes.login(Precheck.config[:username])
         Spaceship::Tunes.select_team
@@ -26,14 +28,14 @@ module Precheck
         UI.message "Successfully logged in"
       end
 
-      unless run_from_Xcode
+      unless run_from_xcode
         UI.message "Checking app for precheck rule violations"
         ensure_app_exists!
       end
 
       processor_result = check_for_rule_violations(app: app, app_version: latest_app_version)
 
-      unless run_from_Xcode
+      unless run_from_xcode
         if processor_result.items_not_checked?
           print_items_not_checked(processor_result: processor_result)
         end
@@ -57,7 +59,6 @@ module Precheck
         end
       end
       return true
-
     end
 
     def print_items_not_checked(processor_result: nil)

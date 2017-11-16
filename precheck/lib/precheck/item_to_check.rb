@@ -46,7 +46,7 @@ module Precheck
     attr_accessor :target_name
     attr_accessor :configuration
 
-    def GetFullPath(relative_path)
+    def get_full_path(relative_path)
       return File.join(@project.path, '..', relative_path)
     end
 
@@ -59,17 +59,17 @@ module Precheck
       @project = Xcodeproj::Project.open(@project_path)
     end
 
-    def get_project
+    def project
       return @project
     end
 
-    def get_google_service_plist
-      google_service_plist_entry = @project.files.select{|x| x.path == 'GoogleService-Info.plist'}[0]
+    def google_service_plist
+      google_service_plist_entry = @project.files.select { |x| x.path == 'GoogleService-Info.plist' }[0]
       if google_service_plist_entry.nil?
         return nil
       end
 
-      return Xcodeproj::Plist.read_from_path(GetFullPath(google_service_plist_entry.path))
+      return Xcodeproj::Plist.read_from_path(get_full_path(google_service_plist_entry.path))
     end
 
     def podfile_includes?(pod_name)
@@ -79,44 +79,33 @@ module Precheck
       return content.include?(pod_name)
     end
 
-    def get_target
+    def target
       return @project.native_targets.detect { |target| target.name == @target_name }
     end
 
-    def get_configuration
-      target = get_target()
-      if target.nil?
-        return nil
-      end
-
-      return target.build_configurations.detect { |configuration | configuration .name = @configuration }
+    def configuration
+      return nil if target.nil?
+      return target.build_configurations.detect { |configuration| configuration .name = @configuration }
     end
 
-    def get_info_plist
-      configuration = get_configuration()
-      if configuration.nil?
-        return nil
-      end
+    def info_plist
+      return nil if configuration.nil?
       infoplist_file = configuration.build_settings['INFOPLIST_FILE']
-      if infoplist_file.nil?
-        return nil
-      end
 
-      return Xcodeproj::Plist.read_from_path(GetFullPath(infoplist_file))
+      return nil if infoplist_file.nil?
+
+      return Xcodeproj::Plist.read_from_path(get_full_path(infoplist_file))
     end
 
-    def get_entitlements
-      configuration = get_configuration()
-      if configuration.nil?
-        return nil
-      end
+    def entitlements
+      return nil if configuration.nil?
 
       entitlements_file = configuration.build_settings['CODE_SIGN_ENTITLEMENTS']
       if entitlements_file.nil?
         return nil
       end
 
-      return Xcodeproj::Plist.read_from_path(GetFullPath(entitlements_file))
+      return Xcodeproj::Plist.read_from_path(get_full_path(entitlements_file))
     end
 
     def item_data

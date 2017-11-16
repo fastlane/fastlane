@@ -6,7 +6,6 @@ target 'BadUrlSchemesApp' do
   # use_frameworks!
 
   # Pods for BadUrlSchemesApp
-	pod 'Firebase/Auth'
-	pod 'Firebase/Messaging'
-
+  pod 'Firebase/Auth'
+  pod 'Firebase/Messaging'
 end

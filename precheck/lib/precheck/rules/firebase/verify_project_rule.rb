@@ -23,27 +23,27 @@ module Precheck
       perform_check(item: item) # we can handle anything
     end
 
-    def GetFullPath(project, relative_path)
+    def full_path(project, relative_path)
       return File.join(project.path, '..', relative_path)
     end
 
     def rule_block
       return lambda { |xcode_project_item|
-        project = xcode_project_item.get_project()
+        project = xcode_project_item.project
 
-        google_service_plist_entry = project.files.select{|x| x.path == 'GoogleService-Info.plist'}[0]
+        google_service_plist_entry = project.files.select { |x| x.path == 'GoogleService-Info.plist' }[0]
         if google_service_plist_entry.nil?
           return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "A valid Firebase project requires a GoogleService-Info.plist. Please download it via the Firebase console.")
         end
 
-        google_service_plist = Xcodeproj::Plist.read_from_path(GetFullPath(project, google_service_plist_entry.path))
+        google_service_plist = Xcodeproj::Plist.read_from_path(full_path(project, google_service_plist_entry.path))
 
-        target = xcode_project_item.get_target()
+        target = xcode_project_item.target
         if target.nil?
           return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to locate a target for #{xcode_project_item.target_name}.")
         end
 
-        build_configuration = xcode_project_item.get_configuration()
+        build_configuration = xcode_project_item.get_configuration
         if build_configuration.nil?
           return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to locate a build configuration #{xcode_project_item.configuration} for target #{xcode_project_item.target_name}.")
         end

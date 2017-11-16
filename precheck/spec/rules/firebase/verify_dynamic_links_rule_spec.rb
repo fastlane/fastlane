@@ -4,9 +4,9 @@ module Precheck
   describe Precheck do
     describe Precheck::VerifyFirebaseDynamicLinksRule do
       let(:rule) { VerifyFirebaseDynamicLinksRule.new }
-      let(:missing_entitlements_xcode_project) {XcodeProjectItemToCheck.new("./spec/fixtures/MismatchedApp/MismatchedApp.xcodeproj", "MissingUrlSchemesApp", "Release", :xcode_project, "XcodeProject")}
-      let(:incorrect_entitlements_xcode_project) {XcodeProjectItemToCheck.new("./spec/fixtures/MissingUrlSchemesApp/MissingUrlSchemesApp.xcodeproj", "MissingUrlSchemesApp", "Release", :xcode_project, "XcodeProject")}
-      let(:good_xcode_project) {XcodeProjectItemToCheck.new("./spec/fixtures/GoodApp/GoodApp.xcodeproj", "GoodApp", "Release", :xcode_project, "XcodeProject")}
+      let(:missing_entitlements_xcode_project) { XcodeProjectItemToCheck.new("./spec/fixtures/MismatchedApp/MismatchedApp.xcodeproj", "MissingUrlSchemesApp", "Release", :xcode_project, "XcodeProject") }
+      let(:incorrect_entitlements_xcode_project) { XcodeProjectItemToCheck.new("./spec/fixtures/MissingUrlSchemesApp/MissingUrlSchemesApp.xcodeproj", "MissingUrlSchemesApp", "Release", :xcode_project, "XcodeProject") }
+      let(:good_xcode_project) { XcodeProjectItemToCheck.new("./spec/fixtures/GoodApp/GoodApp.xcodeproj", "GoodApp", "Release", :xcode_project, "XcodeProject") }
 
       it "fails for missing entitlements file" do
         result = rule.check_item(missing_entitlements_xcode_project)

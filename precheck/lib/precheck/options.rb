@@ -8,8 +8,8 @@ module Precheck
       if Precheck::XcodeEnv.run_as_build_phase?
         # These are the Build phase / Firebase specific rules
         return [
-            VerifyFirebaseAuthRule,
-            VerifyFirebaseProjectRule
+          VerifyFirebaseAuthRule,
+          VerifyFirebaseProjectRule
         ].map(&:new)
       else
         # These are the default rules for app metadata & screenshots

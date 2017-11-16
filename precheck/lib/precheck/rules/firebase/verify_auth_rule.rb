@@ -3,7 +3,7 @@ require 'xcodeproj'
 
 module Precheck
   class VerifyFirebaseAuthRule < URLRule
-    @@details_message = "Please see https://firebase.google.com/docs/auth/ios/google-signin for details."
+    DETAILS_MESSAGE = "Please see https://firebase.google.com/docs/auth/ios/google-signin for details."
 
     def self.key
       :verify_firebase_auth
@@ -27,8 +27,7 @@ module Precheck
 
     def rule_block
       return lambda { |xcode_project_item|
-
-        google_service_plist = xcode_project_item.get_google_service_plist()
+        google_service_plist = xcode_project_item.google_service_plist
 
         # Cannot check Auth if plist is missing
         if google_service_plist.nil?
@@ -42,7 +41,7 @@ module Precheck
 
         expected_client_id = google_service_plist['REVERSED_CLIENT_ID']
 
-        info_plist = xcode_project_item.get_info_plist()
+        info_plist = xcode_project_item.info_plist
         # We need an Info.plist to proceed
         if info_plist.nil?
           return RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
@@ -50,7 +49,7 @@ module Precheck
 
         url_types = info_plist["CFBundleURLTypes"]
         if url_types.nil?
-          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Your project is using Firebase/Auth but custom URL Schemes are not configured. #{@@details_message}")
+          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Your project is using Firebase/Auth but custom URL Schemes are not configured. #{DETAILS_MESSAGE}")
         end
 
         matched_scheme = false
@@ -64,7 +63,7 @@ module Precheck
           end
         end
 
-        return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Your project is using Firebase/Auth but no custom URL Scheme matches #{expected_client_id}. #{@@details_message}") unless matched_scheme
+        return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Your project is using Firebase/Auth but no custom URL Scheme matches #{expected_client_id}. #{DETAILS_MESSAGE}") unless matched_scheme
 
         return RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
       }
