@@ -42,17 +42,17 @@ module Precheck
 
         target = xcode_project_item.get_target()
         if target.nil?
-          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to locate a target for #{item.target_name}.")
+          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to locate a target for #{xcode_project_item.target_name}.")
         end
 
         build_configuration = xcode_project_item.get_configuration()
         if build_configuration.nil?
-          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to locate a build configuration #{configuration} for target #{target_name}.")
+          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to locate a build configuration #{xcode_project_item.configuration} for target #{xcode_project_item.target_name}.")
         end
 
         infoplist_file = build_configuration.build_settings['INFOPLIST_FILE']
         if infoplist_file.nil?
-          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to find an INFOPLIST_FILE in a build configuration #{configuration} for target #{target_name}.")
+          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to find an INFOPLIST_FILE in a build configuration #{xcode_project_item.configuration} for target #{xcode_project_item.target_name}.")
         end
 
         product_bundle_identifier = build_configuration.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
