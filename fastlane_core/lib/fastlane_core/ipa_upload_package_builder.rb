@@ -23,7 +23,7 @@ module FastlaneCore
       }
 
       xml_path = File.join(FastlaneCore::ROOT, "lib/assets/XMLTemplate.xml.erb")
-      xml = ERB.new(File.read(xml_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
+      xml = ERB.new(File.read(xml_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
       File.write(File.join(self.package_path, METADATA_FILE_NAME), xml)
       UI.success("Wrote XML data to '#{self.package_path}'") if FastlaneCore::Globals.verbose?
