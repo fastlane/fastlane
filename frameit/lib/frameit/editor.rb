@@ -266,6 +266,7 @@ module Frameit
       # Resize the 2 labels if necessary
       smaller = 1.0 # default
       ratio = (sum_width + (keyword_padding + horizontal_frame_padding) * 2) / image.width.to_f
+      title_height = title.height
       if ratio > 1.0
         # too large - resizing now
         smaller = (1.0 / ratio)
@@ -274,15 +275,16 @@ module Frameit
 
         title.resize "#{(smaller * title.width).round}x"
         keyword.resize "#{(smaller * keyword.width).round}x" if keyword
+        title_height *= smaller
         sum_width *= smaller
       end
 
       vertical_padding = vertical_frame_padding
-      top_space = vertical_padding + (actual_font_size - title.height) / 2
+      top_space = vertical_padding
       left_space = (background.width / 2.0 - sum_width / 2.0).round
       title_below_image = fetch_config['title_below_image']
 
-      self.space_to_device += actual_font_size + vertical_padding
+      self.space_to_device += title_height + vertical_padding
 
       # First, put the keyword on top of the screenshot, if we have one
       if keyword
