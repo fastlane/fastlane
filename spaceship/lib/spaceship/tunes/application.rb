@@ -267,9 +267,7 @@ module Spaceship
       # The numbers of all build trains that were uploaded
       # @return [Array] An array of train version numbers
       def all_build_train_numbers(platform: nil)
-        client.all_build_trains(app_id: self.apple_id, platform: platform).fetch("trains").collect do |current|
-          current["versionString"]
-        end
+        return self.build_trains.versions
       end
 
       # Receive the build details for a specific build
@@ -277,22 +275,7 @@ module Spaceship
       # which might happen if you don't use TestFlight
       # This is used to receive dSYM files from Apple
       def all_builds_for_train(train: nil, platform: nil)
-        client.all_builds_for_train(app_id: self.apple_id, train: train, platform: platform).fetch("items", []).collect do |attrs|
-          attrs[:apple_id] = self.apple_id
-          Tunes::Build.factory(attrs)
-        end
-      end
-
-      # @return [Array]A list of binaries which are in the invalid state
-      # TODO: FIX THIS METHOD!
-      def all_invalid_builds(platform: nil)
-        builds = []
-
-        self.build_trains(platform: platform).values.each do |train|
-          builds.concat(train.invalid_builds)
-        end
-
-        return builds
+        return TestFlight::Build.builds_for_train(app_id: self.apple_id, platform: platform, train_version: train)
       end
 
       # @return [Array] This will return an array of *all* processing builds

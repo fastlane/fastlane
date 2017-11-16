@@ -88,18 +88,6 @@ describe Spaceship::Tunes::BuildTrain do
     end
 
     describe "Processing builds (ios)" do
-      it "extracts builds that are stuck or pre-processing" do
-        expect(app.all_invalid_builds(platform: 'ios').count).to eq(2)
-
-        invalid_binary = app.all_invalid_builds(platform: 'ios').first
-        expect(invalid_binary.upload_date).to eq(1_436_381_720_000)
-        expect(invalid_binary.processing_state).to eq("invalidBinary")
-
-        processing_failed = app.all_invalid_builds(platform: 'ios')[1]
-        expect(processing_failed.upload_date).to eq(1_461_108_334_000)
-        expect(processing_failed.processing_state).to eq("processingFailed")
-      end
-
       it "properly extracted the processing builds from a train" do
         train = app.build_trains(platform: 'ios')['1.0']
         expect(train.platform).to eq('ios')
@@ -108,18 +96,6 @@ describe Spaceship::Tunes::BuildTrain do
     end
 
     describe "Processing builds (tvos)" do
-      it "extracts builds that are stuck or pre-processing" do
-        expect(app.all_invalid_builds(platform: 'appletvos').count).to eq(2)
-
-        invalid_binary = app.all_invalid_builds(platform: 'appletvos').first
-        expect(invalid_binary.upload_date).to eq(1_436_381_720_000)
-        expect(invalid_binary.processing_state).to eq("invalidBinary")
-
-        processing_failed = app.all_invalid_builds(platform: 'ios')[1]
-        expect(processing_failed.upload_date).to eq(1_461_108_334_000)
-        expect(processing_failed.processing_state).to eq("processingFailed")
-      end
-
       it "properly extracted the processing builds from a train" do
         train = app.build_trains(platform: 'appletvos')['1.0']
         expect(train.platform).to eq('appletvos')
