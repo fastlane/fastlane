@@ -41,7 +41,7 @@ module Deliver
       @languages ||= options[:app].latest_version.description.languages
 
       html_path = File.join(Deliver::ROOT, "lib/assets/summary.html.erb")
-      html = ERB.new(File.read(html_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
+      html = ERB.new(File.read(html_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
       export_path = File.join(export_path, "Preview.html")
       File.write(export_path, html)
