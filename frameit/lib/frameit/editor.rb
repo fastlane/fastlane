@@ -363,7 +363,7 @@ module Frameit
       config_path = File.join(File.expand_path("../..", screenshot.path), "Framefile.json") unless File.exist?(config_path)
       file = ConfigParser.new.load(config_path)
       return {} unless file # no config file at all
-      @config = file.fetch_value(screenshot.path)
+      @config = file.fetch_value(screenshot.path, screenshot.device_name)
     end
 
     # Fetches the title + keyword for this particular screenshot

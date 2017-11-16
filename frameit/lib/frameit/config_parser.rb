@@ -23,12 +23,15 @@ module Frameit
 
     # Fetches the finished configuration for a given path. This will try to look for a specific value
     # and fallback to a default value if nothing was found
-    def fetch_value(path)
+    def fetch_value(path, device_name = nil)
+      device_specific = @data['data'].find { |a| a['device_filter'] && device_name.include?(a['device_filter']) } unless device_name.nil?
+
       specific = @data['data'].find { |a| path.include? a['filter'] }
 
       default = @data['default']
 
-      values = default.fastlane_deep_merge(specific || {})
+      values = default.fastlane_deep_merge(device_specific || {})
+      values = values.fastlane_deep_merge(specific || {})
 
       change_paths_to_absolutes!(values)
       validate_values(values)
