@@ -50,6 +50,7 @@ module Spaceship::TestFlight
     attr_accessor :include_symbols
     attr_accessor :number_of_asset_packs
     attr_accessor :contains_odr
+    attr_accessor :file_name
 
     attr_mapping({
       'appAdamId' => :app_id,
@@ -72,7 +73,8 @@ module Spaceship::TestFlight
       'buildSdk' => :build_sdk,
       'includesSymbols' => :include_symbols,
       'numberOfAssetPacks' => :number_of_asset_packs,
-      'containsODR' => :contains_odr
+      'containsODR' => :contains_odr,
+      'fileName' => :file_name
     })
 
     BUILD_STATES = {
