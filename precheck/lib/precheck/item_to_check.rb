@@ -107,6 +107,20 @@ module Precheck
       return Xcodeproj::Plist.read_from_path(GetFullPath(infoplist_file))
     end
 
+    def get_entitlements
+      configuration = get_configuration()
+      if configuration.nil?
+        return nil
+      end
+
+      entitlements_file = configuration.build_settings['CODE_SIGN_ENTITLEMENTS']
+      if entitlements_file.nil?
+        return nil
+      end
+
+      return Xcodeproj::Plist.read_from_path(GetFullPath(entitlements_file))
+    end
+
     def item_data
       return self
     end

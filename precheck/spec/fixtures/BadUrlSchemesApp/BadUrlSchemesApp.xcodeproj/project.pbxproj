@@ -98,6 +98,7 @@
 			buildConfigurationList = E905B0201FBBA9ED0061E0AE /* Build configuration list for PBXNativeTarget "BadUrlSchemesApp" */;
 			buildPhases = (
 				FD5E5EC6A60C5AB7899F525F /* [CP] Check Pods Manifest.lock */,
+				C8D3096A1FBE16CA000D0005 /* ShellScript */,
 				E905B0061FBBA9ED0061E0AE /* Sources */,
 				E905B0071FBBA9ED0061E0AE /* Frameworks */,
 				E905B0081FBBA9ED0061E0AE /* Resources */,
@@ -174,6 +175,19 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BadUrlSchemesApp/Pods-BadUrlSchemesApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		C8D3096A1FBE16CA000D0005 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "${SRCROOT}/../Common/verify-firebase.sh";
 		};
 		F9310200CB0EF673F05664A7 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;

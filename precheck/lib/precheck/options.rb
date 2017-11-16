@@ -1,6 +1,6 @@
 require 'fastlane_core'
 require 'credentials_manager'
-Dir[File.dirname(__FILE__) + '/rules/*.rb'].each { |file| require file }
+Dir[File.dirname(__FILE__) + '/rules/**/*.rb'].each { |file| require file }
 
 module Precheck
   class Options
