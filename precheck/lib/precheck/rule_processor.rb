@@ -60,6 +60,7 @@ module Precheck
       error_results = {} # rule to fields map
       warning_results = {} # rule to fields map
       skipped_rules = []
+      run_from_Xcode = XcodeEnv.run_as_build_phase?
 
       rules.each do |rule|
         rule_config = Precheck.config[rule.key]
@@ -68,13 +69,13 @@ module Precheck
 
         if rule_level == RULE_LEVELS[:skip]
           skipped_rules << rule
-          UI.message "Skipped: #{rule.class.friendly_name}-> #{rule.description}".yellow
+          UI.message "Skipped: #{rule.class.friendly_name}-> #{rule.description}".yellow unless run_from_Xcode
           next
         end
 
         if rule.needs_customization?
           if rule_config.nil? || rule_config[:data].nil?
-            UI.verbose("#{rule.key} excluded because no data was passed to it e.g.: #{rule.key}(data: <data here>)")
+            UI.verbose("#{rule.key} excluded because no data was passed to it e.g.: #{rule.key}(data: <data here>)") unless run_from_Xcode
             next
           end
 
@@ -104,12 +105,20 @@ module Precheck
         if rule_failed_at_least_once
           message = "😵  Failed: #{rule.class.friendly_name}-> #{rule.description}"
           if rule_level == RULE_LEVELS[:error]
-            UI.error message
+            if run_from_Xcode
+              UI.message "error: #{message}"
+            else
+              UI.error message
+            end
           else
-            UI.important message
+            if run_from_Xcode
+              UI.message "warning: #{message}"
+            else
+              UI.important message
+            end
           end
         else
-          UI.message "✅  Passed: #{rule.class.friendly_name}"
+          UI.message "✅  Passed: #{rule.class.friendly_name}" unless run_from_Xcode
         end
       end
 

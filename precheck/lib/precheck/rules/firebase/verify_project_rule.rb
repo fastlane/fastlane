@@ -29,8 +29,6 @@ module Precheck
 
     def rule_block
       return lambda { |xcode_project_item|
-        puts "Project path: #{xcode_project_item.project_path}"
-
         project = xcode_project_item.get_project()
 
         google_service_plist_entry = project.files.select{|x| x.path == 'GoogleService-Info.plist'}[0]
