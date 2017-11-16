@@ -24,7 +24,6 @@ module Precheck
         result = rule.check_item(good_xcode_project)
         expect(result.status).to eq(VALIDATION_STATES[:passed])
       end
-
     end
   end
 end
