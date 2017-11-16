@@ -73,6 +73,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E905B0201FBBA9ED0061E0AE /* Build configuration list for PBXNativeTarget "MismatchedApp" */;
 			buildPhases = (
+				C8D3096C1FBE174C000D0005 /* ShellScript */,
 				E905B0061FBBA9ED0061E0AE /* Sources */,
 				E905B0071FBBA9ED0061E0AE /* Frameworks */,
 				E905B0081FBBA9ED0061E0AE /* Resources */,
@@ -131,6 +132,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C8D3096C1FBE174C000D0005 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "${SRCROOT}/../Common/verify-firebase.sh";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E905B0061FBBA9ED0061E0AE /* Sources */ = {
