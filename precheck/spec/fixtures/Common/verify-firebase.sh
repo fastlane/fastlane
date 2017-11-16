@@ -20,4 +20,4 @@ fi
 
 # Actually run fastlane from the fastlane root directory.
 cd ../../../
-bundle exec fastlane verify_firebase
+FASTLANE_HIDE_CHANGELOG=1 FASTLANE_HIDE_TIMESTAMP=1 FASTLANE_ENV_PRINTER=1 FASTLANE_SKIP_UPDATE_CHECK=1 bundle exec fastlane verify_firebase
