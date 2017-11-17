@@ -202,7 +202,7 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    def put_tester_to_group(app_id: nil, email: nil, first_name: nil, last_name: nil, group_id: nil)
+    def post_tester_to_group(app_id: nil, email: nil, first_name: nil, last_name: nil, group_id: nil)
       assert_required_params(__method__, binding)
 
       # Then we can add the tester to the group that allows the app to test
