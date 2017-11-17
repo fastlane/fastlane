@@ -33,6 +33,10 @@ module Spaceship
 
     attr_accessor :csrf_tokens
 
+    attr_accessor :provider
+
+    attr_accessor :available_providers
+
     # Base class for errors that want to present their message as
     # preferred error info for fastlane error handling. See:
     # fastlane_core/lib/fastlane_core/ui/fastlane_runner.rb
@@ -489,10 +493,18 @@ module Spaceship
     # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
     def fetch_olympus_session
       response = request(:get, "https://olympus.itunes.apple.com/v1/session")
-      if response.body
-        user_map = response.body["user"]
+      body = response.body
+      if body
+        body = JSON.parse(body) if body.kind_of?(String)
+        user_map = body["user"]
         if user_map
           self.user_email = user_map["emailAddress"]
+        end
+
+        provider = body["provider"]
+        self.provider = Spaceship::Provider.new(provider_hash: provider)
+        self.available_providers = body["availableProviders"].map do |provider_hash|
+          Spaceship::Provider.new(provider_hash: provider_hash)
         end
       end
     end

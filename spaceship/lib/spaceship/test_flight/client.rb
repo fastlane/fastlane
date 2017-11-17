@@ -105,6 +105,44 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
+    # Returns a list of available testing groups
+    # e.g.
+    #   {"b6f65dbd-c845-4d91-bc39-0b661d608970" => "Boarding",
+    #    "70402368-9deb-409f-9a26-bb3f215dfee3" => "Automatic"}
+    def groups(app_id)
+      return @cached_groups if @cached_groups
+
+      r = request(:get, "/testflight/v2/providers/#{self.provider.provider_id}/apps/#{app_id}/groups")
+      @cached_groups = parse_response(r, 'data')
+    end
+
+    #####################################################
+    # @!group Testers
+    #####################################################
+    def testers(tester)
+      url = tester.url[:index]
+      r = request(:get, url)
+      parse_response(r, 'data')['users']
+    end
+
+    def testers_by_app(tester, app_id, group_id: nil)
+      if group_id.nil?
+        group_ids = groups(app_id).map do |group|
+          group['id']
+        end
+      end
+      group_ids ||= [group_id]
+      testers = []
+
+      group_ids.each do |json_group_id|
+        url = tester.url(app_id, self.provider.provider_id, json_group_id)[:index_by_app]
+        r = request(:get, url)
+        testers += parse_response(r, 'data')['users']
+      end
+
+      testers
+    end
+
     ##
     # @!group Testers API
     ##
@@ -164,18 +202,19 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    def put_tester_to_group(app_id: nil, tester_id: nil, group_id: nil)
+    def post_tester_to_group(app_id: nil, email: nil, first_name: nil, last_name: nil, group_id: nil)
       assert_required_params(__method__, binding)
 
       # Then we can add the tester to the group that allows the app to test
       # This is easy enough, we already have all this data. We don't need any response from the previous request
-      url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
-      response = request(:put) do |req|
+      url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers"
+      response = request(:post) do |req|
         req.url url
-        req.body = {
-          "groupId" => group_id,
-          "testerId" => tester_id
-        }.to_json
+        req.body = [{
+          "email" => email,
+          "firstName" => first_name,
+          "lastName" => last_name
+        }].to_json
         req.headers['Content-Type'] = 'application/json'
       end
       handle_response(response)
