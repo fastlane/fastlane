@@ -47,7 +47,7 @@ module Fastlane
         UI.message(message.join(" "))
 
         # Loop through all app versions and download their dSYM
-        # TODO: this will need to change with the new build trains endpoints
+        # This will need to change with the new build trains endpoints
         # can use app.build_trains(platform: platform).versions to check for the right version
         # then iterate through the builds
         app.all_build_train_numbers(platform: platform).each do |train_number|
