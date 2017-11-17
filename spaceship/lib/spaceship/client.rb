@@ -33,6 +33,10 @@ module Spaceship
 
     attr_accessor :csrf_tokens
 
+    attr_accessor :provider
+
+    attr_accessor :available_providers
+
     # Base class for errors that want to present their message as
     # preferred error info for fastlane error handling. See:
     # fastlane_core/lib/fastlane_core/ui/fastlane_runner.rb
@@ -493,6 +497,13 @@ module Spaceship
         user_map = response.body["user"]
         if user_map
           self.user_email = user_map["emailAddress"]
+        end
+        provider = response.body["provider"]
+
+        self.provider = Spaceship::Provider.new(provider_hash: provider)
+
+        self.available_providers = response.body["availableProviders"].map do |provider_hash|
+          Spaceship::Provider.new(provider_hash: provider_hash)
         end
       end
     end
