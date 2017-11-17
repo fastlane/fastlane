@@ -202,7 +202,7 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    def put_tester_to_group(app_id: nil, tester: nil, group_id: nil)
+    def add_tester_to_group(app_id: nil, tester: nil, group_id: nil)
       assert_required_params(__method__, binding)
 
       # Then we can add the tester to the group that allows the app to test
@@ -213,7 +213,7 @@ module Spaceship::TestFlight
         req.body = [{
           "email" => tester.email,
           "firstName" => tester.first_name,
-          "lastName" => tester.first_name
+          "lastName" => tester.last_name
         }].to_json
         req.headers['Content-Type'] = 'application/json'
       end
