@@ -43,7 +43,7 @@ module Precheck
           return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to locate a target for #{xcode_project_item.target_name}.")
         end
 
-        build_configuration = xcode_project_item.get_configuration
+        build_configuration = xcode_project_item.configuration
         if build_configuration.nil?
           return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to locate a build configuration #{xcode_project_item.configuration} for target #{xcode_project_item.target_name}.")
         end
