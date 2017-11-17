@@ -179,9 +179,11 @@ describe Spaceship::TestFlight::Client do
 
   context '#put_tester_to_group' do
     it 'executes the request' do
-      MockAPI::TestFlightServer.put('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers/fake-tester-id') {}
-      subject.put_tester_to_group(app_id: app_id, tester_id: 'fake-tester-id', group_id: 'fake-group-id')
-      expect(WebMock).to have_requested(:put, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers/fake-tester-id')
+      MockAPI::TestFlightServer.post('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers') {}
+      tester = OpenStruct.new({ first_name: "Josh", last_name: "Taquitos", email: "taquitos@google.com" })
+      subject.put_tester_to_group(app_id: app_id, tester: tester, group_id: 'fake-group-id')
+      expect(WebMock).to have_requested(:post, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers').
+        with(body: '[{"email":"taquitos@google.com","firstName":"Josh","lastName":"Josh"}]')
     end
   end
 

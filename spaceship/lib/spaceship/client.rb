@@ -493,16 +493,17 @@ module Spaceship
     # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
     def fetch_olympus_session
       response = request(:get, "https://olympus.itunes.apple.com/v1/session")
-      if response.body
-        user_map = response.body["user"]
+      body = response.body
+      if body
+        body = JSON.parse(body) if body.kind_of?(String)
+        user_map = body["user"]
         if user_map
           self.user_email = user_map["emailAddress"]
         end
-        provider = response.body["provider"]
 
+        provider = body["provider"]
         self.provider = Spaceship::Provider.new(provider_hash: provider)
-
-        self.available_providers = response.body["availableProviders"].map do |provider_hash|
+        self.available_providers = body["availableProviders"].map do |provider_hash|
           Spaceship::Provider.new(provider_hash: provider_hash)
         end
       end
