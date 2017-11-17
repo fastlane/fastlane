@@ -27,10 +27,12 @@ module Precheck
     class RuleReturn
       attr_accessor :validation_state
       attr_accessor :failure_data
+      attr_accessor :file_path
 
-      def initialize(validation_state: nil, failure_data: nil)
+      def initialize(validation_state: nil, failure_data: nil, file_path: nil)
         @validation_state = validation_state
         @failure_data = failure_data
+        @file_path = file_path
       end
     end
 

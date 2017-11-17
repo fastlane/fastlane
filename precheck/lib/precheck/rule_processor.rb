@@ -105,17 +105,16 @@ module Precheck
         end
 
         if rule_failed_at_least_once
-          message = "😵  Failed: #{rule.class.friendly_name}-> #{rule.description}"
-          if rule_level == RULE_LEVELS[:error]
-            if run_from_xcode
-              # Force warning for Xcode to avoid awkward messaging in build logs.
-              UI.message "warning: #{error_results[rule].first.failure_data}"
-            else
-              UI.error message
+          message = ''
+          if run_from_xcode
+            if error_results[rule].first.rule_return.file_path
+              message = "#{error_results[rule].first.rule_return.file_path}:1:"
             end
+            UI.message "#{message} warning: #{error_results[rule].first.failure_data}"
           else
-            if run_from_xcode
-              UI.message "warning: #{error_results[rule].first.failure_data}"
+            message = "😵  Failed: #{rule.class.friendly_name}-> #{rule.description}"
+            if rule_level == RULE_LEVELS[:error]
+              UI.error message
             else
               UI.important message
             end
