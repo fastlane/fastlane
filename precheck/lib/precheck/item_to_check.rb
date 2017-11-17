@@ -46,8 +46,12 @@ module Precheck
     attr_accessor :target_name
     attr_accessor :configuration
 
+    def expand_env(str)
+      str.gsub(/\$\(([a-zA-Z_][a-zA-Z0-9_]*\))|\$\({\g<1>}|%\g<1>%/) { ENV[$1] }
+    end
+
     def get_full_path(relative_path)
-      return File.join(@project.path, '..', relative_path)
+      return File.join(@project.path, '..', expand_env(relative_path))
     end
 
     def initialize(project_path, target_name, configuration, item_name, friendly_name, is_optional = false)
@@ -64,7 +68,7 @@ module Precheck
     end
 
     def google_service_plist
-      google_service_plist_entry = @project.files.select { |x| x.path == 'GoogleService-Info.plist' }[0]
+      google_service_plist_entry = @project.files.select { |x| x.path.end_with? 'GoogleService-Info.plist' }[0]
       if google_service_plist_entry.nil?
         return nil
       end

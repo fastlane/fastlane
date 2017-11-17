@@ -29,14 +29,10 @@ module Precheck
 
     def rule_block
       return lambda { |xcode_project_item|
-        project = xcode_project_item.project
-
-        google_service_plist_entry = project.files.select { |x| x.path == 'GoogleService-Info.plist' }[0]
-        if google_service_plist_entry.nil?
+        google_service_plist = xcode_project_item.google_service_plist
+        if google_service_plist.nil?
           return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "A valid Firebase project requires a GoogleService-Info.plist. Please download it via the Firebase console.", file_path: xcode_project_item.project_path)
         end
-
-        google_service_plist = Xcodeproj::Plist.read_from_path(full_path(project, google_service_plist_entry.path))
 
         target = xcode_project_item.target
         if target.nil?
