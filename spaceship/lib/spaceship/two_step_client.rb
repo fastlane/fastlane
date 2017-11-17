@@ -3,82 +3,29 @@ require 'tempfile'
 module Spaceship
   class Client
     def handle_two_step(response)
-      @x_apple_id_session_id = response["x-apple-id-session-id"]
-      @scnt = response["scnt"]
+      labels_regex = %r{<label class="radio-label" for="(deviceId.*?)">.*?([0-9]+)<\/.*?>}
+      device_matches = response.body.scan(labels_regex)
 
-      r = request(:get) do |req|
-        req.url "https://idmsa.apple.com/appleauth/auth"
-        update_request_headers(req)
-      end
-
-      if r.body.kind_of?(Hash) && r.body["trustedDevices"].kind_of?(Array)
-        if r.body.fetch("securityCode", {})["tooManyCodesLock"].to_s.length > 0
-          raise ITunesConnectError.new, "Too many verification codes have been sent. Enter the last code you received, use one of your devices, or try again later."
-        end
-
-        old_client = (begin
-                        Tunes::RecoveryDevice.client
-                      rescue
-                        nil # since client might be nil, which raises an exception
-                      end)
-        Tunes::RecoveryDevice.client = self # temporary set it as it's required by the factory method
-        devices = r.body["trustedDevices"].collect do |current|
-          Tunes::RecoveryDevice.factory(current)
-        end
-        Tunes::RecoveryDevice.client = old_client
-
-        puts "Two Step Verification for account '#{self.user}' is enabled"
-        puts "Please select a device to verify your identity"
-        available = devices.collect do |c|
-          "#{c.name}\t#{c.model_name || 'SMS'}\t(#{c.device_id})"
+      if device_matches.length > 0
+        puts "Two Factor Verification for account '#{self.user}' is enabled"
+        puts "Please select a phone to verify your identity"
+        available = device_matches.collect do |match|
+          "Phone number ending in #{match[1]}"
         end
         result = choose(*available)
-        device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
-        select_device(r, device_id)
-      elsif r.body.kind_of?(Hash) && r.body["trustedPhoneNumbers"].kind_of?(Array) && r.body["trustedPhoneNumbers"].first.kind_of?(Hash)
-        handle_two_factor(r)
+
+        selected_index = 1 # omg no.
+        available.each do |selected|
+          break if selected == result
+          selected_index += selected_index
+        end
+
+        scnt_regex = %r{<input type="hidden" id="scnt" name="scnt" value="(.*?)" .*?\/>}
+        scnt = response.body.scan(scnt_regex)[0][0]
+        select_device(scnt, selected_index)
       else
-        raise "Invalid 2 step response #{r.body}"
+        raise "Invalid 2 step response #{response.body}"
       end
-    end
-
-    def handle_two_factor(response)
-      two_factor_url = "https://github.com/fastlane/fastlane/tree/master/spaceship#2-step-verification"
-      puts "Two Factor Authentication for account '#{self.user}' is enabled"
-
-      if !File.exist?(persistent_cookie_path) && self.class.spaceship_session_env.to_s.length.zero?
-        puts "If you're running this in a non-interactive session (e.g. server or CI)"
-        puts "check out #{two_factor_url}"
-      else
-        # If the cookie is set but still required, the cookie is expired
-        puts "Your session cookie has been expired."
-      end
-
-      security_code = response.body["securityCode"]
-      # {"length"=>6,
-      #  "tooManyCodesSent"=>false,
-      #  "tooManyCodesValidated"=>false,
-      #  "securityCodeLocked"=>false}
-      code_length = security_code["length"]
-      code = ask("Please enter the #{code_length} digit code: ")
-      puts "Requesting session..."
-
-      # Send securityCode back to server to get a valid session
-      r = request(:post) do |req|
-        req.url "https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode"
-        req.headers['Content-Type'] = 'application/json'
-        req.body = { "securityCode" => { "code" => code.to_s } }.to_json
-
-        update_request_headers(req)
-      end
-
-      # we use `Spaceship::TunesClient.new.handle_itc_response`
-      # since this might be from the Dev Portal, but for 2 step
-      Spaceship::TunesClient.new.handle_itc_response(r.body)
-
-      store_session
-
-      return true
     end
 
     # Only needed for 2 step
@@ -116,66 +63,54 @@ module Spaceship
       ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
     end
 
-    def select_device(r, device_id)
+    def select_device(scnt, device_id)
       # Request Token
-      r = request(:put) do |req|
-        req.url "https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode"
-        update_request_headers(req)
+      response = request(:post) do |req|
+        req.url "https://idmsa.apple.com/IDMSWebAuth/generateSecurityCode"
+        req.body = "deviceIndex=#{device_id}&scnt=#{scnt}"
+        req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        req.headers['Accept'] = 'application/json, text/javascript'
       end
 
-      # we use `Spaceship::TunesClient.new.handle_itc_response`
-      # since this might be from the Dev Portal, but for 2 step
-      Spaceship::TunesClient.new.handle_itc_response(r.body)
+      # if the hidden rate limit message isn't there, that means it is being shown, so we have an error
+      hidden_rate_limit_regex = /<div\s*id="tooManyCodesSentError"\s*style="display:\snone">/
+      hidden_rate_limit_error_matches = response.body.scan(hidden_rate_limit_regex)[0]
+      raise "Too many codes sent, enter the last code you received, use a different device, or try again later" if hidden_rate_limit_error_matches.nil?
 
       puts "Successfully requested notification"
       code = ask("Please enter the 4 digit code: ")
       puts "Requesting session..."
 
-      # Send token back to server to get a valid session
-      r = request(:post) do |req|
-        req.url "https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode"
-        req.body = { "code" => code.to_s }.to_json
-        req.headers['Content-Type'] = 'application/json'
+      request_body = []
+      code.each_char.with_index do |c, index|
+        n = index + 1
+        request_body << "digit#{n}=#{c}"
+      end
+      request_body << "scnt=#{scnt}"
 
-        update_request_headers(req)
+      # Send code back to server to get a valid session
+      response = request(:post) do |req|
+        req.url "https://idmsa.apple.com/IDMSWebAuth/validateSecurityCode"
+        req.body = body.join('&')
+        req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        req.headers['Accept'] = 'application/json, text/javascript'
       end
 
-      begin
-        Spaceship::TunesClient.new.handle_itc_response(r.body) # this will fail if the code is invalid
-      rescue => ex
-        # If the code was entered wrong
-        # {
-        #   "securityCode": {
-        #     "code": "1234"
-        #   },
-        #   "securityCodeLocked": false,
-        #   "recoveryKeyLocked": false,
-        #   "recoveryKeySupported": true,
-        #   "manageTrustedDevicesLinkName": "appleid.apple.com",
-        #   "suppressResend": false,
-        #   "authType": "hsa",
-        #   "accountLocked": false,
-        #   "validationErrors": [{
-        #     "code": "-21669",
-        #     "title": "Incorrect Verification Code",
-        #     "message": "Incorrect verification code."
-        #   }]
-        # }
-        if ex.to_s.include?("verification code") # to have a nicer output
-          puts "Error: Incorrect verification code"
-          return select_device(r, device_id)
-        end
-
-        raise ex
+      case response.status
+      when 200
+        # When 2 factor fails, it's a 200 with error instead of a 302 redirect
+        puts "Error: Incorrect verification code"
+        return select_device(scnt, device_id)
+      when 302
+        store_session
+        return true
+      else
+        raise "Unable to valid your verification code: #{response.body}"
       end
-
-      store_session
-
-      return true
     end
 
     def store_session
-      # If the request was successful, r.body is actually nil
+      # If the request was successful, response.body is actually nil
       # The previous request will fail if the user isn't on a team
       # on iTunes Connect, but it still works, so we're good
 

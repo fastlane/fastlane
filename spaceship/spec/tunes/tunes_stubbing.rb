@@ -21,20 +21,23 @@ class TunesStubbing
         to_return(status: 200, body: "")
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa").
         to_return(status: 200, body: "")
-      stub_request(:get, "https://olympus.itunes.apple.com/v1/session").
-        to_return(status: 200, body: "") # we don't actually care about the body
-      stub_request(:get, "https://olympus.itunes.apple.com/v1/app/config?hostname=itunesconnect.apple.com").
+
+      # Used to be https://olympus.itunes.apple.com ...
+      stub_request(:get, "https://itunesconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.co").
         to_return(status: 200, body: { authServiceKey: 'e0abc' }.to_json, headers: { 'Content-Type' => 'application/json' })
+      stub_request(:get, "https://itunesconnect.apple.com/olympus/v1/session").
+        to_return(status: 200)
 
       # Actual login
-      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin").
-        with(body: { "accountName" => "spaceship@krausefx.com", "password" => "so_secret", "rememberMe" => true }.to_json).
-        to_return(status: 200, body: '{}', headers: { 'Set-Cookie' => "myacinfo=abcdef;" })
+      stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").
+        with(body: { "accountPassword" => "bad-password", "appIdKey" => "891bd3417a7776362562d2197f89480a8547b108fd934911bcbea0110d07f757", "appleId" => "bad-username" },
+          headers: { 'Accept' => 'application/json, text/javascript', 'Content-Type' => 'application/x-www-form-urlencoded' }).
+        to_return(status: 401, body: "", headers: { 'Set-Cookie' => 'session=invalid' })
 
-      # Failed login attempts
-      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin").
-        with(body: { "accountName" => "bad-username", "password" => "bad-password", "rememberMe" => true }.to_json).
-        to_return(status: 401, body: '{}', headers: { 'Set-Cookie' => 'session=invalid' })
+      stub_request(:post, "https://idmsa.apple.com/IDMSWebAuth/authenticate").
+        with(body: { "accountPassword" => "so_secret", "appIdKey" => "891bd3417a7776362562d2197f89480a8547b108fd934911bcbea0110d07f757", "appleId" => "spaceship@krausefx.com" },
+          headers: { 'Accept' => 'application/json, text/javascript', 'Content-Type' => 'application/x-www-form-urlencoded' }).
+        to_return(status: 302, body: "", headers: { 'Set-Cookie' => "myacinfo=abcdef;" })
     end
 
     def itc_stub_applications

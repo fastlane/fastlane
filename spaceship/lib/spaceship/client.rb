@@ -420,12 +420,6 @@ module Spaceship
       # If this is a CI, the user can pass the session via environment variable
       load_session_from_env
 
-      data = {
-        accountName: user,
-        password: password,
-        rememberMe: true
-      }
-
       begin
         # The below workaround is only needed for 2 step verified machines
         # Due to escaping of cookie values we have a little workaround here
@@ -446,12 +440,15 @@ module Spaceship
           modified_cookie.gsub!(unescaped_important_cookie, escaped_important_cookie)
         end
 
+        require 'uri'
+        encoded_password = URI.encode(password)
+        encoded_apple_id = URI.encode(user)
+
         response = request(:post) do |req|
-          req.url "https://idmsa.apple.com/appleauth/auth/signin"
-          req.body = data.to_json
-          req.headers['Content-Type'] = 'application/json'
-          req.headers['X-Requested-With'] = 'XMLHttpRequest'
-          req.headers['X-Apple-Widget-Key'] = self.itc_service_key
+          req.url "https://idmsa.apple.com/IDMSWebAuth/authenticate"
+          # appIdKey is hardcoded because that seems to the be an internal SSO service identifier.
+          req.body = "appIdKey=891bd3417a7776362562d2197f89480a8547b108fd934911bcbea0110d07f757&appleId=#{encoded_apple_id}&accountPassword=#{encoded_password}"
+          req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
           req.headers['Accept'] = 'application/json, text/javascript'
           req.headers["Cookie"] = modified_cookie if modified_cookie
         end
@@ -465,9 +462,17 @@ module Spaceship
       when 403
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       when 200
+        # 2 factor requires HTML parsing now...
+        # When 2 factor is needed, it's a 200 instead of a 302 redirect
+        handle_two_step(response)
+        fetch_olympus_session
+        return response
+      when 302
+        # on success, 302 redirect to idmsa.apple.com happens
         fetch_olympus_session
         return response
       when 409
+        # Can probably remove this
         # 2 factor is enabled for this account, first handle that
         # and then get the olympus session
         handle_two_step(response)
@@ -488,7 +493,7 @@ module Spaceship
 
     # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
     def fetch_olympus_session
-      response = request(:get, "https://olympus.itunes.apple.com/v1/session")
+      response = request(:get, "https://itunesconnect.apple.com/olympus/v1/session")
       if response.body
         user_map = response.body["user"]
         if user_map
@@ -504,7 +509,7 @@ module Spaceship
       itc_service_key_path = "/tmp/spaceship_itc_service_key.txt"
       return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
 
-      response = request(:get, "https://olympus.itunes.apple.com/v1/app/config?hostname=itunesconnect.apple.com")
+      response = request(:get, "https://itunesconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com")
       @service_key = response.body["authServiceKey"].to_s
 
       raise "Service key is empty" if @service_key.length == 0
