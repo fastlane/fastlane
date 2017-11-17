@@ -24,10 +24,11 @@ module Spaceship::TestFlight
       assert_required_params(__method__, binding)
 
       response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains")
+
       handle_response(response)
     end
 
-    def get_builds_for_train(app_id: nil, platform: "ios", train_version: nil, retry_count: 0)
+    def get_builds_for_train(app_id: nil, platform: "ios", train_version: nil, retry_count: 3)
       assert_required_params(__method__, binding)
       with_retry(retry_count) do
         response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains/#{train_version}/builds", nil, {}, true)
@@ -267,6 +268,8 @@ module Spaceship::TestFlight
       end
 
       raise UnexpectedResponse, response.body['error'] if response.body['error']
+
+      raise UnexpectedResponse, "Temporary iTunes Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
 
       return response.body['data'] if response.body['data']
 
