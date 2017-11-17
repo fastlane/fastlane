@@ -9,7 +9,7 @@ module Fastlane
       SIGH_PROFILE_TYPE = :SIGH_PROFILE_TYPE
     end
 
-    class SighAction < Action
+    class GenerateProvisioningProfileAction < Action
       def self.run(values)
         require 'sigh'
         require 'credentials_manager/appfile_config'
@@ -44,7 +44,7 @@ module Fastlane
       end
 
       def self.description
-        "Generates a provisioning profile. Stores the profile in the current folder"
+        "Generates a provisioning profile, saving it in the current folder (via `sigh`)"
       end
 
       def self.author
@@ -70,8 +70,9 @@ module Fastlane
 
       def self.example_code
         [
-          'sigh',
-          'sigh(
+          'generate_provisioning_profile',
+          'sigh # alias for "generate_provisioning_profile"',
+          'generate_provisioning_profile(
             adhoc: true,
             force: true,
             filename: "myFile.mobileprovision"

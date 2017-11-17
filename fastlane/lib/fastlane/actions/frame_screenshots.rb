@@ -1,12 +1,12 @@
 module Fastlane
   module Actions
-    class FrameitAction < Action
+    class FrameScreenshotsAction < Action
       def self.run(config)
         return if Helper.test?
 
         require 'frameit'
 
-        UI.message("Framing screenshots at path #{config[:path]}")
+        UI.message("Framing screenshots at path #{config[:path]} (via frameit)")
 
         Dir.chdir(config[:path]) do
           Frameit.config = config
@@ -15,12 +15,12 @@ module Fastlane
       end
 
       def self.description
-        "Adds device frames around the screenshots using frameit"
+        "Adds device frames around all screenshots (via `frameit`)"
       end
 
       def self.details
         [
-          "Use [frameit](https://github.com/fastlane/fastlane/tree/master/frameit) to prepare perfect screenshots for the App Store, your website, QA",
+          "Uses [frameit](https://github.com/fastlane/fastlane/tree/master/frameit) to prepare perfect screenshots for the App Store, your website, QA",
           "or emails. You can add background and titles to the framed screenshots as well."
         ].join("\n")
       end
@@ -42,10 +42,11 @@ module Fastlane
 
       def self.example_code
         [
-          'frameit',
-          'frameit(silver: true)',
-          'frameit(path: "/screenshots")',
-          'frameit(rose_gold: true)'
+          'frame_screenshots',
+          'frameit # alias for "frame_screenshots"',
+          'frame_screenshots(silver: true)',
+          'frame_screenshots(path: "/screenshots")',
+          'frame_screenshots(rose_gold: true)'
         ]
       end
 

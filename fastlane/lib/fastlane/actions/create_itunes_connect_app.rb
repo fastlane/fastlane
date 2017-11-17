@@ -4,7 +4,7 @@ module Fastlane
       PRODUCE_APPLE_ID = :PRODUCE_APPLE_ID
     end
 
-    class ProduceAction < Action
+    class CreateItunesConnectAppAction < Action
       def self.run(params)
         require 'produce'
 
@@ -22,12 +22,13 @@ module Fastlane
       end
 
       def self.description
-        "Creates the given application on iTC and the Dev Portal if necessary"
+        "Creates the given application on iTC and the Dev Portal (via `produce`)"
       end
 
       def details
         [
-          'Create new apps on iTunes Connect and Apple Developer Portal. If the app already exists, `produce` will not do anything.',
+          'Create new apps on iTunes Connect and Apple Developer Portal via `produce`.',
+          'If the app already exists, `create_itunes_connect_app` will not do anything.',
           'For more information about produce, visit its GitHub page:',
           'https://github.com/fastlane/fastlane/tree/master/produce'
         ].join(' ')
@@ -54,7 +55,7 @@ module Fastlane
 
       def self.example_code
         [
-          'produce(
+          'create_itunes_connect_app(
             username: "felix@krausefx.com",
             app_identifier: "com.krausefx.app",
             app_name: "MyApp",
@@ -62,7 +63,8 @@ module Fastlane
             app_version: "1.0",
             sku: "123",
             team_name: "SunApps GmbH" # Only necessary when in multiple teams.
-          )'
+          )',
+          'produce(...) # alias for "create_itunes_connect_app"'
         ]
       end
 

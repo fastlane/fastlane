@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    class PemAction < Action
+    class RenewPushCertificateAction < Action
       def self.run(params)
         require 'pem'
         require 'pem/options'
@@ -22,7 +22,7 @@ module Fastlane
       end
 
       def self.description
-        "Makes sure a valid push profile is active and creates a new one if needed"
+        "Ensure a valid push profile is active, creating a new one if needed (via `pem`)"
       end
 
       def self.author
@@ -34,7 +34,7 @@ module Fastlane
           "Additionally to the available options, you can also specify a block that only gets executed if a new",
           "profile was created. You can use it to upload the new profile to your server.",
           "Use it like this: ",
-          "pem(",
+          "renew_push_certificate(",
           "  new_profile: proc do ",
           "    # your upload code",
           "  end",
@@ -60,8 +60,9 @@ module Fastlane
 
       def self.example_code
         [
-          'pem',
-          'pem(
+          'renew_push_certificate',
+          'pem # alias for "renew_push_certificate"',
+          'renew_push_certificate(
             force: true, # create a new profile, even if the old one is still valid
             app_identifier: "net.sunapps.9", # optional app identifier,
             save_private_key: true,

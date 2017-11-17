@@ -3,7 +3,7 @@ module Fastlane
     module SharedValues
     end
 
-    class DeliverAction < Action
+    class UploadToAppStoreAction < Action
       def self.run(config)
         require 'deliver'
 
@@ -18,16 +18,17 @@ module Fastlane
       end
 
       def self.description
-        "Uses deliver to upload new app metadata and builds to iTunes Connect"
+        "Upload metadata and binary to iTunes Connect (via `deliver`)"
       end
 
       def self.details
         [
-          "Using _deliver_ after _gym_ and _snapshot_ will automatically upload the",
+          "Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the",
           "latest ipa and screenshots with no other configuration",
           "",
           "If you don't want a PDF report for App Store builds, use the `:force` option.",
-          "This is useful when running _fastlane_ on your Continuous Integration server: `deliver(force: true)`",
+          "This is useful when running _fastlane_ on your Continuous Integration server:",
+          "`_upload_to_app_store_(force: true)`",
           "If your account is on multiple teams and you need to tell the `iTMSTransporter`",
           "which 'provider' to use, you can set the `itc_provider` option to pass this info."
         ].join("\n")
@@ -49,10 +50,12 @@ module Fastlane
 
       def self.example_code
         [
-          'deliver(
+          'upload_to_app_store(
             force: true, # Set to true to skip PDF verification
             itc_provider: "abcde12345" # pass a specific value to the iTMSTransporter -itc_provider option
-          )'
+          )',
+          'deliver(...) # alias for "upload_to_app_store"',
+          'appstore(...) # alias for "upload_to_app_store"'
         ]
       end
 

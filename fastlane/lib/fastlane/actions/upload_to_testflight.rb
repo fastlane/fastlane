@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    class PilotAction < Action
+    class UploadToTestflightAction < Action
       def self.run(values)
         require 'pilot'
         require 'pilot/options'
@@ -21,7 +21,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Upload a new binary to iTunes Connect for TestFlight beta testing"
+        "Upload a new binary to iTunes Connect for TestFlight beta testing (via `pilot`)"
       end
 
       def self.details
@@ -39,10 +39,11 @@ module Fastlane
 
       def self.example_code
         [
-          'testflight',
-          'pilot # alias for "testflight"',
-          'testflight(skip_submission: true) # to only upload the build',
-          'testflight(
+          'upload_to_testfight',
+          'testflight # alias for "upload_to_testfight"',
+          'pilot # alias for "upload_to_testfight"',
+          'upload_to_testfight(skip_submission: true) # to only upload the build',
+          'upload_to_testfight(
             username: "felix@krausefx.com",
             app_identifier: "com.krausefx.app",
             itc_provider: "abcde12345" # pass a specific value to the iTMSTransporter -itc_provider option

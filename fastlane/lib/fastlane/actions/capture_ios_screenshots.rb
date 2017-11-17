@@ -4,7 +4,7 @@ module Fastlane
       SNAPSHOT_SCREENSHOTS_PATH = :SNAPSHOT_SCREENSHOTS_PATH
     end
 
-    class SnapshotAction < Action
+    class CaptureIOSScreenshotsAction < Action
       def self.run(params)
         return nil unless Helper.mac?
         require 'snapshot'
@@ -19,7 +19,7 @@ module Fastlane
       end
 
       def self.description
-        "Generate new localized screenshots on multiple devices"
+        "Generate new localized screenshots on multiple devices (via `snapshot`)"
       end
 
       def self.available_options
@@ -38,8 +38,9 @@ module Fastlane
 
       def self.example_code
         [
-          'snapshot',
-          'snapshot(
+          'capture_ios_screenshots',
+          'snapshot # alias for "capture_ios_screenshots"',
+          'capture_ios_screenshots(
             skip_open_summary: true,
             clean: true
           )'

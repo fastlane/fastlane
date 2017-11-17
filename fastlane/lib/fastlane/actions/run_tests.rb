@@ -6,7 +6,7 @@ module Fastlane
       SCAN_GENERATED_PLIST_FILES = :SCAN_GENERATED_PLIST_FILES
     end
 
-    class ScanAction < Action
+    class RunTestsAction < Action
       def self.run(values)
         require 'scan'
         plist_files_before = []
@@ -38,7 +38,7 @@ module Fastlane
       end
 
       def self.description
-        "Easily run tests of your iOS app using _scan_"
+        "Easily run tests of your iOS app (via `scan`)"
       end
 
       def self.details
@@ -73,24 +73,25 @@ module Fastlane
 
       def self.example_code
         [
-          'scan',
-          'scan(
+          'run_tests',
+          'scan # alias for "run_tests"',
+          'run_tests(
             workspace: "App.xcworkspace",
             scheme: "MyTests",
             clean: false
           )',
           '# Build For Testing
-          scan(
+          run_tests(
              derived_data_path: "my_folder",
              build_for_testing: true
           )',
           '# run tests using derived data from prev. build
-          scan(
+          run_tests(
              derived_data_path: "my_folder",
              test_without_building: true
           )',
           '# or run it from an existing xctestrun package
-          scan(
+          run_tests(
              xctestrun: "/path/to/mytests.xctestrun"
           )'
         ]

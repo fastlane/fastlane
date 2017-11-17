@@ -5,7 +5,7 @@ module Fastlane
       DSYM_OUTPUT_PATH = :DSYM_OUTPUT_PATH
     end
 
-    class GymAction < Action
+    class BuildAppAction < Action
       def self.run(values)
         require 'gym'
 
@@ -86,7 +86,7 @@ module Fastlane
       end
 
       def self.description
-        "Easily build and sign your app using _gym_"
+        "Easily build and sign your app (via gym)"
       end
 
       def self.details
@@ -112,8 +112,8 @@ module Fastlane
 
       def self.example_code
         [
-          'gym(scheme: "MyApp", workspace: "MyApp.xcworkspace")',
-          'gym(
+          'build_app(scheme: "MyApp", workspace: "MyApp.xcworkspace")',
+          'build_app(
             workspace: "MyApp.xcworkspace",
             configuration: "Debug",
             scheme: "MyApp",
@@ -122,7 +122,8 @@ module Fastlane
             output_directory: "path/to/dir", # Destination directory. Defaults to current directory.
             output_name: "my-app.ipa",       # specify the name of the .ipa file to generate (including file extension)
             sdk: "10.0"                      # use SDK as the name or path of the base SDK when building the project.
-          )'
+          )',
+          'gym(...) # alias for "build_app"'
         ]
       end
 

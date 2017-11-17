@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    class SupplyAction < Action
+    class UploadToPlayStoreAction < Action
       def self.run(params)
         require 'supply'
         require 'supply/options'
@@ -26,7 +26,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Upload metadata, screenshots and binaries to Google Play"
+        "Upload metadata, screenshots and binaries to Google Play (via `supply`)"
       end
 
       def self.details
@@ -55,7 +55,8 @@ module Fastlane
 
       def self.example_code
         [
-          'supply'
+          'upload_to_play_store',
+          'supply # alias for "upload_to_play_store"'
         ]
       end
 

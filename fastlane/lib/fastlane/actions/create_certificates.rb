@@ -5,7 +5,7 @@ module Fastlane
       CERT_CERTIFICATE_ID = :CERT_CERTIFICATE_ID
     end
 
-    class CertAction < Action
+    class CreateCertificatesAction < Action
       def self.run(params)
         require 'cert'
 
@@ -27,7 +27,7 @@ module Fastlane
       end
 
       def self.description
-        "Fetch or generate the latest available code signing identity"
+        "Create new iOS code signing certificates (via `cert`)"
       end
 
       def self.details
@@ -52,8 +52,9 @@ module Fastlane
 
       def self.example_code
         [
-          'cert',
-          'cert(
+          'create_certificates',
+          'cert # alias for "create_certificates"',
+          'create_certificates(
             development: true,
             username: "user@email.com"
           )'

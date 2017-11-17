@@ -4,7 +4,7 @@ module Fastlane
       MATCH_PROVISIONING_PROFILE_MAPPING = :MATCH_PROVISIONING_PROFILE_MAPPING
     end
 
-    class MatchAction < Action
+    class SynchronizeProvisioningAction < Action
       def self.run(params)
         require 'match'
 
@@ -55,7 +55,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Easily sync your certificates and profiles across your team using git"
+        "Easily sync your certificates and profiles across your team (via `match`)"
       end
 
       def self.details
@@ -84,9 +84,10 @@ module Fastlane
 
       def self.example_code
         [
-          'match(type: "appstore", app_identifier: "tools.fastlane.app")',
-          'match(type: "development", readonly: true)',
-          'match(app_identifier: ["tools.fastlane.app", "tools.fastlane.sleepy"])'
+          'synchronize_provisioning(type: "appstore", app_identifier: "tools.fastlane.app")',
+          'synchronize_provisioning(type: "development", readonly: true)',
+          'synchronize_provisioning(app_identifier: ["tools.fastlane.app", "tools.fastlane.sleepy"])',
+          'match(...) # alias for "synchronize_provisioning"'
         ]
       end
 

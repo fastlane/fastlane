@@ -4,7 +4,7 @@ module Fastlane
       SCREENGRAB_OUTPUT_DIRECTORY = :SCREENGRAB_OUTPUT_DIRECTORY
     end
 
-    class ScreengrabAction < Action
+    class CaptureAndroidScreenshotsAction < Action
       def self.run(params)
         require 'screengrab'
 
@@ -20,7 +20,7 @@ module Fastlane
       end
 
       def self.description
-        'Automated localized screenshots of your Android app on every device'
+        'Automated localized screenshots of your Android app (via `screengrab`)'
       end
 
       def self.available_options
@@ -38,8 +38,9 @@ module Fastlane
 
       def self.example_code
         [
-          'screengrab',
-          'screengrab(
+          'capture_android_screenshots',
+          'screengrab # alias for "capture_android_screenshots"',
+          'capture_android_screenshots(
             locales: ["en-US", "fr-FR", "ja-JP"],
             clear_previous_screenshots: true,
             app_apk_path: "build/outputs/apk/example-debug.apk",

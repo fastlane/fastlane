@@ -3,7 +3,7 @@ module Fastlane
     module SharedValues
     end
 
-    class PrecheckAction < Action
+    class CheckAppStoreMetadataAction < Action
       def self.run(config)
         require 'precheck'
         Precheck.config = config
@@ -11,7 +11,7 @@ module Fastlane
       end
 
       def self.description
-        "Check your app's metadata before you submit your app to review using _precheck_"
+        "Check your app's metadata before you submit your app to review (via `precheck`)"
       end
 
       def self.details
@@ -37,10 +37,11 @@ module Fastlane
 
       def self.example_code
         [
-          'precheck(
+          'check_app_store_metadata(
             negative_apple_sentiment(level: :skip), # Set to skip to not run the `negative_apple_sentiment` rule
             curse_words(level: :warn) # Set to warn to only warn on curse word check failures
-          )'
+          )',
+          'precheck(...) # alias for "check_app_store_metadata"'
         ]
       end
 
