@@ -187,7 +187,7 @@ describe Spaceship::TestFlight::Client do
                                 last_name: tester.last_name,
                                  group_id: 'fake-group-id')
       expect(WebMock).to have_requested(:post, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers').
-        with(body: '[{"email":"taquitos@google.com","firstName":"Josh","lastName":"Josh"}]')
+        with(body: '[{"email":"taquitos@google.com","firstName":"Josh","lastName":"Taquitos"}]')
     end
   end
 
