@@ -191,8 +191,8 @@ module Fastlane
           You can use this to automatically [sign and zipalign](https://developer.android.com/studio/publish/app-signing.html) your app:
           ```ruby
           gradle(
-            task: 'assemble',
-            build_type: 'Release',
+            task: "assemble",
+            build_type: "Release",
             print_command: false,
             properties: {
               "android.injected.signing.store.file" => "keystore.jks",
