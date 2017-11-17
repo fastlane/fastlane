@@ -19,7 +19,7 @@ By adopting this Code of Conduct, project maintainers commit themselves to fairl
 
 This Code of Conduct applies both within project spaces and in public spaces when an individual is representing the project or its community.
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting a project maintainer at fastlane-abuse@twitter.com. Complaints will result in a response and be reviewed and investigated in a way that is deemed necessary and appropriate to the circumstances. Maintainers are obligated to maintain confidentiality with regard to the reporter of an incident.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting a project maintainer at fastlane-abuse@google.com. Complaints will result in a response and be reviewed and investigated in a way that is deemed necessary and appropriate to the circumstances. Maintainers are obligated to maintain confidentiality with regard to the reporter of an incident.
 
 This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.3.0, available at [http://contributor-covenant.org/version/1/3/0/][version]
 
