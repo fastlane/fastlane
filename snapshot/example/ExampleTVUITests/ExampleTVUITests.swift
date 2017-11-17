@@ -19,8 +19,7 @@ class ExampleTVUITests: XCTestCase {
     app.launch()
   }
 
-  func testExample()
-  {
+  func testExample() {
     snapshot("0Launch")
   }
 }
