@@ -33,29 +33,29 @@ module Precheck
 
         google_service_plist_entry = project.files.select { |x| x.path == 'GoogleService-Info.plist' }[0]
         if google_service_plist_entry.nil?
-          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "A valid Firebase project requires a GoogleService-Info.plist. Please download it via the Firebase console.", file_path:xcode_project_item.project_path)
+          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "A valid Firebase project requires a GoogleService-Info.plist. Please download it via the Firebase console.", file_path: xcode_project_item.project_path)
         end
 
         google_service_plist = Xcodeproj::Plist.read_from_path(full_path(project, google_service_plist_entry.path))
 
         target = xcode_project_item.target
         if target.nil?
-          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to locate a target for #{xcode_project_item.target_name}.", file_path:xcode_project_item.project_path)
+          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to locate a target for #{xcode_project_item.target_name}.", file_path: xcode_project_item.project_path)
         end
 
         build_configuration = xcode_project_item.configuration
         if build_configuration.nil?
-          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to locate a build configuration #{xcode_project_item.configuration} for target #{xcode_project_item.target_name}.", file_path:xcode_project_item.project_path)
+          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to locate a build configuration #{xcode_project_item.configuration} for target #{xcode_project_item.target_name}.", file_path: xcode_project_item.project_path)
         end
 
         infoplist_file = build_configuration.build_settings['INFOPLIST_FILE']
         if infoplist_file.nil?
-          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to find an INFOPLIST_FILE in a build configuration #{xcode_project_item.configuration} for target #{xcode_project_item.target_name}.", file_path:xcode_project_item.project_path)
+          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "Failed to find an INFOPLIST_FILE in a build configuration #{xcode_project_item.configuration} for target #{xcode_project_item.target_name}.", file_path: xcode_project_item.project_path)
         end
 
         product_bundle_identifier = build_configuration.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
         if product_bundle_identifier != google_service_plist['BUNDLE_ID']
-          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "The project bundle id #{product_bundle_identifier} does not match the GoogleService-Info.plist bundle id #{google_service_plist['BUNDLE_ID']}.", file_path:xcode_project_item.project_path)
+          return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "The project bundle id #{product_bundle_identifier} does not match the GoogleService-Info.plist bundle id #{google_service_plist['BUNDLE_ID']}.", file_path: xcode_project_item.project_path)
         end
 
         return RuleReturn.new(validation_state: VALIDATION_STATES[:passed])

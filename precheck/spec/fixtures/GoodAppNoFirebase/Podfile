@@ -6,5 +6,5 @@ target 'GoodAppNoFirebase' do
   # use_frameworks!
 
   # Pods for GoodAppNoFirebase
-  pod ‘GoogleWebRTC'
+  pod 'GoogleWebRTC'
 end
