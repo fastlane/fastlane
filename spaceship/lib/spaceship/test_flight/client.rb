@@ -213,7 +213,7 @@ module Spaceship::TestFlight
         req.body = [{
           "email" => email,
           "firstName" => first_name,
-          "lastName" => first_name
+          "lastName" => last_name
         }].to_json
         req.headers['Content-Type'] = 'application/json'
       end
