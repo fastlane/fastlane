@@ -157,7 +157,7 @@ module FastlaneCore
         return value.to_i if value.to_i.to_s == value.to_s
       elsif data_type == Float
         return value.to_f if value.to_f.to_s == value.to_s
-      elsif data_type == String && allow_shell_conversion
+      elsif allow_shell_conversion
         return value.map(&:to_s).map(&:shellescape).join(' ') if value.kind_of?(Array)
         return value.map { |k, v| "#{k.to_s.shellescape}=#{v.shellescape}" }.join(' ') if value.kind_of?(Hash)
       else
@@ -175,7 +175,9 @@ module FastlaneCore
 
     # Determines the defined data type of this ConfigItem
     def data_type
-      if @data_type
+      if @data_type.kind_of?(Symbol)
+        nil
+      elsif @data_type
         @data_type
       else
         (@is_string ? String : nil)
