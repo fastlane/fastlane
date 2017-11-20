@@ -9,6 +9,7 @@ module Precheck
         # These are the Build phase / Firebase specific rules
         return [
           VerifyFirebaseAuthRule,
+          VerifyFirebaseDynamicLinksRule,
           VerifyFirebaseProjectRule
         ].map(&:new)
       else

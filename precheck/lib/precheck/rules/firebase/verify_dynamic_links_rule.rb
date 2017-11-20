@@ -54,6 +54,7 @@ module Precheck
         associated_domains.each do |associated_domain|
           # Note: ideally, we would check if the project specific prefix matches, but we don't currently have a way of getting it.
           # If it becomes available in GoogleService-Info.plist, we should do an exact string match here.
+          # Alternatively, we can hit the https://[APPLINK]/apple-app-site-association URL and check if there is a matching bundle id
           if associated_domain.start_with?("applinks:") and associated_domain.end_with?("app.goo.gl")
             has_app_links = true
           end
