@@ -54,6 +54,8 @@ describe Fastlane do
           allow(project).to receive(:default_app_name).and_return("Project Name")
           allow(project).to receive(:is_workspace).and_return(false)
           allow(project).to receive(:path).and_return("./path")
+          allow(project).to receive(:project_name).and_return("ProjectName")
+          allow(project).to receive(:select_scheme)
 
           expect(setup.run).to eq(true)
           expect(setup.tools).to eq({ snapshot: false, cocoapods: true, carthage: false })
