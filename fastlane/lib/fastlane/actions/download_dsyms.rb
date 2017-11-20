@@ -47,9 +47,6 @@ module Fastlane
         UI.message(message.join(" "))
 
         # Loop through all app versions and download their dSYM
-        # This will need to change with the new build trains endpoints
-        # can use app.build_trains(platform: platform).versions to check for the right version
-        # then iterate through the builds
         app.all_build_train_numbers(platform: platform).each do |train_number|
           if version && version != train_number
             next
@@ -60,7 +57,7 @@ module Fastlane
             end
 
             begin
-              download_url = build.details.dsym_url
+              download_url = build.dsym_url
             rescue Spaceship::TunesClient::ITunesConnectError => ex
               UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
             end
@@ -162,7 +159,8 @@ module Fastlane
                                        short_option: "-p",
                                        env_name: "DOWNLOAD_DSYMS_PLATFORM",
                                        description: "The app platform for dSYMs you wish to download",
-                                       optional: true),
+                                       optional: true,
+                                       default_value: :ios),
           FastlaneCore::ConfigItem.new(key: :version,
                                        short_option: "-v",
                                        env_name: "DOWNLOAD_DSYMS_VERSION",
