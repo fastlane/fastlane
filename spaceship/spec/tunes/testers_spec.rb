@@ -1,4 +1,4 @@
-describe Spaceship::Tunes::Tester do
+describe Spaceship::Tunes::SandboxTester do
   before { Spaceship::Tunes.login }
 
   let(:client) { Spaceship::AppSubmission.client }
