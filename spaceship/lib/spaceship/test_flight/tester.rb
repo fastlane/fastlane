@@ -41,6 +41,8 @@ module Spaceship::TestFlight
     # }
     attr_accessor :latest_install_info
 
+    attr_accessor :latest_install_date
+
     # @return (Integer) Number of sessions
     attr_accessor :session_count
 
@@ -58,10 +60,13 @@ module Spaceship::TestFlight
       'groups' => :groups
     )
 
-    def pretty_install_date
+    def latest_install_date
       return nil unless latest_install_info
       latest_installed_date = latest_install_info["latestInstalledDate"]
+      return latest_installed_date
+    end
 
+    def pretty_install_date
       return nil unless latest_installed_date
 
       Time.at((latest_installed_date / 1000)).strftime("%m/%d/%y %H:%M")
