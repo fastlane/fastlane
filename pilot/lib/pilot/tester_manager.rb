@@ -191,11 +191,12 @@ module Pilot
     def list_by_app(all_testers, title)
       headers = ["First", "Last", "Email", "Groups"]
       list(all_testers, "#{title} (#{all_testers.count})", headers) do |tester|
+        tester_groups = tester.groups.nil? ? nil : tester.groups.join(";")
         [
           tester.first_name,
           tester.last_name,
           tester.email,
-          tester.groups.join(";")
+          tester_groups
           # Testers returned by the query made in the context of an app do not contain
           # the version, or install date information
         ]

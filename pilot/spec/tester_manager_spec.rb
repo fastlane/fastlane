@@ -145,26 +145,22 @@ describe Pilot::TesterManager do
     #   end
     # end
 
-    # describe "when invoked from the context of an app" do
-    #   it "prints a table without columns showing device and version info" do
-    #     allow(Spaceship::Tunes::Tester::Internal).to receive(:all_by_app).and_return(app_context_testers)
-    #     allow(Spaceship::Tunes::Tester::External).to receive(:all_by_app).and_return(app_context_testers)
+    describe "when invoked from the context of an app" do
+      it "prints a table without columns showing device and version info" do
+        allow(Spaceship::TestFlight::Tester).to receive(:all).and_return(app_context_testers)
 
-    #     headings = ["First", "Last", "Email", "Groups"]
-    #     rows = app_context_testers.map do |tester|
-    #       [tester.first_name, tester.last_name, tester.email, tester.group_names]
-    #     end
+        headings = ["First", "Last", "Email", "Groups"]
+        rows = app_context_testers.map do |tester|
+          [tester.first_name, tester.last_name, tester.email, tester.group_names]
+        end
 
-    #     expect(Terminal::Table).to receive(:new).with(title: "Internal Testers (2)".green,
-    #                                                headings: headings,
-    #                                                    rows: rows)
-    #     expect(Terminal::Table).to receive(:new).with(title: "External Testers (2)".green,
-    #                                                headings: headings,
-    #                                                    rows: rows)
+        expect(Terminal::Table).to receive(:new).with(title: "All Testers (2)".green,
+                                                   headings: headings,
+                                                       rows: rows)
 
-    #     tester_manager.list_testers(app_identifier: 'com.whatever')
-    #   end
-    # end
+        tester_manager.list_testers(app_identifier: 'com.whatever')
+      end
+    end
 
     # describe "when app manager asks to create new tester in the default group" do
     #   it "creates a new tester and adds it to the default group" do
