@@ -24,7 +24,7 @@ module Pilot
         csv << ['First', 'Last', 'Email', 'Groups', 'Installed Version', 'Install Date']
 
         testers.each do |tester|
-          group_names = tester.groups.join(",") || ""
+          group_names = tester.groups.join(";") || ""
           latest_install_info = tester.latest_install_info
           install_version = latest_install_info["latestInstalledShortVersion"] || ""
           pretty_date = tester.pretty_install_date || ""

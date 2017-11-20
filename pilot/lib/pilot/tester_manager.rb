@@ -62,7 +62,7 @@ module Pilot
       begin
         # If no groups are passed to options, remove the tester from the app-level,
         # otherwise remove the tester from the groups specified.
-        if config[:groups].nil? && tester.kind_of?(Spaceship::Tunes::Tester::External)
+        if config[:groups].nil?
           test_flight_testers = Spaceship::TestFlight::Tester.search(app_id: app.apple_id, text: tester.email, is_email_exact_match: true)
 
           if test_flight_testers.length > 1
@@ -91,7 +91,7 @@ module Pilot
       if app_filter
         list_testers_by_app(app_filter)
       else
-        list_testers_global
+        UI.user_error!("You must include an `app_identifier` to `list_testers`")
       end
     end
 
@@ -161,37 +161,28 @@ module Pilot
     def list_testers_by_app(app_filter)
       app = Spaceship::Application.find(app_filter)
       UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
-
-      int_testers = Spaceship::Tunes::Tester::Internal.all_by_app(app.apple_id)
-      ext_testers = Spaceship::Tunes::Tester::External.all_by_app(app.apple_id)
-
-      list_by_app(int_testers, "Internal Testers")
-      puts ""
-      list_by_app(ext_testers, "External Testers")
+      testers = Spaceship::TestFlight::Tester.all(app_id: app.apple_id)
+      list_by_app(testers, "All Testers")
     end
 
     def list_testers_global
       begin
-        int_testers = Spaceship::Tunes::Tester::Internal.all
-        ext_testers = Spaceship::Tunes::Tester::External.all
+        testers = Spaceship::TestFlight::Tester.all
       rescue Spaceship::Client::InsufficientPermissions
         UI.user_error!("You don't have the permission to list the testers of your whole team. Please provide an app identifier to list all testers of a specific application.")
       end
 
-      list_global(int_testers, "Internal Testers")
-      puts ""
-      list_global(ext_testers, "External Testers")
+      list_global(testers, "Testers")
     end
 
     def list_global(all_testers, title)
-      headers = ["First", "Last", "Email", "Groups", "Devices", "Latest Version", "Latest Install Date"]
+      headers = ["First", "Last", "Email", "Groups", "Latest Version", "Latest Install Date"]
       list(all_testers, "#{title} (#{all_testers.count})", headers) do |tester|
         [
           tester.first_name,
           tester.last_name,
           tester.email,
-          tester.groups_list,
-          tester.devices.count,
+          tester.groups,
           tester.latest_build,
           tester.pretty_install_date
         ]
@@ -205,9 +196,9 @@ module Pilot
           tester.first_name,
           tester.last_name,
           tester.email,
-          tester.groups_list
+          tester.groups.join(";")
           # Testers returned by the query made in the context of an app do not contain
-          # the devices, version, or install date information
+          # the version, or install date information
         ]
       end
     end
@@ -233,27 +224,12 @@ module Pilot
       rows << ["Email", tester.email]
 
       if tester.groups.to_s.length > 0
-        rows << ["Groups", tester.groups_list]
+        rows << ["Groups", tester.groups.join(";")]
       end
 
       if tester.latest_install_date
         rows << ["Latest Version", tester.latest_build]
         rows << ["Latest Install Date", tester.pretty_install_date]
-      end
-
-      if tester.devices.to_s.length == 0
-        rows << ["Devices", "No devices"]
-      else
-        rows << ["#{tester.devices.count} Devices", ""]
-        tester.devices.each do |device|
-          current = "\u2022 #{device['model']}, iOS #{device['osVersion']}"
-
-          if rows.last[1].length == 0
-            rows.last[1] = current
-          else
-            rows << ["", current]
-          end
-        end
       end
 
       puts Terminal::Table.new(

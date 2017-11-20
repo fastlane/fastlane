@@ -235,7 +235,6 @@ describe Pilot::TesterManager do
     describe "when asked to add an existing internal tester to a specific existing custom group" do
       it "adds the tester to the custom group" do
         allow(current_user).to receive(:roles).and_return(["appmanager"])
-        allow(fake_tester).to receive(:kind_of?).with(Spaceship::Tunes::Tester::Internal).and_return(true)
 
         expect(Spaceship::TestFlight::Tester).to receive(:find).and_return(fake_tester)
         expect(Spaceship::TestFlight::Tester).to_not receive(:create_app_level_tester)
