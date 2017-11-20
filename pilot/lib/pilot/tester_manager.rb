@@ -19,7 +19,6 @@ module Pilot
       begin
         # Groups are now required
         groups = Spaceship::TestFlight::Group.add_tester_to_groups!(tester: tester, app: app, groups: config[:groups])
-        UI.success("Successfully added tester to app #{app.name}")
         if config[:groups]
           group_names = groups.map(&:name).join(", ")
           UI.success("Successfully added tester to group(s): #{group_names} in app: #{app.name}")
@@ -109,14 +108,15 @@ module Pilot
 
     def find_app_tester(email: nil, app: nil)
       current_user = find_current_user
+      app_apple_id = app.nil? ? nil : app.apple_id
 
       if current_user.admin?
-        tester = Spaceship::TestFlight::Tester.find(app_id: app.apple_id, email: email)
+        tester = Spaceship::TestFlight::Tester.find(app_id: app_apple_id, email: email)
       elsif current_user.app_manager?
-        unless app
+        unless app_apple_id
           UI.user_error!("Account #{current_user.email_address} is only an 'App Manager' and therefore you must also define what app this tester (#{email}) should be added to")
         end
-        tester = Spaceship::TestFlight::Tester.find(app_id: app.apple_id, email: email)
+        tester = Spaceship::TestFlight::Tester.find(app_id: app_apple_id, email: email)
       else
         UI.user_error!("Account #{current_user.email_address} doesn't have a role that is allowed to administer app testers, current roles: #{current_user.roles}")
         tester = nil
