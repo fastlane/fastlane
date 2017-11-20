@@ -71,19 +71,11 @@ module Spaceship::TestFlight
     end
 
     def self.add_tester_to_groups!(tester: nil, app: nil, groups: nil)
-      if tester.kind_of?(Spaceship::Tunes::Tester::Internal)
-        self.internal_group(app_id: app.apple_id).add_tester!(tester)
-      else
-        self.perform_for_groups_in_app(app: app, groups: groups) { |group| group.add_tester!(tester) }
-      end
+      self.perform_for_groups_in_app(app: app, groups: groups) { |group| group.add_tester!(tester) }
     end
 
     def self.remove_tester_from_groups!(tester: nil, app: nil, groups: nil)
-      if tester.kind_of?(Spaceship::Tunes::Tester::Internal)
-        self.internal_group(app_id: app.apple_id).remove_tester!(tester)
-      else
-        self.perform_for_groups_in_app(app: app, groups: groups) { |group| group.remove_tester!(tester) }
-      end
+      self.perform_for_groups_in_app(app: app, groups: groups) { |group| group.remove_tester!(tester) }
     end
 
     def default_external_group?

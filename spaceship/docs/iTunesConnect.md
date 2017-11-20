@@ -289,17 +289,17 @@ There are 3 types of testers:
 - **Sandbox testers**: Dummy accounts to test development-mode apps with in-app purchase or Apple Pay.
 
 ```ruby
-# Find an internal tester based on the email address
-tester = Spaceship::Tunes::Tester::Internal.find("felix@krausefx.com")
+# Find a tester based on the email address
+tester = Spaceship::TestFlight::Tester.find(app_id: "some_app_id", email: "felix@krausefx.com")
 
-# Same for external testers
-tester = Spaceship::Tunes::Tester::External.find("guest@krausefx.com")
+# Creating new testers
+Spaceship::TestFlight::Tester.create_app_level_tester(
+      app_id: "io.myapp"
+       email: "github@krausefx.com",
+  first_name: "Felix",
+   last_name: "Krause"
+)
 
-# Creating new external testers
-Spaceship::Tunes::Tester::External.create!(email: "github@krausefx.com",
-                                      first_name: "Felix",
-                                       last_name: "Krause",
-                                          groups: ["spaceship"])
 ```
 Right now, `spaceship` can't modify or create internal testers.
 
