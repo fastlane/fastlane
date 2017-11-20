@@ -34,6 +34,9 @@ module Fastlane
           detect_if_app_is_available
         end
         print_config_table
+        if self.project.schemes.count > 1
+          UI.important("Note: If the values above are incorrect, it is possible the wrong scheme was selected")
+        end
         if UI.confirm("Please confirm the above values")
           default_setup
         else
@@ -137,6 +140,8 @@ module Fastlane
       config = {}
       FastlaneCore::Project.detect_projects(config)
       self.project = FastlaneCore::Project.new(config)
+      self.project.select_scheme(preferred_to_include: self.project.project_name)
+
       self.app_identifier = self.project.default_app_identifier # These two vars need to be accessed in order to be set
       self.app_name = self.project.default_app_name # They are set as a side effect, this could/should be changed down the road
     end
