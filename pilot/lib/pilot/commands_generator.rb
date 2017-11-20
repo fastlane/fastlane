@@ -104,6 +104,7 @@ module Pilot
 
         c.action do |args, options|
           config = create_config(options)
+          UI.user_error!("You must include an `app_identifier` to list testers") unless config[:app_identifier]
           Pilot::TesterManager.new.list_testers(config)
         end
       end
