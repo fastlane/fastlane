@@ -147,8 +147,9 @@ module Pilot
                                                           first_name: first_name || '',
                                                            last_name: last_name || '',
                                                                email: email)
-        return Spaceship::TestFlight::Tester.find(app_id: app.apple_id, email: email)
+
         UI.success("Successfully added tester: #{email} to app: #{app.name}")
+        return Spaceship::TestFlight::Tester.find(app_id: app.apple_id, email: email)
       else
         UI.user_error!("Current account doesn't have permission to create a tester")
       end
