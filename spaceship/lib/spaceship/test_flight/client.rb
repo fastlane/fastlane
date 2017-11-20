@@ -153,17 +153,27 @@ module Spaceship::TestFlight
       page_size = 40 # that's enforced by the iTC servers
       offset = nil
       resulting_array = []
+      initial_url = "providers/#{team_id}/apps/#{app_id}/testers?limit=#{page_size}&sort=email&order=asc"
+      response = request(:get, initial_url)
+      result = Array(handle_response(response))
+      resulting_array += result
+      return resulting_array if result.count == 0
+      offset = result.last['id']
 
       loop do
-        url = "providers/#{team_id}/apps/#{app_id}/testers?limit=#{page_size}&sort=email&order=asc"
+        url = "providers/#{team_id}/apps/#{app_id}/testers?offset=added,#{offset}&limit=#{page_size}&sort=status,default&order=asc"
         url += "&offset=#{offset}" if offset
         response = request(:get, url)
         result = Array(handle_response(response))
-        resulting_array += result
+
         break if result.count == 0
-        offset = "#{result.last['email']}%2C#{result.last['id']}"
+        # If there are no more, the last response seems to be repeated
+        break if offset == result.last['id']
+
+        resulting_array += result
+        offset = result.last['id']
       end
-      return resulting_array
+      return resulting_array.uniq
     end
 
     def delete_tester_from_app(app_id: nil, tester_id: nil)

@@ -44,6 +44,8 @@ module Spaceship::TestFlight
     # @return (Integer) Number of sessions
     attr_accessor :session_count
 
+    attr_accessor :groups
+
     attr_mapping(
       'id' => :tester_id,
       'email' => :email,
@@ -52,8 +54,18 @@ module Spaceship::TestFlight
       'latestInstallInfo' => :latest_install_info,
       'sessionCount' => :session_count,
       'firstName' => :first_name,
-      'lastName' => :last_name
+      'lastName' => :last_name,
+      'groups' => :groups
     )
+
+    def pretty_install_date
+      return nil unless latest_install_info
+      latest_installed_date = latest_install_info["latestInstalledDate"]
+
+      return nil unless latest_installed_date
+
+      Time.at((latest_installed_date / 1000)).strftime("%m/%d/%y %H:%M")
+    end
 
     # @return (Array) Returns all beta testers available for this account
     def self.all(app_id: nil)
