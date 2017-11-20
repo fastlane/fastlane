@@ -53,6 +53,16 @@ module Fastlane
                                        env_name: "LATEST_VERSION",
                                        description: "The version number whose latest build number we want",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :platform,
+                                       short_option: "-j",
+                                       env_name: "APPSTORE_PLATFORM",
+                                       description: "The platform to use (optional)",
+                                       optional: true,
+                                       is_string: true,
+                                       default_value: "ios",
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The platform can only be ios, or appletvos") unless %('ios', 'appletvos').include? value
+                                       end),
           FastlaneCore::ConfigItem.new(key: :initial_build_number,
                                        env_name: "INITIAL_BUILD_NUMBER",
                                        description: "sets the build number to given value if no build is in current train",

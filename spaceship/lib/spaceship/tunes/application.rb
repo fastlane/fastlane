@@ -267,7 +267,7 @@ module Spaceship
       # The numbers of all build trains that were uploaded
       # @return [Array] An array of train version numbers
       def all_build_train_numbers(platform: nil)
-        return self.build_trains.versions
+        return self.build_trains(platform: platform).versions
       end
 
       # Receive the build details for a specific build
