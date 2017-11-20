@@ -98,7 +98,7 @@ module Pilot
 
       puts Terminal::Table.new(
         title: "#{app.name} Builds".green,
-        headings: ["Version #", "Build #", "Testing", "Installs", "Sessions"],
+        headings: ["Version #", "Build #", "Installs"],
         rows: FastlaneCore::PrintTable.transform_output(rows)
       )
     end
@@ -119,9 +119,7 @@ module Pilot
     def describe_build(build)
       row = [build.train_version,
              build.build_version,
-             build.testing_status,
-             build.install_count,
-             build.session_count]
+             build.install_count]
 
       return row
     end
