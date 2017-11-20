@@ -568,7 +568,7 @@ describe FastlaneCore do
           it "raises an error if this option does not exist" do
             expect do
               @config[:asdfasdf]
-            end.to raise_error "Could not find option for key :asdfasdf. Available keys: cert_name, output, wait_processing_interval"
+            end.to raise_error "Could not find option 'asdfasdf' in the list of available options: cert_name, output, wait_processing_interval"
           end
 
           it "returns the value for the given key if given" do
@@ -605,6 +605,55 @@ describe FastlaneCore do
             new_val = "../../"
             expect(@config.set(:output, new_val)).to eq(true)
             expect(@config[:output]).to eq(new_val)
+          end
+        end
+
+        describe "Parameter priority order" do
+          it "prioritizes CLI values over everything else" do
+            ENV["abc"] = "val env"
+            config_item = FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", default_value: "val default")
+            config = FastlaneCore::Configuration.create([config_item], { item: "val cli" })
+            config.config_file_options = { item: "val config" }
+
+            expect(config[:item]).to eq("val cli")
+            ENV.delete("abc")
+          end
+
+          it "prioritizes ENV values after CLI" do
+            ENV["abc"] = "val env"
+            config_item = FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", default_value: "val default")
+            config = FastlaneCore::Configuration.create([config_item], {})
+            config.config_file_options = { item: "val config" }
+
+            expect(config[:item]).to eq("val env")
+            ENV.delete("abc")
+          end
+
+          it "prioritizes config file values after ENV" do
+            config_item = FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", default_value: "val default")
+            config = FastlaneCore::Configuration.create([config_item], {})
+            config.config_file_options = { item: "val config" }
+
+            expect(config[:item]).to eq("val config")
+          end
+
+          it "prioritizes default values last" do
+            config_item = FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", default_value: "val default")
+            config = FastlaneCore::Configuration.create([config_item], {})
+
+            expect(config[:item]).to eq("val default")
+          end
+
+          it "asks if no other option" do
+            allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
+            allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
+            allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
+
+            config_item = FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", optional: false)
+            config = FastlaneCore::Configuration.create([config_item], {})
+
+            expect(FastlaneCore::UI).to receive(:input).and_return("val ask")
+            expect(config[:item]).to eq("val ask")
           end
         end
       end
