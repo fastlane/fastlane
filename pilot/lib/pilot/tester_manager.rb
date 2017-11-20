@@ -164,30 +164,6 @@ module Pilot
       list_by_app(testers, "All Testers")
     end
 
-    def list_testers_global
-      begin
-        testers = Spaceship::TestFlight::Tester.all
-      rescue Spaceship::Client::InsufficientPermissions
-        UI.user_error!("You don't have the permission to list the testers of your whole team. Please provide an app identifier to list all testers of a specific application.")
-      end
-
-      list_global(testers, "Testers")
-    end
-
-    def list_global(all_testers, title)
-      headers = ["First", "Last", "Email", "Groups", "Latest Version", "Latest Install Date"]
-      list(all_testers, "#{title} (#{all_testers.count})", headers) do |tester|
-        [
-          tester.first_name,
-          tester.last_name,
-          tester.email,
-          tester.groups,
-          tester.latest_build,
-          tester.pretty_install_date
-        ]
-      end
-    end
-
     def list_by_app(all_testers, title)
       headers = ["First", "Last", "Email", "Groups"]
       list(all_testers, "#{title} (#{all_testers.count})", headers) do |tester|
