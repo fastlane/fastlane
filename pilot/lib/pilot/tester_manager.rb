@@ -9,6 +9,9 @@ module Pilot
       app = find_app(app_filter: config[:apple_id] || config[:app_identifier])
       UI.user_error!("You must provide either a Apple ID for the app (with the `:apple_id` option) or app identifier (with the `:app_identifier` option)") unless app
 
+      groups_param = config[:groups]
+      UI.user_error!("You must provide 1 or more groups (with the `:groups` option)") unless groups_param
+
       tester = find_app_tester(email: config[:email], app: app)
       tester ||= create_tester(
         email: config[:email],
@@ -19,12 +22,8 @@ module Pilot
       begin
         # Groups are now required
         groups = Spaceship::TestFlight::Group.add_tester_to_groups!(tester: tester, app: app, groups: config[:groups])
-        if config[:groups]
-          group_names = groups.map(&:name).join(", ")
-          UI.success("Successfully added tester to group(s): #{group_names} in app: #{app.name}")
-        else
-          UI.success("Successfully added tester to the default tester group in app: #{app.name}")
-        end
+        group_names = groups.map(&:name).join(", ")
+        UI.success("Successfully added tester to group(s): #{group_names} in app: #{app.name}")
       rescue => ex
         UI.error("Could not add #{tester.email} to app: #{app.name}")
         raise ex
