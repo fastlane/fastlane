@@ -43,7 +43,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Copy and save your build artifacts (Useful when you use reset_git_repo)"
+        "Copy and save your build artifacts (useful when you use reset_git_repo)"
       end
 
       def self.details
