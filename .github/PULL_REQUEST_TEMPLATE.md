@@ -7,9 +7,9 @@
 - [ ] I've updated the documentation if necessary.
 
 ### Motivation and Context
-<!--- Why is this change required? What problem does it solve? -->
-<!--- If it fixes an open issue, please link to the issue here. -->
-<!--- Please describe in detail how you tested your changes. --->
+<!-- Why is this change required? What problem does it solve? -->
+<!-- If it fixes an open issue, please link to the issue here. -->
+<!-- Please describe in detail how you tested your changes. -->
 
 ### Description
-<!--- Describe your changes in detail -->
+<!-- Describe your changes in detail -->
