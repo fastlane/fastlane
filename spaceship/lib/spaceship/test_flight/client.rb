@@ -84,11 +84,16 @@ module Spaceship::TestFlight
     # @!group Groups API
     ##
 
+    # Returns a list of available testing groups
+    # e.g.
+    #   {"b6f65dbd-c845-4d91-bc39-0b661d608970" => "Boarding",
+    #    "70402368-9deb-409f-9a26-bb3f215dfee3" => "Automatic"}
     def get_groups(app_id: nil)
+      return @cached_groups if @cached_groups
       assert_required_params(__method__, binding)
 
-      response = request(:get, "/testflight/v2/providers/#{team_id}/apps/#{app_id}/groups")
-      handle_response(response)
+      response = request(:get, "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/groups")
+      @cached_groups = handle_response(response)
     end
 
     def add_group_to_build(app_id: nil, group_id: nil, build_id: nil)
@@ -106,17 +111,6 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    # Returns a list of available testing groups
-    # e.g.
-    #   {"b6f65dbd-c845-4d91-bc39-0b661d608970" => "Boarding",
-    #    "70402368-9deb-409f-9a26-bb3f215dfee3" => "Automatic"}
-    def groups(app_id)
-      return @cached_groups if @cached_groups
-
-      r = request(:get, "/testflight/v2/providers/#{self.provider.provider_id}/apps/#{app_id}/groups")
-      @cached_groups = parse_response(r, 'data')
-    end
-
     #####################################################
     # @!group Testers
     #####################################################
@@ -128,7 +122,7 @@ module Spaceship::TestFlight
 
     def testers_by_app(tester, app_id, group_id: nil)
       if group_id.nil?
-        group_ids = groups(app_id).map do |group|
+        group_ids = get_groups(app_id: app_id).map do |group|
           group['id']
         end
       end
@@ -136,7 +130,7 @@ module Spaceship::TestFlight
       testers = []
 
       group_ids.each do |json_group_id|
-        url = tester.url(app_id, self.provider.provider_id, json_group_id)[:index_by_app]
+        url = tester.url(app_id, provider_id, json_group_id)[:index_by_app]
         r = request(:get, url)
         testers += parse_response(r, 'data')['users']
       end
@@ -306,6 +300,11 @@ module Spaceship::TestFlight
       else
         binding.eval(name.to_s)
       end
+    end
+
+    def provider_id
+      return team_id if self.provider.nil?
+      self.provider.provider_id
     end
   end
 end
