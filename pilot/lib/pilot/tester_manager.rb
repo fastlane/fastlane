@@ -203,7 +203,7 @@ module Pilot
         rows << ["Groups", tester.groups.join(";")]
       end
 
-      if tester.latest_install_date
+      if tester.latest_installed_date
         rows << ["Latest Version", tester.latest_build]
         rows << ["Latest Install Date", tester.pretty_install_date]
       end

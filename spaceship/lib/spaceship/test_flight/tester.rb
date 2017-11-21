@@ -41,7 +41,7 @@ module Spaceship::TestFlight
     # }
     attr_accessor :latest_install_info
 
-    attr_accessor :latest_install_date
+    attr_accessor :latest_installed_date
 
     # @return (Integer) Number of sessions
     attr_accessor :session_count
@@ -60,10 +60,10 @@ module Spaceship::TestFlight
       'groups' => :groups
     )
 
-    def latest_install_date
+    def latest_installed_date
       return nil unless latest_install_info
-      latest_installed_date = latest_install_info["latestInstalledDate"]
-      return latest_installed_date
+      latest_installed_date_value = latest_install_info["latestInstalledDate"]
+      return latest_installed_date_value
     end
 
     def pretty_install_date
