@@ -63,7 +63,9 @@ module Spaceship::TestFlight
     def latest_installed_date
       return nil unless latest_install_info
       latest_installed_date_value = latest_install_info["latestInstalledDate"]
-      return latest_installed_date_value
+      return nil unless latest_installed_date_value
+
+      return latest_installed_date_value.to_i
     end
 
     def pretty_install_date
