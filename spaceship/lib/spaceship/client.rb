@@ -502,7 +502,7 @@ module Spaceship
         end
 
         provider = body["provider"]
-        self.provider = Spaceship::Provider.new(provider_hash: provider)
+        self.provider = Spaceship::Provider.new(provider_hash: provider) unless provider.nil?
         self.available_providers = body["availableProviders"].map do |provider_hash|
           Spaceship::Provider.new(provider_hash: provider_hash)
         end
