@@ -1,3 +1,5 @@
+<!-- Thanks for helping _fastlane_! Before you submit your issue, please make sure to check the following boxes by putting an x in the [ ] (do: [x], don't: [x ], [ x], [✔️]) -->
+
 ### New Issue Checklist
 
 - [ ] Updated fastlane to the latest version
