@@ -18,7 +18,7 @@ describe Fastlane do
                                                                   nil)
       Fastlane::CommandLineHandler.handle(["ios", "deploy", "key:true", "key2:false"], {})
     end
-    
+
     it "properly handles calls with custom 'simple' parameters" do
       expect(Fastlane::LaneManager).to receive(:cruise_lane).with("ios", "deploy",
                                                                   { bool: true },
