@@ -3,7 +3,10 @@ require 'fileutils'
 module Fastlane
   # Enable tab auto completion
   class AutoComplete
-    def self.execute
+    # This method copies the tab auto completion scripts to the user's home folder,
+    # while optionally adding custom commands for which to enable auto complete
+    # @param [Array] options An array of all options (e.g. --custom fl)
+    def self.execute(args, options)
       shell = ENV['SHELL']
 
       if shell.end_with? "fish"
@@ -38,6 +41,22 @@ module Fastlane
         # then copy all of the completions files into it from the gem
         completion_script_path = File.join(Fastlane::ROOT, 'lib', 'assets', 'completions')
         FileUtils.cp_r completion_script_path, fastlane_conf_dir
+
+        custom_commands = options.custom.to_s.split(',')
+
+        if custom_commands.any?
+          open("#{fastlane_conf_dir}/completions/completion.bash", 'a') do |file|
+            custom_commands.each do |command|
+              file.puts "complete -F _fastlane_complete #{command}"
+            end
+          end
+
+          open("#{fastlane_conf_dir}/completions/completion.zsh", 'a') do |file|
+            custom_commands.each do |command|
+              file.puts "compctl -K _fastlane_complete #{command}"
+            end
+          end
+        end
 
         UI.success "Copied! To use auto complete for fastlane, add the following line to your favorite rc file (e.g. ~/.bashrc)"
         UI.important "  . ~/.fastlane/completions/completion.sh"
