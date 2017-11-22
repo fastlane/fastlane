@@ -67,9 +67,10 @@ describe Spaceship::Application do
 
     describe "#create!" do
       it "works with valid data and defaults to English" do
+        TunesStubbing.itc_stub_applications_first_create
         Spaceship::Tunes::Application.create!(name: "My name",
                                               sku: "SKU123",
-                                              bundle_id: "net.sunapps.123")
+                                              bundle_id: "net.sunapps.100")
       end
 
       it "raises an error if something is wrong" do
@@ -77,8 +78,8 @@ describe Spaceship::Application do
         expect do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 sku: "SKU123",
-                                                bundle_id: "net.sunapps.123")
-        end.to raise_error("You must choose a primary language. You must choose a primary language.")
+                                                bundle_id: "net.sunapps.100")
+        end.to raise_error "You must choose a primary language. You must choose a primary language."
       end
 
       it "raises an error if bundle is wildcard and bundle_id_suffix has not specified" do
@@ -87,7 +88,16 @@ describe Spaceship::Application do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.*")
-        end.to raise_error("You must enter a Bundle ID Suffix. You must enter a Bundle ID Suffix.")
+        end.to raise_error "You must enter a Bundle ID Suffix. You must enter a Bundle ID Suffix."
+      end
+
+      it "raises an error if the bundle id is not populated" do
+        TunesStubbing.itc_stub_create_invalid_bundle_id
+        expect do
+          Spaceship::Tunes::Application.create!(name: "My name",
+                                                sku: "SKU123",
+                                                bundle_id: "net.sunapps.123")
+        end.to raise_error "requested bundle id not available"
       end
     end
 
@@ -96,7 +106,7 @@ describe Spaceship::Application do
         TunesStubbing.itc_stub_applications_first_create
         Spaceship::Tunes::Application.create!(name: "My Name",
                                               sku: "SKU123",
-                                              bundle_id: "net.sunapps.123",
+                                              bundle_id: "net.sunapps.100",
                                               company_name: "SunApps GmbH")
       end
 
@@ -105,8 +115,8 @@ describe Spaceship::Application do
         expect do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 sku: "SKU123",
-                                                bundle_id: "net.sunapps.123")
-        end.to raise_error("You must provide a company name to use on the App Store. You must provide a company name to use on the App Store.")
+                                                bundle_id: "net.sunapps.100")
+        end.to raise_error "You must provide a company name to use on the App Store. You must provide a company name to use on the App Store."
       end
     end
 
@@ -140,11 +150,11 @@ describe Spaceship::Application do
         mock_client_response(:get_builds_for_train, with: hash_including(train_version: '1.0')) do
           [
             {
-              id: 1,
-              appAdamId: 10,
-              trainVersion: '1.0',
-              uploadDate: '2017-01-01T12:00:00.000+0000',
-              externalState: 'testflight.build.state.export.compliance.missing'
+                id: 1,
+                appAdamId: 10,
+                trainVersion: '1.0',
+                uploadDate: '2017-01-01T12:00:00.000+0000',
+                externalState: 'testflight.build.state.export.compliance.missing'
             }
           ]
         end
@@ -152,18 +162,18 @@ describe Spaceship::Application do
         mock_client_response(:get_builds_for_train, with: hash_including(train_version: '1.1')) do
           [
             {
-              id: 2,
-              appAdamId: 10,
-              trainVersion: '1.1',
-              uploadDate: '2017-01-02T12:00:00.000+0000',
-              externalState: 'testflight.build.state.submit.ready'
+                id: 2,
+                appAdamId: 10,
+                trainVersion: '1.1',
+                uploadDate: '2017-01-02T12:00:00.000+0000',
+                externalState: 'testflight.build.state.submit.ready'
             },
             {
-              id: 3,
-              appAdamId: 10,
-              trainVersion: '1.1',
-              uploadDate: '2017-01-03T12:00:00.000+0000',
-              externalState: 'testflight.build.state.processing'
+                id: 3,
+                appAdamId: 10,
+                trainVersion: '1.1',
+                uploadDate: '2017-01-03T12:00:00.000+0000',
+                externalState: 'testflight.build.state.processing'
             }
           ]
         end
