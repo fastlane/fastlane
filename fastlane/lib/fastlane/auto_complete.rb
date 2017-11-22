@@ -8,8 +8,11 @@ module Fastlane
 
       if shell.end_with? "fish"
         fish_completions_dir = "~/.config/fish/completions"
-        confirm = UI.confirm "This will copy a fish script into #{fish_completions_dir} that provides the command tab completion. If the directory does not exist it will be created. Sound good?"
-        return unless confirm
+
+        if UI.interactive?
+          confirm = UI.confirm "This will copy a fish script into #{fish_completions_dir} that provides the command tab completion. If the directory does not exist it will be created. Sound good?"
+          return unless confirm
+        end
 
         fish_completions_dir = File.expand_path fish_completions_dir
         FileUtils.mkdir_p fish_completions_dir
@@ -22,8 +25,11 @@ module Fastlane
         UI.success "Copied! You can now use tab completion for lanes"
       else
         fastlane_conf_dir = "~/.fastlane"
-        confirm = UI.confirm "This will copy a shell script into #{fastlane_conf_dir} that provides the command tab completion. Sound good?"
-        return unless confirm
+
+        if UI.interactive?
+          confirm = UI.confirm "This will copy a shell script into #{fastlane_conf_dir} that provides the command tab completion. Sound good?"
+          return unless confirm
+        end
 
         # create the ~/.fastlane directory
         fastlane_conf_dir = File.expand_path fastlane_conf_dir
