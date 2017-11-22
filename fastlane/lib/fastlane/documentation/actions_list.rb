@@ -68,7 +68,7 @@ module Fastlane
           puts "==========================================\n".deprecated
         end
 
-        puts "More information can be found on https://docs.fastlane.tools/actions"
+        puts "More information can be found on https://docs.fastlane.tools/actions/#{filter}"
         puts ""
       else
         puts "Couldn't find action for the given filter.".red
