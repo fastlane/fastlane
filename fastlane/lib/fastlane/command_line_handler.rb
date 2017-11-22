@@ -26,12 +26,12 @@ module Fastlane
         lane = platform_lane_info.delete_at(0)
       end
 
-      # convert remaining platform_lane_info values into parameters
+      # convert remaining platform_lane_info values into `:true` parameters
       platform_lane_info.each do |key|
-        UI.verbose("Using #{key}: true (!)")
+        UI.verbose("Using (!) #{key}: true")
         lane_parameters[key.to_sym] = true
       end
-      
+
       dot_env = Helper.is_test? ? nil : options.env
       Fastlane::LaneManager.cruise_lane(platform, lane, lane_parameters, dot_env)
     end
