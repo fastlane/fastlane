@@ -3,7 +3,7 @@ module Frameit
     attr_accessor :screenshot # reference to the screenshot object to fetch the path, title, etc.
     attr_accessor :frame # the frame of the device
     attr_accessor :image # the current image used for editing
-    attr_accessor :space_to_device
+    attr_accessor :height_device_cannot_use
 
     def frame!(screenshot)
       self.screenshot = screenshot
@@ -104,7 +104,7 @@ module Frameit
     def complex_framing
       background = generate_background
 
-      self.space_to_device = vertical_frame_padding
+      self.height_device_cannot_use = vertical_frame_padding
 
       if fetch_config['title']
         background = put_title_into_background(background, fetch_config['stack_title'])
@@ -116,7 +116,7 @@ module Frameit
 
         # Decrease the size of the framed screenshot to fit into the defined padding + background
         frame_width = background.width - horizontal_frame_padding * 2
-        frame_height = background.height - space_to_device - vertical_frame_padding
+        frame_height = background.height - effective_text_height - vertical_frame_padding
 
         if fetch_config['show_complete_frame']
           # calculate the final size of the screenshot to resize in one go
@@ -156,6 +156,17 @@ module Frameit
       return scale_padding(padding)
     end
 
+    # Minimum height for the title
+    def title_min_height
+      @title_min_height ||= begin
+        height = fetch_config['title_min_height'] || 0
+        if height.kind_of?(String) && height.end_with?('%')
+          height = ([image.width, image.height].min * height.to_f * 0.01).ceil
+        end
+        height
+      end
+    end
+
     def scale_padding(padding)
       if padding.kind_of?(String) && padding.end_with?('%')
         padding = ([image.width, image.height].min * padding.to_f * 0.01).ceil
@@ -163,6 +174,24 @@ module Frameit
       multi = 1.0
       multi = 1.7 if self.screenshot.triple_density?
       return padding * multi
+    end
+
+    def effective_text_height
+      [height_device_cannot_use, title_min_height].max
+    end
+
+    def device_top(background)
+      @device_top ||= begin
+        if title_below_image
+          background.height - effective_text_height - image.height
+        else
+          effective_text_height
+        end
+      end
+    end
+
+    def title_below_image
+      @title_below_image ||= fetch_config['title_below_image']
     end
 
     # Returns a correctly sized background image
@@ -178,17 +207,10 @@ module Frameit
 
     def put_device_into_background(background)
       left_space = (background.width / 2.0 - image.width / 2.0).round
-      title_below_image = fetch_config['title_below_image']
 
       @image = background.composite(image, "png") do |c|
         c.compose "Over"
-        if title_below_image
-          show_complete_frame = fetch_config['show_complete_frame']
-          c.geometry "+#{left_space}+#{background.height - image.height - space_to_device}" unless show_complete_frame
-          c.geometry "+#{left_space}+#{vertical_frame_padding}" if show_complete_frame
-        else
-          c.geometry "+#{left_space}+#{space_to_device}"
-        end
+        c.geometry "+#{left_space}+#{device_top(background)}"
       end
 
       return image
@@ -223,27 +245,30 @@ module Frameit
       keyword_width = keyword.width
 
       vertical_padding = vertical_frame_padding
-      keyword_top_space = vertical_padding
 
       spacing_between_title_and_keyword = (title.height / 2)
-      title_top_space = vertical_padding + keyword.height + spacing_between_title_and_keyword
       title_left_space = (background.width / 2.0 - title_width / 2.0).round
       keyword_left_space = (background.width / 2.0 - keyword_width / 2.0).round
 
-      self.space_to_device += title.height + keyword.height + spacing_between_title_and_keyword + vertical_padding
-      title_below_image = fetch_config['title_below_image']
+      self.height_device_cannot_use += title.height + keyword.height + spacing_between_title_and_keyword + vertical_padding
+
+      if title_below_image
+        keyword_top = background.height - effective_text_height / 2 - (keyword.height + spacing_between_title_and_keyword + title.height) / 2
+      else
+        keyword_top = device_top(background) / 2 - spacing_between_title_and_keyword / 2 - keyword.height
+      end
+      title_top = keyword_top + keyword.height + spacing_between_title_and_keyword
+
       # keyword
       background = background.composite(keyword, "png") do |c|
         c.compose "Over"
-        c.geometry "+#{keyword_left_space}+#{keyword_top_space}" unless title_below_image
-        c.geometry "+#{keyword_left_space}+#{background.height - space_to_device + keyword_top_space}" if title_below_image
+        c.geometry "+#{keyword_left_space}+#{keyword_top}"
       end
       # Then, put the title on top of the screenshot next to the keyword
       # Then, put the title above/below of the screenshot next to the keyword
       background = background.composite(title, "png") do |c|
         c.compose "Over"
-        c.geometry "+#{title_left_space}+#{title_top_space}" unless title_below_image
-        c.geometry "+#{title_left_space}+#{background.height - space_to_device + title_top_space}" if title_below_image
+        c.geometry "+#{title_left_space}+#{title_top}"
       end
       background
     end
@@ -279,19 +304,21 @@ module Frameit
         sum_width *= smaller
       end
 
-      vertical_padding = vertical_frame_padding
-      top_space = vertical_padding
       left_space = (background.width / 2.0 - sum_width / 2.0).round
-      title_below_image = fetch_config['title_below_image']
 
-      self.space_to_device += title_height + vertical_padding
+      self.height_device_cannot_use += title_height + vertical_frame_padding
+
+      if title_below_image
+        title_top = background.height - effective_text_height / 2 - title_height / 2
+      else
+        title_top = device_top(background) / 2 - title_height / 2
+      end
 
       # First, put the keyword on top of the screenshot, if we have one
       if keyword
         background = background.composite(keyword, "png") do |c|
           c.compose "Over"
-          c.geometry "+#{left_space}+#{top_space}" unless title_below_image
-          c.geometry "+#{left_space}+#{background.height - space_to_device + top_space}" if title_below_image
+          c.geometry "+#{left_space}+#{title_top}"
         end
 
         left_space += keyword.width + (keyword_padding * smaller)
@@ -300,8 +327,7 @@ module Frameit
       # Then, put the title on top of the screenshot next to the keyword
       background = background.composite(title, "png") do |c|
         c.compose "Over"
-        c.geometry "+#{left_space}+#{top_space}" unless title_below_image
-        c.geometry "+#{left_space}+#{background.height - space_to_device + top_space}" if title_below_image
+        c.geometry "+#{left_space}+#{title_top}"
       end
       background
     end
