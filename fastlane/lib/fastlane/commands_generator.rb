@@ -218,7 +218,7 @@ module Fastlane
       command :enable_auto_complete do |c|
         c.syntax = 'fastlane enable_auto_complete'
         c.description = 'Enable tab auto completion'
-        c.option '-c STRING[,STRING2]', '--custom STRING[,STRING2]', String, 'Add custom command(s) to use for auto complete'
+        c.option '-c STRING[,STRING2]', '--custom STRING[,STRING2]', String, 'Add custom command(s) for which tab auto complete should be enabled too'
 
         c.action do |args, options|
           require 'fastlane/auto_complete'
