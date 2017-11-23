@@ -22,9 +22,9 @@ module FastlaneCore
         runtime_info = ''
         Open3.popen3('xcrun simctl list runtimes') do |stdin, stdout, stderr, wait_thr|
           # This regex outputs the version info in the format "<platform> <version><exact version>"
-          runtime_info = stdout.readlines.map { |v| v.sub(/(\w+ \S+)\s*\((\S+)\s[\S\s]*/, "\\1 \\2") }.drop(1)
+          runtime_info = stdout.read.lines.map { |v| v.sub(/(\w+ \S+)\s*\((\S+)\s[\S\s]*/, "\\1 \\2") }.drop(1)
         end
-        exact_versions = {}
+        exact_versions = Hash.new({})
         runtime_info.each do |r|
           platform, general, exact = r.split
           exact_versions[platform] = {} unless exact_versions.include?(platform)
@@ -52,7 +52,7 @@ module FastlaneCore
             name = matches.join(' ')
 
             if matches.count && (os_type == requested_os_type || requested_os_type == "")
-              @devices << Device.new(name: name, os_type: os_type, os_version: exact_versions[os_type][os_version], udid: udid, state: state, is_simulator: true)
+              @devices << Device.new(name: name, os_type: os_type, os_version: (exact_versions[os_type][os_version] || os_version), udid: udid, state: state, is_simulator: true)
             end
           end
         end
