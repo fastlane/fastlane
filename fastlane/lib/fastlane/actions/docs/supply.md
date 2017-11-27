@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="/img/actions/supply.png" height="110">
+  <img src="/img/actions/supply.png" width="250">
 </p>
 
 ###### Command line tool for updating Android apps and their metadata on the Google Play Store

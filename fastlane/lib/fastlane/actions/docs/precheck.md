@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="/img/actions/precheck.png" height="110">
+  <img src="/img/actions/precheck.png" width="250">
 </p>
 
 Precheck
