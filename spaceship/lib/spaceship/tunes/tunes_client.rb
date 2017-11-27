@@ -1204,7 +1204,7 @@ module Spaceship
       end
       response_object = parse_response(r, 'data')
       errors = response_object['sectionErrorKeys']
-      raise ITunesConnectError.new errors.join(' ') unless errors.empty?
+      raise ITunesConnectError, errors.join(' ') unless errors.empty?
       response_object['user']
     end
 
