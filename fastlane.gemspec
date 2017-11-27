@@ -44,7 +44,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'public_suffix', '~> 2.0.0' # https://github.com/fastlane/fastlane/issues/10162
 
   # TTY dependencies
-  spec.add_dependency 'tty-screen', '~> 0.6.2' # detect the terminal width
+  spec.add_dependency 'tty-screen', '~> 0.6.3' # detect the terminal width
 
   spec.add_dependency 'babosa', '>= 1.0.2', "< 2.0.0"
   spec.add_dependency 'colored' # colored terminal output
