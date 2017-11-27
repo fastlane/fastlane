@@ -1,6 +1,6 @@
 module FastlaneCore
   # Represents an Xcode project
-  class Project
+  class Project # rubocop:disable Metrics/ClassLength
     class << self
       # Project discovery
       def detect_projects(config)

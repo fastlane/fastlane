@@ -525,8 +525,8 @@ describe FastlaneCore do
         })
 
         expect(project.project_paths).to eq([
-                                          File.expand_path(workspace_path.gsub("xcworkspace", "xcodeproj")) # this should point to the included Xcode project
-                                        ])
+                                              File.expand_path(workspace_path.gsub("xcworkspace", "xcodeproj")) # this should point to the included Xcode project
+                                            ])
       end
     end
   end
