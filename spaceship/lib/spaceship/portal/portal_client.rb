@@ -714,7 +714,7 @@ module Spaceship
 
     # This is a cache of entity type (App, AppGroup, Certificate, Device) to csrf_tokens
     def csrf_cache
-      @csrf_cache || {}
+      @csrf_cache ||= {}
     end
 
     # Ensures that there are csrf tokens for the appropriate entity type
