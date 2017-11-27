@@ -57,6 +57,8 @@ module Fastlane
             end
 
             begin
+              # need to call reload here or dsym_url is nil
+              build.reload
               download_url = build.dsym_url
             rescue Spaceship::TunesClient::ITunesConnectError => ex
               UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
