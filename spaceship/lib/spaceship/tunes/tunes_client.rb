@@ -1202,7 +1202,10 @@ module Spaceship
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
-      parse_response(r, 'data')['user']
+      response_object = parse_response(r, 'data')
+      errors = response_object['sectionErrorKeys']
+      raise ITunesConnectError, errors.join(' ') unless errors.empty?
+      response_object['user']
     end
 
     def delete_sandbox_testers!(tester_class, emails)
