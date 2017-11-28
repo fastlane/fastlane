@@ -1,13 +1,13 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/renew_push_certificate'
-    class PemAction < RenewPushCertificateAction
+    require 'fastlane/actions/get_push_certificate'
+    class PemAction < GetPushCertificateAction
       #####################################################
       # @!group Documentation
       #####################################################
 
       def self.description
-        "Alias for the `renew_push_certificate` action"
+        "Alias for the `get_push_certificate` action"
       end
     end
   end
