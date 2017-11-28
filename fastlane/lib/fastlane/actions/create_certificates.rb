@@ -5,7 +5,7 @@ module Fastlane
       CERT_CERTIFICATE_ID = :CERT_CERTIFICATE_ID
     end
 
-    class CreateCertificatesAction < Action
+    class GetCertificatesAction < Action
       def self.run(params)
         require 'cert'
 
@@ -52,9 +52,9 @@ module Fastlane
 
       def self.example_code
         [
-          'create_certificates',
-          'cert # alias for "create_certificates"',
-          'create_certificates(
+          'get_certificates',
+          'cert # alias for "get_certificates"',
+          'get_certificates(
             development: true,
             username: "user@email.com"
           )'

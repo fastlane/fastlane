@@ -4,7 +4,7 @@ module Fastlane
       MATCH_PROVISIONING_PROFILE_MAPPING = :MATCH_PROVISIONING_PROFILE_MAPPING
     end
 
-    class SynchronizeProvisioningAction < Action
+    class SyncCodeSigningAction < Action
       def self.run(params)
         require 'match'
 
@@ -84,10 +84,10 @@ module Fastlane
 
       def self.example_code
         [
-          'synchronize_provisioning(type: "appstore", app_identifier: "tools.fastlane.app")',
-          'synchronize_provisioning(type: "development", readonly: true)',
-          'synchronize_provisioning(app_identifier: ["tools.fastlane.app", "tools.fastlane.sleepy"])',
-          'match(...) # alias for "synchronize_provisioning"'
+          'sync_code_signing(type: "appstore", app_identifier: "tools.fastlane.app")',
+          'sync_code_signing(type: "development", readonly: true)',
+          'sync_code_signing(app_identifier: ["tools.fastlane.app", "tools.fastlane.sleepy"])',
+          'match(...) # alias for "sync_code_signing"'
         ]
       end
 
