@@ -12,6 +12,10 @@ unless ENV["DEBUG"]
   $stdout = File.open("/tmp/fastlane_tests", "w")
 end
 
+# This module is only used to check the environment is currently a testing env
+module SpecHelper
+end
+
 xcode_path = FastlaneCore::Helper.xcode_path
 unless xcode_path.include?("Contents/Developer")
   UI.error("Seems like you didn't set the developer tools path correctly")
@@ -20,10 +24,6 @@ unless xcode_path.include?("Contents/Developer")
   UI.command("sudo xcode-select -s /Applications/Xcode.app")
   UI.error("Adapt the path if you have Xcode installed/named somewhere else")
   exit(1)
-end
-
-# This module is only used to check the environment is currently a testing env
-module SpecHelper
 end
 
 (Fastlane::TOOLS + [:spaceship, :fastlane_core]).each do |tool|
