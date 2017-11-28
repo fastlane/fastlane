@@ -170,7 +170,7 @@ module Gym
         # xcodebuild will not use provisioning profiles
         # if we don't specify signingStyle as manual
         if Helper.xcode_at_least?("9.0") && hash[:provisioningProfiles]
-          hash[:signingStyle] = 'manual'
+          hash[:signingStyle] = signing_style
         end
 
         hash[:teamID] = Gym.config[:export_team_id] if Gym.config[:export_team_id]
@@ -187,6 +187,19 @@ module Gym
         end
 
         to_plist(hash)
+      end
+
+      def signing_style
+        projects = Gym.project.project_paths
+        project = projects.first
+        xcodeproj = Xcodeproj::Project.open(project)
+        xcodeproj.root_object.attributes["TargetAttributes"].each do |target, sett|
+          return sett["ProvisioningStyle"].to_s.downcase
+        end
+      rescue => e
+        UI.verbose(e.to_s)
+        UI.error("Unable to read provisioning style from .pbxproj file.")
+        return "automatic"
       end
 
       # Avoids a Hash#to_plist conflict between CFPropertyList and plist gems
