@@ -45,15 +45,15 @@ module Fastlane
         custom_commands = options.custom.to_s.split(',')
 
         if custom_commands.any?
-          open("#{fastlane_conf_dir}/completions/completion.bash", 'a') do |file|
-            custom_commands.each do |command|
-              file.puts "complete -F _fastlane_complete #{command}"
-            end
-          end
+          Fastlane::SHELLS.each do |shell|
+            open("#{fastlane_conf_dir}/completions/completion.#{shell}", 'a') do |file|
+              custom_commands.each do |command|
+                auto_complete_line = self.get_auto_complete_line(shell, command)
 
-          open("#{fastlane_conf_dir}/completions/completion.zsh", 'a') do |file|
-            custom_commands.each do |command|
-              file.puts "compctl -K _fastlane_complete #{command}"
+                next if auto_complete_line.nil?
+
+                file.puts auto_complete_line
+              end
             end
           end
         end
@@ -62,6 +62,19 @@ module Fastlane
         UI.important "  . ~/.fastlane/completions/completion.sh"
         UI.success "Don't forget to source that file in your current shell! 🐚"
       end
+    end
+
+    # Helper to get the auto complete register script line
+    def self.get_auto_complete_line(shell, command)
+      if shell == :bash
+        prefix = "complete -F"
+      elsif shell == :zsh
+        prefix = "compctl -K"
+      else
+        return nil
+      end
+
+      return "#{prefix} _fastlane_complete #{command}"
     end
   end
 end
