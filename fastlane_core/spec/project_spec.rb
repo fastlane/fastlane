@@ -507,5 +507,27 @@ describe FastlaneCore do
         expect(project.build_xcodebuild_showbuildsettings_command).to match(%r{2> /dev/null})
       end
     end
+
+    describe "#project_paths" do
+      it "works with basic projects" do
+        project = FastlaneCore::Project.new({
+          project: "gym/lib"
+        })
+
+        expect(project.project_paths).to be_an(Array)
+        expect(project.project_paths).to eq([File.expand_path("gym/lib")])
+      end
+
+      it "works with workspaces" do
+        workspace_path = "gym/spec/fixtures/projects/cocoapods/Example.xcworkspace"
+        project = FastlaneCore::Project.new({
+          workspace: workspace_path
+        })
+
+        expect(project.project_paths).to eq([
+                                              File.expand_path(workspace_path.gsub("xcworkspace", "xcodeproj")) # this should point to the included Xcode project
+                                            ])
+      end
+    end
   end
 end
