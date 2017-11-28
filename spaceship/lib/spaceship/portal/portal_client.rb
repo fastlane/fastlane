@@ -439,7 +439,11 @@ module Spaceship
           sort: 'name=asc',
           includeRemovedDevices: include_disabled
         })
-        parse_response(r, 'devices')
+        result = parse_response(r, 'devices')
+
+        csrf_cache[Spaceship::Device] = self.csrf_tokens
+
+        result
       end
     end
 
@@ -558,7 +562,11 @@ module Spaceship
           onlyCountLists: true
         })
 
-        parse_response(req, 'provisioningProfiles')
+        result = parse_response(req, 'provisioningProfiles')
+
+        csrf_cache[Spaceship::ProvisioningProfile] = self.csrf_tokens
+
+        result
       end
     end
 
@@ -577,7 +585,11 @@ module Spaceship
         }
       end
 
-      parse_response(req, 'provisioningProfiles')
+      result = parse_response(req, 'provisioningProfiles')
+
+      csrf_cache[Spaceship::ProvisioningProfile] = self.csrf_tokens
+
+      result
     end
 
     def provisioning_profile_details(provisioning_profile_id: nil, mac: false)
@@ -732,12 +744,6 @@ module Spaceship
 
       # If we directly create a new resource (e.g. app) without querying anything before
       # we don't have a valid csrf token, that's why we have to do at least one request
-      block_given? ? yield : klass.all
-
-      # Update 18th August 2016
-      # For some reason, we have to query the resource twice to actually get a valid csrf_token
-      # I couldn't find out why, the first response does have a valid Set-Cookie header
-      # But it still needs this second request
       block_given? ? yield : klass.all
 
       csrf_cache[klass] = self.csrf_tokens
