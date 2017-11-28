@@ -21,6 +21,3 @@ _fastlane_complete() {
   COMPREPLY=( $(compgen -W "$completions" -- "$word") )
 }
 
-complete -F _fastlane_complete fastlane
-# this also works for "bundle lane_nam<tab>" but it's an acceptable trade-off
-complete -F _fastlane_complete bundle exec fastlane

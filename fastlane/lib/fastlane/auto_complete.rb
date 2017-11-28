@@ -47,6 +47,10 @@ module Fastlane
         if custom_commands.any?
           Fastlane::SHELLS.each do |shell|
             open("#{fastlane_conf_dir}/completions/completion.#{shell}", 'a') do |file|
+              default_line_prefix = Helper.bundler? ? "bundle exec " : ""
+
+              file.puts self.get_auto_complete_line(shell, "#{default_line_prefix}fastlane")
+
               custom_commands.each do |command|
                 auto_complete_line = self.get_auto_complete_line(shell, command)
 

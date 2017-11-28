@@ -20,6 +20,3 @@ _fastlane_complete() {
   reply=( "${(ps:\n:)completions}" )
 }
 
-compctl -K _fastlane_complete fastlane
-# this also works for "bundle lane_nam<tab>" but it's an acceptable trade-off
-compctl -K _fastlane_complete bundle exec fastlane
