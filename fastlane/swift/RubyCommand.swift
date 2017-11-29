@@ -16,7 +16,7 @@ struct RubyCommand: RubyCommandable {
     struct Argument {
         enum ArgType {
             case stringClosure
-            
+
             var typeString: String {
                 switch self {
                 case .stringClosure:
@@ -24,24 +24,24 @@ struct RubyCommand: RubyCommandable {
                 }
             }
         }
-        
+
         let name: String
         let value: Any?
         let type: ArgType?
-        
+
         init(name: String, value: Any?, type: ArgType? = nil) {
             self.name = name
             self.value = value
             self.type = type
         }
-        
+
         var hasValue: Bool {
             return nil != self.value
         }
-        
+
         var json: String {
             get {
-                
+
                 if let someValue = value {
                     let typeJson: String
                     if let type = type {
@@ -49,9 +49,11 @@ struct RubyCommand: RubyCommandable {
                     }else {
                         typeJson = ""
                     }
-                    
+
                     if type == .stringClosure  {
                         return "{\"name\" : \"\(name)\", \"value\" : \"ignored_for_closure\"\(typeJson)}"
+                    } else if let array = someValue as? [String] {
+                        return "{\"name\" : \"\(name)\", \"value\" : \"\(array.joined(separator: ","))\"\(typeJson)}"
                     } else {
                         return "{\"name\" : \"\(name)\", \"value\" : \"\(someValue)\"\(typeJson)}"
                     }
@@ -62,12 +64,12 @@ struct RubyCommand: RubyCommandable {
             }
         }
     }
-    
+
     let commandID: String
     let methodName: String
     let className: String?
     let args: [Argument]
-    
+
     func performCallback(callbackArg: String) {
         // WARNING: This will perform the first callback it receives
         let callbacks = self.args.filter { ($0.type != nil) && $0.type == .stringClosure }
@@ -75,48 +77,48 @@ struct RubyCommand: RubyCommandable {
             verbose(message: "received call to performCallback with \(callbackArg), but no callback available to perform")
             return
         }
-        
+
         guard let callbackArgValue = callback.value else {
             verbose(message: "received call to performCallback with \(callbackArg), but callback is nil")
             return
         }
-        
+
         guard let callbackClosure = callbackArgValue as? ((String) -> Void) else {
             verbose(message: "received call to performCallback with \(callbackArg), but callback type is unknown \(callbackArgValue.self)")
             return
         }
-        
+
         print("Performing callback with: \(callbackArg)")
         callbackClosure(callbackArg)
     }
-    
+
     var json: String {
         let argsArrayJson = self.args
             .map { $0.json }
             .filter { $0 != "" }
-        
+
         let argsJson: String?
         if argsArrayJson.count > 0 {
             argsJson = "\"args\" : [\(argsArrayJson.joined(separator: ","))]"
         } else {
             argsJson = nil
         }
-        
+
         let commandIDJson = "\"commandID\" : \"\(commandID)\""
         let methodNameJson = "\"methodName\" : \"\(methodName)\""
-        
+
         var jsonParts = [commandIDJson, methodNameJson]
         if let argsJson = argsJson {
             jsonParts.append(argsJson)
         }
-        
+
         if let className = className {
             let classNameJson = "\"className\" : \"\(className)\""
             jsonParts.append(classNameJson)
         }
-        
+
         let commandJsonString = "{\(jsonParts.joined(separator: ","))}"
-        
+
         return commandJsonString
     }
 }
