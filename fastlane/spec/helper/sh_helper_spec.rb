@@ -1,15 +1,13 @@
 describe Fastlane::Actions do
   describe "#sh" do
     let (:mock_input) { double :input }
-    let (:mock_output) { double :output }
     let (:mock_status) { double :status }
     let (:mock_thread) { double :thread, value: mock_status }
+    # Just open an empty file to mock command output
+    let (:mock_output) { File.open(File.expand_path(File.join("..", "..", "fixtures", "appfiles", "Appfile_empty"), __FILE__)) }
 
     before do
       allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true)
-      allow(mock_output).to receive(:sync=).with(true)
-      allow(mock_output).to receive(:each)
-      allow(mock_output).to receive(:close)
     end
 
     context "external commands are failed" do

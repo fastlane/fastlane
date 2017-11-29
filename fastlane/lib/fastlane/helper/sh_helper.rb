@@ -39,7 +39,6 @@ module Fastlane
             UI.command_output(line.strip) if print_command_output
             result << line
           end
-          io.close
           exit_status = thread.value.exitstatus
         end
 
