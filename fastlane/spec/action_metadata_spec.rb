@@ -10,7 +10,7 @@ describe Fastlane::Action do
       end
 
       it "is a subclass of Action" do
-        expect(action.superclass).to eq(Fastlane::Action), "Please add `Action` as a superclass for action '#{name}'"
+        expect(action.ancestors.include?(Fastlane::Action)).to be_truthy, "Please add `Action` as a superclass for action '#{name}'"
       end
 
       it "description" do

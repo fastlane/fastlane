@@ -1,13 +1,13 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/get_certificates'
-    class CertAction < GetCertificatesAction
+    require 'fastlane/actions/build_ios_app'
+    class BuildAppAction < BuildIosAppAction
       #####################################################
       # @!group Documentation
       #####################################################
 
       def self.description
-        "Alias for the `get_certificates` action"
+        "Alias for the `build_ios_app` action"
       end
     end
   end
