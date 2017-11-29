@@ -1,13 +1,13 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/build_ios_app'
-    class GymAction < BuildIOSAppAction
+    require 'fastlane/actions/capture_ios_screenshots'
+    class CaptureScreenshotsAction < CaptureIOSScreenshotsAction
       #####################################################
       # @!group Documentation
       #####################################################
 
       def self.description
-        "Alias for the `build_app` action"
+        "Alias for the `capture_ios_screenshots` action"
       end
     end
   end

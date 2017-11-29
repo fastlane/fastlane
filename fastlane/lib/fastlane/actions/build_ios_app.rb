@@ -5,7 +5,7 @@ module Fastlane
       DSYM_OUTPUT_PATH = :DSYM_OUTPUT_PATH
     end
 
-    class BuildAppAction < Action
+    class BuildIOSAppAction < Action
       def self.run(values)
         require 'gym'
 
@@ -112,8 +112,8 @@ module Fastlane
 
       def self.example_code
         [
-          'build_app(scheme: "MyApp", workspace: "MyApp.xcworkspace")',
-          'build_app(
+          'build_ios_app(scheme: "MyApp", workspace: "MyApp.xcworkspace")',
+          'build_ios_app(
             workspace: "MyApp.xcworkspace",
             configuration: "Debug",
             scheme: "MyApp",
@@ -123,7 +123,8 @@ module Fastlane
             output_name: "my-app.ipa",       # specify the name of the .ipa file to generate (including file extension)
             sdk: "10.0"                      # use SDK as the name or path of the base SDK when building the project.
           )',
-          'gym(...) # alias for "build_app"'
+          'gym(...) # alias for "build_ios_app"',
+          'build_app(...) # alias for "build_ios_app"'
         ]
       end
 
