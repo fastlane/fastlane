@@ -19,7 +19,7 @@ module Fastlane
 
     def start
       server = TCPServer.open('localhost', 2000) # Socket to listen on port 2000
-      print "Accepting connections\n"
+      print "Accepting connections from localhost\n"
 
       # set thread local to ready so we can check it
       Thread.current[:ready] = true
@@ -30,22 +30,20 @@ module Fastlane
         str = client.recv(1_048_576) # 1024 * 1024
         if str == 'done'
           time = Time.new
-          print "[#{time.usec}]: received done signal, shutting down\n"
-
-          print "Done! Byeeeee\n"
+          UI.verbose("[#{time.usec}]: received done signal, shutting down")
           break
         end
         response_json = process_command(command_json: str)
 
         time = Time.new
-        print "[#{time.usec}]: sending #{response_json}\n"
+        UI.verbose("[#{time.usec}]: sending #{response_json}")
         client.puts(response_json) # Send some json to the client
       end
     end
 
     def process_command(command_json: nil)
       time = Time.new
-      print "[#{time.usec}]: received command:#{command_json}\n"
+      UI.verbose("[#{time.usec}]: received command:#{command_json}")
       command = Command.new(json: command_json)
 
       return execute_command(command: command)
