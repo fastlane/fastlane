@@ -9,9 +9,7 @@ module Fastlane
       def self.run(values)
         require 'gym'
 
-        unless Actions.lane_context[SharedValues::SIGH_PROFILE_TYPE].to_s == "development"
-          values[:export_method] ||= Actions.lane_context[SharedValues::SIGH_PROFILE_TYPE]
-        end
+        values[:export_method] ||= Actions.lane_context[SharedValues::SIGH_PROFILE_TYPE] || Gym::PackageCommandGeneratorXcode7::DEFAULT_EXPORT_METHOD
 
         if Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]
           # Since Xcode 9 you need to explicitly provide the provisioning profile per app target
