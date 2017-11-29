@@ -21,4 +21,3 @@ update_fastlane"
   reply=( "${(ps:\n:)completions}" )
 }
 
-compctl -K _fastlane_complete fastlane
