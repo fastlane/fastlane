@@ -638,7 +638,7 @@ module Spaceship
       elsif body.to_s.include?("Internal Server Error - Read")
         raise InternalServerError, "Received an internal server error from iTunes Connect / Developer Portal, please try again later"
       elsif (body["resultString"] || "").include?("Program License Agreement")
-        raise ProgramLicenseAgreementUpdated, "#{body['userString']} Please manually log into iTunes Connect to review and accept the updated agreement."
+        raise ProgramLicenseAgreementUpdated, "#{body['userString']} Please manually log into your Apple Developer account to review and accept the updated agreement."
       end
     end
 
