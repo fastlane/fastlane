@@ -12,8 +12,7 @@ unless ENV["DEBUG"]
   $stdout = File.open("/tmp/fastlane_tests", "w")
 end
 
-is_mac = FastlaneCore::Helper.is_mac?
-if is_mac
+if FastlaneCore::Helper.is_mac?
   xcode_path = FastlaneCore::Helper.xcode_path
   unless xcode_path.include?("Contents/Developer")
     UI.error("Seems like you didn't set the developer tools path correctly")
