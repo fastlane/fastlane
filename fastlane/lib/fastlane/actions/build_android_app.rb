@@ -1,13 +1,13 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/get_certificates'
-    class CertAction < GetCertificatesAction
+    require 'fastlane/actions/gradle'
+    class BuildAndroidAppAction < GradleAction
       #####################################################
       # @!group Documentation
       #####################################################
 
       def self.description
-        "Alias for the `get_certificates` action"
+        "Alias for the `gradle` action"
       end
     end
   end
