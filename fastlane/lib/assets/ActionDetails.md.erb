@@ -27,7 +27,7 @@ Returns | <%= action.return_value %>
 
 <% if (action.example_code || []).count > 0 %>
 
-**<%= action.example_code.count %> Example<%= (action.example_code.count > 1) ? "s" : "" %>**
+## <%= action.example_code.count %> Example<%= (action.example_code.count > 1) ? "s" : "" %>
 <% action.example_code.each do |current_sample| %>
 ```ruby
 <%= current_sample.gsub("          ", "") %>
@@ -37,7 +37,7 @@ Returns | <%= action.return_value %>
 
 <% if action.available_options && action.available_options.first.kind_of?(FastlaneCore::ConfigItem) %>
 
-**Parameters**
+## Parameters
 
 Key | Description
 ----|------------
