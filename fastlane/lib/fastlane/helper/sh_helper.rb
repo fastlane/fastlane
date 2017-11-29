@@ -25,7 +25,7 @@ module Fastlane
       Encoding.default_external = Encoding::UTF_8
       Encoding.default_internal = Encoding::UTF_8
 
-      command = command.join(' ') if command.kind_of?(Array) # since it's an array of one element when running from the Fastfile
+      command = command.map(&:to_s).map(&:shellescape).join(' ') if command.kind_of?(Array) # since it's an array of one element when running from the Fastfile
       UI.command(command) if print_command
 
       result = ''
