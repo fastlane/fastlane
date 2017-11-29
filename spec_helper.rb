@@ -1,3 +1,7 @@
+# This module is only used to check the environment is currently a testing env
+module SpecHelper
+end
+
 require "coveralls"
 Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
@@ -22,10 +26,6 @@ if FastlaneCore::Helper.is_mac?
     UI.error("Adapt the path if you have Xcode installed/named somewhere else")
     exit(1)
   end
-end
-
-# This module is only used to check the environment is currently a testing env
-module SpecHelper
 end
 
 (Fastlane::TOOLS + [:spaceship, :fastlane_core]).each do |tool|
