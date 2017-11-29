@@ -7,13 +7,13 @@ WebMock.disable_net_connect!(allow: 'coveralls.io')
 require "fastlane"
 UI = FastlaneCore::UI
 
+# This module is only used to check the environment is currently a testing env
+module SpecHelper
+end
+
 unless ENV["DEBUG"]
   $stdout.puts "Changing stdout to /tmp/fastlane_tests, set `DEBUG` environment variable to print to stdout (e.g. when using `pry`)"
   $stdout = File.open("/tmp/fastlane_tests", "w")
-end
-
-# This module is only used to check the environment is currently a testing env
-module SpecHelper
 end
 
 if FastlaneCore::Helper.is_mac?
