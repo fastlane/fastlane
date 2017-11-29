@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     require 'fastlane/actions/capture_ios_screenshots'
-    class CaptureScreenshotsAction < CaptureIOSScreenshotsAction
+    class CaptureScreenshotsAction < CaptureIosScreenshotsAction
       #####################################################
       # @!group Documentation
       #####################################################

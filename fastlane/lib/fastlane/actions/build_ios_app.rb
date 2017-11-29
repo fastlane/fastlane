@@ -5,7 +5,7 @@ module Fastlane
       DSYM_OUTPUT_PATH = :DSYM_OUTPUT_PATH
     end
 
-    class BuildIOSAppAction < Action
+    class BuildIosAppAction < Action
       def self.run(values)
         require 'gym'
 

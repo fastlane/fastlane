@@ -4,7 +4,7 @@ module Fastlane
       SNAPSHOT_SCREENSHOTS_PATH = :SNAPSHOT_SCREENSHOTS_PATH
     end
 
-    class CaptureIOSScreenshotsAction < Action
+    class CaptureIosScreenshotsAction < Action
       def self.run(params)
         return nil unless Helper.mac?
         require 'snapshot'

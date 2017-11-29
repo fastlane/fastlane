@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     require 'fastlane/actions/build_ios_app'
-    class BuildAppAction < BuildIOSAppAction
+    class BuildAppAction < BuildIosAppAction
       #####################################################
       # @!group Documentation
       #####################################################
