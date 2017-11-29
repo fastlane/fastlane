@@ -16,14 +16,16 @@ end
 module SpecHelper
 end
 
-xcode_path = FastlaneCore::Helper.xcode_path
-unless xcode_path.include?("Contents/Developer")
-  UI.error("Seems like you didn't set the developer tools path correctly")
-  UI.error("Detected path '#{xcode_path}'") if xcode_path.to_s.length > 0
-  UI.error("Please run the following on your machine")
-  UI.command("sudo xcode-select -s /Applications/Xcode.app")
-  UI.error("Adapt the path if you have Xcode installed/named somewhere else")
-  exit(1)
+if FastlaneCore::Helper.is_mac?
+  xcode_path = FastlaneCore::Helper.xcode_path
+  unless xcode_path.include?("Contents/Developer")
+    UI.error("Seems like you didn't set the developer tools path correctly")
+    UI.error("Detected path '#{xcode_path}'") if xcode_path.to_s.length > 0
+    UI.error("Please run the following on your machine")
+    UI.command("sudo xcode-select -s /Applications/Xcode.app")
+    UI.error("Adapt the path if you have Xcode installed/named somewhere else")
+    exit(1)
+  end
 end
 
 (Fastlane::TOOLS + [:spaceship, :fastlane_core]).each do |tool|
