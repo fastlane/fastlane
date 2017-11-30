@@ -24,15 +24,15 @@ platform :ios do
 
   desc "Runs all the tests"
   lane :test do
-    scan
+    run_tests
   end
 
   desc "Submit a new Beta Build to Apple TestFlight"
   desc "This will also make sure the profile is up to date"
   lane :beta do
     # match(type: "appstore") # more information: https://codesigning.guide
-    gym[[SCHEME]] # Build your app - more options available
-    pilot
+    build_app[[SCHEME]] # more options available
+    upload_to_testflight
 
     # sh "your_script.sh"
     # You can also use other beta testing services here (run `fastlane actions`)
@@ -40,11 +40,11 @@ platform :ios do
 
   desc "Deploy a new version to the App Store"
   lane :release do
-    # match(type: "appstore")
-    snapshot
-    gym[[SCHEME]] # Build your app - more options available
-    deliver(force: true)
-    # frameit
+    # sync_code_signing(type: "appstore")
+    capture_screenshots
+    build_app[[SCHEME]] # Build your app - more options available
+    upload_to_app_store(force: true)
+    # frame_screenshots
   end
 
   # You can define as many lanes as you want
