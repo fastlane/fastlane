@@ -175,6 +175,7 @@ module Fastlane
 
     # Execute shell command
     def sh(command, log: true, error_callback: nil)
+      command = Shellwords.join(command) if command.kind_of?(Array)
       command_header = log ? command : "shell command"
       Actions.execute_action(command_header) do
         Actions.sh_no_action(command, log: log, error_callback: error_callback)
