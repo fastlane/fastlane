@@ -282,6 +282,7 @@ module Deliver
                                      description: "Metadata: The localised app subtitle",
                                      optional: true,
                                      is_string: false,
+                                     type: Hash,
                                      verify_block: proc do |value|
                                        UI.user_error!(":subtitle must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                      end),
@@ -289,6 +290,7 @@ module Deliver
                                      description: "Metadata: An array of localised keywords",
                                      optional: true,
                                      is_string: false,
+                                     type: Hash,
                                      verify_block: proc do |value|
                                        UI.user_error!(":keywords must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                        value.each do |language, keywords|
@@ -303,6 +305,7 @@ module Deliver
                                      description: "Metadata: An array of localised promotional texts",
                                      optional: true,
                                      is_string: false,
+                                     type: Hash,
                                      verify_block: proc do |value|
                                        UI.user_error!(":keywords must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                      end),
