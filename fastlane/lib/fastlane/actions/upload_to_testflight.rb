@@ -39,11 +39,11 @@ module Fastlane
 
       def self.example_code
         [
-          'upload_to_testfight',
-          'testflight # alias for "upload_to_testfight"',
-          'pilot # alias for "upload_to_testfight"',
-          'upload_to_testfight(skip_submission: true) # to only upload the build',
-          'upload_to_testfight(
+          'upload_to_testflight',
+          'testflight # alias for "upload_to_testflight"',
+          'pilot # alias for "upload_to_testflight"',
+          'upload_to_testflight(skip_submission: true) # to only upload the build',
+          'upload_to_testflight(
             username: "felix@krausefx.com",
             app_identifier: "com.krausefx.app",
             itc_provider: "abcde12345" # pass a specific value to the iTMSTransporter -itc_provider option
