@@ -121,8 +121,6 @@ module FastlaneCore
     end
 
     def verify!(value)
-      # require "pry"
-      # binding.pry
       valid?(value)
     end
 
