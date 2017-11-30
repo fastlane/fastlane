@@ -62,6 +62,7 @@ module Fastlane
                                        env_name: "FL_REGISTER_DEVICES_DEVICES",
                                        description: "A hash of devices, with the name as key and the UDID as value",
                                        is_string: false,
+                                       type: Hash,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :devices_file,
                                        env_name: "FL_REGISTER_DEVICES_FILE",

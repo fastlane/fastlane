@@ -43,9 +43,9 @@ protocol DeliverfileProtocol: class {
   var appReviewInformation: String? { get }
   var description: String? { get }
   var name: String? { get }
-  var subtitle: String? { get }
-  var keywords: String? { get }
-  var promotionalText: String? { get }
+  var subtitle: [String : Any]? { get }
+  var keywords: [String : Any]? { get }
+  var promotionalText: [String : Any]? { get }
   var releaseNotes: String? { get }
   var privacyUrl: String? { get }
   var supportUrl: String? { get }
@@ -100,9 +100,9 @@ extension DeliverfileProtocol {
   var appReviewInformation: String? { return nil }
   var description: String? { return nil }
   var name: String? { return nil }
-  var subtitle: String? { return nil }
-  var keywords: String? { return nil }
-  var promotionalText: String? { return nil }
+  var subtitle: [String : Any]? { return nil }
+  var keywords: [String : Any]? { return nil }
+  var promotionalText: [String : Any]? { return nil }
   var releaseNotes: String? { return nil }
   var privacyUrl: String? { return nil }
   var supportUrl: String? { return nil }
