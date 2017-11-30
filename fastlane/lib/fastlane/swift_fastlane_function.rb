@@ -199,8 +199,6 @@ module Fastlane
 
         "RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}#{type_string})"
       end
-      argument_object_strings = argument_object_strings.join(", ")
-      argument_object_strings = "[#{argument_object_strings}]" # turn into swift array
       return argument_object_strings
     end
 
@@ -229,7 +227,12 @@ module Fastlane
     def implementation
       args = build_argument_list
 
-      implm = "  let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: #{args})\n"
+      implm = "  let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: ["
+      # Get the indent of the first argument in the list to give each
+      # subsequent argument it's own line with proper indenting
+      indent = ' ' * implm.length
+      implm += args.join(",\n#{indent}")
+      implm += "])\n"
       return implm + "  #{return_statement}"
     end
   end
