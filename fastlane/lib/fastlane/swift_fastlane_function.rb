@@ -28,7 +28,7 @@ module Fastlane
         "cert" => ["keychain_path"].to_set,
         "set_github_release" => ["api_token"].to_set,
         "github_api" => ["api_token"].to_set,
-        "create_pull_request" => ["api_token", "head"].to_set,
+        "create_pull_request" => ["api_token", "head", "api_url"].to_set,
         "commit_github_file" => ["api_token"].to_set,
         "verify_xcode" => ["xcode_path"].to_set,
         "produce" => ["sku"].to_set
@@ -99,69 +99,70 @@ module Fastlane
       end
     end
 
-    def override_default_value_if_not_correct_type(param_type: nil, default_value: nil)
+    def override_default_value_if_not_correct_type(param_name: nil, param_type: nil, default_value: nil)
+      default_value = nil if ignore_default_value?(function_name: @function_name, param_name: param_name)
+
       return "[]" if param_type == "[String]" && default_value == ""
       return "{_ in }" if param_type == "((String) -> Void)"
 
       return default_value
     end
 
-    # rubocop:disable Metrics/PerceivedComplexity
+    def get_type(param: nil, default_value: nil, optional: nil, param_type_override: nil)
+      unless param_type_override.nil?
+        type = determine_type_from_override(type_override: param_type_override)
+      end
+      type ||= "String"
+
+      optional_specifier = ""
+      # if we are optional and don't have a default value, we'll need to use ?
+      optional_specifier = "?" if (optional && default_value.nil?) && type != "((String) -> Void)"
+
+      # If we have a default value of true or false, we can infer it is a Bool
+      if default_value.class == FalseClass
+        type = "Bool"
+      elsif default_value.class == TrueClass
+        type = "Bool"
+      elsif default_value.kind_of?(Array)
+        type = "[String]"
+      end
+      return "#{type}#{optional_specifier}"
+    end
+
     def parameters
       unless @param_names
         return ""
       end
 
       param_names_and_types = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
-        unless param_type_override.nil?
-          type = determine_type_from_override(type_override: param_type_override)
+        type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
+
+        unless default_value.nil?
+          if type == "[String : String]"
+            # we can't handle default values for Hashes, yet
+            default_value = "[:]"
+          elsif type != "Bool" && type != "[String]" && type != "Int" && type != "((String) -> Void)"
+            default_value = "\"#{default_value}\""
+          end
         end
-        type ||= "String"
 
-        # some default values should be ignored during Swift generation because they use our local environment to
-        # deduce what values should be used
-        default_value = nil if ignore_default_value?(function_name: @function_name, param_name: param)
-
-        optional_specifier = ""
-        # if we are optional and don't have a default value, we'll need to use ?
-        optional_specifier = "?" if (optional && default_value.nil?) && type != "((String) -> Void)"
-
-        # If we have a default value of true or false, we can infer it is a Bool
-        if default_value.class == FalseClass
-          type = "Bool"
-        elsif default_value.class == TrueClass
-          type = "Bool"
-        elsif default_value.kind_of?(Array)
-          type = "[String]"
+        # if we don't have a default value, but the param is optional, set a default value in Swift to be nil
+        if optional && default_value.nil?
+          default_value ||= "nil"
         end
 
         # sometimes we get to the point where we have a default value but its type is wrong
         # so we need to correct that because [String] = "" is not valid swift
-        default_value = override_default_value_if_not_correct_type(param_type: type, default_value: default_value)
-
-        unless default_value.nil?
-          if type == "Bool" || type == "[String]" || type == "Int" || type == "((String) -> Void)"
-            default_value = " = #{default_value}"
-          elsif type == "[String : String]"
-            # we can't handle default values for Hashes, yet
-            default_value = ""
-          else
-            default_value = " = \"#{default_value}\""
-          end
-        end
-
-        # if we don't have a default value, but the param is options, just set a default value to nil
-        if optional
-          default_value ||= " = nil"
-        end
-
-        # erase the default value from the swift param string since it's nil because
-        # it means we don't have a default value nor optional value so we must get one
-        default_value ||= ""
+        default_value = override_default_value_if_not_correct_type(param_type: type, param_name: param, default_value: default_value)
 
         param = camel_case_lower(string: param)
         param = sanitize_reserved_word(word: param)
-        "#{param}: #{type}#{optional_specifier}#{default_value}"
+
+        if default_value.nil?
+          "#{param}: #{type}"
+        else
+          "#{param}: #{type} = #{default_value}"
+        end
       end
 
       return param_names_and_types.join(", ")
@@ -223,28 +224,6 @@ module Fastlane
   end
 
   class ToolSwiftFunction < SwiftFunction
-    def get_type(param: nil, default_value: nil, optional: nil)
-      type = "String"
-      optional_specifier = ""
-
-      # if we are optional and don't have a default value, we'll need to use ?
-      optional_specifier = "?" if optional && default_value.nil?
-
-      # If we have a default value of true or false, we can infer it is a Bool
-      if default_value.class == FalseClass
-        type = "Bool"
-      elsif default_value.class == TrueClass
-        type = "Bool"
-      end
-
-      unless default_value.nil?
-        if default_value.kind_of?(Array)
-          type = "[String]"
-        end
-      end
-      return "#{type}#{optional_specifier}"
-    end
-
     def protocol_name
       function_name = camel_case_lower(string: self.function_name)
       return function_name.capitalize + "fileProtocol"
@@ -260,7 +239,7 @@ module Fastlane
         return []
       end
       swift_vars = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
-        type = get_type(param: param, default_value: default_value, optional: optional)
+        type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
         type = determine_type_from_override(type_override: param_type_override, default_type: type)
 
         param = camel_case_lower(string: param)
@@ -278,7 +257,9 @@ module Fastlane
       end
 
       swift_implementations = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
-        default_type = get_type(param: param, default_value: default_value, optional: optional)
+        default_type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
+        default_value = nil if ignore_default_value?(function_name: @function_name, param_name: param)
+
         type_overridden = false
         type = determine_type_from_override(type_override: param_type_override, default_type: default_type)
         if type != default_type
@@ -327,7 +308,7 @@ module Fastlane
       end
 
       param_names_and_types = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
-        type = get_type(param: param, default_value: default_value, optional: optional)
+        type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
         type = determine_type_from_override(type_override: param_type_override, default_type: type)
 
         param = camel_case_lower(string: param)

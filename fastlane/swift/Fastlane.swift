@@ -67,7 +67,7 @@ func badge(dark: String? = nil, custom: String? = nil, noBadge: String? = nil, s
   let command = RubyCommand(commandID: "", methodName: "badge", className: nil, args: [RubyCommand.Argument(name: "dark", value: dark), RubyCommand.Argument(name: "custom", value: custom), RubyCommand.Argument(name: "no_badge", value: noBadge), RubyCommand.Argument(name: "shield", value: shield), RubyCommand.Argument(name: "alpha", value: alpha), RubyCommand.Argument(name: "path", value: path), RubyCommand.Argument(name: "shield_io_timeout", value: shieldIoTimeout), RubyCommand.Argument(name: "glob", value: glob), RubyCommand.Argument(name: "alpha_channel", value: alphaChannel), RubyCommand.Argument(name: "shield_gravity", value: shieldGravity), RubyCommand.Argument(name: "shield_no_resize", value: shieldNoResize)])
   _ = runner.executeCommand(command)
 }
-func buildAndUploadToAppetize(xcodebuild: [String : String], scheme: String? = nil, apiToken: String) {
+func buildAndUploadToAppetize(xcodebuild: [String : String] = [:], scheme: String? = nil, apiToken: String) {
   let command = RubyCommand(commandID: "", methodName: "build_and_upload_to_appetize", className: nil, args: [RubyCommand.Argument(name: "xcodebuild", value: xcodebuild), RubyCommand.Argument(name: "scheme", value: scheme), RubyCommand.Argument(name: "api_token", value: apiToken)])
   _ = runner.executeCommand(command)
 }
@@ -139,7 +139,7 @@ func createKeychain(name: String? = nil, path: String? = nil, password: String, 
   let command = RubyCommand(commandID: "", methodName: "create_keychain", className: nil, args: [RubyCommand.Argument(name: "name", value: name), RubyCommand.Argument(name: "path", value: path), RubyCommand.Argument(name: "password", value: password), RubyCommand.Argument(name: "default_keychain", value: defaultKeychain), RubyCommand.Argument(name: "unlock", value: unlock), RubyCommand.Argument(name: "timeout", value: timeout), RubyCommand.Argument(name: "lock_when_sleeps", value: lockWhenSleeps), RubyCommand.Argument(name: "lock_after_timeout", value: lockAfterTimeout), RubyCommand.Argument(name: "add_to_search_list", value: addToSearchList)])
   _ = runner.executeCommand(command)
 }
-func createPullRequest(apiToken: String, repo: String, title: String, body: String? = nil, head: String? = nil, base: String = "master", apiUrl: String = "https://api.github.com") {
+func createPullRequest(apiToken: String, repo: String, title: String, body: String? = nil, head: String, base: String = "master", apiUrl: String = "https://api.github.com") {
   let command = RubyCommand(commandID: "", methodName: "create_pull_request", className: nil, args: [RubyCommand.Argument(name: "api_token", value: apiToken), RubyCommand.Argument(name: "repo", value: repo), RubyCommand.Argument(name: "title", value: title), RubyCommand.Argument(name: "body", value: body), RubyCommand.Argument(name: "head", value: head), RubyCommand.Argument(name: "base", value: base), RubyCommand.Argument(name: "api_url", value: apiUrl)])
   _ = runner.executeCommand(command)
 }
@@ -195,7 +195,7 @@ func ensureXcodeVersion(version: String) {
   let command = RubyCommand(commandID: "", methodName: "environment_variable", className: nil, args: [RubyCommand.Argument(name: "set", value: set🚀), RubyCommand.Argument(name: "get", value: get🚀), RubyCommand.Argument(name: "remove", value: remove)])
   return runner.executeCommand(command)
 }
-func erb(template: String, destination: String? = nil, placeholders: [String : String]) {
+func erb(template: String, destination: String? = nil, placeholders: [String : String] = [:]) {
   let command = RubyCommand(commandID: "", methodName: "erb", className: nil, args: [RubyCommand.Argument(name: "template", value: template), RubyCommand.Argument(name: "destination", value: destination), RubyCommand.Argument(name: "placeholders", value: placeholders)])
   _ = runner.executeCommand(command)
 }
