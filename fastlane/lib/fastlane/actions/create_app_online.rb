@@ -64,7 +64,7 @@ module Fastlane
             sku: "123",
             team_name: "SunApps GmbH" # Only necessary when in multiple teams.
           )',
-          'produce(...) # alias for "create_app_online"'
+          'produce   # alias for "create_app_online"'
         ]
       end
 
