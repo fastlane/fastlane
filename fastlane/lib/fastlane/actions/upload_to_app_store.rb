@@ -54,8 +54,8 @@ module Fastlane
             force: true, # Set to true to skip PDF verification
             itc_provider: "abcde12345" # pass a specific value to the iTMSTransporter -itc_provider option
           )',
-          'deliver(...) # alias for "upload_to_app_store"',
-          'appstore(...) # alias for "upload_to_app_store"'
+          'deliver   # alias for "upload_to_app_store"',
+          'appstore  # alias for "upload_to_app_store"'
         ]
       end
 

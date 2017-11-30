@@ -123,8 +123,8 @@ module Fastlane
             output_name: "my-app.ipa",       # specify the name of the .ipa file to generate (including file extension)
             sdk: "10.0"                      # use SDK as the name or path of the base SDK when building the project.
           )',
-          'gym(...) # alias for "build_ios_app"',
-          'build_app(...) # alias for "build_ios_app"'
+          'gym         # alias for "build_ios_app"',
+          'build_app   # alias for "build_ios_app"'
         ]
       end
 
