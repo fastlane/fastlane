@@ -8,26 +8,26 @@ module Fastlane
     # When running this in tests, it will return the actual command instead of executing it
     # @param log [Boolean] should fastlane print out the executed command
     # @param error_callback [Block] a callback invoked with the command output if there is a non-zero exit status
-    def self.sh(command, log: true, error_callback: nil)
-      sh_control_output(command, print_command: log, print_command_output: log, error_callback: error_callback)
+    def self.sh(*command, log: true, error_callback: nil)
+      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback)
     end
 
-    def self.sh_no_action(command, log: true, error_callback: nil)
-      sh_control_output(command, print_command: log, print_command_output: log, error_callback: error_callback)
+    def self.sh_no_action(*command, log: true, error_callback: nil)
+      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback)
     end
 
-    # @param command [String] The command to be executed
+    # @param command [String, Array] The command to be executed
     # @param print_command [Boolean] Should we print the command that's being executed
     # @param print_command_output [Boolean] Should we print the command output during execution
     # @param error_callback [Block] A block that's called if the command exits with a non-zero status
-    def self.sh_control_output(command, print_command: true, print_command_output: true, error_callback: nil)
+    def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil)
       print_command = print_command_output = true if $troubleshoot
       # Set the encoding first, the user might have set it wrong
       previous_encoding = [Encoding.default_external, Encoding.default_internal]
       Encoding.default_external = Encoding::UTF_8
       Encoding.default_internal = Encoding::UTF_8
 
-      command = Shellwords.join(command) if command.kind_of?(Array) # since it's an array of one element when running from the Fastfile
+      command = command_from_args(*command)
       UI.command(command) if print_command
 
       result = ''
@@ -67,6 +67,16 @@ module Fastlane
     ensure
       Encoding.default_external = previous_encoding.first
       Encoding.default_internal = previous_encoding.last
+    end
+
+    def self.command_from_args(*args)
+      if args.count == 1
+        command = args.first
+        command = command.shelljoin if command.kind_of?(Array)
+      else
+        command = args.shelljoin
+      end
+      command
     end
   end
 end

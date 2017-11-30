@@ -50,6 +50,11 @@ describe Fastlane::Actions do
         expect_command 'git commit . -m a\ message'
         Fastlane::Actions.sh(["git", "commit", pathname, "-m", "a message"])
       end
+
+      it "converts a list of arguments" do
+        expect_command 'git commit -m a\ message'
+        Fastlane::Actions.sh("git", "commit", "-m", "a message")
+      end
     end
   end
 end
