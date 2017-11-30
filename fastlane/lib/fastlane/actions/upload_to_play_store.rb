@@ -26,7 +26,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Upload metadata, screenshots and binaries to Google Play (via `supply`)"
+        "Upload metadata, screenshots and binaries to Google Play (via _supply_)"
       end
 
       def self.details

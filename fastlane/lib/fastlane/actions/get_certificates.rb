@@ -27,7 +27,7 @@ module Fastlane
       end
 
       def self.description
-        "Create new iOS code signing certificates (via `cert`)"
+        "Create new iOS code signing certificates (via _cert_)"
       end
 
       def self.details

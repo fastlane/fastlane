@@ -44,7 +44,7 @@ module Fastlane
       end
 
       def self.description
-        "Generates a provisioning profile, saving it in the current folder (via `sigh`)"
+        "Generates a provisioning profile, saving it in the current folder (via _sigh_)"
       end
 
       def self.author

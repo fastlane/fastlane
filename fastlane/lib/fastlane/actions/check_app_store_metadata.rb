@@ -11,7 +11,7 @@ module Fastlane
       end
 
       def self.description
-        "Check your app's metadata before you submit your app to review (via `precheck`)"
+        "Check your app's metadata before you submit your app to review (via _precheck_)"
       end
 
       def self.details

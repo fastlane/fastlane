@@ -55,7 +55,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Easily sync your certificates and profiles across your team (via `match`)"
+        "Easily sync your certificates and profiles across your team (via _match_)"
       end
 
       def self.details
