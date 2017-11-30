@@ -31,7 +31,8 @@ module Fastlane
         "create_pull_request" => ["api_token", "head", "api_url"].to_set,
         "commit_github_file" => ["api_token"].to_set,
         "verify_xcode" => ["xcode_path"].to_set,
-        "produce" => ["sku"].to_set
+        "produce" => ["sku"].to_set,
+        "screengrab" => ["android_home"].to_set
       }
     end
 
@@ -148,7 +149,7 @@ module Fastlane
 
         # if we don't have a default value, but the param is optional, set a default value in Swift to be nil
         if optional && default_value.nil?
-          default_value ||= "nil"
+          default_value = "nil"
         end
 
         # sometimes we get to the point where we have a default value but its type is wrong
@@ -254,7 +255,6 @@ module Fastlane
       end
       swift_vars = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
         type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
-        type = determine_type_from_override(type_override: param_type_override, default_type: type)
 
         param = camel_case_lower(string: param)
         param = sanitize_reserved_word(word: param)
@@ -271,14 +271,8 @@ module Fastlane
       end
 
       swift_implementations = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
-        default_type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
+        type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
         default_value = nil if ignore_default_value?(function_name: @function_name, param_name: param)
-
-        type_overridden = false
-        type = determine_type_from_override(type_override: param_type_override, default_type: default_type)
-        if type != default_type
-          type_overridden = true
-        end
 
         param = camel_case_lower(string: param)
         param = sanitize_reserved_word(word: param)
@@ -293,8 +287,8 @@ module Fastlane
         end
 
         # if we don't have a default value, but the param is options, just set a default value to nil
-        if optional && !type_overridden
-          default_value ||= "nil"
+        if optional && default_value.nil?
+          default_value = "nil"
         end
 
         # if we don't have a default value still, we need to assign them based on type
@@ -323,7 +317,6 @@ module Fastlane
 
       param_names_and_types = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
         type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
-        type = determine_type_from_override(type_override: param_type_override, default_type: type)
 
         param = camel_case_lower(string: param)
         param = sanitize_reserved_word(word: param)

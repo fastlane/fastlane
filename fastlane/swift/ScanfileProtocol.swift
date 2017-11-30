@@ -3,7 +3,7 @@ protocol ScanfileProtocol: class {
   var project: String? { get }
   var device: String? { get }
   var toolchain: String? { get }
-  var devices: [String] { get }
+  var devices: [String]? { get }
   var scheme: String? { get }
   var clean: Bool { get }
   var codeCoverage: String? { get }
@@ -45,7 +45,7 @@ extension ScanfileProtocol {
   var project: String? { return nil }
   var device: String? { return nil }
   var toolchain: String? { return nil }
-  var devices: [String] { return [] }
+  var devices: [String]? { return nil }
   var scheme: String? { return nil }
   var clean: Bool { return false }
   var codeCoverage: String? { return nil }

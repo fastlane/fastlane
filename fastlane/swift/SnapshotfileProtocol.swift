@@ -2,7 +2,7 @@ protocol SnapshotfileProtocol: class {
   var workspace: String? { get }
   var project: String? { get }
   var xcargs: String? { get }
-  var devices: [String] { get }
+  var devices: [String]? { get }
   var languages: [String] { get }
   var launchArguments: [String] { get }
   var outputDirectory: String { get }
@@ -15,8 +15,8 @@ protocol SnapshotfileProtocol: class {
   var eraseSimulator: Bool { get }
   var localizeSimulator: Bool { get }
   var appIdentifier: String? { get }
-  var addPhotos: [String] { get }
-  var addVideos: [String] { get }
+  var addPhotos: [String]? { get }
+  var addVideos: [String]? { get }
   var buildlogPath: String { get }
   var clean: Bool { get }
   var configuration: String? { get }
@@ -35,7 +35,7 @@ extension SnapshotfileProtocol {
   var workspace: String? { return nil }
   var project: String? { return nil }
   var xcargs: String? { return nil }
-  var devices: [String] { return [] }
+  var devices: [String]? { return nil }
   var languages: [String] { return ["en-US"] }
   var launchArguments: [String] { return [""] }
   var outputDirectory: String { return "screenshots" }
@@ -48,8 +48,8 @@ extension SnapshotfileProtocol {
   var eraseSimulator: Bool { return false }
   var localizeSimulator: Bool { return false }
   var appIdentifier: String? { return nil }
-  var addPhotos: [String] { return [] }
-  var addVideos: [String] { return [] }
+  var addPhotos: [String]? { return nil }
+  var addVideos: [String]? { return nil }
   var buildlogPath: String { return "~/Library/Logs/snapshot" }
   var clean: Bool { return false }
   var configuration: String? { return nil }
