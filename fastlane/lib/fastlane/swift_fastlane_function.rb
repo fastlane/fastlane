@@ -31,7 +31,8 @@ module Fastlane
         "create_pull_request" => ["api_token", "head", "api_url"].to_set,
         "commit_github_file" => ["api_token"].to_set,
         "verify_xcode" => ["xcode_path"].to_set,
-        "produce" => ["sku"].to_set
+        "produce" => ["sku"].to_set,
+        "screengrab" => ["android_home"].to_set
       }
     end
 
@@ -118,6 +119,10 @@ module Fastlane
       # if we are optional and don't have a default value, we'll need to use ?
       optional_specifier = "?" if (optional && default_value.nil?) && type != "((String) -> Void)"
 
+      if optional && ignore_default_value?(function_name: @function_name, param_name: param)
+        optional_specifier = "?"
+      end
+
       # If we have a default value of true or false, we can infer it is a Bool
       if default_value.class == FalseClass
         type = "Bool"
@@ -148,7 +153,7 @@ module Fastlane
 
         # if we don't have a default value, but the param is optional, set a default value in Swift to be nil
         if optional && default_value.nil?
-          default_value ||= "nil"
+          default_value = "nil"
         end
 
         # sometimes we get to the point where we have a default value but its type is wrong
@@ -165,15 +170,29 @@ module Fastlane
         end
       end
 
-      return param_names_and_types.join(", ")
+      return param_names_and_types
     end
     # rubocop:enable Metrics/PerceivedComplexity
 
     def swift_code
       function_name = camel_case_lower(string: self.function_name)
       function_return_declaration = self.return_declaration
-      discardable_result = "@discardableResult " if function_return_declaration.length > 0
-      return "#{discardable_result}func #{function_name}(#{self.parameters})#{function_return_declaration} {\n#{self.implementation}\n}"
+      discardable_result = function_return_declaration.length > 0 ? "@discardableResult " : ''
+
+      # Calculate the necessary indent to line up parameter names on new lines
+      # with the first parameter after the opening paren following the function name.
+      # i.e.: @discardableResult func someFunctionName(firstParameter: T
+      #                                                secondParameter: T)
+      # This just creates a string with as many spaces are necessary given whether or not
+      # the function has a 'discardableResult' annotation, the 'func' keyword, function name
+      # and the opening paren.
+      function_keyword_definition = 'func '
+      open_paren = '('
+      closed_paren = ')'
+      indent = ' ' * (discardable_result.length + function_name.length + function_keyword_definition.length + open_paren.length)
+      params = self.parameters.join(",\n#{indent}")
+
+      return "#{discardable_result}#{function_keyword_definition}#{function_name}#{open_paren}#{params}#{closed_paren}#{function_return_declaration} {\n#{self.implementation}\n}"
     end
 
     def build_argument_list
@@ -188,8 +207,6 @@ module Fastlane
 
         "RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}#{type_string})"
       end
-      argument_object_strings = argument_object_strings.join(", ")
-      argument_object_strings = "[#{argument_object_strings}]" # turn into swift array
       return argument_object_strings
     end
 
@@ -218,7 +235,12 @@ module Fastlane
     def implementation
       args = build_argument_list
 
-      implm = "  let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: #{args})\n"
+      implm = "  let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: ["
+      # Get the indent of the first argument in the list to give each
+      # subsequent argument it's own line with proper indenting
+      indent = ' ' * implm.length
+      implm += args.join(",\n#{indent}")
+      implm += "])\n"
       return implm + "  #{return_statement}"
     end
   end
@@ -240,7 +262,6 @@ module Fastlane
       end
       swift_vars = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
         type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
-        type = determine_type_from_override(type_override: param_type_override, default_type: type)
 
         param = camel_case_lower(string: param)
         param = sanitize_reserved_word(word: param)
@@ -257,14 +278,9 @@ module Fastlane
       end
 
       swift_implementations = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
-        default_type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
-        default_value = nil if ignore_default_value?(function_name: @function_name, param_name: param)
+        type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
 
-        type_overridden = false
-        type = determine_type_from_override(type_override: param_type_override, default_type: default_type)
-        if type != default_type
-          type_overridden = true
-        end
+        default_value = nil if ignore_default_value?(function_name: @function_name, param_name: param)
 
         param = camel_case_lower(string: param)
         param = sanitize_reserved_word(word: param)
@@ -279,8 +295,8 @@ module Fastlane
         end
 
         # if we don't have a default value, but the param is options, just set a default value to nil
-        if optional && !type_overridden
-          default_value ||= "nil"
+        if optional && default_value.nil?
+          default_value = "nil"
         end
 
         # if we don't have a default value still, we need to assign them based on type
@@ -309,7 +325,6 @@ module Fastlane
 
       param_names_and_types = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
         type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
-        type = determine_type_from_override(type_override: param_type_override, default_type: type)
 
         param = camel_case_lower(string: param)
         param = sanitize_reserved_word(word: param)
@@ -318,7 +333,7 @@ module Fastlane
         "#{param}: #{type} = #{self.class_name.downcase}.#{static_var_for_parameter_name}"
       end
 
-      return param_names_and_types.join(", ")
+      return param_names_and_types
     end
   end
 end
