@@ -20,7 +20,7 @@ module Fastlane
       end
 
       def self.description
-        'Automated localized screenshots of your Android app (via `screengrab`)'
+        'Automated localized screenshots of your Android app (via _screengrab_)'
       end
 
       def self.available_options

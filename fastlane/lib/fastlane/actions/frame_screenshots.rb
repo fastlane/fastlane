@@ -15,7 +15,7 @@ module Fastlane
       end
 
       def self.description
-        "Adds device frames around all screenshots (via `frameit`)"
+        "Adds device frames around all screenshots (via _frameit_)"
       end
 
       def self.details

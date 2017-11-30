@@ -21,7 +21,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Upload a new binary to iTunes Connect for TestFlight beta testing (via `pilot`)"
+        "Upload a new binary to iTunes Connect for TestFlight beta testing (via _pilot_)"
       end
 
       def self.details

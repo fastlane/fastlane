@@ -22,12 +22,12 @@ module Fastlane
       end
 
       def self.description
-        "Creates the given application on iTC and the Dev Portal (via `produce`)"
+        "Creates the given application on iTC and the Dev Portal (via _produce_)"
       end
 
       def details
         [
-          'Create new apps on iTunes Connect and Apple Developer Portal via `produce`.',
+          'Create new apps on iTunes Connect and Apple Developer Portal via _produce_.',
           'If the app already exists, `create_app_online` will not do anything.',
           'For more information about produce, visit its GitHub page:',
           'https://github.com/fastlane/fastlane/tree/master/produce'
