@@ -90,7 +90,7 @@ module Fastlane
       if type_override == Array
         return "[String]"
       elsif type_override == Hash
-        return "[String : String]"
+        return "[String : Any]"
       elsif type_override == Integer
         return "Int"
       elsif type_override == :string_callback
@@ -143,7 +143,7 @@ module Fastlane
         type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
 
         unless default_value.nil?
-          if type == "[String : String]"
+          if type == "[String : Any]"
             # we can't handle default values for Hashes, yet
             default_value = "[:]"
           elsif type != "Bool" && type != "[String]" && type != "Int" && type != "((String) -> Void)"

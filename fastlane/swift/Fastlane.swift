@@ -114,7 +114,7 @@ func appium(platform: String,
             host: String = "0.0.0.0",
             port: String = "4723",
             appiumPath: String? = nil,
-            caps: String? = nil) {
+            caps: [String : Any]? = nil) {
   let command = RubyCommand(commandID: "", methodName: "appium", className: nil, args: [RubyCommand.Argument(name: "platform", value: platform),
                                                                                         RubyCommand.Argument(name: "spec_path", value: specPath),
                                                                                         RubyCommand.Argument(name: "app_path", value: appPath),
@@ -259,9 +259,9 @@ func appstore(username: String,
               appReviewInformation: String? = nil,
               description: String? = nil,
               name: String? = nil,
-              subtitle: String? = nil,
-              keywords: String? = nil,
-              promotionalText: String? = nil,
+              subtitle: [String : Any]? = nil,
+              keywords: [String : Any]? = nil,
+              promotionalText: [String : Any]? = nil,
               releaseNotes: String? = nil,
               privacyUrl: String? = nil,
               supportUrl: String? = nil,
@@ -411,7 +411,7 @@ func badge(dark: String? = nil,
                                                                                        RubyCommand.Argument(name: "shield_no_resize", value: shieldNoResize)])
   _ = runner.executeCommand(command)
 }
-func buildAndUploadToAppetize(xcodebuild: [String : String] = [:],
+func buildAndUploadToAppetize(xcodebuild: [String : Any] = [:],
                               scheme: String? = nil,
                               apiToken: String) {
   let command = RubyCommand(commandID: "", methodName: "build_and_upload_to_appetize", className: nil, args: [RubyCommand.Argument(name: "xcodebuild", value: xcodebuild),
@@ -765,9 +765,9 @@ func deliver(username: String = deliverfile.username,
              appReviewInformation: String? = deliverfile.appReviewInformation,
              description: String? = deliverfile.description,
              name: String? = deliverfile.name,
-             subtitle: String? = deliverfile.subtitle,
-             keywords: String? = deliverfile.keywords,
-             promotionalText: String? = deliverfile.promotionalText,
+             subtitle: [String : Any]? = deliverfile.subtitle,
+             keywords: [String : Any]? = deliverfile.keywords,
+             promotionalText: [String : Any]? = deliverfile.promotionalText,
              releaseNotes: String? = deliverfile.releaseNotes,
              privacyUrl: String? = deliverfile.privacyUrl,
              supportUrl: String? = deliverfile.supportUrl,
@@ -909,7 +909,7 @@ func ensureXcodeVersion(version: String) {
   let command = RubyCommand(commandID: "", methodName: "ensure_xcode_version", className: nil, args: [RubyCommand.Argument(name: "version", value: version)])
   _ = runner.executeCommand(command)
 }
-@discardableResult func environmentVariable(set🚀: [String : String]? = nil,
+@discardableResult func environmentVariable(set🚀: [String : Any]? = nil,
                                             get🚀: String? = nil,
                                             remove: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "environment_variable", className: nil, args: [RubyCommand.Argument(name: "set", value: set🚀),
@@ -919,7 +919,7 @@ func ensureXcodeVersion(version: String) {
 }
 func erb(template: String,
          destination: String? = nil,
-         placeholders: [String : String] = [:]) {
+         placeholders: [String : Any] = [:]) {
   let command = RubyCommand(commandID: "", methodName: "erb", className: nil, args: [RubyCommand.Argument(name: "template", value: template),
                                                                                      RubyCommand.Argument(name: "destination", value: destination),
                                                                                      RubyCommand.Argument(name: "placeholders", value: placeholders)])
@@ -1497,7 +1497,7 @@ func match(gitUrl: String = matchfile.gitUrl,
 }
 func modifyServices(username: String,
                     appIdentifier: String,
-                    services: String = "{}",
+                    services: [String : Any] = [:],
                     teamId: String? = nil,
                     teamName: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "modify_services", className: nil, args: [RubyCommand.Argument(name: "username", value: username),
@@ -1851,7 +1851,7 @@ func recreateSchemes(project: String) {
                                                                                                  RubyCommand.Argument(name: "username", value: username)])
   return runner.executeCommand(command)
 }
-func registerDevices(devices: String? = nil,
+func registerDevices(devices: [String : Any]? = nil,
                      devicesFile: String? = nil,
                      teamId: String? = nil,
                      teamName: String? = nil,
@@ -2045,8 +2045,8 @@ func scp(username: String,
          password: String? = nil,
          host: String,
          port: String = "22",
-         upload: [String : String]? = nil,
-         download: [String : String]? = nil) {
+         upload: [String : Any]? = nil,
+         download: [String : Any]? = nil) {
   let command = RubyCommand(commandID: "", methodName: "scp", className: nil, args: [RubyCommand.Argument(name: "username", value: username),
                                                                                      RubyCommand.Argument(name: "password", value: password),
                                                                                      RubyCommand.Argument(name: "host", value: host),
