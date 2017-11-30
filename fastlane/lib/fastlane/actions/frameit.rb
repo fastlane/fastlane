@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/frameit'
+    require 'fastlane/actions/frame_screenshots'
     class FrameitAction < FrameScreenshotsAction
       #####################################################
       # @!group Documentation
