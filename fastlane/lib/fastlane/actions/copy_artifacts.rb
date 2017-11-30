@@ -97,7 +97,7 @@ module Fastlane
           reset_git_repo(
             exclude: "artifacts"
           )',
-          '# Copy the .ipa created by `gym` if it was successfully created
+          '# Copy the .ipa created by _gym_ if it was successfully created
           artifacts = []
           artifacts << lane_context[SharedValues::IPA_OUTPUT_PATH] if lane_context[SharedValues::IPA_OUTPUT_PATH]
           copy_artifacts(
