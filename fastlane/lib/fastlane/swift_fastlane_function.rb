@@ -165,15 +165,19 @@ module Fastlane
         end
       end
 
-      return param_names_and_types.join(", ")
+      return param_names_and_types
     end
     # rubocop:enable Metrics/PerceivedComplexity
 
     def swift_code
       function_name = camel_case_lower(string: self.function_name)
       function_return_declaration = self.return_declaration
-      discardable_result = "@discardableResult " if function_return_declaration.length > 0
-      return "#{discardable_result}func #{function_name}(#{self.parameters})#{function_return_declaration} {\n#{self.implementation}\n}"
+      discardable_result = function_return_declaration.length > 0 ? "@discardableResult " : ''
+
+      indent = ' ' * (discardable_result.length + function_name.length + 'func '.length + '('.length)
+      params = self.parameters.join(",\n#{indent}")
+
+      return "#{discardable_result}func #{function_name}(#{params})#{function_return_declaration} {\n#{self.implementation}\n}"
     end
 
     def build_argument_list
@@ -318,7 +322,7 @@ module Fastlane
         "#{param}: #{type} = #{self.class_name.downcase}.#{static_var_for_parameter_name}"
       end
 
-      return param_names_and_types.join(", ")
+      return param_names_and_types
     end
   end
 end
