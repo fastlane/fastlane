@@ -27,7 +27,7 @@ module Fastlane
       Encoding.default_external = Encoding::UTF_8
       Encoding.default_internal = Encoding::UTF_8
 
-      command = command_from_args(*command)
+      command = shell_command_from_args(*command)
       UI.command(command) if print_command
 
       result = ''
@@ -69,7 +69,7 @@ module Fastlane
       Encoding.default_internal = previous_encoding.last
     end
 
-    def self.command_from_args(*args)
+    def self.shell_command_from_args(*args)
       raise ArgumentError, "sh requires at least one argument" unless args.count > 0
       if args.count == 1
         command = args.first

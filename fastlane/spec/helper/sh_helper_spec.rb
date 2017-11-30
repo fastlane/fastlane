@@ -58,25 +58,25 @@ describe Fastlane::Actions do
     end
   end
 
-  describe "command_from_args" do
+  describe "shell_command_from_args" do
     it "returns the string without shell escaping if a string is passed" do
-      command = Fastlane::Actions.command_from_args "cmd arg1 arg 2"
+      command = Fastlane::Actions.shell_command_from_args "cmd arg1 arg 2"
       expect(command).to eq "cmd arg1 arg 2"
     end
 
     it "returns a shelljoined string if an array is passed" do
-      command = Fastlane::Actions.command_from_args ["cmd", "arg1", "arg 2", 42]
+      command = Fastlane::Actions.shell_command_from_args ["cmd", "arg1", "arg 2", 42]
       expect(command).to eq 'cmd arg1 arg\ 2 42'
     end
 
     it "returns a shelljoined string if multiple arguments are passed" do
-      command = Fastlane::Actions.command_from_args "cmd", "arg1", "arg 2", 42
+      command = Fastlane::Actions.shell_command_from_args "cmd", "arg1", "arg 2", 42
       expect(command).to eq 'cmd arg1 arg\ 2 42'
     end
 
     it "raises ArgumentError with no arguments" do
       expect do
-        Fastlane::Actions.command_from_args
+        Fastlane::Actions.shell_command_from_args
       end.to raise_error ArgumentError
     end
   end
