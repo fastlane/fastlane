@@ -22,7 +22,7 @@ module Fastlane
       end
 
       def self.description
-        "Ensure a valid push profile is active, creating a new one if needed (via `pem`)"
+        "Ensure a valid push profile is active, creating a new one if needed (via _pem_)"
       end
 
       def self.author

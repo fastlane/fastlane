@@ -38,7 +38,7 @@ module Fastlane
       end
 
       def self.description
-        "Easily run tests of your iOS app (via `scan`)"
+        "Easily run tests of your iOS app (via _scan_)"
       end
 
       def self.details
