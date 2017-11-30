@@ -119,6 +119,10 @@ module Fastlane
       # if we are optional and don't have a default value, we'll need to use ?
       optional_specifier = "?" if (optional && default_value.nil?) && type != "((String) -> Void)"
 
+      if optional && ignore_default_value?(function_name: @function_name, param_name: param)
+        optional_specifier = "?"
+      end
+
       # If we have a default value of true or false, we can infer it is a Bool
       if default_value.class == FalseClass
         type = "Bool"
@@ -182,10 +186,13 @@ module Fastlane
       # This just creates a string with as many spaces are necessary given whether or not
       # the function has a 'discardableResult' annotation, the 'func' keyword, function name
       # and the opening paren.
-      indent = ' ' * (discardable_result.length + function_name.length + 'func '.length + '('.length)
+      function_keyword_definition = 'func '
+      open_paren = '('
+      closed_paren = ')'
+      indent = ' ' * (discardable_result.length + function_name.length + function_keyword_definition.length + open_paren.length)
       params = self.parameters.join(",\n#{indent}")
 
-      return "#{discardable_result}func #{function_name}(#{params})#{function_return_declaration} {\n#{self.implementation}\n}"
+      return "#{discardable_result}#{function_keyword_definition}#{function_name}#{open_paren}#{params}#{closed_paren}#{function_return_declaration} {\n#{self.implementation}\n}"
     end
 
     def build_argument_list
@@ -272,6 +279,7 @@ module Fastlane
 
       swift_implementations = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
         type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
+
         default_value = nil if ignore_default_value?(function_name: @function_name, param_name: param)
 
         param = camel_case_lower(string: param)

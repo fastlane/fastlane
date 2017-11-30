@@ -1,5 +1,5 @@
 protocol ScreengrabfileProtocol: class {
-  var androidHome: String { get }
+  var androidHome: String? { get }
   var buildToolsVersion: String? { get }
   var locales: [String] { get }
   var clearPreviousScreenshots: Bool { get }
@@ -21,7 +21,7 @@ protocol ScreengrabfileProtocol: class {
 }
 
 extension ScreengrabfileProtocol {
-  var androidHome: String { return "/Users/liebowitz/Library/Android/sdk" }
+  var androidHome: String? { return nil }
   var buildToolsVersion: String? { return nil }
   var locales: [String] { return ["en-US"] }
   var clearPreviousScreenshots: Bool { return false }

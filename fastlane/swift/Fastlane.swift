@@ -683,9 +683,9 @@ func createPullRequest(apiToken: String,
                        repo: String,
                        title: String,
                        body: String? = nil,
-                       head: String,
+                       head: String?,
                        base: String = "master",
-                       apiUrl: String) {
+                       apiUrl: String?) {
   let command = RubyCommand(commandID: "", methodName: "create_pull_request", className: nil, args: [RubyCommand.Argument(name: "api_token", value: apiToken),
                                                                                                      RubyCommand.Argument(name: "repo", value: repo),
                                                                                                      RubyCommand.Argument(name: "title", value: title),
@@ -2055,7 +2055,7 @@ func scp(username: String,
                                                                                      RubyCommand.Argument(name: "download", value: download)])
   _ = runner.executeCommand(command)
 }
-func screengrab(androidHome: String = screengrabfile.androidHome,
+func screengrab(androidHome: String? = screengrabfile.androidHome,
                 buildToolsVersion: String? = screengrabfile.buildToolsVersion,
                 locales: [String] = screengrabfile.locales,
                 clearPreviousScreenshots: Bool = screengrabfile.clearPreviousScreenshots,
