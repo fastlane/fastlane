@@ -21,7 +21,7 @@ protocol ScreengrabfileProtocol: class {
 }
 
 extension ScreengrabfileProtocol {
-  var androidHome: String { return "/Users/liebowitz/Library/Android/sdk" }
+  var androidHome: String { return "/Users/ohayon/Library/Android/sdk" }
   var buildToolsVersion: String? { return nil }
   var locales: [String] { return ["en-US"] }
   var clearPreviousScreenshots: Bool { return false }
