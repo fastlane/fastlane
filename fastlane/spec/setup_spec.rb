@@ -62,9 +62,9 @@ describe Fastlane do
 
           content = File.read(File.join(FastlaneCore::FastlaneFolder.path, 'Fastfile'))
           expect(content).to include "# update_fastlane"
-          expect(content).to include "deliver"
-          expect(content).to include "scan"
-          expect(content).to include "gym(scheme: \"MyScheme\")"
+          expect(content).to include "upload_to_app_store"
+          expect(content).to include "run_tests"
+          expect(content).to include "build_app(scheme: \"MyScheme\")"
 
           content = File.read(File.join(FastlaneCore::FastlaneFolder.path, 'Appfile'))
 
