@@ -174,6 +174,13 @@ module Fastlane
       function_return_declaration = self.return_declaration
       discardable_result = function_return_declaration.length > 0 ? "@discardableResult " : ''
 
+      # Calculate the necessary indent to line up parameter names on new lines
+      # with the first parameter after the opening paren following the function name.
+      # i.e.: @discardableResult func someFunctionName(firstParameter: T
+      #                                                secondParameter: T)
+      # This just creates a string with as many spaces are necessary given whether or not
+      # the function has a 'discardableResult' annotation, the 'func' keyword, function name
+      # and the opening paren.
       indent = ' ' * (discardable_result.length + function_name.length + 'func '.length + '('.length)
       params = self.parameters.join(",\n#{indent}")
 
