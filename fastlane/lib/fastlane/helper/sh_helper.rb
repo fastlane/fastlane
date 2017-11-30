@@ -1,3 +1,5 @@
+require "open3"
+
 module Fastlane
   module Actions
     # Execute a shell command
@@ -25,20 +27,19 @@ module Fastlane
       Encoding.default_external = Encoding::UTF_8
       Encoding.default_internal = Encoding::UTF_8
 
-      command = command.join(' ') if command.kind_of?(Array) # since it's an array of one element when running from the Fastfile
+      command = Shellwords.join(command) if command.kind_of?(Array) # since it's an array of one element when running from the Fastfile
       UI.command(command) if print_command
 
       result = ''
       if Helper.sh_enabled?
         exit_status = nil
-        IO.popen(command, err: [:child, :out]) do |io|
+        Open3.popen2e(command) do |stdin, io, thread|
           io.sync = true
           io.each do |line|
             UI.command_output(line.strip) if print_command_output
             result << line
           end
-          io.close
-          exit_status = $?.exitstatus
+          exit_status = thread.value.exitstatus
         end
 
         if exit_status != 0
