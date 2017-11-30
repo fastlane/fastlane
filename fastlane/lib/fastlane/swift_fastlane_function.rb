@@ -165,15 +165,26 @@ module Fastlane
         end
       end
 
-      return param_names_and_types.join(", ")
+      return param_names_and_types
     end
     # rubocop:enable Metrics/PerceivedComplexity
 
     def swift_code
       function_name = camel_case_lower(string: self.function_name)
       function_return_declaration = self.return_declaration
-      discardable_result = "@discardableResult " if function_return_declaration.length > 0
-      return "#{discardable_result}func #{function_name}(#{self.parameters})#{function_return_declaration} {\n#{self.implementation}\n}"
+      discardable_result = function_return_declaration.length > 0 ? "@discardableResult " : ''
+
+      # Calculate the necessary indent to line up parameter names on new lines
+      # with the first parameter after the opening paren following the function name.
+      # i.e.: @discardableResult func someFunctionName(firstParameter: T
+      #                                                secondParameter: T)
+      # This just creates a string with as many spaces are necessary given whether or not
+      # the function has a 'discardableResult' annotation, the 'func' keyword, function name
+      # and the opening paren.
+      indent = ' ' * (discardable_result.length + function_name.length + 'func '.length + '('.length)
+      params = self.parameters.join(",\n#{indent}")
+
+      return "#{discardable_result}func #{function_name}(#{params})#{function_return_declaration} {\n#{self.implementation}\n}"
     end
 
     def build_argument_list
@@ -188,8 +199,6 @@ module Fastlane
 
         "RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}#{type_string})"
       end
-      argument_object_strings = argument_object_strings.join(", ")
-      argument_object_strings = "[#{argument_object_strings}]" # turn into swift array
       return argument_object_strings
     end
 
@@ -218,7 +227,12 @@ module Fastlane
     def implementation
       args = build_argument_list
 
-      implm = "  let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: #{args})\n"
+      implm = "  let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: ["
+      # Get the indent of the first argument in the list to give each
+      # subsequent argument it's own line with proper indenting
+      indent = ' ' * implm.length
+      implm += args.join(",\n#{indent}")
+      implm += "])\n"
       return implm + "  #{return_statement}"
     end
   end
@@ -318,7 +332,7 @@ module Fastlane
         "#{param}: #{type} = #{self.class_name.downcase}.#{static_var_for_parameter_name}"
       end
 
-      return param_names_and_types.join(", ")
+      return param_names_and_types
     end
   end
 end
