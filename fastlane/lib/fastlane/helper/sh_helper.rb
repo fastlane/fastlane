@@ -70,6 +70,7 @@ module Fastlane
     end
 
     def self.command_from_args(*args)
+      raise ArgumentError, "sh requires at least one argument" unless args.count > 0
       if args.count == 1
         command = args.first
         command = command.shelljoin if command.kind_of?(Array)

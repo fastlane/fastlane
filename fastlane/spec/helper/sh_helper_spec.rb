@@ -73,6 +73,12 @@ describe Fastlane::Actions do
       command = Fastlane::Actions.command_from_args "cmd", "arg1", "arg 2", 42
       expect(command).to eq 'cmd arg1 arg\ 2 42'
     end
+
+    it "raises ArgumentError with no arguments" do
+      expect do
+        Fastlane::Actions.command_from_args
+      end.to raise_error ArgumentError
+    end
   end
 end
 
