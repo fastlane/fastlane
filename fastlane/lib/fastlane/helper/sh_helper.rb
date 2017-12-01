@@ -16,7 +16,7 @@ module Fastlane
       sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback)
     end
 
-    # @param command [String, Array] The command to be executed
+    # @param command The command to be executed (variadic)
     # @param print_command [Boolean] Should we print the command that's being executed
     # @param print_command_output [Boolean] Should we print the command output during execution
     # @param error_callback [Block] A block that's called if the command exits with a non-zero status
@@ -27,13 +27,22 @@ module Fastlane
       Encoding.default_external = Encoding::UTF_8
       Encoding.default_internal = Encoding::UTF_8
 
-      command = shell_command_from_args(*command)
-      UI.command(command) if print_command
+      shell_command = shell_command_from_args(*command)
+      UI.command(shell_command) if print_command
 
       result = ''
       if Helper.sh_enabled?
         exit_status = nil
-        Open3.popen2e(command) do |stdin, io, thread|
+
+        # The argument list is passed directly to Open3.popen2e, which
+        # handles the variadic argument list in the same way as Kernel#spawn.
+        # (http://ruby-doc.org/core-2.4.2/Kernel.html#method-i-spawn) or
+        # Process.spawn (http://ruby-doc.org/core-2.4.2/Process.html#method-c-spawn).
+        #
+        # sh "ls -la /Applications/Xcode\ 7.3.1.app"
+        # sh "ls", "-la", "/Applications/Xcode 7.3.1.app"
+        # sh({ "FOO" => "Hello" }, "echo $FOO")
+        Open3.popen2e(*command) do |stdin, io, thread|
           io.sync = true
           io.each do |line|
             UI.command_output(line.strip) if print_command_output
@@ -44,7 +53,7 @@ module Fastlane
 
         if exit_status != 0
           message = if print_command
-                      "Exit status of command '#{command}' was #{exit_status} instead of 0."
+                      "Exit status of command '#{shell_command}' was #{exit_status} instead of 0."
                     else
                       "Shell command exited with exit status #{exit_status} instead of 0."
                     end
@@ -69,14 +78,35 @@ module Fastlane
       Encoding.default_internal = previous_encoding.last
     end
 
+    # Used to produce a shell command string from a list of arguments that may
+    # be passed to methods such as Kernel#system, Kernel#spawn and Open3.popen2e
+    # in order to print the command to the terminal. The same *args are passed
+    # directly to a system call (Open3.popen2e). This interpretation is not
+    # used when executing a command.
+    #
+    # @param args Any number of arguments used to construct a command
+    # @raise [ArgumentError] If no arguments passed
+    # @return [String] A shell command representing the arguments passed in
     def self.shell_command_from_args(*args)
       raise ArgumentError, "sh requires at least one argument" unless args.count > 0
-      if args.count == 1
-        command = args.first
-        command = command.shelljoin if command.kind_of?(Array)
-      else
-        command = args.shelljoin
+
+      command = ""
+
+      # Optional initial environment Hash
+      if args.first.kind_of?(Hash)
+        command = args.shift.map { |k, v| "#{k}=#{v.shellescape}" }.join(" ") + " "
       end
+
+      # Support [ "/usr/local/bin/foo", "foo" ], "-x", ...
+      if args.first.kind_of?(Array)
+        command += args.shift.first.shellescape + " " + args.shelljoin
+        command.chomp! " "
+      elsif args.count == 1 && args.first.kind_of?(String)
+        command += args.first
+      else
+        command += args.shelljoin
+      end
+
       command
     end
   end

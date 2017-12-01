@@ -1,11 +1,5 @@
 describe Fastlane::Actions do
   describe "#sh" do
-    let (:mock_input) { double :input }
-    let (:mock_status) { double :status }
-    let (:mock_thread) { double :thread, value: mock_status }
-    # Just open an empty file to mock command output
-    let (:mock_output) { File.open(File.expand_path(File.join("..", "..", "fixtures", "appfiles", "Appfile_empty"), __FILE__)) }
-
     before do
       allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true)
     end
@@ -15,7 +9,7 @@ describe Fastlane::Actions do
         it "doesn't raise shell_error" do
           allow(FastlaneCore::UI).to receive(:error)
           called = false
-          expect_command "exit 1", 1
+          expect_command "exit 1", exitstatus: 1
           Fastlane::Actions.sh("exit 1", error_callback: ->(_) { called = true })
 
           expect(called).to be true
@@ -26,7 +20,7 @@ describe Fastlane::Actions do
       context "without error_callback" do
         it "raise shell_error" do
           allow(FastlaneCore::UI).to receive(:shell_error!)
-          expect_command "exit 1", 1
+          expect_command "exit 1", exitstatus: 1
           Fastlane::Actions.sh("exit 1")
 
           expect(UI).to have_received(:shell_error!).with("Exit status of command 'exit 1' was 1 instead of 0.\n")
@@ -34,57 +28,77 @@ describe Fastlane::Actions do
       end
     end
 
-    context "handling of array arguments" do
-      it "joins arrays into a single string" do
+    context "passing command arguments to the system" do
+      it "passes a string as a string" do
         expect_command "git commit"
-        Fastlane::Actions.sh(%w(git commit))
+        Fastlane::Actions.sh "git commit"
       end
 
-      it "shell escapes array elements" do
-        expect_command 'git commit -m a\ message'
-        Fastlane::Actions.sh(["git", "commit", "-m", "a message"])
+      it "passes a list" do
+        expect_command "git", "commit"
+        Fastlane::Actions.sh "git", "commit"
       end
 
-      it "converts array elements to strings" do
-        pathname = Pathname.new "."
-        expect_command 'git commit . -m a\ message'
-        Fastlane::Actions.sh(["git", "commit", pathname, "-m", "a message"])
+      it "passes an environment Hash" do
+        expect_command({ "PATH" => "/usr/local/bin" }, "git", "commit")
+        Fastlane::Actions.sh({ "PATH" => "/usr/local/bin" }, "git", "commit")
       end
 
-      it "converts a list of arguments" do
-        expect_command 'git commit -m a\ message'
-        Fastlane::Actions.sh("git", "commit", "-m", "a message")
+      it "allows override of argv[0]" do
+        expect_command ["/usr/local/bin", "git"], "commit", "-m", "A message"
+        Fastlane::Actions.sh ["/usr/local/bin", "git"], "commit", "-m", "A message"
       end
     end
   end
 
   describe "shell_command_from_args" do
-    it "returns the string without shell escaping if a string is passed" do
-      command = Fastlane::Actions.shell_command_from_args "cmd arg1 arg 2"
-      expect(command).to eq "cmd arg1 arg 2"
+    it 'returns the string when a string is passed' do
+      command = command_from_args "git commit -m 'A message'"
+      expect(command).to eq "git commit -m 'A message'"
     end
 
-    it "returns a shelljoined string if an array is passed" do
-      command = Fastlane::Actions.shell_command_from_args ["cmd", "arg1", "arg 2", 42]
-      expect(command).to eq 'cmd arg1 arg\ 2 42'
-    end
-
-    it "returns a shelljoined string if multiple arguments are passed" do
-      command = Fastlane::Actions.shell_command_from_args "cmd", "arg1", "arg 2", 42
-      expect(command).to eq 'cmd arg1 arg\ 2 42'
-    end
-
-    it "raises ArgumentError with no arguments" do
+    it 'raises when no argument passed' do
       expect do
-        Fastlane::Actions.shell_command_from_args
+        command_from_args
       end.to raise_error ArgumentError
+    end
+
+    it 'shelljoins multiple args' do
+      command = command_from_args "git", "commit", "-m", "A message"
+      expect(command).to eq 'git commit -m A\ message'
+    end
+
+    it 'adds an environment Hash at the beginning' do
+      command = command_from_args({ "PATH" => "/usr/local/bin" }, "git", "commit", "-m", "A message")
+      expect(command).to eq 'PATH=/usr/local/bin git commit -m A\ message'
+    end
+
+    it 'shell-escapes environment variable values' do
+      command = command_from_args({ "PATH" => "/usr/my local/bin" }, "git", "commit", "-m", "A message")
+      expect(command).to eq 'PATH=/usr/my\ local/bin git commit -m A\ message'
+    end
+
+    it 'recognizes an array as the only element of a command' do
+      command = command_from_args ["/usr/local/bin/git", "git"]
+      expect(command).to eq "/usr/local/bin/git"
+    end
+
+    it 'recognizes an array as the first element of a command' do
+      command = command_from_args ["/usr/local/bin/git", "git"], "commit", "-m", "A message"
+      expect(command).to eq '/usr/local/bin/git commit -m A\ message'
     end
   end
 end
 
-def expect_command(command, exitstatus = 0)
-  require "open3"
+def command_from_args(*args)
+  Fastlane::Actions.shell_command_from_args(*args)
+end
 
-  allow(mock_status).to receive(:exitstatus) { exitstatus }
-  expect(Open3).to receive(:popen2e).with(command).and_yield mock_input, mock_output, mock_thread
+def expect_command(*command, exitstatus: 0)
+  mock_input = double :input
+  mock_output = File.open(File.expand_path(File.join("..", "..", "fixtures", "appfiles", "Appfile_empty"), __FILE__))
+  mock_status = double :status, exitstatus: exitstatus
+  mock_thread = double :thread, value: mock_status
+
+  expect(Open3).to receive(:popen2e).with(*command).and_yield mock_input, mock_output, mock_thread
 end
