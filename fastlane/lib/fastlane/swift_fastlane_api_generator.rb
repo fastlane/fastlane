@@ -62,7 +62,7 @@ module Fastlane
 
       tool_objects = generate_lanefile_tool_objects(classes: generated_tool_classes)
       file_content << tool_objects
-      file_content << "" # newline because it's the end of the file adding an extension
+      file_content += autogen_version_warning_text_array
 
       file_content = file_content.join("\n")
       target_path = File.join(@target_output_path, "Fastlane.swift")
@@ -78,7 +78,7 @@ module Fastlane
       disclaimer << "// If you have a custom #{class_name}.swift, this file will be replaced by it"
       disclaimer << "// Don't modify this file unless you are familiar with how fastlane's swift code generation works"
       disclaimer << "// *** This file will be overwritten or replaced during build time ***"
-      disclaimer << "// Generated at #{Time.now.strftime('%H:%M:%S on %m-%d-%Y')} with fastlane #{Fastlane::VERSION}"
+      disclaimer << "// Generated with fastlane #{Fastlane::VERSION}"
       disclaimer << ""
       disclaimer << lanefile_implementation
       disclaimer << ""
@@ -143,6 +143,16 @@ func parseInt(fromString: String, function: String = #function) -> Int {
       return objects
     end
 
+    def autogen_version_warning_text_array()
+      warning_text_array = []
+      warning_text_array << ""
+      warning_text_array << "// Please don't remove the lines below"
+      warning_text_array << "// They are used to detect outdated files"
+      warning_text_array << "// FastlaneRunnerAPIVersion [0.9.1]"
+      warning_text_array << ""
+      return warning_text_array
+    end
+
     def generate_tool_protocol(tool_swift_function: nil)
       protocol_content_array = []
       protocol_name = tool_swift_function.protocol_name
@@ -156,6 +166,8 @@ func parseInt(fromString: String, function: String = #function) -> Int {
       protocol_content_array += tool_swift_function.swift_default_implementations
       protocol_content_array << "}"
       protocol_content_array << ""
+      protocol_content_array += autogen_version_warning_text_array
+
 
       target_path = File.join(@target_output_path, "#{protocol_name}.swift")
       file_content = protocol_content_array.join("\n")
