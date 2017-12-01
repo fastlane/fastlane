@@ -44,12 +44,11 @@ module Fastlane
     def process_command(command_json: nil)
       time = Time.new
       UI.verbose("[#{time.usec}]: received command:#{command_json}")
-      command = Command.new(json: command_json)
-
-      return execute_command(command: command)
+      return execute_command(command_json: command_json)
     end
 
-    def execute_command(command: nil)
+    def execute_command(command_json: nil)
+      command = Command.new(json: command_json)
       command_return = @command_executor.execute(command: command, target_object: nil)
       ## probably need to just return Strings, or ready_for_next with object isn't String
       return_object = command_return.return_value

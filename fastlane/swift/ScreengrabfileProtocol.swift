@@ -41,3 +41,8 @@ extension ScreengrabfileProtocol {
   var exitOnTestFailure: Bool { return true }
   var reinstallApp: Bool { return false }
 }
+
+
+// Please don't remove the lines below
+// They are used to detect outdated files
+// FastlaneRunnerAPIVersion [0.9.1]
