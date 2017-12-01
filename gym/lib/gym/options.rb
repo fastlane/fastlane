@@ -114,6 +114,7 @@ module Gym
                                      description: "Specifies path to export options plist. Use 'xcodebuild -help' to print the full set of available options",
                                      is_string: false,
                                      optional: true,
+                                     type: Hash,
                                      conflict_block: proc do |value|
                                        UI.user_error!("'#{value.key}' must be false to use 'export_options'")
                                      end),
