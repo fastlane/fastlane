@@ -33,10 +33,10 @@ class Runner {
         currentlyExecutingCommand = command
         socketClient.send(rubyCommand: command)
         
-        let secondsToWait = DispatchTimeInterval.seconds(SocketClient.connectTimeoutSeconds)
+        let secondsToWait = DispatchTimeInterval.seconds(SocketClient.defaultCommandTimeoutSeconds)
         let connectTimeout = DispatchTime.now() + secondsToWait
         let timeoutResult = self.dispatchGroup.wait(timeout: connectTimeout)
-        let failureMessage = "command didn't execute in: \(SocketClient.connectTimeoutSeconds) seconds"
+        let failureMessage = "command didn't execute in: \(SocketClient.defaultCommandTimeoutSeconds) seconds"
         let success = testDispatchTimeoutResult(timeoutResult, failureMessage: failureMessage, timeToWait: secondsToWait)
         guard success else {
             log(message: "command timeout")
@@ -87,7 +87,7 @@ extension Runner {
         guard let socketClient = self.socketClient else {
             return
         }
-        
+
         socketClient.connectAndOpenStreams()
         self.dispatchGroup.leave()
     }
@@ -114,15 +114,15 @@ extension Runner : SocketClientDelegateProtocol {
                     command.performCallback(callbackArg: closureArgumentValue)
                 }
             }
+            self.dispatchGroup.leave()
             
         case .alreadyClosedSockets, .connectionFailure, .malformedRequest, .malformedResponse, .serverError:
             log(message: "error encountered while executing command:\n\(serverResponse)")
-            
+            self.dispatchGroup.leave()
+
         case .commandTimeout(let timeout):
             log(message: "Runner timed out after \(timeout) second(s)")
         }
-        
-        self.dispatchGroup.leave()
     }
     
     func connectionsOpened() {
@@ -140,6 +140,7 @@ extension Runner : SocketClientDelegateProtocol {
             if self.shouldLeaveDispatchGroupDuringDisconnect {
                 self.dispatchGroup.leave()
             }
+            exit(0)
         }
     }
 }

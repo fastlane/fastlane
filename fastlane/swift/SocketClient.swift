@@ -101,6 +101,7 @@ class SocketClient: NSObject {
     }
     
     public func send(rubyCommand: RubyCommandable) {
+        verbose(message: "sending: \(rubyCommand.json)")
         send(string: rubyCommand.json)
     }
     
@@ -147,15 +148,14 @@ class SocketClient: NSObject {
             let data = string.data(using: .utf8)!
             _ = data.withUnsafeBytes { self.outputStream.write($0, maxLength: data.count) }
         }
-        
-        let timeToWait = DispatchTimeInterval.seconds(self.commandTimeoutSeconds)
+
+        let timeoutSeconds = self.cleaningUpAfterDone ? 1 : self.commandTimeoutSeconds
+
+        let timeToWait = DispatchTimeInterval.seconds(timeoutSeconds)
         let commandTimeout = DispatchTime.now() + timeToWait
         let timeoutResult =  self.dispatchGroup.wait(timeout: commandTimeout)
-        
-        if !self.cleaningUpAfterDone {
-            // only wait if we aren't cleaning up, otherwise, we're in the process of exiting anyway
-            _ = testDispatchTimeoutResult(timeoutResult, failureMessage: "Ruby process didn't return after: \(SocketClient.connectTimeoutSeconds) seconds", timeToWait: timeToWait)
-        }
+
+        _ = testDispatchTimeoutResult(timeoutResult, failureMessage: "Ruby process didn't return after: \(SocketClient.connectTimeoutSeconds) seconds", timeToWait: timeToWait)
     }
     
     func sendAbort() {
@@ -164,7 +164,7 @@ class SocketClient: NSObject {
         stopInputSession()
         
         // and error occured, let's try to send the "done" message
-        send(string: "done")
+        send(string: SocketClient.doneToken)
         
         stopOutputSession()
         self.socketDelegate?.connectionsClosed()
@@ -222,7 +222,7 @@ extension SocketClient: StreamDelegate {
             case Stream.Event.hasSpaceAvailable:
                 // we don't care about this
                 break
-                
+
             default:
                 verbose(message: "output stream caused unrecognized event: \(eventCode)")
             }
@@ -240,7 +240,7 @@ extension SocketClient: StreamDelegate {
                 verbose(message: "Stream read() error")
             }
         }
-        
+
         processResponse(string: output)
     }
     
@@ -251,7 +251,9 @@ extension SocketClient: StreamDelegate {
     
     func processResponse(string: String) {
         guard string.count > 0 else {
+            self.socketDelegate?.commandExecuted(serverResponse: .malformedResponse)
             self.handleFailure(message: ["empty response from ruby process"])
+
             return
         }
         
@@ -262,16 +264,15 @@ extension SocketClient: StreamDelegate {
         case .failure(let failureInformation):
             self.socketDelegate?.commandExecuted(serverResponse: .serverError)
             self.handleFailure(message: failureInformation)
-            
+
         case .parseFailure(let failureInformation):
             self.socketDelegate?.commandExecuted(serverResponse: .malformedResponse)
             self.handleFailure(message: failureInformation)
-            
+
         case .readyForNext(let returnedObject, let closureArgumentValue):
             self.socketDelegate?.commandExecuted(serverResponse: .success(returnedObject: returnedObject, closureArgumentValue: closureArgumentValue))
             // cool, ready for next command
             break
-            
         }
         self.dispatchGroup.leave() // should now pull the next piece of work
     }
