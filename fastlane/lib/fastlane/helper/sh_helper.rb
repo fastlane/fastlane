@@ -67,7 +67,7 @@ module Fastlane
           end
         end
       else
-        result << command # only for the tests
+        result << shell_command # only for the tests
       end
 
       result
