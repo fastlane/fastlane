@@ -45,8 +45,8 @@ describe Fastlane::Actions do
       end
 
       it "allows override of argv[0]" do
-        expect_command ["/usr/local/bin", "git"], "commit", "-m", "A message"
-        Fastlane::Actions.sh ["/usr/local/bin", "git"], "commit", "-m", "A message"
+        expect_command ["/usr/local/bin/git", "git"], "commit", "-m", "A message"
+        Fastlane::Actions.sh ["/usr/local/bin/git", "git"], "commit", "-m", "A message"
       end
     end
   end
