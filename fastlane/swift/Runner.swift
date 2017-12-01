@@ -183,3 +183,7 @@ func log(message: String) {
 func verbose(message: String) {
     logger.verbose(message: message)
 }
+
+// Please don't remove the lines below
+// They are used to detect outdated files
+// FastlaneRunnerAPIVersion [0.9.1]

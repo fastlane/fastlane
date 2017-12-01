@@ -11,3 +11,7 @@ var itcTeam: String? { return nil } // iTunes Connect Team ID (may be nil if no 
 
 // you can even provide different app identifiers, Apple IDs and team names per lane:
 // More information: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Appfile.md
+
+// Please don't remove the lines below
+// They are used to detect outdated files
+// FastlaneRunnerAPIVersion [0.9.1]
