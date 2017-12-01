@@ -1092,7 +1092,7 @@ func gradle(task: String,
                             includeSymbols: String? = gymfile.includeSymbols,
                             includeBitcode: String? = gymfile.includeBitcode,
                             exportMethod: String? = gymfile.exportMethod,
-                            exportOptions: String? = gymfile.exportOptions,
+                            exportOptions: [String : Any]? = gymfile.exportOptions,
                             exportXcargs: String? = gymfile.exportXcargs,
                             skipBuildArchive: String? = gymfile.skipBuildArchive,
                             skipArchive: String? = gymfile.skipArchive,
@@ -2883,3 +2883,7 @@ let precheckfile: Precheckfile = Precheckfile()
 let scanfile: Scanfile = Scanfile()
 let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
+
+// Please don't remove the lines below
+// They are used to detect outdated files
+// FastlaneRunnerAPIVersion [0.9.1]
