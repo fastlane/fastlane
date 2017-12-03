@@ -318,6 +318,8 @@ module Frameit
     def build_title_images(max_width, max_height)
       words = [:keyword, :title].keep_if { |a| fetch_text(a) } # optional keyword/title
       results = {}
+      trim_boxes = {}
+      min_vertical_trim_offset = Float::INFINITY    # Init at a large value, as the code will search for a minimal value.
       words.each do |key|
         # Create empty background
         empty_path = File.join(Frameit::ROOT, "lib/assets/empty.png")
@@ -347,10 +349,60 @@ module Frameit
           i.interline_spacing interline_spacing if interline_spacing
           i.fill fetch_config[key.to_s]['color']
         end
-        title_image.trim # remove white space
-
+                            
+        # title_image.trim # remove white space
+           
         results[key] = title_image
+                            
+        # Trimming of each individual image will result in the loss of the common baseline between both texts.
+        # Hence retrieve the calculated trim bounding box, which can be used later to apply a crop on both images, while maintaining the same vertical top offset based on the smallest value from the trim box:
+        calculated_trim_box = title_image.identify do |b|
+        b.format("%@")    # CALCULATED: trim bounding box (without actually trimming), see: http://www.imagemagick.org/script/escape.php
+        end
+                            
+        # Get minimum vertical top offset from both trim boxes by converting it from string to an integer array:
+        trim_values = calculated_trim_box.split(/[\sx+]/).map { |s| s.to_i }    # The format is "wxh+X+y", so use multiple string separators: the "x", "+" and a whitespace "\s"
+        print "Calculated trim box = #{calculated_trim_box} => #{trim_values}\n"
+        if trim_values[3] < min_vertical_trim_offset
+          min_vertical_trim_offset = trim_values[3]
+        end
+                            
+        # Store for the crop action:
+        trim_boxes[key] = trim_values
       end
+      
+      print "min_vertical_trim_offset = #{min_vertical_trim_offset}\n"
+                            
+      # Crop images based on min_vertical_trim_offset to maintain text baseline:
+      words.each do |key|
+        # Get matching trim box:
+        trim_box = trim_boxes[key]
+        print "Trim box for key \"#{key}\" = #{trim_box}\n"
+                            
+        # Determine trim area:
+        if (trim_box[3] > min_vertical_trim_offset)
+          # The 4th parameter is the vertical top offset. When it's larger than the smallest vertical top offset, set it equal and compensate the crop height (2nd parameter):
+          trim_box[1] += (trim_box[3] - min_vertical_trim_offset) # Increase the height of the crop area with the difference in vertical offset
+          trim_box[3] = min_vertical_trim_offset              # Set vertical top offset
+                            
+          print "Trim box for key \"#{key}\" is adjusted to maintain baseline: #{trim_box}\n"
+        end
+                            
+        # Convert trim box parameters to string for crop method (format: wxh+X+y):
+        crop_input = "#{trim_box[0]}x#{trim_box[1]}+#{trim_box[2]}+#{trim_box[3]}"
+        print "crop_input = #{crop_input}\n"
+                            
+        # Get text image:
+        image_to_crop = results[key]
+                            
+        # Crop image:
+        image_to_crop.crop(crop_input)
+                            
+        # Store image:
+        results[key] = image_to_crop
+      end
+
+      # Output:
       results
     end
 
