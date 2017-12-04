@@ -15,11 +15,17 @@ module Fastlane
         end
 
         cmd << ['bundle exec'] if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
-        cmd << ['pod install']
 
-        cmd << '--no-clean' unless params[:clean]
-        cmd << '--no-integrate' unless params[:integrate]
-        cmd << '--repo-update' if params[:repo_update]
+        if params[:update]
+          cmd << ['pod update']
+        else 
+          cmd << ['pod install']
+
+          cmd << '--no-clean' unless params[:clean]
+          cmd << '--no-integrate' unless params[:integrate]
+          cmd << '--repo-update' if params[:repo_update]
+        end
+
         cmd << '--silent' if params[:silent]
         cmd << '--verbose' if params[:verbose]
         cmd << '--no-ansi' unless params[:ansi]
@@ -52,6 +58,11 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :update,
+                                       env_name: "FL_COCOAPODS_UPDATE",
+                                       description: "Runs pod update instead of pod install. Commands no-clean, no-integrate and repo-update are not working when update is used.",
+                                       is_string: false,
+                                       default_value: false)
           FastlaneCore::ConfigItem.new(key: :clean,
                                        env_name: "FL_COCOAPODS_CLEAN",
                                        description: "Remove SCM directories",
@@ -119,7 +130,7 @@ module Fastlane
       end
 
       def self.authors
-        ["KrauseFx", "tadpol", "birmacher", "Liquidsoul"]
+        ["KrauseFx", "tadpol", "birmacher", "Liquidsoul", "mRs-"]
       end
 
       def self.details
