@@ -33,6 +33,13 @@ module Gym
         options << config[:export_xcargs] if config[:export_xcargs]
         options << config[:xcargs] if config[:xcargs]
 
+        if Helper.xcode_at_least?("9.0") && !config[:export_xcargs].include?("-allowProvisioningUpdates")
+          # via https://github.com/fastlane/fastlane/issues/9589
+          # With Xcode 9, we should allow ProvisioningUpdates, since this enables Xcode
+          # to use the team provisioning profiles, according to users, this fixes lots of problems
+          options << "-allowProvisioningUpdates"
+        end
+
         options
       end
 
