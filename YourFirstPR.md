@@ -100,7 +100,7 @@ _fastlane_ changes a lot and is in constant flux. We usually merge multiple PRs 
 After your contribution is merged, it’s not immediately available to all users. Your change will be shipped as part of the next release, which is usually once per week. If your change is time critical, please let us know so we can schedule a release for your change.
 
 <!-- Links -->
-[you can do this]: https://github.com/fastlane/fastlane/issues?utf8=✓&q=is%3Aopen%20is%3Aissue%20label%3A%22you%20can%20do%20this%22%20
+[you can do this]: https://github.com/fastlane/fastlane/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+label%3A%22complexity%3A+you+can+do+this%22+
 [fastlane]: https://github.com/fastlane/fastlane
 [pr template]: .github/PULL_REQUEST_TEMPLATE.md
 [bundler]: https://bundler.io
