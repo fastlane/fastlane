@@ -2,7 +2,9 @@
 
 ## Prerequisites
 
-Before you start working on _fastlane_, you should have [Bundler][bundler] installed. Bundler is a ruby project that allows you to specify all ruby dependencies in a file called the `Gemfile`. If you want to learn more about how Bundler works, check out [their website][bundler help].
+Before you start working on _fastlane_, make sure you had a look at [CONTRIBUTING.md](CONTRIBUTING.md).
+
+For working on _fastlane_ you should have [Bundler][bundler] installed. Bundler is a ruby project that allows you to specify all ruby dependencies in a file called the `Gemfile`. If you want to learn more about how Bundler works, check out [their website][bundler help].
 
 ## Finding things to work on
 
