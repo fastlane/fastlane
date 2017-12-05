@@ -107,7 +107,6 @@ module Fastlane
                                        description: 'Retry with --repo-update if action was finished with error',
                                        optional: true,
                                        is_string: false,
-                                       default_value: true,
                                        conflicting_options: [:repo_update])
         ]
         # Please don't add a version parameter to the `cocoapods` action. If you need to specify a version when running
