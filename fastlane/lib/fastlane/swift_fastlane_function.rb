@@ -32,6 +32,7 @@ module Fastlane
         "commit_github_file" => ["api_token"].to_set,
         "verify_xcode" => ["xcode_path"].to_set,
         "produce" => ["sku"].to_set,
+        "create_app_online" => ["sku"].to_set,
         "screengrab" => ["android_home"].to_set
       }
     end
@@ -93,6 +94,8 @@ module Fastlane
         return "[String : Any]"
       elsif type_override == Integer
         return "Int"
+      elsif type_override == Boolean
+        return "Bool"
       elsif type_override == :string_callback
         return "((String) -> Void)"
       else

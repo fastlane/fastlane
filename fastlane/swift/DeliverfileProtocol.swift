@@ -17,7 +17,7 @@ protocol DeliverfileProtocol: class {
   var submitForReview: Bool { get }
   var automaticRelease: Bool { get }
   var autoReleaseDate: String? { get }
-  var phasedRelease: String? { get }
+  var phasedRelease: Bool { get }
   var priceTier: String? { get }
   var buildNumber: String? { get }
   var appRatingConfigPath: String? { get }
@@ -74,7 +74,7 @@ extension DeliverfileProtocol {
   var submitForReview: Bool { return false }
   var automaticRelease: Bool { return false }
   var autoReleaseDate: String? { return nil }
-  var phasedRelease: String? { return nil }
+  var phasedRelease: Bool { return false }
   var priceTier: String? { return nil }
   var buildNumber: String? { return nil }
   var appRatingConfigPath: String? { return nil }

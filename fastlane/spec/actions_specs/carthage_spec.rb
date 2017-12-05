@@ -11,66 +11,6 @@ describe Fastlane do
         end.to raise_error("Please pass a valid command. Use one of the following: build, bootstrap, update, archive")
       end
 
-      it "raises an error if use_ssh is invalid" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            carthage(
-              use_ssh: 'thisistest'
-            )
-          end").runner.execute(:test)
-        end.to raise_error("Please pass a valid value for use_ssh. Use one of the following: true, false")
-      end
-
-      it "raises an error if use_submodules is invalid" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            carthage(
-              use_submodules: 'thisistest'
-            )
-          end").runner.execute(:test)
-        end.to raise_error("Please pass a valid value for use_submodules. Use one of the following: true, false")
-      end
-
-      it "raises an error if use_binaries is invalid" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            carthage(
-              use_binaries: 'thisistest'
-            )
-          end").runner.execute(:test)
-        end.to raise_error("Please pass a valid value for use_binaries. Use one of the following: true, false")
-      end
-
-      it "raises an error if no_build is invalid" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            carthage(
-              no_build: 'thisistest'
-            )
-          end").runner.execute(:test)
-        end.to raise_error("Please pass a valid value for no_build. Use one of the following: true, false")
-      end
-
-      it "raises an error if no_skip_current is invalid" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            carthage(
-              no_skip_current: 'thisistest'
-            )
-          end").runner.execute(:test)
-        end.to raise_error("Please pass a valid value for no_skip_current. Use one of the following: true, false")
-      end
-
-      it "raises an error if verbose is invalid" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            carthage(
-              verbose: 'thisistest'
-            )
-          end").runner.execute(:test)
-        end.to raise_error("Please pass a valid value for verbose. Use one of the following: true, false")
-      end
-
       it "raises an error if platform is invalid" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do

@@ -1,5 +1,6 @@
 require 'json'
 require 'fastlane/version'
+require 'fastlane/boolean'
 
 require 'fastlane_core/globals'
 # Ruby monkey-patches - should be before almost all else
@@ -52,6 +53,8 @@ require 'commander'
 
 # after commander import
 require 'fastlane_core/ui/fastlane_runner' # monkey patch
+
+Boolean = Fastlane::Boolean
 
 module FastlaneCore
   ROOT = Pathname.new(File.expand_path('../..', __FILE__))
