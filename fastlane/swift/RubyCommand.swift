@@ -59,7 +59,13 @@ struct RubyCommand: RubyCommandable {
                         let jsonString = String(data: jsonData, encoding: .utf8)!
                         return "{\"name\" : \"\(name)\", \"value\" : \(jsonString)\(typeJson)}"
                     } else {
-                        return "{\"name\" : \"\(name)\", \"value\" : \"\(someValue)\"\(typeJson)}"
+                        let dictionary = [
+                            "name": name,
+                            "value": someValue
+                        ]
+                        let jsonData = try! JSONSerialization.data(withJSONObject: dictionary, options: [])
+                        let jsonString = String(data: jsonData, encoding: .utf8)!
+                        return jsonString
                     }
                 } else {
                     // Just exclude this arg if it doesn't have a value
