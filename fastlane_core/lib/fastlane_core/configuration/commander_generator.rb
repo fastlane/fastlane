@@ -25,7 +25,6 @@ module FastlaneCore
         # so we need to switch that to something that is supported, luckily, we have an `is_string`
         # property and if that is false, we'll default to nil
         if type == Hash
-          print "String? #{option.is_string}"
           type = option.is_string ? String : nil
         end
 

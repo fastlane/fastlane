@@ -17,7 +17,7 @@ func addExtraPlatforms(platforms: [String] = []) {
 }
 func addGitTag(tag: String? = nil,
                grouping: String = "builds",
-               prefix🚀: String = "",
+               `prefix`: String = "",
                buildNumber: String,
                message: String? = nil,
                commit: String? = nil,
@@ -25,7 +25,7 @@ func addGitTag(tag: String? = nil,
                sign: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "add_git_tag", className: nil, args: [RubyCommand.Argument(name: "tag", value: tag),
                                                                                              RubyCommand.Argument(name: "grouping", value: grouping),
-                                                                                             RubyCommand.Argument(name: "prefix", value: prefix🚀),
+                                                                                             RubyCommand.Argument(name: "prefix", value: `prefix`),
                                                                                              RubyCommand.Argument(name: "build_number", value: buildNumber),
                                                                                              RubyCommand.Argument(name: "message", value: message),
                                                                                              RubyCommand.Argument(name: "commit", value: commit),
@@ -962,7 +962,7 @@ func cocoapods(clean: Bool = true,
                useBundleExec: Bool = true,
                podfile: String? = nil,
                errorCallback: String? = nil,
-               tryRepoUpdateOnError: Bool = true) {
+               tryRepoUpdateOnError: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "cocoapods", className: nil, args: [RubyCommand.Argument(name: "clean", value: clean),
                                                                                            RubyCommand.Argument(name: "integrate", value: integrate),
                                                                                            RubyCommand.Argument(name: "repo_update", value: repoUpdate),
@@ -1044,7 +1044,7 @@ func createAppOnline(username: String,
                      bundleIdentifierSuffix: String? = nil,
                      appName: String,
                      appVersion: String? = nil,
-                     sku: String = "1512436037",
+                     sku: String = "1512504226",
                      platform: String = "ios",
                      language: String = "English",
                      companyName: String? = nil,
@@ -1311,13 +1311,13 @@ func ensureGitStatusClean(showUncommittedChanges: Bool = false) {
 }
 func ensureNoDebugCode(text: String,
                        path: String = ".",
-                       extension🚀: String? = nil,
+                       `extension`: String? = nil,
                        extensions: String? = nil,
                        exclude: String? = nil,
                        excludeDirs: [String]? = nil) {
   let command = RubyCommand(commandID: "", methodName: "ensure_no_debug_code", className: nil, args: [RubyCommand.Argument(name: "text", value: text),
                                                                                                       RubyCommand.Argument(name: "path", value: path),
-                                                                                                      RubyCommand.Argument(name: "extension", value: extension🚀),
+                                                                                                      RubyCommand.Argument(name: "extension", value: `extension`),
                                                                                                       RubyCommand.Argument(name: "extensions", value: extensions),
                                                                                                       RubyCommand.Argument(name: "exclude", value: exclude),
                                                                                                       RubyCommand.Argument(name: "exclude_dirs", value: excludeDirs)])
@@ -1327,11 +1327,11 @@ func ensureXcodeVersion(version: String) {
   let command = RubyCommand(commandID: "", methodName: "ensure_xcode_version", className: nil, args: [RubyCommand.Argument(name: "version", value: version)])
   _ = runner.executeCommand(command)
 }
-@discardableResult func environmentVariable(set🚀: [String : Any]? = nil,
-                                            get🚀: String? = nil,
+@discardableResult func environmentVariable(`set`: [String : Any]? = nil,
+                                            `get`: String? = nil,
                                             remove: String? = nil) -> String {
-  let command = RubyCommand(commandID: "", methodName: "environment_variable", className: nil, args: [RubyCommand.Argument(name: "set", value: set🚀),
-                                                                                                      RubyCommand.Argument(name: "get", value: get🚀),
+  let command = RubyCommand(commandID: "", methodName: "environment_variable", className: nil, args: [RubyCommand.Argument(name: "set", value: `set`),
+                                                                                                      RubyCommand.Argument(name: "get", value: `get`),
                                                                                                       RubyCommand.Argument(name: "remove", value: remove)])
   return runner.executeCommand(command)
 }
@@ -2229,7 +2229,7 @@ func podLibLint(useBundleExec: Bool = true,
                 sources: String? = nil,
                 useLibraries: Bool = false,
                 failFast: Bool = false,
-                private🚀: Bool = false,
+                `private`: Bool = false,
                 quick: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "pod_lib_lint", className: nil, args: [RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec),
                                                                                               RubyCommand.Argument(name: "verbose", value: verbose),
@@ -2237,7 +2237,7 @@ func podLibLint(useBundleExec: Bool = true,
                                                                                               RubyCommand.Argument(name: "sources", value: sources),
                                                                                               RubyCommand.Argument(name: "use_libraries", value: useLibraries),
                                                                                               RubyCommand.Argument(name: "fail_fast", value: failFast),
-                                                                                              RubyCommand.Argument(name: "private", value: private🚀),
+                                                                                              RubyCommand.Argument(name: "private", value: `private`),
                                                                                               RubyCommand.Argument(name: "quick", value: quick)])
   _ = runner.executeCommand(command)
 }
