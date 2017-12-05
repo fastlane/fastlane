@@ -15,7 +15,7 @@ describe Deliver::CommandsGenerator do
   end
 
   describe ":run option handling" do
-    it "can use the username short flag from tool options" do
+    it "can use the username short flag from tool options", now: true do
       # leaving out the command name defaults to 'run'
       stub_commander_runner_args(['--description', 'My description', '-u', 'me@it.com'])
 

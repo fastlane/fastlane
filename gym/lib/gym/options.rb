@@ -115,6 +115,7 @@ module Gym
                                      is_string: false,
                                      optional: true,
                                      type: Hash,
+                                     skip_type_validation: true,
                                      conflict_block: proc do |value|
                                        UI.user_error!("'#{value.key}' must be false to use 'export_options'")
                                      end),
