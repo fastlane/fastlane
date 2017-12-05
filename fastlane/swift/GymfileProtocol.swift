@@ -9,13 +9,13 @@ protocol GymfileProtocol: class {
   var silent: Bool { get }
   var codesigningIdentity: String? { get }
   var skipPackageIpa: Bool { get }
-  var includeSymbols: String? { get }
-  var includeBitcode: String? { get }
+  var includeSymbols: Bool? { get }
+  var includeBitcode: Bool? { get }
   var exportMethod: String? { get }
   var exportOptions: [String : Any]? { get }
   var exportXcargs: String? { get }
-  var skipBuildArchive: String? { get }
-  var skipArchive: String? { get }
+  var skipBuildArchive: Bool? { get }
+  var skipArchive: Bool? { get }
   var buildPath: String? { get }
   var archivePath: String? { get }
   var derivedDataPath: String? { get }
@@ -50,13 +50,13 @@ extension GymfileProtocol {
   var silent: Bool { return false }
   var codesigningIdentity: String? { return nil }
   var skipPackageIpa: Bool { return false }
-  var includeSymbols: String? { return nil }
-  var includeBitcode: String? { return nil }
+  var includeSymbols: Bool? { return nil }
+  var includeBitcode: Bool? { return nil }
   var exportMethod: String? { return nil }
   var exportOptions: [String : Any]? { return nil }
   var exportXcargs: String? { return nil }
-  var skipBuildArchive: String? { return nil }
-  var skipArchive: String? { return nil }
+  var skipBuildArchive: Bool? { return nil }
+  var skipArchive: Bool? { return nil }
   var buildPath: String? { return nil }
   var archivePath: String? { return nil }
   var derivedDataPath: String? { return nil }
