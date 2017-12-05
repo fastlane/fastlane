@@ -21,6 +21,13 @@ module FastlaneCore
 
         type = option.data_type
 
+        # We added type: Hash to code generation, but Ruby's OptionParser doesn't like that
+        # so we need to switch that to something that is supported, luckily, we have an `is_string`
+        # property and if that is false, we'll default to nil
+        if type == Hash
+          type = option.is_string ? String : nil
+        end
+
         # This is an important bit of trickery to solve the boolean option situation.
         #
         # Typically, boolean command line flags do not accept trailing values. If the flag

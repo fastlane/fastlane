@@ -49,7 +49,7 @@ module Fastlane
       unless @reserved_words.include?(word)
         return word
       end
-      return word + "🚀"
+      return "`#{word}`"
     end
 
     def return_declaration
