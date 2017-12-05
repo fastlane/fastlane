@@ -6,9 +6,9 @@ protocol ScanfileProtocol: class {
   var devices: [String]? { get }
   var scheme: String? { get }
   var clean: Bool { get }
-  var codeCoverage: String? { get }
-  var addressSanitizer: String? { get }
-  var threadSanitizer: String? { get }
+  var codeCoverage: Bool? { get }
+  var addressSanitizer: Bool? { get }
+  var threadSanitizer: Bool? { get }
   var skipBuild: Bool { get }
   var outputDirectory: String { get }
   var outputStyle: String? { get }
@@ -17,8 +17,8 @@ protocol ScanfileProtocol: class {
   var buildlogPath: String { get }
   var includeSimulatorLogs: Bool { get }
   var formatter: String? { get }
-  var testWithoutBuilding: String? { get }
-  var buildForTesting: String? { get }
+  var testWithoutBuilding: Bool? { get }
+  var buildForTesting: Bool? { get }
   var xctestrun: String? { get }
   var derivedDataPath: String? { get }
   var resultBundle: String? { get }
@@ -48,9 +48,9 @@ extension ScanfileProtocol {
   var devices: [String]? { return nil }
   var scheme: String? { return nil }
   var clean: Bool { return false }
-  var codeCoverage: String? { return nil }
-  var addressSanitizer: String? { return nil }
-  var threadSanitizer: String? { return nil }
+  var codeCoverage: Bool? { return nil }
+  var addressSanitizer: Bool? { return nil }
+  var threadSanitizer: Bool? { return nil }
   var skipBuild: Bool { return false }
   var outputDirectory: String { return "./test_output" }
   var outputStyle: String? { return nil }
@@ -59,8 +59,8 @@ extension ScanfileProtocol {
   var buildlogPath: String { return "~/Library/Logs/scan" }
   var includeSimulatorLogs: Bool { return false }
   var formatter: String? { return nil }
-  var testWithoutBuilding: String? { return nil }
-  var buildForTesting: String? { return nil }
+  var testWithoutBuilding: Bool? { return nil }
+  var buildForTesting: Bool? { return nil }
   var xctestrun: String? { return nil }
   var derivedDataPath: String? { return nil }
   var resultBundle: String? { return nil }

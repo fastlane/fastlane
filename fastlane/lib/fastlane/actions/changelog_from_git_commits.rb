@@ -115,6 +115,7 @@ module Fastlane
                                        description: "Whether or not to include any commits that are merges\n" + '(DEPRECATED - use :merge_commit_filtering)'.red,
                                        optional: true,
                                        is_string: false,
+                                       type: Boolean,
                                        verify_block: proc do |value|
                                          UI.important "The :include_merges option is deprecated. Please use :merge_commit_filtering instead" unless value.nil?
                                        end),
