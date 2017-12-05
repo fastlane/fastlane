@@ -9,7 +9,7 @@ describe Spaceship::Client do
   describe '#login' do
     it 'sets the session cookies' do
       response = subject.login(username, password)
-      expect(response.env.request_headers['Cookie']).to eq('myacinfo=abcdef')
+      expect(subject.cookie).to eq("myacinfo=abcdef")
     end
 
     it 'raises an exception if authentication failed' do
