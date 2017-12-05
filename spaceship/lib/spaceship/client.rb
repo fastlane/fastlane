@@ -428,6 +428,7 @@ module Spaceship
       # tools in a lane (e.g. call match 5 times), this would mean it locks you out of the account
       # for a while.
       # By loading existing sessions and checking if they're valid, we're sending less login requests
+      # More context on why this change was necessary https://github.com/fastlane/fastlane/pull/11108
       #
       if load_session_from_file
         # Check if the session is still valid here
