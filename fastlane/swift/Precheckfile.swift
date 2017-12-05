@@ -11,4 +11,4 @@ class Precheckfile: PrecheckfileProtocol {
 
 
 
-// Generated with fastlane 2.68.1
+// Generated with fastlane 2.68.2

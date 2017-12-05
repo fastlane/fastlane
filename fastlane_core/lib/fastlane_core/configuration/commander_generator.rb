@@ -28,6 +28,12 @@ module FastlaneCore
           type = option.is_string ? String : nil
         end
 
+        # Boolean is a fastlane thing, it's either TrueClass, or FalseClass, but we won't know
+        # that until runtime, so nil is the best we get
+        if type == Boolean
+          type = nil
+        end
+
         # This is an important bit of trickery to solve the boolean option situation.
         #
         # Typically, boolean command line flags do not accept trailing values. If the flag

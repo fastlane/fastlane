@@ -126,14 +126,38 @@ module FastlaneCore
       valid?(value)
     end
 
+    def ensure_generic_type_passes_validation(value)
+      if @skip_type_validation
+        return
+      end
+
+      if data_type != :string_callback && data_type && !value.kind_of?(data_type)
+        UI.user_error!("'#{self.key}' value must be a #{data_type}! Found #{value.class} instead.")
+      end
+    end
+
+    def ensure_boolean_type_passes_validation(value)
+      if @skip_type_validation
+        return
+      end
+
+      # We need to explicity test against Fastlane::Boolean, TrueClass/FalseClass
+      if value.class != FalseClass && value.class != TrueClass
+        UI.user_error!("'#{self.key}' value must be either `true` or `false`! Found #{value.class} instead.")
+      end
+    end
+
     # Make sure, the value is valid (based on the verify block)
     # Raises an exception if the value is invalid
     def valid?(value)
       # we also allow nil values, which do not have to be verified.
       if value
         # Verify that value is the type that we're expecting, if we are expecting a type
-        if !@skip_type_validation && data_type != :string_callback && data_type && !value.kind_of?(data_type)
-          UI.user_error!("'#{self.key}' value must be a #{data_type}! Found #{value.class} instead.")
+
+        if data_type == Boolean
+          ensure_boolean_type_passes_validation(value)
+        else
+          ensure_generic_type_passes_validation(value)
         end
 
         if @verify_block
