@@ -39,8 +39,8 @@ protocol DeliverfileProtocol: class {
   var primarySecondSubCategory: String? { get }
   var secondaryFirstSubCategory: String? { get }
   var secondarySecondSubCategory: String? { get }
-  var tradeRepresentativeContactInformation: String? { get }
-  var appReviewInformation: String? { get }
+  var tradeRepresentativeContactInformation: [String : Any]? { get }
+  var appReviewInformation: [String : Any]? { get }
   var description: String? { get }
   var name: String? { get }
   var subtitle: [String : Any]? { get }
@@ -96,8 +96,8 @@ extension DeliverfileProtocol {
   var primarySecondSubCategory: String? { return nil }
   var secondaryFirstSubCategory: String? { return nil }
   var secondarySecondSubCategory: String? { return nil }
-  var tradeRepresentativeContactInformation: String? { return nil }
-  var appReviewInformation: String? { return nil }
+  var tradeRepresentativeContactInformation: [String : Any]? { return nil }
+  var appReviewInformation: [String : Any]? { return nil }
   var description: String? { return nil }
   var name: String? { return nil }
   var subtitle: [String : Any]? { return nil }
