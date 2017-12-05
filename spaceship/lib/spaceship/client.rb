@@ -417,11 +417,31 @@ module Spaceship
     # This method is used for both the Apple Dev Portal and iTunes Connect
     # This will also handle 2 step verification
     def send_shared_login_request(user, password)
-      # First we see if we have a stored cookie for 2 step enabled accounts
-      # this is needed as it stores the information on if this computer is a
-      # trusted one. In general I think spaceship clients should be trusted
-      load_session_from_file
+      # Check if we have a cached/valid session here
+      # Fixes
+      #   - https://github.com/fastlane/fastlane/issues/10812
+      #   - https://github.com/fastlane/fastlane/issues/10793
+      #
+      # Before 4th December 2017 we didn't load existing session from the disk
+      # but changed it, because Apple introduced a rate limit, which is fine by itself
+      # but unfortunately it also rate limits successful logins, meaning if you call multiple
+      # tools in a lane (e.g. call match 5 times), this would mean it locks you out of the account
+      # for a while.
+      # By loading existing sessions and checking if they're valid, we're sending less login requests
+      #
+      if load_session_from_file
+        # Check if the session is still valid here
+        begin
+          # We use the olympus session to determine if the old session is still valid
+          # As this will raise an exception if the old session has expired
+          # If the old session is still valid, we don't have to do anything else in this method
+          return true if fetch_olympus_session.count > 0
+        rescue
+        end
+      end
+
       # If this is a CI, the user can pass the session via environment variable
+      # This is used for 2FA related sessions
       load_session_from_env
 
       data = {
