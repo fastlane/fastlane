@@ -357,9 +357,8 @@ module Frameit
         results[key] = title_image
 
         # Hence retrieve the calculated trim bounding box:
-        calculated_trim_box = title_image.identify do |b|
-          b.format("%@") # CALCULATED: trim bounding box (without actually trimming), see: http://www.imagemagick.org/script/escape.php
-        end
+        # CALCULATED: trim bounding box (without actually trimming), see: http://www.imagemagick.org/script/escape.php
+        calculated_trim_box = title_image.identify { |b| b.format("%@") }
 
         # Get vertical top offset from the trim box by converting it from string to an integer array:
         trim_values = calculated_trim_box.split(/[\sx+]/).map(&:to_i) # The format is "wxh+X+Y", so use multiple string separators: the whitespace "\s", "x" and "+"
