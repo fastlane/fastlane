@@ -351,58 +351,65 @@ module Frameit
           i.fill fetch_config[key.to_s]['color']
         end
 
-        # Trimming the image will result in the loss of the common baseline between the text in all images.
-        # title_image.trim # remove white space
-
         results[key] = title_image
 
-        # Hence retrieve the calculated trim bounding box:
-        # CALCULATED: trim bounding box (without actually trimming), see: http://www.imagemagick.org/script/escape.php
-        calculated_trim_box = title_image.identify { |b| b.format("%@") }
+        # Natively trimming the image with .trim will result in the loss of the common baseline between the text in all images.
+        # Hence retrieve the calculated trim bounding box without actually trimming:
+        calculated_trim_box = title_image.identify do |b|
+          b.format("%@") # CALCULATED: trim bounding box (without actually trimming), see: http://www.imagemagick.org/script/escape.php
+        end
 
-        # Get vertical top offset from the trim box by converting it from string to an integer array:
-        trim_values = calculated_trim_box.split(/[\sx+]/).map(&:to_i) # The format is "wxh+X+Y", so use multiple string separators: the whitespace "\s", "x" and "+"
+        # The .identify with format("%@") returns a string with "<width>x<height>+<offset_x>+<offset_y>". Extract these 4 parameters into an integer array, by using multiple string separators: the whitespace "\s", "x" and "+":
+        trim_values = calculated_trim_box.split(/[\sx+]/).map(&:to_i)
+
+        # Get the height and vertical offset:
+        trim_box_height = trim_values[1]
+        trim_box_offset_y = trim_values[3]
 
         # Get the minimum top offset of the trim box:
-        if trim_values[3] < top_vertical_trim_offset
-          top_vertical_trim_offset = trim_values[3]
+        if trim_box_offset_y < top_vertical_trim_offset
+          top_vertical_trim_offset = trim_box_offset_y
         end
 
         # Get the maximum bottom offset of the trimbox, this is the top offset + height:
-        if (trim_values[3] + trim_values[1]) > bottom_vertical_trim_offset
-          bottom_vertical_trim_offset = trim_values[3] + trim_values[1]
+        if (trim_box_offset_y + trim_box_height) > bottom_vertical_trim_offset
+          bottom_vertical_trim_offset = trim_box_offset_y + trim_box_height
         end
 
         # Store for the crop action:
         trim_boxes[key] = trim_values
       end
 
-      # Crop images based on top_vertical_trim_offset to maintain text baseline:
+      # Crop images based on top_vertical_trim_offset and bottom_vertical_trim_offset to maintain text baseline:
       words.each do |key|
         # Get matching trim box:
         trim_box = trim_boxes[key]
 
+        # Get the height and vertical offset:
+        trim_box_height = trim_box[1]
+        trim_box_offset_y = trim_box[3]
+
         # Determine the trim area by maintaining the same vertical top offset based on the smallest value from all trim boxes (top_vertical_trim_offset).
-        # The 4th parameter is the vertical top offset. When it's larger than the smallest vertical top offset, the trim box needs to be adjusted:
-        if trim_box[3] > top_vertical_trim_offset
-          # Increase the height of the trim box (2nd parameter) with the difference in vertical top offset:
-          trim_box[1] += trim_box[3] - top_vertical_trim_offset
+        # When the vertical top offset is larger than the smallest vertical top offset, the trim box needs to be adjusted:
+        if trim_box_offset_y > top_vertical_trim_offset
+          # Increase the height of the trim box with the difference in vertical top offset:
+          trim_box_height += trim_box_offset_y - top_vertical_trim_offset
           # Change the vertical top offset to match that of the others:
-          trim_box[3] = top_vertical_trim_offset
+          trim_box_offset_y = top_vertical_trim_offset
 
           UI.verbose("Trim box for key \"#{key}\" is adjusted to align top: #{trim_box}\n")
         end
 
-        # Repeat the same for the bottom offset:
-        if (trim_box[3] + trim_box[1]) < bottom_vertical_trim_offset
-          # Set the height of the trim box (2nd parameter) to the difference between vertical bottom and top offset:
-          trim_box[1] = bottom_vertical_trim_offset - trim_box[3]
+        # Check if the height needs to be adjusted to reach the bottom offset:
+        if (trim_box_offset_y + trim_box_height) < bottom_vertical_trim_offset
+          # Set the height of the trim box to the difference between vertical bottom and top offset:
+          trim_box_height = bottom_vertical_trim_offset - trim_box_offset_y
 
           UI.verbose("Trim box for key \"#{key}\" is adjusted to align bottom: #{trim_box}\n")
         end
 
-        # Convert trim box parameters to string for crop method (format: wxh+X+Y):
-        crop_input = "#{trim_box[0]}x#{trim_box[1]}+#{trim_box[2]}+#{trim_box[3]}"
+        # Convert trim box parameters to string for crop method (format: "<width>x<height>+<offset_x>+<offset_y>"):
+        crop_input = "#{trim_box[0]}x#{trim_box_height}+#{trim_box[2]}+#{trim_box_offset_y}"
 
         # Crop image:
         results[key].crop(crop_input)
