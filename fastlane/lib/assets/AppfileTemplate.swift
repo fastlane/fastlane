@@ -5,4 +5,4 @@ var teamID: String { return "[[DEV_PORTAL_TEAM_ID]]" } // Developer Portal Team 
 var itcTeam: String? { return [[ITC_TEAM]] } // iTunes Connect Team ID (may be nil if no team)
 
 // you can even provide different app identifiers, Apple IDs and team names per lane:
-// More information: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Appfile.md
+// More information: https://docs.fastlane.tools/advanced/#appfile

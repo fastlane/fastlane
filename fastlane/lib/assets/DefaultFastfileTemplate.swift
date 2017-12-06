@@ -1,5 +1,5 @@
 // Customize this file, documentation can be found here:
-// https://github.com/fastlane/fastlane/tree/master/fastlane/docs
+// https://docs.fastlane.tools/
 // All available actions: https://docs.fastlane.tools/actions
 // can also be listed using the `fastlane actions` command
 
@@ -65,7 +65,6 @@ class Fastfile: LaneFile {
         // )
     }
 
-    // More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md
     // All available actions: https://docs.fastlane.tools/actions
 
     // fastlane reports which actions are used. No personal data is recorded.
