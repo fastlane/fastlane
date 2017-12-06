@@ -1,5 +1,3 @@
-
-require_relative '../helper/sh_helper.rb'
 module Fastlane
   module Actions
     class ShAction < Action

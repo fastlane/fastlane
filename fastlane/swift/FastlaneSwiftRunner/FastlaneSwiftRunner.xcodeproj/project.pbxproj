@@ -215,7 +215,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${SRCROOT}\ncd ../..\ncp ${TARGET_BUILD_DIR}/${EXECUTABLE_PATH} .";
+			shellScript = "cd \"${SRCROOT}\"\ncd ../..\ncp \"${TARGET_BUILD_DIR}/${EXECUTABLE_PATH}\" .";
 		};
 /* End PBXShellScriptBuildPhase section */
 
