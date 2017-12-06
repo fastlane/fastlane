@@ -318,6 +318,9 @@ module Frameit
     def build_title_images(max_width, max_height)
       words = [:keyword, :title].keep_if { |a| fetch_text(a) } # optional keyword/title
       results = {}
+      trim_boxes = {}
+      top_vertical_trim_offset = Float::INFINITY # Init at a large value, as the code will search for a minimal value.
+      bottom_vertical_trim_offset = 0
       words.each do |key|
         # Create empty background
         empty_path = File.join(Frameit::ROOT, "lib/assets/empty.png")
@@ -347,10 +350,64 @@ module Frameit
           i.interline_spacing interline_spacing if interline_spacing
           i.fill fetch_config[key.to_s]['color']
         end
-        title_image.trim # remove white space
+
+        # Trimming the image will result in the loss of the common baseline between the text in all images.
+        # title_image.trim # remove white space
 
         results[key] = title_image
+
+        # Hence retrieve the calculated trim bounding box:
+        # CALCULATED: trim bounding box (without actually trimming), see: http://www.imagemagick.org/script/escape.php
+        calculated_trim_box = title_image.identify { |b| b.format("%@") }
+
+        # Get vertical top offset from the trim box by converting it from string to an integer array:
+        trim_values = calculated_trim_box.split(/[\sx+]/).map(&:to_i) # The format is "wxh+X+Y", so use multiple string separators: the whitespace "\s", "x" and "+"
+
+        # Get the minimum top offset of the trim box:
+        if trim_values[3] < top_vertical_trim_offset
+          top_vertical_trim_offset = trim_values[3]
+        end
+
+        # Get the maximum bottom offset of the trimbox, this is the top offset + height:
+        if (trim_values[3] + trim_values[1]) > bottom_vertical_trim_offset
+          bottom_vertical_trim_offset = trim_values[3] + trim_values[1]
+        end
+
+        # Store for the crop action:
+        trim_boxes[key] = trim_values
       end
+
+      # Crop images based on top_vertical_trim_offset to maintain text baseline:
+      words.each do |key|
+        # Get matching trim box:
+        trim_box = trim_boxes[key]
+
+        # Determine the trim area by maintaining the same vertical top offset based on the smallest value from all trim boxes (top_vertical_trim_offset).
+        # The 4th parameter is the vertical top offset. When it's larger than the smallest vertical top offset, the trim box needs to be adjusted:
+        if trim_box[3] > top_vertical_trim_offset
+          # Increase the height of the trim box (2nd parameter) with the difference in vertical top offset:
+          trim_box[1] += trim_box[3] - top_vertical_trim_offset
+          # Change the vertical top offset to match that of the others:
+          trim_box[3] = top_vertical_trim_offset
+
+          UI.verbose("Trim box for key \"#{key}\" is adjusted to align top: #{trim_box}\n")
+        end
+
+        # Repeat the same for the bottom offset:
+        if (trim_box[3] + trim_box[1]) < bottom_vertical_trim_offset
+          # Set the height of the trim box (2nd parameter) to the difference between vertical bottom and top offset:
+          trim_box[1] = bottom_vertical_trim_offset - trim_box[3]
+
+          UI.verbose("Trim box for key \"#{key}\" is adjusted to align bottom: #{trim_box}\n")
+        end
+
+        # Convert trim box parameters to string for crop method (format: wxh+X+Y):
+        crop_input = "#{trim_box[0]}x#{trim_box[1]}+#{trim_box[2]}+#{trim_box[3]}"
+
+        # Crop image:
+        results[key].crop(crop_input)
+      end
+
       results
     end
 
