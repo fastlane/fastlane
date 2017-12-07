@@ -1,4 +1,5 @@
 require 'fastlane/actions/actions_helper'
+require 'forwardable'
 
 module Fastlane
   class Action
@@ -18,8 +19,14 @@ module Fastlane
       :deprecated # This should be the last item
     ]
 
+
     class << self
       attr_accessor :runner
+
+      extend Forwardable
+
+      # to allow a simple `sh` in the custom actions
+      def_delegator "Fastlane::Actions", :sh_control_output, :sh
     end
 
     def self.run(params)
@@ -91,11 +98,6 @@ module Fastlane
     # Return nil if you don't want any logging in the terminal/JUnit Report
     def self.step_text
       self.action_name
-    end
-
-    # to allow a simple `sh` in the custom actions
-    def self.sh(*command, print_command: true, print_command_output: true, error_callback: nil, &b)
-      Fastlane::Actions.sh_control_output(*command, print_command: print_command, print_command_output: print_command_output, error_callback: error_callback, &b)
     end
 
     # Documentation category, available values defined in AVAILABLE_CATEGORIES
