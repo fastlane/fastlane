@@ -436,8 +436,15 @@ module Spaceship
           # We use the olympus session to determine if the old session is still valid
           # As this will raise an exception if the old session has expired
           # If the old session is still valid, we don't have to do anything else in this method
+          # that's why we return true
           return true if fetch_olympus_session.count > 0
         rescue
+          # If the `fetch_olympus_session` method raises an exception
+          # we'll land here, and therefore continue doing a full login process
+          # This happens if the session we loaded from the cache isn't valid any more
+          # which is common, as the session automatically invalidates after x hours (we don't know x)
+          # In this case we don't actually care about the exact exception, and why it was failing
+          # because either way, we'll have to do a fresh login, where we do the actual error handling
         end
       end
 
