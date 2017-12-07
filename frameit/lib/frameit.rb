@@ -11,6 +11,7 @@ require 'frameit/strings_parser'
 require 'frameit/mac_editor'
 require 'frameit/dependency_checker'
 require 'frameit/options'
+require 'frameit/trim_box'
 
 require 'fastlane_core'
 
