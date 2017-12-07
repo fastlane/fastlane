@@ -158,7 +158,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :platform,
                                        short_option: "-p",
                                        env_name: "DOWNLOAD_DSYMS_PLATFORM",
-                                       description: "The app platform for dSYMs you wish to download",
+                                       description: "The app platform for dSYMs you wish to download (ios, appletvos)",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :version,
                                        short_option: "-v",
