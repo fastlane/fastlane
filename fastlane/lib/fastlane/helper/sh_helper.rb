@@ -23,7 +23,7 @@ module Fastlane
     # @yield [status, result] The return status of the command and all output from the command
     # @yieldparam [Process::Status] status A Process::Status indicating the status of the completed command
     # @yieldparam [String] result The complete output to stdout and stderr of the completed command
-    def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil, &b)
+    def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil)
       print_command = print_command_output = true if $troubleshoot
       # Set the encoding first, the user might have set it wrong
       previous_encoding = [Encoding.default_external, Encoding.default_internal]
