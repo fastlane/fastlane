@@ -54,7 +54,7 @@ module Fastlane
       def self.example_code
         [
           'sh("ls")',
-          'sh("git commit -m \'My message\'")'
+          'sh("git", "commit", "-m", "My message")'
         ]
       end
 
