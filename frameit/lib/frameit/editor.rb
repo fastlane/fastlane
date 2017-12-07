@@ -359,25 +359,21 @@ module Frameit
           b.format("%@") # CALCULATED: trim bounding box (without actually trimming), see: http://www.imagemagick.org/script/escape.php
         end
 
-        # The .identify with format("%@") returns a string with "<width>x<height>+<offset_x>+<offset_y>". Extract these 4 parameters into an integer array, by using multiple string separators: the whitespace "\s", "x" and "+":
-        trim_values = calculated_trim_box.split(/[\sx+]/).map(&:to_i)
-
-        # Get the height and vertical offset:
-        trim_box_height = trim_values[1]
-        trim_box_offset_y = trim_values[3]
+        # Create a Trimbox object from the MiniMagick .identify string with syntax "<width>x<height>+<offset_x>+<offset_y>":
+        trim_box = Frameit::Trimbox.new(calculated_trim_box)
 
         # Get the minimum top offset of the trim box:
-        if trim_box_offset_y < top_vertical_trim_offset
-          top_vertical_trim_offset = trim_box_offset_y
+        if trim_box.offset_y < top_vertical_trim_offset
+          top_vertical_trim_offset = trim_box.offset_y
         end
 
         # Get the maximum bottom offset of the trimbox, this is the top offset + height:
-        if (trim_box_offset_y + trim_box_height) > bottom_vertical_trim_offset
-          bottom_vertical_trim_offset = trim_box_offset_y + trim_box_height
+        if (trim_box.offset_y + trim_box.height) > bottom_vertical_trim_offset
+          bottom_vertical_trim_offset = trim_box.offset_y + trim_box.height
         end
 
         # Store for the crop action:
-        trim_boxes[key] = trim_values
+        trim_boxes[key] = trim_box
       end
 
       # Crop images based on top_vertical_trim_offset and bottom_vertical_trim_offset to maintain text baseline:
@@ -385,34 +381,27 @@ module Frameit
         # Get matching trim box:
         trim_box = trim_boxes[key]
 
-        # Get the height and vertical offset:
-        trim_box_height = trim_box[1]
-        trim_box_offset_y = trim_box[3]
-
         # Determine the trim area by maintaining the same vertical top offset based on the smallest value from all trim boxes (top_vertical_trim_offset).
         # When the vertical top offset is larger than the smallest vertical top offset, the trim box needs to be adjusted:
-        if trim_box_offset_y > top_vertical_trim_offset
+        if trim_box.offset_y > top_vertical_trim_offset
           # Increase the height of the trim box with the difference in vertical top offset:
-          trim_box_height += trim_box_offset_y - top_vertical_trim_offset
+          trim_box.height += trim_box.offset_y - top_vertical_trim_offset
           # Change the vertical top offset to match that of the others:
-          trim_box_offset_y = top_vertical_trim_offset
+          trim_box.offset_y = top_vertical_trim_offset
 
           UI.verbose("Trim box for key \"#{key}\" is adjusted to align top: #{trim_box}\n")
         end
 
         # Check if the height needs to be adjusted to reach the bottom offset:
-        if (trim_box_offset_y + trim_box_height) < bottom_vertical_trim_offset
+        if (trim_box.offset_y + trim_box.height) < bottom_vertical_trim_offset
           # Set the height of the trim box to the difference between vertical bottom and top offset:
-          trim_box_height = bottom_vertical_trim_offset - trim_box_offset_y
+          trim_box.height = bottom_vertical_trim_offset - trim_box.offset_y
 
           UI.verbose("Trim box for key \"#{key}\" is adjusted to align bottom: #{trim_box}\n")
         end
 
-        # Convert trim box parameters to string for crop method (format: "<width>x<height>+<offset_x>+<offset_y>"):
-        crop_input = "#{trim_box[0]}x#{trim_box_height}+#{trim_box[2]}+#{trim_box_offset_y}"
-
-        # Crop image:
-        results[key].crop(crop_input)
+        # Crop image with adjusted trim box parameters in MiniMagick string format:
+        results[key].crop(trim_box.string_format)
       end
 
       results
