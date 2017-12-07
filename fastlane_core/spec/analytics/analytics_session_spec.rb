@@ -1,5 +1,6 @@
 describe FastlaneCore::AnalyticsSession do
   let(:oauth_app_name) { 'fastlane-tests' }
+  let(:app_id) { 'some.app.id' }
   let(:p_hash) { 'some.phash.value' }
   let(:session_id) { 's0m3s3ss10n1D' }
   let(:timestamp_millis) { 1_507_142_046 }
@@ -20,6 +21,7 @@ describe FastlaneCore::AnalyticsSession do
       let(:launch_context) do
         FastlaneCore::ActionLaunchContext.new(
           action_name: action_name,
+          app_id: app_id,
           p_hash: p_hash,
           platform: 'ios'
         )
@@ -74,6 +76,7 @@ describe FastlaneCore::AnalyticsSession do
     context 'action completion' do
       let(:completion_context) do
         FastlaneCore::ActionCompletionContext.new(
+          app_id: app_id,
           p_hash: p_hash,
           status: FastlaneCore::ActionCompletionStatus::SUCCESS,
           action_name: action_name
@@ -108,12 +111,14 @@ describe FastlaneCore::AnalyticsSession do
       let(:action_1_launch_context) do
         FastlaneCore::ActionLaunchContext.new(
           action_name: action_1_name,
+          app_id: app_id,
           p_hash: p_hash,
           platform: 'ios'
         )
       end
       let(:action_1_completion_context) do
         FastlaneCore::ActionCompletionContext.new(
+          app_id: app_id,
           p_hash: p_hash,
           status: FastlaneCore::ActionCompletionStatus::SUCCESS,
           action_name: action_1_name
@@ -122,12 +127,14 @@ describe FastlaneCore::AnalyticsSession do
       let(:action_2_launch_context) do
         FastlaneCore::ActionLaunchContext.new(
           action_name: action_2_name,
+          app_id: app_id,
           p_hash: p_hash,
           platform: 'ios'
         )
       end
       let(:action_2_completion_context) do
         FastlaneCore::ActionCompletionContext.new(
+          app_id: app_id,
           p_hash: p_hash,
           status: FastlaneCore::ActionCompletionStatus::SUCCESS,
           action_name: action_2_name
