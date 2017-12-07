@@ -25,7 +25,7 @@ module Fastlane
       extend Forwardable
 
       # to allow a simple `sh` in the custom actions
-      def_delegator Fastlane::Actions, :sh_control_output, :sh
+      def_delegator Actions, :sh_control_output, :sh
     end
 
     def self.run(params)
