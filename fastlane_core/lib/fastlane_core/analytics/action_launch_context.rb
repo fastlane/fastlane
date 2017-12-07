@@ -2,14 +2,17 @@ require 'fastlane_core/helper'
 
 module FastlaneCore
   class ActionLaunchContext
+    UNKNOWN_APP_ID = 'unknown'
     UNKNOWN_P_HASH = 'unknown'
 
     attr_accessor :action_name
+    attr_accessor :app_id
     attr_accessor :p_hash
     attr_accessor :platform
 
-    def initialize(action_name: nil, p_hash: UNKNOWN_P_HASH, platform: nil)
+    def initialize(action_name: nil, app_id: UNKNOWN_APP_ID, p_hash: UNKNOWN_P_HASH, platform: nil)
       @action_name = action_name
+      @app_id = app_id
       @p_hash = p_hash
       @platform = platform
     end
@@ -18,6 +21,7 @@ module FastlaneCore
       app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: args)
       return self.new(
         action_name: action_name,
+        app_id: app_id_guesser.app_id,
         p_hash: app_id_guesser.p_hash,
         platform: app_id_guesser.platform
       )
