@@ -8,19 +8,22 @@ module Fastlane
     # When running this in tests, it will return the actual command instead of executing it
     # @param log [Boolean] should fastlane print out the executed command
     # @param error_callback [Block] a callback invoked with the command output if there is a non-zero exit status
-    def self.sh(*command, log: true, error_callback: nil)
-      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback)
+    def self.sh(*command, log: true, error_callback: nil, &b)
+      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, &b)
     end
 
-    def self.sh_no_action(*command, log: true, error_callback: nil)
-      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback)
+    def self.sh_no_action(*command, log: true, error_callback: nil, &b)
+      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, &b)
     end
 
     # @param command The command to be executed (variadic)
     # @param print_command [Boolean] Should we print the command that's being executed
     # @param print_command_output [Boolean] Should we print the command output during execution
     # @param error_callback [Block] A block that's called if the command exits with a non-zero status
-    def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil)
+    # @yield [status, result] The return status of the command and all output from the command
+    # @yieldparam [Process::Status] status A Process::Status indicating the status of the completed command
+    # @yieldparam [String] result The complete output to stdout and stderr of the completed command
+    def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil, &b)
       print_command = print_command_output = true if $troubleshoot
       # Set the encoding first, the user might have set it wrong
       previous_encoding = [Encoding.default_external, Encoding.default_internal]
@@ -31,6 +34,7 @@ module Fastlane
       UI.command(shell_command) if print_command
 
       result = ''
+      block_return = nil
       if Helper.sh_enabled?
         exit_status = nil
 
@@ -49,6 +53,10 @@ module Fastlane
             result << line
           end
           exit_status = thread.value.exitstatus
+
+          if block_given?
+            block_return = yield thread.value, result
+          end
         end
 
         if exit_status != 0
@@ -62,7 +70,7 @@ module Fastlane
           if error_callback
             UI.error(message)
             error_callback.call(result)
-          else
+          elsif !block_given?
             UI.shell_error!(message)
           end
         end
@@ -70,6 +78,7 @@ module Fastlane
         result << shell_command # only for the tests
       end
 
+      return block_return if block_given?
       result
     rescue => ex
       raise ex

@@ -174,10 +174,10 @@ module Fastlane
     end
 
     # Execute shell command
-    def sh(*command, log: true, error_callback: nil)
+    def sh(*command, log: true, error_callback: nil, &b)
       command_header = log ? Actions.shell_command_from_args(*command) : "shell command"
       Actions.execute_action(command_header) do
-        Actions.sh_no_action(*command, log: log, error_callback: error_callback)
+        Actions.sh_no_action(*command, log: log, error_callback: error_callback, &b)
       end
     end
 
