@@ -70,7 +70,7 @@ module Fastlane
           if error_callback || block_given?
             UI.error(message)
             # block already notified above, on success or failure
-            error_callback.call(result) if error_callback
+            error_callback && error_callback.call(result)
           else
             UI.shell_error!(message)
           end
