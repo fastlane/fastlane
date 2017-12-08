@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="/img/actions/produce.png" height="110">
+  <img src="/img/actions/produce.png" width="250">
 </p>
 
 ###### Create new iOS apps on iTunes Connect and Dev Portal using your command line

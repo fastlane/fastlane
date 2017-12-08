@@ -8,6 +8,19 @@
 
 > <%= @plugin.info %>
 
+<% if @plugin.data[:actions].count > 0 %>
+<details>
+<summary class="plugin-actions">Provided actions</summary>
+
+ Name | Category | Description
+------|----------|------------
+<%- @plugin.data[:actions].each do |action| -%>
+  **<%= action.name %>** | <%= action.category || "-" %> | <%= action.description || action.details || "-" %>
+<%- end -%>
+
+</details>
+<% end %>
+
 <details>
 <summary class="score-details">Score details</summary>
 

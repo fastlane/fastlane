@@ -1,6 +1,6 @@
 module FastlaneCore
   # Represents an Xcode project
-  class Project
+  class Project # rubocop:disable Metrics/ClassLength
     class << self
       # Project discovery
       def detect_projects(config)
@@ -455,6 +455,34 @@ module FastlaneCore
       end
 
       return result
+    end
+
+    # Array of paths to all project files
+    # (might be multiple, because of workspaces)
+    def project_paths
+      return @_project_paths if @_project_paths
+      if self.workspace?
+        # Find the xcodeproj file, as the information isn't included in the workspace file
+        # We have a reference to the workspace, let's find the xcodeproj file
+        # For some reason the `plist` gem can't parse the content file
+        # so we'll use a regex to find all group references
+
+        workspace_data_path = File.join(path, "contents.xcworkspacedata")
+        workspace_data = File.read(workspace_data_path)
+        @_project_paths = workspace_data.scan(/\"group:(.*)\"/).collect do |current_match|
+          # It's a relative path from the workspace file
+          File.join(File.expand_path("..", path), current_match.first)
+        end.find_all do |current_match|
+          # We're not interested in a `Pods` project, as it doesn't contain any relevant
+          # information about code signing
+          !current_match.end_with?("Pods/Pods.xcodeproj")
+        end
+
+        return @_project_paths
+      else
+        # Return the path as an array
+        return @_project_paths = [path]
+      end
     end
 
     private

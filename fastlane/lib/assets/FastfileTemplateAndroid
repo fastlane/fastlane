@@ -37,7 +37,7 @@ platform :android do
   desc "Deploy a new version to the Google Play"
   lane :deploy do
     gradle(task: "assembleRelease")
-    supply
+    upload_to_play_store
   end
 
   # You can define as many lanes as you want
@@ -58,7 +58,7 @@ platform :android do
   end
 end
 
-# More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md
+# More information about multiple platforms in fastlane: https://docs.fastlane.tools/advanced/#control-configuration-by-lane-and-by-platform
 # All available actions: https://docs.fastlane.tools/actions
 
 # fastlane reports which actions are used. No personal data is recorded.

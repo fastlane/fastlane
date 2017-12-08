@@ -135,7 +135,10 @@ module Gym
             hash = normalize_export_options(Gym.config[:export_options])
           else
             # Reads options from file
-            hash = Plist.parse_xml(Gym.config[:export_options])
+            plist_file_path = Gym.config[:export_options]
+            UI.user_error!("Couldn't find plist file at path #{File.expand_path(plist_file_path)}") unless File.exist?(plist_file_path)
+            hash = Plist.parse_xml(plist_file_path)
+            UI.user_error!("Couldn't read provided plist at path #{File.expand_path(plist_file_path)}") if hash.nil?
             # Convert keys to symbols
             hash = keys_to_symbols(hash)
           end
@@ -187,6 +190,19 @@ module Gym
         end
 
         to_plist(hash)
+      end
+
+      def signing_style
+        projects = Gym.project.project_paths
+        project = projects.first
+        xcodeproj = Xcodeproj::Project.open(project)
+        xcodeproj.root_object.attributes["TargetAttributes"].each do |target, sett|
+          return sett["ProvisioningStyle"].to_s.downcase
+        end
+      rescue => e
+        UI.verbose(e.to_s)
+        UI.error("Unable to read provisioning style from .pbxproj file.")
+        return "automatic"
       end
 
       # Avoids a Hash#to_plist conflict between CFPropertyList and plist gems

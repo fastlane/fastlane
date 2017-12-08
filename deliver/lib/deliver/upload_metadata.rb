@@ -44,7 +44,7 @@ module Deliver
     }
 
     # Localized app details values, that are editable in live state
-    LOCALISED_LIVE_VALUES = [:description, :release_notes, :support_url, :marketing_url]
+    LOCALISED_LIVE_VALUES = [:description, :release_notes, :support_url, :marketing_url, :promotional_text]
 
     # Non localized app details values, that are editable in live state
     NON_LOCALISED_LIVE_VALUES = [:privacy_url]

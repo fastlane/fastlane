@@ -57,7 +57,9 @@ module Fastlane
             end
 
             begin
-              download_url = build.details.dsym_url
+              # need to call reload here or dsym_url is nil
+              build.reload
+              download_url = build.dsym_url
             rescue Spaceship::TunesClient::ITunesConnectError => ex
               UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
             end
@@ -159,7 +161,8 @@ module Fastlane
                                        short_option: "-p",
                                        env_name: "DOWNLOAD_DSYMS_PLATFORM",
                                        description: "The app platform for dSYMs you wish to download (ios, appletvos)",
-                                       optional: true),
+                                       optional: true,
+                                       default_value: :ios),
           FastlaneCore::ConfigItem.new(key: :version,
                                        short_option: "-v",
                                        env_name: "DOWNLOAD_DSYMS_VERSION",

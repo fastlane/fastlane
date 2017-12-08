@@ -170,7 +170,8 @@ module Frameit
       background = MiniMagick::Image.open(fetch_config['background'])
 
       if background.height != screenshot.size[1]
-        background.resize "#{screenshot.size[0]}x#{screenshot.size[1]}!" # `!` says it should ignore the ratio
+        background.resize "#{screenshot.size[0]}x#{screenshot.size[1]}^" # `^` says it should fill area
+        background.merge! ["-gravity", "center", "-crop", "#{screenshot.size[0]}x#{screenshot.size[1]}+0+0"] # crop from center
       end
       background
     end
@@ -317,6 +318,9 @@ module Frameit
     def build_title_images(max_width, max_height)
       words = [:keyword, :title].keep_if { |a| fetch_text(a) } # optional keyword/title
       results = {}
+      trim_boxes = {}
+      top_vertical_trim_offset = Float::INFINITY # Init at a large value, as the code will search for a minimal value.
+      bottom_vertical_trim_offset = 0
       words.each do |key|
         # Create empty background
         empty_path = File.join(Frameit::ROOT, "lib/assets/empty.png")
@@ -346,10 +350,60 @@ module Frameit
           i.interline_spacing interline_spacing if interline_spacing
           i.fill fetch_config[key.to_s]['color']
         end
-        title_image.trim # remove white space
 
         results[key] = title_image
+
+        # Natively trimming the image with .trim will result in the loss of the common baseline between the text in all images.
+        # Hence retrieve the calculated trim bounding box without actually trimming:
+        calculated_trim_box = title_image.identify do |b|
+          b.format("%@") # CALCULATED: trim bounding box (without actually trimming), see: http://www.imagemagick.org/script/escape.php
+        end
+
+        # Create a Trimbox object from the MiniMagick .identify string with syntax "<width>x<height>+<offset_x>+<offset_y>":
+        trim_box = Frameit::Trimbox.new(calculated_trim_box)
+
+        # Get the minimum top offset of the trim box:
+        if trim_box.offset_y < top_vertical_trim_offset
+          top_vertical_trim_offset = trim_box.offset_y
+        end
+
+        # Get the maximum bottom offset of the trimbox, this is the top offset + height:
+        if (trim_box.offset_y + trim_box.height) > bottom_vertical_trim_offset
+          bottom_vertical_trim_offset = trim_box.offset_y + trim_box.height
+        end
+
+        # Store for the crop action:
+        trim_boxes[key] = trim_box
       end
+
+      # Crop images based on top_vertical_trim_offset and bottom_vertical_trim_offset to maintain text baseline:
+      words.each do |key|
+        # Get matching trim box:
+        trim_box = trim_boxes[key]
+
+        # Determine the trim area by maintaining the same vertical top offset based on the smallest value from all trim boxes (top_vertical_trim_offset).
+        # When the vertical top offset is larger than the smallest vertical top offset, the trim box needs to be adjusted:
+        if trim_box.offset_y > top_vertical_trim_offset
+          # Increase the height of the trim box with the difference in vertical top offset:
+          trim_box.height += trim_box.offset_y - top_vertical_trim_offset
+          # Change the vertical top offset to match that of the others:
+          trim_box.offset_y = top_vertical_trim_offset
+
+          UI.verbose("Trim box for key \"#{key}\" is adjusted to align top: #{trim_box}\n")
+        end
+
+        # Check if the height needs to be adjusted to reach the bottom offset:
+        if (trim_box.offset_y + trim_box.height) < bottom_vertical_trim_offset
+          # Set the height of the trim box to the difference between vertical bottom and top offset:
+          trim_box.height = bottom_vertical_trim_offset - trim_box.offset_y
+
+          UI.verbose("Trim box for key \"#{key}\" is adjusted to align bottom: #{trim_box}\n")
+        end
+
+        # Crop image with adjusted trim box parameters in MiniMagick string format:
+        results[key].crop(trim_box.string_format)
+      end
+
       results
     end
 

@@ -91,7 +91,12 @@ describe Spaceship::TestFlight::Group do
         expect(mock_client).to receive(:create_app_level_tester)
           .with(app_id: 1, first_name: tester.first_name, last_name: tester.last_name, email: tester.email)
           .and_return('id' => 'some-tester-id')
-        expect(mock_client).to receive(:put_tester_to_group).with(group_id: 2, tester_id: 'some-tester-id', app_id: 1)
+        expect(mock_client).to receive(:post_tester_to_group)
+          .with(group_id: 2,
+                   email: tester.email,
+              first_name: tester.first_name,
+               last_name: tester.last_name,
+                  app_id: 1)
         group.add_tester!(tester)
       end
     end

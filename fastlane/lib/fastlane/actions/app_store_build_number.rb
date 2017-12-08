@@ -13,6 +13,8 @@ module Fastlane
         Spaceship::Tunes.select_team
         UI.message("Login successful")
 
+        platform = params[:platform]
+
         app = Spaceship::Tunes::Application.find(params[:app_identifier])
         if params[:live]
           UI.message("Fetching the latest build number for live-version")
@@ -22,7 +24,7 @@ module Fastlane
           unless version_number
             # Automatically fetch the latest version in testflight
             begin
-              testflight_version = app.build_trains.keys.last
+              testflight_version = app.all_build_train_numbers(platform: platform).sort_by { |v| Gem::Version.new(v) }.last
             rescue
               testflight_version = params[:version]
             end
@@ -38,14 +40,17 @@ module Fastlane
           UI.message("Fetching the latest build number for version #{version_number}")
 
           begin
-            train = app.build_trains[version_number]
-            build_nr = train.builds.map(&:build_version).map(&:to_i).sort.last
+            build_nr = app.all_builds_for_train(train: version_number, platform: platform).map(&:build_version).map(&:to_i).sort.last
+            if build_nr.nil? && params[:initial_build_number]
+              UI.message("Could not find a build on iTC. Using supplied 'initial_build_number' option")
+              build_nr = params[:initial_build_number]
+            end
           rescue
-            UI.user_error!("could not find a build on iTC - and 'initial_build_number' option is not set") unless params[:initial_build_number]
+            UI.user_error!("Could not find a build on iTC - and 'initial_build_number' option is not set") unless params[:initial_build_number]
             build_nr = params[:initial_build_number]
           end
         end
-        UI.message("Latest upload is build number: #{build_nr}")
+        UI.message("Latest upload for version #{version_number} is build: #{build_nr}")
         Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER] = build_nr
       end
 
@@ -97,6 +102,16 @@ module Fastlane
                                        env_name: "LATEST_VERSION",
                                        description: "The version number whose latest build number we want",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :platform,
+                                       short_option: "-j",
+                                       env_name: "APPSTORE_PLATFORM",
+                                       description: "The platform to use (optional)",
+                                       optional: true,
+                                       is_string: true,
+                                       default_value: "ios",
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include? value
+                                       end),
           FastlaneCore::ConfigItem.new(key: :team_name,
                                        short_option: "-e",
                                        env_name: "LATEST_TESTFLIGHT_BUILD_NUMBER_TEAM_NAME",

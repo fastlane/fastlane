@@ -191,8 +191,8 @@ module Spaceship
       #   Certificate.factory(attrs)
       #   #=> #<PushCertificate ... >
       #
-      def factory(attrs)
-        self.new(attrs)
+      def factory(attrs, existing_client = nil)
+        self.new(attrs, existing_client)
       end
     end
 
@@ -210,12 +210,12 @@ module Spaceship
     # attributes that are defined by `attr_mapping`
     #
     # Do not override `initialize` in your own models.
-    def initialize(attrs = {})
+    def initialize(attrs = {}, existing_client = nil)
       attrs.each do |key, val|
         self.send("#{key}=", val) if respond_to?("#{key}=")
       end
       self.raw_data = DataHash.new(attrs)
-      @client = self.class.client
+      @client = existing_client || self.class.client
       self.setup
     end
 

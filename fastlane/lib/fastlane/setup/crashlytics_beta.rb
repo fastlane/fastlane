@@ -61,7 +61,7 @@ module Fastlane
   lane :beta do |values|
     # Fabric generated this lane for deployment to Crashlytics Beta
     # set 'export_method' to 'ad-hoc' if your Crashlytics Beta distribution uses ad-hoc provisioning
-    gym(scheme: '#{@beta_info.schemes.first}', export_method: '#{@beta_info.export_method}')
+    build_app(scheme: '#{@beta_info.schemes.first}', export_method: '#{@beta_info.export_method}')
 
     emails = values[:test_email] ? values[:test_email] : #{beta_info_emails} # You can list more emails here
     groups = values[:test_email] ? nil : #{beta_info_groups} # You can define groups on the web and reference them here

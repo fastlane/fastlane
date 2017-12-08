@@ -22,7 +22,7 @@ class TunesStubbing
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/wa").
         to_return(status: 200, body: "")
       stub_request(:get, "https://olympus.itunes.apple.com/v1/session").
-        to_return(status: 200, body: "") # we don't actually care about the body
+        to_return(status: 200, body: itc_read_fixture_file('olympus_session.json'))
       stub_request(:get, "https://olympus.itunes.apple.com/v1/app/config?hostname=itunesconnect.apple.com").
         to_return(status: 200, body: { authServiceKey: 'e0abc' }.to_json, headers: { 'Content-Type' => 'application/json' })
 

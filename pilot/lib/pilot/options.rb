@@ -24,6 +24,7 @@ module Pilot
                                      env_name: "PILOT_PLATFORM",
                                      description: "The platform to use (optional)",
                                      optional: true,
+                                     default_value: 'ios',
                                      verify_block: proc do |value|
                                        UI.user_error!("The platform can only be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include? value
                                      end),
@@ -158,7 +159,12 @@ module Pilot
                                      type: Array,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :wait_for_uploaded_build,
+                                     env_name: "PILOT_WAIT_FOR_UPLOADED_BUILD",
+                                     description: "Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used",
+                                     is_string: false,
+                                     default_value: false)
       ]
     end
   end
