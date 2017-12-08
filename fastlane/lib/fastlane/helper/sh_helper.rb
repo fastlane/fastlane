@@ -35,9 +35,8 @@ module Fastlane
       UI.command(shell_command) if print_command
 
       result = ''
-      block_return = nil
+      exit_status = nil
       if Helper.sh_enabled?
-        exit_status = nil
 
         # The argument list is passed directly to Open3.popen2e, which
         # handles the variadic argument list in the same way as Kernel#spawn.
@@ -53,24 +52,24 @@ module Fastlane
             UI.command_output(line.strip) if print_command_output
             result << line
           end
-          exit_status = thread.value.exitstatus
-
-          if block_given?
-            block_return = yield thread.value, result, shell_command
-          end
+          exit_status = thread.value
         end
 
-        if exit_status != 0
+        # Checking Process::Status#exitstatus instead of #success? makes for more
+        # testable code. (Tests mock exitstatus only.) This is also consistent
+        # with previous implementations of sh and... probably portable to all
+        # relevant platforms.
+        if exit_status.exitstatus != 0
           message = if print_command
-                      "Exit status of command '#{shell_command}' was #{exit_status} instead of 0."
+                      "Exit status of command '#{shell_command}' was #{exit_status.exitstatus} instead of 0."
                     else
-                      "Shell command exited with exit status #{exit_status} instead of 0."
+                      "Shell command exited with exit status #{exit_status.exitstatus} instead of 0."
                     end
           message += "\n#{result}" if print_command_output
 
           if error_callback || block_given?
             UI.error(message)
-            # block already notified above, on success or failure
+            # block notified below, on success or failure
             error_callback && error_callback.call(result)
           else
             UI.shell_error!(message)
@@ -80,7 +79,12 @@ module Fastlane
         result << shell_command # only for the tests
       end
 
-      return block_return if block_given?
+      if block_given?
+        # Avoid yielding nil in tests. $? will be meaningless, but calls to
+        # it will not crash. There is no Process::Status.new. The alternative
+        # is to move this inside the sh_enabled? check and not yield in tests.
+        return yield exit_status || $?, result, shell_command
+      end
       result
     rescue => ex
       raise ex
