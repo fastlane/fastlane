@@ -20,7 +20,7 @@ struct RubyCommand: RubyCommandable {
             var typeString: String {
                 switch self {
                 case .stringClosure:
-                    return "string_closure" // this should match when is in ruby's GenericCommandExecuter
+                    return "string_closure" // this should match when is in ruby's SocketServerActionCommandExecutor
                 }
             }
         }
