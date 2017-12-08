@@ -20,9 +20,10 @@ module Fastlane
     # @param print_command [Boolean] Should we print the command that's being executed
     # @param print_command_output [Boolean] Should we print the command output during execution
     # @param error_callback [Block] A block that's called if the command exits with a non-zero status
-    # @yield [status, result] The return status of the command and all output from the command
+    # @yield [status, result, cmd] The return status of the command, all output from the command and an equivalent shell command
     # @yieldparam [Process::Status] status A Process::Status indicating the status of the completed command
     # @yieldparam [String] result The complete output to stdout and stderr of the completed command
+    # @yieldparam [String] cmd A shell command equivalent to the arguments passed
     def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil)
       print_command = print_command_output = true if $troubleshoot
       # Set the encoding first, the user might have set it wrong
@@ -55,7 +56,7 @@ module Fastlane
           exit_status = thread.value.exitstatus
 
           if block_given?
-            block_return = yield thread.value, result
+            block_return = yield thread.value, result, shell_command
           end
         end
 

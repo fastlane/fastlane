@@ -53,11 +53,12 @@ describe Fastlane::Actions do
     end
 
     context "with a postfix block" do
-      it "yields the status and result" do
+      it "yields the status, result and command" do
         expect_command "ls", "-la"
-        Fastlane::Actions.sh "ls", "-la" do |status, result|
+        Fastlane::Actions.sh "ls", "-la" do |status, result, command|
           expect(status.exitstatus).to eq 0
           expect(result).to be_empty
+          expect(command).to eq "ls -la"
         end
       end
 
