@@ -67,10 +67,11 @@ module Fastlane
                     end
           message += "\n#{result}" if print_command_output
 
-          if error_callback
+          if error_callback || block_given?
             UI.error(message)
-            error_callback.call(result)
-          elsif !block_given?
+            # block already notified above, on success or failure
+            error_callback.call(result) if error_callback
+          else
             UI.shell_error!(message)
           end
         end
