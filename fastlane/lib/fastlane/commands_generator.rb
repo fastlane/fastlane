@@ -121,7 +121,6 @@ module Fastlane
           else
             is_swift_fastfile = args.include?("swift")
             Fastlane::Setup.new.run(user: options.user, is_swift_fastfile: is_swift_fastfile)
-            Fastlane::SwiftLaneManager.first_time_setup
           end
         end
       end
@@ -133,7 +132,6 @@ module Fastlane
 
         c.action do |args, options|
           Fastlane::Setup.new.run(user: options.user, is_swift_fastfile: true)
-          Fastlane::SwiftLaneManager.first_time_setup
         end
       end
 
@@ -151,11 +149,26 @@ module Fastlane
       command :socket_server do |c|
         c.syntax = 'fastlane start_server'
         c.description = 'Starts local socket server and enables only a single local connection'
+        c.option '-s', '--stay_alive', 'Keeps socket server up even after error or disconnects, requires CTRL-C to kill.'
+        c.option '-c seconds', '--connection_timeout', 'Sets connection established timeout'
         c.action do |args, options|
+          default_connection_timeout = 5
+          stay_alive = options.stay_alive || false
+          connection_timeout = options.connection_timeout || default_connection_timeout
+
+          if stay_alive && options.connection_timeout.nil?
+            UI.important("stay_alive is set, but the connection timeout is not, this will give you #{default_connection_timeout} seconds to (re)connect")
+          end
+
           require 'fastlane/server/socket_server'
           require 'fastlane/server/socket_server_action_command_executor'
+
           command_executor = SocketServerActionCommandExecutor.new
-          server = Fastlane::SocketServer.new(command_executor: command_executor)
+          server = Fastlane::SocketServer.new(
+            command_executor: command_executor,
+            connection_timeout: connection_timeout,
+            stay_alive: stay_alive
+          )
           result = server.start
           UI.success "Result: #{result}" if result
         end

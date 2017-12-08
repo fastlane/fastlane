@@ -2,6 +2,8 @@ require 'fastlane/server/command.rb'
 require 'fastlane/server/command_executor.rb'
 
 module Fastlane
+  # Handles receiving commands from the socket server, finding the Action to be invoked,
+  # invoking it, and returning any return values
   class SocketServerActionCommandExecutor < CommandExecutor
     attr_accessor :runner
     attr_accessor :actions_requiring_special_handling

@@ -32,6 +32,11 @@ module Fastlane
       else
         UI.user_error!("Couldn't find platform '#{platform}'")
       end
+
+      # Now that we've setup all the things, if we're using Swift, do the first time setup
+      if is_swift_fastfile
+        Fastlane::SwiftLaneManager.first_time_setup
+      end
     end
 
     def is_ios?

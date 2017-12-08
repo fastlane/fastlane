@@ -60,6 +60,10 @@ module Fastlane
         parameter_string += " #{key} #{value}"
       end
 
+      if FastlaneCore::Globals.verbose?
+        parameter_string += " logMode verbose"
+      end
+
       return Thread.new do
         Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lane #{lane}#{parameter_string} > /dev/null))
       end
