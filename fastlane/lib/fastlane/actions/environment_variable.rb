@@ -54,7 +54,7 @@ module Fastlane
       end
 
       def self.description
-        "Sets and gets environment variables"
+        "Sets/gets env vars for Fastlane.swift. Don't use in ruby, use `ENV[key] = val`"
       end
 
       def self.category

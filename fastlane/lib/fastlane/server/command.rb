@@ -43,9 +43,7 @@ module Fastlane
         return nil
       end
 
-      # rubocop:disable Security/Eval
-      return eval(class_name)
-      # rubocop:enable Security/Eval
+      return Fastlane::Actions.const_get(class_name)
     end
 
     def is_class_method_command

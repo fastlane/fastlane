@@ -30,8 +30,6 @@ public extension LaneFileProtocol {
 public class LaneFile: NSObject, LaneFileProtocol {
     private(set) static var fastfileInstance: Fastfile?
     
-    private(set) var laneDescriptionMapping: [Selector : String] = [:]
-    
     // Called before any lane is executed.
     private func setupAllTheThings() {
         // Step 1, add lange descriptions
@@ -97,13 +95,6 @@ public class LaneFile: NSObject, LaneFileProtocol {
         // only call on success
         fastfileInstance.afterAll(currentLane: named)
         log(message: "Done running lane: \(named) 🚀")
-    }
-    
-    func addLaneDescription(lane: Selector, _ description: String) {
-        if laneDescriptionMapping[lane] != nil {
-            fatalError("Unable to add lane description for lane: \(lane) (\(description))\nbecause it already exists")
-        }
-        laneDescriptionMapping[lane] = description
     }
 }
 

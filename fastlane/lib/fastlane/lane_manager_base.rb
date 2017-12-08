@@ -1,4 +1,6 @@
 module Fastlane
+  # Base class for all LaneManager classes
+  # Takes care of all common things like printing the lane description tables and loading .env files
   class LaneManagerBase
     def self.skip_docs?
       Helper.test? || FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")

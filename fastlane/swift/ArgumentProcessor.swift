@@ -25,7 +25,7 @@ struct ArgumentProcessor {
         }
         
         let potentialLogMode = fastlaneArgsMinusLanes.filter { arg in
-            return arg.name.lowercased() == "logMode"
+            return arg.name.lowercased() == "logmode"
         }
         
         // Configure logMode since we might need to use it before we finish parsing

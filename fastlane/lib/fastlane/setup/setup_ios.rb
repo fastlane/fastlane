@@ -154,7 +154,6 @@ module Fastlane
       FastlaneCore::Project.detect_projects(config)
       self.project = FastlaneCore::Project.new(config)
       self.project.select_scheme(preferred_to_include: self.project.project_name)
-
       self.app_identifier = self.project.default_app_identifier # These two vars need to be accessed in order to be set
       self.app_name = self.project.default_app_name # They are set as a side effect, this could/should be changed down the road
     end
@@ -281,8 +280,11 @@ module Fastlane
       UI.message("Loading up 'deliver', this might take a few seconds")
       require 'deliver'
       require 'deliver/setup'
+
       options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
       options[:run_precheck_before_submit] = false # precheck doesn't need to run during init
+      options[:username] = self.apple_id if self.apple_id
+      options[:app_identifier] = self.app_identifier if self.app_identifier
 
       Deliver::Runner.new(options) # to login...
       Deliver::Setup.new.run(options, is_swift: self.is_swift_fastfile)
