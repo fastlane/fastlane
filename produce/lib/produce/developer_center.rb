@@ -29,7 +29,11 @@ module Produce
       passbook: [SERVICE_ON, SERVICE_OFF],
       push_notification: [SERVICE_ON, SERVICE_OFF],
       siri_kit: [SERVICE_ON, SERVICE_OFF],
-      vpn_configuration: [SERVICE_ON, SERVICE_OFF]
+      vpn_configuration: [SERVICE_ON, SERVICE_OFF],
+      network_extension: [SERVICE_ON, SERVICE_OFF],
+      hotspot: [SERVICE_ON, SERVICE_OFF],
+      multipath: [SERVICE_ON, SERVICE_OFF],
+      nfc_tag_reading: [SERVICE_ON, SERVICE_OFF]
     }
 
     def run
