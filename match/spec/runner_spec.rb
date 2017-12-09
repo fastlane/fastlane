@@ -8,7 +8,7 @@ describe Match do
       allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_PASSWORD').and_return(nil)
     end
 
-    it "creates a new profile and certificate if it doesn't exist yet" do
+    it "creates a new profile and certificate if it doesn't exist yet", requires_security: true do
       git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
       values = {
         app_identifier: "tools.fastlane.app",
@@ -61,7 +61,7 @@ describe Match do
                                                                      type: "appstore")]).to eql(profile_path)
     end
 
-    it "uses existing certificates and profiles if they exist" do
+    it "uses existing certificates and profiles if they exist", requires_security: true do
       git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
       values = {
         app_identifier: "tools.fastlane.app",

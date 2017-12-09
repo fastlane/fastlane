@@ -63,6 +63,15 @@ RSpec.configure do |config|
   end
 
   config.example_status_persistence_file_path = "/tmp/rspec_failed_tests.txt"
+
+  # disable/filter some tests if not running on mac
+  unless FastlaneCore::Helper.is_mac?
+    config.filter_run_excluding requires_xcode: true
+    config.filter_run_excluding requires_xcodebuild: true
+    config.filter_run_excluding requires_plistbuddy: true
+    config.filter_run_excluding requires_keychain: true
+    config.filter_run_excluding requires_security: true    
+  end
 end
 
 module FastlaneSpec
