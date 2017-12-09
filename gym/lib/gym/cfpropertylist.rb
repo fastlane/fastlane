@@ -51,6 +51,7 @@ end
 
     if Plist.version_at_least? "3.4.0"
       # The API is gaining an optional parameter in 3.4.0
+      options = { indent: Plist::Emit::DEFAULT_INDENT }.merge(options)
       Plist::Emit.dump self, envelope, options
     else
       Plist::Emit.dump self, envelope
