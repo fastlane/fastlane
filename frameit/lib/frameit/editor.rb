@@ -11,7 +11,8 @@ module Frameit
 
       if load_frame # Mac doesn't need a frame
         self.frame = MiniMagick::Image.open(load_frame)
-        self.frame.rotate(90) unless self.screenshot.portrait? # we use portrait device frames for landscape screenshots
+        # Rotate the frame according to the device orientation
+        self.frame.rotate(self.rotation_for_device_orientation)
       elsif self.class == Editor
         # Couldn't find device frame (probably an iPhone 4, for which there are no images available any more)
         # Message is already shown elsewhere
@@ -36,6 +37,12 @@ module Frameit
       @image = MiniMagick::Image.open(screenshot.path)
     end
 
+    def rotation_for_device_orientation
+      return 90 if self.screenshot.landscape_right?
+      return -90 if self.screenshot.landscape_left?
+      return 0
+    end
+
     private
 
     def store_result
@@ -50,21 +57,18 @@ module Frameit
       # We have to rotate the screenshot, since the offset information is for portrait
       # only. Instead of doing the calculations ourselves, it's much easier to let
       # imagemagick do the hard lifting for landscape screenshots
-      unless self.screenshot.portrait?
-        frame.rotate(-90)
-        @image.rotate(-90)
-      end
+      rotation = self.rotation_for_device_orientation
+      frame.rotate(-rotation)
+      @image.rotate(-rotation)
 
       @image = frame.composite(image, "png") do |c|
         c.compose "DstOver"
         c.geometry offset['offset']
       end
 
-      # We have to revert the state to be landscape screenshots
-      unless self.screenshot.portrait?
-        frame.rotate(90)
-        @image.rotate(90)
-      end
+      # Revert the rotation from above
+      frame.rotate(rotation)
+      @image.rotate(rotation)
     end
 
     def offset
