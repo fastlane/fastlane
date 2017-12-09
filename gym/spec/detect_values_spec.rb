@@ -2,7 +2,7 @@ describe Gym do
   describe Gym::DetectValues do
     day = Time.now.strftime("%F")
 
-    describe 'Xcode config handling', :stuff do
+    describe 'Xcode config handling', :stuff, requires_xcodebuild: true do
       it "fetches the custom build path from the Xcode config" do
         expect(Gym::DetectValues).to receive(:has_xcode_preferences_plist?).and_return(true)
         expect(Gym::DetectValues).to receive(:xcode_preferences_dictionary).and_return({ "IDECustomDistributionArchivesLocation" => "/test/path" })
