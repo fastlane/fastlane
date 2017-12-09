@@ -1,3 +1,5 @@
+require 'cfpropertylist'
+
 module Gym
   # This class detects all kinds of default values
   class DetectValues
@@ -55,7 +57,6 @@ module Gym
     end
 
     def self.xcode_preferences_dictionary(path = xcode_preference_plist_path)
-      require 'cfpropertylist'
       CFPropertyList.native_types(CFPropertyList::List.new(file: path).value)
     end
 
@@ -133,4 +134,20 @@ module Gym
       end
     end
   end
+end
+
+# Brute-force solution to conflict between #to_plist introduced by
+# CFPropertyList and plist. This is the only code unit that uses CFPropertyList,
+# and it's only used to read. Remove these extensions.
+
+class Array
+  remove_method :to_plist
+end
+
+class Enumerator
+  remove_method :to_plist
+end
+
+class Hash
+  remove_method :to_plist
 end
