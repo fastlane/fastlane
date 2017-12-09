@@ -8,8 +8,6 @@ require "plist"
 # CFPropertyList and plist. Remove the method added by CFPropertyList
 # and restore the method from Plist::Emit. Each class gains a
 # #to_binary_plist method equivalent to #to_plist from CFPropertyList.
-# However, this may not enable generation of binary plists with
-# CFPropertyList, which will not call the renamed method.
 #
 # CFPropertyList also adds Enumerator#to_plist, but there is no such
 # method from Plist, so leave it.
