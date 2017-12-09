@@ -1,4 +1,4 @@
-<!-- Thanks for helping _fastlane_! Before you submit your issue, please make sure to check the following boxes by putting an x in the [ ] (do: [x], don't: [x ], [ x], [✔️]) -->
+<!-- Thanks for helping _fastlane_! Before you submit your issue, please make sure to check the following boxes by putting an x in the [ ] (don't: [x ], [ x], [✔], do: [x]) -->
 
 ### New Issue Checklist
 

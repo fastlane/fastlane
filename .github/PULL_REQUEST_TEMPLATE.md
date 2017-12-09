@@ -1,4 +1,4 @@
-<!-- Thanks for contributing to _fastlane_! Before you submit your pull request, please make sure to check the following boxes by putting an x in the [ ] (do: [x], don't: [x ], [ x], [✔️]) -->
+<!-- Thanks for contributing to _fastlane_! Before you submit your pull request, please make sure to check the following boxes by putting an x in the [ ] (don't: [x ], [ x], [✔], do: [x]) -->
 
 ### Checklist
 - [ ] I've run `bundle exec rspec` from the root directory to see all new and existing tests pass
