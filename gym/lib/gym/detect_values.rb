@@ -1,4 +1,4 @@
-require "gym/cfpropertylist"
+require "fastlane_core/core_ext/cfpropertylist"
 
 module Gym
   # This class detects all kinds of default values
