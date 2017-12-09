@@ -10,7 +10,10 @@ require "plist"
 # #to_binary_plist method equivalent to #to_plist from CFPropertyList.
 # However, this may not enable generation of binary plists with
 # CFPropertyList, which will not call the renamed method.
-[Array, Enumerator, Hash].each do |c|
+#
+# CFPropertyList also adds Enumerator#to_plist, but there is no such
+# method from Plist, so leave it.
+[Array, Hash].each do |c|
   c.send :alias_method, :to_binary_plist, :to_plist
   c.send :remove_method, :to_plist
   c.include Plist::Emit
