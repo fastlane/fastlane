@@ -1,4 +1,3 @@
-require 'cfpropertylist'
 module Gym
   # This class detects all kinds of default values
   class DetectValues
@@ -56,6 +55,7 @@ module Gym
     end
 
     def self.xcode_preferences_dictionary(path = xcode_preference_plist_path)
+      require 'cfpropertylist'
       CFPropertyList.native_types(CFPropertyList::List.new(file: path).value)
     end
 
