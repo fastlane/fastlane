@@ -1,4 +1,4 @@
-require 'cfpropertylist'
+require "gym/cfpropertylist"
 
 module Gym
   # This class detects all kinds of default values
@@ -134,20 +134,4 @@ module Gym
       end
     end
   end
-end
-
-# Brute-force solution to conflict between #to_plist introduced by
-# CFPropertyList and plist. This is the only code unit that uses CFPropertyList,
-# and it's only used to read. Remove these extensions.
-
-class Array
-  remove_method :to_plist
-end
-
-class Enumerator
-  remove_method :to_plist
-end
-
-class Hash
-  remove_method :to_plist
 end
