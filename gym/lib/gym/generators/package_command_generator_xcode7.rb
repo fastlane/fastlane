@@ -189,7 +189,7 @@ module Gym
           UI.command_output("-----------------------------------------")
         end
 
-        to_plist(hash)
+        hash.to_plist
       end
 
       def signing_style
@@ -203,11 +203,6 @@ module Gym
         UI.verbose(e.to_s)
         UI.error("Unable to read provisioning style from .pbxproj file.")
         return "automatic"
-      end
-
-      # Avoids a Hash#to_plist conflict between CFPropertyList and plist gems
-      def to_plist(hash)
-        Plist::Emit.dump(hash, true)
       end
     end
   end
