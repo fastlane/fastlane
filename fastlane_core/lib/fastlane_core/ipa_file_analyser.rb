@@ -1,5 +1,5 @@
 require 'zip'
-require 'plist'
+require "fastlane_core/core_ext/cfpropertylist"
 
 module FastlaneCore
   class IpaFileAnalyser
@@ -47,8 +47,7 @@ module FastlaneCore
           File.open(tmp_path, 'wb') do |output|
             output.write zipfile.read(file)
           end
-          system("plutil -convert xml1 #{tmp_path}")
-          result = Plist.parse_xml(tmp_path)
+          result = CFPropertyList.native_types(CFPropertyList::List.new(file: tmp_path).value)
 
           if result['CFBundleIdentifier'] or result['CFBundleVersion']
             return result
