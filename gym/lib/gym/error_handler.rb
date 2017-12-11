@@ -153,6 +153,7 @@ module Gym
 
       def print_xcode9_plist_warning
         return unless Helper.xcode_at_least?("9.0")
+        return unless Gym.config[:export_options].kind_of?(Hash)
 
         export_options = Gym.config[:export_options] || {}
         provisioning_profiles = export_options[:provisioningProfiles] || []
@@ -220,7 +221,7 @@ module Gym
           UI.error("Please make sure to define the correct export methods when calling")
           UI.error("gym in your Fastfile or from the command line")
           UI.message("")
-        elsif Gym.config[:export_options]
+        elsif Gym.config[:export_options] && Gym.config[:export_options].kind_of?(Hash)
           # We want to tell the user if there is an obvious mismatch between the selected
           # `export_method` and the selected provisioning profiles
           selected_export_method = Gym.config[:export_method].to_s
