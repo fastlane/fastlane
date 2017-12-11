@@ -89,8 +89,14 @@ module Match
       command << "-out #{tmpfile.shellescape}"
       command << "-a"
       command << "-d" unless encrypt
-      command << "&> /dev/null" unless FastlaneCore::Globals.verbose? # to show show an error message is something goes wrong
-      success = system(command.join(' '))
+      command << "&> /dev/null" unless FastlaneCore::Globals.verbose? # to show show an error message if something goes wrong
+     
+      out, err, st = Open3.capture3(command.join(' '))
+      if err.to_s == ''
+        success = true
+      else
+        success = false
+      end
 
       UI.crash!("Error decrypting '#{path}'") unless success
       FileUtils.mv(tmpfile, path)
