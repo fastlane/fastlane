@@ -35,7 +35,8 @@ describe FastlaneCore do
                                                       state: 'Shutdown',
                                                is_simulator: true)
 
-      expected_command = "open -a #{FastlaneCore::Helper.xcode_path}Applications/Simulator.app --args -CurrentDeviceUDID #{device.udid}"
+      simulator_path = File.join(FastlaneCore::Helper.xcode_path, 'Applications', 'Simulator.app')
+      expected_command = "open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}"
 
       expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: FastlaneCore::Globals.verbose?)
 
