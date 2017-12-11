@@ -90,8 +90,8 @@ module Match
       command << "-a"
       command << "-d" unless encrypt
       command << "&> /dev/null" unless FastlaneCore::Globals.verbose? # to show show an error message if something goes wrong
-     
-      out, err, st = Open3.capture3(command.join(' '))
+
+      _out, err, _st = Open3.capture3(command.join(' '))
       if err.to_s == ''
         success = true
       else
