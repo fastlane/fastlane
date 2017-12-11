@@ -1,4 +1,5 @@
 require 'precheck/rule'
+require 'addressable'
 
 module Precheck
   class UnreachableURLRule < URLRule
