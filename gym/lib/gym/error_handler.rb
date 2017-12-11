@@ -95,7 +95,7 @@ module Gym
         when /requires a provisioning profile/
           print "No provisioning profile provided"
           print "Make sure to pass a valid provisioning for each required target"
-          print "Check out the docs on how to fix this: https://github.com/fastlane/fastlane/tree/master/gym#export-options"
+          print "Check out the docs on how to fix this: https://docs.fastlane.tools/actions/gym/#export-options"
         # insert more specific code signing errors here
         when /Codesign check fails/
           print "A general code signing error occurred. Make sure you passed a valid"
