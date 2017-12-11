@@ -93,6 +93,9 @@ module Match
       success = system(command.join(' '))
 
       UI.crash!("Error decrypting '#{path}'") unless success
+      until File.exist?(tmpfile)
+        sleep 0.1
+      end 
       FileUtils.mv(tmpfile, path)
     end
   end
