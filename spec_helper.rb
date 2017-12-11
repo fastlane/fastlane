@@ -70,7 +70,7 @@ RSpec.configure do |config|
     config.filter_run_excluding requires_xcodebuild: true
     config.filter_run_excluding requires_plistbuddy: true
     config.filter_run_excluding requires_keychain: true
-    config.filter_run_excluding requires_security: true    
+    config.filter_run_excluding requires_security: true
   end
 end
 
