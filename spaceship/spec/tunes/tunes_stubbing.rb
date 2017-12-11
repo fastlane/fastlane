@@ -295,7 +295,7 @@ class TunesStubbing
     end
 
     def itc_stub_generate_promocodes
-      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/promocodes/versions/812106519").
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/promocodes/versions").
         to_return(status: 200, body: itc_read_fixture_file("promocodes_generated.json"),
                   headers: { "Content-Type" => "application/json" })
     end
