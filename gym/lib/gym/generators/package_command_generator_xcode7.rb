@@ -121,7 +121,7 @@ module Gym
       def keys_to_symbols(hash)
         # Convert keys to symbols
         hash = hash.each_with_object({}) do |(k, v), memo|
-          memo[k.to_sym] = v
+          memo[k.b.to_s.to_sym] = v
           memo
         end
         hash
