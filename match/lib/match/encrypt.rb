@@ -93,7 +93,11 @@ module Match
       success = system(command.join(' '))
 
       UI.crash!("Error decrypting '#{path}'") unless success
-      sleep 0.1 until File.exist?(tmpfile)
+
+      # On non-Mac systems it might take some time for the file to actually be there
+      if FastlaneCore::Helper.is_mac?
+        sleep 0.1 until File.exist?(tmpfile)
+
       FileUtils.mv(tmpfile, path)
     end
   end
