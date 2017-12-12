@@ -38,11 +38,22 @@ module Precheck
       command :init do |c|
         c.syntax = "fastlane precheck init"
         c.description = "Creates a new Precheckfile for you"
-        c.action do |_args, options|
+        c.action do |args, options|
           containing = FastlaneCore::Helper.fastlane_enabled_folder_path
           path = File.join(containing, Precheck.precheckfile_name)
           UI.user_error! "Precheckfile already exists" if File.exist?(path)
-          template = File.read("#{Precheck::ROOT}/lib/assets/PrecheckfileTemplate")
+
+          is_swift_fastfile = args.include?("swift")
+          if is_swift_fastfile
+            path = File.join(containing, Precheck.precheckfile_name + ".swift")
+            UI.user_error! "Precheckfile.swift already exists" if File.exist?(path)
+          end
+
+          if is_swift_fastfile
+            template = File.read("#{Precheck::ROOT}/lib/assets/PrecheckfileTemplate.swift")
+          else
+            template = File.read("#{Precheck::ROOT}/lib/assets/PrecheckfileTemplate")
+          end
           File.write(path, template)
           UI.success "Successfully created '#{path}'. Open the file using a code editor."
         end

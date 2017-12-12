@@ -175,6 +175,10 @@ module Fastlane
 
     # Execute shell command
     def sh(*command, log: true, error_callback: nil, &b)
+      FastFile.sh(*command, log: log, error_callback: error_callback, &b)
+    end
+
+    def self.sh(*command, log: true, error_callback: nil, &b)
       command_header = log ? Actions.shell_command_from_args(*command) : "shell command"
       Actions.execute_action(command_header) do
         Actions.sh_no_action(*command, log: log, error_callback: error_callback, &b)
@@ -392,7 +396,7 @@ module Fastlane
     end
 
     def action_launched(action_name)
-      action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name, args: ARGV)
+      action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name, configuration_language: "ruby", args: ARGV)
       FastlaneCore.session.action_launched(launch_context: action_launch_context)
     end
 

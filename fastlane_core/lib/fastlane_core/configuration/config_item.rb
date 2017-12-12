@@ -67,6 +67,7 @@ module FastlaneCore
                    verify_block: nil,
                    is_string: true,
                    type: nil,
+                   skip_type_validation: false,
                    optional: nil,
                    conflicting_options: nil,
                    conflict_block: nil,
@@ -118,10 +119,32 @@ module FastlaneCore
       @sensitive = sensitive
       @allow_shell_conversion = (type == :shell_string)
       @display_in_shell = display_in_shell
+      @skip_type_validation = skip_type_validation # sometimes we allow multiple types which causes type validation failures, e.g.: export_options in gym
     end
 
     def verify!(value)
       valid?(value)
+    end
+
+    def ensure_generic_type_passes_validation(value)
+      if @skip_type_validation
+        return
+      end
+
+      if data_type != :string_callback && data_type && !value.kind_of?(data_type)
+        UI.user_error!("'#{self.key}' value must be a #{data_type}! Found #{value.class} instead.")
+      end
+    end
+
+    def ensure_boolean_type_passes_validation(value)
+      if @skip_type_validation
+        return
+      end
+
+      # We need to explicity test against Fastlane::Boolean, TrueClass/FalseClass
+      if value.class != FalseClass && value.class != TrueClass
+        UI.user_error!("'#{self.key}' value must be either `true` or `false`! Found #{value.class} instead.")
+      end
     end
 
     # Make sure, the value is valid (based on the verify block)
@@ -130,8 +153,11 @@ module FastlaneCore
       # we also allow nil values, which do not have to be verified.
       if value
         # Verify that value is the type that we're expecting, if we are expecting a type
-        if data_type && !value.kind_of?(data_type)
-          UI.user_error!("'#{self.key}' value must be a #{data_type}! Found #{value.class} instead.")
+
+        if data_type == Boolean
+          ensure_boolean_type_passes_validation(value)
+        else
+          ensure_generic_type_passes_validation(value)
         end
 
         if @verify_block
@@ -187,6 +213,11 @@ module FastlaneCore
     # Replaces the attr_accessor, but maintains the same interface
     def string?
       data_type == String
+    end
+
+    # it's preferred to use self.string? In most cases, except in commander_generator.rb, cause... reasons
+    def is_string
+      return @is_string
     end
 
     def to_s

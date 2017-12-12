@@ -35,12 +35,17 @@ module Fastlane
                                          description: 'A callback invoked with the command output if there is a non-zero exit status',
                                          optional: true,
                                          is_string: false,
+                                         type: :string_callback,
                                          default_value: nil)
         ]
       end
 
       def self.return_value
         'Outputs the string and executes it. When running in tests, it returns the actual command instead of executing it'
+      end
+
+      def self.return_type
+        :string
       end
 
       def self.authors

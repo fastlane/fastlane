@@ -161,6 +161,7 @@ module Fastlane
             env_name: 'FL_APPIUM_CAPS',
             description: 'Hash of caps for Appium::Driver',
             is_string: false,
+            type: Hash,
             optional: true
           ),
           FastlaneCore::ConfigItem.new(
@@ -168,6 +169,7 @@ module Fastlane
             env_name: 'FL_APPIUM_LIB',
             description: 'Hash of appium_lib for Appium::Driver',
             is_string: false,
+            type: Hash,
             optional: true
           )
         ]

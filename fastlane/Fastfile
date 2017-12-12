@@ -7,7 +7,7 @@ lane :test do |options|
   validate_repo
 end
 
-desc "Increment the version number of this gem"
+desc "Increment the version number of this gem, after generating new Swift API"
 lane :bump do |options|
   ensure_git_branch(branch: "master")
   ensure_git_status_clean
@@ -26,6 +26,9 @@ lane :bump do |options|
 
   bump_type ||= 'minor' if prompt(text: "New feature, method or API?", boolean: true)
   bump_type ||= 'patch'
+
+  # Everything looks good, let's generate the Swift API
+  generate_swift_api
 
   slug = "fastlane/fastlane"
   new_version = version_bump_podspec(path: path, bump_type: bump_type)
@@ -56,6 +59,19 @@ lane :bump do |options|
 
   # Revert to master branch
   sh "git checkout master"
+end
+
+desc "Generate the Swift api and test it"
+lane :generate_swift_api do |options|
+  require "../fastlane/lib/fastlane/swift_fastlane_api_generator.rb"
+  swift_generator = Fastlane::SwiftFastlaneAPIGenerator.new
+  swift_generator.generate_swift
+  UI.success("Done generating fastlane.swift API, ensuring it builds")
+  gym(
+    project: File.expand_path("swift/FastlaneSwiftRunner/FastlaneSwiftRunner.xcodeproj"),
+    skip_package_ipa: true
+  )
+  sh("rm ../FastlaneRunner")
 end
 
 desc "Does everything that's needed for a release"

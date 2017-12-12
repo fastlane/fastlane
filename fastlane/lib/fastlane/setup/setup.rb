@@ -1,7 +1,7 @@
 module Fastlane
   class Setup
     # Start the setup process
-    def run(user: nil)
+    def run(user: nil, is_swift_fastfile: false)
       if FastlaneCore::FastlaneFolder.setup? and !Helper.is_test?
         UI.important("fastlane is already set up at path #{FastlaneCore::FastlaneFolder.path}")
         return
@@ -26,11 +26,16 @@ module Fastlane
       end
 
       if platform == :ios
-        SetupIos.new.run(user: user)
+        SetupIos.new.run(user: user, is_swift_fastfile: is_swift_fastfile)
       elsif platform == :android
         SetupAndroid.new.run
       else
         UI.user_error!("Couldn't find platform '#{platform}'")
+      end
+
+      # Now that we've setup all the things, if we're using Swift, do the first time setup
+      if is_swift_fastfile
+        Fastlane::SwiftLaneManager.first_time_setup
       end
     end
 

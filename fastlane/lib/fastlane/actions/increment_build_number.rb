@@ -89,6 +89,10 @@ module Fastlane
         "The new build number"
       end
 
+      def self.return_type
+        :string
+      end
+
       def self.author
         "KrauseFx"
       end

@@ -125,7 +125,7 @@ module Deliver
                                      description: "Enable the phased release feature of iTC",
                                      optional: true,
                                      is_string: false,
-                                     default_value: nil),
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :price_tier,
                                      short_option: "-r",
                                      description: "The price tier of this application",
@@ -264,11 +264,13 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :trade_representative_contact_information,
                                      description: "Metadata: A hash containing the trade representative contact information",
                                      optional: true,
-                                     is_string: false),
+                                     is_string: false,
+                                     type: Hash),
         FastlaneCore::ConfigItem.new(key: :app_review_information,
                                      description: "Metadata: A hash containing the review information",
                                      optional: true,
-                                     is_string: false),
+                                     is_string: false,
+                                     type: Hash),
         # Localised
         FastlaneCore::ConfigItem.new(key: :description,
                                      description: "Metadata: The localised app description",
@@ -282,6 +284,7 @@ module Deliver
                                      description: "Metadata: The localised app subtitle",
                                      optional: true,
                                      is_string: false,
+                                     type: Hash,
                                      verify_block: proc do |value|
                                        UI.user_error!(":subtitle must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                      end),
@@ -289,6 +292,7 @@ module Deliver
                                      description: "Metadata: An array of localised keywords",
                                      optional: true,
                                      is_string: false,
+                                     type: Hash,
                                      verify_block: proc do |value|
                                        UI.user_error!(":keywords must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                        value.each do |language, keywords|
@@ -303,6 +307,7 @@ module Deliver
                                      description: "Metadata: An array of localised promotional texts",
                                      optional: true,
                                      is_string: false,
+                                     type: Hash,
                                      verify_block: proc do |value|
                                        UI.user_error!(":keywords must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                      end),

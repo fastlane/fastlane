@@ -63,9 +63,10 @@ module Deliver
           loaded = true if File.exist?(File.join(FastlaneCore::FastlaneFolder.path || ".", "metadata"))
           unless loaded
             if UI.confirm("No deliver configuration found in the current directory. Do you want to setup deliver?")
+              is_swift = UI.confirm("Would you like to use Swift instead of Ruby?")
               require 'deliver/setup'
               Deliver::Runner.new(options) # to login...
-              Deliver::Setup.new.run(options)
+              Deliver::Setup.new.run(options, is_swift: is_swift)
               return 0
             end
           end
