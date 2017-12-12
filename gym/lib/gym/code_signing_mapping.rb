@@ -22,7 +22,7 @@ module Gym
       #   (e.g. coming from `provisioningProfiles` of the `export_options` or from previous match calls)
       # with the secondary hash we just created (or was provided as parameter).
       # Both might include information about what profile to use
-      # This is important as it mght not be clear for the user that they have to call match for each app target
+      # This is important as it might not be clear for the user that they have to call match for each app target
       # before adding this code, we'd only either use whatever we get from match, or what's defined in the Xcode project
       # With the code below, we'll make sure to take the best of it:
       #

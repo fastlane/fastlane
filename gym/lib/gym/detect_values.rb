@@ -22,7 +22,7 @@ module Gym
 
       detect_scheme
       detect_platform # we can only do that *after* we have the scheme
-      detect_selected_provisioning_profiles # we can only do that *aftet* we have the platform
+      detect_selected_provisioning_profiles # we can only do that *after* we have the platform
       detect_configuration
       detect_toolchain
 
