@@ -115,10 +115,10 @@ module Fastlane
                              end),
           FastlaneCore::ConfigItem.new(key: :scheme,
                              env_name: "FL_VERSION_NUMBER_SCHEME",
-                             description: "Specify a specific scheme if you have multiple per project, optional.
-                                          This parameter is deprecated and will be removed in a future release.
-                                          Please use the 'target' parameter instead. The behavior of this parameter
-                                          is currently undefined if your scheme name doesn't match your target name",
+                             description: "Specify a specific scheme if you have multiple per project, optional. " \
+                                          "This parameter is deprecated and will be removed in a future release. " \
+                                          "Please use the 'target' parameter instead. The behavior of this parameter " \
+                                          "is currently undefined if your scheme name doesn't match your target name",
                              optional: true,
                              deprecated: true),
           FastlaneCore::ConfigItem.new(key: :target,
