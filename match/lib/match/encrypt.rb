@@ -97,6 +97,7 @@ module Match
       # On non-Mac systems it might take some time for the file to actually be there
       unless FastlaneCore::Helper.is_mac?
         sleep 0.1 until File.exist?(tmpfile)
+      end
 
       FileUtils.mv(tmpfile, path)
     end
