@@ -119,8 +119,19 @@ module Fastlane
             beta_info = CrashlyticsBetaCommandLineHandler.info_from_options(options)
             Fastlane::CrashlyticsBeta.new(beta_info, Fastlane::CrashlyticsBetaUi.new).run
           else
-            Fastlane::Setup.new.run(user: options.user)
+            is_swift_fastfile = args.include?("swift")
+            Fastlane::Setup.new.run(user: options.user, is_swift_fastfile: is_swift_fastfile)
           end
+        end
+      end
+
+      command :init_swift do |c|
+        c.syntax = 'fastlane init_swift'
+        c.description = 'Helps you with your initial fastlane setup for Swift'
+        c.option '-u STRING', '--user STRING', String, 'iOS projects only: Your Apple ID'
+
+        c.action do |args, options|
+          Fastlane::Setup.new.run(user: options.user, is_swift_fastfile: true)
         end
       end
 
@@ -132,6 +143,34 @@ module Fastlane
 
         c.action do |args, options|
           Fastlane::NewAction.run(new_action_name: options.name)
+        end
+      end
+
+      command :socket_server do |c|
+        c.syntax = 'fastlane start_server'
+        c.description = 'Starts local socket server and enables only a single local connection'
+        c.option '-s', '--stay_alive', 'Keeps socket server up even after error or disconnects, requires CTRL-C to kill.'
+        c.option '-c seconds', '--connection_timeout', 'Sets connection established timeout'
+        c.action do |args, options|
+          default_connection_timeout = 5
+          stay_alive = options.stay_alive || false
+          connection_timeout = options.connection_timeout || default_connection_timeout
+
+          if stay_alive && options.connection_timeout.nil?
+            UI.important("stay_alive is set, but the connection timeout is not, this will give you #{default_connection_timeout} seconds to (re)connect")
+          end
+
+          require 'fastlane/server/socket_server'
+          require 'fastlane/server/socket_server_action_command_executor'
+
+          command_executor = SocketServerActionCommandExecutor.new
+          server = Fastlane::SocketServer.new(
+            command_executor: command_executor,
+            connection_timeout: connection_timeout,
+            stay_alive: stay_alive
+          )
+          result = server.start
+          UI.success "Result: #{result}" if result
         end
       end
 

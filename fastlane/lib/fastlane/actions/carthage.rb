@@ -73,42 +73,32 @@ module Fastlane
                                        env_name: "FL_CARTHAGE_USE_SSH",
                                        description: "Use SSH for downloading GitHub repositories",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for use_ssh. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :use_submodules,
                                        env_name: "FL_CARTHAGE_USE_SUBMODULES",
                                        description: "Add dependencies as Git submodules",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for use_submodules. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :use_binaries,
                                        env_name: "FL_CARTHAGE_USE_BINARIES",
                                        description: "Check out dependency repositories even when prebuilt frameworks exist",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for use_binaries. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :no_build,
                                        env_name: "FL_CARTHAGE_NO_BUILD",
                                        description: "When bootstrapping Carthage do not build",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for no_build. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :no_skip_current,
                                        env_name: "FL_CARTHAGE_NO_SKIP_CURRENT",
                                        description: "Don't skip building the Carthage project (in addition to its dependencies)",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for no_skip_current. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :derived_data,
                                        env_name: "FL_CARTHAGE_DERIVED_DATA",
                                        description: "Use derived data folder at path",
@@ -117,10 +107,8 @@ module Fastlane
                                        env_name: "FL_CARTHAGE_VERBOSE",
                                        description: "Print xcodebuild output inline",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for verbose. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        env_name: "FL_CARTHAGE_PLATFORM",
                                        description: "Define which platform to build for",
