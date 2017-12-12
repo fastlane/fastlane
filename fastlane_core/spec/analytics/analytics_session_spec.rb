@@ -186,7 +186,7 @@ describe FastlaneCore::AnalyticsSession do
           expected_final_array[2]['primary_target']['detail'] = `uname`.strip
           expected_final_array[11]['primary_target']['detail'] = `uname`.strip
         end
-        
+
         parsed_events.zip(expected_final_array).each do |parsed, fixture|
           expect(parsed).to eq(fixture)
         end
