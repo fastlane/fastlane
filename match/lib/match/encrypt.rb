@@ -94,9 +94,14 @@ module Match
 
       UI.crash!("Error decrypting '#{path}'") unless success
 
-      # On non-Mac systems it might take some time for the file to actually be there
+      # On non-Mac systems it might take some time for the file to actually be there (#11182)
       unless FastlaneCore::Helper.is_mac?
-        sleep 0.1 until File.exist?(tmpfile)
+        count = 0
+        # sleep until file exists or 20*0.1s (=2s) passed
+        until (File.exist?(tmpfile) || count == 20)
+          sleep(0.1)
+          count += 1
+        end
       end
 
       FileUtils.mv(tmpfile, path)
