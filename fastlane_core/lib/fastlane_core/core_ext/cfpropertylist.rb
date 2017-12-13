@@ -14,5 +14,5 @@ require "plist"
 [Array, Hash].each do |c|
   c.send :alias_method, :to_binary_plist, :to_plist
   c.send :remove_method, :to_plist
-  c.include Plist::Emit
+  c.module_eval "include Plist::Emit"
 end
