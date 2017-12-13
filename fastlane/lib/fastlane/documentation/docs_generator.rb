@@ -16,10 +16,10 @@ module Fastlane
       output << ""
       output << "## Choose your installation method:"
       output << ""
-      output << "| Homebrew                    | Installer Script                                | RubyGems                                |"
+      output << "| [Homebrew](http://brew.sh)  | Installer Script                                | RubyGems                                |"
       output << "|-----------------------------|-------------------------------------------------|-----------------------------------------|"
       output << "| macOS                       | macOS                                           | macOS or Linux with Ruby 2.0.0 or above |"
-      output << "| `brew cask install fastlane`| [Download zip](https://download.fastlane.tools) | `sudo gem install fastlane -NV`         |"
+      output << "| `brew cask install fastlane`| [Download the zip file](https://download.fastlane.tools). Then double click on the `install` script (or run it in a terminal window). | `sudo gem install fastlane -NV`         |"
       output << ""
       output << "# Available Actions"
 
