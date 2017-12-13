@@ -5,6 +5,7 @@
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
 
 require 'tempfile'
+require 'fastlane_core/core_ext/cfpropertylist'
 
 module Gym
   # Responsible for building the fully working xcodebuild command
@@ -159,8 +160,6 @@ module Gym
       end
 
       def config_content
-        require 'plist'
-
         hash = read_export_options
 
         # Overrides export options if needed
