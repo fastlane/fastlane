@@ -33,7 +33,8 @@ module Match
                                      env_name: "MATCH_APP_IDENTIFIER",
                                      description: "The bundle identifier(s) of your app (comma-separated)",
                                      is_string: false,
-                                     type: Array,
+                                     type: Array, # we actually allow String and Array here
+                                     skip_type_validation: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
