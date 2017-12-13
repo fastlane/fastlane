@@ -185,7 +185,7 @@ module Gym
         if FastlaneCore::Globals.verbose?
           UI.message("This results in the following plist file:")
           UI.command_output("-----------------------------------------")
-          UI.command_output(to_plist(hash))
+          UI.command_output(hash.to_plist)
           UI.command_output("-----------------------------------------")
         end
 
