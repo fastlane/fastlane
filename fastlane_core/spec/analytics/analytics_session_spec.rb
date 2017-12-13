@@ -1,5 +1,6 @@
 describe FastlaneCore::AnalyticsSession do
   let(:oauth_app_name) { 'fastlane-tests' }
+  let(:configuration_language) { 'ruby' }
   let(:p_hash) { 'some.phash.value' }
   let(:session_id) { 's0m3s3ss10n1D' }
   let(:timestamp_millis) { 1_507_142_046 }
@@ -21,7 +22,8 @@ describe FastlaneCore::AnalyticsSession do
         FastlaneCore::ActionLaunchContext.new(
           action_name: action_name,
           p_hash: p_hash,
-          platform: 'ios'
+          platform: 'ios',
+          configuration_language: configuration_language
         )
       end
 
@@ -109,7 +111,8 @@ describe FastlaneCore::AnalyticsSession do
         FastlaneCore::ActionLaunchContext.new(
           action_name: action_1_name,
           p_hash: p_hash,
-          platform: 'ios'
+          platform: 'ios',
+          configuration_language: configuration_language
         )
       end
       let(:action_1_completion_context) do
@@ -123,7 +126,8 @@ describe FastlaneCore::AnalyticsSession do
         FastlaneCore::ActionLaunchContext.new(
           action_name: action_2_name,
           p_hash: p_hash,
-          platform: 'ios'
+          platform: 'ios',
+          configuration_language: configuration_language
         )
       end
       let(:action_2_completion_context) do

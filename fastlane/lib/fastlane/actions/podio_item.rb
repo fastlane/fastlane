@@ -80,6 +80,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :other_fields,
                                        description: 'Dictionary of your app fields. Podio supports several field types, see https://developers.podio.com/doc/items',
                                        is_string: false,
+                                       type: Hash,
                                        optional: true)
         ]
       end

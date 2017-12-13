@@ -236,6 +236,10 @@ module Fastlane
         ].join("\n")
       end
 
+      def self.return_type
+        :hash_of_strings
+      end
+
       def self.authors
         ["czechboy0", "tommeier"]
       end
