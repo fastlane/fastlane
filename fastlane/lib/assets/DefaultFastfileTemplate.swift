@@ -30,7 +30,7 @@ class Fastfile: LaneFile {
     func betaLane() {
         desc("Submit a new Beta Build to Apple TestFlight. This will also make sure the profile is up to date")
 
-        // sync_code_signing(gitUrl: "gitUrl", appIdentifier: [appIdentifier], username: appleID)
+        // syncCodeSigning(gitUrl: "gitUrl", appIdentifier: [appIdentifier], username: appleID)
         buildApp([[SCHEME]]) // more options available
         uploadToTestflight(username: appleID)
         // You can also use other beta testing services here (run `fastlane actions`)
