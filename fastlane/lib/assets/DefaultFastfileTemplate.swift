@@ -24,27 +24,26 @@ class Fastfile: LaneFile {
 
     func testLane() {
         desc("Runs all the tests")
-        scan()
+        runTests()
     }
 
     func betaLane() {
         desc("Submit a new Beta Build to Apple TestFlight. This will also make sure the profile is up to date")
 
-        match(gitUrl: "gitUrl", appIdentifier: [appIdentifier], username: appleID)
-        // Build your app - more options available
-        gym([[SCHEME]])
-        pilot(username: appleID)
+        // syncCodeSigning(gitUrl: "gitUrl", appIdentifier: [appIdentifier], username: appleID)
+        buildApp([[SCHEME]]) // more options available
+        uploadToTestflight(username: appleID)
         // You can also use other beta testing services here (run `fastlane actions`)
     }
 
     func releaseLane() {
         desc("Deploy a new version to the App Store")
 
-        match(gitUrl: "gitUrl", type: "appstore", appIdentifier: [appIdentifier], username: appleID)
-        snapshot()
-        gym([[SCHEME]]) // Build your app - more options available
-        deliver(username: appleID, app: appIdentifier, force: true)
-        // frameit()
+        // syncCodeSigning(gitUrl: "gitUrl", type: "appstore", appIdentifier: [appIdentifier], username: appleID)
+        captureScreenshots()
+        buildApp([[SCHEME]]) // more options available
+        uploadToAppStore(username: appleID, app: appIdentifier, force: true)
+        // frameScreenshots()
     }
 
     // You can define as many lanes as you want
