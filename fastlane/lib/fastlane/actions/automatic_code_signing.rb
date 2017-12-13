@@ -28,7 +28,12 @@ module Fastlane
             end
           end
 
-          sett["ProvisioningStyle"] = params[:use_automatic_signing] ? 'Automatic' : 'Manual'
+          style_value = params[:use_automatic_signing] ? 'Automatic' : 'Manual'
+          target = project.targets.find { |target| target.name == found_target[:name] }
+          target.build_configurations.each do |configuration|
+            configuration.build_settings["CODE_SIGN_STYLE"] = style_value
+          end
+          sett["ProvisioningStyle"] = style_value
           if params[:team_id]
             sett["DevelopmentTeam"] = params[:team_id]
             UI.important("Set Team id to: #{params[:team_id]} for target: #{found_target[:name]}")
