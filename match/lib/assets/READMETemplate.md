@@ -16,10 +16,10 @@ xcode-select --install
 
 ### Choose your installation method:
 
-| Homebrew                    | Installer Script                                | RubyGems                                |
+| [Homebrew](http://brew.sh)  | Installer Script                                | RubyGems                                |
 |-----------------------------|-------------------------------------------------|-----------------------------------------|
 | macOS                       | macOS                                           | macOS or Linux with Ruby 2.0.0 or above |
-| `brew cask install fastlane`| [Download zip](https://download.fastlane.tools) | `sudo gem install fastlane -NV`         |
+| `brew cask install fastlane`| [Download the zip file](https://download.fastlane.tools). Then double click on the `install` script (or run it in a terminal window). | `sudo gem install fastlane -NV`         |
 
 
 ### Usage
