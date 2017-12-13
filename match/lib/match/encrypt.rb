@@ -98,7 +98,7 @@ module Match
       unless FastlaneCore::Helper.is_mac?
         count = 0
         # sleep until file exists or 20*0.1s (=2s) passed
-        until (File.exist?(tmpfile) || count == 20)
+        until File.exist?(tmpfile) || count == 20
           sleep(0.1)
           count += 1
         end
