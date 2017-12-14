@@ -31,6 +31,11 @@ jobs:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
 
+      - run:
+          name: Ruby lang
+          command: |
+            ruby -e 'puts Encoding.default_external'
+
       - run: bundle exec fastlane test
 
       - store_test_results:
