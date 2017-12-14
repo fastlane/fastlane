@@ -23,7 +23,7 @@ jobs:
             sudo apt-get install shellcheck
             bundle check || bundle install --jobs=4 --retry=3 --path vendor/bundle
       - run:
-          name: Install additional dependencies
+          name: Install additional dependency xar
           command: |
             wget https://github.com/downloads/mackyle/xar/xar-1.6.1.tar.gz
             tar -xzf xar-1.6.1.tar.gz -C vendor/bundle 
@@ -32,6 +32,11 @@ jobs:
             ./configure
             make
             sudo make install
+      - run:
+          name: Install additional dependency iTMSTransporter
+          command: |
+            wget https://github.com/janpio/fastlane-ubuntu-foo/raw/master/iTMSTransporter_installer_linux_1.9.7.sh
+            sudo sh iTMSTransporter_installer_linux_1.9.7.sh
       - save_cache:
           key: fastlane-v2-gems-{{ checksum "Gemfile" }}
           paths:
