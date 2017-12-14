@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     docker:
-      image: circleci/ruby:2.3
+      - image: circleci/ruby:2.3
     environment:
       CIRCLE_TEST_RESULTS: $HOME/test-results
       LC_ALL: en_US.UTF-8
