@@ -53,6 +53,7 @@ module Fastlane
       file_content << "import Foundation"
 
       tool_details = []
+      require_actions_from_plugins
       ActionsList.all_actions do |action|
         next if self.actions_not_supported.include?(action.action_name)
 
@@ -84,6 +85,19 @@ module Fastlane
       UI.success(target_path)
 
       generate_default_implementation_opening(tool_details: tool_details)
+    end
+
+    def require_actions_from_plugins
+      Dir.mktmpdir('tmp_plugins') do |tmp|
+        clone_folder = File.join(tmp, 'ya_tu_sabes')
+        `GIT_TERMINAL_PROMPT=0 git clone 'git@github.com:krausefx/fastlane-plugin-ya_tu_sabes.git' '#{clone_folder}'`
+        break unless File.directory?(clone_folder)
+        Dir.chdir(clone_folder) do
+          lib_path = File.join(File.expand_path('.'), 'lib')
+          $:.unshift(lib_path)
+          require 'fastlane/plugin/ya_tu_sabes'
+        end
+      end
     end
 
     def write_lanefile(lanefile_implementation_opening: nil, class_name: nil, tool_name: nil)
@@ -208,10 +222,15 @@ func parseInt(fromString: String, function: String = #function) -> Int {
     end
 
     def process_action(action: nil)
-      unless action.available_options
-        return nil
-      end
-      options = action.available_options
+      options = action.available_options || [
+        FastlaneCore::ConfigItem.new(
+          key: :params,
+          env_name: "FASTLANE_GENERIC_PARAMS_HASH",
+          type: Hash,
+          default_value: {},
+          description: "A Ruby Hash object with arbitrary keys and values"
+        )
+      ]
 
       action_name = action.action_name
       keys = []
