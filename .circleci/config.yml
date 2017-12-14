@@ -6,8 +6,8 @@ jobs:
       - image: circleci/ruby:2.3
         environment:
           CIRCLE_TEST_RESULTS: $HOME/test-results
-          LC_ALL: en_US.UTF-8
-          LANG: en_US.UTF-8
+          LC_ALL: C.UTF-8
+          LANG: C.UTF-8
     shell: /bin/bash --login -eo pipefail
     steps:
       - checkout
