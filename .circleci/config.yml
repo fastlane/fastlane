@@ -2,8 +2,8 @@ version: 2
 
 jobs:
   build:
-    macos:
-      xcode: "9.0.0"
+    docker:
+      image: circleci/ruby:2.3
     environment:
       CIRCLE_TEST_RESULTS: $HOME/test-results
       LC_ALL: en_US.UTF-8
