@@ -21,11 +21,11 @@ jobs:
             echo "2.3" > .ruby-version
             gem update --system
             brew install shellcheck
-            bundle check || bundle install --jobs=4 --retry=3 --path .bundle
+            bundle check || bundle install --jobs=4 --retry=3 --path vendor/bundle
       - save_cache:
           key: v1-gems-{{ checksum "Gemfile" }}
           paths:
-            - .bundle
+            - vendor/bundle
 
       - run:
           name: Check PR Metadata
