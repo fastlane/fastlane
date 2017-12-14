@@ -29,7 +29,7 @@ module Fastlane
           end
 
           style_value = params[:use_automatic_signing] ? 'Automatic' : 'Manual'
-          target = project.targets.find { |target| target.name == found_target[:name] }
+          target = project.targets.find { |t| t.name == found_target[:name] }
           target.build_configurations.each do |configuration|
             configuration.build_settings["CODE_SIGN_STYLE"] = style_value
           end
