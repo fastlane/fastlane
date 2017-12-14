@@ -4,10 +4,10 @@ jobs:
   build:
     docker:
       - image: circleci/ruby:2.3
-    environment:
-      CIRCLE_TEST_RESULTS: $HOME/test-results
-      LC_ALL: en_US.UTF-8
-      LANG: en_US.UTF-8
+        environment:
+          CIRCLE_TEST_RESULTS: $HOME/test-results
+          LC_ALL: en_US.UTF-8
+          LANG: en_US.UTF-8
     shell: /bin/bash --login -eo pipefail
     steps:
       - checkout
@@ -17,8 +17,6 @@ jobs:
       - run:
           name: Setup Build
           command: |
-            export LANG=en_US.UTF-8
-            export LC_ALL=en_US.UTF-8
             mkdir -p $CIRCLE_TEST_RESULTS
             echo "2.3" > .ruby-version
             gem update --system
