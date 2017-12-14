@@ -26,8 +26,8 @@ jobs:
           name: Install additional dependencies
           command: |
             wget https://github.com/downloads/mackyle/xar/xar-1.6.1.tar.gz
-            tar -xzf xar-1.6.1.tar.gz
-            cd xar-1.6.1
+            tar -xzf xar-1.6.1.tar.gz -C vendor/bundle 
+            cd vendor/bundle/xar-1.6.1
             ./autogen.sh --noconfigure
             ./configure
             make
