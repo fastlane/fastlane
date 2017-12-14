@@ -11,4 +11,4 @@ class Matchfile: MatchfileProtocol {
 
 
 
-// Generated with fastlane 2.68.2
+// Generated with fastlane 2.69.2
