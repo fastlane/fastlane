@@ -261,13 +261,13 @@ private_lane :validate_repo do
   # Verifying that no debug code is in the code base
   #
   ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "playground.rb", exclude_dirs: ["\.bundle", "vendor"]) # debugging code
-  ensure_no_debug_code(text: "# TODO", extension: ".rb", exclude_dirs: ["\.bundle"]) # TODOs
-  ensure_no_debug_code(text: "now: ", extension: ".rb", exclude_dirs: ["\.bundle"]) # rspec focus
-  ensure_no_debug_code(text: "<<<<<<<", extension: ".rb", exclude_dirs: ["\.bundle"]) # Merge conflict
+  ensure_no_debug_code(text: "# TODO", extension: ".rb", exclude_dirs: ["\.bundle", "vendor"]) # TODOs
+  ensure_no_debug_code(text: "now: ", extension: ".rb", exclude_dirs: ["\.bundle", "vendor"]) # rspec focus
+  ensure_no_debug_code(text: "<<<<<<<", extension: ".rb", exclude_dirs: ["\.bundle", "vendor"]) # Merge conflict
 
   # spaceship and credentials_manager don't have access to fastlane_core
-  ensure_no_debug_code(text: " UI\\.", path: "spaceship/lib", extension: ".rb", exclude_dirs: ["\.bundle"])
-  ensure_no_debug_code(text: " UI\\.", path: "credentials_manager/lib", extension: ".rb", exclude_dirs: ["\.bundle"])
+  ensure_no_debug_code(text: " UI\\.", path: "spaceship/lib", extension: ".rb", exclude_dirs: ["\.bundle", "vendor"])
+  ensure_no_debug_code(text: " UI\\.", path: "credentials_manager/lib", extension: ".rb", exclude_dirs: ["\.bundle", "vendor"])
 
   rubocop
 
