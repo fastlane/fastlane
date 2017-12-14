@@ -16,7 +16,7 @@ end
 task :test_all do
   formatter = "--format progress"
   formatter += " -r rspec_junit_formatter --format RspecJunitFormatter -o $CIRCLE_TEST_REPORTS/rspec/fastlane-junit-results.xml" if ENV["CIRCLE_TEST_REPORTS"]
-  sh "rspec --pattern ./**/*_spec.rb #{formatter}"
+  sh "rspec --pattern ./**/*_spec.rb --exclude-pattern vendor/bundle #{formatter}"
 end
 
 # Overwrite the default rake task
