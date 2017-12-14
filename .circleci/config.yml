@@ -17,6 +17,8 @@ jobs:
       - run:
           name: Setup Build
           command: |
+            export LANG=en_US.UTF-8
+            export LC_ALL=en_US.UTF-8
             mkdir -p $CIRCLE_TEST_RESULTS
             echo "2.3" > .ruby-version
             gem update --system
