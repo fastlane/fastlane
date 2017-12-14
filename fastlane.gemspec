@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.0.0'
 
-  spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"]
+  spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["fastlane/swift/**/*"] + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"]
   spec.bindir = "bin"
   spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
 
