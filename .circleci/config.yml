@@ -36,9 +36,8 @@ jobs:
           name: Install additional dependency iTMSTransporter
           command: |
             wget https://github.com/janpio/fastlane-ubuntu-foo/raw/master/iTMSTransporter_installer_linux_1.9.7.sh
-            spawn sudo sh iTMSTransporter_installer_linux_1.9.7.sh
-            set timeout 60
-            expect "More:" {send " "}            
+            wget https://github.com/janpio/fastlane-ubuntu-foo/raw/master/install_itms.sh
+            sudo sh install_itms.sh           
       - save_cache:
           key: fastlane-v2-gems-{{ checksum "Gemfile" }}
           paths:
