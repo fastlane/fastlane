@@ -290,7 +290,7 @@ private_lane :validate_repo do
     sh "bundle exec rake test_all"
 
     # Verify shell code style
-    sh 'find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +'
+    sh 'find . -regextype posix-egrep -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +'
   end
 
   # Test if generating the docs is successful
