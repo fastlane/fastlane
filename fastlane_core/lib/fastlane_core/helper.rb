@@ -142,6 +142,7 @@ module FastlaneCore
     def self.xcode_version
       return nil unless self.is_mac?
       return @xcode_version if @xcode_version && @developer_dir == ENV['DEVELOPER_DIR']
+      return nil unless File.exist?("#{xcode_path}/usr/bin/xcodebuild")
 
       begin
         output = `DEVELOPER_DIR='' "#{xcode_path}/usr/bin/xcodebuild" -version`
