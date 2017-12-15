@@ -49,11 +49,11 @@ module Fastlane
 
       def self.resolve_path(path, xcodeproj_path)
         project_dir = File.dirname(xcodeproj_path)
-        # SRCROOT and PROJECT_DIR are the same
-        %w{SRCROOT PROJECT_DIR}.each do |variable_name|
+        # SRCROOT, SOURCE_ROOT and PROJECT_DIR are the same
+        %w{SRCROOT SOURCE_ROOT PROJECT_DIR}.each do |variable_name|
           path = path.sub("$(#{variable_name})", project_dir)
         end
-        path = File.join(project_dir, path) unless path.start_with?('/')
+        path = File.absolute_path(path, project_dir)
         path
       end
 
