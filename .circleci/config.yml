@@ -13,7 +13,7 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: v1-gems-{{ checksum "Gemfile" }}
+          key: fastlane-ubuntu-gems-{{ checksum "Gemfile" }}
       - run:
           name: Setup Build
           command: |
@@ -23,7 +23,7 @@ jobs:
             brew install shellcheck
             bundle check || bundle install --jobs=4 --retry=3 --path .bundle
       - save_cache:
-          key: v1-gems-{{ checksum "Gemfile" }}
+          key: fastlane-v2-gems-{{ checksum "Gemfile" }}-b
           paths:
             - .bundle
 
