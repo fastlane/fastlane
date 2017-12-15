@@ -4,6 +4,9 @@ require 'spaceship/client'
 require 'spaceship/provider'
 require 'spaceship/launcher'
 
+# For basic user inputs
+require 'highline/import'
+
 # Dev Portal
 require 'spaceship/portal/portal'
 require 'spaceship/portal/spaceship'
