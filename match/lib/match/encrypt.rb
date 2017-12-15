@@ -89,7 +89,7 @@ module Match
       command << "-out #{tmpfile.shellescape}"
       command << "-a"
       command << "-d" unless encrypt
-      command << "&> /dev/null" unless FastlaneCore::Globals.verbose? # to show show an error message if something goes wrong
+      command << "&> /dev/null" unless FastlaneCore::Globals.verbose? # to show an error message if something goes wrong
 
       _out, err, st = Open3.capture3(command.join(' '))
       success = st.success?
