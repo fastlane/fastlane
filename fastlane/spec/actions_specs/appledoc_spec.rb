@@ -14,7 +14,7 @@ describe Fastlane do
       end
 
       it "accepts an array of input paths" do
-        result = Fastlane::FastFile.new.prase("lane :test do
+        result = Fastlane::FastFile.new.parse("lane :test do
           appledoc(
             project_name: 'Project Name',
             project_company: 'Company',
