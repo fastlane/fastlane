@@ -1,3 +1,5 @@
+require "fastlane/fastlane_config"
+
 module Fastlane
   class FastFile
     # Stores all relevant information from the currently running process
@@ -65,6 +67,16 @@ module Fastlane
     #####################################################
     # @!group DSL
     #####################################################
+
+    # Allows user to run certain actions by setting attrs
+    def settings(&block)
+      config = FastlaneConfig.new
+      if block_given?
+        yield config
+      else
+        config
+      end
+    end
 
     # User defines a new lane
     def lane(lane_name, &block)

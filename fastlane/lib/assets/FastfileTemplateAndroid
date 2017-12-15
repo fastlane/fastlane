@@ -9,11 +9,13 @@
 # If you want to automatically update fastlane if a new version is available:
 # update_fastlane
 
-# This is the minimum version number required.
-# Update this, if you use features of a newer version
-min_fastlane_version("[[FASTLANE_VERSION]]")
+settings do |s|
+  # This is the minimum version number required.
+  # Update this, if you use features of a newer version
+  s.min_fastlane_version = "[[FASTLANE_VERSION]]"
 
-default_platform(:android)
+  s.default_platform = :android
+end
 
 platform :android do
   before_all do
