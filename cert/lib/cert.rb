@@ -1,8 +1,8 @@
-require 'cert/runner'
-require 'cert/options'
+require_relative 'cert/runner'
+require_relative 'cert/options'
 
-require 'fastlane_core'
-require 'spaceship'
+require 'fastlane_core/helper'
+require 'fastlane_core/ui/ui'
 
 module Cert
   # Use this to just setup the configuration attribute and set it later somewhere else
