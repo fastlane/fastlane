@@ -20,8 +20,8 @@ jobs:
             mkdir -p $CIRCLE_TEST_RESULTS
             echo "2.3" > .ruby-version
             gem update --system
-            brew install shellcheck
             bundle check || bundle install --jobs=4 --retry=3 --path .bundle
+            sudo apt-get install shellcheck
       - save_cache:
           key: fastlane-v2-gems-{{ checksum "Gemfile" }}-b
           paths:
