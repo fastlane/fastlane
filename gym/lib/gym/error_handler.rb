@@ -153,6 +153,8 @@ module Gym
 
       def print_xcode9_plist_warning
         return unless Helper.xcode_at_least?("9.0")
+
+        # prevent crash in case of packaging error AND if you have set export_options to a path.
         return unless Gym.config[:export_options].kind_of?(Hash)
 
         export_options = Gym.config[:export_options] || {}
