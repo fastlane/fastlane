@@ -23,6 +23,19 @@ jobs:
             gem update --system
             bundle check || bundle install --jobs=4 --retry=3 --path .bundle
             sudo apt-get install shellcheck
+      - run:
+          name: Install additional dependency xar
+          command: |
+            cd /tmp
+            mkdir download
+            cd download
+            wget https://github.com/downloads/mackyle/xar/xar-1.6.1.tar.gz
+            tar -xzf xar-1.6.1.tar.gz
+            cd xar-1.6.1
+            ./autogen.sh --noconfigure
+            ./configure
+            make
+            sudo make install
       - save_cache:
           key: fastlane-v2-gems-{{ checksum "Gemfile" }}-b
           paths:
