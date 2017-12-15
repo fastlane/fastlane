@@ -6,6 +6,7 @@ jobs:
       CIRCLE_TEST_RESULTS: $HOME/test-results
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
+      FASTLANE_ITUNES_TRANSPORTER_PATH: .bundle
     docker:
       - image: circleci/ruby:2.3
     shell: /bin/bash --login -eo pipefail
