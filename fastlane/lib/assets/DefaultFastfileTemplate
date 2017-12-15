@@ -11,9 +11,9 @@
 
 # This is the minimum version number required.
 # Update this, if you use features of a newer version
-fastlane_version "[[FASTLANE_VERSION]]"
+min_fastlane_version("[[FASTLANE_VERSION]]")
 
-default_platform :ios
+default_platform(:ios)
 
 platform :ios do
   before_all do

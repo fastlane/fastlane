@@ -9,7 +9,7 @@ module Fastlane
         value = (params || []).first
         defined_version = Gem::Version.new(value) if value
 
-        UI.user_error!("Please pass minimum fastlane version as parameter to fastlane_version") unless defined_version
+        UI.user_error!("Please pass minimum fastlane version as parameter to min_fastlane_version") unless defined_version
 
         if Gem::Version.new(Fastlane::VERSION) < defined_version
           FastlaneCore::UpdateChecker.show_update_message('fastlane', Fastlane::VERSION)

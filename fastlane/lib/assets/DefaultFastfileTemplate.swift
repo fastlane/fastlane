@@ -14,7 +14,7 @@ import Foundation
 class Fastfile: LaneFile {
     // This is the minimum version number required.
     // Update this, if you use features of a newer version
-    var fastlaneVersion: String { return "[[FASTLANE_VERSION]]" }
+    var minFastlaneVersion: String { return "[[FASTLANE_VERSION]]" }
 
     func beforeAll() {
         // environmentVariables["SLACK_URL"] = "https://hooks.slack.com/services/..."
