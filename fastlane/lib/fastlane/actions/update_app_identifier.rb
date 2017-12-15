@@ -9,7 +9,7 @@ module Fastlane
         identifier_key = 'PRODUCT_BUNDLE_IDENTIFIER'
 
         # Read existing plist file
-        info_plist_path = File.join(params[:xcodeproj], '..', params[:plist_path])
+        info_plist_path = resolve_path(params[:plist_path], params[:xcodeproj])
         UI.user_error!("Couldn't find info plist file at path '#{params[:plist_path]}'") unless File.exist?(info_plist_path)
         plist = Plist.parse_xml(info_plist_path)
 
@@ -45,6 +45,16 @@ module Fastlane
 
           UI.success("Updated #{params[:plist_path]} 💾.")
         end
+      end
+
+      def self.resolve_path(path, xcodeproj_path)
+        project_dir = File.dirname(xcodeproj_path)
+        # SRCROOT and PROJECT_DIR are the same
+        %w{SRCROOT PROJECT_DIR}.each do |variable_name|
+          path = path.sub("$(#{variable_name})", project_dir)
+        end
+        path = File.join(project_dir, path) unless path.start_with?('/')
+        path
       end
 
       #####################################################
