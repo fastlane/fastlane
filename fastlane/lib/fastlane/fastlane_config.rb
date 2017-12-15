@@ -4,9 +4,12 @@ module Fastlane
     # Limited to actions that take a single argument, not params
     #
     SUPPORTED_ACTIONS = %w(
-      min_fastlane_version
       default_platform
+      fastlane_version
+      min_fastlane_version
+      ruby_version
       team_id
+      team_name
     )
 
     def method_missing(method_sym, *args, &block)
