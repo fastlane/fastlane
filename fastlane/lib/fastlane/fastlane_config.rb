@@ -19,7 +19,7 @@ module Fastlane
       # It was a setter. Should have a single argument.
       raise ArgumentError, "#{method_sym} requires one argument." unless args.count == 1
 
-      action_class = Actions.const_get("#{root.split("_").map(&:capitalize).join}Action")
+      action_class = Actions.const_get("#{root.split('_').map(&:capitalize).join}Action")
       return super unless action_class
 
       action_class.run([args.first])
