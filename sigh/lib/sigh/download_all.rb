@@ -1,3 +1,7 @@
+require 'spaceship'
+
+require_relative 'manager'
+
 module Sigh
   class DownloadAll
     # Download all valid provisioning profiles

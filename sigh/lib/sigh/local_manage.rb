@@ -1,3 +1,8 @@
+require 'plist'
+require 'fastlane_core/globals'
+
+require_relative 'module'
+
 module Sigh
   class LocalManage
     LIST = "list"

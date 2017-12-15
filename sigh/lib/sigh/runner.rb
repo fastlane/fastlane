@@ -1,5 +1,8 @@
 require 'spaceship'
 
+require 'fastlane_core/print_table'
+require 'fastlane_core/cert_checker'
+
 module Sigh
   class Runner
     attr_accessor :spaceship
