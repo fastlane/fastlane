@@ -8,6 +8,7 @@ jobs:
           CIRCLE_TEST_RESULTS: $HOME/test-results
           LC_ALL: C.UTF-8
           LANG: C.UTF-8
+          FASTLANE_ITUNES_TRANSPORTER_PATH: vendor/bundle
     shell: /bin/bash --login -eo pipefail
     steps:
       - checkout
@@ -35,10 +36,10 @@ jobs:
       - run:
           name: Install additional dependency iTMSTransporter
           command: |
-            wget https://github.com/janpio/fastlane-ubuntu-foo/raw/master/iTMSTransporter_installer_linux_1.9.7.sh
-            wget https://github.com/janpio/fastlane-ubuntu-foo/raw/master/install_itms.sh
-            sudo apt-get install expect
-            sudo sh install_itms.sh           
+            #wget https://github.com/janpio/fastlane-ubuntu-foo/raw/master/iTMSTransporter_installer_linux_1.9.7.sh
+            #wget https://github.com/janpio/fastlane-ubuntu-foo/raw/master/install_itms.sh
+            #sudo apt-get install expect
+            #sudo sh install_itms.sh           
       - save_cache:
           key: fastlane-v2-gems-{{ checksum "Gemfile" }}
           paths:
