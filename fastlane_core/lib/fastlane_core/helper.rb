@@ -134,7 +134,7 @@ module FastlaneCore
     # @return the full path to the Xcode developer tools of the currently
     #  running system
     def self.xcode_path
-      return "" if self.is_test? and !self.is_mac?
+      return "" if !self.is_mac?
       `xcode-select -p`.delete("\n") + "/"
     end
 
