@@ -22,6 +22,11 @@ describe Fastlane do
 
       expect(root_attrs["771D79501D9E69C900D840FA"]["DevelopmentTeam"]).to eq("XXXX")
       expect(root_attrs["77C503031DD3175E00AC8FF0"]["DevelopmentTeam"]).to eq("XXXX")
+      project.targets.each do |target|
+        target.build_configurations.each do |configuration|
+          expect(configuration.build_settings["CODE_SIGN_STYLE"]).to eq("Automatic")
+        end
+      end
     end
 
     it "disable_automatic_code_signing for specific target" do
@@ -38,6 +43,14 @@ describe Fastlane do
       root_attrs = project.root_object.attributes["TargetAttributes"]
       expect(root_attrs["771D79501D9E69C900D840FA"]["ProvisioningStyle"]).to eq("Automatic")
       expect(root_attrs["77C503031DD3175E00AC8FF0"]["ProvisioningStyle"]).to eq("Manual")
+      automatic_target = project.targets.first
+      manual_target = project.targets.last
+      automatic_target.build_configurations.each do |configuration|
+        expect(configuration.build_settings["CODE_SIGN_STYLE"]).to eq("Automatic")
+      end
+      manual_target.build_configurations.each do |configuration|
+        expect(configuration.build_settings["CODE_SIGN_STYLE"]).to eq("Manual")
+      end
     end
 
     it "disable_automatic_code_signing" do
@@ -52,6 +65,11 @@ describe Fastlane do
       root_attrs = project.root_object.attributes["TargetAttributes"]
       expect(root_attrs["771D79501D9E69C900D840FA"]["ProvisioningStyle"]).to eq("Manual")
       expect(root_attrs["77C503031DD3175E00AC8FF0"]["ProvisioningStyle"]).to eq("Manual")
+      project.targets.each do |target|
+        target.build_configurations.each do |configuration|
+          expect(configuration.build_settings["CODE_SIGN_STYLE"]).to eq("Manual")
+        end
+      end
     end
 
     it "sets team id" do
