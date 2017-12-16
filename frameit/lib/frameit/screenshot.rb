@@ -1,3 +1,10 @@
+require 'deliver/app_screenshot'
+
+require_relative 'editor'
+require_relative 'mac_editor'
+require_relative 'device_types'
+require_relative 'module'
+
 module Frameit
   # Represents one screenshot
   class Screenshot
@@ -19,6 +26,7 @@ module Frameit
 
     # Device name for a given screen size. Used to use the correct template
     def device_name
+      # rubocop:disable Lint/MissingRequireStatement
       sizes = Deliver::AppScreenshot::ScreenSize
       case @screen_size
       when sizes::IOS_58
@@ -40,6 +48,7 @@ module Frameit
       else
         UI.error "Unknown device type for size #{@screen_size} for path '#{path}'"
       end
+      # rubocop:enable Lint/MissingRequireStatement
     end
 
     def color
