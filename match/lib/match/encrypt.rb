@@ -96,7 +96,7 @@ module Match
 
       # Ubuntu `openssl` does not fail on failure
       # but at least outputs an error message
-      if err.to_s != ''
+      unless err.to_s.empty?
         success = false
       end
 
