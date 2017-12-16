@@ -1,7 +1,47 @@
 version: 2
 
 jobs:
-  build:
+  "macOS":
+    macos:
+      xcode: "9.0.0"
+    environment:
+      CIRCLE_TEST_RESULTS: $HOME/test-results
+      LC_ALL: en_US.UTF-8
+      LANG: en_US.UTF-8
+    shell: /bin/bash --login -eo pipefail
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: fastlane-macos-gems-{{ checksum "Gemfile" }}
+      - run:
+          name: Setup Build
+          command: |
+            mkdir -p $CIRCLE_TEST_RESULTS
+            echo "2.3" > .ruby-version
+            gem update --system
+            brew install shellcheck
+            bundle check || bundle install --jobs=4 --retry=3 --path .bundle
+      - save_cache:
+          key: fastlane-macos-gems-{{ checksum "Gemfile" }}
+          paths:
+            - .bundle
+
+      - run:
+          name: Check PR Metadata
+          command: bundle exec danger || echo "danger failed"
+
+      - run: bundle exec fastlane test
+
+      - store_test_results:
+          path: /Users/distiller/test-results
+
+      - run:
+          name: Post Test Results to GitHub
+          command: bundle exec danger || echo "danger failed"
+          when: always # Run this even when tests fail
+  
+  "Ubuntu":
     environment:
       CIRCLE_TEST_REPORTS: ~/test-results
       LC_ALL: C.UTF-8
@@ -37,7 +77,7 @@ jobs:
             make
             sudo make install
       - save_cache:
-          key: fastlane-v2-gems-{{ checksum "Gemfile" }}-b
+          key: fastlane-ubuntu-gems-{{ checksum "Gemfile" }}
           paths:
             - .bundle
 
@@ -57,3 +97,10 @@ jobs:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - "macOS"
+      - "Ubuntu"
