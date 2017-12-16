@@ -3,7 +3,7 @@ require 'excon'
 module FastlaneCore
   class Changelog
     class << self
-      def show_changes(gem_name, current_version)
+      def show_changes(gem_name, current_version, update_command: "bundle update")
         did_show_changelog = false
 
         self.releases(gem_name).each_with_index do |release, index|
@@ -20,7 +20,7 @@ module FastlaneCore
         end
 
         puts ""
-        puts "Please update using `#{UpdateChecker.update_command(gem_name: gem_name)}`".green if did_show_changelog
+        puts "Please update using `#{update_command}`".green if did_show_changelog
       rescue
         # Something went wrong, we don't care so much about this
       end

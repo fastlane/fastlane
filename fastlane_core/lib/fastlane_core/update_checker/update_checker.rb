@@ -1,8 +1,10 @@
 require 'excon'
 require 'digest'
 
-require 'fastlane_core/update_checker/changelog'
-require 'fastlane_core/analytics/app_identifier_guesser'
+require_relative 'changelog'
+require_relative '../analytics/app_identifier_guesser'
+require_relative '../helper'
+require_relative '../ui/ui'
 
 module FastlaneCore
   # Verifies, the user runs the latest version of this gem
@@ -80,7 +82,7 @@ module FastlaneCore
         puts "# Run `sudo gem cleanup` from time to time to speed up fastlane".green
       end
       puts '#######################################################################'.green
-      Changelog.show_changes(gem_name, current_version) unless FastlaneCore::Env.truthy?("FASTLANE_HIDE_CHANGELOG")
+      Changelog.show_changes(gem_name, current_version, UpdateChecker.update_command(gem_name: gem_name)) unless FastlaneCore::Env.truthy?("FASTLANE_HIDE_CHANGELOG")
 
       ensure_rubygems_source
     end
