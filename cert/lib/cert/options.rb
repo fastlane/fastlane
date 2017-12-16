@@ -1,6 +1,8 @@
 require 'credentials_manager/appfile_config'
 require 'fastlane_core/configuration/config_item'
 
+require_relative 'module'
+
 module Cert
   class Options
     def self.available_options

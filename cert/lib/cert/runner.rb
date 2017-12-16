@@ -5,6 +5,8 @@ require 'fastlane_core/keychain_importer'
 require 'fastlane_core/print_table'
 require 'spaceship'
 
+require_relative 'module'
+
 module Cert
   class Runner
     def launch
