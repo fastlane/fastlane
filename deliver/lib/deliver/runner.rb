@@ -1,4 +1,13 @@
 require 'precheck'
+require 'fastlane_core/configuration/configuration'
+
+require_relative 'html_generator'
+require_relative 'submit_for_review'
+require_relative 'upload_assets'
+require_relative 'upload_price_tier'
+require_relative 'upload_metadata'
+require_relative 'upload_screenshots'
+require_relative 'detect_values'
 
 module Deliver
   class Runner

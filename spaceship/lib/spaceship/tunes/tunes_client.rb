@@ -1,4 +1,7 @@
 require "securerandom"
+
+require_relative '../client'
+
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
