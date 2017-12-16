@@ -2,6 +2,10 @@ require 'logger'
 require 'colored'
 require 'tty-spinner'
 
+require_relative 'fastlane_folder'
+require_relative 'ui/ui'
+require_relative 'env'
+
 module FastlaneCore
   module Helper
     # This method is deprecated, use the `UI` class
@@ -22,7 +26,7 @@ module FastlaneCore
 
     # @return true if the currently running program is a unit test
     def self.test?
-      defined? SpecHelper
+      defined?("SpecHelper")
     end
 
     # @return true if it is enabled to execute external commands

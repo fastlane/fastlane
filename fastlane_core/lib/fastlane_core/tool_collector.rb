@@ -1,3 +1,5 @@
+require_relative 'helper'
+
 module FastlaneCore
   class ToolCollector
     # Learn more at https://docs.fastlane.tools/#metrics

@@ -1,3 +1,6 @@
+require_relative 'xcodebuild_list_output_parser'
+require_relative 'helper'
+
 module FastlaneCore
   # Represents an Xcode project
   class Project # rubocop:disable Metrics/ClassLength
