@@ -1,7 +1,11 @@
+require_relative 'module'
+require_relative 'change_password'
+
 module Match
   class Encrypt
     require 'security'
     require 'shellwords'
+    require 'open3'
 
     def server_name(git_url)
       ["match", git_url].join("_")

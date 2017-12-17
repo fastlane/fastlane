@@ -1,3 +1,6 @@
+require 'spaceship'
+require_relative 'module'
+
 module Match
   # Ensures the certificate and profiles are also available on iTunes Connect
   class SpaceshipEnsure
@@ -24,7 +27,7 @@ module Match
       found = Spaceship.app.find(app_identifier)
       return if found
 
-      require 'sigh'
+      require 'sigh/runner'
       Sigh::Runner.new.print_produce_command({
         username: username,
         app_identifier: app_identifier
