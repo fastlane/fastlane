@@ -38,6 +38,27 @@ func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20) {
     Snapshot.snapshot(name, timeWaitingForIdle: timeout)
 }
 
+func startRecording(name: String) {
+    sendCommand(commnad: "startRecording",args: "name=\(name)")
+}
+
+func stopRecording() {
+    sendCommand(commnad: "stopRecording")
+}
+
+func sendCommand(commnad: String,args: String = "") {
+    guard var simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let port = Snapshot.getCommandListenerPort() else { return }
+    simulator = simulator.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
+    if let url = URL(string: "http://localhost:\(port)/\(commnad)?device=\(simulator)&\(args)") {
+        let (_, _, error) = URLSession.shared.synchronousDataTask(with: url)
+        if (error != nil) {
+            print("Error sending commnad: \(String(describing: error))")
+        }
+    } else {
+        print("Error sending commnad: bad URL")
+    }
+}
+
 enum SnapshotError: Error, CustomDebugStringConvertible {
     case cannotDetectUser
     case cannotFindHomeDirectory
@@ -122,6 +143,18 @@ open class Snapshot: NSObject {
         }
     }
 
+    class func getCommandListenerPort() -> String? {
+        let path = cacheDirectory.appendingPathComponent("Command_listener_port.txt")
+        var port: String?
+        do {
+            let trimCharacterSet = CharacterSet.whitespacesAndNewlines
+            port = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
+        } catch {
+            print("Couldn't get the command listener port...")
+        }
+        return port
+    }
+    
     open class func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20) {
         if timeout > 0 {
             waitForLoadingIndicatorToDisappear(within: timeout)
@@ -237,6 +270,29 @@ private extension XCUIElementQuery {
 private extension CGFloat {
     func isBetween(_ numberA: CGFloat, and numberB: CGFloat) -> Bool {
         return numberA...numberB ~= self
+    }
+}
+
+extension URLSession {
+    func synchronousDataTask(with url: URL) -> (Data?, URLResponse?, Error?) {
+        var data: Data?
+        var response: URLResponse?
+        var error: Error?
+        
+        let semaphore = DispatchSemaphore(value: 0)
+        
+        let dataTask = self.dataTask(with: url) {
+            data = $0
+            response = $1
+            error = $2
+            
+            semaphore.signal()
+        }
+        dataTask.resume()
+        
+        _ = semaphore.wait(timeout: .distantFuture)
+        
+        return (data, response, error)
     }
 }
 

@@ -79,6 +79,14 @@ module Snapshot
           end
         }
       ]
+
+      dir_name = locale || language
+      listener = CommandListener.new do |cmd, args|
+        start_recording(dir_name, device_type, args["name"].first) if cmd == "startRecording"
+        stop_recording if cmd == "stopRecording"
+      end
+      File.write(File.join(CACHE_DIR, "Command_listener_port.txt"), listener.server.addr[1])
+
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: true,
                                       print_command: true,
@@ -86,6 +94,8 @@ module Snapshot
                                             loading: "Loading...",
                                               error: proc do |output, return_code|
                                                 ErrorHandler.handle_test_error(output, return_code)
+                                                listener.close
+                                                stop_recording
 
                                                 # no exception raised... that means we need to retry
                                                 UI.error "Caught error... #{return_code}"
@@ -98,6 +108,36 @@ module Snapshot
                                                   UI.crash!("Too many errors... no more retries...")
                                                 end
                                               end)
+      listener.close
+      stop_recording
+    end
+
+    def start_recording(dir_name, device_type, name)
+      return unless @recording_pid.nil?
+      UI.message("start_recording '#{name}'")
+      language_folder = File.join(Snapshot.config[:video_output_directory], dir_name, device_type.delete(" "))
+      FileUtils.mkdir_p(language_folder)
+      Thread.new do
+        FastlaneCore::CommandExecutor.execute(command: "xcrun simctl io booted recordVideo #{language_folder}/#{name}.mp4",
+                                            print_all: true,
+                                        print_command: true,
+                                              loading: "Recording video...",
+                                          pid_created: proc do |pid|
+                                                         @recording_pid = pid
+                                                       end,
+                                                error: proc do |output, return_code|
+                                                         ErrorHandler.handle_test_error(output, return_code)
+                                                         UI.error "Caught error... #{return_code}"
+                                                         UI.error "Caught output... #{output}"
+                                                       end)
+      end
+    end
+
+    def stop_recording
+      return if @recording_pid.nil?
+      UI.message("stop_recording")
+      Process.kill("SIGINT", @recording_pid)
+      @recording_pid = nil
     end
 
     def open_simulator_for_device(device_name)

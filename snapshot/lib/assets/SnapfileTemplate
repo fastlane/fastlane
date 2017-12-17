@@ -23,6 +23,9 @@ languages([
 # Where should the resulting screenshots be stored?
 # output_directory "./screenshots"
 
+# Where should the resulting videos be stored?
+# video_output_directory "./videos"
+
 # clear_previous_screenshots true # remove the '#' to clear all previously generated screenshots before creating new ones
 
 # Choose which project/workspace to use

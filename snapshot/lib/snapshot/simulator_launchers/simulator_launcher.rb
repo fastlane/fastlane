@@ -40,9 +40,20 @@ module Snapshot
             device_batches = launcher_config.devices.map { |d| [d] }
           end
 
+          @recording_pid = {}
+          dir_name = locale || language
+          listener = CommandListener.new do |cmd, args|
+            UI.verbose("cmd '#{cmd}' - '#{args}'")
+            start_recording(dir_name, args["device"].first, args["name"].first) if cmd == "startRecording"
+            stop_recording(args["device"].first) if cmd == "stopRecording"
+          end
+          File.write(File.join(CACHE_DIR, "Command_listener_port.txt"), listener.server.addr[1])
+
           device_batches.each do |devices|
             languages_finished[language] = launch_simultaneously(devices, language, locale, launch_args)
           end
+
+          listener.close
         end
       end
       launcher_config.devices.each_with_object({}) do |device, results_hash|
@@ -106,6 +117,39 @@ module Snapshot
                                                   UI.crash!("Too many errors... no more retries...") if launcher_config.stop_after_first_error
                                                 end
                                               end)
+    end
+
+    def start_recording(dir_name, device, name)
+      device_udid = TestCommandGenerator.device_udid(device)
+      pid = @recording_pid[device_udid]
+      return unless pid.nil?
+      device = device.gsub(/[^0-9A-Za-z.\-]/, '_')
+      name = name.gsub(/[^0-9A-Za-z.\-]/, '_')
+      folder = File.join(Snapshot.config[:video_output_directory], dir_name, device)
+      FileUtils.mkdir_p(folder)
+      Thread.new do
+        FastlaneCore::CommandExecutor.execute(command: "xcrun simctl io #{device_udid} recordVideo #{folder}/#{name}.mp4",
+                                            print_all: true,
+                                        print_command: true,
+                                              loading: "Recording video...",
+                                          pid_created: proc do |new_pid|
+                                                         @recording_pid[device_udid] = new_pid
+                                                       end,
+                                                error: proc do |output, return_code|
+                                                         ErrorHandler.handle_test_error(output, return_code)
+                                                         UI.error "Caught error... #{return_code}"
+                                                         UI.error "Caught output... #{output}"
+                                                       end)
+      end
+    end
+
+    def stop_recording(device)
+      device_udid = TestCommandGenerator.device_udid(device)
+      pid = @recording_pid[device_udid]
+      return if pid.nil?
+      UI.message("stop_recording")
+      Process.kill("SIGINT", pid)
+      @recording_pid[device_udid] = nil
     end
 
     def cleanup_after_failure(devices, language, locale, launch_args, return_code)
