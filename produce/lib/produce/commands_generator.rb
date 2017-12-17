@@ -1,5 +1,10 @@
 require 'commander'
+
 require 'fastlane/version'
+require 'fastlane_core/configuration/config_item'
+require_relative 'module'
+require_relative 'manager'
+require_relative 'options'
 
 HighLine.track_eof = false
 
