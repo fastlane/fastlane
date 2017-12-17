@@ -22,6 +22,7 @@ module Fastlane
         create_docset: "--create-docset",
         install_docset: "--install-docset",
         publish_docset: "--publish-docset",
+        no_create_docset: "--no-create-docset",
         html_anchors: "--html-anchors",
         clean_output: "--clean-output",
         docset_bundle_id: "--docset-bundle-id",
@@ -143,6 +144,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :create_docset, env_name: "FL_APPLEDOC_CREATE_DOCSET", description: "Create documentation set", is_string: false, default_value: false),
           FastlaneCore::ConfigItem.new(key: :install_docset, env_name: "FL_APPLEDOC_INSTALL_DOCSET", description: "Install documentation set to Xcode", is_string: false, default_value: false),
           FastlaneCore::ConfigItem.new(key: :publish_docset, env_name: "FL_APPLEDOC_PUBLISH_DOCSET", description: "Prepare DocSet for publishing", is_string: false, default_value: false),
+          FastlaneCore::ConfigItem.new(key: :no_create_docset, env_name: "FL_APPLEDOC_NO_CREATE_DOCSET", description: "Create HTML and skip creating a DocSet", is_string: false, default_value: false),
           FastlaneCore::ConfigItem.new(key: :html_anchors, env_name: "FL_APPLEDOC_HTML_ANCHORS", description: "The html anchor format to use in DocSet HTML", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :clean_output, env_name: "FL_APPLEDOC_CLEAN_OUTPUT", description: "Remove contents of output path before starting", is_string: false, default_value: false),
 

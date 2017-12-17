@@ -195,6 +195,19 @@ describe Fastlane do
         expect(result).to eq("appledoc --project-name \"Project Name\" --project-company \"Company\" --publish-docset --exit-threshold \"2\" \"input/dir\"")
       end
 
+      it "adds no_create_docset param to command" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          appledoc(
+            project_name: 'Project Name',
+            project_company: 'Company',
+            input: 'input/dir',
+            no_create_docset: true
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("appledoc --project-name \"Project Name\" --project-company \"Company\" --no-create-docset --exit-threshold \"2\" \"input/dir\"")
+      end
+
       it "adds html_anchors param to command" do
         result = Fastlane::FastFile.new.parse("lane :test do
           appledoc(
