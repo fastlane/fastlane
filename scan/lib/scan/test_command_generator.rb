@@ -1,3 +1,5 @@
+require_relative 'xcpretty_reporter_options_generator'
+
 module Scan
   # Responsible for building the fully working xcodebuild command
   class TestCommandGenerator
