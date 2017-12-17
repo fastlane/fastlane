@@ -241,10 +241,13 @@ module Gym
             "app-store" => "app-store",
             "app store" => "app-store",
             "appstore" => "app-store",
+            "enterprise" => "enterprise",
+            "in-house" => "enterprise",
+            "in house" => "enterprise",
+            "inhouse" => "enterprise",
             "ad-hoc" => "ad-hoc",
             "adhoc" => "ad-hoc",
             "ad hoc" => "ad-hoc",
-            "enterprise" => "enterprise",
             "development" => "development"
           }
 
@@ -263,7 +266,7 @@ module Gym
               # As seen above, there is obviously a mismatch, the user selected an App Store
               # profile, but the export method that's being passed to Xcode is "enterprise"
 
-              next if matching_type.to_s == selected_export_method
+              break if matching_type.to_s == selected_export_method
               UI.message("")
               UI.error("There seems to be a mismatch between your provided `export_method` in gym")
               UI.error("and the selected provisioning profiles. You passed the following options:")
@@ -275,6 +278,7 @@ module Gym
               UI.error("or select the correct provisioning profiles by updating your Xcode project")
               UI.error("or passing the profiles to use by using match or manually via the `export_options` hash")
               UI.message("")
+              break
             end
           end
         end
