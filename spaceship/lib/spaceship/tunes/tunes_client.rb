@@ -1250,11 +1250,12 @@ module Spaceship
     end
 
     def generate_app_version_promocodes!(app_id: nil, version_id: nil, quantity: nil)
-      data = {
-        numberOfCodes: { value: quantity },
-        agreedToContract: { value: true }
-      }
-      url = "ra/apps/#{app_id}/promocodes/versions/#{version_id}"
+      data = [{
+        numberOfCodes: quantity,
+        agreedToContract: true,
+        versionId: version_id
+      }]
+      url = "ra/apps/#{app_id}/promocodes/versions"
       r = request(:post) do |req|
         req.url url
         req.body = data.to_json
