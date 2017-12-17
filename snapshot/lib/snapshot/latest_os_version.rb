@@ -1,5 +1,9 @@
+require 'open3'
+require_relative 'module'
+
 module Snapshot
   class LatestOsVersion
+
     def self.ios_version
       return ENV["SNAPSHOT_IOS_VERSION"] if FastlaneCore::Env.truthy?("SNAPSHOT_IOS_VERSION")
       self.version("iOS")
