@@ -1,5 +1,7 @@
-require "fastlane_core"
-require "pilot/tester_util"
+require 'spaceship/tunes/application'
+require 'spaceship/test_flight/tester'
+require_relative 'tester_util'
+require_relative 'module'
 
 module Pilot
   class TesterExporter < Manager
@@ -11,7 +13,7 @@ module Pilot
 
       app_filter = (config[:apple_id] || config[:app_identifier])
       if app_filter
-        app = Spaceship::Application.find(app_filter)
+        app = Spaceship::Tunes::Application.find(app_filter)
 
         testers = Spaceship::TestFlight::Tester.all(app_id: app.apple_id)
       else
