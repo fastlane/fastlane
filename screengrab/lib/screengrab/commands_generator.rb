@@ -1,7 +1,7 @@
 require 'commander'
 
 require 'fastlane/version'
-require 'fastlane/fastlane_folder'
+require 'fastlane_core/fastlane_folder'
 require 'fastlane_core/configuration/configuration'
 require_relative 'android_environment'
 require_relative 'dependency_checker'
