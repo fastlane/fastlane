@@ -26,6 +26,7 @@ module Fastlane
 
       @default_values_to_ignore = {
         "cert" => ["keychain_path"].to_set,
+        "get_certificates" => ["keychain_path"].to_set,
         "set_github_release" => ["api_token"].to_set,
         "github_api" => ["api_token"].to_set,
         "create_pull_request" => ["api_token", "head", "api_url"].to_set,
@@ -33,7 +34,8 @@ module Fastlane
         "verify_xcode" => ["xcode_path"].to_set,
         "produce" => ["sku"].to_set,
         "create_app_online" => ["sku"].to_set,
-        "screengrab" => ["android_home"].to_set
+        "screengrab" => ["android_home"].to_set,
+        "capture_android_screenshots" => ["android_home"].to_set
       }
     end
 
