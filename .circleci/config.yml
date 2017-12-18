@@ -2,28 +2,42 @@ version: 2
 
 jobs:
   build:
-    macos:
-      xcode: "9.0.0"
     environment:
       CIRCLE_TEST_RESULTS: $HOME/test-results
-      LC_ALL: en_US.UTF-8
-      LANG: en_US.UTF-8
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+      FASTLANE_ITUNES_TRANSPORTER_PATH: .bundle
+    docker:
+      - image: circleci/ruby:2.3
     shell: /bin/bash --login -eo pipefail
     steps:
       - checkout
 
       - restore_cache:
-          key: v1-gems-{{ checksum "Gemfile" }}
+          key: fastlane-ubuntu-gems-{{ checksum "Gemfile" }}
       - run:
           name: Setup Build
           command: |
             mkdir -p $CIRCLE_TEST_RESULTS
             echo "2.3" > .ruby-version
             gem update --system
-            brew install shellcheck
             bundle check || bundle install --jobs=4 --retry=3 --path .bundle
+            sudo apt-get install shellcheck
+      - run:
+          name: Install additional dependency xar
+          command: |
+            cd /tmp
+            mkdir download
+            cd download
+            wget https://github.com/downloads/mackyle/xar/xar-1.6.1.tar.gz
+            tar -xzf xar-1.6.1.tar.gz
+            cd xar-1.6.1
+            ./autogen.sh --noconfigure
+            ./configure
+            make
+            sudo make install
       - save_cache:
-          key: v1-gems-{{ checksum "Gemfile" }}
+          key: fastlane-v2-gems-{{ checksum "Gemfile" }}-b
           paths:
             - .bundle
 
