@@ -46,7 +46,7 @@ module Fastlane
           if ENV['JAVA_HOME'].nil?
             command = ["java"]
           else
-            command = ["#{ENV['JAVA_HOME']}/bin/java}"]
+            command = ["#{ENV['JAVA_HOME']}/bin/java"]
           end
           command << "-jar #{File.expand_path(params[:crashlytics_path])}"
           command << "-androidRes ."
