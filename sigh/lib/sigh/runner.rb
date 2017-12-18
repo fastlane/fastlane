@@ -2,6 +2,7 @@ require 'spaceship'
 
 require 'fastlane_core/print_table'
 require 'fastlane_core/cert_checker'
+require_relative 'module'
 
 module Sigh
   class Runner

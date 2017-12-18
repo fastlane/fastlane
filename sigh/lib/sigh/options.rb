@@ -1,5 +1,6 @@
 require 'fastlane_core/configuration/configuration'
 require 'credentials_manager/appfile_config'
+require_relative 'module'
 
 module Sigh
   class Options

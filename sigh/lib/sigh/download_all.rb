@@ -1,6 +1,7 @@
 require 'spaceship'
 
 require_relative 'manager'
+require_relative 'module'
 
 module Sigh
   class DownloadAll

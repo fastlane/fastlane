@@ -2,6 +2,7 @@ require 'spaceship/tunes/application'
 require 'spaceship/test_flight/tester'
 require_relative 'tester_util'
 require_relative 'module'
+require_relative 'manager'
 
 module Pilot
   class TesterExporter < Manager
