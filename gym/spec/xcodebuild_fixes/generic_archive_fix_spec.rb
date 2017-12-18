@@ -3,7 +3,7 @@ describe Gym do
     let (:watch_app) { 'gym/spec/fixtures/xcodebuild_fixes/ios_watch_app.app' }
     let (:ios_app) { 'gym/spec/fixtures/xcodebuild_fixes/ios_app.app' }
 
-    it "can detect watch application" do
+    it "can detect watch application", requires_plistbuddy: true do
       expect(Gym::XcodebuildFixes.is_watchkit_app?(watch_app)).to eq(true)
     end
 
