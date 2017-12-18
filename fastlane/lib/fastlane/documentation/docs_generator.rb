@@ -16,11 +16,13 @@ module Fastlane
       output << ""
       output << "## Choose your installation method:"
       output << ""
-      output << "| [Homebrew](http://brew.sh)  | Installer Script                                | RubyGems                                |"
-      output << "|-----------------------------|-------------------------------------------------|-----------------------------------------|"
-      output << "| macOS                       | macOS                                           | macOS or Linux with Ruby 2.0.0 or above |"
-      output << "| `brew cask install fastlane`| [Download the zip file](https://download.fastlane.tools). Then double click on the `install` script (or run it in a terminal window). | `sudo gem install fastlane -NV`         |"
+      output << "| Method                     | OS support                              | Description                                                                                                                           |"
+      output << "|----------------------------|-----------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|"
+      output << "| [Homebrew](http://brew.sh) | macOS                                   | `brew cask install fastlane`                                                                                                          |"
+      output << "| Installer Script           | macOS                                   | [Download the zip file](https://download.fastlane.tools). Then double click on the `install` script (or run it in a terminal window). |"
+      output << "| RubyGems                   | macOS or Linux with Ruby 2.0.0 or above | `sudo gem install fastlane -NV`                                                                                                       |"
       output << ""
+  
       output << "# Available Actions"
 
       all_keys = ff.runner.lanes.keys.reject(&:nil?)
