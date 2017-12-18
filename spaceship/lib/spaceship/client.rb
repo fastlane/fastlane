@@ -1,15 +1,20 @@
 require 'faraday' # HTTP Client
 require 'faraday-cookie_jar'
 require 'faraday_middleware'
-require 'fastlane/version'
 require 'logger'
-require 'spaceship/babosa_fix'
-require 'spaceship/helper/net_http_generic_request'
-require 'spaceship/helper/plist_middleware'
-require 'spaceship/helper/rels_middleware'
-require 'spaceship/ui'
 require 'tmpdir'
 require 'cgi'
+
+require 'fastlane/version'
+require_relative 'babosa_fix'
+require_relative 'helper/net_http_generic_request'
+require_relative 'helper/plist_middleware'
+require_relative 'helper/rels_middleware'
+require_relative 'ui'
+require_relative 'errors'
+require_relative 'tunes/errors'
+require_relative 'globals'
+require_relative 'provider'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
@@ -37,71 +42,16 @@ module Spaceship
 
     attr_accessor :available_providers
 
-    # Base class for errors that want to present their message as
-    # preferred error info for fastlane error handling. See:
-    # fastlane_core/lib/fastlane_core/ui/fastlane_runner.rb
-    class BasicPreferredInfoError < StandardError
-      TITLE = 'The request could not be completed because:'.freeze
-
-      def preferred_error_info
-        message ? [TITLE, message] : nil
-      end
-    end
-
-    # Invalid user credentials were provided
-    class InvalidUserCredentialsError < BasicPreferredInfoError; end
-
-    # Raised when no user credentials were passed at all
-    class NoUserCredentialsError < BasicPreferredInfoError; end
-
-    class ProgramLicenseAgreementUpdated < BasicPreferredInfoError
-      def show_github_issues
-        false
-      end
-    end
-
-    # User doesn't have enough permission for given action
-    class InsufficientPermissions < BasicPreferredInfoError
-      TITLE = 'Insufficient permissions for your Apple ID:'.freeze
-
-      def preferred_error_info
-        message ? [TITLE, message] : nil
-      end
-
-      # We don't want to show similar GitHub issues, as the error message
-      # should be pretty clear
-      def show_github_issues
-        false
-      end
-    end
-
-    class UnexpectedResponse < StandardError
-      attr_reader :error_info
-
-      def initialize(error_info = nil)
-        super(error_info)
-        @error_info = error_info
-      end
-
-      def preferred_error_info
-        return nil unless @error_info.kind_of?(Hash) && @error_info['resultString']
-
-        [
-          "Apple provided the following error info:",
-          @error_info['resultString'],
-          @error_info['userString']
-        ].compact.uniq # sometimes 'resultString' and 'userString' are the same value
-      end
-    end
-
-    # Raised when 302 is received from portal request
-    class AppleTimeoutError < BasicPreferredInfoError; end
-
-    # Raised when 401 is received from portal request
-    class UnauthorizedAccessError < BasicPreferredInfoError; end
-
-    # Raised when 500 is received from iTunes Connect
-    class InternalServerError < BasicPreferredInfoError; end
+    # legacy support
+    BasicPreferredInfoError = Spaceship::BasicPreferredInfoError
+    InvalidUserCredentialsError = Spaceship::InvalidUserCredentialsError
+    NoUserCredentialsError = Spaceship::NoUserCredentialsError
+    ProgramLicenseAgreementUpdated = Spaceship::ProgramLicenseAgreementUpdated
+    InsufficientPermissions = Spaceship::InsufficientPermissions
+    UnexpectedResponse = Spaceship::UnexpectedResponse
+    AppleTimeoutError = Spaceship::AppleTimeoutError
+    UnauthorizedAccessError = Spaceship::UnauthorizedAccessError
+    InternalServerError = Spaceship::InternalServerError
 
     # Authenticates with Apple's web services. This method has to be called once
     # to generate a valid session. The session will automatically be used from then
@@ -219,7 +169,7 @@ module Spaceship
 
       unless result
         error_string = "Could not set team ID to '#{team_id}', only found the following available teams:\n\n#{available_teams.map { |team| "- #{team[:team_id]} (#{team[:team_name]})" }.join("\n")}\n"
-        raise TunesClient::ITunesConnectError.new, error_string
+        raise Tunes::Error.new, error_string
       end
 
       response = request(:post) do |req|
@@ -513,7 +463,7 @@ module Spaceship
           raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
         else
           info = [response.body, response['Set-Cookie']]
-          raise TunesClient::ITunesConnectError.new, info.join("\n")
+          raise Tunes::Error.new, info.join("\n")
         end
       end
     end
@@ -576,7 +526,7 @@ module Spaceship
       tries -= 1
       unless tries.zero?
         logger.warn("Timeout received: '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})...")
-        sleep 3 unless defined? SpecHelper
+        sleep 3 unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex # re-raise the exception
@@ -591,7 +541,7 @@ module Spaceship
         end
 
         do_login(self.user, @password)
-        sleep 3 unless defined? SpecHelper
+        sleep 3 unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex # re-raise the exception

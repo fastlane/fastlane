@@ -4,7 +4,7 @@ module Faraday
   end
 end
 
-require 'faraday/middleware'
+require 'faraday'
 
 module FaradayMiddleware
   class RelsMiddleware < Faraday::Middleware
