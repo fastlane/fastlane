@@ -317,7 +317,11 @@ private_lane :validate_repo do
     sh "bundle exec rake test_all"
 
     # Verify shell code style
-    sh 'find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +'
+    if FastlaneCore::Helper.is_mac?
+      sh 'find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +'
+    else
+      sh 'find . -regextype posix-egrep -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +'
+    end
   end
 
   # Test if generating the docs is successful
