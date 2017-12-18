@@ -95,8 +95,7 @@ lane :release do
 
   # Verifying RubyGems version
   #
-  require "../fastlane/lib/fastlane/version.rb"
-  version = Fastlane::VERSION
+  version = local_version
   old_version = current_version
   puts "Deploying #{version}"
   if Gem::Version.new(version) <= Gem::Version.new(old_version)
@@ -272,6 +271,12 @@ private_lane :send_mac_app_ci_reminder do
   end
 end
 
+private_lane :local_version do
+  require "../fastlane/lib/fastlane/version.rb"
+
+  Fastlane::VERSION
+end
+
 desc "Verifies all tests pass and the current state of the repo is valid"
 private_lane :validate_repo do
   # Verifying that no debug code is in the code base
@@ -287,6 +292,8 @@ private_lane :validate_repo do
 
   rubocop
 
+  version = local_version # has to be outside of the `Dir.chdir`
+
   # Verifying the --help command
   #
   Dir.chdir("..") do
@@ -300,6 +307,10 @@ private_lane :validate_repo do
     # Install the bundle and the actual gem
     sh "bundle check || bundle install"
     sh "rake install"
+
+    # Ensure the file size of the fastlane gem is below 1 MB
+    size_in_mb = File.size("pkg/fastlane-#{version}.gem").to_f / 1_024_000
+    UI.user_error!("fastlane gem is above 1 MB, make sure no additional resources are included by mistake") if size_in_mb > 1
 
     # Run the tests
     #
