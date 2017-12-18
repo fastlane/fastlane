@@ -1,6 +1,10 @@
 require 'time'
 
 require_relative 'base'
+require_relative 'test_info'
+require_relative 'export_compliance'
+require_relative 'beta_review_info'
+require_relative 'build_trains'
 
 module Spaceship
   module TestFlight

@@ -1,4 +1,5 @@
 require_relative '../base'
+require_relative '../tunes/tunes_client'
 
 module Spaceship
   module TestFlight
