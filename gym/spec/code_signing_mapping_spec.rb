@@ -26,7 +26,7 @@ describe Gym::CodeSigningMapping do
   end
 
   describe "#detect_project_profile_mapping" do
-    it "returns the mapping of the selected provisioning profiles" do
+    it "returns the mapping of the selected provisioning profiles", requires_xcode: true do
       workspace_path = "gym/spec/fixtures/projects/cocoapods/Example.xcworkspace"
       project = FastlaneCore::Project.new({
         workspace: workspace_path
@@ -37,7 +37,7 @@ describe Gym::CodeSigningMapping do
   end
 
   describe "#detect_project_profile_mapping_for_tv_os" do
-    it "returns the mapping of the selected provisioning profiles for tv_os" do
+    it "returns the mapping of the selected provisioning profiles for tv_os", requires_xcode: true do
       workspace_path = "gym/spec/fixtures/projects/cocoapods/Example.xcworkspace"
       project = FastlaneCore::Project.new({
         workspace: workspace_path
