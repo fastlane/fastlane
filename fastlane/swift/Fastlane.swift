@@ -143,6 +143,7 @@ func appledoc(input: String,
               createDocset: Bool = false,
               installDocset: Bool = false,
               publishDocset: Bool = false,
+              noCreateDocset: Bool = false,
               htmlAnchors: String? = nil,
               cleanOutput: Bool = false,
               docsetBundleId: String? = nil,
@@ -187,6 +188,7 @@ func appledoc(input: String,
                                                                                           RubyCommand.Argument(name: "create_docset", value: createDocset),
                                                                                           RubyCommand.Argument(name: "install_docset", value: installDocset),
                                                                                           RubyCommand.Argument(name: "publish_docset", value: publishDocset),
+                                                                                          RubyCommand.Argument(name: "no_create_docset", value: noCreateDocset),
                                                                                           RubyCommand.Argument(name: "html_anchors", value: htmlAnchors),
                                                                                           RubyCommand.Argument(name: "clean_output", value: cleanOutput),
                                                                                           RubyCommand.Argument(name: "docset_bundle_id", value: docsetBundleId),
@@ -639,7 +641,7 @@ func bundleInstall(binstubs: String? = nil,
                                                                                                 RubyCommand.Argument(name: "with", value: with)])
   _ = runner.executeCommand(command)
 }
-func captureAndroidScreenshots(androidHome: String = "/Users/liebowitz/Library/Android/sdk",
+func captureAndroidScreenshots(androidHome: String? = nil,
                                buildToolsVersion: String? = nil,
                                locales: [String] = ["en-US"],
                                clearPreviousScreenshots: Bool = false,
@@ -1405,7 +1407,7 @@ func getCertificates(development: Bool = false,
                      teamId: String? = nil,
                      teamName: String? = nil,
                      outputPath: String = ".",
-                     keychainPath: String = "/Users/liebowitz/Library/Keychains/login.keychain-db",
+                     keychainPath: String = "/Users/felixkrause/Library/Keychains/login.keychain-db",
                      keychainPassword: String? = nil,
                      platform: String = "ios") {
   let command = RubyCommand(commandID: "", methodName: "get_certificates", className: nil, args: [RubyCommand.Argument(name: "development", value: development),
@@ -2338,9 +2340,11 @@ func produce(username: String,
   return runner.executeCommand(command)
 }
 func pushGitTags(force: Bool = false,
-                 remote: String? = nil) {
+                 remote: String = "origin",
+                 tag: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "push_git_tags", className: nil, args: [RubyCommand.Argument(name: "force", value: force),
-                                                                                               RubyCommand.Argument(name: "remote", value: remote)])
+                                                                                               RubyCommand.Argument(name: "remote", value: remote),
+                                                                                               RubyCommand.Argument(name: "tag", value: tag)])
   _ = runner.executeCommand(command)
 }
 func pushToGitRemote(localBranch: String? = nil,
@@ -2895,6 +2899,7 @@ func slather(buildDirectory: String? = nil,
              simpleOutput: Bool? = nil,
              gutterJson: Bool? = nil,
              coberturaXml: Bool? = nil,
+             llvmCov: String? = nil,
              html: Bool? = nil,
              show: Bool = false,
              sourceDirectory: String? = nil,
@@ -2922,6 +2927,7 @@ func slather(buildDirectory: String? = nil,
                                                                                          RubyCommand.Argument(name: "simple_output", value: simpleOutput),
                                                                                          RubyCommand.Argument(name: "gutter_json", value: gutterJson),
                                                                                          RubyCommand.Argument(name: "cobertura_xml", value: coberturaXml),
+                                                                                         RubyCommand.Argument(name: "llvm_cov", value: llvmCov),
                                                                                          RubyCommand.Argument(name: "html", value: html),
                                                                                          RubyCommand.Argument(name: "show", value: show),
                                                                                          RubyCommand.Argument(name: "source_directory", value: sourceDirectory),
