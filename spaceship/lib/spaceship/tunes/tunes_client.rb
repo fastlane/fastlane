@@ -1,21 +1,24 @@
 require "securerandom"
 
 require_relative '../client'
+require_relative '../du/du_client'
+require_relative '../du/upload_file'
+require_relative 'app_version_common'
+require_relative 'app_version_ref'
+require_relative 'availability'
+require_relative 'errors'
+require_relative 'iap_subscription_pricing_tier'
+require_relative 'pricing_tier'
+require_relative 'territory'
+require_relative 'user_detail'
 
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
-    # ITunesConnectError is only thrown when iTunes Connect raises an exception
-    class ITunesConnectError < BasicPreferredInfoError
-    end
-
-    # raised if the server failed to save temporarily
-    class ITunesConnectTemporaryError < ITunesConnectError
-    end
-
-    # raised if the server failed to save, and it might be caused by an invisible server error
-    class ITunesConnectPotentialServerError < ITunesConnectError
-    end
+    # Legacy support
+    ITunesConnectError = Tunes::Error
+    ITunesConnectTemporaryError = Tunes::TemporaryError
+    ITunesConnectPotentialServerError = Tunes::PotentialServerError
 
     attr_reader :du_client
 
@@ -798,7 +801,7 @@ module Spaceship
         tries -= 1
         if tries > 0
           logger.warn("Received temporary server error from iTunes Connect. Retrying the request...")
-          sleep 3 unless defined? SpecHelper
+          sleep 3 unless Object.const_defined?("SpecHelper")
           retry
         end
       end
@@ -1299,7 +1302,7 @@ module Spaceship
         msg = "iTunes Connect temporary error received: '#{ex.message}'. Retrying after 60 seconds (remaining: #{tries})..."
         puts msg
         logger.warn msg
-        sleep 60 unless defined? SpecHelper # unless FastlaneCore::Helper.is_test?
+        sleep 60 unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex # re-raise the exception
@@ -1308,7 +1311,7 @@ module Spaceship
         msg = "Potential server error received: '#{ex.message}'. Retrying after 10 seconds (remaining: #{tries})..."
         puts msg
         logger.warn msg
-        sleep 10 unless defined? SpecHelper # unless FastlaneCore::Helper.is_test?
+        sleep 10 unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex
