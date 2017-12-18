@@ -48,6 +48,11 @@ describe FastlaneCore::AnalyticsSession do
 
         session.action_launched(launch_context: launch_context)
 
+        # Modify Fixture if not on Mac
+        unless FastlaneCore::Helper.is_mac?
+          fixture_data[2]['primary_target']['detail'] = FastlaneCore::Helper.operating_system
+        end
+
         parsed_events = JSON.parse(session.events.to_json)
         parsed_events.zip(fixture_data).each do |parsed, fixture|
           expect(parsed).to eq(fixture)
@@ -179,6 +184,13 @@ describe FastlaneCore::AnalyticsSession do
 
         expected_final_array = fixture_data_action_1_launched + [fixture_data_action_1_completed] + fixture_data_action_2_launched + [fixture_data_action_2_completed]
         parsed_events = JSON.parse(session.events.to_json)
+
+        # Modify Fixture if not on Mac
+        unless FastlaneCore::Helper.is_mac?
+          os = FastlaneCore::Helper.operating_system
+          expected_final_array[2]['primary_target']['detail'] = os
+          expected_final_array[11]['primary_target']['detail'] = os
+        end
 
         parsed_events.zip(expected_final_array).each do |parsed, fixture|
           expect(parsed).to eq(fixture)

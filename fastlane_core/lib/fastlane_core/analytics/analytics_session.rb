@@ -168,10 +168,7 @@ module FastlaneCore
     end
 
     def operating_system
-      return "macOS" if RUBY_PLATFORM.downcase.include?("darwin")
-      return "Windows" if RUBY_PLATFORM.downcase.include?("mswin")
-      return "Linux" if RUBY_PLATFORM.downcase.include?("linux")
-      return "Unknown"
+      return Helper.operating_system
     end
 
     def install_method
