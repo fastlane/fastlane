@@ -102,6 +102,7 @@ module Fastlane
       disclaimer << ""
       disclaimer << ""
       disclaimer << "// Generated with fastlane #{Fastlane::VERSION}"
+      disclaimer << ""
 
       file_content = disclaimer.join("\n")
 
