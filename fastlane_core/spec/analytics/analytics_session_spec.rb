@@ -48,7 +48,7 @@ describe FastlaneCore::AnalyticsSession do
 
         # Modify Fixture if not on Mac
         unless FastlaneCore::Helper.is_mac?
-          fixture_data[2]['primary_target']['detail'] = `uname`.strip
+          fixture_data[2]['primary_target']['detail'] = FastlaneCore::Helper.operating_system
         end
 
         parsed_events = JSON.parse(session.events.to_json)
@@ -183,8 +183,9 @@ describe FastlaneCore::AnalyticsSession do
 
         # Modify Fixture if not on Mac
         unless FastlaneCore::Helper.is_mac?
-          expected_final_array[2]['primary_target']['detail'] = `uname`.strip
-          expected_final_array[11]['primary_target']['detail'] = `uname`.strip
+          os = FastlaneCore::Helper.operating_system
+          expected_final_array[2]['primary_target']['detail'] = os
+          expected_final_array[11]['primary_target']['detail'] = os
         end
 
         parsed_events.zip(expected_final_array).each do |parsed, fixture|
