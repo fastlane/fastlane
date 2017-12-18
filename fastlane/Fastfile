@@ -309,7 +309,7 @@ private_lane :validate_repo do
     sh "rake install"
 
     # Ensure the file size of the fastlane gem is below 1 MB
-    size_in_mb = File.size("pkg/fastlane-#{version}.gem").to_f / 1_024_000
+    size_in_mb = File.size("pkg/fastlane-#{version}.gem").to_f / (1024 * 1024)
     UI.user_error!("fastlane gem is above 1 MB, make sure no additional resources are included by mistake") if size_in_mb > 1
 
     # Run the tests
