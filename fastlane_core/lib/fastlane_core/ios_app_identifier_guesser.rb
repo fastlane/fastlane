@@ -61,10 +61,10 @@ module FastlaneCore
           application_id = match_swift_application_id(text_line: line)
           return application_id if application_id
         end
-        nil
+        return nil
       rescue
         # any option/file error here should just be treated as identifier not found
-        nil
+        return nil
       end
 
       def match_swift_application_id(text_line: nil)
