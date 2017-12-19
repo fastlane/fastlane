@@ -20,7 +20,7 @@ module FastlaneCore
       app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: args)
       return self.new(
         action_name: action_name,
-        p_hash: app_id_guesser.p_hash,
+        p_hash: app_id_guesser.p_hash || UNKNOWN_P_HASH,
         platform: app_id_guesser.platform,
         configuration_language: configuration_language
       )
