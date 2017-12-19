@@ -163,14 +163,9 @@ module FastlaneCore
 
       self.config_file_name = config_file_name
 
-      paths = []
-      paths += Dir["./fastlane/#{self.config_file_name}"]
-      paths += Dir["./.fastlane/#{self.config_file_name}"]
-      paths += Dir["./#{self.config_file_name}"]
-      paths += Dir["./fastlane_core/spec/fixtures/#{self.config_file_name}"] if Helper.is_test?
-      return if paths.count == 0
+      path = FastlaneCore::Configuration.find_configuration_file_path(config_file_name: config_file_name)
+      return if path.nil?
 
-      path = paths.first
       begin
         configuration_file = ConfigurationFile.new(self, path, block_for_missing, skip_printing_values)
         options = configuration_file.options
@@ -194,6 +189,16 @@ module FastlaneCore
       raise wrapped_exception unless wrapped_exception.nil?
 
       configuration_file
+    end
+
+    def self.find_configuration_file_path(config_file_name: nil)
+      paths = []
+      paths += Dir["./fastlane/#{config_file_name}"]
+      paths += Dir["./.fastlane/#{config_file_name}"]
+      paths += Dir["./#{config_file_name}"]
+      paths += Dir["./fastlane_core/spec/fixtures/#{config_file_name}"] if Helper.is_test?
+      return nil if paths.count == 0
+      return paths.first
     end
 
     #####################################################

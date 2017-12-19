@@ -1,5 +1,6 @@
 module FastlaneCore
   class IOSAppIdentifierGuesser
+    APP_ID_REGEX = /var\s*appIdentifier:\s*String\?{0,1}\s*\[?\]?\s*{\s*return\s*\[?\s*"(\s*[a-zA-Z.-]+\s*)"\s*\]?\s*}/
     class << self
       def guess_app_identifier_from_args(args)
         # args example: ["-a", "com.krausefx.app", "--team_id", "5AA97AAHK2"]
@@ -24,7 +25,7 @@ module FastlaneCore
         CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
       end
 
-      def fetch_app_identifier_from_file(file_name)
+      def fetch_app_identifier_from_ruby_file(file_name)
         # we only care about the app_identifier item in the configuration file, so
         # build an options array & Configuration with just that one key and it will
         # be fetched if it is present in the config file
@@ -41,12 +42,52 @@ module FastlaneCore
         nil
       end
 
-      def guess_app_identifier_from_config_files
-        ["Deliverfile", "Gymfile", "Snapfile", "Matchfile"].each do |current|
-          app_identifier = self.fetch_app_identifier_from_file(current)
-          return app_identifier if app_identifier
+      def fetch_app_identifier_from_swift_file(file_name)
+        swift_config_file_path = FastlaneCore::Configuration.find_configuration_file_path(config_file_name: file_name)
+        return nil if swift_config_file_path.nil?
+
+        # Deliverfile.swift, Snapfile.swift, Appfile.swift all look like:
+        #   var appIdentifier: String? { return nil }
+        #   var appIdentifier: String { return "" }
+
+        # Matchfile.swift is the odd one out
+        #   var appIdentifier: [String] { return [] }
+        #
+
+        swift_config_file_path = File.expand_path(swift_config_file_path)
+        swift_config_content = File.read(swift_config_file_path)
+
+        swift_config_content.split("\n").reject(&:empty?).each do |line|
+          application_id = match_swift_application_id(text_line: line)
+          return application_id if application_id
         end
         nil
+      rescue
+        # any option/file error here should just be treated as identifier not found
+        nil
+      end
+
+      def match_swift_application_id(text_line: nil)
+        text_line.strip!
+        application_id_match = APP_ID_REGEX.match(text_line)
+        return application_id_match[1] if application_id_match
+
+        return nil
+      end
+
+      def guess_app_identifier_from_config_files
+        ["Deliverfile", "Gymfile", "Snapfile", "Matchfile"].each do |current|
+          app_identifier = self.fetch_app_identifier_from_ruby_file(current)
+          return app_identifier if app_identifier
+        end
+
+        # if we're swifty, let's look there
+        # this isn't the same list as above
+        ["Deliverfile.swift", "Snapfile.swift", "Appfile.swift", "Matchfile.swift"].each do |current|
+          app_identifier = self.fetch_app_identifier_from_swift_file(current)
+          return app_identifier if app_identifier
+        end
+        return nil
       end
 
       # make a best-guess for the app_identifier for this project, using most-reliable signals

@@ -60,6 +60,44 @@ describe FastlaneCore::IOSAppIdentifierGuesser do
       expect(FastlaneCore::IOSAppIdentifierGuesser.guess_app_identifier([])).to eq("Deliverfile.bundle.id")
     end
 
+    it 'catches common permuations of application id with swift matcher' do
+      valid_id_strings = [
+        "var appIdentifier: String { return \"a.c.b\" }",
+        "var appIdentifier: String? { return \"a.c.b\" }",
+        "var appIdentifier: String[] { return [\"a.c.b\"] }",
+        "var appIdentifier: String {return \"a.c.b\"}",
+        "var appIdentifier: String {return \"a.c.b\"} ",
+        "var  appIdentifier:  String {  return  \"a.c.b \"  }",
+        "var appIdentifier: String { return \"a-c-b\" }",
+        "var appIdentifier: String { return \"a\" }",
+        "var appIdentifier: String { return \"ad\" }",
+        "var appIdentifier: String { return \"a--.--.b\" }"
+      ]
+
+      valid_id_strings.each do |line|
+        expect(FastlaneCore::IOSAppIdentifierGuesser.match_swift_application_id(text_line: line)).to_not be_nil
+      end
+    end
+
+    it 'ignores non-application ids with swift matcher' do
+      valid_id_strings = [
+        "var appIdentifier: String { return \"\" }",
+        "var appIdentifier: String",
+        "var appIdentifier: String { get }",
+        "var appIdentifier: String? { return nil }",
+        "var appIdentifier: String? { get }",
+        "var appIdentifier: String[] { return [] }",
+        "var appIdentifier: String[] { get }",
+        "var appIdentifier: String [ ] {get }",
+        "var appId: String { return \"\" }",
+        "var appId: String { get }"
+      ]
+
+      valid_id_strings.each do |line|
+        expect(FastlaneCore::IOSAppIdentifierGuesser.match_swift_application_id(text_line: line)).to be_nil
+      end
+    end
+
     it 'returns iOS app_identifier found in Gymfile' do
       allow_target_configuration_file("Gymfile")
       allow_non_target_configuration_file("Deliverfile")
