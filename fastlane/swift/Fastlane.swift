@@ -1393,9 +1393,9 @@ func gcovr() {
   let command = RubyCommand(commandID: "", methodName: "gcovr", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
-func getBuildNumber(xcodeproj: String? = nil) {
+@discardableResult func getBuildNumber(xcodeproj: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "get_build_number", className: nil, args: [RubyCommand.Argument(name: "xcodeproj", value: xcodeproj)])
-  _ = runner.executeCommand(command)
+  return runner.executeCommand(command)
 }
 func getBuildNumberRepository(useHgRevisionNumber: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "get_build_number_repository", className: nil, args: [RubyCommand.Argument(name: "use_hg_revision_number", value: useHgRevisionNumber)])
