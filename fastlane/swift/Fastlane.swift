@@ -1525,9 +1525,9 @@ func gitAdd(path: String? = nil,
                                                                                          RubyCommand.Argument(name: "pathspec", value: pathspec)])
   _ = runner.executeCommand(command)
 }
-func gitBranch() {
+@discardableResult func gitBranch() -> String {
   let command = RubyCommand(commandID: "", methodName: "git_branch", className: nil, args: [])
-  _ = runner.executeCommand(command)
+  return runner.executeCommand(command)
 }
 func gitCommit(path: String,
                message: String) {
