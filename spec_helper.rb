@@ -66,11 +66,21 @@ RSpec.configure do |config|
 
   # disable/filter some tests if not running on mac
   unless FastlaneCore::Helper.is_mac?
-    config.filter_run_excluding requires_xcode: true
-    config.filter_run_excluding requires_xcodebuild: true
-    config.filter_run_excluding requires_plistbuddy: true
-    config.filter_run_excluding requires_keychain: true
-    config.filter_run_excluding requires_security: true
+    config.define_derived_metadata(:requires_xcode) do |meta|
+      meta[:skip] = "Requires Xcode to be installed which is not possible on this platform"
+    end
+    config.define_derived_metadata(:requires_xcodebuild) do |meta|
+      meta[:skip] = "Requires `xcodebuild` to be installed which is not possible on this platform"
+    end
+    config.define_derived_metadata(:requires_plistbuddy) do |meta|
+      meta[:skip] = "Requires `plistbuddy` to be installed which is not possible on this platform"
+    end
+    config.define_derived_metadata(:requires_keychain) do |meta|
+      meta[:skip] = "Requires `keychain` to be installed which is not possible on this platform"
+    end
+    config.define_derived_metadata(:requires_security) do |meta|
+      meta[:skip] = "Requires `security` to be installed which is not possible on this platform"
+    end
   end
 end
 
