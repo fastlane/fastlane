@@ -70,7 +70,7 @@ module FastlaneCore
       def match_swift_application_id(text_line: nil)
         text_line.strip!
         application_id_match = APP_ID_REGEX.match(text_line)
-        return application_id_match[1] if application_id_match
+        return application_id_match[1].strip if application_id_match
 
         return nil
       end
