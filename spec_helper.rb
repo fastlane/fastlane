@@ -64,23 +64,37 @@ RSpec.configure do |config|
 
   config.example_status_persistence_file_path = "/tmp/rspec_failed_tests.txt"
 
-  # disable/filter some tests if not running on mac
+  # skip some tests if not running on mac
   unless FastlaneCore::Helper.is_mac?
+
+    # define metadata tags that also implie :skip
     config.define_derived_metadata(:requires_xcode) do |meta|
-      meta[:skip] = "Requires Xcode to be installed which is not possible on this platform"
+      meta[:skip] = "Skipped: Requires Xcode to be installed which is not possible on this platform and no workaround has beend implemented"
     end
     config.define_derived_metadata(:requires_xcodebuild) do |meta|
-      meta[:skip] = "Requires `xcodebuild` to be installed which is not possible on this platform"
+      meta[:skip] = "Skipped: Requires `xcodebuild` to be installed which is not possible on this platform and no workaround has beend implemented"
     end
     config.define_derived_metadata(:requires_plistbuddy) do |meta|
-      meta[:skip] = "Requires `plistbuddy` to be installed which is not possible on this platform"
+      meta[:skip] = "Skipped: Requires `plistbuddy` to be installed which is not possible on this platform and no workaround has beend implemented"
     end
     config.define_derived_metadata(:requires_keychain) do |meta|
-      meta[:skip] = "Requires `keychain` to be installed which is not possible on this platform"
+      meta[:skip] = "Skipped: Requires `keychain` to be installed which is not possible on this platform and no workaround has beend implemented"
     end
     config.define_derived_metadata(:requires_security) do |meta|
-      meta[:skip] = "Requires `security` to be installed which is not possible on this platform"
+      meta[:skip] = "Skipped: Requires `security` to be installed which is not possible on this platform and no workaround has beend implemented"
     end
+
+    # also skip `before()` for test groups that are skipped because of their tags
+    # does not work if the tag is set on `it`, only parent `describe` of `before()`
+    # caution! has unexpected side effect on usage of `skip: false` for individual examples
+    # see https://groups.google.com/d/msg/rspec/5qeKQr_7G7k/Pb3ss2hOAAAJ
+    module HookOverrides
+      def before(*args)
+        super unless metadata[:skip]
+      end
+    end
+    config.extend HookOverrides
+
   end
 end
 
