@@ -14,12 +14,13 @@ lane :bump do |options|
 
   github_api_token = ENV["FL_GITHUB_RELEASE_API_TOKEN"]
   UI.user_error!("Please provide a GitHub API token using `FL_GITHUB_RELEASE_API_TOKEN`") if github_api_token.to_s.length == 0
+  paths_for_commit = []
 
-  path = "./fastlane/lib/fastlane/version.rb"
+  version_file_path = "./fastlane/lib/fastlane/version.rb"
 
   # Verify everything is in a consistent state
   latest_version = current_version
-  local_version = version_get_podspec(path: path)
+  local_version = version_get_podspec(path: version_file_path)
   UI.user_error!("Version on RubyGems doesn't match local repo: #{latest_version} != #{local_version}") if latest_version != local_version
 
   changelog_text = show_changelog
@@ -28,13 +29,21 @@ lane :bump do |options|
   bump_type ||= 'patch'
 
   # Everything looks good, let's generate the Swift API
-  generate_swift_api
+  generated_files = generate_swift_api
+
+  # Add all changed files to the version bump commit
+  paths_for_commit += generated_files
 
   slug = "fastlane/fastlane"
-  new_version = version_bump_podspec(path: path, bump_type: bump_type)
+  new_version = version_bump_podspec(path: version_file_path, bump_type: bump_type)
+
+  # Add version file path to change set
+  paths_for_commit << version_file_path
+
   sh "git checkout -b 'version-bump-#{new_version}'"
   commit_message = "Version bump to #{new_version}"
-  git_commit(path: path,
+
+  git_commit(path: paths_for_commit,
              message: commit_message)
   push_to_git_remote
 
@@ -65,13 +74,14 @@ desc "Generate the Swift api and test it"
 lane :generate_swift_api do |options|
   require "../fastlane/lib/fastlane/swift_fastlane_api_generator.rb"
   swift_generator = Fastlane::SwiftFastlaneAPIGenerator.new
-  swift_generator.generate_swift
+  generated_files = swift_generator.generate_swift
   UI.success("Done generating fastlane.swift API, ensuring it builds")
   gym(
     project: File.expand_path("swift/FastlaneSwiftRunner/FastlaneSwiftRunner.xcodeproj"),
     skip_package_ipa: true
   )
   sh("rm ../FastlaneRunner")
+  generated_files
 end
 
 desc "Does everything that's needed for a release"
