@@ -234,9 +234,12 @@ func parseInt(fromString: String, function: String = #function) -> Int {
             next
           end
 
+          # If the option's default value is code_gen_sensitive, then clear it
+          default_value = (current.code_gen_sensitive || current.sensitive) ? nil : current.default_value
+
           keys << current.key.to_s
           key_descriptions << current.description
-          key_default_values << current.default_value
+          key_default_values << default_value
           key_optionality_values << current.optional
           key_type_overrides << current.data_type
         end

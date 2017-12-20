@@ -33,7 +33,11 @@ module FastlaneCore
     attr_accessor :deprecated
 
     # [Boolean] Set if the variable is sensitive, such as a password or API token, to prevent echoing when prompted for the parameter
+    # If a default value exists, it won't be used during code generation as default values can read from environment variables.
     attr_accessor :sensitive
+
+    # [Boolean] Set if the default value should never be used during code generation for Swift
+    attr_accessor :code_gen_sensitive
 
     # [Boolean] Set if the variable is to be converted to a shell-escaped String when provided as a Hash or Array
     # Allows items expected to be strings used in shell arguments to be alternatively provided as a Hash or Array for better readability and auto-escaped for us.
@@ -73,6 +77,7 @@ module FastlaneCore
                    conflict_block: nil,
                    deprecated: nil,
                    sensitive: nil,
+                   code_gen_sensitive: false,
                    display_in_shell: true)
       UI.user_error!("key must be a symbol") unless key.kind_of? Symbol
       UI.user_error!("env_name must be a String") unless (env_name || '').kind_of? String
@@ -117,6 +122,7 @@ module FastlaneCore
       @conflict_block = conflict_block
       @deprecated = deprecated
       @sensitive = sensitive
+      @code_gen_sensitive = code_gen_sensitive
       @allow_shell_conversion = (type == :shell_string)
       @display_in_shell = display_in_shell
       @skip_type_validation = skip_type_validation # sometimes we allow multiple types which causes type validation failures, e.g.: export_options in gym

@@ -14,6 +14,7 @@ module Screengrab
         FastlaneCore::ConfigItem.new(key: :android_home,
                                      short_option: "-n",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: ENV['ANDROID_HOME'] || ENV['ANDROID_SDK'],
                                      description: "Path to the root of your Android SDK installation, e.g. ~/tools/android-sdk-macosx"),
         FastlaneCore::ConfigItem.new(key: :build_tools_version,
@@ -34,6 +35,7 @@ module Screengrab
                                      short_option: "-o",
                                      env_name: "SCREENGRAB_OUTPUT_DIRECTORY",
                                      description: "The directory where to store the screenshots",
+                                     code_gen_sensitive: true,
                                      default_value: File.join("fastlane", "metadata", "android")),
         FastlaneCore::ConfigItem.new(key: :skip_open_summary,
                                      env_name: 'SCREENGRAB_SKIP_OPEN_SUMMARY',
@@ -44,6 +46,7 @@ module Screengrab
                                      env_name: 'SCREENGRAB_APP_PACKAGE_NAME',
                                      short_option: "-a",
                                      description: "The package name of the app under test (e.g. com.yourcompany.yourapp)",
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:package_name)),
         FastlaneCore::ConfigItem.new(key: :tests_package_name,
                                      env_name: 'SCREENGRAB_TESTS_PACKAGE_NAME',
@@ -83,6 +86,7 @@ module Screengrab
                                      optional: true,
                                      description: "The path to the APK for the app under test",
                                      short_option: "-k",
+                                     code_gen_sensitive: true,
                                      default_value: Dir[File.join("app", "build", "outputs", "apk", "app-debug.apk")].last,
                                      verify_block: proc do |value|
                                        UI.user_error! "Could not find APK file at path '#{value}'" unless File.exist?(value)
@@ -92,6 +96,7 @@ module Screengrab
                                      optional: true,
                                      description: "The path to the APK for the the tests bundle",
                                      short_option: "-b",
+                                     code_gen_sensitive: true,
                                      default_value: Dir[File.join("app", "build", "outputs", "apk", "app-debug-androidTest-unaligned.apk")].last,
                                      verify_block: proc do |value|
                                        UI.user_error! "Could not find APK file at path '#{value}'" unless File.exist?(value)

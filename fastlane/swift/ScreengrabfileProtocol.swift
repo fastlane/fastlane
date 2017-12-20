@@ -25,7 +25,7 @@ extension ScreengrabfileProtocol {
   var buildToolsVersion: String? { return nil }
   var locales: [String] { return ["en-US"] }
   var clearPreviousScreenshots: Bool { return false }
-  var outputDirectory: String { return "fastlane/metadata/android" }
+  var outputDirectory: String { return "" }
   var skipOpenSummary: Bool { return false }
   var appPackageName: String { return "" }
   var testsPackageName: String? { return nil }
