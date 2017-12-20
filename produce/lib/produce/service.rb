@@ -34,7 +34,8 @@ module Produce
 
     def valid_services_for(options)
       allowed_keys = [:app_group, :apple_pay, :associated_domains, :data_protection, :game_center, :healthkit, :homekit,
-                      :wireless_conf, :icloud, :in_app_purchase, :inter_app_audio, :passbook, :push_notification, :sirikit, :vpn_conf]
+                      :wireless_conf, :icloud, :in_app_purchase, :inter_app_audio, :passbook, :push_notification, :sirikit,
+                      :vpn_conf, :network_extension, :hotspot, :multipath, :nfc_tag_reading]
       options.__hash__.select { |key, value| allowed_keys.include? key }
     end
 
@@ -207,6 +208,46 @@ module Produce
           app.update_service(Spaceship.app_service.vpn_configuration.on)
         else
           app.update_service(Spaceship.app_service.vpn_configuration.off)
+        end
+      end
+
+      if options.network_extension
+        UI.message("\tNetwork Extension")
+
+        if on
+          app.update_service(Spaceship.app_service.network_extension.on)
+        else
+          app.update_service(Spaceship.app_service.network_extension.off)
+        end
+      end
+
+      if options.hotspot
+        UI.message("\tHotspot")
+
+        if on
+          app.update_service(Spaceship.app_service.hotspot.on)
+        else
+          app.update_service(Spaceship.app_service.hotspot.off)
+        end
+      end
+
+      if options.multipath
+        UI.message("\tMultipath")
+
+        if on
+          app.update_service(Spaceship.app_service.multipath.on)
+        else
+          app.update_service(Spaceship.app_service.multipath.off)
+        end
+      end
+
+      if options.nfc_tag_reading
+        UI.message("\tNFC Tag Reading")
+
+        if on
+          app.update_service(Spaceship.app_service.nfc_tag_reading.on)
+        else
+          app.update_service(Spaceship.app_service.nfc_tag_reading.off)
         end
       end
 
