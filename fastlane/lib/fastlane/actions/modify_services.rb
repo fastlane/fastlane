@@ -58,7 +58,11 @@ module Fastlane
             passbook: 'passbook',
             push_notification: 'push_notification',
             siri_kit: 'sirikit',
-            vpn_configuration: 'vpn_conf'
+            vpn_configuration: 'vpn_conf',
+            network_extension: 'network_extension',
+            hotspot: 'hotspot',
+            multipath: 'multipath',
+            nfc_tag_reading: 'nfc_tag_reading'
         }
       end
 
