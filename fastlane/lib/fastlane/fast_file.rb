@@ -1,4 +1,4 @@
-require "rubygems"
+require "rubygems/requirement"
 
 module Fastlane
   class FastFile

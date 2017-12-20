@@ -1,4 +1,4 @@
-require "rubygems"
+require "rubygems/version"
 
 module FastlaneCore
   # Utility class to construct a Gem::Version from a tag.
