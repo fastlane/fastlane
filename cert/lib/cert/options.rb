@@ -26,6 +26,7 @@ module Cert
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
                                      env_name: "CERT_TEAM_ID",
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      description: "The ID of your Developer Portal team if you're in multiple teams",
                                      optional: true,
@@ -37,6 +38,7 @@ module Cert
                                      env_name: "CERT_TEAM_NAME",
                                      description: "The name of your Developer Portal team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s

@@ -78,6 +78,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
                                        env_name: "FL_UPDATE_APP_IDENTIFIER_PROJECT_PATH",
                                        description: "Path to your Xcode project",
+                                       code_gen_sensitive: true,
                                        default_value: Dir['*.xcodeproj'].first,
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass the path to the project, not the workspace") unless value.end_with?(".xcodeproj")
@@ -92,6 +93,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        env_name: 'FL_UPDATE_APP_IDENTIFIER',
                                        description: 'The app Identifier you want to set',
+                                       code_gen_sensitive: true,
                                        default_value: ENV['PRODUCE_APP_IDENTIFIER'] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier))
         ]
       end

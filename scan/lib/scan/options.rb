@@ -105,6 +105,7 @@ module Scan
                                      short_option: "-o",
                                      env_name: "SCAN_OUTPUT_DIRECTORY",
                                      description: "The directory in which all reports will be stored",
+                                     code_gen_sensitive: true,
                                      default_value: File.join(containing, "test_output")),
         FastlaneCore::ConfigItem.new(key: :output_style,
                                      short_option: "-b",

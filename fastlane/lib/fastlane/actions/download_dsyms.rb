@@ -137,6 +137,7 @@ module Fastlane
                                        env_name: "DOWNLOAD_DSYMS_APP_IDENTIFIER",
                                        description: "The bundle identifier of your app",
                                        optional: false,
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        short_option: "-k",
@@ -144,6 +145,7 @@ module Fastlane
                                        description: "The ID of your iTunes Connect team if you're in multiple teams",
                                        optional: true,
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
@@ -153,6 +155,7 @@ module Fastlane
                                        env_name: "DOWNLOAD_DSYMS_TEAM_NAME",
                                        description: "The name of your iTunes Connect team if you're in multiple teams",
                                        optional: true,
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
