@@ -132,7 +132,7 @@ xcodebuild(
   workspace: "Themoji.xcworkspace",
   sdk: "iphonesimulator",
   scheme: "Themoji",
-  derivedDataPath: tmp_path
+  derived_data_path: tmp_path
 )
 
 app_path = Dir[File.join(tmp_path, "**", "*.app")].last
