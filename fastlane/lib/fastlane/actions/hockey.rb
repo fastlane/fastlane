@@ -159,6 +159,8 @@ module Fastlane
         values[:dsym_filename] = dsym_filename
         values.delete_if { |k, v| v.nil? }
 
+        return values if Helper.test?
+
         if options[:upload_dsym_only]
           UI.success('Starting with dSYM upload to HockeyApp... this could take some time.')
           if dsym_filename
