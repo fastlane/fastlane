@@ -67,25 +67,25 @@ RSpec.configure do |config|
   # skip some tests if not running on mac
   unless FastlaneCore::Helper.is_mac?
 
-    # define metadata tags that also implie :skip
+    # define metadata tags that also imply :skip
     config.define_derived_metadata(:requires_xcode) do |meta|
-      meta[:skip] = "Skipped: Requires Xcode to be installed which is not possible on this platform and no workaround has beend implemented"
+      meta[:skip] = "Skipped: Requires Xcode to be installed (which is not possible on this platform and no workaround has been implemented)"
     end
     config.define_derived_metadata(:requires_xcodebuild) do |meta|
-      meta[:skip] = "Skipped: Requires `xcodebuild` to be installed which is not possible on this platform and no workaround has beend implemented"
+      meta[:skip] = "Skipped: Requires `xcodebuild` to be installed (which is not possible on this platform and no workaround has been implemented)"
     end
     config.define_derived_metadata(:requires_plistbuddy) do |meta|
-      meta[:skip] = "Skipped: Requires `plistbuddy` to be installed which is not possible on this platform and no workaround has beend implemented"
+      meta[:skip] = "Skipped: Requires `plistbuddy` to be installed (which is not possible on this platform and no workaround has been implemented)"
     end
     config.define_derived_metadata(:requires_keychain) do |meta|
-      meta[:skip] = "Skipped: Requires `keychain` to be installed which is not possible on this platform and no workaround has beend implemented"
+      meta[:skip] = "Skipped: Requires `keychain` to be installed (which is not possible on this platform and no workaround has been implemented)"
     end
     config.define_derived_metadata(:requires_security) do |meta|
-      meta[:skip] = "Skipped: Requires `security` to be installed which is not possible on this platform and no workaround has beend implemented"
+      meta[:skip] = "Skipped: Requires `security` to be installed (which is not possible on this platform and no workaround has been implemented)"
     end
 
     # also skip `before()` for test groups that are skipped because of their tags
-    # does not work if the tag is set on `it`, only parent `describe` of `before()`
+    # only works for `describe` groups (that are parents of the `before`, not if the tag is set on `it`
     # caution! has unexpected side effect on usage of `skip: false` for individual examples
     # see https://groups.google.com/d/msg/rspec/5qeKQr_7G7k/Pb3ss2hOAAAJ
     module HookOverrides
