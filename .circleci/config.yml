@@ -13,7 +13,7 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: fastlane-macos-gems-{{ checksum "Gemfile" }}
+          key: v1-macos-gems-{{ checksum "Gemfile" }}
       - run:
           name: Setup Build
           command: |
@@ -23,7 +23,7 @@ jobs:
             brew install shellcheck
             bundle check || bundle install --jobs=4 --retry=3 --path .bundle
       - save_cache:
-          key: fastlane-macos-gems-{{ checksum "Gemfile" }}
+          key: v1-macos-gems-{{ checksum "Gemfile" }}
           paths:
             - .bundle
 
@@ -54,7 +54,7 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: fastlane-ubuntu-gems-{{ checksum "Gemfile" }}
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
       - run:
           name: Setup Build
           command: |
@@ -63,6 +63,11 @@ jobs:
             gem update --system
             bundle check || bundle install --jobs=4 --retry=3 --path .bundle
             sudo apt-get install shellcheck
+      - save_cache:
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
+          paths:
+            - .bundle
+
       - run:
           name: Install additional dependency xar
           command: |
@@ -76,10 +81,6 @@ jobs:
             ./configure
             make
             sudo make install
-      - save_cache:
-          key: fastlane-ubuntu-gems-{{ checksum "Gemfile" }}
-          paths:
-            - .bundle
 
       - run:
           name: Check PR Metadata
