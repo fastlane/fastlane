@@ -71,7 +71,7 @@ module Supply
         FileUtils.mkdir_p(File.join(containing, IMAGES_FOLDER_NAME, screenshot_type))
       end
 
-      UI.message("Due to a limitation of the Google Play API, there is no way for `supply` to download your existing screenshots. Please copy your screenshots into `metadata/android/en-US/images/`")
+      UI.message("Due to a limitation of the Google Play API, there is no way for `supply` to download your existing screenshots. Please copy your screenshots into `metadata/android/#{listing.language}/images/`")
     end
 
     def store_apk_listing(apk_listing)
