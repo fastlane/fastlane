@@ -80,7 +80,7 @@ module Fastlane
       def self.input_param_to_cli_arg(input_param)
         cli_arg = ""
         if input_param.kind_of?(Array)
-          input_param.map! {|path| quote_string_param(path)}
+          input_param.map! { |path| quote_string_param(path) }
           cli_arg = input_param.join(' ')
         else
           cli_arg = quote_string_param(input_param)
@@ -118,7 +118,7 @@ module Fastlane
       end
 
       def self.quote_string_param(s)
-        quoted_string = (s != true && s.to_s.length > 0 ? "\"#{s}\"" : "")
+        s != true && s.to_s.length > 0 ? "\"#{s}\"" : ""
       end
 
       def self.create_output_dir_if_not_exists(output_path)
