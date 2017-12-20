@@ -35,7 +35,6 @@ module Screengrab
                                      short_option: "-o",
                                      env_name: "SCREENGRAB_OUTPUT_DIRECTORY",
                                      description: "The directory where to store the screenshots",
-                                     code_gen_sensitive: true,
                                      default_value: File.join("fastlane", "metadata", "android")),
         FastlaneCore::ConfigItem.new(key: :skip_open_summary,
                                      env_name: 'SCREENGRAB_SKIP_OPEN_SUMMARY',
