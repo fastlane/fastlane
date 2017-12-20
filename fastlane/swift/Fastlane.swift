@@ -1123,7 +1123,8 @@ func danger(useBundleExec: Bool = true,
             failOnErrors: Bool = false,
             newComment: Bool = false,
             base: String? = nil,
-            head: String? = nil) {
+            head: String? = nil,
+            pr: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "danger", className: nil, args: [RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec),
                                                                                         RubyCommand.Argument(name: "verbose", value: verbose),
                                                                                         RubyCommand.Argument(name: "danger_id", value: dangerId),
@@ -1132,7 +1133,8 @@ func danger(useBundleExec: Bool = true,
                                                                                         RubyCommand.Argument(name: "fail_on_errors", value: failOnErrors),
                                                                                         RubyCommand.Argument(name: "new_comment", value: newComment),
                                                                                         RubyCommand.Argument(name: "base", value: base),
-                                                                                        RubyCommand.Argument(name: "head", value: head)])
+                                                                                        RubyCommand.Argument(name: "head", value: head),
+                                                                                        RubyCommand.Argument(name: "pr", value: pr)])
   _ = runner.executeCommand(command)
 }
 func deleteKeychain(name: String? = nil,
@@ -2856,7 +2858,8 @@ func slack(message: String? = nil,
            payload: String = "{}",
            defaultPayloads: [String]? = nil,
            attachmentProperties: String = "{}",
-           success: Bool = true) {
+           success: Bool = true,
+           failOnError: Bool = true) {
   let command = RubyCommand(commandID: "", methodName: "slack", className: nil, args: [RubyCommand.Argument(name: "message", value: message),
                                                                                        RubyCommand.Argument(name: "channel", value: channel),
                                                                                        RubyCommand.Argument(name: "use_webhook_configured_username_and_icon", value: useWebhookConfiguredUsernameAndIcon),
@@ -2866,7 +2869,8 @@ func slack(message: String? = nil,
                                                                                        RubyCommand.Argument(name: "payload", value: payload),
                                                                                        RubyCommand.Argument(name: "default_payloads", value: defaultPayloads),
                                                                                        RubyCommand.Argument(name: "attachment_properties", value: attachmentProperties),
-                                                                                       RubyCommand.Argument(name: "success", value: success)])
+                                                                                       RubyCommand.Argument(name: "success", value: success),
+                                                                                       RubyCommand.Argument(name: "fail_on_error", value: failOnError)])
   _ = runner.executeCommand(command)
 }
 func slackTrain() {
