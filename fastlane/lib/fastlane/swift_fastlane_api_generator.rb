@@ -79,11 +79,13 @@ module Fastlane
       file_content += autogen_version_warning_text_array
 
       file_content = file_content.join("\n")
-      target_path = File.join(@target_output_path, "Fastlane.swift")
-      File.write(target_path, file_content)
-      UI.success(target_path)
+      fastlane_swift_api_path = File.join(@target_output_path, "Fastlane.swift")
+      File.write(fastlane_swift_api_path, file_content)
+      UI.success(fastlane_swift_api_path)
 
-      generate_default_implementation_opening(tool_details: tool_details)
+      files_generated = [fastlane_swift_api_path]
+      files_generated += generate_default_implementations(tool_details: tool_details)
+      return files_generated
     end
 
     def write_lanefile(lanefile_implementation_opening: nil, class_name: nil, tool_name: nil)
@@ -109,17 +111,20 @@ module Fastlane
       target_path = File.join(@target_output_path, "#{class_name}.swift")
       File.write(target_path, file_content)
       UI.success(target_path)
+      return target_path
     end
 
-    def generate_default_implementation_opening(tool_details: nil)
+    def generate_default_implementations(tool_details: nil)
+      files_generated = []
       tool_details.each do |tool_detail|
         lanefile_implementation_opening = "class #{tool_detail.swift_class}: #{tool_detail.swift_protocol} {"
-        write_lanefile(
+        files_generated << write_lanefile(
           lanefile_implementation_opening: lanefile_implementation_opening,
           class_name: tool_detail.swift_class,
           tool_name: tool_detail.command_line_tool_name
         )
       end
+      return files_generated
     end
 
     def generate_lanefile_parsing_functions
