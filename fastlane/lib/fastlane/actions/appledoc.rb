@@ -141,7 +141,7 @@ module Fastlane
       def self.available_options
         [
           # PATHS
-          FastlaneCore::ConfigItem.new(key: :input, env_name: "FL_APPLEDOC_INPUT", description: "Path(s) to source files. Accepts a single string, or an array of strings", is_string: false),
+          FastlaneCore::ConfigItem.new(key: :input, env_name: "FL_APPLEDOC_INPUT", description: "Path(s) to source files", is_string: false),
           FastlaneCore::ConfigItem.new(key: :output, env_name: "FL_APPLEDOC_OUTPUT", description: "Output path", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :templates, env_name: "FL_APPLEDOC_TEMPLATES", description: "Template files path", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :docset_install_path, env_name: "FL_APPLEDOC_DOCSET_INSTALL_PATH", description: "DocSet installation path", is_string: true, optional: true),
@@ -224,7 +224,10 @@ module Fastlane
           'appledoc(
             project_name: "MyProjectName",
             project_company: "Company Name",
-            input: "MyProjectSources",
+            input: [
+              "MyProjectSources",
+              "MyProjectSourceFile.h"
+            ],
             ignore: [
               "ignore/path/1",
               "ingore/path/2"
