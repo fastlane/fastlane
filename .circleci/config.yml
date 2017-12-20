@@ -49,7 +49,6 @@ jobs:
       FASTLANE_ITUNES_TRANSPORTER_PATH: .bundle
     docker:
       - image: circleci/ruby:2.3
-    shell: /bin/bash --login -eo pipefail
     steps:
       - checkout
 
