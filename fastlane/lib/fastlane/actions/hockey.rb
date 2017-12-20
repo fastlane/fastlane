@@ -33,6 +33,22 @@ module Fastlane
         end
       end
 
+      def self.upload_dsym(api_token, app_id, bundle_version, options)
+        connection = self.connection(options)
+        response = connection.put do |req|
+          req.options.timeout = options.delete(:timeout)
+          req.url("/api/2/apps/#{app_id}/app_versions/#{bundle_version}")
+          req.headers['X-HockeyAppToken'] = api_token
+          req.body = options
+        end
+
+        if response.status == 201
+            UI.success("Successfully uploaded symbols for version #{bundle_version}")
+        else
+            UI.user_error!("Error trying to upload symbols:  #{response.status} - #{response.body}")
+        end
+      end
+
       # Uses https://support.hockeyapp.net/kb/api/api-versions#upload-version if a `public_identifier` was specified
       # otherwise https://support.hockeyapp.net/kb/api/api-apps#upload-app
       def self.upload_build(api_token, ipa, options)
@@ -108,12 +124,7 @@ module Fastlane
 
         options[:status] = update_status
 
-        connection.put do |req|
-          req.options.timeout = options.delete(:timeout)
-          req.url("/api/2/apps/#{app_id}/app_versions/#{app_version_id}")
-          req.headers['X-HockeyAppToken'] = api_token
-          req.body = options
-        end
+        self.upload_dsym(api_token, app_id, app_version_id, options)
       end
 
       def self.run(options)
@@ -143,40 +154,39 @@ module Fastlane
 
         UI.user_error!("Symbols on path '#{File.expand_path(dsym_filename)}' not found") if dsym_filename && !File.exist?(dsym_filename)
 
-        if options[:upload_dsym_only]
-          UI.success('Starting with dSYM upload to HockeyApp... this could take some time.')
-        else
-          UI.success('Starting with file(s) upload to HockeyApp... this could take some time.')
-        end
-
         values = options.values
-        values[:dsym_filename] = dsym_filename
-        values[:notes_type] = options[:notes_type]
-
         api_token = values.delete(:api_token)
-
+        values[:dsym_filename] = dsym_filename
         values.delete_if { |k, v| v.nil? }
 
-        return values if Helper.test?
-
-        ipa_filename = build_file
-        ipa_filename = nil if options[:upload_dsym_only]
-
-        response = self.upload(api_token, ipa_filename, values)
-        case response.status
-        when 200...300
-          url = response.body['public_url']
-
-          Actions.lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] = url
-          Actions.lane_context[SharedValues::HOCKEY_BUILD_INFORMATION] = response.body
-
-          UI.message("Public Download URL: #{url}") if url
-          UI.success('Build successfully uploaded to HockeyApp!')
+        if options[:upload_dsym_only]
+          UI.success('Starting with dSYM upload to HockeyApp... this could take some time.')
+          if dsym_filename
+              dsym_io = Faraday::UploadIO.new(dsym_filename, 'application/octet-stream') if dsym_filename and File.exist?(dsym_filename)
+          end
+          values[:dsym] = dsym_io
+          self.upload_dsym(api_token, values[:public_identifier], values[:bundle_version], values)
         else
-          if response.body.to_s.include?("App could not be created")
-            UI.user_error!("Hockey has an issue processing this app. Please confirm that an app in Hockey matches this IPA's bundle ID or that you are using the correct API upload token. If error persists, please provide the :public_identifier option from the HockeyApp website. More information https://github.com/fastlane/fastlane/issues/400")
-          else
-            UI.user_error!("Error when trying to upload file(s) to HockeyApp: #{response.status} - #{response.body}")
+          UI.success('Starting with file(s) upload to HockeyApp... this could take some time.')
+          
+          ipa_filename = build_file
+          
+          response = self.upload(api_token, ipa_filename, values)
+          case response.status
+              when 200...300
+              url = response.body['public_url']
+              
+              Actions.lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] = url
+              Actions.lane_context[SharedValues::HOCKEY_BUILD_INFORMATION] = response.body
+              
+              UI.message("Public Download URL: #{url}") if url
+              UI.success('Build successfully uploaded to HockeyApp!')
+              else
+              if response.body.to_s.include?("App could not be created")
+                  UI.user_error!("Hockey has an issue processing this app. Please confirm that an app in Hockey matches this IPA's bundle ID or that you are using the correct API upload token. If error persists, please provide the :public_identifier option from the HockeyApp website. More information https://github.com/fastlane/fastlane/issues/400")
+                  else
+                  UI.user_error!("Error when trying to upload file(s) to HockeyApp: #{response.status} - #{response.body}")
+              end
           end
         end
       end
@@ -281,7 +291,7 @@ module Fastlane
                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :bundle_version,
                                       env_name: "FL_HOCKEY_BUNDLE_VERSION",
-                                      description: "The bundle_version of your application, required when using `create_update`",
+                                      description: "The bundle_version of your application, required when using `create_update` and if `upload_dsym_only` set to `true`",
                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :public_identifier,
                                       env_name: "FL_HOCKEY_PUBLIC_IDENTIFIER",
