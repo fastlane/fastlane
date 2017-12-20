@@ -58,7 +58,6 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-results
-            echo "2.3" > .ruby-version
             gem update --system
             bundle check || bundle install --jobs=4 --retry=3 --path .bundle
             sudo apt-get install shellcheck
