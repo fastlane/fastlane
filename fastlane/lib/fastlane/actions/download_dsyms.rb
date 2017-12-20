@@ -5,6 +5,7 @@ module Fastlane
     end
 
     class DownloadDsymsAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         require 'spaceship'
         require 'net/http'
@@ -84,6 +85,7 @@ module Fastlane
           UI.error("No dSYM files found on iTunes Connect - this usually happens when no recompling happened yet")
         end
       end
+      # rubocop:enable Metrics/PerceivedComplexity
 
       def self.write_dsym(data, bundle_id, train_number, build_number, output_directory)
         file_name = "#{bundle_id}-#{train_number}-#{build_number}.dSYM.zip"
