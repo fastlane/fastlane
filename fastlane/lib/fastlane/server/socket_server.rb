@@ -174,7 +174,8 @@ module Fastlane
         return_value = ""
       end
 
-      return JSON.generate(return_value.to_s)
+      # quirks_mode because sometimes the build-in library is used for some folks and that needs quirks_mode: true
+      return JSON.generate(return_value.to_s, quirks_mode: true)
     end
 
     def process_value_as_array_of_strings(return_value: nil)
@@ -182,6 +183,7 @@ module Fastlane
         return_value = []
       end
 
+      # quirks_mode shouldn't be required for real objects
       return JSON.generate(return_value)
     end
 
@@ -190,6 +192,7 @@ module Fastlane
         return_value = {}
       end
 
+      # quirks_mode shouldn't be required for real objects
       return JSON.generate(return_value)
     end
 
@@ -198,7 +201,8 @@ module Fastlane
         return_value = false
       end
 
-      return JSON.generate(return_value)
+      # quirks_mode because sometimes the build-in library is used for some folks and that needs quirks_mode: true
+      return JSON.generate(return_value.to_s, quirks_mode: true)
     end
 
     def process_value_as_int(return_value: nil)
@@ -206,7 +210,8 @@ module Fastlane
         return_value = 0
       end
 
-      return JSON.generate(return_value)
+      # quirks_mode because sometimes the build-in library is used for some folks and that needs quirks_mode: true
+      return JSON.generate(return_value.to_s, quirks_mode: true)
     end
   end
 end
