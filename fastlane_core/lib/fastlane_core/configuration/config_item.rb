@@ -15,6 +15,9 @@ module FastlaneCore
     # the value which is used if there was no given values and no environment values
     attr_accessor :default_value
 
+    # the value which is used during code generation
+    attr_accessor :code_gen_default_value
+
     # An optional block which is called when a new value is set.
     #   Check value is valid. This could be type checks or if a folder/file exists
     #   You have to raise a specific exception if something goes wrong. Append .red after the string
@@ -78,6 +81,7 @@ module FastlaneCore
                    deprecated: nil,
                    sensitive: nil,
                    code_gen_sensitive: false,
+                   code_gen_default_value: nil,
                    display_in_shell: true)
       UI.user_error!("key must be a symbol") unless key.kind_of? Symbol
       UI.user_error!("env_name must be a String") unless (env_name || '').kind_of? String
@@ -113,6 +117,7 @@ module FastlaneCore
       @description = description
       @short_option = short_option
       @default_value = default_value
+      @code_gen_default_value = code_gen_default_value
       @verify_block = verify_block
       @is_string = is_string
       @data_type = type

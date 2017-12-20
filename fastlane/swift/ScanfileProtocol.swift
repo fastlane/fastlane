@@ -52,7 +52,7 @@ extension ScanfileProtocol {
   var addressSanitizer: Bool? { return nil }
   var threadSanitizer: Bool? { return nil }
   var skipBuild: Bool { return false }
-  var outputDirectory: String { return "" }
+  var outputDirectory: String { return "./test_output" }
   var outputStyle: String? { return nil }
   var outputTypes: String { return "html,junit" }
   var outputFiles: String? { return nil }
