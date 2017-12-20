@@ -60,17 +60,19 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
 
 @objcMembers
 open class Snapshot: NSObject {
-    static var app: XCUIApplication!
-    static var cacheDirectory: URL!
+    static var app: XCUIApplication?
+    static var cacheDirectory: URL?
     static var screenshotsDirectory: URL? {
-        return cacheDirectory.appendingPathComponent("screenshots", isDirectory: true)
+        return cacheDirectory?.appendingPathComponent("screenshots", isDirectory: true)
     }
 
     open class func setupSnapshot(_ app: XCUIApplication) {
+        
+        Snapshot.app = app
+
         do {
             let cacheDir = try pathPrefix()
             Snapshot.cacheDirectory = cacheDir
-            Snapshot.app = app
             setLanguage(app)
             setLocale(app)
             setLaunchArguments(app)
@@ -80,6 +82,11 @@ open class Snapshot: NSObject {
     }
 
     class func setLanguage(_ app: XCUIApplication) {
+        guard let cacheDirectory = self.cacheDirectory else {
+            print("CacheDirectory is not set - probably runnig a physical device?")
+            return
+        }
+        
         let path = cacheDirectory.appendingPathComponent("language.txt")
 
         do {
@@ -92,6 +99,11 @@ open class Snapshot: NSObject {
     }
 
     class func setLocale(_ app: XCUIApplication) {
+        guard let cacheDirectory = self.cacheDirectory else {
+            print("CacheDirectory is not set - probably runnig a physical device?")
+            return
+        }
+        
         let path = cacheDirectory.appendingPathComponent("locale.txt")
 
         do {
@@ -107,6 +119,11 @@ open class Snapshot: NSObject {
     }
 
     class func setLaunchArguments(_ app: XCUIApplication) {
+        guard let cacheDirectory = self.cacheDirectory else {
+            print("CacheDirectory is not set - probably runnig a physical device?")
+            return
+        }
+        
         let path = cacheDirectory.appendingPathComponent("snapshot-launch_arguments.txt")
         app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES", "-ui_testing"]
 
@@ -135,6 +152,12 @@ open class Snapshot: NSObject {
         #if os(OSX)
             XCUIApplication().typeKey(XCUIKeyboardKeySecondaryFn, modifierFlags: [])
         #else
+            
+            guard let app = self.app else {
+                print("XCUIApplication is not set")
+                return
+            }
+            
             let screenshot = app.windows.firstMatch.screenshot()
             guard let simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
             let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
