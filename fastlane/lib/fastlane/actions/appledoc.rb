@@ -71,9 +71,22 @@ module Fastlane
         appledoc_args = params_hash_to_cli_args(params_hash)
         UI.success("Generating documentation.")
         cli_args = appledoc_args.join(' ')
-        command = "appledoc #{cli_args}".strip + " \"#{params_hash[:input]}\""
+        input_cli_arg = input_param_to_cli_arg(params_hash[:input])
+        command = "appledoc #{cli_args}".strip + " " + input_cli_arg
         UI.verbose(command)
         Actions.sh command
+      end
+
+      def self.input_param_to_cli_arg(input_param)
+        cli_arg = ""
+        if input_param.kind_of?(Array)
+          input_param.map! {|path| quote_string_param(path)}
+          cli_arg = input_param.join(' ')
+        else
+          cli_arg = quote_string_param(input_param)
+        end
+
+        return cli_arg
       end
 
       def self.params_hash_to_cli_args(params)
@@ -100,8 +113,12 @@ module Fastlane
       end
 
       def self.cli_param(k, v)
-        value = (v != true && v.to_s.length > 0 ? "\"#{v}\"" : "")
+        value = quote_string_param(v)
         "#{k} #{value}".strip
+      end
+
+      def self.quote_string_param(s)
+        quoted_string = (s != true && s.to_s.length > 0 ? "\"#{s}\"" : "")
       end
 
       def self.create_output_dir_if_not_exists(output_path)
@@ -124,7 +141,7 @@ module Fastlane
       def self.available_options
         [
           # PATHS
-          FastlaneCore::ConfigItem.new(key: :input, env_name: "FL_APPLEDOC_INPUT", description: "Path to source file(s). Accepts a single string, or an array of strings.", is_string: false),
+          FastlaneCore::ConfigItem.new(key: :input, env_name: "FL_APPLEDOC_INPUT", description: "Path(s) to source files. Accepts a single string, or an array of strings", is_string: false),
           FastlaneCore::ConfigItem.new(key: :output, env_name: "FL_APPLEDOC_OUTPUT", description: "Output path", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :templates, env_name: "FL_APPLEDOC_TEMPLATES", description: "Template files path", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :docset_install_path, env_name: "FL_APPLEDOC_DOCSET_INSTALL_PATH", description: "DocSet installation path", is_string: true, optional: true),

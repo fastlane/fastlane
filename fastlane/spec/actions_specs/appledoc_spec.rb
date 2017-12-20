@@ -13,16 +13,28 @@ describe Fastlane do
         expect(result).to eq("appledoc --project-name \"Project Name\" --project-company \"Company\" --exit-threshold \"2\" \"input/dir\"")
       end
 
+      it "accepts an input path with spaces" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          appledoc(
+            project_name: 'Project Name',
+            project_company: 'Company',
+            input: 'input/dir with spaces/file'
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("appledoc --project-name \"Project Name\" --project-company \"Company\" --exit-threshold \"2\" \"input/dir with spaces/file\"")
+      end
+
       it "accepts an array of input paths" do
         result = Fastlane::FastFile.new.parse("lane :test do
           appledoc(
             project_name: 'Project Name',
             project_company: 'Company',
-            input: ['input/dir', 'second/input/dir', 'third/input/file.h']
+            input: ['input/dir', 'second/input dir with spaces', 'third/input/file.h']
           )
         end").runner.execute(:test)
 
-        expect(result).to eq("appledoc --project-name \"Project Name\" --project-company \"Company\" --exit-threshold \"2\" \"input/dir\" \"second/input/dir\" \"third/input/file.h\"")
+        expect(result).to eq("appledoc --project-name \"Project Name\" --project-company \"Company\" --exit-threshold \"2\" \"input/dir\" \"second/input dir with spaces\" \"third/input/file.h\"")
       end
 
       it "adds output param to command" do
