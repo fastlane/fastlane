@@ -1431,17 +1431,17 @@ func getGithubRelease(url: String,
                                                                                                     RubyCommand.Argument(name: "api_token", value: apiToken)])
   _ = runner.executeCommand(command)
 }
-func getInfoPlistValue(key: String,
-                       path: String) {
+@discardableResult func getInfoPlistValue(key: String,
+                                          path: String) -> String {
   let command = RubyCommand(commandID: "", methodName: "get_info_plist_value", className: nil, args: [RubyCommand.Argument(name: "key", value: key),
                                                                                                       RubyCommand.Argument(name: "path", value: path)])
-  _ = runner.executeCommand(command)
+  return runner.executeCommand(command)
 }
-func getIpaInfoPlistValue(key: String,
-                          ipa: String) {
+@discardableResult func getIpaInfoPlistValue(key: String,
+                                             ipa: String) -> String {
   let command = RubyCommand(commandID: "", methodName: "get_ipa_info_plist_value", className: nil, args: [RubyCommand.Argument(name: "key", value: key),
                                                                                                           RubyCommand.Argument(name: "ipa", value: ipa)])
-  _ = runner.executeCommand(command)
+  return runner.executeCommand(command)
 }
 func getProvisioningProfile(adhoc: Bool = false,
                             development: Bool = false,
