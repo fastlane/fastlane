@@ -88,7 +88,7 @@ module Fastlane
                                        env_name: "GITHUB_PULL_REQUEST_API_URL",
                                        description: "The URL of GitHub API - used when the Enterprise (default to `https://api.github.com`)",
                                        is_string: true,
-                                       code_gen_sensitive: true,
+                                       code_gen_default_value: 'https://api.github.com',
                                        default_value: 'https://api.github.com',
                                        optional: true)
         ]

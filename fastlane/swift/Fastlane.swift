@@ -1105,7 +1105,7 @@ func createPullRequest(apiToken: String,
                        body: String? = nil,
                        head: String? = nil,
                        base: String = "master",
-                       apiUrl: String? = nil) {
+                       apiUrl: String = "https://api.github.com") {
   let command = RubyCommand(commandID: "", methodName: "create_pull_request", className: nil, args: [RubyCommand.Argument(name: "api_token", value: apiToken),
                                                                                                      RubyCommand.Argument(name: "repo", value: repo),
                                                                                                      RubyCommand.Argument(name: "title", value: title),
