@@ -44,7 +44,7 @@ module Supply
       IMAGES_TYPES.each do |image_type|
         if ['featureGraphic'].include?(image_type)
           # we don't get all files in full resolution :(
-          UI.message("Due to a limitation of the Google Play API, there is no way for `supply` to download your existing feature graphics. Please copy your feature graphics into `metadata/android/en-US/images/`")
+          UI.message("Due to a limitation of the Google Play API, there is no way for `supply` to download your existing feature graphic. Please copy your feature graphic to `metadata/android/en-US/images/featureGraphic.png`")
           next
         end
 
