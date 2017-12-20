@@ -174,7 +174,7 @@ module Fastlane
         return_value = ""
       end
 
-      # quirks_mode because sometimes the build-in library is used for some folks and that needs quirks_mode: true
+      # quirks_mode because sometimes the built-in library is used for some folks and that needs quirks_mode: true
       return JSON.generate(return_value.to_s, quirks_mode: true)
     end
 
@@ -201,7 +201,7 @@ module Fastlane
         return_value = false
       end
 
-      # quirks_mode because sometimes the build-in library is used for some folks and that needs quirks_mode: true
+      # quirks_mode because sometimes the built-in library is used for some folks and that needs quirks_mode: true
       return JSON.generate(return_value.to_s, quirks_mode: true)
     end
 
@@ -210,7 +210,7 @@ module Fastlane
         return_value = 0
       end
 
-      # quirks_mode because sometimes the build-in library is used for some folks and that needs quirks_mode: true
+      # quirks_mode because sometimes the built-in library is used for some folks and that needs quirks_mode: true
       return JSON.generate(return_value.to_s, quirks_mode: true)
     end
   end
