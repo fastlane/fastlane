@@ -192,6 +192,7 @@ module Supply
         end
 
         next if removed_version_codes.empty?
+
         keep_version_codes = track_version_codes - removed_version_codes
         max_tracks_version_code = keep_version_codes[0] unless keep_version_codes.empty?
         client.update_track(track, 1.0, keep_version_codes)
