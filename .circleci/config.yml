@@ -5,7 +5,7 @@ jobs:
     macos:
       xcode: "9.0.0"
     environment:
-      CIRCLE_TEST_RESULTS: $HOME/test-results
+      CIRCLE_TEST_REPORTS: ~/test-results
       LC_ALL: en_US.UTF-8
       LANG: en_US.UTF-8
     shell: /bin/bash --login -eo pipefail
@@ -17,7 +17,7 @@ jobs:
       - run:
           name: Setup Build
           command: |
-            mkdir -p $CIRCLE_TEST_RESULTS
+            mkdir -p ~/test-results
             echo "2.3" > .ruby-version
             gem update --system
             brew install shellcheck
@@ -34,7 +34,10 @@ jobs:
       - run: bundle exec fastlane test
 
       - store_test_results:
-          path: /Users/distiller/test-results
+          path: ~/test-results
+      - store_artifacts:
+          path: ~/test-results/rspec
+          destination: test-results
 
       - run:
           name: Post Test Results to GitHub
