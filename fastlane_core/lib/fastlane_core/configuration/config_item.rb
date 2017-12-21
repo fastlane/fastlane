@@ -124,7 +124,6 @@ module FastlaneCore
       @description = description
       @short_option = short_option
       @default_value = default_value
-      @code_gen_default_value = code_gen_default_value
       @verify_block = verify_block
       @is_string = is_string
       @data_type = type
@@ -134,10 +133,24 @@ module FastlaneCore
       @conflict_block = conflict_block
       @deprecated = deprecated
       @sensitive = sensitive
-      @code_gen_sensitive = code_gen_sensitive
+      @code_gen_sensitive = code_gen_sensitive || sensitive
       @allow_shell_conversion = (type == :shell_string)
       @display_in_shell = display_in_shell
       @skip_type_validation = skip_type_validation # sometimes we allow multiple types which causes type validation failures, e.g.: export_options in gym
+
+      @code_gen_default_value = code_gen_default_value
+
+      update_code_gen_default_value_if_able!
+    end
+
+    # if code_gen_default_value is nil, use the default value if it isn't a `code_gen_sensitive` value
+    def update_code_gen_default_value_if_able!
+      if @code_gen_default_value.nil?
+        unless @code_gen_sensitive
+
+          @code_gen_default_value = @default_value
+        end
+      end
     end
 
     def verify!(value)

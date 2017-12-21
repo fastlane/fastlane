@@ -233,18 +233,9 @@ func parseInt(fromString: String, function: String = #function) -> Int {
           if ignore_param?(function_name: action_name, param_name: current.key)
             next
           end
-
-          # If the option's default value is code_gen_sensitive, then clear it
-          default_value = (current.code_gen_sensitive || current.sensitive) ? nil : current.default_value
-
-          # If we have a default value specifically for code gen, override our current default_value
-          if current.code_gen_default_value
-            default_value = current.code_gen_default_value
-          end
-
           keys << current.key.to_s
           key_descriptions << current.description
-          key_default_values << default_value
+          key_default_values << current.code_gen_default_value
           key_optionality_values << current.optional
           key_type_overrides << current.data_type
         end
