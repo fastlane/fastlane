@@ -5,6 +5,7 @@ module Fastlane
     end
 
     class DownloadDsymsAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         require 'spaceship'
         require 'net/http'
@@ -29,8 +30,12 @@ module Fastlane
         # Set version if it is latest
         if version == 'latest'
           # Try to grab the edit version first, else fallback to live version
+          UI.message("Looking for latest version...")
           latest_version = app.edit_version(platform: platform) || app.live_version(platform: platform)
-          version = nil
+
+          UI.user_error!("Could not find latest version for your app, please try setting a specific version") if latest_version.version.nil?
+
+          version = latest_version.version
           build_number = latest_version.build_version
         end
 
@@ -82,6 +87,7 @@ module Fastlane
           UI.error("No dSYM files found on iTunes Connect - this usually happens when no recompling happened yet")
         end
       end
+      # rubocop:enable Metrics/PerceivedComplexity
 
       def self.write_dsym(data, bundle_id, train_number, build_number, output_directory)
         file_name = "#{bundle_id}-#{train_number}-#{build_number}.dSYM.zip"

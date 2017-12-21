@@ -9,6 +9,7 @@ end
 
 desc "Increment the version number of this gem, after generating new Swift API"
 lane :bump do |options|
+  verify_env_variables
   ensure_git_branch(branch: "master")
   ensure_git_status_clean
 
@@ -28,14 +29,14 @@ lane :bump do |options|
   bump_type ||= 'minor' if prompt(text: "New feature, method or API?", boolean: true)
   bump_type ||= 'patch'
 
+  slug = "fastlane/fastlane"
+  new_version = version_bump_podspec(path: version_file_path, bump_type: bump_type)
+
   # Everything looks good, let's generate the Swift API
   generated_files = generate_swift_api
 
   # Add all changed files to the version bump commit
   paths_for_commit += generated_files
-
-  slug = "fastlane/fastlane"
-  new_version = version_bump_podspec(path: version_file_path, bump_type: bump_type)
 
   # Add version file path to change set
   paths_for_commit << version_file_path
@@ -87,6 +88,7 @@ end
 desc "Does everything that's needed for a release"
 desc "This includes running tests and verifying the GitHub release"
 lane :release do
+  verify_env_variables
   slack_train_start(distance: 2,
                        train: "🚀",
            reverse_direction: true,

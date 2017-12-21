@@ -30,6 +30,9 @@ module FastlaneCore
     # [Boolean] is false by default. If set to true, also string values will not be asked to the user
     attr_accessor :optional
 
+    # [Boolean] is false by default. If set to true, type of the parameter will not be validated.
+    attr_accessor :skip_type_validation
+
     # [Array] array of conflicting option keys(@param key). This allows to resolve conflicts intelligently
     attr_accessor :conflicting_options
 
@@ -67,6 +70,7 @@ module FastlaneCore
     #   You have to raise a specific exception if something goes wrong. Append .red after the string
     # @param is_string *DEPRECATED: Use `type` instead* (Boolean) is that parameter a string? Defaults to true. If it's true, the type string will be verified.
     # @param type (Class) the data type of this config item. Takes precedence over `is_string`. Use `:shell_string` to allow types `String`, `Hash` and `Array` that will be converted to shell-escaped strings
+    # @param skip_type_validation (Boolean) is false by default. If set to true, type of the parameter will not be validated.
     # @param optional (Boolean) is false by default. If set to true, also string values will not be asked to the user
     # @param conflicting_options ([]) array of conflicting option keys(@param key). This allows to resolve conflicts intelligently
     # @param conflict_block an optional block which is called when options conflict happens
