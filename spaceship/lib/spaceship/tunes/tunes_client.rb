@@ -534,7 +534,7 @@ module Spaceship
     end
 
     def price_tier(app_id)
-      r = request(:get, "ra/apps/#{app_id}/pricing/intervals")
+      r = request(:get, "ra/apps/#{app_id}/pricing")
       data = parse_response(r, 'data')
 
       begin
@@ -1043,8 +1043,14 @@ module Spaceship
       handle_itc_response(r)
     end
 
-    # Loads the full In-App-Purchases
-    def load_iap(app_id: nil, purchase_id: nil)
+    # Loads the iap prices for specific product
+    def load_iap_prices(app_id: nil, purchase_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps/#{purchase_id}/pricing")
+      parse_response(r, 'data')
+    end
+
+    # Loads iap full details
+    def load_iap_details(app_id: nil, purchase_id: nil)
       r = request(:get, "ra/apps/#{app_id}/iaps/#{purchase_id}")
       parse_response(r, 'data')
     end
