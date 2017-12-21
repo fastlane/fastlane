@@ -41,7 +41,7 @@ describe Spaceship::TestFlight::Group do
           }
         ]
       end
-      mock_client_response(:create_group_for_app, with: {app_id: 'app-id' , group_name: 'group-name'}) do
+      mock_client_response(:create_group_for_app, with: { app_id: 'app-id', group_name: 'group-name' }) do
         {
           id: 3,
           name: 'group-name',
