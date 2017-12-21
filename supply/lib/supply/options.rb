@@ -11,6 +11,7 @@ module Supply
                                      env_name: "SUPPLY_PACKAGE_NAME",
                                      short_option: "-p",
                                      description: "The package name of the application to use",
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:package_name)),
         FastlaneCore::ConfigItem.new(key: :track,
                                      short_option: "-a",
@@ -42,6 +43,7 @@ module Supply
                                      conflicting_options: [:json_key],
                                      deprecated: 'Use --json_key instead',
                                      description: "The p12 File used to authenticate with Google",
+                                     code_gen_sensitive: true,
                                      default_value: Dir["*.p12"].first || CredentialsManager::AppfileConfig.try_fetch_value(:keyfile),
                                      verify_block: proc do |value|
                                        UI.user_error! "Could not find p12 file at path '#{File.expand_path(value)}'" unless File.exist?(File.expand_path(value))
@@ -52,6 +54,7 @@ module Supply
                                      conflicting_options: [:json_key],
                                      deprecated: 'Use --json_key instead',
                                      description: "The issuer of the p12 file (email address of the service account)",
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:issuer),
                                      verify_block: proc do |value|
                                        UI.important("DEPRECATED --issuer OPTION. Use --json_key instead")
@@ -62,6 +65,7 @@ module Supply
                                      conflicting_options: [:issuer, :key, :json_key_data],
                                      optional: true, # this shouldn't be optional but is until --key and --issuer are completely removed
                                      description: "The service account json file used to authenticate with Google",
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
                                      verify_block: proc do |value|
                                        UI.user_error! "'#{value}' doesn't seem to be a JSON file" unless FastlaneCore::Helper.json_file?(File.expand_path(value))
@@ -73,6 +77,7 @@ module Supply
                                      conflicting_options: [:issuer, :key, :json_key],
                                      optional: true,
                                      description: "The service account json used to authenticate with Google",
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
                                      verify_block: proc do |value|
                                        begin
@@ -86,6 +91,7 @@ module Supply
                                      description: "Path to the APK file to upload",
                                      short_option: "-b",
                                      conflicting_options: [:apk_paths],
+                                     code_gen_sensitive: true,
                                      default_value: Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-Release.apk")].last,
                                      optional: true,
                                      verify_block: proc do |value|

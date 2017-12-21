@@ -88,6 +88,7 @@ module Fastlane
                                          env_name: "FL_GITHUB_API_TOKEN",
                                          description: "Personal API Token for GitHub - generate one at https://github.com/settings/tokens",
                                          sensitive: true,
+                                         code_gen_sensitive: true,
                                          is_string: true,
                                          default_value: ENV["GITHUB_API_TOKEN"],
                                          optional: false),
