@@ -1123,7 +1123,8 @@ func danger(useBundleExec: Bool = true,
             failOnErrors: Bool = false,
             newComment: Bool = false,
             base: String? = nil,
-            head: String? = nil) {
+            head: String? = nil,
+            pr: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "danger", className: nil, args: [RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec),
                                                                                         RubyCommand.Argument(name: "verbose", value: verbose),
                                                                                         RubyCommand.Argument(name: "danger_id", value: dangerId),
@@ -1132,7 +1133,8 @@ func danger(useBundleExec: Bool = true,
                                                                                         RubyCommand.Argument(name: "fail_on_errors", value: failOnErrors),
                                                                                         RubyCommand.Argument(name: "new_comment", value: newComment),
                                                                                         RubyCommand.Argument(name: "base", value: base),
-                                                                                        RubyCommand.Argument(name: "head", value: head)])
+                                                                                        RubyCommand.Argument(name: "head", value: head),
+                                                                                        RubyCommand.Argument(name: "pr", value: pr)])
   _ = runner.executeCommand(command)
 }
 func deleteKeychain(name: String? = nil,
@@ -1393,9 +1395,9 @@ func gcovr() {
   let command = RubyCommand(commandID: "", methodName: "gcovr", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
-func getBuildNumber(xcodeproj: String? = nil) {
+@discardableResult func getBuildNumber(xcodeproj: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "get_build_number", className: nil, args: [RubyCommand.Argument(name: "xcodeproj", value: xcodeproj)])
-  _ = runner.executeCommand(command)
+  return runner.executeCommand(command)
 }
 func getBuildNumberRepository(useHgRevisionNumber: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "get_build_number_repository", className: nil, args: [RubyCommand.Argument(name: "use_hg_revision_number", value: useHgRevisionNumber)])
@@ -1431,17 +1433,17 @@ func getGithubRelease(url: String,
                                                                                                     RubyCommand.Argument(name: "api_token", value: apiToken)])
   _ = runner.executeCommand(command)
 }
-func getInfoPlistValue(key: String,
-                       path: String) {
+@discardableResult func getInfoPlistValue(key: String,
+                                          path: String) -> String {
   let command = RubyCommand(commandID: "", methodName: "get_info_plist_value", className: nil, args: [RubyCommand.Argument(name: "key", value: key),
                                                                                                       RubyCommand.Argument(name: "path", value: path)])
-  _ = runner.executeCommand(command)
+  return runner.executeCommand(command)
 }
-func getIpaInfoPlistValue(key: String,
-                          ipa: String) {
+@discardableResult func getIpaInfoPlistValue(key: String,
+                                             ipa: String) -> String {
   let command = RubyCommand(commandID: "", methodName: "get_ipa_info_plist_value", className: nil, args: [RubyCommand.Argument(name: "key", value: key),
                                                                                                           RubyCommand.Argument(name: "ipa", value: ipa)])
-  _ = runner.executeCommand(command)
+  return runner.executeCommand(command)
 }
 func getProvisioningProfile(adhoc: Bool = false,
                             development: Bool = false,
@@ -1525,9 +1527,9 @@ func gitAdd(path: String? = nil,
                                                                                          RubyCommand.Argument(name: "pathspec", value: pathspec)])
   _ = runner.executeCommand(command)
 }
-func gitBranch() {
+@discardableResult func gitBranch() -> String {
   let command = RubyCommand(commandID: "", methodName: "git_branch", className: nil, args: [])
-  _ = runner.executeCommand(command)
+  return runner.executeCommand(command)
 }
 func gitCommit(path: String,
                message: String) {
@@ -2856,7 +2858,8 @@ func slack(message: String? = nil,
            payload: String = "{}",
            defaultPayloads: [String]? = nil,
            attachmentProperties: String = "{}",
-           success: Bool = true) {
+           success: Bool = true,
+           failOnError: Bool = true) {
   let command = RubyCommand(commandID: "", methodName: "slack", className: nil, args: [RubyCommand.Argument(name: "message", value: message),
                                                                                        RubyCommand.Argument(name: "channel", value: channel),
                                                                                        RubyCommand.Argument(name: "use_webhook_configured_username_and_icon", value: useWebhookConfiguredUsernameAndIcon),
@@ -2866,7 +2869,8 @@ func slack(message: String? = nil,
                                                                                        RubyCommand.Argument(name: "payload", value: payload),
                                                                                        RubyCommand.Argument(name: "default_payloads", value: defaultPayloads),
                                                                                        RubyCommand.Argument(name: "attachment_properties", value: attachmentProperties),
-                                                                                       RubyCommand.Argument(name: "success", value: success)])
+                                                                                       RubyCommand.Argument(name: "success", value: success),
+                                                                                       RubyCommand.Argument(name: "fail_on_error", value: failOnError)])
   _ = runner.executeCommand(command)
 }
 func slackTrain() {

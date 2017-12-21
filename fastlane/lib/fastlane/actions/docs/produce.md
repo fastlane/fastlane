@@ -204,7 +204,11 @@ lane :release do
       passbook: "on",                # Valid values: "on", "off"
       push_notification: "on",       # Valid values: "on", "off"
       siri_kit: "on",                # Valid values: "on", "off"
-      vpn_configuration: "on"       # Valid values: "on", "off"
+      vpn_configuration: "on",       # Valid values: "on", "off"
+      network_extension: "on",       # Valid values: "on", "off"
+      hotspot: "on",                 # Valid values: "on", "off"
+      multipath: "on",               # Valid values: "on", "off"
+      nfc_tag_reading: "on",         # Valid values: "on", "off"
     }
   )
 
