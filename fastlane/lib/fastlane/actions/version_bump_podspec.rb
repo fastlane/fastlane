@@ -47,6 +47,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_VERSION_BUMP_PODSPEC_PATH",
                                        description: "You must specify the path to the podspec file to update",
+                                       code_gen_sensitive: true,
                                        default_value: Dir["*.podspec"].last,
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a path to the `version_bump_podspec` action") if value.length == 0

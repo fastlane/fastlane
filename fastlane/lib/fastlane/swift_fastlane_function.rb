@@ -23,29 +23,6 @@ module Fastlane
       # class instance?
       @reserved_words = %w[associativity break case catch class continue convenience default deinit didSet do else enum extension fallthrough false final for func get guard if in infix init inout internal lazy let mutating nil operator override postfix precedence prefix private public repeat required return self set static struct subscript super switch throws true try var weak where while willSet].to_set
       # rubocop:enable LineLength
-
-      @default_values_to_ignore = {
-        "cert" => ["keychain_path"].to_set,
-        "get_certificates" => ["keychain_path"].to_set,
-        "set_github_release" => ["api_token"].to_set,
-        "github_api" => ["api_token"].to_set,
-        "create_pull_request" => ["api_token", "head", "api_url"].to_set,
-        "commit_github_file" => ["api_token"].to_set,
-        "verify_xcode" => ["xcode_path"].to_set,
-        "produce" => ["sku"].to_set,
-        "create_app_online" => ["sku"].to_set,
-        "screengrab" => ["android_home"].to_set,
-        "capture_android_screenshots" => ["android_home"].to_set
-      }
-    end
-
-    def ignore_default_value?(function_name: nil, param_name: nil)
-      action_set = @default_values_to_ignore[function_name]
-      unless action_set
-        return false
-      end
-
-      return action_set.include?(param_name)
     end
 
     def sanitize_reserved_word(word: nil)
@@ -106,8 +83,6 @@ module Fastlane
     end
 
     def override_default_value_if_not_correct_type(param_name: nil, param_type: nil, default_value: nil)
-      default_value = nil if ignore_default_value?(function_name: @function_name, param_name: param_name)
-
       return "[]" if param_type == "[String]" && default_value == ""
       return "{_ in }" if param_type == "((String) -> Void)"
 
@@ -123,10 +98,6 @@ module Fastlane
       optional_specifier = ""
       # if we are optional and don't have a default value, we'll need to use ?
       optional_specifier = "?" if (optional && default_value.nil?) && type != "((String) -> Void)"
-
-      if optional && ignore_default_value?(function_name: @function_name, param_name: param)
-        optional_specifier = "?"
-      end
 
       # If we have a default value of true or false, we can infer it is a Bool
       if default_value.class == FalseClass
@@ -284,9 +255,6 @@ module Fastlane
 
       swift_implementations = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
         type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
-
-        default_value = nil if ignore_default_value?(function_name: @function_name, param_name: param)
-
         param = camel_case_lower(string: param)
         param = sanitize_reserved_word(word: param)
         var_for_parameter_name = param

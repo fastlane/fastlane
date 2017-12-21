@@ -80,6 +80,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_PROJECT_SIGNING_PROJECT_PATH",
                                        description: "Path to your Xcode project",
+                                       code_gen_sensitive: true,
                                        default_value: Dir['*.xcodeproj'].first,
                                        verify_block: proc do |value|
                                          UI.user_error!("Path is invalid") unless File.exist?(File.expand_path(value))

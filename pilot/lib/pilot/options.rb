@@ -18,6 +18,7 @@ module Pilot
                                      env_name: "PILOT_APP_IDENTIFIER",
                                      description: "The bundle identifier of the app to upload or manage testers (optional)",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: ENV["TESTFLIGHT_APP_IDENTITIFER"] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
         FastlaneCore::ConfigItem.new(key: :app_platform,
                                      short_option: "-m",
@@ -33,6 +34,7 @@ module Pilot
                                      optional: true,
                                      env_name: "PILOT_IPA",
                                      description: "Path to the ipa file to upload",
+                                     code_gen_sensitive: true,
                                      default_value: Dir["*.ipa"].sort_by { |x| File.mtime(x) }.last,
                                      verify_block: proc do |value|
                                        value = File.expand_path(value)
@@ -78,6 +80,7 @@ module Pilot
                                      env_name: "PILOT_APPLE_ID",
                                      description: "The unique App ID provided by iTunes Connect",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: ENV["TESTFLIGHT_APPLE_ID"]),
         FastlaneCore::ConfigItem.new(key: :distribute_external,
                                      is_string: false,
@@ -123,6 +126,7 @@ module Pilot
                                      description: "The ID of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
                                      is_string: false, # as we also allow integers, which we convert to strings anyway
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
@@ -132,6 +136,7 @@ module Pilot
                                      env_name: "PILOT_TEAM_NAME",
                                      description: "The name of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
@@ -141,6 +146,7 @@ module Pilot
                                      description: "The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!",
                                      optional: true,
                                      is_string: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s

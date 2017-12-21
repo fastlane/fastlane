@@ -25,6 +25,7 @@ module Fastlane
                                        env_name: "FL_VERSION_PODSPEC_PATH",
                                        description: "You must specify the path to the podspec file",
                                        is_string: true,
+                                       code_gen_sensitive: true,
                                        default_value: Dir["*.podspec"].last,
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a path to the `version_get_podspec` action") if value.length == 0

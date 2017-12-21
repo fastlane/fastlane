@@ -97,6 +97,7 @@ module Fastlane
                                        env_name: "PRODUCE_APP_IDENTIFIER",
                                        short_option: "-a",
                                        description: "App Identifier (Bundle ID, e.g. com.krausefx.app)",
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
           FastlaneCore::ConfigItem.new(key: :services,
                                        display_in_shell: false,
@@ -117,6 +118,7 @@ module Fastlane
                                        env_name: "PRODUCE_TEAM_ID",
                                        description: "The ID of your Developer Portal team if you're in multiple teams",
                                        optional: true,
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_TEAM_ID"] = value.to_s
@@ -126,6 +128,7 @@ module Fastlane
                                        env_name: "PRODUCE_TEAM_NAME",
                                        description: "The name of your Developer Portal team if you're in multiple teams",
                                        optional: true,
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_TEAM_NAME"] = value.to_s

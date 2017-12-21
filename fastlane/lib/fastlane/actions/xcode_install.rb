@@ -62,6 +62,7 @@ module Fastlane
                                        env_name: "XCODE_INSTALL_TEAM_ID",
                                        description: "The ID of your team if you're in multiple teams",
                                        optional: true,
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id))
         ]
       end
