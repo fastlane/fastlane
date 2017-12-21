@@ -71,22 +71,10 @@ module Fastlane
         appledoc_args = params_hash_to_cli_args(params_hash)
         UI.success("Generating documentation.")
         cli_args = appledoc_args.join(' ')
-        input_cli_arg = input_param_to_cli_arg(params_hash[:input])
+        input_cli_arg = Array(params_hash[:input]).map(&:shellescape).join(' ')
         command = "appledoc #{cli_args}".strip + " " + input_cli_arg
         UI.verbose(command)
         Actions.sh command
-      end
-
-      def self.input_param_to_cli_arg(input_param)
-        cli_arg = ""
-        if input_param.kind_of?(Array)
-          input_param.map! { |path| quote_string_param(path) }
-          cli_arg = input_param.join(' ')
-        else
-          cli_arg = quote_string_param(input_param)
-        end
-
-        return cli_arg
       end
 
       def self.params_hash_to_cli_args(params)
@@ -113,12 +101,8 @@ module Fastlane
       end
 
       def self.cli_param(k, v)
-        value = quote_string_param(v)
+        value = (v != true && v.to_s.length > 0 ? "\"#{v}\"" : "")
         "#{k} #{value}".strip
-      end
-
-      def self.quote_string_param(s)
-        s != true && s.to_s.length > 0 ? "\"#{s}\"" : ""
       end
 
       def self.create_output_dir_if_not_exists(output_path)
