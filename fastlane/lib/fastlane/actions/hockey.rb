@@ -50,7 +50,7 @@ module Fastlane
         end
       end
 
-      def self.upload_dsym(api_token, app_id, bundle_version, options)
+      def self.upload_ipa_dsym(api_token, app_id, bundle_version, options)
         connection = self.connection(options)
         response = connection.put do |req|
           req.options.timeout = options.delete(:timeout)
@@ -113,8 +113,8 @@ module Fastlane
 
         case response.status
         when 200...300
-          app_version_id = response.body['id']
-          UI.message("successfully created version with id #{app_version_id}")
+          bundle_version = response.body['id']
+          UI.message("successfully created version with id #{bundle_version}")
         else
           UI.user_error!("Error trying to create app version:  #{response.status} - #{response.body}")
         end
@@ -123,7 +123,7 @@ module Fastlane
         options[:dsym] = dsym_io
         options[:status] = update_status
 
-        self.upload_dsym(api_token, app_id, app_version_id, options)
+        self.upload_ipa_dsym(api_token, app_id, bundle_version, options)
       end
 
       def self.run(options)
@@ -164,7 +164,7 @@ module Fastlane
 
         if options[:upload_dsym_only]
           UI.success('Starting with dSYM upload to HockeyApp... this could take some time.')
-          self.upload_dsym(api_token, values[:public_identifier], values[:bundle_version], values)
+          self.upload_ipa_dsym(api_token, values[:public_identifier], values[:bundle_version], values)
         else
           UI.success('Starting with file(s) upload to HockeyApp... this could take some time.')
 
