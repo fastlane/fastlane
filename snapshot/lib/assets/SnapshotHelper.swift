@@ -43,6 +43,7 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
     case cannotFindHomeDirectory
     case cannotFindSimulatorHomeDirectory
     case cannotAccessSimulatorHomeDirectory(String)
+    case cannotRunOnPhysicalDevice
 
     var debugDescription: String {
         switch self {
@@ -54,6 +55,8 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
             return "Couldn't find simulator home location. Please, check SIMULATOR_HOST_HOME env variable."
         case .cannotAccessSimulatorHomeDirectory(let simulatorHostHome):
             return "Can't prepare environment. Simulator home location is inaccessible. Does \(simulatorHostHome) exist?"
+        case .cannotRunOnPhysicalDevice:
+            return "Can't use Snapshot on a physical device."
         }
     }
 }
@@ -83,7 +86,7 @@ open class Snapshot: NSObject {
 
     class func setLanguage(_ app: XCUIApplication) {
         guard let cacheDirectory = self.cacheDirectory else {
-            print("CacheDirectory is not set - probably runnig a physical device?")
+            print("CacheDirectory is not set - probably runnig on a physical device?")
             return
         }
         
@@ -100,7 +103,7 @@ open class Snapshot: NSObject {
 
     class func setLocale(_ app: XCUIApplication) {
         guard let cacheDirectory = self.cacheDirectory else {
-            print("CacheDirectory is not set - probably runnig a physical device?")
+            print("CacheDirectory is not set - probably runnig on a physical device?")
             return
         }
         
@@ -120,7 +123,7 @@ open class Snapshot: NSObject {
 
     class func setLaunchArguments(_ app: XCUIApplication) {
         guard let cacheDirectory = self.cacheDirectory else {
-            print("CacheDirectory is not set - probably runnig a physical device?")
+            print("CacheDirectory is not set - probably runnig on a physical device?")
             return
         }
         
@@ -154,7 +157,7 @@ open class Snapshot: NSObject {
         #else
             
             guard let app = self.app else {
-                print("XCUIApplication is not set")
+                print("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
                 return
             }
             
@@ -195,13 +198,17 @@ open class Snapshot: NSObject {
 
             homeDir = usersDir.appendingPathComponent(user)
         #else
-            guard let simulatorHostHome = ProcessInfo().environment["SIMULATOR_HOST_HOME"] else {
-                throw SnapshotError.cannotFindSimulatorHomeDirectory
-            }
-            guard let homeDirUrl = URL(string: simulatorHostHome) else {
-                throw SnapshotError.cannotAccessSimulatorHomeDirectory(simulatorHostHome)
-            }
-            homeDir = URL(fileURLWithPath: homeDirUrl.path)
+            #if arch(i386) || arch(x86_64)
+                guard let simulatorHostHome = ProcessInfo().environment["SIMULATOR_HOST_HOME"] else {
+                    throw SnapshotError.cannotFindSimulatorHomeDirectory
+                }
+                guard let homeDirUrl = URL(string: simulatorHostHome) else {
+                    throw SnapshotError.cannotAccessSimulatorHomeDirectory(simulatorHostHome)
+                }
+                homeDir = URL(fileURLWithPath: homeDirUrl.path)
+            #else
+                throw SnapshotError.cannotRunOnPhysicalDevice
+            #endif
         #endif
         return homeDir.appendingPathComponent("Library/Caches/tools.fastlane")
     }
