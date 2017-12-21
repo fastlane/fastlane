@@ -1,7 +1,7 @@
 version: 2
 
 jobs:
-  build:
+  "macOS":
     macos:
       xcode: "9.0.0"
     environment:
@@ -13,7 +13,7 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: v1-gems-{{ checksum "Gemfile" }}
+          key: fastlane-macos-gems-{{ checksum "Gemfile" }}
       - run:
           name: Setup Build
           command: |
@@ -23,7 +23,70 @@ jobs:
             brew install shellcheck
             bundle check || bundle install --jobs=4 --retry=3 --path .bundle
       - save_cache:
-          key: v1-gems-{{ checksum "Gemfile" }}
+          key: fastlane-macos-gems-{{ checksum "Gemfile" }}
+          paths:
+            - .bundle
+
+      - run:
+          name: Check PR Metadata
+          command: bundle exec danger || echo "danger failed"
+
+      - run: bundle exec fastlane test
+
+      - store_test_results:
+          path: /Users/distiller/test-results
+
+      - run:
+          name: Post Test Results to GitHub
+          command: bundle exec danger || echo "danger failed"
+          when: always # Run this even when tests fail
+  
+  "Ubuntu":
+    environment:
+      CIRCLE_TEST_RESULTS: $HOME/test-results
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+      FASTLANE_ITUNES_TRANSPORTER_PATH: /usr/local/itms
+    docker:
+      - image: circleci/ruby:2.3
+    shell: /bin/bash --login -eo pipefail
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: fastlane-ubuntu-gems-{{ checksum "Gemfile" }}
+      - run:
+          name: Setup Build
+          command: |
+            mkdir -p $CIRCLE_TEST_RESULTS
+            echo "2.3" > .ruby-version
+            gem update --system
+            bundle check || bundle install --jobs=4 --retry=3 --path .bundle
+            sudo apt-get install shellcheck
+      - run:
+          name: Install additional dependency xar
+          command: |
+            cd /tmp
+            mkdir download
+            cd download
+            wget https://github.com/downloads/mackyle/xar/xar-1.6.1.tar.gz
+            tar -xzf xar-1.6.1.tar.gz
+            cd xar-1.6.1
+            ./autogen.sh --noconfigure
+            ./configure
+            make
+            sudo make install
+      - run:
+          name: Install additional dependency iTMSTransporter
+          command: |
+            cd /tmp
+            wget https://github.com/janpio/fastlane-ubuntu-foo/raw/master/iTMSTransporter_installer_linux_1.9.7.sh
+            sudo sh iTMSTransporter_installer_linux_1.9.7.sh --target itms --noexec
+            cd itms
+            sudo sed -e '15,43d' -i install_script.sh
+            sudo ./install_script.sh
+      - save_cache:
+          key: fastlane-ubuntu-gems-{{ checksum "Gemfile" }}
           paths:
             - .bundle
 
@@ -43,3 +106,10 @@ jobs:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - "macOS"
+      - "Ubuntu"
