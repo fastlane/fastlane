@@ -41,6 +41,13 @@ describe Spaceship::TestFlight::Group do
           }
         ]
       end
+      mock_client_response(:create_group_for_app, with: {app_id: 'app-id' , group_name: 'group-name'}) do
+        {
+          id: 3,
+          name: 'group-name',
+          isDefaultExternalGroup: false
+        }
+      end
     end
 
     context '.all' do
@@ -61,6 +68,22 @@ describe Spaceship::TestFlight::Group do
       it 'returns nil if no group matches' do
         group = Spaceship::TestFlight::Group.find(app_id: 'app-id', group_name: 'Group NaN')
         expect(group).to be_nil
+      end
+    end
+
+    context '.create!' do
+      it 'returns an existing group with the same name' do
+        group = Spaceship::TestFlight::Group.create!(app_id: 'app-id', group_name: 'Group 1')
+        expect(group.name).to eq('Group 1')
+        expect(group.id).to eq(1)
+        expect(group).to be_instance_of(Spaceship::TestFlight::Group)
+      end
+
+      it 'creates the group for correct parameters' do
+        group = Spaceship::TestFlight::Group.create!(app_id: 'app-id', group_name: 'group-name')
+        expect(group.name).to eq('group-name')
+        expect(group.id).to eq(3)
+        expect(group).to be_instance_of(Spaceship::TestFlight::Group)
       end
     end
 
