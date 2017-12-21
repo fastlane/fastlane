@@ -9,6 +9,7 @@ end
 
 desc "Increment the version number of this gem, after generating new Swift API"
 lane :bump do |options|
+  verify_env_variables
   ensure_git_branch(branch: "master")
   ensure_git_status_clean
 
@@ -87,6 +88,7 @@ end
 desc "Does everything that's needed for a release"
 desc "This includes running tests and verifying the GitHub release"
 lane :release do
+  verify_env_variables
   slack_train_start(distance: 2,
                        train: "🚀",
            reverse_direction: true,
