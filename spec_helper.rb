@@ -64,13 +64,37 @@ RSpec.configure do |config|
 
   config.example_status_persistence_file_path = "/tmp/rspec_failed_tests.txt"
 
-  # disable/filter some tests if not running on mac
+  # skip some tests if not running on mac
   unless FastlaneCore::Helper.is_mac?
-    config.filter_run_excluding requires_xcode: true
-    config.filter_run_excluding requires_xcodebuild: true
-    config.filter_run_excluding requires_plistbuddy: true
-    config.filter_run_excluding requires_keychain: true
-    config.filter_run_excluding requires_security: true
+
+    # define metadata tags that also imply :skip
+    config.define_derived_metadata(:requires_xcode) do |meta|
+      meta[:skip] = "Skipped: Requires Xcode to be installed (which is not possible on this platform and no workaround has been implemented)"
+    end
+    config.define_derived_metadata(:requires_xcodebuild) do |meta|
+      meta[:skip] = "Skipped: Requires `xcodebuild` to be installed (which is not possible on this platform and no workaround has been implemented)"
+    end
+    config.define_derived_metadata(:requires_plistbuddy) do |meta|
+      meta[:skip] = "Skipped: Requires `plistbuddy` to be installed (which is not possible on this platform and no workaround has been implemented)"
+    end
+    config.define_derived_metadata(:requires_keychain) do |meta|
+      meta[:skip] = "Skipped: Requires `keychain` to be installed (which is not possible on this platform and no workaround has been implemented)"
+    end
+    config.define_derived_metadata(:requires_security) do |meta|
+      meta[:skip] = "Skipped: Requires `security` to be installed (which is not possible on this platform and no workaround has been implemented)"
+    end
+
+    # also skip `before()` for test groups that are skipped because of their tags
+    # only works for `describe` groups (that are parents of the `before`, not if the tag is set on `it`
+    # caution! has unexpected side effect on usage of `skip: false` for individual examples
+    # see https://groups.google.com/d/msg/rspec/5qeKQr_7G7k/Pb3ss2hOAAAJ
+    module HookOverrides
+      def before(*args)
+        super unless metadata[:skip]
+      end
+    end
+    config.extend HookOverrides
+
   end
 end
 
