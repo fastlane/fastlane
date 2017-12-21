@@ -78,10 +78,12 @@ module Fastlane
         end
 
         version_number = line.partition('=').last
-        return version_number if Helper.is_test?
 
         # Store the number in the shared hash
         Actions.lane_context[SharedValues::VERSION_NUMBER] = version_number
+
+        # Return the version number because Swift might need this return value
+        return version_number
       rescue => ex
         UI.error('Before being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html')
         raise ex
@@ -146,6 +148,10 @@ module Fastlane
         [
           'version = get_version_number(xcodeproj: "Project.xcodeproj")'
         ]
+      end
+
+      def self.return_type
+        :string
       end
 
       def self.category

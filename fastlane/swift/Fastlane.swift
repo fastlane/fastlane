@@ -1513,13 +1513,13 @@ func getPushCertificate(development: Bool = false,
                                                                                                       RubyCommand.Argument(name: "new_profile", value: newProfile)])
   _ = runner.executeCommand(command)
 }
-func getVersionNumber(xcodeproj: String? = nil,
-                      scheme: String? = nil,
-                      target: String? = nil) {
+@discardableResult func getVersionNumber(xcodeproj: String? = nil,
+                                         scheme: String? = nil,
+                                         target: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "get_version_number", className: nil, args: [RubyCommand.Argument(name: "xcodeproj", value: xcodeproj),
                                                                                                     RubyCommand.Argument(name: "scheme", value: scheme),
                                                                                                     RubyCommand.Argument(name: "target", value: target)])
-  _ = runner.executeCommand(command)
+  return runner.executeCommand(command)
 }
 func gitAdd(path: String? = nil,
             pathspec: String? = nil) {
