@@ -78,7 +78,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry-byebug'
   spec.add_development_dependency 'pry-rescue'
   spec.add_development_dependency 'pry-stack_explorer'
-  spec.add_development_dependency 'yard', '~> 0.8.7.4'
+  spec.add_development_dependency 'yard', '~> 0.9.11'
   spec.add_development_dependency 'webmock', '~> 2.3.2'
   spec.add_development_dependency 'coveralls', '~> 0.8.13'
   spec.add_development_dependency 'rubocop', Fastlane::RUBOCOP_REQUIREMENT
