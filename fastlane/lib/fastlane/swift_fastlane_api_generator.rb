@@ -233,10 +233,9 @@ func parseInt(fromString: String, function: String = #function) -> Int {
           if ignore_param?(function_name: action_name, param_name: current.key)
             next
           end
-
           keys << current.key.to_s
           key_descriptions << current.description
-          key_default_values << current.default_value
+          key_default_values << current.code_gen_default_value
           key_optionality_values << current.optional
           key_type_overrides << current.data_type
         end
