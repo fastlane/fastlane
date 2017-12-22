@@ -1,11 +1,11 @@
 version: 2
 
 jobs:
-  build:
+  "macOS":
     macos:
       xcode: "9.0.0"
     environment:
-      CIRCLE_TEST_REPORTS: ~/test-results
+      CIRCLE_TEST_REPORTS: ~/test-reports
       LC_ALL: en_US.UTF-8
       LANG: en_US.UTF-8
     shell: /bin/bash --login -eo pipefail
@@ -13,17 +13,17 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: v1-gems-{{ checksum "Gemfile" }}
+          key: v1-macos-gems-{{ checksum "Gemfile" }}
       - run:
           name: Setup Build
           command: |
-            mkdir -p ~/test-results
+            mkdir -p ~/test-reports
             echo "2.3" > .ruby-version
             gem update --system
             brew install shellcheck
             bundle check || bundle install --jobs=4 --retry=3 --path .bundle
       - save_cache:
-          key: v1-gems-{{ checksum "Gemfile" }}
+          key: v1-macos-gems-{{ checksum "Gemfile" }}
           paths:
             - .bundle
 
@@ -34,12 +34,74 @@ jobs:
       - run: bundle exec fastlane test
 
       - store_test_results:
-          path: ~/test-results
+          path: ~/test-reports
       - store_artifacts:
-          path: ~/test-results/rspec
-          destination: test-results
+          path: ~/test-reports/rspec
+          destination: test-reports
 
       - run:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
+  
+  "Ubuntu":
+    environment:
+      CIRCLE_TEST_REPORTS: ~/test-reports
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+      FASTLANE_ITUNES_TRANSPORTER_PATH: .bundle
+    docker:
+      - image: circleci/ruby:2.3
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
+      - run:
+          name: Setup Build
+          command: |
+            mkdir -p ~/test-reports
+            bundle check || bundle install --jobs=4 --retry=3 --path .bundle
+            sudo apt-get install shellcheck
+      - save_cache:
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
+          paths:
+            - .bundle
+
+      - run:
+          name: Install additional dependency xar
+          command: |
+            cd /tmp
+            mkdir download
+            cd download
+            wget https://github.com/downloads/mackyle/xar/xar-1.6.1.tar.gz
+            tar -xzf xar-1.6.1.tar.gz
+            cd xar-1.6.1
+            ./autogen.sh --noconfigure
+            ./configure
+            make
+            sudo make install
+
+      - run:
+          name: Check PR Metadata
+          command: bundle exec danger || echo "danger failed"
+
+      - run: bundle exec fastlane test
+
+      - store_test_results:
+          path: ~/test-reports
+      - store_artifacts:
+          path: ~/test-reports/rspec
+          destination: test-reports
+
+      - run:
+          name: Post Test Results to GitHub
+          command: bundle exec danger || echo "danger failed"
+          when: always # Run this even when tests fail
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - "macOS"
+      - "Ubuntu"
