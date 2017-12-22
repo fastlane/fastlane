@@ -71,7 +71,8 @@ module Fastlane
         appledoc_args = params_hash_to_cli_args(params_hash)
         UI.success("Generating documentation.")
         cli_args = appledoc_args.join(' ')
-        command = "appledoc #{cli_args}".strip + " \"#{params_hash[:input]}\""
+        input_cli_arg = Array(params_hash[:input]).map(&:shellescape).join(' ')
+        command = "appledoc #{cli_args}".strip + " " + input_cli_arg
         UI.verbose(command)
         Actions.sh command
       end
@@ -124,7 +125,7 @@ module Fastlane
       def self.available_options
         [
           # PATHS
-          FastlaneCore::ConfigItem.new(key: :input, env_name: "FL_APPLEDOC_INPUT", description: "Path to source files", is_string: true),
+          FastlaneCore::ConfigItem.new(key: :input, env_name: "FL_APPLEDOC_INPUT", description: "Path(s) to source file directories or individual source files. Accepts a single path or an array of paths", is_string: false),
           FastlaneCore::ConfigItem.new(key: :output, env_name: "FL_APPLEDOC_OUTPUT", description: "Output path", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :templates, env_name: "FL_APPLEDOC_TEMPLATES", description: "Template files path", is_string: true, optional: true),
           FastlaneCore::ConfigItem.new(key: :docset_install_path, env_name: "FL_APPLEDOC_DOCSET_INSTALL_PATH", description: "DocSet installation path", is_string: true, optional: true),
@@ -207,7 +208,10 @@ module Fastlane
           'appledoc(
             project_name: "MyProjectName",
             project_company: "Company Name",
-            input: "MyProjectSources",
+            input: [
+              "MyProjectSources",
+              "MyProjectSourceFile.h"
+            ],
             ignore: [
               "ignore/path/1",
               "ingore/path/2"
