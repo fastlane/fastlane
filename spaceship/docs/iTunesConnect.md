@@ -101,7 +101,7 @@ v.set_rating({
   'UNRESTRICTED_WEB_ACCESS' => 0
 })
 # Available values:
-# https://github.com/KrauseFx/deliver/blob/master/Reference.md
+# https://github.com/fastlane/fastlane/blob/master/deliver/assets/example_rating_config.json
 
 # Push the changes back to the server
 v.save!
