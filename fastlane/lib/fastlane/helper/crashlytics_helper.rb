@@ -43,7 +43,11 @@ module Fastlane
 
           UI.user_error!("The `crashlytics_path` must be a jar file for Android") unless params[:crashlytics_path].end_with?(".jar") || Helper.test?
 
-          command = ["java"]
+          if ENV['JAVA_HOME'].nil?
+            command = ["java"]
+          else
+            command = ["#{ENV['JAVA_HOME']}/bin/java"]
+          end
           command << "-jar #{File.expand_path(params[:crashlytics_path])}"
           command << "-androidRes ."
           command << "-apiKey #{params[:api_token]}"

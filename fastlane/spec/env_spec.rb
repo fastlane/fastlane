@@ -25,7 +25,7 @@ describe Fastlane do
       expect(env).to include("xcpretty")
     end
 
-    it "contains main information about the stack" do
+    it "contains main information about the stack", requires_xcode: true do
       expect(env).to include("Bundler?")
       expect(env).to include("Xcode Path")
       expect(env).to include("Xcode Version")
@@ -44,7 +44,7 @@ describe Fastlane do
         allow(FastlaneCore::Helper).to receive(:xcode_version).and_raise("Boom!")
       end
 
-      it 'contains stack information other than Xcode Version' do
+      it 'contains stack information other than Xcode Version', requires_xcode: true do
         expect(env).to include("Bundler?")
         expect(env).to include("Xcode Path")
         expect(env).not_to include("Xcode Version")

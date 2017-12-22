@@ -40,8 +40,12 @@ module Snapshot
 
         destinations = devices.map do |d|
           device = find_device(d, os_version)
-          UI.user_error!("No device found named '#{d}' for version '#{os_version}'") if device.nil?
-          "-destination 'platform=#{os} Simulator,name=#{device.name},OS=#{os_version}'"
+          if device.nil?
+            UI.user_error!("No device found named '#{d}' for version '#{os_version}'") if device.nil?
+          elsif device.os_version != os_version
+            UI.important("Using device named '#{device.name}' with version '#{device.os_version}' because no match was found for version '#{os_version}'")
+          end
+          "-destination 'platform=#{os} Simulator,name=#{device.name},OS=#{device.os_version}'"
         end
 
         return [destinations.join(' ')]
@@ -51,14 +55,14 @@ module Snapshot
         # Check each device to see if it is an iOS device
         all_ios = devices.map do |device|
           device = device.downcase
-          device.start_with?('iphone', 'ipad')
+          device.include?('iphone') || device.include?('ipad')
         end
         # Return true if all devices are iOS devices
         return true unless all_ios.include?(false)
 
         all_tvos = devices.map do |device|
           device = device.downcase
-          device.start_with?('apple tv')
+          device.include?('apple tv')
         end
         # Return true if all devices are iOS devices
         return true unless all_tvos.include?(false)

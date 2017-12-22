@@ -22,6 +22,15 @@ module Fastlane
           print_bundle_exec_warning(is_slow: (Time.now - before_import_time > 3))
         end
 
+        unless (ENV['LANG'] || "").end_with?("UTF-8") || (ENV['LC_ALL'] || "").end_with?("UTF-8")
+          warn = "WARNING: fastlane requires your locale to be set to UTF-8. To learn more go to https://docs.fastlane.tools/getting-started/ios/setup/#set-up-environment-variables"
+          UI.error(warn)
+          at_exit do
+            # Repeat warning here so users hopefully see it
+            UI.error(warn)
+          end
+        end
+
         FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
 
         ARGV.unshift("spaceship") if ARGV.first == "spaceauth"
@@ -113,8 +122,6 @@ module Fastlane
           UI.important "After creating the Gemfile and Gemfile.lock, commit those files into version control"
         end
         UI.important "Get started using a Gemfile for fastlane https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile"
-
-        sleep 2 # napping is life, otherwise the user might not see this message
       end
 
       # Returns an array of symbols for the available lanes for the Fastfile

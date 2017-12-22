@@ -30,13 +30,16 @@ task :generate_device_frames do
 
   image_assets = []
   (Dir["raw/Phones/Apple*/Device/*.png"] + Dir["raw/Computers/Apple*/Device/*.png"] + Dir["raw/Tablets/Apple*/Device/*.png"]).each do |current_raw|
-    next if DEVICES_TO_SKIP.include?(File.basename(current_raw))
+    basename = File.basename(current_raw)
+    next if DEVICES_TO_SKIP.include?(basename)
 
     cp(current_raw, output)
-
-    output_file_path = File.join(output, File.basename(current_raw))
-    convert_image_resource(output_file_path)
-    image_assets << File.basename(current_raw)
+    output_file_path = File.join(output, basename)
+    sanitaized_basename = sanitize_filename(basename)
+    sanitaized_file_path = File.join(output, sanitaized_basename)
+    mv(output_file_path, sanitaized_file_path) unless output_file_path == sanitaized_file_path
+    convert_image_resource(sanitaized_file_path)
+    image_assets << sanitaized_basename
   end
 
   raise "Could not find any images, make sure to copy all extracted files into ./raw" if image_assets.count < 10
@@ -62,6 +65,10 @@ end
 def confirm
   puts "Press any key when you're ready to continue".yellow
   gets
+end
+
+def sanitize_filename(filename)
+  filename.gsub('Grey', 'Gray')
 end
 
 # This will remove the white space around the actual frame

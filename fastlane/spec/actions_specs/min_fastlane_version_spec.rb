@@ -1,9 +1,9 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    describe "fastlane_version action" do
+    describe "min_fastlane_version action" do
       it "works as expected" do
         Fastlane::FastFile.new.parse("lane :test do
-          fastlane_version '0.1'
+          min_fastlane_version '0.1'
         end").runner.execute(:test)
       end
 
@@ -11,7 +11,7 @@ describe Fastlane do
         expect do
           expect(FastlaneCore::Changelog).to receive(:show_changes).with("fastlane", Fastlane::VERSION)
           Fastlane::FastFile.new.parse("lane :test do
-            fastlane_version '9999'
+            min_fastlane_version '9999'
           end").runner.execute(:test)
         end.to raise_error(/The Fastfile requires a fastlane version of >= 9999./)
       end
@@ -23,7 +23,7 @@ describe Fastlane do
           expect(FastlaneCore::Changelog).to receive(:show_changes).with("fastlane", Fastlane::VERSION)
 
           Fastlane::FastFile.new.parse("lane :test do
-            fastlane_version '9999'
+            min_fastlane_version '9999'
           end").runner.execute(:test)
         end.to raise_error("The Fastfile requires a fastlane version of >= 9999. You are on #{Fastlane::VERSION}.")
       end
@@ -35,17 +35,17 @@ describe Fastlane do
           # Let's define BUNDLE_BIN_PATH in ENV to simulate a bundler environement
           stub_const('ENV', { 'BUNDLE_BIN_PATH' => '/fake/elsewhere' })
           Fastlane::FastFile.new.parse("lane :test do
-            fastlane_version '9999'
+            min_fastlane_version '9999'
           end").runner.execute(:test)
         end.to raise_error("The Fastfile requires a fastlane version of >= 9999. You are on #{Fastlane::VERSION}.")
       end
 
-      it "raises an error if no team ID is given" do
+      it "raises an error if no fastlane version is given" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
-            fastlane_version
+            min_fastlane_version
           end").runner.execute(:test)
-        end.to raise_error("Please pass minimum fastlane version as parameter to fastlane_version")
+        end.to raise_error("Please pass minimum fastlane version as parameter to min_fastlane_version")
       end
     end
   end

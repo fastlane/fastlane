@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.0.0'
 
-  spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"]
+  spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["fastlane/swift/**/*"] + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"] - Dir["fastlane/lib/fastlane/actions/docs/assets/*"]
   spec.bindir = "bin"
   spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
 
@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = Dir["*/lib"]
 
   spec.add_dependency 'slack-notifier', '>= 1.3', '< 2.0.0' # Slack notifications
-  spec.add_dependency 'xcodeproj', '>= 1.5.0', '< 2.0.0' # Needed for commit_version_bump action
+  spec.add_dependency 'xcodeproj', '>= 1.5.2', '< 2.0.0' # Needed for commit_version_bump action and gym code_signing_mapping
   spec.add_dependency 'xcpretty', '>= 0.2.4', '< 1.0.0' # prettify xcodebuild output
   spec.add_dependency 'terminal-notifier', '>= 1.6.2', '< 2.0.0' # macOS notifications
   spec.add_dependency 'terminal-table', '>= 1.4.5', '< 2.0.0' # Actions documentation
@@ -44,7 +44,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'public_suffix', '~> 2.0.0' # https://github.com/fastlane/fastlane/issues/10162
 
   # TTY dependencies
-  spec.add_dependency 'tty-screen', '~> 0.5.0' # detect the terminal width
+  spec.add_dependency 'tty-screen', '~> 0.6.3' # detect the terminal width
 
   spec.add_dependency 'babosa', '>= 1.0.2', "< 2.0.0"
   spec.add_dependency 'colored' # colored terminal output
@@ -78,7 +78,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry-byebug'
   spec.add_development_dependency 'pry-rescue'
   spec.add_development_dependency 'pry-stack_explorer'
-  spec.add_development_dependency 'yard', '~> 0.8.7.4'
+  spec.add_development_dependency 'yard', '~> 0.9.11'
   spec.add_development_dependency 'webmock', '~> 2.3.2'
   spec.add_development_dependency 'coveralls', '~> 0.8.13'
   spec.add_development_dependency 'rubocop', Fastlane::RUBOCOP_REQUIREMENT

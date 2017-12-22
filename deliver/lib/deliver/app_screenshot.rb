@@ -13,6 +13,8 @@ module Deliver
       IOS_47 = "iOS-4.7-in"
       # iPhone 6 Plus
       IOS_55 = "iOS-5.5-in"
+      # iPhone X
+      IOS_58 = "iOS-5.8-in"
       # iPad
       IOS_IPAD = "iOS-iPad"
       # iPad Pro
@@ -23,6 +25,8 @@ module Deliver
       IOS_47_MESSAGES = "iOS-4.7-in-messages"
       # iPhone 6 Plus iMessage
       IOS_55_MESSAGES = "iOS-5.5-in-messages"
+      # iPhone X iMessage
+      IOS_58_MESSAGES = "iOS-5.8-in-messages"
       # iPad iMessage
       IOS_IPAD_MESSAGES = "iOS-iPad-messages"
       # iPad Pro iMessage
@@ -64,11 +68,13 @@ module Deliver
         ScreenSize::IOS_40 => "iphone4",
         ScreenSize::IOS_47 => "iphone6",
         ScreenSize::IOS_55 => "iphone6Plus",
+        ScreenSize::IOS_58 => "iphone58",
         ScreenSize::IOS_IPAD => "ipad",
         ScreenSize::IOS_IPAD_PRO => "ipadPro",
         ScreenSize::IOS_40_MESSAGES => "iphone4",
         ScreenSize::IOS_47_MESSAGES => "iphone6",
         ScreenSize::IOS_55_MESSAGES => "iphone6Plus",
+        ScreenSize::IOS_58_MESSAGES => "iphone58",
         ScreenSize::IOS_IPAD_MESSAGES => "ipad",
         ScreenSize::IOS_IPAD_PRO_MESSAGES => "ipadPro",
         ScreenSize::MAC => "desktop",
@@ -85,11 +91,13 @@ module Deliver
         ScreenSize::IOS_40 => "iPhone 5",
         ScreenSize::IOS_47 => "iPhone 6",
         ScreenSize::IOS_55 => "iPhone 6 Plus",
+        ScreenSize::IOS_58 => "iPhone X",
         ScreenSize::IOS_IPAD => "iPad",
         ScreenSize::IOS_IPAD_PRO => "iPad Pro",
         ScreenSize::IOS_40_MESSAGES => "iPhone 5 (iMessage)",
         ScreenSize::IOS_47_MESSAGES => "iPhone 6 (iMessage)",
         ScreenSize::IOS_55_MESSAGES => "iPhone 6 Plus (iMessage)",
+        ScreenSize::IOS_58_MESSAGES => "iPhone X (iMessage)",
         ScreenSize::IOS_IPAD_MESSAGES => "iPad (iMessage)",
         ScreenSize::IOS_IPAD_PRO_MESSAGES => "iPad Pro (iMessage)",
         ScreenSize::MAC => "Mac",
@@ -107,11 +115,21 @@ module Deliver
     end
 
     def is_messages?
-      return [ScreenSize::IOS_40_MESSAGES, ScreenSize::IOS_47_MESSAGES, ScreenSize::IOS_55_MESSAGES, ScreenSize::IOS_IPAD_MESSAGES, ScreenSize::IOS_IPAD_PRO_MESSAGES].include?(self.screen_size)
+      return [
+        ScreenSize::IOS_40_MESSAGES,
+        ScreenSize::IOS_47_MESSAGES,
+        ScreenSize::IOS_55_MESSAGES,
+        ScreenSize::IOS_58_MESSAGES,
+        ScreenSize::IOS_IPAD_MESSAGES,
+        ScreenSize::IOS_IPAD_PRO_MESSAGES
+      ].include?(self.screen_size)
     end
 
     def self.device_messages
       return {
+        ScreenSize::IOS_58_MESSAGES => [
+          [1125, 2436]
+        ],
         ScreenSize::IOS_55_MESSAGES => [
           [1080, 1920],
           [1242, 2208]
@@ -143,6 +161,9 @@ module Deliver
 
     def self.devices
       return {
+        ScreenSize::IOS_58 => [
+          [1125, 2436]
+        ],
         ScreenSize::IOS_55 => [
           [1080, 1920],
           [1242, 2208]

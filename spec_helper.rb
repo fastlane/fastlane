@@ -1,3 +1,7 @@
+# This module is only used to check the environment is currently a testing env
+module SpecHelper
+end
+
 require "coveralls"
 Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
 
@@ -12,18 +16,16 @@ unless ENV["DEBUG"]
   $stdout = File.open("/tmp/fastlane_tests", "w")
 end
 
-xcode_path = FastlaneCore::Helper.xcode_path
-unless xcode_path.include?("Contents/Developer")
-  UI.error("Seems like you didn't set the developer tools path correctly")
-  UI.error("Detected path '#{xcode_path}'") if xcode_path.to_s.length > 0
-  UI.error("Please run the following on your machine")
-  UI.command("sudo xcode-select -s /Applications/Xcode.app")
-  UI.error("Adapt the path if you have Xcode installed/named somewhere else")
-  exit(1)
-end
-
-# This module is only used to check the environment is currently a testing env
-module SpecHelper
+if FastlaneCore::Helper.is_mac?
+  xcode_path = FastlaneCore::Helper.xcode_path
+  unless xcode_path.include?("Contents/Developer")
+    UI.error("Seems like you didn't set the developer tools path correctly")
+    UI.error("Detected path '#{xcode_path}'") if xcode_path.to_s.length > 0
+    UI.error("Please run the following on your machine")
+    UI.command("sudo xcode-select -s /Applications/Xcode.app")
+    UI.error("Adapt the path if you have Xcode installed/named somewhere else")
+    exit(1)
+  end
 end
 
 (Fastlane::TOOLS + [:spaceship, :fastlane_core]).each do |tool|
@@ -61,6 +63,15 @@ RSpec.configure do |config|
   end
 
   config.example_status_persistence_file_path = "/tmp/rspec_failed_tests.txt"
+
+  # disable/filter some tests if not running on mac
+  unless FastlaneCore::Helper.is_mac?
+    config.filter_run_excluding requires_xcode: true
+    config.filter_run_excluding requires_xcodebuild: true
+    config.filter_run_excluding requires_plistbuddy: true
+    config.filter_run_excluding requires_keychain: true
+    config.filter_run_excluding requires_security: true
+  end
 end
 
 module FastlaneSpec

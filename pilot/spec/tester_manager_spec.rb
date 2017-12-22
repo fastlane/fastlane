@@ -5,31 +5,6 @@ describe Pilot::TesterManager do
   describe "Manages adding/removing/displaying testers" do
     let(:tester_manager) { Pilot::TesterManager.new }
 
-    let(:global_testers) do
-      [
-        OpenStruct.new(
-          first_name: 'First',
-          last_name: 'Last',
-          email: 'my@email.addr',
-          groups: ['testers'],
-          devices: ["d"],
-          latest_build: '1.0 (21)',
-          pretty_install_date: '2016-01-01',
-          something_else: 'blah'
-        ),
-        OpenStruct.new(
-          first_name: 'Fabricio',
-          last_name: 'Devtoolio',
-          email: 'fabric-devtools@gmail.com',
-          groups: ['testers'],
-          devices: ["d", "d2"],
-          latest_build: '1.1 (22)',
-          pretty_install_date: '2016-02-02',
-          something_else: 'blah'
-        )
-      ]
-    end
-
     let(:app_context_testers) do
       [
         OpenStruct.new(
@@ -111,97 +86,24 @@ describe Pilot::TesterManager do
 
       allow(tester_manager).to receive(:login) # prevent attempting to log in with iTC
       allow(fake_client).to receive(:user).and_return(current_user)
-      allow(fake_client).to receive(:testers).and_return(global_testers)
       allow(fake_client).to receive(:user_email).and_return("taquitos@fastlane.tools")
-    end
-
-    describe "when invoked from a global context" do
-      it "prints a table with columns including device and version info" do
-        allow(Spaceship::Tunes::Tester::Internal).to receive(:all).and_return(global_testers)
-        allow(Spaceship::Tunes::Tester::External).to receive(:all).and_return(global_testers)
-
-        headings = ["First", "Last", "Email", "Groups", "Devices", "Latest Version", "Latest Install Date"]
-        rows = global_testers.map do |tester|
-          [
-            tester.first_name,
-            tester.last_name,
-            tester.email,
-            tester.group_names,
-            tester.devices.count,
-            tester.latest_build,
-            tester.pretty_install_date
-          ]
-        end
-
-        expect(Terminal::Table).to receive(:new).with(title: "Internal Testers (2)".green,
-                                                   headings: headings,
-                                                       rows: rows)
-        expect(Terminal::Table).to receive(:new).with(title: "External Testers (2)".green,
-                                                   headings: headings,
-                                                       rows: rows)
-
-        tester_manager.list_testers({})
-      end
+      allow(fake_client).to receive(:team_id).and_return("1234")
     end
 
     describe "when invoked from the context of an app" do
       it "prints a table without columns showing device and version info" do
-        allow(Spaceship::Tunes::Tester::Internal).to receive(:all_by_app).and_return(app_context_testers)
-        allow(Spaceship::Tunes::Tester::External).to receive(:all_by_app).and_return(app_context_testers)
+        allow(Spaceship::TestFlight::Tester).to receive(:all).and_return(app_context_testers)
 
         headings = ["First", "Last", "Email", "Groups"]
         rows = app_context_testers.map do |tester|
           [tester.first_name, tester.last_name, tester.email, tester.group_names]
         end
 
-        expect(Terminal::Table).to receive(:new).with(title: "Internal Testers (2)".green,
-                                                   headings: headings,
-                                                       rows: rows)
-        expect(Terminal::Table).to receive(:new).with(title: "External Testers (2)".green,
+        expect(Terminal::Table).to receive(:new).with(title: "All Testers (2)".green,
                                                    headings: headings,
                                                        rows: rows)
 
         tester_manager.list_testers(app_identifier: 'com.whatever')
-      end
-    end
-
-    describe "when app manager asks to create new tester in the default group" do
-      it "creates a new tester and adds it to the default group" do
-        allow(current_user).to receive(:roles).and_return(["appmanager"])
-        allow(fake_client).to receive(:testers_by_app).and_return([])
-
-        expect(Spaceship::TestFlight::Tester).to receive(:create_app_level_tester).with(
-          app_id: 'com.whatever',
-          first_name: 'fake',
-          last_name: 'tester',
-          email: 'fabric-devtools@gmail.com+fake@gmail.com'
-        )
-        expect(Spaceship::Tunes::Tester::External).to receive(:find_by_app).and_return(nil) # before creating, no testers
-        expect(Spaceship::TestFlight::Group).to receive(:add_tester_to_groups!)
-        expect(Spaceship::Tunes::Tester::External).to receive(:find_by_app).and_return(fake_tester) # after creating a tester, we return one
-
-        expect(FastlaneCore::UI).to receive(:success).with('Successfully added tester: fabric-devtools@gmail.com+fake@gmail.com to app: My Fake App')
-        expect(FastlaneCore::UI).to receive(:success).with('Successfully added tester to the default tester group in app: My Fake App')
-
-        tester_manager.add_tester(default_add_tester_options)
-      end
-    end
-
-    describe "when admin asks to create new tester in the default group" do
-      it "creates a new tester and adds it to the default group" do
-        allow(current_user).to receive(:roles).and_return(["admin"])
-        allow(tester_manager).to receive(:find_app_tester).and_return(nil)
-
-        expect(Spaceship::Tunes::Tester::External).to receive(:create!).with(
-          email: 'fabric-devtools@gmail.com+fake@gmail.com',
-          first_name: 'fake',
-          last_name: 'tester'
-        )
-        expect(Spaceship::TestFlight::Group).to receive(:add_tester_to_groups!)
-        expect(FastlaneCore::UI).to receive(:success).with('Successfully added tester: fabric-devtools@gmail.com+fake@gmail.com to your account')
-        expect(FastlaneCore::UI).to receive(:success).with('Successfully added tester to the default tester group in app: My Fake App')
-
-        tester_manager.add_tester(default_add_tester_options)
       end
     end
 
@@ -210,7 +112,7 @@ describe Pilot::TesterManager do
         allow(current_user).to receive(:roles).and_return(["admin"])
         allow(tester_manager).to receive(:find_app_tester).and_return(fake_tester)
 
-        expect(Spaceship::Tunes::Tester::External).to_not receive(:create!)
+        expect(Spaceship::TestFlight::Tester).to_not receive(:create!)
         expect(Spaceship::TestFlight::Group).to receive(:add_tester_to_groups!).and_return([custom_tester_group])
         expect(FastlaneCore::UI).to receive(:success).with('Successfully added tester to group(s): Test Group in app: My Fake App')
 
@@ -234,13 +136,12 @@ describe Pilot::TesterManager do
     describe "when asked to add an existing internal tester to a specific existing custom group" do
       it "adds the tester to the custom group" do
         allow(current_user).to receive(:roles).and_return(["appmanager"])
-        allow(fake_tester).to receive(:kind_of?).with(Spaceship::Tunes::Tester::Internal).and_return(true)
 
-        expect(Spaceship::Tunes::Tester::Internal).to receive(:find_by_app).and_return(fake_tester)
+        expect(Spaceship::TestFlight::Tester).to receive(:find).and_return(fake_tester)
         expect(Spaceship::TestFlight::Tester).to_not receive(:create_app_level_tester)
         expect(Spaceship::TestFlight::Group).to receive(:add_tester_to_groups!).and_return([custom_tester_group])
         expect(FastlaneCore::UI).to receive(:success).with('Found existing tester fabric-devtools@gmail.com+fake@gmail.com')
-        expect(FastlaneCore::UI).to receive(:success).with('Successfully added tester to app My Fake App')
+        expect(FastlaneCore::UI).to receive(:success).with('Successfully added tester to group(s): Test Group in app: My Fake App')
 
         tester_manager.add_tester(default_add_tester_options_with_group)
       end
@@ -265,7 +166,7 @@ describe Pilot::TesterManager do
         allow(Spaceship::Application).to receive(:find).and_return(nil)
         allow(tester_manager).to receive(:find_app).and_return(nil)
 
-        expect(Spaceship::Tunes::Tester::External).to receive(:find).and_return(fake_tester)
+        expect(Spaceship::TestFlight::Tester).to receive(:find).and_return(fake_tester)
         expect(Spaceship::TestFlight::Group).to_not receive(:remove_tester_from_groups!)
         expect(FastlaneCore::UI).to receive(:success).with('Found existing tester fabric-devtools@gmail.com+fake@gmail.com')
         expect(FastlaneCore::UI).to receive(:success).with('Successfully removed tester fabric-devtools@gmail.com+fake@gmail.com from Users and Roles')

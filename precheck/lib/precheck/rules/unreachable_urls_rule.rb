@@ -1,4 +1,5 @@
 require 'precheck/rule'
+require 'addressable'
 
 module Precheck
   class UnreachableURLRule < URLRule
@@ -24,7 +25,9 @@ module Precheck
         return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "empty url") if url.empty?
 
         begin
-          request = Faraday.new(URI.encode(url)) do |connection|
+          uri = Addressable::URI.parse(url)
+          uri.fragment = nil
+          request = Faraday.new(URI.encode(uri.to_s)) do |connection|
             connection.use FaradayMiddleware::FollowRedirects
             connection.adapter :net_http
           end

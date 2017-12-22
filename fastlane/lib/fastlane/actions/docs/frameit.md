@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="/img/actions/frameit.png" height="110">
+  <img src="/img/actions/frameit.png" width="250">
 </p>
 
 ###### Quickly put your screenshots into the right device frames
@@ -22,13 +22,14 @@ _frameit_ allows you to put a gorgeous device frame around your iOS and macOS sc
 # Features
 
 Put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Support for:
+
 - iPhone, iPad and Mac
 - Portrait and Landscape modes
 - Several colors
 
 The complete and updated list of supported devices and colors can be found [here](https://github.com/fastlane/frameit-frames/tree/gh-pages/latest)
 
-Here is a nice gif, that shows ```frameit``` in action:
+Here is a nice gif, that shows _frameit_ in action:
 
 ![img/actions/FrameitGit.gif](/img/actions/FrameitGit.gif?raw=1)
 
@@ -47,7 +48,7 @@ Here is a nice gif, that shows ```frameit``` in action:
 <h5 align="center">The <code>frameit</code> 2.0 update was kindly sponsored by <a href="https://mindnode.com/">MindNode</a>, seen in the screenshots above.</h5>
 
 
-The first time that ```frameit``` is executed the frames will be downloaded automatically. Originally the frames are coming from [Facebook frameset](http://facebook.design/devices) and they are kept on this repo: https://github.com/fastlane/frameit-frames
+The first time that _frameit_ is executed the frames will be downloaded automatically. Originally the frames are coming from [Facebook frameset](http://facebook.design/devices) and they are kept on [this repo](https://github.com/fastlane/frameit-frames).
 
 More information about this process and how to update the frames can be found [here](https://github.com/fastlane/fastlane/tree/master/frameit/frames_generator)
 

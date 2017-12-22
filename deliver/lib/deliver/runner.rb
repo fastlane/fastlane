@@ -49,6 +49,7 @@ module Deliver
 
       precheck_options = {
         default_rule_level: options[:precheck_default_rule_level],
+        include_in_app_purchases: options[:precheck_include_in_app_purchases],
         app_identifier: options[:app_identifier],
         username: options[:username]
       }

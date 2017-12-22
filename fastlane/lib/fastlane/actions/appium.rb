@@ -84,10 +84,13 @@ module Fastlane
             caps[:autoAcceptAlerts] ||= true
             caps[:app] = params[:app_path]
 
+            appium_lib = params[:appium_lib] || {}
+
             @driver = Appium::Driver.new(
               caps: caps,
               server_url: params[:host],
-              port: params[:port]
+              port: params[:port],
+              appium_lib: appium_lib
             ).start_driver
             Appium.promote_appium_methods(RSpec::Core::ExampleGroup)
           end
@@ -158,6 +161,15 @@ module Fastlane
             env_name: 'FL_APPIUM_CAPS',
             description: 'Hash of caps for Appium::Driver',
             is_string: false,
+            type: Hash,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :appium_lib,
+            env_name: 'FL_APPIUM_LIB',
+            description: 'Hash of appium_lib for Appium::Driver',
+            is_string: false,
+            type: Hash,
             optional: true
           )
         ]
@@ -168,7 +180,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :android].include?(platform)
       end
 
       def self.category
@@ -184,6 +196,9 @@ module Fastlane
             caps: {
               versionNumber: "9.1",
               deviceName:    "iPhone 6"
+            },
+            appium_lib: {
+              wait: 10
             }
           )'
         ]

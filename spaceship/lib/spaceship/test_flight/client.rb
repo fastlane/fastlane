@@ -24,10 +24,11 @@ module Spaceship::TestFlight
       assert_required_params(__method__, binding)
 
       response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains")
+
       handle_response(response)
     end
 
-    def get_builds_for_train(app_id: nil, platform: "ios", train_version: nil, retry_count: 0)
+    def get_builds_for_train(app_id: nil, platform: "ios", train_version: nil, retry_count: 3)
       assert_required_params(__method__, binding)
       with_retry(retry_count) do
         response = request(:get, "providers/#{team_id}/apps/#{app_id}/platforms/#{platform}/trains/#{train_version}/builds", nil, {}, true)
@@ -83,11 +84,16 @@ module Spaceship::TestFlight
     # @!group Groups API
     ##
 
+    # Returns a list of available testing groups
+    # e.g.
+    #   {"b6f65dbd-c845-4d91-bc39-0b661d608970" => "Boarding",
+    #    "70402368-9deb-409f-9a26-bb3f215dfee3" => "Automatic"}
     def get_groups(app_id: nil)
+      return @cached_groups if @cached_groups
       assert_required_params(__method__, binding)
 
-      response = request(:get, "/testflight/v2/providers/#{team_id}/apps/#{app_id}/groups")
-      handle_response(response)
+      response = request(:get, "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/groups")
+      @cached_groups = handle_response(response)
     end
 
     def add_group_to_build(app_id: nil, group_id: nil, build_id: nil)
@@ -105,6 +111,33 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
+    #####################################################
+    # @!group Testers
+    #####################################################
+    def testers(tester)
+      url = tester.url[:index]
+      r = request(:get, url)
+      parse_response(r, 'data')['users']
+    end
+
+    def testers_by_app(tester, app_id, group_id: nil)
+      if group_id.nil?
+        group_ids = get_groups(app_id: app_id).map do |group|
+          group['id']
+        end
+      end
+      group_ids ||= [group_id]
+      testers = []
+
+      group_ids.each do |json_group_id|
+        url = tester.url(app_id, provider_id, json_group_id)[:index_by_app]
+        r = request(:get, url)
+        testers += parse_response(r, 'data')['users']
+      end
+
+      testers
+    end
+
     ##
     # @!group Testers API
     ##
@@ -112,19 +145,28 @@ module Spaceship::TestFlight
     def testers_for_app(app_id: nil)
       assert_required_params(__method__, binding)
       page_size = 40 # that's enforced by the iTC servers
-      offset = nil
       resulting_array = []
-
-      loop do
-        url = "providers/#{team_id}/apps/#{app_id}/testers?limit=#{page_size}&sort=email&order=asc"
-        url += "&offset=#{offset}" if offset
-        response = request(:get, url)
-        result = Array(handle_response(response))
-        resulting_array += result
-        break if result.count == 0
-        offset = "#{result.last['email']}%2C#{result.last['id']}"
+      initial_url = "providers/#{team_id}/apps/#{app_id}/testers?limit=#{page_size}&sort=email&order=asc"
+      response = request(:get, initial_url)
+      link_from_response = proc do |r|
+        # I weep for Swift nil chaining
+        (l = r.headers['link']) && (m = l.match(/<(.*)>/)) && m.captures.first
       end
-      return resulting_array
+      next_link = link_from_response.call(response)
+      result = Array(handle_response(response))
+      resulting_array += result
+      return resulting_array if result.count == 0
+
+      until next_link.nil?
+        response = request(:get, next_link)
+        result = Array(handle_response(response))
+        next_link = link_from_response.call(response)
+
+        break if result.count == 0
+
+        resulting_array += result
+      end
+      return resulting_array.uniq
     end
 
     def delete_tester_from_app(app_id: nil, tester_id: nil)
@@ -164,18 +206,19 @@ module Spaceship::TestFlight
       handle_response(response)
     end
 
-    def put_tester_to_group(app_id: nil, tester_id: nil, group_id: nil)
+    def post_tester_to_group(app_id: nil, email: nil, first_name: nil, last_name: nil, group_id: nil)
       assert_required_params(__method__, binding)
 
       # Then we can add the tester to the group that allows the app to test
       # This is easy enough, we already have all this data. We don't need any response from the previous request
-      url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
-      response = request(:put) do |req|
+      url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers"
+      response = request(:post) do |req|
         req.url url
-        req.body = {
-          "groupId" => group_id,
-          "testerId" => tester_id
-        }.to_json
+        req.body = [{
+          "email" => email,
+          "firstName" => first_name,
+          "lastName" => last_name
+        }].to_json
         req.headers['Content-Type'] = 'application/json'
       end
       handle_response(response)
@@ -229,6 +272,8 @@ module Spaceship::TestFlight
 
       raise UnexpectedResponse, response.body['error'] if response.body['error']
 
+      raise UnexpectedResponse, "Temporary iTunes Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
+
       return response.body['data'] if response.body['data']
 
       return response.body
@@ -254,6 +299,11 @@ module Spaceship::TestFlight
       else
         binding.eval(name.to_s)
       end
+    end
+
+    def provider_id
+      return team_id if self.provider.nil?
+      self.provider.provider_id
     end
   end
 end

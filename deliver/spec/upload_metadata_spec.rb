@@ -134,6 +134,37 @@ describe Deliver::UploadMetadata do
     end
   end
 
+  context "with auto_release_date" do
+    let(:app) { double('app') }
+    let(:version) { double('version') }
+    let(:details) { double('details') }
+    before do
+      allow(uploader).to receive(:verify_available_languages!)
+      allow(version).to receive(:save!)
+      allow(version).to receive(:release_on_approval=)
+      allow(version).to receive(:toggle_phased_release)
+      allow(version).to receive(:auto_release_date=)
+      allow(app).to receive(:edit_version).and_return(version)
+      allow(app).to receive(:details).and_return(details)
+      allow(details).to receive(:save!)
+    end
+    context 'with date' do
+      it "auto_release_date is called" do
+        options = { auto_release_date: 2, app: app }
+        uploader.upload(options)
+        expect(version).to have_received(:auto_release_date=).with(2)
+      end
+    end
+
+    context 'without date' do
+      it "auto_release_date is not called" do
+        options = { app: app }
+        uploader.upload(options)
+        expect(version).to_not have_received(:auto_release_date=).with(2)
+      end
+    end
+  end
+
   context "with phased_release" do
     let(:app) { double('app') }
     let(:version) { double('version') }
@@ -143,6 +174,7 @@ describe Deliver::UploadMetadata do
       allow(version).to receive(:save!)
       allow(version).to receive(:release_on_approval=)
       allow(version).to receive(:toggle_phased_release)
+      allow(version).to receive(:auto_release_date=)
       allow(app).to receive(:edit_version).and_return(version)
       allow(app).to receive(:details).and_return(details)
       allow(details).to receive(:save!)

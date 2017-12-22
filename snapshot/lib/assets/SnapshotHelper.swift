@@ -58,6 +58,7 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
     }
 }
 
+@objcMembers
 open class Snapshot: NSObject {
     static var app: XCUIApplication!
     static var cacheDirectory: URL!
@@ -112,7 +113,7 @@ open class Snapshot: NSObject {
         do {
             let launchArguments = try String(contentsOf: path, encoding: String.Encoding.utf8)
             let regex = try NSRegularExpression(pattern: "(\\\".+?\\\"|\\S+)", options: [])
-            let matches = regex.matches(in: launchArguments, options: [], range: NSRange(location:0, length:launchArguments.characters.count))
+            let matches = regex.matches(in: launchArguments, options: [], range: NSRange(location: 0, length: launchArguments.count))
             let results = matches.map { result -> String in
                 (launchArguments as NSString).substring(with: result.range)
             }
@@ -153,7 +154,7 @@ open class Snapshot: NSObject {
 
         let networkLoadingIndicator = XCUIApplication().otherElements.deviceStatusBars.networkLoadingIndicators.element
         let networkLoadingIndicatorDisappeared = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: networkLoadingIndicator)
-        let _ = XCTWaiter.wait(for: [networkLoadingIndicatorDisappeared], timeout: timeout)
+        _ = XCTWaiter.wait(for: [networkLoadingIndicatorDisappeared], timeout: timeout)
     }
 
     class func pathPrefix() throws -> URL? {
@@ -242,4 +243,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.6]
+// SnapshotHelperVersion [1.8]

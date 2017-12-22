@@ -29,6 +29,7 @@ module Spaceship
             'iphone4' => [1136, 640],
             'iphone6' => [1334, 750],
             'iphone6Plus' => [2208, 1242],
+            'iphone58' => [2436, 1125],
             'ipad' => [1024, 768],
             'ipadPro' => [2732, 2048]
         }
@@ -108,7 +109,11 @@ module Spaceship
 
     def send_login_request(user, password)
       clear_user_cached_data
-      send_shared_login_request(user, password)
+      result = send_shared_login_request(user, password)
+
+      store_cookie
+
+      return result
     end
 
     # Sometimes we get errors or info nested in our data
@@ -661,9 +666,21 @@ module Spaceship
     # Uploads an In-App-Purchase Review screenshot
     # @param app_id (AppId): The id of the app
     # @param upload_image (UploadFile): The icon to upload
-    # @return [JSON] the response
+    # @return [JSON] the screenshot data, ready to be added to an In-App-Purchase
     def upload_purchase_review_screenshot(app_id, upload_image)
-      du_client.upload_purchase_review_screenshot(app_id, upload_image, content_provider_id, sso_token_for_image)
+      data = du_client.upload_purchase_review_screenshot(app_id, upload_image, content_provider_id, sso_token_for_image)
+      {
+          "value" => {
+              "assetToken" => data["token"],
+              "sortOrder" => 0,
+              "type" => du_client.get_picture_type(upload_image),
+              "originalFileName" => upload_image.file_name,
+              "size" => data["length"],
+              "height" => data["height"],
+              "width" => data["width"],
+              "checksum" => data["md5"]
+          }
+      }
     end
 
     # Uploads a screenshot
@@ -740,7 +757,7 @@ module Spaceship
     # so we cache it
     # @return [UserDetail] the response
     def user_detail_data
-      @_cached_user_detail_data ||= Spaceship::Tunes::UserDetail.factory(user_details_data)
+      @_cached_user_detail_data ||= Spaceship::Tunes::UserDetail.factory(user_details_data, self)
     end
 
     #####################################################
@@ -1147,20 +1164,7 @@ module Spaceship
         # Upload Screenshot:
         upload_file = UploadFile.from_path review_screenshot
         screenshot_data = upload_purchase_review_screenshot(app_id, upload_file)
-        new_screenshot = {
-          "value" => {
-            "assetToken" => screenshot_data["token"],
-            "sortOrder" => 0,
-            "type" => "SortedScreenShot",
-            "originalFileName" => upload_file.file_name,
-            "size" => screenshot_data["length"],
-            "height" => screenshot_data["height"],
-            "width" => screenshot_data["width"],
-            "checksum" => screenshot_data["md5"]
-          }
-        }
-
-        data["versions"][0]["reviewScreenshot"] = new_screenshot
+        data["versions"][0]["reviewScreenshot"] = screenshot_data
       end
 
       # Now send back the modified hash
@@ -1170,127 +1174,6 @@ module Spaceship
         req.headers['Content-Type'] = 'application/json'
       end
       handle_itc_response(r.body)
-    end
-
-    #####################################################
-    # @!group Testers
-    #####################################################
-    def testers(tester)
-      url = tester.url[:index]
-      r = request(:get, url)
-      parse_response(r, 'data')['testers']
-    end
-
-    def testers_by_app(tester, app_id)
-      url = tester.url(app_id)[:index_by_app]
-      r = request(:get, url)
-      parse_response(r, 'data')['users']
-    end
-
-    # Returns a list of available testing groups
-    # e.g.
-    #   {"b6f65dbd-c845-4d91-bc39-0b661d608970" => "Boarding",
-    #    "70402368-9deb-409f-9a26-bb3f215dfee3" => "Automatic"}
-    def groups
-      return @cached_groups if @cached_groups
-      r = request(:get, '/WebObjects/iTunesConnect.woa/ra/users/pre/ext')
-      @cached_groups = parse_response(r, 'data')['groups']
-    end
-
-    def create_tester!(tester: nil, email: nil, first_name: nil, last_name: nil, groups: nil)
-      url = tester.url[:create]
-      raise "Action not provided for this tester type." unless url
-
-      tester_data = {
-        emailAddress: {
-          value: email
-        },
-        firstName: {
-          value: first_name || ""
-        },
-        lastName: {
-          value: last_name || ""
-        },
-        testing: {
-          value: true
-        }
-      }
-
-      if groups
-        tester_data[:groups] = groups.map do |group_name_or_group_id|
-          if self.groups.value?(group_name_or_group_id)
-            # This is an existing group, let's use that, the user specified the group name
-            group_name = group_name_or_group_id
-            group_id = self.groups.key(group_name_or_group_id)
-          elsif self.groups.key?(group_name_or_group_id)
-            # This is an existing group, let's use that, the user specified the group ID
-            group_name = self.groups[group_name_or_group_id]
-            group_id = group_name_or_group_id
-          else
-            group_name = group_name_or_group_id
-            group_id = nil # this is expected by the iTC API
-          end
-
-          {
-            "id" => group_id,
-            "name" => {
-              "value" => group_name
-            }
-          }
-        end
-      end
-
-      data = { testers: [tester_data] }
-
-      r = request(:post) do |req|
-        req.url url
-        req.body = data.to_json
-        req.headers['Content-Type'] = 'application/json'
-      end
-
-      data = parse_response(r, 'data')['testers']
-      handle_itc_response(data) || data[0]
-    end
-
-    def delete_tester!(tester)
-      url = tester.class.url[:delete]
-      raise "Action not provided for this tester type." unless url
-
-      data = [
-        {
-          emailAddress: {
-            value: tester.email
-          },
-          firstName: {
-            value: tester.first_name
-          },
-          lastName: {
-            value: tester.last_name
-          },
-          testing: {
-            value: false
-          },
-          userName: tester.email,
-          testerId: tester.tester_id
-        }
-      ]
-
-      r = request(:post) do |req|
-        req.url url
-        req.body = data.to_json
-        req.headers['Content-Type'] = 'application/json'
-      end
-
-      data = parse_response(r, 'data')['testers']
-      handle_itc_response(data) || data[0]
-    end
-
-    def add_tester_to_app!(tester, app_id)
-      update_tester_from_app!(tester, app_id, true)
-    end
-
-    def remove_tester_from_app!(tester, app_id)
-      update_tester_from_app!(tester, app_id, false)
     end
 
     #####################################################
@@ -1323,7 +1206,10 @@ module Spaceship
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
-      parse_response(r, 'data')['user']
+      response_object = parse_response(r, 'data')
+      errors = response_object['sectionErrorKeys']
+      raise ITunesConnectError, errors.join(' ') unless errors.empty?
+      response_object['user']
     end
 
     def delete_sandbox_testers!(tester_class, emails)
@@ -1364,11 +1250,12 @@ module Spaceship
     end
 
     def generate_app_version_promocodes!(app_id: nil, version_id: nil, quantity: nil)
-      data = {
-        numberOfCodes: { value: quantity },
-        agreedToContract: { value: true }
-      }
-      url = "ra/apps/#{app_id}/promocodes/versions/#{version_id}"
+      data = [{
+        numberOfCodes: quantity,
+        agreedToContract: true,
+        versionId: version_id
+      }]
+      url = "ra/apps/#{app_id}/promocodes/versions"
       r = request(:post) do |req|
         req.url url
         req.body = data.to_json

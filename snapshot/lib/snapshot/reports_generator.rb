@@ -27,7 +27,7 @@ module Snapshot
       end
 
       html_path = File.join(Snapshot::ROOT, "lib", "snapshot/page.html.erb")
-      html = ERB.new(File.read(html_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
+      html = ERB.new(File.read(html_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
       export_path = "#{screens_path}/screenshots.html"
       File.write(export_path, html)
@@ -78,6 +78,7 @@ module Snapshot
         'iPhone 6' => "iPhone 6 (4.7-Inch)",
         'iPhone 5s' => "iPhone 5 (4-Inch)",
         'iPhone SE' => "iPhone SE",
+        'iPhone 4s' => "iPhone 4 (3.5-Inch)",
         'iPad Air' => 'iPad Air',
         'iPad Air 2' => 'iPad Air 2',
         'iPad (5th generation)' => 'iPad (5th generation)',
