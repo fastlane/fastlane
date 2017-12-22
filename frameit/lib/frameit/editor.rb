@@ -1,5 +1,6 @@
 module Frameit
-  class Editor
+  # Currently the class is 2 lines too long. Reevaluate refactoring when it's length changes significantly
+  class Editor # rubocop:disable Metrics/ClassLength
     attr_accessor :screenshot # reference to the screenshot object to fetch the path, title, etc.
     attr_accessor :frame # the frame of the device
     attr_accessor :image # the current image used for editing
