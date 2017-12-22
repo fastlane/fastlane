@@ -236,10 +236,7 @@ module Fastlane
       FastlaneCore::CommandExecutor.execute(
         command: build_command,
         print_all: false,
-        print_command: !Gym.config[:silent],
-        error: proc do |output|
-          ErrorHandler.handle_build_error(output)
-        end
+        print_command: !Gym.config[:silent]
       )
     end
   end
