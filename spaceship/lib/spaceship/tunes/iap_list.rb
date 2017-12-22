@@ -53,13 +53,27 @@ module Spaceship
       end
 
       def edit
-        attrs = client.load_iap(app_id: application.apple_id, purchase_id: self.purchase_id)
-        attrs[:application] = application
-        Tunes::IAPDetail.new(attrs)
+        Tunes::IAPDetail.new(build_iap)
       end
 
       def delete!
         client.delete_iap!(app_id: application.apple_id, purchase_id: self.purchase_id)
+      end
+
+      private
+
+      def build_iap
+        attrs = [*iap_prices, *iap_details].to_h
+        attrs[:application] = application
+        attrs
+      end
+
+      def iap_prices
+        client.load_iap_prices(app_id: application.apple_id, purchase_id: self.purchase_id)
+      end
+
+      def iap_details
+        client.load_iap_details(app_id: application.apple_id, purchase_id: self.purchase_id)
       end
     end
   end
