@@ -23,7 +23,7 @@ module Scan
       program :description, Scan::DESCRIPTION
       program :help, "Author", "Felix Krause <scan@krausefx.com>"
       program :help, "Website", "https://fastlane.tools"
-      program :help, "GitHub", "https://github.com/fastlane/fastlane/tree/master/scan"
+      program :help, "GitHub", "https://docs.fastlane.tools/actions/scan/"
       program :help_formatter, :compact
 
       global_option("--verbose") { FastlaneCore::Globals.verbose = true }
