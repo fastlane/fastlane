@@ -23,7 +23,7 @@ module Fastlane
       puts ""
       puts "To automatically upload builds and metadata to Google Play, fastlane needs a service action json secret file".yellow
       puts "Feel free to just click Enter to skip not provide certain things"
-      puts "Follow the Setup Guide on how to get the Json file: https://github.com/fastlane/fastlane/tree/master/supply#setup".yellow
+      puts "Follow the Setup Guide on how to get the Json file: https://docs.fastlane.tools/actions/supply/".yellow
       json_key_file = UI.input("Path to the json secret file: ")
 
       template = File.read("#{Fastlane::ROOT}/lib/assets/AppfileTemplateAndroid")
