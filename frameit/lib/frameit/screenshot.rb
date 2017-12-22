@@ -73,11 +73,15 @@ module Frameit
 
     def frame_orientation
       filename = File.basename(self.path, ".*")
-      orientation = Frameit.config[:force_orientation_block].call(filename)
-      valid = [:landscape_left, :landscape_right, :portrait, nil]
-      UI.user_error("orientation_block must return #{valid[0..-2].join(', ')} or nil") unless valid.include?(orientation)
+      block = Frameit.config[:force_orientation_block]
 
-      puts "Forced orientation: #{orientation}"
+      unless block.nil?
+        orientation = block.call(filename)
+        valid = [:landscape_left, :landscape_right, :portrait, nil]
+        UI.user_error("orientation_block must return #{valid[0..-2].join(', ')} or nil") unless valid.include?(orientation)
+
+        puts "Forced orientation: #{orientation}"
+      end
 
       return orientation unless orientation.nil?
       return :portrait if self.orientation_name == Orientation::PORTRAIT

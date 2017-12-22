@@ -43,6 +43,7 @@ module Frameit
         FastlaneCore::ConfigItem.new(key: :force_orientation_block,
                            type: Proc,
                            description: "[Advanced] A block to customize your screnshots' device orientation",
+                           display_in_shell: false,
                            default_value: proc do |filename|
                              f = filename.downcase
                              if f.end_with?("force_landscapeleft")
