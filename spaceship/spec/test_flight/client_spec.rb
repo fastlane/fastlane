@@ -17,6 +17,7 @@ describe Spaceship::TestFlight::Client do
   subject { TestFlightTestClient.new(current_team_id: 'fake-team-id') }
   let(:app_id) { 'some-app-id' }
   let(:platform) { 'ios' }
+
   context '#assert_required_params' do
     it 'requires named parameters to be passed' do
       expect do
