@@ -1,5 +1,3 @@
-require "rubygems/requirement"
-
 module Fastlane
   class FastFile
     # Stores all relevant information from the currently running process
@@ -176,14 +174,10 @@ module Fastlane
     end
 
     # Execute shell command
-    def sh(*command, log: true, error_callback: nil, &b)
-      FastFile.sh(*command, log: log, error_callback: error_callback, &b)
-    end
-
-    def self.sh(*command, log: true, error_callback: nil, &b)
-      command_header = log ? Actions.shell_command_from_args(*command) : "shell command"
+    def sh(command, log: true, error_callback: nil)
+      command_header = log ? command : "shell command"
       Actions.execute_action(command_header) do
-        Actions.sh_no_action(*command, log: log, error_callback: error_callback, &b)
+        Actions.sh_no_action(command, log: log, error_callback: error_callback)
       end
     end
 
@@ -231,7 +225,7 @@ module Fastlane
     # @param url [String] The git URL to clone the repository from
     # @param branch [String] The branch to checkout in the repository
     # @param path [String] The path to the Fastfile
-    # @param version [String, Array] Version requirement for repo tags
+    # @param verion [String] Version of the required Fastlane version
     def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil)
       UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
 
@@ -253,10 +247,13 @@ module Fastlane
           Actions.sh("GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}")
 
           unless version.nil?
-            req = Gem::Requirement.new(version)
-            all_tags = fetch_remote_tags(folder: clone_folder)
-            checkout_param = all_tags.select { |t| req =~ FastlaneCore::TagVersion.new(t) }.last
-            UI.user_error! "No tag found matching #{version.inspect}" if checkout_param.nil?
+            git_tags = fetch_remote_tags(folder: clone_folder)
+
+            # Separate version from optimistic operator
+            version_number = version(version_string: version)
+            operator = operator(version_string: version)
+
+            checkout_param = checkout_param_for_operator(operator: operator, version: version_number, git_tags: git_tags)
           end
 
           Actions.sh("cd '#{clone_folder}' && git checkout #{checkout_param} '#{path}'")
@@ -292,10 +289,75 @@ module Fastlane
       git_tags_string = Actions.sh("cd '#{folder}' && git tag -l")
       git_tags = git_tags_string.split("\n")
 
+      # Delete tags that are not a real version number
+      git_tags.delete_if { |tag| Gem::Version.correct?(tag) != 0 }
+
       # Sort tags based on their version number
+      git_tags.sort_by { |tag| Gem::Version.new(tag) }
+
       return git_tags
-             .select { |tag| FastlaneCore::TagVersion.correct?(tag) }
-             .sort_by { |tag| FastlaneCore::TagVersion.new(tag) }
+    end
+
+    def checkout_param_for_operator(operator: nil, version: nil, git_tags: nil)
+      # ~> should select the latest version withing constraints.
+      # -> should select a specific version without fallback.
+      if operator == "~>"
+        return checkout_param_twiddle_wakka(version: version, git_tags: git_tags)
+
+      elsif operator == "->" || operator.nil?
+        return checkout_param_specific_version(version: version, git_tags: git_tags)
+
+      else
+        UI.user_error!("The specified operator \"#{operator}\" in \"#{version}\" is unknown. Please use one of these '~> ->'")
+      end
+    end
+
+    def checkout_param_specific_version(version: nil, git_tags: nil)
+      # Search matching version in array
+      matching_git_tags = git_tags.select do |tag|
+        tag == version
+      end
+
+      UI.user_error!("The specified version \"#{version}\" doesn't exist") if matching_git_tags.count == 0
+      return matching_git_tags.last
+    end
+
+    def checkout_param_twiddle_wakka(version: nil, git_tags: nil)
+      # Drop last specified digit in version
+      last_dot_index = version.rindex('.')
+      version_range = version[0..last_dot_index - 1]
+
+      # Search matching version in array
+      matching_git_tags = git_tags.select do |tag|
+        tag.start_with?(version_range)
+      end
+
+      UI.user_error!("No version found within the \"#{version_range}.*\" range") if matching_git_tags.count == 0
+
+      return matching_git_tags.last
+    end
+
+    def operator(version_string: nil)
+      version_info = version_range_info(version_string: version_string)
+
+      # version_info will have 2 elements if an optimistic operator is specified.
+      if version_info.count > 1
+
+        # Optimistic operator is always the first part. e.g.: ["~>", "2.0.0"]
+        return version_info.first
+      end
+
+      return nil
+    end
+
+    def version(version_string: nil)
+      version_info = version_range_info(version_string: version_string)
+      return version_info.last
+    end
+
+    def version_range_info(version_string: nil)
+      # Separate version from optimistic operator
+      return version_string.split(" ")
     end
 
     #####################################################
@@ -330,7 +392,7 @@ module Fastlane
     end
 
     def action_launched(action_name)
-      action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name, configuration_language: "ruby", args: ARGV)
+      action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name, args: ARGV)
       FastlaneCore.session.action_launched(launch_context: action_launch_context)
     end
 

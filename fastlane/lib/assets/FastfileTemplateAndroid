@@ -11,9 +11,9 @@
 
 # This is the minimum version number required.
 # Update this, if you use features of a newer version
-min_fastlane_version("[[FASTLANE_VERSION]]")
+fastlane_version "[[FASTLANE_VERSION]]"
 
-default_platform(:android)
+default_platform :android
 
 platform :android do
   before_all do
@@ -37,7 +37,7 @@ platform :android do
   desc "Deploy a new version to the Google Play"
   lane :deploy do
     gradle(task: "assembleRelease")
-    upload_to_play_store
+    supply
   end
 
   # You can define as many lanes as you want
@@ -58,7 +58,7 @@ platform :android do
   end
 end
 
-# More information about multiple platforms in fastlane: https://docs.fastlane.tools/advanced/#control-configuration-by-lane-and-by-platform
+# More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md
 # All available actions: https://docs.fastlane.tools/actions
 
 # fastlane reports which actions are used. No personal data is recorded.
