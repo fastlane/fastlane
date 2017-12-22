@@ -361,6 +361,11 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file("iap_detail.json"),
                 headers: { "Content-Type" => "application/json" })
 
+      # iap pricing
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1194457865/pricing").
+        to_return(status: 200, body: itc_read_fixture_file("iap_prices.json"),
+                headers: { "Content-Type" => "application/json" })
+
       # list families
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/families").
         to_return(status: 200, body: itc_read_fixture_file("iap_families.json"),
