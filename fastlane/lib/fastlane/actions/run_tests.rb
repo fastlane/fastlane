@@ -42,7 +42,7 @@ module Fastlane
       end
 
       def self.details
-        "More information: https://github.com/fastlane/fastlane/tree/master/scan"
+        "More information: https://docs.fastlane.tools/actions/scan/"
       end
 
       def self.author

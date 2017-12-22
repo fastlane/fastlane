@@ -21,7 +21,7 @@ module Match
         cert_path = Cert::Runner.new.launch
       rescue => ex
         if ex.to_s.include?("You already have a current")
-          UI.user_error!("Could not create a new certificate as you reached the maximum number of certificates for this account. You can use the `fastlane match nuke` command to revoke your existing certificates. More information https://github.com/fastlane/fastlane/tree/master/match")
+          UI.user_error!("Could not create a new certificate as you reached the maximum number of certificates for this account. You can use the `fastlane match nuke` command to revoke your existing certificates. More information https://docs.fastlane.tools/actions/match/")
         else
           raise ex
         end

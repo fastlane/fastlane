@@ -24,7 +24,7 @@ module Gym
       program :description, Gym::DESCRIPTION
       program :help, "Author", "Felix Krause <gym@krausefx.com>"
       program :help, "Website", "https://fastlane.tools"
-      program :help, "GitHub", "https://github.com/fastlane/fastlane/tree/master/gym"
+      program :help, "GitHub", "https://docs.fastlane.tools/actions/gym/"
       program :help_formatter, :compact
 
       global_option("--verbose") { FastlaneCore::Globals.verbose = true }

@@ -44,7 +44,7 @@ module Pilot
       program :description, Pilot::DESCRIPTION
       program :help, "Author", "Felix Krause <pilot@krausefx.com>"
       program :help, "Website", "https://fastlane.tools"
-      program :help, "GitHub", "https://github.com/fastlane/fastlane/tree/master/pilot"
+      program :help, "GitHub", "https://docs.fastlane.tools/actions/pilot/"
       program :help_formatter, :compact
 
       global_option("--verbose") { FastlaneCore::Globals.verbose = true }
