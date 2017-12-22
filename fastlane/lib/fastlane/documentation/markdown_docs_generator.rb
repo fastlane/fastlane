@@ -51,7 +51,7 @@ module Fastlane
 
       # Generate actions.md
       template = File.join(Fastlane::ROOT, "lib/assets/Actions.md.erb")
-      result = ERB.new(File.read(template), 0, '-').result(binding) # http://www.rrn.dk/rubys-erb-templating-system
+      result = ERB.new(File.read(template), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
       File.write(File.join(docs_dir, "actions.md"), result)
 
       # Generate actions sub pages (e.g. actions/slather.md, actions/scan.md)
@@ -68,7 +68,7 @@ module Fastlane
 
         template = File.join(Fastlane::ROOT, "lib/assets/ActionDetails.md.erb")
         @action = action # to provide a reference in the .html.erb template
-        result = ERB.new(File.read(template), 0, '-').result(binding) # http://www.rrn.dk/rubys-erb-templating-system
+        result = ERB.new(File.read(template), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
         file_name = File.join("actions", "#{action.action_name}.md")
         File.write(File.join(docs_dir, file_name), result)

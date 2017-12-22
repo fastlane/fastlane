@@ -151,7 +151,7 @@ module CredentialsManager
       if lane_name.to_s.split(" ").count > 1
         # That's the legacy syntax 'platform name'
         puts "You use deprecated syntax '#{lane_name}' in your Appfile.".yellow
-        puts "Please follow the Appfile guide: https://github.com/fastlane/fastlane/blob/master/docs/Appfile.md".yellow
+        puts "Please follow the Appfile guide: https://docs.fastlane.tools/advanced/#appfile".yellow
         platform, lane_name = lane_name.split(" ")
 
         return unless platform == ENV["FASTLANE_PLATFORM_NAME"]

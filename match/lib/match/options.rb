@@ -33,6 +33,9 @@ module Match
                                      env_name: "MATCH_APP_IDENTIFIER",
                                      description: "The bundle identifier(s) of your app (comma-separated)",
                                      is_string: false,
+                                     type: Array, # we actually allow String and Array here
+                                     skip_type_validation: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
@@ -60,6 +63,7 @@ module Match
                                      env_name: "FASTLANE_TEAM_ID",
                                      description: "The ID of your Developer Portal team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
@@ -79,6 +83,7 @@ module Match
                                      env_name: "FASTLANE_TEAM_NAME",
                                      description: "The name of your Developer Portal team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s

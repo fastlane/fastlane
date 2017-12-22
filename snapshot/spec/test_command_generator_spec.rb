@@ -51,6 +51,18 @@ describe Snapshot do
         result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
         expect(result).to be(false)
       end
+
+      it "returns true with custom named iOS devices" do
+        devices = ["11.0 - iPhone X", "11.0 - iPad Air 2"]
+        result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
+        expect(result).to be(true)
+      end
+
+      it "returns true with custom named Apple TV devices" do
+        devices = ["11.0 - Apple TV 1080p", "11.0 - Apple TV 4K", "11.0 - Apple TV 4K (at 1080p)"]
+        result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
+        expect(result).to be(true)
+      end
     end
 
     describe '#find_device' do
@@ -82,7 +94,7 @@ describe Snapshot do
         })
       end
 
-      it 'copies all device log archives to the output directory on macOS 10.12 (Sierra)' do
+      it 'copies all device log archives to the output directory on macOS 10.12 (Sierra)', requires_xcode: true do
         Snapshot.config = @config
         launcher_config = Snapshot::SimulatorLauncherConfiguration.new(snapshot_config: Snapshot.config)
 
@@ -103,7 +115,7 @@ describe Snapshot do
         Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).copy_simulator_logs(["iPhone 6s (10.1)"], "en-US", nil, 0)
       end
 
-      it 'copies all iOS 9 device log files to the output directory on macOS 10.12 (Sierra)' do
+      it 'copies all iOS 9 device log files to the output directory on macOS 10.12 (Sierra)', requires_xcode: true do
         Snapshot.config = @config
         launcher_config = Snapshot::SimulatorLauncherConfiguration.new(snapshot_config: Snapshot.config)
 
@@ -120,7 +132,7 @@ describe Snapshot do
         Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).copy_simulator_logs(["iPhone 6"], "en-US", nil, 0)
       end
 
-      it 'copies all device log files to the output directory on macOS 10.11 (El Capitan)' do
+      it 'copies all device log files to the output directory on macOS 10.11 (El Capitan)', requires_xcode: true do
         Snapshot.config = @config
         launcher_config = Snapshot::SimulatorLauncherConfiguration.new(snapshot_config: Snapshot.config)
 
@@ -146,7 +158,7 @@ describe Snapshot do
       end
 
       context 'default options' do
-        it "uses the default parameters" do
+        it "uses the default parameters", requires_xcode: true do
           configure options
           expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
           command = Snapshot::TestCommandGenerator.generate(
@@ -173,7 +185,7 @@ describe Snapshot do
           )
         end
 
-        it "allows to supply custom xcargs" do
+        it "allows to supply custom xcargs", requires_xcode: true do
           configure options.merge(xcargs: "-only-testing:TestBundle/TestSuite/Screenshots")
           expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
           command = Snapshot::TestCommandGenerator.generate(
@@ -201,7 +213,7 @@ describe Snapshot do
           )
         end
 
-        it "uses the default parameters on tvOS too" do
+        it "uses the default parameters on tvOS too", requires_xcode: true do
           configure options.merge(devices: ["Apple TV 1080p"])
           expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
           command = Snapshot::TestCommandGenerator.generate(
@@ -234,7 +246,7 @@ describe Snapshot do
           configure options.merge(derived_data_path: 'fake/derived/path')
         end
 
-        it 'uses the fixed derivedDataPath if given' do
+        it 'uses the fixed derivedDataPath if given', requires_xcode: true do
           expect(Dir).not_to receive(:mktmpdir)
           command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
           expect(command.join('')).to include("-derivedDataPath 'fake/derived/path'")
@@ -245,7 +257,7 @@ describe Snapshot do
     describe "Valid macOS Configuration" do
       let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleMacOS", namespace_log_files: true } }
 
-      it "uses default parameters on macOS" do
+      it "uses default parameters on macOS", requires_xcode: true do
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options.merge(devices: ["Mac"]))
         expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
         command = Snapshot::TestCommandGenerator.generate(
@@ -280,21 +292,21 @@ describe Snapshot do
         return simulator_launcher = Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config)
       end
 
-      it 'uses correct name and language' do
+      it 'uses correct name and language', requires_xcode: true do
         log_path = simulator_launcher.xcodebuild_log_path(language: "pt", locale: nil)
         expect(log_path).to eq(
           File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-iPhone 6-pt.log").to_s
         )
       end
 
-      it 'uses includes locale if specified' do
+      it 'uses includes locale if specified', requires_xcode: true do
         log_path = simulator_launcher.xcodebuild_log_path(language: "pt", locale: "pt_BR")
         expect(log_path).to eq(
           File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-iPhone 6-pt-pt_BR.log").to_s
         )
       end
 
-      it 'can work without parameters' do
+      it 'can work without parameters', requires_xcode: true do
         simulator_launcher.launcher_config.devices = []
         log_path = simulator_launcher.xcodebuild_log_path
         expect(log_path).to eq(
@@ -312,7 +324,7 @@ describe Snapshot do
         return simulator_launcher = Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config)
       end
 
-      it 'uses correct file name' do
+      it 'uses correct file name', requires_xcode: true do
         log_path = simulator_launcher.xcodebuild_log_path(language: "pt", locale: nil)
         expect(log_path).to eq(
           File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log").to_s

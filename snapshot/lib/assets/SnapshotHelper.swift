@@ -58,6 +58,7 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
     }
 }
 
+@objcMembers
 open class Snapshot: NSObject {
     static var app: XCUIApplication!
     static var cacheDirectory: URL!
@@ -242,4 +243,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.7]
+// SnapshotHelperVersion [1.8]

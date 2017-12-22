@@ -86,6 +86,13 @@ module FastlaneCore
       return false
     end
 
+    def self.operating_system
+      return "macOS" if RUBY_PLATFORM.downcase.include?("darwin")
+      return "Windows" if RUBY_PLATFORM.downcase.include?("mswin")
+      return "Linux" if RUBY_PLATFORM.downcase.include?("linux")
+      return "Unknown"
+    end
+
     def self.windows?
       # taken from: https://stackoverflow.com/a/171011/1945875
       (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
@@ -134,7 +141,7 @@ module FastlaneCore
     # @return the full path to the Xcode developer tools of the currently
     #  running system
     def self.xcode_path
-      return "" if self.is_test? and !self.is_mac?
+      return "" unless self.is_mac?
       `xcode-select -p`.delete("\n") + "/"
     end
 
@@ -142,6 +149,7 @@ module FastlaneCore
     def self.xcode_version
       return nil unless self.is_mac?
       return @xcode_version if @xcode_version && @developer_dir == ENV['DEVELOPER_DIR']
+      return nil unless File.exist?("#{xcode_path}/usr/bin/xcodebuild")
 
       begin
         output = `DEVELOPER_DIR='' "#{xcode_path}/usr/bin/xcodebuild" -version`

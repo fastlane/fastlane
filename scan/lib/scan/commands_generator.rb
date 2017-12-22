@@ -44,11 +44,23 @@ module Scan
       command :init do |c|
         c.syntax = "fastlane scan init"
         c.description = "Creates a new Scanfile for you"
-        c.action do |_args, options|
+        c.action do |args, options|
           containing = FastlaneCore::Helper.fastlane_enabled_folder_path
           path = File.join(containing, Scan.scanfile_name)
           UI.user_error!("Scanfile already exists").yellow if File.exist?(path)
-          template = File.read("#{Scan::ROOT}/lib/assets/ScanfileTemplate")
+
+          is_swift_fastfile = args.include?("swift")
+          if is_swift_fastfile
+            path = File.join(containing, Scan.scanfile_name + ".swift")
+            UI.user_error! "Scanfile.swift already exists" if File.exist?(path)
+          end
+
+          if is_swift_fastfile
+            template = File.read("#{Scan::ROOT}/lib/assets/ScanfileTemplate.swift")
+          else
+            template = File.read("#{Scan::ROOT}/lib/assets/ScanfileTemplate")
+          end
+
           File.write(path, template)
           UI.success("Successfully created '#{path}'. Open the file using a code editor.")
         end

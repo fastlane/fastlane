@@ -20,6 +20,7 @@ module Deliver
                                      env_name: "DELIVER_APP_IDENTIFIER",
                                      description: "The bundle identifier of your app",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
         FastlaneCore::ConfigItem.new(key: :app,
                                      short_option: "-p",
@@ -38,6 +39,7 @@ module Deliver
                                      optional: true,
                                      env_name: "DELIVER_IPA_PATH",
                                      description: "Path to your ipa file",
+                                     code_gen_sensitive: true,
                                      default_value: Dir["*.ipa"].sort_by { |x| File.mtime(x) }.last,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find ipa file at path '#{File.expand_path(value)}'") unless File.exist?(value)
@@ -52,6 +54,7 @@ module Deliver
                                      optional: true,
                                      env_name: "DELIVER_PKG_PATH",
                                      description: "Path to your pkg file",
+                                     code_gen_sensitive: true,
                                      default_value: Dir["*.pkg"].sort_by { |x| File.mtime(x) }.last,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find pkg file at path '#{File.expand_path(value)}'") unless File.exist?(value)
@@ -130,7 +133,7 @@ module Deliver
                                      description: "Enable the phased release feature of iTC",
                                      optional: true,
                                      is_string: false,
-                                     default_value: nil),
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :price_tier,
                                      short_option: "-r",
                                      description: "The price tier of this application",
@@ -164,6 +167,7 @@ module Deliver
                                      description: "The ID of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
                                      is_string: false, # as we also allow integers, which we convert to strings anyway
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
@@ -173,6 +177,7 @@ module Deliver
                                      env_name: "DELIVER_TEAM_NAME",
                                      description: "The name of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
@@ -183,6 +188,7 @@ module Deliver
                                      description: "The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!",
                                      optional: true,
                                      is_string: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
@@ -192,6 +198,7 @@ module Deliver
                                      env_name: "DELIVER_DEV_PORTAL_TEAM_NAME",
                                      description: "The name of your Developer Portal team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s
@@ -269,11 +276,13 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :trade_representative_contact_information,
                                      description: "Metadata: A hash containing the trade representative contact information",
                                      optional: true,
-                                     is_string: false),
+                                     is_string: false,
+                                     type: Hash),
         FastlaneCore::ConfigItem.new(key: :app_review_information,
                                      description: "Metadata: A hash containing the review information",
                                      optional: true,
-                                     is_string: false),
+                                     is_string: false,
+                                     type: Hash),
         # Localised
         FastlaneCore::ConfigItem.new(key: :description,
                                      description: "Metadata: The localised app description",
@@ -287,6 +296,7 @@ module Deliver
                                      description: "Metadata: The localised app subtitle",
                                      optional: true,
                                      is_string: false,
+                                     type: Hash,
                                      verify_block: proc do |value|
                                        UI.user_error!(":subtitle must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                      end),
@@ -294,6 +304,7 @@ module Deliver
                                      description: "Metadata: An array of localised keywords",
                                      optional: true,
                                      is_string: false,
+                                     type: Hash,
                                      verify_block: proc do |value|
                                        UI.user_error!(":keywords must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                        value.each do |language, keywords|
@@ -308,6 +319,7 @@ module Deliver
                                      description: "Metadata: An array of localised promotional texts",
                                      optional: true,
                                      is_string: false,
+                                     type: Hash,
                                      verify_block: proc do |value|
                                        UI.user_error!(":keywords must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                      end),

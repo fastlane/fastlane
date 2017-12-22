@@ -105,6 +105,7 @@ module Fastlane
                                        description: "Personal API Token for GitHub - generate one at https://github.com/settings/tokens",
                                        sensitive: true,
                                        is_string: true,
+                                       code_gen_sensitive: true,
                                        default_value: ENV["GITHUB_API_TOKEN"],
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :branch,
@@ -140,6 +141,10 @@ module Fastlane
           ['COMMIT_GITHUB_FILE_SHA', 'Commit SHA generated'],
           ['COMMIT_GITHUB_FILE_JSON', 'The whole commit JSON object response']
         ]
+      end
+
+      def self.return_type
+        :hash_of_strings
       end
 
       def self.return_value

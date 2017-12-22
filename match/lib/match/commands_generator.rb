@@ -62,14 +62,20 @@ module Match
         c.description = 'Create the Matchfile for you'
         c.action do |args, options|
           containing = FastlaneCore::Helper.fastlane_enabled_folder_path
-          path = File.join(containing, "Matchfile")
+          is_swift_fastfile = args.include?("swift")
+
+          if is_swift_fastfile
+            path = File.join(containing, "Matchfile.swift")
+          else
+            path = File.join(containing, "Matchfile")
+          end
 
           if File.exist?(path)
-            FastlaneCore::UI.user_error!("You already got a Matchfile in this directory")
+            FastlaneCore::UI.user_error!("You already have a Matchfile in this directory (#{path})")
             return 0
           end
 
-          Match::Setup.new.run(path)
+          Match::Setup.new.run(path, is_swift_fastfile: is_swift_fastfile)
         end
       end
 

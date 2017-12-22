@@ -47,7 +47,7 @@ module Fastlane
         headings: ["Plugin", "Your Version", "Latest Version"]
       })
       UI.message "To update all plugins, just run"
-      UI.command "fastlane update_plugins"
+      UI.command "bundle exec fastlane update_plugins"
       puts ''
       @server_results = nil
     end

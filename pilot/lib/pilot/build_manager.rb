@@ -35,7 +35,13 @@ module Pilot
       end
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, poll_interval: config[:wait_processing_interval])
+      app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
+      app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, train_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval], strict_build_watch: config[:wait_for_uploaded_build])
+
+      unless latest_build.train_version == app_version && latest_build.build_version == app_build
+        UI.important("Uploaded app #{app_version} - #{app_build}, but received build #{latest_build.train_version} - #{latest_build.build_version}. If you want to wait for uploaded build to be finished processing, use the `wait_for_uploaded_build` option")
+      end
 
       distribute(options, build: latest_build)
     end
@@ -92,7 +98,7 @@ module Pilot
 
       puts Terminal::Table.new(
         title: "#{app.name} Builds".green,
-        headings: ["Version #", "Build #", "Testing", "Installs", "Sessions"],
+        headings: ["Version #", "Build #", "Installs"],
         rows: FastlaneCore::PrintTable.transform_output(rows)
       )
     end
@@ -113,9 +119,7 @@ module Pilot
     def describe_build(build)
       row = [build.train_version,
              build.build_version,
-             build.testing_status,
-             build.install_count,
-             build.session_count]
+             build.install_count]
 
       return row
     end

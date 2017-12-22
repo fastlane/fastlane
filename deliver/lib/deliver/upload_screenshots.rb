@@ -17,6 +17,8 @@ module Deliver
         UI.message("Removing all previously uploaded screenshots...")
         # First, clear all previously uploaded screenshots
         screenshots_per_language.keys.each do |language|
+          # We have to nil check for languages not activated
+          next if v.screenshots[language].nil?
           v.screenshots[language].each_with_index do |t, index|
             v.upload_screenshot!(nil, t.sort_order, t.language, t.device_type, false)
           end

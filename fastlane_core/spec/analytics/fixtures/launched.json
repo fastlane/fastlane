@@ -33,6 +33,26 @@
       "detail": "some_action"
     },
     "primary_target": {
+      "name": "configuration_language",
+      "detail": "ruby"
+    },
+    "millis_since_epoch": 1507142046000,
+    "version": 1
+  },
+  {
+    "event_source": {
+      "oauth_app_name": "fastlane-tests",
+      "product": "fastlane"
+    },
+    "actor": {
+      "name": "some.phash.value",
+      "detail": "s0m3s3ss10n1D"
+    },
+    "action": {
+      "name": "launched",
+      "detail": "some_action"
+    },
+    "primary_target": {
       "name": "install_method",
       "detail": "bundler"
     },

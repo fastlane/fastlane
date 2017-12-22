@@ -56,6 +56,13 @@ module FastlaneCore
 
       @events << builder.launched_event(
         primary_target_hash: {
+          name: 'configuration_language',
+          detail: launch_context.configuration_language
+        }
+      )
+
+      @events << builder.launched_event(
+        primary_target_hash: {
           name: 'install_method',
           detail: install_method
         }
@@ -161,10 +168,7 @@ module FastlaneCore
     end
 
     def operating_system
-      return "macOS" if RUBY_PLATFORM.downcase.include?("darwin")
-      return "Windows" if RUBY_PLATFORM.downcase.include?("mswin")
-      return "Linux" if RUBY_PLATFORM.downcase.include?("linux")
-      return "Unknown"
+      return Helper.operating_system
     end
 
     def install_method

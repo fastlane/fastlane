@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="/img/actions/precheck.png" height="110">
+  <img src="/img/actions/precheck.png" width="250">
 </p>
 
 Precheck
@@ -26,22 +26,26 @@ Apple rejects builds for many avoidable metadata issues like including swear wor
 |          |  precheck Features  |
 |----------|-----------------|
 |🐛|  product bug mentions|
-|🙅‍♂️|Swear word checker|
+|🙅|Swear word checker|
 |🤖|Mentioning other platforms|
 |😵|URL reachability checker|
 |📝|Placeholder/test words/mentioning future features|
 |📅|Copyright date checking|
 |🙈|Customizable word list checking|
-|📢|You can decide if you want to warn  about potential problems and continue or have _fastlane_ show an error and stop after all scans are done.|
+|📢|You can decide if you want to warn about potential problems and continue or have _fastlane_ show an error and stop after all scans are done|
 
 # Usage
 Run _fastlane precheck_ to check the app metadata from iTunes Connect
 
-    fastlane precheck
+```no-highlight
+fastlane precheck
+```
 
 To get a list of available options run
-    
-    fastlane action precheck
+
+```no-highlight
+fastlane action precheck
+```
 
 <img src="/img/actions/precheck.gif" />
     

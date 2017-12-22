@@ -55,14 +55,14 @@ module Snapshot
         # Check each device to see if it is an iOS device
         all_ios = devices.map do |device|
           device = device.downcase
-          device.start_with?('iphone', 'ipad')
+          device.include?('iphone') || device.include?('ipad')
         end
         # Return true if all devices are iOS devices
         return true unless all_ios.include?(false)
 
         all_tvos = devices.map do |device|
           device = device.downcase
-          device.start_with?('apple tv')
+          device.include?('apple tv')
         end
         # Return true if all devices are iOS devices
         return true unless all_tvos.include?(false)

@@ -95,7 +95,7 @@ module Gym
         when /requires a provisioning profile/
           print "No provisioning profile provided"
           print "Make sure to pass a valid provisioning for each required target"
-          print "Check out the docs on how to fix this: https://github.com/fastlane/fastlane/tree/master/gym#export-options"
+          print "Check out the docs on how to fix this: https://docs.fastlane.tools/actions/gym/#export-options"
         # insert more specific code signing errors here
         when /Codesign check fails/
           print "A general code signing error occurred. Make sure you passed a valid"
@@ -153,6 +153,9 @@ module Gym
 
       def print_xcode9_plist_warning
         return unless Helper.xcode_at_least?("9.0")
+
+        # prevent crash in case of packaging error AND if you have set export_options to a path.
+        return unless Gym.config[:export_options].kind_of?(Hash)
 
         export_options = Gym.config[:export_options] || {}
         provisioning_profiles = export_options[:provisioningProfiles] || []
@@ -220,7 +223,7 @@ module Gym
           UI.error("Please make sure to define the correct export methods when calling")
           UI.error("gym in your Fastfile or from the command line")
           UI.message("")
-        elsif Gym.config[:export_options]
+        elsif Gym.config[:export_options] && Gym.config[:export_options].kind_of?(Hash)
           # We want to tell the user if there is an obvious mismatch between the selected
           # `export_method` and the selected provisioning profiles
           selected_export_method = Gym.config[:export_method].to_s
@@ -238,10 +241,13 @@ module Gym
             "app-store" => "app-store",
             "app store" => "app-store",
             "appstore" => "app-store",
+            "enterprise" => "enterprise",
+            "in-house" => "enterprise",
+            "in house" => "enterprise",
+            "inhouse" => "enterprise",
             "ad-hoc" => "ad-hoc",
             "adhoc" => "ad-hoc",
             "ad hoc" => "ad-hoc",
-            "enterprise" => "enterprise",
             "development" => "development"
           }
 
@@ -260,7 +266,7 @@ module Gym
               # As seen above, there is obviously a mismatch, the user selected an App Store
               # profile, but the export method that's being passed to Xcode is "enterprise"
 
-              next if matching_type.to_s == selected_export_method
+              break if matching_type.to_s == selected_export_method
               UI.message("")
               UI.error("There seems to be a mismatch between your provided `export_method` in gym")
               UI.error("and the selected provisioning profiles. You passed the following options:")
@@ -272,6 +278,7 @@ module Gym
               UI.error("or select the correct provisioning profiles by updating your Xcode project")
               UI.error("or passing the profiles to use by using match or manually via the `export_options` hash")
               UI.message("")
+              break
             end
           end
         end

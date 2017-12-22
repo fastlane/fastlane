@@ -33,6 +33,10 @@ module Spaceship
 
     attr_accessor :csrf_tokens
 
+    attr_accessor :provider
+
+    attr_accessor :available_providers
+
     # Base class for errors that want to present their message as
     # preferred error info for fastlane error handling. See:
     # fastlane_core/lib/fastlane_core/ui/fastlane_runner.rb
@@ -413,11 +417,39 @@ module Spaceship
     # This method is used for both the Apple Dev Portal and iTunes Connect
     # This will also handle 2 step verification
     def send_shared_login_request(user, password)
-      # First we see if we have a stored cookie for 2 step enabled accounts
-      # this is needed as it stores the information on if this computer is a
-      # trusted one. In general I think spaceship clients should be trusted
-      load_session_from_file
+      # Check if we have a cached/valid session here
+      # Fixes
+      #   - https://github.com/fastlane/fastlane/issues/10812
+      #   - https://github.com/fastlane/fastlane/issues/10793
+      #
+      # Before 4th December 2017 we didn't load existing session from the disk
+      # but changed it, because Apple introduced a rate limit, which is fine by itself
+      # but unfortunately it also rate limits successful logins, meaning if you call multiple
+      # tools in a lane (e.g. call match 5 times), this would mean it locks you out of the account
+      # for a while.
+      # By loading existing sessions and checking if they're valid, we're sending less login requests
+      # More context on why this change was necessary https://github.com/fastlane/fastlane/pull/11108
+      #
+      if load_session_from_file
+        # Check if the session is still valid here
+        begin
+          # We use the olympus session to determine if the old session is still valid
+          # As this will raise an exception if the old session has expired
+          # If the old session is still valid, we don't have to do anything else in this method
+          # that's why we return true
+          return true if fetch_olympus_session.count > 0
+        rescue
+          # If the `fetch_olympus_session` method raises an exception
+          # we'll land here, and therefore continue doing a full login process
+          # This happens if the session we loaded from the cache isn't valid any more
+          # which is common, as the session automatically invalidates after x hours (we don't know x)
+          # In this case we don't actually care about the exact exception, and why it was failing
+          # because either way, we'll have to do a fresh login, where we do the actual error handling
+        end
+      end
+
       # If this is a CI, the user can pass the session via environment variable
+      # This is used for 2FA related sessions
       load_session_from_env
 
       data = {
@@ -489,10 +521,21 @@ module Spaceship
     # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
     def fetch_olympus_session
       response = request(:get, "https://olympus.itunes.apple.com/v1/session")
-      if response.body
-        user_map = response.body["user"]
+      body = response.body
+      if body
+        body = JSON.parse(body) if body.kind_of?(String)
+        user_map = body["user"]
         if user_map
           self.user_email = user_map["emailAddress"]
+        end
+
+        provider = body["provider"]
+        self.provider = Spaceship::Provider.new(provider_hash: provider) unless provider.nil?
+
+        available_providers_list = body["availableProviders"].compact
+
+        self.available_providers = available_providers_list.map do |provider_hash|
+          Spaceship::Provider.new(provider_hash: provider_hash)
         end
       end
     end
@@ -626,7 +669,7 @@ module Spaceship
       elsif body.to_s.include?("Internal Server Error - Read")
         raise InternalServerError, "Received an internal server error from iTunes Connect / Developer Portal, please try again later"
       elsif (body["resultString"] || "").include?("Program License Agreement")
-        raise ProgramLicenseAgreementUpdated, "#{body['userString']} Please manually log into iTunes Connect to review and accept the updated agreement."
+        raise ProgramLicenseAgreementUpdated, "#{body['userString']} Please manually log into your Apple Developer account to review and accept the updated agreement."
       end
     end
 
@@ -637,14 +680,10 @@ module Spaceship
       # The ! is part of some methods when they modify or delete a resource, so we don't want to show it
       # Using `sub` instead of `delete` as we don't want to allow multiple matches
       calling_method_name = caller_locations(caller_location, 2).first.label.sub("block in", "").delete("!").strip
-      begin
-        team_id = "(Team ID #{self.team_id}) "
-      rescue
-        # Showing the team ID is something that's nice to have, however it might cause an exception
-        # when the user doesn't have any permission at all (e.g. failing at login)
-        # we still want the error message to show the actual string, but without the team_id in that case
-        team_id = ""
-      end
+
+      # calling the computed property self.team_id can get us into an exception handling loop
+      team_id = @current_team_id ? "(Team ID #{@current_team_id}) " : ""
+
       error_message = "User #{self.user} #{team_id}doesn't have enough permission for the following action: #{calling_method_name}"
       error_message += " (#{additional_error_string})" if additional_error_string.to_s.length > 0
       raise InsufficientPermissions, error_message
