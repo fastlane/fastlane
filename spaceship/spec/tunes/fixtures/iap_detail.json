@@ -34,18 +34,6 @@
       "errorKeys": null
     },
     "pricingDurationType": null,
-    "pricingIntervals": [{
-      "value": {
-        "tierStem": "1",
-        "priceTierEffectiveDate": null,
-        "priceTierEndDate": null,
-        "country": "WW",
-        "grandfathered": null
-      },
-      "isEditable": true,
-      "isRequired": false,
-      "errorKeys": null
-    }],
     "ungrandfatheredIntervals": null,
     "freeTrialDurationType": null,
     "bonusPeriodDurationType": null,

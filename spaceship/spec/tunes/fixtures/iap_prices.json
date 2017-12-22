@@ -1,0 +1,25 @@
+{
+  "data": {
+    "subscriptions": [
+      {
+        "value": {
+          "tierStem": "1",
+          "priceTierEffectiveDate": null,
+          "priceTierEndDate": null,
+          "country": "WW",
+          "grandfathered": null
+        },
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      }],
+    "introOffers": [],
+    "freeTrials": null
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}
