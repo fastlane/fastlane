@@ -124,6 +124,15 @@ describe Spaceship::TestFlight::Client do
   # @!group Groups API
   ##
 
+  context '#create_group_for_app' do
+    let(:group_name) { 'some-group-name' }
+    it 'executes the request' do
+      MockAPI::TestFlightServer.post('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups') {}
+      subject.create_group_for_app(app_id: app_id, group_name: group_name)
+      expect(WebMock).to have_requested(:post, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups')
+    end
+  end
+
   context '#get_groups' do
     it 'executes the request' do
       MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups') {}
