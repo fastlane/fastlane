@@ -39,7 +39,7 @@ module Snapshot
       puts ""
       puts "4) Add `snapshot(\"0Launch\")` to wherever you want to create the screenshots".yellow
       puts ""
-      puts "More information on GitHub: https://docs.fastlane.tools/actions/snapshot/".green
+      puts "More information: https://docs.fastlane.tools/actions/snapshot/".green
     end
   end
 end

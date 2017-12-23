@@ -17,7 +17,7 @@ module Cert
       program :description, 'CLI for \'cert\' - Create new iOS code signing certificates'
       program :help, 'Author', 'Felix Krause <cert@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://docs.fastlane.tools/actions/cert/'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/cert/'
       program :help_formatter, :compact
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
