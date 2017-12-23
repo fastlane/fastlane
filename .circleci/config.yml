@@ -14,6 +14,8 @@ jobs:
 
       - restore_cache:
           key: v1-macos-gems-{{ checksum "Gemfile" }}
+      - restore_cache:
+          key: v1-{{ arch }}-rubocop
       - run:
           name: Setup Build
           command: |
@@ -33,6 +35,10 @@ jobs:
 
       - run: bundle exec fastlane test
 
+      - save_cache:
+          key: v1-{{ arch }}-rubocop
+          paths:
+            - ~/.cache/rubocop_cache
       - store_test_results:
           path: ~/test-reports
       - store_artifacts:
@@ -57,6 +63,8 @@ jobs:
 
       - restore_cache:
           key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
+      - restore_cache:
+          key: v1-{{ arch }}-rubocop
       - run:
           name: Setup Build
           command: |
@@ -88,6 +96,10 @@ jobs:
 
       - run: bundle exec fastlane test
 
+      - save_cache:
+          key: v1-{{ arch }}-rubocop
+          paths:
+            - ~/.cache/rubocop_cache
       - store_test_results:
           path: ~/test-reports
       - store_artifacts:
