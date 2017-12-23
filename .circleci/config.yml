@@ -14,8 +14,6 @@ jobs:
 
       - restore_cache:
           key: v1-macos-gems-{{ checksum "Gemfile" }}
-      - restore_cache:
-          key: v1-{{ arch }}-rubocop
       - run:
           name: Setup Build
           command: |
@@ -32,6 +30,9 @@ jobs:
       - run:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
+
+      - restore_cache:
+          key: v1-{{ arch }}-rubocop
 
       - run: bundle exec fastlane test
 
@@ -63,8 +64,6 @@ jobs:
 
       - restore_cache:
           key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
-      - restore_cache:
-          key: v1-{{ arch }}-rubocop
       - run:
           name: Setup Build
           command: |
@@ -93,6 +92,9 @@ jobs:
       - run:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
+
+      - restore_cache:
+          key: v1-{{ arch }}-rubocop
 
       - run: bundle exec fastlane test
 
