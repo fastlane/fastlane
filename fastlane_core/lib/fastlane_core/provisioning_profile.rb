@@ -42,6 +42,11 @@ module FastlaneCore
         parse(path).fetch("Name")
       end
 
+      # @return [String] The Apple TeamIdentifier of the given provisioning profile
+      def team_identifier(path)
+        parse(path).fetch("Entitlements").fetch("com.apple.developer.team-identifier")
+      end
+
       def profiles_path
         path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
         # If the directory doesn't exist, create it first
@@ -55,15 +60,13 @@ module FastlaneCore
       # Installs a provisioning profile for Xcode to use
       def install(path)
         UI.message("Installing provisioning profile...")
-        profile_filename = uuid(path) + ".mobileprovision"
+        profile_filename = team_identifier(path) + "_" + File.basename(path)
         destination = File.join(profiles_path, profile_filename)
 
         if path != destination
-          # copy to Xcode provisioning profile directory
+          # copy to Xcode provisioning profile directory and delete previous file if present
+          FileUtils.remove_entry(destination, force: true)
           FileUtils.copy(path, destination)
-          unless File.exist?(destination)
-            UI.user_error!("Failed installation of provisioning profile at location: '#{destination}'")
-          end
         end
 
         destination

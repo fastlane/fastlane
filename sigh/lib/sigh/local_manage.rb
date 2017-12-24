@@ -15,8 +15,8 @@ module Sigh
     def self.install_profile(profile)
       UI.message "Installing provisioning profile..."
       profile_path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
-      uuid = ENV["SIGH_UUID"] || ENV["SIGH_UDID"]
-      profile_filename = uuid + ".mobileprovision"
+      name = ENV["SIGH_TEAM_ID"] + "_" + ENV["SIGH_PROFILE_FILE_NAME"] + ".mobileprovision"
+      profile_filename = File.basename(name)
       destination = profile_path + profile_filename
 
       # If the directory doesn't exist, make it first
@@ -24,14 +24,9 @@ module Sigh
         FileUtils.mkdir_p(profile_path)
       end
 
-      # copy to Xcode provisioning profile directory
-      FileUtils.copy profile, destination
-
-      if File.exist? destination
-        UI.success "Profile installed at \"#{destination}\""
-      else
-        UI.user_error!("Failed installation of provisioning profile at location: #{destination}")
-      end
+      # copy to Xcode provisioning profile directory and delete previous file if present
+      FileUtils.remove_entry(destination, force: true)
+      FileUtils.copy(profile, destination)
     end
 
     def self.get_inputs(options, _args)
