@@ -21,7 +21,7 @@ describe Match do
       repo_dir = Dir.mktmpdir
       cert_path = File.join(repo_dir, "something.cer")
       profile_path = "./match/spec/fixtures/test.mobileprovision"
-      destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
+      destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/439BBM9367_test.mobileprovision")
 
       expect(Match::GitHelper).to receive(:clone).with(git_url, true, skip_docs: false, branch: "master", git_full_name: nil, git_user_email: nil, clone_branch_directly: false).and_return(repo_dir)
       expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution).and_return(cert_path)
@@ -56,7 +56,7 @@ describe Match do
                                                                 type: "appstore")]).to eql('439BBM9367')
       expect(ENV[Match::Utils.environment_variable_name_profile_name(app_identifier: "tools.fastlane.app",
                                                                      type: "appstore")]).to eql('tools.fastlane.app AppStore')
-      profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision')
+      profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/439BBM9367_test.mobileprovision')
       expect(ENV[Match::Utils.environment_variable_name_profile_path(app_identifier: "tools.fastlane.app",
                                                                      type: "appstore")]).to eql(profile_path)
     end
@@ -96,7 +96,7 @@ describe Match do
                                                                 type: "appstore")]).to eql('439BBM9367')
       expect(ENV[Match::Utils.environment_variable_name_profile_name(app_identifier: "tools.fastlane.app",
                                                                      type: "appstore")]).to eql('match AppStore tools.fastlane.app 1449198835')
-      profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/736590c3-dfe8-4c25-b2eb-2404b8e65fb8.mobileprovision')
+      profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/439BBM9367_AppStore_tools.fastlane.app.mobileprovision')
       expect(ENV[Match::Utils.environment_variable_name_profile_path(app_identifier: "tools.fastlane.app",
                                                                      type: "appstore")]).to eql(profile_path)
     end
