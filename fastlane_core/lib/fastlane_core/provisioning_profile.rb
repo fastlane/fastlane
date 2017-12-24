@@ -64,7 +64,7 @@ module FastlaneCore
         destination = File.join(profiles_path, profile_filename)
 
         if path != destination
-          # copy to Xcode provisioning profile directory and delete previous file if present
+          # copy to Xcode provisioning profile directory and delete previous .mobileprovision file if present
           FileUtils.remove_entry(destination, force: true)
           FileUtils.copy(path, destination)
         end
