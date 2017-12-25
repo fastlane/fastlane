@@ -41,9 +41,10 @@ module Frameit
                            description: "Use iPhone 6s frames instead of iPhone 7 frames",
                            default_value: false),
         FastlaneCore::ConfigItem.new(key: :force_orientation_block,
-                           type: Proc,
+                           type: :string_callback,
                            description: "[Advanced] A block to customize your screnshots' device orientation",
                            display_in_shell: false,
+                           optional: true,
                            default_value: proc do |filename|
                              f = filename.downcase
                              if f.end_with?("force_landscapeleft")
