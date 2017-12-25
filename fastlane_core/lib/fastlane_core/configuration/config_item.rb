@@ -149,6 +149,12 @@ module FastlaneCore
 
     # if code_gen_default_value is nil, use the default value if it isn't a `code_gen_sensitive` value
     def update_code_gen_default_value_if_able!
+      # we don't support default values for procs
+      if @data_type == :string_callback
+        @code_gen_default_value = nil
+        return
+      end
+
       if @code_gen_default_value.nil?
         unless @code_gen_sensitive
 
