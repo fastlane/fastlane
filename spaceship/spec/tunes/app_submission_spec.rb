@@ -58,5 +58,19 @@ describe Spaceship::AppSubmission do
       end.to raise_exception("Problem processing review submission.")
       expect(submission.submitted_for_review).to eq(false)
     end
+
+    it "successfully submits app for review if `reject_if_waiting_for_review` option is true" do
+      TunesStubbing.itc_stub_app_submission_reject_submission
+      # expect do
+      #   submission = app.create_submission
+      # end
+        submission = app.create_submission
+      submission.content_rights_contains_third_party_content = true
+      submission.content_rights_has_rights = true
+      submission.add_id_info_uses_idfa = false
+      # submission.submitted_for_review = true
+      submission.complete!(true)
+      expect(submission.submitted_for_review).to eq(true)
+    end
   end
 end
