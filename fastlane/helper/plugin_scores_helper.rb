@@ -293,16 +293,16 @@ module Fastlane
         def is_block?(line)
           # Matches beginning block statement from the list of keywords
           # `do` has to be handled separately because it can be preceded by a function call
-          line.match?(/^(?:[\s\w]*=)?\s*(if|unless|case|while|loop|for|until|begin)/) \
-          || line.match?(/^(?:[\s\w]*=)?\s*.*\s+do\s*(?:\|.*\|)?\s*(?:#.*)?$/)
+          !!line.match(/^(?:[\s\w]*=)?\s*(if|unless|case|while|loop|for|until|begin)/) \
+          || !!line.match(/^(?:[\s\w]*=)?\s*.*\s+do\s*(?:\|.*\|)?\s*(?:#.*)?$/)
         end
 
         def is_end?(line)
-          line.match?(/^\s*end\s*/)
+          !!line.match(/^\s*end\s*/)
         end
 
         def is_class?(line)
-          line.match?(/^\s*class\s+/)
+          !!line.match(/^\s*class\s+/)
         end
 
         def action_name_from_line(line)
