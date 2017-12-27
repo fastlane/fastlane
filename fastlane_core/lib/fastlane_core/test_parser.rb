@@ -18,16 +18,6 @@ module FastlaneCore
       parse_content
     end
 
-    # Returns the JUnit report as String
-    def to_junit
-      JunitGenerator.new(self.data).generate
-    end
-
-    # @return [Bool] were all tests successful? Is false if at least one test failed
-    def tests_successful?
-      self.data.collect { |a| a[:number_of_failures] }.all?(&:zero?)
-    end
-
     private
 
     def ensure_file_valid!
