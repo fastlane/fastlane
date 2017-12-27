@@ -17,7 +17,7 @@ module Produce
       program :description, 'CLI for \'produce\''
       program :help, 'Author', 'Felix Krause <produce@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://docs.fastlane.tools/actions/produce/'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/produce/'
       program :help_formatter, :compact
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
