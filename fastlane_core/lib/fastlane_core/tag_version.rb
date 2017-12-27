@@ -6,7 +6,14 @@ module FastlaneCore
   class TagVersion < Gem::Version
     class << self
       def correct?(tag)
-        superclass.correct?(version_number_from_tag(tag))
+        result = superclass.correct?(version_number_from_tag(tag))
+
+        # It seems like depending on the Ruby env, the result is
+        # slightly different. We actually just want `true` and `false`
+        # values here
+        return false if result.nil?
+        return true if result == 0
+        return result
       end
 
       # Gem::Version.new barfs on things like "v0.1.0", which is the style
