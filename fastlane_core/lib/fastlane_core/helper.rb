@@ -120,6 +120,10 @@ module FastlaneCore
       self.mac?
     end
 
+    def self.is_windows?
+      self.windows?
+    end
+
     # Do we want to disable the colored output?
     def self.colors_disabled?
       FastlaneCore::Env.truthy?("FASTLANE_DISABLE_COLORS")
