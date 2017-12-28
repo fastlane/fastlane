@@ -5,8 +5,8 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'fastlane/version'
 
 # Copy over the latest .rubocop.yml style guide
-rubocop_config = File.expand_path('../.rubocop.yml', __FILE__)
-`cp #{rubocop_config} #{lib}/fastlane/plugins/template/.rubocop.yml`
+# rubocop_config = File.expand_path('../.rubocop.yml', __FILE__)
+# `cp #{rubocop_config} #{lib}/fastlane/plugins/template/.rubocop.yml`
 
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
@@ -55,7 +55,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'fastimage', '>= 2.1.0', '< 3.0.0' # fetch the image sizes from the screenshots
   spec.add_dependency 'gh_inspector', '>= 1.0.1', '< 2.0.0' # search for issues on GitHub when something goes wrong
   spec.add_dependency 'highline', '>= 1.7.2', '< 2.0.0' # user inputs (e.g. passwords)
-  spec.add_dependency 'json', '< 3.0.0' # Because sometimes it's just not installed
+  # spec.add_dependency 'json', '< 3.0.0' # Because sometimes it's just not installed
   spec.add_dependency 'mini_magick', '~> 4.5.1' # To open, edit and export PSD files
   spec.add_dependency 'multi_json' # Because sometimes it's just not installed
   spec.add_dependency 'multi_xml', '~> 0.5'
@@ -76,12 +76,12 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.5.0'
   spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
   spec.add_development_dependency 'pry'
-  spec.add_development_dependency 'pry-byebug'
+  # spec.add_development_dependency 'pry-byebug'
   spec.add_development_dependency 'pry-rescue'
-  spec.add_development_dependency 'pry-stack_explorer'
+  # spec.add_development_dependency 'pry-stack_explorer'
   spec.add_development_dependency 'yard', '~> 0.9.11'
   spec.add_development_dependency 'webmock', '~> 2.3.2'
-  spec.add_development_dependency 'coveralls', '~> 0.8.13'
+  # spec.add_development_dependency 'coveralls', '~> 0.8.13'
   spec.add_development_dependency 'rubocop', Fastlane::RUBOCOP_REQUIREMENT
   spec.add_development_dependency 'rb-readline' # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
   spec.add_development_dependency 'rest-client', '>= 1.8.0'

@@ -43,6 +43,12 @@ module Fastlane
         # don't actually load anything we don't want to load
         # This is just to test if the gem is already preinstalled, e.g. YAML
         # See https://github.com/fastlane/fastlane/issues/6951
+
+        # Doesn't work in Windows, so just return `true`...
+        if Helper.is_windows?
+          return true
+        end
+
         Thread.new do
           begin
             require name
