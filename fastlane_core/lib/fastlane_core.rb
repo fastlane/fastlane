@@ -47,6 +47,7 @@ require 'fastlane_core/analytics/analytics_event_builder'
 require 'fastlane_core/analytics/analytics_ingester_client'
 require 'fastlane_core/analytics/analytics_session'
 require 'fastlane_core/tag_version'
+require 'fastlane_core/PTY'
 
 # Third Party code
 require 'colored'
