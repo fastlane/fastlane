@@ -24,7 +24,7 @@ module Fastlane
         require "rubygems/command_manager"
         installer = Gem::CommandManager.instance[:install]
 
-        UI.important("Installing Ruby gem '#{gem_name}'...")
+        UI.important "Installing Ruby gem '#{gem_name}'..."
 
         spec_name = self.find_gem_name(gem_name)
         UI.important("Found gem \"#{spec_name}\" instead of the required name \"#{gem_name}\"") if spec_name != gem_name
@@ -39,22 +39,24 @@ module Fastlane
       end
 
       def gem_installed?(name, req = Gem::Requirement.default)
-        installed = Gem::Specification.any? { |s| s.name == name and req =~ s.version }
-        return true if installed
-
         # In special cases a gem is already preinstalled, e.g. YAML.
         # To find out we try to load a gem with that name in a child process
         # (so we don't actually load anything we don't want to load)
         # See https://github.com/fastlane/fastlane/issues/6951
-        require_tester = <<-RB.gsub(/^ */, '')
-          begin
-            require ARGV.first
-          rescue LoadError
-            exit(1)
+        if Process.respond_to?(:fork)
+          fork do
+            begin
+              require name
+            rescue LoadError
+              exit(1)
+            end
           end
-        RB
-        system(RbConfig.ruby, "-e", require_tester.lines.map(&:chomp).join("; "), name)
-        return $?.success?
+          _pid, status = Process.wait2
+          return true if status.exitstatus == 0
+          # else OS doesn't support `fork` (e.g. Windows)
+        end
+
+        Gem::Specification.any? { |s| s.name == name and req =~ s.version }
       end
 
       def find_gem_name(user_supplied_name)
@@ -66,7 +68,7 @@ module Fastlane
 
       def format_gem_require_name(gem_name)
         # from "fastlane-plugin-xcversion" to "fastlane/plugin/xcversion"
-        gem_name = gem_name.tr("-", "/") if gem_name.start_with?("fastlane-plugin-")
+        gem_name = gem_name.tr("-", "/") if gem_name.start_with? "fastlane-plugin-"
 
         return gem_name
       end
