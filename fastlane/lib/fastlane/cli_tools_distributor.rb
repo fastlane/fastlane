@@ -15,7 +15,12 @@ module Fastlane
       def take_off
         before_import_time = Time.now
 
+        require "tty-spinner"
+
+        require_fastlane_spinner = TTY::Spinner.new("[:spinner] 🚀 ", format: :dots)
+        require_fastlane_spinner.auto_spin
         require "fastlane" # this might take a long time if there is no Gemfile :(
+        require_fastlane_spinner.success
 
         # We want to avoid printing output other than the version number if we are running `fastlane -v`
         unless running_version_command?
