@@ -71,6 +71,9 @@ Gem::Specification.new do |spec|
   # If you upgrade this gem, make sure to upgrade the users of it as well.
   spec.add_dependency 'google-api-client', '>= 0.13.1', '< 0.14.0' # Google API Client to access Play Publishing API
 
+  # jwt 2.x requires Ruby 2.1. This is ultimately pulled in by the google-api-client.
+  spec.add_dependency 'jwt', '~> 1.5'
+
   # Development only
   spec.add_development_dependency 'rake', '< 12'
   spec.add_development_dependency 'rspec', '~> 3.5.0'
