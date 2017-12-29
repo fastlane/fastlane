@@ -1,0 +1,16 @@
+environment:
+  LC_ALL: en_US.UTF-8
+  LANG: en_US.UTF-8
+  FASTLANE_ITUNES_TRANSPORTER_PATH: C:/tmp
+
+init:
+  - git config --global core.autocrlf true
+
+install:
+  - set PATH=C:\Ruby24-x64\bin;%PATH%
+  - bundle install
+
+build: off
+
+test_script:
+  - bundle exec fastlane test
