@@ -16,6 +16,9 @@ require 'spaceship/tunes/tunes'
 require 'spaceship/tunes/spaceship'
 require 'spaceship/test_flight'
 
+# For Ruby 2.0 support
+require 'fastlane_core/core_ext/array'
+
 # To support legacy code
 module Spaceship
   ROOT = Pathname.new(File.expand_path('../..', __FILE__))
