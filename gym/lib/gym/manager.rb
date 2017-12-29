@@ -8,11 +8,6 @@ module Gym
       values = Gym.config.values(ask: false)
       values[:xcode_path] = File.expand_path("../..", FastlaneCore::Helper.xcode_path)
 
-      # Make sure the output name is valid and remove a trailing `.ipa` extension
-      # as it will be added by gym for free
-      values[:output_name].gsub!(".ipa", "")
-      values[:output_name].gsub!(File::SEPARATOR, "_")
-
       FastlaneCore::PrintTable.print_values(config: values,
                                          hide_keys: [],
                                              title: "Summary for gym #{Fastlane::VERSION}")
