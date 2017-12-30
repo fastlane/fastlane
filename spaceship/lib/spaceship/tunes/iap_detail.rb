@@ -98,7 +98,7 @@ module Spaceship
             }
           }
         end
-        raw_data.set(["subscriptions"], new_intervals)
+        raw_data.set(["pricingIntervals"], new_intervals)
       end
 
       # @return (Array) pricing intervals
@@ -112,7 +112,7 @@ module Spaceship
       #    }
       #  ]
       def pricing_intervals
-        @pricing_intervals ||= raw_data["subscriptions"].map do |interval|
+        @pricing_intervals ||= raw_data["pricingIntervals"].map do |interval|
           {
             tier: interval["value"]["tierStem"].to_i,
             begin_date: interval["value"]["priceTierEffectiveDate"],
