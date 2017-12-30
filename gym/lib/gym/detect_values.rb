@@ -30,6 +30,11 @@ module Gym
 
       config[:build_path] ||= archive_path_from_local_xcode_preferences
 
+      # Make sure the output name is valid and remove a trailing `.ipa` extension
+      # as it will be added by gym for free
+      config[:output_name].gsub!(".ipa", "")
+      config[:output_name].gsub!(File::SEPARATOR, "_")
+
       return config
     end
 
