@@ -32,12 +32,12 @@ describe Fastlane do
       end
 
       it "Copies a file with a space" do
-        FileUtils.touch('/tmp/fastlane/copy_artifacts\ with\ a\ space')
+        FileUtils.touch("/tmp/fastlane/copy_artifacts with a space")
 
         Fastlane::FastFile.new.parse("lane :test do
           copy_artifacts(artifacts: '/tmp/fastlane/copy_artifacts with a space', target_path: '/tmp/fastlane2')
         end").runner.execute(:test)
-        expect(File.exist?('/tmp/fastlane/copy_artifacts\ with\ a\ space')).to eq(true)
+        expect(File.exist?('/tmp/fastlane/copy_artifacts with a space')).to eq(true)
       end
 
       it "Copies a file with verbose" do
