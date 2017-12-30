@@ -1,3 +1,5 @@
+# For Ruby 2.0 support
+require 'fastlane_core/core_ext/array'
 
 module Spaceship
   module Tunes
@@ -63,7 +65,7 @@ module Spaceship
       private
 
       def build_iap
-        attrs = [*iap_prices, *iap_details].to_h
+        attrs = [*iap_prices, *iap_details].fl_to_h
         attrs[:application] = application
         attrs
       end
