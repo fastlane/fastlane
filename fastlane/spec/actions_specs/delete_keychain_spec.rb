@@ -49,8 +49,9 @@ describe Fastlane do
       end
 
       it "works with keychain name that contain spaces and `\"`" do
+        keychain = File.expand_path('" test ".keychain')
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
-        allow(File).to receive(:file?).with(File.expand_path('" test ".keychain')).and_return(true)
+        allow(File).to receive(:file?).with(keychain).and_return(true)
 
         result = Fastlane::FastFile.new.parse("lane :test do
           delete_keychain ({
@@ -58,8 +59,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        keychain = File.expand_path('\\"\\ test\\ \\".keychain')
-        expect(result).to eq %(security delete-keychain #{keychain})
+        expect(result).to eq %(security delete-keychain #{keychain.shellescape})
       end
 
       it "works with absolute keychain path" do
