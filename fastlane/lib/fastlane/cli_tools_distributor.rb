@@ -18,6 +18,7 @@ module Fastlane
         # Usually in the fastlane code base we use
         #
         #   Helper.show_loading_indicator
+        #   longer_taking_task_here
         #   Helper.hide_loading_indicator
         #
         # but in this case we haven't required FastlaneCore yet
