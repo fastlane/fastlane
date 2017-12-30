@@ -66,7 +66,8 @@ describe Fastlane do
       end
 
       it "correctly escapes the gradle path" do
-        gradle_path = '/fake gradle/path' # this value is interesting because it contains a space in the path
+        tmp_path = Dir.mktmpdir
+        gradle_path = "#{tmp_path}/fake gradle/path" # this value is interesting because it contains a space in the path
         allow(File).to receive(:exist?).and_call_original
         allow(File).to receive(:exist?).with(gradle_path).and_return(true)
 

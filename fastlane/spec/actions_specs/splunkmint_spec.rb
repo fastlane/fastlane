@@ -112,10 +112,11 @@ describe Fastlane do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_ZIP_PATH] = nil
 
-        file_path = '/tmp/file.dSYM.zip'
+        tmp_path = Dir.mktmpdir
+        file_path = "#{tmp_path}/file.dSYM.zip"
         FileUtils.touch file_path
         result = Fastlane::FastFile.new.parse("lane :test do
-          splunkmint(dsym: '/tmp/file.dSYM.zip',
+          splunkmint(dsym: '#{file_path}',
                       api_key: '33823d3a',
                       api_token: 'e05ba40754c4869fb7e0b61',
                       verbose: true,
@@ -125,7 +126,7 @@ describe Fastlane do
                       proxy_password: 'admin')
         end").runner.execute(:test)
 
-        expect(result).to include("-F file=@/tmp/file.dSYM.zip")
+        expect(result).to include("-F file=@#{file_path}")
         expect(result).to include('--verbose')
         expect(result).to include("--header 'X-Splunk-Mint-Auth-Token: e05ba40754c4869fb7e0b61'")
         expect(result).to include("--header 'X-Splunk-Mint-apikey: 33823d3a'")
@@ -139,16 +140,17 @@ describe Fastlane do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_ZIP_PATH] = nil
 
-        file_path = '/tmp/file.dSYM.zip'
+        tmp_path = Dir.mktmpdir
+        file_path = "#{tmp_path}/file.dSYM.zip"
         FileUtils.touch file_path
         result = Fastlane::FastFile.new.parse("lane :test do
-          splunkmint(dsym: '/tmp/file.dSYM.zip',
+          splunkmint(dsym: '#{file_path}',
                       api_key: '33823d3a',
                       api_token: 'e05ba40754c4869fb7e0b61',
                       verbose: true)
         end").runner.execute(:test)
 
-        expect(result).to include("-F file=@/tmp/file.dSYM.zip")
+        expect(result).to include("-F file=@#{file_path}")
         expect(result).to include('--verbose')
         expect(result).to include("--header 'X-Splunk-Mint-Auth-Token: e05ba40754c4869fb7e0b61'")
         expect(result).to include("--header 'X-Splunk-Mint-apikey: 33823d3a'")
@@ -162,17 +164,18 @@ describe Fastlane do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_ZIP_PATH] = nil
 
-        file_path = '/tmp/file.dSYM.zip'
+        tmp_path = Dir.mktmpdir
+        file_path = "#{tmp_path}/file.dSYM.zip"
         FileUtils.touch file_path
         result = Fastlane::FastFile.new.parse("lane :test do
-          splunkmint(dsym: '/tmp/file.dSYM.zip',
+          splunkmint(dsym: '#{file_path}',
                       api_key: '33823d3a',
                       api_token: 'e05ba40754c4869fb7e0b61',
                       verbose: true,
                       upload_progress: true)
         end").runner.execute(:test)
 
-        expect(result).to include("-F file=@/tmp/file.dSYM.zip")
+        expect(result).to include("-F file=@#{file_path}")
         expect(result).to include('--verbose')
         expect(result).to include("--header 'X-Splunk-Mint-Auth-Token: e05ba40754c4869fb7e0b61'")
         expect(result).to include("--header 'X-Splunk-Mint-apikey: 33823d3a'")
