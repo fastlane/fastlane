@@ -41,35 +41,45 @@ describe Fastlane do
       end
 
       it "Copies a file with verbose" do
-        FileUtils.touch('/tmp/fastlane/copy_artifacts')
+        tmp_path1 = Dir.mktmpdir
+        source_path = "#{tmp_path1}/source"
+        FileUtils.touch(source_path)
 
-        expect(UI).to receive(:verbose).once.ordered.with('Copying artifacts /tmp/fastlane/copy_artifacts to /tmp/fastlane2')
+        tmp_path2 = Dir.mktmpdir
+        target_path = "#{tmp_path2}/target"
+
+        expect(UI).to receive(:verbose).once.ordered.with("Copying artifacts #{source_path} to #{target_path}")
         expect(UI).to receive(:verbose).once.ordered.with('Keeping original files')
 
         with_verbose(true) do
           Fastlane::FastFile.new.parse("lane :test do
-            copy_artifacts(artifacts: '/tmp/fastlane/copy_artifacts', target_path: '/tmp/fastlane2')
+            copy_artifacts(artifacts: '#{source_path}', target_path: '#{target_path}')
           end").runner.execute(:test)
         end
 
-        expect(File.exist?('/tmp/fastlane/copy_artifacts')).to eq(true)
-        expect(File.exist?('/tmp/fastlane2/copy_artifacts')).to eq(true)
+        expect(File.exist?(source_path)).to eq(true)
+        expect(File.exist?(target_path)).to eq(true)
       end
 
       it "Copies a file without keeping original and verbose" do
-        FileUtils.touch('/tmp/fastlane/copy_artifacts')
+        tmp_path1 = Dir.mktmpdir
+        source_path = "#{tmp_path1}/source"
+        FileUtils.touch(source_path)
 
-        expect(UI).to receive(:verbose).once.ordered.with('Copying artifacts /tmp/fastlane/copy_artifacts to /tmp/fastlane2')
+        tmp_path2 = Dir.mktmpdir
+        target_path = "#{tmp_path2}/target"
+
+        expect(UI).to receive(:verbose).once.ordered.with("Copying artifacts #{source_path} to #{target_path}")
         expect(UI).to receive(:verbose).once.ordered.with('Not keeping original files')
 
         with_verbose(true) do
           Fastlane::FastFile.new.parse("lane :test do
-            copy_artifacts(artifacts: '/tmp/fastlane/copy_artifacts', target_path: '/tmp/fastlane2', keep_original: false)
+            copy_artifacts(artifacts: '#{source_path}', target_path: '#{target_path}', keep_original: false)
           end").runner.execute(:test)
         end
 
-        expect(File.exist?('/tmp/fastlane2/copy_artifacts')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/copy_artifacts')).to eq(false)
+        expect(File.exist?(source_path)).to eq(false)
+        expect(File.exist?(target_path)).to eq(true)
       end
 
       it "Copies a file with file missing does not fail (no flag set)" do
