@@ -156,9 +156,11 @@ describe FastlaneCore do
     end
 
     it "raises an exception if path was not found" do
+      tmp_path = Dir.mktmpdir
+      path = "#{tmp_path}/notHere123"
       expect do
-        FastlaneCore::Project.new(project: "/tmp/notHere123")
-      end.to raise_error "Could not find project at path '/tmp/notHere123'"
+        FastlaneCore::Project.new(project: path)
+      end.to raise_error "Could not find project at path '#{path}'"
     end
 
     describe "Valid Standard Project" do

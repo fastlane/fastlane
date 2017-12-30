@@ -11,9 +11,11 @@ describe Gym do
 
   describe Gym::BuildCommandGenerator do
     it "raises an exception when project path wasn't found" do
+      tmp_path = Dir.mktmpdir
+      path = "#{tmp_path}/notExistent"
       expect do
-        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, { project: "/notExistent" })
-      end.to raise_error "Project file not found at path '/notExistent'"
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, { project: path })
+      end.to raise_error "Project file not found at path '#{path}'"
     end
 
     it "supports additional parameters", requires_xcodebuild: true do
