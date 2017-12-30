@@ -4,7 +4,7 @@ describe FastlaneCore do
       def within_a_temp_dir
         Dir.mktmpdir do |dir|
           FileUtils.cd(dir) do
-            yield(dir) if block_given?
+            yield dir if block_given?
           end
         end
       end
@@ -69,7 +69,7 @@ describe FastlaneCore do
           FileUtils.mkdir_p(workspaces)
 
           expect(FastlaneCore::Project).to receive(:choose).and_return(workspaces.last)
-          expect(FastlaneCore::Project).not_to(receive(:select_project))
+          expect(FastlaneCore::Project).not_to receive(:select_project)
 
           config = FastlaneCore::Configuration.new(options, {})
           FastlaneCore::Project.detect_projects(config)
@@ -84,7 +84,7 @@ describe FastlaneCore do
           FileUtils.mkdir_p(projects)
 
           expect(FastlaneCore::Project).to receive(:choose).and_return(projects.last)
-          expect(FastlaneCore::Project).not_to(receive(:select_project))
+          expect(FastlaneCore::Project).not_to receive(:select_project)
 
           config = FastlaneCore::Configuration.new(options, {})
           FastlaneCore::Project.detect_projects(config)
@@ -160,7 +160,7 @@ describe FastlaneCore do
       path = "#{tmp_path}/notHere123"
       expect do
         FastlaneCore::Project.new(project: path)
-      end.to raise_error("Could not find project at path '#{path}'")
+      end.to raise_error "Could not find project at path '#{path}'"
     end
 
     describe "Valid Standard Project" do
@@ -487,7 +487,7 @@ describe FastlaneCore do
     describe 'xcodebuild_suppress_stderr option', requires_xcode: true do
       it 'generates an xcodebuild -list command without stderr redirection by default' do
         project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
-        expect(project.build_xcodebuild_list_command).not_to(match(%r{2> /dev/null}))
+        expect(project.build_xcodebuild_list_command).not_to match(%r{2> /dev/null})
       end
 
       it 'generates an xcodebuild -list command that redirects stderr to /dev/null' do
@@ -500,7 +500,7 @@ describe FastlaneCore do
 
       it 'generates an xcodebuild -showBuildSettings command without stderr redirection by default' do
         project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
-        expect(project.build_xcodebuild_showbuildsettings_command).not_to(match(%r{2> /dev/null}))
+        expect(project.build_xcodebuild_showbuildsettings_command).not_to match(%r{2> /dev/null})
       end
 
       it 'generates an xcodebuild -showBuildSettings command that redirects stderr to /dev/null', requires_xcode: true do
