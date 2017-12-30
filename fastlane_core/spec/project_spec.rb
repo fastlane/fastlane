@@ -419,7 +419,7 @@ describe FastlaneCore do
       end
 
       it "runs simple commands" do
-        cmd = 'echo "HO"'
+        cmd = 'echo HO'
         expect(FastlaneCore::Project.run_command(cmd)).to eq("HO\n")
       end
 
