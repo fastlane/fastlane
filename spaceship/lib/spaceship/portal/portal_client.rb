@@ -651,10 +651,8 @@ module Spaceship
       parse_response(r)
     end
 
-    def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil, template_name: nil)
-      ensure_csrf(Spaceship::ProvisioningProfile) do
-        fetch_csrf_token_for_provisioning
-      end
+    def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil, template_name: nil)      
+      fetch_csrf_token_for_provisioning
 
       params = {
           teamId: team_id,
