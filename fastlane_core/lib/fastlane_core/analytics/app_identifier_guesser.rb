@@ -26,7 +26,7 @@ module FastlaneCore
     end
 
     # To not count the same projects multiple time for the number of launches
-    # Learn more at https://github.com/fastlane/fastlane#metrics
+    # Learn more at https://docs.fastlane.tools/#metrics
     # Use the `FASTLANE_OPT_OUT_USAGE` variable to opt out
     # The resulting value is e.g. ce12f8371df11ef6097a83bdf2303e4357d6f5040acc4f76019489fa5deeae0d
     def generate_p_hash(app_id)
