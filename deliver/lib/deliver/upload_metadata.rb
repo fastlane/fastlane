@@ -122,8 +122,9 @@ module Deliver
       set_review_information(v, options)
       set_app_rating(v, options)
 
-      UI.message("Uploading metadata to iTunes Connect")
+      Helper.show_loading_indicator("Uploading metadata to iTunes Connect")
       v.save!
+      Helper.hide_loading_indicator
       begin
         details.save!
         UI.success("Successfully uploaded set of metadata to iTunes Connect")
@@ -244,8 +245,9 @@ module Deliver
         v.create_languages(enabled_languages)
         lng_text = "language"
         lng_text += "s" if enabled_languages.count != 1
-        UI.message("Activating #{lng_text} #{enabled_languages.join(', ')}...")
+        Helper.show_loading_indicator("Activating #{lng_text} #{enabled_languages.join(', ')}...")
         v.save!
+        Helper.hide_loading_indicator
       end
       true
     end
