@@ -213,7 +213,7 @@ module FastlaneCore
       #
 
       # Remove the ".keychain" at the end of the name
-      name.sub!(/\.keychain$/, "")
+      name = name.sub(/\.keychain$/, "")
 
       possible_locations = [
         File.join(Dir.home, 'Library', 'Keychains', name),
