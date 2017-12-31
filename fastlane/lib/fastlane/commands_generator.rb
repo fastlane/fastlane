@@ -112,7 +112,7 @@ module Fastlane
 
         c.option '-u STRING', '--user STRING', String, 'iOS projects only: Your Apple ID'
 
-        CrashlyticsBetaCommandLineHandler.apply_options(c)
+        # CrashlyticsBetaCommandLineHandler.apply_options(c)
 
         c.action do |args, options|
           if args[0] == 'beta'
