@@ -1,5 +1,6 @@
 require 'logger'
 require 'colored'
+require 'tty-spinner'
 
 module FastlaneCore
   module Helper
@@ -267,6 +268,16 @@ module FastlaneCore
       else
         return './'
       end
+    end
+
+    # Show/Hide loading indicator
+    def self.show_loading_indicator(text = "🚀")
+      @require_fastlane_spinner = TTY::Spinner.new("[:spinner] #{text} ", format: :dots)
+      @require_fastlane_spinner.auto_spin
+    end
+
+    def self.hide_loading_indicator
+      @require_fastlane_spinner.success
     end
   end
 end
