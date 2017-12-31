@@ -64,7 +64,7 @@ module FastlaneCore
   # If you opt out, we will not send anything.
   # You can confirm this by observing how we use the environment variable: FASTLANE_OPT_OUT_USAGE
   # Specifically, in AnalyticsSession.finalize_session
-  # Learn more at https://github.com/fastlane/fastlane#metrics
+  # Learn more at https://docs.fastlane.tools/#metrics
   def self.session
     @session ||= AnalyticsSession.new
   end
