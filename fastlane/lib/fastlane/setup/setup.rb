@@ -9,8 +9,10 @@ module Fastlane
     # The current content of the generated Fastfile
     attr_accessor :fastfile_content
 
+    attr_accessor :user
+
     # Start the setup process
-    def run(user: nil, is_swift_fastfile: false)
+    def self.start(user: nil, is_swift_fastfile: false)
       if FastlaneCore::FastlaneFolder.setup? and !Helper.is_test?
         require 'fastlane/lane_list'
         Fastlane::LaneList.output(FastlaneCore::FastlaneFolder.fastfile_path)
@@ -19,7 +21,7 @@ module Fastlane
         return
       end
 
-      self.is_swift_fastfile = false # TODO: this is just for now
+      is_swift_fastfile = false # TODO: this is just for now
 
       # TODO: Search subdirectory
       ios_projects = Dir["*.xcodeproj"] + Dir["*.xcworkspace"] # TODO: Search sub-directories also
@@ -31,7 +33,7 @@ module Fastlane
         # TODO: Implement here
       elsif ios_projects.count > 0
         UI.message("Detected iOS/Mac project in current directory...")
-        setup_ios
+        SetupIos.new(is_swift_fastfile: is_swift_fastfile, user: user).setup_ios
       elsif android_projects.count > 0
         UI.message("Detected Android project in current directory...")
         # TODO: implement
@@ -44,43 +46,9 @@ module Fastlane
       # end
     end
 
-    def setup_ios
-      self.platform = :ios
-      self.fastfile_content = fastfile_template_content
-
-      welcome_to_fastlane
-
-      options = {
-        "📸  Automate screenshots" => :ios_screenshots,
-        "👩‍✈️  Automate beta distribution to TestFlight" => :ios_testflight,
-        "🚀  Automate App Store distribution" => :ios_app_store,
-        "🛠  Manual setup - setup your project to manually automate your tasks" => :ios_manual
-      }
-
-      selected = UI.select("What do you want to use fastlane for?", options.keys)
-      method_to_use = options[selected]
-      self.send(method_to_use)
-    end
-
-    # Different iOS flows
-    def ios_testflight
-      UI.header("Setting up fastlane for iOS TestFlight distribution")
-    end
-
-    def ios_app_store
-      UI.header("Setting up fastlane for iOS App Store distribution")
-    end
-
-    def ios_screenshots
-      UI.header("Setting up fastlane to automate iOS screenshots")
-    end
-
-    def ios_manual
-      UI.header("Setting up fastlane, the manual way")
-      append_lane(["lane :custom_lane do",
-                   "  # add actions here: https://docs.fastlane.tools/actions",
-                   "end"])
-      finishing_up
+    def initialize(is_swift_fastfile: nil, user: nil)
+      self.is_swift_fastfile = is_swift_fastfile
+      self.user = user
     end
 
     # Helpers
@@ -92,7 +60,7 @@ module Fastlane
 
     # Append a lane to the current Fastfile template we're generating
     def append_lane(lane)
-      self.fastfile_content.gsub!("[[lanes]]", "#{lane.join("\n")}\n\n[[lanes]]")
+      self.fastfile_content.gsub!("[[lanes]]", "  #{lane.join("\n  ")}\n\n[[lanes]]")
     end
 
     def write_fastfile!
@@ -104,7 +72,7 @@ module Fastlane
       UI.success("✅  Successfully generated fastlane configuration at `#{path}`")
     end
 
-    def finishing_up
+    def finish_up
       write_fastfile!
       show_analytics_note
       explain_concepts
@@ -160,3 +128,5 @@ module Fastlane
     end
   end
 end
+
+require 'fastlane/setup/setup_ios'

@@ -120,20 +120,21 @@ module Fastlane
             Fastlane::CrashlyticsBeta.new(beta_info, Fastlane::CrashlyticsBetaUi.new).run
           else
             is_swift_fastfile = args.include?("swift")
-            Fastlane::Setup.new.run(user: options.user, is_swift_fastfile: is_swift_fastfile)
+            Fastlane::Setup.start(user: options.user, is_swift_fastfile: is_swift_fastfile)
           end
         end
       end
 
-      command :init_swift do |c|
-        c.syntax = 'fastlane init_swift'
-        c.description = 'Helps you with your initial fastlane setup for Swift'
-        c.option '-u STRING', '--user STRING', String, 'iOS projects only: Your Apple ID'
+      # TODO: make sure this works, needs changes
+      # command :init_swift do |c|
+      #   c.syntax = 'fastlane init_swift'
+      #   c.description = 'Helps you with your initial fastlane setup for Swift'
+      #   c.option '-u STRING', '--user STRING', String, 'iOS projects only: Your Apple ID'
 
-        c.action do |args, options|
-          Fastlane::Setup.new.run(user: options.user, is_swift_fastfile: true)
-        end
-      end
+      #   c.action do |args, options|
+      #     Fastlane::Setup.start(user: options.user, is_swift_fastfile: true)
+      #   end
+      # end
 
       command :new_action do |c|
         c.syntax = 'fastlane new_action'
