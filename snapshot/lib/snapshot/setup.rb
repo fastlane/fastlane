@@ -47,6 +47,8 @@ module Snapshot
       puts "  app.launch()"
       puts ""
       puts "4) Add `snapshot(\"0Launch\")` to wherever you want to create the screenshots".yellow
+      puts "5) Add a new Xcode scheme for the newly created UITest target"
+      puts "6) Enable the `Shared` box of the newly created scheme"
       puts ""
     end
   end
