@@ -106,6 +106,14 @@ module Fastlane
       UI.message("\thttps://docs.fastlane.tools/getting-started/ios/screenshots/".cyan)
       continue_with_enter
 
+      begin
+        find_and_setup_xcode_project(ask_for_scheme: false) # to get the bundle identifier
+      rescue => ex
+        # If this fails, it's no big deal, since we really just want the bundle identifier
+        # so instead, we'll just ask the user
+        UI.verbose(ex.to_s)
+      end
+
       require 'snapshot'
       require 'snapshot/setup'
 
@@ -115,7 +123,12 @@ module Fastlane
         print_instructions_on_failure: true
       )
 
+      UI.message("If you want more details on how to setup automatic screenshots, check out")
+      UI.message("\thttps://docs.fastlane.tools/getting-started/ios/screenshots/#setting-up-snapshot".cyan)
       continue_with_enter
+
+      available_schemes = self.project.schemes
+      ui_testing_scheme = UI.select("What's your UI Testing scheme? If it doesn't appear on the list, make sure it's marked as `Shared` in the Xcode scheme list", available_schemes)
 
       UI.header("Automatically upload to iTC?")
       UI.message("Do you want to automatically upload all generated screenshots to iTunes Connect")
@@ -123,14 +136,13 @@ module Fastlane
       UI.message("If you enable this feature, fastlane will also need access to your iTunes Connect account")
       automatic_upload = UI.confirm("Enable automatic upload of localized screenshots to iTunes Connect?")
       if automatic_upload
-        find_and_setup_xcode_project # to get the bundle identifier
         ask_for_credentials(adp: true, itc: true)
         verify_app_exists_itc!
       end
 
-      # TODO: ask for the scheme
+      # TODO: does it also need to create a directory structure to get it to work?
       lane = ["lane :screenshots do",
-                   "  capture_screenshots"]
+                   "  capture_screenshots(scheme: \"#{ui_testing_scheme}\")"]
       
       if automatic_upload
         lane << "  upload_to_app_store(skip_binary_upload: true, skip_metadata: true)"
@@ -155,17 +167,28 @@ module Fastlane
 
     # Every installation setup that needs an Xcode project should
     # call this method
-    def find_and_setup_xcode_project
+    def find_and_setup_xcode_project(ask_for_scheme: true)
       UI.message("Parsing your local Xcode project to find the available schemes and the app identifier")
       config = {} # this is needed as the first method call will store information in there
       FastlaneCore::Project.detect_projects(config)
       self.project = FastlaneCore::Project.new(config)
-      self.scheme = self.project.select_scheme(preferred_to_include: self.project.project_name)
+
+      if ask_for_scheme
+        self.scheme = self.project.select_scheme(preferred_to_include: self.project.project_name)
+      end
+
       self.app_identifier = self.project.default_app_identifier # These two vars need to be accessed in order to be set
       if self.app_identifier.to_s.length == 0
-        # TODO: ask the user, in case we can't detect it
+        ask_for_bundle_identifier
       end
       # TODO: can we find the username from the Xcode project?
+    end
+
+    def ask_for_bundle_identifier
+      loop do
+        return if self.app_identifier.to_s.length > 0
+        self.app_identifier = UI.input("Bundle identifier of your app: ")
+      end
     end
 
     def ask_for_credentials(itc: true, adp: false)
