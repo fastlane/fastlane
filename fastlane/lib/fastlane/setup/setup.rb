@@ -9,6 +9,7 @@ module Fastlane
     # The current content of the generated Fastfile
     attr_accessor :fastfile_content
 
+    # For iOS projects that's the Apple ID email
     attr_accessor :user
 
     # Start the setup process
@@ -20,6 +21,9 @@ module Fastlane
         UI.important("fastlane is already set up at path `#{FastlaneCore::FastlaneFolder.path}`, see the available lanes above")
         return
       end
+
+      # this is used by e.g. configuration.rb to not show warnings when running produce
+      ENV["FASTLANE_ONBOARDING_IN_PROCESS"] = 1.to_s
 
       is_swift_fastfile = false # TODO: this is just for now
 

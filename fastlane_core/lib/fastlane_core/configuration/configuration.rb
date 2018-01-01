@@ -237,7 +237,7 @@ module FastlaneCore
       end
 
       while value.nil?
-        UI.important("To not be asked about this value, you can specify it using '#{option.key}'")
+        UI.important("To not be asked about this value, you can specify it using '#{option.key}'") if ENV["FASTLANE_ONBOARDING_IN_PROCESS"].to_s.length == 0
         value = option.sensitive ? UI.password("#{option.description}: ") : UI.input("#{option.description}: ")
         # Also store this value to use it from now on
         begin
