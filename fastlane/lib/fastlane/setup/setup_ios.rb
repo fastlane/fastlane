@@ -46,6 +46,7 @@ module Fastlane
                    "  gym(scheme: \"#{self.scheme}\")",
                    "  upload_to_testflight",
                    "end"])
+      self.lane_to_mention = "beta"
       finish_up
     end
 
@@ -55,10 +56,14 @@ module Fastlane
       ask_for_credentials(adp: true, itc: true)
       verify_app_exists_adp!
       verify_app_exists_itc!
+
+      self.lane_to_mention = "release"
     end
 
     def ios_screenshots
       UI.header("Setting up fastlane to automate iOS screenshots")
+
+      self.lane_to_mention = "screenshots"
     end
 
     def ios_manual
@@ -66,6 +71,7 @@ module Fastlane
       append_lane(["lane :custom_lane do",
                    "  # add actions here: https://docs.fastlane.tools/actions",
                    "end"])
+      self.lane_to_mention = "custom_lane"
       finish_up
     end
 
@@ -128,46 +134,14 @@ module Fastlane
         UI.error("for the team ID '#{self.adp_team_id}' on Apple ID '#{self.user}'")
         
         if UI.confirm("Do you want fastlane to create the App ID for you on the Apple Developer Portal?")
-          require 'produce'
-          produce_options = {
-            username: self.user,
-            team_id: self.adp_team_id,
-            skip_itc: true,
-            platform: "ios",
-            app_identifier: self.app_identifier
-          }
-          Produce.config = FastlaneCore::Configuration.create(
-            Produce::Options.available_options, 
-            produce_options
-          )
-
-          # The retrying system allows people to correct invalid inputs
-          # e.g. the app's name is already taken
-          loop do
-            begin
-              result = Produce::Manager.start_producing
-            rescue => ex
-              # show the user facing error, and inform them of what went wrong
-              if ex.kind_of?(Spaceship::Client::BasicPreferredInfoError) || ex.kind_of?(Spaceship::Client::UnexpectedResponse)
-                UI.error(ex.preferred_error_info)
-              else
-                UI.error(ex.to_s)
-              end
-              UI.error(ex.backtrace.join("\n")) if FastlaneCore::Globals.verbose?
-              UI.important("Looks like something went wrong when trying to create the app on the Apple Developer Portal")
-              unless UI.confirm("Do you want to try again (y)? If you enter (n), fastlane will fall back to the manual setup")
-                ios_manual
-                return # TODO: fail out somehow, this will return the initial process instead
-              end
-            end
-          end
+          create_app_online!(mode: :adp)
         else
           UI.error("User declined... falling back to manual fastlane setup")
           ios_manual
           # TODO: fail out somehow, this will return the initial process instead
         end
       else
-        UI.success("✅  Your app '#{self.app_identifier.yellow}' is available on iTunes Connect")
+        UI.success("✅  Your app '#{self.app_identifier}' is available on iTunes Connect")
       end
     end
 
@@ -178,9 +152,60 @@ module Fastlane
       if app.nil?
         UI.error("Looks like the app '#{self.app_identifier}' isn't available on iTunes Connect")
         UI.error("for the team ID '#{self.itc_team_id}' on Apple ID '#{self.user}'")
-        UI.message("Do you want fastlane to create the App on iTunes Connect for you?")
+        if UI.confirm("Do you want fastlane to create the App on iTunes Connect for you?")
+          create_app_online!(mode: :itc)
+        else
+          UI.error("User declined... falling back to manual fastlane setup")
+          ios_manual
+          # TODO: fail out somehow, this will return the initial process instead
+        end
       else
-        UI.success("✅  Your app '#{self.app_identifier.yellow}' is available on iTunes Connect")
+        UI.success("✅  Your app '#{self.app_identifier}' is available on iTunes Connect")
+      end
+    end
+
+    def create_app_online!(mode: nil)
+      # mode is either :adp or :itc
+      require 'produce'
+      produce_options = {
+        username: self.user,
+        team_id: self.adp_team_id,
+        itc_team_id: self.itc_team_id,
+        platform: "ios",
+        app_identifier: self.app_identifier
+      }
+      if mode == :adp
+        produce_options[:skip_itc] = true
+      else
+        produce_options[:skip_devcenter] = true
+      end
+
+      Produce.config = FastlaneCore::Configuration.create(
+        Produce::Options.available_options, 
+        produce_options
+      )
+
+      # The retrying system allows people to correct invalid inputs
+      # e.g. the app's name is already taken
+      loop do
+        begin
+          Produce::Manager.start_producing
+          UI.success("✅  Successfully created app")
+          return # success
+        rescue => ex
+          # show the user facing error, and inform them of what went wrong
+          if ex.kind_of?(Spaceship::Client::BasicPreferredInfoError) || ex.kind_of?(Spaceship::Client::UnexpectedResponse)
+            UI.error(ex.preferred_error_info)
+          else
+            UI.error(ex.to_s)
+          end
+          UI.error(ex.backtrace.join("\n")) if FastlaneCore::Globals.verbose?
+          UI.important("Looks like something went wrong when trying to create the app on the Apple Developer Portal")
+          unless UI.confirm("Do you want to try again (y)? If you enter (n), fastlane will fall back to the manual setup")
+            ios_manual
+            return # TODO: fail out somehow, this will return the initial process instead
+          end
+        end
       end
     end
   end

@@ -12,6 +12,10 @@ module Fastlane
     # For iOS projects that's the Apple ID email
     attr_accessor :user
 
+    # This is the lane that we tell the user to run to try the new fastlane setup
+    # This needs to be setup by each setup
+    attr_accessor :lane_to_mention
+
     # Start the setup process
     def self.start(user: nil, is_swift_fastfile: false)
       if FastlaneCore::FastlaneFolder.setup? and !Helper.is_test?
@@ -73,7 +77,10 @@ module Fastlane
       path = File.join(FastlaneCore::FastlaneFolder.path, 'Fastfile') # TODO: different path for swift
       self.fastfile_content.gsub!("[[lanes]]", "") # since we always keep it until writing out
       File.write(path, self.fastfile_content)
-      UI.header("✅  Successfully generated fastlane configuration at `#{path}`")
+      UI.header("✅  Successfully generated fastlane configuration")
+      UI.message("Generated Fastfile at path `#{path}`")
+      # UI.message("Generated Appfile at path `#{appfile_path}`") # TODO: implement Appfile
+      continue_with_enter
     end
 
     def finish_up
@@ -101,12 +108,16 @@ module Fastlane
       UI.message("Within that, you'll see different " + "lanes".yellow + ", each is there to automate a different process")
       UI.message("This way, you can easily use fastlane to solve different tasks")
       UI.message("like screenshots, code signing or pushing new releases")
-      UI.input("Continue by pressing Enter ⏎")
+      continue_with_enter
 
       UI.header("How to customize your Fastfile")
       UI.message("Use a code editor of your choice to open the newly created Fastfile and take a look")
       UI.message("You can now edit the available lanes and actions to customize the setup to fit your needs")
       UI.message("To get a list of all the available actions, open " + "https://docs.fastlane.tools/actions".cyan)
+      continue_with_enter
+    end
+
+    def continue_with_enter
       UI.input("Continue by pressing Enter ⏎")
     end
 
@@ -124,6 +135,12 @@ module Fastlane
       else
         UI.user_error!("not implemented yet")
       end
+
+      # we crash here, so that this never happens when a new setup method is added
+      UI.user_error!("No `lane_to_mention` provided by setup method") if self.lane_to_mention.to_s.length == 0
+      UI.message("")
+      UI.message("To try your new fastlane setup, just enter and run")
+      UI.command("fastlane #{self.lane_to_mention}")
     end
 
     def show_analytics_note
