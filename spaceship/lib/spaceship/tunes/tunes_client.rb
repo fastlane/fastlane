@@ -76,7 +76,7 @@ module Spaceship
 
       # user didn't specify a team... #thisiswhywecanthavenicethings
       loop do
-        puts "Multiple iTunes Connect teams found, please enter the number of the team you want to use: "
+        puts "Multiple #{'iTunes Connect teams'.yellow} found, please enter the number of the team you want to use: "
         if ENV["FASTLANE_HIDE_TEAM_INFORMATION"].to_s.length == 0
           puts "Note: to automatically choose the team, provide either the iTunes Connect Team ID, or the Team Name in your fastlane/Appfile:"
           puts "Alternatively you can pass the team name or team ID using the `FASTLANE_ITC_TEAM_ID` or `FASTLANE_ITC_TEAM_NAME` environment variable"

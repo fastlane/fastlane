@@ -6,6 +6,7 @@ require 'spaceship/launcher'
 
 # For basic user inputs
 require 'highline/import'
+require 'colored'
 
 # Dev Portal
 require 'spaceship/portal/portal'
