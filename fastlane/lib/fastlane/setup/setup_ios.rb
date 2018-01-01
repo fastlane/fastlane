@@ -62,7 +62,9 @@ module Fastlane
       UI.message("If you enable this feature, fastlane will download your existing metadata and screenshots.")
       UI.message("This way, you'll be able to edit your app's metadata in the form of local `.txt` files.")
       UI.message("After editing the local `.txt` files, just run fastlane, and all changes will be pushed up.")
-      if UI.confirm("Do you want fastlane to manage your app metadata?")
+      UI.message("If you don't use that feature, you can still use fastlane to upload and distribute new builds to the App Store")
+      include_metadata = UI.confirm("Do you want fastlane to manage your app metadata?")
+      if include_metadata
         require 'deliver'
         require 'deliver/setup'
 
@@ -80,10 +82,14 @@ module Fastlane
         Deliver::Setup.new.run(deliver_options, is_swift: self.is_swift_fastfile)
       end
 
-      append_lane(["lane :beta do",
+      lane = ["lane :release do",
                    "  build_app(scheme: \"#{self.scheme}\")",
-                   "  upload_to_app_store",
-                   "end"])
+                   "  upload_to_app_store"]
+      unless include_metadata
+        lane[lane.length - 1] += "(skip_metadata: true, skip_screenshots: true)"
+      end
+      lane << "end"
+      append_lane(lane)
 
       self.lane_to_mention = "release"
       finish_up
