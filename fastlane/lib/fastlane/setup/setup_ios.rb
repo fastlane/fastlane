@@ -43,7 +43,7 @@ module Fastlane
       verify_app_exists_itc!
 
       append_lane(["lane :beta do",
-                   "  gym(scheme: \"#{self.scheme}\")",
+                   "  build_app(scheme: \"#{self.scheme}\")",
                    "  upload_to_testflight",
                    "end"])
       self.lane_to_mention = "beta"
@@ -57,13 +57,43 @@ module Fastlane
       verify_app_exists_adp!
       verify_app_exists_itc!
 
+      UI.header("Manage app metadata?")
+      UI.message("Do you want to use fastlane to manage your app metadata?")
+      UI.message("If you enable this feature, fastlane will download your existing metadata and screenshots.")
+      UI.message("This way, you'll be able to edit your app's metadata in the form of local `.txt` files.")
+      UI.message("After editing the local `.txt` files, just run fastlane, and all changes will be pushed up.")
+      if UI.confirm("Do you want fastlane to manage your app metadata?")
+        require 'deliver'
+        require 'deliver/setup'
+
+        deliver_options = FastlaneCore::Configuration.create(
+          Deliver::Options.available_options, 
+          {
+            run_precheck_before_submit: false, # precheck doesn't need to run during init
+            username: self.user,
+            app_identifier: self.app_identifier,
+            team_id: self.itc_team_id
+          }
+        )
+
+        Deliver::DetectValues.new.run!(deliver_options, {}) # needed to fetch the app details
+        Deliver::Setup.new.run(deliver_options, is_swift: self.is_swift_fastfile)
+      end
+
+      append_lane(["lane :beta do",
+                   "  build_app(scheme: \"#{self.scheme}\")",
+                   "  upload_to_app_store",
+                   "end"])
+
       self.lane_to_mention = "release"
+      finish_up
     end
 
     def ios_screenshots
       UI.header("Setting up fastlane to automate iOS screenshots")
 
       self.lane_to_mention = "screenshots"
+      finish_up
     end
 
     def ios_manual
@@ -108,6 +138,7 @@ module Fastlane
         UI.important("Please enter your Apple ID developer credentials")
         self.user = UI.input("Apple ID Username:") # TODO: why does this render in new-line
       end
+      UI.message("Logging in...")
 
       # Disable the warning texts and information that's not relevant during onboarding
       ENV["FASTLANE_HIDE_LOGIN_INFORMATION"] = 1.to_s

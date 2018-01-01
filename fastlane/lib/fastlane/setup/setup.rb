@@ -76,7 +76,7 @@ module Fastlane
 
       path = File.join(FastlaneCore::FastlaneFolder.path, 'Fastfile') # TODO: different path for swift
       self.fastfile_content.gsub!("[[lanes]]", "") # since we always keep it until writing out
-      File.write(path, self.fastfile_content)
+      File.write(path, self.fastfile_content) # remove trailing spaces before platform ends
       UI.header("✅  Successfully generated fastlane configuration")
       UI.message("Generated Fastfile at path `#{path}`")
       # UI.message("Generated Appfile at path `#{appfile_path}`") # TODO: implement Appfile
