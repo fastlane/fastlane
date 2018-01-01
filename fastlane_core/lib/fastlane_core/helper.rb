@@ -194,7 +194,7 @@ module FastlaneCore
       return File.join(self.itms_path, 'bin', 'iTMSTransporter')
     end
 
-    def self.keychain_path(name)
+    def self.keychain_path(keychain_name)
       # Existing code expects that a keychain name will be expanded into a default path to Library/Keychains
       # in the user's home directory. However, this will not allow the user to pass an absolute path
       # for the keychain value
@@ -209,7 +209,7 @@ module FastlaneCore
       #
 
       # Remove the ".keychain" at the end of the name
-      name = name.sub(/\.keychain$/, "")
+      name = keychain_name.sub(/\.keychain$/, "")
 
       possible_locations = [
         File.join(Dir.home, 'Library', 'Keychains', name),
