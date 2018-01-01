@@ -84,9 +84,11 @@ module Fastlane
 
       lane = ["lane :release do",
                    "  build_app(scheme: \"#{self.scheme}\")",
-                   "  upload_to_app_store"]
-      unless include_metadata
-        lane[lane.length - 1] += "(skip_metadata: true, skip_screenshots: true)"
+                   "  "]
+      if include_metadata
+        lane << "  upload_to_app_store"
+      else
+        lane << "  upload_to_app_store(skip_metadata: true, skip_screenshots: true)"
       end
       lane << "end"
       append_lane(lane)
@@ -97,6 +99,44 @@ module Fastlane
 
     def ios_screenshots
       UI.header("Setting up fastlane to automate iOS screenshots")
+
+      UI.message("fastlane uses UITests to automatically generate localized screenshots of your iOS app")
+      UI.message("fastlane will now create 2 helper files that are needed to get the setup running")
+      UI.message("For more information on how this works and best practices, check out")
+      UI.message("\thttps://docs.fastlane.tools/getting-started/ios/screenshots/".cyan)
+      continue_with_enter
+
+      require 'snapshot'
+      require 'snapshot/setup'
+
+      Snapshot::Setup.create(
+        FastlaneCore::FastlaneFolder.path,
+        is_swift_fastfile: self.is_swift_fastfile,
+        print_instructions_on_failure: true
+      )
+
+      continue_with_enter
+
+      UI.header("Automatically upload to iTC?")
+      UI.message("Do you want to automatically upload all generated screenshots to iTunes Connect")
+      UI.message("after generating them?")
+      UI.message("If you enable this feature, fastlane will also need access to your iTunes Connect account")
+      automatic_upload = UI.confirm("Enable automatic upload of localized screenshots to iTunes Connect?")
+      if automatic_upload
+        find_and_setup_xcode_project # to get the bundle identifier
+        ask_for_credentials(adp: true, itc: true)
+        verify_app_exists_itc!
+      end
+
+      # TODO: ask for the scheme
+      lane = ["lane :screenshots do",
+                   "  capture_screenshots"]
+      
+      if automatic_upload
+        lane << "  upload_to_app_store(skip_binary_upload: true, skip_metadata: true)"
+      end
+      lane << "end"
+      append_lane(lane)
 
       self.lane_to_mention = "screenshots"
       finish_up
@@ -122,6 +162,9 @@ module Fastlane
       self.project = FastlaneCore::Project.new(config)
       self.scheme = self.project.select_scheme(preferred_to_include: self.project.project_name)
       self.app_identifier = self.project.default_app_identifier # These two vars need to be accessed in order to be set
+      if self.app_identifier.to_s.length == 0
+        # TODO: ask the user, in case we can't detect it
+      end
       # TODO: can we find the username from the Xcode project?
     end
 
