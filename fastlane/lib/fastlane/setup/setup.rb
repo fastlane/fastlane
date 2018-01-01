@@ -129,11 +129,13 @@ module Fastlane
       UI.message("Within that, you'll see different " + "lanes".yellow + ", each is there to automate a different process")
       UI.message("This way, you can easily use fastlane to solve different tasks")
       UI.message("like screenshots, code signing or pushing new releases")
+      UI.input("Continue by pressing Enter ⏎")
 
       UI.header("How to customize your Fastfile")
       UI.message("Use a code editor of your choice to open the newly created Fastfile and take a look")
       UI.message("You can now edit the available lanes and actions to customize the setup to fit your needs")
       UI.message("To get a list of all the available actions, open " + "https://docs.fastlane.tools/actions".cyan)
+      UI.input("Continue by pressing Enter ⏎")
     end
 
     def suggest_next_steps
