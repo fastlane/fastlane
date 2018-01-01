@@ -10,6 +10,8 @@ module Fastlane
     attr_accessor :scheme
 
     def setup_ios
+      require 'spaceship'
+
       self.platform = :ios
       self.fastfile_content = fastfile_template_content
 
@@ -31,6 +33,7 @@ module Fastlane
     def ios_testflight
       UI.header("Setting up fastlane for iOS TestFlight distribution")
       find_and_setup_xcode_project
+      ask_for_credentials
 
       append_lane(["lane :beta do",
                    "  gym(scheme: \"#{self.scheme}\")",
@@ -58,6 +61,8 @@ module Fastlane
 
     # Helpers
 
+    # Every installation setup that needs an Xcode project should
+    # call this method
     def find_and_setup_xcode_project
       UI.message("Parsing your local Xcode project to find the available schemes and the app identifier")
       config = {} # this is needed as the first method call will store information in there
@@ -65,8 +70,30 @@ module Fastlane
       self.project = FastlaneCore::Project.new(config)
       self.scheme = self.project.select_scheme(preferred_to_include: self.project.project_name)
       self.app_identifier = self.project.default_app_identifier # These two vars need to be accessed in order to be set
-      # TODO: Remove the line below? 
-      # self.app_name = self.project.default_app_name # They are set as a side effect, this could/should be changed down the road
+    end
+
+    def ask_for_credentials(username: nil)
+      UI.header("Login with your Apple ID")
+      UI.message("To use iTunes Connect and Apple Developer Portal features as part of fastlane,")
+      UI.message("we will ask you for your Apple ID username and password")
+      UI.message("This is necessary to use certain fastlane features, for example:")
+      UI.message("")
+      UI.message("- Create and manage your provisioning profiles on the Developer Portal")
+      UI.message("- Upload and manage TestFlight and App Store builds on iTunes Connect")
+      UI.message("- Manage your iTunes Connect app metadata and screenshots")
+      UI.message("")
+      UI.message("Your Apple ID credentials will only be stored on your local machine, in the Keychain")
+      UI.message("For more information, check out")
+      UI.message("\thttps://github.com/fastlane/fastlane/tree/master/credentials_manager".cyan)
+      UI.message("")
+      UI.important("Please enter your Apple ID developer account username and password:")
+
+      # Disable the warning texts and information that's not relevant during onboarding
+      ENV["FASTLANE_HIDE_LOGIN_INFORMATION"] = 1.to_s
+      ENV["FASTLANE_HIDE_TEAM_INFORMATION"] = 1.to_s
+      Spaceship::Tunes.login(username)
+      Spaceship::Tunes.select_team
+      UI.success("Login with your Apple ID was successful")
     end
   end
 end

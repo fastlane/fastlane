@@ -102,16 +102,18 @@ module CredentialsManager
     private
 
     def ask_for_login
-      puts "-------------------------------------------------------------------------------------".green
-      puts "Please provide your Apple Developer Program account credentials".green
-      puts "The login information you enter will be stored in your macOS Keychain".green
-      if default_prefix?
-        # We don't want to show this message, if we ask for the application specific password
-        # which has a different prefix
-        puts "You can also pass the password using the `FASTLANE_PASSWORD` environment variable".green
-        puts "More information about it on GitHub: https://github.com/fastlane/fastlane/tree/master/credentials_manager".green
+      if ENV["FASTLANE_HIDE_LOGIN_INFORMATION"].to_s.length == 0
+        puts "-------------------------------------------------------------------------------------".green
+        puts "Please provide your Apple Developer Program account credentials".green
+        puts "The login information you enter will be stored in your macOS Keychain".green
+        if default_prefix?
+          # We don't want to show this message, if we ask for the application specific password
+          # which has a different prefix
+          puts "You can also pass the password using the `FASTLANE_PASSWORD` environment variable".green
+          puts "More information about it on GitHub: https://github.com/fastlane/fastlane/tree/master/credentials_manager".green
+        end
+        puts "-------------------------------------------------------------------------------------".green
       end
-      puts "-------------------------------------------------------------------------------------".green
 
       if @user.to_s.length == 0
         raise "Missing username, and running in non-interactive shell" if $stdout.isatty == false

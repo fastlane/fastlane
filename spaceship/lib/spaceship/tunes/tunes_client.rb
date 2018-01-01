@@ -77,16 +77,20 @@ module Spaceship
       # user didn't specify a team... #thisiswhywecanthavenicethings
       loop do
         puts "Multiple iTunes Connect teams found, please enter the number of the team you want to use: "
-        puts "Note: to automatically choose the team, provide either the iTunes Connect Team ID, or the Team Name in your fastlane/Appfile:"
-        puts "Alternatively you can pass the team name or team ID using the `FASTLANE_ITC_TEAM_ID` or `FASTLANE_ITC_TEAM_NAME` environment variable"
-        first_team = teams.first["contentProvider"]
-        puts ""
-        puts "  itc_team_id \"#{first_team['contentProviderId']}\""
-        puts ""
-        puts "or"
-        puts ""
-        puts "  itc_team_name \"#{first_team['name']}\""
-        puts ""
+        if ENV["FASTLANE_HIDE_TEAM_INFORMATION"].to_s.length == 0
+          puts "Note: to automatically choose the team, provide either the iTunes Connect Team ID, or the Team Name in your fastlane/Appfile:"
+          puts "Alternatively you can pass the team name or team ID using the `FASTLANE_ITC_TEAM_ID` or `FASTLANE_ITC_TEAM_NAME` environment variable"
+          first_team = teams.first["contentProvider"]
+          puts ""
+          puts "  itc_team_id \"#{first_team['contentProviderId']}\""
+          puts ""
+          puts "or"
+          puts ""
+          puts "  itc_team_name \"#{first_team['name']}\""
+          puts ""
+        end
+
+        # We're not using highline here, as spaceship doesn't have a dependency to fastlane_core or highline
         teams.each_with_index do |team, i|
           puts "#{i + 1}) \"#{team['contentProvider']['name']}\" (#{team['contentProvider']['contentProviderId']})"
         end
