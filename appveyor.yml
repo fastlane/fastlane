@@ -1,6 +1,6 @@
 # https://www.appveyor.com/docs/appveyor-yml/
 
-version: {build}-{branch}
+version: {build}
 
 init:
   - git config --global core.autocrlf true
