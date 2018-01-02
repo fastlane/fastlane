@@ -19,6 +19,7 @@ module Fastlane
 
       self.platform = :ios
       self.fastfile_content = fastfile_template_content
+      self.appfile_content = appfile_template_content
 
       welcome_to_fastlane
 
@@ -219,12 +220,15 @@ module Fastlane
         Spaceship::Tunes.login(self.user)
         Spaceship::Tunes.select_team
         self.itc_team_id = Spaceship::Tunes.client.team_id
+        self.append_team("itc_team_id \"#{self.itc_team_id}\" # iTunes Connect Team ID")
       end
       if adp
         Spaceship::Portal.login(self.user)
         Spaceship::Portal.select_team
         self.adp_team_id = Spaceship::Portal.client.team_id
+        self.append_team("team_id \"#{self.adp_team_id}\" # Developer Portal Team ID")
       end
+
       UI.success("✅  Login with your Apple ID was successful")
     end
 
@@ -265,6 +269,21 @@ module Fastlane
       else
         UI.success("✅  Your app '#{self.app_identifier}' is available on iTunes Connect")
       end
+    end
+
+    def finish_up
+      # iOS specific things first
+      if self.app_identifier
+        self.appfile_content.gsub!("# app_identifier", "app_identifier")
+        self.appfile_content.gsub!("[[APP_IDENTIFIER]]", self.app_identifier)
+      end
+
+      if self.user
+        self.appfile_content.gsub!("# apple_id", "apple_id")
+        self.appfile_content.gsub!("[[APPLE_ID]]", self.user)
+      end
+
+      super
     end
 
     def create_app_online!(mode: nil)

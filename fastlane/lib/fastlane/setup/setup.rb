@@ -9,6 +9,9 @@ module Fastlane
     # The current content of the generated Fastfile
     attr_accessor :fastfile_content
 
+    # Appfile
+    attr_accessor :appfile_content
+
     # For iOS projects that's the Apple ID email
     attr_accessor :user
 
@@ -68,18 +71,31 @@ module Fastlane
 
     # Append a lane to the current Fastfile template we're generating
     def append_lane(lane)
-      self.fastfile_content.gsub!("[[lanes]]", "  #{lane.join("\n  ")}\n\n[[lanes]]")
+      self.fastfile_content.gsub!("[[LANES]]", "  #{lane.join("\n  ")}\n\n[[LANES]]")
+    end
+
+    # Append a team to the Appfile
+    def append_team(team)
+      self.appfile_content.gsub!("[[TEAMS]]", "#{team}\n[[TEAMS]]")
     end
 
     def write_fastfile!
       FastlaneCore::FastlaneFolder.create_folder!
 
-      path = File.join(FastlaneCore::FastlaneFolder.path, 'Fastfile') # TODO: different path for swift
-      self.fastfile_content.gsub!("[[lanes]]", "") # since we always keep it until writing out
-      File.write(path, self.fastfile_content) # remove trailing spaces before platform ends
+      # Write the Fastfile
+      fastfile_path = File.join(FastlaneCore::FastlaneFolder.path, 'Fastfile') # TODO: different path for swift
+      self.fastfile_content.gsub!("[[LANES]]", "") # since we always keep it until writing out
+      File.write(fastfile_path, self.fastfile_content) # remove trailing spaces before platform ends
+
+      appfile_path = File.join(FastlaneCore::FastlaneFolder.path, 'Appfile')
+      self.appfile_content.gsub!("[[TEAMS]]", "")
+
+      File.write(appfile_path, self.appfile_content)
+      
       UI.header("✅  Successfully generated fastlane configuration")
-      UI.message("Generated Fastfile at path `#{path}`")
-      # UI.message("Generated Appfile at path `#{appfile_path}`") # TODO: implement Appfile
+      UI.message("Generated Fastfile at path `#{fastfile_path}`")
+      UI.message("Generated Appfile at path `#{appfile_path}`")
+
       UI.message("Please check the newly generated configuration files into source control (e.g. git) together with your project")
       UI.message("This way, everyone in your team can easily use the fastlane setup")
       continue_with_enter
@@ -100,6 +116,13 @@ module Fastlane
       else
         path = "#{Fastlane::ROOT}/lib/assets/DefaultFastfileTemplate"
       end
+
+      return File.read(path)
+    end
+
+    def appfile_template_content
+      # TODO: Support android
+      path = "#{Fastlane::ROOT}/lib/assets/AppfileTemplate"
 
       return File.read(path)
     end
