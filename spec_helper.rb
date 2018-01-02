@@ -12,8 +12,9 @@ require "fastlane"
 UI = FastlaneCore::UI
 
 unless ENV["DEBUG"]
-  $stdout.puts "Changing stdout to /tmp/fastlane_tests, set `DEBUG` environment variable to print to stdout (e.g. when using `pry`)"
-  $stdout = File.open("/tmp/fastlane_tests", "w")
+  fastlane_tests_tmpdir = "#{Dir.tmpdir}/fastlane_tests"
+  $stdout.puts "Changing stdout to #{fastlane_tests_tmpdir}, set `DEBUG` environment variable to print to stdout (e.g. when using `pry`)"
+  $stdout = File.open(fastlane_tests_tmpdir, "w")
 end
 
 if FastlaneCore::Helper.is_mac?

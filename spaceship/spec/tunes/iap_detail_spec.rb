@@ -96,7 +96,7 @@ describe Spaceship::Tunes::IAPDetail do
     end
 
     it "saved and changed screenshot" do
-      detailed.review_screenshot = "/tmp/fastlane_tests"
+      detailed.review_screenshot = "#{Dir.tmpdir}/fastlane_tests"
       expect(client.du_client).to receive(:upload_purchase_review_screenshot).and_return({ "token" => "tok", "height" => 100, "width" => 200, "md5" => "xxxx" })
       expect(client.du_client).to receive(:get_picture_type).and_return("MZPFT.SortedScreenShot")
       expect(Spaceship::Utilities).to receive(:content_type).and_return("image/jpg")
