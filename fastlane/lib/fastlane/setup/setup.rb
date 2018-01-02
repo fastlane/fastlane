@@ -71,7 +71,9 @@ module Fastlane
 
     # Append a lane to the current Fastfile template we're generating
     def append_lane(lane)
-      self.fastfile_content.gsub!("[[LANES]]", "  #{lane.join("\n  ")}\n\n[[LANES]]")
+      new_lines = "\n\n"
+      new_lines = "" unless self.fastfile_content.include?("lane :") # the first lane we don't want new lines
+      self.fastfile_content.gsub!("[[LANES]]", "#{new_lines}  #{lane.join("\n  ")}[[LANES]]")
     end
 
     # Append a team to the Appfile
