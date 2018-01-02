@@ -13,7 +13,6 @@ module Fastlane
     attr_accessor :itc_team_id
     attr_accessor :adp_team_id
 
-
     def setup_ios
       require 'spaceship'
 
@@ -22,6 +21,11 @@ module Fastlane
       self.appfile_content = appfile_template_content
 
       welcome_to_fastlane
+
+      if preferred_setup_method
+        self.send(preferred_setup_method)
+        return
+      end
 
       options = {
         "📸  Automate screenshots" => :ios_screenshots,
@@ -43,10 +47,12 @@ module Fastlane
       verify_app_exists_adp!
       verify_app_exists_itc!
 
-      append_lane(["lane :beta do",
-                   "  build_app(scheme: \"#{self.scheme}\")",
-                   "  upload_to_testflight",
-                   "end"])
+      lane = ["lane :beta do",
+              "  build_app(scheme: \"#{self.scheme}\"#{project_suffix})",
+              "  upload_to_testflight",
+              "end"]
+
+      self.append_lane(lane)
       self.lane_to_mention = "beta"
       finish_up
     end
@@ -70,7 +76,7 @@ module Fastlane
         require 'deliver/setup'
 
         deliver_options = FastlaneCore::Configuration.create(
-          Deliver::Options.available_options, 
+          Deliver::Options.available_options,
           {
             run_precheck_before_submit: false, # precheck doesn't need to run during init
             username: self.user,
@@ -84,8 +90,8 @@ module Fastlane
       end
 
       lane = ["lane :release do",
-                   "  build_app(scheme: \"#{self.scheme}\")",
-                   "  "]
+              "  build_app(scheme: \"#{self.scheme}\"#{project_suffix})",
+              "  "]
       if include_metadata
         lane << "  upload_to_app_store"
       else
@@ -143,8 +149,8 @@ module Fastlane
 
       # TODO: does it also need to create a directory structure to get it to work?
       lane = ["lane :screenshots do",
-                   "  capture_screenshots(scheme: \"#{ui_testing_scheme}\")"]
-      
+              "  capture_screenshots(scheme: \"#{ui_testing_scheme}\"#{project_suffix})"]
+
       if automatic_upload
         lane << "  upload_to_app_store(skip_binary_upload: true, skip_metadata: true)"
       end
@@ -171,6 +177,12 @@ module Fastlane
     def find_and_setup_xcode_project(ask_for_scheme: true)
       UI.message("Parsing your local Xcode project to find the available schemes and the app identifier")
       config = {} # this is needed as the first method call will store information in there
+      if self.project_path.end_with?("xcworkspace")
+        config[:workspace] = self.project_path
+      else
+        config[:project] = self.project_path
+      end
+
       FastlaneCore::Project.detect_projects(config)
       self.project = FastlaneCore::Project.new(config)
 
@@ -239,7 +251,7 @@ module Fastlane
       if app.nil?
         UI.error("Looks like the app '#{self.app_identifier}' isn't available on the Apple Developer Portal")
         UI.error("for the team ID '#{self.adp_team_id}' on Apple ID '#{self.user}'")
-        
+
         if UI.confirm("Do you want fastlane to create the App ID for you on the Apple Developer Portal?")
           create_app_online!(mode: :adp)
         else
@@ -286,6 +298,19 @@ module Fastlane
       super
     end
 
+    # Returns the `workspace` or `project` key/value pair for
+    # gym and snapshot, but only if necessary
+    #     (when there are multiple projects in the current directory)
+    def project_suffix
+      return "" unless self.had_multiple_projects_to_choose_from
+
+      if self.project_path.end_with?(".xcworkspace")
+        return ", workspace: \"#{self.project_path}\""
+      else
+        return ", project: \"#{self.project_path}\""
+      end
+    end
+
     def create_app_online!(mode: nil)
       # mode is either :adp or :itc
       require 'produce'
@@ -303,7 +328,7 @@ module Fastlane
       end
 
       Produce.config = FastlaneCore::Configuration.create(
-        Produce::Options.available_options, 
+        Produce::Options.available_options,
         produce_options
       )
 

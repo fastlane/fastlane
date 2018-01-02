@@ -1,3 +1,5 @@
+require "tty-spinner"
+
 module Fastlane
   class Setup
     # Is the current `setup` using a swift based configuration file
@@ -5,6 +7,15 @@ module Fastlane
 
     # :ios or :android # TODO: maybe more in the future (react-native?)
     attr_accessor :platform
+
+    attr_accessor :project_path
+
+    # Used for :manual sometimes
+    attr_accessor :preferred_setup_method
+
+    # remember if there were multiple projects
+    # if so, we set it as part of the Fastfile
+    attr_accessor :had_multiple_projects_to_choose_from
 
     # The current content of the generated Fastfile
     attr_accessor :fastfile_content
@@ -20,6 +31,7 @@ module Fastlane
     attr_accessor :lane_to_mention
 
     # Start the setup process
+    # rubocop:disable Metrics/BlockNesting
     def self.start(user: nil, is_swift_fastfile: false)
       if FastlaneCore::FastlaneFolder.setup? and !Helper.is_test?
         require 'fastlane/lane_list'
@@ -34,20 +46,74 @@ module Fastlane
 
       is_swift_fastfile = false # TODO: this is just for now
 
+      spinner = TTY::Spinner.new("[:spinner] Looking for iOS and Android projects in current directory...", format: :dots)
+      spinner.auto_spin
+
       # TODO: Search subdirectory
-      ios_projects = Dir["*.xcodeproj"] + Dir["*.xcworkspace"] # TODO: Search sub-directories also
-      android_projects = Dir["*.gradle"]
+      ios_projects = Dir["**/*.xcodeproj"] + Dir["**/*.xcworkspace"] # TODO: Search sub-directories also
+      android_projects = Dir["**/*.gradle"]
       # react_native_projects = # TODO, we have code in the old `setup_ios` class
+
+      spinner.success
 
       if ios_projects.count > 0 && android_projects.count > 0
         UI.message("It seems like you have both iOS and Android projects in the current directory")
         # TODO: Implement here
       elsif ios_projects.count > 0
-        UI.message("Detected iOS/Mac project in current directory...")
-        SetupIos.new(is_swift_fastfile: is_swift_fastfile, user: user).setup_ios
+        current_directory = ios_projects.find_all do |current_project_path|
+          current_project_path.split(File::Separator).count == 1
+        end
+        chosen_project = nil
+        had_multiple_projects_to_choose_from = false
+
+        if current_directory.count == 1
+          chosen_project = current_directory.first
+        elsif current_directory.count > 1
+          if current_directory.count == 2
+            # This is a common case (e.g. with CocoaPods), where the project has an xcodeproj and an xcworkspace file
+            extensions = [File.extname(current_directory[0]), File.extname(current_directory[1])]
+            if extensions.sort == [".xcodeproj", ".xcworkspace"].sort
+              # Yep, that's this kind of setup
+              chosen_project = current_directory.find { |d| d.end_with?(".xcworkspace") }
+            end
+          end
+          chosen_project ||= UI.select("Multiple iOS projects found in current directory", current_directory)
+          had_multiple_projects_to_choose_from = true
+        else
+          UI.error("Looks like there is no iOS project in the current directory, but inside a sub-directory instead")
+          UI.error("Please use `cd` into the subfolder of the location of your Xcode project")
+          UI.user_error!("Please `cd` into the subfolder of your Xcode project and run `fastlane init` again")
+        end
+
+        if chosen_project == "Pods.xcodeproj"
+          unless UI.confirm("Found '#{chosen_project}', which usually isn't a valid Xcode project. Make sure to switch to the directory containing your iOS Xcode project. Do you still want to continue?")
+            UI.user_error!("Make sure to `cd` into the right directory and then use `fastlane init` again")
+          end
+        end
+        UI.message("Detected iOS/Mac project in current directory: '#{chosen_project}'")
+        SetupIos.new(
+          is_swift_fastfile: is_swift_fastfile,
+          user: user,
+          project_path: chosen_project,
+          had_multiple_projects_to_choose_from: had_multiple_projects_to_choose_from
+        ).setup_ios
       elsif android_projects.count > 0
         UI.message("Detected Android project in current directory...")
         # TODO: implement
+      else
+        UI.error("No iOS or Android projects found in current directory '#{Dir.pwd}'")
+        UI.error("Make sure to `cd` into a directory containing your iOS or Android app")
+        if UI.confirm("Do you still want to setup a manual fastlane config in the current directory?")
+          SetupIos.new(
+            is_swift_fastfile: is_swift_fastfile,
+            user: user,
+            project_path: chosen_project,
+            had_multiple_projects_to_choose_from: had_multiple_projects_to_choose_from,
+            preferred_setup_method: :ios_manual
+          ).setup_ios
+        else
+          UI.user_error!("Make sure to `cd` into the right directory and then use `fastlane init` again")
+        end
       end
 
       # TODO: Implement swift flow
@@ -56,10 +122,14 @@ module Fastlane
       #   Fastlane::SwiftLaneManager.first_time_setup
       # end
     end
+    # rubocop:enable Metrics/BlockNesting
 
-    def initialize(is_swift_fastfile: nil, user: nil)
+    def initialize(is_swift_fastfile: nil, user: nil, project_path: nil, had_multiple_projects_to_choose_from: nil, preferred_setup_method: nil)
       self.is_swift_fastfile = is_swift_fastfile
       self.user = user
+      self.project_path = project_path
+      self.had_multiple_projects_to_choose_from = had_multiple_projects_to_choose_from
+      self.preferred_setup_method = preferred_setup_method
     end
 
     # Helpers
@@ -93,7 +163,7 @@ module Fastlane
       self.appfile_content.gsub!("[[TEAMS]]", "")
 
       File.write(appfile_path, self.appfile_content)
-      
+
       UI.header("✅  Successfully generated fastlane configuration")
       UI.message("Generated Fastfile at path `#{fastfile_path}`")
       UI.message("Generated Appfile at path `#{appfile_path}`")
