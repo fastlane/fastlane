@@ -37,6 +37,10 @@ module Fastlane
       result = ''
       exit_status = nil
       if Helper.sh_enabled?
+        # Workaround to support previous Fastlane syntax.
+        # This has some limitations. For example, it requires the caller to shell escape
+        # everything because of usages like ["ls -la", "/tmp"] instead of ["ls", "-la", "/tmp"].
+        command = [command.first.join(" ")] if command.length == 1 && command.first.kind_of?(Array)
 
         # The argument list is passed directly to Open3.popen2e, which
         # handles the variadic argument list in the same way as Kernel#spawn.
