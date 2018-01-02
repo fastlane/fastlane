@@ -80,6 +80,8 @@ module Fastlane
       UI.header("✅  Successfully generated fastlane configuration")
       UI.message("Generated Fastfile at path `#{path}`")
       # UI.message("Generated Appfile at path `#{appfile_path}`") # TODO: implement Appfile
+      UI.message("Please check the newly generated configuration files into source control (e.g. git) together with your project")
+      UI.message("This way, everyone in your team can easily use the fastlane setup")
       continue_with_enter
     end
 
