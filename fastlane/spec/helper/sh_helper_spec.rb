@@ -50,6 +50,11 @@ describe Fastlane::Actions do
         expect_command ["/usr/local/bin/git", "git"], "commit", "-m", "A message"
         Fastlane::Actions.sh ["/usr/local/bin/git", "git"], "commit", "-m", "A message"
       end
+
+      it "allows a single array to be passed to support older Fastlane syntax" do
+        expect_command "ls -la /tmp"
+        Fastlane::Actions.sh ["ls -la", "/tmp"]
+      end
     end
 
     context "with a postfix block" do
