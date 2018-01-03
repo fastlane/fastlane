@@ -10,7 +10,7 @@ import Foundation
 
 public protocol LaneFileProtocol: class {
     var fastlaneVersion: String { get }
-    static func runLane(named: String)
+    static func runLane(named: String, parameters: [String: String])
     
     func recordLaneDescriptions()
     func beforeAll()
@@ -47,13 +47,16 @@ public class LaneFile: NSObject, LaneFileProtocol {
             let selName = sel_getName(method_getName(methodList![i]))
             let name = String(cString: selName)
             let lowercasedName = name.lowercased()
-            guard lowercasedName.hasSuffix("lane") else {
-                continue
+            if lowercasedName.hasSuffix("lane") {
+                laneToMethodName[lowercasedName] = name
+                let lowercasedNameNoLane = String(lowercasedName.prefix(lowercasedName.count - 4))
+                laneToMethodName[lowercasedNameNoLane] = name
+            } else if lowercasedName.hasSuffix("lanewithoptions:") {
+                let lowercasedNameNoOptions = String(lowercasedName.prefix(lowercasedName.count - 12))
+                laneToMethodName[lowercasedNameNoOptions] = name
+                let lowercasedNameNoLane = String(lowercasedNameNoOptions.prefix(lowercasedNameNoOptions.count - 4))
+                laneToMethodName[lowercasedNameNoLane] = name
             }
-            
-            laneToMethodName[lowercasedName] = name
-            let lowercasedNameNoLane = String(lowercasedName.prefix(lowercasedName.count - 4))
-            laneToMethodName[lowercasedNameNoLane] = name
         }
         return laneToMethodName
     }
@@ -67,7 +70,7 @@ public class LaneFile: NSObject, LaneFileProtocol {
         }
     }
     
-    public static func runLane(named: String) {
+    public static func runLane(named: String, parameters: [String: String]) {
         log(message: "Running lane: \(named)")
         self.loadFastfile()
         
@@ -90,7 +93,7 @@ public class LaneFile: NSObject, LaneFileProtocol {
         }
         
         // We need to catch all possible errors here and display a nice message
-        _ = fastfileInstance.perform(NSSelectorFromString(laneMethod))
+        _ = fastfileInstance.perform(NSSelectorFromString(laneMethod), with: parameters)
         
         // only call on success
         fastfileInstance.afterAll(currentLane: named)
