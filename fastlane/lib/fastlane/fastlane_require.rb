@@ -46,7 +46,8 @@ module Fastlane
         Thread.new do
           begin
             require name
-          rescue LoadError
+          rescue LoadError => e
+            UI.user_error!("LoadError #{e}")
             exit(1)
           end
         end
