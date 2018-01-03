@@ -48,7 +48,27 @@ module Fastlane
       # and only then we ask them about the language they want to use
       choose_swift
 
-      self.send(method_to_use)
+      begin
+        self.send(method_to_use)
+      rescue => ex
+        # If it's already manual, and it has failed
+        # we need to re-raise the exception, as something definitely is wrong
+        raise ex if method_to_use == :ios_manual
+
+        # If we're here, that means something else failed. We now show the
+        # error message and fallback to `:ios_manual`
+        UI.header("fastlane init failed".red)
+        UI.verbose(ex.backtrace.join("\n"))
+        UI.error(ex.to_s)
+        UI.important("Something has failed when running `fastlane init`")
+        UI.important("You can either re-try, or fallback to a basic Fastfile you can manually customize")
+        if UI.confirm("Do you want to fallback to a manual Fastfile?")
+          self.ios_manual
+        else
+          self.send(method_to_use)
+        end
+        # the second time, we're just failing, and don't use a `begin` `rescue` block any more
+      end
     end
 
     # Different iOS flows
