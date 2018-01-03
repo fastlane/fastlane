@@ -15,24 +15,27 @@ module Fastlane
       def take_off
         before_import_time = Time.now
 
-        # Usually in the fastlane code base we use
-        #
-        #   Helper.show_loading_indicator
-        #   longer_taking_task_here
-        #   Helper.hide_loading_indicator
-        #
-        # but in this case we haven't required FastlaneCore yet
-        # so we'll have to access the raw API for now
-        require "tty-spinner"
-        require_fastlane_spinner = TTY::Spinner.new("[:spinner] 🚀 ", format: :dots)
-        require_fastlane_spinner.auto_spin
+        if !FastlaneCore::Env.truthy?("FASTLANE_DISABLE_ANIMATION")
+          # Usually in the fastlane code base we use
+          #
+          #   Helper.show_loading_indicator
+          #   longer_taking_task_here
+          #   Helper.hide_loading_indicator
+          #
+          # but in this case we haven't required FastlaneCore yet
+          # so we'll have to access the raw API for now
+          require "tty-spinner"
+          require_fastlane_spinner = TTY::Spinner.new("[:spinner] 🚀 ", format: :dots)
+          require_fastlane_spinner.auto_spin
 
-        # this might take a long time if there is no Gemfile :(
-        # That's why we show the loading indicator here also
-        require "fastlane"
+          # this might take a long time if there is no Gemfile :(
+          # That's why we show the loading indicator here also
+          require "fastlane"
 
-        require_fastlane_spinner.success
-
+          require_fastlane_spinner.success
+        else
+          require "fastlane"
+        end
         # We want to avoid printing output other than the version number if we are running `fastlane -v`
         unless running_version_command?
           print_bundle_exec_warning(is_slow: (Time.now - before_import_time > 3))
