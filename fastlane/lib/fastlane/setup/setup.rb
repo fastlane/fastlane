@@ -99,7 +99,7 @@ module Fastlane
         ).setup_ios
       elsif android_projects.count > 0
         UI.message("Detected Android project in current directory...")
-        # TODO: implement
+        SetupAndroid.new.setup_android
       else
         UI.error("No iOS or Android projects found in current directory '#{Dir.pwd}'")
         UI.error("Make sure to `cd` into a directory containing your iOS or Android app")
@@ -206,10 +206,14 @@ module Fastlane
     end
 
     def appfile_template_content
-      if self.is_swift_fastfile
-        path = "#{Fastlane::ROOT}/lib/assets/AppfileTemplate.swift"
+      if self.platform == :ios
+        if self.is_swift_fastfile
+          path = "#{Fastlane::ROOT}/lib/assets/AppfileTemplate.swift"
+        else
+          path = "#{Fastlane::ROOT}/lib/assets/AppfileTemplate"
+        end
       else
-        path = "#{Fastlane::ROOT}/lib/assets/AppfileTemplate"
+        path = "#{Fastlane::ROOT}/lib/assets/AppfileTemplateAndroid"
       end
 
       return File.read(path)
@@ -237,16 +241,21 @@ module Fastlane
     def suggest_next_steps
       UI.header("Where to go from here?")
       if self.platform == :ios
+        UI.message("📸  Learn more about how to automatically generate localized App Store screenshots:")
+        UI.message("\t\thttps://docs.fastlane.tools/getting-started/ios/screenshots/".cyan)
         UI.message("👩‍✈️  Learn more about distribution to beta testing services:")
         UI.message("\t\thttps://docs.fastlane.tools/getting-started/ios/beta-deployment/".cyan)
         UI.message("🚀  Learn more about how to automate the App Store release process:")
         UI.message("\t\thttps://docs.fastlane.tools/getting-started/ios/appstore-deployment/".cyan)
-        UI.message("📸  Learn more about how to automatically generate localized App Store screenshots:")
-        UI.message("\t\thttps://docs.fastlane.tools/getting-started/ios/screenshots/".cyan)
         UI.message("👩‍⚕️  Lern more about how to setup code signing with fastlane")
         UI.message("\t\thttps://docs.fastlane.tools/codesigning/getting-started/".cyan)
       else
-        UI.user_error!("not implemented yet")
+        UI.message("📸  Learn more about how to automatically generate localized Google Play screenshots:")
+        UI.message("\t\thttps://docs.fastlane.tools/getting-started/android/screenshots/".cyan)
+        UI.message("👩‍✈️  Learn more about distribution to beta testing services:")
+        UI.message("\t\thttps://docs.fastlane.tools/getting-started/android/beta-deployment/".cyan)
+        UI.message("🚀  Learn more about how to automate the Google Play release process:")
+        UI.message("\t\thttps://docs.fastlane.tools/getting-started/android/release-deployment/".cyan)
       end
 
       # we crash here, so that this never happens when a new setup method is added
@@ -264,3 +273,4 @@ module Fastlane
 end
 
 require 'fastlane/setup/setup_ios'
+require 'fastlane/setup/setup_android'
