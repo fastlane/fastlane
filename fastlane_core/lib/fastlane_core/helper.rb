@@ -206,9 +206,8 @@ module FastlaneCore
       #
       # We also try to append `-db` at the end of the file path, as with Sierra the default Keychain name
       # has changed for some users: https://github.com/fastlane/fastlane/issues/5649
-      #
 
-      # Remove the ".keychain" at the end of the name
+      # Remove the ".keychain" at the end of the keychain name
       name = keychain_name.sub(/\.keychain$/, "")
 
       possible_locations = [
