@@ -57,10 +57,19 @@ module Fastlane
 
         # If we're here, that means something else failed. We now show the
         # error message and fallback to `:ios_manual`
-        UI.header("fastlane init failed".red)
+        UI.error("--------------------")
+        UI.error("fastlane init failed")
+        UI.error("--------------------")
+
         UI.verbose(ex.backtrace.join("\n"))
-        UI.error(ex.to_s)
+        if ex.kind_of?(Spaceship::Client::BasicPreferredInfoError) || ex.kind_of?(Spaceship::Client::UnexpectedResponse)
+          UI.error(ex.preferred_error_info)
+        else
+          UI.error(ex.to_s)
+        end
+
         UI.important("Something has failed when running `fastlane init`")
+        UI.important("Tried using Apple ID with email '#{self.user}'")
         UI.important("You can either re-try, or fallback to a basic Fastfile you can manually customize")
         if UI.confirm("Do you want to fallback to a manual Fastfile?")
           self.ios_manual
