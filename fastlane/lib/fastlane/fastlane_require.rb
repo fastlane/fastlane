@@ -46,11 +46,15 @@ module Fastlane
         fork do
           begin
             require name
+          rescue NotImplementedError => e
+            # fork method is not available
+            UI.user_error!("NotImplementedError #{e}")
+            puts e
           rescue LoadError
             exit(1)
           end
         end
-        _, status = Process.wait2
+        _pid, status = Process.wait2
         return true if status.exitstatus == 0
 
         Gem::Specification.any? { |s| s.name == name and req =~ s.version }
