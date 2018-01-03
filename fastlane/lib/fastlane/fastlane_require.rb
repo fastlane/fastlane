@@ -43,9 +43,19 @@ module Fastlane
         # don't actually load anything we don't want to load
         # This is just to test if the gem is already preinstalled, e.g. YAML
         # See https://github.com/fastlane/fastlane/issues/6951
-        spawn do
+        fork do
           begin
             require name
+          rescue NotImplementedError => e
+            puts e
+            # fork method is not available (Windows?)
+            spawn do
+              begin
+                require name
+              rescue LoadError
+                exit(1)
+              end
+            end
           rescue LoadError
             exit(1)
           end
