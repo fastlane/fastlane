@@ -214,23 +214,42 @@ module FastlaneCore
       true
     end
 
+    def strip_braces(value)
+      value.strip!
+      value = value[1..value.length - 2] if value[0] == "[" && value[value.length - 1] == "]"
+      return value
+    end
+
+    def auto_convert_array_value(value)
+      # covers Arrays like:
+      # ["["value", "value"]"]
+      if value.kind_of?(Array)
+        return value.map do |item|
+          item = strip_braces(item) if item.kind_of?(String)
+          item
+        end
+      end
+
+      # covers Strings that are actually Arrays like:
+      # "["value", "value"]"
+      # "\"value\", \"value\""
+      if value.kind_of?(String)
+        value = strip_braces(value)
+
+        return value.split(',').map do |item|
+          item.strip!
+          item = item[1..item.length - 2] if item[0] == "\"" && item[item.length - 1] == "\""
+          item
+        end
+      end
+    end
+
     # Returns an updated value type (if necessary)
     def auto_convert_value(value)
       return nil if value.nil?
 
       if data_type == Array
-        chars_to_delete = "[\" ]"
-
-        # covers Arrays like:
-        # ["\"value\", \"value\""]
-        # ["[\"value\", \"value\"]"]
-        return value.map { |item| item.delete(chars_to_delete) } if value.kind_of?(Array)
-
-        # covers Strings that are actually Arrays like:
-        # "["value", "value"]"
-        # "\"value\", \"value\""
-        return value.delete(chars_to_delete).split(',') if value.kind_of?(String)
-
+        return auto_convert_array_value(value)
       elsif data_type == Integer
         return value.to_i if value.to_i.to_s == value.to_s
       elsif data_type == Float
