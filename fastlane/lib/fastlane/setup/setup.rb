@@ -48,12 +48,12 @@ module Fastlane
       spinner = TTY::Spinner.new("[:spinner] Looking for iOS and Android projects in current directory...", format: :dots)
       spinner.auto_spin
 
-      # TODO: Search subdirectory
-      ios_projects = Dir["**/*.xcodeproj"] + Dir["**/*.xcworkspace"] # TODO: Search sub-directories also
+      ios_projects = Dir["**/*.xcodeproj"] + Dir["**/*.xcworkspace"]
       android_projects = Dir["**/*.gradle"]
-      # react_native_projects = # TODO, we have code in the old `setup_ios` class
 
       spinner.success
+
+      FastlaneCore::FastlaneFolder.create_folder!
 
       if ios_projects.count > 0 && android_projects.count > 0
         UI.message("It seems like you have both iOS and Android projects in the current directory")
@@ -90,6 +90,7 @@ module Fastlane
           end
         end
         UI.message("Detected iOS/Mac project in current directory: '#{chosen_project}'")
+
         SetupIos.new(
           is_swift_fastfile: is_swift_fastfile,
           user: user,
@@ -152,8 +153,6 @@ module Fastlane
     end
 
     def write_fastfile!
-      FastlaneCore::FastlaneFolder.create_folder!
-
       # Write the Fastfile
       fastfile_file_name = "Fastfile"
       fastfile_file_name += ".swift" if self.is_swift_fastfile
@@ -198,7 +197,6 @@ module Fastlane
     def fastfile_template_content
       # TODO: Support android
       if self.is_swift_fastfile
-        # TODO: Implement & simplify the swift based file also
         path = "#{Fastlane::ROOT}/lib/assets/DefaultFastfileTemplate.swift"
       else
         path = "#{Fastlane::ROOT}/lib/assets/DefaultFastfileTemplate"

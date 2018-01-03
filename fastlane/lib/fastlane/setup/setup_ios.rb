@@ -64,7 +64,7 @@ module Fastlane
         lane = ["func betaLane() {",
                 increment_build_number_if_applicable,
                 "\tbuildApp(#{project_prefix}scheme: \"#{self.scheme}\")",
-                "\tuploadToTestflight(username: \"#{self.user}\")", # TODO: Why the username
+                "\tuploadToTestflight(username: \"#{self.user}\")", # TODO: Josh Why the username
                 "}"]
       else
         lane = ["lane :beta do",
@@ -145,7 +145,7 @@ module Fastlane
     def ios_screenshots
       UI.header("Setting up fastlane to automate iOS screenshots")
 
-      UI.message("fastlane uses UITests to automatically generate localized screenshots of your iOS app")
+      UI.message("fastlane uses UI Tests to automatically generate localized screenshots of your iOS app")
       UI.message("fastlane will now create 2 helper files that are needed to get the setup running")
       UI.message("For more information on how this works and best practices, check out")
       UI.message("\thttps://docs.fastlane.tools/getting-started/ios/screenshots/".cyan)
