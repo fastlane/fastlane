@@ -185,8 +185,6 @@ module Fastlane
         verify_app_exists_itc!
       end
 
-      # TODO: does it also need to create a directory structure for screenshots to get it to work?
-
       if self.is_swift_fastfile
         lane = ["func screenshotsLane() {",
                 "\tcaptureScreenshots(#{project_prefix}scheme: \"#{ui_testing_scheme}\")"]
@@ -253,7 +251,6 @@ module Fastlane
       if self.app_identifier.to_s.length == 0
         ask_for_bundle_identifier
       end
-      # TODO: can we find the username from the Xcode project?
     end
 
     def ask_for_bundle_identifier
