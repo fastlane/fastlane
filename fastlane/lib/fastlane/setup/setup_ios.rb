@@ -14,6 +14,8 @@ module Fastlane
     attr_accessor :itc_team_id
     attr_accessor :adp_team_id
 
+    attr_accessor :app_exists_on_itc
+
     attr_accessor :automatic_versioning_enabled
 
     def setup_ios
@@ -85,29 +87,31 @@ module Fastlane
       verify_app_exists_adp!
       verify_app_exists_itc!
 
-      UI.header("Manage app metadata?")
-      UI.message("Do you want to use fastlane to manage your app metadata?")
-      UI.message("If you enable this feature, fastlane will download your existing metadata and screenshots.")
-      UI.message("This way, you'll be able to edit your app's metadata in the form of local `.txt` files.")
-      UI.message("After editing the local `.txt` files, just run fastlane, and all changes will be pushed up.")
-      UI.message("If you don't use that feature, you can still use fastlane to upload and distribute new builds to the App Store")
-      include_metadata = UI.confirm("Do you want fastlane to manage your app metadata?")
-      if include_metadata
-        require 'deliver'
-        require 'deliver/setup'
+      if self.app_exists_on_itc
+        UI.header("Manage app metadata?")
+        UI.message("Do you want to use fastlane to manage your app metadata?")
+        UI.message("If you enable this feature, fastlane will download your existing metadata and screenshots.")
+        UI.message("This way, you'll be able to edit your app's metadata in the form of local `.txt` files.")
+        UI.message("After editing the local `.txt` files, just run fastlane, and all changes will be pushed up.")
+        UI.message("If you don't use that feature, you can still use fastlane to upload and distribute new builds to the App Store")
+        include_metadata = UI.confirm("Do you want fastlane to manage your app metadata?")
+        if include_metadata
+          require 'deliver'
+          require 'deliver/setup'
 
-        deliver_options = FastlaneCore::Configuration.create(
-          Deliver::Options.available_options,
-          {
-            run_precheck_before_submit: false, # precheck doesn't need to run during init
-            username: self.user,
-            app_identifier: self.app_identifier,
-            team_id: self.itc_team_id
-          }
-        )
+          deliver_options = FastlaneCore::Configuration.create(
+            Deliver::Options.available_options,
+            {
+              run_precheck_before_submit: false, # precheck doesn't need to run during init
+              username: self.user,
+              app_identifier: self.app_identifier,
+              team_id: self.itc_team_id
+            }
+          )
 
-        Deliver::DetectValues.new.run!(deliver_options, {}) # needed to fetch the app details
-        Deliver::Setup.new.run(deliver_options, is_swift: self.is_swift_fastfile)
+          Deliver::DetectValues.new.run!(deliver_options, {}) # needed to fetch the app details
+          Deliver::Setup.new.run(deliver_options, is_swift: self.is_swift_fastfile)
+        end
       end
 
       if self.is_swift_fastfile
@@ -118,7 +122,7 @@ module Fastlane
           # TODO: Josh why do I have to provide `app` and `username` here?
           lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\")"
         else
-          lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\", skipMetadata: true, skipScreenshots: true)"
+          lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\", skipScreenshots: true, skipMetadata: true)"
         end
         lane << "}"
       else
@@ -339,15 +343,13 @@ module Fastlane
       UI.message("Checking if the app '#{self.app_identifier}' exists on the Apple Developer Portal...")
       app = Spaceship::Portal::App.find(self.app_identifier)
       if app.nil?
-        UI.error("Looks like the app '#{self.app_identifier}' isn't available on the Apple Developer Portal")
+        UI.error("Looks like the app '#{self.app_identifier}' isn't available on the #{'Apple Developer Portal'.bold.underline}")
         UI.error("for the team ID '#{self.adp_team_id}' on Apple ID '#{self.user}'")
 
         if UI.confirm("Do you want fastlane to create the App ID for you on the Apple Developer Portal?")
           create_app_online!(mode: :adp)
         else
-          UI.error("User declined... falling back to manual fastlane setup")
-          ios_manual
-          # TODO: fail out somehow, this will return the initial process instead
+          UI.important("Alright, not creating the app for you, but be aware the build is probably gonna fail once you try it")
         end
       else
         UI.success("✅  Your app '#{self.app_identifier}' is available on iTunes Connect")
@@ -359,17 +361,17 @@ module Fastlane
       UI.message("Checking if the app '#{self.app_identifier}' exists on iTunes Connect...")
       app = Spaceship::Tunes::Application.find(self.app_identifier)
       if app.nil?
-        UI.error("Looks like the app '#{self.app_identifier}' isn't available on iTunes Connect")
+        UI.error("Looks like the app '#{self.app_identifier}' isn't available on #{'iTunes Connect'.bold.underline}")
         UI.error("for the team ID '#{self.itc_team_id}' on Apple ID '#{self.user}'")
         if UI.confirm("Do you want fastlane to create the App on iTunes Connect for you?")
           create_app_online!(mode: :itc)
+          self.app_exists_on_itc = true
         else
-          UI.error("User declined... falling back to manual fastlane setup")
-          ios_manual
-          # TODO: fail out somehow, this will return the initial process instead
+          UI.important("Alright, not creating the app for you, but be aware the build is probably gonna fail once you try it")
         end
       else
         UI.success("✅  Your app '#{self.app_identifier}' is available on iTunes Connect")
+        self.app_exists_on_itc = true
       end
     end
 
