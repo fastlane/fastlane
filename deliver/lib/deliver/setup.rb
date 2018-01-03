@@ -38,10 +38,7 @@ module Deliver
       generate_metadata_files(v, File.join(deliver_path, 'metadata'))
 
       # Generate the final Deliverfile here
-      deliver = File.read(deliverfile_path)
-      deliver.gsub!("[[APP_IDENTIFIER]]", options[:app].bundle_id)
-      deliver.gsub!("[[USERNAME]]", Spaceship::Tunes.client.user)
-      return deliver
+      return File.read(deliverfile_path)
     end
 
     def deliverfile_path
