@@ -50,7 +50,7 @@ struct ArgumentProcessor {
         
         // User might have configured a timeout for the socket connection
         let potentialTimeout = fastlaneArgsMinusLanes.filter { arg in
-            return arg.name.lowercased() == "timeoutSeconds"
+            return arg.name.lowercased() == "timeoutseconds"
         }
         
         if let logModeArg = potentialLogMode.first {
