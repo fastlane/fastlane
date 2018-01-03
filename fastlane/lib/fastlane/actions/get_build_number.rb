@@ -25,7 +25,7 @@ module Fastlane
         if Helper.test?
           Actions.lane_context[SharedValues::BUILD_NUMBER] = command
         else
-          build_number = (Actions.sh(command)).split("\n").last.strip
+          build_number = Actions.sh(command).split("\n").last.strip
 
           # Store the number in the shared hash
           Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
