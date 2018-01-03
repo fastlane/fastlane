@@ -46,6 +46,16 @@ module Fastlane
         fork do
           begin
             require name
+          rescue NotImplementedError => e
+            puts e
+            # fork method is not available (Windows?)
+            spawn do
+              begin
+                require name
+              rescue LoadError
+                exit(1)
+              end
+            end
           rescue LoadError
             exit(1)
           end
