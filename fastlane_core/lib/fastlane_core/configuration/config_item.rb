@@ -219,7 +219,18 @@ module FastlaneCore
       return nil if value.nil?
 
       if data_type == Array
-        return value.split(',') if value.kind_of?(String)
+        chars_to_delete = "[\" ]"
+
+        # covers Arrays like:
+        # ["\"value\", \"value\""]
+        # ["[\"value\", \"value\"]"]
+        return value.map { |item| item.delete(chars_to_delete) } if value.kind_of?(Array)
+
+        # covers Strings that are actually Arrays like:
+        # "["value", "value"]"
+        # "\"value\", \"value\""
+        return value.delete(chars_to_delete).split(',') if value.kind_of?(String)
+
       elsif data_type == Integer
         return value.to_i if value.to_i.to_s == value.to_s
       elsif data_type == Float

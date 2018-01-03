@@ -240,6 +240,32 @@ describe FastlaneCore do
           expect(value).to eq('a\\ b c\\ d e')
         end
 
+        it "auto converts String that is an Array to actual Array" do
+          config_item = FastlaneCore::ConfigItem.new(key: :app_identifier,
+                                       short_option: "-a",
+                                       env_name: "MATCH_APP_IDENTIFIER",
+                                       description: "The bundle identifier(s) of your app (comma-separated)",
+                                       is_string: false,
+                                       type: Array, # we actually allow String and Array here
+                                       skip_type_validation: true,
+                                       code_gen_sensitive: true)
+
+          value = config_item.auto_convert_value("[\"bundle1\", \"bundle2\"]")
+          expect(value).to eq(["bundle1", "bundle2"])
+
+          value = config_item.auto_convert_value("\"bundle1\", \"bundle2\"")
+          expect(value).to eq(["bundle1", "bundle2"])
+
+          value = config_item.auto_convert_value("\"bundle1\"")
+          expect(value).to eq(["bundle1"])
+
+          value = config_item.auto_convert_value(["bundle1"])
+          expect(value).to eq(["bundle1"])
+
+          value = config_item.auto_convert_value(["bundle1", "bundle2"])
+          expect(value).to eq(["bundle1", "bundle2"])
+        end
+
         it "auto converts Hash values to Strings if allowed" do
           config_item = FastlaneCore::ConfigItem.new(key: :xcargs,
                                                      description: 'xcargs',
