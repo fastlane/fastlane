@@ -62,12 +62,14 @@ module Fastlane
 
       if self.is_swift_fastfile
         lane = ["func betaLane() {",
+                "desc(\"Push a new beta build to TestFlight\")",
                 increment_build_number_if_applicable,
                 "\tbuildApp(#{project_prefix}scheme: \"#{self.scheme}\")",
                 "\tuploadToTestflight(username: \"#{self.user}\")", # TODO: Josh Why the username
                 "}"]
       else
-        lane = ["lane :beta do",
+        lane = ["desc \"Push a new beta build to TestFlight\"",
+                "lane :beta do",
                 increment_build_number_if_applicable,
                 "  build_app(#{project_prefix}scheme: \"#{self.scheme}\")",
                 "  upload_to_testflight",
@@ -116,6 +118,7 @@ module Fastlane
 
       if self.is_swift_fastfile
         lane = ["func releaseLane() {",
+                "desc(\"Push a new release build to the App Store\")",
                 increment_build_number_if_applicable,
                 "\tbuildApp(#{project_prefix}scheme: \"#{self.scheme}\")"]
         if include_metadata
@@ -126,7 +129,8 @@ module Fastlane
         end
         lane << "}"
       else
-        lane = ["lane :release do",
+        lane = ["desc \"Push a new release build to the App Store\"",
+                "lane :release do",
                 increment_build_number_if_applicable,
                 "  build_app(#{project_prefix}scheme: \"#{self.scheme}\")"]
         if include_metadata
@@ -187,6 +191,7 @@ module Fastlane
 
       if self.is_swift_fastfile
         lane = ["func screenshotsLane() {",
+                "desc(\"Generate new localized screenshots\")",
                 "\tcaptureScreenshots(#{project_prefix}scheme: \"#{ui_testing_scheme}\")"]
 
         if automatic_upload
@@ -195,7 +200,8 @@ module Fastlane
         end
         lane << "}"
       else
-        lane = ["lane :screenshots do",
+        lane = ["desc \"Generate new localized screenshots\"",
+                "lane :screenshots do",
                 "  capture_screenshots(#{project_prefix}scheme: \"#{ui_testing_scheme}\")"]
 
         if automatic_upload
@@ -214,11 +220,13 @@ module Fastlane
 
       if self.is_swift_fastfile
         append_lane(["func customLane() {",
+                     "desc(\"Description of what the lane does\")",
                      "\t// add actions here: https://docs.fastlane.tools/actions",
                      "}"])
         self.lane_to_mention = "custom" # lane is part of the notation
       else
-        append_lane(["lane :custom_lane do",
+        append_lane(["desc \"Description of what the lane does\"",
+                     "lane :custom_lane do",
                      "  # add actions here: https://docs.fastlane.tools/actions",
                      "end"])
         self.lane_to_mention = "custom_lane"
