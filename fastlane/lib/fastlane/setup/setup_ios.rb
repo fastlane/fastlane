@@ -405,8 +405,10 @@ module Fastlane
 
     # Choose the language the config files should be based in
     def choose_swift
+      # The Swift question below is removed, as we don't want everyone
+      # to use the Beta setup yet
       # using `||=` since if the user already used `fastlane init swift` we want to just use swift
-      self.is_swift_fastfile ||= UI.confirm("[Beta] Do you want to try our new experimental Swift based configuration files?")
+      # self.is_swift_fastfile ||= UI.confirm("[Beta] Do you want to try our new experimental Swift based configuration files?")
 
       self.fastfile_content = fastfile_template_content
       self.appfile_content = appfile_template_content

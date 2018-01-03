@@ -19,30 +19,30 @@ module Fastlane
       init_supply
 
       self.append_lane([
-        "desc \"Runs all the tests\"",
-        "lane :test do",
-        "  gradle(task: \"test\")",
-        "end"
-      ])
+                         "desc \"Runs all the tests\"",
+                         "lane :test do",
+                         "  gradle(task: \"test\")",
+                         "end"
+                       ])
 
       self.append_lane([
-          "desc \"Submit a new Beta Build to Crashlytics Beta\"",
-          "lane :beta do",
-          "  gradle(task: \"assembleRelease\")",
-          "  crashlytics",
-          "",
-          "  # sh \"your_script.sh\"",
-          "  # You can also use other beta testing services here",
-          "end",
-      ])
+                         "desc \"Submit a new Beta Build to Crashlytics Beta\"",
+                         "lane :beta do",
+                         "  gradle(task: \"assembleRelease\")",
+                         "  crashlytics",
+                         "",
+                         "  # sh \"your_script.sh\"",
+                         "  # You can also use other beta testing services here",
+                         "end"
+                       ])
 
       self.append_lane([
-          "desc \"Deploy a new version to the Google Play\"",
-          "lane :deploy do",
-          "  gradle(task: \"assembleRelease\")",
-          "  upload_to_play_store",
-          "end",
-      ])
+                         "desc \"Deploy a new version to the Google Play\"",
+                         "lane :deploy do",
+                         "  gradle(task: \"assembleRelease\")",
+                         "  upload_to_play_store",
+                         "end"
+                       ])
 
       self.lane_to_mention = "test"
 
@@ -64,7 +64,6 @@ module Fastlane
       self.appfile_content.gsub!("[[PACKAGE_NAME]]", self.package_name)
     end
 
-
     def init_supply
       UI.message("")
       question = "Do you plan on uploading metadata, screenshots and builds to Google Play using fastlane?".yellow
@@ -80,8 +79,6 @@ module Fastlane
           }
           Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, supply_config)
           Supply::Setup.new.perform_download
-
-          # TODO: add lane here
         rescue => ex
           UI.error(ex.to_s)
           UI.error("supply failed, but don't worry, you can launch supply using `fastlane supply init` whenever you want.")
@@ -98,4 +95,3 @@ module Fastlane
     end
   end
 end
-
