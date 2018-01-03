@@ -10,7 +10,9 @@
 ### Issue Description
 
 ##### Complete output when running fastlane, including the stack trace and command used
-<!-- You can use: `--capture_output` as the last commandline argument to get that collected for you -->
+<!-- You can use: `--capture_output` as the last commandline argument to get that collected for you. -->
+
+<!-- The output of `--capture_output` could contain sensitive data such as application ids, certificate ids, or email addreses, Please make sure you double check the output and replace anything sensitive you don't wish to submit in the issue -->
 
 [INSERT OUTPUT HERE]
 
