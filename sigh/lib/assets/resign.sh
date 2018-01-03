@@ -301,7 +301,6 @@ fi
 # Set the app name
 # In Payload directory may be another file except .app file, such as StoreKit folder.
 # Search the first .app file within the Payload directory
-# TODO: Replace with glob or call to 'find'; and remove shellcheck directive
 # shellcheck disable=SC2010
 APP_NAME=$(ls "$TEMP_DIR/Payload/" | grep ".app$" | head -1)
 

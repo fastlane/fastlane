@@ -94,7 +94,7 @@ module Fastlane
                 "desc(\"Push a new beta build to TestFlight\")",
                 increment_build_number_if_applicable,
                 "\tbuildApp(#{project_prefix}scheme: \"#{self.scheme}\")",
-                "\tuploadToTestflight(username: \"#{self.user}\")", # TODO: Josh Why the username
+                "\tuploadToTestflight(username: \"#{self.user}\")",
                 "}"]
       else
         lane = ["desc \"Push a new beta build to TestFlight\"",
@@ -151,7 +151,6 @@ module Fastlane
                 increment_build_number_if_applicable,
                 "\tbuildApp(#{project_prefix}scheme: \"#{self.scheme}\")"]
         if include_metadata
-          # TODO: Josh why do I have to provide `app` and `username` here?
           lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\")"
         else
           lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\", skipScreenshots: true, skipMetadata: true)"
@@ -224,7 +223,6 @@ module Fastlane
                 "\tcaptureScreenshots(#{project_prefix}scheme: \"#{ui_testing_scheme}\")"]
 
         if automatic_upload
-          # TODO: Josh why do I have to provide `app` and `username` here?
           lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\", skipBinaryUpload: true, skipMetadata: true)"
         end
         lane << "}"
@@ -314,7 +312,7 @@ module Fastlane
 
       if self.user.to_s.length == 0
         UI.important("Please enter your Apple ID developer credentials")
-        self.user = UI.input("Apple ID Username:") # TODO: why does this render in new-line
+        self.user = UI.input("Apple ID Username:")
       end
       UI.message("Logging in...")
 
@@ -507,8 +505,7 @@ module Fastlane
           UI.error(ex.backtrace.join("\n")) if FastlaneCore::Globals.verbose?
           UI.important("Looks like something went wrong when trying to create the app on the Apple Developer Portal")
           unless UI.confirm("Do you want to try again (y)? If you enter (n), fastlane will fall back to the manual setup")
-            ios_manual
-            return # TODO: fail out somehow, this will return the initial process instead
+            raise ex
           end
         end
       end

@@ -5,7 +5,7 @@ module Fastlane
     # Is the current `setup` using a swift based configuration file
     attr_accessor :is_swift_fastfile
 
-    # :ios or :android # TODO: maybe more in the future (react-native?)
+    # :ios or :android
     attr_accessor :platform
 
     # Path to the xcodeproj or xcworkspace
@@ -55,10 +55,10 @@ module Fastlane
 
       FastlaneCore::FastlaneFolder.create_folder!
 
-      if ios_projects.count > 0 && android_projects.count > 0
-        UI.message("It seems like you have both iOS and Android projects in the current directory")
-        # TODO: Implement here
-      elsif ios_projects.count > 0
+      # Currently we prefer iOS app projects, as the `init` process is
+      # more intelligent and does more things. The user can easily add
+      # the `:android` platform to the resulting Fastfile
+      if ios_projects.count > 0
         current_directory = ios_projects.find_all do |current_project_path|
           current_project_path.split(File::Separator).count == 1
         end
@@ -195,7 +195,6 @@ module Fastlane
     end
 
     def fastfile_template_content
-      # TODO: Support android
       if self.is_swift_fastfile
         path = "#{Fastlane::ROOT}/lib/assets/DefaultFastfileTemplate.swift"
       else
