@@ -1,6 +1,7 @@
 module Fastlane
+  # rubocop:disable Metrics/ClassLength
   class SetupIos < Setup
-    # Reference to the iOS project
+    # Reference to the iOS project `project.rb`
     attr_accessor :project
 
     # App Identifier of the current app
@@ -12,6 +13,8 @@ module Fastlane
     # If the current setup requires a login, this is where we'll store the team ID
     attr_accessor :itc_team_id
     attr_accessor :adp_team_id
+
+    attr_accessor :automatic_versioning_enabled
 
     def setup_ios
       require 'spaceship'
@@ -50,21 +53,25 @@ module Fastlane
     def ios_testflight
       UI.header("Setting up fastlane for iOS TestFlight distribution")
       find_and_setup_xcode_project
+      apple_xcode_project_versioning_enabled
       ask_for_credentials(adp: true, itc: true)
       verify_app_exists_adp!
       verify_app_exists_itc!
 
       if self.is_swift_fastfile
-        self.append_lane(["func betaLane() {",
-                          "\tbuildApp(#{project_prefix}scheme: \"#{self.scheme}\")",
-                          "\tuploadToTestflight(username: \"#{self.user}\")", # TODO: Why the username
-                          "}"])
+        lane = ["func betaLane() {",
+                increment_build_number_if_applicable,
+                "\tbuildApp(#{project_prefix}scheme: \"#{self.scheme}\")",
+                "\tuploadToTestflight(username: \"#{self.user}\")", # TODO: Why the username
+                "}"]
       else
-        self.append_lane(["lane :beta do",
-                          "  build_app(#{project_prefix}scheme: \"#{self.scheme}\")",
-                          "  upload_to_testflight",
-                          "end"])
+        lane = ["lane :beta do",
+                increment_build_number_if_applicable,
+                "  build_app(#{project_prefix}scheme: \"#{self.scheme}\")",
+                "  upload_to_testflight",
+                "end"]
       end
+      self.append_lane(lane)
 
       self.lane_to_mention = "beta"
       finish_up
@@ -73,6 +80,7 @@ module Fastlane
     def ios_app_store
       UI.header("Setting up fastlane for iOS App Store distribution")
       find_and_setup_xcode_project
+      apple_xcode_project_versioning_enabled
       ask_for_credentials(adp: true, itc: true)
       verify_app_exists_adp!
       verify_app_exists_itc!
@@ -104,6 +112,7 @@ module Fastlane
 
       if self.is_swift_fastfile
         lane = ["func releaseLane() {",
+                increment_build_number_if_applicable,
                 "\tbuildApp(#{project_prefix}scheme: \"#{self.scheme}\")"]
         if include_metadata
           # TODO: Josh why do I have to provide `app` and `username` here?
@@ -114,6 +123,7 @@ module Fastlane
         lane << "}"
       else
         lane = ["lane :release do",
+                increment_build_number_if_applicable,
                 "  build_app(#{project_prefix}scheme: \"#{self.scheme}\")"]
         if include_metadata
           lane << "  upload_to_app_store"
@@ -175,12 +185,12 @@ module Fastlane
 
       if self.is_swift_fastfile
         lane = ["func screenshotsLane() {",
-                 "\tcaptureScreenshots(#{project_prefix}scheme: \"#{ui_testing_scheme}\")"]
-        
+                "\tcaptureScreenshots(#{project_prefix}scheme: \"#{ui_testing_scheme}\")"]
+
         if automatic_upload
           # TODO: Josh why do I have to provide `app` and `username` here?
           lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\", skipBinaryUpload: true, skipMetadata: true)"
-        end   
+        end
         lane << "}"
       else
         lane = ["lane :screenshots do",
@@ -299,6 +309,31 @@ module Fastlane
       UI.success("✅  Login with your Apple ID was successful")
     end
 
+    def apple_xcode_project_versioning_enabled
+      self.automatic_versioning_enabled = false
+
+      paths = self.project.project_paths
+      return false if paths.count == 0
+
+      result = Fastlane::Actions::GetBuildNumberAction.run({
+        project: paths.first, # most of the times, there will only be one project in there
+        hide_error_when_versioning_disabled: true
+      })
+
+      if result.kind_of?(String) && result.to_f > 0
+        self.automatic_versioning_enabled = true
+      end
+      return self.automatic_versioning_enabled
+    end
+
+    def show_information_about_version_bumps
+      UI.important("Looks like your project isn't set up to do automatic version increments")
+      UI.important("To let fastlane do automatic version bumps, please follow this guide:")
+      UI.message("\thttps://developer.apple.com/library/content/qa/qa1827/_index.html".cyan)
+      UI.important("Afterwards check out the fastlane docs on how to set up automatic build increments")
+      UI.message("\thttps://docs.fastlane.tools/getting-started/ios/beta-deployment/#best-practices".cyan)
+    end
+
     def verify_app_exists_adp!
       UI.user_error!("No app identifier provided") if self.app_identifier.to_s.length == 0
       UI.message("Checking if the app '#{self.app_identifier}' exists on the Apple Developer Portal...")
@@ -350,6 +385,8 @@ module Fastlane
         self.appfile_content.gsub!("[[APPLE_ID]]", self.user)
       end
 
+      self.show_information_about_version_bumps unless self.automatic_versioning_enabled
+
       super
     end
 
@@ -373,6 +410,24 @@ module Fastlane
 
       self.fastfile_content = fastfile_template_content
       self.appfile_content = appfile_template_content
+    end
+
+    def increment_build_number_if_applicable
+      return nil unless self.automatic_versioning_enabled
+      return nil if self.project.project_paths.first.to_s.length == 0
+
+      project_path = self.project.project_paths.first
+      # Convert the absolute path to a relative path
+      project_path_name = Pathname.new(project_path)
+      current_path_name = Pathname.new(File.expand_path("."))
+
+      relative_project_path = project_path_name.relative_path_from(current_path_name)
+
+      if self.is_swift_fastfile
+        return "\tincrementBuildNumber(xcodeproj: \"#{relative_project_path}\")"
+      else
+        return "  increment_build_number(xcodeproj: \"#{relative_project_path}\")"
+      end
     end
 
     def create_app_online!(mode: nil)
@@ -420,4 +475,5 @@ module Fastlane
       end
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
