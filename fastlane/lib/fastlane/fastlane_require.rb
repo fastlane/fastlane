@@ -47,7 +47,7 @@ module Fastlane
           begin
             require name
           rescue LoadError => e
-            UI.user_error!("LoadError #{e}")
+            #UI.user_error!("LoadError #{e}")
             exit(1)
           end
         end
