@@ -341,7 +341,9 @@ module Fastlane
       return true if FastlaneCore::FastlaneFolder.setup?
 
       create = UI.confirm('Could not find fastlane in current directory. Make sure to have your fastlane configuration files inside a folder called "fastlane". Would you like to set fastlane up?')
-      Fastlane::Setup.new.run if create
+      if create
+        Fastlane::Setup.start
+      end
       return false
     end
   end
