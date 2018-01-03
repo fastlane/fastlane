@@ -1,4 +1,4 @@
-# This file contains the automation information of fastlane.tools
+# This file contains the fastlane.tools configuration
 # You can find the documentation on https://docs.fastlane.tools
 #
 # For a list of all available actions, check out
@@ -6,7 +6,7 @@
 #     https://docs.fastlane.tools/actions
 #
 
-# If you want to automatically update fastlane if a new version is available:
+# Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
 
 default_platform(:ios)

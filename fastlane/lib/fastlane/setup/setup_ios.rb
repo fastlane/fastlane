@@ -17,13 +17,14 @@ module Fastlane
       require 'spaceship'
 
       self.platform = :ios
-      self.fastfile_content = fastfile_template_content
-      self.appfile_content = appfile_template_content
 
       welcome_to_fastlane
 
       if preferred_setup_method
         self.send(preferred_setup_method)
+
+        # We call `choose_swift` here also, as we skip the selection (see below)
+        choose_swift
         return
       end
 
@@ -36,6 +37,12 @@ module Fastlane
 
       selected = UI.select("What do you want to use fastlane for?", options.keys)
       method_to_use = options[selected]
+
+      # we want to first ask the user of what they want to do
+      # to make them already excited about all the things they can do with fastlane
+      # and only then we ask them about the language they want to use
+      choose_swift
+
       self.send(method_to_use)
     end
 
@@ -47,12 +54,18 @@ module Fastlane
       verify_app_exists_adp!
       verify_app_exists_itc!
 
-      lane = ["lane :beta do",
-              "  build_app(scheme: \"#{self.scheme}\"#{project_suffix})",
-              "  upload_to_testflight",
-              "end"]
+      if self.is_swift_fastfile
+        self.append_lane(["func betaLane() {",
+                          "\tbuildApp(#{project_prefix}scheme: \"#{self.scheme}\")",
+                          "\tuploadToTestflight(username: \"#{self.user}\")", # TODO: Why the username
+                          "}"])
+      else
+        self.append_lane(["lane :beta do",
+                          "  build_app(#{project_prefix}scheme: \"#{self.scheme}\")",
+                          "  upload_to_testflight",
+                          "end"])
+      end
 
-      self.append_lane(lane)
       self.lane_to_mention = "beta"
       finish_up
     end
@@ -89,17 +102,28 @@ module Fastlane
         Deliver::Setup.new.run(deliver_options, is_swift: self.is_swift_fastfile)
       end
 
-      lane = ["lane :release do",
-              "  build_app(scheme: \"#{self.scheme}\"#{project_suffix})",
-              "  "]
-      if include_metadata
-        lane << "  upload_to_app_store"
+      if self.is_swift_fastfile
+        lane = ["func releaseLane() {",
+                "\tbuildApp(#{project_prefix}scheme: \"#{self.scheme}\")"]
+        if include_metadata
+          # TODO: Josh why do I have to provide `app` and `username` here?
+          lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\")"
+        else
+          lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\", skipMetadata: true, skipScreenshots: true)"
+        end
+        lane << "}"
       else
-        lane << "  upload_to_app_store(skip_metadata: true, skip_screenshots: true)"
+        lane = ["lane :release do",
+                "  build_app(#{project_prefix}scheme: \"#{self.scheme}\")"]
+        if include_metadata
+          lane << "  upload_to_app_store"
+        else
+          lane << "  upload_to_app_store(skip_metadata: true, skip_screenshots: true)"
+        end
+        lane << "end"
       end
-      lane << "end"
-      append_lane(lane)
 
+      append_lane(lane)
       self.lane_to_mention = "release"
       finish_up
     end
@@ -147,14 +171,26 @@ module Fastlane
         verify_app_exists_itc!
       end
 
-      # TODO: does it also need to create a directory structure to get it to work?
-      lane = ["lane :screenshots do",
-              "  capture_screenshots(scheme: \"#{ui_testing_scheme}\"#{project_suffix})"]
+      # TODO: does it also need to create a directory structure for screenshots to get it to work?
 
-      if automatic_upload
-        lane << "  upload_to_app_store(skip_binary_upload: true, skip_metadata: true)"
+      if self.is_swift_fastfile
+        lane = ["func screenshotsLane() {",
+                 "\tcaptureScreenshots(#{project_prefix}scheme: \"#{ui_testing_scheme}\")"]
+        
+        if automatic_upload
+          # TODO: Josh why do I have to provide `app` and `username` here?
+          lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\", skipBinaryUpload: true, skipMetadata: true)"
+        end   
+        lane << "}"
+      else
+        lane = ["lane :screenshots do",
+                "  capture_screenshots(#{project_prefix}scheme: \"#{ui_testing_scheme}\")"]
+
+        if automatic_upload
+          lane << "  upload_to_app_store(skip_binary_upload: true, skip_metadata: true)"
+        end
+        lane << "end"
       end
-      lane << "end"
       append_lane(lane)
 
       self.lane_to_mention = "screenshots"
@@ -163,10 +199,19 @@ module Fastlane
 
     def ios_manual
       UI.header("Setting up fastlane, the manual way")
-      append_lane(["lane :custom_lane do",
-                   "  # add actions here: https://docs.fastlane.tools/actions",
-                   "end"])
-      self.lane_to_mention = "custom_lane"
+
+      if self.is_swift_fastfile
+        append_lane(["func customLane() {",
+                     "\t// add actions here: https://docs.fastlane.tools/actions",
+                     "}"])
+        self.lane_to_mention = "custom" # lane is part of the notation
+      else
+        append_lane(["lane :custom_lane do",
+                     "  # add actions here: https://docs.fastlane.tools/actions",
+                     "end"])
+        self.lane_to_mention = "custom_lane"
+      end
+
       finish_up
     end
 
@@ -228,17 +273,27 @@ module Fastlane
       # Disable the warning texts and information that's not relevant during onboarding
       ENV["FASTLANE_HIDE_LOGIN_INFORMATION"] = 1.to_s
       ENV["FASTLANE_HIDE_TEAM_INFORMATION"] = 1.to_s
+
       if itc
         Spaceship::Tunes.login(self.user)
         Spaceship::Tunes.select_team
         self.itc_team_id = Spaceship::Tunes.client.team_id
-        self.append_team("itc_team_id \"#{self.itc_team_id}\" # iTunes Connect Team ID")
+        if self.is_swift_fastfile
+          self.append_team("var itcTeam: String? { return \"#{self.itc_team_id}\" } // iTunes Connect Team ID")
+        else
+          self.append_team("itc_team_id \"#{self.itc_team_id}\" # iTunes Connect Team ID")
+        end
       end
+
       if adp
         Spaceship::Portal.login(self.user)
         Spaceship::Portal.select_team
         self.adp_team_id = Spaceship::Portal.client.team_id
-        self.append_team("team_id \"#{self.adp_team_id}\" # Developer Portal Team ID")
+        if self.is_swift_fastfile
+          self.append_team("var teamID: String { return \"#{self.adp_team_id}\" } // Apple Developer Portal Team ID")
+        else
+          self.append_team("team_id \"#{self.adp_team_id}\" # Developer Portal Team ID")
+        end
       end
 
       UI.success("✅  Login with your Apple ID was successful")
@@ -301,14 +356,23 @@ module Fastlane
     # Returns the `workspace` or `project` key/value pair for
     # gym and snapshot, but only if necessary
     #     (when there are multiple projects in the current directory)
-    def project_suffix
+    # it's a prefix, and not a suffix, as Swift cares about the order of parameters
+    def project_prefix
       return "" unless self.had_multiple_projects_to_choose_from
 
       if self.project_path.end_with?(".xcworkspace")
-        return ", workspace: \"#{self.project_path}\""
+        return "workspace: \"#{self.project_path}\", "
       else
-        return ", project: \"#{self.project_path}\""
+        return "project: \"#{self.project_path}\", "
       end
+    end
+
+    # Choose the language the config files should be based in
+    def choose_swift
+      self.is_swift_fastfile = UI.confirm("[Beta] Do you want to try our new experimental Swift based configuration files?")
+
+      self.fastfile_content = fastfile_template_content
+      self.appfile_content = appfile_template_content
     end
 
     def create_app_online!(mode: nil)

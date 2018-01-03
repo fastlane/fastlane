@@ -115,12 +115,6 @@ module Fastlane
           UI.user_error!("Make sure to `cd` into the right directory and then use `fastlane init` again")
         end
       end
-
-      # TODO: Implement swift flow
-      # Now that we've setup all the things, if we're using Swift, do the first time setup
-      # if is_swift_fastfile
-      #   Fastlane::SwiftLaneManager.first_time_setup
-      # end
     end
     # rubocop:enable Metrics/BlockNesting
 
@@ -142,8 +136,13 @@ module Fastlane
     # Append a lane to the current Fastfile template we're generating
     def append_lane(lane)
       new_lines = "\n\n"
-      new_lines = "" unless self.fastfile_content.include?("lane :") # the first lane we don't want new lines
-      self.fastfile_content.gsub!("[[LANES]]", "#{new_lines}  #{lane.join("\n  ")}[[LANES]]")
+      if self.is_swift_fastfile
+        new_lines = "" unless self.fastfile_content.include?("lane() {") # the first lane we don't want new lines
+        self.fastfile_content.gsub!("[[LANES]]", "#{new_lines}\t#{lane.join("\n\t")}[[LANES]]")
+      else
+        new_lines = "" unless self.fastfile_content.include?("lane :") # the first lane we don't want new lines
+        self.fastfile_content.gsub!("[[LANES]]", "#{new_lines}  #{lane.join("\n  ")}[[LANES]]")
+      end
     end
 
     # Append a team to the Appfile
@@ -155,11 +154,16 @@ module Fastlane
       FastlaneCore::FastlaneFolder.create_folder!
 
       # Write the Fastfile
-      fastfile_path = File.join(FastlaneCore::FastlaneFolder.path, 'Fastfile') # TODO: different path for swift
+      fastfile_file_name = "Fastfile"
+      fastfile_file_name += ".swift" if self.is_swift_fastfile
+
+      fastfile_path = File.join(FastlaneCore::FastlaneFolder.path, fastfile_file_name)
       self.fastfile_content.gsub!("[[LANES]]", "") # since we always keep it until writing out
       File.write(fastfile_path, self.fastfile_content) # remove trailing spaces before platform ends
 
-      appfile_path = File.join(FastlaneCore::FastlaneFolder.path, 'Appfile')
+      appfile_file_name = "Appfile"
+      appfile_file_name += ".swift" if self.is_swift_fastfile
+      appfile_path = File.join(FastlaneCore::FastlaneFolder.path, appfile_file_name)
       self.appfile_content.gsub!("[[TEAMS]]", "")
 
       File.write(appfile_path, self.appfile_content)
@@ -168,16 +172,26 @@ module Fastlane
       UI.message("Generated Fastfile at path `#{fastfile_path}`")
       UI.message("Generated Appfile at path `#{appfile_path}`")
 
-      UI.message("Please check the newly generated configuration files into source control (e.g. git) together with your project")
+      UI.message("Please check the newly generated configuration files into git together with your project")
       UI.message("This way, everyone in your team can easily use the fastlane setup")
       continue_with_enter
     end
 
     def finish_up
       write_fastfile!
+      setup_swift_support if is_swift_fastfile
       show_analytics_note
       explain_concepts
       suggest_next_steps
+    end
+
+    def setup_swift_support
+      runner_source_resources = "#{Fastlane::ROOT}/swift/."
+      destination_path = File.expand_path('swift', FastlaneCore::FastlaneFolder.path)
+      FileUtils.cp_r(runner_source_resources, destination_path)   
+      UI.success("Copied Swift fastlane runner project to '#{destination_path}'.")    
+
+      Fastlane::SwiftLaneManager.first_time_setup
     end
 
     def fastfile_template_content
@@ -193,8 +207,11 @@ module Fastlane
     end
 
     def appfile_template_content
-      # TODO: Support android
-      path = "#{Fastlane::ROOT}/lib/assets/AppfileTemplate"
+      if self.is_swift_fastfile
+        path = "#{Fastlane::ROOT}/lib/assets/AppfileTemplate.swift"
+      else
+        path = "#{Fastlane::ROOT}/lib/assets/AppfileTemplate"
+      end
 
       return File.read(path)
     end
