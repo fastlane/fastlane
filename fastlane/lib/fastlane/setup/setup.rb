@@ -45,8 +45,6 @@ module Fastlane
       # this is used by e.g. configuration.rb to not show warnings when running produce
       ENV["FASTLANE_ONBOARDING_IN_PROCESS"] = 1.to_s
 
-      is_swift_fastfile = false # TODO: this is just for now
-
       spinner = TTY::Spinner.new("[:spinner] Looking for iOS and Android projects in current directory...", format: :dots)
       spinner.auto_spin
 
