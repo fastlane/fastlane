@@ -8,6 +8,7 @@ module Fastlane
     # :ios or :android # TODO: maybe more in the future (react-native?)
     attr_accessor :platform
 
+    # Path to the xcodeproj or xcworkspace
     attr_accessor :project_path
 
     # Used for :manual sometimes
@@ -135,6 +136,8 @@ module Fastlane
 
     # Append a lane to the current Fastfile template we're generating
     def append_lane(lane)
+      lane.compact! # remove nil values
+
       new_lines = "\n\n"
       if self.is_swift_fastfile
         new_lines = "" unless self.fastfile_content.include?("lane() {") # the first lane we don't want new lines
@@ -188,8 +191,8 @@ module Fastlane
     def setup_swift_support
       runner_source_resources = "#{Fastlane::ROOT}/swift/."
       destination_path = File.expand_path('swift', FastlaneCore::FastlaneFolder.path)
-      FileUtils.cp_r(runner_source_resources, destination_path)   
-      UI.success("Copied Swift fastlane runner project to '#{destination_path}'.")    
+      FileUtils.cp_r(runner_source_resources, destination_path)
+      UI.success("Copied Swift fastlane runner project to '#{destination_path}'.")
 
       Fastlane::SwiftLaneManager.first_time_setup
     end
