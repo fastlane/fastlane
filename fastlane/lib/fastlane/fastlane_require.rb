@@ -47,7 +47,7 @@ module Fastlane
           begin
             require name
           rescue NotImplementedError => e
-            # fork method is not available in JRuby
+            # fork method is not available
             UI.user_error!("NotImplementedError #{e}")
             puts e
           rescue LoadError
