@@ -50,7 +50,7 @@ struct ArgumentProcessor {
         
         // User might have configured a timeout for the socket connection
         let potentialTimeout = fastlaneArgsMinusLanes.filter { arg in
-            return arg.name.lowercased() == "timeoutSeconds"
+            return arg.name.lowercased() == "timeoutseconds"
         }
         
         if let logModeArg = potentialLogMode.first {
@@ -64,6 +64,18 @@ struct ArgumentProcessor {
         } else {
             self.commandTimeout = SocketClient.defaultCommandTimeoutSeconds
         }
+    }
+    
+    func laneParameters() -> [String : String] {
+        let laneParametersArgs = self.args.filter { arg in
+            let lowercasedName = arg.name.lowercased()
+            return lowercasedName != "timeoutseconds" && lowercasedName != "lane" && lowercasedName != "logmode"
+        }
+        var laneParameters = [String : String]()
+        for arg in laneParametersArgs {
+            laneParameters[arg.name] = arg.value
+        }
+        return laneParameters
     }
 }
 
