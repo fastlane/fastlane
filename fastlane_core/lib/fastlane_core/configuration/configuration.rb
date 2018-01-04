@@ -248,7 +248,12 @@ module FastlaneCore
         end
       end
 
-      value
+      # It's very, very important to use the self[:my_key] notation
+      # as this will make sure to use the `fetch` method
+      # that is responsible for auto converting the values into the right
+      # data type
+      # Found out via https://github.com/fastlane/fastlane/issues/11243
+      return self[key]
     end
 
     # Overwrites or sets a new value for a given key
