@@ -348,7 +348,7 @@ module Fastlane
     end
 
     def did_finish
-      # to maintain compatibility until 
+      # to maintain compatibility with other sibling classes that have this API
     end
 
     def before_each_blocks
