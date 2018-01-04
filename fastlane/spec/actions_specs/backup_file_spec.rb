@@ -1,7 +1,8 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Backup file Integration" do
-      let (:test_path) { "/tmp/fastlane/tests/fastlane" }
+      tmp_path = Dir.mktmpdir
+      let (:test_path) { "#{tmp_path}/tests/fastlane" }
       let (:file_path) { "file.txt" }
       let (:backup_path) { "#{file_path}.back" }
       let (:file_content) { Time.now.to_s }
@@ -17,7 +18,7 @@ describe Fastlane do
 
       it "backup file to `.back` file" do
         expect(
-          File.open(File.join(test_path, backup_path))
+          File.read(File.join(test_path, backup_path))
         ).to include file_content
       end
 
