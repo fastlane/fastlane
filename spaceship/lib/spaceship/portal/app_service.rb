@@ -31,13 +31,13 @@ module Spaceship
       end
 
       def self.new_service(id, values: { on: true, off: false })
-        Module.new do
-          values.each do |k, v|
-            self.class.send(:define_method, k) do
-              AppService.new(id, v)
-            end
+        m = Module.new
+        values.each do |k, v|
+          m.define_singleton_method(k) do
+            AppService.new(id, v)
           end
         end
+        return m
       end
 
       AppGroup = AppService.new_service("APG3427HIY")
