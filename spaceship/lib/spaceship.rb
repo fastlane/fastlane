@@ -8,7 +8,6 @@ require_relative 'spaceship/launcher'
 require_relative 'spaceship/portal/portal'
 require_relative 'spaceship/portal/spaceship'
 
-
 # iTunes Connect
 require_relative 'spaceship/tunes/tunes'
 require_relative 'spaceship/tunes/spaceship'
