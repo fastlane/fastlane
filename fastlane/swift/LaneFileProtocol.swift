@@ -10,7 +10,7 @@ import Foundation
 
 public protocol LaneFileProtocol: class {
     var fastlaneVersion: String { get }
-    static func runLane(named: String, parameters: [String: String])
+    static func runLane(named: String, parameters: [String : String])
     
     func recordLaneDescriptions()
     func beforeAll()
@@ -70,7 +70,7 @@ public class LaneFile: NSObject, LaneFileProtocol {
         }
     }
     
-    public static func runLane(named: String, parameters: [String: String]) {
+    public static func runLane(named: String, parameters: [String : String]) {
         log(message: "Running lane: \(named)")
         self.loadFastfile()
         
