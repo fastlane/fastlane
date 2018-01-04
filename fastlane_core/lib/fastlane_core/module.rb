@@ -3,7 +3,7 @@ require 'fastlane/boolean'
 require_relative 'analytics/analytics_session'
 
 module FastlaneCore
-  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
+  ROOT = Pathname.new(File.expand_path('../../..', __FILE__))
   Boolean = Fastlane::Boolean
 
   # Session is used to report usage metrics.
