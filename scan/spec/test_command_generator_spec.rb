@@ -78,10 +78,12 @@ describe Scan do
     end
 
     it "raises an exception when project path wasn't found" do
+      tmp_path = Dir.mktmpdir
+      path = "#{tmp_path}/notExistent"
       expect do
-        options = { project: "/notExistent" }
+        options = { project: path }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-      end.to raise_error "Project file not found at path '/notExistent'"
+      end.to raise_error "Project file not found at path '#{path}'"
     end
 
     describe "Supports toolchain" do

@@ -55,10 +55,11 @@ describe Fastlane do
       end
 
       it "mandatory options are used correctly" do
-        file_path = '/tmp/file.ipa'
+        tmp_path = Dir.mktmpdir
+        file_path = "#{tmp_path}/file.ipa"
         FileUtils.touch file_path
         result = Fastlane::FastFile.new.parse("lane :test do
-          nexus_upload(file: '/tmp/file.ipa',
+          nexus_upload(file: '#{file_path}',
                       repo_id: 'artefacts',
                       repo_group_id: 'com.fastlane',
                       repo_project_name: 'myproject',
@@ -81,7 +82,7 @@ describe Fastlane do
         expect(result).to include('-F a=myproject')
         expect(result).to include('-F v=1.12')
         expect(result).to include('-F e=ipa')
-        expect(result).to include("-F file=@/tmp/file.ipa")
+        expect(result).to include("-F file=@#{tmp_path}")
         expect(result).to include('-u admin:admin123')
         expect(result).to include('--verbose')
         expect(result).to include('http://localhost:8081/nexus/service/local/artifact/maven/content')
@@ -91,10 +92,11 @@ describe Fastlane do
       end
 
       it "optional options are used correctly" do
-        file_path = '/tmp/file.ipa'
+        tmp_path = Dir.mktmpdir
+        file_path = "#{tmp_path}/file.ipa"
         FileUtils.touch file_path
         result = Fastlane::FastFile.new.parse("lane :test do
-          nexus_upload(file: '/tmp/file.ipa',
+          nexus_upload(file: '#{file_path}',
                       repo_id: 'artefacts',
                       repo_group_id: 'com.fastlane',
                       repo_project_name: 'myproject',
@@ -115,7 +117,7 @@ describe Fastlane do
         expect(result).to include('-F v=1.12')
         expect(result).to include('-F c=dSYM')
         expect(result).to include('-F e=ipa')
-        expect(result).to include("-F file=@/tmp/file.ipa")
+        expect(result).to include("-F file=@#{file_path}")
         expect(result).to include('-u admin:admin123')
         expect(result).to include('--verbose')
         expect(result).to include('http://localhost:8081/my-nexus/service/local/artifact/maven/content')
