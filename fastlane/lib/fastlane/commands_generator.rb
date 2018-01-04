@@ -90,7 +90,7 @@ module Fastlane
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
       global_option('--capture_output', 'Captures the output of the current run, and generates a markdown issue template') do
-        FastlaneCore::Globals.capture_output = true
+        FastlaneCore::Globals.capture_output = false
         FastlaneCore::Globals.verbose = true
       end
       global_option('--troubleshoot', 'Enables extended verbose mode. Use with caution, as this even includes ALL sensitive data. Cannot be used on CI.')

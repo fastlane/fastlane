@@ -1,6 +1,5 @@
-require 'json'
-
 module Fastlane
+  # Represents an argument to the ActionCommand
   class Argument
     def initialize(json: nil)
       @name = json['name']
@@ -25,14 +24,19 @@ module Fastlane
     attr_reader :value_type
   end
 
-  class Command
-    def initialize(json: nil)
-      command_json = JSON.parse(json)
-      @method_name = command_json['methodName']
-      @class_name = command_json['className']
-      @command_id = command_json['commandID']
+  # Represents a command that is meant to execute an Action on the client's behalf
+  class ActionCommand
+    attr_reader :command_id # always present
+    attr_reader :args # always present
+    attr_reader :method_name # always present
+    attr_reader :class_name # only present when executing a class-method
 
-      args_json = command_json['args'] ||= []
+    def initialize(json: nil)
+      @method_name = json['methodName']
+      @class_name = json['className']
+      @command_id = json['commandID']
+
+      args_json = json['args'] ||= []
       @args = args_json.map do |arg|
         Argument.new(json: arg)
       end
@@ -52,23 +56,6 @@ module Fastlane
 
     def is_class_method_command
       return class_name.to_s.length > 0
-    end
-
-    attr_reader :command_id # always present
-    attr_reader :args # always present
-    attr_reader :method_name # always present
-    attr_reader :class_name # only present when executing a class-method
-  end
-
-  class CommandReturn
-    attr_reader :return_value
-    attr_reader :return_value_type
-    attr_reader :closure_argument_value
-
-    def initialize(return_value: nil, return_value_type: nil, closure_argument_value: nil)
-      @return_value = return_value
-      @closure_argument_value = closure_argument_value
-      @return_value_type = return_value_type
     end
   end
 end

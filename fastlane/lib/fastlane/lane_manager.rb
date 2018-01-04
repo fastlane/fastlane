@@ -68,7 +68,6 @@ module Fastlane
       Fastlane::DocsGenerator.run(ff) unless skip_docs?
 
       duration = ((Time.now - started) / 60.0).round
-
       finish_fastlane(ff, duration, e)
 
       return ff

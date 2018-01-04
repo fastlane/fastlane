@@ -28,7 +28,7 @@ class SocketClient: NSObject {
     
     static let connectTimeoutSeconds = 2
     static let defaultCommandTimeoutSeconds = 3_600 // Hopefully 1 hr is enough ¯\_(ツ)_/¯
-    static let doneToken = "done"
+    static let doneToken = "done" // TODO: remove these
     static let cancelToken = "cancelFastlaneRun"
     
     fileprivate var inputStream: InputStream!
@@ -108,7 +108,7 @@ class SocketClient: NSObject {
     }
     
     public func sendComplete() {
-        sendAbort()
+        closeSession(sendAbort: true)
     }
     
     private func testDispatchTimeoutResult(_ timeoutResult: DispatchTimeoutResult, failureMessage: String, timeToWait: DispatchTimeInterval) -> Bool {
@@ -166,15 +166,16 @@ class SocketClient: NSObject {
 
         privateSend(string: string)
     }
-    
-    func sendAbort() {
+
+    func closeSession(sendAbort: Bool = true) {
         self.socketStatus = .closed
-        
+
         stopInputSession()
-        
-        // Either we completed successfully, or an error occured, eitherway let's try to send the "done" message
-        send(string: SocketClient.doneToken)
-        
+
+        if sendAbort {
+            send(rubyCommand: ControlCommand(commandType: .done))
+        }
+
         stopOutputSession()
         self.socketDelegate?.connectionsClosed()
     }
@@ -197,7 +198,7 @@ extension SocketClient: StreamDelegate {
                 
             case Stream.Event.errorOccurred:
                 verbose(message: "input stream error occurred")
-                sendAbort()
+                closeSession(sendAbort: true)
                 
             case Stream.Event.hasBytesAvailable:
                 read()
@@ -255,7 +256,8 @@ extension SocketClient: StreamDelegate {
     
     func handleFailure(message: [String]) {
         log(message: "Encountered a problem: \(message.joined(separator:"\n"))")
-        sendAbort()
+        let shutdownCommand = ControlCommand(commandType: .cancel(cancelReason: .serverError))
+        self.send(rubyCommand: shutdownCommand)
     }
     
     func processResponse(string: String) {
@@ -272,7 +274,8 @@ extension SocketClient: StreamDelegate {
         switch socketResponse.responseType {
         case .clientInitiatedCancel:
             self.socketDelegate?.commandExecuted(serverResponse: .clientInitiatedCancelAcknowledged)
-            self.sendAbort()
+            self.closeSession(sendAbort: false)
+
         case .failure(let failureInformation):
             self.socketDelegate?.commandExecuted(serverResponse: .serverError)
             self.handleFailure(message: failureInformation)

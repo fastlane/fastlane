@@ -86,7 +86,8 @@ public class LaneFile: NSObject, LaneFileProtocol {
             let message = "[!] Could not find lane '\(named)'. Available lanes: \(laneNames)"
             log(message: message)
 
-            _ = runner.executeCommand(ClientShutdownCommand(message: message))
+            let shutdownCommand = ControlCommand(commandType: .cancel(cancelReason: .clientError), message: message)
+            _ = runner.executeCommand(shutdownCommand)
             return false
         }
 
