@@ -48,12 +48,12 @@ lane(:execute_tests) do
 
   # Verifying the --help command
   #
-  Dir.chdir("..") do
-    content = sh("PAGER=cat bin/fastlane --help")
-    ["--version", "https://fastlane.tools", "fastlane"].each do |current|
-      UI.user_error!("--help missing information: '#{current}'") unless content.include?(current)
-    end
-  end
+  # Dir.chdir("..") do
+  #   content = sh("PAGER=cat bin/fastlane --help")
+  #   ["--version", "https://fastlane.tools", "fastlane"].each do |current|
+  #     UI.user_error!("--help missing information: '#{current}'") unless content.include?(current)
+  #   end
+  # end
 
   Dir.chdir("..") do
     # Install the bundle and the actual gem
