@@ -255,7 +255,7 @@ describe Snapshot do
 
       context 'test-without-building' do
         before do
-          configure options.merge(test_without_building: true)
+          configure options.merge(derived_data_path: 'fake/derived/path', test_without_building: true)
         end
 
         it 'uses the "test-without-building" command and not the default "build test"', requires_xcode: true do
