@@ -38,6 +38,10 @@ module Fastlane
       end
     end
 
+    def cancel_signal?
+      return @command_id == "cancelFastlaneRun"
+    end
+
     def target_class
       unless class_name
         return nil

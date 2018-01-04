@@ -42,7 +42,13 @@ module Fastlane
 
       duration = ((Time.now - started) / 60.0).round
 
-      finish_fastlane(nil, duration, e)
+      skip_message = false
+      exit_reason = socket_thread[:exit_reason]
+      if exit_reason == :cancelled
+        skip_message = true
+      end
+
+      finish_fastlane(nil, duration, e, skip_message: skip_message)
     end
 
     def self.display_lanes

@@ -347,6 +347,10 @@ module Fastlane
       @lanes ||= {}
     end
 
+    def did_finish
+      # to maintain compatibility until 
+    end
+
     def before_each_blocks
       @before_each ||= {}
     end

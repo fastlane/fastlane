@@ -34,8 +34,9 @@ module Fastlane
     private
 
     def receive_and_process_commands
-      # We'll break out of the infinite loop somehow, either error or 'done' message
+      # We'll break out of the infinite loop somehow, either error, 'done' message, or 'cancelFastlaneRun'
       ended_loop_due_to_error = true
+      kill = false
 
       loop do # No idea how many commands are coming, so we loop until an error or the done command is sent
         str = nil
@@ -47,13 +48,28 @@ module Fastlane
           break
         end
 
+        # done is handled specially because it isn't json, just a single word
         if str == 'done'
           time = Time.new
           UI.verbose("[#{time.usec}]: received done signal, shutting down")
           ended_loop_due_to_error = false
-          break
+          kill = true
+          Thread.current[:exit_reason] = :done
+          break # break because we don't want to parse, just exit
         end
-        response_json = process_command(command_json: str)
+
+        command = Command.new(json: str)
+
+        # if we cancel, we need to parse the cancel reason and display it
+        if command.cancel_signal?
+          time = Time.new
+          UI.verbose("[#{time.usec}]: received cancel signal, finishing parsing, sending response, and then shutting down")
+          ended_loop_due_to_error = false
+          kill = true
+          Thread.current[:exit_reason] = :cancelled
+        end
+
+        response_json = process_command(command: command)
 
         time = Time.new
         UI.verbose("[#{time.usec}]: sending #{response_json}")
@@ -63,14 +79,16 @@ module Fastlane
           UI.verbose(e)
           break
         end
-      end
 
-      return handle_disconnect(error: ended_loop_due_to_error)
+        if kill
+          return handle_disconnect(error: ended_loop_due_to_error)
+        end
+      end
     end
 
     def listen
       @server = TCPServer.open('localhost', 2000) # Socket to listen on port 2000
-      UI.message("Waiting for #{@connection_timeout} seconds for a connection from FastlaneRunner")
+      UI.verbose("Waiting for #{@connection_timeout} seconds for a connection from FastlaneRunner")
 
       # set thread local to ready so we can check it
       Thread.current[:ready] = true
@@ -84,7 +102,7 @@ module Fastlane
       rescue StandardError => e
         UI.user_error!("Something went wrong while waiting for a connection from the FastlaneRunner binary, shutting down\n#{e}")
       end
-      UI.message("Client connected")
+      UI.verbose("Client connected")
 
       receive_and_process_commands
     end
@@ -104,14 +122,19 @@ module Fastlane
       return false # Don't restart server
     end
 
-    def process_command(command_json: nil)
+    def process_command(command: nil)
       time = Time.new
-      UI.verbose("[#{time.usec}]: received command:#{command_json}")
-      return execute_command(command_json: command_json)
+      UI.verbose("[#{time.usec}]: received command:#{command.inspect}")
+      return execute_command(command: command)
     end
 
-    def execute_command(command_json: nil)
-      command = Command.new(json: command_json)
+    def execute_command(command: nil)
+      if command.cancel_signal?
+        message = command.args.select { |arg| arg.name == "message" }.first
+        UI.important(message.value.red)
+        return '{"payload":{"status":"cancelled"}}'
+      end
+
       command_return = @command_executor.execute(command: command, target_object: nil)
       ## probably need to just return Strings, or ready_for_next with object isn't String
       return_object = command_return.return_value
@@ -143,6 +166,8 @@ module Fastlane
         exception_array << "cause: #{e.class}"
         exception_array << backtrace
       end
+
+      Thread.current[:exit_reason] = :exception
       return "{\"payload\":{\"status\":\"failure\",\"failure_information\":#{exception_array.flatten}}}"
     end
   end

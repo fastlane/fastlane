@@ -10,7 +10,7 @@ import Foundation
 
 public protocol LaneFileProtocol: class {
     var fastlaneVersion: String { get }
-    static func runLane(named: String, parameters: [String : String])
+    static func runLane(named: String, parameters: [String : String]) -> Bool
     
     func recordLaneDescriptions()
     func beforeAll()
@@ -32,10 +32,6 @@ public class LaneFile: NSObject, LaneFileProtocol {
     
     // Called before any lane is executed.
     private func setupAllTheThings() {
-        // Step 1, add lange descriptions
-        (self as! Fastfile).recordLaneDescriptions()
-        
-        // Step 2, run beforeAll() function
         LaneFile.fastfileInstance!.beforeAll()
     }
     
@@ -58,6 +54,7 @@ public class LaneFile: NSObject, LaneFileProtocol {
                 laneToMethodName[lowercasedNameNoLane] = name
             }
         }
+
         return laneToMethodName
     }
     
@@ -70,7 +67,7 @@ public class LaneFile: NSObject, LaneFileProtocol {
         }
     }
     
-    public static func runLane(named: String, parameters: [String : String]) {
+    public static func runLane(named: String, parameters: [String : String]) -> Bool {
         log(message: "Running lane: \(named)")
         self.loadFastfile()
         
@@ -79,18 +76,22 @@ public class LaneFile: NSObject, LaneFileProtocol {
             log(message: message)
             fatalError(message)
         }
-        
-        // call all methods that need to be called before we start calling lanes
-        fastfileInstance.setupAllTheThings()
-        
+
         let currentLanes = self.lanes
         let lowerCasedLaneRequested = named.lowercased()
         
         guard let laneMethod = currentLanes[lowerCasedLaneRequested] else {
-            let message = "unable to find lane named: \(named)"
+            let currentLaneNames = laneFunctions.map { String($0.prefix($0.count - 4)) }
+            let laneNames = currentLaneNames.joined(separator: ", ")
+            let message = "[!] Could not find lane '\(named)'. Available lanes: \(laneNames)"
             log(message: message)
-            fatalError(message)
+
+            _ = runner.executeCommand(ClientShutdownCommand(message: message))
+            return false
         }
+
+        // call all methods that need to be called before we start calling lanes
+        fastfileInstance.setupAllTheThings()
         
         // We need to catch all possible errors here and display a nice message
         _ = fastfileInstance.perform(NSSelectorFromString(laneMethod), with: parameters)
@@ -98,9 +99,10 @@ public class LaneFile: NSObject, LaneFileProtocol {
         // only call on success
         fastfileInstance.afterAll(currentLane: named)
         log(message: "Done running lane: \(named) 🚀")
+        return true
     }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.1]
+// FastlaneRunnerAPIVersion [0.9.2]
