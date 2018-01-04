@@ -6,7 +6,7 @@ require 'fastlane/version'
 
 # Copy over the latest .rubocop.yml style guide
 rubocop_config = File.expand_path('../.rubocop.yml', __FILE__)
-`cp #{rubocop_config} #{lib}/fastlane/plugins/template/.rubocop.yml`
+FileUtils.cp rubocop_config, "#{lib}/fastlane/plugins/template/.rubocop.yml"
 
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
