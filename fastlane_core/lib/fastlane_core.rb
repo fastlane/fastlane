@@ -78,7 +78,7 @@ module FastlaneCore
   # Since we don't want to access FastlaneCore from spaceship
   # this method is duplicated in spaceship/client.rb
   def self.fastlane_user_dir
-    path = File.expand_path(File.join("~", ".fastlane"))
+    path = File.expand_path(File.join(Dir.home, ".fastlane"))
     FileUtils.mkdir_p(path) unless File.directory?(path)
     return path
   end
