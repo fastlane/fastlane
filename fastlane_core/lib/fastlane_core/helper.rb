@@ -113,16 +113,27 @@ module FastlaneCore
       self.test?
     end
 
+    # Compare given paths if they are equal, respecting filesystem case sensitivity.
+    # Some systems have insensitive filesystems (e.g.: macOS AFPS)
+    #   https://developer.apple.com/library/content/documentation/FileManagement/Conceptual/APFS_Guide/FAQ/FAQ.html
+    # Issues:
+    #   - https://github.com/fastlane/fastlane/issues/11392
+    #   - https://github.com/fastlane/fastlane/issues/10166
     def self.compare_paths(path1, path2)
       compare_path1 = File.expand_path(path1)
       compare_path2 = File.expand_path(path2)
       if self.fs_is_insensitive?
-        # FS is insensitive, there fore the file `fastlane`  is also accessable via `FASTLANE``
-        return compare_path1.downcase == compare_path2.downcase
+        # FS is insensitive, so /path/fastlane is equal to /path/FASTLANE
+        # return the compare result by ignoring case sensitivity
+        return compare_path1.casecmp(compare_path2).zero?
       end
+      # FS is configured with sensitive filenames
+      # /tmp/fastlane is not /tmp/FASTLANE
+      # return result of plain compare.
       return compare_path1 == compare_path2
     end
 
+    # Detect if filesystem is insenstive or not.
     def self.fs_is_insensitive?
       is_insensitive = false
       Dir.mktmpdir("foo") do |dir|
