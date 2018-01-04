@@ -118,7 +118,7 @@ module FastlaneCore
       compare_path2 = File.expand_path(path2)
       if self.fs_is_insensitive?
         # FS is insensitive, there fore the file `fastlane`  is also accessable via `FASTLANE``
-        return compare_path1.casecmp(compare_path2.downcase).zero?
+        return compare_path1.downcase == compare_path2.downcase
       end
       return compare_path1 == compare_path2
     end
