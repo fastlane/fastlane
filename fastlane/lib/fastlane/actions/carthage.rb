@@ -158,9 +158,7 @@ module Fastlane
                                        description: "Use new resolver when resolving dependency graph",
                                        is_string: false,
                                        optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for new_resolver. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end)
+                                       type: Boolean)
         ]
       end
 
