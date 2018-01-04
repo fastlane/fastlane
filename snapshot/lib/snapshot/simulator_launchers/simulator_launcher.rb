@@ -2,32 +2,32 @@ require 'fastlane_core/test_parser'
 require_relative 'simulator_launcher_base'
 
 module Snapshot
-  class SimulatorLauncher < SimulatorLauncherBase
-    class CPUInspector
-      def self.hwprefs_available?
-        `which hwprefs` != ''
-      end
-
-      def self.cpu_count
-        @cpu_count ||=
-          case RUBY_PLATFORM
-          when /darwin9/
-            `hwprefs cpu_count`.to_i
-          when /darwin10/
-            (hwprefs_available? ? `hwprefs thread_count` : `sysctl -n hw.physicalcpu_max`).to_i
-          when /linux/
-            UI.user_error!("We detected that you are running snapshot on Linux, but snapshot is only supported on macOS")
-          when /freebsd/
-            UI.user_error!("We detected that you are running snapshot on FreeBSD, but snapshot is only supported on macOS")
-          else
-            if RbConfig::CONFIG['host_os'] =~ /darwin/
-              (hwprefs_available? ? `hwprefs thread_count` : `sysctl -n hw.physicalcpu_max`).to_i
-            else
-              UI.crash!("Cannot find the machine's processor count.")
-            end
-          end
-      end
+  class CPUInspector
+    def self.hwprefs_available?
+      `which hwprefs` != ''
     end
+
+    def self.cpu_count
+      @cpu_count ||=
+        case RUBY_PLATFORM
+        when /darwin9/
+          `hwprefs cpu_count`.to_i
+        when /darwin10/
+          (hwprefs_available? ? `hwprefs thread_count` : `sysctl -n hw.physicalcpu_max`).to_i
+        when /linux/
+          UI.user_error!("We detected that you are running snapshot on Linux, but snapshot is only supported on macOS")
+        when /freebsd/
+          UI.user_error!("We detected that you are running snapshot on FreeBSD, but snapshot is only supported on macOS")
+        else
+          if RbConfig::CONFIG['host_os'] =~ /darwin/
+            (hwprefs_available? ? `hwprefs thread_count` : `sysctl -n hw.physicalcpu_max`).to_i
+          else
+            UI.crash!("Cannot find the machine's processor count.")
+          end
+        end
+    end
+  end
+  class SimulatorLauncher < SimulatorLauncherBase
     # With Xcode 9's ability to run tests on multiple concurrent simulators,
     # this method sets the maximum number of simulators to run simultaneously
     # to avoid overloading your machine.
