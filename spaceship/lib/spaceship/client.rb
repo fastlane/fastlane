@@ -320,7 +320,7 @@ module Spaceship
 
     # This is a duplicate method of fastlane_core/fastlane_core.rb#fastlane_user_dir
     def fastlane_user_dir
-      path = File.expand_path(File.join("~", ".fastlane"))
+      path = File.expand_path(File.join(Dir.home, ".fastlane"))
       FileUtils.mkdir_p(path) unless File.directory?(path)
       return path
     end
