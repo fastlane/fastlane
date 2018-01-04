@@ -58,6 +58,30 @@ describe FastlaneCore do
       end
     end
 
+    describe "#fs_is_insensitive?" do
+      it "detects fs sensitivity" do
+        expect(File).to receive(:exist?).and_return(true)
+        expect(FastlaneCore::Helper.fs_is_insensitive?).to be true
+        expect(File).to receive(:exist?).and_return(false)
+        expect(FastlaneCore::Helper.fs_is_insensitive?).to be false
+      end
+    end
+
+    describe "#compare_paths?" do
+      it "Compare Path on sensitive system" do
+        expect(FastlaneCore::Helper).to receive(:fs_is_insensitive?).and_return(false)
+        expect(FastlaneCore::Helper).to receive(:fs_is_insensitive?).and_return(false)
+        expect(FastlaneCore::Helper.compare_paths("FASTLANE", "fastlane")).to be false
+        expect(FastlaneCore::Helper.compare_paths("fastlane", "fastlane")).to be true
+      end
+      it "Compare Path on insensitive system" do
+        expect(FastlaneCore::Helper).to receive(:fs_is_insensitive?).and_return(true)
+        expect(FastlaneCore::Helper).to receive(:fs_is_insensitive?).and_return(true)
+        expect(FastlaneCore::Helper.compare_paths("fastlane", "FASTLANE")).to be true
+        expect(FastlaneCore::Helper.compare_paths("fastlane", "fastlane")).to be true
+      end
+    end
+
     describe "#keychain_path" do
       it "finds file in current directory" do
         allow(File).to receive(:file?).and_return(false)

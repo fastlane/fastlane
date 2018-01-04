@@ -113,6 +113,25 @@ module FastlaneCore
       self.test?
     end
 
+    def self.compare_paths(path1, path2)
+      compare_path1 = File.expand_path(path1)
+      compare_path2 = File.expand_path(path2)
+      if self.fs_is_insensitive?
+        # FS is insensitive, there fore the file `fastlane`  is also accessable via `FASTLANE``
+        return compare_path1.casecmp(compare_path2.downcase).zero?
+      end
+      return compare_path1 == compare_path2
+    end
+
+    def self.fs_is_insensitive?
+      is_insensitive = false
+      Dir.mktmpdir("foo") do |dir|
+        File.write(File.join(dir, "FASTLANE"), ":rocket:")
+        is_insensitive = File.exist?(File.join(dir, "fastlane"))
+      end
+      is_insensitive
+    end
+
     def self.is_ci?
       ci?
     end
