@@ -12,7 +12,6 @@ struct ArgumentProcessor {
     let args: [RunnerArgument]
     let currentLane: String
     let commandTimeout: Int
-    let laneParameters: [String: String]
     
     init(args: [String]) {        
         // Dump the first arg which is the program name
@@ -65,15 +64,18 @@ struct ArgumentProcessor {
         } else {
             self.commandTimeout = SocketClient.defaultCommandTimeoutSeconds
         }
-        
-        var laneParameters = [String: String]()
-        for arg in fastlaneArgs {
+    }
+    
+    func laneParameters() -> [String : String] {
+        let laneParametersArgs = self.args.filter { arg in
             let lowercasedName = arg.name.lowercased()
-            if lowercasedName != "timeoutseconds" && lowercasedName != "lane" && lowercasedName != "logmode" {
-                laneParameters[arg.name] = arg.value
-            }
+            return lowercasedName != "timeoutseconds" && lowercasedName != "lane" && lowercasedName != "logmode"
         }
-        self.laneParameters = laneParameters
+        var laneParameters = [String : String]()
+        for arg in laneParametersArgs {
+            laneParameters[arg.name] = arg.value
+        }
+        return laneParameters
     }
 }
 
