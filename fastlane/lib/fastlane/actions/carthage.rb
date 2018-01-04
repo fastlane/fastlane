@@ -28,6 +28,7 @@ module Fastlane
         cmd << "--toolchain #{params[:toolchain]}" if params[:toolchain]
         cmd << "--project-directory #{params[:project_directory]}" if params[:project_directory]
         cmd << "--cache-builds" if params[:cache_builds]
+        cmd << "--new-resolver" if params[:new_resolver]
 
         Actions.sh(cmd.join(' '))
       end
@@ -151,7 +152,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :project_directory,
                                        env_name: "FL_CARTHAGE_PROJECT_DIRECTORY",
                                        description: "Define the directory containing the Carthage project",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :new_resolver,
+                                       env_name: "FL_CARTHAGE_NEW_RESOLVER",
+                                       description: "Use new resolver when resolving dependency graph",
+                                       is_string: false,
+                                       optional: true,
+                                       type: Boolean)
         ]
       end
 
@@ -172,7 +179,8 @@ module Fastlane
             platform: "all",                                # Define which platform to build for (one of ‘all’, ‘Mac’, ‘iOS’, ‘watchOS’, ‘tvOS‘, or comma-separated values of the formers except for ‘all’)
             configuration: "Release",                       # Build configuration to use when building
             cache_builds: true,                             # By default Carthage will rebuild a dependency regardless of whether its the same resolved version as before.
-            toolchain: "com.apple.dt.toolchain.Swift_2_3"   # Specify the xcodebuild toolchain
+            toolchain: "com.apple.dt.toolchain.Swift_2_3",  # Specify the xcodebuild toolchain
+            new_resolver: false                             # Use the new resolver to resolve depdendency graph
           )'
         ]
       end
@@ -186,7 +194,7 @@ module Fastlane
       end
 
       def self.authors
-        ["bassrock", "petester42", "jschmid", "JaviSoto", "uny", "phatblat", "bfcrampton", "antondomashnev"]
+        ["bassrock", "petester42", "jschmid", "JaviSoto", "uny", "phatblat", "bfcrampton", "antondomashnev", "gbrhaz"]
       end
     end
   end

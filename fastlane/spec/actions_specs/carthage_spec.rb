@@ -421,6 +421,21 @@ describe Fastlane do
         end.not_to raise_error
       end
 
+      it "works with new resolver" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              use_ssh: true,
+              use_submodules: true,
+              use_binaries: false,
+              cache_builds: true,
+              platform: 'iOS',
+              new_resolver: true
+            )
+          end").runner.execute(:test)
+        end.not_to raise_error
+      end
+
       context "when specify framework" do
         let(:command) { 'archive' }
 
