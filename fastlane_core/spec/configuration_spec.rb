@@ -652,6 +652,29 @@ describe FastlaneCore do
             @config.set(:cert_name, nil)
             expect(@config[:cert_name]).to eq("production_default")
           end
+
+          it "auto converts the value after asking the user for one" do
+            allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
+            allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
+            allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
+
+            # Taken from match/options.rb
+            config_item = FastlaneCore::ConfigItem.new(key: :app_identifiers,
+                                     short_option: "-a",
+                                     env_name: "MATCH_APP_IDENTIFIER",
+                                     description: "The bundle identifier(s) of your app (comma-separated)",
+                                     is_string: false,
+                                     type: Array, # we actually allow String and Array here
+                                     skip_type_validation: true,
+                                     code_gen_sensitive: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier))
+            config = FastlaneCore::Configuration.create([config_item], {})
+
+            config.set(:app_identifiers, nil)
+            expect(FastlaneCore::UI).to receive(:input).and_return("app.identifier")
+            expect(config[:app_identifiers].class).to eq(Array)
+            expect(config[:app_identifiers]).to eq(["app.identifier"])
+          end
         end
 
         describe "verify_block" do
