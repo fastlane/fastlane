@@ -42,7 +42,7 @@ module Spaceship
         return path
       end
 
-      def mac?
+      def mac? # TODO Windows
         (/darwin/ =~ RUBY_PLATFORM) != nil
       end
     end
