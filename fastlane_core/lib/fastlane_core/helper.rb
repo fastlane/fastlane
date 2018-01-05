@@ -281,6 +281,7 @@ module FastlaneCore
     end
 
     def self.hide_loading_indicator
+      return if FastlaneCore::Env.truthy?("FASTLANE_DISABLE_ANIMATION")
       @require_fastlane_spinner.success
     end
   end
