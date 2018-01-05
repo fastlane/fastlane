@@ -330,11 +330,12 @@ module Spaceship
 
     def get_ratings(app_id, platform, version_id = '', storefront = '')
       # if storefront or version_id is empty api fails
-      rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews/summary?"
-      rating_url << "storefront=#{storefront}" unless storefront.empty?
-      rating_url << "version_id=#{version_id}" unless version_id.empty?
+      rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews/summary"
+      params = {}
+      params['storefront'] = storefront unless storefront.empty?
+      params['version_id'] = version_id unless version_id.empty?
 
-      r = request(:get, rating_url)
+      r = request(:get, rating_url, params)
       parse_response(r, 'data')
     end
 
