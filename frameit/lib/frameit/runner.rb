@@ -1,4 +1,3 @@
-require 'deliver'
 require 'fastimage'
 
 require_relative 'frame_downloader'

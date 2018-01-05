@@ -35,7 +35,6 @@ module FastlaneCore
         return nil
       end
 
-      require 'credentials_manager'
       return Digest::SHA256.hexdigest("p#{app_id}fastlan3_SAlt") # hashed + salted the bundle identifier
     rescue
       return nil # we don't want this method to cause a crash

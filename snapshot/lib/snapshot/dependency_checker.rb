@@ -1,5 +1,6 @@
 require 'fastlane_core/device_manager'
 require 'fastlane_core/helper'
+require_relative 'latest_os_version'
 
 module Snapshot
   class DependencyChecker
@@ -11,8 +12,6 @@ module Snapshot
     end
 
     def self.check_xcode_select
-      require_relative 'latest_os_version'
-
       unless `xcode-select -v`.include? "xcode-select version"
         FastlaneCore::UI.error '#############################################################'
         FastlaneCore::UI.error "# You have to install Xcode command line tools to use snapshot"

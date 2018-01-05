@@ -7,7 +7,7 @@ module Match
     def initialize(user)
       # We'll try to manually fetch the password
       # to tell the user that a password is optional
-      require 'credentials_manager'
+      require 'credentials_manager/account_manager'
 
       keychain_entry = CredentialsManager::AccountManager.new(user: user)
 

@@ -338,7 +338,7 @@ module Spaceship
     # @return (Spaceship::Client) The client the login method was called for
     def login(user = nil, password = nil)
       if user.to_s.empty? or password.to_s.empty?
-        require 'credentials_manager'
+        require 'credentials_manager/account_manager'
 
         keychain_entry = CredentialsManager::AccountManager.new(user: user, password: password)
         user ||= keychain_entry.user

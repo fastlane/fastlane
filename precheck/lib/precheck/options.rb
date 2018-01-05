@@ -1,5 +1,5 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
 
 require_relative 'rules/all'
 
