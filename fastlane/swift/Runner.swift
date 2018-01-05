@@ -27,7 +27,7 @@ class Runner {
     fileprivate var returnValue: String? // lol, so safe
     fileprivate var currentlyExecutingCommand: RubyCommandable? = nil
     fileprivate var shouldLeaveDispatchGroupDuringDisconnect = false
-    
+
     func executeCommand(_ command: RubyCommandable) -> String {
         self.dispatchGroup.enter()
         currentlyExecutingCommand = command
@@ -115,7 +115,10 @@ extension Runner : SocketClientDelegateProtocol {
                 }
             }
             self.dispatchGroup.leave()
-            
+        case .clientInitiatedCancelAcknowledged:
+            verbose(message: "server acknowledged a cancel request")
+            self.dispatchGroup.leave()
+
         case .alreadyClosedSockets, .connectionFailure, .malformedRequest, .malformedResponse, .serverError:
             log(message: "error encountered while executing command:\n\(serverResponse)")
             self.dispatchGroup.leave()
@@ -187,4 +190,4 @@ func verbose(message: String) {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.1]
+// FastlaneRunnerAPIVersion [0.9.2]

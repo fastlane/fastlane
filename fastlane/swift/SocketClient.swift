@@ -13,6 +13,7 @@ public enum SocketClientResponse: Error {
     case malformedRequest
     case malformedResponse
     case serverError
+    case clientInitiatedCancelAcknowledged
     case commandTimeout(seconds: Int)
     case connectionFailure
     case success(returnedObject: String?, closureArgumentValue: String?)
@@ -27,7 +28,8 @@ class SocketClient: NSObject {
     
     static let connectTimeoutSeconds = 2
     static let defaultCommandTimeoutSeconds = 3_600 // Hopefully 1 hr is enough ¯\_(ツ)_/¯
-    static let doneToken = "done"
+    static let doneToken = "done" // TODO: remove these
+    static let cancelToken = "cancelFastlaneRun"
     
     fileprivate var inputStream: InputStream!
     fileprivate var outputStream: OutputStream!
@@ -106,7 +108,7 @@ class SocketClient: NSObject {
     }
     
     public func sendComplete() {
-        sendAbort()
+        closeSession(sendAbort: true)
     }
     
     private func testDispatchTimeoutResult(_ timeoutResult: DispatchTimeoutResult, failureMessage: String, timeToWait: DispatchTimeInterval) -> Bool {
@@ -130,7 +132,26 @@ class SocketClient: NSObject {
     private func stopOutputSession() {
         outputStream.close()
     }
-    
+
+    private func sendThroughQueue(string: String) {
+        streamQueue.async {
+            let data = string.data(using: .utf8)!
+            _ = data.withUnsafeBytes { self.outputStream.write($0, maxLength: data.count) }
+        }
+    }
+
+    private func privateSend(string: String) {
+        self.dispatchGroup.enter()
+        sendThroughQueue(string: string)
+
+        let timeoutSeconds = self.cleaningUpAfterDone ? 1 : self.commandTimeoutSeconds
+        let timeToWait = DispatchTimeInterval.seconds(timeoutSeconds)
+        let commandTimeout = DispatchTime.now() + timeToWait
+        let timeoutResult =  self.dispatchGroup.wait(timeout: commandTimeout)
+
+        _ = testDispatchTimeoutResult(timeoutResult, failureMessage: "Ruby process didn't return after: \(SocketClient.connectTimeoutSeconds) seconds", timeToWait: timeToWait)
+    }
+
     private func send(string: String) {
         guard !self.cleaningUpAfterDone else {
             // This will happen after we abort if there are commands waiting to be executed
@@ -138,34 +159,23 @@ class SocketClient: NSObject {
             socketDelegate?.commandExecuted(serverResponse: .alreadyClosedSockets)
             return
         }
-        
+
         if string == SocketClient.doneToken {
             self.cleaningUpAfterDone = true
         }
-        
-        self.dispatchGroup.enter()
-        streamQueue.async {
-            let data = string.data(using: .utf8)!
-            _ = data.withUnsafeBytes { self.outputStream.write($0, maxLength: data.count) }
+
+        privateSend(string: string)
+    }
+
+    func closeSession(sendAbort: Bool = true) {
+        self.socketStatus = .closed
+
+        stopInputSession()
+
+        if sendAbort {
+            send(rubyCommand: ControlCommand(commandType: .done))
         }
 
-        let timeoutSeconds = self.cleaningUpAfterDone ? 1 : self.commandTimeoutSeconds
-
-        let timeToWait = DispatchTimeInterval.seconds(timeoutSeconds)
-        let commandTimeout = DispatchTime.now() + timeToWait
-        let timeoutResult =  self.dispatchGroup.wait(timeout: commandTimeout)
-
-        _ = testDispatchTimeoutResult(timeoutResult, failureMessage: "Ruby process didn't return after: \(SocketClient.connectTimeoutSeconds) seconds", timeToWait: timeToWait)
-    }
-    
-    func sendAbort() {
-        self.socketStatus = .closed
-        
-        stopInputSession()
-        
-        // and error occured, let's try to send the "done" message
-        send(string: SocketClient.doneToken)
-        
         stopOutputSession()
         self.socketDelegate?.connectionsClosed()
     }
@@ -188,7 +198,7 @@ extension SocketClient: StreamDelegate {
                 
             case Stream.Event.errorOccurred:
                 verbose(message: "input stream error occurred")
-                sendAbort()
+                closeSession(sendAbort: true)
                 
             case Stream.Event.hasBytesAvailable:
                 read()
@@ -246,7 +256,8 @@ extension SocketClient: StreamDelegate {
     
     func handleFailure(message: [String]) {
         log(message: "Encountered a problem: \(message.joined(separator:"\n"))")
-        sendAbort()
+        let shutdownCommand = ControlCommand(commandType: .cancel(cancelReason: .serverError))
+        self.send(rubyCommand: shutdownCommand)
     }
     
     func processResponse(string: String) {
@@ -261,6 +272,10 @@ extension SocketClient: StreamDelegate {
         let socketResponse = SocketResponse(payload: responseString)
         verbose(message: "response is: \(responseString)")
         switch socketResponse.responseType {
+        case .clientInitiatedCancel:
+            self.socketDelegate?.commandExecuted(serverResponse: .clientInitiatedCancelAcknowledged)
+            self.closeSession(sendAbort: false)
+
         case .failure(let failureInformation):
             self.socketDelegate?.commandExecuted(serverResponse: .serverError)
             self.handleFailure(message: failureInformation)
@@ -274,10 +289,11 @@ extension SocketClient: StreamDelegate {
             // cool, ready for next command
             break
         }
+
         self.dispatchGroup.leave() // should now pull the next piece of work
     }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.1]
+// FastlaneRunnerAPIVersion [0.9.2]

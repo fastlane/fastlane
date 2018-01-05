@@ -8,11 +8,9 @@
 
 import Foundation
 
-protocol RubyCommandable {
-    var json: String { get }
-}
-
 struct RubyCommand: RubyCommandable {
+    var type: CommandType { return .action }
+
     struct Argument {
         enum ArgType {
             case stringClosure
@@ -41,7 +39,6 @@ struct RubyCommand: RubyCommandable {
 
         var json: String {
             get {
-
                 if let someValue = value {
                     let typeJson: String
                     if let type = type {
@@ -102,7 +99,7 @@ struct RubyCommand: RubyCommandable {
         callbackClosure(callbackArg)
     }
 
-    var json: String {
+    var commandJson: String {
         let argsArrayJson = self.args
             .map { $0.json }
             .filter { $0 != "" }

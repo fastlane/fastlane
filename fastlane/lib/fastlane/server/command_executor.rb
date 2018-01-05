@@ -1,5 +1,3 @@
-require 'fastlane/server/command.rb'
-
 module Fastlane
   class CommandExecutor
     def execute(command: nil, target_object: nil)
