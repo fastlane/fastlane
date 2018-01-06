@@ -12,7 +12,7 @@ module Fastlane
       def self.description
         "Access lane context values"
       end
-      
+
       def self.details
         [
           "Access the fastlane lane context values",
