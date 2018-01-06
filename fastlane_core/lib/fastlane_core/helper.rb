@@ -275,11 +275,13 @@ module FastlaneCore
 
     # Show/Hide loading indicator
     def self.show_loading_indicator(text = "🚀")
+      return if FastlaneCore::Env.truthy?("FASTLANE_DISABLE_ANIMATION")
       @require_fastlane_spinner = TTY::Spinner.new("[:spinner] #{text} ", format: :dots)
       @require_fastlane_spinner.auto_spin
     end
 
     def self.hide_loading_indicator
+      return if FastlaneCore::Env.truthy?("FASTLANE_DISABLE_ANIMATION")
       @require_fastlane_spinner.success
     end
   end
