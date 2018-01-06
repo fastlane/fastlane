@@ -11,6 +11,21 @@ module Gym
       # First, try loading the Gymfile from the current directory
       config.load_configuration_file(Gym.gymfile_name)
 
+      # `project_detection` is being executed for most setups
+      # and contains the majority of the code
+      project_detection(config) unless config[:skip_build_archive]
+
+      config[:build_path] ||= archive_path_from_local_xcode_preferences
+
+      # Make sure the output name is valid and remove a trailing `.ipa` extension
+      # as it will be added by gym for free
+      config[:output_name].gsub!(".ipa", "")
+      config[:output_name].gsub!(File::SEPARATOR, "_")
+
+      return config
+    end
+
+    def self.project_detection(config)
       # Detect the project
       FastlaneCore::Project.detect_projects(config)
       Gym.project = FastlaneCore::Project.new(config)
@@ -24,18 +39,10 @@ module Gym
       detect_platform # we can only do that *after* we have the scheme
       detect_selected_provisioning_profiles # we can only do that *after* we have the platform
       detect_configuration
+
       detect_toolchain
 
       config[:output_name] ||= Gym.project.app_name
-
-      config[:build_path] ||= archive_path_from_local_xcode_preferences
-
-      # Make sure the output name is valid and remove a trailing `.ipa` extension
-      # as it will be added by gym for free
-      config[:output_name].gsub!(".ipa", "")
-      config[:output_name].gsub!(File::SEPARATOR, "_")
-
-      return config
     end
 
     def self.archive_path_from_local_xcode_preferences
