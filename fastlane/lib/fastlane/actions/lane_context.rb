@@ -10,6 +10,10 @@ module Fastlane
       #####################################################
 
       def self.description
+        "Access lane context values"
+      end
+      
+      def self.details
         [
           "Access the fastlane lane context values",
           "More information about how the lane context works: https://docs.fastlane.tools/advanced/#lane-context"
