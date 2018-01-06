@@ -1,6 +1,3 @@
-require_relative 'ui/ui'
-require_relative 'globals'
-
 module FastlaneCore
   # Executes commands and takes care of error handling and more
   class CommandExecutor
@@ -46,8 +43,7 @@ module FastlaneCore
         end
 
         begin
-          require 'pty'
-          PTY.spawn(command) do |stdin, stdout, pid|
+          FastlaneCore::PTY.spawn(command) do |stdin, stdout, pid|
             begin
               stdin.each do |l|
                 line = l.strip # strip so that \n gets removed
