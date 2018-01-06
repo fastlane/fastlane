@@ -1,7 +1,12 @@
 class PortalStubbing
   class << self
     def adp_read_fixture_file(filename)
-      File.read(File.join('spaceship', 'spec', 'portal', 'fixtures', filename))
+      if filename == "aps_development.cer"
+        file = File.binread(File.join('spaceship', 'spec', 'portal', 'fixtures', filename))
+      else
+        file = File.read(File.join('spaceship', 'spec', 'portal', 'fixtures', filename))
+      end
+      file
     end
 
     # Necessary, as we're now running this in a different context
