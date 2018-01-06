@@ -1,7 +1,7 @@
 version: 2
 
 jobs:
-  "Execute tests on macOS":
+  "macOS":
     macos:
       xcode: "9.0.0"
     environment:
@@ -13,11 +13,7 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
-      - restore_cache:
-          keys:
-            - v3-homebrew-{{ epoch }}
-            - v3-homebrew
+          key: v1-macos-gems-{{ checksum "Gemfile" }}
       - run:
           name: Setup Build
           command: |
@@ -26,13 +22,8 @@ jobs:
             gem update --system
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-
       - save_cache:
-          key: v3-homebrew-{{ epoch }}
-          paths:
-            - /usr/local/Homebrew
-      - save_cache:
-          key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+          key: v1-macos-gems-{{ checksum "Gemfile" }}
           paths:
             - .bundle
 
@@ -59,26 +50,27 @@ jobs:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
-  "Execute tests on Ubuntu":
+  
+  "Ubuntu":
     environment:
       CIRCLE_TEST_REPORTS: ~/test-reports
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
       FASTLANE_ITUNES_TRANSPORTER_PATH: .bundle
     docker:
-      - image: fastlanetools/fastlane:2.3.4
+      - image: fastlanetools/fastlane
     steps:
       - checkout
 
       - restore_cache:
-          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
       - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
       - save_cache:
-          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
           paths:
             - .bundle
 
@@ -106,7 +98,7 @@ jobs:
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
 
-  "Validate Documentation":
+  "Docs":
     docker:
       - image: circleci/ruby:2.3
     steps:
@@ -125,7 +117,7 @@ jobs:
 
       - run: bundle exec fastlane validate_docs
 
-  "Lint Source Code":
+  "Sourcecode":
     docker:
       - image: circleci/ruby:2.3
     steps:
@@ -142,13 +134,13 @@ jobs:
           paths:
             - .bundle
 
-      - run: bundle exec fastlane lint_source
+      - run: bundle exec fastlane verify_source
 
 workflows:
   version: 2
   build:
     jobs:
-      - "Execute tests on macOS"
-      - "Execute tests on Ubuntu"
-      - "Validate Documentation"
-      - "Lint Source Code"
+      - "macOS"
+      - "Ubuntu"
+      - "Docs"
+      - "Sourcecode"

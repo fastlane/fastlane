@@ -2,10 +2,74 @@ require 'fileutils'
 
 skip_docs # Do not create fastlane/README.txt
 
+# Test and Validate
+
 desc "Runs the unit tests and other verifications for the fastlane repo"
 lane :test do |options|
   validate_repo
 end
+
+desc "Verifies all tests pass and the current state of the repo is valid"
+private_lane :validate_repo do
+  verify_source
+  execute_tests
+  validate_docs
+end
+
+desc "Verifies source code is in a good state"
+lane :verify_source do
+  # Verifying that no debug code is in the code base
+  #
+  ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "playground.rb", exclude_dirs: ["\.bundle"]) # debugging code
+  ensure_no_debug_code(text: "# TODO", extension: ".rb", exclude_dirs: ["\.bundle"]) # TODOs
+  ensure_no_debug_code(text: "now: ", extension: ".rb", exclude_dirs: ["\.bundle"]) # rspec focus
+  ensure_no_debug_code(text: "<<<<<<<", extension: ".rb", exclude_dirs: ["\.bundle"]) # Merge conflict
+
+  # spaceship and credentials_manager don't have access to fastlane_core
+  ensure_no_debug_code(text: " UI\\.", path: "spaceship/lib", extension: ".rb", exclude_dirs: ["\.bundle"])
+  ensure_no_debug_code(text: " UI\\.", path: "credentials_manager/lib", extension: ".rb", exclude_dirs: ["\.bundle"])
+
+  rubocop
+
+  Dir.chdir("..") do
+    # Verify shell code style
+    if FastlaneCore::Helper.is_mac?
+      sh 'find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +'
+    else
+      sh 'find . -regextype posix-egrep -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +'
+    end
+  end
+end
+
+desc "Runs the tests"
+lane :execute_tests do
+  version = local_version # has to be outside of the `Dir.chdir`
+
+  # Verifying the --help command
+  #
+  Dir.chdir("..") do
+    content = sh("PAGER=cat bin/fastlane --help")
+    ["--version", "https://fastlane.tools", "fastlane"].each do |current|
+      UI.user_error!("--help missing information: '#{current}'") unless content.include?(current)
+    end
+  end
+
+  Dir.chdir("..") do
+    # Install the bundle and the actual gem
+    sh "bundle check || bundle install"
+    sh "rake install"
+
+    # Ensure the file size of the fastlane gem is below 1 MB
+    size_in_mb = File.size("pkg/fastlane-#{version}.gem").to_f / (1024 * 1024)
+    UI.user_error!("fastlane gem is above 1 MB, make sure no additional resources are included by mistake") if size_in_mb > 1
+
+    # Run the tests
+    #
+    sh "bundle exec rake test_all"
+  end
+end
+
+# Release Management
 
 desc "Increment the version number of this gem, after generating new Swift API"
 lane :bump do |options|
@@ -176,6 +240,51 @@ lane :release do
   slack_train
 end
 
+desc "Notifies Fabric Slack to run CI Job for Mac App"
+private_lane :send_mac_app_ci_reminder do
+  if ENV['FABRIC_SLACK_URL']
+    slack(
+      slack_url: ENV['FABRIC_SLACK_URL'],
+      channel: 'deployment-tools',
+      default_payloads: [],
+      message: "Please run the Fastlane Mac App Package CI job in TeamCity\n#{ENV['FABRIC_MAC_APP_CI_JOB_URL']}"
+    )
+  end
+end
+
+desc "Print out the changelog since the last tagged release and open the GitHub page with the changes"
+lane :show_changelog do |options|
+  old_version = options[:old_version] || current_version
+
+  changes = sh("git log --pretty='* %s via %aN' #{old_version}...HEAD --no-merges ..", log: $verbose).gsub("\n\n", "\n")
+  changes.gsub!("[WIP]", "") # sometimes a [WIP] is merged
+
+  github_diff_url = "https://github.com/fastlane/fastlane/compare/#{old_version}...master"
+  sh "open #{github_diff_url}"
+
+  puts "Changes since release #{old_version}:\n\n#{changes.cyan}"
+  changes # return the text without the modified colors
+end
+
+desc "Add a git tag in the fastlane repo for this release"
+private_lane :add_fastlane_git_tag do |options|
+  `git tag -am #{options[:message].shellescape} #{options[:tag].shellescape}`
+  push_git_tags
+end
+
+# Docs
+
+desc "Validates the docs still are good"
+lane :validate_docs do
+  # Test if generating the docs is successful
+  clone_docs do
+    generate_markdown_docs(target_path: ".")
+  end
+
+  # Verify docs are still working
+  verify_docs
+end
+
 desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
 lane :verify_docs do
   clone_docs do
@@ -245,12 +354,6 @@ lane :update_docs do
   end
 end
 
-def generate_markdown_docs(target_path: nil)
-  require 'fastlane/documentation/markdown_docs_generator'
-  Fastlane::MarkdownDocsGenerator.new.generate!(target_path: File.expand_path(target_path))
-  return target_path
-end
-
 def clone_docs
   require 'tmpdir'
   git_url = ENV['FASTLANE_DOCS_GIT_URL'] || "https://github.com/fastlane/docs"
@@ -265,6 +368,14 @@ def clone_docs
   end
 end
 
+def generate_markdown_docs(target_path: nil)
+  require 'fastlane/documentation/markdown_docs_generator'
+  Fastlane::MarkdownDocsGenerator.new.generate!(target_path: File.expand_path(target_path))
+  return target_path
+end
+
+# Exception Handling
+
 error do |lane, exception|
   if ENV['SLACK_URL']
     slack(channel: "testing", message: exception.to_s, success: false)
@@ -272,104 +383,7 @@ error do |lane, exception|
   slack_train_crash
 end
 
-private_lane :send_mac_app_ci_reminder do
-  if ENV['FABRIC_SLACK_URL']
-    slack(
-      slack_url: ENV['FABRIC_SLACK_URL'],
-      channel: 'deployment-tools',
-      default_payloads: [],
-      message: "Please run the Fastlane Mac App Package CI job in TeamCity\n#{ENV['FABRIC_MAC_APP_CI_JOB_URL']}"
-    )
-  end
-end
-
-private_lane :local_version do
-  require "../fastlane/lib/fastlane/version.rb"
-
-  Fastlane::VERSION
-end
-
-desc "Verifies all tests pass and the current state of the repo is valid"
-private_lane :validate_repo do
-  # Verifying that no debug code is in the code base
-  #
-  ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "playground.rb", exclude_dirs: ["\.bundle"]) # debugging code
-  ensure_no_debug_code(text: "# TODO", extension: ".rb", exclude_dirs: ["\.bundle"]) # TODOs
-  ensure_no_debug_code(text: "now: ", extension: ".rb", exclude_dirs: ["\.bundle"]) # rspec focus
-  ensure_no_debug_code(text: "<<<<<<<", extension: ".rb", exclude_dirs: ["\.bundle"]) # Merge conflict
-
-  # spaceship and credentials_manager don't have access to fastlane_core
-  ensure_no_debug_code(text: " UI\\.", path: "spaceship/lib", extension: ".rb", exclude_dirs: ["\.bundle"])
-  ensure_no_debug_code(text: " UI\\.", path: "credentials_manager/lib", extension: ".rb", exclude_dirs: ["\.bundle"])
-
-  rubocop
-
-  version = local_version # has to be outside of the `Dir.chdir`
-
-  # Verifying the --help command
-  #
-  # Dir.chdir("..") do
-  #   content = sh("PAGER=cat bin/fastlane --help")
-  #   ["--version", "https://fastlane.tools", "fastlane"].each do |current|
-  #     UI.user_error!("--help missing information: '#{current}'") unless content.include?(current)
-  #   end
-  # end
-
-  Dir.chdir("..") do
-    # Install the bundle and the actual gem
-    sh "bundle check || bundle install"
-    sh "rake install"
-
-    # Ensure the file size of the fastlane gem is below 1 MB
-    size_in_mb = File.size("pkg/fastlane-#{version}.gem").to_f / (1024 * 1024)
-    UI.user_error!("fastlane gem is above 1 MB, make sure no additional resources are included by mistake") if size_in_mb > 1
-
-    # Run the tests
-    #
-    sh "bundle exec rake test_all"
-
-    # Verify shell code style
-    if FastlaneCore::Helper.is_mac?
-      sh 'find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +'
-    elsif !FastlaneCore::Helper.is_windows?
-      sh 'find . -regextype posix-egrep -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +'
-    end
-  end
-
-  # Test if generating the docs is successful
-  clone_docs do
-    generate_markdown_docs(target_path: ".")
-  end
-
-  # Verify docs are still working
-  verify_docs
-end
-
-desc "Get the version number of the last release"
-private_lane :current_version do
-  puts "Checking the latest version on RubyGems"
-  download(url: "https://rubygems.org/api/v1/gems/fastlane.json")["version"]
-end
-
-desc "Print out the changelog since the last tagged release and open the GitHub page with the changes"
-lane :show_changelog do |options|
-  old_version = options[:old_version] || current_version
-
-  changes = sh("git log --pretty='* %s via %aN' #{old_version}...HEAD --no-merges ..", log: $verbose).gsub("\n\n", "\n")
-  changes.gsub!("[WIP]", "") # sometimes a [WIP] is merged
-
-  github_diff_url = "https://github.com/fastlane/fastlane/compare/#{old_version}...master"
-  sh "open #{github_diff_url}"
-
-  puts "Changes since release #{old_version}:\n\n#{changes.cyan}"
-  changes # return the text without the modified colors
-end
-
-desc "Add a git tag in the fastlane repo for this release"
-private_lane :add_fastlane_git_tag do |options|
-  `git tag -am #{options[:message].shellescape} #{options[:tag].shellescape}`
-  push_git_tags
-end
+# Helper
 
 desc "Ensure all the requirement environment variables are provided"
 desc "this way the deployment script will fail early (and often)"
@@ -378,4 +392,17 @@ private_lane :verify_env_variables do
     next if ENV[variable].to_s.length > 0
     UI.user_error!("Missing ENV variables #{variable}, make sure to provide one for fastlane to be successful")
   end
+end
+
+desc "Get the local version number per version.rb"
+private_lane :local_version do
+  require "../fastlane/lib/fastlane/version.rb"
+
+  Fastlane::VERSION
+end
+
+desc "Get the version number of the last release"
+private_lane :current_version do
+  puts "Checking the latest version on RubyGems"
+  download(url: "https://rubygems.org/api/v1/gems/fastlane.json")["version"]
 end
