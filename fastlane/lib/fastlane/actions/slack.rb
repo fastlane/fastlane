@@ -43,12 +43,13 @@ module Fastlane
         return [notifier, slack_attachment] if Helper.is_test? # tests will verify the slack attachments and other properties
 
         begin
-          result = notifier.ping '',
-                                 icon_url: icon_url,
-                                 attachments: [slack_attachment]
+          results = notifier.ping '',
+                                  icon_url: icon_url,
+                                  attachments: [slack_attachment]
         rescue => exception
           UI.error("Exception: #{exception}")
         ensure
+          result = results.first
           if !result.nil? && result.code.to_i == 200
             UI.success('Successfully sent Slack notification')
           else
