@@ -18,7 +18,7 @@ module Precheck
       program :description, Precheck::DESCRIPTION
       program :help, "Author", "Joshua Liebowitz <taquitos@gmail.com>, @taquitos"
       program :help, "Website", "https://fastlane.tools"
-      program :help, "GitHub", "https://docs.fastlane.tools/actions/precheck/"
+      program :help, "Documentation", "https://docs.fastlane.tools/actions/precheck/"
       program :help_formatter, :compact
 
       global_option("--verbose") { FastlaneCore::Globals.verbose = true }
