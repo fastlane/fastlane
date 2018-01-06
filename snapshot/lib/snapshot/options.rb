@@ -1,5 +1,7 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require 'fastlane_core/configuration/config_item'
+require 'fastlane_core/device_manager'
+require 'credentials_manager/appfile_config'
+require_relative 'module'
 
 module Snapshot
   class Options
@@ -137,6 +139,13 @@ module Snapshot
                                      description: "Should the project be cleaned before building it?",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :test_without_building,
+                                     short_option: "-T",
+                                     env_name: "SNAPSHOT_TEST_WITHOUT_BUILDING",
+                                     description: "Test without building, requires a derived data path",
+                                     is_string: false,
+                                     type: Boolean,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :configuration,
                                      short_option: "-q",
                                      env_name: "SNAPSHOT_CONFIGURATION",

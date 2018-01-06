@@ -1,6 +1,7 @@
-require "fastlane_core"
-require "pilot/tester_util"
 require 'terminal-table'
+
+require_relative 'manager'
+require_relative 'tester_util'
 
 module Pilot
   class TesterManager < Manager
@@ -98,7 +99,7 @@ module Pilot
 
     def find_app(app_filter: nil)
       if app_filter
-        app = Spaceship::Application.find(app_filter)
+        app = Spaceship::Tunes::Application.find(app_filter)
         UI.user_error!("Could not find an app by #{app_filter}") unless app
         return app
       end
@@ -132,7 +133,7 @@ module Pilot
       current_user_email = Spaceship::Tunes.client.user_email
       current_user_apple_id = Spaceship::Tunes.client.user
 
-      current_user = Spaceship::Members.find(current_user_email)
+      current_user = Spaceship::Tunes::Members.find(current_user_email)
       unless current_user
         UI.user_error!("Unable to find a member for AppleID: #{current_user_apple_id}, email: #{current_user_email}")
       end
@@ -158,7 +159,7 @@ module Pilot
     end
 
     def list_testers_by_app(app_filter)
-      app = Spaceship::Application.find(app_filter)
+      app = Spaceship::Tunes::Application.find(app_filter)
       UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
       testers = Spaceship::TestFlight::Tester.all(app_id: app.apple_id)
       list_by_app(testers, "All Testers")

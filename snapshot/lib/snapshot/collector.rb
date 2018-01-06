@@ -1,3 +1,8 @@
+require 'plist'
+
+require_relative 'module'
+require_relative 'test_command_generator'
+
 module Snapshot
   # Responsible for collecting the generated screenshots and copying them over to the output directory
   class Collector

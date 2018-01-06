@@ -43,7 +43,10 @@ module Fastlane
     ensure
       Fastlane::PluginUpdateManager.show_update_status
       if FastlaneCore::Globals.capture_output?
-        FastlaneCore::Globals.captured_output = Helper.strip_ansi_colors($stdout.string)
+        if $stdout.respond_to?(:string)
+          # Sometimes you can get NoMethodError: undefined method `string' for #<IO:<STDOUT>> when runing with FastlaneRunner (swift)
+          FastlaneCore::Globals.captured_output = Helper.strip_ansi_colors($stdout.string)
+        end
         $stdout = STDOUT
         $stderr = STDERR
 
@@ -87,7 +90,7 @@ module Fastlane
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
       global_option('--capture_output', 'Captures the output of the current run, and generates a markdown issue template') do
-        FastlaneCore::Globals.capture_output = true
+        FastlaneCore::Globals.capture_output = false
         FastlaneCore::Globals.verbose = true
       end
       global_option('--troubleshoot', 'Enables extended verbose mode. Use with caution, as this even includes ALL sensitive data. Cannot be used on CI.')

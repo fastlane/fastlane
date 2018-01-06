@@ -1,3 +1,6 @@
+require 'fastlane_core/project'
+require 'fastlane_core/device_manager'
+
 module Snapshot
   class DetectValues
     # This is needed as these are more complex default values
@@ -17,6 +20,10 @@ module Snapshot
         unless File.expand_path(Snapshot.snapfile_name) == configuration_file_path
           config.load_configuration_file(Snapshot.snapfile_name)
         end
+      end
+
+      if config[:test_without_building] == true && config[:derived_data_path].to_s.length == 0
+        UI.user_error!("Cannot use test_without_building option without a derived_data_path!")
       end
 
       Snapshot.project.select_scheme(preferred_to_include: "UITests")

@@ -1,5 +1,7 @@
 require 'fastimage'
 
+require_relative 'module'
+
 module Deliver
   # AppScreenshot represents one screenshots for one specific locale and
   # device type.

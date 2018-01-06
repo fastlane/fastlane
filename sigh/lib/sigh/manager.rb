@@ -1,5 +1,6 @@
-require 'plist'
-require 'sigh/runner'
+require 'fastlane_core/provisioning_profile'
+
+require_relative 'runner'
 
 module Sigh
   class Manager

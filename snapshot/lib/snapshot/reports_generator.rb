@@ -1,8 +1,10 @@
-require 'erb'
-require 'fastimage'
+require_relative 'module'
 
 module Snapshot
   class ReportsGenerator
+    require 'erb'
+    require 'fastimage'
+
     def generate
       UI.message "Generating HTML Report"
 

@@ -1,5 +1,7 @@
 require 'xcodeproj'
 
+require_relative 'module'
+
 module Gym
   class CodeSigningMapping
     attr_accessor :project

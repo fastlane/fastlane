@@ -1,3 +1,11 @@
+require 'plist'
+
+require_relative '../module'
+require_relative '../test_command_generator'
+require_relative '../collector'
+require_relative '../fixes/hardware_keyboard_fix'
+require_relative '../fixes/simulator_zoom_fix'
+
 module Snapshot
   class SimulatorLauncherBase
     attr_accessor :collected_errors

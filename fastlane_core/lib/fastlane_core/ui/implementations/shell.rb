@@ -1,3 +1,9 @@
+require_relative '../../helper'
+require_relative '../../globals'
+require_relative '../../env'
+
+require_relative '../interface'
+
 module FastlaneCore
   # Shell is the terminal output of things
   # For documentation for each of the methods open `interface.rb`

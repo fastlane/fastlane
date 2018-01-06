@@ -261,3 +261,6 @@ Style/IfInsideElse:
 # Sometimes we just want to 'collect'
 Style/CollectionMethods:
   Enabled: false
+
+Lint/UnneededDisable:
+  Enabled: false

@@ -1,11 +1,15 @@
-require 'fastlane_core'
+require 'spaceship/tunes/tunes'
+
+require_relative 'module'
+require_relative 'download_screenshots'
+require_relative 'upload_metadata'
 
 module Deliver
   class Setup
     attr_accessor :is_swift
 
     def run(options, is_swift: false)
-      containing = FastlaneCore::Helper.fastlane_enabled_folder_path
+      containing = Helper.fastlane_enabled_folder_path
       self.is_swift = is_swift
 
       if is_swift

@@ -1,3 +1,6 @@
+require_relative '../print_table'
+require_relative '../ui/ui'
+
 module FastlaneCore
   # Responsible for loading configuration files
   class ConfigurationFile

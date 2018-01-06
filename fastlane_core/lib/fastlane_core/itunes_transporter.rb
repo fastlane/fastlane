@@ -3,6 +3,9 @@ require 'shellwords'
 require 'fileutils'
 require 'credentials_manager/account_manager'
 
+require_relative 'features'
+require_relative 'helper'
+
 module FastlaneCore
   # The TransporterInputError occurs when you passed wrong inputs to the {Deliver::ItunesTransporter}
   class TransporterInputError < StandardError
