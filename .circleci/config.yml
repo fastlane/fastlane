@@ -34,7 +34,7 @@ jobs:
       - restore_cache:
           key: v1-{{ arch }}-rubocop
 
-      - run: bundle exec fastlane test
+      - run: bundle exec fastlane execute_tests
 
       - save_cache:
           key: v1-{{ arch }}-rubocop
@@ -81,7 +81,7 @@ jobs:
       - restore_cache:
           key: v1-{{ arch }}-rubocop
 
-      - run: bundle exec fastlane test
+      - run: bundle exec fastlane execute_tests
 
       - save_cache:
           key: v1-{{ arch }}-rubocop
@@ -98,9 +98,49 @@ jobs:
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
 
+  "Docs":
+    docker:
+      - image: circleci/ruby:2.3
+    steps:
+      - checkout
+      
+      - restore_cache:
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
+      - run:
+          name: Setup Build
+          command: |
+            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+      - save_cache:
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
+          paths:
+            - .bundle
+
+      - run: bundle exec fastlane validate_docs
+
+  "Sourcecode":
+    docker:
+      - image: circleci/ruby:2.3
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
+      - run:
+          name: Setup Build
+          command: |
+            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+      - save_cache:
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
+          paths:
+            - .bundle
+
+      - run: bundle exec fastlane verify_source
+
 workflows:
   version: 2
   build:
     jobs:
       - "macOS"
       - "Ubuntu"
+      - "Docs"
+      - "Sourcecode"
