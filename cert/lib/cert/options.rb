@@ -1,5 +1,7 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require 'credentials_manager/appfile_config'
+require 'fastlane_core/configuration/config_item'
+
+require_relative 'module'
 
 module Cert
   class Options

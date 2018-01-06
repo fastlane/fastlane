@@ -1,3 +1,5 @@
+require_relative '../module'
+
 module Snapshot
   module Fixes
     # Having "Connect Hardware Keyboard" enabled causes issues with entering text in secure textfields

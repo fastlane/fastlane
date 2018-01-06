@@ -1,8 +1,10 @@
-require 'fastlane'
-require 'fastlane_core'
-require 'spaceship'
 require 'terminal-table'
-require 'precheck/rule_processor'
+require 'fastlane_core/print_table'
+require 'spaceship/tunes/tunes'
+require 'spaceship/tunes/application'
+
+require_relative 'rule_processor'
+require_relative 'options'
 
 module Precheck
   class Runner

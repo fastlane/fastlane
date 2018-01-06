@@ -5,7 +5,12 @@
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
 
 require 'tempfile'
+require 'xcodeproj'
+
 require 'fastlane_core/core_ext/cfpropertylist'
+require_relative '../module'
+require_relative '../error_handler'
+require_relative 'build_command_generator'
 
 module Gym
   # Responsible for building the fully working xcodebuild command

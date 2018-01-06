@@ -1,5 +1,8 @@
 # coding: utf-8
 
+require 'fastlane_core/print_table'
+require_relative 'module'
+
 module Gym
   # This classes methods are called when something goes wrong in the building process
   class ErrorHandler

@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Screengrab
   class DependencyChecker
     def self.check(android_env)

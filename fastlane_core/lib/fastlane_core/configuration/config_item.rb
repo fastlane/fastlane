@@ -1,3 +1,8 @@
+require_relative '../ui/ui'
+require_relative '../ui/errors/fastlane_error'
+require_relative '../helper'
+require_relative '../module'
+
 module FastlaneCore
   class ConfigItem
     # [Symbol] the key which is used as command parameters or key in the fastlane tools
@@ -195,7 +200,7 @@ module FastlaneCore
       if value
         # Verify that value is the type that we're expecting, if we are expecting a type
 
-        if data_type == Boolean
+        if data_type == Fastlane::Boolean
           ensure_boolean_type_passes_validation(value)
         else
           ensure_generic_type_passes_validation(value)

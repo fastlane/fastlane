@@ -1,10 +1,13 @@
+require 'spaceship'
+require_relative 'module'
+
 module Match
   # Ensures the certificate and profiles are also available on iTunes Connect
   class SpaceshipEnsure
     def initialize(user)
       # We'll try to manually fetch the password
       # to tell the user that a password is optional
-      require 'credentials_manager'
+      require 'credentials_manager/account_manager'
 
       keychain_entry = CredentialsManager::AccountManager.new(user: user)
 
@@ -24,7 +27,7 @@ module Match
       found = Spaceship.app.find(app_identifier)
       return if found
 
-      require 'sigh'
+      require 'sigh/runner'
       Sigh::Runner.new.print_produce_command({
         username: username,
         app_identifier: app_identifier

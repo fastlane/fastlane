@@ -1,4 +1,7 @@
 require "stringio"
+
+require_relative 'helper'
+
 module FastlaneCore
   class Swag
     # rubocop:disable LineLength

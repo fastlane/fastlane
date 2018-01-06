@@ -1,5 +1,4 @@
-require 'precheck/rule'
-require 'precheck/rules/abstract_text_match_rule'
+require_relative 'abstract_text_match_rule'
 
 module Precheck
   class CustomTextRule < AbstractTextMatchRule

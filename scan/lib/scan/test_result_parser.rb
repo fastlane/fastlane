@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Scan
   class TestResultParser
     def parse_result(output)

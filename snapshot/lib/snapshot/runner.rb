@@ -2,6 +2,16 @@ require 'shellwords'
 require 'plist'
 require 'os'
 require 'thread'
+require 'terminal-table'
+
+require 'fastlane_core/print_table'
+require_relative 'module'
+require_relative 'update'
+require_relative 'test_command_generator'
+require_relative 'reports_generator'
+require_relative 'simulator_launchers/simulator_launcher'
+require_relative 'simulator_launchers/simulator_launcher_xcode_8'
+require_relative 'simulator_launchers/launcher_configuration'
 
 module Snapshot
   class Runner

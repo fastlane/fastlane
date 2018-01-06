@@ -1,5 +1,12 @@
 require 'commander'
 require 'fastlane/version'
+require 'fastlane_core/globals'
+require 'fastlane_core/configuration/configuration'
+
+require_relative 'device_types'
+require_relative 'runner'
+require_relative 'options'
+require_relative 'dependency_checker'
 
 HighLine.track_eof = false
 

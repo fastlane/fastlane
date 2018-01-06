@@ -1,3 +1,7 @@
+require 'spaceship'
+
+require_relative 'module'
+
 module Sigh
   class Repair
     def repair_all

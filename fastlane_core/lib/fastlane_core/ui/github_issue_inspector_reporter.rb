@@ -1,3 +1,6 @@
+require_relative '../helper'
+require_relative '../globals'
+
 module Fastlane
   # Adds all the necessary emojis (obv)
   #
@@ -53,7 +56,7 @@ module Fastlane
 
     def print_open_link_hint(newline = false)
       puts "" if newline
-      puts "🔗  You can ⌘ + double-click on links to open them directly in your browser." if Helper.mac?
+      puts "🔗  You can ⌘ + double-click on links to open them directly in your browser." if FastlaneCore::Helper.mac?
     end
   end
 end

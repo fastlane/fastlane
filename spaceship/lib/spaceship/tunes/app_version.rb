@@ -1,3 +1,14 @@
+require_relative 'tunes_client'
+require_relative 'app_trailer'
+require_relative 'app_screenshot'
+require_relative 'app_image'
+require_relative 'device_type'
+require_relative 'app_version_generated_promocodes'
+require_relative 'language_item'
+require_relative 'transit_app_file'
+require_relative 'build'
+require_relative 'app_status'
+
 module Spaceship
   module Tunes
     # Represents an editable version of an iTunes Connect Application

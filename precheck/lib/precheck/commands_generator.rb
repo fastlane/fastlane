@@ -1,6 +1,13 @@
 require "commander"
-require "fastlane_core"
+require "fastlane_core/globals"
+require "fastlane_core/configuration/commander_generator"
+require "fastlane_core/configuration/configuration"
+require "fastlane_core/helper"
 require "fastlane/version"
+
+require_relative 'module'
+require_relative 'options'
+require_relative 'runner'
 
 HighLine.track_eof = false
 

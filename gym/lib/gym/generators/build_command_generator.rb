@@ -1,4 +1,5 @@
 require 'shellwords'
+require_relative '../module'
 
 module Gym
   # Responsible for building the fully working xcodebuild command

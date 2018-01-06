@@ -1,4 +1,8 @@
 require 'fastlane_core/languages'
+require 'spaceship/tunes/tunes'
+
+require_relative 'module'
+require_relative 'upload_metadata'
 
 module Deliver
   module Loader

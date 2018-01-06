@@ -1,3 +1,6 @@
+require 'mini_magick'
+require_relative 'editor'
+
 module Frameit
   # Responsible for framing Mac Screenshots
   class MacEditor < Editor

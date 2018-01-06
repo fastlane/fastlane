@@ -1,3 +1,7 @@
+require 'fastlane_core/module'
+
+require_relative 'module'
+
 module Frameit
   class FrameDownloader
     HOST_URL = "https://fastlane.github.io/frameit-frames"
@@ -66,6 +70,7 @@ module Frameit
 
     def download_file(path, txt: "file")
       require 'uri'
+      require 'excon'
 
       url = File.join(HOST_URL, Frameit.frames_version, URI.escape(path))
       UI.message("Downloading #{txt} from '#{url}' ...")
