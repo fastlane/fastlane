@@ -1,4 +1,5 @@
 require 'fastlane_core/helper'
+require 'fastlane/boolean'
 require_relative 'detect_values'
 require_relative 'dependency_checker'
 
@@ -33,6 +34,7 @@ module Snapshot
   DESCRIPTION = "Automate taking localized screenshots of your iOS and tvOS apps on every device"
   CACHE_DIR = File.join(Dir.home, "Library/Caches/tools.fastlane")
   SCREENSHOTS_DIR = File.join(CACHE_DIR, 'screenshots')
+  Boolean = Fastlane::Boolean
 
   Snapshot::DependencyChecker.check_dependencies
 
