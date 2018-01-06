@@ -327,7 +327,8 @@ describe Fastlane do
       end
 
       it "properly shows an error message when there is a syntax error in the Fastfile from string" do
-        expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 3: (eval):3: syntax error, unexpected keyword_end, expecting ']'\n        end\n           ^")
+        # ruby error message differs in 2.5 and earlier. We use a matcher
+        expect(UI).to receive(:user_error!).with(/Syntax error in your Fastfile on line 3: \(eval\):3: syntax error, unexpected keyword_end, expecting '\]'\n        end\n.*/)
 
         ff = Fastlane::FastFile.new.parse("lane :test do
           cases = [:abc,
