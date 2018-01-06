@@ -294,7 +294,7 @@ tester = Spaceship::TestFlight::Tester.find(app_id: "some_app_id", email: "felix
 
 # Creating new testers
 Spaceship::TestFlight::Tester.create_app_level_tester(
-      app_id: "io.myapp"
+      app_id: "io.myapp",
        email: "github@krausefx.com",
   first_name: "Felix",
    last_name: "Krause"
