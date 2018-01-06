@@ -252,6 +252,18 @@ describe Snapshot do
           expect(command.join('')).to include("-derivedDataPath 'fake/derived/path'")
         end
       end
+
+      context 'test-without-building' do
+        before do
+          configure options.merge(derived_data_path: 'fake/derived/path', test_without_building: true)
+        end
+
+        it 'uses the "test-without-building" command and not the default "build test"', requires_xcode: true do
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("test-without-building")
+          expect(command.join('')).not_to include("build test")
+        end
+      end
     end
 
     describe "Valid macOS Configuration" do
