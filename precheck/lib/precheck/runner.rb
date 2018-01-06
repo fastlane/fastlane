@@ -12,11 +12,15 @@ module Precheck
     def run
       Precheck.config.load_configuration_file(Precheck.precheckfile_name)
 
-      FastlaneCore::PrintTable.print_values(config: Precheck.config,
-                                         hide_keys: [:output_path],
-                                             title: "Summary for precheck #{Fastlane::VERSION}")
+      run_from_xcode = XcodeEnv.run_as_build_phase?
 
-      unless Spaceship::Tunes.client
+      unless run_from_xcode
+        FastlaneCore::PrintTable.print_values(config: Precheck.config,
+                                           hide_keys: [:output_path],
+                                               title: "Summary for precheck #{Fastlane::VERSION}")
+      end
+
+      if Spaceship::Tunes.client.nil? && !run_from_xcode
         UI.message "Starting login with user '#{Precheck.config[:username]}'"
         Spaceship::Tunes.login(Precheck.config[:username])
         Spaceship::Tunes.select_team
@@ -24,34 +28,36 @@ module Precheck
         UI.message "Successfully logged in"
       end
 
-      UI.message "Checking app for precheck rule violations"
-
-      ensure_app_exists!
+      unless run_from_xcode
+        UI.message "Checking app for precheck rule violations"
+        ensure_app_exists!
+      end
 
       processor_result = check_for_rule_violations(app: app, app_version: latest_app_version)
 
-      if processor_result.items_not_checked?
-        print_items_not_checked(processor_result: processor_result)
-      end
+      unless run_from_xcode
+        if processor_result.items_not_checked?
+          print_items_not_checked(processor_result: processor_result)
+        end
 
-      if processor_result.has_errors_or_warnings?
-        summary_table = build_potential_problems_table(processor_result: processor_result)
-        puts summary_table
-      end
+        if processor_result.has_errors_or_warnings?
+          summary_table = build_potential_problems_table(processor_result: processor_result)
+          puts summary_table
+        end
 
-      if processor_result.should_trigger_user_error?
-        UI.user_error!("precheck 👮‍♀️ 👮  found one or more potential problems that must be addressed before submitting to review")
-        return false
-      end
+        if processor_result.should_trigger_user_error?
+          UI.user_error!("precheck 👮‍♀️ 👮  found one or more potential problems that must be addressed before submitting to review")
+          return false
+        end
 
-      if processor_result.has_errors_or_warnings?
-        UI.important "precheck 👮‍♀️ 👮  found one or more potential metadata problems, but this won't prevent fastlane from completing 👍".yellow
-      end
+        if processor_result.has_errors_or_warnings?
+          UI.important "precheck 👮‍♀️ 👮  found one or more potential metadata problems, but this won't prevent fastlane from completing 👍".yellow
+        end
 
-      if !processor_result.has_errors_or_warnings? && !processor_result.items_not_checked?
-        UI.message "precheck 👮‍♀️ 👮  finished without detecting any potential problems 🛫".green
+        if !processor_result.has_errors_or_warnings? && !processor_result.items_not_checked?
+          UI.message "precheck 👮‍♀️ 👮  finished without detecting any potential problems 🛫".green
+        end
       end
-
       return true
     end
 
@@ -158,10 +164,12 @@ module Precheck
     end
 
     def app
+      return nil if XcodeEnv.run_as_build_phase?
       Spaceship::Tunes::Application.find(Precheck.config[:app_identifier])
     end
 
     def latest_app_version
+      return nil if XcodeEnv.run_as_build_phase?
       @latest_version ||= app.latest_version
     end
 

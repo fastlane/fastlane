@@ -40,17 +40,29 @@ module Precheck
   class RuleProcessor
     def self.process_app_and_version(app: nil, app_version: nil, rules: nil)
       items_to_check = []
-      items_to_check += generate_text_items_to_check(app: app, app_version: app_version)
-      items_to_check += generate_url_items_to_check(app: app, app_version: app_version)
+      if app
+        items_to_check += generate_text_items_to_check(app: app, app_version: app_version)
+        items_to_check += generate_url_items_to_check(app: app, app_version: app_version)
+      else
+        items_to_check = [XcodeProjectItemToCheck.new(
+          XcodeEnv.project_path,
+          XcodeEnv.target_name,
+          XcodeEnv.configuration,
+          :xcode_project,
+          "XcodeProject"
+        )]
+      end
 
       return process_rules(items_to_check: items_to_check, rules: rules)
     end
 
+    # rubocop:disable Metrics/PerceivedComplexity
     def self.process_rules(items_to_check: nil, rules: nil)
       items_not_checked = items_to_check.to_set # items we haven't checked by at least one rule
       error_results = {} # rule to fields map
       warning_results = {} # rule to fields map
       skipped_rules = []
+      run_from_xcode = XcodeEnv.run_as_build_phase?
 
       rules.each do |rule|
         rule_config = Precheck.config[rule.key]
@@ -59,13 +71,13 @@ module Precheck
 
         if rule_level == RULE_LEVELS[:skip]
           skipped_rules << rule
-          UI.message "Skipped: #{rule.class.friendly_name}-> #{rule.description}".yellow
+          UI.message "Skipped: #{rule.class.friendly_name}-> #{rule.description}".yellow unless run_from_xcode
           next
         end
 
         if rule.needs_customization?
           if rule_config.nil? || rule_config[:data].nil?
-            UI.verbose("#{rule.key} excluded because no data was passed to it e.g.: #{rule.key}(data: <data here>)")
+            UI.verbose("#{rule.key} excluded because no data was passed to it e.g.: #{rule.key}(data: <data here>)") unless run_from_xcode
             next
           end
 
@@ -93,14 +105,22 @@ module Precheck
         end
 
         if rule_failed_at_least_once
-          message = "😵  Failed: #{rule.class.friendly_name}-> #{rule.description}"
-          if rule_level == RULE_LEVELS[:error]
-            UI.error message
+          message = ''
+          if run_from_xcode
+            if error_results[rule].first.rule_return.file_path
+              message = "#{error_results[rule].first.rule_return.file_path}:1:"
+            end
+            UI.message "#{message} warning: #{error_results[rule].first.failure_data}"
           else
-            UI.important message
+            message = "😵  Failed: #{rule.class.friendly_name}-> #{rule.description}"
+            if rule_level == RULE_LEVELS[:error]
+              UI.error message
+            else
+              UI.important message
+            end
           end
         else
-          UI.message "✅  Passed: #{rule.class.friendly_name}"
+          UI.message "✅  Passed: #{rule.class.friendly_name}" unless run_from_xcode
         end
       end
 
@@ -111,6 +131,7 @@ module Precheck
         items_not_checked: items_not_checked.to_a
       )
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     # hash will be { rule: [result, result, result] }
     def self.add_new_result_to_rule_hash(rule_hash: nil, result: nil)

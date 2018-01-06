@@ -286,6 +286,20 @@ module Fastlane
         end
       end
 
+      command :verify_firebase do |c|
+        c.syntax = 'fastlane verify_firebase'
+        c.description = 'Run this as part of your Xcode build phase to ensure your Firebase setup is ready'
+        c.action do |args, options|
+          require 'precheck'
+
+          options = {
+            username: "yolo" # we don't actually need it here
+          }
+          Precheck.config = FastlaneCore::Configuration.create(Precheck::Options.available_options, options)
+          Precheck::Runner.new.run
+        end
+      end
+
       #####################################################
       # @!group Plugins
       #####################################################

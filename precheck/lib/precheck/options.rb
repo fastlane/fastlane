@@ -1,22 +1,32 @@
 require 'fastlane_core'
 require 'credentials_manager'
-Dir[File.dirname(__FILE__) + '/rules/*.rb'].each { |file| require file }
+Dir[File.dirname(__FILE__) + '/rules/**/*.rb'].each { |file| require file }
 
 module Precheck
   class Options
     def self.rules
-      [
-        NegativeAppleSentimentRule,
-        PlaceholderWordsRule,
-        OtherPlatformsRule,
-        FutureFunctionalityRule,
-        TestWordsRule,
-        CurseWordsRule,
-        FreeStuffIAPRule,
-        CustomTextRule,
-        CopyrightDateRule,
-        UnreachableURLRule
-      ].map(&:new)
+      if Precheck::XcodeEnv.run_as_build_phase?
+        # These are the Build phase / Firebase specific rules
+        return [
+          VerifyFirebaseAuthRule,
+          VerifyFirebaseDynamicLinksRule,
+          VerifyFirebaseProjectRule
+        ].map(&:new)
+      else
+        # These are the default rules for app metadata & screenshots
+        return [
+          NegativeAppleSentimentRule,
+          PlaceholderWordsRule,
+          OtherPlatformsRule,
+          FutureFunctionalityRule,
+          TestWordsRule,
+          CurseWordsRule,
+          FreeStuffIAPRule,
+          CustomTextRule,
+          CopyrightDateRule,
+          UnreachableURLRule
+        ].map(&:new)
+      end
     end
 
     def self.available_options
