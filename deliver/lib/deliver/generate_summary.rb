@@ -1,3 +1,7 @@
+require_relative 'upload_metadata'
+require_relative 'html_generator'
+require_relative 'upload_screenshots'
+
 module Deliver
   class GenerateSummary
     def run(options)

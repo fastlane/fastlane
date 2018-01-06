@@ -1,3 +1,9 @@
+require 'spaceship/tunes/tunes'
+
+require_relative 'app_screenshot'
+require_relative 'module'
+require_relative 'loader'
+
 module Deliver
   # upload screenshots to iTunes Connect
   class UploadScreenshots

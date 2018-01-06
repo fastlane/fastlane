@@ -1,3 +1,5 @@
+require_relative 'fastlane_exception'
+
 module FastlaneCore
   class Interface
     # Super class for exception types that we do not want to record

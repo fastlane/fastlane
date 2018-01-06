@@ -1,5 +1,6 @@
 require 'digest'
-require 'precheck/rule'
+
+require_relative '../rule'
 
 module Precheck
   class CurseWordsRule < TextRule

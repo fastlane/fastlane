@@ -1,3 +1,6 @@
+require_relative '../client'
+require_relative 'utilities'
+
 module Spaceship
   # This class is used to upload Digital files (Images, Videos, JSON files) onto the du-itc service.
   # Its implementation is tied to the tunes module (in particular using +AppVersion+ instances)

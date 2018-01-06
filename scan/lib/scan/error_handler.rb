@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Scan
   # This classes methods are called when something goes wrong in the building process
   class ErrorHandler

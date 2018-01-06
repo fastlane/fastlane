@@ -1,6 +1,8 @@
-require 'fastlane_core/configuration/config_item'
-require 'fastlane_core/configuration/commander_generator'
-require 'fastlane_core/configuration/configuration_file'
+require_relative '../helper'
+require_relative '../globals'
+require_relative 'config_item'
+require_relative 'commander_generator'
+require_relative 'configuration_file'
 
 module FastlaneCore
   class Configuration

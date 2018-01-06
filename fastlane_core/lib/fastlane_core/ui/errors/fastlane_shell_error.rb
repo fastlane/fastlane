@@ -1,3 +1,5 @@
+require_relative 'fastlane_exception'
+
 module FastlaneCore
   class Interface
     class FastlaneShellError < FastlaneException

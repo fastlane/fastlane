@@ -1,5 +1,7 @@
 require 'commander'
 
+require_relative 'account_manager'
+
 module CredentialsManager
   class CLI
     include Commander::Methods

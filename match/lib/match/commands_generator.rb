@@ -1,13 +1,19 @@
 require 'commander'
-require 'fastlane_core'
-require 'fastlane/version'
+
+require 'fastlane_core/configuration/configuration'
+require_relative 'module'
+require_relative 'nuke'
+require_relative 'git_helper'
+require_relative 'change_password'
+require_relative 'setup'
+require_relative 'runner'
+require_relative 'options'
 
 HighLine.track_eof = false
 
 module Match
   class CommandsGenerator
     include Commander::Methods
-    UI = FastlaneCore::UI
 
     def self.start
       self.new.run

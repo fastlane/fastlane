@@ -1,4 +1,10 @@
 require 'tmpdir'
+require 'terminal-table'
+
+require 'fastlane_core/itunes_transporter'
+require 'fastlane_core/build_watcher'
+require 'fastlane_core/ipa_upload_package_builder'
+require_relative 'manager'
 
 module Pilot
   class BuildManager < Manager
