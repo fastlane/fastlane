@@ -19,6 +19,10 @@ module Snapshot
         end
       end
 
+      if config[:test_without_building] == true && config[:derived_data_path].to_s.length == 0
+        UI.user_error!("Cannot use test_without_building option without a derived_data_path!")
+      end
+
       Snapshot.project.select_scheme(preferred_to_include: "UITests")
 
       # Devices
