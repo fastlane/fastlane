@@ -1,3 +1,5 @@
+require_relative '../env'
+
 module FastlaneCore
   class Feature
     class << self

@@ -1,6 +1,8 @@
 require 'security'
 require 'highline/import' # to hide the entered password
 
+require_relative 'appfile_config'
+
 module CredentialsManager
   class AccountManager
     DEFAULT_PREFIX = "deliver"

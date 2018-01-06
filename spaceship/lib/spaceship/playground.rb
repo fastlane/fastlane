@@ -1,6 +1,9 @@
 require "colored"
 require "credentials_manager"
 
+require_relative 'tunes/tunes'
+require_relative 'portal/portal'
+
 module Spaceship
   class Playground
     def initialize(username: nil)

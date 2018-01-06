@@ -1,8 +1,10 @@
+require 'highline'
+
 HighLine.track_eof = false
 
 require 'fastlane/version'
-require 'spaceship/playground'
-require 'spaceship/spaceauth_runner'
+require_relative 'playground'
+require_relative 'spaceauth_runner'
 
 module Spaceship
   class CommandsGenerator

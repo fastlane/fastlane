@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Deliver
   # upload description, rating, etc.
   class UploadMetadata
@@ -58,6 +60,8 @@ module Deliver
     ALL_META_SUB_DIRS = [TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR, REVIEW_INFORMATION_DIR]
 
     # rubocop:disable Metrics/PerceivedComplexity
+
+    require_relative 'loader'
 
     # Make sure to call `load_from_filesystem` before calling upload
     def upload(options)

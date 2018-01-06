@@ -1,3 +1,5 @@
+require_relative 'base'
+
 module Spaceship::TestFlight
   class TestInfo < Base
     # TestInfo Contains a collection of info for testers. There is one "testInfo" for each locale.

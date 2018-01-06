@@ -1,3 +1,6 @@
+require_relative 'module'
+require_relative 'runner'
+
 module Snapshot
   # Migrate helper files
   class Update

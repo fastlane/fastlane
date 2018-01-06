@@ -1,4 +1,7 @@
 require 'shellwords'
+require 'fastlane_core/globals'
+
+require_relative 'module'
 
 module Sigh
   # Resigns an existing ipa file

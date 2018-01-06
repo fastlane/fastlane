@@ -1,5 +1,7 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
+require_relative 'module'
+require_relative 'developer_center'
 
 module Produce
   class Options

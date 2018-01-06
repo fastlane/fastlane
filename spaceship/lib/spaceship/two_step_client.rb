@@ -1,5 +1,9 @@
 require 'tempfile'
 
+require_relative 'globals'
+require_relative 'tunes/tunes_client'
+require_relative 'tunes/recovery_device'
+
 module Spaceship
   class Client
     def handle_two_step(response)
@@ -13,7 +17,7 @@ module Spaceship
 
       if r.body.kind_of?(Hash) && r.body["trustedDevices"].kind_of?(Array)
         if r.body.fetch("securityCode", {})["tooManyCodesLock"].to_s.length > 0
-          raise ITunesConnectError.new, "Too many verification codes have been sent. Enter the last code you received, use one of your devices, or try again later."
+          raise Tunes::Error.new, "Too many verification codes have been sent. Enter the last code you received, use one of your devices, or try again later."
         end
 
         old_client = (begin

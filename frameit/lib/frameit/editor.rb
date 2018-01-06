@@ -1,3 +1,12 @@
+require 'mini_magick'
+
+require_relative 'template_finder'
+require_relative 'trim_box'
+require_relative 'module'
+require_relative 'offsets'
+require_relative 'config_parser'
+require_relative 'strings_parser'
+
 module Frameit
   # Currently the class is 2 lines too long. Reevaluate refactoring when it's length changes significantly
   class Editor # rubocop:disable Metrics/ClassLength

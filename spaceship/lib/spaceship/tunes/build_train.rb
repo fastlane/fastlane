@@ -1,3 +1,7 @@
+require_relative 'tunes_base'
+require_relative 'errors'
+require_relative 'build'
+
 module Spaceship
   module Tunes
     # Represents a build train of builds from iTunes Connect
@@ -146,7 +150,7 @@ module Spaceship
 
         begin
           result = client.update_build_trains!(application.apple_id, testing_type, data)
-        rescue Spaceship::TunesClient::ITunesConnectError => ex
+        rescue Spaceship::Tunes::Error => ex
           if ex.to_s.include?("You must provide an answer for this question")
             # This is a very common error message that's raised by TestFlight
             # We want to show a nicer error message with instructions on how

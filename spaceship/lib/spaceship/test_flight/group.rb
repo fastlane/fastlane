@@ -1,3 +1,5 @@
+require_relative 'base'
+
 module Spaceship::TestFlight
   class Group < Base
     attr_accessor :id

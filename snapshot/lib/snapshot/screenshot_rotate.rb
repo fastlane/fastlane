@@ -1,8 +1,11 @@
-require 'shellwords'
+require_relative 'module'
 
 module Snapshot
   # This class takes care of rotating images
   class ScreenshotRotate
+    require 'shellwords'
+    require 'pty'
+
     # @param (String) The path in which the screenshots are located in
     def run(path)
       UI.verbose "Rotating the screenshots (if necessary)"

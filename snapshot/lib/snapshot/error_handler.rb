@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Snapshot
   class ErrorHandler
     class << self

@@ -18,6 +18,15 @@ unless Object.const_defined?("OpenSSL")
   end
 end
 
+require 'commander'
+
+require_relative '../env'
+require_relative '../globals'
+require_relative '../analytics/action_completion_context'
+require_relative '../analytics/action_launch_context'
+require_relative '../crash_reporter/crash_reporter'
+require_relative 'errors'
+
 module Commander
   # This class override the run method with our custom stack trace handling
   # In particular we want to distinguish between user_error! and crash! (one with, one without stack trace)
@@ -67,7 +76,7 @@ module Commander
 
         action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::SUCCESS)
         return return_value
-      rescue InvalidCommandError => e
+      rescue Commander::Runner::InvalidCommandError => e
         # calling `abort` makes it likely that tests stop without failing, so
         # we'll disable that during tests.
         if FastlaneCore::Helper.test?

@@ -1,3 +1,7 @@
+require_relative 'base'
+require_relative 'test_info'
+require_relative 'beta_review_info'
+
 module Spaceship::TestFlight
   class AppTestInfo < Base
     # AppTestInfo wraps a test_info and beta_review_info in the format required to manage test_info

@@ -1,3 +1,5 @@
+require_relative '../module'
+
 module Spaceship
   module Tunes
     class LanguageConverter

@@ -2,6 +2,14 @@ require 'pty'
 require 'open3'
 require 'fileutils'
 require 'shellwords'
+require 'terminal-table'
+
+require 'fastlane_core/print_table'
+require 'fastlane_core/command_executor'
+require_relative 'module'
+require_relative 'generators/package_command_generator'
+require_relative 'generators/build_command_generator'
+require_relative 'error_handler'
 
 module Gym
   class Runner

@@ -1,3 +1,6 @@
+require 'open3'
+require 'fastlane_core/ui/ui'
+
 module Snapshot
   class LatestOsVersion
     def self.ios_version
@@ -20,11 +23,11 @@ module Snapshot
 
       matched = output.match(/#{os} ([\d\.]+) \(.*/)
       if matched.nil?
-        UI.user_error!("Could not determine installed #{os} SDK version. Try running the _xcodebuild_ command manually to ensure it works.")
+        FastlaneCore::UI.user_error!("Could not determine installed #{os} SDK version. Try running the _xcodebuild_ command manually to ensure it works.")
       elsif matched.length > 1
         return matched[1]
       else
-        UI.user_error!("Could not determine installed #{os} SDK version. Please pass it via the environment variable 'SNAPSHOT_IOS_VERSION'")
+        FastlaneCore::UI.user_error!("Could not determine installed #{os} SDK version. Please pass it via the environment variable 'SNAPSHOT_IOS_VERSION'")
       end
     end
   end

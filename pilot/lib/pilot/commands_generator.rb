@@ -1,6 +1,12 @@
 require "commander"
-require "pilot/options"
-require "fastlane_core"
+
+require 'fastlane_core/configuration/configuration'
+require_relative 'module'
+require_relative 'tester_importer'
+require_relative 'tester_exporter'
+require_relative 'tester_manager'
+require_relative 'build_manager'
+require_relative 'options'
 
 HighLine.track_eof = false
 

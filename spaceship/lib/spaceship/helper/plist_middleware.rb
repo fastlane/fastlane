@@ -3,7 +3,7 @@ require 'faraday_middleware/response_middleware'
 module FaradayMiddleware
   class PlistMiddleware < ResponseMiddleware
     dependency do
-      require 'plist' unless defined?(::Plist)
+      require 'plist' unless Object.const_defined?("Plist")
     end
 
     define_parser do |body|

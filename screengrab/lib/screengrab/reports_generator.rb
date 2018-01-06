@@ -1,7 +1,9 @@
-require 'erb'
+require_relative 'module'
 
 module Screengrab
   class ReportsGenerator
+    require 'erb'
+
     def generate
       UI.message "Generating HTML Report"
 

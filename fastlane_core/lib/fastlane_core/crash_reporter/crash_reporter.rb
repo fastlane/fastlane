@@ -1,5 +1,10 @@
-require 'faraday'
 require 'json'
+
+require_relative '../env'
+require_relative '../helper'
+require_relative '../globals'
+require_relative '../ui/ui'
+require_relative 'crash_report_generator'
 
 module FastlaneCore
   class CrashReporter
@@ -87,6 +92,7 @@ module FastlaneCore
       end
 
       def send_report(payload: "{}")
+        require 'faraday'
         connection = Faraday.new(url: "https://clouderrorreporting.googleapis.com/v1beta1/projects/fastlane-166414/events:report?key=AIzaSyAMACPfuI-wi4grJWEZjcPvhfV2Rhmddwo")
         connection.post do |request|
           request.headers['Content-Type'] = 'application/json'

@@ -1,3 +1,4 @@
+require_relative 'tunes_base'
 
 module Spaceship
   module Tunes

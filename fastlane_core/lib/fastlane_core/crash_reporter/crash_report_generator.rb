@@ -1,3 +1,5 @@
+require_relative 'crash_report_sanitizer'
+
 module FastlaneCore
   class CrashReportGenerator
     class << self

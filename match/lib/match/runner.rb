@@ -1,3 +1,14 @@
+require 'fastlane_core/cert_checker'
+require 'fastlane_core/provisioning_profile'
+require 'fastlane_core/print_table'
+require 'spaceship/client'
+require_relative 'generator'
+require_relative 'git_helper'
+require_relative 'module'
+require_relative 'table_printer'
+require_relative 'spaceship_ensure'
+require_relative 'utils'
+
 module Match
   class Runner
     attr_accessor :files_to_commmit

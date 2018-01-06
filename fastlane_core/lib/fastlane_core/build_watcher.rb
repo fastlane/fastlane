@@ -1,3 +1,7 @@
+require 'spaceship/test_flight/build'
+
+require_relative 'ui/ui'
+
 module FastlaneCore
   class BuildWatcher
     class << self

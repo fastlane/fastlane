@@ -1,3 +1,6 @@
+require_relative 'base'
+require_relative 'build'
+
 module Spaceship::TestFlight
   class BuildTrains < Base
     ##
@@ -15,7 +18,7 @@ module Spaceship::TestFlight
 
       data.each do |train_version|
         builds_data = client.get_builds_for_train(app_id: app_id, platform: platform, train_version: train_version, retry_count: retry_count)
-        trains[train_version] = builds_data.map { |attrs| Build.new(attrs) }
+        trains[train_version] = builds_data.map { |attrs| Spaceship::TestFlight::Build.new(attrs) }
       end
 
       self.new(trains)

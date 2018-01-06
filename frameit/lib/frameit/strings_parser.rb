@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Frameit
   # This class will parse the .string files
   class StringsParser

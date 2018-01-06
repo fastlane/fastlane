@@ -1,3 +1,8 @@
+require 'credentials_manager/appfile_config'
+
+require_relative 'env'
+require_relative 'configuration/configuration'
+
 module FastlaneCore
   class IOSAppIdentifierGuesser
     APP_ID_REGEX = /var\s*appIdentifier:\s*String\?{0,1}\s*\[?\]?\s*{\s*return\s*\[?\s*"(\s*[a-zA-Z.-]+\s*)"\s*\]?\s*}/

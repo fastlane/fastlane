@@ -1,3 +1,5 @@
+require_relative 'territory'
+
 module Spaceship
   module Tunes
     class Availability < TunesBase

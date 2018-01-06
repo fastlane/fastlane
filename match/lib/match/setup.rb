@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Match
   class Setup
     def run(path, is_swift_fastfile: false)

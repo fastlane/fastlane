@@ -1,3 +1,5 @@
+require_relative 'app_identifier_guesser'
+
 module FastlaneCore
   class ActionCompletionStatus
     SUCCESS = 'success'

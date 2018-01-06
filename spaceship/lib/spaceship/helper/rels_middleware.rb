@@ -4,6 +4,8 @@ module Faraday
   end
 end
 
+require 'faraday'
+
 module FaradayMiddleware
   class RelsMiddleware < Faraday::Middleware
     def initialize(app, options = {})

@@ -1,3 +1,5 @@
+require 'fastlane_core/command_executor'
+
 module Screengrab
   class AndroidEnvironment
     attr_reader :android_home

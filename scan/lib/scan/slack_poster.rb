@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Scan
   class SlackPoster
     def run(results)

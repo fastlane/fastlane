@@ -1,4 +1,5 @@
-require 'snapshot/test_command_generator_base'
+require_relative 'test_command_generator_base'
+require_relative 'latest_os_version'
 
 module Snapshot
   # Responsible for building the fully working xcodebuild command

@@ -1,4 +1,6 @@
-require "fastlane_core"
+require_relative 'module'
+require_relative 'manager'
+require_relative 'tester_manager'
 
 module Pilot
   class TesterImporter < Manager

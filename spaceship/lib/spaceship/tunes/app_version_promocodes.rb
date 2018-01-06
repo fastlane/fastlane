@@ -1,3 +1,5 @@
+require_relative 'tunes_base'
+
 module Spaceship
   module Tunes
     # Represents the information about remaining number of promo codes for an app version

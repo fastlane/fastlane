@@ -1,5 +1,7 @@
 require 'tempfile'
 
+require_relative 'helper'
+
 module FastlaneCore
   # This class checks if a specific certificate is installed on the current mac
   class CertChecker

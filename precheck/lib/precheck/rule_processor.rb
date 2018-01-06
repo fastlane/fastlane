@@ -1,6 +1,9 @@
-require 'spaceship'
+require 'spaceship/tunes/language_item'
 require 'fastlane/markdown_table_formatter'
-require 'precheck/item_to_check'
+
+require_relative 'module'
+require_relative 'item_to_check'
+require_relative 'rule'
 
 module Precheck
   # encapsulated the results of the rule processing, needed to return not just an array of the results of our

@@ -1,6 +1,7 @@
-require 'fastlane_core'
-require 'credentials_manager'
-Dir[File.dirname(__FILE__) + '/rules/*.rb'].each { |file| require file }
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
+
+require_relative 'rules/all'
 
 module Precheck
   class Options

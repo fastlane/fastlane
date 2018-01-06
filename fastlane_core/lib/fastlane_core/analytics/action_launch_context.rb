@@ -1,4 +1,5 @@
-require 'fastlane_core/helper'
+require_relative '../helper'
+require_relative 'app_identifier_guesser'
 
 module FastlaneCore
   class ActionLaunchContext

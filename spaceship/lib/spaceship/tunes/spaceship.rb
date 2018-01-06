@@ -1,3 +1,5 @@
+require_relative 'tunes_client'
+
 module Spaceship
   module Tunes
     class << self

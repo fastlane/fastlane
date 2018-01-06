@@ -1,3 +1,7 @@
+require 'fastlane_core/print_table'
+require_relative 'developer_center'
+require_relative 'itunes_connect'
+
 module Produce
   class Manager
     # Produces app at DeveloperCenter and ItunesConnect

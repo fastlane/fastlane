@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Snapshot
   # This class takes care of removing the alpha channel of the generated screenshots
   class ScreenshotFlatten

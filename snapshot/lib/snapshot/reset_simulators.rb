@@ -1,3 +1,6 @@
+require 'fastlane_core/device_manager'
+require_relative 'module'
+
 module Snapshot
   class ResetSimulators
     def self.clear_everything!(ios_versions, force = false)

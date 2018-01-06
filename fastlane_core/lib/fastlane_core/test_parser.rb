@@ -1,3 +1,10 @@
+require 'plist'
+
+require 'fastlane/junit_generator'
+
+require_relative 'ui/ui'
+require_relative 'print_table'
+
 module FastlaneCore
   class TestParser
     attr_accessor :data

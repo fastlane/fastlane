@@ -1,3 +1,7 @@
+require 'fastlane_core/configuration/config_item'
+
+require_relative 'module'
+
 module Frameit
   class Options
     def self.available_options

@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Screengrab
   class Setup
     # This method will take care of creating a screengrabfile and other necessary files

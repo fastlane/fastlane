@@ -1,4 +1,7 @@
-require 'snapshot/simulator_launchers/simulator_launcher_base'
+require_relative 'simulator_launcher_base'
+require_relative '../error_handler'
+require_relative '../collector'
+require_relative '../test_command_generator_xcode_8'
 
 module Snapshot
   class SimulatorLauncherXcode8 < SimulatorLauncherBase

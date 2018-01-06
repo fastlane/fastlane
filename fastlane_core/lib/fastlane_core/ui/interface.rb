@@ -1,3 +1,5 @@
+require_relative 'errors'
+
 module FastlaneCore
   # Abstract super class
   class Interface
@@ -178,6 +180,7 @@ module FastlaneCore
     # @!group Helpers
     #####################################################
     def not_implemented(method_name)
+      require_relative 'ui'
       UI.user_error!("Current UI '#{self}' doesn't support method '#{method_name}'")
     end
 

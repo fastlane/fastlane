@@ -1,3 +1,6 @@
+require 'fastlane_core/keychain_importer'
+require_relative 'module'
+
 module Match
   class Utils
     def self.import(item_path, keychain, password: "")

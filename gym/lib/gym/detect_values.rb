@@ -1,4 +1,7 @@
-require "fastlane_core/core_ext/cfpropertylist"
+require 'fastlane_core/core_ext/cfpropertylist'
+require 'fastlane_core/project'
+require_relative 'module'
+require_relative 'code_signing_mapping'
 
 module Gym
   # This class detects all kinds of default values

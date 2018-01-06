@@ -1,6 +1,11 @@
 require 'commander'
 require 'fastlane/version'
 
+require_relative 'options'
+require_relative 'resign'
+require_relative 'local_manage'
+require_relative 'manager'
+
 HighLine.track_eof = false
 
 module Sigh

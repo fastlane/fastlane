@@ -1,3 +1,5 @@
+require_relative 'ui/ui'
+
 module FastlaneCore
   class FastlaneFolder
     FOLDER_NAME = 'fastlane'

@@ -1,5 +1,9 @@
 require "digest/md5"
 
+require_relative 'globals'
+require_relative 'ui/ui'
+require_relative 'module'
+
 module FastlaneCore
   # Builds a package for the binary ready to be uploaded with the iTunes Transporter
   class IpaUploadPackageBuilder

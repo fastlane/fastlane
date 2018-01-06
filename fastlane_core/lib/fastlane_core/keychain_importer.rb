@@ -1,3 +1,5 @@
+require_relative 'helper'
+
 module FastlaneCore
   class KeychainImporter
     def self.import_file(path, keychain_path, keychain_password: "", certificate_password: "", output: FastlaneCore::Globals.verbose?)

@@ -1,3 +1,6 @@
+require_relative 'configuration/configuration'
+require_relative 'helper'
+
 module FastlaneCore
   class PrintTable
     class << self

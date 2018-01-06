@@ -1,3 +1,5 @@
+require_relative '../module'
+
 module Snapshot
   module Fixes
     # This fix is needed due to a bug in UI Tests that creates invalid screenshots when the

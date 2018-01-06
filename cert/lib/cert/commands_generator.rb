@@ -1,5 +1,10 @@
 require 'commander'
 require 'fastlane/version'
+require 'fastlane_core/configuration/configuration'
+require 'fastlane_core/globals'
+
+require_relative 'options'
+require_relative 'runner'
 
 HighLine.track_eof = false
 

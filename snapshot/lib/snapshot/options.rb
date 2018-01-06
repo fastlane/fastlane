@@ -1,5 +1,7 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require 'fastlane_core/configuration/config_item'
+require 'fastlane_core/device_manager'
+require 'credentials_manager/appfile_config'
+require_relative 'module'
 
 module Snapshot
   class Options

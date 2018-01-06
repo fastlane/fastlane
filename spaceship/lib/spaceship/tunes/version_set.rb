@@ -1,3 +1,5 @@
+require_relative 'tunes_base'
+
 module Spaceship
   module Tunes
     # Represents a version set inside of an application

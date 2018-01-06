@@ -1,5 +1,9 @@
-require "commander"
-require "fastlane_core"
+require 'commander'
+
+require 'fastlane_core/configuration/configuration'
+require_relative 'module'
+require_relative 'manager'
+require_relative 'options'
 
 HighLine.track_eof = false
 

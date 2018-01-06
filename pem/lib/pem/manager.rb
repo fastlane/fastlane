@@ -1,5 +1,8 @@
 require 'pathname'
+
 require 'spaceship'
+require 'fastlane_core/print_table'
+require_relative 'module'
 
 module PEM
   # Creates the push profile and stores it in the correct location

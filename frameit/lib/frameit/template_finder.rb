@@ -1,3 +1,9 @@
+require 'deliver/app_screenshot'
+
+require_relative 'module'
+require_relative 'device_types'
+require_relative 'frame_downloader'
+
 module Frameit
   # Responsible for finding the correct device
   class TemplateFinder

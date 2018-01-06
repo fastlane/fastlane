@@ -1,3 +1,5 @@
+require_relative 'app_image'
+
 module Spaceship
   module Tunes
     # Represents a screenshot hosted on iTunes Connect

@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Snapshot
   class Setup
     # This method will take care of creating a Snapfile and other necessary files

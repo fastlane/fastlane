@@ -1,3 +1,6 @@
+require_relative 'iap_detail'
+require_relative 'iap_status'
+require_relative 'iap_type'
 
 module Spaceship
   module Tunes

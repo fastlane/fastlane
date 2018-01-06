@@ -1,3 +1,8 @@
+require_relative '../du/upload_file'
+require_relative 'iap_status'
+require_relative 'iap_type'
+require_relative 'tunes_base'
+
 module Spaceship
   module Tunes
     class IAPDetail < TunesBase

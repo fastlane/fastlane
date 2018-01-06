@@ -1,4 +1,5 @@
 require 'spaceship'
+require_relative 'module'
 
 module Produce
   class DeveloperCenter

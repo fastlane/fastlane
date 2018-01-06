@@ -1,5 +1,8 @@
 require 'shellwords'
 
+require_relative '../module'
+require_relative '../generators/build_command_generator'
+
 module Gym
   class XcodebuildFixes
     class << self

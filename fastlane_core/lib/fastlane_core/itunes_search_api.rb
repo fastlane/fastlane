@@ -1,5 +1,7 @@
 require 'open-uri'
 
+require_relative 'ui/ui'
+
 module FastlaneCore
   # A wrapper around the Apple iTunes Search API to access app information like
   # the app identifier of an app.

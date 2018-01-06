@@ -1,3 +1,6 @@
+require 'spaceship'
+require_relative 'module'
+
 module Produce
   class Service
     def self.enable(options, args)

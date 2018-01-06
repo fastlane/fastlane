@@ -1,3 +1,5 @@
+require_relative 'base'
+
 module Spaceship::TestFlight
   class BetaReviewInfo < Base
     attr_accessor :contact_first_name, :contact_last_name, :contact_phone, :contact_email

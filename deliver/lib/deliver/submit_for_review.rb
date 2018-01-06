@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Deliver
   class SubmitForReview
     def submit!(options)

@@ -1,4 +1,4 @@
-require 'precheck/rule'
+require_relative '../rule'
 
 module Precheck
   # abstract class that defines a default way to check for the presence of a list of words within a block of text

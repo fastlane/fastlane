@@ -1,40 +1,10 @@
-require 'json'
-require 'scan/manager'
-require 'scan/options'
-require 'scan/runner'
-require 'scan/detect_values'
-require 'scan/test_command_generator'
-require 'scan/xcpretty_reporter_options_generator.rb'
-require 'scan/test_result_parser'
-require 'scan/error_handler'
-require 'scan/slack_poster'
-
-require 'fastlane_core'
-
-module Scan
-  class << self
-    attr_accessor :config
-
-    attr_accessor :project
-
-    attr_accessor :cache
-
-    attr_accessor :devices
-
-    def config=(value)
-      @config = value
-      DetectValues.set_additional_default_values
-      @cache = {}
-    end
-
-    def scanfile_name
-      "Scanfile"
-    end
-  end
-
-  Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
-  UI = FastlaneCore::UI
-  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
-
-  DESCRIPTION = "The easiest way to run tests of your iOS and Mac app"
-end
+require_relative 'scan/manager'
+require_relative 'scan/options'
+require_relative 'scan/runner'
+require_relative 'scan/detect_values'
+require_relative 'scan/test_command_generator'
+require_relative 'scan/xcpretty_reporter_options_generator.rb'
+require_relative 'scan/test_result_parser'
+require_relative 'scan/error_handler'
+require_relative 'scan/slack_poster'
+require_relative 'scan/module'

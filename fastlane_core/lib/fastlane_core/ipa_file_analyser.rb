@@ -1,5 +1,7 @@
 require 'zip'
-require "fastlane_core/core_ext/cfpropertylist"
+
+require_relative 'core_ext/cfpropertylist'
+require_relative 'ui/ui'
 
 module FastlaneCore
   class IpaFileAnalyser
