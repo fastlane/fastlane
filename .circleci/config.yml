@@ -1,7 +1,7 @@
 version: 2
 
 jobs:
-  "macOS":
+  "Tests on macOS":
     macos:
       xcode: "9.0.0"
     environment:
@@ -51,7 +51,7 @@ jobs:
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
   
-  "Ubuntu":
+  "Tests on Ubuntu":
     environment:
       CIRCLE_TEST_REPORTS: ~/test-reports
       LC_ALL: C.UTF-8
@@ -117,7 +117,7 @@ jobs:
 
       - run: bundle exec fastlane validate_docs
 
-  "Sourcecode":
+  "Source Code Linting":
     docker:
       - image: circleci/ruby:2.3
     steps:
@@ -140,7 +140,7 @@ workflows:
   version: 2
   build:
     jobs:
-      - "macOS"
-      - "Ubuntu"
+      - "Tests on macOS"
+      - "Tests on Ubuntu"
       - "Docs"
-      - "Sourcecode"
+      - "Source Code Linting"
