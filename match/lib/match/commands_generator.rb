@@ -25,7 +25,7 @@ module Match
       program :description, Match::DESCRIPTION
       program :help, 'Author', 'Felix Krause <match@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/match#readme'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/match/'
       program :help_formatter, :compact
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }

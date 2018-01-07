@@ -29,8 +29,8 @@ module Fastlane
         [
           'Create new apps on iTunes Connect and Apple Developer Portal via _produce_.',
           'If the app already exists, `create_app_online` will not do anything.',
-          'For more information about produce, visit its GitHub page:',
-          'https://github.com/fastlane/fastlane/tree/master/produce'
+          'For more information about produce, visit its documentation page:',
+          'https://docs.fastlane.tools/actions/produce/'
         ].join(' ')
       end
 

@@ -59,7 +59,7 @@ module Fastlane
       end
 
       def self.details
-        "More details https://github.com/fastlane/fastlane/tree/master/match"
+        "More information: https://docs.fastlane.tools/actions/match/"
       end
 
       def self.available_options

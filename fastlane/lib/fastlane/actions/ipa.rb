@@ -78,7 +78,7 @@ module Fastlane
             " => " + ex.to_s,
             "A build error occurred. You are using legacy `shenzhen` for building",
             "it is recommended to upgrade to _gym_: ",
-            "https://github.com/fastlane/fastlane/tree/master/gym",
+            "https://docs.fastlane.tools/actions/gym/",
             core_command,
             "-------------------------------------------------------"
           ].each do |txt|
