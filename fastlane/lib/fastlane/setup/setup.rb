@@ -39,6 +39,8 @@ module Fastlane
         Fastlane::LaneList.output(FastlaneCore::FastlaneFolder.fastfile_path)
         UI.important("------------------")
         UI.important("fastlane is already set up at path `#{FastlaneCore::FastlaneFolder.path}`, see the available lanes above")
+        UI.message("")
+        self.new.suggest_next_steps
         return
       end
 
@@ -239,7 +241,14 @@ module Fastlane
 
     def suggest_next_steps
       UI.header("Where to go from here?")
-      if self.platform == :ios
+      if self.platform == :android
+        UI.message("📸  Learn more about how to automatically generate localized Google Play screenshots:")
+        UI.message("\t\thttps://docs.fastlane.tools/getting-started/android/screenshots/".cyan)
+        UI.message("👩‍✈️  Learn more about distribution to beta testing services:")
+        UI.message("\t\thttps://docs.fastlane.tools/getting-started/android/beta-deployment/".cyan)
+        UI.message("🚀  Learn more about how to automate the Google Play release process:")
+        UI.message("\t\thttps://docs.fastlane.tools/getting-started/android/release-deployment/".cyan)
+      else
         UI.message("📸  Learn more about how to automatically generate localized App Store screenshots:")
         UI.message("\t\thttps://docs.fastlane.tools/getting-started/ios/screenshots/".cyan)
         UI.message("👩‍✈️  Learn more about distribution to beta testing services:")
@@ -248,17 +257,10 @@ module Fastlane
         UI.message("\t\thttps://docs.fastlane.tools/getting-started/ios/appstore-deployment/".cyan)
         UI.message("👩‍⚕️  Lern more about how to setup code signing with fastlane")
         UI.message("\t\thttps://docs.fastlane.tools/codesigning/getting-started/".cyan)
-      else
-        UI.message("📸  Learn more about how to automatically generate localized Google Play screenshots:")
-        UI.message("\t\thttps://docs.fastlane.tools/getting-started/android/screenshots/".cyan)
-        UI.message("👩‍✈️  Learn more about distribution to beta testing services:")
-        UI.message("\t\thttps://docs.fastlane.tools/getting-started/android/beta-deployment/".cyan)
-        UI.message("🚀  Learn more about how to automate the Google Play release process:")
-        UI.message("\t\thttps://docs.fastlane.tools/getting-started/android/release-deployment/".cyan)
       end
 
       # we crash here, so that this never happens when a new setup method is added
-      UI.user_error!("No `lane_to_mention` provided by setup method") if self.lane_to_mention.to_s.length == 0
+      return if self.lane_to_mention.to_s.length == 0
       UI.message("")
       UI.message("To try your new fastlane setup, just enter and run")
       UI.command("fastlane #{self.lane_to_mention}")
