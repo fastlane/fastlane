@@ -1,3 +1,4 @@
+require 'pty'
 require 'open3'
 require 'fileutils'
 require 'terminal-table'
