@@ -58,6 +58,12 @@ module Spaceship
       def edit
         attrs = client.load_iap(app_id: application.apple_id, purchase_id: self.purchase_id)
         attrs[:application] = application
+
+        if attrs["addOnType"] == Spaceship::Tunes::IAPType::RECURRING
+          attrs["pricingIntervals"] = client.load_recurring_iap_pricing(app_id: application.apple_id,
+                                                                        purchase_id: self.purchase_id)["subscriptions"]
+        end
+
         Tunes::IAPDetail.new(attrs)
       end
 

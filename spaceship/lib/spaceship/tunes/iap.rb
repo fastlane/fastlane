@@ -75,6 +75,17 @@ module Spaceship
                            family_id: family_id,
                            subscription_duration: subscription_duration,
                            subscription_free_trial: subscription_free_trial)
+
+        # Update pricing for a recurring subscription.
+        if type == Spaceship::Tunes::IAPType::RECURRING && pricing_intervals
+          # There are cases where the product that was just created is not immediately found,
+          # and in order to update its pricing the purchase_id is needed. Therefore polling is done
+          # until it is found.
+          product = find(product_id) until product
+          client.update_recurring_iap_pricing!(app_id: self.application.apple_id,
+                                               purchase_id: product.purchase_id,
+                                               pricing_intervals: pricing_intervals)
+        end
       end
 
       # find a specific product
