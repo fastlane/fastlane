@@ -54,7 +54,7 @@ module Fastlane
           end
         RB
         system(RbConfig.ruby, "-e", require_tester.lines.map(&:chomp).join("; "), name)
-        return true if $?.success?
+        return $?.success?
       end
 
       def find_gem_name(user_supplied_name)
