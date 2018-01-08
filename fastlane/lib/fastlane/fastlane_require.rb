@@ -45,18 +45,15 @@ module Fastlane
           # To find out we try to load a gem with that name in a child process
           # (so we don't actually load anything we don't want to load)
           # See https://github.com/fastlane/fastlane/issues/6951
-          if Process.respond_to?(:fork)
-            fork do
-              begin
-                require name
-              rescue LoadError
-                exit(1)
-              end
+          require_tester = <<-RB.gsub(/^ */, '')
+            begin
+              require ARGV.first
+            rescue LoadError
+              exit(1)
             end
-            _pid, status = Process.wait2
-            return true if status.exitstatus == 0
-            # else OS doesn't support `fork` (e.g. Windows)
-          end
+          RB
+          system(RbConfig.ruby, "-e", require_tester.lines.map(&:chomp).join("; "), name)
+          return true if $?.success?
         end
         return installed
       end
