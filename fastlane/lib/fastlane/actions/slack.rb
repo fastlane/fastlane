@@ -26,7 +26,7 @@ module Fastlane
 
         if options[:channel].to_s.length > 0
           channel = options[:channel]
-          channel = ('#' + notifier.channel) unless ['#', '@'].include?(channel[0]) # send message to channel by default
+          channel = ('#' + options[:channel]) unless ['#', '@'].include?(channel[0]) # send message to channel by default
         end
 
         username = options[:use_webhook_configured_username_and_icon] ? nil : options[:username]
