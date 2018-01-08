@@ -137,6 +137,7 @@ end
 
 desc "Generate the Swift api and test it"
 lane :generate_swift_api do |options|
+  require "../fastlane/lib/fastlane/version.rb" # ensure we use the version we are releasing with
   require "../fastlane/lib/fastlane/swift_fastlane_api_generator.rb"
   swift_generator = Fastlane::SwiftFastlaneAPIGenerator.new
   generated_files = swift_generator.generate_swift
