@@ -103,7 +103,7 @@ describe Fastlane::PluginGenerator do
       gemfile_lines = File.read(gemfile).lines
 
       [
-        "source 'https://rubygems.org'\n",
+        "source('https://rubygems.org')\n",
         "gemspec\n"
       ].each do |line|
         expect(gemfile_lines).to include(line)
@@ -272,7 +272,7 @@ describe Fastlane::PluginGenerator do
       expect(File.exist?(rakefile)).to be(true)
 
       rakefile_contents = File.read(rakefile)
-      expect(rakefile_contents).to eq("require 'bundler/gem_tasks'\n\nrequire 'rspec/core/rake_task'\nRSpec::Core::RakeTask.new\n\nrequire 'rubocop/rake_task'\nRuboCop::RakeTask.new(:rubocop)\n\ntask default: [:spec, :rubocop]\n")
+      expect(rakefile_contents).to eq("require 'bundler/gem_tasks'\n\nrequire 'rspec/core/rake_task'\nRSpec::Core::RakeTask.new\n\nrequire 'rubocop/rake_task'\nRuboCop::RakeTask.new(:rubocop)\n\ntask(default: [:spec, :rubocop])\n")
     end
 
     describe "All tests and style validation of the new plugin are passing" do
