@@ -52,6 +52,7 @@ module Snapshot
       puts "5) Add a new Xcode scheme for the newly created UITest target"
       puts "6) Enable the `Shared` box of the newly created scheme"
       puts ""
+      puts "More information: https://docs.fastlane.tools/getting-started/ios/screenshots/".green
     end
   end
 end
