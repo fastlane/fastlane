@@ -31,7 +31,7 @@ module Spaceship
       #     {...}
       #   ]
 
-      # rubocop:disable Lint/MissingRequireStatement
+      # rubocop:disable Require/MissingRequireStatement
       def self.ci?
         if Object.const_defined?("FastlaneCore") && FastlaneCore.const_defined?("Helper")
           return FastlaneCore::Helper.ci?
@@ -45,7 +45,7 @@ module Spaceship
         end
         return true
       end
-      # rubocop:enable Lint/MissingRequireStatement
+      # rubocop:enable Require/MissingRequireStatement
 
       def select_team
         teams = client.teams
