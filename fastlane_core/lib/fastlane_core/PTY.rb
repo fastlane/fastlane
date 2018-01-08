@@ -15,7 +15,7 @@ module FastlaneCore
         require "systemu"
         stdout = ''
         stderr = ''
-        _status = systemu cmd, 'stdout' => stdout, 'stderr' => stderr
+        _status = systemu(cmd, 'stdout' => stdout, 'stderr' => stderr)
         block.call("", stdout, 0)
       end
     end
