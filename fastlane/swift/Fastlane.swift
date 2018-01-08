@@ -3067,6 +3067,18 @@ func splunkmint(dsym: String? = nil,
                                                                                             RubyCommand.Argument(name: "proxy_port", value: proxyPort)])
   _ = runner.executeCommand(command)
 }
+func spm(command: String = "build",
+         buildPath: String? = nil,
+         packagePath: String? = nil,
+         configuration: String? = nil,
+         verbose: Bool = false) {
+  let command = RubyCommand(commandID: "", methodName: "spm", className: nil, args: [RubyCommand.Argument(name: "command", value: command),
+                                                                                     RubyCommand.Argument(name: "build_path", value: buildPath),
+                                                                                     RubyCommand.Argument(name: "package_path", value: packagePath),
+                                                                                     RubyCommand.Argument(name: "configuration", value: configuration),
+                                                                                     RubyCommand.Argument(name: "verbose", value: verbose)])
+  _ = runner.executeCommand(command)
+}
 func ssh(username: String,
          password: String? = nil,
          host: String,
