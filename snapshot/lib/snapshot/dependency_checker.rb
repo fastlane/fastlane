@@ -6,20 +6,21 @@ module Snapshot
   class DependencyChecker
     def self.check_dependencies
       return if FastlaneCore::Helper.test?
+      return unless FastlaneCore::Helper.mac?
 
       self.check_xcode_select
       self.check_simctl
     end
 
     def self.check_xcode_select
-      xcode_unavailable = nil
-      begin 
-        xcode_unavailable = `xcode-select -v`.include?("xcode-select version")
+      xcode_available = nil
+      begin
+        xcode_available = `xcode-select -v`.include?("xcode-select version")
       rescue
-        xcode_unavailable = true
+        xcode_available = true
       end
 
-      unless xcode_unavailable
+      unless xcode_available
         FastlaneCore::UI.error '#############################################################'
         FastlaneCore::UI.error "# You have to install Xcode command line tools to use snapshot"
         FastlaneCore::UI.error "# Install the latest version of Xcode from the AppStore"
@@ -53,13 +54,14 @@ module Snapshot
     end
 
     def self.check_simctl
-      simctl_unavailable = nil
-      begin 
-        simctl_unavailable = `xcrun simctl`.include? "openurl"
+      simctl_available = nil
+      begin
+        simctl_available = `xcrun simctl`.include? "openurl"
       rescue
-        simctl_unavailable = true
+        simctl_available = true
       end
-      unless simctl_unavailable
+
+      unless simctl_available
         FastlaneCore::UI.user_error!("Could not find `xcrun simctl`. Make sure you have the latest version of Xcode and macOS installed.")
       end
     end
