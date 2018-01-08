@@ -10,7 +10,7 @@ module FastlaneCore
           block.call(stdin, stdout, pid)
         end
       else
-        # We don't lets try to handle it
+        # We don't - lets try to handle it
         Actions.verify_gem!('systemu')
         require "systemu"
         stdout = ''
