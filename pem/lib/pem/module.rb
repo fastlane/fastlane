@@ -6,7 +6,8 @@ module PEM
     attr_accessor :config
   end
 
-  TMP_FOLDER = "/tmp/PEM/"
+  tmp_dir = Dir.tmpdir
+  TMP_FOLDER = "#{tmp_dir}/fastlane/PEM/"
   FileUtils.mkdir_p TMP_FOLDER
 
   ENV['FASTLANE_TEAM_ID'] ||= ENV["PEM_TEAM_ID"]
