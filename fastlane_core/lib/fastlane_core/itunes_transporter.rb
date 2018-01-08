@@ -1,3 +1,4 @@
+require 'pty'
 require 'shellwords'
 require 'fileutils'
 require 'credentials_manager/account_manager'
@@ -43,7 +44,7 @@ module FastlaneCore
       end
 
       begin
-        FastlaneCore::PTY.spawn(command) do |stdin, stdout, pid|
+        PTY.spawn(command) do |stdin, stdout, pid|
           begin
             stdin.each do |line|
               @all_lines << line
