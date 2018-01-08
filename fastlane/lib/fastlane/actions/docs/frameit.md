@@ -150,7 +150,7 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 
 #### Uploading screenshots to iTC
 
-Use [deliver](https://github.com/fastlane/fastlane/tree/master/deliver) to upload all screenshots to iTunes Connect completely automatically 🚀
+Use [deliver](https://docs.fastlane.tools/actions/deliver) to upload all screenshots to iTunes Connect completely automatically 🚀
 
 ### Mac
 
@@ -189,7 +189,7 @@ Check out the [MindNode example project](https://github.com/fastlane/examples/tr
 # Tips
 
 ## Generate localized screenshots
-Check out [_snapshot_](https://github.com/fastlane/fastlane/tree/master/snapshot) to automatically generate screenshots using ```UI Automation```.
+Check out [_snapshot_](https://docs.fastlane.tools/actions/snapshot) to automatically generate screenshots using ```UI Automation```.
 
 ## Alternative location to store device_frames
 
