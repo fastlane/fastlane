@@ -177,7 +177,7 @@ describe Fastlane::PluginGenerator do
       action_contents = File.read(action_file)
 
       # rubocop:disable Security/Eval
-      eval(action_contents)
+      eval(action_contents, nil, action_file)
       # rubocop:enable Security/Eval
 
       # If we evaluate the contents of the generated action file,
