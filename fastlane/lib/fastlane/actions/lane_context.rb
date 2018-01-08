@@ -10,7 +10,14 @@ module Fastlane
       #####################################################
 
       def self.description
-        "An alias to `Actions.lane_context`"
+        "Access lane context values"
+      end
+
+      def self.details
+        [
+          "Access the fastlane lane context values",
+          "More information about how the lane context works: https://docs.fastlane.tools/advanced/#lane-context"
+        ].join("\n")
       end
 
       def self.available_options
@@ -35,7 +42,10 @@ module Fastlane
       end
 
       def self.example_code
-        []
+        [
+          'lane_context[SharedValues::BUILD_NUMBER]',
+          'lane_context[SharedValues::IPA_OUTPUT_PATH]'
+        ]
       end
 
       def self.category

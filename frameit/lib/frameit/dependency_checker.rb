@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Frameit
   class DependencyChecker
     def self.check_dependencies

@@ -1,6 +1,8 @@
-require "colored"
-require "credentials_manager"
+require 'colored'
+require 'credentials_manager/appfile_config'
 require 'yaml'
+
+require_relative 'tunes/tunes_client'
 
 module Spaceship
   class SpaceauthRunner

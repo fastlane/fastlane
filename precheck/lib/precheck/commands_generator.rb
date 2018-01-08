@@ -1,6 +1,13 @@
 require "commander"
-require "fastlane_core"
+require "fastlane_core/globals"
+require "fastlane_core/configuration/commander_generator"
+require "fastlane_core/configuration/configuration"
+require "fastlane_core/helper"
 require "fastlane/version"
+
+require_relative 'module'
+require_relative 'options'
+require_relative 'runner'
 
 HighLine.track_eof = false
 
@@ -18,7 +25,7 @@ module Precheck
       program :description, Precheck::DESCRIPTION
       program :help, "Author", "Joshua Liebowitz <taquitos@gmail.com>, @taquitos"
       program :help, "Website", "https://fastlane.tools"
-      program :help, "GitHub", "https://github.com/fastlane/fastlane/tree/master/precheck"
+      program :help, "Documentation", "https://docs.fastlane.tools/actions/precheck/"
       program :help_formatter, :compact
 
       global_option("--verbose") { FastlaneCore::Globals.verbose = true }

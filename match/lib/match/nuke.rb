@@ -1,3 +1,11 @@
+require 'terminal-table'
+
+require 'spaceship'
+require 'fastlane_core/provisioning_profile'
+require 'fastlane_core/print_table'
+require_relative 'module'
+require_relative 'git_helper'
+
 module Match
   class Nuke
     attr_accessor :params

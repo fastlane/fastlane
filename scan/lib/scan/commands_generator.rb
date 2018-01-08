@@ -1,5 +1,9 @@
-require "commander"
-require "fastlane_core"
+require 'commander'
+
+require 'fastlane_core/configuration/configuration'
+require_relative 'module'
+require_relative 'manager'
+require_relative 'options'
 
 HighLine.track_eof = false
 
@@ -23,7 +27,7 @@ module Scan
       program :description, Scan::DESCRIPTION
       program :help, "Author", "Felix Krause <scan@krausefx.com>"
       program :help, "Website", "https://fastlane.tools"
-      program :help, "GitHub", "https://github.com/fastlane/fastlane/tree/master/scan"
+      program :help, "Documentation", "https://docs.fastlane.tools/actions/scan/"
       program :help_formatter, :compact
 
       global_option("--verbose") { FastlaneCore::Globals.verbose = true }

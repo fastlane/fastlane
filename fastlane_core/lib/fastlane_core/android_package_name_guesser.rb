@@ -1,3 +1,8 @@
+require 'credentials_manager/appfile_config'
+
+require_relative 'configuration/configuration'
+require_relative 'env'
+
 module FastlaneCore
   class AndroidPackageNameGuesser
     class << self

@@ -1,5 +1,8 @@
 require 'commander'
-require 'fastlane/version'
+
+require_relative 'module'
+require_relative 'runner'
+require_relative 'options'
 
 HighLine.track_eof = false
 
@@ -17,7 +20,7 @@ module Snapshot
       program :description, 'CLI for \'snapshot\' - Automate taking localized screenshots of your iOS app on every device'
       program :help, 'Author', 'Felix Krause <snapshot@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/snapshot#readme'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/snapshot/'
       program :help_formatter, :compact
 
       global_option('--verbose', 'Shows a more verbose output') { FastlaneCore::Globals.verbose = true }

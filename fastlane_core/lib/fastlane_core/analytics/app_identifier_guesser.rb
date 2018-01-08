@@ -1,5 +1,6 @@
-require 'fastlane_core/android_package_name_guesser'
-require 'fastlane_core/ios_app_identifier_guesser'
+require_relative '../android_package_name_guesser'
+require_relative '../ios_app_identifier_guesser'
+require_relative '../env'
 
 module FastlaneCore
   class AppIdentifierGuesser
@@ -34,7 +35,6 @@ module FastlaneCore
         return nil
       end
 
-      require 'credentials_manager'
       return Digest::SHA256.hexdigest("p#{app_id}fastlan3_SAlt") # hashed + salted the bundle identifier
     rescue
       return nil # we don't want this method to cause a crash

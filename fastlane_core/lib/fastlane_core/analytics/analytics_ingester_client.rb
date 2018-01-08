@@ -1,3 +1,7 @@
+require 'openssl'
+
+require_relative '../helper'
+
 module FastlaneCore
   class AnalyticsIngesterClient
     def post_events(events)

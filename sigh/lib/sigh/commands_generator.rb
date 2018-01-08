@@ -1,6 +1,11 @@
 require 'commander'
 require 'fastlane/version'
 
+require_relative 'options'
+require_relative 'resign'
+require_relative 'local_manage'
+require_relative 'manager'
+
 HighLine.track_eof = false
 
 module Sigh
@@ -17,7 +22,7 @@ module Sigh
       program :description, 'CLI for \'sigh\' - Because you would rather spend your time building stuff than fighting provisioning'
       program :help, 'Author', 'Felix Krause <sigh@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/sigh#readme'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/sigh/'
       program :help_formatter, :compact
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }

@@ -1,5 +1,9 @@
-require 'deliver'
 require 'fastimage'
+
+require_relative 'frame_downloader'
+require_relative 'module'
+require_relative 'screenshot'
+require_relative 'device_types'
 
 module Frameit
   class Runner

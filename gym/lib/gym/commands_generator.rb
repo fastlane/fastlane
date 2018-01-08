@@ -1,12 +1,15 @@
-require "commander"
-require "fastlane_core"
+require 'commander'
+
+require 'fastlane_core/configuration/configuration'
+require_relative 'module'
+require_relative 'manager'
+require_relative 'options'
 
 HighLine.track_eof = false
 
 module Gym
   class CommandsGenerator
     include Commander::Methods
-    UI = FastlaneCore::UI
 
     def self.start
       new.run
@@ -24,7 +27,7 @@ module Gym
       program :description, Gym::DESCRIPTION
       program :help, "Author", "Felix Krause <gym@krausefx.com>"
       program :help, "Website", "https://fastlane.tools"
-      program :help, "GitHub", "https://github.com/fastlane/fastlane/tree/master/gym"
+      program :help, "Documentation", "https://docs.fastlane.tools/actions/gym/"
       program :help_formatter, :compact
 
       global_option("--verbose") { FastlaneCore::Globals.verbose = true }

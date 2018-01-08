@@ -1,4 +1,6 @@
-require 'fastlane_core/analytics/analytics_ingester_client'
+require_relative 'analytics_ingester_client'
+require_relative 'action_launch_context'
+require_relative 'analytics_event_builder'
 
 module FastlaneCore
   class AnalyticsSession

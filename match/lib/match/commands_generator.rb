@@ -1,13 +1,19 @@
 require 'commander'
-require 'fastlane_core'
-require 'fastlane/version'
+
+require 'fastlane_core/configuration/configuration'
+require_relative 'module'
+require_relative 'nuke'
+require_relative 'git_helper'
+require_relative 'change_password'
+require_relative 'setup'
+require_relative 'runner'
+require_relative 'options'
 
 HighLine.track_eof = false
 
 module Match
   class CommandsGenerator
     include Commander::Methods
-    UI = FastlaneCore::UI
 
     def self.start
       self.new.run
@@ -19,7 +25,7 @@ module Match
       program :description, Match::DESCRIPTION
       program :help, 'Author', 'Felix Krause <match@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/match#readme'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/match/'
       program :help_formatter, :compact
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }

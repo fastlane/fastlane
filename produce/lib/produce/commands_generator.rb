@@ -1,5 +1,10 @@
 require 'commander'
+
 require 'fastlane/version'
+require 'fastlane_core/configuration/config_item'
+require_relative 'module'
+require_relative 'manager'
+require_relative 'options'
 
 HighLine.track_eof = false
 
@@ -17,7 +22,7 @@ module Produce
       program :description, 'CLI for \'produce\''
       program :help, 'Author', 'Felix Krause <produce@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/produce#readme'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/produce/'
       program :help_formatter, :compact
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }

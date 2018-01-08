@@ -2,6 +2,16 @@ require 'shellwords'
 require 'plist'
 require 'os'
 require 'thread'
+require 'terminal-table'
+
+require 'fastlane_core/print_table'
+require_relative 'module'
+require_relative 'update'
+require_relative 'test_command_generator'
+require_relative 'reports_generator'
+require_relative 'simulator_launchers/simulator_launcher'
+require_relative 'simulator_launchers/simulator_launcher_xcode_8'
+require_relative 'simulator_launchers/launcher_configuration'
 
 module Snapshot
   class Runner
@@ -10,7 +20,7 @@ module Snapshot
         UI.error "Found old snapshot configuration file 'snapshot.js'"
         UI.error "You updated to snapshot 1.0 which now uses UI Automation"
         UI.error "Please follow the migration guide: https://github.com/fastlane/fastlane/blob/master/snapshot/MigrationGuide.md"
-        UI.error "And read the updated documentation: https://github.com/fastlane/fastlane/tree/master/snapshot"
+        UI.error "And read the updated documentation: https://docs.fastlane.tools/actions/snapshot/"
         sleep 3 # to be sure the user sees this, as compiling clears the screen
       end
 

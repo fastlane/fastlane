@@ -1,5 +1,7 @@
 require 'rexml/document'
 
+require_relative 'helper'
+
 module FastlaneCore
   class PkgFileAnalyser
     def self.fetch_app_identifier(path)

@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Snapshot
   class Setup
     # This method will take care of creating a Snapfile and other necessary files
@@ -39,7 +41,7 @@ module Snapshot
       puts ""
       puts "4) Add `snapshot(\"0Launch\")` to wherever you want to create the screenshots".yellow
       puts ""
-      puts "More information on GitHub: https://github.com/fastlane/fastlane/tree/master/snapshot".green
+      puts "More information: https://docs.fastlane.tools/actions/snapshot/".green
     end
   end
 end
