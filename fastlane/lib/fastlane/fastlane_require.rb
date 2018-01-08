@@ -39,24 +39,26 @@ module Fastlane
       end
 
       def gem_installed?(name, req = Gem::Requirement.default)
-        # In special cases a gem is already preinstalled, e.g. YAML.
-        # To find out we try to load a gem with that name in a child process
-        # (so we don't actually load anything we don't want to load)
-        # See https://github.com/fastlane/fastlane/issues/6951
-        if Process.respond_to?(:fork)
-          fork do
-            begin
-              require name
-            rescue LoadError
-              exit(1)
+        installed = Gem::Specification.any? { |s| s.name == name and req =~ s.version }
+        unless installed
+          # In special cases a gem is already preinstalled, e.g. YAML.
+          # To find out we try to load a gem with that name in a child process
+          # (so we don't actually load anything we don't want to load)
+          # See https://github.com/fastlane/fastlane/issues/6951
+          if Process.respond_to?(:fork)
+            fork do
+              begin
+                require name
+              rescue LoadError
+                exit(1)
+              end
             end
+            _pid, status = Process.wait2
+            return true if status.exitstatus == 0
+            # else OS doesn't support `fork` (e.g. Windows)
           end
-          _pid, status = Process.wait2
-          return true if status.exitstatus == 0
-          # else OS doesn't support `fork` (e.g. Windows)
         end
-
-        Gem::Specification.any? { |s| s.name == name and req =~ s.version }
+        return installed
       end
 
       def find_gem_name(user_supplied_name)
