@@ -13,7 +13,7 @@ module Fastlane
           no_badge: params[:no_badge],
           shield: params[:shield],
           alpha: params[:alpha],
-          shield_io_timeout: params[:shield_io_timeout],
+          shield_service_timeout: params[:shield_service_timeout],
           glob: params[:glob],
           alpha_channel: params[:alpha_channel],
           shield_gravity: params[:shield_gravity],
@@ -105,13 +105,13 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("path needs to be a valid directory") if Dir[value].empty?
                                        end),
-          FastlaneCore::ConfigItem.new(key: :shield_io_timeout,
-                                       env_name: "FL_BADGE_SHIELD_IO_TIMEOUT",
+          FastlaneCore::ConfigItem.new(key: :shield_service_timeout,
+                                       env_name: "FL_BADGE_SHIELD_SERVICE_TIMEOUT",
                                        description: "Set custom duration for the timeout of the shields.io request in seconds",
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         UI.user_error!("shield_io_timeout needs to be an integer > 0") if value.to_i < 1
+                                         UI.user_error!("shield_service_timeout needs to be an integer > 0") if value.to_i < 1
                                        end),
           FastlaneCore::ConfigItem.new(key: :glob,
                                        env_name: "FL_BADGE_GLOB",
