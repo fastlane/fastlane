@@ -3,14 +3,15 @@
 module FastlaneCore
   class PTY
     def self.spawn(*cmd, &block)
-      # Utopia - we have PTY
+      # We have PTY
       if Gem::Specification.any? { |s| s.name == "pty" }
         require "pty"
         PTY.spawn(command) do |stdout, stdin, pid|
           block.call(stdin, stdout, pid)
         end
       else
-        # Sucks - but lets try to handle it
+        # We don't lets try to handle it
+        Actions.verify_gem!('systemu')
         require "systemu"
         stdout = ''
         stderr = ''
