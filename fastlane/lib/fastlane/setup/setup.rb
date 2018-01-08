@@ -82,7 +82,7 @@ module Fastlane
           had_multiple_projects_to_choose_from = true
         else
           UI.error("Looks like there is no iOS project in the current directory, but inside a sub-directory instead")
-          UI.error("Please use `cd` into the subfolder of the location of your Xcode project")
+          UI.error("Please `cd` into the subfolder of the location of your Xcode project")
           UI.user_error!("Please `cd` into the subfolder of your Xcode project and run `fastlane init` again")
         end
 
@@ -91,7 +91,7 @@ module Fastlane
             UI.user_error!("Make sure to `cd` into the right directory and then use `fastlane init` again")
           end
         end
-        UI.message("Detected iOS/Mac project in current directory: '#{chosen_project}'")
+        UI.message("Detected iOS/macOS project in current directory: '#{chosen_project}'")
 
         SetupIos.new(
           is_swift_fastfile: is_swift_fastfile,
@@ -104,7 +104,7 @@ module Fastlane
         SetupAndroid.new.setup_android
       else
         UI.error("No iOS or Android projects found in current directory '#{Dir.pwd}'")
-        UI.error("Make sure to `cd` into a directory containing your iOS or Android app")
+        UI.error("Make sure to `cd` into the directory containing your iOS or Android app")
         if UI.confirm("Do you still want to setup a manual fastlane config in the current directory?")
           SetupIos.new(
             is_swift_fastfile: is_swift_fastfile,
@@ -132,7 +132,7 @@ module Fastlane
     def welcome_to_fastlane
       UI.header("Welcome to fastlane 🚀")
       UI.message("fastlane can help you with all kinds of mobile app automation")
-      UI.message("We recommend getting started with one piece and then gradually automate more and more over time")
+      UI.message("We recommend automating one task first, then gradually automating more and more over time")
     end
 
     # Append a lane to the current Fastfile template we're generating

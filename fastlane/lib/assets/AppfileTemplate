@@ -2,5 +2,5 @@
 # apple_id "[[APPLE_ID]]" # Your Apple email address
 
 [[TEAMS]]
-# More information about the Appfile:
+# For more information about the Appfile, see:
 #     https://docs.fastlane.tools/advanced/#appfile

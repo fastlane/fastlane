@@ -3,5 +3,5 @@ var appleID: String { return "[[APPLE_ID]]" } // Your Apple email address
 
 [[TEAMS]]
 
-// you can even provide different app identifiers, Apple IDs and team names per lane:
-// More information: https://docs.fastlane.tools/advanced/#appfile
+// For more information about the Appfile, see:
+//     https://docs.fastlane.tools/advanced/#appfile

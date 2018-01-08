@@ -112,7 +112,7 @@ module CredentialsManager
           # We don't want to show this message, if we ask for the application specific password
           # which has a different prefix
           puts "You can also pass the password using the `FASTLANE_PASSWORD` environment variable".green
-          puts "More information about it on GitHub: https://github.com/fastlane/fastlane/tree/master/credentials_manager".green
+          puts "See more information about it on GitHub: https://github.com/fastlane/fastlane/tree/master/credentials_manager".green
         end
         puts "-------------------------------------------------------------------------------------".green
       end
