@@ -31,10 +31,7 @@ module Fastlane
 
         username = options[:use_webhook_configured_username_and_icon] ? nil : options[:username]
 
-        notifier = Slack::Notifier.new(options[:slack_url]) do
-          defaults channel: channel,
-                   username: username
-        end
+        notifier = Slack::Notifier.new(options[:slack_url], channel: channel, username: username)
 
         icon_url = options[:use_webhook_configured_username_and_icon] ? nil : options[:icon_url]
 
@@ -43,9 +40,7 @@ module Fastlane
         return [notifier, slack_attachment] if Helper.is_test? # tests will verify the slack attachments and other properties
 
         begin
-          results = notifier.ping '',
-                                  icon_url: icon_url,
-                                  attachments: [slack_attachment]
+          results = notifier.ping('', icon_url: icon_url, attachments: [slack_attachment])
         rescue => exception
           UI.error("Exception: #{exception}")
         ensure
