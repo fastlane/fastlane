@@ -72,20 +72,20 @@ Gem::Specification.new do |spec|
   spec.add_dependency('google-api-client', '>= 0.13.1', '< 0.14.0') # Google API Client to access Play Publishing API
 
   # Development only
-  spec.add_development_dependency 'rake', '< 12'
-  spec.add_development_dependency 'rspec', '~> 3.5.0'
-  spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
-  spec.add_development_dependency 'pry'
-  spec.add_development_dependency 'pry-byebug'
-  spec.add_development_dependency 'pry-rescue'
-  spec.add_development_dependency 'pry-stack_explorer'
-  spec.add_development_dependency 'yard', '~> 0.9.11'
-  spec.add_development_dependency 'webmock', '~> 2.3.2'
-  spec.add_development_dependency 'coveralls', '~> 0.8.13'
-  spec.add_development_dependency 'rubocop', Fastlane::RUBOCOP_REQUIREMENT
-  spec.add_development_dependency 'rubocop-require_tools', '>= 0.1.2'
-  spec.add_development_dependency 'rb-readline' # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
-  spec.add_development_dependency 'rest-client', '>= 1.8.0'
-  spec.add_development_dependency 'fakefs', '~> 0.8.1'
-  spec.add_development_dependency 'sinatra', '~> 1.4.8'
+  spec.add_development_dependency('rake', '< 12')
+  spec.add_development_dependency('rspec', '~> 3.5.0')
+  spec.add_development_dependency('rspec_junit_formatter', '~> 0.2.3')
+  spec.add_development_dependency('pry')
+  spec.add_development_dependency('pry-byebug')
+  spec.add_development_dependency('pry-rescue')
+  spec.add_development_dependency('pry-stack_explorer')
+  spec.add_development_dependency('yard', '~> 0.9.11')
+  spec.add_development_dependency('webmock', '~> 2.3.2')
+  spec.add_development_dependency('coveralls', '~> 0.8.13')
+  spec.add_development_dependency('rubocop', Fastlane::RUBOCOP_REQUIREMENT)
+  spec.add_development_dependency('rubocop-require_tools', '>= 0.1.2')
+  spec.add_development_dependency('rb-readline') # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
+  spec.add_development_dependency('rest-client', '>= 1.8.0')
+  spec.add_development_dependency('fakefs', '~> 0.8.1')
+  spec.add_development_dependency('sinatra', '~> 1.4.8')
 end

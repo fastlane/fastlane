@@ -21,11 +21,11 @@ module Snapshot
       end
 
       unless xcode_available
-        FastlaneCore::UI.error '#############################################################'
-        FastlaneCore::UI.error "# You have to install Xcode command line tools to use snapshot"
-        FastlaneCore::UI.error "# Install the latest version of Xcode from the AppStore"
-        FastlaneCore::UI.error "# Run xcode-select --install to install the developer tools"
-        FastlaneCore::UI.error '#############################################################'
+        FastlaneCore::UI.error('#############################################################')
+        FastlaneCore::UI.error("# You have to install Xcode command line tools to use snapshot")
+        FastlaneCore::UI.error("# Install the latest version of Xcode from the AppStore")
+        FastlaneCore::UI.error("# Run xcode-select --install to install the developer tools")
+        FastlaneCore::UI.error('#############################################################')
         FastlaneCore::UI.user_error!("Run 'xcode-select --install' and start snapshot again")
       end
 
@@ -56,7 +56,7 @@ module Snapshot
     def self.check_simctl
       simctl_available = nil
       begin
-        simctl_available = `xcrun simctl`.include? "openurl"
+        simctl_available = `xcrun simctl`.include?("openurl")
       rescue
         simctl_available = true
       end
