@@ -88,7 +88,7 @@ module Fastlane
 
       self.generated_paths << fastlane_swift_api_path
       self.generated_paths += generate_default_implementations(tool_details: tool_details)
-      return @generated_paths
+      return self.generated_paths
     end
 
     def write_lanefile(lanefile_implementation_opening: nil, class_name: nil, tool_name: nil)
