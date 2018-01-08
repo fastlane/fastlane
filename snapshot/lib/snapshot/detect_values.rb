@@ -1,6 +1,8 @@
 require 'fastlane_core/project'
 require 'fastlane_core/device_manager'
 
+require_relative 'module'
+
 module Snapshot
   class DetectValues
     # This is needed as these are more complex default values

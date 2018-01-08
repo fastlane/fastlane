@@ -6,18 +6,26 @@ module Snapshot
   class DependencyChecker
     def self.check_dependencies
       return if FastlaneCore::Helper.test?
+      return unless FastlaneCore::Helper.mac?
 
       self.check_xcode_select
       self.check_simctl
     end
 
     def self.check_xcode_select
-      unless `xcode-select -v`.include?("xcode-select version")
-        FastlaneCore::UI.error('#############################################################')
-        FastlaneCore::UI.error("# You have to install Xcode command line tools to use snapshot")
-        FastlaneCore::UI.error("# Install the latest version of Xcode from the AppStore")
-        FastlaneCore::UI.error("# Run xcode-select --install to install the developer tools")
-        FastlaneCore::UI.error('#############################################################')
+      xcode_available = nil
+      begin
+        xcode_available = `xcode-select -v`.include?("xcode-select version")
+      rescue
+        xcode_available = true
+      end
+
+      unless xcode_available
+        FastlaneCore::UI.error '#############################################################'
+        FastlaneCore::UI.error "# You have to install Xcode command line tools to use snapshot"
+        FastlaneCore::UI.error "# Install the latest version of Xcode from the AppStore"
+        FastlaneCore::UI.error "# Run xcode-select --install to install the developer tools"
+        FastlaneCore::UI.error '#############################################################'
         FastlaneCore::UI.user_error!("Run 'xcode-select --install' and start snapshot again")
       end
 
@@ -46,7 +54,14 @@ module Snapshot
     end
 
     def self.check_simctl
-      unless `xcrun simctl`.include?("openurl")
+      simctl_available = nil
+      begin
+        simctl_available = `xcrun simctl`.include? "openurl"
+      rescue
+        simctl_available = true
+      end
+
+      unless simctl_available
         FastlaneCore::UI.user_error!("Could not find `xcrun simctl`. Make sure you have the latest version of Xcode and macOS installed.")
       end
     end
