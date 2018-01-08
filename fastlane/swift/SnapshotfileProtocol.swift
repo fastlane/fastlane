@@ -19,6 +19,7 @@ protocol SnapshotfileProtocol: class {
   var addVideos: [String]? { get }
   var buildlogPath: String { get }
   var clean: Bool { get }
+  var testWithoutBuilding: Bool? { get }
   var configuration: String? { get }
   var xcprettyArgs: String? { get }
   var sdk: String? { get }
@@ -52,6 +53,7 @@ extension SnapshotfileProtocol {
   var addVideos: [String]? { return nil }
   var buildlogPath: String { return "~/Library/Logs/snapshot" }
   var clean: Bool { return false }
+  var testWithoutBuilding: Bool? { return nil }
   var configuration: String? { return nil }
   var xcprettyArgs: String? { return nil }
   var sdk: String? { return nil }
