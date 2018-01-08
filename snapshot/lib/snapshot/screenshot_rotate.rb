@@ -28,7 +28,7 @@ module Snapshot
         next unless command
 
         # Only rotate if we need to
-        FastlaneCore::PTY.spawn(command) do |r, w, pid|
+        PTY.spawn(command) do |r, w, pid|
           r.sync
           r.each do |line|
             # We need to read this otherwise things hang
