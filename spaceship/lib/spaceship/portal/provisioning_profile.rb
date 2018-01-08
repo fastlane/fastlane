@@ -193,7 +193,6 @@ module Spaceship
         # Create a new object based on a hash.
         # This is used to create a new object based on the server response.
         def factory(attrs)
-          # rubocop:disable Lint/MissingRequireStatement
           # available values of `distributionMethod` at this point: ['adhoc', 'store', 'limited', 'direct']
           klass = case attrs['distributionMethod']
                   when 'limited'
@@ -207,7 +206,6 @@ module Spaceship
                   else
                     raise "Can't find class '#{attrs['distributionMethod']}'"
                   end
-          # rubocop:enable Lint/MissingRequireStatement
 
           # Parse the dates
           # rubocop:disable Style/RescueModifier
@@ -269,7 +267,7 @@ module Spaceship
           # Fill in sensible default values
           name ||= [bundle_id, self.pretty_type].join(' ')
 
-          if self == AppStore || self == InHouse || self == Direct # rubocop:disable Lint/MissingRequireStatement
+          if self == AppStore || self == InHouse || self == Direct
             # Distribution Profiles MUST NOT have devices
             devices = []
           end
@@ -281,7 +279,7 @@ module Spaceship
           certificate_parameter = certificate_parameter.first if certificate_parameter.count == 1
 
           if devices.nil? or devices.count == 0
-            if self == Development or self == AdHoc # rubocop:disable Lint/MissingRequireStatement
+            if self == Development or self == AdHoc
               # For Development and AdHoc we usually want all compatible devices by default
               if mac
                 devices = Spaceship::Portal::Device.all_macs

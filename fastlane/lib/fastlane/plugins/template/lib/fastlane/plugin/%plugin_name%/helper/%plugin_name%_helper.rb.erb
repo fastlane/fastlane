@@ -1,4 +1,8 @@
+require 'fastlane_core/ui/ui'
+
 module Fastlane
+  UI = FastlaneCore::UI unless Fastlane.const_defined?("UI")
+
   module Helper
     class <%= plugin_name.fastlane_class %>Helper
       # class methods that you define here become available in your action

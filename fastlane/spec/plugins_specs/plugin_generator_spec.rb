@@ -177,7 +177,7 @@ describe Fastlane::PluginGenerator do
       action_contents = File.read(action_file)
 
       # rubocop:disable Security/Eval
-      eval(action_contents)
+      eval(action_contents, nil, action_file)
       # rubocop:enable Security/Eval
 
       # If we evaluate the contents of the generated action file,
@@ -226,6 +226,7 @@ describe Fastlane::PluginGenerator do
           Gem::Dependency.new("rspec_junit_formatter", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("rake", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("rubocop", Gem::Requirement.new([Fastlane::RUBOCOP_REQUIREMENT]), :development),
+          Gem::Dependency.new("rubocop-require_tools", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("simplecov", Gem::Requirement.new([">= 0"]), :development),
           Gem::Dependency.new("fastlane", Gem::Requirement.new([">= #{Fastlane::VERSION}"]), :development)
         )
