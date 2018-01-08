@@ -3,6 +3,24 @@ require 'fastlane/documentation/actions_list'
 describe Fastlane::Action do
   Fastlane::ActionsList.all_actions do |action, name|
     describe name do
+      it "`fastlane_class` and `action` are matching" do
+        # `to_s.gsub(/::.*/, '')` to convert
+        #   "Fastlane::Actions::AdbDevicesAction"
+        # to
+        #   "AdbDevicesAction"
+        #
+        expect(name.fastlane_class + "Action").to eq(action.to_s.gsub(/^.*::/, ''))
+      end
+
+      it "file name follows our convention and matches the class name" do
+        exceptions = %w(plugin_scores xcarchive xcbuild xcclean xcexport xctest)
+
+        action_path = File.join(Dir.pwd, "fastlane/lib/fastlane/actions/#{name}.rb")
+        unless exceptions.include?(name)
+          expect(File.exist?(action_path)).to eq(true)
+        end
+      end
+
       it "contains a valid category" do
         expect(action.category).to_not be_nil
         expect(action.category).to be_kind_of(Symbol)
