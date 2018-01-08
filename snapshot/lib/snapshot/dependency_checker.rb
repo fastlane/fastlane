@@ -12,7 +12,14 @@ module Snapshot
     end
 
     def self.check_xcode_select
-      unless `xcode-select -v`.include? "xcode-select version"
+      xcode_unavailable = nil
+      begin 
+        xcode_unavailable = `xcode-select -v`.include?("xcode-select version")
+      rescue
+        xcode_unavailable = true
+      end
+
+      unless xcode_unavailable
         FastlaneCore::UI.error '#############################################################'
         FastlaneCore::UI.error "# You have to install Xcode command line tools to use snapshot"
         FastlaneCore::UI.error "# Install the latest version of Xcode from the AppStore"
@@ -46,7 +53,13 @@ module Snapshot
     end
 
     def self.check_simctl
-      unless `xcrun simctl`.include? "openurl"
+      simctl_unavailable = nil
+      begin 
+        simctl_unavailable = `xcrun simctl`.include? "openurl"
+      rescue
+        simctl_unavailable = true
+      end
+      unless simctl_unavailable
         FastlaneCore::UI.user_error!("Could not find `xcrun simctl`. Make sure you have the latest version of Xcode and macOS installed.")
       end
     end
