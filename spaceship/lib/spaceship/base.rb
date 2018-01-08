@@ -231,7 +231,7 @@ module Spaceship
     # This will store a list of defined attr_accessors to easily access them when inspecting the values
     def self.attr_accessor(*vars)
       @attributes ||= []
-      @attributes.concat vars
+      @attributes.concat(vars)
       super(*vars)
     end
 
@@ -261,12 +261,12 @@ module Spaceship
       tree_root = thread[:inspected_objects].nil?
       thread[:inspected_objects] = Set.new if tree_root
 
-      if thread[:inspected_objects].include? self
+      if thread[:inspected_objects].include?(self)
         # already inspected objects have a default value,
         # let's follow Ruby's convention for circular references
         value = "#<Object ...>"
       else
-        thread[:inspected_objects].add self
+        thread[:inspected_objects].add(self)
         begin
           value = inspect_value
         ensure

@@ -48,7 +48,7 @@ module Fastlane
         validate_params!(params)
 
         command = build_command(params)
-        sh command
+        sh(command)
       end
 
       def self.has_config_file
@@ -280,7 +280,7 @@ Slather is available at https://github.com/SlatherOrg/slather
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

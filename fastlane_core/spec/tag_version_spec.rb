@@ -17,17 +17,17 @@ describe FastlaneCore::TagVersion do
   describe "correct?" do
     it "returns true for versions supported by Gem::Version" do
       tag = "1.2.3"
-      expect(FastlaneCore::TagVersion.correct?(tag)).to be true
+      expect(FastlaneCore::TagVersion.correct?(tag)).to be(true)
     end
 
     it "returns true for tags that can be converted to a Gem::Version using version_number_from_tag" do
       tag = "v1.2.3"
-      expect(FastlaneCore::TagVersion.correct?(tag)).to be true
+      expect(FastlaneCore::TagVersion.correct?(tag)).to be(true)
     end
 
     it "returns false for tags that are not versions" do
       tag = "finished-refactoring"
-      expect(FastlaneCore::TagVersion.correct?(tag)).to be false
+      expect(FastlaneCore::TagVersion.correct?(tag)).to be(false)
     end
   end
 

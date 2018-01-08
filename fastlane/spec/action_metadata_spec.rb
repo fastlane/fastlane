@@ -4,7 +4,7 @@ describe Fastlane::Action do
   Fastlane::ActionsList.all_actions do |action, name|
     describe name do
       it "contains a valid category" do
-        expect(action.category).to_not be_nil
+        expect(action.category).to_not(be_nil)
         expect(action.category).to be_kind_of(Symbol)
         expect(Fastlane::Action::AVAILABLE_CATEGORIES).to include(action.category), "Unknown action category '#{action.category}', must be one of #{Fastlane::Action::AVAILABLE_CATEGORIES.join(', ')}"
       end
@@ -28,7 +28,7 @@ describe Fastlane::Action do
         expect(authors.count).to be >= 1, "Action '#{name}' must have at least one author"
 
         authors.each do |author|
-          expect(author).to_not start_with("@")
+          expect(author).to_not(start_with("@"))
         end
       end
 

@@ -88,7 +88,7 @@ module Fastlane
 
         if params[:settings]
           settings_plists_from_param(params[:settings]).each do |file|
-            settings_file_pathname = Pathname.new settings_bundle_file_path(project, file)
+            settings_file_pathname = Pathname.new(settings_bundle_file_path(project, file))
             expected_changed_files << settings_file_pathname.relative_path_from(repo_pathname).to_s
           end
         end
@@ -102,7 +102,7 @@ module Fastlane
         UI.user_error!("No file changes picked up. Make sure you run the `increment_build_number` action first.") if git_dirty_files.empty?
 
         # check if the files changed are the ones we expected to change (these should be only the files that have version info in them)
-        changed_files_as_expected = (Set.new(git_dirty_files.map(&:downcase)).subset? Set.new(expected_changed_files.map(&:downcase)))
+        changed_files_as_expected = Set.new(git_dirty_files.map(&:downcase)).subset?(Set.new(expected_changed_files.map(&:downcase)))
         unless changed_files_as_expected
           unless params[:force]
             error = [
@@ -155,7 +155,7 @@ module Fastlane
                                        description: "The path to your project file (Not the workspace). If you have only one, this is optional",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
+                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
                                          UI.user_error!("Could not find Xcode project") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :force,
@@ -204,7 +204,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code
@@ -238,10 +238,10 @@ module Fastlane
 
       class << self
         def settings_plists_from_param(param)
-          if param.kind_of? String
+          if param.kind_of?(String)
             # commit_version_bump settings: "About.plist"
             return [param]
-          elsif param.kind_of? Array
+          elsif param.kind_of?(Array)
             # commit_version_bump settings: ["Root.plist", "About.plist"]
             return param
           else
@@ -260,7 +260,7 @@ module Fastlane
         def modified_files_relative_to_repo_root(repo_root)
           return [] if Actions.lane_context[SharedValues::MODIFIED_FILES].nil?
 
-          root_pathname = Pathname.new repo_root
+          root_pathname = Pathname.new(repo_root)
           all_modified_files = Actions.lane_context[SharedValues::MODIFIED_FILES].map do |path|
             next path unless path =~ %r{^/}
             Pathname.new(path).relative_path_from(root_pathname).to_s

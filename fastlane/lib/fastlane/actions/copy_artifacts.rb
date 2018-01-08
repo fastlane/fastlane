@@ -23,7 +23,7 @@ module Fastlane
 
         if params[:fail_on_missing]
           missing = artifacts.reject { |a| File.exist?(a) }
-          UI.user_error! "Not all files were present in copy artifacts. Missing #{missing.join(', ')}" unless missing.empty?
+          UI.user_error!("Not all files were present in copy artifacts. Missing #{missing.join(', ')}") unless missing.empty?
         else
           # If we don't fail on non-existent files, don't try to copy non-existent files
           artifacts.select! { |artifact| File.exist?(artifact) }

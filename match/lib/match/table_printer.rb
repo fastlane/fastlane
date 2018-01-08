@@ -13,9 +13,9 @@ module Match
         title: "Installed Certificate".green
       }
 
-      puts ""
-      puts Terminal::Table.new(params)
-      puts ""
+      puts("")
+      puts(Terminal::Table.new(params))
+      puts("")
     rescue => ex
       UI.error(ex)
     end
@@ -43,9 +43,9 @@ module Match
       params[:title] = "Installed Provisioning Profile".green
       params[:headings] = ['Parameter', 'Environment Variable', 'Value']
 
-      puts ""
-      puts Terminal::Table.new(params)
-      puts ""
+      puts("")
+      puts(Terminal::Table.new(params))
+      puts("")
     end
   end
 end

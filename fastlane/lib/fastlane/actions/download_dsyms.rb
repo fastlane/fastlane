@@ -70,7 +70,7 @@ module Fastlane
             end
 
             if download_url
-              result = self.download download_url
+              result = self.download(download_url)
               path   = write_dsym(result, app.bundle_id, train_number, build.build_version, output_directory)
               UI.success("🔑  Successfully downloaded dSYM file for #{train_number} - #{build.build_version} to '#{path}'")
 

@@ -257,7 +257,7 @@ module FastlaneCore
 
         simulator_path = File.join(Helper.xcode_path, 'Applications', 'Simulator.app')
 
-        UI.verbose "Launching #{simulator_path} for device: #{device.name} (#{device.udid})"
+        UI.verbose("Launching #{simulator_path} for device: #{device.name} (#{device.udid})")
 
         Helper.backticks("open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}", print: FastlaneCore::Globals.verbose?)
       end
@@ -288,7 +288,7 @@ module FastlaneCore
 
         FileUtils.rm_f(logfile_dst)
         FileUtils.cp(logfile_src, logfile_dst)
-        UI.success "Copying file '#{logfile_src}' to '#{logfile_dst}'..."
+        UI.success("Copying file '#{logfile_src}' to '#{logfile_dst}'...")
       end
 
       def copy_logarchive(device, log_identity, logs_destination_dir)

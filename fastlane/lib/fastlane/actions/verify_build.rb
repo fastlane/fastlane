@@ -46,10 +46,10 @@ module Fastlane
             type = part.split('=')[1].split(':')[0]
             values['provisioning_type'] = type.downcase =~ /distribution/i ? "distribution" : "development"
           end
-          if part.start_with? "TeamIdentifier"
+          if part.start_with?("TeamIdentifier")
             values['team_identifier'] = part.split('=')[1]
           end
-          if part.start_with? "Identifier"
+          if part.start_with?("Identifier")
             values['bundle_identifier'] = part.split('=')[1]
           end
         end
@@ -96,9 +96,9 @@ module Fastlane
           end
         end
 
-        puts ""
-        puts table
-        puts ""
+        puts("")
+        puts(table)
+        puts("")
       end
 
       def self.evaulate(params, values)
@@ -121,7 +121,7 @@ module Fastlane
           UI.user_error!("Mismatched bundle_identifier. Required: '#{params[:bundle_identifier]}'; Found: '#{values['bundle_identifier']}'") unless params[:bundle_identifier] == values['bundle_identifier']
         end
 
-        UI.success "Build is verified, have a 🍪."
+        UI.success("Build is verified, have a 🍪.")
       end
 
       #####################################################

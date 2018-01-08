@@ -66,11 +66,11 @@ module Snapshot
       command :reset_simulators do |c|
         c.syntax = 'fastlane snapshot reset_simulators'
         c.description = "This will remove all your existing simulators and re-create new ones"
-        c.option '-i', '--ios_version String', String, 'The comma separated list of iOS Versions you want to use'
-        c.option '--force', 'Disables confirmation prompts'
+        c.option('-i', '--ios_version String', String, 'The comma separated list of iOS Versions you want to use')
+        c.option('--force', 'Disables confirmation prompts')
 
         c.action do |args, options|
-          options.default ios_version: Snapshot::LatestOsVersion.ios_version
+          options.default(ios_version: Snapshot::LatestOsVersion.ios_version)
           versions = options.ios_version.split(',') if options.ios_version
           require 'snapshot/reset_simulators'
 
@@ -89,17 +89,17 @@ module Snapshot
           derived_data_path = Snapshot.config[:derived_data_path]
 
           if !derived_data_path
-            Snapshot::UI.user_error! "No derived_data_path"
+            Snapshot::UI.user_error!("No derived_data_path")
           elsif !Dir.exist?(derived_data_path)
-            Snapshot::UI.important "Path #{derived_data_path} does not exist"
+            Snapshot::UI.important("Path #{derived_data_path} does not exist")
           else
             FileUtils.rm_rf(derived_data_path)
-            Snapshot::UI.success "Removed #{derived_data_path}"
+            Snapshot::UI.success("Removed #{derived_data_path}")
           end
         end
       end
 
-      default_command :run
+      default_command(:run)
 
       run!
     end

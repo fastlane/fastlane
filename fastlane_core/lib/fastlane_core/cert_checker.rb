@@ -11,7 +11,7 @@ module FastlaneCore
       ids = installed_identies
       finger_print = sha1_fingerprint(path)
 
-      return ids.include? finger_print
+      return ids.include?(finger_print)
     end
 
     # Legacy Method, use `installed?` instead
@@ -35,7 +35,7 @@ module FastlaneCore
 
       ids = []
       available.split("\n").each do |current|
-        next if current.include? "REVOKED"
+        next if current.include?("REVOKED")
         begin
           (ids << current.match(/.*\) ([[:xdigit:]]*) \".*/)[1])
         rescue

@@ -220,7 +220,7 @@ describe Fastlane do
 
                 expect(result[:status]).to eq(200)
                 expect(result[:html_url]).to eq("https://api.github.com/repos/fastlane/fastlane/contents/TEST_FILE.md")
-                expect(result[:html_url]).to_not eq("https://api.github.com/repos/fastlane/fastlane/contents/NONEXISTENT_TEST_FILE.md")
+                expect(result[:html_url]).to_not(eq("https://api.github.com/repos/fastlane/fastlane/contents/NONEXISTENT_TEST_FILE.md"))
               end
             end
           end

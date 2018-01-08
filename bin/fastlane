@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
 if RUBY_VERSION < '2.0.0'
-  abort "fastlane requires Ruby 2.0.0 or higher"
+  abort("fastlane requires Ruby 2.0.0 or higher")
 end
 
-$LOAD_PATH.push File.expand_path("../../lib", __FILE__)
+$LOAD_PATH.push(File.expand_path("../../lib", __FILE__))
 
 require "fastlane/cli_tools_distributor"
 
@@ -12,9 +12,9 @@ if Fastlane::CLIToolsDistributor.running_version_command?
   # This will print out the fastlane binary path right above the
   # version number. Very often, users are not aware they have
   # e.g. bundled fastlane installed
-  puts "fastlane installation at path:"
-  puts File.expand_path(__FILE__)
-  puts "-----------------------------"
+  puts("fastlane installation at path:")
+  puts(File.expand_path(__FILE__))
+  puts("-----------------------------")
 end
 
 Fastlane::CLIToolsDistributor.take_off

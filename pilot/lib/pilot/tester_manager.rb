@@ -182,12 +182,12 @@ module Pilot
 
     # Requires a block that accepts a tester and returns an array of tester column values
     def list(all_testers, title, headings)
-      rows = all_testers.map { |tester| yield tester }
-      puts Terminal::Table.new(
-        title: title.green,
-        headings: headings,
-        rows: FastlaneCore::PrintTable.transform_output(rows)
-      )
+      rows = all_testers.map { |tester| yield(tester) }
+      puts(Terminal::Table.new(
+             title: title.green,
+             headings: headings,
+             rows: FastlaneCore::PrintTable.transform_output(rows)
+      ))
     end
 
     # Print out all the details of a specific tester
@@ -209,10 +209,10 @@ module Pilot
         rows << ["Latest Install Date", tester.pretty_install_date]
       end
 
-      puts Terminal::Table.new(
-        title: tester.email.green,
-        rows: FastlaneCore::PrintTable.transform_output(rows)
-      )
+      puts(Terminal::Table.new(
+             title: tester.email.green,
+             rows: FastlaneCore::PrintTable.transform_output(rows)
+      ))
     end
   end
 end

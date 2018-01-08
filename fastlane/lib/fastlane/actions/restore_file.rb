@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         path = params[:path]
         backup_path = "#{path}.back"
-        UI.user_error!("Could not find file '#{backup_path}'") unless File.exist? backup_path
+        UI.user_error!("Could not find file '#{backup_path}'") unless File.exist?(backup_path)
         FileUtils.cp(backup_path, path, { preserve: true })
         FileUtils.rm(backup_path)
         UI.message("Successfully restored backup 📤")

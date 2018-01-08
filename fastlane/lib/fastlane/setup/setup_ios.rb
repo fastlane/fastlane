@@ -165,17 +165,17 @@ module Fastlane
       rows << ["App Identifier", self.app_identifier]
       rows << [(self.project.is_workspace ? "Workspace" : "Project"), self.project.path]
       require 'terminal-table'
-      puts ""
-      puts Terminal::Table.new(rows: FastlaneCore::PrintTable.transform_output(rows),
-                              title: "Detected Values")
-      puts ""
+      puts("")
+      puts(Terminal::Table.new(rows: FastlaneCore::PrintTable.transform_output(rows),
+                              title: "Detected Values"))
+      puts("")
 
       unless self.itc_ref || self.project.mac?
-        UI.important "This app identifier doesn't exist on iTunes Connect yet, it will be created for you"
+        UI.important("This app identifier doesn't exist on iTunes Connect yet, it will be created for you")
       end
 
       unless self.portal_ref || self.project.mac?
-        UI.important "This app identifier doesn't exist on the Apple Developer Portal yet, it will be created for you"
+        UI.important("This app identifier doesn't exist on the Apple Developer Portal yet, it will be created for you")
       end
     end
 
@@ -234,8 +234,8 @@ module Fastlane
 
     # Detect if the app was created on the Dev Portal / iTC
     def detect_if_app_is_available
-      UI.important "Verifying that app is available on the Apple Developer Portal and iTunes Connect..."
-      UI.message "Starting login with user '#{self.apple_id}'"
+      UI.important("Verifying that app is available on the Apple Developer Portal and iTunes Connect...")
+      UI.message("Starting login with user '#{self.apple_id}'")
       Spaceship.login(self.apple_id, nil)
       self.dev_portal_team = Spaceship.select_team
       self.portal_ref = Spaceship::App.find(self.app_identifier)
@@ -246,7 +246,7 @@ module Fastlane
     end
 
     def create_app_if_necessary
-      UI.important "Creating the app on iTunes Connect and the Apple Developer Portal"
+      UI.important("Creating the app on iTunes Connect and the Apple Developer Portal")
       require 'produce'
       config = {} # this has to be done like this
       FastlaneCore::Project.detect_projects(config)

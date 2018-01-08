@@ -274,7 +274,7 @@ module Spaceship
             devices = []
           end
 
-          certificate_parameter = certificate.collect(&:id) if certificate.kind_of? Array
+          certificate_parameter = certificate.collect(&:id) if certificate.kind_of?(Array)
           certificate_parameter ||= [certificate.id]
 
           # Fix https://github.com/KrauseFx/fastlane/issues/349
@@ -444,17 +444,17 @@ module Spaceship
         # This is the minimum protection needed for people using spaceship directly
         unless certificate_valid?
           if mac?
-            if self.kind_of? Development
+            if self.kind_of?(Development)
               self.certificates = [Spaceship::Portal::Certificate::MacDevelopment.all.first]
-            elsif self.kind_of? Direct
+            elsif self.kind_of?(Direct)
               self.certificates = [Spaceship::Portal::Certificate::DeveloperIDApplication.all.first]
             else
               self.certificates = [Spaceship::Portal::Certificate::MacAppDistribution.all.first]
             end
           else
-            if self.kind_of? Development
+            if self.kind_of?(Development)
               self.certificates = [Spaceship::Portal::Certificate::Development.all.first]
-            elsif self.kind_of? InHouse
+            elsif self.kind_of?(InHouse)
               self.certificates = [Spaceship::Portal::Certificate::InHouse.all.first]
             else
               self.certificates = [Spaceship::Portal::Certificate::Production.all.first]

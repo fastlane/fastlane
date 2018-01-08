@@ -12,7 +12,7 @@ describe Scan do
         reporter_options = generator.generate_reporter_options
         temp_junit_report = Scan.cache[:temp_junit_report]
 
-        expect(temp_junit_report).not_to be_nil
+        expect(temp_junit_report).not_to(be_nil)
         expect(reporter_options).to end_with([
                                                "--report junit",
                                                "--output '#{temp_junit_report}'"
@@ -119,7 +119,7 @@ describe Scan do
           reporter_options = generator.generate_reporter_options
           temp_junit_report = Scan.cache[:temp_junit_report]
 
-          expect(temp_junit_report).not_to be_nil
+          expect(temp_junit_report).not_to(be_nil)
           expect(reporter_options).to end_with([
                                                  "--report junit",
                                                  "--output '#{temp_junit_report}'"

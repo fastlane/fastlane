@@ -6,7 +6,7 @@ module Spaceship
         attr_accessor :types
 
         def exists?(type)
-          types.include? type
+          types.include?(type)
         end
       end
     end

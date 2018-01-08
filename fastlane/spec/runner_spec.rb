@@ -18,7 +18,7 @@ describe Fastlane do
       end
 
       it "doesn't show private lanes" do
-        expect(@ff.runner.available_lanes).to_not include('android such_private')
+        expect(@ff.runner.available_lanes).to_not(include('android such_private'))
       end
     end
   end
