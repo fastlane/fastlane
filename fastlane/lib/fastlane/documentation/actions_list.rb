@@ -170,7 +170,7 @@ module Fastlane
         next if platform && action.respond_to?(:is_supported?) && !action.is_supported?(platform.to_sym)
 
         name = symbol.to_s.gsub('Action', '').fastlane_underscore
-        yield action, name
+        yield action, name if block_given?
       end
     end
 
