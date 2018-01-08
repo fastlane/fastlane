@@ -26,11 +26,14 @@ module Frameit
     # Fetches the finished configuration for a given path. This will try to look for a specific value
     # and fallback to a default value if nothing was found
     def fetch_value(path)
-      specific = @data['data'].find { |a| path.include? a['filter'] }
+      specifics = @data['data'].select { |a| path.include? a['filter'] }
 
       default = @data['default']
 
-      values = default.fastlane_deep_merge(specific || {})
+      values = default.clone
+      specifics.each do |specific|
+        values = values.fastlane_deep_merge(specific)
+      end
 
       change_paths_to_absolutes!(values)
       validate_values(values)
@@ -60,6 +63,10 @@ module Frameit
       end
     end
 
+    def is_absolute_or_percentage(value)
+      value.kind_of?(Integer) || (value.end_with?('%') && value.to_f > 0)
+    end
+
     # Make sure the paths/colors are valid
     def validate_values(values)
       values.each do |key, value|
@@ -82,8 +89,12 @@ module Frameit
           when 'color'
             UI.user_error!("Invalid color '#{value}'. Must be valid Hex #123123") unless value.include?("#")
           when 'padding'
-            unless value.kind_of?(Integer) || value.split('x').length == 2 || (value.end_with?('%') && value.to_f > 0)
+            unless is_absolute_or_percentage(value) || value.split('x').length == 2
               UI.user_error!("padding must be type integer or pair of integers of format 'AxB' or a percentage of screen size")
+            end
+          when 'title_min_height'
+            unless is_absolute_or_percentage(value)
+              UI.user_error!("padding must be type integer or a percentage of screen size")
             end
           when 'show_complete_frame', 'title_below_image'
             UI.user_error! "'#{key}' must be a Boolean" unless [true, false].include?(value)

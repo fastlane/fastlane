@@ -132,7 +132,9 @@ The `show_complete_frame` value specifies whether _frameit_ should shrink the de
 
 The `title_below_image` value specifies whether _frameit_ should place the title below the screenshot. If it is false, it will be placed above the screenshot.
 
-The `filter` value is a part of the screenshot named for which the given option should be used. If a screenshot is named `iPhone5_Brainstorming.png` the first entry in the `data` array will be used.
+The `title_min_height` value specifies whether _frameit_ should keep a minimum height for the text area, even if the text's actual height is smaller.
+
+The `filter` value is a part of the screenshot named for which the given option should be used. If a screenshot is named `iPhone5_Brainstorming.png` the first entry in the `data` array will be used. If there are more than one `filter` matching an entry, they will all be applied in order (which means that the last one has the highest precedence).
 
 You can find a more complex [configuration](https://github.com/fastlane/examples/blob/master/MindNode/screenshots/Framefile.json) to also support Chinese, Japanese and Korean languages.
 
