@@ -1,5 +1,6 @@
-require: 
+require:
   - rubocop/require_tools
+  - ./rubocop/fork_usage.rb
 
 Style/MultipleComparison:
   Enabled: false
@@ -278,6 +279,11 @@ Style/IfInsideElse:
 # Sometimes we just want to 'collect'
 Style/CollectionMethods:
   Enabled: false
+
+# Check whether fork is handled correctly on all platforms
+CrossPlatform/ForkUsage:
+  Exclude:
+    - '**/plugins/template/**/*'
 
 # ( ) for method calls
 Style/MethodCallWithArgsParentheses:
