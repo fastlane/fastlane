@@ -154,7 +154,12 @@ module Match
                                      env_name: "MATCH_PROVISIONING_PROFILE_TEMPLATE_NAME",
                                      description: "The name of provisioning profile template. If the developer account has provisioning profile templates, template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile",
                                      optional: true,
-                                     default_value: nil)
+                                     default_value: nil),
+        FastlaneCore::ConfigItem.new(key: :provisioning_profile_names_mode,
+                                     short_option: "-m",
+                                     env_name: "FASTLANE_MOBILE_PROVISION_FILES_NAMES_MODE",
+                                     description: "Using regular UUID based names for provisioning profile names (default value for the option is 'UUID') or use a name that is unique, but will reduce the number of profiles stored when they are recreated (provide the following value for the option 'PROFILES_NAME')",
+                                     default_value: "UUID")
       ]
     end
   end

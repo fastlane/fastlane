@@ -167,7 +167,7 @@ module Match
         self.files_to_commmit << profile
       end
 
-      installed_profile = FastlaneCore::ProvisioningProfile.install(profile)
+      installed_profile = FastlaneCore::ProvisioningProfile.install(profile, params[:provisioning_profile_names_mode])
 
       parsed = FastlaneCore::ProvisioningProfile.parse(profile)
       uuid = parsed["UUID"]

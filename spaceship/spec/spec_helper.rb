@@ -9,7 +9,8 @@ require_relative 'du/du_stubbing'
 set_auth_vars = [
   'FASTLANE_SESSION',
   'FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD',
-  'FASTLANE_PASSWORD'
+  'FASTLANE_PASSWORD',
+  'FASTLANE_MOBILE_PROVISION_FILES_MODE'
 ].select { |var| ENV.key?(var) }
 
 if set_auth_vars.any?
