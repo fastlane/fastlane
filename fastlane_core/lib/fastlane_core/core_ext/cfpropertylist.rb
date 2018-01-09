@@ -12,7 +12,9 @@ require "plist"
 # CFPropertyList also adds Enumerator#to_plist, but there is no such
 # method from Plist, so leave it.
 [Array, Hash].each do |c|
-  c.send(:alias_method, :to_binary_plist, :to_plist)
-  c.send(:remove_method, :to_plist) if c.method_defined?(:remove_method)
+  if c.method_defined?(:to_plist)
+    c.send(:alias_method, :to_binary_plist, :to_plist)
+    c.send(:remove_method, :to_plist)
+  end
   c.module_eval("include Plist::Emit")
 end
