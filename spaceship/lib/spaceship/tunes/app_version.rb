@@ -304,7 +304,7 @@ module Spaceship
       # Important: Due to a bug you have to fetch the `edit_version` again, as it doesn't get refreshed immediately
       def create_languages(languages)
         languages = [languages] if languages.kind_of?(String)
-        raise "Please pass an array" unless languages.kind_of? Array
+        raise "Please pass an array" unless languages.kind_of?(Array)
 
         copy_from = self.languages.find { |a| a['language'] == 'en-US' } || self.languages.first
 
@@ -442,7 +442,7 @@ module Spaceship
           @large_app_icon.reset!
           return
         end
-        upload_image = UploadFile.from_path icon_path
+        upload_image = UploadFile.from_path(icon_path)
         image_data = client.upload_large_icon(self, upload_image)
 
         raw_data["largeAppIcon"]["value"] = generate_image_metadata(image_data, upload_image.file_name)
@@ -455,7 +455,7 @@ module Spaceship
           @watch_app_icon.reset!
           return
         end
-        upload_image = UploadFile.from_path icon_path
+        upload_image = UploadFile.from_path(icon_path)
         image_data = client.upload_watch_icon(self, upload_image)
 
         raw_data["watchAppIcon"]["value"] = generate_image_metadata(image_data, upload_image.file_name)
@@ -469,7 +469,7 @@ module Spaceship
           @transit_app_file = nil
           return
         end
-        upload_file = UploadFile.from_path geojson_path
+        upload_file = UploadFile.from_path(geojson_path)
         geojson_data = client.upload_geojson(self, upload_file)
 
         @transit_app_file = Tunes::TransitAppFile.factory({}) if @transit_app_file.nil?
@@ -493,7 +493,7 @@ module Spaceship
 
         existing_sort_orders = device_lang_screenshots.map { |s| s["value"]["sortOrder"] }
         if screenshot_path # adding / replacing
-          upload_file = UploadFile.from_path screenshot_path
+          upload_file = UploadFile.from_path(screenshot_path)
           screenshot_data = client.upload_screenshot(self, upload_file, device, is_messages)
 
           # Since October 2016 we also need to pass the size, height, width and checksum
@@ -569,10 +569,10 @@ module Spaceship
             video_preview_resolution = video_preview_resolution_for(device, trailer_path)
             video_preview_path = Utilities.grab_video_preview(trailer_path, timestamp, video_preview_resolution)
           end
-          video_preview_file = UploadFile.from_path video_preview_path
+          video_preview_file = UploadFile.from_path(video_preview_path)
           video_preview_data = client.upload_trailer_preview(self, video_preview_file, device)
 
-          upload_file = UploadFile.from_path trailer_path
+          upload_file = UploadFile.from_path(trailer_path)
           trailer_data = client.upload_trailer(self, upload_file)
 
           ts = "00:00:#{timestamp}"

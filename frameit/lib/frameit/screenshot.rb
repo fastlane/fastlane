@@ -16,7 +16,7 @@ module Frameit
     # path: Path to screenshot
     # color: Color to use for the frame
     def initialize(path, color)
-      UI.user_error!("Couldn't find file at path '#{path}'") unless File.exist? path
+      UI.user_error!("Couldn't find file at path '#{path}'") unless File.exist?(path)
       @color = color
       @path = path
       @size = FastImage.size(path)
@@ -46,7 +46,7 @@ module Frameit
       when sizes::MAC
         return 'MacBook'
       else
-        UI.error "Unknown device type for size #{@screen_size} for path '#{path}'"
+        UI.error("Unknown device type for size #{@screen_size} for path '#{path}'")
       end
       # rubocop:enable Require/MissingRequireStatement
     end
@@ -89,7 +89,7 @@ module Frameit
         valid = [:landscape_left, :landscape_right, :portrait, nil]
         UI.user_error("orientation_block must return #{valid[0..-2].join(', ')} or nil") unless valid.include?(orientation)
 
-        puts "Forced orientation: #{orientation}"
+        puts("Forced orientation: #{orientation}")
       end
 
       return orientation unless orientation.nil?

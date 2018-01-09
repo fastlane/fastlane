@@ -4,7 +4,7 @@ describe Gym do
       expect do
         options = { project: "./gym/examples/standard/Example.xcodeproj", workspace: "./gym/examples/cocoapods/Example.xcworkspace" }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
-      end.to raise_error "You can only pass either a 'project' or a 'workspace', not both"
+      end.to raise_error("You can only pass either a 'project' or a 'workspace', not both")
     end
 
     it "removes the `ipa` from the output name if given", requires_xcodebuild: true do

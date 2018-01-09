@@ -35,7 +35,7 @@ module Fastlane
       Actions.lane_context[Actions::SharedValues::PLATFORM_NAME] = current_platform
       Actions.lane_context[Actions::SharedValues::LANE_NAME] = full_lane_name
 
-      UI.success "Driving the lane '#{full_lane_name}' 🚀"
+      UI.success("Driving the lane '#{full_lane_name}' 🚀")
 
       return_val = nil
 
@@ -186,14 +186,14 @@ module Fastlane
         original_full = full_lane_name
         original_lane = current_lane
 
-        UI.user_error!("Parameters for a lane must always be a hash") unless (parameters.first || {}).kind_of? Hash
+        UI.user_error!("Parameters for a lane must always be a hash") unless (parameters.first || {}).kind_of?(Hash)
 
         execute_flow_block(before_each_blocks, current_platform, new_lane, parameters)
 
         pretty = [new_lane]
         pretty = [current_platform, new_lane] if current_platform
         Actions.execute_action("Switch to #{pretty.join(' ')} lane") {} # log the action
-        UI.message "Cruising over to lane '#{pretty.join(' ')}' 🚖"
+        UI.message("Cruising over to lane '#{pretty.join(' ')}' 🚖")
 
         # Actually switch lane now
         self.current_lane = new_lane
@@ -205,7 +205,7 @@ module Fastlane
         # Call the platform specific after block and then the general one
         execute_flow_block(after_each_blocks, current_platform, new_lane, parameters)
 
-        UI.message "Cruising back to lane '#{original_full}' 🚘"
+        UI.message("Cruising back to lane '#{original_full}' 🚘")
         return result
       else
         raise LaneNotAvailableError.new, "Lane not found"
@@ -233,7 +233,7 @@ module Fastlane
             # Since we usually just need the passed hash, we'll just use the first object if there is only one
             if arguments.count == 0
               arguments = ConfigurationHelper.parse(class_ref, {}) # no parameters => empty hash
-            elsif arguments.count == 1 and arguments.first.kind_of? Hash
+            elsif arguments.count == 1 and arguments.first.kind_of?(Hash)
               arguments = ConfigurationHelper.parse(class_ref, arguments.first) # Correct configuration passed
             elsif !class_ref.available_options
               # This action does not use the new action format
@@ -243,10 +243,10 @@ module Fastlane
             end
 
             if Fastlane::Actions.is_deprecated?(class_ref)
-              puts "==========================================".deprecated
-              puts "This action (#{method_sym}) is deprecated".deprecated
-              puts class_ref.deprecated_notes.to_s.deprecated if class_ref.deprecated_notes
-              puts "==========================================\n".deprecated
+              puts("==========================================".deprecated)
+              puts("This action (#{method_sym}) is deprecated".deprecated)
+              puts(class_ref.deprecated_notes.to_s.deprecated) if class_ref.deprecated_notes
+              puts("==========================================\n".deprecated)
             end
 
             class_ref.runner = self # needed to call another action form an action

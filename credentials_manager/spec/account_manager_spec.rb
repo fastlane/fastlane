@@ -1,7 +1,7 @@
 describe CredentialsManager do
   describe CredentialsManager::AccountManager do
-    let (:user) { "felix@krausefx.com" }
-    let (:password) { "suchSecret" }
+    let(:user) { "felix@krausefx.com" }
+    let(:password) { "suchSecret" }
 
     it "allows passing user and password" do
       c = CredentialsManager::AccountManager.new(user: user, password: password)

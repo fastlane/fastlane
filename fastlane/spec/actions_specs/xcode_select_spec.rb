@@ -10,7 +10,7 @@ describe Fastlane do
       end
 
       after(:each) do
-        ENV.delete "DEVELOPER_DIR"
+        ENV.delete("DEVELOPER_DIR")
       end
 
       it "throws an exception if no params are passed" do

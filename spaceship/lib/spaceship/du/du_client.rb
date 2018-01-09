@@ -48,7 +48,7 @@ module Spaceship
     def get_picture_type(upload_file)
       resolution = Utilities.resolution(upload_file.file_path)
       result = device_resolution_map.find do |key, resolutions|
-        resolutions.include? resolution
+        resolutions.include?(resolution)
       end
       raise "Unknown device for screen resolution #{resolution}" if result.nil?
 
@@ -73,7 +73,7 @@ module Spaceship
       end
 
       r = request(:post) do |req|
-        req.url "#{self.class.hostname}#{path}"
+        req.url("#{self.class.hostname}#{path}")
         req.body = upload_file.bytes
         req.headers['Accept'] = 'application/json, text/plain, */*'
         req.headers['Content-Type'] = upload_file.content_type
@@ -147,7 +147,7 @@ module Spaceship
     def screenshot_picture_type(device, is_messages)
       map = is_messages ? messages_picture_type_map : picture_type_map
       device = device.to_sym
-      raise "Unknown picture type for device: #{device}" unless map.key? device
+      raise "Unknown picture type for device: #{device}" unless map.key?(device)
       map[device]
     end
 

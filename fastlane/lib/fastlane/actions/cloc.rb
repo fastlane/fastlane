@@ -18,7 +18,7 @@ module Fastlane
           source_directory
         ].join(' ').strip
 
-        Actions.sh command
+        Actions.sh(command)
       end
 
       def self.description

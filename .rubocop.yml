@@ -278,3 +278,24 @@ Style/IfInsideElse:
 # Sometimes we just want to 'collect'
 Style/CollectionMethods:
   Enabled: false
+
+# ( ) for method calls
+Style/MethodCallWithArgsParentheses:
+  Enabled: true
+  IgnoredMethods:
+    - 'require'
+    - 'require_relative'
+    - 'gem'
+    - 'program'
+    - 'command'
+    - 'raise'
+    - 'attr_accessor'
+    - 'attr_reader'
+    - 'lane'
+    # rspec tests code below
+    - 'to'
+    - 'describe'
+    - 'it'
+    - 'context'
+    - 'before'
+    - 'after'

@@ -54,7 +54,7 @@ module Supply
         end
       end
 
-      default_command :run
+      default_command(:run)
 
       run!
     end

@@ -9,13 +9,13 @@ module Frameit
     end
 
     def self.check_image_magick
-      unless `which convert`.include? "convert"
-        UI.error '#############################################################'
-        UI.error "# You have to install the ImageMagick to use FrameIt"
-        UI.error "# Install it using 'brew update && brew install imagemagick'"
-        UI.error "# If you don't have homebrew: http://brew.sh"
-        UI.error '#############################################################'
-        UI.user_error! "Install ImageMagick and start frameit again!"
+      unless `which convert`.include?("convert")
+        UI.error('#############################################################')
+        UI.error("# You have to install the ImageMagick to use FrameIt")
+        UI.error("# Install it using 'brew update && brew install imagemagick'")
+        UI.error("# If you don't have homebrew: http://brew.sh")
+        UI.error('#############################################################')
+        UI.user_error!("Install ImageMagick and start frameit again!")
       end
     end
   end

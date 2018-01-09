@@ -10,7 +10,7 @@ module Match
 
     # Fill in an environment variable, ready to be used in _xcodebuild_
     def self.fill_environment(key, value)
-      UI.important "Setting environment variable '#{key}' to '#{value}'" if FastlaneCore::Globals.verbose?
+      UI.important("Setting environment variable '#{key}' to '#{value}'") if FastlaneCore::Globals.verbose?
       ENV[key] = value
     end
 
@@ -51,7 +51,7 @@ module Match
            'notAfter' => 'End Datetime'
        }
 
-      return out_array.map { |x| x.split(/=+/) if x.include? "=" }
+      return out_array.map { |x| x.split(/=+/) if x.include?("=") }
                       .compact
                       .map { |k, v| [openssl_keys_to_readable_keys.fetch(k, k), v] }
     rescue => ex

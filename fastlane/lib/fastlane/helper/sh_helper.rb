@@ -88,7 +88,7 @@ module Fastlane
         # Avoid yielding nil in tests. $? will be meaningless, but calls to
         # it will not crash. There is no Process::Status.new. The alternative
         # is to move this inside the sh_enabled? check and not yield in tests.
-        return yield exit_status || $?, result, shell_command
+        return yield(exit_status || $?, result, shell_command)
       end
       result
     rescue => ex
@@ -121,7 +121,7 @@ module Fastlane
       # Support [ "/usr/local/bin/foo", "foo" ], "-x", ...
       if args.first.kind_of?(Array)
         command += args.shift.first.shellescape + " " + args.shelljoin
-        command.chomp! " "
+        command.chomp!(" ")
       elsif args.count == 1 && args.first.kind_of?(String)
         command += args.first
       else
