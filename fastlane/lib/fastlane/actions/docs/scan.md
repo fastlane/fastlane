@@ -111,7 +111,9 @@ scan(
 
 For a list of all available parameters use
 
-    fastlane action scan
+```no-highlight
+fastlane action scan
+```
 
 To access the raw `xcodebuild` output open `~/Library/Logs/scan`
 
