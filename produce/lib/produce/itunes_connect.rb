@@ -1,3 +1,4 @@
+require 'spaceship'
 require 'spaceship/tunes/tunes'
 require_relative 'module'
 require_relative 'available_default_languages'
