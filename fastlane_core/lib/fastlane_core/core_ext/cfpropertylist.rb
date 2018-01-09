@@ -13,6 +13,6 @@ require "plist"
 # method from Plist, so leave it.
 [Array, Hash].each do |c|
   c.send(:alias_method, :to_binary_plist, :to_plist)
-  c.send(:remove_method, :to_plist)
+  c.send(:remove_method, :to_plist) if c.method_defined?(:remove_method)
   c.module_eval("include Plist::Emit")
 end
