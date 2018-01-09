@@ -10,7 +10,8 @@ module Fastlane
 
         begin
           path = File.expand_path(params[:path])
-          plist = Plist.parse_xml(path)
+
+          plist = File.open(path) { |f| Plist.parse_xml(f) }
 
           value = plist[params[:key]]
           Actions.lane_context[SharedValues::GET_INFO_PLIST_VALUE_CUSTOM_VALUE] = value
@@ -18,7 +19,6 @@ module Fastlane
           return value
         rescue => ex
           UI.error(ex)
-          UI.error("Unable to find plist file at '#{path}'")
         end
       end
 
