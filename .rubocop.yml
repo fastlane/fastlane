@@ -99,7 +99,6 @@ Require/MissingRequireStatement:
     - '**/*.rake'
     - '**/Rakefile'
     - 'fastlane/**/*' # TODO: remove
-    - 'supply/**/*' # TODO: remove
 
 # We could potentially enable the 2 below:
 Layout/IndentHash:

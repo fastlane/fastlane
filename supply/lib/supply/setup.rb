@@ -1,3 +1,6 @@
+require_relative 'module'
+require_relative 'client'
+
 module Supply
   class Setup
     def perform_download

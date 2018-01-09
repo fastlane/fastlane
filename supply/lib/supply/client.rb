@@ -4,6 +4,9 @@ Androidpublisher = Google::Apis::AndroidpublisherV2
 
 require 'net/http'
 
+# This doesn't work properly because of the constants above
+# rubocop:disable Require/MissingRequireStatement
+
 module Supply
   class Client
     # Connecting with Google
