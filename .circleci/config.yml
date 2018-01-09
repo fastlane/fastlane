@@ -58,7 +58,7 @@ jobs:
       LANG: C.UTF-8
       FASTLANE_ITUNES_TRANSPORTER_PATH: .bundle
     docker:
-      - image: fastlanetools/fastlane
+      - image: fastlanetools/fastlane:2.3.4
     steps:
       - checkout
 
