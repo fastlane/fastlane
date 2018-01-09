@@ -1,4 +1,17 @@
-require 'precheck'
+require 'precheck/options'
+require 'precheck/runner'
+require 'fastlane_core/configuration/configuration'
+require 'fastlane_core/crash_reporter/crash_reporter'
+require 'fastlane_core/ipa_upload_package_builder'
+require 'fastlane_core/pkg_upload_package_builder'
+require 'fastlane_core/itunes_transporter'
+require_relative 'html_generator'
+require_relative 'submit_for_review'
+require_relative 'upload_assets'
+require_relative 'upload_price_tier'
+require_relative 'upload_metadata'
+require_relative 'upload_screenshots'
+require_relative 'detect_values'
 
 module Deliver
   class Runner

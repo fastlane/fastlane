@@ -1,5 +1,7 @@
 require 'rexml/document'
 
+require_relative 'helper'
+
 module FastlaneCore
   class PkgFileAnalyser
     def self.fetch_app_identifier(path)
@@ -20,7 +22,7 @@ module FastlaneCore
         Helper.backticks("xar -C #{dir.shellescape} -xf #{path.shellescape}")
 
         Dir.foreach(dir) do |file|
-          next unless file.include? 'Distribution'
+          next unless file.include?('Distribution')
 
           begin
             content = File.open(File.join(dir, file))

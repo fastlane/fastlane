@@ -30,7 +30,7 @@ module Fastlane
         unless changelog
           path = default_changelog_path
           UI.message("Looking for changelog in '#{path}'...")
-          if File.exist? path
+          if File.exist?(path)
             changelog = File.read(path)
           else
             UI.error("Couldn't find changelog.txt")
@@ -141,7 +141,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

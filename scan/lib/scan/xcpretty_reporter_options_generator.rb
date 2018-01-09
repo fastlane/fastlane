@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Scan
   class XCPrettyReporterOptionsGenerator
     SUPPORTED_REPORT_TYPES = %w(html junit json-compilation-database)

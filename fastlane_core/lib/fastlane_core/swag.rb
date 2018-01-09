@@ -1,4 +1,7 @@
 require "stringio"
+
+require_relative 'helper'
+
 module FastlaneCore
   class Swag
     # rubocop:disable LineLength
@@ -29,8 +32,8 @@ module FastlaneCore
       @break = true
       @thr.join
       # Process.kill("KILL", @sound_pid) if @sound_thr
-      STDOUT.print "\e[H\e[2J"
-      STDOUT.print "\e[?25l"
+      STDOUT.print("\e[H\e[2J")
+      STDOUT.print("\e[?25l")
     end
 
     def self.should_be_shown?
@@ -63,19 +66,19 @@ module FastlaneCore
       interrupted = false
       begin
         loop do
-          STDOUT.print "\e[H\e[2J"
-          STDOUT.print "\e[?25l"
-          FRAMES.each.with_index 1 do |frame, nxt|
-            STDOUT.print Zlib::Inflate.inflate frame
-            sleep 0.1
+          STDOUT.print("\e[H\e[2J")
+          STDOUT.print("\e[?25l")
+          FRAMES.each.with_index(1) do |frame, nxt|
+            STDOUT.print(Zlib::Inflate.inflate(frame))
+            sleep(0.1)
             break if interrupted
-            STDOUT.print "\e[H\e[2J" if FRAMES[nxt]
+            STDOUT.print("\e[H\e[2J") if FRAMES[nxt]
           end
           break if do_break
         end
         STDOUT.puts
       ensure
-        print "\e[?25h"
+        print("\e[?25h")
       end
     end
   end

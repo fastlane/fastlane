@@ -4,9 +4,9 @@ module Fastlane
     SWIFT_FUNCTION_REGEX = /\s*func\s*(\w*)\s*\(\s*\)\s*/
     SWIFT_DESC_REGEX = /\s*desc\s*\(\s*"(.*)"\s*\)\s*/
     def self.output(path)
-      puts generate(path)
+      puts(generate(path))
 
-      puts "Execute using `fastlane [lane_name]`".yellow
+      puts("Execute using `fastlane [lane_name]`".yellow)
     end
 
     def self.generate_swift_lanes(path)
@@ -103,7 +103,7 @@ module Fastlane
     end
 
     def self.output_json(path)
-      puts JSON.pretty_generate(self.generate_json(path))
+      puts(JSON.pretty_generate(self.generate_json(path)))
     end
 
     # Returns a hash

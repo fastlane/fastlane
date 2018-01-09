@@ -1,3 +1,8 @@
+require_relative '../du/upload_file'
+require_relative 'iap_status'
+require_relative 'iap_type'
+require_relative 'tunes_base'
+
 module Spaceship
   module Tunes
     class IAPDetail < TunesBase
@@ -98,7 +103,7 @@ module Spaceship
             }
           }
         end
-        raw_data.set(["subscriptions"], new_intervals)
+        raw_data.set(["pricingIntervals"], new_intervals)
       end
 
       # @return (Array) pricing intervals
@@ -112,7 +117,7 @@ module Spaceship
       #    }
       #  ]
       def pricing_intervals
-        @pricing_intervals ||= raw_data["subscriptions"].map do |interval|
+        @pricing_intervals ||= raw_data["pricingIntervals"].map do |interval|
           {
             tier: interval["value"]["tierStem"].to_i,
             begin_date: interval["value"]["priceTierEffectiveDate"],
@@ -190,7 +195,7 @@ module Spaceship
 
         if @review_screenshot
           # Upload Screenshot
-          upload_file = UploadFile.from_path @review_screenshot
+          upload_file = UploadFile.from_path(@review_screenshot)
           screenshot_data = client.upload_purchase_review_screenshot(application.apple_id, upload_file)
           raw_data["versions"][0]["reviewScreenshot"] = screenshot_data
         end

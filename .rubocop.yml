@@ -1,3 +1,6 @@
+require: 
+  - rubocop/require_tools
+
 Style/MultipleComparison:
   Enabled: false
 
@@ -82,6 +85,20 @@ Style/BracesAroundHashParameters:
 Lint/UselessAssignment:
   Exclude:
     - '**/spec/**/*'
+
+# In specs requires are done automatically
+Require/MissingRequireStatement:
+  Exclude:
+    - '**/spec/**/*.rb'
+    - '**/spec_helper.rb'
+    - 'spaceship/lib/spaceship/babosa_fix.rb'
+    - '**/Fastfile'
+    - '**/*.gemspec'
+    - 'rakelib/**/*'
+    - '**/*.rake'
+    - '**/Rakefile'
+    - 'fastlane/**/*' # TODO: remove
+    - 'supply/**/*' # TODO: remove
 
 # We could potentially enable the 2 below:
 Layout/IndentHash:
@@ -261,3 +278,24 @@ Style/IfInsideElse:
 # Sometimes we just want to 'collect'
 Style/CollectionMethods:
   Enabled: false
+
+# ( ) for method calls
+Style/MethodCallWithArgsParentheses:
+  Enabled: true
+  IgnoredMethods:
+    - 'require'
+    - 'require_relative'
+    - 'gem'
+    - 'program'
+    - 'command'
+    - 'raise'
+    - 'attr_accessor'
+    - 'attr_reader'
+    - 'lane'
+    # rspec tests code below
+    - 'to'
+    - 'describe'
+    - 'it'
+    - 'context'
+    - 'before'
+    - 'after'

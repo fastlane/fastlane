@@ -1,11 +1,15 @@
-require 'fastlane_core'
+require 'spaceship/tunes/tunes'
+
+require_relative 'module'
+require_relative 'download_screenshots'
+require_relative 'upload_metadata'
 
 module Deliver
   class Setup
     attr_accessor :is_swift
 
     def run(options, is_swift: false)
-      containing = FastlaneCore::Helper.fastlane_enabled_folder_path
+      containing = Helper.fastlane_enabled_folder_path
       self.is_swift = is_swift
 
       if is_swift
@@ -24,7 +28,7 @@ module Deliver
         download_screenshots(deliver_path, options)
 
         # Add a README to the screenshots folder
-        FileUtils.mkdir_p File.join(deliver_path, 'screenshots') # just in case the fetching didn't work
+        FileUtils.mkdir_p(File.join(deliver_path, 'screenshots')) # just in case the fetching didn't work
         File.write(File.join(deliver_path, 'screenshots', 'README.txt'), File.read("#{Deliver::ROOT}/lib/assets/ScreenshotsHelp"))
       end
 
@@ -38,10 +42,7 @@ module Deliver
       generate_metadata_files(v, File.join(deliver_path, 'metadata'))
 
       # Generate the final Deliverfile here
-      deliver = File.read(deliverfile_path)
-      deliver.gsub!("[[APP_IDENTIFIER]]", options[:app].bundle_id)
-      deliver.gsub!("[[USERNAME]]", Spaceship::Tunes.client.user)
-      return deliver
+      return File.read(deliverfile_path)
     end
 
     def deliverfile_path

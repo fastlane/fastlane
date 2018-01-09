@@ -26,23 +26,34 @@ module Fastlane
         socket_thread = self.start_socket_thread
         sleep(0.250) while socket_thread[:ready].nil?
         # wait on socket_thread to be in ready state, then start the runner thread
-        runner_thread = self.cruise_swift_lane_in_thread(lane, parameters)
+        self.cruise_swift_lane_in_thread(lane, parameters)
 
-        runner_thread.join
         socket_thread.join
       rescue Exception => ex # rubocop:disable Lint/RescueException
+        e = ex
+      end
+      # If we have a thread exception, drop that in the exception
+      # won't ever have a situation where e is non-nil, and socket_thread[:exception] is also non-nil
+      e ||= socket_thread[:exception]
+
+      unless e.nil?
+        print_lane_context
+
         # We also catch Exception, since the implemented action might send a SystemExit signal
         # (or similar). We still want to catch that, since we want properly finish running fastlane
         # Tested with `xcake`, which throws a `Xcake::Informative` object
+        UI.error(e.to_s) if e.kind_of?(StandardError) # we don't want to print things like 'system exit'
+      end
 
-        print_lane_context
-        UI.error ex.to_s if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
-        e = ex
+      skip_message = false
+      exit_reason = socket_thread[:exit_reason]
+      if exit_reason == :cancelled && e.nil?
+        skip_message = true
       end
 
       duration = ((Time.now - started) / 60.0).round
 
-      finish_fastlane(nil, duration, e)
+      finish_fastlane(nil, duration, e, skip_message: skip_message)
     end
 
     def self.display_lanes

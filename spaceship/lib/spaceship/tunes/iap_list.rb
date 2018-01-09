@@ -1,5 +1,8 @@
-# For Ruby 2.0 support
 require 'fastlane_core/core_ext/array'
+
+require_relative 'iap_detail'
+require_relative 'iap_status'
+require_relative 'iap_type'
 
 module Spaceship
   module Tunes
@@ -55,7 +58,9 @@ module Spaceship
       end
 
       def edit
-        Tunes::IAPDetail.new(build_iap)
+        attrs = client.load_iap(app_id: application.apple_id, purchase_id: self.purchase_id)
+        attrs[:application] = application
+        Tunes::IAPDetail.new(attrs)
       end
 
       def delete!

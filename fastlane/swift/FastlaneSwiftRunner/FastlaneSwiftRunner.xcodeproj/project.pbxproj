@@ -32,7 +32,9 @@
 		D55B28C91F6C588300DC42C5 /* Snapshotfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28C21F6C588300DC42C5 /* Snapshotfile.swift */; };
 		D5A7C48F1F7C4DAF00A91DE6 /* Appfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A7C48D1F7C4DAF00A91DE6 /* Appfile.swift */; };
 		D5A7C4901F7C4DAF00A91DE6 /* Fastfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A7C48E1F7C4DAF00A91DE6 /* Fastfile.swift */; };
+		D5B8A5B31FFDC49E00536B24 /* ControlCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B8A5B21FFDC49D00536B24 /* ControlCommand.swift */; };
 		D5BAFD121F7DAAFC0030B324 /* ArgumentProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5BAFD111F7DAAFC0030B324 /* ArgumentProcessor.swift */; };
+		D5D1DE991FFEE8EA00502A00 /* RubyCommandable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5D1DE981FFEE8E900502A00 /* RubyCommandable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,7 +64,9 @@
 		D55B28C21F6C588300DC42C5 /* Snapshotfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Snapshotfile.swift; path = ../Snapshotfile.swift; sourceTree = "<group>"; };
 		D5A7C48D1F7C4DAF00A91DE6 /* Appfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Appfile.swift; path = ../Appfile.swift; sourceTree = "<group>"; };
 		D5A7C48E1F7C4DAF00A91DE6 /* Fastfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Fastfile.swift; path = ../Fastfile.swift; sourceTree = "<group>"; };
+		D5B8A5B21FFDC49D00536B24 /* ControlCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ControlCommand.swift; path = ../ControlCommand.swift; sourceTree = "<group>"; };
 		D5BAFD111F7DAAFC0030B324 /* ArgumentProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ArgumentProcessor.swift; path = ../ArgumentProcessor.swift; sourceTree = "<group>"; };
+		D5D1DE981FFEE8E900502A00 /* RubyCommandable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RubyCommandable.swift; path = ../RubyCommandable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,7 +111,9 @@
 		B3BA65B11F5A325E00B34850 /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				D5B8A5B21FFDC49D00536B24 /* ControlCommand.swift */,
 				B3BA65A01F5A269100B34850 /* RubyCommand.swift */,
+				D5D1DE981FFEE8E900502A00 /* RubyCommandable.swift */,
 				B3BA65A11F5A269100B34850 /* Runner.swift */,
 				B3BA65A21F5A269100B34850 /* SocketClient.swift */,
 				B3BA65A31F5A269100B34850 /* SocketClientDelegateProtocol.swift */,
@@ -225,6 +231,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B3BA65A91F5A269100B34850 /* RubyCommand.swift in Sources */,
+				D5D1DE991FFEE8EA00502A00 /* RubyCommandable.swift in Sources */,
 				D55B28C41F6C588300DC42C5 /* Gymfile.swift in Sources */,
 				B302067D1F5E3E9000DE6EBD /* MatchfileProtocol.swift in Sources */,
 				B3BA65AC1F5A269100B34850 /* SocketClientDelegateProtocol.swift in Sources */,
@@ -243,6 +250,7 @@
 				B30206811F5E3E9000DE6EBD /* DeliverfileProtocol.swift in Sources */,
 				B3BA65AA1F5A269100B34850 /* Runner.swift in Sources */,
 				B3BA65AF1F5A2D5C00B34850 /* RunnerArgument.swift in Sources */,
+				D5B8A5B31FFDC49E00536B24 /* ControlCommand.swift in Sources */,
 				B302067E1F5E3E9000DE6EBD /* PrecheckfileProtocol.swift in Sources */,
 				B3BA65AD1F5A269100B34850 /* SocketResponse.swift in Sources */,
 				B3BA65A81F5A269100B34850 /* main.swift in Sources */,

@@ -15,13 +15,27 @@ module Fastlane
       def take_off
         before_import_time = Time.now
 
-        require "tty-spinner"
+        if !ENV["FASTLANE_DISABLE_ANIMATION"]
+          # Usually in the fastlane code base we use
+          #
+          #   Helper.show_loading_indicator
+          #   longer_taking_task_here
+          #   Helper.hide_loading_indicator
+          #
+          # but in this case we haven't required FastlaneCore yet
+          # so we'll have to access the raw API for now
+          require "tty-spinner"
+          require_fastlane_spinner = TTY::Spinner.new("[:spinner] 🚀 ", format: :dots)
+          require_fastlane_spinner.auto_spin
 
-        require_fastlane_spinner = TTY::Spinner.new("[:spinner] 🚀 ", format: :dots)
-        require_fastlane_spinner.auto_spin
-        require "fastlane" # this might take a long time if there is no Gemfile :(
-        require_fastlane_spinner.success
+          # this might take a long time if there is no Gemfile :(
+          # That's why we show the loading indicator here also
+          require "fastlane"
 
+          require_fastlane_spinner.success
+        else
+          require "fastlane"
+        end
         # We want to avoid printing output other than the version number if we are running `fastlane -v`
         unless running_version_command?
           print_bundle_exec_warning(is_slow: (Time.now - before_import_time > 3))
@@ -102,31 +116,31 @@ module Fastlane
           # The user has a Gemfile, but forgot to use `bundle exec`
           # Let's tell the user how to use `bundle exec`
           # We show this warning no matter if the command is slow or not
-          UI.important "fastlane detected a Gemfile in the current directory"
-          UI.important "however it seems like you don't use `bundle exec`"
-          UI.important "to launch fastlane faster, please use"
-          UI.message ""
+          UI.important("fastlane detected a Gemfile in the current directory")
+          UI.important("however it seems like you don't use `bundle exec`")
+          UI.important("to launch fastlane faster, please use")
+          UI.message("")
           UI.command "bundle exec fastlane #{ARGV.join(' ')}"
-          UI.message ""
+          UI.message("")
         elsif is_slow
           # fastlane is slow and there is no Gemfile
           # Let's tell the user how to use `gem cleanup` and how to
           # start using a Gemfile
-          UI.important "Seems like launching fastlane takes a while - please run"
-          UI.message ""
+          UI.important("Seems like launching fastlane takes a while - please run")
+          UI.message("")
           UI.command "[sudo] gem cleanup"
-          UI.message ""
-          UI.important "to uninstall outdated gems and make fastlane launch faster"
-          UI.important "Alternatively it's recommended to start using a Gemfile to lock your dependencies"
-          UI.important "To get started with a Gemfile, run"
-          UI.message ""
+          UI.message("")
+          UI.important("to uninstall outdated gems and make fastlane launch faster")
+          UI.important("Alternatively it's recommended to start using a Gemfile to lock your dependencies")
+          UI.important("To get started with a Gemfile, run")
+          UI.message("")
           UI.command "bundle init"
           UI.command "echo 'gem \"fastlane\"' >> Gemfile"
           UI.command "bundle install"
-          UI.message ""
-          UI.important "After creating the Gemfile and Gemfile.lock, commit those files into version control"
+          UI.message("")
+          UI.important("After creating the Gemfile and Gemfile.lock, commit those files into version control")
         end
-        UI.important "Get started using a Gemfile for fastlane https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile"
+        UI.important("Get started using a Gemfile for fastlane https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile")
       end
 
       # Returns an array of symbols for the available lanes for the Fastfile

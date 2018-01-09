@@ -1,3 +1,7 @@
+require 'openssl'
+
+require_relative '../helper'
+
 module FastlaneCore
   class AnalyticsIngesterClient
     def post_events(events)
@@ -24,14 +28,14 @@ module FastlaneCore
 
       require 'faraday'
       connection = Faraday.new(url) do |conn|
-        conn.adapter Faraday.default_adapter
+        conn.adapter(Faraday.default_adapter)
         if ENV['METRICS_DEBUG']
           conn.proxy = "https://127.0.0.1:8888"
           conn.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
         end
       end
       connection.post do |req|
-        req.url '/public'
+        req.url('/public')
         req.headers['Content-Type'] = 'application/json'
         req.body = body
       end

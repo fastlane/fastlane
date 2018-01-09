@@ -1,5 +1,9 @@
 require 'digest/md5'
 
+require_relative 'globals'
+require_relative 'ui/ui'
+require_relative 'module'
+
 module FastlaneCore
   # Builds a package for the pkg ready to be uploaded with the iTunes Transporter
   class PkgUploadPackageBuilder
@@ -10,7 +14,7 @@ module FastlaneCore
     def generate(app_id: nil, pkg_path: nil, package_path: nil, platform: "osx")
       self.package_path = File.join(package_path, "#{app_id}.itmsp")
       FileUtils.rm_rf(self.package_path) if File.directory?(self.package_path)
-      FileUtils.mkdir_p self.package_path
+      FileUtils.mkdir_p(self.package_path)
 
       pkg_path = copy_pkg(pkg_path)
       @data = {

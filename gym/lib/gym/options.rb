@@ -1,5 +1,6 @@
-require "fastlane_core"
-require "credentials_manager"
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
+require_relative 'module'
 
 module Gym
   class Options
@@ -61,11 +62,7 @@ module Gym
                                      short_option: "-n",
                                      env_name: "GYM_OUTPUT_NAME",
                                      description: "The name of the resulting ipa file",
-                                     optional: true,
-                                     verify_block: proc do |value|
-                                       value.gsub!(".ipa", "")
-                                       value.gsub!(File::SEPARATOR, "_")
-                                     end),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :configuration,
                                      short_option: "-q",
                                      env_name: "GYM_CONFIGURATION",

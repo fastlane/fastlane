@@ -1,6 +1,8 @@
+require_relative 'helper'
+
 module FastlaneCore
   class ToolCollector
-    # Learn more at https://github.com/fastlane/fastlane#metrics
+    # Learn more at https://docs.fastlane.tools/#metrics
 
     # This is the original error reporting mechanism, which has always represented
     # either controlled (UI.user_error!), or uncontrolled (UI.crash!, anything else)
@@ -120,7 +122,7 @@ module FastlaneCore
 
     def show_message
       UI.message("Sending Crash/Success information")
-      UI.message("Learn more at https://github.com/fastlane/fastlane#metrics")
+      UI.message("Learn more at https://docs.fastlane.tools/#metrics")
       UI.message("No personal/sensitive data is sent. Only sharing the following:")
       UI.message(launches)
       UI.message(@error) if @error

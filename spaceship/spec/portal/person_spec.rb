@@ -55,6 +55,6 @@ describe Spaceship::Portal::Persons do
 
   it "should change role" do
     person = Spaceship::Portal::Persons.find("helmut@januschka.com")
-    expect { person.change_role("member") }.to_not raise_error
+    expect { person.change_role("member") }.to_not(raise_error)
   end
 end

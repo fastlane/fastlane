@@ -1,12 +1,18 @@
 require 'logger'
 require 'colored'
+require 'tty-spinner'
+require 'pathname'
+
+require_relative 'fastlane_folder'
+require_relative 'ui/ui'
+require_relative 'env'
 
 module FastlaneCore
   module Helper
     # This method is deprecated, use the `UI` class
     # https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md
     def self.log
-      UI.deprecated "Helper.log is deprecated. Use `UI` class instead"
+      UI.deprecated("Helper.log is deprecated. Use `UI` class instead")
       UI.current.log
     end
 
@@ -21,7 +27,7 @@ module FastlaneCore
 
     # @return true if the currently running program is a unit test
     def self.test?
-      defined? SpecHelper
+      Object.const_defined?("SpecHelper")
     end
 
     # @return true if it is enabled to execute external commands
@@ -120,6 +126,10 @@ module FastlaneCore
       self.mac?
     end
 
+    def self.is_windows?
+      self.windows?
+    end
+
     # Do we want to disable the colored output?
     def self.colors_disabled?
       FastlaneCore::Env.truthy?("FASTLANE_DISABLE_COLORS")
@@ -194,7 +204,7 @@ module FastlaneCore
       return File.join(self.itms_path, 'bin', 'iTMSTransporter')
     end
 
-    def self.keychain_path(name)
+    def self.keychain_path(keychain_name)
       # Existing code expects that a keychain name will be expanded into a default path to Library/Keychains
       # in the user's home directory. However, this will not allow the user to pass an absolute path
       # for the keychain value
@@ -206,10 +216,9 @@ module FastlaneCore
       #
       # We also try to append `-db` at the end of the file path, as with Sierra the default Keychain name
       # has changed for some users: https://github.com/fastlane/fastlane/issues/5649
-      #
 
-      # Remove the ".keychain" at the end of the name
-      name.sub!(/\.keychain$/, "")
+      # Remove the ".keychain" at the end of the keychain name
+      name = keychain_name.sub(/\.keychain$/, "")
 
       possible_locations = [
         File.join(Dir.home, 'Library', 'Keychains', name),
@@ -266,6 +275,25 @@ module FastlaneCore
         return Gem::Specification.find_by_name(gem_name).gem_dir
       else
         return './'
+      end
+    end
+
+    # Show/Hide loading indicator
+    def self.show_loading_indicator(text = nil)
+      if FastlaneCore::Env.truthy?("FASTLANE_DISABLE_ANIMATION")
+        UI.message(text) if text
+      else
+        # we set the default here, instead of at the parameters
+        # as we don't want to `UI.message` a rocket that's just there for the loading indicator
+        text ||= "🚀"
+        @require_fastlane_spinner = TTY::Spinner.new("[:spinner] #{text} ", format: :dots)
+        @require_fastlane_spinner.auto_spin
+      end
+    end
+
+    def self.hide_loading_indicator
+      if !FastlaneCore::Env.truthy?("FASTLANE_DISABLE_ANIMATION") && @require_fastlane_spinner
+        @require_fastlane_spinner.success
       end
     end
   end

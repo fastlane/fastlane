@@ -1,0 +1,22 @@
+# https://www.appveyor.com/docs/appveyor-yml/
+
+version: "{build}"
+
+init:
+  - git config --global core.autocrlf true
+
+# cloning the repository happens here
+
+install:
+  - set PATH=C:\Ruby24-x64\bin;%PATH%
+  - bundle install
+
+environment:
+  LC_ALL: en_US.UTF-8
+  LANG: en_US.UTF-8
+  FASTLANE_ITUNES_TRANSPORTER_PATH: C:/tmp
+
+build: off
+
+test_script:
+  - bundle exec fastlane test

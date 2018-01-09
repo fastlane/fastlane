@@ -13,6 +13,7 @@ struct SocketResponse {
         case parseFailure(failureInformation: [String])
         case failure(failureInformation: [String])
         case readyForNext(returnedObject: String?, closureArgumentValue: String?)
+        case clientInitiatedCancel
         
         init(statusDictionary: [String : Any]) {
             guard let status = statusDictionary["status"] as? String else {
@@ -25,7 +26,11 @@ struct SocketResponse {
                 let closureArgumentValue = statusDictionary["closure_argument_value"] as? String
                 self = .readyForNext(returnedObject: returnedObject, closureArgumentValue: closureArgumentValue)
                 return
-                
+
+            } else if status == "cancelled" {
+                self = .clientInitiatedCancel
+                return
+
             } else if status == "failure" {
                 guard let failureInformation = statusDictionary["failure_information"] as? [String] else {
                     self = .parseFailure(failureInformation: ["Ruby server indicated failure but Swift couldn't receive it"])
@@ -71,4 +76,4 @@ extension SocketResponse {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.1]
+// FastlaneRunnerAPIVersion [0.9.2]

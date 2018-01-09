@@ -1,3 +1,8 @@
+require_relative 'app'
+require_relative 'device'
+require_relative 'certificate'
+require_relative 'provisioning_profile_template'
+
 module Spaceship
   module Portal
     # Represents a provisioning profile of the Apple Dev Portal
@@ -81,7 +86,7 @@ module Spaceship
       # @return (App) The app this profile is for
       #
       # @example Example Value
-      #   <Spaceship::App
+      #   <Spaceship::Portal::App
       #     @app_id="2UMR2S6PAA"
       #     @name="App Name"
       #     @platform="ios"
@@ -98,7 +103,7 @@ module Spaceship
       # @return (Array) A list of certificates used for this profile
       # @example Example Value
       #  [
-      #   <Spaceship::Certificate::Production
+      #   <Spaceship::Portal::Certificate::Production
       #     @status=nil
       #     @id="XC5PH8D4AA"
       #     @name="iOS Distribution"
@@ -118,7 +123,7 @@ module Spaceship
       #   This will always be [] for AppStore profiles
       #
       # @example Example Value
-      #  <Spaceship::Device
+      #  <Spaceship::Portal::Device
       #    @id="WXQ7V239BE"
       #    @name="Grahams iPhone 4s"
       #    @udid="ba0ac7d70f7a14c6fa02ef0e02f4fe9c5178e2f7"
@@ -252,9 +257,9 @@ module Spaceship
         # @return (ProvisioningProfile): The profile that was just created
         def create!(name: nil, bundle_id: nil, certificate: nil, devices: [], mac: false, sub_platform: nil, template_name: nil)
           raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
-          raise "Missing required parameter 'certificate'. e.g. use `Spaceship::Certificate::Production.all.first`" if certificate.to_s.empty?
+          raise "Missing required parameter 'certificate'. e.g. use `Spaceship::Portal::Certificate::Production.all.first`" if certificate.to_s.empty?
 
-          app = Spaceship::App.find(bundle_id, mac: mac)
+          app = Spaceship::Portal::App.find(bundle_id, mac: mac)
           raise "Could not find app with bundle id '#{bundle_id}'" unless app
 
           raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? and sub_platform != 'tvOS'
@@ -267,7 +272,7 @@ module Spaceship
             devices = []
           end
 
-          certificate_parameter = certificate.collect(&:id) if certificate.kind_of? Array
+          certificate_parameter = certificate.collect(&:id) if certificate.kind_of?(Array)
           certificate_parameter ||= [certificate.id]
 
           # Fix https://github.com/KrauseFx/fastlane/issues/349
@@ -277,11 +282,11 @@ module Spaceship
             if self == Development or self == AdHoc
               # For Development and AdHoc we usually want all compatible devices by default
               if mac
-                devices = Spaceship::Device.all_macs
+                devices = Spaceship::Portal::Device.all_macs
               elsif sub_platform == 'tvOS'
-                devices = Spaceship::Device.all_apple_tvs
+                devices = Spaceship::Portal::Device.all_apple_tvs
               else
-                devices = Spaceship::Device.all_ios_profile_devices
+                devices = Spaceship::Portal::Device.all_ios_profile_devices
               end
             end
           end
@@ -326,8 +331,8 @@ module Spaceship
           # a details request (see `profile_details`). This is an expensive operation
           # which we can't do for every single provisioning profile
           # Instead we'll treat App Store profiles the same way as Ad Hoc profiles
-          # Spaceship::ProvisioningProfile::AdHoc.all will return the same array as
-          # Spaceship::ProvisioningProfile::AppStore.all, containing only AppStore
+          # Spaceship::Portal::ProvisioningProfile::AdHoc.all will return the same array as
+          # Spaceship::Portal::ProvisioningProfile::AppStore.all, containing only AppStore
           # profiles. To determine if it's an Ad Hoc profile, you can use the
           # is_adhoc? method on the profile.
           klass = self
@@ -437,20 +442,20 @@ module Spaceship
         # This is the minimum protection needed for people using spaceship directly
         unless certificate_valid?
           if mac?
-            if self.kind_of? Development
-              self.certificates = [Spaceship::Certificate::MacDevelopment.all.first]
-            elsif self.kind_of? Direct
-              self.certificates = [Spaceship::Certificate::DeveloperIDApplication.all.first]
+            if self.kind_of?(Development)
+              self.certificates = [Spaceship::Portal::Certificate::MacDevelopment.all.first]
+            elsif self.kind_of?(Direct)
+              self.certificates = [Spaceship::Portal::Certificate::DeveloperIDApplication.all.first]
             else
-              self.certificates = [Spaceship::Certificate::MacAppDistribution.all.first]
+              self.certificates = [Spaceship::Portal::Certificate::MacAppDistribution.all.first]
             end
           else
-            if self.kind_of? Development
-              self.certificates = [Spaceship::Certificate::Development.all.first]
-            elsif self.kind_of? InHouse
-              self.certificates = [Spaceship::Certificate::InHouse.all.first]
+            if self.kind_of?(Development)
+              self.certificates = [Spaceship::Portal::Certificate::Development.all.first]
+            elsif self.kind_of?(InHouse)
+              self.certificates = [Spaceship::Portal::Certificate::InHouse.all.first]
             else
-              self.certificates = [Spaceship::Certificate::Production.all.first]
+              self.certificates = [Spaceship::Portal::Certificate::Production.all.first]
             end
           end
         end
@@ -470,7 +475,7 @@ module Spaceship
         end
 
         # We need to fetch the provisioning profile again, as the ID changes
-        profile = Spaceship::ProvisioningProfile.all(mac: mac?).find do |p|
+        profile = Spaceship::Portal::ProvisioningProfile.all(mac: mac?).find do |p|
           p.name == self.name # we can use the name as it's valid
         end
 
@@ -482,7 +487,7 @@ module Spaceship
       def certificate_valid?
         return false if (certificates || []).count == 0
         certificates.each do |c|
-          if Spaceship::Certificate.all(mac: mac?).collect(&:id).include?(c.id)
+          if Spaceship::Portal::Certificate.all(mac: mac?).collect(&:id).include?(c.id)
             return true
           end
         end
