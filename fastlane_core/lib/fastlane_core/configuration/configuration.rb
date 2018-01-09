@@ -70,9 +70,9 @@ module FastlaneCore
     end
 
     def verify_input_types
-      UI.user_error!("available_options parameter must be an array of ConfigItems but is #{@available_options.class}") unless @available_options.kind_of? Array
+      UI.user_error!("available_options parameter must be an array of ConfigItems but is #{@available_options.class}") unless @available_options.kind_of?(Array)
       @available_options.each do |item|
-        UI.user_error!("available_options parameter must be an array of ConfigItems. Found #{item.class}.") unless item.kind_of? ConfigItem
+        UI.user_error!("available_options parameter must be an array of ConfigItems. Found #{item.class}.") unless item.kind_of?(ConfigItem)
       end
       UI.user_error!("values parameter must be a hash") unless @values.kind_of?(Hash)
     end
@@ -245,7 +245,7 @@ module FastlaneCore
         begin
           set(key, value)
         rescue => ex
-          puts ex
+          puts(ex)
           value = nil
         end
       end
@@ -261,7 +261,7 @@ module FastlaneCore
     # Overwrites or sets a new value for a given key
     # @param key [Symbol] Must be a symbol
     def set(key, value)
-      UI.user_error!("Key '#{key}' must be a symbol. Example :#{key}.") unless key.kind_of? Symbol
+      UI.user_error!("Key '#{key}' must be a symbol. Example :#{key}.") unless key.kind_of?(Symbol)
       option = option_for_key(key)
 
       unless option

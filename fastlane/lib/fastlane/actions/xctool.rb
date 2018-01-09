@@ -7,7 +7,7 @@ module Fastlane
           UI.user_error!("xctool not installed, please install using `brew install xctool`") if `which xctool`.length == 0
         end
 
-        params = [] if params.kind_of? FastlaneCore::Configuration
+        params = [] if params.kind_of?(FastlaneCore::Configuration)
 
         Actions.sh('xctool ' + params.join(' '))
       end

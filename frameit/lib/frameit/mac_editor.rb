@@ -13,8 +13,8 @@ module Frameit
       self.top_space_above_device = offset['titleHeight'] # needed for centering the title
 
       @image = background.composite(image, "png") do |c|
-        c.compose "Over"
-        c.geometry offset['offset']
+        c.compose("Over")
+        c.geometry(offset['offset'])
       end
 
       return image

@@ -9,7 +9,7 @@ describe Fastlane do
 
       it "support a success callback block" do
         temp_path = "/tmp/fastlane_callback.txt"
-        File.delete(temp_path) if File.exist? temp_path
+        File.delete(temp_path) if File.exist?(temp_path)
 
         expect(File.exist?(temp_path)).to eq(false)
 

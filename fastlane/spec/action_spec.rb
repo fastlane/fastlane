@@ -97,11 +97,11 @@ describe Fastlane do
 
     describe "Action.sh" do
       it "delegates to Actions.sh_control_output" do
-        mock_status = double :status, exitstatus: 0
-        expect(Fastlane::Actions).to receive(:sh_control_output).with("ls", "-la").and_yield mock_status, "Command output"
-        Fastlane::Action.sh "ls", "-la" do |status, result|
-          expect(status.exitstatus).to eq 0
-          expect(result).to eq "Command output"
+        mock_status = double(:status, exitstatus: 0)
+        expect(Fastlane::Actions).to receive(:sh_control_output).with("ls", "-la").and_yield(mock_status, "Command output")
+        Fastlane::Action.sh("ls", "-la") do |status, result|
+          expect(status.exitstatus).to eq(0)
+          expect(result).to eq("Command output")
         end
       end
     end

@@ -5,7 +5,7 @@ module Snapshot
   class ScreenshotFlatten
     # @param (String) The path in which the screenshots are located in
     def run(path)
-      UI.message "Removing the alpha channel from generated png files"
+      UI.message("Removing the alpha channel from generated png files")
       flatten(path)
     end
 

@@ -29,5 +29,5 @@ if File.exist?(file_path)
   junit.headers = [:name, :file]
   junit.report
 else
-  puts "Couldn't find any test artifacts in path #{file_path}"
+  puts("Couldn't find any test artifacts in path #{file_path}")
 end

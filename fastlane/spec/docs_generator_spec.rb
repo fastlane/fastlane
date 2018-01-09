@@ -35,10 +35,10 @@ describe Fastlane do
       expect(output).to include('fastlane android lane')
       expect(output).to include("I'm a lane")
 
-      expect(output).not_to include('## iOS')
-      expect(output).not_to include('## Mac')
-      expect(output).not_to include('mac_lane')
-      expect(output).not_to include("I'm a mac private_lane")
+      expect(output).not_to(include('## iOS'))
+      expect(output).not_to(include('## Mac'))
+      expect(output).not_to(include('mac_lane'))
+      expect(output).not_to(include("I'm a mac private_lane"))
     end
   end
 end

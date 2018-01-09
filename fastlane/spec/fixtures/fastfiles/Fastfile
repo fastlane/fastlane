@@ -2,28 +2,28 @@
 
 FileUtils.mkdir_p("/tmp/fastlane/")
 
-default_platform :ios
+default_platform(:ios)
 
-lane :test do
+lane(:test) do
   File.write("/tmp/fastlane/tests.txt", Time.now.to_s)
   1
 end
 
-platform :ios do
-  lane :beta do
+platform(:ios) do
+  lane(:beta) do
     File.write("/tmp/fastlane/mac_beta.txt", Time.now.to_s)
     frameit
-    team_id '123'
-    team_id '123'
+    team_id('123')
+    team_id('123')
   end
 
-  lane :empty do
+  lane(:empty) do
     # nothing going on here
   end
 
-  desc "This action does nothing"
-  desc "but crash"
-  lane :crashy do
+  desc("This action does nothing")
+  desc("but crash")
+  lane(:crashy) do
     raise "my exception"
   end
 end
@@ -32,7 +32,7 @@ before_all do |lane|
   File.write("/tmp/fastlane/before_all.txt", Time.now.to_s)
 end
 
-lane :anotherroot do
+lane(:anotherroot) do
   File.write("/tmp/fastlane/another_root.txt", Time.now.to_s)
 end
 

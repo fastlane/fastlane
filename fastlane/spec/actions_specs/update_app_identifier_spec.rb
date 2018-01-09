@@ -1,20 +1,20 @@
 require 'xcodeproj'
-include Xcodeproj
+include(Xcodeproj)
 
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Update App Identifier Integration" do
       # Variables
-      let (:test_path) { "/tmp/fastlane/tests/fastlane" }
-      let (:fixtures_path) { "./fastlane/spec/fixtures/xcodeproj" }
-      let (:proj_file) { "bundle.xcodeproj" }
-      let (:identifier_key) { 'PRODUCT_BUNDLE_IDENTIFIER' }
+      let(:test_path) { "/tmp/fastlane/tests/fastlane" }
+      let(:fixtures_path) { "./fastlane/spec/fixtures/xcodeproj" }
+      let(:proj_file) { "bundle.xcodeproj" }
+      let(:identifier_key) { 'PRODUCT_BUNDLE_IDENTIFIER' }
 
       # Action parameters
-      let (:xcodeproj) { File.join(test_path, proj_file) }
-      let (:plist_path) { "Info.plist" }
-      let (:plist_path_with_srcroot) { "$(SRCROOT)/Info.plist" }
-      let (:app_identifier) { "com.test.plist" }
+      let(:xcodeproj) { File.join(test_path, proj_file) }
+      let(:plist_path) { "Info.plist" }
+      let(:plist_path_with_srcroot) { "$(SRCROOT)/Info.plist" }
+      let(:app_identifier) { "com.test.plist" }
 
       # Is there a better place for an helper function?
       # Create an Info.plist file with a supplied bundle_identifier parameter
@@ -75,7 +75,7 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(stub_settings_1['PRODUCT_BUNDLE_IDENTIFIER']).to eq('com.test.plist')
-          expect(stub_settings_2['PRODUCT_BUNDLE_IDENTIFIER']).to_not eq('com.test.plist')
+          expect(stub_settings_2['PRODUCT_BUNDLE_IDENTIFIER']).to_not(eq('com.test.plist'))
         end
 
         it "updates the xcode project when info plist path contains $(SRCROOT)" do
@@ -105,7 +105,7 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(stub_settings_1['PRODUCT_BUNDLE_IDENTIFIER']).to eq('com.test.plist')
-          expect(stub_settings_2['PRODUCT_BUNDLE_IDENTIFIER']).to_not eq('com.test.plist')
+          expect(stub_settings_2['PRODUCT_BUNDLE_IDENTIFIER']).to_not(eq('com.test.plist'))
         end
 
         it "should raise an exception when PRODUCT_BUNDLE_IDENTIFIER in info plist but project doesn't use this info plist" do

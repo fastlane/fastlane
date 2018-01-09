@@ -19,7 +19,7 @@ module Fastlane
         end
 
         Fastlane::Actions.sh("security default-keychain -s #{original}", log: false) unless original.nil?
-        Fastlane::Actions.sh "security delete-keychain #{keychain_path.shellescape}", log: false
+        Fastlane::Actions.sh("security delete-keychain #{keychain_path.shellescape}", log: false)
       end
 
       def self.details

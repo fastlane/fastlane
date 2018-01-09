@@ -1,5 +1,5 @@
 describe FastlaneCore::FastlaneFolder do
-  let (:fastfile_name) { "Fastfile" }
+  let(:fastfile_name) { "Fastfile" }
   describe "#path" do
     it "returns the fastlane path if it exists" do
       expect(FastlaneCore::FastlaneFolder.path).to eq("./fastlane/")

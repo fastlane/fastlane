@@ -76,7 +76,7 @@ describe Fastlane do
         it "Successfully handles exceptions" do
           expect do
             ff = Fastlane::LaneManager.cruise_lane('ios', 'crashy')
-          end.to raise_error 'my exception'
+          end.to raise_error('my exception')
         end
 
         it "Uses the default platform if given" do

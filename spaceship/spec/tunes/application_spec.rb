@@ -78,7 +78,7 @@ describe Spaceship::Application do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.123")
-        end.to raise_error "You must choose a primary language. You must choose a primary language."
+        end.to raise_error("You must choose a primary language. You must choose a primary language.")
       end
 
       it "raises an error if bundle is wildcard and bundle_id_suffix has not specified" do
@@ -87,7 +87,7 @@ describe Spaceship::Application do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.*")
-        end.to raise_error "You must enter a Bundle ID Suffix. You must enter a Bundle ID Suffix."
+        end.to raise_error("You must enter a Bundle ID Suffix. You must enter a Bundle ID Suffix.")
       end
     end
 
@@ -106,7 +106,7 @@ describe Spaceship::Application do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.123")
-        end.to raise_error "You must provide a company name to use on the App Store. You must provide a company name to use on the App Store."
+        end.to raise_error("You must provide a company name to use on the App Store. You must provide a company name to use on the App Store.")
       end
     end
 
@@ -220,7 +220,7 @@ describe Spaceship::Application do
       end
 
       describe "BUNDLES" do
-        let (:bundle) { Spaceship::Application.find(928_444_013) }
+        let(:bundle) { Spaceship::Application.find(928_444_013) }
         it "can find a bundle" do
           expect(bundle.raw_data['type']).to eq("iOS App Bundle")
         end
@@ -244,7 +244,7 @@ describe Spaceship::Application do
         app = Spaceship::Application.all.first
         expect do
           app.create_version!('0.1')
-        end.to raise_error "Cannot create a new version for this app as there already is an `edit_version` available"
+        end.to raise_error("Cannot create a new version for this app as there already is an `edit_version` available")
       end
     end
 

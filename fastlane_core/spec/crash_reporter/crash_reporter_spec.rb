@@ -41,7 +41,7 @@ describe FastlaneCore::CrashReporter do
       it 'does not post crash report if the crash came from a custom action' do
         custom_action_exception = FastlaneCore::Interface::FastlaneError.new
         custom_action_exception.set_backtrace(['actions/git_lab:58:in `include?'])
-        expect(FastlaneCore::CrashReportGenerator).to_not receive(:generate)
+        expect(FastlaneCore::CrashReportGenerator).to_not(receive(:generate))
         expect(custom_action_exception.fastlane_crash_came_from_custom_action?).to eq(true)
         FastlaneCore::CrashReporter.report_crash(exception: custom_action_exception)
       end

@@ -3,7 +3,7 @@ module Fastlane
     class SetupCircleCiAction < Action
       def self.run(params)
         unless should_run?(params)
-          UI.message "Not running on CI, skipping `setup_circle_ci`"
+          UI.message("Not running on CI, skipping `setup_circle_ci`")
           return
         end
 
@@ -13,7 +13,7 @@ module Fastlane
 
       def self.setup_output_paths(params)
         unless ENV["FL_OUTPUT_DIR"]
-          UI.message "Skipping Log Path setup as FL_OUTPUT_DIR is unset"
+          UI.message("Skipping Log Path setup as FL_OUTPUT_DIR is unset")
           return
         end
 
@@ -26,7 +26,7 @@ module Fastlane
 
       def self.setup_keychain
         unless ENV["MATCH_KEYCHAIN_NAME"].nil?
-          UI.message "Skipping Keychain setup as a keychain was already specified"
+          UI.message("Skipping Keychain setup as a keychain was already specified")
           return
         end
 
@@ -34,7 +34,7 @@ module Fastlane
         ENV["MATCH_KEYCHAIN_NAME"] = keychain_name
         ENV["MATCH_KEYCHAIN_PASSWORD"] = ""
 
-        UI.message "Creating temporary keychain: \"#{keychain_name}\"."
+        UI.message("Creating temporary keychain: \"#{keychain_name}\".")
         Actions::CreateKeychainAction.run(
           name: keychain_name,
           default_keychain: true,

@@ -49,7 +49,7 @@ describe Cert do
       allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(true)
 
       expect(expired_cert).to receive(:revoke!)
-      expect(good_cert).to_not receive(:revoke!)
+      expect(good_cert).to_not(receive(:revoke!))
 
       Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, keychain_path: ".")
       Cert::Runner.new.revoke_expired_certs!

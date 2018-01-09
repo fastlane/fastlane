@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "#execute_action" do
-      let (:step_name) { "My Step" }
+      let(:step_name) { "My Step" }
 
       it "stores the action properly" do
         Fastlane::Actions.execute_action(step_name) {}
@@ -15,12 +15,12 @@ describe Fastlane do
           Fastlane::Actions.execute_action(step_name) do
             UI.user_error!("Some error")
           end
-        end.to raise_error "Some error"
+        end.to raise_error("Some error")
 
         result = Fastlane::Actions.executed_actions.last
         expect(result[:name]).to eq(step_name)
-        expect(result[:error]).to include "Some error"
-        expect(result[:error]).to include "actions_helper.rb"
+        expect(result[:error]).to include("Some error")
+        expect(result[:error]).to include("actions_helper.rb")
       end
     end
 

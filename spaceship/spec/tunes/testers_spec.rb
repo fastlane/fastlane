@@ -40,11 +40,11 @@ describe Spaceship::Tunes::SandboxTester do
 
     describe "deletion" do
       it 'deletes a user' do
-        expect { Spaceship::Tunes::SandboxTester.delete!(['test@test.com']) }.not_to raise_error
+        expect { Spaceship::Tunes::SandboxTester.delete!(['test@test.com']) }.not_to(raise_error)
       end
 
       it 'deletes all users' do
-        expect { Spaceship::Tunes::SandboxTester.delete_all! }.not_to raise_error
+        expect { Spaceship::Tunes::SandboxTester.delete_all! }.not_to(raise_error)
       end
     end
   end

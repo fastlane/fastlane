@@ -14,7 +14,7 @@ module Fastlane
         ssh.open_channel do |channel|
           channel.exec(command) do |ch, success|
             unless success
-              abort "FAILED: couldn't execute command (ssh.channel.exec)"
+              abort("FAILED: couldn't execute command (ssh.channel.exec)")
             end
             channel.on_data do |ch1, data|
               stdout_data += data

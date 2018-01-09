@@ -76,7 +76,7 @@ describe Match do
 
       expect(Match::GitHelper).to receive(:clone).with(git_url, false, skip_docs: false, branch: "master", git_full_name: nil, git_user_email: nil, clone_branch_directly: false).and_return(repo_dir)
       expect(Match::Utils).to receive(:import).with(key_path, keychain, password: nil).and_return(nil)
-      expect(Match::GitHelper).to_not receive(:commit_changes)
+      expect(Match::GitHelper).to_not(receive(:commit_changes))
 
       # To also install the certificate, fake that
       expect(FastlaneCore::CertChecker).to receive(:installed?).with(cert_path).and_return(false)

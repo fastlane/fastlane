@@ -51,7 +51,7 @@ module Cert
         end
       end
 
-      default_command :create
+      default_command(:create)
 
       run!
     end

@@ -14,7 +14,7 @@ module FastlaneCore
     def generate(app_id: nil, pkg_path: nil, package_path: nil, platform: "osx")
       self.package_path = File.join(package_path, "#{app_id}.itmsp")
       FileUtils.rm_rf(self.package_path) if File.directory?(self.package_path)
-      FileUtils.mkdir_p self.package_path
+      FileUtils.mkdir_p(self.package_path)
 
       pkg_path = copy_pkg(pkg_path)
       @data = {

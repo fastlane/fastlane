@@ -47,9 +47,9 @@ module Scan
         }
       end
 
-      result = notifier.ping "#{Scan.project.app_name} Tests:",
+      result = notifier.ping("#{Scan.project.app_name} Tests:",
                              icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
-                             attachments: attachments
+                             attachments: attachments)
 
       if result.code.to_i == 200
         UI.success('Successfully sent Slack notification')

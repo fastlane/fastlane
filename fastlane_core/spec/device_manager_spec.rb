@@ -15,7 +15,7 @@ describe FastlaneCore do
     it "raises an error if xcrun CLI prints garbage simulator" do
       response = "response"
       s = StringIO.new
-      s.puts response
+      s.puts(response)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, s, nil, nil)
       allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, s, nil, nil)
 

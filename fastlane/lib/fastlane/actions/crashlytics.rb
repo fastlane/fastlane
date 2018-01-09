@@ -35,7 +35,7 @@ module Fastlane
                  .gsub(params[:build_secret], '[[BUILD_SECRET]]')
         end
 
-        UI.verbose sanitizer.call(command.join(' ')) if FastlaneCore::Globals.verbose?
+        UI.verbose(sanitizer.call(command.join(' '))) if FastlaneCore::Globals.verbose?
 
         error_callback = proc do |error|
           clean_error = sanitizer.call(error)
@@ -51,7 +51,7 @@ module Fastlane
 
         return command if Helper.test?
 
-        UI.verbose sanitizer.call(result) if FastlaneCore::Globals.verbose?
+        UI.verbose(sanitizer.call(result)) if FastlaneCore::Globals.verbose?
 
         UI.success('Build successfully uploaded to Crashlytics Beta 🌷')
         UI.success('Visit https://fabric.io/_/beta to add release notes and notify testers.')

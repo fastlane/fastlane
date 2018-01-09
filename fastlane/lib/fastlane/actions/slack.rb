@@ -39,9 +39,9 @@ module Fastlane
         return [notifier, slack_attachment] if Helper.is_test? # tests will verify the slack attachments and other properties
 
         begin
-          result = notifier.ping '',
+          result = notifier.ping('',
                                  icon_url: icon_url,
-                                 attachments: [slack_attachment]
+                                 attachments: [slack_attachment])
         rescue => exception
           UI.error("Exception: #{exception}")
         ensure
@@ -84,7 +84,7 @@ module Fastlane
                                        sensitive: true,
                                        description: "Create an Incoming WebHook for your Slack group",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Invalid URL, must start with https://") unless value.start_with? "https://"
+                                         UI.user_error!("Invalid URL, must start with https://") unless value.start_with?("https://")
                                        end),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "FL_SLACK_USERNAME",

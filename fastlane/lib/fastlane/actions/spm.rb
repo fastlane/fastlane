@@ -29,7 +29,7 @@ module Fastlane
                                        description: "The swift command (one of: #{available_commands.join(', ')})",
                                        default_value: "build",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid command. Use one of the following: #{available_commands.join(', ')}") unless available_commands.include? value
+                                         UI.user_error!("Please pass a valid command. Use one of the following: #{available_commands.join(', ')}") unless available_commands.include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :build_path,
                                        env_name: "FL_SPM_BUILD_PATH",
@@ -45,7 +45,7 @@ module Fastlane
                                        description: "Build with configuration (debug|release) [default: debug]",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid configuration: (debug|release)") unless valid_configurations.include? value
+                                         UI.user_error!("Please pass a valid configuration: (debug|release)") unless valid_configurations.include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        short_option: "-v",

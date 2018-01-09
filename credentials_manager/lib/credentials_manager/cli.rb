@@ -17,8 +17,8 @@ module CredentialsManager
         c.syntax = 'fastlane fastlane-credentials add'
         c.description = 'Adds a fastlane credential to the keychain.'
 
-        c.option '--username username', String, 'Username to add.'
-        c.option '--password password', String, 'Password to add.'
+        c.option('--username username', String, 'Username to add.')
+        c.option('--password password', String, 'Password to add.')
 
         c.action do |args, options|
           username = options.username || ask('Username: ')
@@ -26,7 +26,7 @@ module CredentialsManager
 
           add(username, password)
 
-          puts "Credential #{username}:#{'*' * password.length} added to keychain."
+          puts("Credential #{username}:#{'*' * password.length} added to keychain.")
         end
       end
 
@@ -35,7 +35,7 @@ module CredentialsManager
         c.syntax = 'fastlane fastlane-credentials remove'
         c.description = 'Removes a fastlane credential from the keychain.'
 
-        c.option '--username username', String, 'Username to remove.'
+        c.option('--username username', String, 'Username to remove.')
 
         c.action do |args, options|
           username = options.username || ask('Username: ')

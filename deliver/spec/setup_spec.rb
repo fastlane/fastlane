@@ -55,7 +55,7 @@ describe Deliver do
         end
       end
       context 'with trade_representative_contact_information' do
-        let (:version) do
+        let(:version) do
           double('version',
                  trade_representative_trade_name: 'John Smith',
                  trade_representative_first_name: 'John',

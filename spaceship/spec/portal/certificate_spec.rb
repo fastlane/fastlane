@@ -110,7 +110,7 @@ describe Spaceship::Certificate do
       expect do
         csr, pkey = Spaceship::Portal::Certificate.create_certificate_signing_request
         Spaceship::Portal::Certificate::ProductionPush.create!(csr: csr, bundle_id: 'notExisting')
-      end.to raise_error "Could not find app with bundle id 'notExisting'"
+      end.to raise_error("Could not find app with bundle id 'notExisting'")
     end
   end
 end

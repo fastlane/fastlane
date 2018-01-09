@@ -43,7 +43,7 @@ module Spaceship
         end
       end
 
-      default_command :playground
+      default_command(:playground)
 
       run!
     end

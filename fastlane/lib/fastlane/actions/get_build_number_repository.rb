@@ -6,28 +6,28 @@ module Fastlane
 
     class GetBuildNumberRepositoryAction < Action
       def self.is_svn?
-        Actions.sh 'svn info'
+        Actions.sh('svn info')
         return true
       rescue
         return false
       end
 
       def self.is_git?
-        Actions.sh 'git rev-parse HEAD'
+        Actions.sh('git rev-parse HEAD')
         return true
       rescue
         return false
       end
 
       def self.is_git_svn?
-        Actions.sh 'git svn info'
+        Actions.sh('git svn info')
         return true
       rescue
         return false
       end
 
       def self.is_hg?
-        Actions.sh 'hg status'
+        Actions.sh('hg status')
         return true
       rescue
         return false
@@ -35,16 +35,16 @@ module Fastlane
 
       def self.command(use_hg_revision_number)
         if is_svn?
-          UI.message "Detected repo: svn"
+          UI.message("Detected repo: svn")
           return 'svn info | grep Revision | egrep -o "[0-9]+"'
         elsif is_git_svn?
-          UI.message "Detected repo: git-svn"
+          UI.message("Detected repo: git-svn")
           return 'git svn info | grep Revision | egrep -o "[0-9]+"'
         elsif is_git?
-          UI.message "Detected repo: git"
+          UI.message("Detected repo: git")
           return 'git rev-parse --short HEAD'
         elsif is_hg?
-          UI.message "Detected repo: hg"
+          UI.message("Detected repo: hg")
           if use_hg_revision_number
             return 'hg parent --template {rev}'
           else
@@ -103,7 +103,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

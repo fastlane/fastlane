@@ -68,7 +68,7 @@ module Snapshot
 
     def self.create(device_type, os_versions, os_name = 'iOS')
       os_versions.each do |os_version|
-        puts "Creating #{device_type[0]} for #{os_name} version #{os_version[0]}"
+        puts("Creating #{device_type[0]} for #{os_name} version #{os_version[0]}")
         command = "xcrun simctl create '#{device_type[0]}' #{device_type[1]} #{os_version[1]}"
         UI.command(command) if FastlaneCore::Globals.verbose?
         `#{command}`
@@ -110,7 +110,7 @@ module Snapshot
       end
 
       if phones.any? && watches.any?
-        puts "Creating device pair of #{phones.last} and #{watches.last}"
+        puts("Creating device pair of #{phones.last} and #{watches.last}")
         Helper.backticks("xcrun simctl pair #{watches.last} #{phones.last}", print: FastlaneCore::Globals.verbose?)
       end
     end

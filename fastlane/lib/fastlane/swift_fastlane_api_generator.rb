@@ -226,9 +226,9 @@ func parseInt(fromString: String, function: String = #function) -> Int {
       key_optionality_values = []
       key_type_overrides = []
 
-      if options.kind_of? Array
+      if options.kind_of?(Array)
         options.each do |current|
-          next unless current.kind_of? FastlaneCore::ConfigItem
+          next unless current.kind_of?(FastlaneCore::ConfigItem)
 
           if ignore_param?(function_name: action_name, param_name: current.key)
             next

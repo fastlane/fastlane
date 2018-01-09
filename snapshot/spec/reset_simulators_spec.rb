@@ -88,7 +88,7 @@ describe Snapshot::ResetSimulators do
           ["    Apple Watch - 42mm (C8250DD7-8C4E-4803-838A-731B42785262) (Shutdown)", "Apple Watch - 42mm", "C8250DD7-8C4E-4803-838A-731B42785262"]
         ]
         expect(Snapshot::ResetSimulators).to receive(:devices).and_return(mocked_devices)
-        expect(FastlaneCore::Helper).not_to receive(:backticks)
+        expect(FastlaneCore::Helper).not_to(receive(:backticks))
 
         Snapshot::ResetSimulators.make_phone_watch_pair
       end
@@ -102,7 +102,7 @@ describe Snapshot::ResetSimulators do
           ["    Apple TV 1080p (D7D591A8-17D2-47B4-8D2A-AFAFA28874C9) (Shutdown)", "Apple TV 1080p", "D7D591A8-17D2-47B4-8D2A-AFAFA28874C9"]
         ]
         expect(Snapshot::ResetSimulators).to receive(:devices).and_return(mocked_devices)
-        expect(FastlaneCore::Helper).not_to receive(:backticks)
+        expect(FastlaneCore::Helper).not_to(receive(:backticks))
 
         Snapshot::ResetSimulators.make_phone_watch_pair
       end

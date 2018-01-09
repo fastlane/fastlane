@@ -11,7 +11,7 @@ describe Spaceship do
     end
 
     it 'should have 2 separate spaceships' do
-      expect(spaceship1).to_not eq(spaceship2)
+      expect(spaceship1).to_not(eq(spaceship2))
     end
 
     it '#select_team' do
@@ -71,7 +71,7 @@ describe Spaceship do
         csr, pkey = Spaceship::Portal::Certificate.create_certificate_signing_request
         expect do
           clean_launcher.certificate.development_push.create!(csr: csr, bundle_id: 'net.sunapps.151')
-        end.to_not raise_error
+        end.to_not(raise_error)
       end
     end
   end

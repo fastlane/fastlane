@@ -128,7 +128,7 @@ describe FastlaneCore do
       it "doesn't transform if the env variable is set" do
         with_env_values("FL_SKIP_TABLE_TRANSFORM" => "1") do
           value = FastlaneCore::PrintTable.print_values(config: @config, hide_keys: [:output, :a_bool, :a_sensitive], transform: :truncate_middle)
-          expect(value[:rows][0][1]).to_not include("...")
+          expect(value[:rows][0][1]).to_not(include("..."))
         end
       end
 

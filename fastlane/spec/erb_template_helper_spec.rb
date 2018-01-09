@@ -9,7 +9,7 @@ describe Fastlane do
 
       it "should load file if exists" do
         f = Fastlane::ErbTemplateHelper.load('s3_html_template')
-        expect(f).not_to be_empty
+        expect(f).not_to(be_empty)
       end
     end
 

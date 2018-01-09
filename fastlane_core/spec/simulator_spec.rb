@@ -51,7 +51,7 @@ describe FastlaneCore do
                                                       state: 'Shutdown',
                                                is_simulator: false)
 
-      expect(FastlaneCore::Helper).not_to receive(:backticks)
+      expect(FastlaneCore::Helper).not_to(receive(:backticks))
 
       FastlaneCore::Simulator.launch(device)
     end

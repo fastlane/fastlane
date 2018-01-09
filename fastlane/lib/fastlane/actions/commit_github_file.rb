@@ -19,8 +19,8 @@ module Fastlane
         UI.important("Creating commit on #{repo_name} on branch \"#{branch}\" for file \"#{file_path}\"")
 
         api_file_path = file_path
-        api_file_path = "/#{api_file_path}" unless api_file_path.start_with? '/'
-        api_file_path = api_file_path[0..-2] if api_file_path.end_with? '/'
+        api_file_path = "/#{api_file_path}" unless api_file_path.start_with?('/')
+        api_file_path = api_file_path[0..-2] if api_file_path.end_with?('/')
 
         payload = {
           path: api_file_path,
@@ -89,7 +89,7 @@ module Fastlane
                                        env_name: "FL_COMMIT_GITHUB_FILE_REPOSITORY_NAME",
                                        description: "The path to your repo, e.g. 'fastlane/fastlane'",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please only pass the path, e.g. 'fastlane/fastlane'") if value.include? "github.com"
+                                         UI.user_error!("Please only pass the path, e.g. 'fastlane/fastlane'") if value.include?("github.com")
                                          UI.user_error!("Please only pass the path, e.g. 'fastlane/fastlane'") if value.split('/').count != 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :server_url,
@@ -98,7 +98,7 @@ module Fastlane
                                        default_value: "https://api.github.com",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server/api/v3") unless value.include? "//"
+                                         UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server/api/v3") unless value.include?("//")
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_COMMIT_GITHUB_FILE_API_TOKEN",

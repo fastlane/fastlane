@@ -19,8 +19,8 @@ module Fastlane
 
         response = https.request(req)
 
-        UI.user_error! "Failed to make a request to IFTTT. #{response.message}." unless response.code == "200"
-        UI.success "Successfully made a request to IFTTT."
+        UI.user_error!("Failed to make a request to IFTTT. #{response.message}.") unless response.code == "200"
+        UI.success("Successfully made a request to IFTTT.")
       end
 
       #####################################################
@@ -42,13 +42,13 @@ module Fastlane
                                       sensitive: true,
                                       description: "API key",
                                       verify_block: proc do |value|
-                                        raise UI.error "No API key given, pass using `api_key: 'key'`" if value.to_s.empty?
+                                        raise UI.error("No API key given, pass using `api_key: 'key'`") if value.to_s.empty?
                                       end),
           FastlaneCore::ConfigItem.new(key: :event_name,
                                       env_name: "IFTTT_EVENT_NAME",
                                       description: "The name of the event that will be triggered",
                                       verify_block: proc do |value|
-                                        raise UI.error "No event name given, pass using `event_name: 'name'`" if value.to_s.empty?
+                                        raise UI.error("No event name given, pass using `event_name: 'name'`") if value.to_s.empty?
                                       end),
           FastlaneCore::ConfigItem.new(key: :value1,
                                        env_name: "IFTTT_VALUE1",

@@ -54,7 +54,7 @@ module Spaceship
       return @current_team_id if @current_team_id
 
       if teams.count > 1
-        puts "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
+        puts("The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now.")
       end
 
       if teams.count == 0
@@ -378,7 +378,7 @@ module Spaceship
     #####################################################
     def team_members
       response = request(:post) do |req|
-        req.url "/services-account/#{PROTOCOL_VERSION}/account/getTeamMembers"
+        req.url("/services-account/#{PROTOCOL_VERSION}/account/getTeamMembers")
         req.body = {
           teamId: team_id
         }.to_json
@@ -389,7 +389,7 @@ module Spaceship
 
     def team_invited
       response = request(:post) do |req|
-        req.url "/services-account/#{PROTOCOL_VERSION}/account/getInvites"
+        req.url("/services-account/#{PROTOCOL_VERSION}/account/getInvites")
         req.body = {
           teamId: team_id
         }.to_json
@@ -401,7 +401,7 @@ module Spaceship
     def team_set_role(team_member_id, role)
       ensure_csrf(Spaceship::Portal::Persons)
       response = request(:post) do |req|
-        req.url "/services-account/#{PROTOCOL_VERSION}/account/setTeamMemberRoles"
+        req.url("/services-account/#{PROTOCOL_VERSION}/account/setTeamMemberRoles")
         req.body = {
           teamId: team_id,
           role: role,
@@ -415,7 +415,7 @@ module Spaceship
     def team_remove_member!(team_member_id)
       ensure_csrf(Spaceship::Portal::Persons)
       response = request(:post) do |req|
-        req.url "/services-account/#{PROTOCOL_VERSION}/account/removeTeamMembers"
+        req.url("/services-account/#{PROTOCOL_VERSION}/account/removeTeamMembers")
         req.body = {
           teamId: team_id,
           teamMemberIds: [team_member_id]
@@ -428,7 +428,7 @@ module Spaceship
     def team_invite(email, role)
       ensure_csrf(Spaceship::Portal::Persons)
       response = request(:post) do |req|
-        req.url "/services-account/#{PROTOCOL_VERSION}/account/sendInvites"
+        req.url("/services-account/#{PROTOCOL_VERSION}/account/sendInvites")
         req.body = {
           invites: [
             { recipientEmail: email, recipientRole: role }
@@ -591,7 +591,7 @@ module Spaceship
     # Use this method over `provisioning_profiles` if possible because no secondary API calls are necessary to populate the ProvisioningProfile data model.
     def provisioning_profiles_via_xcode_api(mac: false)
       req = request(:post) do |r|
-        r.url "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/listProvisioningProfiles.action"
+        r.url("https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/listProvisioningProfiles.action")
         r.params = {
           teamId: team_id,
           includeInactiveProfiles: true,

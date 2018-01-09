@@ -9,38 +9,38 @@ module Fastlane
     def self.execute(args, options)
       shell = ENV['SHELL']
 
-      if shell.end_with? "fish"
+      if shell.end_with?("fish")
         fish_completions_dir = "~/.config/fish/completions"
 
         if UI.interactive?
-          confirm = UI.confirm "This will copy a fish script into #{fish_completions_dir} that provides the command tab completion. If the directory does not exist it will be created. Sound good?"
+          confirm = UI.confirm("This will copy a fish script into #{fish_completions_dir} that provides the command tab completion. If the directory does not exist it will be created. Sound good?")
           return unless confirm
         end
 
-        fish_completions_dir = File.expand_path fish_completions_dir
-        FileUtils.mkdir_p fish_completions_dir
+        fish_completions_dir = File.expand_path(fish_completions_dir)
+        FileUtils.mkdir_p(fish_completions_dir)
 
         completion_script_path = File.join(Fastlane::ROOT, 'lib', 'assets', 'completions', 'completion.fish')
         final_completion_script_path = File.join(fish_completions_dir, 'fastlane.fish')
 
-        FileUtils.cp completion_script_path, final_completion_script_path
+        FileUtils.cp(completion_script_path, final_completion_script_path)
 
-        UI.success "Copied! You can now use tab completion for lanes"
+        UI.success("Copied! You can now use tab completion for lanes")
       else
         fastlane_conf_dir = "~/.fastlane"
 
         if UI.interactive?
-          confirm = UI.confirm "This will copy a shell script into #{fastlane_conf_dir} that provides the command tab completion. Sound good?"
+          confirm = UI.confirm("This will copy a shell script into #{fastlane_conf_dir} that provides the command tab completion. Sound good?")
           return unless confirm
         end
 
         # create the ~/.fastlane directory
-        fastlane_conf_dir = File.expand_path fastlane_conf_dir
-        FileUtils.mkdir_p fastlane_conf_dir
+        fastlane_conf_dir = File.expand_path(fastlane_conf_dir)
+        FileUtils.mkdir_p(fastlane_conf_dir)
 
         # then copy all of the completions files into it from the gem
         completion_script_path = File.join(Fastlane::ROOT, 'lib', 'assets', 'completions')
-        FileUtils.cp_r completion_script_path, fastlane_conf_dir
+        FileUtils.cp_r(completion_script_path, fastlane_conf_dir)
 
         custom_commands = options.custom.to_s.split(',')
 
@@ -48,21 +48,21 @@ module Fastlane
           open("#{fastlane_conf_dir}/completions/completion.#{shell_name}", 'a') do |file|
             default_line_prefix = Helper.bundler? ? "bundle exec " : ""
 
-            file.puts self.get_auto_complete_line(shell_name, "#{default_line_prefix}fastlane")
+            file.puts(self.get_auto_complete_line(shell_name, "#{default_line_prefix}fastlane"))
 
             custom_commands.each do |command|
               auto_complete_line = self.get_auto_complete_line(shell_name, command)
 
               next if auto_complete_line.nil?
 
-              file.puts auto_complete_line
+              file.puts(auto_complete_line)
             end
           end
         end
 
-        UI.success "Copied! To use auto complete for fastlane, add the following line to your favorite rc file (e.g. ~/.bashrc)"
-        UI.important "  . ~/.fastlane/completions/completion.sh"
-        UI.success "Don't forget to source that file in your current shell! 🐚"
+        UI.success("Copied! To use auto complete for fastlane, add the following line to your favorite rc file (e.g. ~/.bashrc)")
+        UI.important("  . ~/.fastlane/completions/completion.sh")
+        UI.success("Don't forget to source that file in your current shell! 🐚")
       end
     end
 

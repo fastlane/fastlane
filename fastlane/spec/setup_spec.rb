@@ -9,11 +9,11 @@ describe Fastlane do
     end
 
     describe "Complete setup process" do
-      let (:fixtures) { File.expand_path("./fastlane/spec/fixtures/setup_workspace/") }
-      let (:workspace) { File.expand_path("/tmp/setup_workspace/") }
+      let(:fixtures) { File.expand_path("./fastlane/spec/fixtures/setup_workspace/") }
+      let(:workspace) { File.expand_path("/tmp/setup_workspace/") }
       before do
         fastlane_folder = File.join(workspace, 'fastlane')
-        FileUtils.rm_rf(workspace) if File.directory? workspace
+        FileUtils.rm_rf(workspace) if File.directory?(workspace)
         FileUtils.cp_r(fixtures, File.expand_path('..', workspace)) # copy workspace to work on to /tmp
 
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(fastlane_folder)
@@ -61,17 +61,17 @@ describe Fastlane do
           expect(setup.tools).to eq({ snapshot: false, cocoapods: true, carthage: false })
 
           content = File.read(File.join(FastlaneCore::FastlaneFolder.path, 'Fastfile'))
-          expect(content).to include "# update_fastlane"
-          expect(content).to include "upload_to_app_store"
-          expect(content).to include "run_tests"
-          expect(content).to include "build_app(scheme: \"MyScheme\")"
+          expect(content).to include("# update_fastlane")
+          expect(content).to include("upload_to_app_store")
+          expect(content).to include("run_tests")
+          expect(content).to include("build_app(scheme: \"MyScheme\")")
 
           content = File.read(File.join(FastlaneCore::FastlaneFolder.path, 'Appfile'))
 
-          expect(content).to include "app_identifier \"#{app_identifier}\""
-          expect(content).to include "team_id \"#{dev_team_id}\""
-          expect(content).to include "itc_team_id \"#{itc_team_id}\""
-          expect(content).to include "apple_id \"y\""
+          expect(content).to include("app_identifier \"#{app_identifier}\"")
+          expect(content).to include("team_id \"#{dev_team_id}\"")
+          expect(content).to include("itc_team_id \"#{itc_team_id}\"")
+          expect(content).to include("apple_id \"y\"")
         end
       end
 

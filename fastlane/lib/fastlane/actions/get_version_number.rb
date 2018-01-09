@@ -39,7 +39,7 @@ module Fastlane
             '"SampleProject.xcodeproj/../SampleProject_tests/Info.plist"=1.0'
           ]
         else
-          results = (Actions.sh command).split("\n")
+          results = Actions.sh(command).split("\n")
         end
 
         if target.empty? && scheme.empty?
@@ -48,7 +48,7 @@ module Fastlane
           # emulating the actual behavior or the -terse1 flag correctly
           project_string = ".xcodeproj"
           results.any? do |result|
-            if result.include? project_string
+            if result.include?(project_string)
               line = result
               break
             end
@@ -61,15 +61,15 @@ module Fastlane
           plist_target_string = "/#{target}-"
           results.any? do |result|
             if !target.empty?
-              if result.include? target_string
+              if result.include?(target_string)
                 line = result
                 break
-              elsif result.include? plist_target_string
+              elsif result.include?(plist_target_string)
                 line = result
                 break
               end
             else
-              if result.include? scheme_string
+              if result.include?(scheme_string)
                 line = result
                 break
               end
@@ -112,7 +112,7 @@ module Fastlane
                              description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
                              optional: true,
                              verify_block: proc do |value|
-                               UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
+                               UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
                                UI.user_error!("Could not find Xcode project at path '#{File.expand_path(value)}'") if !File.exist?(value) and !Helper.is_test?
                              end),
           FastlaneCore::ConfigItem.new(key: :scheme,
@@ -141,7 +141,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

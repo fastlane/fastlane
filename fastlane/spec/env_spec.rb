@@ -47,7 +47,7 @@ describe Fastlane do
       it 'contains stack information other than Xcode Version', requires_xcode: true do
         expect(env).to include("Bundler?")
         expect(env).to include("Xcode Path")
-        expect(env).not_to include("Xcode Version")
+        expect(env).not_to(include("Xcode Version"))
         expect(env).to include("OpenSSL")
       end
     end

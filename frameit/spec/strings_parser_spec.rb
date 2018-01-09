@@ -4,13 +4,13 @@ describe Frameit do
       it "raise error when file can't be found" do
         expect do
           Frameit::StringsParser.parse("./nothere")
-        end.to raise_exception "Couldn't find strings file at path './nothere'"
+        end.to raise_exception("Couldn't find strings file at path './nothere'")
       end
 
       it "raise error when file isn't a .strings file" do
         expect do
           Frameit::StringsParser.parse("./frameit/spec/fixtures/background.jpg")
-        end.to raise_exception "Must be .strings file, only got './frameit/spec/fixtures/background.jpg'"
+        end.to raise_exception("Must be .strings file, only got './frameit/spec/fixtures/background.jpg'")
       end
 
       describe "successfully parsing" do

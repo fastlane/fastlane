@@ -1,11 +1,11 @@
 module Fastlane
   class CrashlyticsBetaUi
     def success(text)
-      puts text.green
+      puts(text.green)
     end
 
     def message(text)
-      puts text
+      puts(text)
     end
 
     def header(text)
@@ -13,7 +13,7 @@ module Fastlane
     end
 
     def important(text)
-      puts text.yellow
+      puts(text.yellow)
     end
 
     def input(text)

@@ -134,7 +134,7 @@ module Scan
         day = Time.now.strftime("%F") # e.g. 2015-08-07
 
         Scan.cache[:build_path] = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}/")
-        FileUtils.mkdir_p Scan.cache[:build_path]
+        FileUtils.mkdir_p(Scan.cache[:build_path])
       end
       Scan.cache[:build_path]
     end

@@ -1,9 +1,9 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "SwiftLint" do
-      let (:swiftlint_gem_version) { Gem::Version.new('0.9.2') }
-      let (:output_file) { "swiftlint.result.json" }
-      let (:config_file) { ".swiftlint-ci.yml" }
+      let(:swiftlint_gem_version) { Gem::Version.new('0.9.2') }
+      let(:output_file) { "swiftlint.result.json" }
+      let(:config_file) { ".swiftlint-ci.yml" }
 
       before :each do
         allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(swiftlint_gem_version)
@@ -124,7 +124,7 @@ describe Fastlane do
             expect(FastlaneCore::UI).to receive(:important).with(/fastlane will continue/)
             # This is simulating the exception raised if the return code is non-zero
             expect(Fastlane::Actions).to receive(:sh).and_raise("fake error")
-            expect(FastlaneCore::UI).to_not receive(:user_error!)
+            expect(FastlaneCore::UI).to_not(receive(:user_error!))
 
             result = Fastlane::FastFile.new.parse("lane :test do
               swiftlint(ignore_exit_status: true)

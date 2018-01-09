@@ -115,16 +115,16 @@ module Fastlane
           class_ref = Fastlane::Actions.const_get(class_name)
 
           if class_ref.respond_to?(:run)
-            UI.success "Successfully loaded custom action '#{file}'." if FastlaneCore::Globals.verbose?
+            UI.success("Successfully loaded custom action '#{file}'.") if FastlaneCore::Globals.verbose?
           else
-            UI.error "Could not find method 'run' in class #{class_name}."
-            UI.error 'For more information, check out the docs: https://docs.fastlane.tools/'
+            UI.error("Could not find method 'run' in class #{class_name}.")
+            UI.error('For more information, check out the docs: https://docs.fastlane.tools/')
             UI.user_error!("Action '#{file_name}' is damaged!", show_github_issues: true)
           end
         rescue NameError
           # Action not found
-          UI.error "Could not find '#{class_name}' class defined."
-          UI.error 'For more information, check out the docs: https://docs.fastlane.tools/'
+          UI.error("Could not find '#{class_name}' class defined.")
+          UI.error('For more information, check out the docs: https://docs.fastlane.tools/')
           UI.user_error!("Action '#{file_name}' is damaged!", show_github_issues: true)
         end
       end

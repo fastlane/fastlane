@@ -112,7 +112,7 @@ describe Pilot::TesterManager do
         allow(current_user).to receive(:roles).and_return(["admin"])
         allow(tester_manager).to receive(:find_app_tester).and_return(fake_tester)
 
-        expect(Spaceship::TestFlight::Tester).to_not receive(:create!)
+        expect(Spaceship::TestFlight::Tester).to_not(receive(:create!))
         expect(Spaceship::TestFlight::Group).to receive(:add_tester_to_groups!).and_return([custom_tester_group])
         expect(FastlaneCore::UI).to receive(:success).with('Successfully added tester to group(s): Test Group in app: My Fake App')
 
@@ -125,7 +125,7 @@ describe Pilot::TesterManager do
         allow(current_user).to receive(:roles).and_return(["appmanager"])
         allow(tester_manager).to receive(:find_app_tester).and_return(fake_tester)
 
-        expect(Spaceship::TestFlight::Tester).to_not receive(:create_app_level_tester)
+        expect(Spaceship::TestFlight::Tester).to_not(receive(:create_app_level_tester))
         expect(Spaceship::TestFlight::Group).to receive(:add_tester_to_groups!).and_return([custom_tester_group])
         expect(FastlaneCore::UI).to receive(:success).with('Successfully added tester to group(s): Test Group in app: My Fake App')
 
@@ -138,7 +138,7 @@ describe Pilot::TesterManager do
         allow(current_user).to receive(:roles).and_return(["appmanager"])
 
         expect(Spaceship::TestFlight::Tester).to receive(:find).and_return(fake_tester)
-        expect(Spaceship::TestFlight::Tester).to_not receive(:create_app_level_tester)
+        expect(Spaceship::TestFlight::Tester).to_not(receive(:create_app_level_tester))
         expect(Spaceship::TestFlight::Group).to receive(:add_tester_to_groups!).and_return([custom_tester_group])
         expect(FastlaneCore::UI).to receive(:success).with('Found existing tester fabric-devtools@gmail.com+fake@gmail.com')
         expect(FastlaneCore::UI).to receive(:success).with('Successfully added tester to group(s): Test Group in app: My Fake App')
@@ -152,7 +152,7 @@ describe Pilot::TesterManager do
         allow(current_user).to receive(:roles).and_return(["appmanager"])
         allow(tester_manager).to receive(:find_app_tester).and_return(fake_tester)
 
-        expect(Spaceship::TestFlight::Tester).to_not receive(:create_app_level_tester)
+        expect(Spaceship::TestFlight::Tester).to_not(receive(:create_app_level_tester))
         expect(Spaceship::TestFlight::Group).to receive(:add_tester_to_groups!).and_return([custom_tester_group])
         expect(FastlaneCore::UI).to receive(:success).with('Successfully added tester to group(s): Test Group in app: My Fake App')
 
@@ -167,7 +167,7 @@ describe Pilot::TesterManager do
         allow(tester_manager).to receive(:find_app).and_return(nil)
 
         expect(Spaceship::TestFlight::Tester).to receive(:find).and_return(fake_tester)
-        expect(Spaceship::TestFlight::Group).to_not receive(:remove_tester_from_groups!)
+        expect(Spaceship::TestFlight::Group).to_not(receive(:remove_tester_from_groups!))
         expect(FastlaneCore::UI).to receive(:success).with('Found existing tester fabric-devtools@gmail.com+fake@gmail.com')
         expect(FastlaneCore::UI).to receive(:success).with('Successfully removed tester fabric-devtools@gmail.com+fake@gmail.com from Users and Roles')
 

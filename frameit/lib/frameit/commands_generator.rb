@@ -30,7 +30,7 @@ module Frameit
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
-      default_command :run
+      default_command(:run)
 
       command :run do |c|
         c.syntax = 'fastlane frameit black'
@@ -98,7 +98,7 @@ module Frameit
         end
       end
 
-      alias_command :white, :silver
+      alias_command(:white, :silver)
 
       run!
     end

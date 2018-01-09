@@ -60,7 +60,7 @@ module Fastlane
         # Tested with `xcake`, which throws a `Xcake::Informative` object
 
         print_lane_context
-        UI.error ex.to_s if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
+        UI.error(ex.to_s) if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
         e = ex
       end
 
@@ -89,7 +89,7 @@ module Fastlane
       end
 
       if available.empty?
-        UI.user_error! "It looks like you don't have any lanes to run just yet. Check out how to get started here: https://github.com/fastlane/fastlane 🚀"
+        UI.user_error!("It looks like you don't have any lanes to run just yet. Check out how to get started here: https://github.com/fastlane/fastlane 🚀")
       end
 
       rows = []
@@ -105,16 +105,16 @@ module Fastlane
         rows: FastlaneCore::PrintTable.transform_output(rows)
       )
 
-      UI.message "Welcome to fastlane! Here's what your app is setup to do:"
+      UI.message("Welcome to fastlane! Here's what your app is setup to do:")
 
-      puts table
+      puts(table)
 
-      i = UI.input "Which number would you like run?"
+      i = UI.input("Which number would you like run?")
 
       i = i.to_i - 1
       if i >= 0 && available[i]
         selection = available[i].last.pretty_name
-        UI.important "Running lane `#{selection}`. Next time you can do this by directly typing `fastlane #{selection}` 🚀."
+        UI.important("Running lane `#{selection}`. Next time you can do this by directly typing `fastlane #{selection}` 🚀.")
         platform = selection.split(' ')[0]
         lane_name = selection.split(' ')[1]
 
@@ -125,7 +125,7 @@ module Fastlane
 
         return platform, lane_name # yeah
       else
-        UI.user_error! "Run `fastlane` the next time you need to build, test or release your app 🚀"
+        UI.user_error!("Run `fastlane` the next time you need to build, test or release your app 🚀")
       end
     end
   end

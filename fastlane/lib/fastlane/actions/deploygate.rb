@@ -18,11 +18,11 @@ module Fastlane
         require 'faraday_middleware'
 
         connection = Faraday.new(url: DEPLOYGATE_URL_BASE, request: { timeout: 120 }) do |builder|
-          builder.request :multipart
-          builder.request :json
-          builder.response :json, content_type: /\bjson$/
-          builder.use FaradayMiddleware::FollowRedirects
-          builder.adapter :net_http
+          builder.request(:multipart)
+          builder.request(:json)
+          builder.response(:json, content_type: /\bjson$/)
+          builder.use(FaradayMiddleware::FollowRedirects)
+          builder.adapter(:net_http)
         end
 
         options.update({
@@ -34,7 +34,7 @@ module Fastlane
 
         connection.post("/api/users/#{user_name}/apps", options)
       rescue Faraday::Error::TimeoutError
-        UI.crash! "Timed out while uploading build. Check https://deploygate.com/ to see if the upload was completed."
+        UI.crash!("Timed out while uploading build. Check https://deploygate.com/ to see if the upload was completed.")
       end
 
       def self.run(options)
@@ -45,7 +45,7 @@ module Fastlane
         user_name = options[:user]
         binary = options[:ipa] || options[:apk]
         upload_options = options.values.select do |key, _|
-          [:message, :distribution_key, :release_note, :disable_notify].include? key
+          [:message, :distribution_key, :release_note, :disable_notify].include?(key)
         end
 
         UI.user_error!('missing `ipa` and `apk`. deploygate action needs least one.') unless binary

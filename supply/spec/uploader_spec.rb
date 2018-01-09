@@ -20,7 +20,7 @@ describe Supply do
       end
 
       before do
-        FileUtils.rm_rf Dir.glob("#{@obb_dir}/*.obb")
+        FileUtils.rm_rf(Dir.glob("#{@obb_dir}/*.obb"))
       end
 
       def find_obbs
@@ -100,14 +100,14 @@ describe Supply do
 
       it 'remove lesser than the greatest of any later (i.e. production) track' do
         allow(client).to receive(:track_version_codes) do |track|
-          next [103] if track.eql? 'production'
-          next [102] if track.eql? 'rollout'
-          next [101] if track.eql? 'beta'
+          next [103] if track.eql?('production')
+          next [102] if track.eql?('rollout')
+          next [101] if track.eql?('beta')
           []
         end
 
         allow(client).to receive(:update_track) do |track, rollout, apk_version_code|
-          expect(track).to eq('beta').or eq('rollout')
+          expect(track).to eq('beta').or(eq('rollout'))
           expect(rollout).to eq(1.0)
           expect(apk_version_code).to be_empty
         end
@@ -122,7 +122,7 @@ describe Supply do
 
       it 'remove lesser than the currently being uploaded if it is in an earlier (i.e. alpha) track' do
         allow(client).to receive(:track_version_codes) do |track|
-          next [100] if track.eql? 'alpha'
+          next [100] if track.eql?('alpha')
           []
         end
 
@@ -142,14 +142,14 @@ describe Supply do
 
       it 'combined case' do
         allow(client).to receive(:track_version_codes) do |track|
-          next [102] if track.eql? 'production'
-          next [101] if track.eql? 'rollout'
-          next [103] if track.eql? 'alpha'
+          next [102] if track.eql?('production')
+          next [101] if track.eql?('rollout')
+          next [103] if track.eql?('alpha')
           []
         end
 
         allow(client).to receive(:update_track) do |track, rollout, apk_version_code|
-          expect(track).to eq('rollout').or eq('alpha')
+          expect(track).to eq('rollout').or(eq('alpha'))
           expect(rollout).to eq(1.0)
           expect(apk_version_code).to be_empty
         end

@@ -28,7 +28,7 @@ module Deliver
         download_screenshots(deliver_path, options)
 
         # Add a README to the screenshots folder
-        FileUtils.mkdir_p File.join(deliver_path, 'screenshots') # just in case the fetching didn't work
+        FileUtils.mkdir_p(File.join(deliver_path, 'screenshots')) # just in case the fetching didn't work
         File.write(File.join(deliver_path, 'screenshots', 'README.txt'), File.read("#{Deliver::ROOT}/lib/assets/ScreenshotsHelp"))
       end
 

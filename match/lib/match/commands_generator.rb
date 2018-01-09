@@ -96,7 +96,7 @@ module Match
           params.load_configuration_file("Matchfile")
 
           Match::ChangePassword.update(params: params)
-          UI.success "Successfully changed the password. Make sure to update the password on all your clients and servers"
+          UI.success("Successfully changed the password. Make sure to update the password on all your clients and servers")
         end
       end
 
@@ -113,7 +113,7 @@ module Match
                                                   params[:shallow_clone],
                                                   branch: params[:git_branch],
                                                   clone_branch_directly: params[:clone_branch_directly])
-          UI.success "Repo is at: '#{decrypted_repo}'"
+          UI.success("Repo is at: '#{decrypted_repo}'")
         end
       end
 
@@ -141,7 +141,7 @@ module Match
         end
       end
 
-      default_command :run
+      default_command(:run)
 
       run!
     end

@@ -23,11 +23,11 @@ ensure
 end
 
 def raise_fastlane_error
-  raise_error FastlaneCore::Interface::FastlaneError
+  raise_error(FastlaneCore::Interface::FastlaneError)
 end
 
 def raise_fastlane_test_failure
-  raise_error FastlaneCore::Interface::FastlaneTestFailure
+  raise_error(FastlaneCore::Interface::FastlaneTestFailure)
 end
 
 # The following methods is taken from activesupport,

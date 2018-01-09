@@ -144,7 +144,7 @@ module Spaceship
       return @current_team_id if @current_team_id
 
       if teams.count > 1
-        puts "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
+        puts("The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now.")
       end
       @current_team_id ||= teams[0]['contentProvider']['contentProviderId']
     end
@@ -173,7 +173,7 @@ module Spaceship
       end
 
       response = request(:post) do |req|
-        req.url "ra/v1/session/webSession"
+        req.url("ra/v1/session/webSession")
         req.body = {
           contentProviderId: team_id,
           dsId: user_detail_data.ds_id # https://github.com/fastlane/fastlane/issues/6711
@@ -210,22 +210,22 @@ module Spaceship
       @current_team_id = current_team_id
       @cookie = cookie || HTTP::CookieJar.new
       @client = Faraday.new(self.class.hostname, options) do |c|
-        c.response :json, content_type: /\bjson$/
-        c.response :xml, content_type: /\bxml$/
-        c.response :plist, content_type: /\bplist$/
-        c.use :cookie_jar, jar: @cookie
-        c.use FaradayMiddleware::RelsMiddleware
-        c.adapter Faraday.default_adapter
+        c.response(:json, content_type: /\bjson$/)
+        c.response(:xml, content_type: /\bxml$/)
+        c.response(:plist, content_type: /\bplist$/)
+        c.use(:cookie_jar, jar: @cookie)
+        c.use(FaradayMiddleware::RelsMiddleware)
+        c.adapter(Faraday.default_adapter)
 
         if ENV['SPACESHIP_DEBUG']
           # for debugging only
           # This enables tracking of networking requests using Charles Web Proxy
-          c.proxy "https://127.0.0.1:8888"
+          c.proxy("https://127.0.0.1:8888")
           c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
         end
 
         if ENV["DEBUG"]
-          puts "To run _spaceship_ through a local proxy, use SPACESHIP_DEBUG"
+          puts("To run _spaceship_ through a local proxy, use SPACESHIP_DEBUG")
         end
       end
     end
@@ -429,7 +429,7 @@ module Spaceship
         end
 
         response = request(:post) do |req|
-          req.url "https://idmsa.apple.com/appleauth/auth/signin"
+          req.url("https://idmsa.apple.com/appleauth/auth/signin")
           req.body = data.to_json
           req.headers['Content-Type'] = 'application/json'
           req.headers['X-Requested-With'] = 'XMLHttpRequest'
@@ -507,7 +507,7 @@ module Spaceship
 
       return @service_key
     rescue => ex
-      puts ex.to_s
+      puts(ex.to_s)
       raise AppleTimeoutError.new, "Could not receive latest API key from iTunes Connect, this might be a server issue."
     end
 
@@ -526,22 +526,22 @@ module Spaceship
       tries -= 1
       unless tries.zero?
         logger.warn("Timeout received: '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})...")
-        sleep 3 unless Object.const_defined?("SpecHelper")
+        sleep(3) unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex # re-raise the exception
     rescue UnauthorizedAccessError => ex
       if @loggedin && !(tries -= 1).zero?
         msg = "Auth error received: '#{ex.message}'. Login in again then retrying after 3 seconds (remaining: #{tries})..."
-        puts msg if Spaceship::Globals.verbose?
-        logger.warn msg
+        puts(msg) if Spaceship::Globals.verbose?
+        logger.warn(msg)
 
         if self.class.spaceship_session_env.to_s.length > 0
           raise UnauthorizedAccessError.new, "Authentication error, you passed an invalid session using the environment variable FASTLANE_SESSION or SPACESHIP_SESSION"
         end
 
         do_login(self.user, @password)
-        sleep 3 unless Object.const_defined?("SpecHelper")
+        sleep(3) unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex # re-raise the exception
@@ -685,7 +685,7 @@ module Spaceship
         resp_hash = response.to_hash
         if resp_hash[:status] == 401
           msg = "Auth lost"
-          logger.warn msg
+          logger.warn(msg)
           raise UnauthorizedAccessError.new, "Unauthorized Access"
         end
 

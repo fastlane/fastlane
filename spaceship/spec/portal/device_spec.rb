@@ -111,7 +111,7 @@ describe Spaceship::Device do
     end
 
     it "doesn't trigger an ITC call if the device ID is already registered" do
-      expect(client).to_not receive(:create_device!)
+      expect(client).to_not(receive(:create_device!))
       device = Spaceship::Device.create!(name: "Personal iPhone", udid: "e5814abb3b1d92087d48b64f375d8e7694932c39")
     end
 

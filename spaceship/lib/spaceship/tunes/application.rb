@@ -90,7 +90,7 @@ module Spaceship
         #  should it be an ios or an osx app
 
         def create!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil, itunes_connect_users: nil)
-          puts "The `version` parameter is deprecated. Use `ensure_version!` method instead" if version
+          puts("The `version` parameter is deprecated. Use `ensure_version!` method instead") if version
           client.create_application!(name: name,
                          primary_language: primary_language,
                                       sku: sku,

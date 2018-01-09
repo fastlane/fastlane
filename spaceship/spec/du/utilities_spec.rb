@@ -29,7 +29,7 @@ describe Spaceship::Utilities do
     end
 
     it 'raises an exception for unknown extensions' do
-      expect { Spaceship::Utilities.content_type('blah.unknown') }.to raise_error "Unknown content-type for file blah.unknown"
+      expect { Spaceship::Utilities.content_type('blah.unknown') }.to raise_error("Unknown content-type for file blah.unknown")
     end
   end
 end

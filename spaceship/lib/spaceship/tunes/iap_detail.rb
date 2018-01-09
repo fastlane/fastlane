@@ -195,7 +195,7 @@ module Spaceship
 
         if @review_screenshot
           # Upload Screenshot
-          upload_file = UploadFile.from_path @review_screenshot
+          upload_file = UploadFile.from_path(@review_screenshot)
           screenshot_data = client.upload_purchase_review_screenshot(application.apple_id, upload_file)
           raw_data["versions"][0]["reviewScreenshot"] = screenshot_data
         end

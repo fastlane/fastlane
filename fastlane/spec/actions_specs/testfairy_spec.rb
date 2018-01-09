@@ -51,7 +51,7 @@ describe Fastlane do
               api_key: 'thisistest',
             })
           end").runner.execute(:test)
-        end.not_to raise_error
+        end.not_to(raise_error)
       end
 
       it "works with valid optional parameters" do
@@ -65,7 +65,7 @@ describe Fastlane do
               testers_groups: ['group1', 'group2']
             })
           end").runner.execute(:test)
-        end.not_to raise_error
+        end.not_to(raise_error)
       end
     end
   end

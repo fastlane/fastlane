@@ -236,7 +236,7 @@ module Deliver
 
       # Walk up two directories and test if we need to handle a platform that doesn't support landscape
       path_component = Pathname.new(path).each_filename.to_a[-3]
-      if path_component.eql? "appleTV"
+      if path_component.eql?("appleTV")
         skip_landscape = true
       end
 

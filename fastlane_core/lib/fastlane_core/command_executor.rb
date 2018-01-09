@@ -74,7 +74,7 @@ module FastlaneCore
           # > invalid byte sequence in US-ASCII (ArgumentError)
           output << ex.to_s
           o = output.join("\n")
-          puts o
+          puts(o)
           if error
             error.call(o, nil)
           else
@@ -86,8 +86,8 @@ module FastlaneCore
         status = $?.exitstatus
         if status != 0
           o = output.join("\n")
-          puts o # the user has the right to see the raw output
-          UI.error "Exit status: #{status}"
+          puts(o) # the user has the right to see the raw output
+          UI.error("Exit status: #{status}")
           if error
             error.call(o, status)
           else

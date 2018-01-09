@@ -65,7 +65,7 @@ module Deliver
           UI.message("")
           UI.message("You can tweet: \"iTunes Connect #iosprocessingtime #{((Time.now - start) / 60).round} minutes\"")
         end
-        sleep 30
+        sleep(30)
       end
       nil
     end

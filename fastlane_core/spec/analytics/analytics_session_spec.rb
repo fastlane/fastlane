@@ -255,7 +255,7 @@ describe FastlaneCore::AnalyticsSession do
           event[:action][:name] == 'completed'
         end
         expect(completion_events.count).to eq(4)
-        expect(FastlaneCore.session.client).not_to receive(:post_events)
+        expect(FastlaneCore.session.client).not_to(receive(:post_events))
         FastlaneCore.session.finalize_session
       end
     end

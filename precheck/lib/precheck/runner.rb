@@ -19,14 +19,14 @@ module Precheck
                                              title: "Summary for precheck #{Fastlane::VERSION}")
 
       unless Spaceship::Tunes.client
-        UI.message "Starting login with user '#{Precheck.config[:username]}'"
+        UI.message("Starting login with user '#{Precheck.config[:username]}'")
         Spaceship::Tunes.login(Precheck.config[:username])
         Spaceship::Tunes.select_team
 
-        UI.message "Successfully logged in"
+        UI.message("Successfully logged in")
       end
 
-      UI.message "Checking app for precheck rule violations"
+      UI.message("Checking app for precheck rule violations")
 
       ensure_app_exists!
 
@@ -38,7 +38,7 @@ module Precheck
 
       if processor_result.has_errors_or_warnings?
         summary_table = build_potential_problems_table(processor_result: processor_result)
-        puts summary_table
+        puts(summary_table)
       end
 
       if processor_result.should_trigger_user_error?
@@ -47,11 +47,11 @@ module Precheck
       end
 
       if processor_result.has_errors_or_warnings?
-        UI.important "precheck 👮‍♀️ 👮  found one or more potential metadata problems, but this won't prevent fastlane from completing 👍".yellow
+        UI.important("precheck 👮‍♀️ 👮  found one or more potential metadata problems, but this won't prevent fastlane from completing 👍".yellow)
       end
 
       if !processor_result.has_errors_or_warnings? && !processor_result.items_not_checked?
-        UI.message "precheck 👮‍♀️ 👮  finished without detecting any potential problems 🛫".green
+        UI.message("precheck 👮‍♀️ 👮  finished without detecting any potential problems 🛫".green)
       end
 
       return true
@@ -59,7 +59,7 @@ module Precheck
 
     def print_items_not_checked(processor_result: nil)
       names = processor_result.items_not_checked.map(&:friendly_name)
-      UI.message "😶  Metadata fields not checked by any rule: #{names.join(', ')}".yellow if names.length > 0
+      UI.message("😶  Metadata fields not checked by any rule: #{names.join(', ')}".yellow) if names.length > 0
     end
 
     def build_potential_problems_table(processor_result: nil)

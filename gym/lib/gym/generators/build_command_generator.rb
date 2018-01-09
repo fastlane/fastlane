@@ -106,7 +106,7 @@ module Gym
       def build_path
         unless Gym.cache[:build_path]
           Gym.cache[:build_path] = Gym.config[:build_path]
-          FileUtils.mkdir_p Gym.cache[:build_path]
+          FileUtils.mkdir_p(Gym.cache[:build_path])
         end
         Gym.cache[:build_path]
       end

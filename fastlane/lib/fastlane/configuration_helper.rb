@@ -3,7 +3,7 @@ module Fastlane
     def self.parse(action, params)
       first_element = (action.available_options || []).first
 
-      if first_element and first_element.kind_of? FastlaneCore::ConfigItem
+      if first_element and first_element.kind_of?(FastlaneCore::ConfigItem)
         # default use case
         return FastlaneCore::Configuration.create(action.available_options, params)
       elsif first_element
@@ -16,7 +16,7 @@ module Fastlane
 
       end
     rescue => ex
-      if action.respond_to? :action_name
+      if action.respond_to?(:action_name)
         UI.error("You passed invalid parameters to '#{action.action_name}'.")
         UI.error("Check out the error below and available options by running `fastlane action #{action.action_name}`")
       end

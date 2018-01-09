@@ -39,7 +39,7 @@ module Produce
       allowed_keys = [:app_group, :apple_pay, :associated_domains, :data_protection, :game_center, :healthkit, :homekit,
                       :wireless_conf, :icloud, :in_app_purchase, :inter_app_audio, :passbook, :push_notification, :sirikit,
                       :vpn_conf, :network_extension, :hotspot, :multipath, :nfc_tag_reading]
-      options.__hash__.select { |key, value| allowed_keys.include? key }
+      options.__hash__.select { |key, value| allowed_keys.include?(key) }
     end
 
     # rubocop:disable Metrics/PerceivedComplexity

@@ -62,7 +62,7 @@ module Fastlane
                                        is_string: true,
                                        default_value: "ios",
                                        verify_block: proc do |value|
-                                         UI.user_error!("The platform can only be ios, or appletvos") unless %('ios', 'appletvos').include? value
+                                         UI.user_error!("The platform can only be ios, or appletvos") unless %('ios', 'appletvos').include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :initial_build_number,
                                        env_name: "INITIAL_BUILD_NUMBER",

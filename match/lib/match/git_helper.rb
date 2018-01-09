@@ -32,7 +32,7 @@ module Match
         command += " -b #{branch.shellescape} --single-branch"
       end
 
-      UI.message "Cloning remote git repo..."
+      UI.message("Cloning remote git repo...")
 
       if branch && !clone_branch_directly
         UI.message("If cloning the repo takes too long, you can use the `clone_branch_directly` option in match.")
@@ -60,7 +60,7 @@ module Match
       checkout_branch(branch) unless branch == "master"
 
       if !Helper.test? and GitHelper.match_version(@dir).nil? and manual_password.nil? and File.exist?(File.join(@dir, "README.md"))
-        UI.important "Migrating to new match..."
+        UI.important("Migrating to new match...")
         ChangePassword.update(params: { git_url: git_url,
                                     git_branch: branch,
                                  shallow_clone: shallow_clone },
@@ -128,7 +128,7 @@ module Match
         commands << "git commit -m #{message.shellescape}"
         commands << "GIT_TERMINAL_PROMPT=0 git push origin #{branch.shellescape}"
 
-        UI.message "Pushing changes to remote git repo..."
+        UI.message("Pushing changes to remote git repo...")
 
         commands.each do |command|
           FastlaneCore::CommandExecutor.execute(command: command,
@@ -165,7 +165,7 @@ module Match
         commands << "git reset --hard"
       end
 
-      UI.message "Checking out branch #{branch}..."
+      UI.message("Checking out branch #{branch}...")
 
       Dir.chdir(@dir) do
         commands.each do |command|
@@ -196,7 +196,7 @@ module Match
 
       return if commands.empty?
 
-      UI.message "Add git user config to local git repo..."
+      UI.message("Add git user config to local git repo...")
       Dir.chdir(@dir) do
         commands.each do |command|
           FastlaneCore::CommandExecutor.execute(command: command,

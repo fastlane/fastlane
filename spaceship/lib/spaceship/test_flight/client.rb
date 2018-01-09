@@ -54,7 +54,7 @@ module Spaceship
         assert_required_params(__method__, binding)
 
         response = request(:put) do |req|
-          req.url "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}"
+          req.url("providers/#{team_id}/apps/#{app_id}/builds/#{build_id}")
           req.body = build.to_json
           req.headers['Content-Type'] = 'application/json'
         end
@@ -65,7 +65,7 @@ module Spaceship
         assert_required_params(__method__, binding)
 
         response = request(:post) do |req|
-          req.url "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}/review"
+          req.url("providers/#{team_id}/apps/#{app_id}/builds/#{build_id}/review")
           req.body = build.to_json
           req.headers['Content-Type'] = 'application/json'
         end
@@ -76,7 +76,7 @@ module Spaceship
         assert_required_params(__method__, binding)
 
         response = request(:post) do |req|
-          req.url "providers/#{team_id}/apps/#{app_id}/builds/#{build_id}/expire"
+          req.url("providers/#{team_id}/apps/#{app_id}/builds/#{build_id}/expire")
           req.body = build.to_json
           req.headers['Content-Type'] = 'application/json'
         end
@@ -106,7 +106,7 @@ module Spaceship
         }
 
         response = request(:post) do |req|
-          req.url "providers/#{team_id}/apps/#{app_id}/groups"
+          req.url("providers/#{team_id}/apps/#{app_id}/groups")
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
@@ -121,7 +121,7 @@ module Spaceship
           'buildId' => build_id
         }
         response = request(:put) do |req|
-          req.url "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/builds/#{build_id}"
+          req.url("providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/builds/#{build_id}")
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
@@ -212,7 +212,7 @@ module Spaceship
         assert_required_params(__method__, binding)
         url = "providers/#{team_id}/apps/#{app_id}/testers"
         response = request(:post) do |req|
-          req.url url
+          req.url(url)
           req.body = {
             "email" => email,
             "firstName" => first_name,
@@ -230,7 +230,7 @@ module Spaceship
         # This is easy enough, we already have all this data. We don't need any response from the previous request
         url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers"
         response = request(:post) do |req|
-          req.url url
+          req.url(url)
           req.body = [{
             "email" => email,
             "firstName" => first_name,
@@ -246,7 +246,7 @@ module Spaceship
 
         url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/testers/#{tester_id}"
         response = request(:delete) do |req|
-          req.url url
+          req.url(url)
           req.headers['Content-Type'] = 'application/json'
         end
         handle_response(response)
@@ -267,7 +267,7 @@ module Spaceship
         assert_required_params(__method__, binding)
 
         response = request(:put) do |req|
-          req.url "providers/#{team_id}/apps/#{app_id}/testInfo"
+          req.url("providers/#{team_id}/apps/#{app_id}/testInfo")
           req.body = app_test_info.to_json
           req.headers['Content-Type'] = 'application/json'
         end

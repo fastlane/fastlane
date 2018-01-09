@@ -24,7 +24,7 @@ module Fastlane
         require "rubygems/command_manager"
         installer = Gem::CommandManager.instance[:install]
 
-        UI.important "Installing Ruby gem '#{gem_name}'..."
+        UI.important("Installing Ruby gem '#{gem_name}'...")
 
         spec_name = self.find_gem_name(gem_name)
         UI.important("Found gem \"#{spec_name}\" instead of the required name \"#{gem_name}\"") if spec_name != gem_name
@@ -65,7 +65,7 @@ module Fastlane
 
       def format_gem_require_name(gem_name)
         # from "fastlane-plugin-xcversion" to "fastlane/plugin/xcversion"
-        gem_name = gem_name.tr("-", "/") if gem_name.start_with? "fastlane-plugin-"
+        gem_name = gem_name.tr("-", "/") if gem_name.start_with?("fastlane-plugin-")
 
         return gem_name
       end

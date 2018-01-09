@@ -18,9 +18,9 @@ module Fastlane
 
       def self.fail_on_error(result)
         if result != "200"
-          UI.crash! "Server error, failed to upload the dSYM file."
+          UI.crash!("Server error, failed to upload the dSYM file.")
         else
-          UI.success 'dSYM successfully uploaded to Apteligent!'
+          UI.success('dSYM successfully uploaded to Apteligent!')
         end
       end
 

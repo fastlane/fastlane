@@ -12,7 +12,7 @@ module FastlaneCore
     # This method is deprecated, use the `UI` class
     # https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md
     def self.log
-      UI.deprecated "Helper.log is deprecated. Use `UI` class instead"
+      UI.deprecated("Helper.log is deprecated. Use `UI` class instead")
       UI.current.log
     end
 

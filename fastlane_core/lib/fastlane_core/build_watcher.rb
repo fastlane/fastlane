@@ -28,7 +28,7 @@ module FastlaneCore
             return matched_build
           end
 
-          sleep poll_interval
+          sleep(poll_interval)
         end
       end
 

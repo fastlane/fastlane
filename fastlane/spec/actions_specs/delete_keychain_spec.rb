@@ -59,7 +59,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         keychain = File.expand_path('\\"\\ test\\ \\".keychain')
-        expect(result).to eq %(security delete-keychain #{keychain})
+        expect(result).to eq(%(security delete-keychain #{keychain}))
       end
 
       it "works with absolute keychain path" do

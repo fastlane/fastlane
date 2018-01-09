@@ -366,7 +366,7 @@ module Supply
     def call_google_api
       yield if block_given?
     rescue Google::Apis::ClientError => e
-      UI.user_error! "Google Api Error: #{e.message}"
+      UI.user_error!("Google Api Error: #{e.message}")
     end
   end
 end

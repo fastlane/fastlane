@@ -8,7 +8,7 @@ end
 def before_each_fastlane_core
   # iTunes Lookup API by Apple ID
   ["invalid", "", 0, '284882215', ['338986109', 'FR']].each do |current|
-    if current.kind_of? Array
+    if current.kind_of?(Array)
       id = current[0]
       country = current[1]
       url = "https://itunes.apple.com/lookup?id=#{id}&country=#{country}"

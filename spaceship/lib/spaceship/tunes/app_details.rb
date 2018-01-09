@@ -139,7 +139,7 @@ module Spaceship
       end
 
       def prefix_apps(value)
-        return value unless value.include? "Stickers"
+        return value unless value.include?("Stickers")
         value.include?("Apps") ? value : "Apps.#{value}"
       end
     end

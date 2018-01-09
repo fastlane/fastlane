@@ -1,6 +1,6 @@
 describe Fastlane do
   describe Fastlane::PluginManager do
-    let (:plugin_manager) { Fastlane::PluginManager.new }
+    let(:plugin_manager) { Fastlane::PluginManager.new }
     describe "#gemfile_path" do
       it "returns an absolute path if Gemfile available" do
         expect(plugin_manager.gemfile_path).to eq(File.expand_path("./Gemfile"))
@@ -222,7 +222,7 @@ describe Fastlane do
         expect(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).with(gem_name: plugin_name, require_gem: true).and_raise(ex)
         expect(UI).to receive(:error).with("Error loading plugin '#{plugin_name}': #{ex}")
         pm.load_plugins
-        expect(pm.plugin_references[plugin_name]).not_to be_nil
+        expect(pm.plugin_references[plugin_name]).not_to(be_nil)
       end
     end
   end

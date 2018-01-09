@@ -19,7 +19,7 @@ describe Spaceship::Tunes::Territory do
     it "correctly parses the territories" do
       territory_0 = client.supported_territories[0]
 
-      expect(territory_0).not_to be_nil
+      expect(territory_0).not_to(be_nil)
       expect(territory_0.code).to eq('AL')
       expect(territory_0.currency_code).to eq('USD')
       expect(territory_0.name).to eq('Albania')

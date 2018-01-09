@@ -15,7 +15,7 @@ describe Match do
     it "encrypt" do
       @e = Match::Encrypt.new
       @e.encrypt_repo(path: @directory, git_url: @git_url)
-      expect(File.read(@full_path)).to_not eq(@content)
+      expect(File.read(@full_path)).to_not(eq(@content))
 
       @e.decrypt_repo(path: @directory, git_url: @git_url)
       expect(File.read(@full_path)).to eq(@content)
@@ -23,7 +23,7 @@ describe Match do
 
     it "raises an exception if invalid password is passed" do
       @e.encrypt_repo(path: @directory, git_url: @git_url)
-      expect(File.read(@full_path)).to_not eq(@content)
+      expect(File.read(@full_path)).to_not(eq(@content))
 
       ENV["MATCH_PASSWORD"] = "invalid"
       expect do

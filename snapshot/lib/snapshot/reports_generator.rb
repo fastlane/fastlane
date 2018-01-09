@@ -6,7 +6,7 @@ module Snapshot
     require 'fastimage'
 
     def generate
-      UI.message "Generating HTML Report"
+      UI.message("Generating HTML Report")
 
       screens_path = Snapshot.config[:output_directory]
 
@@ -35,7 +35,7 @@ module Snapshot
       File.write(export_path, html)
 
       export_path = File.expand_path(export_path)
-      UI.success "Successfully created HTML file with an overview of all the screenshots: '#{export_path}'"
+      UI.success("Successfully created HTML file with an overview of all the screenshots: '#{export_path}'")
       system("open '#{export_path}'") unless Snapshot.config[:skip_open_summary]
     end
 

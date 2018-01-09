@@ -169,7 +169,7 @@ module Fastlane
     # This is necessary since the user might be prompted for their password
     def install_dependencies!
       # Using puts instead of `UI` to have the same style as the `echo`
-      puts "Installing plugin dependencies..."
+      puts("Installing plugin dependencies...")
       ensure_plugins_attached!
       with_clean_bundler_env do
         cmd = "bundle install"
@@ -183,7 +183,7 @@ module Fastlane
     # Warning: This will exec out
     # This is necessary since the user might be prompted for their password
     def update_dependencies!
-      puts "Updating plugin dependencies..."
+      puts("Updating plugin dependencies...")
       ensure_plugins_attached!
       plugins = available_plugins
       if plugins.empty?
@@ -233,8 +233,8 @@ module Fastlane
 
       unless UI.confirm("Should fastlane modify the Gemfile at path '#{path_to_gemfile}' for you?")
         UI.important("Please add the following code to '#{path_to_gemfile}':")
-        puts ""
-        puts self.class.code_to_attach.magenta # we use `puts` instead of `UI` to make it easier to copy and paste
+        puts("")
+        puts(self.class.code_to_attach.magenta) # we use `puts` instead of `UI` to make it easier to copy and paste
         UI.user_error!("Please update '#{path_to_gemfile} and run fastlane again")
       end
 
@@ -323,12 +323,12 @@ module Fastlane
       end
 
       require 'terminal-table'
-      puts Terminal::Table.new({
+      puts(Terminal::Table.new({
         rows: FastlaneCore::PrintTable.transform_output(rows),
         title: "Used plugins".green,
         headings: ["Plugin", "Version", "Action"]
-      })
-      puts ""
+      }))
+      puts("")
     end
 
     #####################################################

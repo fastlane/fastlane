@@ -58,7 +58,7 @@ module Fastlane
         UI.verbose(command)
 
         begin
-          Actions.sh command
+          Actions.sh(command)
 
           # Finds absolute path of IPA and dSYM
           absolute_ipa_path = find_ipa_file(absolute_dest_directory)

@@ -43,9 +43,9 @@ module Deliver
 
       if !ignore_validation && !rejected_folders.empty?
         rejected_folders = rejected_folders.map { |path| File.basename(path) }
-        UI.user_error! "Unsupported directory name(s) for screenshots/metadata in '#{root}': #{rejected_folders.join(', ')}" \
+        UI.user_error!("Unsupported directory name(s) for screenshots/metadata in '#{root}': #{rejected_folders.join(', ')}" \
                        "\nValid directory names are: #{allowed_directory_names_with_case}" \
-                       "\n\nEnable 'ignore_language_directory_validation' to prevent this validation from happening"
+                       "\n\nEnable 'ignore_language_directory_validation' to prevent this validation from happening")
       end
 
       selected_folders

@@ -28,7 +28,7 @@ module Fastlane
         http.use_ssl = true
         presign_form_response = http.request(Net::HTTP::Get.new(uri.request_uri))
         json_res = JSON.parse(presign_form_response.body)
-        return if error_detected json_res['errors']
+        return if error_detected(json_res['errors'])
         s3_sign = json_res['s3_sign']
         path = json_res['path']
         uri = URI.parse(Base64.decode64(s3_sign))
@@ -123,9 +123,9 @@ module Fastlane
         uoa_response = http.request(req)
         json_res = JSON.parse(uoa_response.body)
         if json_res['errors']
-          UI.error "App: #{json_res['errors']}"
+          UI.error("App: #{json_res['errors']}")
         else
-          UI.success "Binary processing: Check your app': #{json_res['link']}"
+          UI.success("Binary processing: Check your app': #{json_res['link']}")
         end
       end
 
@@ -226,7 +226,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac, :android].include? platform
+        [:ios, :mac, :android].include?(platform)
       end
 
       def self.invalid_response?(url_for_download_response)

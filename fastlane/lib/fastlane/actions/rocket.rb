@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class RocketAction < Action
       def self.run(params)
-        puts "
+        puts("
         ____
        /    \\
       |      |
@@ -36,7 +36,7 @@ module Fastlane
          ##
          ##
          ##
-         "
+         ")
         return "🚀"
       end
 

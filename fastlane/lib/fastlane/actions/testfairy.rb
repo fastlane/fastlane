@@ -10,12 +10,12 @@ module Fastlane
         require 'faraday_middleware'
 
         connection = Faraday.new(url: "https://upload.testfairy.com") do |builder|
-          builder.request :multipart
-          builder.request :url_encoded
-          builder.request :retry, max: 3, interval: 5
-          builder.response :json, content_type: /\bjson$/
-          builder.use FaradayMiddleware::FollowRedirects
-          builder.adapter :net_http
+          builder.request(:multipart)
+          builder.request(:url_encoded)
+          builder.request(:retry, max: 3, interval: 5)
+          builder.response(:json, content_type: /\bjson$/)
+          builder.use(FaradayMiddleware::FollowRedirects)
+          builder.adapter(:net_http)
         end
 
         options[:file] = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa and File.exist?(ipa)
@@ -227,7 +227,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :android].include? platform
+        [:ios, :android].include?(platform)
       end
     end
   end

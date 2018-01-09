@@ -32,7 +32,7 @@ module Precheck
     end
 
     def handle_item?(item)
-      (item.kind_of? TestItemToCheck) ? true : false
+      item.kind_of?(TestItemToCheck) ? true : false
     end
 
     def supported_fields_symbol_set

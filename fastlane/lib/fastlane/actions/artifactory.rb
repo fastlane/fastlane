@@ -11,7 +11,7 @@ module Fastlane
 
         require 'artifactory'
         file_path = File.absolute_path(params[:file])
-        if File.exist? file_path
+        if File.exist?(file_path)
           client = connect_to_artifactory(params)
           artifact = Artifactory::Resource::Artifact.new
           artifact.client = client
@@ -39,7 +39,7 @@ module Fastlane
       def self.connect_to_artifactory(params)
         config_keys = [:endpoint, :username, :password, :ssl_pem_file, :ssl_verify, :proxy_username, :proxy_password, :proxy_address, :proxy_port]
         config = params.values.select do |key|
-          config_keys.include? key
+          config_keys.include?(key)
         end
         Artifactory::Client.new(config)
       end

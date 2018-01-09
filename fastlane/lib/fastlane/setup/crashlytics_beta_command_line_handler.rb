@@ -14,13 +14,13 @@ module Fastlane
     end
 
     def self.apply_options(command)
-      command.option '--crashlytics_path STRING', String, 'Path to Crashlytics.framework'
-      command.option '--api_key STRING', String, 'Crashlytics API key'
-      command.option '--build_secret STRING', String, 'Crashlytics build secret'
-      command.option '--emails ARRAY', Array, 'List of emails to invite'
-      command.option '--groups ARRAY', Array, 'List of group aliases to invite'
-      command.option '--scheme STRING', String, 'Xcode scheme'
-      command.option '--export_method STRING', String, 'Provisioning profile type (ad-hoc, enterprise, development)'
+      command.option('--crashlytics_path STRING', String, 'Path to Crashlytics.framework')
+      command.option('--api_key STRING', String, 'Crashlytics API key')
+      command.option('--build_secret STRING', String, 'Crashlytics build secret')
+      command.option('--emails ARRAY', Array, 'List of emails to invite')
+      command.option('--groups ARRAY', Array, 'List of group aliases to invite')
+      command.option('--scheme STRING', String, 'Xcode scheme')
+      command.option('--export_method STRING', String, 'Provisioning profile type (ad-hoc, enterprise, development)')
     end
   end
 end

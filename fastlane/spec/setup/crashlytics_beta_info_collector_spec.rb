@@ -45,15 +45,15 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
     end
 
     it 'does not parse or prompt with valid api_key and build_secret and crashlytics_path' do
-      expect(info).not_to receive(:api_key=)
-      expect(info).not_to receive(:build_secret=)
-      expect(info).not_to receive(:crashlytics_path=)
-      expect(info).not_to receive(:emails=)
-      expect(info).not_to receive(:groups=)
-      expect(info).not_to receive(:schemes=)
-      expect(info).not_to receive(:export_method=)
+      expect(info).not_to(receive(:api_key=))
+      expect(info).not_to(receive(:build_secret=))
+      expect(info).not_to(receive(:crashlytics_path=))
+      expect(info).not_to(receive(:emails=))
+      expect(info).not_to(receive(:groups=))
+      expect(info).not_to(receive(:schemes=))
+      expect(info).not_to(receive(:export_method=))
 
-      expect(ui).not_to receive(:input)
+      expect(ui).not_to(receive(:input))
 
       collector.collect_info_into(info)
 
@@ -68,13 +68,13 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.api_key = 'invalid'
 
       expect(info).to receive(:api_key=).and_call_original
-      expect(info).not_to receive(:build_secret=)
-      expect(info).not_to receive(:crashlytics_path=)
-      expect(info).not_to receive(:emails=)
-      expect(info).not_to receive(:groups=)
-      expect(info).not_to receive(:schemes=)
+      expect(info).not_to(receive(:build_secret=))
+      expect(info).not_to(receive(:crashlytics_path=))
+      expect(info).not_to(receive(:emails=))
+      expect(info).not_to(receive(:groups=))
+      expect(info).not_to(receive(:schemes=))
 
-      expect(ui).not_to receive(:input)
+      expect(ui).not_to(receive(:input))
 
       collector.collect_info_into(info)
 
@@ -89,13 +89,13 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.build_secret = 'invalid'
 
       expect(info).to receive(:build_secret=).and_call_original
-      expect(info).not_to receive(:api_key=)
-      expect(info).not_to receive(:crashlytics_path=)
-      expect(info).not_to receive(:emails=)
-      expect(info).not_to receive(:groups=)
-      expect(info).not_to receive(:schemes=)
+      expect(info).not_to(receive(:api_key=))
+      expect(info).not_to(receive(:crashlytics_path=))
+      expect(info).not_to(receive(:emails=))
+      expect(info).not_to(receive(:groups=))
+      expect(info).not_to(receive(:schemes=))
 
-      expect(ui).not_to receive(:input)
+      expect(ui).not_to(receive(:input))
 
       collector.collect_info_into(info)
 
@@ -110,13 +110,13 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
       info.crashlytics_path = 'invalid_crashlytics_path'
 
       expect(info).to receive(:crashlytics_path=).and_call_original
-      expect(info).not_to receive(:api_key=)
-      expect(info).not_to receive(:build_secret=)
-      expect(info).not_to receive(:emails=)
-      expect(info).not_to receive(:groups=)
-      expect(info).not_to receive(:schemes=)
+      expect(info).not_to(receive(:api_key=))
+      expect(info).not_to(receive(:build_secret=))
+      expect(info).not_to(receive(:emails=))
+      expect(info).not_to(receive(:groups=))
+      expect(info).not_to(receive(:schemes=))
 
-      expect(ui).not_to receive(:input)
+      expect(ui).not_to(receive(:input))
 
       collector.collect_info_into(info)
 
@@ -130,15 +130,15 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
 
       info.emails = nil
 
-      expect(info).not_to receive(:crashlytics_path=)
-      expect(info).not_to receive(:api_key=)
-      expect(info).not_to receive(:build_secret=)
+      expect(info).not_to(receive(:crashlytics_path=))
+      expect(info).not_to(receive(:api_key=))
+      expect(info).not_to(receive(:build_secret=))
       expect(info).to receive(:emails=).and_call_original
-      expect(info).not_to receive(:groups=)
-      expect(info).not_to receive(:schemes=)
+      expect(info).not_to(receive(:groups=))
+      expect(info).not_to(receive(:schemes=))
 
       allow(ui).to receive(:important)
-      expect(ui).not_to receive(:input)
+      expect(ui).not_to(receive(:input))
 
       collector.collect_info_into(info)
 
@@ -232,7 +232,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
 
       info.emails = nil
 
-      expect(ui).not_to receive(:input)
+      expect(ui).not_to(receive(:input))
 
       collector.collect_info_into(info)
 
@@ -304,15 +304,15 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
     end
 
     it 'does not prompt the user when a valid export method is provided' do
-      expect(info).not_to receive(:api_key=)
-      expect(info).not_to receive(:build_secret=)
-      expect(info).not_to receive(:crashlytics_path=)
-      expect(info).not_to receive(:emails=)
-      expect(info).not_to receive(:groups=)
-      expect(info).not_to receive(:schemes=)
-      expect(info).not_to receive(:export_method=)
+      expect(info).not_to(receive(:api_key=))
+      expect(info).not_to(receive(:build_secret=))
+      expect(info).not_to(receive(:crashlytics_path=))
+      expect(info).not_to(receive(:emails=))
+      expect(info).not_to(receive(:groups=))
+      expect(info).not_to(receive(:schemes=))
+      expect(info).not_to(receive(:export_method=))
 
-      expect(ui).not_to receive(:choose)
+      expect(ui).not_to(receive(:choose))
 
       collector.collect_info_into(info)
 
@@ -333,7 +333,7 @@ describe Fastlane::CrashlyticsBetaInfoCollector do
     it 'has a default value of development for export method when none is provided' do
       info.export_method = nil
 
-      expect(ui).not_to receive(:choose)
+      expect(ui).not_to(receive(:choose))
 
       collector.collect_info_into(info)
 

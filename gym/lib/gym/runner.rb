@@ -64,11 +64,11 @@ module Gym
         end
       end
 
-      puts Terminal::Table.new(
-        title: title.green,
-        headings: ["Option", "Value"],
-        rows: FastlaneCore::PrintTable.transform_output(rows.delete_if { |c| c.to_s.empty? })
-      )
+      puts(Terminal::Table.new(
+             title: title.green,
+             headings: ["Option", "Value"],
+             rows: FastlaneCore::PrintTable.transform_output(rows.delete_if { |c| c.to_s.empty? })
+      ))
     end
 
     private
@@ -99,7 +99,7 @@ module Gym
                                               end)
 
       mark_archive_as_built_by_gym(BuildCommandGenerator.archive_path)
-      UI.success "Successfully stored the archive. You can find it in the Xcode Organizer." unless Gym.config[:archive_path].nil?
+      UI.success("Successfully stored the archive. You can find it in the Xcode Organizer.") unless Gym.config[:archive_path].nil?
       UI.verbose("Stored the archive in: " + BuildCommandGenerator.archive_path)
     end
 
@@ -130,15 +130,15 @@ module Gym
       containing_directory = File.expand_path("..", PackageCommandGenerator.dsym_path)
 
       available_dsyms = Dir.glob("#{containing_directory}/*.dSYM")
-      UI.message "Compressing #{available_dsyms.count} dSYM(s)" unless Gym.config[:silent]
+      UI.message("Compressing #{available_dsyms.count} dSYM(s)") unless Gym.config[:silent]
 
       output_path = File.expand_path(File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".app.dSYM.zip"))
       command = "cd '#{containing_directory}' && zip -r '#{output_path}' *.dSYM"
       Helper.backticks(command, print: !Gym.config[:silent])
 
-      puts "" # new line
+      puts("") # new line
 
-      UI.success "Successfully exported and compressed dSYM file"
+      UI.success("Successfully exported and compressed dSYM file")
     end
 
     # Moves over the binary and dsym file to the output directory
@@ -147,26 +147,26 @@ module Gym
       FileUtils.mv(PackageCommandGenerator.ipa_path, File.expand_path(Gym.config[:output_directory]), force: true)
       ipa_path = File.expand_path(File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.ipa_path)))
 
-      UI.success "Successfully exported and signed the ipa file:"
-      UI.message ipa_path
+      UI.success("Successfully exported and signed the ipa file:")
+      UI.message(ipa_path)
       ipa_path
     end
 
     # copys framework from temp folder:
 
     def copy_files_from_path(path)
-      UI.success "Exporting Files:"
+      UI.success("Exporting Files:")
       Dir[path].each do |f|
         existing_file = File.join(File.expand_path(Gym.config[:output_directory]), File.basename(f))
         # If the target file already exists in output directory
         # we have to remove it first, otherwise cp_r fails even with remove_destination
         # e.g.: there are symlinks in the .framework
         if File.exist?(existing_file)
-          UI.important "Removing #{File.basename(f)} from output directory" if FastlaneCore::Globals.verbose?
+          UI.important("Removing #{File.basename(f)} from output directory") if FastlaneCore::Globals.verbose?
           FileUtils.rm_rf(existing_file)
         end
         FileUtils.cp_r(f, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
-        UI.message "\t ▸ #{File.basename(f)}"
+        UI.message("\t ▸ #{File.basename(f)}")
       end
     end
 
@@ -177,8 +177,8 @@ module Gym
       UI.crash!("Couldn't find application in '#{BuildCommandGenerator.archive_path}'") unless File.exist?(app_path)
       FileUtils.cp_r(app_path, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
       app_path = File.join(Gym.config[:output_directory], File.basename(app_path))
-      UI.success "Successfully exported the .app file:"
-      UI.message app_path
+      UI.success("Successfully exported the .app file:")
+      UI.message(app_path)
       app_path
     end
 
@@ -188,8 +188,8 @@ module Gym
         FileUtils.mv(PackageCommandGenerator.manifest_path, File.expand_path(Gym.config[:output_directory]), force: true)
         manifest_path = File.join(File.expand_path(Gym.config[:output_directory]), File.basename(PackageCommandGenerator.manifest_path))
 
-        UI.success "Successfully exported the manifest.plist file:"
-        UI.message manifest_path
+        UI.success("Successfully exported the manifest.plist file:")
+        UI.message(manifest_path)
         manifest_path
       end
     end
@@ -200,8 +200,8 @@ module Gym
         FileUtils.mv(PackageCommandGenerator.app_thinning_path, File.expand_path(Gym.config[:output_directory]), force: true)
         app_thinning_path = File.join(File.expand_path(Gym.config[:output_directory]), File.basename(PackageCommandGenerator.app_thinning_path))
 
-        UI.success "Successfully exported the app-thinning.plist file:"
-        UI.message app_thinning_path
+        UI.success("Successfully exported the app-thinning.plist file:")
+        UI.message(app_thinning_path)
         app_thinning_path
       end
     end
@@ -212,8 +212,8 @@ module Gym
         FileUtils.mv(PackageCommandGenerator.app_thinning_size_report_path, File.expand_path(Gym.config[:output_directory]), force: true)
         app_thinning_size_report_path = File.join(File.expand_path(Gym.config[:output_directory]), File.basename(PackageCommandGenerator.app_thinning_size_report_path))
 
-        UI.success "Successfully exported the App Thinning Size Report.txt file:"
-        UI.message app_thinning_size_report_path
+        UI.success("Successfully exported the App Thinning Size Report.txt file:")
+        UI.message(app_thinning_size_report_path)
         app_thinning_size_report_path
       end
     end
@@ -224,8 +224,8 @@ module Gym
         FileUtils.mv(PackageCommandGenerator.apps_path, File.expand_path(Gym.config[:output_directory]), force: true)
         apps_path = File.join(File.expand_path(Gym.config[:output_directory]), File.basename(PackageCommandGenerator.apps_path))
 
-        UI.success "Successfully exported Apps folder:"
-        UI.message apps_path
+        UI.success("Successfully exported Apps folder:")
+        UI.message(apps_path)
         apps_path
       end
     end

@@ -30,7 +30,7 @@ describe Scan do
           output_types: 'junit',
           custom_report_file_name: 'report.xml'
         }
-        expect(FastlaneCore::UI).not_to receive(:user_error!)
+        expect(FastlaneCore::UI).not_to(receive(:user_error!))
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
       end
     end

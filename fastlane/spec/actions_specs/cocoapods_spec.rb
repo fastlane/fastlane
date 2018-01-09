@@ -148,7 +148,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(Fastlane::Actions).to have_received(:sh_control_output).with("bundle exec pod install", hash_including(print_command: true)).ordered
-        expect(Fastlane::Actions).to_not have_received(:sh_control_output).with("bundle exec pod install --repo-update", hash_including(print_command: true)).ordered
+        expect(Fastlane::Actions).to_not(have_received(:sh_control_output).with("bundle exec pod install --repo-update", hash_including(print_command: true)).ordered)
       end
 
       it "calls error_callback if retry with --repo-update finished with error" do

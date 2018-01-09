@@ -4,7 +4,7 @@ describe FastlaneCore::Interface::FastlaneException do
       begin
         UI.user_error!('USER ERROR!!')
       rescue => e
-        expect(e.caused_by_calling_ui_method?(method_name: 'user_error!')).to be true
+        expect(e.caused_by_calling_ui_method?(method_name: 'user_error!')).to be(true)
       end
     end
 
@@ -12,7 +12,7 @@ describe FastlaneCore::Interface::FastlaneException do
       begin
         UI.crash!('CRASH!!')
       rescue => e
-        expect(e.caused_by_calling_ui_method?(method_name: 'crash!')).to be true
+        expect(e.caused_by_calling_ui_method?(method_name: 'crash!')).to be(true)
       end
     end
 
@@ -20,7 +20,7 @@ describe FastlaneCore::Interface::FastlaneException do
       begin
         raise FastlaneCore::Interface::FastlaneError.new, 'EXPLICITLY RAISED ERROR'
       rescue => e
-        expect(e.caused_by_calling_ui_method?(method_name: 'user_error!')). to be false
+        expect(e.caused_by_calling_ui_method?(method_name: 'user_error!')). to be(false)
       end
     end
   end
@@ -87,14 +87,14 @@ describe FastlaneCore::Interface::FastlaneException do
     # hard code backtrace, and be sure that is trimmed properly
     it 'trims backtrace containing sh_helper.rb' do
       mock_backtrace = ["path/to/sh_helper.rb:55", "path/to/sh_helper.rb:10", "path/to/another/file.rb:1337"]
-      exception = FastlaneCore::Interface::FastlaneShellError.new "SHELL ERROR!!"
+      exception = FastlaneCore::Interface::FastlaneShellError.new("SHELL ERROR!!")
       expect(exception).to receive(:backtrace).at_least(:once).and_return(mock_backtrace)
       expect(exception.trimmed_backtrace).to eq(mock_backtrace.drop(2))
     end
 
     it 'does not trim backtrace not containing sh_helper.rb' do
       mock_backtrace = ["path/to/file.rb:1337", "path/to/file.rb:2001"]
-      exception = FastlaneCore::Interface::FastlaneShellError.new "SHELL ERROR!!"
+      exception = FastlaneCore::Interface::FastlaneShellError.new("SHELL ERROR!!")
       expect(exception).to receive(:backtrace).at_least(:once).and_return(mock_backtrace)
       expect(exception.trimmed_backtrace).to eq(mock_backtrace)
     end

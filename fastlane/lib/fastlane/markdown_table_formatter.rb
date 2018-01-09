@@ -13,7 +13,7 @@ module Fastlane
       rows.each do |row|
         row_array = row.split("|")
         row_array.each(&:strip!)
-        @table.push row_array
+        @table.push(row_array)
       end
       @table.delete_at(1) if @header # strip header separator
       @table
@@ -43,7 +43,7 @@ module Fastlane
     def header_separator_row
       output = []
       [*0...table.first.length].each do |column|
-        output.push separator(column_width(column))
+        output.push(separator(column_width(column)))
       end
       output
     end

@@ -15,11 +15,11 @@ module Fastlane
           url: base_url
         }
         Faraday.new(foptions) do |builder|
-          builder.request :multipart
-          builder.request :url_encoded
-          builder.response :json, content_type: /\bjson$/
-          builder.use FaradayMiddleware::FollowRedirects
-          builder.adapter :net_http
+          builder.request(:multipart)
+          builder.request(:url_encoded)
+          builder.response(:json, content_type: /\bjson$/)
+          builder.use(FaradayMiddleware::FollowRedirects)
+          builder.adapter(:net_http)
         end
       end
 

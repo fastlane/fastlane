@@ -6,7 +6,7 @@ module Fastlane
       action_name = nil
 
       args.each do |current|
-        if current.include? ":" # that's a key/value which we want to pass to the lane
+        if current.include?(":") # that's a key/value which we want to pass to the lane
           key, value = current.split(":", 2)
           UI.user_error!("Please pass values like this: key:value") unless key.length > 0
           value = CommandLineHandler.convert_value(value)

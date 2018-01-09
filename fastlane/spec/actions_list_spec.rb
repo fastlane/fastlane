@@ -46,7 +46,7 @@ describe Fastlane do
 
         expect do
           Fastlane::ActionsList.show_details(filter: 'broken')
-        end.to raise_error "boom"
+        end.to raise_error("boom")
       end
     end
   end

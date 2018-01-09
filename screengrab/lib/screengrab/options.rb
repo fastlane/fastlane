@@ -89,7 +89,7 @@ module Screengrab
                                      code_gen_sensitive: true,
                                      default_value: Dir[File.join("app", "build", "outputs", "apk", "app-debug.apk")].last,
                                      verify_block: proc do |value|
-                                       UI.user_error! "Could not find APK file at path '#{value}'" unless File.exist?(value)
+                                       UI.user_error!("Could not find APK file at path '#{value}'") unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :tests_apk_path,
                                      env_name: 'SCREENGRAB_TESTS_APK_PATH',
@@ -99,7 +99,7 @@ module Screengrab
                                      code_gen_sensitive: true,
                                      default_value: Dir[File.join("app", "build", "outputs", "apk", "app-debug-androidTest-unaligned.apk")].last,
                                      verify_block: proc do |value|
-                                       UI.user_error! "Could not find APK file at path '#{value}'" unless File.exist?(value)
+                                       UI.user_error!("Could not find APK file at path '#{value}'") unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :specific_device,
                                      env_name: 'SCREENGRAB_SPECIFIC_DEVICE',
@@ -112,7 +112,7 @@ module Screengrab
                                      short_option: "-d",
                                      default_value: "phone",
                                      verify_block: proc do |value|
-                                       UI.user_error! "device_type must be one of: #{DEVICE_TYPES}" unless DEVICE_TYPES.include?(value)
+                                       UI.user_error!("device_type must be one of: #{DEVICE_TYPES}") unless DEVICE_TYPES.include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :exit_on_test_failure,
                                      env_name: 'EXIT_ON_TEST_FAILURE',

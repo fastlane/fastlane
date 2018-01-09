@@ -161,7 +161,7 @@ module Pilot
         end
       end
 
-      default_command :help
+      default_command(:help)
 
       run!
     end
