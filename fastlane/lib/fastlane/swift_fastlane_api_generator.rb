@@ -18,9 +18,11 @@ module Fastlane
     attr_accessor :actions_not_supported
     attr_accessor :action_options_to_ignore
     attr_accessor :target_output_path
+    attr_accessor :generated_paths # stores all file names of generated files (as they are generated)
 
     def initialize(target_output_path: "swift")
       @target_output_path = File.expand_path(target_output_path)
+      @generated_paths = []
       require 'fastlane'
       require 'fastlane/documentation/actions_list'
       Fastlane.load_actions
@@ -49,6 +51,7 @@ module Fastlane
     end
 
     def generate_swift
+      self.generated_paths = [] # reset generated paths in case we're called multiple times
       file_content = []
       file_content << "import Foundation"
 
@@ -83,9 +86,9 @@ module Fastlane
       File.write(fastlane_swift_api_path, file_content)
       UI.success(fastlane_swift_api_path)
 
-      files_generated = [fastlane_swift_api_path]
-      files_generated += generate_default_implementations(tool_details: tool_details)
-      return files_generated
+      self.generated_paths << fastlane_swift_api_path
+      self.generated_paths += generate_default_implementations(tool_details: tool_details)
+      return self.generated_paths
     end
 
     def write_lanefile(lanefile_implementation_opening: nil, class_name: nil, tool_name: nil)
@@ -202,6 +205,7 @@ func parseInt(fromString: String, function: String = #function) -> Int {
       file_content = protocol_content_array.join("\n")
       File.write(target_path, file_content)
       UI.success(target_path)
+      return target_path
     end
 
     def ignore_param?(function_name: nil, param_name: nil)
@@ -252,7 +256,7 @@ func parseInt(fromString: String, function: String = #function) -> Int {
           key_type_overrides: key_type_overrides,
           return_type: action_return_type
         )
-        generate_tool_protocol(tool_swift_function: tool_swift_function)
+        self.generated_paths << generate_tool_protocol(tool_swift_function: tool_swift_function)
         return tool_swift_function
       else
         return SwiftFunction.new(
