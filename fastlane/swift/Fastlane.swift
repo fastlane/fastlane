@@ -1413,8 +1413,10 @@ func gcovr() {
   let command = RubyCommand(commandID: "", methodName: "gcovr", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
-@discardableResult func getBuildNumber(xcodeproj: String? = nil) -> String {
-  let command = RubyCommand(commandID: "", methodName: "get_build_number", className: nil, args: [RubyCommand.Argument(name: "xcodeproj", value: xcodeproj)])
+@discardableResult func getBuildNumber(xcodeproj: String? = nil,
+                                       hideErrorWhenVersioningDisabled: Bool = false) -> String {
+  let command = RubyCommand(commandID: "", methodName: "get_build_number", className: nil, args: [RubyCommand.Argument(name: "xcodeproj", value: xcodeproj),
+                                                                                                  RubyCommand.Argument(name: "hide_error_when_versioning_disabled", value: hideErrorWhenVersioningDisabled)])
   return runner.executeCommand(command)
 }
 func getBuildNumberRepository(useHgRevisionNumber: Bool = false) {
