@@ -44,6 +44,11 @@ module FastlaneCore
         parse(path).fetch("Name")
       end
 
+      # @return [String] The Apple TeamIdentifier of the given provisioning profile
+      def team_identifier(path)
+        parse(path).fetch("Entitlements").fetch("com.apple.developer.team-identifier")
+      end
+
       def profiles_path
         path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
         # If the directory doesn't exist, create it first
@@ -55,16 +60,29 @@ module FastlaneCore
       end
 
       # Installs a provisioning profile for Xcode to use
-      def install(path)
+      def install(path, provisioning_profiles_mode_option = nil)
         UI.message("Installing provisioning profile...")
         profile_filename = uuid(path) + ".mobileprovision"
         destination = File.join(profiles_path, profile_filename)
 
         if path != destination
-          # copy to Xcode provisioning profile directory
-          FileUtils.copy(path, destination)
-          unless File.exist?(destination)
-            UI.user_error!("Failed installation of provisioning profile at location: '#{destination}'")
+
+          if ENV['FASTLANE_MOBILE_PROVISION_FILES_NAMES_MODE'] == "PROFILES_NAME" || provisioning_profiles_mode_option == "PROFILES_NAME"
+            # Remove previous generation provisioning profile name
+            #  to avoid installing the same file twice with different file names
+            FileUtils.remove_entry(destination, force: true)
+
+            # Copy to Xcode provisioning profile directory and delete previous file if present
+            profile_filename = team_identifier(path) + "_" + File.basename(path)
+            destination = File.join(profiles_path, profile_filename)
+
+            FileUtils.remove_entry(destination, force: true)
+            FileUtils.copy(path, destination)
+          else
+            FileUtils.copy(path, destination)
+            unless File.exist?(destination)
+              UI.user_error!("Failed installation of provisioning profile at location: '#{destination}'")
+            end
           end
         end
 
