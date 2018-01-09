@@ -81,17 +81,17 @@ module Fastlane
           chosen_project ||= UI.select("Multiple iOS projects found in current directory", current_directory)
           had_multiple_projects_to_choose_from = true
         else
-          UI.error("Looks like there is no iOS project in the current directory, but inside a sub-directory instead")
-          UI.error("Please `cd` into the subfolder of the location of your Xcode project")
-          UI.user_error!("Please `cd` into the subfolder of your Xcode project and run `fastlane init` again")
+          UI.error("It looks like there is no iOS project in the current directory, though we did find one in a sub-directory")
+          UI.error("Please `cd` into the directory of the intended Xcode project you wish to use.")
+          UI.user_error!("Please `cd` into the directory of the intended Xcode project you wish to use and run `fastlane init` again")
         end
 
         if chosen_project == "Pods.xcodeproj"
-          unless UI.confirm("Found '#{chosen_project}', which usually isn't a valid Xcode project. Make sure to switch to the directory containing your iOS Xcode project. Do you still want to continue?")
-            UI.user_error!("Make sure to `cd` into the right directory and then use `fastlane init` again")
+          unless UI.confirm("Found '#{chosen_project}', which usually isn't normally what you want. Make sure to switch to the directory containing your intended Xcode project. Would you still like to continue with #{chosen_project}?")
+            UI.user_error!("Make sure to `cd` into the directory containing the Xcode project you intend to use and then use `fastlane init` again")
           end
         end
-        UI.message("Detected iOS/macOS project in current directory: '#{chosen_project}'")
+        UI.message("Detected an iOS/macOS project in the current directory: '#{chosen_project}'")
 
         SetupIos.new(
           is_swift_fastfile: is_swift_fastfile,
@@ -100,12 +100,12 @@ module Fastlane
           had_multiple_projects_to_choose_from: had_multiple_projects_to_choose_from
         ).setup_ios
       elsif android_projects.count > 0
-        UI.message("Detected Android project in current directory...")
+        UI.message("Detected an Android project in the current directory...")
         SetupAndroid.new.setup_android
       else
-        UI.error("No iOS or Android projects found in current directory '#{Dir.pwd}'")
+        UI.error("No iOS or Android projects were found in directory '#{Dir.pwd}'")
         UI.error("Make sure to `cd` into the directory containing your iOS or Android app")
-        if UI.confirm("Do you still want to setup a manual fastlane config in the current directory?")
+        if UI.confirm("Alternatively, would you like to manually setup a fastlane config in the current directory instead?")
           SetupIos.new(
             is_swift_fastfile: is_swift_fastfile,
             user: user,
@@ -114,7 +114,7 @@ module Fastlane
             preferred_setup_method: :ios_manual
           ).setup_ios
         else
-          UI.user_error!("Make sure to `cd` into the right directory and then use `fastlane init` again")
+          UI.user_error!("Make sure to `cd` into the directory containing your project and then use `fastlane init` again")
         end
       end
     end
@@ -131,8 +131,8 @@ module Fastlane
     # Helpers
     def welcome_to_fastlane
       UI.header("Welcome to fastlane 🚀")
-      UI.message("fastlane can help you with all kinds of mobile app automation")
-      UI.message("We recommend automating one task first, then gradually automating more and more over time")
+      UI.message("fastlane can help you with all kinds of automation for your mobile app")
+      UI.message("We recommend automating one task first, and then gradually automating more over time")
     end
 
     # Append a lane to the current Fastfile template we're generating
@@ -174,8 +174,8 @@ module Fastlane
       UI.message("Generated Fastfile at path `#{fastfile_path}`")
       UI.message("Generated Appfile at path `#{appfile_path}`")
 
-      UI.message("Please check the newly generated configuration files into git together with your project")
-      UI.message("This way, everyone in your team can easily use the fastlane setup")
+      UI.message("Please check the newly generated configuration files into git along with your project")
+      UI.message("This way everyone in your team can benefit from your fastlane setup")
       continue_with_enter
     end
 
@@ -223,13 +223,12 @@ module Fastlane
     def explain_concepts
       UI.header("fastlane lanes")
       UI.message("fastlane uses a " + "`Fastfile`".yellow + " to store the automation configuration")
-      UI.message("Within that, you'll see different " + "lanes".yellow + ", each is there to automate a different process")
-      UI.message("This way, you can easily use fastlane to solve different tasks")
-      UI.message("like screenshots, code signing or pushing new releases")
+      UI.message("Within that, you'll see different " + "lanes".yellow + ".")
+      UI.message("Each is there to automate a different task, like screenshots, code signing, or pushing new releases")
       continue_with_enter
 
       UI.header("How to customize your Fastfile")
-      UI.message("Use a code editor of your choice to open the newly created Fastfile and take a look")
+      UI.message("Use a text editor of your choice to open the newly created Fastfile and take a look")
       UI.message("You can now edit the available lanes and actions to customize the setup to fit your needs")
       UI.message("To get a list of all the available actions, open " + "https://docs.fastlane.tools/actions".cyan)
       continue_with_enter

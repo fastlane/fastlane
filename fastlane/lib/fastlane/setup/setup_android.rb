@@ -51,13 +51,13 @@ module Fastlane
 
     def fetch_information_for_appfile
       UI.message('')
-      UI.message('To not re-enter your packagename and issuer every time you run one of fastlane, these will be stored in a so-called Appfile.')
+      UI.message("To avoid re-entering your package name and issuer every time you run fastlane, we'll store those in a so-called Appfile.")
 
       self.package_name = UI.input("Package Name (com.krausefx.app): ")
       puts ""
       puts "To automatically upload builds and metadata to Google Play, fastlane needs a service action json secret file".yellow
-      puts "Feel free to just click Enter to skip not provide certain things"
       puts "Follow the Setup Guide on how to get the Json file: https://docs.fastlane.tools/actions/supply/".yellow
+      puts "Feel free to press Enter at any time in order to skip providing pieces of information when asked"
       self.json_key_file = UI.input("Path to the json secret file: ")
 
       self.appfile_content.gsub!("[[JSON_KEY_FILE]]", self.json_key_file)
@@ -66,10 +66,10 @@ module Fastlane
 
     def init_supply
       UI.message("")
-      question = "Do you plan on uploading metadata, screenshots and builds to Google Play using fastlane?".yellow
+      question = "Do you plan on uploading metadata, screenshots, and builds to Google Play using fastlane?".yellow
       UI.message(question)
-      UI.message("This will download your existing metadata and screenshots into the `fastlane` folder")
-      if UI.confirm("Setup metadata management, and download existing metadata?")
+      UI.message("We will now download your existing metadata and screenshots into the `fastlane` folder so fastlane can manage it")
+      if UI.confirm("Download existing metadata and setup metadata management?")
         begin
           require 'supply'
           require 'supply/setup'
@@ -81,10 +81,10 @@ module Fastlane
           Supply::Setup.new.perform_download
         rescue => ex
           UI.error(ex.to_s)
-          UI.error("supply failed, but don't worry, you can launch supply using `fastlane supply init` whenever you want.")
+          UI.error("Setting up `supply` (metadata management action) failed, but don't worry, you can try setting it up again using `fastlane supply init` whenever you want.")
         end
       else
-        UI.success("You can run `fastlane supply init` to do so at a later point.")
+        UI.success("You can run `fastlane supply init` to set up metadata management at a later point.")
       end
     end
 

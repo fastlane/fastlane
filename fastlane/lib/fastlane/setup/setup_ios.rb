@@ -37,10 +37,10 @@ module Fastlane
         "📸  Automate screenshots" => :ios_screenshots,
         "👩‍✈️  Automate beta distribution to TestFlight" => :ios_testflight,
         "🚀  Automate App Store distribution" => :ios_app_store,
-        "🛠  Manual setup - setup your project to manually automate your tasks" => :ios_manual
+        "🛠  Manual setup - manually setup your project to automate your tasks" => :ios_manual
       }
 
-      selected = UI.select("What do you want to use fastlane for?", options.keys)
+      selected = UI.select("What would you like to use fastlane for?", options.keys)
       method_to_use = options[selected]
 
       # we want to first ask the user of what they want to do
@@ -68,10 +68,10 @@ module Fastlane
           UI.error(ex.to_s)
         end
 
-        UI.important("Something has failed when running `fastlane init`")
+        UI.important("Something failed while running `fastlane init`")
         UI.important("Tried using Apple ID with email '#{self.user}'")
-        UI.important("You can either re-try, or fallback to a basic Fastfile you can manually customize")
-        if UI.confirm("Do you want to fallback to a manual Fastfile?")
+        UI.important("You can either retry, or fallback to manual setup which will create a basic Fastfile")
+        if UI.confirm("Would you like to fallback to a manual Fastfile?")
           self.ios_manual
         else
           self.send(method_to_use)
@@ -120,12 +120,12 @@ module Fastlane
 
       if self.app_exists_on_itc
         UI.header("Manage app metadata?")
-        UI.message("Do you want to use fastlane to manage your app metadata?")
+        UI.message("Would you like to have fastlane manage your app's metadata?")
         UI.message("If you enable this feature, fastlane will download your existing metadata and screenshots.")
-        UI.message("This way, you'll be able to edit your app's metadata in the form of local `.txt` files.")
-        UI.message("After editing the local `.txt` files, just run fastlane, and all changes will be pushed up.")
-        UI.message("If you don't use that feature, you can still use fastlane to upload and distribute new builds to the App Store")
-        include_metadata = UI.confirm("Do you want fastlane to manage your app metadata?")
+        UI.message("This way, you'll be able to edit your app's metadata in local `.txt` files.")
+        UI.message("After editing the local `.txt` files, just run fastlane and all changes will be pushed up.")
+        UI.message("If you don't want to use this feature, you can still use fastlane to upload and distribute new builds to the App Store")
+        include_metadata = UI.confirm("Would you like fastlane to manage your app's metadata?")
         if include_metadata
           require 'deliver'
           require 'deliver/setup'
@@ -177,7 +177,7 @@ module Fastlane
     def ios_screenshots
       UI.header("Setting up fastlane to automate iOS screenshots")
 
-      UI.message("fastlane uses UI Tests to automatically generate localized screenshots of your iOS app")
+      UI.message("fastlane uses UI Tests to automate generating localized screenshots of your iOS app")
       UI.message("fastlane will now create 2 helper files that are needed to get the setup running")
       UI.message("For more information on how this works and best practices, check out")
       UI.message("\thttps://docs.fastlane.tools/getting-started/ios/screenshots/".cyan)
@@ -205,12 +205,12 @@ module Fastlane
       continue_with_enter
 
       available_schemes = self.project.schemes
-      ui_testing_scheme = UI.select("What's your UI Testing scheme? If it doesn't appear on the list, make sure it's marked as `Shared` in the Xcode scheme list", available_schemes)
+      ui_testing_scheme = UI.select("Which is your UI Testing scheme? If you can't find it in this list, make sure it's marked as `Shared` in the Xcode scheme list", available_schemes)
 
       UI.header("Automatically upload to iTC?")
-      UI.message("Do you want to automatically upload all generated screenshots to iTunes Connect")
+      UI.message("Would you like fastlane to automatically upload all generated screenshots to iTunes Connect")
       UI.message("after generating them?")
-      UI.message("If you enable this feature, fastlane will also need access to your iTunes Connect account")
+      UI.message("If you enable this feature you'll need to provide your iTunes Connect credentials so fastlane can upload the screenshots to iTunes Connect")
       automatic_upload = UI.confirm("Enable automatic upload of localized screenshots to iTunes Connect?")
       if automatic_upload
         ask_for_credentials(adp: true, itc: true)
@@ -243,7 +243,7 @@ module Fastlane
     end
 
     def ios_manual
-      UI.header("Setting up fastlane, the manual way")
+      UI.header("Setting up fastlane so you can manually configure it")
 
       if self.is_swift_fastfile
         append_lane(["func customLane() {",
@@ -299,13 +299,13 @@ module Fastlane
       UI.header("Login with your Apple ID")
       UI.message("To use iTunes Connect and Apple Developer Portal features as part of fastlane,")
       UI.message("we will ask you for your Apple ID username and password")
-      UI.message("This is necessary to use certain fastlane features, for example:")
+      UI.message("This is necessary for certain fastlane features, for example:")
       UI.message("")
       UI.message("- Create and manage your provisioning profiles on the Developer Portal")
       UI.message("- Upload and manage TestFlight and App Store builds on iTunes Connect")
       UI.message("- Manage your iTunes Connect app metadata and screenshots")
       UI.message("")
-      UI.message("Your Apple ID credentials will only be stored on your local machine, in the Keychain")
+      UI.message("Your Apple ID credentials will only be stored in your Keychain, on your local machine")
       UI.message("For more information, check out")
       UI.message("\thttps://github.com/fastlane/fastlane/tree/master/credentials_manager".cyan)
       UI.message("")
@@ -342,7 +342,7 @@ module Fastlane
         end
       end
 
-      UI.success("✅  Login with your Apple ID was successful")
+      UI.success("✅  Logging in with your Apple ID was successful")
     end
 
     def apple_xcode_project_versioning_enabled
@@ -363,8 +363,8 @@ module Fastlane
     end
 
     def show_information_about_version_bumps
-      UI.important("Looks like your project isn't set up to do automatic version increments")
-      UI.important("To let fastlane do automatic version bumps, please follow this guide:")
+      UI.important("It looks like your project isn't set up to do automatic version incrementing")
+      UI.important("To enable fastlane to handle automatic version incrementing for you, please follow this guide:")
       UI.message("\thttps://developer.apple.com/library/content/qa/qa1827/_index.html".cyan)
       UI.important("Afterwards check out the fastlane docs on how to set up automatic build increments")
       UI.message("\thttps://docs.fastlane.tools/getting-started/ios/beta-deployment/#best-practices".cyan)
@@ -372,16 +372,16 @@ module Fastlane
 
     def verify_app_exists_adp!
       UI.user_error!("No app identifier provided") if self.app_identifier.to_s.length == 0
-      UI.message("Checking if the app '#{self.app_identifier}' exists on the Apple Developer Portal...")
+      UI.message("Checking if the app '#{self.app_identifier}' exists in your Apple Developer Portal...")
       app = Spaceship::Portal::App.find(self.app_identifier)
       if app.nil?
-        UI.error("Looks like the app '#{self.app_identifier}' isn't available on the #{'Apple Developer Portal'.bold.underline}")
+        UI.error("It looks like the app '#{self.app_identifier}' isn't available on the #{'Apple Developer Portal'.bold.underline}")
         UI.error("for the team ID '#{self.adp_team_id}' on Apple ID '#{self.user}'")
 
         if UI.confirm("Do you want fastlane to create the App ID for you on the Apple Developer Portal?")
           create_app_online!(mode: :adp)
         else
-          UI.important("Alright, not creating the app for you, but be aware the build is probably gonna fail once you try it")
+          UI.important("Alright, we won't create the app for you. Be aware, the build is probably going to fail when you try it")
         end
       else
         UI.success("✅  Your app '#{self.app_identifier}' is available on iTunes Connect")
@@ -395,11 +395,11 @@ module Fastlane
       if app.nil?
         UI.error("Looks like the app '#{self.app_identifier}' isn't available on #{'iTunes Connect'.bold.underline}")
         UI.error("for the team ID '#{self.itc_team_id}' on Apple ID '#{self.user}'")
-        if UI.confirm("Do you want fastlane to create the App on iTunes Connect for you?")
+        if UI.confirm("Would you like fastlane to create the App on iTunes Connect for you?")
           create_app_online!(mode: :itc)
           self.app_exists_on_itc = true
         else
-          UI.important("Alright, not creating the app for you, but be aware the build is probably gonna fail once you try it")
+          UI.important("Alright, we won't create the app for you. Be aware, the build is probably going to fail when you try it")
         end
       else
         UI.success("✅  Your app '#{self.app_identifier}' is available on iTunes Connect")
@@ -503,8 +503,8 @@ module Fastlane
             UI.error(ex.to_s)
           end
           UI.error(ex.backtrace.join("\n")) if FastlaneCore::Globals.verbose?
-          UI.important("Looks like something went wrong when trying to create the app on the Apple Developer Portal")
-          unless UI.confirm("Do you want to try again (y)? If you enter (n), fastlane will fall back to the manual setup")
+          UI.important("It looks like something went wrong when we tried to create your app on the Apple Developer Portal")
+          unless UI.confirm("Would you like to try again (y)? If you enter (n), fastlane will fall back to the manual setup")
             raise ex
           end
         end
