@@ -1,6 +1,6 @@
-require 'fastlane/server/command_executor.rb'
-require 'fastlane/server/command_parser.rb'
-require 'fastlane/server/json_return_value_processor.rb'
+require_relative from_fastlane/'server/command_executor.rb'
+require_relative from_fastlane/'server/command_parser.rb'
+require_relative from_fastlane/'server/json_return_value_processor.rb'
 require 'socket'
 require 'json'
 

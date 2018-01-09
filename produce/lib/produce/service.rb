@@ -1,5 +1,5 @@
-require 'spaceship'
 require_relative 'module'
+require_relative from_spaceship
 
 module Produce
   class Service

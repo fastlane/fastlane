@@ -1,4 +1,4 @@
-require 'fastlane_core/tool_collector'
+require_relative from_fastlane_core/'tool_collector'
 
 module Fastlane
   class ActionCollector < FastlaneCore::ToolCollector

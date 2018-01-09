@@ -1,6 +1,6 @@
 require 'commander'
 
-require 'fastlane_core/configuration/configuration'
+require_relative from_fastlane_core/'configuration/configuration'
 require_relative 'module'
 require_relative 'nuke'
 require_relative 'git_helper'

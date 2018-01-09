@@ -1,7 +1,7 @@
 require 'pathname'
 
-require 'fastlane_core/ui/ui'
-require 'fastlane_core/helper'
+require_relative from_fastlane_core/'ui/ui'
+require_relative from_fastlane_core/'helper'
 
 module Supply
   # Use this to just setup the configuration attribute and set it later somewhere else

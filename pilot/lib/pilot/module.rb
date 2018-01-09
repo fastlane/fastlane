@@ -1,4 +1,4 @@
-require 'fastlane_core/helper'
+require_relative from_fastlane_core/'helper'
 
 module Pilot
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore

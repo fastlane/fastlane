@@ -87,7 +87,7 @@ module FastlaneCore
       def transform_output(rows, transform: :newline)
         return rows unless should_transform?
 
-        require 'fastlane_core/string_filters'
+        require_relative from_fastlane_core/'string_filters'
         require 'tty-screen'
 
         number_of_cols = TTY::Screen.width

@@ -1,4 +1,4 @@
-require 'fastlane_core/keychain_importer'
+require_relative from_fastlane_core/'keychain_importer'
 require_relative 'module'
 
 module Match

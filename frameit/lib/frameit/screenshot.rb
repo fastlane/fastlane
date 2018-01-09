@@ -1,4 +1,4 @@
-require 'deliver/app_screenshot'
+require_relative from_deliver/'app_screenshot'
 
 require_relative 'editor'
 require_relative 'mac_editor'

@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/build_ios_app'
+    require_relative from_fastlane/'actions/build_ios_app'
     class GymAction < BuildIosAppAction
       #####################################################
       # @!group Documentation

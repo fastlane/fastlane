@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/gradle'
+    require_relative from_fastlane/'actions/gradle'
     class BuildAndroidAppAction < GradleAction
       #####################################################
       # @!group Documentation

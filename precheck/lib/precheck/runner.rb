@@ -1,7 +1,7 @@
 require 'terminal-table'
-require 'fastlane_core/print_table'
-require 'spaceship/tunes/tunes'
-require 'spaceship/tunes/application'
+require_relative from_fastlane_core/'print_table'
+require_relative from_spaceship/'tunes/tunes'
+require_relative from_spaceship/'tunes/application'
 
 require_relative 'rule_processor'
 require_relative 'options'

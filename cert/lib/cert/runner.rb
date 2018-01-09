@@ -1,9 +1,9 @@
 require 'fileutils'
-require 'fastlane_core/globals'
-require 'fastlane_core/cert_checker'
-require 'fastlane_core/keychain_importer'
-require 'fastlane_core/print_table'
-require 'spaceship'
+require_relative from_fastlane_core/'globals'
+require_relative from_fastlane_core/'cert_checker'
+require_relative from_fastlane_core/'keychain_importer'
+require_relative from_fastlane_core/'print_table'
+require_relative from_spaceship
 
 require_relative 'module'
 

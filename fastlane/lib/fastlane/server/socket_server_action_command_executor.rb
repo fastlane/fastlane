@@ -1,6 +1,6 @@
-require 'fastlane/server/action_command_return.rb'
-require 'fastlane/server/command_parser.rb'
-require 'fastlane/server/command_executor.rb'
+require_relative from_fastlane/'server/action_command_return.rb'
+require_relative from_fastlane/'server/command_parser.rb'
+require_relative from_fastlane/'server/command_executor.rb'
 
 module Fastlane
   # Handles receiving commands from the socket server, finding the Action to be invoked,
