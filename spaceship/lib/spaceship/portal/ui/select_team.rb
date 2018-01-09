@@ -31,7 +31,7 @@ module Spaceship
       #     {...}
       #   ]
 
-      # rubocop:disable Require/MissingRequireStatement
+      # rubocop:disable Lint/MissingRequireStatement
       def self.ci?
         if Object.const_defined?("FastlaneCore") && FastlaneCore.const_defined?("Helper")
           return FastlaneCore::Helper.ci?
@@ -45,7 +45,7 @@ module Spaceship
         end
         return true
       end
-      # rubocop:enable Require/MissingRequireStatement
+      # rubocop:enable Lint/MissingRequireStatement
 
       def select_team
         teams = client.teams
@@ -93,7 +93,7 @@ module Spaceship
         # User Selection
         loop do
           # Multiple teams, user has to select
-          puts("Multiple teams found on the Developer Portal, please enter the number of the team you want to use: ")
+          puts("Multiple teams found on the " + "Developer Portal".yellow + ", please enter the number of the team you want to use: ")
           teams.each_with_index do |team, i|
             puts("#{i + 1}) #{team['teamId']} \"#{team['name']}\" (#{team['type']})")
           end

@@ -18,3 +18,7 @@ require_relative 'spaceship/module'
 # Support for legacy wrappers
 require_relative 'spaceship/portal/legacy_wrapper'
 require_relative 'spaceship/tunes/legacy_wrapper'
+
+# For basic user inputs
+require 'highline/import'
+require 'colored'

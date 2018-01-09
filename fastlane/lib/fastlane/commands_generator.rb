@@ -115,26 +115,16 @@ module Fastlane
 
         c.option('-u STRING', '--user STRING', String, 'iOS projects only: Your Apple ID')
 
-        CrashlyticsBetaCommandLineHandler.apply_options(c)
+        # CrashlyticsBetaCommandLineHandler.apply_options(c)
 
         c.action do |args, options|
-          if args[0] == 'beta'
-            beta_info = CrashlyticsBetaCommandLineHandler.info_from_options(options)
-            Fastlane::CrashlyticsBeta.new(beta_info, Fastlane::CrashlyticsBetaUi.new).run
-          else
-            is_swift_fastfile = args.include?("swift")
-            Fastlane::Setup.new.run(user: options.user, is_swift_fastfile: is_swift_fastfile)
-          end
-        end
-      end
-
-      command :init_swift do |c|
-        c.syntax = 'fastlane init_swift'
-        c.description = 'Helps you with your initial fastlane setup for Swift'
-        c.option('-u STRING', '--user STRING', String, 'iOS projects only: Your Apple ID')
-
-        c.action do |args, options|
-          Fastlane::Setup.new.run(user: options.user, is_swift_fastfile: true)
+          # if args[0] == 'beta'
+          #   beta_info = CrashlyticsBetaCommandLineHandler.info_from_options(options)
+          #   Fastlane::CrashlyticsBeta.new(beta_info, Fastlane::CrashlyticsBetaUi.new).run
+          # else
+          is_swift_fastfile = args.include?("swift")
+          Fastlane::Setup.start(user: options.user, is_swift_fastfile: is_swift_fastfile)
+          # end
         end
       end
 
@@ -354,7 +344,9 @@ module Fastlane
       return true if FastlaneCore::FastlaneFolder.setup?
 
       create = UI.confirm('Could not find fastlane in current directory. Make sure to have your fastlane configuration files inside a folder called "fastlane". Would you like to set fastlane up?')
-      Fastlane::Setup.new.run if create
+      if create
+        Fastlane::Setup.start
+      end
       return false
     end
   end

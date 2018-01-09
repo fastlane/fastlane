@@ -209,6 +209,7 @@ module FastlaneCore
 
     # Returns the value for a certain key. fastlane_core tries to fetch the value from different sources
     # if 'ask' is true and the value is not present, the user will be prompted to provide a value
+    # rubocop:disable Metrics/PerceivedComplexity
     def fetch(key, ask: true)
       UI.user_error!("Key '#{key}' must be a symbol. Example :app_id.") unless key.kind_of?(Symbol)
 
@@ -239,7 +240,7 @@ module FastlaneCore
       end
 
       while value.nil?
-        UI.important("To not be asked about this value, you can specify it using '#{option.key}'")
+        UI.important("To not be asked about this value, you can specify it using '#{option.key}'") if ENV["FASTLANE_ONBOARDING_IN_PROCESS"].to_s.length == 0
         value = option.sensitive ? UI.password("#{option.description}: ") : UI.input("#{option.description}: ")
         # Also store this value to use it from now on
         begin
@@ -257,6 +258,7 @@ module FastlaneCore
       # Found out via https://github.com/fastlane/fastlane/issues/11243
       return self[key]
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     # Overwrites or sets a new value for a given key
     # @param key [Symbol] Must be a symbol
