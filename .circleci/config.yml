@@ -15,8 +15,8 @@ jobs:
       - restore_cache:
           key: v1-macos-gems-{{ checksum "Gemfile" }}
       - restore_cache:
-          key: v1-homebrew-{{ .BuildNum }}
-          key: v1-homebrew
+          key: v2-homebrew-{{ .BuildNum }}
+          key: v2-homebrew
       - run:
           name: Setup Build
           command: |
@@ -26,7 +26,7 @@ jobs:
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
       - save_cache:
-          key: v1-homebrew-{{ .BuildNum }}
+          key: v2-homebrew-{{ .BuildNum }}
           paths:
             - /usr/local/Homebrew
       - save_cache:
