@@ -1,6 +1,7 @@
 require 'credentials_manager/appfile_config'
 
 require 'fastlane_core/print_table'
+require 'spaceship'
 require 'spaceship/tunes/tunes'
 require 'spaceship/tunes/members'
 require 'spaceship/test_flight'
