@@ -18,19 +18,19 @@ describe Fastlane do
       it "true on known installed gem" do
         gem_name = "fastlane"
         gem_installed = Fastlane::FastlaneRequire.gem_installed?(gem_name)
-        expect(gem_installed).to be true
+        expect(gem_installed).to be(true)
       end
 
       it "false on known missing gem" do
         gem_name = "foobar"
         gem_installed = Fastlane::FastlaneRequire.gem_installed?(gem_name)
-        expect(gem_installed).to be false
+        expect(gem_installed).to be(false)
       end
 
       it "true on known preinstalled gem" do
         gem_name = "yaml"
         gem_installed = Fastlane::FastlaneRequire.gem_installed?(gem_name)
-        expect(gem_installed).to be true
+        expect(gem_installed).to be(true)
       end
     end
   end
