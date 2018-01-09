@@ -126,7 +126,7 @@ module Gym
       if config[:configuration]
         # Verify the configuration is available
         unless configurations.include?(config[:configuration])
-          UI.error "Couldn't find specified configuration '#{config[:configuration]}'."
+          UI.error("Couldn't find specified configuration '#{config[:configuration]}'.")
           config[:configuration] = nil
         end
       end

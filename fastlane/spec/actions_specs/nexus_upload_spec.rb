@@ -2,33 +2,33 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Nexus Upload integration" do
       it "verbosity is set correctly" do
-        expect(Fastlane::Actions::NexusUploadAction.verbose(verbose: true)).to eq "--verbose"
-        expect(Fastlane::Actions::NexusUploadAction.verbose(verbose: false)).to eq "--silent"
+        expect(Fastlane::Actions::NexusUploadAction.verbose(verbose: true)).to eq("--verbose")
+        expect(Fastlane::Actions::NexusUploadAction.verbose(verbose: false)).to eq("--silent")
       end
 
       it "upload url is set correctly" do
         expect(Fastlane::Actions::NexusUploadAction.upload_url(endpoint: "http://localhost:8081",
-          mount_path: "/nexus")).to eq "http://localhost:8081/nexus/service/local/artifact/maven/content"
+          mount_path: "/nexus")).to eq("http://localhost:8081/nexus/service/local/artifact/maven/content")
         expect(Fastlane::Actions::NexusUploadAction.upload_url(endpoint: "http://localhost:8081",
-          mount_path: "/custom-nexus")).to eq "http://localhost:8081/custom-nexus/service/local/artifact/maven/content"
+          mount_path: "/custom-nexus")).to eq("http://localhost:8081/custom-nexus/service/local/artifact/maven/content")
         expect(Fastlane::Actions::NexusUploadAction.upload_url(endpoint: "http://localhost:8081",
-          mount_path: "")).to eq "http://localhost:8081/service/local/artifact/maven/content"
+          mount_path: "")).to eq("http://localhost:8081/service/local/artifact/maven/content")
       end
 
       it "ssl option is set correctly" do
-        expect(Fastlane::Actions::NexusUploadAction.ssl_options(ssl_verify: false)).to eq ["--insecure"]
-        expect(Fastlane::Actions::NexusUploadAction.ssl_options(ssl_verify: true)).to eq []
+        expect(Fastlane::Actions::NexusUploadAction.ssl_options(ssl_verify: false)).to eq(["--insecure"])
+        expect(Fastlane::Actions::NexusUploadAction.ssl_options(ssl_verify: true)).to eq([])
       end
 
       it "proxy options are set correctly" do
         expect(Fastlane::Actions::NexusUploadAction.proxy_options(proxy_address: "",
-          proxy_port: nil, proxy_username: nil, proxy_password: nil)).to eq []
+          proxy_port: nil, proxy_username: nil, proxy_password: nil)).to eq([])
         expect(Fastlane::Actions::NexusUploadAction.proxy_options(proxy_address: nil,
-          proxy_port: "", proxy_username: nil, proxy_password: nil)).to eq []
+          proxy_port: "", proxy_username: nil, proxy_password: nil)).to eq([])
         expect(Fastlane::Actions::NexusUploadAction.proxy_options(proxy_address: nil,
-          proxy_port: nil, proxy_username: "", proxy_password: "")).to eq []
+          proxy_port: nil, proxy_username: "", proxy_password: "")).to eq([])
         expect(Fastlane::Actions::NexusUploadAction.proxy_options(proxy_address: "http://1",
-          proxy_port: "2", proxy_username: "3", proxy_password: "4")).to eq ["-x http://1:2", "--proxy-user 3:4"]
+          proxy_port: "2", proxy_username: "3", proxy_password: "4")).to eq(["-x http://1:2", "--proxy-user 3:4"])
       end
 
       it "raises an error if file does not exist" do
@@ -56,7 +56,7 @@ describe Fastlane do
 
       it "mandatory options are used correctly" do
         file_path = '/tmp/file.ipa'
-        FileUtils.touch file_path
+        FileUtils.touch(file_path)
         result = Fastlane::FastFile.new.parse("lane :test do
           nexus_upload(file: '/tmp/file.ipa',
                       repo_id: 'artefacts',
@@ -92,7 +92,7 @@ describe Fastlane do
 
       it "optional options are used correctly" do
         file_path = '/tmp/file.ipa'
-        FileUtils.touch file_path
+        FileUtils.touch(file_path)
         result = Fastlane::FastFile.new.parse("lane :test do
           nexus_upload(file: '/tmp/file.ipa',
                       repo_id: 'artefacts',
@@ -119,8 +119,8 @@ describe Fastlane do
         expect(result).to include('-u admin:admin123')
         expect(result).to include('--verbose')
         expect(result).to include('http://localhost:8081/my-nexus/service/local/artifact/maven/content')
-        expect(result).not_to include('-x')
-        expect(result).not_to include('--proxy-user')
+        expect(result).not_to(include('-x'))
+        expect(result).not_to(include('--proxy-user'))
       end
     end
   end

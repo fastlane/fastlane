@@ -159,13 +159,13 @@ module Precheck
   # URLRule rule_block
   class TextRule < Rule
     def handle_item?(item)
-      (item.kind_of? TextItemToCheck) ? true : false
+      item.kind_of?(TextItemToCheck) ? true : false
     end
   end
 
   class URLRule < Rule
     def handle_item?(item)
-      (item.kind_of? URLItemToCheck) ? true : false
+      item.kind_of?(URLItemToCheck) ? true : false
     end
   end
 end

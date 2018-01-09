@@ -3,7 +3,7 @@ require 'fastlane_core/analytics/app_identifier_guesser'
 
 describe FastlaneCore do
   describe FastlaneCore::UpdateChecker do
-    let (:name) { 'fastlane' }
+    let(:name) { 'fastlane' }
     def android_hash_of(value)
       hash_of("android_project_#{value}")
     end
@@ -78,7 +78,7 @@ describe FastlaneCore do
     end
 
     describe "#p_hash?" do
-      let (:package_name) { 'com.test.app' }
+      let(:package_name) { 'com.test.app' }
 
       before do
         ENV.delete("FASTLANE_OPT_OUT_USAGE")
@@ -113,7 +113,7 @@ describe FastlaneCore do
 
       it "sends no events when opted out" do
         with_env_values('FASTLANE_OPT_OUT_USAGE' => 'true') do
-          expect(FastlaneCore::UpdateChecker).to_not receive(:send_events)
+          expect(FastlaneCore::UpdateChecker).to_not(receive(:send_events))
           FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
         end
       end
@@ -160,7 +160,7 @@ describe FastlaneCore do
 
       it "sends no events when opted out" do
         with_env_values('FASTLANE_OPT_OUT_USAGE' => 'true') do
-          expect(FastlaneCore::UpdateChecker).to_not receive(:send_events)
+          expect(FastlaneCore::UpdateChecker).to_not(receive(:send_events))
           FastlaneCore::UpdateChecker.send_completion_events_for("fastlane")
         end
       end

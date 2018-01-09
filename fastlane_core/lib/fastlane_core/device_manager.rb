@@ -56,9 +56,7 @@ module FastlaneCore
 
             if matches.count && (os_type == requested_os_type || requested_os_type == "")
               # This is disabled here because the Device is defined later in the file, and that's a problem for the cop
-              # rubocop:disable Lint/MissingRequireStatement
               @devices << Device.new(name: name, os_type: os_type, os_version: (exact_versions[os_type][os_version] || os_version), udid: udid, state: state, is_simulator: true)
-              # rubocop:enable Lint/MissingRequireStatement
             end
           end
         end
@@ -257,7 +255,7 @@ module FastlaneCore
 
         simulator_path = File.join(Helper.xcode_path, 'Applications', 'Simulator.app')
 
-        UI.verbose "Launching #{simulator_path} for device: #{device.name} (#{device.udid})"
+        UI.verbose("Launching #{simulator_path} for device: #{device.name} (#{device.udid})")
 
         Helper.backticks("open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}", print: FastlaneCore::Globals.verbose?)
       end
@@ -288,7 +286,7 @@ module FastlaneCore
 
         FileUtils.rm_f(logfile_dst)
         FileUtils.cp(logfile_src, logfile_dst)
-        UI.success "Copying file '#{logfile_src}' to '#{logfile_dst}'..."
+        UI.success("Copying file '#{logfile_src}' to '#{logfile_dst}'...")
       end
 
       def copy_logarchive(device, log_identity, logs_destination_dir)

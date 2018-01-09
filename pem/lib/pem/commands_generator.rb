@@ -38,7 +38,7 @@ module PEM
         end
       end
 
-      default_command :renew
+      default_command(:renew)
 
       run!
     end

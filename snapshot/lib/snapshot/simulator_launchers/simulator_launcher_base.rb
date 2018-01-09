@@ -69,28 +69,28 @@ module Snapshot
       media_type = media_type.to_s
 
       device_types.each do |device_type|
-        UI.verbose "Adding #{media_type}s to #{device_type}..."
+        UI.verbose("Adding #{media_type}s to #{device_type}...")
         device_udid = TestCommandGenerator.device_udid(device_type)
 
-        UI.message "Launch Simulator #{device_type}"
+        UI.message("Launch Simulator #{device_type}")
         Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
 
         paths.each do |path|
-          UI.message "Adding '#{path}'"
+          UI.message("Adding '#{path}'")
           Helper.backticks("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape} &> /dev/null")
         end
       end
     end
 
     def uninstall_app(device_type)
-      UI.verbose "Uninstalling app '#{launcher_config.app_identifier}' from #{device_type}..."
+      UI.verbose("Uninstalling app '#{launcher_config.app_identifier}' from #{device_type}...")
       launcher_config.app_identifier ||= UI.input("App Identifier: ")
       device_udid = TestCommandGenerator.device_udid(device_type)
 
-      UI.message "Launch Simulator #{device_type}"
+      UI.message("Launch Simulator #{device_type}")
       Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
 
-      UI.message "Uninstall application #{launcher_config.app_identifier}"
+      UI.message("Uninstall application #{launcher_config.app_identifier}")
       Helper.backticks("xcrun simctl uninstall #{device_udid} #{launcher_config.app_identifier} &> /dev/null")
     end
 
@@ -111,7 +111,7 @@ module Snapshot
           AppleLocale: locale,
           AppleLanguages: [language]
         }
-        UI.message "Localizing #{device_type} (AppleLocale=#{locale} AppleLanguages=[#{language}])"
+        UI.message("Localizing #{device_type} (AppleLocale=#{locale} AppleLanguages=[#{language}])")
         plist_path = "#{ENV['HOME']}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/.GlobalPreferences.plist"
         File.write(plist_path, Plist::Emit.dump(plist))
       end

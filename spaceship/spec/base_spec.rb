@@ -13,8 +13,8 @@ describe Spaceship::Base do
     it "contains the relevant data" do
       app = Spaceship::App.all.first
       output = app.inspect
-      expect(output).to include "B7JBD8LHAA"
-      expect(output).to include "The App Name"
+      expect(output).to include("B7JBD8LHAA")
+      expect(output).to include("The App Name")
     end
 
     it "prints out references" do
@@ -22,8 +22,8 @@ describe Spaceship::Base do
       app = Spaceship::Application.all.first
       v = app.live_version
       output = v.inspect
-      expect(output).to include "Tunes::AppVersion"
-      expect(output).to include "Tunes::Application"
+      expect(output).to include("Tunes::AppVersion")
+      expect(output).to include("Tunes::Application")
     end
 
     it 'handles circular references' do
@@ -31,7 +31,7 @@ describe Spaceship::Base do
       test_base.child = test_base # self-references
       expect do
         test_base.inspect
-      end.to_not raise_error
+      end.to_not(raise_error)
     end
 
     it 'displays a placeholder value in inspect/to_s' do
@@ -59,7 +59,7 @@ describe Spaceship::Base do
 
   it "doesn't blow up if it was initialized with a nil data hash" do
     hash = Spaceship::Base::DataHash.new(nil)
-    expect { hash["key"] }.not_to raise_exception
+    expect { hash["key"] }.not_to(raise_exception)
   end
 
   it "allows modification of values and properly retrieving them" do

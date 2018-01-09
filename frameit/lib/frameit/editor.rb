@@ -59,7 +59,7 @@ module Frameit
       output_path = screenshot.path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
       image.format("png")
       image.write(output_path)
-      UI.success "Added frame: '#{File.expand_path(output_path)}'"
+      UI.success("Added frame: '#{File.expand_path(output_path)}'")
     end
 
     # puts the screenshot into the frame
@@ -72,8 +72,8 @@ module Frameit
       @image.rotate(-rotation)
 
       @image = frame.composite(image, "png") do |c|
-        c.compose "DstOver"
-        c.geometry offset['offset']
+        c.compose("DstOver")
+        c.geometry(offset['offset'])
       end
 
       # Revert the rotation from above
@@ -89,7 +89,7 @@ module Frameit
       if @offset_information and (@offset_information['offset'] or @offset_information['offset'])
         return @offset_information
       end
-      UI.user_error! "Could not find offset_information for '#{screenshot}'"
+      UI.user_error!("Could not find offset_information for '#{screenshot}'")
     end
 
     #########################################################################################
@@ -139,11 +139,11 @@ module Frameit
           image_width = [frame_width, @image.width].min
           image_height = [frame_height, image_width / image_aspect_ratio].min
           image_width = image_height * image_aspect_ratio
-          @image.resize "#{image_width}x#{image_height}" if image_width < @image.width || image_height < @image.height
+          @image.resize("#{image_width}x#{image_height}") if image_width < @image.width || image_height < @image.height
         else
           # the screenshot size is only limited by width.
           # If higher than the frame, the screenshot is cut off at the bottom
-          @image.resize "#{frame_width}x" if frame_width < @image.width
+          @image.resize("#{frame_width}x") if frame_width < @image.width
         end
       end
 
@@ -184,8 +184,8 @@ module Frameit
       background = MiniMagick::Image.open(fetch_config['background'])
 
       if background.height != screenshot.size[1]
-        background.resize "#{screenshot.size[0]}x#{screenshot.size[1]}^" # `^` says it should fill area
-        background.merge! ["-gravity", "center", "-crop", "#{screenshot.size[0]}x#{screenshot.size[1]}+0+0"] # crop from center
+        background.resize("#{screenshot.size[0]}x#{screenshot.size[1]}^") # `^` says it should fill area
+        background.merge!(["-gravity", "center", "-crop", "#{screenshot.size[0]}x#{screenshot.size[1]}+0+0"]) # crop from center
       end
       background
     end
@@ -195,13 +195,13 @@ module Frameit
       title_below_image = fetch_config['title_below_image']
 
       @image = background.composite(image, "png") do |c|
-        c.compose "Over"
+        c.compose("Over")
         if title_below_image
           show_complete_frame = fetch_config['show_complete_frame']
-          c.geometry "+#{left_space}+#{background.height - image.height - space_to_device}" unless show_complete_frame
-          c.geometry "+#{left_space}+#{vertical_frame_padding}" if show_complete_frame
+          c.geometry("+#{left_space}+#{background.height - image.height - space_to_device}") unless show_complete_frame
+          c.geometry("+#{left_space}+#{vertical_frame_padding}") if show_complete_frame
         else
-          c.geometry "+#{left_space}+#{space_to_device}"
+          c.geometry("+#{left_space}+#{space_to_device}")
         end
       end
 
@@ -214,7 +214,7 @@ module Frameit
 
       multiplicator = (screenshot_width.to_f / offset['width'].to_f) # by how much do we have to change this?
       new_frame_width = multiplicator * frame.width # the new width for the frame
-      frame.resize "#{new_frame_width.round}x" # resize it to the calculated width
+      frame.resize("#{new_frame_width.round}x") # resize it to the calculated width
       modify_offset(multiplicator) # modify the offset to properly insert the screenshot into the frame later
     end
 
@@ -224,7 +224,7 @@ module Frameit
       if ratio > 1.0
         # too large - resizing now
         smaller = (1.0 / ratio)
-        text.resize "#{(smaller * text.width).round}x"
+        text.resize("#{(smaller * text.width).round}x")
       end
     end
 
@@ -248,16 +248,16 @@ module Frameit
       title_below_image = fetch_config['title_below_image']
       # keyword
       background = background.composite(keyword, "png") do |c|
-        c.compose "Over"
-        c.geometry "+#{keyword_left_space}+#{keyword_top_space}" unless title_below_image
-        c.geometry "+#{keyword_left_space}+#{background.height - space_to_device + keyword_top_space}" if title_below_image
+        c.compose("Over")
+        c.geometry("+#{keyword_left_space}+#{keyword_top_space}") unless title_below_image
+        c.geometry("+#{keyword_left_space}+#{background.height - space_to_device + keyword_top_space}") if title_below_image
       end
       # Then, put the title on top of the screenshot next to the keyword
       # Then, put the title above/below of the screenshot next to the keyword
       background = background.composite(title, "png") do |c|
-        c.compose "Over"
-        c.geometry "+#{title_left_space}+#{title_top_space}" unless title_below_image
-        c.geometry "+#{title_left_space}+#{background.height - space_to_device + title_top_space}" if title_below_image
+        c.compose("Over")
+        c.geometry("+#{title_left_space}+#{title_top_space}") unless title_below_image
+        c.geometry("+#{title_left_space}+#{background.height - space_to_device + title_top_space}") if title_below_image
       end
       background
     end
@@ -286,8 +286,8 @@ module Frameit
 
         UI.verbose("Text for image #{self.screenshot.path} is quite long, reducing font size by #{(ratio - 1.0).round(2)}")
 
-        title.resize "#{(smaller * title.width).round}x"
-        keyword.resize "#{(smaller * keyword.width).round}x" if keyword
+        title.resize("#{(smaller * title.width).round}x")
+        keyword.resize("#{(smaller * keyword.width).round}x") if keyword
         sum_width *= smaller
       end
 
@@ -301,9 +301,9 @@ module Frameit
       # First, put the keyword on top of the screenshot, if we have one
       if keyword
         background = background.composite(keyword, "png") do |c|
-          c.compose "Over"
-          c.geometry "+#{left_space}+#{top_space}" unless title_below_image
-          c.geometry "+#{left_space}+#{background.height - space_to_device + top_space}" if title_below_image
+          c.compose("Over")
+          c.geometry("+#{left_space}+#{top_space}") unless title_below_image
+          c.geometry("+#{left_space}+#{background.height - space_to_device + top_space}") if title_below_image
         end
 
         left_space += keyword.width + (keyword_padding * smaller)
@@ -311,9 +311,9 @@ module Frameit
 
       # Then, put the title on top of the screenshot next to the keyword
       background = background.composite(title, "png") do |c|
-        c.compose "Over"
-        c.geometry "+#{left_space}+#{top_space}" unless title_below_image
-        c.geometry "+#{left_space}+#{background.height - space_to_device + top_space}" if title_below_image
+        c.compose("Over")
+        c.geometry("+#{left_space}+#{top_space}") unless title_below_image
+        c.geometry("+#{left_space}+#{background.height - space_to_device + top_space}") if title_below_image
       end
       background
     end
@@ -342,7 +342,7 @@ module Frameit
         image_height = max_height # gets trimmed afterwards anyway, and on the iPad the `y` would get cut
         title_image.combine_options do |i|
           # Oversize as the text might be larger than the actual image. We're trimming afterwards anyway
-          i.resize "#{max_width * 5.0}x#{image_height}!" # `!` says it should ignore the ratio
+          i.resize("#{max_width * 5.0}x#{image_height}!") # `!` says it should ignore the ratio
         end
 
         current_font = font(key)
@@ -350,19 +350,19 @@ module Frameit
         UI.verbose("Using #{current_font} as font the #{key} of #{screenshot.path}") if current_font
         UI.verbose("Adding text '#{text}'")
 
-        text.gsub! '\n', "\n"
+        text.gsub!('\n', "\n")
         text.gsub!(/(?<!\\)(')/) { |s| "\\#{s}" } # escape unescaped apostrophes with a backslash
 
         interline_spacing = fetch_config['interline_spacing']
 
         # Add the actual title
         title_image.combine_options do |i|
-          i.font current_font if current_font
-          i.gravity "Center"
-          i.pointsize actual_font_size
-          i.draw "text 0,0 '#{text}'"
-          i.interline_spacing interline_spacing if interline_spacing
-          i.fill fetch_config[key.to_s]['color']
+          i.font(current_font) if current_font
+          i.gravity("Center")
+          i.pointsize(actual_font_size)
+          i.draw("text 0,0 '#{text}'")
+          i.interline_spacing(interline_spacing) if interline_spacing
+          i.fill(fetch_config[key.to_s]['color'])
         end
 
         results[key] = title_image
@@ -435,13 +435,13 @@ module Frameit
 
     # Fetches the title + keyword for this particular screenshot
     def fetch_text(type)
-      UI.user_error! "Valid parameters :keyword, :title" unless [:keyword, :title].include? type
+      UI.user_error!("Valid parameters :keyword, :title") unless [:keyword, :title].include?(type)
 
       # Try to get it from a keyword.strings or title.strings file
       strings_path = File.join(File.expand_path("..", screenshot.path), "#{type}.strings")
-      if File.exist? strings_path
+      if File.exist?(strings_path)
         parsed = StringsParser.parse(strings_path)
-        result = parsed.find { |k, v| screenshot.path.upcase.include? k.upcase }
+        result = parsed.find { |k, v| screenshot.path.upcase.include?(k.upcase) }
         return result.last if result
       end
 
@@ -451,7 +451,7 @@ module Frameit
 
       if type == :title and !result
         # title is mandatory
-        UI.user_error! "Could not get title for screenshot #{screenshot.path}. Please provide one in your Framefile.json"
+        UI.user_error!("Could not get title for screenshot #{screenshot.path}. Please provide one in your Framefile.json")
       end
 
       return result
@@ -467,7 +467,7 @@ module Frameit
         fonts.each do |font|
           if font['supported']
             font['supported'].each do |language|
-              if screenshot.path.include? language
+              if screenshot.path.include?(language)
                 return font["font"]
               end
             end

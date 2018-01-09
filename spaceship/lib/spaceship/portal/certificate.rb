@@ -191,7 +191,7 @@ module Spaceship
         #  # Use the signing request to create a new distribution certificate
         #  Spaceship.certificate.production.create!(csr: csr)
         def create_certificate_signing_request
-          key = OpenSSL::PKey::RSA.new 2048
+          key = OpenSSL::PKey::RSA.new(2048)
           csr = OpenSSL::X509::Request.new
           csr.version = 0
           csr.subject = OpenSSL::X509::Name.new([
@@ -254,7 +254,7 @@ module Spaceship
             types += OLDER_IOS_CERTIFICATE_TYPES unless mac
           else
             types = [CERTIFICATE_TYPE_IDS.key(self)]
-            mac = MAC_CERTIFICATE_TYPE_IDS.values.include? self
+            mac = MAC_CERTIFICATE_TYPE_IDS.values.include?(self)
           end
 
           client.certificates(types, mac: mac).map do |cert|
@@ -285,7 +285,7 @@ module Spaceship
         # @return (Certificate): The newly created certificate
         def create!(csr: nil, bundle_id: nil)
           type = CERTIFICATE_TYPE_IDS.key(self)
-          mac = MAC_CERTIFICATE_TYPE_IDS.include? type
+          mac = MAC_CERTIFICATE_TYPE_IDS.include?(type)
 
           # look up the app_id by the bundle_id
           if bundle_id
@@ -324,12 +324,12 @@ module Spaceship
 
       # @return (Bool): Is this certificate a push profile for apps?
       def is_push?
-        self.kind_of? PushCertificate
+        self.kind_of?(PushCertificate)
       end
 
       # @return (Bool) Is this a Mac profile?
       def mac?
-        MAC_CERTIFICATE_TYPE_IDS.include? type_display_id
+        MAC_CERTIFICATE_TYPE_IDS.include?(type_display_id)
       end
     end
   end

@@ -60,7 +60,7 @@ module Fastlane
                              description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
                              optional: true,
                              verify_block: proc do |value|
-                               UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
+                               UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
                                UI.user_error!("Could not find Xcode project") if !File.exist?(value) and !Helper.is_test?
                              end),
           FastlaneCore::ConfigItem.new(key: :hide_error_when_versioning_disabled,
@@ -82,7 +82,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

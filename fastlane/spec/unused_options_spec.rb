@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::Action do
     describe "No unused options" do
-      let (:all_exceptions) do
+      let(:all_exceptions) do
         %w(
           pilot
           appstore

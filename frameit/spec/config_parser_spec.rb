@@ -9,7 +9,7 @@ describe Frameit do
       it "raises an exception" do
         expect do
           Frameit::ConfigParser.new.parse("invalid_json")
-        end.to raise_exception "Invalid JSON file at path ''. Make sure it's a valid JSON file"
+        end.to raise_exception("Invalid JSON file at path ''. Make sure it's a valid JSON file")
       end
     end
 

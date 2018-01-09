@@ -275,7 +275,7 @@ module Fastlane
         # writing to an object will create an object version
         # instead of replacing the existing object.
         # http://docs.aws.amazon.com/AWSRubySDK/latest/AWS/S3/ObjectVersion.html
-        if obj.kind_of? AWS::S3::ObjectVersion
+        if obj.kind_of?(AWS::S3::ObjectVersion)
           obj = obj.object
         end
 
