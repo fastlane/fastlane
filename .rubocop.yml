@@ -101,6 +101,16 @@ Require/MissingRequireStatement:
     - '**/Rakefile'
     - 'fastlane/**/*' # TODO: remove
 
+Require/PreferRelative:
+  Exclude:
+    - '**/spec/**/*.rb'
+    - '**/spec_helper.rb'
+    - '**/Fastfile'
+    - '**/*.gemspec'
+    - 'rakelib/**/*'
+    - '**/*.rake'
+    - '**/Rakefile'
+
 # We could potentially enable the 2 below:
 Layout/IndentHash:
   Enabled: false
@@ -236,6 +246,7 @@ Style/PerlBackrefs:
 
 # Disable '+ should be surrounded with a single space' for xcodebuild_spec.rb
 Layout/SpaceAroundOperators:
+  Enabled: false # TODO: remove
   Exclude:
     - '**/spec/actions_specs/xcodebuild_spec.rb'
 
@@ -305,3 +316,4 @@ Style/MethodCallWithArgsParentheses:
     - 'context'
     - 'before'
     - 'after'
+
