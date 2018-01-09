@@ -312,8 +312,8 @@ lane(:update_docs) do
     end
 
     # Copy over the custom assets
-    custom_action_docs = "lib/fastlane/actions/docs/"
-    custom_assets = Dir[File.join(Fastlane::ROOT, custom_action_docs, "assets", "*")].collect do |current_asset_path|
+    custom_action_docs_path = "lib/fastlane/actions/docs/"
+    custom_assets = Dir[File.join(Fastlane::ROOT, custom_action_docs_path, "assets", "*")].collect do |current_asset_path|
       current_output_path = File.join("docs/img/actions", File.basename(current_asset_path))
       FileUtils.cp(current_asset_path, current_output_path)
 

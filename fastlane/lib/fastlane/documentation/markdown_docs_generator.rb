@@ -43,11 +43,24 @@ module Fastlane
       @_launches ||= JSON.parse(File.read(File.join(Fastlane::ROOT, "assets/action_ranking.json"))) # root because we're in a temporary directory here
     end
 
+    def custom_action_docs_path
+      "lib/fastlane/actions/docs/"
+    end
+
+    def load_custom_action_md(action)
+      # check if there is a custom detail view in markdown available in the fastlane code base
+      custom_file_location = File.join(Fastlane::ROOT, custom_action_docs_path, "#{action.action_name}.md")
+      if File.exist?(custom_file_location)
+        UI.verbose("Using custom md file for action #{action.action_name}")
+        return File.read(custom_file_location)
+      end
+      return nil
+    end
+
     def generate!(target_path: nil)
       require 'yaml'
       FileUtils.mkdir_p(target_path)
       docs_dir = File.join(target_path, "docs")
-      custom_action_docs = "lib/fastlane/actions/docs/"
 
       # Generate actions.md
       template = File.join(Fastlane::ROOT, "lib/assets/Actions.md.erb")
@@ -58,12 +71,15 @@ module Fastlane
       all_actions_ref_yml = []
       FileUtils.mkdir_p(File.join(docs_dir, "actions"))
       ActionsList.all_actions do |action|
-        # check if there is a custom detail view in markdown available in the fastlane code base
-        custom_file_location = File.join(Fastlane::ROOT, custom_action_docs, "#{action.action_name}.md")
-        @custom_content = nil # important, as we're in a loop and using @ variables
-        if File.exist?(custom_file_location)
-          UI.verbose("Using custom md file for action #{action.action_name}")
-          @custom_content = File.read(custom_file_location)
+        # Make sure to always assign `@custom_content`, as we're in a loop and `@` is needed for the `erb`
+        @custom_content = load_custom_action_md(action)
+
+        if action.superclass != Fastlane::Action
+          # This means, the current method is an alias
+          # meaning we're gonna look if the parent class
+          # as a custom md file.
+          # e.g. `deliver.rb` super class is `upload_to_app_store.rb`
+          @custom_content ||= load_custom_action_md(action.superclass)
         end
 
         template = File.join(Fastlane::ROOT, "lib/assets/ActionDetails.md.erb")
@@ -85,7 +101,7 @@ module Fastlane
       File.write(mkdocs_yml_path, mkdocs_yml.to_yaml)
 
       # Copy over the assets from the `actions/docs/assets` directory
-      Dir[File.join(custom_action_docs, "assets", "*")].each do |current_asset_path|
+      Dir[File.join(custom_action_docs_path, "assets", "*")].each do |current_asset_path|
         UI.message("Copying asset #{current_asset_path}")
         FileUtils.cp(current_asset_path, File.join(docs_dir, "img", "actions", File.basename(current_asset_path)))
       end
