@@ -31,28 +31,28 @@ module Snapshot
       # ensure that upgrade is cause when going from 8 to 9
       File.write(File.join(path, snapshot_helper_filename), File.read("#{Snapshot::ROOT}/lib/assets/#{snapshot_helper_filename}"))
 
-      puts "✅  Successfully created #{snapshot_helper_filename} '#{File.join(path, snapshot_helper_filename)}'".green
-      puts "✅  Successfully created new Snapfile at '#{snapfile_path}'".green
-      puts "-------------------------------------------------------".yellow
+      puts("✅  Successfully created #{snapshot_helper_filename} '#{File.join(path, snapshot_helper_filename)}'".green)
+      puts("✅  Successfully created new Snapfile at '#{snapfile_path}'".green)
+      puts("-------------------------------------------------------".yellow)
       print_instructions(snapshot_helper_filename: snapshot_helper_filename, snapfile_path: snapfile_path)
     end
 
     def self.print_instructions(snapshot_helper_filename: nil, snapfile_path: nil)
-      puts "Open your Xcode project and make sure to do the following:".yellow
-      puts "1) Add a new UI Test target to your project".yellow
-      puts "2) Add the ./fastlane/#{snapshot_helper_filename} to your UI Test target".yellow
-      puts "   You can move the file anywhere you want".yellow
-      puts "3) Call `setupSnapshot(app)` when launching your app".yellow
-      puts ""
-      puts "  let app = XCUIApplication()"
-      puts "  setupSnapshot(app)"
-      puts "  app.launch()"
-      puts ""
-      puts "4) Add `snapshot(\"0Launch\")` to wherever you want to trigger screenshots".yellow
-      puts "5) Add a new Xcode scheme for the newly created UITest target"
-      puts "6) Add a Check to enable the `Shared` box of the newly created scheme"
-      puts ""
-      puts "More information: https://docs.fastlane.tools/getting-started/ios/screenshots/".green
+      puts("Open your Xcode project and make sure to do the following:".yellow)
+      puts("1) Add a new UI Test target to your project".yellow)
+      puts("2) Add the ./fastlane/#{snapshot_helper_filename} to your UI Test target".yellow)
+      puts("   You can move the file anywhere you want".yellow)
+      puts("3) Call `setupSnapshot(app)` when launching your app".yellow)
+      puts("")
+      puts("  let app = XCUIApplication()")
+      puts("  setupSnapshot(app)")
+      puts("  app.launch()")
+      puts("")
+      puts("4) Add `snapshot(\"0Launch\")` to wherever you want to trigger screenshots".yellow)
+      puts("5) Add a new Xcode scheme for the newly created UITest target")
+      puts("6) Add a Check to enable the `Shared` box of the newly created scheme")
+      puts("")
+      puts("More information: https://docs.fastlane.tools/getting-started/ios/screenshots/".green)
     end
   end
 end

@@ -54,10 +54,10 @@ module Fastlane
       UI.message("To avoid re-entering your package name and issuer every time you run fastlane, we'll store those in a so-called Appfile.")
 
       self.package_name = UI.input("Package Name (com.krausefx.app): ")
-      puts ""
-      puts "To automatically upload builds and metadata to Google Play, fastlane needs a service action json secret file".yellow
-      puts "Follow the Setup Guide on how to get the Json file: https://docs.fastlane.tools/actions/supply/".yellow
-      puts "Feel free to press Enter at any time in order to skip providing pieces of information when asked"
+      puts("")
+      puts("To automatically upload builds and metadata to Google Play, fastlane needs a service action json secret file".yellow)
+      puts("Follow the Setup Guide on how to get the Json file: https://docs.fastlane.tools/actions/supply/".yellow)
+      puts("Feel free to press Enter at any time in order to skip providing pieces of information when asked")
       self.json_key_file = UI.input("Path to the json secret file: ")
 
       self.appfile_content.gsub!("[[JSON_KEY_FILE]]", self.json_key_file)
