@@ -49,8 +49,8 @@ module Snapshot
       puts("  app.launch()")
       puts("")
       puts("4) Add `snapshot(\"0Launch\")` to wherever you want to trigger screenshots".yellow)
-      puts("5) Add a new Xcode scheme for the newly created UITest target")
-      puts("6) Add a Check to enable the `Shared` box of the newly created scheme")
+      puts("5) Add a new Xcode scheme for the newly created UITest target".yellow)
+      puts("6) Add a Check to enable the `Shared` box of the newly created scheme".yellow)
       puts("")
       puts("More information: https://docs.fastlane.tools/getting-started/ios/screenshots/".green)
     end
