@@ -90,6 +90,7 @@ Lint/UselessAssignment:
 
 # In specs requires are done automatically
 Require/MissingRequireStatement:
+  Enabled: false # TODO: remove
   Exclude:
     - '**/spec/**/*.rb'
     - '**/spec_helper.rb'
