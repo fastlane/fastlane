@@ -134,8 +134,18 @@ module Spaceship
           @attr_mapping.values.each do |method_name|
             getter = method_name.to_sym
             setter = "#{method_name}=".to_sym
-            remove_method(getter) if public_instance_methods.include?(getter)
-            remove_method(setter) if public_instance_methods.include?(setter)
+
+            # Seems like the `public_instance_methods.include?` doesn't always work
+            # More context https://github.com/fastlane/fastlane/issues/11481
+            # That's why we have the `begin` `rescue` code here
+            begin
+              remove_method(getter) if public_instance_methods.include?(getter)
+            rescue NameError
+            end
+            begin
+              remove_method(setter) if public_instance_methods.include?(setter)
+            rescue NameError
+            end
           end
           include(mapping_module(@attr_mapping))
         else
