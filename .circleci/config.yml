@@ -15,8 +15,9 @@ jobs:
       - restore_cache:
           key: v1-macos-gems-{{ checksum "Gemfile" }}
       - restore_cache:
-          key: v3-homebrew-{{ epoch }}
-          key: v3-homebrew
+          keys:
+            - v3-homebrew-{{ epoch }}
+            - v3-homebrew
       - run:
           name: Setup Build
           command: |
@@ -25,6 +26,7 @@ jobs:
             gem update --system
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+
       - save_cache:
           key: v3-homebrew-{{ epoch }}
           paths:
@@ -57,7 +59,7 @@ jobs:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
-  
+
   "Ubuntu":
     environment:
       CIRCLE_TEST_REPORTS: ~/test-reports
