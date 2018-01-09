@@ -1,4 +1,4 @@
-require 'fastlane_core/core_ext/array'
+require_relative '../../../../fastlane_core/lib/fastlane_core/core_ext/array'
 
 require_relative 'iap_detail'
 require_relative 'iap_status'
