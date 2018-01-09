@@ -1,3 +1,6 @@
+require_relative 'module'
+require_relative 'client'
+
 module Supply
   class Reader
     def track_version_codes
