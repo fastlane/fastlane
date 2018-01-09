@@ -46,7 +46,7 @@ module FastlaneCore
     end
 
     def self.show_update_status(gem_name, current_version)
-      fork do
+      Thread.new do
         begin
           send_completion_events_for(gem_name)
         rescue

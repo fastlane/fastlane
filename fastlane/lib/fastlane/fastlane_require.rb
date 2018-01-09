@@ -39,21 +39,22 @@ module Fastlane
       end
 
       def gem_installed?(name, req = Gem::Requirement.default)
-        # We fork and try to load a gem with that name in the child process so we
-        # don't actually load anything we don't want to load
-        # This is just to test if the gem is already preinstalled, e.g. YAML
+        installed = Gem::Specification.any? { |s| s.name == name and req =~ s.version }
+        return true if installed
+
+        # In special cases a gem is already preinstalled, e.g. YAML.
+        # To find out we try to load a gem with that name in a child process
+        # (so we don't actually load anything we don't want to load)
         # See https://github.com/fastlane/fastlane/issues/6951
-        fork do
+        require_tester = <<-RB.gsub(/^ */, '')
           begin
-            require name
+            require ARGV.first
           rescue LoadError
             exit(1)
           end
-        end
-        _, status = Process.wait2
-        return true if status.exitstatus == 0
-
-        Gem::Specification.any? { |s| s.name == name and req =~ s.version }
+        RB
+        system(RbConfig.ruby, "-e", require_tester.lines.map(&:chomp).join("; "), name)
+        return $?.success?
       end
 
       def find_gem_name(user_supplied_name)

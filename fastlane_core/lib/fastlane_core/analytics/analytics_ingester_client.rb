@@ -6,7 +6,7 @@ module FastlaneCore
   class AnalyticsIngesterClient
     def post_events(events)
       unless Helper.test?
-        fork do
+        Thread.new do
           send_request(json: { analytics: events }.to_json)
         end
       end
