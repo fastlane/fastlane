@@ -13,7 +13,7 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: v1-macos-gems-{{ checksum "Gemfile" }}
+          key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}-{{ checksum 'fastlane/Pluginfile' }}
       - restore_cache:
           keys:
             - v3-homebrew-{{ epoch }}
@@ -32,7 +32,7 @@ jobs:
           paths:
             - /usr/local/Homebrew
       - save_cache:
-          key: v1-macos-gems-{{ checksum "Gemfile" }}
+          key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}-{{ checksum 'fastlane/Pluginfile' }}
           paths:
             - .bundle
 
