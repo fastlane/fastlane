@@ -110,7 +110,7 @@ module Fastlane
                                          allowed_keys = Produce::DeveloperCenter::ALLOWED_SERVICES.keys
                                          UI.user_error!("enable_services has to be of type Hash") unless value.kind_of?(Hash)
                                          value.each do |key, v|
-                                           UI.user_error!("The key: '#{key}' is not supported in `enable_services' - following keys are available: [#{allowed_keys.join(',')}]") unless allowed_keys.include? key.to_sym
+                                           UI.user_error!("The key: '#{key}' is not supported in `enable_services' - following keys are available: [#{allowed_keys.join(',')}]") unless allowed_keys.include?(key.to_sym)
                                          end
                                        end),
           FastlaneCore::ConfigItem.new(key: :team_id,

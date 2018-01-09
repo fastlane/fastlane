@@ -20,13 +20,13 @@ module Match
 
       unless password
         if !UI.interactive?
-          UI.error "Neither the MATCH_PASSWORD environment variable nor the local keychain contained a password."
-          UI.error "Bailing out instead of asking for a password, since this is non-interactive mode."
+          UI.error("Neither the MATCH_PASSWORD environment variable nor the local keychain contained a password.")
+          UI.error("Bailing out instead of asking for a password, since this is non-interactive mode.")
           UI.user_error!("Try setting the MATCH_PASSWORD environment variable, or temporarily enable interactive mode to store a password.")
         else
-          UI.important "Enter the passphrase that should be used to encrypt/decrypt your certificates"
-          UI.important "This passphrase is specific per repository and will be stored in your local keychain"
-          UI.important "Make sure to remember the password, as you'll need it when you run match on a different machine"
+          UI.important("Enter the passphrase that should be used to encrypt/decrypt your certificates")
+          UI.important("This passphrase is specific per repository and will be stored in your local keychain")
+          UI.important("Make sure to remember the password, as you'll need it when you run match on a different machine")
           password = ChangePassword.ask_password(confirm: true)
           store_password(git_url, password)
         end
@@ -49,9 +49,9 @@ module Match
         crypt(path: current,
           password: password(git_url),
            encrypt: true)
-        UI.success "🔒  Encrypted '#{File.basename(current)}'" if FastlaneCore::Globals.verbose?
+        UI.success("🔒  Encrypted '#{File.basename(current)}'") if FastlaneCore::Globals.verbose?
       end
-      UI.success "🔒  Successfully encrypted certificates repo"
+      UI.success("🔒  Successfully encrypted certificates repo")
     end
 
     def decrypt_repo(path: nil, git_url: nil, manual_password: nil)
@@ -61,15 +61,15 @@ module Match
             password: manual_password || password(git_url),
              encrypt: false)
         rescue
-          UI.error "Couldn't decrypt the repo, please make sure you enter the right password!"
+          UI.error("Couldn't decrypt the repo, please make sure you enter the right password!")
           UI.user_error!("Invalid password passed via 'MATCH_PASSWORD'") if ENV["MATCH_PASSWORD"]
           clear_password(git_url)
           decrypt_repo(path: path, git_url: git_url)
           return
         end
-        UI.success "🔓  Decrypted '#{File.basename(current)}'" if FastlaneCore::Globals.verbose?
+        UI.success("🔓  Decrypted '#{File.basename(current)}'") if FastlaneCore::Globals.verbose?
       end
-      UI.success "🔓  Successfully decrypted certificates repo"
+      UI.success("🔓  Successfully decrypted certificates repo")
     end
 
     private

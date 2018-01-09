@@ -102,10 +102,10 @@ module Fastlane
 
       def self.handle_params_transition(options)
         options[:postmaster] = options[:mailgun_sandbox_postmaster] if options[:mailgun_sandbox_postmaster]
-        puts "\nUsing :mailgun_sandbox_postmaster is deprecated, please change to :postmaster".yellow if options[:mailgun_sandbox_postmaster]
+        puts("\nUsing :mailgun_sandbox_postmaster is deprecated, please change to :postmaster".yellow) if options[:mailgun_sandbox_postmaster]
 
         options[:apikey] = options[:mailgun_apikey] if options[:mailgun_apikey]
-        puts "\nUsing :mailgun_apikey is deprecated, please change to :apikey".yellow if options[:mailgun_apikey]
+        puts("\nUsing :mailgun_apikey is deprecated, please change to :apikey".yellow) if options[:mailgun_apikey]
       end
 
       def self.mailgunit(options)
@@ -126,7 +126,7 @@ module Fastlane
           params.store(:attachment, attachments)
         end
 
-        RestClient.post "https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages", params
+        RestClient.post("https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages", params)
         mail_template(options)
       end
 

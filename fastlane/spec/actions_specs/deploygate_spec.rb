@@ -78,7 +78,7 @@ describe Fastlane do
               api_token: 'thisistest',
             })
           end").runner.execute(:test)
-        end.not_to raise_error
+        end.not_to(raise_error)
       end
 
       it "works with valid parameters include optionals" do
@@ -93,7 +93,7 @@ describe Fastlane do
               disable_notify: true,
             })
           end").runner.execute(:test)
-        end.not_to raise_error
+        end.not_to(raise_error)
       end
     end
   end

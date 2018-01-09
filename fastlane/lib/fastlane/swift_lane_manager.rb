@@ -42,7 +42,7 @@ module Fastlane
         # We also catch Exception, since the implemented action might send a SystemExit signal
         # (or similar). We still want to catch that, since we want properly finish running fastlane
         # Tested with `xcake`, which throws a `Xcake::Informative` object
-        UI.error e.to_s if e.kind_of?(StandardError) # we don't want to print things like 'system exit'
+        UI.error(e.to_s) if e.kind_of?(StandardError) # we don't want to print things like 'system exit'
       end
 
       skip_message = false

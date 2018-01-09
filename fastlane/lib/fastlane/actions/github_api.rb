@@ -82,7 +82,7 @@ module Fastlane
                                          default_value: "https://api.github.com",
                                          optional: true,
                                          verify_block: proc do |value|
-                                           UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server/api/v3") unless value.include? "//"
+                                           UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server/api/v3") unless value.include?("//")
                                          end),
             FastlaneCore::ConfigItem.new(key: :api_token,
                                          env_name: "FL_GITHUB_API_TOKEN",
@@ -122,7 +122,7 @@ module Fastlane
                                          description: "The complete full url - used instead of path. e.g. 'https://uploads.github.com/repos/fastlane...'",
                                          optional: true,
                                          verify_block: proc do |value|
-                                           UI.user_error!("Please include the protocol in the url, e.g. https://uploads.github.com") unless value.include? "//"
+                                           UI.user_error!("Please include the protocol in the url, e.g. https://uploads.github.com") unless value.include?("//")
                                          end),
             FastlaneCore::ConfigItem.new(key: :error_handlers,
                                          description: "Optional error handling hash based on status code, or pass '*' to handle all errors",

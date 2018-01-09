@@ -115,12 +115,12 @@ describe Fastlane do
             Fastlane::FastFile.new.parse("lane :test do
               spm
             end").runner.execute(:test)
-          end.not_to raise_error
+          end.not_to(raise_error)
         end
       end
 
       context "when command is package related" do
-        let (:command) { 'update' }
+        let(:command) { 'update' }
 
         it "adds verbose flag to package command if verbose is set to true" do
           result = Fastlane::FastFile.new.parse("lane :test do

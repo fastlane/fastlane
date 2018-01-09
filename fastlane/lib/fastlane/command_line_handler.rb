@@ -7,7 +7,7 @@ module Fastlane
       lane_parameters = {} # the parameters we'll pass to the lane
       platform_lane_info = [] # the part that's responsible for the lane/platform definition
       args.each do |current|
-        if current.include? ":" # that's a key/value which we want to pass to the lane
+        if current.include?(":") # that's a key/value which we want to pass to the lane
           key, value = current.split(":", 2)
           UI.user_error!("Please pass values like this: key:value") unless key.length > 0
           value = convert_value(value)

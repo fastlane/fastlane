@@ -69,7 +69,7 @@ module Pilot
         app_test_info.test_info.description = options[:beta_app_description] if options[:beta_app_description]
         begin
           app_test_info.save_for_app!(app_id: build.app_id)
-          UI.success "Successfully set the beta_app_feedback_email and/or beta_app_description"
+          UI.success("Successfully set the beta_app_feedback_email and/or beta_app_description")
         rescue => ex
           UI.user_error!("Could not set beta_app_feedback_email and/or beta_app_description: #{ex}")
         end
@@ -78,7 +78,7 @@ module Pilot
       if should_update_build_information?(options)
         begin
           build.update_build_information!(whats_new: options[:changelog])
-          UI.success "Successfully set the changelog for build"
+          UI.success("Successfully set the changelog for build")
         rescue => ex
           UI.user_error!("Could not set changelog: #{ex}")
         end
@@ -102,11 +102,11 @@ module Pilot
       builds.sort! { |a, b| a.upload_date <=> b.upload_date }
       rows = builds.collect { |build| describe_build(build) }
 
-      puts Terminal::Table.new(
-        title: "#{app.name} Builds".green,
-        headings: ["Version #", "Build #", "Installs"],
-        rows: FastlaneCore::PrintTable.transform_output(rows)
-      )
+      puts(Terminal::Table.new(
+             title: "#{app.name} Builds".green,
+             headings: ["Version #", "Build #", "Installs"],
+             rows: FastlaneCore::PrintTable.transform_output(rows)
+      ))
     end
 
     def self.truncate_changelog(changelog)
@@ -115,7 +115,7 @@ module Pilot
         original_length = changelog.length
         bottom_message = "..."
         changelog = "#{changelog[0...max_changelog_length - bottom_message.length]}#{bottom_message}"
-        UI.important "Changelog has been truncated since it exceeds Apple's #{max_changelog_length} character limit. It currently contains #{original_length} characters."
+        UI.important("Changelog has been truncated since it exceeds Apple's #{max_changelog_length} character limit. It currently contains #{original_length} characters.")
       end
       return changelog
     end

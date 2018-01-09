@@ -69,14 +69,14 @@ module Scan
         failures_str = result[:failures].to_s.green
       end
 
-      puts Terminal::Table.new({
+      puts(Terminal::Table.new({
         title: "Test Results",
         rows: [
           ["Number of tests", result[:tests]],
           ["Number of failures", failures_str]
         ]
-      })
-      puts ""
+      }))
+      puts("")
 
       copy_simulator_logs
 

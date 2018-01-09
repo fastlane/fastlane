@@ -53,7 +53,7 @@ module Fastlane
 
       begin
         File.write(output_path, output.join("\n"))
-        UI.success "Successfully generated documentation at path '#{File.expand_path(output_path)}'" if FastlaneCore::Globals.verbose?
+        UI.success("Successfully generated documentation at path '#{File.expand_path(output_path)}'") if FastlaneCore::Globals.verbose?
       rescue => ex
         UI.error(ex)
         UI.error("Couldn't save fastlane documentation at path '#{File.expand_path(output_path)}', make sure you have write access to the containing directory.")
