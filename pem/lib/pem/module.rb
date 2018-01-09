@@ -1,4 +1,4 @@
-require 'fastlane_core/helper'
+require_relative from_fastlane_core/'helper'
 
 module PEM
   # Use this to just setup the configuration attribute and set it later somewhere else

@@ -1,5 +1,5 @@
-require 'fastlane_core/helper'
-require 'fastlane_core/ui/ui'
+require_relative from_fastlane_core/'helper'
+require_relative from_fastlane_core/'ui/ui'
 
 module Deliver
   class << self

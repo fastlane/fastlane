@@ -1,5 +1,5 @@
-require 'fastlane_core/languages'
-require 'spaceship/tunes/tunes'
+require_relative from_fastlane_core/'languages'
+require_relative from_spaceship/'tunes/tunes'
 
 require_relative 'module'
 require_relative 'upload_metadata'

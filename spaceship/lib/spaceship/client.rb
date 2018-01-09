@@ -5,7 +5,7 @@ require 'logger'
 require 'tmpdir'
 require 'cgi'
 
-require 'fastlane/version'
+require_relative from_fastlane/'version'
 require_relative 'babosa_fix'
 require_relative 'helper/net_http_generic_request'
 require_relative 'helper/plist_middleware'
@@ -345,8 +345,8 @@ module Spaceship
     #
     # @return (Spaceship::Client) The client the login method was called for
     def login(user = nil, password = nil)
-      if user.to_s.empty? || password.to_s.empty?
-        require 'credentials_manager/account_manager'
+      if user.to_s.empty? or password.to_s.empty?
+        require_relative from_credentials_manager/'account_manager'
 
         keychain_entry = CredentialsManager::AccountManager.new(user: user, password: password)
         user ||= keychain_entry.user
@@ -738,4 +738,4 @@ module Spaceship
   # rubocop:enable Metrics/ClassLength
 end
 
-require 'spaceship/two_step_client'
+require_relative from_spaceship/'two_step_client'

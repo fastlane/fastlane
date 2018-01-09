@@ -30,7 +30,7 @@ module Fastlane
         # this is the only place we're having trouble. If there are other reports about RubyGems
         # 2.6.2 causing problems, we may need to move this code and require it someplace better,
         # like fastlane_core
-        require 'fastlane/core_ext/bundler_monkey_patch'
+        require_relative from_fastlane/'core_ext/bundler_monkey_patch'
 
         begin
           Gem::Specification.find_by_name('xcov')

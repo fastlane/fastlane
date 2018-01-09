@@ -2,14 +2,14 @@ module Fastlane
   module Actions
     class ModifyServicesAction < Action
       def self.run(params)
-        require 'produce'
+        require_relative from_produce
 
         return if Helper.test?
 
         Produce.config = params
 
         Dir.chdir(FastlaneCore::FastlaneFolder.path || Dir.pwd) do
-          require 'produce/service'
+          require_relative from_produce/'service'
           services = params[:services]
 
           enabled_services = services.reject { |k, v| v == 'off' }
@@ -86,7 +86,7 @@ module Fastlane
       end
 
       def self.available_options
-        require 'produce'
+        require_relative from_produce
         user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
         user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
         [

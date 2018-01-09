@@ -71,8 +71,8 @@ module Fastlane
       UI.message("We will now download your existing metadata and screenshots into the `fastlane` folder so fastlane can manage it")
       if UI.confirm("Download existing metadata and setup metadata management?")
         begin
-          require 'supply'
-          require 'supply/setup'
+          require_relative from_supply
+          require_relative from_supply/'setup'
           supply_config = {
             json_key: self.json_key_file,
             package_name: self.package_name

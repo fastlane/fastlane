@@ -7,7 +7,7 @@ module Fastlane
 
     class BuildIosAppAction < Action
       def self.run(values)
-        require 'gym'
+        require_relative from_gym
 
         unless Actions.lane_context[SharedValues::SIGH_PROFILE_TYPE].to_s == "development"
           values[:export_method] ||= Actions.lane_context[SharedValues::SIGH_PROFILE_TYPE]
@@ -101,7 +101,7 @@ module Fastlane
       end
 
       def self.available_options
-        require 'gym'
+        require_relative from_gym
         Gym::Options.available_options
       end
 
