@@ -50,6 +50,8 @@ module Snapshot
           path = Snapshot::Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
           is_swift_fastfile = args.include?("swift")
           Snapshot::Setup.create(path, is_swift_fastfile: is_swift_fastfile)
+          # We do this outside of `Setup`, as it shouldn't be part of `fastlane init`
+          puts("More information: https://docs.fastlane.tools/getting-started/ios/screenshots/".green)
         end
       end
 
