@@ -37,9 +37,7 @@ module Fastlane
 
       def self.invoke_appium_server(params)
         appium = detect_appium(params)
-        fork do
-          Process.exec("#{appium} -a #{params[:host]} -p #{params[:port]}")
-        end
+        Process.spawn("#{appium} -a #{params[:host]} -p #{params[:port]}")
       end
 
       def self.detect_appium(params)
