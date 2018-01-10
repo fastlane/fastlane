@@ -120,7 +120,17 @@ module Fastlane
     def generate_default_implementations(tool_details: nil)
       files_generated = []
       tool_details.each do |tool_detail|
-        lanefile_implementation_opening = "class #{tool_detail.swift_class}: #{tool_detail.swift_protocol} {"
+        header = []
+        header << "//"
+        header << "//  ** NOTE **"
+        header << "//  This file is provided by fastlane and WILL be overwritten in future updates"
+        header << "//  If you want to add extra functionality to this project, create a new file in a"
+        header << "//  new group so that it won't be marked for upgrade"
+        header << "//"
+        header << ""
+        header << "class #{tool_detail.swift_class}: #{tool_detail.swift_protocol} {"
+        lanefile_implementation_opening = header.join("\n")
+
         files_generated << write_lanefile(
           lanefile_implementation_opening: lanefile_implementation_opening,
           class_name: tool_detail.swift_class,
