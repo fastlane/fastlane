@@ -26,6 +26,90 @@ If the above doesn't help, please [submit an issue](https://github.com/fastlane/
 
 **Note**: If you want to report a regression in _fastlane_ (something that has worked before, but broke with a new release), please mark your issue title as such using `[Regression] Your title here`. This enables us to quickly detect and fix regressions.
 
+## _fastlane_ team
+
+<table>
+<tr>
+<td>
+<img src='https://github.com/lacostej.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/'>Jerome Lacoste</a></h4>
+</td>
+<td>
+<img src='https://github.com/taquitos.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/taquitos'>Joshua Liebowitz</a></h4>
+</td>
+<td>
+<img src='https://github.com/jdee.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/'>Jimmy Dee</a></h4>
+</td>
+<td>
+<img src='https://github.com/DanToml.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/DanToml'>Danielle Tomlinson</a></h4>
+</td>
+<td>
+<img src='https://github.com/mgrebenets.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/mgrebenets'>Maksym Grebenets</a></h4>
+</td>
+</tr>
+<tr>
+<td>
+<img src='https://github.com/matthewellis.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/'>Matthew Ellis</a></h4>
+</td>
+<td>
+<img src='https://github.com/joshdholtz.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/joshdholtz'>Josh Holtz</a></h4>
+</td>
+<td>
+<img src='https://github.com/lmirosevic.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/lmirosevic'>Luka Mirosevic</a></h4>
+</td>
+<td>
+<img src='https://github.com/getaaron.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/getaaron'>Aaron Brager</a></h4>
+</td>
+<td>
+<img src='https://github.com/revolter.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/Revolt666'>Iulian Onofrei</a></h4>
+</td>
+</tr>
+<tr>
+<td>
+<img src='https://github.com/janpio.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/'>Jan Piotrowski</a></h4>
+</td>
+<td>
+<img src='https://github.com/milch.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/acrooow'>Manu Wallner</a></h4>
+</td>
+<td>
+<img src='https://github.com/KrauseFx.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/KrauseFx'>Felix Krause</a></h4>
+</td>
+<td>
+<img src='https://github.com/hjanuschka.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/hjanuschka'>Helmut Januschka</a></h4>
+</td>
+<td>
+<img src='https://github.com/nafu.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/nafu003'>Fumiya Nakamura</a></h4>
+</td>
+</tr>
+<tr>
+<td>
+<img src='https://github.com/giginet.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/giginet'>Kohki Miki</a></h4>
+</td>
+<td>
+<img src='https://github.com/snatchev.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/snatchev'>Stefan Natchev</a></h4>
+</td>
+<td>
+<img src='https://github.com/AliSoftware.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/'>Olivier Halligon</a></h4>
+</td>
+</table>
+
 ## Contribute to _fastlane_
 
 Check out [CONTRIBUTING.md](CONTRIBUTING.md) for more information on how to help with _fastlane_.
@@ -39,3 +123,9 @@ Help us keep `fastlane` open and inclusive. Please read and follow our [Code of 
 This project is licensed under the terms of the MIT license. See the [LICENSE](LICENSE) file.
 
 > This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.
+
+<hr />
+<h2 align="center">
+  ✨ All fastlane docs were moved to <a href="https://docs.fastlane.tools/">docs.fastlane.tools</a> ✨
+</h2>
+<hr />
