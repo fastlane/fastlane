@@ -1,11 +1,12 @@
 require_relative 'lane_manager_base.rb'
+require_relative 'swift_runner_upgrader.rb'
 
 module Fastlane
   class SwiftLaneManager < LaneManagerBase
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # @param env Dot Env Information
-    def self.cruise_lane(lane, parameters = nil, env = nil)
+    def self.cruise_lane(lane, parameters = nil, env = nil, disable_runner_upgrades: false)
       UI.user_error!("lane must be a string") unless lane.kind_of?(String) or lane.nil?
       UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) or parameters.nil?
 
@@ -22,6 +23,13 @@ module Fastlane
       started = Time.now
       e = nil
       begin
+        display_upgraded_message = false
+        if disable_runner_upgrades
+          UI.verbose("disable_runner_upgrades is true, not attempting to update the FastlaneRunner project")
+        else
+          display_upgraded_message = self.ensure_runner_up_to_date_fastlane!
+        end
+
         self.ensure_runner_built!
         socket_thread = self.start_socket_thread
         sleep(0.250) while socket_thread[:ready].nil?
@@ -54,6 +62,11 @@ module Fastlane
       duration = ((Time.now - started) / 60.0).round
 
       finish_fastlane(nil, duration, e, skip_message: skip_message)
+
+      if display_upgraded_message
+        UI.message("We updated your FastlaneRunner project during this run to make it compatible with your current version of fastlane.")
+        UI.message("Please make sure to check the changes into source control.")
+      end
     end
 
     def self.display_lanes
@@ -178,11 +191,11 @@ module Fastlane
       )
 
       # Swap out any configs the user has removed, inserting fastlane defaults
-      project_modified ||= swap_paths_in_target(
+      project_modified = swap_paths_in_target(
         target: runner_target,
         file_refs_to_swap: target_file_refs,
         expected_path_to_replacement_path_tuples: user_tool_files_possibly_removed
-      )
+      ) || project_modified
 
       if project_modified
         fastlane_runner_project.save
@@ -229,6 +242,17 @@ module Fastlane
       if runner_needs_building
         self.build_runner!
       end
+    end
+
+    # do we have the latest FastlaneSwiftRunner code from the current version of fastlane?
+    def self.ensure_runner_up_to_date_fastlane!
+      upgrader = SwiftRunnerUpgrader.new
+      upgraded = upgrader.upgrade_if_needed!
+      if upgraded
+        self.build_runner!
+      end
+      UI.success("Updated your FastlaneSwiftRunner project with the newest runner code")
+      return upgraded
     end
 
     def self.build_runner!
