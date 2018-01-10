@@ -154,12 +154,6 @@ lane(:generate_swift_api) do |options|
   generated_files
 end
 
-lane(:test_upgrade) do |options|
-  require "../fastlane/lib/fastlane/swift_runner_upgrader.rb"
-  upgrader = Fastlane::SwiftRunnerUpgrader.new
-  upgrader.upgrade_if_needed!
-end
-
 desc("Generate the FastlaneSwiftRunner project manifest")
 lane(:generate_fastlane_swift_runner_manifest) do |options|
   # Don't attempt to upgrade config files, like Fastfile.swift, Deliverfile.swift, etc...
