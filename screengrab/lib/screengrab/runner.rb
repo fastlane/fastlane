@@ -1,5 +1,5 @@
-require_relative from_fastlane_core/'print_table'
-require_relative from_fastlane_core/'command_executor'
+require 'fastlane_core/print_table'
+require 'fastlane_core/command_executor'
 require_relative 'reports_generator'
 require_relative 'module'
 

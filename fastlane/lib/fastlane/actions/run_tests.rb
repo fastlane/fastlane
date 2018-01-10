@@ -9,7 +9,7 @@ module Fastlane
 
     class RunTestsAction < Action
       def self.run(values)
-        require_relative from_scan
+        require 'scan'
         plist_files_before = []
 
         begin
@@ -59,7 +59,7 @@ module Fastlane
       end
 
       def self.available_options
-        require_relative from_scan
+        require 'scan'
 
         FastlaneCore::CommanderGenerator.new.generate(Scan::Options.available_options) + [
           FastlaneCore::ConfigItem.new(key: :fail_build,

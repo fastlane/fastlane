@@ -6,7 +6,7 @@ module Fastlane
 
     class AppStoreBuildNumberAction < Action
       def self.run(params)
-        require_relative from_spaceship
+        require 'spaceship'
 
         build_nr = get_build_number(params)
 

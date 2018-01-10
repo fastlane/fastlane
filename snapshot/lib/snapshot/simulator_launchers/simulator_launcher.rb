@@ -1,4 +1,4 @@
-require_relative from_fastlane_core/'test_parser'
+require 'fastlane_core/test_parser'
 require_relative 'simulator_launcher_base'
 
 module Snapshot

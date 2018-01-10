@@ -1,4 +1,4 @@
-require_relative from_deliver/'app_screenshot'
+require 'deliver/app_screenshot'
 
 require_relative 'module'
 require_relative 'device_types'

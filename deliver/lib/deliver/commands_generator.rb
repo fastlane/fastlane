@@ -1,5 +1,5 @@
 require 'commander'
-require_relative from_fastlane/'version'
+require 'fastlane/version'
 
 require_relative 'download_screenshots'
 require_relative 'options'
@@ -69,7 +69,7 @@ module Deliver
           unless loaded
             if UI.confirm("No deliver configuration found in the current directory. Do you want to setup deliver?")
               is_swift = UI.confirm("Would you like to use Swift instead of Ruby?")
-              require_relative from_deliver/'setup'
+              require 'deliver/setup'
               Deliver::Runner.new(options) # to login...
               Deliver::Setup.new.run(options, is_swift: is_swift)
               return 0
@@ -107,7 +107,7 @@ module Deliver
             return 0
           end
 
-          require_relative from_deliver/'setup'
+          require 'deliver/setup'
 
           options = FastlaneCore::Configuration.create(deliverfile_options, options.__hash__)
           options[:run_precheck_before_submit] = false # precheck doesn't need to run during init
@@ -164,7 +164,7 @@ module Deliver
           res = Deliver::CommandsGenerator.force_overwrite_metadata?(options, path)
           return 0 unless res
 
-          require_relative from_deliver/'setup'
+          require 'deliver/setup'
           v = options[:app].latest_version
           if options[:app_version].to_s.length > 0
             v = options[:app].live_version if v.version != options[:app_version]

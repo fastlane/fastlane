@@ -1,6 +1,6 @@
-require_relative from_fastlane_core/'keychain_importer'
+require 'fastlane_core/keychain_importer'
 require 'openssl'
-#require_relative 'module'
+require_relative 'module'
 
 module Match
   class Utils

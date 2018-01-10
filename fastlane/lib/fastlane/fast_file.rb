@@ -163,7 +163,7 @@ module Fastlane
       if key.to_sym == :update
         # The user ran `fastlane update`, instead of `fastlane update_fastlane`
         # We're gonna be nice and understand what the user is trying to do
-        require_relative from_fastlane/'one_off'
+        require 'fastlane/one_off'
         Fastlane::OneOff.run(action: "update_fastlane", parameters: {})
       else
         UI.user_error!("Could not find '#{key}'. Available lanes: #{self.runner.available_lanes.join(', ')}")

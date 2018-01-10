@@ -1,5 +1,5 @@
 require 'plist'
-require_relative from_fastlane_core/'globals'
+require 'fastlane_core/globals'
 
 require_relative 'module'
 

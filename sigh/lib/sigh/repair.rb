@@ -1,4 +1,4 @@
-require_relative from_spaceship
+require 'spaceship'
 
 require_relative 'module'
 

@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require_relative from_fastlane/'actions/create_app_online'
+    require 'fastlane/actions/create_app_online'
     class ProduceAction < CreateAppOnlineAction
       #####################################################
       # @!group Documentation

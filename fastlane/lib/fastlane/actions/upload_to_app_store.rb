@@ -5,7 +5,7 @@ module Fastlane
 
     class UploadToAppStoreAction < Action
       def self.run(config)
-        require_relative from_deliver
+        require 'deliver'
 
         begin
           config.load_configuration_file("Deliverfile")
@@ -33,8 +33,8 @@ module Fastlane
       end
 
       def self.available_options
-        require_relative from_deliver
-        require_relative from_deliver/'options'
+        require "deliver"
+        require "deliver/options"
         FastlaneCore::CommanderGenerator.new.generate(Deliver::Options.available_options)
       end
 

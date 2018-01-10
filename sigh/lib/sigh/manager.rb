@@ -1,4 +1,4 @@
-require_relative from_fastlane_core/'provisioning_profile'
+require 'fastlane_core/provisioning_profile'
 
 require_relative 'runner'
 
@@ -31,7 +31,7 @@ module Sigh
     end
 
     def self.download_all(download_xcode_profiles: false)
-      require_relative from_sigh/'download_all'
+      require 'sigh/download_all'
       DownloadAll.new.download_all(download_xcode_profiles: download_xcode_profiles)
     end
 

@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require_relative from_fastlane/'actions/get_provisioning_profile'
+    require 'fastlane/actions/get_provisioning_profile'
     class SighAction < GetProvisioningProfileAction
       #####################################################
       # @!group Documentation

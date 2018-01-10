@@ -1,4 +1,4 @@
-require_relative from_spaceship
+require 'spaceship'
 require_relative 'module'
 
 module Match
@@ -7,7 +7,7 @@ module Match
     def initialize(user, team_id, team_name)
       # We'll try to manually fetch the password
       # to tell the user that a password is optional
-      require_relative from_credentials_manager/'account_manager'
+      require 'credentials_manager/account_manager'
 
       keychain_entry = CredentialsManager::AccountManager.new(user: user)
 
@@ -27,7 +27,7 @@ module Match
       found = Spaceship.app.find(app_identifier)
       return if found
 
-      require_relative from_sigh/'runner'
+      require 'sigh/runner'
       Sigh::Runner.new.print_produce_command({
         username: username,
         app_identifier: app_identifier

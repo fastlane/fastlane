@@ -1,4 +1,4 @@
-require_relative from_spaceship/'tunes/tunes'
+require 'spaceship/tunes/tunes'
 
 require_relative 'app_screenshot'
 require_relative 'module'

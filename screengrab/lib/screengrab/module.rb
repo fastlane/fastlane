@@ -1,4 +1,4 @@
-require_relative from_fastlane_core/'helper'
+require 'fastlane_core/helper'
 require_relative 'detect_values'
 
 module Screengrab

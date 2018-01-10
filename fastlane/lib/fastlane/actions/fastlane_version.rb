@@ -1,4 +1,4 @@
-require_relative from_fastlane/'actions/min_fastlane_version'
+require "fastlane/actions/min_fastlane_version"
 
 module Fastlane
   module Actions

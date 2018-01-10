@@ -1,4 +1,4 @@
-require_relative from_fastlane_core/'print_table'
+require 'fastlane_core/print_table'
 require_relative 'module'
 require_relative 'runner'
 

@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require_relative from_fastlane/'actions/upload_to_play_store'
+    require 'fastlane/actions/upload_to_play_store'
     class SupplyAction < UploadToPlayStoreAction
       #####################################################
       # @!group Documentation

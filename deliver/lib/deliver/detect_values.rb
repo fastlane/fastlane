@@ -1,8 +1,8 @@
-require_relative from_fastlane_core/'fastlane_folder'
-require_relative from_fastlane_core/'ipa_file_analyser'
-require_relative from_fastlane_core/'pkg_file_analyser'
-require_relative from_spaceship/'tunes/tunes'
-require_relative from_spaceship/'tunes/application'
+require 'fastlane_core/fastlane_folder'
+require 'fastlane_core/ipa_file_analyser'
+require 'fastlane_core/pkg_file_analyser'
+require 'spaceship/tunes/tunes'
+require 'spaceship/tunes/application'
 
 require_relative 'module'
 

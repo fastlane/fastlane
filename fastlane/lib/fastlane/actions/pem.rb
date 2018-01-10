@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require_relative from_fastlane/'actions/get_push_certificate'
+    require 'fastlane/actions/get_push_certificate'
     class PemAction < GetPushCertificateAction
       #####################################################
       # @!group Documentation

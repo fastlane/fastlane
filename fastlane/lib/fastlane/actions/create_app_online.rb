@@ -6,7 +6,7 @@ module Fastlane
 
     class CreateAppOnlineAction < Action
       def self.run(params)
-        require_relative from_produce
+        require 'produce'
 
         return if Helper.test?
 
@@ -34,7 +34,7 @@ module Fastlane
       end
 
       def self.available_options
-        require_relative from_produce
+        require 'produce'
         Produce::Options.available_options
       end
 

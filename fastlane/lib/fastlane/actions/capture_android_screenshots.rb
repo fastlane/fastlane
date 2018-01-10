@@ -6,7 +6,7 @@ module Fastlane
 
     class CaptureAndroidScreenshotsAction < Action
       def self.run(params)
-        require_relative from_screengrab
+        require 'screengrab'
 
         Screengrab.config = params
         Screengrab.android_environment = Screengrab::AndroidEnvironment.new(params[:android_home],
@@ -24,7 +24,7 @@ module Fastlane
       end
 
       def self.available_options
-        require_relative from_screengrab
+        require 'screengrab'
         Screengrab::Options.available_options
       end
 

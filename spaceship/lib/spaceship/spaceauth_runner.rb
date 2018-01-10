@@ -1,5 +1,5 @@
 require 'colored'
-require_relative from_credentials_manager/'appfile_config'
+require 'credentials_manager/appfile_config'
 require 'yaml'
 
 require_relative 'tunes/tunes_client'

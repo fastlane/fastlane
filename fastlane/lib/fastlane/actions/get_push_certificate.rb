@@ -2,9 +2,9 @@ module Fastlane
   module Actions
     class GetPushCertificateAction < Action
       def self.run(params)
-        require_relative from_pem
-        require_relative from_pem/'options'
-        require_relative from_pem/'manager'
+        require 'pem'
+        require 'pem/options'
+        require 'pem/manager'
 
         success_block = params[:new_profile]
 
@@ -48,8 +48,8 @@ module Fastlane
       end
 
       def self.available_options
-        require_relative from_pem
-        require_relative from_pem/'options'
+        require 'pem'
+        require 'pem/options'
 
         @options = PEM::Options.available_options
         @options << FastlaneCore::ConfigItem.new(key: :new_profile,

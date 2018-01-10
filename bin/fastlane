@@ -4,7 +4,9 @@ if RUBY_VERSION < '2.0.0'
   abort("fastlane requires Ruby 2.0.0 or higher")
 end
 
-require_relative '../fastlane/lib/fastlane/cli_tools_distributor'
+$LOAD_PATH.push(File.expand_path("../../lib", __FILE__))
+
+require "fastlane/cli_tools_distributor"
 
 if Fastlane::CLIToolsDistributor.running_version_command?
   # This will print out the fastlane binary path right above the

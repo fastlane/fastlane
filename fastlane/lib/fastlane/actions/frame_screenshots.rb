@@ -4,7 +4,7 @@ module Fastlane
       def self.run(config)
         return if Helper.test?
 
-        require_relative from_frameit
+        require 'frameit'
 
         UI.message("Framing screenshots at path #{config[:path]} (via frameit)")
 
@@ -26,8 +26,8 @@ module Fastlane
       end
 
       def self.available_options
-        require_relative from_frameit
-        require_relative from_frameit/'options'
+        require "frameit"
+        require "frameit/options"
         FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options) + [
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FRAMEIT_SCREENSHOTS_PATH",

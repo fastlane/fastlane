@@ -1,5 +1,5 @@
 require "colored"
-require_relative from_credentials_manager
+require "credentials_manager"
 
 require_relative 'tunes/tunes'
 require_relative 'portal/portal'

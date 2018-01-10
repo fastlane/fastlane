@@ -1,4 +1,4 @@
-require_relative from_fastlane_core/'helper'
+require 'fastlane_core/helper'
 
 module Cert
   # Use this to just setup the configuration attribute and set it later somewhere else

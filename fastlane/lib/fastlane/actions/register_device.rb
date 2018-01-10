@@ -1,4 +1,4 @@
-require_relative from_credentials_manager
+require 'credentials_manager'
 
 module Fastlane
   module Actions
@@ -10,7 +10,7 @@ module Fastlane
       end
 
       def self.run(params)
-        require_relative from_spaceship
+        require 'spaceship'
 
         name = params[:name]
         udid = params[:udid]

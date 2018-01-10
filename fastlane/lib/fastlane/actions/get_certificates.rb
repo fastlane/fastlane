@@ -7,7 +7,7 @@ module Fastlane
 
     class GetCertificatesAction < Action
       def self.run(params)
-        require_relative from_cert
+        require 'cert'
 
         return if Helper.test?
 
@@ -38,7 +38,7 @@ module Fastlane
       end
 
       def self.available_options
-        require_relative from_cert
+        require 'cert'
         Cert::Options.available_options
       end
 

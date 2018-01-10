@@ -5,7 +5,7 @@ module Fastlane
 
     class CheckAppStoreMetadataAction < Action
       def self.run(config)
-        require_relative from_precheck
+        require 'precheck'
         Precheck.config = config
         return Precheck::Runner.new.run
       end
@@ -19,7 +19,7 @@ module Fastlane
       end
 
       def self.available_options
-        require_relative from_precheck/'options'
+        require 'precheck/options'
         Precheck::Options.available_options
       end
 

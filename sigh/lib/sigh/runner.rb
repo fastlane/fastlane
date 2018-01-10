@@ -1,7 +1,7 @@
-require_relative from_spaceship
+require 'spaceship'
 
-require_relative from_fastlane_core/'print_table'
-require_relative from_fastlane_core/'cert_checker'
+require 'fastlane_core/print_table'
+require 'fastlane_core/cert_checker'
 require_relative 'module'
 
 module Sigh

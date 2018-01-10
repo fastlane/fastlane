@@ -1,7 +1,7 @@
 require 'commander'
-require_relative from_fastlane/'version'
-require_relative from_fastlane_core/'configuration/configuration'
-require_relative from_fastlane_core/'globals'
+require 'fastlane/version'
+require 'fastlane_core/configuration/configuration'
+require 'fastlane_core/globals'
 
 require_relative 'options'
 require_relative 'runner'

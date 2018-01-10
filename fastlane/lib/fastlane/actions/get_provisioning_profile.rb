@@ -11,8 +11,8 @@ module Fastlane
 
     class GetProvisioningProfileAction < Action
       def self.run(values)
-        require_relative from_sigh
-        require_relative from_credentials_manager/'appfile_config'
+        require 'sigh'
+        require 'credentials_manager/appfile_config'
 
         Sigh.config = values # we already have the finished config
 
@@ -60,7 +60,7 @@ module Fastlane
       end
 
       def self.available_options
-        require_relative from_sigh
+        require 'sigh'
         Sigh::Options.available_options
       end
 

@@ -1,5 +1,5 @@
-require_relative from_fastlane_core/'helper'
-require_relative from_fastlane/'boolean'
+require 'fastlane_core/helper'
+require 'fastlane/boolean'
 require_relative 'detect_values'
 
 module Gym
@@ -22,7 +22,7 @@ module Gym
 
     def init_libs
       # Import all the fixes
-      require_relative from_gym/'xcodebuild_fixes/generic_archive_fix'
+      require 'gym/xcodebuild_fixes/generic_archive_fix'
     end
   end
 

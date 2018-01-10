@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require_relative from_fastlane/'actions/sync_code_signing'
+    require 'fastlane/actions/sync_code_signing'
     class MatchAction < SyncCodeSigningAction
       #####################################################
       # @!group Documentation

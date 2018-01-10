@@ -1,7 +1,7 @@
 require 'pathname'
 
-require_relative from_spaceship
-require_relative from_fastlane_core/'print_table'
+require 'spaceship'
+require 'fastlane_core/print_table'
 require_relative 'module'
 
 module PEM

@@ -182,7 +182,7 @@ module FastlaneCore
         # In the early days before the mono gem this was more complicated
         # Now we have a mono version number, which makes this method easy
         # for all built-in actions and tools
-        require_relative from_fastlane/'version'
+        require 'fastlane/version'
         return Fastlane::VERSION
       end
 

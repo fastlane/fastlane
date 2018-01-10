@@ -1,5 +1,5 @@
-require_relative from_fastlane_core/'configuration/config_item'
-require_relative from_credentials_manager/'appfile_config'
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Supply

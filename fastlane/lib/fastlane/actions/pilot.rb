@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require_relative from_fastlane/'actions/upload_to_testflight'
+    require 'fastlane/actions/upload_to_testflight'
     class PilotAction < UploadToTestflightAction
       #####################################################
       # @!group Documentation

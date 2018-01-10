@@ -1,4 +1,4 @@
-require_relative from_fastlane_core/'device_manager'
+require 'fastlane_core/device_manager'
 require_relative 'module'
 
 module Snapshot

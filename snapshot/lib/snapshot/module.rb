@@ -1,5 +1,5 @@
-require_relative from_fastlane_core/'helper'
-require_relative from_fastlane/'boolean'
+require 'fastlane_core/helper'
+require 'fastlane/boolean'
 require_relative 'detect_values'
 require_relative 'dependency_checker'
 

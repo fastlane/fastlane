@@ -1,7 +1,7 @@
 require_relative 'module'
 require_relative 'client' 
 require_relative 'apk_listing' 
-require_relative from_fastlane_core/'print_table'
+require 'fastlane_core/print_table'
 
 module Supply
   class Uploader

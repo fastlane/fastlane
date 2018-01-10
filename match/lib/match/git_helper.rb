@@ -1,4 +1,4 @@
-require_relative from_fastlane_core/'command_executor'
+require 'fastlane_core/command_executor'
 require_relative 'module'
 require_relative 'change_password'
 require_relative 'encrypt'

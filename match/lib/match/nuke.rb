@@ -1,8 +1,8 @@
 require 'terminal-table'
 
-require_relative from_spaceship
-require_relative from_fastlane_core/'provisioning_profile'
-require_relative from_fastlane_core/'print_table'
+require 'spaceship'
+require 'fastlane_core/provisioning_profile'
+require 'fastlane_core/print_table'
 require_relative 'module'
 require_relative 'git_helper'
 

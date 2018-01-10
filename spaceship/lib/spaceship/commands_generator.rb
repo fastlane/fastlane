@@ -2,7 +2,7 @@ require 'highline'
 
 HighLine.track_eof = false
 
-require_relative from_fastlane/'version'
+require 'fastlane/version'
 require_relative 'playground'
 require_relative 'spaceauth_runner'
 

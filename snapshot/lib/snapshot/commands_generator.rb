@@ -46,7 +46,7 @@ module Snapshot
         c.description = "Creates a new Snapfile in the current directory"
 
         c.action do |args, options|
-          require_relative from_snapshot/'setup'
+          require 'snapshot/setup'
           path = Snapshot::Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
           is_swift_fastfile = args.include?("swift")
           Snapshot::Setup.create(path, is_swift_fastfile: is_swift_fastfile)
@@ -58,7 +58,7 @@ module Snapshot
         c.description = "Updates your SnapshotHelper.swift to the latest version"
 
         c.action do |args, options|
-          require_relative from_snapshot/'update'
+          require 'snapshot/update'
           Snapshot::Update.new.update
         end
       end
@@ -72,7 +72,7 @@ module Snapshot
         c.action do |args, options|
           options.default(ios_version: Snapshot::LatestOsVersion.ios_version)
           versions = options.ios_version.split(',') if options.ios_version
-          require_relative from_snapshot/'reset_simulators'
+          require 'snapshot/reset_simulators'
 
           Snapshot::ResetSimulators.clear_everything!(versions, options.force)
         end

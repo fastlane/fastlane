@@ -19,7 +19,7 @@ module Fastlane
     attr_accessor :automatic_versioning_enabled
 
     def setup_ios
-      require_relative from_spaceship
+      require 'spaceship'
 
       self.platform = :ios
 
@@ -123,8 +123,8 @@ module Fastlane
         UI.message("If you don't want to use this feature, you can still use fastlane to upload and distribute new builds to the App Store")
         include_metadata = UI.confirm("Would you like fastlane to manage your app's metadata?")
         if include_metadata
-          require_relative from_deliver
-          require_relative from_deliver/'setup'
+          require 'deliver'
+          require 'deliver/setup'
 
           deliver_options = FastlaneCore::Configuration.create(
             Deliver::Options.available_options,
@@ -187,8 +187,8 @@ module Fastlane
         UI.verbose(ex.to_s)
       end
 
-      require_relative from_snapshot
-      require_relative from_snapshot/'setup'
+      require 'snapshot'
+      require 'snapshot/setup'
 
       Snapshot::Setup.create(
         FastlaneCore::FastlaneFolder.path,
@@ -456,7 +456,7 @@ module Fastlane
 
     def create_app_online!(mode: nil)
       # mode is either :adp or :itc
-      require_relative from_produce
+      require 'produce'
       produce_options = {
         username: self.user,
         team_id: self.adp_team_id,

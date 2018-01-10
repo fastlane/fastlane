@@ -1,3 +1,5 @@
+require 'fastlane_core'
+
 require_relative 'fastlane/version'
 require_relative 'fastlane/features'
 require_relative 'fastlane/shells'

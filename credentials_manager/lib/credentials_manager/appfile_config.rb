@@ -1,4 +1,4 @@
-require_relative from_fastlane_core/'globals'
+require 'fastlane_core/globals'
 
 module CredentialsManager
   # Access the content of the app file (e.g. app identifier and Apple ID)

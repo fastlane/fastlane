@@ -1,4 +1,4 @@
-require_relative from_fastlane_core/'configuration/config_item'
+require 'fastlane_core/configuration/config_item'
 
 require_relative 'module'
 
