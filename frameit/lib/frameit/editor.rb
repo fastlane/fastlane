@@ -441,20 +441,21 @@ module Frameit
       strings_path = File.join(File.expand_path("..", screenshot.path), "#{type}.strings")
       if File.exist?(strings_path)
         parsed = StringsParser.parse(strings_path)
-        result = parsed.find { |k, v| screenshot.path.upcase.include?(k.upcase) }
-        return result.last if result
+        text_array = parsed.find { |k, v| screenshot.path.upcase.include?(k.upcase) }
+        return text_array.last if text_array && text_array.last.length > 0 # Ignore empty string
       end
+
+      UI.verbose("Falling back to text in Framefile.json as there was nothing specified in the #{type}.strings file")
 
       # No string files, fallback to Framefile config
-      result = fetch_config[type.to_s]['text'] if fetch_config[type.to_s]
-      UI.verbose("Falling back to default text as there was nothing specified in the .strings file")
+      text = fetch_config[type.to_s]['text'] if fetch_config[type.to_s] && fetch_config[type.to_s]['text'] && fetch_config[type.to_s]['text'].length > 0 # Ignore empty string
 
-      if type == :title and !result
+      if type == :title and !text
         # title is mandatory
-        UI.user_error!("Could not get title for screenshot #{screenshot.path}. Please provide one in your Framefile.json")
+        UI.user_error!("Could not get title for screenshot #{screenshot.path}. Please provide one in your Framefile.json or title.strings")
       end
 
-      return result
+      return text
     end
 
     # The font we want to use
