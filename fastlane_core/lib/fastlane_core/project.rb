@@ -394,8 +394,8 @@ module FastlaneCore
         retries = FastlaneCore::Project.xcode_list_retries
         @raw = FastlaneCore::Project.run_command(command, timeout: timeout, retries: retries, print: !silent)
       rescue Timeout::Error
-      UI.user_error!("xcodebuild -list timed out after #{retries + 1} retries with a base timeout of #{timeout}. You might need to recreate the user schemes." \
-          " You can override the base timeout value with the environment variable FASTLANE_XCODE_LIST_TIMEOUT")
+        UI.user_error!("xcodebuild -list timed out after #{retries + 1} retries with a base timeout of #{timeout}. You might need to recreate the user schemes." \
+            " You can override the base timeout value with the environment variable FASTLANE_XCODE_LIST_TIMEOUT")
       end
 
       UI.user_error!("Error parsing xcode file using `#{command}`") if @raw.length == 0
