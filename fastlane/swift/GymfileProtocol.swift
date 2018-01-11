@@ -4,7 +4,7 @@ protocol GymfileProtocol: class {
   var scheme: String? { get }
   var clean: Bool { get }
   var outputDirectory: String { get }
-  var outputName: String { get }
+  var outputName: String? { get }
   var configuration: String? { get }
   var silent: Bool { get }
   var codesigningIdentity: String? { get }
@@ -45,7 +45,7 @@ extension GymfileProtocol {
   var scheme: String? { return nil }
   var clean: Bool { return false }
   var outputDirectory: String { return "." }
-  var outputName: String { return "TACOS" }
+  var outputName: String? { return nil }
   var configuration: String? { return nil }
   var silent: Bool { return false }
   var codesigningIdentity: String? { return nil }
@@ -82,4 +82,4 @@ extension GymfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.2]
+// FastlaneRunnerAPIVersion [0.9.1]
