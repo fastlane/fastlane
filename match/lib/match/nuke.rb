@@ -73,10 +73,11 @@ module Match
       Spaceship.login(params[:username])
       Spaceship.select_team
 
-      if Spaceship.client.in_house? && type == "distribution"
+      if Spaceship.client.in_house? && (type == "distribution" || type == "enterprise")
         UI.error("---")
         UI.error("⚠️ Warning: This seems to be an Enterprise account!")
-        UI.error("By nuking your Enterprise account's distribution, all your in-house apps will stop working!")
+        UI.error("By nuking your account's distribution, all your apps deployed via ad-hoc will stop working!") if type == "distribution"
+        UI.error("By nuking your account's enterprise, all your in-house apps will stop working!") if type == "enterprise"
         UI.error("---")
 
         UI.user_error!("Enterprise account nuke cancelled") unless UI.confirm("Do you really want to nuke your Enterprise account?")
