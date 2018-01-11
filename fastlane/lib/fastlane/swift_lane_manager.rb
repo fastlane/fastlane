@@ -26,6 +26,8 @@ module Fastlane
         display_upgraded_message = false
         if disable_runner_upgrades
           UI.verbose("disable_runner_upgrades is true, not attempting to update the FastlaneRunner project")
+        elsif Helper.is_ci?
+          UI.verbose("Running in CI, not attempting to update the FastlaneRunner project")
         else
           display_upgraded_message = self.ensure_runner_up_to_date_fastlane!
         end
