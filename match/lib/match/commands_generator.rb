@@ -122,11 +122,11 @@ module Match
         c.syntax = "fastlane match nuke"
         c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal"
         c.action do |args, options|
-          FastlaneCore::UI.user_error!("Please run `fastlane match nuke [type], allowed values: distribution and development. For the 'adhoc' type, please use 'distribution' instead.")
+          FastlaneCore::UI.user_error!("Please run `fastlane match nuke [type], allowed values: development, distribution and enterprise. For the 'adhoc' type, please use 'distribution' instead.")
         end
       end
 
-      ["development", "distribution"].each do |type|
+      ["development", "distribution", "enterprise"].each do |type|
         command "nuke #{type}" do |c|
           c.syntax = "fastlane match nuke #{type}"
           c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal of the type #{type}"
