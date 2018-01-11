@@ -14,6 +14,8 @@ module Fastlane
 
   # build project
   class SwiftRunnerUpgrader
+    API_VERSION_REGEX = /FastlaneRunnerAPIVersion\s*\[\s*([0-9]+.[0-9]+.[0-9]+)\s*\]/ # also used by SwiftFastlaneAPIGenerator
+
     attr_accessor :target_project # project we'll be updating
     attr_accessor :fastlane_runner_target # FastlaneRunner xcodeproj target
     attr_accessor :manifest_hash # hash of file names to group names they belong to
@@ -77,7 +79,7 @@ module Fastlane
     # compares source file against the target file's FastlaneRunnerAPIVersion and returned `true` if there is a difference
     def file_needs_update?(filename: nil)
       # looking for something like: FastlaneRunnerAPIVersion [0.9.1]
-      regex_to_use = /FastlaneRunnerAPIVersion\s*\[\s*([0-9]+.[0-9]+.[0-9]+)\s*\]/
+      regex_to_use = API_VERSION_REGEX
 
       source = File.join(self.source_swift_code_file_folder_path, "/#{filename}")
       target = File.join(self.target_swift_code_file_folder_path, "/#{filename}")
@@ -90,15 +92,24 @@ module Fastlane
 
       bundled_version = source_file_content.match(regex_to_use)[1]
       target_version = target_file_content.match(regex_to_use)[1]
+      file_versions_are_different = bundled_version != target_version
 
-      UI.verbose("found FastlaneRunnerAPIVersion #{bundled_version} in #{source}")
-      UI.verbose("found FastlaneRunnerAPIVersion #{target_version} in #{target}")
-      return bundled_version == target_version
+      UI.verbose("#{filename} FastlaneRunnerAPIVersion (bundled/target): #{bundled_version}/#{target_version}")
+      files_are_different = source_file_content != target_file_content
+
+      if files_are_different && !file_versions_are_different
+        UI.verbose("File versions are the same, but the two files are not equal, so that's a problem, setting needs update to 'true'")
+      end
+
+      needs_update = file_versions_are_different || files_are_different
+
+      return needs_update
     end
 
     # currently just copies file, even if not needed.
     def copy_file_if_needed!(filename: nil, dry_run: false)
       needs_update = file_needs_update?(filename: filename)
+      UI.verbose("file #{filename} needs an update") if needs_update
 
       # Ok, we know if this file needs an update, can return now if it's a dry run
       return needs_update if dry_run
@@ -153,7 +164,6 @@ module Fastlane
           new_file_reference = group.new_file("#{RELATIVE_SOURCE_FILE_PATH}#{filename}")
 
           # add references to the target, and make sure they are added to the build phase to
-          self.fastlane_runner_target.add_resources([new_file_reference])
           self.fastlane_runner_target.source_build_phase.add_file_reference(new_file_reference)
 
           updated_project = true
@@ -183,7 +193,6 @@ module Fastlane
           new_file_reference = new_group.new_file("#{RELATIVE_SOURCE_FILE_PATH}#{filename}")
 
           # add references to the target, and make sure they are added to the build phase to
-          self.fastlane_runner_target.add_resources([new_file_reference])
           self.fastlane_runner_target.source_build_phase.add_file_reference(new_file_reference)
         end
       end
