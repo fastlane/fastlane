@@ -162,14 +162,11 @@ lane(:generate_fastlane_swift_runner_manifest) do |options|
   swift_folder = File.expand_path("swift")
   runner_project_path = File.expand_path(File.join(swift_folder, "/FastlaneSwiftRunner/FastlaneSwiftRunner.xcodeproj"))
   project = Xcodeproj::Project.open(runner_project_path)
-  swift_files = project.files.select do |file|
-    # All our swift files have names, others don't
-    !file.name.nil? &&
-      # Sometimes we get files that aren't swift, strip them out
-      file.name.end_with?(".swift") &&
-      # Make sure we don't pick up the user-modifiable files
-      !non_upgrade_set.include?(file.name)
-  end
+
+  swift_files = project.files
+                       .reject { |file| file.name.nil? }
+                       .reject { |file| non_upgrade_set.include?(file.name) }
+                       .select { |file| file.name.end_with?(".swift") }
 
   # It is assumed that all Swift files we're including are contained in the root group, or 1 group deep
   swift_filenames_to_group_name = swift_files.each_with_object({}) { |file, object| object[file.name] = file.parent.name }
