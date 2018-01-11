@@ -1,4 +1,5 @@
 require 'fileutils'
+fastlane_require('xcodeproj')
 
 skip_docs # Do not create fastlane/README.txt
 
@@ -99,6 +100,9 @@ lane(:bump) do |options|
   # Everything looks good, let's generate the Swift API
   generated_files = generate_swift_api
 
+  # Alright, now let's update our FastlaneSwiftRunner manifest
+  generated_files << generate_fastlane_swift_runner_manifest
+
   # Add all changed files to the version bump commit
   paths_for_commit += generated_files
 
@@ -148,6 +152,30 @@ lane(:generate_swift_api) do |options|
   )
   sh("rm ../FastlaneRunner")
   generated_files
+end
+
+desc("Generate the FastlaneSwiftRunner project manifest")
+lane(:generate_fastlane_swift_runner_manifest) do |options|
+  # Don't attempt to upgrade config files, like Fastfile.swift, Deliverfile.swift, etc...
+  non_upgrade_set = TOOL_CONFIG_FILES.map { |tool_name| "#{tool_name}.swift" }.to_set
+
+  swift_folder = File.expand_path("swift")
+  runner_project_path = File.expand_path(File.join(swift_folder, "/FastlaneSwiftRunner/FastlaneSwiftRunner.xcodeproj"))
+  project = Xcodeproj::Project.open(runner_project_path)
+
+  swift_files = project.files
+                       .reject { |file| file.name.nil? }
+                       .reject { |file| non_upgrade_set.include?(file.name) }
+                       .select { |file| file.name.end_with?(".swift") }
+
+  # It is assumed that all Swift files we're including are contained in the root group, or 1 group deep
+  swift_filenames_to_group_name = swift_files.each_with_object({}) { |file, object| object[file.name] = file.parent.name }
+
+  manifest_path = File.expand_path(File.join(swift_folder, "/upgrade_manifest.json"))
+  File.write(manifest_path, swift_filenames_to_group_name.to_json)
+
+  UI.success("Done generating FastlaneSwiftRunner project manifest")
+  manifest_path
 end
 
 desc("Does everything that's needed for a release")

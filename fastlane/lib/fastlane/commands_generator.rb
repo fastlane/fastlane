@@ -101,6 +101,7 @@ module Fastlane
         c.syntax = 'fastlane [lane]'
         c.description = 'Run a specific lane. Pass the lane name and optionally the platform first.'
         c.option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
+        c.option('--disable_runner_upgrades', 'Prevents fastlane from attempting to update FastlaneRunner swift project')
 
         c.action do |args, options|
           if ensure_fastfile
