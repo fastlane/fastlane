@@ -74,10 +74,39 @@ module Fastlane
       return missing_groups
     end
 
+    # compares source file against the target file's FastlaneRunnerAPIVersion and returned `true` if there is a difference
+    def file_needs_update?(filename: nil)
+      # looking for something like: FastlaneRunnerAPIVersion [0.9.1]
+      regex_to_use = /FastlaneRunnerAPIVersion\s*\[\s*([0-9]+.[0-9]+.[0-9]+)\s*\]/
+
+      source = File.join(self.source_swift_code_file_folder_path, "/#{filename}")
+      target = File.join(self.target_swift_code_file_folder_path, "/#{filename}")
+
+      # target doesn't have the file yet, so ya, I'd say it needs to be updated
+      return true unless File.exist?(target)
+
+      source_file_content = File.read(source)
+      target_file_content = File.read(target)
+
+      bundled_version = source_file_content.match(regex_to_use)[1]
+      target_version = target_file_content.match(regex_to_use)[1]
+
+      UI.verbose("found FastlaneRunnerAPIVersion #{bundled_version} in #{source}")
+      UI.verbose("found FastlaneRunnerAPIVersion #{target_version} in #{target}")
+      return bundled_version == target_version
+    end
+
     # currently just copies file, even if not needed.
     def copy_file_if_needed!(filename: nil, dry_run: false)
-      # TODO: implement dry_run (DIFFING [ugh])
-      return true if dry_run
+      needs_update = file_needs_update?(filename: filename)
+
+      # Ok, we know if this file needs an update, can return now if it's a dry run
+      return needs_update if dry_run
+
+      unless needs_update
+        # no work needed, just return
+        return false
+      end
 
       source = File.join(self.source_swift_code_file_folder_path, "/#{filename}")
       target = File.join(self.target_swift_code_file_folder_path, "/#{filename}")

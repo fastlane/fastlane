@@ -191,6 +191,8 @@ func parseInt(fromString: String, function: String = #function) -> Int {
       warning_text_array << ""
       warning_text_array << "// Please don't remove the lines below"
       warning_text_array << "// They are used to detect outdated files"
+      # TODO: We need to diff all the files that have this appened and determine if we need to increment the API
+      # instead of keeping it at 0.9.1
       warning_text_array << "// FastlaneRunnerAPIVersion [0.9.1]"
       warning_text_array << ""
       return warning_text_array
