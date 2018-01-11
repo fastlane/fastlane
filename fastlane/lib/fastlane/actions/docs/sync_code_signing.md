@@ -292,6 +292,7 @@ To revoke all certificates and provisioning profiles for a specific environment:
 ```no-highlight
 fastlane match nuke development
 fastlane match nuke distribution
+fastlane match nuke enterprise
 ```
 
 <img src="/img/actions/match_nuke.gif" width="550" />
