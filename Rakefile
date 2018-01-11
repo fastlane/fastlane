@@ -55,6 +55,19 @@ task(:generate_team_table) do
   puts("All done")
 end
 
+task(:update_gem_spec_authors) do
+  require 'json'
+  contributors = JSON.parse(File.read("team.json"))
+
+  names = contributors.values.collect do |current|
+    current["name"]
+  end.shuffle
+
+  gemspec = File.read("fastlane.gemspec")
+  gemspec.gsub!(%r{spec.authors\s+\=\s.*}, "spec.authors       = [\"#{names.join('", "')}\"]")
+  File.write("fastlane.gemspec", gemspec)
+end
+
 #####################################################
 # @!group Helper Methods
 #####################################################
