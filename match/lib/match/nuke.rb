@@ -73,7 +73,15 @@ module Match
       Spaceship.login(params[:username])
       Spaceship.select_team
 
-      UI.user_error!("`fastlane match nuke` doesn't support enterprise accounts") if Spaceship.client.in_house?
+      if Spaceship.client.in_house? && (type == "distribution" || type == "enterprise")
+        UI.error("---")
+        UI.error("⚠️ Warning: This seems to be an Enterprise account!")
+        UI.error("By nuking your account's distribution, all your apps deployed via ad-hoc will stop working!") if type == "distribution"
+        UI.error("By nuking your account's enterprise, all your in-house apps will stop working!") if type == "enterprise"
+        UI.error("---")
+
+        UI.user_error!("Enterprise account nuke cancelled") unless UI.confirm("Do you really want to nuke your Enterprise account?")
+      end
 
       self.certs = certificate_type(cert_type).all
       self.profiles = []
