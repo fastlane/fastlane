@@ -40,21 +40,24 @@ module Fastlane
       @fastlane_runner_target = @target_project.targets.select { |target| target.name == "FastlaneRunner" }.first
     end
 
-    def upgrade_if_needed!
-      upgraded = add_missing_groups_and_files!
-      upgraded = upgrade_files! || upgraded
+    def upgrade_if_needed!(dry_run: false)
+      upgraded = add_missing_groups_and_files!(dry_run: dry_run)
+      upgraded = upgrade_files!(dry_run: dry_run) || upgraded
       upgraded = add_new_files_to_groups! || upgraded
 
-      UI.verbose("Project likely modified, saving.") if upgraded
-      target_project.save if upgraded
+      UI.verbose("FastlaneRunner project has been updated and can be written back to disk") if upgraded
+      unless dry_run
+        UI.verbose("FastlaneRunner project changes have been stored") if upgraded
+        target_project.save if upgraded
+      end
 
       return upgraded
     end
 
-    def upgrade_files!
+    def upgrade_files!(dry_run: false)
       upgraded_anything = false
       self.manifest_hash.each do |filename, group|
-        upgraded_anything = copy_file_if_needed!(filename: filename) || upgraded_anything
+        upgraded_anything = copy_file_if_needed!(filename: filename, dry_run: dry_run) || upgraded_anything
       end
       return upgraded_anything
     end
@@ -72,7 +75,10 @@ module Fastlane
     end
 
     # currently just copies file, even if not needed.
-    def copy_file_if_needed!(filename: nil)
+    def copy_file_if_needed!(filename: nil, dry_run: false)
+      # TODO: implement dry_run (DIFFING [ugh])
+      return true if dry_run
+
       source = File.join(self.source_swift_code_file_folder_path, "/#{filename}")
       target = File.join(self.target_swift_code_file_folder_path, "/#{filename}")
 
@@ -128,11 +134,15 @@ module Fastlane
       return updated_project
     end
 
-    def add_missing_groups_and_files!
+    def add_missing_groups_and_files!(dry_run: false)
       missing_groups = self.find_missing_groups.to_set
       unless missing_groups.length >= 0
         return false
       end
+
+      # well, we know we have some changes to make, so if this is a dry run,
+      # don't bother doing anything and just return true
+      return true if dry_run
 
       missing_groups.each do |missing_group_name|
         new_group = @root_group.new_group(missing_group_name)

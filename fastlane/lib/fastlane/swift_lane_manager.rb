@@ -25,9 +25,9 @@ module Fastlane
       begin
         display_upgraded_message = false
         if disable_runner_upgrades
-          UI.verbose("disable_runner_upgrades is true, not attempting to update the FastlaneRunner project")
+          UI.verbose("disable_runner_upgrades is true, not attempting to update the FastlaneRunner project".yellow)
         elsif Helper.is_ci?
-          UI.verbose("Running in CI, not attempting to update the FastlaneRunner project")
+          UI.verbose("Running in CI, not attempting to update the FastlaneRunner project".yellow)
         else
           display_upgraded_message = self.ensure_runner_up_to_date_fastlane!
         end
@@ -56,7 +56,13 @@ module Fastlane
       end
 
       skip_message = false
-      exit_reason = socket_thread[:exit_reason]
+
+      # if socket_thread is nil, we were probably debugging, or something else weird happened
+      exit_reason = :cancelled if socket_thread.nil?
+
+      # normal exit means we have a reason
+      exit_reason ||= socket_thread[:exit_reason]
+
       if exit_reason == :cancelled && e.nil?
         skip_message = true
       end
@@ -66,8 +72,8 @@ module Fastlane
       finish_fastlane(nil, duration, e, skip_message: skip_message)
 
       if display_upgraded_message
-        UI.message("We updated your FastlaneRunner project during this run to make it compatible with your current version of fastlane.")
-        UI.message("Please make sure to check the changes into source control.")
+        UI.message("We updated your FastlaneRunner project during this run to make it compatible with your current version of fastlane.".yellow)
+        UI.message("Please make sure to check the changes into source control.".yellow)
       end
     end
 
@@ -248,12 +254,25 @@ module Fastlane
 
     # do we have the latest FastlaneSwiftRunner code from the current version of fastlane?
     def self.ensure_runner_up_to_date_fastlane!
+      upgraded = false
       upgrader = SwiftRunnerUpgrader.new
-      upgraded = upgrader.upgrade_if_needed!
-      if upgraded
-        self.build_runner!
+
+      upgrade_needed = upgrader.upgrade_if_needed!(dry_run: true)
+      if upgrade_needed
+        UI.message("It looks like your `FastlaneSwiftRunner` project is not up-to-date".green)
+        UI.message("If you don't update it, fastlane could fail".green)
+        UI.message("We can try to automatically update it for you, usually this works 🎈 🐐".green)
+        user_wants_upgrade = UI.confirm("Should we try to upgrade just your `FastlaneSwiftRunner` project?")
+
+        UI.important("Ok, if things break, you can try to run this lane again and you'll be prompted to upgrade another time") unless user_wants_upgrade
+
+        if user_wants_upgrade
+          upgraded = upgrader.upgrade_if_needed!
+          UI.success("Updated your FastlaneSwiftRunner project with the newest runner code") if upgraded
+          self.build_runner! if upgraded
+        end
       end
-      UI.success("Updated your FastlaneSwiftRunner project with the newest runner code")
+
       return upgraded
     end
 
