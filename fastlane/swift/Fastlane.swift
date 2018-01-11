@@ -460,7 +460,7 @@ func buildApp(workspace: String? = nil,
               scheme: String? = nil,
               clean: Bool = false,
               outputDirectory: String = ".",
-              outputName: String? = nil,
+              outputName: String = "TACOS",
               configuration: String? = nil,
               silent: Bool = false,
               codesigningIdentity: String? = nil,
@@ -538,7 +538,7 @@ func buildIosApp(workspace: String? = nil,
                  scheme: String? = nil,
                  clean: Bool = false,
                  outputDirectory: String = ".",
-                 outputName: String? = nil,
+                 outputName: String = "TACOS",
                  configuration: String? = nil,
                  silent: Bool = false,
                  codesigningIdentity: String? = nil,
@@ -1632,7 +1632,7 @@ func gym(workspace: String? = gymfile.workspace,
          scheme: String? = gymfile.scheme,
          clean: Bool = gymfile.clean,
          outputDirectory: String = gymfile.outputDirectory,
-         outputName: String? = gymfile.outputName,
+         outputName: String = gymfile.outputName,
          configuration: String? = gymfile.configuration,
          silent: Bool = gymfile.silent,
          codesigningIdentity: String? = gymfile.codesigningIdentity,
@@ -3777,7 +3777,6 @@ let precheckfile: Precheckfile = Precheckfile()
 let scanfile: Scanfile = Scanfile()
 let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
-
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.1]
+// FastlaneRunnerAPIVersion [0.9.2]
