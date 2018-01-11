@@ -14,6 +14,7 @@ module Fastlane
   end
 
   class SwiftFastlaneAPIGenerator
+    DEFAULT_API_VERSION_STRING = "0.9.1"
     attr_accessor :tools_option_files
     attr_accessor :actions_not_supported
     attr_accessor :action_options_to_ignore
@@ -79,15 +80,29 @@ module Fastlane
 
       tool_objects = generate_lanefile_tool_objects(classes: tool_details.map(&:swift_class))
       file_content << tool_objects
-      file_content += autogen_version_warning_text_array
+      new_file_content = file_content.join("\n")
 
-      file_content = file_content.join("\n")
       fastlane_swift_api_path = File.join(@target_output_path, "Fastlane.swift")
-      File.write(fastlane_swift_api_path, file_content)
-      UI.success(fastlane_swift_api_path)
+      old_file_content = File.read(fastlane_swift_api_path)
 
-      self.generated_paths << fastlane_swift_api_path
-      self.generated_paths += generate_default_implementations(tool_details: tool_details)
+      # compare old file content to potential new file content
+      api_version = determine_api_version(new_file_content: new_file_content, old_file_content: old_file_content)
+      old_api_version = find_api_version_string(content: old_file_content)
+
+      # if there is a change, we need to write out the new file
+      if api_version != old_api_version
+        new_file_content.concat(autogen_version_warning_text(api_version: api_version))
+
+        File.write(fastlane_swift_api_path, new_file_content)
+        UI.success(fastlane_swift_api_path)
+        self.generated_paths << fastlane_swift_api_path
+      end
+
+      default_implementations_path = generate_default_implementations(tool_details: tool_details)
+
+      # we might not have any changes, like if it's a hotpatch
+      self.generated_paths += default_implementations_path if default_implementations_path.length > 0
+
       return self.generated_paths
     end
 
@@ -120,7 +135,17 @@ module Fastlane
     def generate_default_implementations(tool_details: nil)
       files_generated = []
       tool_details.each do |tool_detail|
-        lanefile_implementation_opening = "class #{tool_detail.swift_class}: #{tool_detail.swift_protocol} {"
+        header = []
+        header << "//"
+        header << "//  ** NOTE **"
+        header << "//  This file is provided by fastlane and WILL be overwritten in future updates"
+        header << "//  If you want to add extra functionality to this project, create a new file in a"
+        header << "//  new group so that it won't be marked for upgrade"
+        header << "//"
+        header << ""
+        header << "class #{tool_detail.swift_class}: #{tool_detail.swift_protocol} {"
+        lanefile_implementation_opening = header.join("\n")
+
         files_generated << write_lanefile(
           lanefile_implementation_opening: lanefile_implementation_opening,
           class_name: tool_detail.swift_class,
@@ -176,14 +201,73 @@ func parseInt(fromString: String, function: String = #function) -> Int {
       return objects
     end
 
-    def autogen_version_warning_text_array
+    def autogen_version_warning_text(api_version: nil)
       warning_text_array = []
       warning_text_array << ""
       warning_text_array << "// Please don't remove the lines below"
       warning_text_array << "// They are used to detect outdated files"
-      warning_text_array << "// FastlaneRunnerAPIVersion [0.9.1]"
+      warning_text_array << "// FastlaneRunnerAPIVersion [#{api_version}]"
       warning_text_array << ""
-      return warning_text_array
+      return warning_text_array.join("\n")
+    end
+
+    # compares the new file content to the old and figures out what api_version the new content should be
+    def determine_api_version(new_file_content: nil, old_file_content: nil)
+      # we know 100% there is a difference, so no need to compare
+      unless old_file_content.length >= new_file_content.length
+        old_api_version = find_api_version_string(content: old_file_content)
+
+        return DEFAULT_API_VERSION_STRING if old_api_version.nil?
+
+        return increment_api_version_string(api_version_string: old_api_version)
+      end
+
+      relevant_old_file_content = old_file_content[0..(new_file_content.length - 1)]
+
+      if relevant_old_file_content == new_file_content
+        # no changes at all, just return the same old api version string
+        return find_api_version_string(content: old_file_content)
+      else
+        # there are differences, so calculate a new api_version_string
+        old_api_version = find_api_version_string(content: old_file_content)
+
+        return DEFAULT_API_VERSION_STRING if old_api_version.nil?
+
+        return increment_api_version_string(api_version_string: old_api_version)
+      end
+    end
+
+    # expects format to be "X.Y.Z" where each value is a number
+    def increment_api_version_string(api_version_string: nil, increment_by: :patch)
+      versions = api_version_string.split(".")
+      major = versions[0].to_i
+      minor = versions[1].to_i
+      patch = versions[2].to_i
+
+      case increment_by
+      when :patch
+        patch += 1
+      when :minor
+        minor += 1
+        patch = 0
+      when :major
+        major += 1
+        minor = 0
+        patch = 0
+      end
+
+      new_version_string = [major, minor, patch].join(".")
+      return new_version_string
+    end
+
+    def find_api_version_string(content: nil)
+      regex = SwiftRunnerUpgrader::API_VERSION_REGEX
+      matches = content.match(regex)
+      if matches.length > 0
+        return matches[1]
+      else
+        return nil
+      end
     end
 
     def generate_tool_protocol(tool_swift_function: nil)
@@ -199,11 +283,30 @@ func parseInt(fromString: String, function: String = #function) -> Int {
       protocol_content_array += tool_swift_function.swift_default_implementations
       protocol_content_array << "}"
       protocol_content_array << ""
-      protocol_content_array += autogen_version_warning_text_array
+      new_file_content = protocol_content_array.join("\n")
 
       target_path = File.join(@target_output_path, "#{protocol_name}.swift")
-      file_content = protocol_content_array.join("\n")
-      File.write(target_path, file_content)
+
+      old_file_content = ""
+      # we might have a new file here, unlikely, but possible
+      if File.exist?(target_path)
+        old_file_content = File.read(target_path)
+      end
+
+      # compare old file content to potential new file content
+      api_version = determine_api_version(new_file_content: new_file_content, old_file_content: old_file_content)
+      old_api_version = find_api_version_string(content: old_file_content)
+
+      # we don't need to write this file out because the file versions are exactly the same
+      return nil if api_version == old_api_version
+
+      # use api_version to generate the disclaimer
+      api_version_disclaimer = autogen_version_warning_text(api_version: api_version)
+      new_file_content.concat(api_version_disclaimer)
+
+      target_path = File.join(@target_output_path, "#{protocol_name}.swift")
+
+      File.write(target_path, new_file_content)
       UI.success(target_path)
       return target_path
     end
@@ -256,7 +359,8 @@ func parseInt(fromString: String, function: String = #function) -> Int {
           key_type_overrides: key_type_overrides,
           return_type: action_return_type
         )
-        self.generated_paths << generate_tool_protocol(tool_swift_function: tool_swift_function)
+        generated_protocol_file_path = generate_tool_protocol(tool_swift_function: tool_swift_function)
+        self.generated_paths << generated_protocol_file_path unless generated_protocol_file_path.nil?
         return tool_swift_function
       else
         return SwiftFunction.new(
