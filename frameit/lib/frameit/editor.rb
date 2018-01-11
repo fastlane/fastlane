@@ -263,10 +263,10 @@ module Frameit
     end
 
     def put_title_into_background(background, stack_title)
-      title_images = build_title_images(image.width - 2 * horizontal_frame_padding, image.height - 2 * vertical_frame_padding)
+      text_images = build_text_images(image.width - 2 * horizontal_frame_padding, image.height - 2 * vertical_frame_padding)
 
-      keyword = title_images[:keyword]
-      title = title_images[:title]
+      keyword = text_images[:keyword]
+      title = text_images[:title]
 
       if stack_title && !keyword.nil? && !title.nil? && keyword.width > 0 && title.width > 0
         background = put_title_into_background_stacked(background, title, keyword)
@@ -328,8 +328,8 @@ module Frameit
       (actual_font_size / 3.0).round
     end
 
-    # This will build 2 individual images with the title, which will then be added to the real image
-    def build_title_images(max_width, max_height)
+    # This will build up to 2 individual images with the title and optional keyword, which will then be added to the real image
+    def build_text_images(max_width, max_height)
       words = [:keyword, :title].keep_if { |a| fetch_text(a) } # optional keyword/title
       results = {}
       trim_boxes = {}
@@ -338,9 +338,9 @@ module Frameit
       words.each do |key|
         # Create empty background
         empty_path = File.join(Frameit::ROOT, "lib/assets/empty.png")
-        title_image = MiniMagick::Image.open(empty_path)
+        text_image = MiniMagick::Image.open(empty_path)
         image_height = max_height # gets trimmed afterwards anyway, and on the iPad the `y` would get cut
-        title_image.combine_options do |i|
+        text_image.combine_options do |i|
           # Oversize as the text might be larger than the actual image. We're trimming afterwards anyway
           i.resize("#{max_width * 5.0}x#{image_height}!") # `!` says it should ignore the ratio
         end
@@ -356,7 +356,7 @@ module Frameit
         interline_spacing = fetch_config['interline_spacing']
 
         # Add the actual title
-        title_image.combine_options do |i|
+        text_image.combine_options do |i|
           i.font(current_font) if current_font
           i.gravity("Center")
           i.pointsize(actual_font_size)
@@ -365,11 +365,11 @@ module Frameit
           i.fill(fetch_config[key.to_s]['color'])
         end
 
-        results[key] = title_image
+        results[key] = text_image
 
         # Natively trimming the image with .trim will result in the loss of the common baseline between the text in all images.
         # Hence retrieve the calculated trim bounding box without actually trimming:
-        calculated_trim_box = title_image.identify do |b|
+        calculated_trim_box = text_image.identify do |b|
           b.format("%@") # CALCULATED: trim bounding box (without actually trimming), see: http://www.imagemagick.org/script/escape.php
         end
 
