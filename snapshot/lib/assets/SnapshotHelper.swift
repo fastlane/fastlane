@@ -166,7 +166,7 @@ open class Snapshot: NSObject {
                 throw SnapshotError.cannotDetectUser
             }
 
-            guard let usersDir =  FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
+            guard let usersDir = FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
                 throw SnapshotError.cannotFindHomeDirectory
             }
 
