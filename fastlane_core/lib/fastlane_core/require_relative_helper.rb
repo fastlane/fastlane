@@ -12,11 +12,11 @@ def from_base(to_file: nil)
   destination.relative_path_from(source)
 end
 
-# Allows nice relative directory require_relative
-# like `require_relative from_fastlane_core/'helper'`
-tool_dirs_ = Dir["#{FASTLANE_BASE_DIR}/**/lib/*.rb"]
-tool_dirs_.map { |t| File.basename(t, ".rb") }.each do |tool|
-  define_method("from_#{tool}".to_sym) do |**kwargs|
-    from_base(**kwargs) / tool / "lib" / tool
-  end
+FASTLANE_TOOL_DIRS = Dir["#{FASTLANE_BASE_DIR}/**/lib/*.rb"].map { |t| File.basename(t, ".rb") }
+
+def internal(file, **kwargs)
+  tail = file.split("/")
+  tool = tail.shift
+  raise "Unknown fastlane tool" unless FASTLANE_TOOL_DIRS.include?(tool)
+  from_base(**kwargs) / tool / 'lib' / tool / tail.join("/")
 end

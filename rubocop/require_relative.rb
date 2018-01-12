@@ -29,9 +29,7 @@ module RuboCop
         tail = parts.join("/")
         return unless self.tool_dirs.include?(head)
 
-        require_statement = "from_#{head}"
-        require_statement << "/'#{tail}'" unless parts.empty?
-        self.corrected_statements[node] = require_statement
+        self.corrected_statements[node] = "internal('#{required}')"
 
         message = format(MSG, tool: head, require_statement: require_statement)
         add_offense(node, :expression, message)
