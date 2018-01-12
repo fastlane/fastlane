@@ -64,7 +64,7 @@ task(:update_gem_spec_authors) do
   end.shuffle
 
   gemspec = File.read("fastlane.gemspec")
-  gemspec.gsub!(%r{spec.authors\s+\=\s.*}, "spec.authors       = [\"#{names.join('", "')}\"]")
+  gemspec.gsub!(/spec.authors\s+\=\s.*/, "spec.authors       = [\"#{names.join('", "')}\"]")
   File.write("fastlane.gemspec", gemspec)
 end
 
