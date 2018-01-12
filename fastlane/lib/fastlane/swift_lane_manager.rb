@@ -222,8 +222,8 @@ module Fastlane
     end
 
     def self.start_socket_thread
-      require 'fastlane/server/socket_server'
-      require 'fastlane/server/socket_server_action_command_executor'
+      require_relative internal('fastlane/server/socket_server')
+      require_relative internal('fastlane/server/socket_server_action_command_executor')
 
       return Thread.new do
         command_executor = SocketServerActionCommandExecutor.new
@@ -283,9 +283,9 @@ module Fastlane
 
     def self.build_runner!
       UI.verbose("Building FastlaneSwiftRunner")
-      require 'fastlane_core'
-      require 'gym'
-      require 'gym/generators/build_command_generator'
+      require_relative internal('fastlane_core')
+      require_relative internal('gym')
+      require_relative internal('gym/generators/build_command_generator')
 
       project_options = {
           project: FastlaneCore::FastlaneFolder.swift_runner_project_path,

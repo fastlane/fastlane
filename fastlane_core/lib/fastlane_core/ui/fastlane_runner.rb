@@ -278,7 +278,7 @@ module Commander
       return if FastlaneCore::Helper.test?
 
       require 'gh_inspector'
-      require 'fastlane_core/ui/github_issue_inspector_reporter'
+      require_relative internal('fastlane_core/ui/github_issue_inspector_reporter')
 
       inspector = GhInspector::Inspector.new("fastlane", "fastlane", verbose: FastlaneCore::Globals.verbose?)
       delegate = Fastlane::InspectorReporter.new

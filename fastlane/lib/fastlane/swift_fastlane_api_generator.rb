@@ -1,4 +1,4 @@
-require 'fastlane/swift_fastlane_function.rb'
+require_relative internal('fastlane/swift_fastlane_function.rb')
 
 module Fastlane
   class SwiftToolDetail
@@ -24,8 +24,8 @@ module Fastlane
     def initialize(target_output_path: "swift")
       @target_output_path = File.expand_path(target_output_path)
       @generated_paths = []
-      require 'fastlane'
-      require 'fastlane/documentation/actions_list'
+      require_relative internal('fastlane')
+      require_relative internal('fastlane/documentation/actions_list')
       Fastlane.load_actions
       # Tools that can be used with <Toolname>file, like Deliverfile, Screengrabfile
       # this is important because we need to generate the proper api for these by creating a protocol

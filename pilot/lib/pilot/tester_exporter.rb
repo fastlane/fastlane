@@ -1,5 +1,5 @@
-require 'spaceship/tunes/application'
-require 'spaceship/test_flight/tester'
+require_relative internal('spaceship/tunes/application')
+require_relative internal('spaceship/test_flight/tester')
 require_relative 'tester_util'
 require_relative 'module'
 require_relative 'manager'

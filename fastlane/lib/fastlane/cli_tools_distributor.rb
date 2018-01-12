@@ -34,11 +34,11 @@ module Fastlane
 
           # this might take a long time if there is no Gemfile :(
           # That's why we show the loading indicator here also
-          require "fastlane"
+          require_relative internal('fastlane')
 
           require_fastlane_spinner.success
         else
-          require "fastlane"
+          require_relative internal('fastlane')
         end
         # We want to avoid printing output other than the version number if we are running `fastlane -v`
         unless running_version_command? || running_init_command?
@@ -99,12 +99,12 @@ module Fastlane
           end
           commands_generator.start
         elsif tool_name == "fastlane-credentials"
-          require 'credentials_manager'
+          require_relative internal('credentials_manager')
           ARGV.shift
           CredentialsManager::CLI.new.run
         else
           # Triggering fastlane to call a lane
-          require "fastlane/commands_generator"
+          require_relative internal('fastlane/commands_generator')
           Fastlane::CommandsGenerator.start
         end
       ensure

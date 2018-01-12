@@ -1,4 +1,4 @@
-require 'fastlane/actions/actions_helper'
+require_relative internal('fastlane/actions/actions_helper')
 require 'forwardable'
 
 module Fastlane

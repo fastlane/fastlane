@@ -1,4 +1,4 @@
-require 'fastlane_core'
+require_relative internal('fastlane_core')
 
 require_relative 'fastlane/version'
 require_relative 'fastlane/features'

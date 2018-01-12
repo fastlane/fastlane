@@ -4,7 +4,7 @@ require 'os'
 require 'thread'
 require 'terminal-table'
 
-require 'fastlane_core/print_table'
+require_relative internal('fastlane_core/print_table')
 require_relative 'module'
 require_relative 'update'
 require_relative 'test_command_generator'

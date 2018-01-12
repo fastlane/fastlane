@@ -1,5 +1,5 @@
-require 'fastlane_core/device_manager'
-require 'fastlane_core/project'
+require_relative internal('fastlane_core/device_manager')
+require_relative internal('fastlane_core/project')
 require_relative 'module'
 
 module Scan

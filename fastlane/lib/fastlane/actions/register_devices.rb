@@ -1,4 +1,4 @@
-require 'credentials_manager'
+require_relative internal('credentials_manager')
 
 module Fastlane
   module Actions
@@ -11,7 +11,7 @@ module Fastlane
       end
 
       def self.run(params)
-        require 'spaceship'
+        require_relative internal('spaceship')
 
         devices = params[:devices]
         devices_file = params[:devices_file]
