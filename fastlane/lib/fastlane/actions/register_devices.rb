@@ -36,7 +36,7 @@ module Fastlane
           device_objs = devices_file.drop(1).map do |device|
             next if existing_devices.map(&:udid).include?(device[0])
 
-            UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)") unless device.count == 2
+            UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (http://devimages.apple.com/downloads/devices/Multiple-Upload-Samples.zip)") unless device.count == 2
             UI.user_error!("Passed invalid UDID: #{device[0]} for device: #{device[1]}") unless UDID_REGEXP =~ device[0]
 
             Spaceship::Device.create!(name: device[1], udid: device[0])
@@ -118,7 +118,7 @@ module Fastlane
           ) # Simply provide a list of devices as a Hash',
           'register_devices(
             devices_file: "./devices.txt"
-          ) # Alternatively provide a standard UDID export .txt file, see the Apple Sample (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)',
+          ) # Alternatively provide a standard UDID export .txt file, see the Apple Sample (http://devimages.apple.com/downloads/devices/Multiple-Upload-Samples.zip)',
           'register_devices(
             devices_file: "./devices.txt", # You must pass in either `devices_file` or `devices`.
             team_id: "XXXXXXXXXX",         # Optional, if you"re a member of multiple teams, then you need to pass the team ID here.
