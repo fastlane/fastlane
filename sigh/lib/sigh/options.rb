@@ -138,7 +138,7 @@ module Sigh
                                      end),
         FastlaneCore::ConfigItem.new(key: :template_name,
                                      env_name: "SIGH_PROVISIONING_PROFILE_TEMPLATE_NAME",
-                                     description: "The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile",
+                                     description: "The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. \"Apple Pay Pass Suppression Development\")",
                                      optional: true,
                                      default_value: nil)
       ]
