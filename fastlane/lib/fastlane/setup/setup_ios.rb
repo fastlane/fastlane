@@ -419,7 +419,9 @@ module Fastlane
         self.appfile_content.gsub!("[[APPLE_ID]]", self.user)
       end
 
-      self.show_information_about_version_bumps unless self.automatic_versioning_enabled
+      if !self.automatic_versioning_enabled && method_to_use == :ios_manual
+        self.show_information_about_version_bumps
+      end
 
       super
     end
