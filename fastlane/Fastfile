@@ -109,6 +109,12 @@ lane(:bump) do |options|
   # Add version file path to change set
   paths_for_commit << version_file_path
 
+  sh("bundle exec rake generate_team_table")
+  paths_for_commit << "README.md"
+
+  sh("bundle exec rake update_gem_spec_authors")
+  paths_for_commit << "fastlane.gemspec"
+
   sh("git checkout -b 'version-bump-#{new_version}'")
   commit_message = "Version bump to #{new_version}"
 
