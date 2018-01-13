@@ -40,7 +40,7 @@ task(:generate_team_table) do
 
     content << "<tr>" if counter % number_of_rows == 0
     content << "<td id='#{github_user_id}'>"
-    content << "<img src='https://github.com/#{github_user}.png?size=200' width=140>"
+    content << "<img src='https://github.com/#{github_user}.png?size=140'>"
     if user_content['twitter']
       content << "<h4 align='center'><a href='https://twitter.com/#{user_content['twitter']}'>#{github_user_name}</a></h4>"
     else
