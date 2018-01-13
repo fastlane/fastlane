@@ -44,6 +44,7 @@ module Fastlane
 
     def self.do_action(name, payload)
       all_actions.each do |action|
+        next unless action.name == name
         action.block.call(name, payload)
       end
     end
@@ -51,6 +52,7 @@ module Fastlane
     def self.do_filter(name, default)
       current_value = default
       all_filters.each do |filter|
+        next unless filter.name == name
         current_value = filter.block.call(name, current_value)
       end
       current_value
