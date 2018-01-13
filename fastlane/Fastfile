@@ -3,8 +3,10 @@ fastlane_require('xcodeproj')
 
 skip_docs # Do not create fastlane/README.txt
 
-desc "Runs the unit tests and other verifications for the fastlane repo"
-lane :test do |options|
+# Test and Validate
+
+desc("Runs the unit tests and other verifications for the fastlane repo")
+lane(:test) do |options|
   validate_repo
 end
 
