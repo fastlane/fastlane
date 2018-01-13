@@ -235,7 +235,7 @@ module Deliver
       v.languages.each do |language_data|
         lang = language_data["localeCode"]
         enabled_languages[lang] = language_data
-        primary_data = language_data if !language_data["canDeleteLocale"]
+        primary_data = language_data unless language_data["canDeleteLocale"]
       end
 
       UI.user_error!("could not find primary language data for app '#{options[:app].name}'") unless primary_data
