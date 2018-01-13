@@ -135,12 +135,13 @@ module FastlaneCore
 
     # Detect if filesystem is insenstive or not.
     def self.fs_is_insensitive?
+      return @fs_sensitivity_cache unless @fs_sensitivity_cache.nil?
       is_insensitive = false
       Dir.mktmpdir("foo") do |dir|
         File.write(File.join(dir, "FASTLANE"), ":rocket:")
         is_insensitive = File.exist?(File.join(dir, "fastlane"))
       end
-      is_insensitive
+      @fs_sensitivity_cache = is_insensitive
     end
 
     def self.is_ci?

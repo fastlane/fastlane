@@ -57,28 +57,67 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.is_ci?).to be true
       end
     end
-
-    describe "#fs_is_insensitive?" do
-      it "detects fs sensitivity" do
+    describe "#fs_is_insensitive? - caches" do
+      before(:each) do
+        # be sure to not hit cached value
+        FastlaneCore::Helper.instance_variable_set(:@fs_sensitivity_cache, nil)
+      end
+      it "caches the test for insensitive file system" do
+        expect(FastlaneCore::Helper.instance_variable_get(:@fs_sensitivity_cache)).to be nil
         expect(File).to receive(:exist?).and_return(true)
         expect(FastlaneCore::Helper.fs_is_insensitive?).to be true
-        expect(File).to receive(:exist?).and_return(false)
-        expect(FastlaneCore::Helper.fs_is_insensitive?).to be false
+        expect(FastlaneCore::Helper.instance_variable_get(:@fs_sensitivity_cache)).to be true
+      end
+      it "returns cached value" do
+        FastlaneCore::Helper.instance_variable_set(:@fs_sensitivity_cache, "fastlane")
+        expect(FastlaneCore::Helper.fs_is_insensitive?).to eq "fastlane"
+      end
+    end
+    describe "#fs_is_insensitive?" do
+      context 'when the file system is insensitive' do
+        before(:each) do
+          # be sure to not hit cached value
+          FastlaneCore::Helper.instance_variable_set(:@fs_sensitivity_cache, nil)
+          expect(File).to receive(:exist?).and_return(true)
+        end
+        it "fs is insensitive" do
+          expect(FastlaneCore::Helper.fs_is_insensitive?).to be true
+        end
+      end
+      context 'when the file system is sensitive' do
+        before(:each) do
+          # be sure to not hit cached value
+          FastlaneCore::Helper.instance_variable_set(:@fs_sensitivity_cache, nil)
+          expect(File).to receive(:exist?).and_return(false)
+        end
+        it "fs is sensitive" do
+          expect(FastlaneCore::Helper.fs_is_insensitive?).to be false
+        end
       end
     end
 
     describe "#compare_paths?" do
-      it "Compare Path on sensitive system" do
-        expect(FastlaneCore::Helper).to receive(:fs_is_insensitive?).and_return(false)
-        expect(FastlaneCore::Helper).to receive(:fs_is_insensitive?).and_return(false)
-        expect(FastlaneCore::Helper.compare_paths("FASTLANE", "fastlane")).to be false
-        expect(FastlaneCore::Helper.compare_paths("fastlane", "fastlane")).to be true
+      context 'when the file system is insentive' do
+        before(:each) do
+          allow(FastlaneCore::Helper).to receive(:fs_is_insensitive?) { true }
+        end
+        it 'ignores case while comparing' do
+          expect(FastlaneCore::Helper.compare_paths("FASTLANE", "fastlane")).to be true
+        end
+        it 'matches equal strings' do
+          expect(FastlaneCore::Helper.compare_paths("fastlane", "fastlane")).to be true
+        end
       end
-      it "Compare Path on insensitive system" do
-        expect(FastlaneCore::Helper).to receive(:fs_is_insensitive?).and_return(true)
-        expect(FastlaneCore::Helper).to receive(:fs_is_insensitive?).and_return(true)
-        expect(FastlaneCore::Helper.compare_paths("fastlane", "FASTLANE")).to be true
-        expect(FastlaneCore::Helper.compare_paths("fastlane", "fastlane")).to be true
+      context 'when the file system is sensitive' do
+        before(:each) do
+          allow(FastlaneCore::Helper).to receive(:fs_is_insensitive?) { false }
+        end
+        it 'respects case while comparing' do
+          expect(FastlaneCore::Helper.compare_paths("FASTLANE", "fastlane")).to be false
+        end
+        it 'matches equal strings' do
+          expect(FastlaneCore::Helper.compare_paths("fastlane", "fastlane")).to be true
+        end
       end
     end
 
