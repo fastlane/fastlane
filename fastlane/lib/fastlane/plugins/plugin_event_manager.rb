@@ -1,28 +1,57 @@
 module Fastlane
-  class PluginEvent
-    attr_accessor :category
+  
+  class HookAction
+    attr_accessor :name
     attr_accessor :payload
-    def initialize(category, payload)
-      @category = category
+    attr_accessor :prio
+    def initialize(name, payload, prio)
+      @name = name
       @payload = payload
+      @prio = prio
     end
   end
-  class PluginEventManager
-    attr_accessor :all_subscribers
-    def self.all_subscribers
-      @all_subscribers ||= []
+  
+  class HookFilter
+    attr_accessor :name
+    attr_accessor :default
+    attr_accessor :prio
+    def initialize(name, default)
+      @name = name
+      @default = default
     end
-
-    def self.subscribe(listener)
-      all_subscribers << listener
+  end
+  
+  class EventManager
+    attr_accessor :filters
+    attr_accessor :action
+    def self.all_actions
+      @all_actions ||= []
     end
-
-    def self.publish(category, payload)
+    
+    def self.all_filters
+      @all_filters ||= []
+    end
+    
+    def self.add_action(name, prio, block)
+      all_actions << 
+    end
+    
+    def self.do_action(name, payload) 
       all_subscribers.each do |subscriber|
-        if subscriber.respond_to? "event_receiver"
-          subscriber.event_receiver(PluginEvent.new(category, payload))
+        if subscriber.respond_to? "action_handler"
+          subscriber.action_handler(HookAction.new(name, payload))
         end
       end
+    end
+    
+    def self.do_filter(name, default) 
+      current_value = default
+      all_subscribers.each do |subscriber|
+        if subscriber.respond_to? "filter_handler"
+          current_value = subscriber.filter_handler(HookFilter.new(name, current_value))
+        end
+      end
+      current_value
     end
   end
 end
