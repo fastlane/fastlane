@@ -226,30 +226,47 @@ module Deliver
       # Collect all languages we need
       # We only care about languages from user provided values
       # as the other languages are on iTC already anyway
-      v = options[:app].edit_version
-      UI.user_error!("Could not find a version to edit for app '#{options[:app].name}', the app metadata is read-only currently") unless v
+      v = options[:app].details
+      UI.user_error!("Could not find details for app '#{options[:app].name}'") unless v
 
-      enabled_languages = options[:languages] || []
+      # find languages currently enabled on ITC (enabled_languages)
+      enabled_languages = {}  # map of locale code to language data hash
+      primary_data = nil      # the primary language data, e.g. english name/subtitle
+      v.languages.each do |language_data|
+        lang = language_data["localeCode"]
+        enabled_languages[lang] = language_data
+        primary_data = language_data if !language_data["canDeleteLocale"]
+      end
+
+      UI.user_error!("could not find primary language data for app '#{options[:app].name}'") unless primary_data
+
+      # find list of languages we have data for (local_languages)
+      local_languages = options[:languages] || []
       LOCALISED_VERSION_VALUES.each do |key|
         current = options[key]
         next unless current && current.kind_of?(Hash)
         current.each do |language, value|
-          language = language.to_s
-          enabled_languages << language unless enabled_languages.include?(language)
+          lang = language.to_s
+          next if lang == "default"
+          local_languages << lang unless local_languages.include?(lang)
         end
       end
 
-      # Reject "default" language from getting enabled
-      # because "default" is not an iTC language
-      enabled_languages = enabled_languages.reject do |lang|
-        lang == "default"
-      end.uniq
+      UI.verbose("ITC languages: #{enabled_languages.keys}")
+      UI.verbose("local languages: #{local_languages}")
+      # determine languages to add
+      add_languages = local_languages - enabled_languages.keys
 
-      if enabled_languages.count > 0
-        v.create_languages(enabled_languages)
+      if add_languages.count > 0
+        # we need to add languages to ITC
+        # update v.languages
+        add_languages.each do |locale|
+          v.languages << primary_data.merge("localeCode" => locale, "canDeleteLocale" => true)
+        end
+
         lng_text = "language"
-        lng_text += "s" if enabled_languages.count != 1
-        Helper.show_loading_indicator("Activating #{lng_text} #{enabled_languages.join(', ')}...")
+        lng_text += "s" if add_languages.count != 1
+        Helper.show_loading_indicator("Activating #{lng_text} #{add_languages.join(', ')}...")
         v.save!
         Helper.hide_loading_indicator
       end
