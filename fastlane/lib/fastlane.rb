@@ -1,6 +1,7 @@
 require 'fastlane_core'
 
 require 'fastlane/version'
+require 'fastlane/events'
 require 'fastlane/features'
 require 'fastlane/shells'
 require 'fastlane/tools'
