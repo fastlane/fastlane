@@ -52,6 +52,37 @@ describe Spaceship::Tunes::IAP do
             ]
         )
       end
+
+      it "create auto renewable subscription with pricing" do
+        pricing_intervals = [
+          {
+            country: "WW",
+            begin_date: nil,
+            end_date: nil,
+            tier: 1
+          }
+        ]
+        expect(client).to receive(:update_recurring_iap_pricing!).with(app_id: '898536088', purchase_id: "1195137657", pricing_intervals: pricing_intervals)
+
+        app.in_app_purchases.create!(
+          type: Spaceship::Tunes::IAPType::RECURRING,
+          versions: {
+            'en-US' => {
+              name: "test name2",
+              description: "Description has at least 10 characters"
+            },
+            'de-DE' => {
+              name: "test name german2",
+              description: "German has at least 10 characters"
+            }
+          },
+          reference_name: "localizeddemo",
+          product_id: "x.a.a.b.b.c.d.x.y.z",
+          cleared_for_sale: true,
+          review_notes: "Some Review Notes here bla bla bla",
+          pricing_intervals: pricing_intervals
+        )
+      end
     end
   end
 end

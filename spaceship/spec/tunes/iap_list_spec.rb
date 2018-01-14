@@ -16,6 +16,13 @@ describe Spaceship::Tunes::IAPList do
       expect(edit_version.class).to eq(Spaceship::Tunes::IAPDetail)
       expect(edit_version.product_id).to eq("go.find.me")
     end
+    it "Loads Edit Version of Recurring IAP" do
+      edit_version = app.in_app_purchases.find("x.a.a.b.b.c.d.x.y.z").edit
+      expect(edit_version.class).to eq(Spaceship::Tunes::IAPDetail)
+      expect(edit_version.product_id).to eq("x.a.a.b.b.c.d.x.y.z")
+      expect(edit_version.pricing_intervals[0][:tier]).to eq(2)
+      expect(edit_version.pricing_intervals[0][:country]).to eq("BB")
+    end
     it "can delete" do
       deleted = app.in_app_purchases.find("go.find.me").delete!
       expect(deleted).to eq(nil)
