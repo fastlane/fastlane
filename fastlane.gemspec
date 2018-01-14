@@ -48,7 +48,7 @@ Gem::Specification.new do |spec|
 
   # TTY dependencies
   spec.add_dependency('tty-screen', '>= 0.6.3', '< 1.0.0') # detect the terminal width
-  spec.add_dependency('tty-spinner', '>= 0.7.0', '< 1.0.0') # loading indicators
+  spec.add_dependency('tty-spinner', '>= 0.8.0', '< 1.0.0') # loading indicators
 
   spec.add_dependency('babosa', '>= 1.0.2', "< 2.0.0")
   spec.add_dependency('colored') # colored terminal output
