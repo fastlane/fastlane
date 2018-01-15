@@ -60,7 +60,7 @@ bundle exec rspec [tool_name]
 
 #### Unit tests in one specific test file
 
-If you know exactly which `_spec.rc` file you want to run, use
+If you know exactly which `_spec.rb` file you want to run, use
 
 ```
 bundle exec rspec .\fastlane\spec\fastlane_require_spec.rb
