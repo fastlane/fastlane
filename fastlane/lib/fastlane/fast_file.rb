@@ -29,7 +29,7 @@ module Fastlane
       content.scan(/^\s*require (.*)/).each do |current|
         gem_name = current.last
         next if gem_name.include?(".") # these are local gems
-        UI.important("You require a gem, if this is a third party gem, please use `fastlane_require #{gem_name}` to ensure the gem is installed locally")
+        UI.important("You have require'd a gem, if this is a third party gem, please use `fastlane_require #{gem_name}` to ensure the gem is installed locally.")
       end
 
       parse(content, @path)
