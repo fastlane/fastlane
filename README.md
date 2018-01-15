@@ -28,7 +28,7 @@ If the above doesn't help, please [submit an issue](https://github.com/fastlane/
 
 ## _fastlane_ team
 
-<table>
+<table id='team'>
 <tr>
 <td id='jérôme-lacoste'>
 <a href='https://github.com/lacostej'>

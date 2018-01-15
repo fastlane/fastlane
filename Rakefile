@@ -27,7 +27,7 @@ end
 
 task(:generate_team_table) do
   require 'json'
-  content = ["<table>"]
+  content = ["<table id='team'>"]
 
   contributors = JSON.parse(File.read("team.json"))
   counter = 0
@@ -59,7 +59,7 @@ task(:generate_team_table) do
   content << "</table>"
 
   readme = File.read("README.md")
-  readme.gsub!(%r{\<table\>.*\<\/table\>}m, content.join("\n"))
+  readme.gsub!(%r{\<table id='team'\>.*\<\/table\>}m, content.join("\n"))
   File.write("README.md", readme)
   puts("All done")
 end
