@@ -31,8 +31,30 @@ If the above doesn't help, please [submit an issue](https://github.com/fastlane/
 <table>
 <tr>
 <td>
+<img src='https://github.com/jdee.png?size=200' width=140>
+<h4 align='center'>Jimmy Dee</h4>
+</td>
+<td>
+<img src='https://github.com/snatchev.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/snatchev'>Stefan Natchev</a></h4>
+</td>
+<td>
+<img src='https://github.com/nafu.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/nafu003'>Fumiya Nakamura</a></h4>
+</td>
+<td>
 <img src='https://github.com/KrauseFx.png?size=200' width=140>
 <h4 align='center'><a href='https://twitter.com/KrauseFx'>Felix Krause</a></h4>
+</td>
+<td>
+<img src='https://github.com/giginet.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/giginet'>Kohki Miki</a></h4>
+</td>
+</tr>
+<tr>
+<td>
+<img src='https://github.com/milch.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/acrooow'>Manu Wallner</a></h4>
 </td>
 <td>
 <img src='https://github.com/janpio.png?size=200' width=140>
@@ -43,23 +65,15 @@ If the above doesn't help, please [submit an issue](https://github.com/fastlane/
 <h4 align='center'><a href='https://twitter.com/joshdholtz'>Josh Holtz</a></h4>
 </td>
 <td>
-<img src='https://github.com/matthewellis.png?size=200' width=140>
-<h4 align='center'><a href='https://twitter.com/mellis1995'>Matthew Ellis</a></h4>
+<img src='https://github.com/hjanuschka.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/hjanuschka'>Helmut Januschka</a></h4>
 </td>
 <td>
-<img src='https://github.com/giginet.png?size=200' width=140>
-<h4 align='center'><a href='https://twitter.com/giginet'>Kohki Miki</a></h4>
+<img src='https://github.com/revolter.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/Revolt666'>Iulian Onofrei</a></h4>
 </td>
 </tr>
 <tr>
-<td>
-<img src='https://github.com/lmirosevic.png?size=200' width=140>
-<h4 align='center'><a href='https://twitter.com/lmirosevic'>Luka Mirosevic</a></h4>
-</td>
-<td>
-<img src='https://github.com/milch.png?size=200' width=140>
-<h4 align='center'><a href='https://twitter.com/acrooow'>Manu Wallner</a></h4>
-</td>
 <td>
 <img src='https://github.com/lacostej.png?size=200' width=140>
 <h4 align='center'><a href='https://twitter.com/lacostej'>Jérôme Lacoste</a></h4>
@@ -69,44 +83,30 @@ If the above doesn't help, please [submit an issue](https://github.com/fastlane/
 <h4 align='center'><a href='https://twitter.com/getaaron'>Aaron Brager</a></h4>
 </td>
 <td>
-<img src='https://github.com/nafu.png?size=200' width=140>
-<h4 align='center'><a href='https://twitter.com/nafu003'>Fumiya Nakamura</a></h4>
-</td>
-</tr>
-<tr>
-<td>
-<img src='https://github.com/revolter.png?size=200' width=140>
-<h4 align='center'><a href='https://twitter.com/Revolt666'>Iulian Onofrei</a></h4>
-</td>
-<td>
-<img src='https://github.com/jdee.png?size=200' width=140>
-<h4 align='center'>Jimmy Dee</h4>
-</td>
-<td>
-<img src='https://github.com/hjanuschka.png?size=200' width=140>
-<h4 align='center'><a href='https://twitter.com/hjanuschka'>Helmut Januschka</a></h4>
-</td>
-<td>
-<img src='https://github.com/snatchev.png?size=200' width=140>
-<h4 align='center'><a href='https://twitter.com/snatchev'>Stefan Natchev</a></h4>
-</td>
-<td>
-<img src='https://github.com/DanToml.png?size=200' width=140>
-<h4 align='center'><a href='https://twitter.com/DanToml'>Danielle Tomlinson</a></h4>
-</td>
-</tr>
-<tr>
-<td>
 <img src='https://github.com/mgrebenets.png?size=200' width=140>
 <h4 align='center'><a href='https://twitter.com/mgrebenets'>Maksym Grebenets</a></h4>
+</td>
+<td>
+<img src='https://github.com/lmirosevic.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/lmirosevic'>Luka Mirosevic</a></h4>
 </td>
 <td>
 <img src='https://github.com/AliSoftware.png?size=200' width=140>
 <h4 align='center'><a href='https://twitter.com/aligatr'>Olivier Halligon</a></h4>
 </td>
+</tr>
+<tr>
+<td>
+<img src='https://github.com/DanToml.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/DanToml'>Danielle Tomlinson</a></h4>
+</td>
 <td>
 <img src='https://github.com/taquitos.png?size=200' width=140>
 <h4 align='center'><a href='https://twitter.com/taquitos'>Joshua Liebowitz</a></h4>
+</td>
+<td>
+<img src='https://github.com/matthewellis.png?size=200' width=140>
+<h4 align='center'><a href='https://twitter.com/mellis1995'>Matthew Ellis</a></h4>
 </td>
 </table>
 
