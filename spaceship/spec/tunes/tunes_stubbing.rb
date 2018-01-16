@@ -159,11 +159,11 @@ class TunesStubbing
       # stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/812106519/submit/summary").
       #     to_return(status: 200, body: itc_read_fixture_file('app_submission/complete_failed.json'), headers: { 'Content-Type' => 'application/json' })
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/812106519/submit/summary").
-        to_return(status: 200, body: "", headers: {})
+        to_return(status: 200, body: itc_read_fixture_file('app_submission/start_success.json'), headers: { 'Content-Type' => 'application/json' })
 
       # Reject app submission
       stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/812106519/reject").
-        to_return(status: 200, body: "", headers: {})
+        to_return(status: 200, body: "", headers: { 'Content-Type' => 'application/json' })
 
       # Complete app submission
       stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/812106519/submit/complete").

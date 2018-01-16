@@ -1007,6 +1007,7 @@ module Spaceship
         if reject_if_waiting_for_review
           reject_app_submission(app_id, version)
           send_app_submission(app_id, version, data)
+          return
         else
           raise ITunesConnectError.new, r.body['messages']["error"].first
         end
