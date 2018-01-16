@@ -41,7 +41,7 @@ module Fastlane
       }
 
       selected = UI.select("What would you like to use fastlane for?", options.keys)
-      method_to_use = options[selected]
+      @method_to_use = options[selected]
 
       # we want to first ask the user of what they want to do
       # to make them already excited about all the things they can do with fastlane
@@ -49,11 +49,11 @@ module Fastlane
       choose_swift
 
       begin
-        self.send(method_to_use)
+        self.send(@method_to_use)
       rescue => ex
         # If it's already manual, and it has failed
         # we need to re-raise the exception, as something definitely is wrong
-        raise ex if method_to_use == :ios_manual
+        raise ex if @method_to_use == :ios_manual
 
         # If we're here, that means something else failed. We now show the
         # error message and fallback to `:ios_manual`
@@ -74,7 +74,7 @@ module Fastlane
         if UI.confirm("Would you like to fallback to a manual Fastfile?")
           self.ios_manual
         else
-          self.send(method_to_use)
+          self.send(@method_to_use)
         end
         # the second time, we're just failing, and don't use a `begin` `rescue` block any more
       end
@@ -419,7 +419,7 @@ module Fastlane
         self.appfile_content.gsub!("[[APPLE_ID]]", self.user)
       end
 
-      if !self.automatic_versioning_enabled && method_to_use != :ios_manual
+      if !self.automatic_versioning_enabled && @method_to_use != :ios_manual
         self.show_information_about_version_bumps
       end
 
