@@ -186,7 +186,7 @@ module Fastlane
     end
 
     def gemfile_path
-      gemfile_path = "Gemfile" # TODO: use bundler class
+      gemfile_path = "Gemfile"
     end
 
     # Gemfile related code:
