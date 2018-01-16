@@ -1,3 +1,5 @@
+require_relative 'base'
+
 module Spaceship::TestFlight
   class Group < Base
     attr_accessor :id
@@ -20,6 +22,13 @@ module Spaceship::TestFlight
       'active' => :is_active,
       'created' => :created
     })
+
+    def self.create!(app_id: nil, group_name: nil)
+      group = self.find(app_id: app_id, group_name: group_name)
+      return group unless group.nil?
+      data = client.create_group_for_app(app_id: app_id, group_name: group_name)
+      self.new(data)
+    end
 
     def self.all(app_id: nil)
       groups = client.get_groups(app_id: app_id)

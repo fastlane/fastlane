@@ -22,10 +22,10 @@ describe Spaceship::Tunes::PricingTier do
     it "correctly parses the pricing tiers" do
       tier_1 = client.pricing_tiers[1]
 
-      expect(tier_1).not_to be_nil
+      expect(tier_1).not_to(be_nil)
       expect(tier_1.tier_stem).to eq('1')
       expect(tier_1.tier_name).to eq('Tier 1')
-      expect(tier_1.pricing_info).not_to be_empty
+      expect(tier_1.pricing_info).not_to(be_empty)
     end
 
     it "correctly parses the pricing information" do

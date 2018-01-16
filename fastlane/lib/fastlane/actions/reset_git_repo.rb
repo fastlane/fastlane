@@ -79,7 +79,7 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass an array only") unless value.kind_of? Array
+                                         UI.user_error!("Please pass an array only") unless value.kind_of?(Array)
                                        end),
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_RESET_GIT_FORCE",

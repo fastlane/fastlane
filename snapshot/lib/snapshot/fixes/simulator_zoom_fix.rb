@@ -1,3 +1,5 @@
+require_relative '../module'
+
 module Snapshot
   module Fixes
     # This fix is needed due to a bug in UI Tests that creates invalid screenshots when the
@@ -7,7 +9,7 @@ module Snapshot
 
     class SimulatorZoomFix
       def self.patch
-        UI.message "Patching simulators '#{config_path}' to scale to 100%"
+        UI.message("Patching simulators '#{config_path}' to scale to 100%")
 
         FastlaneCore::DeviceManager.simulators.each do |simulator|
           simulator_name = simulator.name.tr("\s", "-")

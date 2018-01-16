@@ -1,5 +1,7 @@
 require 'zip'
-require "fastlane_core/core_ext/cfpropertylist"
+
+require_relative 'core_ext/cfpropertylist'
+require_relative 'ui/ui'
 
 module FastlaneCore
   class IpaFileAnalyser
@@ -45,7 +47,7 @@ module FastlaneCore
           # The XML file has to be properly unpacked first
           tmp_path = File.join(tmp, "Info.plist")
           File.open(tmp_path, 'wb') do |output|
-            output.write zipfile.read(file)
+            output.write(zipfile.read(file))
           end
           result = CFPropertyList.native_types(CFPropertyList::List.new(file: tmp_path).value)
 

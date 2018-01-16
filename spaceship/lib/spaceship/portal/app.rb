@@ -1,3 +1,6 @@
+require_relative 'portal_base'
+require_relative 'app_group'
+
 module Spaceship
   module Portal
     # Represents an App ID from the Developer Portal

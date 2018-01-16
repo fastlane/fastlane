@@ -1,5 +1,7 @@
-require "fastlane_core"
-require "credentials_manager"
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
+
+require_relative 'module'
 
 module Pilot
   class Options
@@ -27,7 +29,7 @@ module Pilot
                                      optional: true,
                                      default_value: 'ios',
                                      verify_block: proc do |value|
-                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include? value
+                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :ipa,
                                      short_option: "-i",
@@ -38,8 +40,8 @@ module Pilot
                                      default_value: Dir["*.ipa"].sort_by { |x| File.mtime(x) }.last,
                                      verify_block: proc do |value|
                                        value = File.expand_path(value)
-                                       UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist? value
-                                       UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with? ".ipa"
+                                       UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with?(".ipa")
                                      end),
         FastlaneCore::ConfigItem.new(key: :changelog,
                                      short_option: "-w",
@@ -103,7 +105,7 @@ module Pilot
                                      description: "The tester's email",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       UI.user_error!("Please pass a valid email address") unless value.include? "@"
+                                       UI.user_error!("Please pass a valid email address") unless value.include?("@")
                                      end),
         FastlaneCore::ConfigItem.new(key: :testers_file_path,
                                      short_option: "-c",

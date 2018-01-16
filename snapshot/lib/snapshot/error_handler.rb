@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Snapshot
   class ErrorHandler
     class << self
@@ -12,7 +14,7 @@ module Snapshot
 
         case output
         when /com\.apple\.CoreSimulator\.SimError/
-          UI.important "The simulator failed to launch - retrying..."
+          UI.important("The simulator failed to launch - retrying...")
         when /is not configured for Running/
           UI.user_error!("Scheme is not properly configured, make sure to check out the snapshot README")
         end

@@ -368,11 +368,19 @@ func artifactory(file: String,
 func automaticCodeSigning(path: String,
                           useAutomaticSigning: Bool = false,
                           teamId: String? = nil,
-                          targets: [String]? = nil) {
+                          targets: [String]? = nil,
+                          codeSignIdentity: String? = nil,
+                          profileName: String? = nil,
+                          profileUuid: String? = nil,
+                          bundleIdentifier: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "automatic_code_signing", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
                                                                                                         RubyCommand.Argument(name: "use_automatic_signing", value: useAutomaticSigning),
                                                                                                         RubyCommand.Argument(name: "team_id", value: teamId),
-                                                                                                        RubyCommand.Argument(name: "targets", value: targets)])
+                                                                                                        RubyCommand.Argument(name: "targets", value: targets),
+                                                                                                        RubyCommand.Argument(name: "code_sign_identity", value: codeSignIdentity),
+                                                                                                        RubyCommand.Argument(name: "profile_name", value: profileName),
+                                                                                                        RubyCommand.Argument(name: "profile_uuid", value: profileUuid),
+                                                                                                        RubyCommand.Argument(name: "bundle_identifier", value: bundleIdentifier)])
   _ = runner.executeCommand(command)
 }
 func backupFile(path: String) {
@@ -701,6 +709,7 @@ func captureIosScreenshots(workspace: String? = nil,
                            addVideos: [String]? = nil,
                            buildlogPath: String = "~/Library/Logs/snapshot",
                            clean: Bool = false,
+                           testWithoutBuilding: Bool? = nil,
                            configuration: String? = nil,
                            xcprettyArgs: String? = nil,
                            sdk: String? = nil,
@@ -731,6 +740,7 @@ func captureIosScreenshots(workspace: String? = nil,
                                                                                                          RubyCommand.Argument(name: "add_videos", value: addVideos),
                                                                                                          RubyCommand.Argument(name: "buildlog_path", value: buildlogPath),
                                                                                                          RubyCommand.Argument(name: "clean", value: clean),
+                                                                                                         RubyCommand.Argument(name: "test_without_building", value: testWithoutBuilding),
                                                                                                          RubyCommand.Argument(name: "configuration", value: configuration),
                                                                                                          RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                                          RubyCommand.Argument(name: "sdk", value: sdk),
@@ -763,6 +773,7 @@ func captureScreenshots(workspace: String? = nil,
                         addVideos: [String]? = nil,
                         buildlogPath: String = "~/Library/Logs/snapshot",
                         clean: Bool = false,
+                        testWithoutBuilding: Bool? = nil,
                         configuration: String? = nil,
                         xcprettyArgs: String? = nil,
                         sdk: String? = nil,
@@ -793,6 +804,7 @@ func captureScreenshots(workspace: String? = nil,
                                                                                                      RubyCommand.Argument(name: "add_videos", value: addVideos),
                                                                                                      RubyCommand.Argument(name: "buildlog_path", value: buildlogPath),
                                                                                                      RubyCommand.Argument(name: "clean", value: clean),
+                                                                                                     RubyCommand.Argument(name: "test_without_building", value: testWithoutBuilding),
                                                                                                      RubyCommand.Argument(name: "configuration", value: configuration),
                                                                                                      RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                                      RubyCommand.Argument(name: "sdk", value: sdk),
@@ -820,7 +832,8 @@ func carthage(command: String = "bootstrap",
               output: String? = nil,
               configuration: String? = nil,
               toolchain: String? = nil,
-              projectDirectory: String? = nil) {
+              projectDirectory: String? = nil,
+              newResolver: Bool? = nil) {
   let command = RubyCommand(commandID: "", methodName: "carthage", className: nil, args: [RubyCommand.Argument(name: "command", value: command),
                                                                                           RubyCommand.Argument(name: "dependencies", value: dependencies),
                                                                                           RubyCommand.Argument(name: "use_ssh", value: useSsh),
@@ -836,7 +849,8 @@ func carthage(command: String = "bootstrap",
                                                                                           RubyCommand.Argument(name: "output", value: output),
                                                                                           RubyCommand.Argument(name: "configuration", value: configuration),
                                                                                           RubyCommand.Argument(name: "toolchain", value: toolchain),
-                                                                                          RubyCommand.Argument(name: "project_directory", value: projectDirectory)])
+                                                                                          RubyCommand.Argument(name: "project_directory", value: projectDirectory),
+                                                                                          RubyCommand.Argument(name: "new_resolver", value: newResolver)])
   _ = runner.executeCommand(command)
 }
 func cert(development: Bool = false,
@@ -1362,6 +1376,7 @@ func frameScreenshots(white: String? = nil,
                       forceDeviceType: String? = nil,
                       useLegacyIphone5s: Bool = false,
                       useLegacyIphone6s: Bool = false,
+                      forceOrientationBlock: String? = nil,
                       path: String = "./") {
   let command = RubyCommand(commandID: "", methodName: "frame_screenshots", className: nil, args: [RubyCommand.Argument(name: "white", value: white),
                                                                                                    RubyCommand.Argument(name: "silver", value: silver),
@@ -1370,6 +1385,7 @@ func frameScreenshots(white: String? = nil,
                                                                                                    RubyCommand.Argument(name: "force_device_type", value: forceDeviceType),
                                                                                                    RubyCommand.Argument(name: "use_legacy_iphone5s", value: useLegacyIphone5s),
                                                                                                    RubyCommand.Argument(name: "use_legacy_iphone6s", value: useLegacyIphone6s),
+                                                                                                   RubyCommand.Argument(name: "force_orientation_block", value: forceOrientationBlock),
                                                                                                    RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
 }
@@ -1380,6 +1396,7 @@ func frameit(white: String? = nil,
              forceDeviceType: String? = nil,
              useLegacyIphone5s: Bool = false,
              useLegacyIphone6s: Bool = false,
+             forceOrientationBlock: String? = nil,
              path: String = "./") {
   let command = RubyCommand(commandID: "", methodName: "frameit", className: nil, args: [RubyCommand.Argument(name: "white", value: white),
                                                                                          RubyCommand.Argument(name: "silver", value: silver),
@@ -1388,6 +1405,7 @@ func frameit(white: String? = nil,
                                                                                          RubyCommand.Argument(name: "force_device_type", value: forceDeviceType),
                                                                                          RubyCommand.Argument(name: "use_legacy_iphone5s", value: useLegacyIphone5s),
                                                                                          RubyCommand.Argument(name: "use_legacy_iphone6s", value: useLegacyIphone6s),
+                                                                                         RubyCommand.Argument(name: "force_orientation_block", value: forceOrientationBlock),
                                                                                          RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
 }
@@ -1395,8 +1413,10 @@ func gcovr() {
   let command = RubyCommand(commandID: "", methodName: "gcovr", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
-@discardableResult func getBuildNumber(xcodeproj: String? = nil) -> String {
-  let command = RubyCommand(commandID: "", methodName: "get_build_number", className: nil, args: [RubyCommand.Argument(name: "xcodeproj", value: xcodeproj)])
+@discardableResult func getBuildNumber(xcodeproj: String? = nil,
+                                       hideErrorWhenVersioningDisabled: Bool = false) -> String {
+  let command = RubyCommand(commandID: "", methodName: "get_build_number", className: nil, args: [RubyCommand.Argument(name: "xcodeproj", value: xcodeproj),
+                                                                                                  RubyCommand.Argument(name: "hide_error_when_versioning_disabled", value: hideErrorWhenVersioningDisabled)])
   return runner.executeCommand(command)
 }
 func getBuildNumberRepository(useHgRevisionNumber: Bool = false) {
@@ -2965,6 +2985,7 @@ func snapshot(workspace: String? = snapshotfile.workspace,
               addVideos: [String]? = snapshotfile.addVideos,
               buildlogPath: String = snapshotfile.buildlogPath,
               clean: Bool = snapshotfile.clean,
+              testWithoutBuilding: Bool? = snapshotfile.testWithoutBuilding,
               configuration: String? = snapshotfile.configuration,
               xcprettyArgs: String? = snapshotfile.xcprettyArgs,
               sdk: String? = snapshotfile.sdk,
@@ -2995,6 +3016,7 @@ func snapshot(workspace: String? = snapshotfile.workspace,
                                                                                           RubyCommand.Argument(name: "add_videos", value: addVideos),
                                                                                           RubyCommand.Argument(name: "buildlog_path", value: buildlogPath),
                                                                                           RubyCommand.Argument(name: "clean", value: clean),
+                                                                                          RubyCommand.Argument(name: "test_without_building", value: testWithoutBuilding),
                                                                                           RubyCommand.Argument(name: "configuration", value: configuration),
                                                                                           RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                           RubyCommand.Argument(name: "sdk", value: sdk),
@@ -3045,6 +3067,18 @@ func splunkmint(dsym: String? = nil,
                                                                                             RubyCommand.Argument(name: "proxy_password", value: proxyPassword),
                                                                                             RubyCommand.Argument(name: "proxy_address", value: proxyAddress),
                                                                                             RubyCommand.Argument(name: "proxy_port", value: proxyPort)])
+  _ = runner.executeCommand(command)
+}
+func spm(command: String = "build",
+         buildPath: String? = nil,
+         packagePath: String? = nil,
+         configuration: String? = nil,
+         verbose: Bool = false) {
+  let command = RubyCommand(commandID: "", methodName: "spm", className: nil, args: [RubyCommand.Argument(name: "command", value: command),
+                                                                                     RubyCommand.Argument(name: "build_path", value: buildPath),
+                                                                                     RubyCommand.Argument(name: "package_path", value: packagePath),
+                                                                                     RubyCommand.Argument(name: "configuration", value: configuration),
+                                                                                     RubyCommand.Argument(name: "verbose", value: verbose)])
   _ = runner.executeCommand(command)
 }
 func ssh(username: String,
@@ -3743,7 +3777,6 @@ let precheckfile: Precheckfile = Precheckfile()
 let scanfile: Scanfile = Scanfile()
 let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
-
 // Please don't remove the lines below
 // They are used to detect outdated files
 // FastlaneRunnerAPIVersion [0.9.1]

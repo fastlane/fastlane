@@ -24,6 +24,7 @@ module Fastlane
     # @yieldparam [Process::Status] status A Process::Status indicating the status of the completed command
     # @yieldparam [String] result The complete output to stdout and stderr of the completed command
     # @yieldparam [String] cmd A shell command equivalent to the arguments passed
+    # rubocop: disable Metrics/PerceivedComplexity
     def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil)
       print_command = print_command_output = true if $troubleshoot
       # Set the encoding first, the user might have set it wrong
@@ -31,13 +32,17 @@ module Fastlane
       Encoding.default_external = Encoding::UTF_8
       Encoding.default_internal = Encoding::UTF_8
 
+      # Workaround to support previous Fastlane syntax.
+      # This has some limitations. For example, it requires the caller to shell escape
+      # everything because of usages like ["ls -la", "/tmp"] instead of ["ls", "-la", "/tmp"].
+      command = [command.first.join(" ")] if command.length == 1 && command.first.kind_of?(Array)
+
       shell_command = shell_command_from_args(*command)
       UI.command(shell_command) if print_command
 
       result = ''
       exit_status = nil
       if Helper.sh_enabled?
-
         # The argument list is passed directly to Open3.popen2e, which
         # handles the variadic argument list in the same way as Kernel#spawn.
         # (http://ruby-doc.org/core-2.4.2/Kernel.html#method-i-spawn) or
@@ -83,7 +88,7 @@ module Fastlane
         # Avoid yielding nil in tests. $? will be meaningless, but calls to
         # it will not crash. There is no Process::Status.new. The alternative
         # is to move this inside the sh_enabled? check and not yield in tests.
-        return yield exit_status || $?, result, shell_command
+        return yield(exit_status || $?, result, shell_command)
       end
       result
     rescue => ex
@@ -92,6 +97,7 @@ module Fastlane
       Encoding.default_external = previous_encoding.first
       Encoding.default_internal = previous_encoding.last
     end
+    # rubocop: enable Metrics/PerceivedComplexity
 
     # Used to produce a shell command string from a list of arguments that may
     # be passed to methods such as Kernel#system, Kernel#spawn and Open3.popen2e
@@ -115,7 +121,7 @@ module Fastlane
       # Support [ "/usr/local/bin/foo", "foo" ], "-x", ...
       if args.first.kind_of?(Array)
         command += args.shift.first.shellescape + " " + args.shelljoin
-        command.chomp! " "
+        command.chomp!(" ")
       elsif args.count == 1 && args.first.kind_of?(String)
         command += args.first
       else

@@ -1,5 +1,9 @@
 require "digest/md5"
 
+require_relative 'globals'
+require_relative 'ui/ui'
+require_relative 'module'
+
 module FastlaneCore
   # Builds a package for the binary ready to be uploaded with the iTunes Transporter
   class IpaUploadPackageBuilder
@@ -9,8 +13,8 @@ module FastlaneCore
 
     def generate(app_id: nil, ipa_path: nil, package_path: nil, platform: nil)
       self.package_path = File.join(package_path, "#{app_id}.itmsp")
-      FileUtils.rm_rf self.package_path if File.directory?(self.package_path)
-      FileUtils.mkdir_p self.package_path
+      FileUtils.rm_rf(self.package_path) if File.directory?(self.package_path)
+      FileUtils.mkdir_p(self.package_path)
 
       ipa_path = copy_ipa(ipa_path)
       @data = {

@@ -79,7 +79,7 @@ module Fastlane
         # check if the files changed are the ones we expected to change (these should be only the files that have version info in them)
         dirty_set = Set.new(hg_dirty_files.map(&:downcase))
         expected_set = Set.new(expected_changed_files.map(&:downcase))
-        changed_files_as_expected = dirty_set.subset? expected_set
+        changed_files_as_expected = dirty_set.subset?(expected_set)
         unless changed_files_as_expected
           unless params[:force]
             str = ["Found unexpected uncommitted changes in the working directory. Expected these files to have changed:",
@@ -120,7 +120,7 @@ module Fastlane
                                        description: "The path to your project file (Not the workspace). If you have only one, this is optional",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
+                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
                                          UI.user_error!("Could not find Xcode project") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :force,

@@ -32,14 +32,12 @@ module Fastlane
           UI.user_error!("Failed to run Appium spec. status code: #{status}")
         end
       ensure
-        Actions.sh "kill #{appium_pid}" if appium_pid
+        Actions.sh("kill #{appium_pid}") if appium_pid
       end
 
       def self.invoke_appium_server(params)
         appium = detect_appium(params)
-        fork do
-          Process.exec("#{appium} -a #{params[:host]} -p #{params[:port]}")
-        end
+        Process.spawn("#{appium} -a #{params[:host]} -p #{params[:port]}")
       end
 
       def self.detect_appium(params)
@@ -72,7 +70,7 @@ module Fastlane
           if count * 5 > INVOKE_TIMEOUT
             UI.user_error!("Invoke Appium server timed out")
           end
-          sleep 5
+          sleep(5)
         end
       end
 

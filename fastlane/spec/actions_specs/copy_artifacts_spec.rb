@@ -85,7 +85,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             copy_artifacts(artifacts: '/tmp/fastlane/not_going_to_be_there', target_path: '/tmp/fastlane2', fail_on_missing: true)
           end").runner.execute(:test)
-        end.to raise_error "Not all files were present in copy artifacts. Missing /tmp/fastlane/not_going_to_be_there"
+        end.to raise_error("Not all files were present in copy artifacts. Missing /tmp/fastlane/not_going_to_be_there")
 
         expect(File.exist?('/tmp/fastlane2/not_going_to_be_there')).to eq(false)
       end

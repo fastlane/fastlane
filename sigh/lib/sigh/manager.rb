@@ -1,5 +1,6 @@
-require 'plist'
-require 'sigh/runner'
+require 'fastlane_core/provisioning_profile'
+
+require_relative 'runner'
 
 module Sigh
   class Manager
@@ -24,7 +25,7 @@ module Sigh
 
       install_profile(output) unless Sigh.config[:skip_install]
 
-      puts output.green
+      puts(output.green)
 
       return File.expand_path(output)
     end

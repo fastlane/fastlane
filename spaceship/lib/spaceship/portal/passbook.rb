@@ -1,3 +1,5 @@
+require_relative 'portal_base'
+
 module Spaceship
   module Portal
     # Represents an Passbook ID from the Developer Portal

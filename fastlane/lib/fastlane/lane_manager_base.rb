@@ -7,7 +7,7 @@ module Fastlane
     end
 
     # All the finishing up that needs to be done
-    def self.finish_fastlane(ff, duration, error)
+    def self.finish_fastlane(ff, duration, error, skip_message: false)
       # Sometimes we don't have a fastfile because we're using Fastfile.swift
       unless ff.nil?
         ff.runner.did_finish
@@ -20,12 +20,12 @@ module Fastlane
       Fastlane::PluginUpdateManager.show_update_status
 
       if error
-        UI.error 'fastlane finished with errors'
+        UI.error('fastlane finished with errors') unless skip_message
         raise error
       elsif duration > 5
-        UI.success "fastlane.tools just saved you #{duration} minutes! 🎉"
+        UI.success("fastlane.tools just saved you #{duration} minutes! 🎉") unless skip_message
       else
-        UI.success 'fastlane.tools finished successfully 🎉'
+        UI.success('fastlane.tools finished successfully 🎉') unless skip_message
       end
     end
 
@@ -46,13 +46,13 @@ module Fastlane
         rows << [index, name, current[:time].to_i]
       end
 
-      puts ""
-      puts Terminal::Table.new(
-        title: "fastlane summary".green,
-        headings: ["Step", "Action", "Time (in s)"],
-        rows: FastlaneCore::PrintTable.transform_output(rows)
-      )
-      puts ""
+      puts("")
+      puts(Terminal::Table.new(
+             title: "fastlane summary".green,
+             headings: ["Step", "Action", "Time (in s)"],
+             rows: FastlaneCore::PrintTable.transform_output(rows)
+      ))
+      puts("")
     end
 
     # @param env_cl_param [String] an optional list of dotenv environment names separated by commas, without space
@@ -95,7 +95,7 @@ module Fastlane
       # Loads .env file for the environment(s) passed in through options
       envs.each do |env|
         env_file = File.join(base_path, ".env.#{env}")
-        UI.success "Loading from '#{env_file}'"
+        UI.success("Loading from '#{env_file}'")
         Dotenv.overload(env_file)
       end
     end
@@ -104,8 +104,8 @@ module Fastlane
       return if Actions.lane_context.empty?
 
       if FastlaneCore::Globals.verbose?
-        UI.important 'Lane Context:'.yellow
-        UI.message Actions.lane_context
+        UI.important('Lane Context:'.yellow)
+        UI.message(Actions.lane_context)
         return
       end
 
@@ -115,10 +115,10 @@ module Fastlane
       end
 
       require 'terminal-table'
-      puts Terminal::Table.new({
+      puts(Terminal::Table.new({
         title: "Lane Context".yellow,
         rows: FastlaneCore::PrintTable.transform_output(rows)
-      })
+      }))
     end
   end
 end

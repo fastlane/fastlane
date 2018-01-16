@@ -18,7 +18,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             clipboard 'Some Value!'
           end").runner.execute(:test)
-        end.to raise_error "You have to call the integration like `clipboard(key: \"value\")`. Run `fastlane action clipboard` for all available keys. Please check out the current documentation on GitHub."
+        end.to raise_error("You have to call the integration like `clipboard(key: \"value\")`. Run `fastlane action clipboard` for all available keys. Please check out the current documentation on GitHub.")
       end
     end
   end

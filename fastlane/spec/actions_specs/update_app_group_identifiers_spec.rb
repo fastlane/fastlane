@@ -1,9 +1,9 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Update Info Plist Integration" do
-      let (:test_path) { "/tmp/fastlane/tests/fastlane" }
-      let (:entitlements_path) { "com.test.entitlements" }
-      let (:new_app_group) { 'group.com.enterprise.test' }
+      let(:test_path) { "/tmp/fastlane/tests/fastlane" }
+      let(:entitlements_path) { "com.test.entitlements" }
+      let(:new_app_group) { 'group.com.enterprise.test' }
 
       before do
         # Set up example info.plist

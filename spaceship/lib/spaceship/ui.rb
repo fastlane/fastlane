@@ -1,4 +1,4 @@
-paths = Dir[File.expand_path "**/ui/*.rb", File.dirname(__FILE__)]
+paths = Dir[File.expand_path("**/ui/*.rb", File.dirname(__FILE__))]
 raise "Could not find UI classes to import" unless paths.count > 0
 paths.each do |file|
   require file
@@ -6,13 +6,6 @@ end
 
 module Spaceship
   class Client
-    # Public getter for all UI related code
-    # rubocop:disable Style/MethodName
-    def UI
-      UserInterface.new(self)
-    end
-    # rubocop:enable Style/MethodName
-
     # All User Interface related code lives in this class
     class UserInterface
       # Access the client this UserInterface object is for
@@ -23,5 +16,12 @@ module Spaceship
         @client = c
       end
     end
+
+    # Public getter for all UI related code
+    # rubocop:disable Naming/MethodName
+    def UI
+      UserInterface.new(self)
+    end
+    # rubocop:enable Naming/MethodName
   end
 end

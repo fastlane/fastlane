@@ -15,7 +15,7 @@ describe Spaceship::Tunes::IAPSubscriptionPricingTier do
 
     it "correctly creates all 200 subscription pricing tiers" do
       expect(subject).to all(be_an(Spaceship::Tunes::IAPSubscriptionPricingTier))
-      expect(subject.size).to eq 200
+      expect(subject.size).to eq(200)
     end
 
     describe "Subscription Pricing Tier Info" do

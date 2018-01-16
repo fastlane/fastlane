@@ -1,3 +1,6 @@
+require_relative '../client'
+require_relative 'utilities'
+
 module Spaceship
   # This class is used to upload Digital files (Images, Videos, JSON files) onto the du-itc service.
   # Its implementation is tied to the tunes module (in particular using +AppVersion+ instances)
@@ -45,7 +48,7 @@ module Spaceship
     def get_picture_type(upload_file)
       resolution = Utilities.resolution(upload_file.file_path)
       result = device_resolution_map.find do |key, resolutions|
-        resolutions.include? resolution
+        resolutions.include?(resolution)
       end
       raise "Unknown device for screen resolution #{resolution}" if result.nil?
 
@@ -70,7 +73,7 @@ module Spaceship
       end
 
       r = request(:post) do |req|
-        req.url "#{self.class.hostname}#{path}"
+        req.url("#{self.class.hostname}#{path}")
         req.body = upload_file.bytes
         req.headers['Accept'] = 'application/json, text/plain, */*'
         req.headers['Content-Type'] = upload_file.content_type
@@ -101,6 +104,7 @@ module Spaceship
         watch:        "MZPFT.SortedN27ScreenShot",
         ipad:         "MZPFT.SortedTabletScreenShot",
         ipadPro:      "MZPFT.SortedJ99ScreenShot",
+        ipad105:      "MZPFT.SortedJ207ScreenShot",
         iphone6:      "MZPFT.SortedN61ScreenShot",
         iphone6Plus:  "MZPFT.SortedN56ScreenShot",
         iphone58:     "MZPFT.SortedD22ScreenShot",
@@ -116,6 +120,7 @@ module Spaceship
       {
         ipad:         "MZPFT.SortedTabletMessagesScreenShot",
         ipadPro:      "MZPFT.SortedJ99MessagesScreenShot",
+        ipad105:      "MZPFT.SortedJ207MessagesScreenShot",
         iphone6:      "MZPFT.SortedN61MessagesScreenShot",
         iphone6Plus:  "MZPFT.SortedN56MessagesScreenShot",
         iphone58:     "MZPFT.SortedD22MessagesScreenShot",
@@ -129,6 +134,7 @@ module Spaceship
         watch:        [[312, 390]],
         ipad:         [[1024, 748], [1024, 768], [2048, 1496], [2048, 1536], [768, 1004], [768, 1024], [1536, 2008], [1536, 2048]],
         ipadPro:      [[2048, 2732], [2732, 2048]],
+        ipad105:      [[1668, 2224], [2224, 1668]],
         iphone6:      [[750, 1334], [1334, 750]],
         iphone6Plus:  [[1242, 2208], [2208, 1242]],
         iphone4:      [[640, 1096], [640, 1136], [1136, 600], [1136, 640]],
@@ -141,7 +147,7 @@ module Spaceship
     def screenshot_picture_type(device, is_messages)
       map = is_messages ? messages_picture_type_map : picture_type_map
       device = device.to_sym
-      raise "Unknown picture type for device: #{device}" unless map.key? device
+      raise "Unknown picture type for device: #{device}" unless map.key?(device)
       map[device]
     end
 

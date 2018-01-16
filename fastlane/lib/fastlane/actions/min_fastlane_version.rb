@@ -21,7 +21,7 @@ module Fastlane
       end
 
       def self.step_text
-        "Verifying required fastlane version"
+        "Verifying fastlane version"
       end
 
       def self.author
