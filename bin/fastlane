@@ -4,6 +4,17 @@ if RUBY_VERSION < '2.0.0'
   abort("fastlane requires Ruby 2.0.0 or higher")
 end
 
+# We recommend people use bundler together with a Gemfile
+# but we can't really force them. To make it easier for them
+# we don't want to tell every user to run every fastlane command
+# using `bundle exec`, so instead we'll try to load it for them
+require 'bundler'
+begin
+  Bundler.setup
+rescue => ex
+  # No Gemfile setup, no big deal
+end
+
 $LOAD_PATH.push(File.expand_path("../../lib", __FILE__))
 
 require "fastlane/cli_tools_distributor"
