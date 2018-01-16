@@ -27,7 +27,7 @@ end
 
 task(:generate_team_table) do
   require 'json'
-  content = ["<table>"]
+  content = ["<table id='team'>"]
 
   contributors = JSON.parse(File.read("team.json"))
   counter = 0
@@ -35,14 +35,19 @@ task(:generate_team_table) do
 
   contributors.keys.shuffle.each do |github_user|
     user_content = contributors[github_user]
+    github_user_name = user_content['name']
+    github_user_id = github_user_name.downcase.gsub(' ', '-')
+    github_profile_url = "https://github.com/#{github_user}"
 
     content << "<tr>" if counter % number_of_rows == 0
-    content << "<td>"
-    content << "<img src='https://github.com/#{github_user}.png?size=200' width=140>"
+    content << "<td id='#{github_user_id}'>"
+    content << "<a href='#{github_profile_url}'>"
+    content << "<img src='#{github_profile_url}.png?size=140'>"
+    content << "</a>"
     if user_content['twitter']
-      content << "<h4 align='center'><a href='https://twitter.com/#{user_content['twitter']}'>#{user_content['name']}</a></h4>"
+      content << "<h4 align='center'><a href='https://twitter.com/#{user_content['twitter']}'>#{github_user_name}</a></h4>"
     else
-      content << "<h4 align='center'>#{user_content['name']}</h4>"
+      content << "<h4 align='center'>#{github_user_name}</h4>"
     end
     # content << "<p align='center'>#{user_content['slogan']}</p>" if user_content['slogan'].to_s.length > 0
 
@@ -54,7 +59,7 @@ task(:generate_team_table) do
   content << "</table>"
 
   readme = File.read("README.md")
-  readme.gsub!(%r{\<table\>.*\<\/table\>}m, content.join("\n"))
+  readme.gsub!(%r{\<table id='team'\>.*\<\/table\>}m, content.join("\n"))
   File.write("README.md", readme)
   puts("All done")
 end
