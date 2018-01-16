@@ -34,7 +34,7 @@ module CredentialsManager
         Dir.chdir(File.expand_path('..', path)) do
           content = File.read(full_path)
 
-          # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
+          # From https://github.com/orta/danger/blob/master/lib/danger/danger_core/dangerfile.rb
           if content.tr!('“”‘’‛', %(""'''))
             puts("Your #{File.basename(path)} has had smart quotes sanitised. " \
                  'To avoid issues in the future, you should not use ' \
