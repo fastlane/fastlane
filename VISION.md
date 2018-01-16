@@ -20,22 +20,22 @@ With these challenges in mind, [_fastlane_ plugin system](https://fabric.io/blog
 
 Each _fastlane_ tool has a specific purpose and should be kept focused on the functionality required for that task.
 
-* [deliver](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata, and your app binary to the App Store
-* [supply](https://github.com/fastlane/fastlane/tree/master/supply): Upload your Android app and its metadata to Google Play
-* [snapshot](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS apps on every device
-* [screengrab](https://github.com/fastlane/fastlane/tree/master/screengrab): Automate taking localized screenshots of your Android app on every device
-* [frameit](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
-* [pem](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification certificates
-* [sigh](https://github.com/fastlane/fastlane/tree/master/sigh): Because you would rather spend your time building stuff than fighting provisioning
-* [produce](https://github.com/fastlane/fastlane/tree/master/produce): Create new iOS apps on iTunes Connect and Apple Developer Portal using the command line
-* [cert](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
+* [deliver](https://docs.fastlane.tools/actions/deliver/): Upload screenshots, metadata, and your app binary to the App Store
+* [supply](https://docs.fastlane.tools/actions/supply/): Upload your Android app and its metadata to Google Play
+* [snapshot](https://docs.fastlane.tools/actions/snapshot/): Automate taking localized screenshots of your iOS apps on every device
+* [screengrab](https://docs.fastlane.tools/actions/screengrab/): Automate taking localized screenshots of your Android app on every device
+* [frameit](https://docs.fastlane.tools/actions/frameit/): Quickly put your screenshots into the right device frames
+* [pem](https://docs.fastlane.tools/actions/pem/): Automatically generate and renew your push notification certificates
+* [sigh](https://docs.fastlane.tools/actions/sigh/): Because you would rather spend your time building stuff than fighting provisioning
+* [produce](https://docs.fastlane.tools/actions/produce/): Create new iOS apps on iTunes Connect and Apple Developer Portal using the command line
+* [cert](https://docs.fastlane.tools/actions/cert/): Automatically create and maintain iOS code signing certificates
 * [spaceship](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Developer Portal and iTunes Connect
-* [pilot](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
+* [pilot](https://docs.fastlane.tools/actions/pilot/): The best way to manage your TestFlight testers and builds from your terminal
 * [boarding](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
-* [gym](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
-* [match](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using Git
-* [scan](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
-* [precheck](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
+* [gym](https://docs.fastlane.tools/actions/gym/): Building your iOS apps has never been easier
+* [match](https://docs.fastlane.tools/actions/match/): Easily sync your certificates and profiles across your team using Git
+* [scan](https://docs.fastlane.tools/actions/scan/): The easiest way to run tests for your iOS and Mac apps
+* [precheck](https://docs.fastlane.tools/actions/precheck/): Check your app using a community driven set of App Store review rules to avoid being rejected
 
 ## _fastlane_’s Relationship with [Google](https://google.com) and [Fabric](https://get.fabric.io/)
 

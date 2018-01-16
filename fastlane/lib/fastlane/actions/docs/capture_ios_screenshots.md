@@ -153,7 +153,7 @@ Reinstall the app before running _snapshot_
 fastlane snapshot --reinstall_app --app_identifier "tools.fastlane.app"
 ```
 
-By default _snapshot_ automatically retries running UI Tests if they fail. This is due to randomly failing UI Tests (e.g. [#372](https://github.com/fastlane/snapshot/issues/372)). You can adapt this number using
+By default _snapshot_ automatically retries running UI Tests if they fail. This is due to randomly failing UI Tests (e.g. [#2517](https://github.com/fastlane/fastlane/issues/2517)). You can adapt this number using
 
 ```no-highlight
 fastlane snapshot --number_of_retries 3

@@ -50,8 +50,8 @@ From     | To              | Note
 
 Removed                   | Use instead
 --------------------------|------------------------------------------------------------
-`deliver testflight` | [pilot](https://github.com/fastlane/fastlane/tree/master/pilot)
-`testflight` | [pilot](https://github.com/fastlane/fastlane/tree/master/pilot)
+`deliver testflight` | [pilot](https://docs.fastlane.tools/actions/pilot/)
+`testflight` | [pilot](https://docs.fastlane.tools/actions/pilot/)
 
 **The following codes/values have been changed:**
 
@@ -70,10 +70,10 @@ App Categories | [Reference.md](https://docs.fastlane.tools/actions/deliver/#ref
 - Removed a lot of legacy code. Did you know `deliver` is now one year old? A lot of things have changed since then
 - Improved the selection of the newly uploaded build and waiting for processing to be finished, which is possible thanks to `spaceship`
 - Updating the app metadata and uploading of the screenshots now happen using `spaceship` instead of the iTunes Transporter, which means changes will immediately visible after running `deliver` :sparkles: 
-- Removed the `deliver beta` and `testflight` commands, as there is now a dedicated tool called [pilot](https://github.com/fastlane/fastlane/tree/master/pilot)
+- Removed the `deliver beta` and `testflight` commands, as there is now a dedicated tool called [pilot](https://docs.fastlane.tools/actions/pilot/)
 - All parameters are now in the config system, which means you can pass values using the `Deliverfile`, from within your `Fastfile` or as command line parameter
 <img width="500" alt="screenshot 2015-09-26 21 57 15" src="https://cloud.githubusercontent.com/assets/869950/10121297/c6ea1c7a-6499-11e5-8d2b-301f86faacf0.png">
 - The preview doesn't highlight changes with blue any more
-- Screenshot are uploaded every time. This is on the [next-tasks list](https://github.com/fastlane/deliver/issues/353)
+- Screenshot are uploaded every time. This is on the [next-tasks list](https://github.com/fastlane/fastlane/issues/2212)
 
 If you run into any issues with the new version of `deliver` please submit an issue on GitHub.

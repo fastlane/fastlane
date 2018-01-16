@@ -31,7 +31,7 @@ module FastlaneCore
       plist = self.fetch_info_plist_file(path)
       platform = "ios"
       platform = plist['DTPlatformName'] if plist
-      platform = "ios" if platform == "iphoneos" # via https://github.com/fastlane/spaceship/issues/247
+      platform = "ios" if platform == "iphoneos" # via https://github.com/fastlane/fastlane/issues/3484
       return platform
     end
 
