@@ -42,7 +42,7 @@ module Fastlane
         UI.message("")
 
         setup_ios = self.new
-        setup_ios.ensure_gemfile_valid!(update_gemfile_if_needed: false)
+        setup_ios.add_or_update_gemfile(update_gemfile_if_needed: false)
         setup_ios.suggest_next_steps
         return
       end
@@ -173,7 +173,7 @@ module Fastlane
 
       File.write(appfile_path, self.appfile_content)
 
-      gemfile_path = add_or_update_gemfile
+      add_or_update_gemfile(update_gemfile_if_needed: true)
 
       UI.header("✅  Successfully generated fastlane configuration")
       UI.message("Generated Fastfile at path `#{fastfile_path}`")
@@ -184,7 +184,6 @@ module Fastlane
       UI.message("This way everyone in your team can benefit from your fastlane setup")
       continue_with_enter
     end
-
 
     def gemfile_path
       gemfile_path = "Gemfile" # TODO: use bundler class
@@ -244,11 +243,13 @@ module Fastlane
     # This method is responsible for ensuring there is a working
     # Gemfile, and that `fastlane` is defined as a dependency
     # while also having `rubygems` as a gem source
-    def add_or_update_gemfile
+    def add_or_update_gemfile(update_gemfile_if_needed: false)
       if gemfile_exists?
-        ensure_gemfile_valid!(update_gemfile_if_needed: true)
+        ensure_gemfile_valid!(update_gemfile_if_needed: update_gemfile_if_needed)
       else
-        setup_gemfile!
+        if update_gemfile_if_needed || UI.confirm("It is recommended to run fastlane with a Gemfile set up, do you want fastlane to create one for you?")
+          setup_gemfile!
+        end
       end
       return gemfile_path
     end
