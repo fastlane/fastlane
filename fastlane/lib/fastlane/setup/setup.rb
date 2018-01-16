@@ -40,7 +40,10 @@ module Fastlane
         UI.important("------------------")
         UI.important("fastlane is already set up at path `#{FastlaneCore::FastlaneFolder.path}`, see the available lanes above")
         UI.message("")
-        self.new.suggest_next_steps
+
+        setup_ios = self.new
+        setup_ios.ensure_gemfile_valid!(update_gemfile_if_needed: false)
+        setup_ios.suggest_next_steps
         return
       end
 
@@ -201,6 +204,7 @@ module Fastlane
       gemfile_content << ""
       File.write(gemfile_path, gemfile_content.join("\n"))
 
+      UI.message("Installing dependencies for you...")
       FastlaneCore::CommandExecutor.execute(
         command: "bundle update",
         print_all: FastlaneCore::Globals.verbose?,
@@ -218,7 +222,10 @@ module Fastlane
       unless gemfile_content.include?("https://rubygems.org")
         UI.error("You have a local Gemfile, but RubyGems isn't defined as source")
         UI.error("Please update your Gemfile at path `#{gemfile_path}` to include")
+        UI.important("")
         UI.important("source \"https://rubygems.org\"")
+        UI.important("")
+        UI.error("Update your Gemfile, and run `bundle update` afterwards")
       end
 
       unless gemfile_content.include?("fastlane")
