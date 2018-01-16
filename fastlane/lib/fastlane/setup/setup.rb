@@ -182,47 +182,67 @@ module Fastlane
       continue_with_enter
     end
 
-    # This method is responsible for ensuring there is a working
-    # Gemfile, and that `fastlane` is defined as a dependency
-    # while also having `rubygems` as a gem source
-    def add_or_update_gemfile
+
+    def gemfile_path
       gemfile_path = "Gemfile" # TODO: use bundler class
+    end
 
-      if File.exist?(gemfile_path)
-        gemfile_content = File.read(gemfile_path)
-        unless gemfile_content.include?("https://rubygems.org")
-          UI.error("You have a local Gemfile, but RubyGems isn't defined as source")
-          UI.error("Please update your Gemfile at path `#{gemfile_path}` to include")
-          UI.important("source \"https://rubygems.org\"")
+    # Gemfile related code:
+    def gemfile_exists?
+      return File.exist?(gemfile_path)
+    end
+
+    def setup_gemfile!
+      # No Gemfile yet
+      gemfile_content = []
+      gemfile_content << "source \"https://rubygems.org\""
+      gemfile_content << ""
+      gemfile_content << 'gem "fastlane"'
+      gemfile_content << ""
+      File.write(gemfile_path, gemfile_content.join("\n"))
+
+      FastlaneCore::CommandExecutor.execute(
+        command: "bundle update",
+        print_all: FastlaneCore::Globals.verbose?,
+        print_command: true,
+        error: proc do |error_output|
+          UI.error("Something went wrong when running `bundle update` for you")
+          UI.error("Please take a look at your Gemfile at path `#{gemfile_path}`")
+          UI.error("and make sure you can run `bundle update` on your machine.")
         end
+      )
+    end
 
-        unless gemfile_content.include?("fastlane")
+    def ensure_gemfile_valid!(update_gemfile_if_needed: false)
+      gemfile_content = File.read(gemfile_path)
+      unless gemfile_content.include?("https://rubygems.org")
+        UI.error("You have a local Gemfile, but RubyGems isn't defined as source")
+        UI.error("Please update your Gemfile at path `#{gemfile_path}` to include")
+        UI.important("source \"https://rubygems.org\"")
+      end
+
+      unless gemfile_content.include?("fastlane")
+        if update_gemfile_if_needed
           gemfile_content << "\n\ngem \"fastlane\""
           UI.message("Adding `fastlane` to your existing Gemfile at path '#{gemfile_path}'")
 
           File.write(gemfile_path, gemfile_content)
+        else
+          UI.error("You have a local Gemfile, but it doesn't include \"fastlane\" as a dependency")
+          UI.error("Please add `gem \"fastlane\"` to your Gemfile")
         end
-      else
-        # No Gemfile yet
-        gemfile_content = []
-        gemfile_content << "source \"https://rubygems.org\""
-        gemfile_content << ""
-        gemfile_content << 'gem "fastlane"'
-        gemfile_content << ""
-        File.write(gemfile_path, gemfile_content.join("\n"))
-
-        FastlaneCore::CommandExecutor.execute(
-          command: "bundle update",
-          print_all: FastlaneCore::Globals.verbose?,
-          print_command: true,
-          error: proc do |error_output|
-            UI.error("Something went wrong when running `bundle update` for you")
-            UI.error("Please take a look at your Gemfile at path `#{gemfile_path}`")
-            UI.error("and make sure you can run `bundle update` on your machine.")
-          end
-        )
       end
+    end
 
+    # This method is responsible for ensuring there is a working
+    # Gemfile, and that `fastlane` is defined as a dependency
+    # while also having `rubygems` as a gem source
+    def add_or_update_gemfile
+      if gemfile_exists?
+        ensure_gemfile_valid!(update_gemfile_if_needed: true)
+      else
+        setup_gemfile!
+      end
       return gemfile_path
     end
 
