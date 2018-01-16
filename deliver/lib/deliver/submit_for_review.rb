@@ -27,7 +27,7 @@ module Deliver
       if options[:reject_if_waiting_for_review]
         submission.complete!(options[:reject_if_waiting_for_review])
       else
-        submission.complete!(false)
+        submission.complete!
       end
 
       UI.success("Successfully submitted the app for review!")
