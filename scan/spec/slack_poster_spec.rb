@@ -84,8 +84,7 @@ describe Scan::SlackPoster do
       fake_notifier = "fake_notifier"
       fake_result = "fake_result"
       expect(Slack::Notifier).to receive(:new).and_return(fake_notifier)
-      expect(fake_notifier).to receive(:username=)
-      expect(fake_notifier).to receive(:ping).and_return(fake_result)
+      expect(fake_notifier).to receive(:ping).and_return([fake_result])
       expect(fake_result).to receive(:code).and_return(200)
     end
 
