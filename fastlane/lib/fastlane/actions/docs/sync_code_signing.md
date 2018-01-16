@@ -56,7 +56,7 @@ Before starting to use _match_, make sure to read the [codesigning.guide](https:
 💥  | Easily reset your existing profiles and certificates if your current account has expired or invalid profiles
 ♻️  | Automatically renew your provisioning profiles to include all your devices using the `--force` option
 👥  | Support for multiple Apple accounts and multiple teams
-✨ | Tightly integrated with [fastlane](https://fastlane.tools) to work seamlessly with [gym](https://docs.fastlane.tools/actions/gym) and other build tools
+✨ | Tightly integrated with [fastlane](https://fastlane.tools) to work seamlessly with [gym](https://docs.fastlane.tools/actions/gym/) and other build tools
 
 For more information about the concept, visit [codesigning.guide](https://codesigning.guide).
 
