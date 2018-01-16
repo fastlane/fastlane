@@ -1034,7 +1034,7 @@ module Spaceship
       raise "app_id is required" unless app_id
 
       r = request(:post) do |req|
-        req.url "ra/apps/#{app_id}/versions/#{version}/reject"
+        req.url("ra/apps/#{app_id}/versions/#{version}/reject")
         req.headers['Content-Type'] = 'application/json'
       end
 
