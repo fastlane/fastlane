@@ -186,7 +186,7 @@ module Fastlane
     end
 
     def gemfile_path
-      gemfile_path = "Gemfile"
+      "Gemfile"
     end
 
     # Gemfile related code:
