@@ -146,6 +146,8 @@ If the above doesn't help, please [submit an issue](https://github.com/fastlane/
 </td>
 </table>
 
+Special thanks to all [contributors](https://github.com/fastlane/fastlane/graphs/contributors) for extending and improving _fastlane_.
+
 ## Contribute to _fastlane_
 
 Check out [CONTRIBUTING.md](CONTRIBUTING.md) for more information on how to help with _fastlane_.
