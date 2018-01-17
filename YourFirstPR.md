@@ -63,10 +63,10 @@ bundle exec rspec [tool_name]
 If you know exactly which `_spec.rb` file you want to run, use
 
 ```
-bundle exec rspec .\fastlane\spec\fastlane_require_spec.rb
+bundle exec rspec ./fastlane/spec/fastlane_require_spec.rb
 ```
 
-(replace `.\fastlane\spec\fastlane_require_spec.rb` with the path of your test file of course)
+(replace `./fastlane/spec/fastlane_require_spec.rb` with the path of your test file of course)
 
 ### Code style
 
