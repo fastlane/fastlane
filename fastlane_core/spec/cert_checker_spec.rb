@@ -35,12 +35,12 @@ describe FastlaneCore do
         `ls`
 
         cmd = %r{curl -f -o (/.+?) https://developer\.apple\.com/certificationauthority/AppleWWDRCA.cer && security import \1 -k keychain\\ with\\ spaces\.keychain}
+        require "open3"
 
-        expect(FastlaneCore::Helper).to receive(:backticks).with(cmd, { print: nil }).and_return("")
+        expect(Open3).to receive(:capture3).with(cmd).and_return("")
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
-        expect($?).to receive(:success?).and_return(true)
 
-        FastlaneCore::CertChecker.install_wwdr_certificate
+        expect(FastlaneCore::CertChecker.install_wwdr_certificate).to be(true)
       end
     end
   end
