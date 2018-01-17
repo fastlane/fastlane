@@ -232,7 +232,7 @@ _gym_ makes use of the new Xcode 7 API which allows us to specify the export opt
 
 Using this method there are no workarounds for WatchKit or Swift required, as it uses the same technique Xcode uses when exporting your binary.
 
-Note: the [xcbuild-safe.sh script](https://github.com/fastlane/fastlane/tree/master/gym/lib/img/actions/wrap_xcodebuild/xcbuild-safe.sh) wraps around xcodebuild to workaround some incompatibilities.
+Note: the [xcbuild-safe.sh script](https://github.com/fastlane/fastlane/blob/master/gym/lib/assets/wrap_xcodebuild/xcbuild-safe.sh) wraps around xcodebuild to workaround some incompatibilities.
 
 ## Use the 'Provisioning Quicklook plugin'
 Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).

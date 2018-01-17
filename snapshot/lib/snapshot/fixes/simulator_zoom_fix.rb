@@ -4,7 +4,7 @@ module Snapshot
   module Fixes
     # This fix is needed due to a bug in UI Tests that creates invalid screenshots when the
     # simulator is not scaled to a 100%
-    # Issue: https://github.com/fastlane/snapshot/issues/249
+    # Issue: https://github.com/fastlane/fastlane/issues/2578
     # Radar: https://openradar.appspot.com/radar?id=6127019184095232
 
     class SimulatorZoomFix

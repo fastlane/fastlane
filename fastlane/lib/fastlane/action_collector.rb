@@ -19,7 +19,7 @@ module Fastlane
     end
 
     def show_message
-      UI.message("Sending Crash/Success information. Learn more at https://github.com/fastlane/fastlane#metrics")
+      UI.message("Sending Crash/Success information. Learn more at https://docs.fastlane.tools/#metrics")
       UI.message("No personal/sensitive data is sent. Only sharing the following:")
       UI.message(launches)
       UI.message(@error) if @error

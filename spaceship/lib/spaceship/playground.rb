@@ -63,7 +63,7 @@ module Spaceship
       binding.pry(quiet: true)
       # rubocop:enable Lint/Debugger
 
-      puts("") # Fixes https://github.com/fastlane/spaceship/issues/203
+      puts("") # Fixes https://github.com/fastlane/fastlane/issues/3493
     end
 
     def docs

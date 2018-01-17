@@ -62,7 +62,7 @@ module FastlaneCore
         UI.message("Sending crash report...")
         UI.message("The stack trace is sanitized so no personal information is sent.")
         UI.message("To see what we are sending, look here: #{crash_report_path}")
-        UI.message("Learn more at https://github.com/fastlane/fastlane#crash-reporting")
+        UI.message("Learn more at https://docs.fastlane.tools/actions/opt_out_crash_reporting/")
         UI.message("You can disable crash reporting by adding `opt_out_crash_reporting` at the top of your Fastfile")
       end
 

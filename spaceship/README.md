@@ -1,25 +1,25 @@
 <h3 align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
+  <a href="https://docs.fastlane.tools">
     <img src="../fastlane/assets/fastlane.png" width="100" />
     <br />
     fastlane
   </a>
 </h3>
 <p align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
+  <a href="https://docs.fastlane.tools/actions/deliver/">deliver</a> &bull;
+  <a href="https://docs.fastlane.tools/actions/snapshot/">snapshot</a> &bull;
+  <a href="https://docs.fastlane.tools/actions/frameit/">frameit</a> &bull;
+  <a href="https://docs.fastlane.tools/actions/pem/">pem</a> &bull;
+  <a href="https://docs.fastlane.tools/actions/sigh/">sigh</a> &bull;
+  <a href="https://docs.fastlane.tools/actions/produce/">produce</a> &bull;
+  <a href="https://docs.fastlane.tools/actions/cert/">cert</a> &bull;
   <b>spaceship</b> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/pilot">pilot</a> &bull;
+  <a href="https://docs.fastlane.tools/actions/pilot/">pilot</a> &bull;
   <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/precheck">precheck</a>
+  <a href="https://docs.fastlane.tools/actions/gym/">gym</a> &bull;
+  <a href="https://docs.fastlane.tools/actions/scan/">scan</a> &bull;
+  <a href="https://docs.fastlane.tools/actions/match/">match</a> &bull;
+  <a href="https://docs.fastlane.tools/actions/precheck/">precheck</a>
 </p>
 
 -------
@@ -55,7 +55,7 @@ Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.co
 
 Up until now, the [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. With spaceship it is possible to directly access the underlying APIs using a simple HTTP client only.
 
-Using spaceship, the execution time of [sigh](https://github.com/fastlane/fastlane/tree/master/sigh) was reduced from over 1 minute to less than 5 seconds.
+Using spaceship, the execution time of [sigh](https://docs.fastlane.tools/actions/sigh/) was reduced from over 1 minute to less than 5 seconds.
 
 spaceship uses a combination of 3 different API endpoints, used by the Apple Developer Portal and Xcode. As no API offers everything we need, spaceship combines all APIs for you. [More details about the APIs](#technical-details).
 

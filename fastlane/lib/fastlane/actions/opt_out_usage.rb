@@ -14,7 +14,7 @@ module Fastlane
         [
           "By default, fastlane will track what actions are being used",
           "No personal/sensitive information is recorded.",
-          "Learn more at https://github.com/fastlane/fastlane#metrics",
+          "Learn more at https://docs.fastlane.tools/#metrics",
           "Add `opt_out_usage` at the top of your Fastfile to disable metrics collection"
         ].join(' ')
       end

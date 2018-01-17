@@ -10,7 +10,7 @@ require_relative 'env'
 module FastlaneCore
   module Helper
     # This method is deprecated, use the `UI` class
-    # https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md
+    # https://docs.fastlane.tools/advanced/#user-input-and-output
     def self.log
       UI.deprecated("Helper.log is deprecated. Use `UI` class instead")
       UI.current.log
