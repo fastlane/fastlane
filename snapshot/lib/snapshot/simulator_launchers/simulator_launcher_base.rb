@@ -45,7 +45,7 @@ module Snapshot
     def prepare_simulators_for_launch(device_types, language: nil, locale: nil)
       # Kill and shutdown all currently running simulators so that the following settings
       # changes will be picked up when they are started again.
-      Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
+      Snapshot.kill_simulator # because of https://github.com/fastlane/fastlane/issues/2533
       `xcrun simctl shutdown booted &> /dev/null`
 
       Fixes::SimulatorZoomFix.patch
