@@ -424,7 +424,9 @@ module FastlaneCore
     end
 
     # @internal to module
-    # runs the specified command with the specified number of retries, killing each run if it times out
+    # runs the specified command with the specified number of retries, killing each run if it times out.
+    # the first run times out after specified timeout elapses, and each successive run times out after
+    # a doubling of the previous timeout has elapsed.
     # @raises Timeout::Error if all tries result in a timeout
     # @returns the output of the command
     # Note: - currently affected by https://github.com/fastlane/fastlane/issues/1504
@@ -451,7 +453,7 @@ module FastlaneCore
         next_timeout = try_timeout * 2
 
         message = "Command timed out after #{try_timeout} seconds on try #{try} of #{total_tries}"
-        message += ", trying again with #{next_timeout} second timeout..." unless try_limit_reached
+        message += ", trying again with a #{next_timeout} second timeout..." unless try_limit_reached
 
         UI.important(message)
 
