@@ -43,7 +43,7 @@ module Snapshot
           actions << "test-without-building"
         else
           actions << :clean if Snapshot.config[:clean]
-          actions << :build # https://github.com/fastlane/snapshot/issues/246
+          actions << :build # https://github.com/fastlane/fastlane/issues/2581
           actions << :test
         end
         return actions
