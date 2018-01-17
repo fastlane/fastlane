@@ -12,6 +12,10 @@ module Fastlane
         ARGV.include?('-h') || ARGV.include?('--help')
       end
 
+      def running_init_command?
+        ARGV.include?("init")
+      end
+
       def take_off
         before_import_time = Time.now
 
@@ -37,7 +41,7 @@ module Fastlane
           require "fastlane"
         end
         # We want to avoid printing output other than the version number if we are running `fastlane -v`
-        unless running_version_command?
+        unless running_version_command? || running_init_command?
           print_bundle_exec_warning(is_slow: (Time.now - before_import_time > 3))
         end
 
