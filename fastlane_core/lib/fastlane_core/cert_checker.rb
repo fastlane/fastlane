@@ -65,13 +65,17 @@ module FastlaneCore
       keychain = "-k #{keychain.shellescape}" unless keychain.empty?
 
       require 'open3'
-      stdout, stderr, status = Open3.capture3("curl -f -o #{filename} #{url} && security import #{filename} #{keychain}")
+
+      import_command = "curl -f -o #{filename} #{url} && security import #{filename} #{keychain}"
+      UI.verbose("Installing WWDR Cert: #{import_command}")
+
+      stdout, stderr, _status = Open3.capture3(import_command)
       if FastlaneCore::Globals.verbose?
         UI.command_output(stdout)
         UI.command_output(stderr)
       end
 
-      unless status.success?
+      unless $?.success?
         UI.verbose("Failed to install WWDR Certificate, checking output to see why")
         # Check the command output, WWDR might already exist
         unless /The specified item already exists in the keychain./ =~ stderr
@@ -79,6 +83,7 @@ module FastlaneCore
         end
         UI.verbose("WWDR Certificate was already installed")
       end
+      return true
     end
 
     def self.wwdr_keychain
