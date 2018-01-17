@@ -94,7 +94,7 @@ module Fastlane
         if output_directory
           file_name = output_directory + file_name
         end
-        File.write(file_name, data)
+        File.binwrite(file_name, data)
         file_name
       end
 
