@@ -212,6 +212,7 @@ module Spaceship
       # e.g. {"warn"=>nil, "error"=>["operation_failed"], "info"=>nil}
       different_error = raw.fetch('messages', {}).fetch('error', nil)
       errors << different_error if different_error
+
       if errors.count > 0 # they are separated by `.` by default
         # Sample `error` content: [["Forbidden"]]
         if errors.count == 1 and errors.first == "You haven't made any changes."
