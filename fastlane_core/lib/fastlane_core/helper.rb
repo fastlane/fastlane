@@ -155,7 +155,9 @@ module FastlaneCore
 
       if self.xcode_server?
         # Xcode server always creates a link here
-        return "/Library/Developer/XcodeServer/CurrentXcodeSymlink/Contents/Developer"
+        xcode_server_xcode_path = "/Library/Developer/XcodeServer/CurrentXcodeSymlink/Contents/Developer"
+        UI.verbose("We're running as XcodeServer, setting path to #{xcode_server_xcode_path}")
+        return xcode_server_xcode_path
       end
 
       return `xcode-select -p`.delete("\n") + "/"
@@ -163,8 +165,7 @@ module FastlaneCore
 
     def self.xcode_server?
       # XCS is set by Xcode Server
-      is_xcode_server = ENV["XCS"] || 0
-      return is_xcode_server.to_i == 1
+      return ENV["XCS"].to_i == 1
     end
 
     # @return The version of the currently used Xcode installation (e.g. "7.0")
