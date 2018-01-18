@@ -9,7 +9,7 @@ module Scan
 
       if Scan.config[:slack_channel].to_s.length > 0
         channel = Scan.config[:slack_channel]
-        channel = ('#' + notifier.channel) unless ['#', '@'].include?(notifier.channel[0]) # send message to channel by default
+        channel = ('#' + channel) unless ['#', '@'].include?(channel[0]) # send message to channel by default
       end
 
       require 'slack-notifier'
