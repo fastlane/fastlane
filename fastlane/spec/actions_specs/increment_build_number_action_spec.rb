@@ -19,6 +19,19 @@ describe Fastlane do
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER]).to match(/cd .* && agvtool new-version -all 24/)
       end
 
+      it "pass a ci build number to the tool" do
+        ENV['CIRCLECI'] = '1'
+        ENV['CIRCLE_BUILD_NUM'] = '24'
+        result = Fastlane::FastFile.new.parse("lane :test do
+          increment_build_number(use_ci_build_number: true, xcodeproj: '.xcproject')
+        end").runner.execute(:test)
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER]).to match(/cd .* && agvtool new-version -all 24/)
+
+        ENV.delete("CIRCLECI")
+        ENV.delete("CIRCLE_BUILD_NUM")
+      end
+
       it "raises an exception when use passes workspace" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
