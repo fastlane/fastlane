@@ -152,17 +152,37 @@ module FastlaneCore
     #  running system
     def self.xcode_path
       return "" unless self.is_mac?
-      `xcode-select -p`.delete("\n") + "/"
+
+      if self.xcode_server?
+        # Xcode server always creates a link here
+        xcode_server_xcode_path = "/Library/Developer/XcodeServer/CurrentXcodeSymlink/Contents/Developer"
+        UI.verbose("We're running as XcodeServer, setting path to #{xcode_server_xcode_path}")
+        return xcode_server_xcode_path
+      end
+
+      return `xcode-select -p`.delete("\n") + "/"
+    end
+
+    def self.xcode_server?
+      # XCS is set by Xcode Server
+      return ENV["XCS"].to_i == 1
     end
 
     # @return The version of the currently used Xcode installation (e.g. "7.0")
     def self.xcode_version
       return nil unless self.is_mac?
       return @xcode_version if @xcode_version && @developer_dir == ENV['DEVELOPER_DIR']
-      return nil unless File.exist?("#{xcode_path}/usr/bin/xcodebuild")
+
+      xcodebuild_path = "#{xcode_path}/usr/bin/xcodebuild"
+
+      xcode_build_installed = File.exist?(xcodebuild_path)
+      unless xcode_build_installed
+        UI.verbose("Couldn't find xcodebuild at #{xcodebuild_path}, check that it exists")
+        return nil
+      end
 
       begin
-        output = `DEVELOPER_DIR='' "#{xcode_path}/usr/bin/xcodebuild" -version`
+        output = `DEVELOPER_DIR='' "#{xcodebuild_path}" -version`
         @xcode_version = output.split("\n").first.split(' ')[1]
         @developer_dir = ENV['DEVELOPER_DIR']
       rescue => ex
