@@ -88,8 +88,6 @@ module Frameit
         orientation = block.call(filename)
         valid = [:landscape_left, :landscape_right, :portrait, nil]
         UI.user_error("orientation_block must return #{valid[0..-2].join(', ')} or nil") unless valid.include?(orientation)
-
-        puts("Forced orientation: #{orientation}")
       end
 
       return orientation unless orientation.nil?
