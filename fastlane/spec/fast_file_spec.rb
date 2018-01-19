@@ -193,7 +193,7 @@ describe Fastlane do
         expect(UI).to receive(:important).with("Setting '[:windows, :neogeo]' as extra SupportedPlatforms")
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileAddNewPlatform')
         expect(UI).to receive(:message).with("echo :windows")
-        ff.runner.execute(:echo, :windows)
+        ff.runner.execute(:echo_lane, :windows)
       end
 
       it "before_each and after_each are called every time" do
