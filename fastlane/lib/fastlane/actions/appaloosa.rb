@@ -22,7 +22,7 @@ module Fastlane
       def self.upload_on_s3(file, api_key, store_id, group_ids = '')
         file_name = file.split('/').last
         uri = URI("#{APPALOOSA_SERVER}/upload_services/presign_form")
-        params = { file: file_name, store_id: store_id, group_ids: group_ids }
+        params = { file: file_name, store_id: store_id, group_ids: group_ids, api_key: api_key }
         uri.query = URI.encode_www_form(params)
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
