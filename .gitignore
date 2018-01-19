@@ -57,6 +57,7 @@ snapshot/example/fastlane/README.md
 snapshot/example/fastlane/screenshots
 fastlane/FastlaneRunner
 fastlane/swift/FastlaneRunner
+vendor
 
 # iOS specific ignores, used in sample projects inside the repo
 *.pbxuser

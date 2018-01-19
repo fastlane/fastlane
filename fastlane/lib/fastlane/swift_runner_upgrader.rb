@@ -173,9 +173,12 @@ module Fastlane
       return updated_project
     end
 
+    # adds new groups, and the files inside those groups
+    # Note: this does not add new files to existing groups, that is in add_new_files_to_groups!
     def add_missing_groups_and_files!(dry_run: false)
       missing_groups = self.find_missing_groups.to_set
-      unless missing_groups.length >= 0
+      unless missing_groups.length > 0
+        UI.verbose("No missing groups found, so we don't need to worry about adding new groups")
         return false
       end
 
