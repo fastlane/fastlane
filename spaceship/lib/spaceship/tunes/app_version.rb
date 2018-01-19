@@ -328,7 +328,7 @@ module Spaceship
           build_version
         else
           if candidate_builds.length > 0
-            candidate_builds.first.build_version
+            candidate_builds.sort_by(&:upload_date).last.build_version
           end
         end
       end
