@@ -103,7 +103,10 @@ module Match
     def print_tables
       puts("")
       if self.certs.count > 0
-        rows = self.certs.collect { |c| [c.name, c.id, c.class.to_s.split("::").last, c.expires.strftime("%Y-%m-%d")] }
+        rows = self.certs.collect do |cert|
+          cert_expiration = cert.expires.nil? ? "Unknown" : cert.expires.strftime("%Y-%m-%d")
+          [cert.name, cert.id, cert.class.to_s.split("::").last, cert_expiration]
+        end
         puts(Terminal::Table.new({
           title: "Certificates that are going to be revoked".green,
           headings: ["Name", "ID", "Type", "Expires"],
