@@ -25,11 +25,12 @@ module Fastlane
 
       welcome_to_fastlane
 
+      self.fastfile_content = fastfile_template_content
+      self.appfile_content = appfile_template_content
+
       if preferred_setup_method
         self.send(preferred_setup_method)
 
-        # We call `choose_swift` here also, as we skip the selection (see below)
-        choose_swift
         return
       end
 
@@ -42,11 +43,6 @@ module Fastlane
 
       selected = UI.select("What would you like to use fastlane for?", options.keys)
       @method_to_use = options[selected]
-
-      # we want to first ask the user of what they want to do
-      # to make them already excited about all the things they can do with fastlane
-      # and only then we ask them about the language they want to use
-      choose_swift
 
       begin
         self.send(@method_to_use)
@@ -438,17 +434,6 @@ module Fastlane
       else
         return "project: \"#{self.project_path}\", "
       end
-    end
-
-    # Choose the language the config files should be based in
-    def choose_swift
-      # The Swift question below is removed, as we don't want everyone
-      # to use the Beta setup yet
-      # using `||=` since if the user already used `fastlane init swift` we want to just use swift
-      # self.is_swift_fastfile ||= UI.confirm("[Beta] Do you want to try our new experimental Swift based configuration files?")
-
-      self.fastfile_content = fastfile_template_content
-      self.appfile_content = appfile_template_content
     end
 
     def increment_build_number_if_applicable
