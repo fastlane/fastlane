@@ -13,6 +13,17 @@ module Fastlane
         "Prints out the given text"
       end
 
+      def self.available_options
+        [
+          FastlaneCore::ConfigItem.new(key: :message,
+                                       env_name: "FL_PUTS_MESSAGE",
+                                       description: "Message to be printed out. Fastlane.swift only",
+                                       optional: true,
+                                       is_string: true,
+                                       default_value: nil)
+        ]
+      end
+
       def self.authors
         ["KrauseFx"]
       end
