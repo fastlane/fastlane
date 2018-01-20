@@ -3,9 +3,11 @@ require_relative 'change_password'
 
 module Match
   class Encrypt
+    require 'base64'
+    require 'openssl'
+    require 'securerandom'
     require 'security'
     require 'shellwords'
-    require 'open3'
 
     def server_name(git_url)
       ["match", git_url].join("_")
@@ -46,9 +48,8 @@ module Match
 
     def encrypt_repo(path: nil, git_url: nil)
       iterate(path) do |current|
-        crypt(path: current,
-          password: password(git_url),
-           encrypt: true)
+        encrypt(path: current,
+          password: password(git_url))
         UI.success("🔒  Encrypted '#{File.basename(current)}'") if FastlaneCore::Globals.verbose?
       end
       UI.success("🔒  Successfully encrypted certificates repo")
@@ -57,9 +58,8 @@ module Match
     def decrypt_repo(path: nil, git_url: nil, manual_password: nil)
       iterate(path) do |current|
         begin
-          crypt(path: current,
-            password: manual_password || password(git_url),
-             encrypt: false)
+          decrypt(path: current,
+            password: manual_password || password(git_url))
         rescue
           UI.error("Couldn't decrypt the repo, please make sure you enter the right password!")
           UI.user_error!("Invalid password passed via 'MATCH_PASSWORD'") if ENV["MATCH_PASSWORD"]
@@ -81,43 +81,39 @@ module Match
       end
     end
 
-    def crypt(path: nil, password: nil, encrypt: true)
-      if password.to_s.strip.length == 0 && encrypt
-        UI.user_error!("No password supplied")
-      end
+    def encrypt(path: nil, password: nil)
+      UI.user_error!("No password supplied") if password.to_s.strip.length == 0
 
-      tmpfile = File.join(Dir.mktmpdir, "temporary")
-      command = ["openssl aes-256-cbc"]
-      command << "-k #{password.shellescape}"
-      command << "-in #{path.shellescape}"
-      command << "-out #{tmpfile.shellescape}"
-      command << "-a"
-      command << "-d" unless encrypt
-      command << "&> /dev/null" unless FastlaneCore::Globals.verbose? # to show an error message if something goes wrong
+      data_to_encrypt = File.read(path)
+      salt = SecureRandom.random_bytes(8)
 
-      _out, err, st = Open3.capture3(command.join(' '))
-      success = st.success?
+      cipher = OpenSSL::Cipher.new('AES-256-CBC')
+      cipher.encrypt
+      cipher.pkcs5_keyivgen(password, salt, 1, "MD5")
+      encrypted_data = "Salted__" + salt + cipher.update(data_to_encrypt) + cipher.final
 
-      # Ubuntu `openssl` does not fail on failure
-      # but at least outputs an error message
-      unless err.to_s.empty?
-        success = false
-      end
+      File.write(path, Base64.encode64(encrypted_data))
+    rescue => error
+      UI.error(error.to_s)
+      UI.crash!("Error encrypting '#{path}'")
+    end
 
-      UI.crash!("Error decrypting '#{path}'") unless success
+    def decrypt(path: nil, password: nil)
+      stored_data = ""
+      stored_data = Base64.decode64(File.read(path))
+      salt = stored_data[8..15]
+      data_to_decrypt = stored_data[16..-1]
 
-      # On non-Mac systems (more specific Ubuntu Linux) it might take some time for the file to actually be there (see #11182).
-      # To try to circumvent this flakyness (in tests), we wait a bit until the file appears (max 2s) (usually only 0.1 is actually waited)
-      unless FastlaneCore::Helper.mac?
-        count = 0
-        # sleep until file exists or 20*0.1s (=2s) passed
-        until File.exist?(tmpfile) || count == 20
-          sleep(0.1)
-          count += 1
-        end
-      end
+      decipher = OpenSSL::Cipher.new('AES-256-CBC')
+      decipher.decrypt
+      decipher.pkcs5_keyivgen(password, salt, 1, "MD5")
 
-      FileUtils.mv(tmpfile, path)
+      decrypted_data = decipher.update(data_to_decrypt) + decipher.final
+
+      File.write(path, decrypted_data)
+    rescue => error
+      UI.error(error.to_s)
+      UI.crash!("Error decrypting '#{path}'")
     end
   end
 end
