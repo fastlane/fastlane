@@ -12,7 +12,6 @@ module Deliver
     end
 
     def self.download(options, folder_path)
-
       v = options[:use_live_version] ? options[:app].live_version : options[:app].latest_version
 
       v.screenshots.each do |language, screenshots|
