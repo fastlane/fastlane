@@ -601,9 +601,7 @@ module Spaceship
     end
 
     def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil, template_name: nil)
-      ensure_csrf(Spaceship::ProvisioningProfile) do
         fetch_csrf_token_for_provisioning
-      end
 
       params = {
         teamId: team_id,
@@ -623,9 +621,7 @@ module Spaceship
     end
 
     def download_provisioning_profile(profile_id, mac: false)
-      ensure_csrf(Spaceship::ProvisioningProfile) do
         fetch_csrf_token_for_provisioning
-      end
 
       r = request(:get, "account/#{platform_slug(mac)}/profile/downloadProfileContent", {
         teamId: team_id,
@@ -640,9 +636,7 @@ module Spaceship
     end
 
     def delete_provisioning_profile!(profile_id, mac: false)
-      ensure_csrf(Spaceship::ProvisioningProfile) do
         fetch_csrf_token_for_provisioning
-      end
 
       r = request(:post, "account/#{platform_slug(mac)}/profile/deleteProvisioningProfile.action", {
         teamId: team_id,
