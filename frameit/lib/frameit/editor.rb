@@ -8,7 +8,8 @@ require_relative 'config_parser'
 require_relative 'strings_parser'
 
 module Frameit
-  class Editor
+  # Currently the class is 2 lines too long. Reevaluate refactoring when it's length changes significantly
+  class Editor # rubocop:disable Metrics/ClassLength
     attr_accessor :screenshot # reference to the screenshot object to fetch the path, title, etc.
     attr_accessor :frame # the frame of the device
     attr_accessor :image # the current image used for editing
@@ -230,7 +231,7 @@ module Frameit
     def put_title_into_background_stacked(background, title, keyword)
       resize_text(title)
       resize_text(keyword)
-      
+
       vertical_padding = vertical_frame_padding # assign padding to variable
       keyword_top_space = vertical_padding
       spacing_between_title_and_keyword = (title.height / 2)

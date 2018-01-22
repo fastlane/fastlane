@@ -91,7 +91,7 @@ module Frameit
       end
 
       puts("Forced orientation: #{orientation}") unless orientation.nil?
-      
+
       return orientation unless orientation.nil?
       return :portrait if self.orientation_name == Orientation::PORTRAIT
       return :landscape_right # Default landscape orientation
