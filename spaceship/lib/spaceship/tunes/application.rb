@@ -1,3 +1,15 @@
+require_relative '../test_flight/group'
+require_relative '../test_flight/build'
+require_relative 'app_details'
+require_relative 'app_ratings'
+require_relative 'app_submission'
+require_relative 'app_version'
+require_relative 'app_version_generated_promocodes'
+require_relative 'app_version_history'
+require_relative 'iap'
+require_relative 'tunes_base'
+require_relative 'version_set'
+
 module Spaceship
   module Tunes
     class Application < TunesBase
@@ -78,7 +90,7 @@ module Spaceship
         #  should it be an ios or an osx app
 
         def create!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil, itunes_connect_users: nil)
-          puts "The `version` parameter is deprecated. Use `ensure_version!` method instead" if version
+          puts("The `version` parameter is deprecated. Use `ensure_version!` method instead") if version
           client.create_application!(name: name,
                          primary_language: primary_language,
                                       sku: sku,
@@ -101,18 +113,18 @@ module Spaceship
         nil
       end
 
-      # @return (Spaceship::AppVersion) Receive the version that is currently live on the
+      # @return (Spaceship::Tunes::AppVersion) Receive the version that is currently live on the
       #  App Store. You can't modify all values there, so be careful.
       def live_version(platform: nil)
-        Spaceship::AppVersion.find(self, self.apple_id, true, platform: platform)
+        Spaceship::Tunes::AppVersion.find(self, self.apple_id, true, platform: platform)
       end
 
-      # @return (Spaceship::AppVersion) Receive the version that can fully be edited
+      # @return (Spaceship::Tunes::AppVersion) Receive the version that can fully be edited
       def edit_version(platform: nil)
-        Spaceship::AppVersion.find(self, self.apple_id, false, platform: platform)
+        Spaceship::Tunes::AppVersion.find(self, self.apple_id, false, platform: platform)
       end
 
-      # @return (Spaceship::AppVersion) This will return the `edit_version` if available
+      # @return (Spaceship::Tunes::AppVersion) This will return the `edit_version` if available
       #   and fallback to the `live_version`. Use this to just access the latest data
       def latest_version(platform: nil)
         edit_version(platform: platform) || live_version(platform: platform)
@@ -302,7 +314,7 @@ module Spaceship
           raise "Could not find a valid version to submit for review"
         end
 
-        Spaceship::AppSubmission.create(self, version)
+        Spaceship::Tunes::AppSubmission.create(self, version)
       end
 
       # Cancels all ongoing TestFlight beta submission for this application

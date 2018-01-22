@@ -4,6 +4,15 @@ require 'fileutils'
 require 'terminal-table'
 require 'shellwords'
 
+require 'fastlane_core/env'
+require 'fastlane_core/device_manager'
+require_relative 'module'
+require_relative 'xcpretty_reporter_options_generator'
+require_relative 'test_result_parser'
+require_relative 'slack_poster'
+require_relative 'test_command_generator'
+require_relative 'error_handler'
+
 module Scan
   class Runner
     def initialize
@@ -60,14 +69,14 @@ module Scan
         failures_str = result[:failures].to_s.green
       end
 
-      puts Terminal::Table.new({
+      puts(Terminal::Table.new({
         title: "Test Results",
         rows: [
           ["Number of tests", result[:tests]],
           ["Number of failures", failures_str]
         ]
-      })
-      puts ""
+      }))
+      puts("")
 
       copy_simulator_logs
 

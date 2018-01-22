@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Frameit
   # Represents the MiniMagick trim bounding box for cropping a text image
   class Trimbox

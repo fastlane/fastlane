@@ -8,7 +8,7 @@ module Supply
       UI.user_error!("No local metadata found, make sure to run `fastlane supply init` to setup supply") unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths]
 
       if metadata_path
-        UI.user_error!("Could not find folder #{metadata_path}") unless File.directory? metadata_path
+        UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
 
         all_languages.each do |language|
           next if language.start_with?('.') # e.g. . or .. or hidden folders
@@ -180,7 +180,7 @@ module Supply
         track_version_codes = client.track_version_codes(track).sort
         UI.verbose("Found '#{track_version_codes}' on track '#{track}'")
 
-        next if track_index.eql? config_track_index
+        next if track_index.eql?(config_track_index)
         next if track_version_codes.empty?
 
         if max_tracks_version_code.nil?
@@ -203,7 +203,7 @@ module Supply
     # returns only language directories from metadata_path
     def all_languages
       Dir.entries(metadata_path)
-         .select { |f| File.directory? File.join(metadata_path, f) }
+         .select { |f| File.directory?(File.join(metadata_path, f)) }
          .reject { |f| f.start_with?('.') }
          .sort { |x, y| x <=> y }
     end

@@ -6,6 +6,13 @@
 //  Copyright © 2017 Joshua Liebowitz. All rights reserved.
 //
 
+//
+//  ** NOTE **
+//  This file is provided by fastlane and WILL be overwritten in future updates
+//  If you want to add extra functionality to this project, create a new file in a
+//  new group so that it won't be marked for upgrade
+//
+
 import Foundation
 
 struct ArgumentProcessor {
@@ -50,7 +57,7 @@ struct ArgumentProcessor {
         
         // User might have configured a timeout for the socket connection
         let potentialTimeout = fastlaneArgsMinusLanes.filter { arg in
-            return arg.name.lowercased() == "timeoutSeconds"
+            return arg.name.lowercased() == "timeoutseconds"
         }
         
         if let logModeArg = potentialLogMode.first {
@@ -65,8 +72,20 @@ struct ArgumentProcessor {
             self.commandTimeout = SocketClient.defaultCommandTimeoutSeconds
         }
     }
+    
+    func laneParameters() -> [String : String] {
+        let laneParametersArgs = self.args.filter { arg in
+            let lowercasedName = arg.name.lowercased()
+            return lowercasedName != "timeoutseconds" && lowercasedName != "lane" && lowercasedName != "logmode"
+        }
+        var laneParameters = [String : String]()
+        for arg in laneParametersArgs {
+            laneParameters[arg.name] = arg.value
+        }
+        return laneParameters
+    }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.1]
+// FastlaneRunnerAPIVersion [0.9.2]

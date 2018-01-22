@@ -84,15 +84,15 @@ module Fastlane
             http_conn = Net::HTTP.new(uri.host, uri.port)
             http_conn.use_ssl = true
             result = http_conn.request_get(uri.path)
-            UI.error! "#{result.message} (#{result.code})" unless result.kind_of? Net::HTTPSuccess
+            UI.error!("#{result.message} (#{result.code})") unless result.kind_of?(Net::HTTPSuccess)
             File.write(zip_path, result.body)
 
             # Now unzip the file
-            Action.sh "unzip '#{zip_path}' -d '#{containing}'"
+            Action.sh("unzip '#{zip_path}' -d '#{containing}'")
 
             UI.user_error!("Couldn't find 'crashlytics-devtools.jar'") unless File.exist?(jar_path)
 
-            UI.success "Successfully downloaded Crashlytics Support Library to '#{jar_path}'"
+            UI.success("Successfully downloaded Crashlytics Support Library to '#{jar_path}'")
           rescue => ex
             UI.user_error!("Error fetching remote file: #{ex}")
           end

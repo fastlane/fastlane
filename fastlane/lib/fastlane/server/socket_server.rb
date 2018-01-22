@@ -1,10 +1,17 @@
-require 'fastlane/server/command.rb'
 require 'fastlane/server/command_executor.rb'
+require 'fastlane/server/command_parser.rb'
+require 'fastlane/server/json_return_value_processor.rb'
 require 'socket'
 require 'json'
 
 module Fastlane
   class SocketServer
+    COMMAND_EXECUTION_STATE = {
+      ready: :ready,
+      already_shutdown: :already_shutdown,
+      error: :error
+    }
+
     attr_accessor :command_executor
     attr_accessor :return_value_processor
 
@@ -24,53 +31,112 @@ module Fastlane
       @stay_alive = stay_alive
     end
 
-    # This is the public API, don't call anything else
+    # this is the public API, don't call anything else
     def start
-      while listen
-        # Loop for-ev-er
+      listen
+
+      while @stay_alive
+        UI.important("stay_alive is set to true, restarting server")
+        listen
       end
     end
 
     private
 
     def receive_and_process_commands
-      # We'll break out of the infinite loop somehow, either error or 'done' message
-      ended_loop_due_to_error = true
+      loop do # no idea how many commands are coming, so we loop until an error or the done command is sent
+        execution_state = COMMAND_EXECUTION_STATE[:ready]
 
-      loop do # No idea how many commands are coming, so we loop until an error or the done command is sent
-        str = nil
-
+        command_string = nil
         begin
-          str = @client.recv(1_048_576) # 1024 * 1024
+          command_string = @client.recv(1_048_576) # 1024 * 1024
         rescue Errno::ECONNRESET => e
           UI.verbose(e)
-          break
+          execution_state = COMMAND_EXECUTION_STATE[:error]
         end
 
-        if str == 'done'
-          time = Time.new
-          UI.verbose("[#{time.usec}]: received done signal, shutting down")
-          ended_loop_due_to_error = false
-          break
+        if execution_state == COMMAND_EXECUTION_STATE[:ready]
+          # Ok, all is good, let's see what command we have
+          execution_state = parse_and_execute_command(command_string: command_string)
         end
-        response_json = process_command(command_json: str)
 
-        time = Time.new
-        UI.verbose("[#{time.usec}]: sending #{response_json}")
-        begin
-          @client.puts(response_json) # Send some json to the client
-        rescue Errno::EPIPE => e
-          UI.verbose(e)
+        case execution_state
+        when COMMAND_EXECUTION_STATE[:ready]
+          # command executed successfully, let's setup for the next command
+          next
+        when COMMAND_EXECUTION_STATE[:already_shutdown]
+          # we shutdown in response to a command, nothing left to do but exit
+          break
+        when COMMAND_EXECUTION_STATE[:error]
+          # we got an error somewhere, let's shutdown and exit
+          handle_disconnect(error: true, exit_reason: :error)
           break
         end
       end
+    end
 
-      return handle_disconnect(error: ended_loop_due_to_error)
+    def parse_and_execute_command(command_string: nil)
+      command = CommandParser.parse(json: command_string)
+      case command
+      when ControlCommand
+        return handle_control_command(command)
+      when ActionCommand
+        return handle_action_command(command)
+      end
+
+      # catch all
+      raise "Command #{command} not supported"
+    end
+
+    # we got a server control command from the client to do something like shutdown
+    def handle_control_command(command)
+      exit_reason = nil
+      if command.cancel_signal?
+        UI.verbose("received cancel signal shutting down, reason: #{command.reason}")
+
+        # send an ack to the client to let it know we're shutting down
+        cancel_response = '{"payload":{"status":"cancelled"}}'
+        send_response(cancel_response)
+
+        exit_reason = :cancelled
+      elsif command.done_signal?
+        UI.verbose("received done signal shutting down")
+
+        # client is already in the process of shutting down, no need to ack
+        exit_reason = :done
+      end
+
+      # if the command came in with a user-facing message, display it
+      if command.user_message
+        UI.important(command.user_message)
+      end
+
+      # currently all control commands should trigger a disconnect and shutdown
+      handle_disconnect(error: false, exit_reason: exit_reason)
+      return COMMAND_EXECUTION_STATE[:already_shutdown]
+    end
+
+    # execute and send back response to client
+    def handle_action_command(command)
+      response_json = process_action_command(command: command)
+      return send_response(response_json)
+    end
+
+    # send json back to client
+    def send_response(json)
+      UI.verbose("sending #{json}")
+      begin
+        @client.puts(json) # Send some json to the client
+      rescue Errno::EPIPE => e
+        UI.verbose(e)
+        return COMMAND_EXECUTION_STATE[:error]
+      end
+      return COMMAND_EXECUTION_STATE[:ready]
     end
 
     def listen
       @server = TCPServer.open('localhost', 2000) # Socket to listen on port 2000
-      UI.message("Waiting for #{@connection_timeout} seconds for a connection from FastlaneRunner")
+      UI.verbose("Waiting for #{@connection_timeout} seconds for a connection from FastlaneRunner")
 
       # set thread local to ready so we can check it
       Thread.current[:ready] = true
@@ -84,34 +150,32 @@ module Fastlane
       rescue StandardError => e
         UI.user_error!("Something went wrong while waiting for a connection from the FastlaneRunner binary, shutting down\n#{e}")
       end
-      UI.message("Client connected")
+      UI.verbose("Client connected")
 
+      # this loops forever
       receive_and_process_commands
     end
 
-    def handle_disconnect(error: false)
-      UI.important("Client disconnected, or a pipe broke") if error
-      if @stay_alive
-        UI.important("stay_alive is set to true, restarting server")
-        # clean up before restart
-        @client.close
-        @client = nil
+    def handle_disconnect(error: false, exit_reason: :error)
+      Thread.current[:exit_reason] = exit_reason
 
-        @server.close
-        @server = nil
-        return true # Restart server
-      end
-      return false # Don't restart server
+      UI.important("Client disconnected, a pipe broke, or received malformed data") if exit_reason == :error
+      # clean up
+      @client.close
+      @client = nil
+
+      @server.close
+      @server = nil
     end
 
-    def process_command(command_json: nil)
-      time = Time.new
-      UI.verbose("[#{time.usec}]: received command:#{command_json}")
-      return execute_command(command_json: command_json)
+    # record fastlane action command and then execute it
+    def process_action_command(command: nil)
+      UI.verbose("received command:#{command.inspect}")
+      return execute_action_command(command: command)
     end
 
-    def execute_command(command_json: nil)
-      command = Command.new(json: command_json)
+    # execute fastlane action command
+    def execute_action_command(command: nil)
       command_return = @command_executor.execute(command: command, target_object: nil)
       ## probably need to just return Strings, or ready_for_next with object isn't String
       return_object = command_return.return_value
@@ -133,85 +197,20 @@ module Fastlane
         closure_arg = ', "closure_argument_value": ' + closure_arg
       end
 
+      Thread.current[:exception] = nil
       return '{"payload":{"status":"ready_for_next", "return_object":' + return_object + closure_arg + '}}'
     rescue StandardError => e
+      Thread.current[:exception] = e
+
       exception_array = []
       exception_array << "#{e.class}:"
       exception_array << e.backtrace
 
       while e.respond_to?("cause") && (e = e.cause)
         exception_array << "cause: #{e.class}"
-        exception_array << backtrace
+        exception_array << e.backtrace
       end
       return "{\"payload\":{\"status\":\"failure\",\"failure_information\":#{exception_array.flatten}}}"
-    end
-  end
-
-  class JSONReturnValueProcessor
-    def prepare_object(return_value: nil, return_value_type: nil)
-      case return_value_type
-      when nil
-        UI.verbose("return_value_type is nil value: #{return_value}")
-        return process_value_as_string(return_value: return_value)
-      when :string
-        return process_value_as_string(return_value: return_value)
-      when :int
-        return process_value_as_int(return_value: return_value)
-      when :bool
-        return process_value_as_bool(return_value: return_value)
-      when :array_of_strings
-        return process_value_as_array_of_strings(return_value: return_value)
-      when :hash_of_strings
-        return process_value_as_hash_of_strings(return_value: return_value)
-      else
-        UI.verbose("Unknown return type defined: #{return_value_type} for value: #{return_value}")
-        return process_value_as_string(return_value: return_value)
-      end
-    end
-
-    def process_value_as_string(return_value: nil)
-      if return_value.nil?
-        return_value = ""
-      end
-
-      # quirks_mode because sometimes the built-in library is used for some folks and that needs quirks_mode: true
-      return JSON.generate(return_value.to_s, quirks_mode: true)
-    end
-
-    def process_value_as_array_of_strings(return_value: nil)
-      if return_value.nil?
-        return_value = []
-      end
-
-      # quirks_mode shouldn't be required for real objects
-      return JSON.generate(return_value)
-    end
-
-    def process_value_as_hash_of_strings(return_value: nil)
-      if return_value.nil?
-        return_value = {}
-      end
-
-      # quirks_mode shouldn't be required for real objects
-      return JSON.generate(return_value)
-    end
-
-    def process_value_as_bool(return_value: nil)
-      if return_value.nil?
-        return_value = false
-      end
-
-      # quirks_mode because sometimes the built-in library is used for some folks and that needs quirks_mode: true
-      return JSON.generate(return_value.to_s, quirks_mode: true)
-    end
-
-    def process_value_as_int(return_value: nil)
-      if return_value.nil?
-        return_value = 0
-      end
-
-      # quirks_mode because sometimes the built-in library is used for some folks and that needs quirks_mode: true
-      return JSON.generate(return_value.to_s, quirks_mode: true)
     end
   end
 end

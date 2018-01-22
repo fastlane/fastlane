@@ -74,7 +74,7 @@ module Fastlane
         input_cli_arg = Array(params_hash[:input]).map(&:shellescape).join(' ')
         command = "appledoc #{cli_args}".strip + " " + input_cli_arg
         UI.verbose(command)
-        Actions.sh command
+        Actions.sh(command)
       end
 
       def self.params_hash_to_cli_args(params)
@@ -109,8 +109,8 @@ module Fastlane
         output_dir = File.dirname(output_path)
 
         # If the output directory doesn't exist, create it
-        unless Dir.exist? output_dir
-          FileUtils.mkpath output_dir
+        unless Dir.exist?(output_dir)
+          FileUtils.mkpath(output_dir)
         end
       end
 

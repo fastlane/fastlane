@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class PutsAction < Action
       def self.run(params)
-        UI.message params.join(' ')
+        UI.message(params.join(' '))
       end
 
       #####################################################

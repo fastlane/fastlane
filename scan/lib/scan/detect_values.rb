@@ -1,3 +1,7 @@
+require 'fastlane_core/device_manager'
+require 'fastlane_core/project'
+require_relative 'module'
+
 module Scan
   # This class detects all kinds of default values
   class DetectValues

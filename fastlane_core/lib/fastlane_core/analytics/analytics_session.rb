@@ -1,4 +1,6 @@
-require 'fastlane_core/analytics/analytics_ingester_client'
+require_relative 'analytics_ingester_client'
+require_relative 'action_launch_context'
+require_relative 'analytics_event_builder'
 
 module FastlaneCore
   class AnalyticsSession
@@ -152,7 +154,7 @@ module FastlaneCore
 
     def finalize_session
       # If our users want to opt out of usage metrics, don't post the events.
-      # Learn more at https://github.com/fastlane/fastlane#metrics
+      # Learn more at https://docs.fastlane.tools/#metrics
       return if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
 
       client.post_events(@events)

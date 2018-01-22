@@ -3,6 +3,9 @@ require 'shellwords'
 require 'fileutils'
 require 'credentials_manager/account_manager'
 
+require_relative 'features'
+require_relative 'helper'
+
 module FastlaneCore
   # The TransporterInputError occurs when you passed wrong inputs to the {Deliver::ItunesTransporter}
   class TransporterInputError < StandardError
@@ -107,8 +110,8 @@ module FastlaneCore
         UI.error("[Transporter Error Output]: #{$1}")
 
         # Check if it's a login error
-        if $1.include? "Your Apple ID or password was entered incorrectly" or
-           $1.include? "This Apple ID has been locked for security reasons"
+        if $1.include?("Your Apple ID or password was entered incorrectly") or
+           $1.include?("This Apple ID has been locked for security reasons")
 
           unless Helper.is_test?
             CredentialsManager::AccountManager.new(user: @user).invalid_credentials

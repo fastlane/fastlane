@@ -1,376 +1,502 @@
-require 'spaceship'
-
 module Fastlane
+  # rubocop:disable Metrics/ClassLength
   class SetupIos < Setup
-    # the tools that are already enabled
-    attr_accessor :tools
+    # Reference to the iOS project `project.rb`
     attr_accessor :project
-    attr_accessor :apple_id
 
-    attr_accessor :portal_ref
-    attr_accessor :itc_ref
-
-    attr_accessor :dev_portal_team
-    attr_accessor :itc_team
-
+    # App Identifier of the current app
     attr_accessor :app_identifier
-    attr_accessor :app_name
 
-    attr_accessor :is_swift_fastfile
+    # Scheme of the Xcode project
+    attr_accessor :scheme
 
-    def run(user: nil, is_swift_fastfile: false)
-      self.is_swift_fastfile = is_swift_fastfile
-      self.apple_id = user
-      show_infos
+    # If the current setup requires a login, this is where we'll store the team ID
+    attr_accessor :itc_team_id
+    attr_accessor :adp_team_id
 
-      FastlaneCore::FastlaneFolder.create_folder! unless Helper.is_test?
-      is_manual_setup = false
+    attr_accessor :app_exists_on_itc
 
-      setup_project
-      react_native_pre_checks
-      ask_for_apple_id
+    attr_accessor :automatic_versioning_enabled
+
+    def setup_ios
+      require 'spaceship'
+
+      self.platform = :ios
+
+      welcome_to_fastlane
+
+      self.fastfile_content = fastfile_template_content
+      self.appfile_content = appfile_template_content
+
+      if preferred_setup_method
+        self.send(preferred_setup_method)
+
+        return
+      end
+
+      options = {
+        "📸  Automate screenshots" => :ios_screenshots,
+        "👩‍✈️  Automate beta distribution to TestFlight" => :ios_testflight,
+        "🚀  Automate App Store distribution" => :ios_app_store,
+        "🛠  Manual setup - manually setup your project to automate your tasks" => :ios_manual
+      }
+
+      selected = UI.select("What would you like to use fastlane for?", options.keys)
+      @method_to_use = options[selected]
 
       begin
-        if self.project.mac?
-          UI.important("Generating apps on the Apple Developer Portal and iTunes Connect is not currently available for Mac apps")
-        else
-          detect_if_app_is_available
-        end
-        print_config_table
-        if self.project.schemes.count > 1
-          UI.important("Note: If the values above are incorrect, it is possible the wrong scheme was selected")
-        end
-        if UI.confirm("Please confirm the above values")
-          default_setup
-        else
-          is_manual_setup = true
-          UI.message("Falling back to manual onboarding")
-          manual_setup
-        end
-        UI.success('Successfully finished setting up fastlane')
-      rescue Spaceship::Client::InsufficientPermissions, Spaceship::Client::ProgramLicenseAgreementUpdated => ex
-        # We don't want to fallback to manual onboarding for this
-        # as the user needs to first accept the agreement / get more permissions
-        # Let's re-raise the exception to properly show the error message
-        raise ex
-      rescue => ex # this will also be caused by Ctrl + C
-        UI.message("Ran into error while trying to connect to iTunes Connect / Dev Portal: #{ex}")
-        UI.message("Falling back to manual onboarding")
+        self.send(@method_to_use)
+      rescue => ex
+        # If it's already manual, and it has failed
+        # we need to re-raise the exception, as something definitely is wrong
+        raise ex if @method_to_use == :ios_manual
 
-        if is_manual_setup
-          handle_exception(exception: ex)
+        # If we're here, that means something else failed. We now show the
+        # error message and fallback to `:ios_manual`
+        UI.error("--------------------")
+        UI.error("fastlane init failed")
+        UI.error("--------------------")
+
+        UI.verbose(ex.backtrace.join("\n"))
+        if ex.kind_of?(Spaceship::Client::BasicPreferredInfoError) || ex.kind_of?(Spaceship::Client::UnexpectedResponse)
+          UI.error(ex.preferred_error_info)
         else
           UI.error(ex.to_s)
-          UI.error('An error occurred during the setup process. Falling back to manual setup!')
-          try_manual_setup
         end
+
+        UI.important("Something failed while running `fastlane init`")
+        UI.important("Tried using Apple ID with email '#{self.user}'")
+        UI.important("You can either retry, or fallback to manual setup which will create a basic Fastfile")
+        if UI.confirm("Would you like to fallback to a manual Fastfile?")
+          self.ios_manual
+        else
+          self.send(@method_to_use)
+        end
+        # the second time, we're just failing, and don't use a `begin` `rescue` block any more
       end
     end
 
-    def handle_exception(exception: nil)
-      # Something went wrong with the setup, clear the folder again
-      # and restore previous files
-      UI.error('Error occurred with the setup program! Reverting changes now!')
-      restore_previous_state
-      raise exception
-    end
-
-    def try_manual_setup
-      manual_setup
-    rescue => ex
-      handle_exception(exception: ex)
-    end
-
-    # React Native specific code
-    # Make it easy for people to onboard
-    def react_native_pre_checks
-      return unless self.class.project_uses_react_native?
-      if app_identifier.to_s.length == 0
-        error_message = []
-        error_message << "Could not detect bundle identifier of your react-native app."
-        error_message << "Make sure to open the Xcode project and update the bundle identifier"
-        error_message << "in the `General` section of your project settings."
-        error_message << "Restart `fastlane init` once you're done!"
-        UI.user_error!(error_message.join(" "))
-      end
-    end
-
-    def self.project_uses_react_native?(path: Dir.pwd)
-      package_json = File.join(path, "..", "package.json")
-      return false unless File.basename(path) == "ios"
-      return false unless File.exist?(package_json)
-      package_content = File.read(package_json)
-      return true if package_content.include?("react-native")
-      false
-    end
-
-    def default_setup
-      copy_existing_files
-      generate_appfile(manually: false)
-      detect_installed_tools # after copying the existing files
-      if !self.project.mac? && self.itc_ref.nil? && self.portal_ref.nil?
-        create_app_if_necessary
-      end
-      enable_deliver
-      generate_fastfile(manually: false)
+    # Different iOS flows
+    def ios_testflight
+      UI.header("Setting up fastlane for iOS TestFlight distribution")
+      find_and_setup_xcode_project
+      apple_xcode_project_versioning_enabled
+      ask_for_credentials(adp: true, itc: true)
+      verify_app_exists_adp!
+      verify_app_exists_itc!
 
       if self.is_swift_fastfile
-        update_swift_runner
+        lane = ["func betaLane() {",
+                "desc(\"Push a new beta build to TestFlight\")",
+                increment_build_number_if_applicable,
+                "\tbuildApp(#{project_prefix}scheme: \"#{self.scheme}\")",
+                "\tuploadToTestflight(username: \"#{self.user}\")",
+                "}"]
+      else
+        lane = ["desc \"Push a new beta build to TestFlight\"",
+                "lane :beta do",
+                increment_build_number_if_applicable,
+                "  build_app(#{project_prefix}scheme: \"#{self.scheme}\")",
+                "  upload_to_testflight",
+                "end"]
       end
+      self.append_lane(lane)
 
-      show_analytics
+      self.lane_to_mention = "beta"
+      finish_up
     end
 
-    def manual_setup
-      copy_existing_files
-      generate_appfile(manually: true)
-      detect_installed_tools # after copying the existing files
-      ask_to_enable_other_tools
-      generate_fastfile(manually: true)
+    def ios_app_store
+      UI.header("Setting up fastlane for iOS App Store distribution")
+      find_and_setup_xcode_project
+      apple_xcode_project_versioning_enabled
+      ask_for_credentials(adp: true, itc: true)
+      verify_app_exists_adp!
+      verify_app_exists_itc!
 
-      if self.is_swift_fastfile
-        update_swift_runner
-      end
+      if self.app_exists_on_itc
+        UI.header("Manage app metadata?")
+        UI.message("Would you like to have fastlane manage your app's metadata?")
+        UI.message("If you enable this feature, fastlane will download your existing metadata and screenshots.")
+        UI.message("This way, you'll be able to edit your app's metadata in local `.txt` files.")
+        UI.message("After editing the local `.txt` files, just run fastlane and all changes will be pushed up.")
+        UI.message("If you don't want to use this feature, you can still use fastlane to upload and distribute new builds to the App Store")
+        include_metadata = UI.confirm("Would you like fastlane to manage your app's metadata?")
+        if include_metadata
+          require 'deliver'
+          require 'deliver/setup'
 
-      show_analytics
-    end
+          deliver_options = FastlaneCore::Configuration.create(
+            Deliver::Options.available_options,
+            {
+              run_precheck_before_submit: false, # precheck doesn't need to run during init
+              username: self.user,
+              app_identifier: self.app_identifier,
+              team_id: self.itc_team_id
+            }
+          )
 
-    def ask_to_enable_other_tools
-      if self.itc_ref.nil? && self.portal_ref.nil?
-        wants_to_create_app = UI.confirm('Would you like to create your app on iTunes Connect and the Developer Portal?')
-        if wants_to_create_app
-          create_app_if_necessary
-          detect_if_app_is_available # check if the app was, in fact, created.
+          Deliver::DetectValues.new.run!(deliver_options, {}) # needed to fetch the app details
+          Deliver::Setup.new.run(deliver_options, is_swift: self.is_swift_fastfile)
         end
       end
-      if self.itc_ref && self.portal_ref
-        wants_to_setup_deliver = UI.confirm("Do you want to setup 'deliver', which is used to upload app screenshots, app metadata and app updates to the App Store? This requires the app to be in the App Store already")
-        enable_deliver if wants_to_setup_deliver
+
+      if self.is_swift_fastfile
+        lane = ["func releaseLane() {",
+                "desc(\"Push a new release build to the App Store\")",
+                increment_build_number_if_applicable,
+                "\tbuildApp(#{project_prefix}scheme: \"#{self.scheme}\")"]
+        if include_metadata
+          lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\")"
+        else
+          lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\", skipScreenshots: true, skipMetadata: true)"
+        end
+        lane << "}"
+      else
+        lane = ["desc \"Push a new release build to the App Store\"",
+                "lane :release do",
+                increment_build_number_if_applicable,
+                "  build_app(#{project_prefix}scheme: \"#{self.scheme}\")"]
+        if include_metadata
+          lane << "  upload_to_app_store"
+        else
+          lane << "  upload_to_app_store(skip_metadata: true, skip_screenshots: true)"
+        end
+        lane << "end"
       end
+
+      append_lane(lane)
+      self.lane_to_mention = "release"
+      finish_up
     end
 
-    def setup_project
-      config = {}
+    def ios_screenshots
+      UI.header("Setting up fastlane to automate iOS screenshots")
+
+      UI.message("fastlane uses UI Tests to automate generating localized screenshots of your iOS app")
+      UI.message("fastlane will now create 2 helper files that are needed to get the setup running")
+      UI.message("For more information on how this works and best practices, check out")
+      UI.message("\thttps://docs.fastlane.tools/getting-started/ios/screenshots/".cyan)
+      continue_with_enter
+
+      begin
+        find_and_setup_xcode_project(ask_for_scheme: false) # to get the bundle identifier
+      rescue => ex
+        # If this fails, it's no big deal, since we really just want the bundle identifier
+        # so instead, we'll just ask the user
+        UI.verbose(ex.to_s)
+      end
+
+      require 'snapshot'
+      require 'snapshot/setup'
+
+      Snapshot::Setup.create(
+        FastlaneCore::FastlaneFolder.path,
+        is_swift_fastfile: self.is_swift_fastfile,
+        print_instructions_on_failure: true
+      )
+
+      UI.message("If you want more details on how to setup automatic screenshots, check out")
+      UI.message("\thttps://docs.fastlane.tools/getting-started/ios/screenshots/#setting-up-snapshot".cyan)
+      continue_with_enter
+
+      available_schemes = self.project.schemes
+      ui_testing_scheme = UI.select("Which is your UI Testing scheme? If you can't find it in this list, make sure it's marked as `Shared` in the Xcode scheme list", available_schemes)
+
+      UI.header("Automatically upload to iTC?")
+      UI.message("Would you like fastlane to automatically upload all generated screenshots to iTunes Connect")
+      UI.message("after generating them?")
+      UI.message("If you enable this feature you'll need to provide your iTunes Connect credentials so fastlane can upload the screenshots to iTunes Connect")
+      automatic_upload = UI.confirm("Enable automatic upload of localized screenshots to iTunes Connect?")
+      if automatic_upload
+        ask_for_credentials(adp: true, itc: true)
+        verify_app_exists_itc!
+      end
+
+      if self.is_swift_fastfile
+        lane = ["func screenshotsLane() {",
+                "desc(\"Generate new localized screenshots\")",
+                "\tcaptureScreenshots(#{project_prefix}scheme: \"#{ui_testing_scheme}\")"]
+
+        if automatic_upload
+          lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\", skipBinaryUpload: true, skipMetadata: true)"
+        end
+        lane << "}"
+      else
+        lane = ["desc \"Generate new localized screenshots\"",
+                "lane :screenshots do",
+                "  capture_screenshots(#{project_prefix}scheme: \"#{ui_testing_scheme}\")"]
+
+        if automatic_upload
+          lane << "  upload_to_app_store(skip_binary_upload: true, skip_metadata: true)"
+        end
+        lane << "end"
+      end
+      append_lane(lane)
+
+      self.lane_to_mention = "screenshots"
+      finish_up
+    end
+
+    def ios_manual
+      UI.header("Setting up fastlane so you can manually configure it")
+
+      if self.is_swift_fastfile
+        append_lane(["func customLane() {",
+                     "desc(\"Description of what the lane does\")",
+                     "\t// add actions here: https://docs.fastlane.tools/actions",
+                     "}"])
+        self.lane_to_mention = "custom" # lane is part of the notation
+      else
+        append_lane(["desc \"Description of what the lane does\"",
+                     "lane :custom_lane do",
+                     "  # add actions here: https://docs.fastlane.tools/actions",
+                     "end"])
+        self.lane_to_mention = "custom_lane"
+      end
+
+      finish_up
+    end
+
+    # Helpers
+
+    # Every installation setup that needs an Xcode project should
+    # call this method
+    def find_and_setup_xcode_project(ask_for_scheme: true)
+      UI.message("Parsing your local Xcode project to find the available schemes and the app identifier")
+      config = {} # this is needed as the first method call will store information in there
+      if self.project_path.end_with?("xcworkspace")
+        config[:workspace] = self.project_path
+      else
+        config[:project] = self.project_path
+      end
+
       FastlaneCore::Project.detect_projects(config)
       self.project = FastlaneCore::Project.new(config)
-      self.project.select_scheme(preferred_to_include: self.project.project_name)
+
+      if ask_for_scheme
+        self.scheme = self.project.select_scheme(preferred_to_include: self.project.project_name)
+      end
+
       self.app_identifier = self.project.default_app_identifier # These two vars need to be accessed in order to be set
-      self.app_name = self.project.default_app_name # They are set as a side effect, this could/should be changed down the road
-    end
-
-    def print_config_table
-      rows = []
-      rows << ["Apple ID", self.apple_id]
-      rows << ["App Name", self.app_name]
-      rows << ["App Identifier", self.app_identifier]
-      rows << [(self.project.is_workspace ? "Workspace" : "Project"), self.project.path]
-      require 'terminal-table'
-      puts ""
-      puts Terminal::Table.new(rows: FastlaneCore::PrintTable.transform_output(rows),
-                              title: "Detected Values")
-      puts ""
-
-      unless self.itc_ref || self.project.mac?
-        UI.important "This app identifier doesn't exist on iTunes Connect yet, it will be created for you"
-      end
-
-      unless self.portal_ref || self.project.mac?
-        UI.important "This app identifier doesn't exist on the Apple Developer Portal yet, it will be created for you"
+      if self.app_identifier.to_s.length == 0
+        ask_for_bundle_identifier
       end
     end
 
-    def show_infos
-      UI.success('This setup will help you get up and running in no time.')
-      UI.success("fastlane will check what tools you're already using and set up")
-      UI.success('the tool automatically for you. Have fun! ')
-    end
-
-    def files_to_copy
-      ['Deliverfile', 'deliver', 'screenshots', 'metadata']
-    end
-
-    def copy_existing_files
-      files_to_copy.each do |current|
-        current = File.join(File.expand_path('..', FastlaneCore::FastlaneFolder.path), current)
-        next unless File.exist?(current)
-        file_name = File.basename(current)
-        to_path = File.join(folder, file_name)
-        UI.success("Moving '#{current}' to '#{to_path}'")
-        FileUtils.mv(current, to_path)
+    def ask_for_bundle_identifier
+      loop do
+        return if self.app_identifier.to_s.length > 0
+        self.app_identifier = UI.input("Bundle identifier of your app: ")
       end
     end
 
-    def ask_for_apple_id
-      self.apple_id ||= UI.input("Your Apple ID (e.g. fastlane@krausefx.com): ")
-    end
+    def ask_for_credentials(itc: true, adp: false)
+      UI.header("Login with your Apple ID")
+      UI.message("To use iTunes Connect and Apple Developer Portal features as part of fastlane,")
+      UI.message("we will ask you for your Apple ID username and password")
+      UI.message("This is necessary for certain fastlane features, for example:")
+      UI.message("")
+      UI.message("- Create and manage your provisioning profiles on the Developer Portal")
+      UI.message("- Upload and manage TestFlight and App Store builds on iTunes Connect")
+      UI.message("- Manage your iTunes Connect app metadata and screenshots")
+      UI.message("")
+      UI.message("Your Apple ID credentials will only be stored in your Keychain, on your local machine")
+      UI.message("For more information, check out")
+      UI.message("\thttps://github.com/fastlane/fastlane/tree/master/credentials_manager".cyan)
+      UI.message("")
 
-    def ask_for_app_identifier
-      self.app_identifier = UI.input("App Identifier (com.krausefx.app): ")
-    end
+      if self.user.to_s.length == 0
+        UI.important("Please enter your Apple ID developer credentials")
+        self.user = UI.input("Apple ID Username:")
+      end
+      UI.message("Logging in...")
 
-    def generate_appfile(manually: false)
-      template = File.read(appfile_template_path)
-      if manually
-        ask_for_app_identifier
-        ask_for_apple_id
+      # Disable the warning texts and information that's not relevant during onboarding
+      ENV["FASTLANE_HIDE_LOGIN_INFORMATION"] = 1.to_s
+      ENV["FASTLANE_HIDE_TEAM_INFORMATION"] = 1.to_s
+
+      if itc
+        Spaceship::Tunes.login(self.user)
+        Spaceship::Tunes.select_team
+        self.itc_team_id = Spaceship::Tunes.client.team_id
+        if self.is_swift_fastfile
+          self.append_team("var itcTeam: String? { return \"#{self.itc_team_id}\" } // iTunes Connect Team ID")
+        else
+          self.append_team("itc_team_id \"#{self.itc_team_id}\" # iTunes Connect Team ID")
+        end
       end
 
-      template.gsub!('[[DEV_PORTAL_TEAM_ID]]', self.dev_portal_team) if self.dev_portal_team
-      template.gsub!('[[APP_IDENTIFIER]]', self.app_identifier)
-      template.gsub!('[[APPLE_ID]]', self.apple_id)
+      if adp
+        Spaceship::Portal.login(self.user)
+        Spaceship::Portal.select_team
+        self.adp_team_id = Spaceship::Portal.client.team_id
+        if self.is_swift_fastfile
+          self.append_team("var teamID: String { return \"#{self.adp_team_id}\" } // Apple Developer Portal Team ID")
+        else
+          self.append_team("team_id \"#{self.adp_team_id}\" # Developer Portal Team ID")
+        end
+      end
+
+      UI.success("✅  Logging in with your Apple ID was successful")
+    end
+
+    def apple_xcode_project_versioning_enabled
+      self.automatic_versioning_enabled = false
+
+      paths = self.project.project_paths
+      return false if paths.count == 0
+
+      result = Fastlane::Actions::GetBuildNumberAction.run({
+        project: paths.first, # most of the times, there will only be one project in there
+        hide_error_when_versioning_disabled: true
+      })
+
+      if result.kind_of?(String) && result.to_f > 0
+        self.automatic_versioning_enabled = true
+      end
+      return self.automatic_versioning_enabled
+    end
+
+    def show_information_about_version_bumps
+      UI.important("It looks like your project isn't set up to do automatic version incrementing")
+      UI.important("To enable fastlane to handle automatic version incrementing for you, please follow this guide:")
+      UI.message("\thttps://developer.apple.com/library/content/qa/qa1827/_index.html".cyan)
+      UI.important("Afterwards check out the fastlane docs on how to set up automatic build increments")
+      UI.message("\thttps://docs.fastlane.tools/getting-started/ios/beta-deployment/#best-practices".cyan)
+    end
+
+    def verify_app_exists_adp!
+      UI.user_error!("No app identifier provided") if self.app_identifier.to_s.length == 0
+      UI.message("Checking if the app '#{self.app_identifier}' exists in your Apple Developer Portal...")
+      app = Spaceship::Portal::App.find(self.app_identifier)
+      if app.nil?
+        UI.error("It looks like the app '#{self.app_identifier}' isn't available on the #{'Apple Developer Portal'.bold.underline}")
+        UI.error("for the team ID '#{self.adp_team_id}' on Apple ID '#{self.user}'")
+
+        if UI.confirm("Do you want fastlane to create the App ID for you on the Apple Developer Portal?")
+          create_app_online!(mode: :adp)
+        else
+          UI.important("Alright, we won't create the app for you. Be aware, the build is probably going to fail when you try it")
+        end
+      else
+        UI.success("✅  Your app '#{self.app_identifier}' is available on iTunes Connect")
+      end
+    end
+
+    def verify_app_exists_itc!
+      UI.user_error!("No app identifier provided") if self.app_identifier.to_s.length == 0
+      UI.message("Checking if the app '#{self.app_identifier}' exists on iTunes Connect...")
+      app = Spaceship::Tunes::Application.find(self.app_identifier)
+      if app.nil?
+        UI.error("Looks like the app '#{self.app_identifier}' isn't available on #{'iTunes Connect'.bold.underline}")
+        UI.error("for the team ID '#{self.itc_team_id}' on Apple ID '#{self.user}'")
+        if UI.confirm("Would you like fastlane to create the App on iTunes Connect for you?")
+          create_app_online!(mode: :itc)
+          self.app_exists_on_itc = true
+        else
+          UI.important("Alright, we won't create the app for you. Be aware, the build is probably going to fail when you try it")
+        end
+      else
+        UI.success("✅  Your app '#{self.app_identifier}' is available on iTunes Connect")
+        self.app_exists_on_itc = true
+      end
+    end
+
+    def finish_up
+      # iOS specific things first
+      if self.app_identifier
+        self.appfile_content.gsub!("# app_identifier", "app_identifier")
+        self.appfile_content.gsub!("[[APP_IDENTIFIER]]", self.app_identifier)
+      end
+
+      if self.user
+        self.appfile_content.gsub!("# apple_id", "apple_id")
+        self.appfile_content.gsub!("[[APPLE_ID]]", self.user)
+      end
+
+      if !self.automatic_versioning_enabled && @method_to_use != :ios_manual
+        self.show_information_about_version_bumps
+      end
+
+      super
+    end
+
+    # Returns the `workspace` or `project` key/value pair for
+    # gym and snapshot, but only if necessary
+    #     (when there are multiple projects in the current directory)
+    # it's a prefix, and not a suffix, as Swift cares about the order of parameters
+    def project_prefix
+      return "" unless self.had_multiple_projects_to_choose_from
+
+      if self.project_path.end_with?(".xcworkspace")
+        return "workspace: \"#{self.project_path}\", "
+      else
+        return "project: \"#{self.project_path}\", "
+      end
+    end
+
+    def increment_build_number_if_applicable
+      return nil unless self.automatic_versioning_enabled
+      return nil if self.project.project_paths.first.to_s.length == 0
+
+      project_path = self.project.project_paths.first
+      # Convert the absolute path to a relative path
+      project_path_name = Pathname.new(project_path)
+      current_path_name = Pathname.new(File.expand_path("."))
+
+      relative_project_path = project_path_name.relative_path_from(current_path_name)
 
       if self.is_swift_fastfile
-        itc_team = self.itc_team ? "\"#{self.itc_team}\"" : "nil"
-        path = File.join(folder, 'Appfile.swift')
+        return "\tincrementBuildNumber(xcodeproj: \"#{relative_project_path}\")"
       else
-        itc_team = self.itc_team ? "itc_team_id \"#{self.itc_team}\" # iTunes Connect Team ID\n" : ""
-        path = File.join(folder, 'Appfile')
+        return "  increment_build_number(xcodeproj: \"#{relative_project_path}\")"
       end
-      template.gsub!('[[ITC_TEAM]]', itc_team)
-
-      File.write(path, template)
-      UI.success("Created new file '#{path}'. Edit it to manage your preferred app metadata information.")
     end
 
-    # Detect if the app was created on the Dev Portal / iTC
-    def detect_if_app_is_available
-      UI.important "Verifying that app is available on the Apple Developer Portal and iTunes Connect..."
-      UI.message "Starting login with user '#{self.apple_id}'"
-      Spaceship.login(self.apple_id, nil)
-      self.dev_portal_team = Spaceship.select_team
-      self.portal_ref = Spaceship::App.find(self.app_identifier)
-
-      Spaceship::Tunes.login(@apple_id, nil)
-      self.itc_team = Spaceship::Tunes.select_team
-      self.itc_ref = Spaceship::Application.find(self.app_identifier)
-    end
-
-    def create_app_if_necessary
-      UI.important "Creating the app on iTunes Connect and the Apple Developer Portal"
+    def create_app_online!(mode: nil)
+      # mode is either :adp or :itc
       require 'produce'
-      config = {} # this has to be done like this
-      FastlaneCore::Project.detect_projects(config)
-      project = FastlaneCore::Project.new(config)
-      produce_options_hash = {
-        app_name: project.app_name,
+      produce_options = {
+        username: self.user,
+        team_id: self.adp_team_id,
+        itc_team_id: self.itc_team_id,
+        platform: "ios",
         app_identifier: self.app_identifier
       }
-      Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, produce_options_hash)
-      begin
-        ENV['PRODUCE_APPLE_ID'] = Produce::Manager.start_producing
-      rescue => exception
-        if exception.to_s.include?("The App Name you entered has already been used")
-          UI.important("It looks like that #{project.app_name} has already been taken by someone else, please enter an alternative.")
-          Produce.config[:app_name] = UI.input("App Name: ")
-          Produce.config[:skip_devcenter] = true # since we failed on iTC
-          ENV['PRODUCE_APPLE_ID'] = Produce::Manager.start_producing
+      if mode == :adp
+        produce_options[:skip_itc] = true
+      else
+        produce_options[:skip_devcenter] = true
+      end
+
+      Produce.config = FastlaneCore::Configuration.create(
+        Produce::Options.available_options,
+        produce_options
+      )
+
+      # The retrying system allows people to correct invalid inputs
+      # e.g. the app's name is already taken
+      loop do
+        begin
+          Produce::Manager.start_producing
+          UI.success("✅  Successfully created app")
+          return # success
+        rescue => ex
+          # show the user facing error, and inform them of what went wrong
+          if ex.kind_of?(Spaceship::Client::BasicPreferredInfoError) || ex.kind_of?(Spaceship::Client::UnexpectedResponse)
+            UI.error(ex.preferred_error_info)
+          else
+            UI.error(ex.to_s)
+          end
+          UI.error(ex.backtrace.join("\n")) if FastlaneCore::Globals.verbose?
+          UI.important("It looks like something went wrong when we tried to create your app on the Apple Developer Portal")
+          unless UI.confirm("Would you like to try again (y)? If you enter (n), fastlane will fall back to the manual setup")
+            raise ex
+          end
         end
       end
-    end
-
-    def detect_installed_tools
-      self.tools = {}
-      self.tools[:snapshot] = File.exist?(File.join(folder, 'Snapfile'))
-      self.tools[:snapshot] ||= File.exist?(File.join(folder, 'Snapfile.swift'))
-      self.tools[:cocoapods] = File.exist?(File.join(File.expand_path('..', folder), 'Podfile'))
-      self.tools[:carthage] = File.exist?(File.join(File.expand_path('..', folder), 'Cartfile'))
-    end
-
-    def enable_deliver
-      UI.message("Loading up 'deliver', this might take a few seconds")
-      require 'deliver'
-      require 'deliver/setup'
-
-      options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
-      options[:run_precheck_before_submit] = false # precheck doesn't need to run during init
-      options[:username] = self.apple_id if self.apple_id
-      options[:app_identifier] = self.app_identifier if self.app_identifier
-
-      Deliver::Runner.new(options) # to login...
-      Deliver::Setup.new.run(options, is_swift: self.is_swift_fastfile)
-    end
-
-    def generate_fastfile(manually: false)
-      scheme = self.project.schemes.first unless manually
-
-      template = File.read(fastfile_template_path)
-
-      scheme = UI.input("Optional: The scheme name of your app (If you don't need one, just hit Enter): ") unless scheme
-      if scheme.length > 0
-        if self.is_swift_fastfile
-          template.gsub!('[[SCHEME]]', "scheme: \"#{scheme}\"")
-        else
-          template.gsub!('[[SCHEME]]', "(scheme: \"#{scheme}\")")
-        end
-      else
-        template.gsub!('[[SCHEME]]', "")
-      end
-
-      template.gsub!('[[FASTLANE_VERSION]]', Fastlane::VERSION)
-
-      if self.is_swift_fastfile
-        template.gsub!('snapshot()', '// snapshot') unless self.tools[:snapshot]
-        template.gsub!('cocoapods()', '// cocoapods()') unless self.tools[:cocoapods]
-        template.gsub!('carthage()', '// carthage()') unless self.tools[:carthage]
-        path = File.join(folder, 'Fastfile.swift')
-      else
-        template.gsub!('snapshot', '# snapshot') unless self.tools[:snapshot]
-        template.gsub!('cocoapods', '# cocoapods') unless self.tools[:cocoapods]
-        template.gsub!('carthage', '# cocoapods') unless self.tools[:carthage]
-        path = File.join(folder, 'Fastfile')
-      end
-
-      self.tools.each do |key, value|
-        UI.message("'#{key}' enabled.".magenta) if value
-        UI.important("'#{key}' not enabled.") unless value
-      end
-
-      File.write(path, template)
-      UI.success("Created new file '#{path}'. Edit it to manage your own deployment lanes.")
-    end
-
-    def folder
-      FastlaneCore::FastlaneFolder.path
-    end
-
-    def appfile_template_path
-      if self.is_swift_fastfile
-        return "#{Fastlane::ROOT}/lib/assets/AppfileTemplate.swift"
-      else
-        return "#{Fastlane::ROOT}/lib/assets/AppfileTemplate"
-      end
-    end
-
-    def fastfile_template_path
-      if self.is_swift_fastfile
-        return "#{Fastlane::ROOT}/lib/assets/DefaultFastfileTemplate.swift"
-      else
-        return "#{Fastlane::ROOT}/lib/assets/DefaultFastfileTemplate"
-      end
-    end
-
-    def update_swift_runner
-      runner_source_resources = "#{Fastlane::ROOT}/swift/."
-
-      destination_path = File.expand_path('swift', FastlaneCore::FastlaneFolder.path)
-      FileUtils.cp_r(runner_source_resources, destination_path)
-
-      UI.success("Copied Swift fastlane runner project to '#{destination_path}'.")
-    end
-
-    def restore_previous_state
-      # Move all moved files back
-      files_to_copy.each do |current|
-        from_path = File.join(folder, current)
-        to_path = File.basename(current)
-        if File.exist?(from_path)
-          UI.important("Moving '#{from_path}' to '#{to_path}'")
-          FileUtils.mv(from_path, to_path)
-        end
-      end
-
-      UI.important("Deleting the 'fastlane' folder")
-      FileUtils.rm_rf(folder)
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

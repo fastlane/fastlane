@@ -1,12 +1,18 @@
 require 'logger'
 require 'colored'
+require 'tty-spinner'
+require 'pathname'
+
+require_relative 'fastlane_folder'
+require_relative 'ui/ui'
+require_relative 'env'
 
 module FastlaneCore
   module Helper
     # This method is deprecated, use the `UI` class
-    # https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md
+    # https://docs.fastlane.tools/advanced/#user-input-and-output
     def self.log
-      UI.deprecated "Helper.log is deprecated. Use `UI` class instead"
+      UI.deprecated("Helper.log is deprecated. Use `UI` class instead")
       UI.current.log
     end
 
@@ -21,7 +27,7 @@ module FastlaneCore
 
     # @return true if the currently running program is a unit test
     def self.test?
-      defined? SpecHelper
+      Object.const_defined?("SpecHelper")
     end
 
     # @return true if it is enabled to execute external commands
@@ -120,6 +126,10 @@ module FastlaneCore
       self.mac?
     end
 
+    def self.is_windows?
+      self.windows?
+    end
+
     # Do we want to disable the colored output?
     def self.colors_disabled?
       FastlaneCore::Env.truthy?("FASTLANE_DISABLE_COLORS")
@@ -142,17 +152,37 @@ module FastlaneCore
     #  running system
     def self.xcode_path
       return "" unless self.is_mac?
-      `xcode-select -p`.delete("\n") + "/"
+
+      if self.xcode_server?
+        # Xcode server always creates a link here
+        xcode_server_xcode_path = "/Library/Developer/XcodeServer/CurrentXcodeSymlink/Contents/Developer"
+        UI.verbose("We're running as XcodeServer, setting path to #{xcode_server_xcode_path}")
+        return xcode_server_xcode_path
+      end
+
+      return `xcode-select -p`.delete("\n") + "/"
+    end
+
+    def self.xcode_server?
+      # XCS is set by Xcode Server
+      return ENV["XCS"].to_i == 1
     end
 
     # @return The version of the currently used Xcode installation (e.g. "7.0")
     def self.xcode_version
       return nil unless self.is_mac?
       return @xcode_version if @xcode_version && @developer_dir == ENV['DEVELOPER_DIR']
-      return nil unless File.exist?("#{xcode_path}/usr/bin/xcodebuild")
+
+      xcodebuild_path = "#{xcode_path}/usr/bin/xcodebuild"
+
+      xcode_build_installed = File.exist?(xcodebuild_path)
+      unless xcode_build_installed
+        UI.verbose("Couldn't find xcodebuild at #{xcodebuild_path}, check that it exists")
+        return nil
+      end
 
       begin
-        output = `DEVELOPER_DIR='' "#{xcode_path}/usr/bin/xcodebuild" -version`
+        output = `DEVELOPER_DIR='' "#{xcodebuild_path}" -version`
         @xcode_version = output.split("\n").first.split(' ')[1]
         @developer_dir = ENV['DEVELOPER_DIR']
       rescue => ex
@@ -194,7 +224,7 @@ module FastlaneCore
       return File.join(self.itms_path, 'bin', 'iTMSTransporter')
     end
 
-    def self.keychain_path(name)
+    def self.keychain_path(keychain_name)
       # Existing code expects that a keychain name will be expanded into a default path to Library/Keychains
       # in the user's home directory. However, this will not allow the user to pass an absolute path
       # for the keychain value
@@ -206,10 +236,9 @@ module FastlaneCore
       #
       # We also try to append `-db` at the end of the file path, as with Sierra the default Keychain name
       # has changed for some users: https://github.com/fastlane/fastlane/issues/5649
-      #
 
-      # Remove the ".keychain" at the end of the name
-      name.sub!(/\.keychain$/, "")
+      # Remove the ".keychain" at the end of the keychain name
+      name = keychain_name.sub(/\.keychain$/, "")
 
       possible_locations = [
         File.join(Dir.home, 'Library', 'Keychains', name),
@@ -266,6 +295,31 @@ module FastlaneCore
         return Gem::Specification.find_by_name(gem_name).gem_dir
       else
         return './'
+      end
+    end
+
+    def self.should_show_loading_indicator?
+      return false if FastlaneCore::Env.truthy?("FASTLANE_DISABLE_ANIMATION")
+      return false if Helper.ci?
+      return true
+    end
+
+    # Show/Hide loading indicator
+    def self.show_loading_indicator(text = nil)
+      if self.should_show_loading_indicator?
+        # we set the default here, instead of at the parameters
+        # as we don't want to `UI.message` a rocket that's just there for the loading indicator
+        text ||= "🚀"
+        @require_fastlane_spinner = TTY::Spinner.new("[:spinner] #{text} ", format: :dots)
+        @require_fastlane_spinner.auto_spin
+      else
+        UI.message(text) if text
+      end
+    end
+
+    def self.hide_loading_indicator
+      if self.should_show_loading_indicator? && @require_fastlane_spinner
+        @require_fastlane_spinner.success
       end
     end
   end

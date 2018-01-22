@@ -3,9 +3,9 @@ describe Fastlane do
     describe "Crashlytics Integration" do
       before :each do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
-        ENV.delete "CRASHLYTICS_API_TOKEN"
-        ENV.delete "CRASHLYTICS_BUILD_SECRET"
-        ENV.delete "CRASHLYTICS_FRAMEWORK_PATH"
+        ENV.delete("CRASHLYTICS_API_TOKEN")
+        ENV.delete("CRASHLYTICS_BUILD_SECRET")
+        ENV.delete("CRASHLYTICS_FRAMEWORK_PATH")
         @crashlytics_bundle = "Crashlytics.framework/submit"
       end
 
@@ -47,8 +47,8 @@ describe Fastlane do
         it "hides sensitive parameters" do
           with_verbose(true) do
             expect(UI).to receive(:verbose) do |message|
-              expect(message).to_not include('PEANUTS')
-              expect(message).to_not include('MAJOR_KEY')
+              expect(message).to_not(include('PEANUTS'))
+              expect(message).to_not(include('MAJOR_KEY'))
 
               expect(message).to include('[[BUILD_SECRET]]')
               expect(message).to include('[[API_TOKEN')
@@ -94,8 +94,8 @@ describe Fastlane do
           it "hides sensitive parameters" do
             with_verbose(true) do
               expect(UI).to receive(:verbose) do |message|
-                expect(message).to_not include('PEANUTS')
-                expect(message).to_not include('MAJOR_KEY')
+                expect(message).to_not(include('PEANUTS'))
+                expect(message).to_not(include('MAJOR_KEY'))
 
                 expect(message).to include('[[BUILD_SECRET]]')
                 expect(message).to include('[[API_TOKEN')

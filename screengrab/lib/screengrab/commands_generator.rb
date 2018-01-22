@@ -1,5 +1,13 @@
 require 'commander'
+
 require 'fastlane/version'
+require 'fastlane_core/fastlane_folder'
+require 'fastlane_core/configuration/configuration'
+require_relative 'android_environment'
+require_relative 'dependency_checker'
+require_relative 'runner'
+require_relative 'options'
+require_relative 'module'
 
 HighLine.track_eof = false
 
@@ -17,7 +25,7 @@ module Screengrab
       program :description, 'CLI for \'screengrab\' - Automate taking localized screenshots of your Android app on emulators or real devices'
       program :help, 'Authors', 'Andrea Falcone <asfalcone@google.com>, Michael Furtak <mfurtak@google.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/screengrab#readme'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/screengrab/'
       program :help_formatter, :compact
 
       global_option('--verbose', 'Shows a more verbose output') { FastlaneCore::Globals.verbose = true }
@@ -54,7 +62,7 @@ module Screengrab
         end
       end
 
-      default_command :run
+      default_command(:run)
 
       run!
     end

@@ -1,5 +1,7 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
+require_relative 'module'
+require_relative 'developer_center'
 
 module Produce
   class Options
@@ -48,7 +50,7 @@ module Produce
                                      optional: true,
                                      default_value: "ios",
                                      verify_block: proc do |value|
-                                                     UI.user_error!("The platform can only be ios or osx") unless %('ios', 'osx').include? value
+                                                     UI.user_error!("The platform can only be ios or osx") unless %('ios', 'osx').include?(value)
                                                    end),
         FastlaneCore::ConfigItem.new(key: :language,
                                      short_option: "-m",
@@ -87,7 +89,7 @@ module Produce
                                                      allowed_keys = Produce::DeveloperCenter::ALLOWED_SERVICES.keys
                                                      UI.user_error!("enabled_features has to be of type Hash") unless value.kind_of?(Hash)
                                                      value.each do |key, v|
-                                                       UI.user_error!("The key: '#{key}' is not supported in `enabled_features' - following keys are available: [#{allowed_keys.join(',')}]") unless allowed_keys.include? key.to_sym
+                                                       UI.user_error!("The key: '#{key}' is not supported in `enabled_features' - following keys are available: [#{allowed_keys.join(',')}]") unless allowed_keys.include?(key.to_sym)
                                                      end
                                                    end),
         FastlaneCore::ConfigItem.new(key: :enable_services,
@@ -100,7 +102,7 @@ module Produce
                                                      allowed_keys = Produce::DeveloperCenter::ALLOWED_SERVICES.keys
                                                      UI.user_error!("enable_services has to be of type Hash") unless value.kind_of?(Hash)
                                                      value.each do |key, v|
-                                                       UI.user_error!("The key: '#{key}' is not supported in `enable_services' - following keys are available: [#{allowed_keys.join(',')}]") unless allowed_keys.include? key.to_sym
+                                                       UI.user_error!("The key: '#{key}' is not supported in `enable_services' - following keys are available: [#{allowed_keys.join(',')}]") unless allowed_keys.include?(key.to_sym)
                                                      end
                                                    end),
 

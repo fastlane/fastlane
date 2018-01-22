@@ -635,7 +635,7 @@ In this case, default values for keywords, urls, name and release notes are used
 
 ## Automatically create screenshots
 
-If you want to integrate _deliver_ with [snapshot](https://github.com/fastlane/fastlane/tree/master/snapshot), check out [fastlane](https://fastlane.tools)!
+If you want to integrate _deliver_ with [snapshot](https://docs.fastlane.tools/actions/snapshot/), check out [fastlane](https://fastlane.tools)!
 
 ## Jenkins integration
 Detailed instructions about how to set up _deliver_ and _fastlane_ in `Jenkins` can be found in the [fastlane README](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration).

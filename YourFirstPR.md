@@ -42,13 +42,31 @@ You can also run those steps independently or on a more fine grained way.
 
 Make sure to run the automated tests using `bundle exec` to ensure you’re running the correct version of `rspec` and `rubocop`
 
-First, navigate into the root of the _fastlane_ project and run unit tests using
+#### All unit tests
+
+First, navigate into the root of the _fastlane_ project and run all unit tests using
 
 ```
 bundle exec rspec
 ```
 
-If you want to run tests only for one tool, use `bundle exec rspec [tool_name]`
+#### Unit tests for one specific tool
+
+If you want to run tests only for one tool, use
+
+```
+bundle exec rspec [tool_name]
+```
+
+#### Unit tests in one specific test file
+
+If you know exactly which `_spec.rb` file you want to run, use
+
+```
+bundle exec rspec ./fastlane/spec/fastlane_require_spec.rb
+```
+
+(replace `./fastlane/spec/fastlane_require_spec.rb` with the path of your test file of course)
 
 ### Code style
 

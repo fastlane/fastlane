@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Scan
   class SlackPoster
     def run(results)
@@ -5,13 +7,15 @@ module Scan
       return if Scan.config[:slack_only_on_failure] && results[:failures] == 0
       return if Scan.config[:slack_url].to_s.empty?
 
-      require 'slack-notifier'
-      notifier = Slack::Notifier.new(Scan.config[:slack_url])
-      notifier.username = 'fastlane'
-
       if Scan.config[:slack_channel].to_s.length > 0
-        notifier.channel = Scan.config[:slack_channel]
-        notifier.channel = ('#' + notifier.channel) unless ['#', '@'].include?(notifier.channel[0]) # send message to channel by default
+        channel = Scan.config[:slack_channel]
+        channel = ('#' + channel) unless ['#', '@'].include?(channel[0]) # send message to channel by default
+      end
+
+      require 'slack-notifier'
+      notifier = Slack::Notifier.new(Scan.config[:slack_url]) do
+        defaults(channel: channel,
+                username: 'fastlane')
       end
 
       attachments = []
@@ -45,9 +49,10 @@ module Scan
         }
       end
 
-      result = notifier.ping "#{Scan.project.app_name} Tests:",
+      result = notifier.ping("#{Scan.project.app_name} Tests:",
                              icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
-                             attachments: attachments
+                             attachments: attachments)
+      result = result.first
 
       if result.code.to_i == 200
         UI.success('Successfully sent Slack notification')

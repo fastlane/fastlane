@@ -1,9 +1,9 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Update Project Provisioning" do
-      let (:fixtures_path) { "./fastlane/spec/fixtures" }
-      let (:xcodeproj) { File.absolute_path(File.join(fixtures_path, 'xcodeproj', 'bundle.xcodeproj')) }
-      let (:profile_path) { File.absolute_path(File.join(fixtures_path, 'profiles', 'test.mobileprovision')) }
+      let(:fixtures_path) { "./fastlane/spec/fixtures" }
+      let(:xcodeproj) { File.absolute_path(File.join(fixtures_path, 'xcodeproj', 'bundle.xcodeproj')) }
+      let(:profile_path) { File.absolute_path(File.join(fixtures_path, 'profiles', 'test.mobileprovision')) }
       describe "target_filter" do
         before do
           allow(Fastlane::Actions::UpdateProjectProvisioningAction).to receive(:run)
@@ -19,7 +19,7 @@ describe Fastlane do
                     target_filter: 'Name'
                 })
               end").runner.execute(:test)
-            end.not_to raise_error
+            end.not_to(raise_error)
           end
         end
 
@@ -33,7 +33,7 @@ describe Fastlane do
                     target_filter: /Name/
                 })
               end").runner.execute(:test)
-            end.not_to raise_error
+            end.not_to(raise_error)
           end
         end
 
@@ -67,7 +67,7 @@ describe Fastlane do
                     build_configuration: 'Debug'
                 })
               end").runner.execute(:test)
-            end.not_to raise_error
+            end.not_to(raise_error)
           end
         end
 
@@ -81,7 +81,7 @@ describe Fastlane do
                     build_configuration: /Debug/
                 })
               end").runner.execute(:test)
-            end.not_to raise_error
+            end.not_to(raise_error)
           end
         end
 

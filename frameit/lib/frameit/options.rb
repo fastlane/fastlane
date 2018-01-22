@@ -1,3 +1,7 @@
+require 'fastlane_core/configuration/config_item'
+
+require_relative 'module'
+
 module Frameit
   class Options
     def self.available_options
@@ -26,7 +30,7 @@ module Frameit
                                      optional: true,
                                      verify_block: proc do |value|
                                        available = ['iPhone_6_Plus', 'iPhone_5s', 'iPhone_4', 'iPad_mini', 'Mac']
-                                       unless available.include? value
+                                       unless available.include?(value)
                                          UI.user_error!("Invalid device type '#{value}'. Available values: #{available}")
                                        end
                                      end),

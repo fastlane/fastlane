@@ -9,7 +9,7 @@ module Fastlane
 
         if params[:extensions]
           params[:extensions].each do |extension|
-            extension.delete!('.') if extension.include? "."
+            extension.delete!('.') if extension.include?(".")
             extensions << extension
           end
         end

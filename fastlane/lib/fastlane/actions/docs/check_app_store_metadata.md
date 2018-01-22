@@ -70,9 +70,9 @@ custom_text(data: ["chrome", "webos"],
            level: :warn)
 ``` 
 
-### Use with [_fastlane_](https://github.com/fastlane/fastlane/tree/master/fastlane)
+### Use with [_fastlane_](https://fastlane.tools)
 
-_precheck_ is fully integrated with [_deliver_](https://github.com/fastlane/fastlane/tree/master/deliver) another [_fastlane_](https://github.com/fastlane/fastlane/tree/master/fastlane) tool.
+_precheck_ is fully integrated with [_deliver_](https://docs.fastlane.tools/actions/deliver/) another [_fastlane_](https://fastlane.tools) tool.
 
 Update your `Fastfile` to contain the following code:
 

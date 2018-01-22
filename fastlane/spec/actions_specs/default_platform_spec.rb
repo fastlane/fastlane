@@ -32,7 +32,7 @@ describe Fastlane do
 
       it "doesn't display a warning at every run if a platform has been added to extra" do
         Fastlane::SupportedPlatforms.extra = [:notSupportedOS]
-        expect(FastlaneCore::UI).not_to receive(:important)
+        expect(FastlaneCore::UI).not_to(receive(:important))
         Fastlane::Actions::DefaultPlatformAction.run(['notSupportedOS'])
       end
     end
