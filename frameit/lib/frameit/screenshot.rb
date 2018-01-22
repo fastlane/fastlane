@@ -90,6 +90,8 @@ module Frameit
         UI.user_error("orientation_block must return #{valid[0..-2].join(', ')} or nil") unless valid.include?(orientation)
       end
 
+      puts("Forced orientation: #{orientation}") unless orientation.nil?
+      
       return orientation unless orientation.nil?
       return :portrait if self.orientation_name == Orientation::PORTRAIT
       return :landscape_right # Default landscape orientation

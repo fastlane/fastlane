@@ -230,19 +230,21 @@ module Frameit
     def put_title_into_background_stacked(background, title, keyword)
       resize_text(title)
       resize_text(keyword)
-
+      
+      vertical_padding = vertical_frame_padding # assign padding to variable
+      keyword_top_space = vertical_padding
       spacing_between_title_and_keyword = (title.height / 2)
-      title_top_space = vertical_frame_padding + keyword.height + spacing_between_title_and_keyword
+      title_top_space = vertical_padding + keyword.height + spacing_between_title_and_keyword
       title_left_space = (background.width / 2.0 - title.width / 2.0).round
       keyword_left_space = (background.width / 2.0 - keyword.width / 2.0).round
 
-      self.space_to_device += title.height + keyword.height + spacing_between_title_and_keyword + vertical_frame_padding
+      self.space_to_device += title.height + keyword.height + spacing_between_title_and_keyword + vertical_padding
       title_below_image = fetch_config['title_below_image']
       # keyword
       background = background.composite(keyword, "png") do |c|
         c.compose("Over")
-        c.geometry("+#{keyword_left_space}+#{vertical_frame_padding}") unless title_below_image
-        c.geometry("+#{keyword_left_space}+#{background.height - space_to_device + vertical_frame_padding}") if title_below_image
+        c.geometry("+#{keyword_left_space}+#{keyword_top_space}") unless title_below_image
+        c.geometry("+#{keyword_left_space}+#{background.height - space_to_device + keyword_top_space}") if title_below_image
       end
       # Place the title below the keyword
       background = background.composite(title, "png") do |c|
@@ -287,10 +289,11 @@ module Frameit
         sum_width *= image_scale_factor
       end
 
-      top_space = vertical_frame_padding + (actual_font_size - title.height) / 2
+      vertical_padding = vertical_frame_padding # assign padding to variable
+      top_space = vertical_padding + (actual_font_size - title.height) / 2
       left_space = (background.width / 2.0 - sum_width / 2.0).round
 
-      self.space_to_device += actual_font_size + vertical_frame_padding
+      self.space_to_device += actual_font_size + vertical_padding
 
       # First, put the keyword on top of the screenshot, if we have one
       if keyword
