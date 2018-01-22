@@ -106,10 +106,9 @@ module FastlaneCore
       file_data = File.read(path.to_s)
       cert = OpenSSL::X509::Certificate.new(file_data)
       return OpenSSL::Digest::SHA1.new(cert.to_der).to_s.upcase
-      rescue => error
-        UI.message(error)
-        UI.user_error!("Error parsing certificate '#{path}'")
-      end
+    rescue => error
+      UI.message(error)
+      UI.user_error!("Error parsing certificate '#{path}'")
     end
   end
 end
