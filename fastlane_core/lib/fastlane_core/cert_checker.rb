@@ -105,13 +105,9 @@ module FastlaneCore
     def self.sha1_fingerprint(path)
       file_data = File.read(path.to_s)
       cert = OpenSSL::X509::Certificate.new(file_data)
-      result = OpenSSL::Digest::SHA1.new(cert.to_der).to_s
-      begin
-        result = result.match(/SHA1 Fingerprint=(.*)/)[1]
-        result.delete!(':')
-        return result
-      rescue
-        UI.message(result)
+      return OpenSSL::Digest::SHA1.new(cert.to_der).to_s.upcase
+      rescue => error
+        UI.message(error)
         UI.user_error!("Error parsing certificate '#{path}'")
       end
     end
