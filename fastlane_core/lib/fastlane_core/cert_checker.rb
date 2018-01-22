@@ -1,4 +1,5 @@
 require 'tempfile'
+require 'openssl'
 
 require_relative 'helper'
 
@@ -102,7 +103,9 @@ module FastlaneCore
     end
 
     def self.sha1_fingerprint(path)
-      result = `openssl x509 -in "#{path}" -inform der -noout -sha1 -fingerprint`
+      file_data = File.read(path.to_s)
+      cert = OpenSSL::X509::Certificate.new(file_data)
+      result = OpenSSL::Digest::SHA1.new(cert.to_der).to_s
       begin
         result = result.match(/SHA1 Fingerprint=(.*)/)[1]
         result.delete!(':')
