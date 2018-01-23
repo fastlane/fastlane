@@ -16,6 +16,7 @@ module FastlaneCore
         # PATHEXT contains the list of file extensions that Windows considers executable, semicolon separated.
         # e.g. ".COM;.EXE;.BAT;.CMD"
         exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
+        exts << ''
 
         ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
           exts.each do |ext|
