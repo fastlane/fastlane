@@ -1,3 +1,4 @@
+require_relative 'module'
 require 'fastlane_core/command_executor'
 
 module Screengrab
@@ -84,7 +85,7 @@ module Screengrab
     end
 
     def executable_command?(cmd_path)
-      cmd_path && File.executable?(cmd_path) && !File.directory?(cmd_path)
+      cmd_path && (File.executable?(cmd_path) || Helper.is_windows?) && !File.directory?(cmd_path)
     end
   end
 end
