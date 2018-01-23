@@ -36,7 +36,7 @@ lane(:lint_source) do
     # Verify shell code style
     if FastlaneCore::Helper.is_mac?
       sh('find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +')
-    else
+    elsif !FastlaneCore::Helper.is_windows?
       sh('find . -regextype posix-egrep -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +')
     end
   end

@@ -44,6 +44,7 @@ RSpec.configure do |config|
 
     ENV['FASTLANE_PLATFORM_NAME'] = nil
 
+    # execute `before_each_*` method from spec_helper for each tool
     tool_name = current_test.id.match(%r{\.\/(\w+)\/})[1]
     method_name = "before_each_#{tool_name}".to_sym
     begin
@@ -51,9 +52,13 @@ RSpec.configure do |config|
     rescue NoMethodError
       # no method implemented
     end
+
+    # Make sure PATH didnt get emptied during execution of previous (!) test
+    expect(ENV['PATH']).to be_truthy, "PATH is missing. (Previous test probably emptied it.)"
   end
 
   config.after(:each) do |current_test|
+    # execute `after_each_*` method from spec_helper for each tool
     tool_name = current_test.id.match(%r{\.\/(\w+)\/})[1]
     method_name = "after_each_#{tool_name}".to_sym
     begin
@@ -96,6 +101,13 @@ RSpec.configure do |config|
     end
     config.extend(HookOverrides)
 
+  end
+
+  # skip some more tests if run on on Windows
+  if FastlaneCore::Helper.is_windows?
+    config.define_derived_metadata(:requires_xar) do |meta|
+      meta[:skip] = "Skipped: Requires `xar` to be installed (which is not possible on Windows and no workaround has been implemented)"
+    end
   end
 end
 
