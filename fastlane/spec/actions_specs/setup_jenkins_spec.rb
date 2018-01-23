@@ -129,31 +129,35 @@ describe Fastlane do
         end
 
         it "set output directory" do
+          tmp_path = Dir.mktmpdir
+          directory = "#{tmp_path}/output/directory"
           Fastlane::FastFile.new.parse("lane :test do
             setup_jenkins(
-              output_directory: '/tmp/output/directory'
+              output_directory: '#{directory}'
             )
           end").runner.execute(:test)
 
-          expect(ENV["BACKUP_XCARCHIVE_DESTINATION"]).to eq("/tmp/output/directory")
-          expect(ENV["GYM_BUILD_PATH"]).to eq("/tmp/output/directory")
-          expect(ENV["GYM_OUTPUT_DIRECTORY"]).to eq("/tmp/output/directory")
-          expect(ENV["SCAN_OUTPUT_DIRECTORY"]).to eq("/tmp/output/directory")
+          expect(ENV["BACKUP_XCARCHIVE_DESTINATION"]).to eq(directory)
+          expect(ENV["GYM_BUILD_PATH"]).to eq(directory)
+          expect(ENV["GYM_OUTPUT_DIRECTORY"]).to eq(directory)
+          expect(ENV["SCAN_OUTPUT_DIRECTORY"]).to eq(directory)
         end
 
         it "set derived data" do
+          tmp_path = Dir.mktmpdir
+          directory = "#{tmp_path}/derived_data"
           Fastlane::FastFile.new.parse("lane :test do
             setup_jenkins(
-              derived_data_path: '/tmp/derived_data'
+              derived_data_path: '#{directory}'
             )
           end").runner.execute(:test)
 
-          expect(ENV["DERIVED_DATA_PATH"]).to eq("/tmp/derived_data")
-          expect(ENV["FL_CARTHAGE_DERIVED_DATA"]).to eq("/tmp/derived_data")
-          expect(ENV["FL_SLATHER_BUILD_DIRECTORY"]).to eq("/tmp/derived_data")
-          expect(ENV["GYM_DERIVED_DATA_PATH"]).to eq("/tmp/derived_data")
-          expect(ENV["SCAN_DERIVED_DATA_PATH"]).to eq("/tmp/derived_data")
-          expect(ENV["XCODE_DERIVED_DATA_PATH"]).to eq("/tmp/derived_data")
+          expect(ENV["DERIVED_DATA_PATH"]).to eq(directory)
+          expect(ENV["FL_CARTHAGE_DERIVED_DATA"]).to eq(directory)
+          expect(ENV["FL_SLATHER_BUILD_DIRECTORY"]).to eq(directory)
+          expect(ENV["GYM_DERIVED_DATA_PATH"]).to eq(directory)
+          expect(ENV["SCAN_DERIVED_DATA_PATH"]).to eq(directory)
+          expect(ENV["XCODE_DERIVED_DATA_PATH"]).to eq(directory)
         end
 
         it "disable result bundle path" do

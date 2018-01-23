@@ -63,7 +63,7 @@ RSpec.configure do |config|
     end
   end
 
-  config.example_status_persistence_file_path = "/tmp/rspec_failed_tests.txt"
+  config.example_status_persistence_file_path = "#{Dir.tmpdir}/rspec_failed_tests.txt"
 
   # skip some tests if not running on mac
   unless FastlaneCore::Helper.is_mac?
