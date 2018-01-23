@@ -19,4 +19,4 @@ environment:
 build: off
 
 test_script:
-  - bundle exec fastlane test
+  - bundle exec fastlane execute_tests
