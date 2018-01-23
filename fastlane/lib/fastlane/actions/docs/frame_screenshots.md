@@ -2,7 +2,7 @@
   <img src="/img/actions/frameit.png" width="250">
 </p>
 
-###### Quickly put your screenshots into the right device frames
+###### Easily put your screenshots into the right device frames
 
 _frameit_ allows you to put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Use _frameit_ to prepare perfect screenshots for the App Store, your website, QA or emails.
 
