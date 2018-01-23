@@ -12,9 +12,7 @@ module Fastlane
         Actions.sh(
           command,
           log: FastlaneCore::Globals.verbose?,
-          error_callback: lambda { |result|
-            exists = false
-          }
+          error_callback: lambda { |result| exists = false }
         )
         exists
       end
