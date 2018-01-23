@@ -243,7 +243,7 @@ module Spaceship
           klass.new(attrs)
         end
 
-        # @param mac [Bool] Fetches Mac certificates if true. (Ignored if callsed from a subclass)
+        # @param mac [Bool] Fetches Mac certificates if true. (Ignored if called from a subclass)
         # @return (Array) Returns all certificates of this account.
         #  If this is called from a subclass of Certificate, this will
         #  only include certificates matching the current type.

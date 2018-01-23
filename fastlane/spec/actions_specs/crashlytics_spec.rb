@@ -24,12 +24,12 @@ describe Fastlane do
               )
             end').runner.execute(:test)
             ["java",
-             "-jar /",
+             "-jar",
              "-androidRes .",
              "-apiKey api_token",
              "-apiSecret build_secret",
-             "-uploadDist '/",
-             "-betaDistributionReleaseNotesFilePath '/",
+             "-uploadDist '",
+             "-betaDistributionReleaseNotesFilePath '",
              "-betaDistributionEmails 'email1@krausefx.com,email2@krausefx.com'",
              "-betaDistributionGroupAliases 'testgroup'",
              "-betaDistributionNotifications true"].each do |to_be|
