@@ -34,12 +34,14 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :tag,
                                        description: "The tag name that should be checked"),
           FastlaneCore::ConfigItem.new(key: :remote,
-                                       description: "Defaults to `false`",
+                                       description: "Whether to check remote. Defaults to `false`",
                                        type: Boolean,
-                                       default_value: false),
+                                       default_value: false,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :remote_name,
                                        description: "The remote to check. Defaults to `origin`",
-                                       default_value: 'origin')
+                                       default_value: 'origin',
+                                       optional: true)
         ]
       end
 
