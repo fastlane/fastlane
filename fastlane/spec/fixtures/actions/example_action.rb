@@ -2,7 +2,9 @@ module Fastlane
   module Actions
     class ExampleActionAction < Action
       def self.run(params)
-        File.write("/tmp/example_action.txt", Time.now.to_i)
+        tmp = Dir.mktmpdir
+        tmp_path = File.join(tmp, "example_action.txt")
+        File.write(tmp_path, Time.now.to_i)
       end
 
       def self.is_supported?(platform)
