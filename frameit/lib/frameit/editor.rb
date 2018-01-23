@@ -378,7 +378,7 @@ module Frameit
           top_vertical_trim_offset = trim_box.offset_y
         end
 
-        # Get the maximum bottom offset of the trimbox, this is the top offset + height:
+        # Get the maximum bottom offset of the trim box, this is the top offset + height:
         if (trim_box.offset_y + trim_box.height) > bottom_vertical_trim_offset
           bottom_vertical_trim_offset = trim_box.offset_y + trim_box.height
         end
@@ -392,7 +392,7 @@ module Frameit
         # Get matching trim box:
         trim_box = trim_boxes[key]
 
-        # For side-by-side text images (e.g. stack_title is false) adjust the trimbox based on top_vertical_trim_offset and bottom_vertical_trim_offset to maintain the text baseline:
+        # For side-by-side text images (e.g. stack_title is false) adjust the trim box based on top_vertical_trim_offset and bottom_vertical_trim_offset to maintain the text baseline:
         unless stack_title
           # Determine the trim area by maintaining the same vertical top offset based on the smallest value from all trim boxes (top_vertical_trim_offset).
           # When the vertical top offset is larger than the smallest vertical top offset, the trim box needs to be adjusted:
