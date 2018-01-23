@@ -310,7 +310,7 @@ end
 # Docs
 
 desc("Validates the docs still are good")
-private_lane(:validate_docs) do
+lane(:validate_docs) do
   # Test if generating the docs is successful
   clone_docs do
     generate_markdown_docs(target_path: ".")
