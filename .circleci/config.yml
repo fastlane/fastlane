@@ -1,7 +1,7 @@
 version: 2
 
 jobs:
-  "Tests on macOS":
+  "Execute tests on macOS":
     macos:
       xcode: "9.0.0"
     environment:
@@ -59,7 +59,7 @@ jobs:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
-  "Tests on Ubuntu":
+  "Execute tests on Ubuntu":
     environment:
       CIRCLE_TEST_REPORTS: ~/test-reports
       LC_ALL: C.UTF-8
@@ -106,7 +106,7 @@ jobs:
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
 
-  "Docs":
+  "Validate Documentation":
     docker:
       - image: circleci/ruby:2.3
     steps:
@@ -125,7 +125,7 @@ jobs:
 
       - run: bundle exec fastlane validate_docs
 
-  "Source Code Linting":
+  "Lint Source Code":
     docker:
       - image: circleci/ruby:2.3
     steps:
@@ -142,13 +142,13 @@ jobs:
           paths:
             - .bundle
 
-      - run: bundle exec fastlane verify_source
+      - run: bundle exec fastlane lint_source
 
 workflows:
   version: 2
   build:
     jobs:
-      - "Tests on macOS"
-      - "Tests on Ubuntu"
-      - "Docs"
-      - "Source Code Linting"
+      - "Execute tests on macOS"
+      - "Execute tests on Ubuntu"
+      - "Validate Documentation"
+      - "Lint Source Code"
