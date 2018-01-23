@@ -1,6 +1,3 @@
-require_relative 'ui/ui'
-require_relative 'globals'
-
 module FastlaneCore
   # Executes commands and takes care of error handling and more
   class CommandExecutor
@@ -15,11 +12,12 @@ module FastlaneCore
         # PATHEXT contains the list of file extensions that Windows considers executable, semicolon separated.
         # e.g. ".COM;.EXE;.BAT;.CMD"
         exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
+        exts << ''
 
         ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
           exts.each do |ext|
             cmd_path = File.join(path, "#{cmd}#{ext}")
-            return cmd_path if File.executable?(cmd_path) && !File.directory?(cmd_path)
+            return cmd_path if (File.executable?(cmd_path) || (Helper.is_windows? && File.exist?(cmd_path))) && !File.directory?(cmd_path)
           end
         end
 
@@ -46,8 +44,7 @@ module FastlaneCore
         end
 
         begin
-          require 'pty'
-          PTY.spawn(command) do |stdin, stdout, pid|
+          FastlaneCore::PTY.spawn(command) do |stdin, stdout, pid|
             begin
               stdin.each do |l|
                 line = l.strip # strip so that \n gets removed

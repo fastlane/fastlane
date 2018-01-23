@@ -39,7 +39,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             import('tmp/asdf')
           end").runner.execute(:test)
-        end.to raise_error(%r{Could not find Fastfile at path \'\/.*}) # /home (travis) # /Users (Mac)
+        end.to raise_error(%r{Could not find Fastfile at path \'([A-Z]\:)?\/.+}) # /home (travis) # /Users (Mac) # C:/path (Windows)
       end
     end
   end
