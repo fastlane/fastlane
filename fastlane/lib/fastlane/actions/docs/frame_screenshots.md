@@ -4,7 +4,7 @@
 
 ###### Easily put your screenshots into the right device frames
 
-_frameit_ allows you to put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Use _frameit_ to prepare perfect screenshots for the App Store, your website, QA or emails.
+_frameit_ allows you to put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Use _frameit_ to prepare perfect screenshots for the App Store, your website, QA or emails. TODO advanced features
 
 -------
 
@@ -21,11 +21,13 @@ _frameit_ allows you to put a gorgeous device frame around your iOS and macOS sc
 
 # Features
 
+## Frame screenshot
+
 Put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Support for:
 
 - iPhone, iPad and Mac
 - Portrait and Landscape modes
-- Several colors
+- Several device colors
 
 The complete and updated list of supported devices and colors can be found [here](https://github.com/fastlane/frameit-frames/tree/gh-pages/latest)
 
@@ -33,7 +35,16 @@ Here is a nice gif, that shows _frameit_ in action:
 
 ![img/actions/FrameitGit.gif](/img/actions/FrameitGit.gif?raw=1)
 
-### Results
+## Advanced Features
+
+- Put framed screenshot on colored background, define padding
+- add text above or under framed screenshot
+  - keyword + text
+  - choose text font and color
+  - multi line text
+  - "intelligent" positioning of text that always looks good(ish)
+
+## Results
 
 ![img/actions/ScreenshotsBig.png](/img/actions/ScreenshotsBig.png?raw=1)
 
@@ -54,6 +65,8 @@ More information about this process and how to update the frames can be found [h
 
 # Usage
 
+## Basic Usage
+
 Why should you have to use Photoshop, just to add a frame around your screenshots?
 
 Just navigate to your folder of screenshots and use the following command:
@@ -68,11 +81,13 @@ To download the latest frames
 
     fastlane frameit download_frames
 
-When using _frameit_ without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store.
+When using _frameit_ without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store. TODO Option to also scale those?
 
-# Titles and Background (optional)
+## Advanced Usage (optional)
 
-With _frameit_ 2.0 you are now able to add a custom background, title and text colors to your screenshots.
+### Titles and Background
+
+With _frameit_ it's possible to add a custom background, title and text colors to your screenshots.
 
 A working example can be found in the [fastlane examples](https://github.com/fastlane/examples/tree/master/MindNode/screenshots) project.
 
@@ -80,6 +95,7 @@ A working example can be found in the [fastlane examples](https://github.com/fas
 
 Use it to define the general information:
 
+TODO list parameters first, then show example
 ```json
 {
   "device_frame_version": "latest",
@@ -134,6 +150,9 @@ The `title_below_image` value specifies whether _frameit_ should place the title
 
 The `filter` value is a part of the screenshot named for which the given option should be used. If a screenshot is named `iPhone5_Brainstorming.png` the first entry in the `data` array will be used.
 
+TODO Add missing parameters
+TODO parameters in usual table instead of normal text
+
 You can find a more complex [configuration](https://github.com/fastlane/examples/blob/master/MindNode/screenshots/Framefile.json) to also support Chinese, Japanese and Korean languages.
 
 The `Framefile.json` should be in the `screenshots` folder, as seen in the [example](https://github.com/fastlane/examples/tree/master/MindNode/screenshots).
@@ -148,13 +167,9 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 
 **Note:** You **MUST** provide a background if you want titles. _frameit_ will not add the tiles if a background is not specified.
 
-#### Uploading screenshots to iTC
-
-Use [deliver](https://docs.fastlane.tools/actions/deliver/) to upload all screenshots to iTunes Connect completely automatically 🚀
-
 ### Mac
 
-With _frameit_ 2.0 it's possible to also frame macOS Application screenshots. You have to provide the following:
+With _frameit_ it's possible to also frame macOS Application screenshots. You have to provide the following:
 
 - The `offset` information so _frameit_ knows where to put your screenshots
 - A path to a `background`, which should contain both the background and the Mac
@@ -188,7 +203,13 @@ Check out the [MindNode example project](https://github.com/fastlane/examples/tr
 
 # Tips
 
+## Upload screenshots to iTC
+
+Use [deliver](https://docs.fastlane.tools/actions/deliver/) to upload all screenshots to iTunes Connect completely automatically 🚀
+TODO Android
+
 ## Generate localized screenshots
+
 Check out [_snapshot_](https://docs.fastlane.tools/actions/snapshot/) to automatically generate screenshots using ```UI Automation```.
 
 ## Alternative location to store device_frames
@@ -200,6 +221,7 @@ Device frames can also be stored in a ```./fastlane/screenshots/devices_frames``
 Some stock images provided by Apple still have a white background instead of a transparent one. You'll have to edit the Photoshop file to remove the white background, delete the generated `.png` file and run `fastlane frameit` again.
 
 ## Use a clean status bar
+
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
 
 ## Gray artifacts around text
