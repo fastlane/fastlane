@@ -12,7 +12,7 @@ module Fastlane
         Actions.sh(
           command,
           log: FastlaneCore::Globals.verbose?,
-          error_callback: lambda { |result| exists = false }
+          error_callback: ->(result) { exists = false }
         )
         exists
       end
@@ -39,7 +39,7 @@ module Fastlane
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :remote_name,
                                        description: "The remote to check. Defaults to `origin`",
-                                       default_value: 'origin'),
+                                       default_value: 'origin')
         ]
       end
 
