@@ -49,7 +49,7 @@ module Fastlane
       def self.check_response_code(response)
         case response.code.to_i
         when 200, 204
-          puts "Successfully created new OneSignal app".green
+          puts("Successfully created new OneSignal app".green)
         else
           UI.user_error!("Unexpected #{response.code} with response: #{response.body}")
         end

@@ -1,6 +1,7 @@
 require 'logger'
 require 'colored'
 require 'tty-spinner'
+require 'pathname'
 
 require_relative 'fastlane_folder'
 require_relative 'ui/ui'
@@ -9,9 +10,9 @@ require_relative 'env'
 module FastlaneCore
   module Helper
     # This method is deprecated, use the `UI` class
-    # https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md
+    # https://docs.fastlane.tools/advanced/#user-input-and-output
     def self.log
-      UI.deprecated "Helper.log is deprecated. Use `UI` class instead"
+      UI.deprecated("Helper.log is deprecated. Use `UI` class instead")
       UI.current.log
     end
 
@@ -151,17 +152,37 @@ module FastlaneCore
     #  running system
     def self.xcode_path
       return "" unless self.is_mac?
-      `xcode-select -p`.delete("\n") + "/"
+
+      if self.xcode_server?
+        # Xcode server always creates a link here
+        xcode_server_xcode_path = "/Library/Developer/XcodeServer/CurrentXcodeSymlink/Contents/Developer"
+        UI.verbose("We're running as XcodeServer, setting path to #{xcode_server_xcode_path}")
+        return xcode_server_xcode_path
+      end
+
+      return `xcode-select -p`.delete("\n") + "/"
+    end
+
+    def self.xcode_server?
+      # XCS is set by Xcode Server
+      return ENV["XCS"].to_i == 1
     end
 
     # @return The version of the currently used Xcode installation (e.g. "7.0")
     def self.xcode_version
       return nil unless self.is_mac?
       return @xcode_version if @xcode_version && @developer_dir == ENV['DEVELOPER_DIR']
-      return nil unless File.exist?("#{xcode_path}/usr/bin/xcodebuild")
+
+      xcodebuild_path = "#{xcode_path}/usr/bin/xcodebuild"
+
+      xcode_build_installed = File.exist?(xcodebuild_path)
+      unless xcode_build_installed
+        UI.verbose("Couldn't find xcodebuild at #{xcodebuild_path}, check that it exists")
+        return nil
+      end
 
       begin
-        output = `DEVELOPER_DIR='' "#{xcode_path}/usr/bin/xcodebuild" -version`
+        output = `DEVELOPER_DIR='' "#{xcodebuild_path}" -version`
         @xcode_version = output.split("\n").first.split(' ')[1]
         @developer_dir = ENV['DEVELOPER_DIR']
       rescue => ex
@@ -277,14 +298,29 @@ module FastlaneCore
       end
     end
 
+    def self.should_show_loading_indicator?
+      return false if FastlaneCore::Env.truthy?("FASTLANE_DISABLE_ANIMATION")
+      return false if Helper.ci?
+      return true
+    end
+
     # Show/Hide loading indicator
-    def self.show_loading_indicator(text = "🚀")
-      @require_fastlane_spinner = TTY::Spinner.new("[:spinner] #{text} ", format: :dots)
-      @require_fastlane_spinner.auto_spin
+    def self.show_loading_indicator(text = nil)
+      if self.should_show_loading_indicator?
+        # we set the default here, instead of at the parameters
+        # as we don't want to `UI.message` a rocket that's just there for the loading indicator
+        text ||= "🚀"
+        @require_fastlane_spinner = TTY::Spinner.new("[:spinner] #{text} ", format: :dots)
+        @require_fastlane_spinner.auto_spin
+      else
+        UI.message(text) if text
+      end
     end
 
     def self.hide_loading_indicator
-      @require_fastlane_spinner.success
+      if self.should_show_loading_indicator? && @require_fastlane_spinner
+        @require_fastlane_spinner.success
+      end
     end
   end
 end

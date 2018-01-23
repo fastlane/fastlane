@@ -27,7 +27,7 @@ module Scan
       program :description, Scan::DESCRIPTION
       program :help, "Author", "Felix Krause <scan@krausefx.com>"
       program :help, "Website", "https://fastlane.tools"
-      program :help, "GitHub", "https://github.com/fastlane/fastlane/tree/master/scan"
+      program :help, "Documentation", "https://docs.fastlane.tools/actions/scan/"
       program :help_formatter, :compact
 
       global_option("--verbose") { FastlaneCore::Globals.verbose = true }
@@ -56,7 +56,7 @@ module Scan
           is_swift_fastfile = args.include?("swift")
           if is_swift_fastfile
             path = File.join(containing, Scan.scanfile_name + ".swift")
-            UI.user_error! "Scanfile.swift already exists" if File.exist?(path)
+            UI.user_error!("Scanfile.swift already exists") if File.exist?(path)
           end
 
           if is_swift_fastfile
@@ -70,7 +70,7 @@ module Scan
         end
       end
 
-      default_command :tests
+      default_command(:tests)
 
       run!
     end

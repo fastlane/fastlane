@@ -29,7 +29,7 @@ describe Scan do
             include_simulator_logs: false
           })
 
-          expect(FastlaneCore::Simulator).not_to receive(:copy_logs)
+          expect(FastlaneCore::Simulator).not_to(receive(:copy_logs))
           @scan.handle_results(0)
         end
       end
@@ -61,7 +61,7 @@ describe Scan do
             expect(custom_parser).to receive(:parse_result).and_return({ tests: 5, failures: 3 })
 
             @scan.handle_results(0)
-          end.to raise_error FastlaneCore::Interface::FastlaneTestFailure, "Tests have failed"
+          end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Tests have failed")
         end
       end
     end
@@ -87,8 +87,8 @@ describe Scan do
 
       it "still proceeds successfully if the temp junit report was deleted", requires_xcodebuild: true do
         Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
-        expect(@scan.test_results).to_not be_nil
-        expect(Scan.cache[:temp_junit_report]).to_not eq('/var/folders/non_existent_file.junit')
+        expect(@scan.test_results).to_not(be_nil)
+        expect(Scan.cache[:temp_junit_report]).to_not(eq('/var/folders/non_existent_file.junit'))
       end
 
       describe "when output_style is raw" do
@@ -101,8 +101,8 @@ describe Scan do
           })
 
           Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
-          expect(@scan.test_results).to_not be_nil
-          expect(Scan.cache[:temp_junit_report]).to_not eq('/var/folders/non_existent_file.junit')
+          expect(@scan.test_results).to_not(be_nil)
+          expect(Scan.cache[:temp_junit_report]).to_not(eq('/var/folders/non_existent_file.junit'))
         end
       end
     end

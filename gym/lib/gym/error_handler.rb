@@ -13,46 +13,46 @@ module Gym
         # The order of the handling below is important
         case output
         when /Your build settings specify a provisioning profile with the UUID/
-          print "Invalid code signing settings"
-          print "Your project defines a provisioning profile which doesn't exist on your local machine"
-          print "You can use sigh (https://github.com/fastlane/fastlane/tree/master/sigh) to download and install the provisioning profile"
-          print "Follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/"
+          print("Invalid code signing settings")
+          print("Your project defines a provisioning profile which doesn't exist on your local machine")
+          print("You can use sigh (https://docs.fastlane.tools/actions/sigh/) to download and install the provisioning profile")
+          print("Follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/")
         when /Provisioning profile does not match bundle identifier/
-          print "Invalid code signing settings"
-          print "Your project defines a provisioning profile that doesn't match the bundle identifier of your app"
-          print "Make sure you use the correct provisioning profile for this app"
-          print "Take a look at the ouptput above for more information"
-          print "You can follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/"
+          print("Invalid code signing settings")
+          print("Your project defines a provisioning profile that doesn't match the bundle identifier of your app")
+          print("Make sure you use the correct provisioning profile for this app")
+          print("Take a look at the ouptput above for more information")
+          print("You can follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/")
         when /provisioning profiles matching the bundle identifier .(.*)./ # the . around the (.*) are for the strange "
-          print "You don't have the provisioning profile for '#{$1}' installed on the local machine"
-          print "Make sure you have the profile on this computer and it's properly installed"
-          print "You can use sigh (https://github.com/fastlane/fastlane/tree/master/sigh) to download and install the provisioning profile"
-          print "Follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/"
+          print("You don't have the provisioning profile for '#{$1}' installed on the local machine")
+          print("Make sure you have the profile on this computer and it's properly installed")
+          print("You can use sigh (https://docs.fastlane.tools/actions/sigh/) to download and install the provisioning profile")
+          print("Follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/")
         when /matching the bundle identifier .(.*). were found/ # the . around the (.*) are for the strange "
-          print "You don't have a provisioning profile for the bundle identifier '#{$1}' installed on the local machine"
-          print "Make sure you have the profile on this computer and it's properly installed"
-          print "You can use sigh (https://github.com/fastlane/fastlane/tree/master/sigh) to download and install the provisioning profile"
-          print "Follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/"
+          print("You don't have a provisioning profile for the bundle identifier '#{$1}' installed on the local machine")
+          print("Make sure you have the profile on this computer and it's properly installed")
+          print("You can use sigh (https://docs.fastlane.tools/actions/sigh/) to download and install the provisioning profile")
+          print("Follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/")
 
         # Insert more code signing specific errors here
         when /code signing is required/
-          print "Your project settings define invalid code signing settings"
-          print "To generate an ipa file you need to enable code signing for your project"
-          print "Additionally make sure you have a code signing identity set"
-          print "Follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/"
+          print("Your project settings define invalid code signing settings")
+          print("To generate an ipa file you need to enable code signing for your project")
+          print("Additionally make sure you have a code signing identity set")
+          print("Follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/")
         when /US\-ASCII/
-          print "Your shell environment is not correctly configured"
-          print "Instead of UTF-8 your shell uses US-ASCII"
-          print "Please add the following to your '~/.bashrc':"
-          print ""
-          print "       export LANG=en_US.UTF-8"
-          print "       export LANGUAGE=en_US.UTF-8"
-          print "       export LC_ALL=en_US.UTF-8"
-          print ""
-          print "You'll have to restart your shell session after updating the file."
-          print "If you are using zshell or another shell, make sure to edit the correct bash file."
-          print "For more information visit this stackoverflow answer:"
-          print "https://stackoverflow.com/a/17031697/445598"
+          print("Your shell environment is not correctly configured")
+          print("Instead of UTF-8 your shell uses US-ASCII")
+          print("Please add the following to your '~/.bashrc':")
+          print("")
+          print("       export LANG=en_US.UTF-8")
+          print("       export LANGUAGE=en_US.UTF-8")
+          print("       export LC_ALL=en_US.UTF-8")
+          print("")
+          print("You'll have to restart your shell session after updating the file.")
+          print("If you are using zshell or another shell, make sure to edit the correct bash file.")
+          print("For more information visit this stackoverflow answer:")
+          print("https://stackoverflow.com/a/17031697/445598")
         end
         print_xcode_path_instructions
         print_xcode_version
@@ -63,11 +63,11 @@ module Gym
         # This error is rather common and should be below the other (a little noisy) output
         case output
         when /Code signing is required for product/
-          print "Seems like Xcode is not happy with the code signing setup"
-          print "Please make sure to check out the raw `xcodebuild` output"
+          print("Seems like Xcode is not happy with the code signing setup")
+          print("Please make sure to check out the raw `xcodebuild` output")
           UI.important(Gym::BuildCommandGenerator.xcodebuild_log_path)
-          print "The very bottom of the file will tell you the raw Xcode error message"
-          print "indicating on why the code signing step failed"
+          print("The very bottom of the file will tell you the raw Xcode error message")
+          print("indicating on why the code signing step failed")
         end
 
         UI.build_failure!("Error building the application - see the log above", error_info: output)
@@ -78,31 +78,31 @@ module Gym
       def handle_package_error(output)
         case output
         when /single\-bundle/
-          print "Your project does not contain a single–bundle application or contains multiple products"
-          print "Please read the documentation provided by Apple: https://developer.apple.com/library/ios/technotes/tn2215/_index.html"
+          print("Your project does not contain a single–bundle application or contains multiple products")
+          print("Please read the documentation provided by Apple: https://developer.apple.com/library/ios/technotes/tn2215/_index.html")
         when /no signing identity matches '(.*)'/
-          print "Could not find code signing identity '#{$1}'"
-          print "Make sure the name of the code signing identity is correct"
-          print "and it matches a locally installed code signing identity"
-          print "You can pass the name of the code signing identity using the"
-          print "`codesigning_identity` option"
+          print("Could not find code signing identity '#{$1}'")
+          print("Make sure the name of the code signing identity is correct")
+          print("and it matches a locally installed code signing identity")
+          print("You can pass the name of the code signing identity using the")
+          print("`codesigning_identity` option")
         when /no provisioning profile matches '(.*)'/
-          print "Could not find provisioning profile with the name '#{$1}'"
-          print "Make sure the name of the provisioning profile is correct"
-          print "and it matches a locally installed profile"
+          print("Could not find provisioning profile with the name '#{$1}'")
+          print("Make sure the name of the provisioning profile is correct")
+          print("and it matches a locally installed profile")
         when /mismatch between specified provisioning profile and signing identity/
-          print "Mismatch between provisioning profile and code signing identity"
-          print "This means, the specified provisioning profile was not created using"
-          print "the specified certificate."
-          print "Run cert and sigh before gym to make sure to have all signing resources ready"
+          print("Mismatch between provisioning profile and code signing identity")
+          print("This means, the specified provisioning profile was not created using")
+          print("the specified certificate.")
+          print("Run cert and sigh before gym to make sure to have all signing resources ready")
         when /requires a provisioning profile/
-          print "No provisioning profile provided"
-          print "Make sure to pass a valid provisioning for each required target"
-          print "Check out the docs on how to fix this: https://docs.fastlane.tools/actions/gym/#export-options"
+          print("No provisioning profile provided")
+          print("Make sure to pass a valid provisioning for each required target")
+          print("Check out the docs on how to fix this: https://docs.fastlane.tools/actions/gym/#export-options")
         # insert more specific code signing errors here
         when /Codesign check fails/
-          print "A general code signing error occurred. Make sure you passed a valid"
-          print "provisioning profile and code signing identity."
+          print("A general code signing error occurred. Make sure you passed a valid")
+          print("provisioning profile and code signing identity.")
         end
         print_xcode_version
         print_full_log_path
@@ -113,17 +113,17 @@ module Gym
       end
 
       def handle_empty_archive
-        print "The generated archive is invalid, this can have various reasons:"
-        print "Usually it's caused by the `Skip Install` option in Xcode, set it to `NO`"
-        print "For more information visit https://developer.apple.com/library/ios/technotes/tn2215/_index.html"
-        print "Also, make sure to have a valid code signing identity and provisioning profile installed"
-        print "Follow this guide to setup code signing https://docs.fastlane.tools/codesigning/GettingStarted/"
-        print "If your intention was only to export an ipa be sure to provide a valid archive at the archive path."
-        print "This error might also happen if your workspace/project file is not in the root directory of your project."
-        print "To workaround that issue, you can wrap your calls to gym with"
-        print "`Dir.chdir('../path/to/dir/containing/proj') do`"
-        print "For an example you can check out"
-        print "https://github.com/artsy/emission-nebula/commit/44fe51a7fea8f7d52f0f77d6c3084827fe5dd59e"
+        print("The generated archive is invalid, this can have various reasons:")
+        print("Usually it's caused by the `Skip Install` option in Xcode, set it to `NO`")
+        print("For more information visit https://developer.apple.com/library/ios/technotes/tn2215/_index.html")
+        print("Also, make sure to have a valid code signing identity and provisioning profile installed")
+        print("Follow this guide to setup code signing https://docs.fastlane.tools/codesigning/GettingStarted/")
+        print("If your intention was only to export an ipa be sure to provide a valid archive at the archive path.")
+        print("This error might also happen if your workspace/project file is not in the root directory of your project.")
+        print("To workaround that issue, you can wrap your calls to gym with")
+        print("`Dir.chdir('../path/to/dir/containing/proj') do`")
+        print("For an example you can check out")
+        print("https://github.com/artsy/emission-nebula/commit/44fe51a7fea8f7d52f0f77d6c3084827fe5dd59e")
         UI.build_failure!("Archive invalid")
       end
 
@@ -131,7 +131,7 @@ module Gym
 
       # Just to make things easier
       def print(text)
-        UI.error text
+        UI.error(text)
       end
 
       def print_full_log_path
@@ -196,25 +196,25 @@ module Gym
 
         xcode_installations_in_default_path = Dir[File.join(default_xcode_path, "Xcode*.app")]
         return unless xcode_installations_in_default_path.count > 1
-        UI.message ""
-        UI.important "Maybe the error shown is caused by using the wrong version of Xcode"
-        UI.important "Found multiple versions of Xcode in '#{default_xcode_path}'"
-        UI.important "Make sure you selected the right version for your project"
-        UI.important "This build process was executed using '#{xcode_path}'"
-        UI.important "If you want to update your Xcode path, either"
-        UI.message ""
+        UI.message("")
+        UI.important("Maybe the error shown is caused by using the wrong version of Xcode")
+        UI.important("Found multiple versions of Xcode in '#{default_xcode_path}'")
+        UI.important("Make sure you selected the right version for your project")
+        UI.important("This build process was executed using '#{xcode_path}'")
+        UI.important("If you want to update your Xcode path, either")
+        UI.message("")
 
-        UI.message "- Specify the Xcode version in your Fastfile"
-        UI.command_output "xcversion(version: \"8.1\") # Selects Xcode 8.1.0"
-        UI.message ""
+        UI.message("- Specify the Xcode version in your Fastfile")
+        UI.command_output("xcversion(version: \"8.1\") # Selects Xcode 8.1.0")
+        UI.message("")
 
-        UI.message "- Specify an absolute path to your Xcode installation in your Fastfile"
-        UI.command_output "xcode_select \"/Applications/Xcode8.app\""
-        UI.message ""
+        UI.message("- Specify an absolute path to your Xcode installation in your Fastfile")
+        UI.command_output("xcode_select \"/Applications/Xcode8.app\"")
+        UI.message("")
 
-        UI.message "- Manually update the path using"
-        UI.command_output "sudo xcode-select -s /Applications/Xcode.app"
-        UI.message ""
+        UI.message("- Manually update the path using")
+        UI.command_output("sudo xcode-select -s /Applications/Xcode.app")
+        UI.message("")
       end
 
       def print_environment_information

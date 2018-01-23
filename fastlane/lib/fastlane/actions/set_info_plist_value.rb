@@ -14,7 +14,7 @@ module Fastlane
             if plist[params[:key]]
               plist[params[:key]][params[:subkey]] = params[:value]
             else
-              UI.message "Key doesn't exist, going to create new one ..."
+              UI.message("Key doesn't exist, going to create new one ...")
               plist[params[:key]] = { params[:subkey] => params[:value] }
             end
           else
@@ -74,7 +74,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

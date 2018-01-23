@@ -111,7 +111,9 @@ scan(
 
 For a list of all available parameters use
 
-    fastlane action scan
+```no-highlight
+fastlane action scan
+```
 
 To access the raw `xcodebuild` output open `~/Library/Logs/scan`
 
@@ -141,5 +143,3 @@ lane :test do
   scan(scheme: "Example")
 end
 ```
-
-For more information visit the [fastlane GitHub page](https://github.com/fastlane/fastlane/tree/master/fastlane).

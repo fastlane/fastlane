@@ -69,10 +69,10 @@ module FastlaneCore
         [key, value] if value.to_s.length > 0
       end.compact
 
-      puts ""
-      puts Terminal::Table.new(rows: FastlaneCore::PrintTable.transform_output(rows),
-                              title: "Detected Values from '#{self.configfile_path}'")
-      puts ""
+      puts("")
+      puts(Terminal::Table.new(rows: FastlaneCore::PrintTable.transform_output(rows),
+                              title: "Detected Values from '#{self.configfile_path}'"))
+      puts("")
     end
 
     # This is used to display only the values that have changed in the summary table

@@ -70,7 +70,7 @@ module FastlaneCore
 
       # Never generate web requests during tests
       unless Helper.test?
-        fork do
+        Thread.new do
           begin
             Excon.post(url,
                        body: analytic_event_body,

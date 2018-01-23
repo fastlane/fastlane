@@ -17,11 +17,11 @@ module Snapshot
   class Runner
     def work
       if File.exist?("./fastlane/snapshot.js") or File.exist?("./snapshot.js")
-        UI.error "Found old snapshot configuration file 'snapshot.js'"
-        UI.error "You updated to snapshot 1.0 which now uses UI Automation"
-        UI.error "Please follow the migration guide: https://github.com/fastlane/fastlane/blob/master/snapshot/MigrationGuide.md"
-        UI.error "And read the updated documentation: https://github.com/fastlane/fastlane/tree/master/snapshot"
-        sleep 3 # to be sure the user sees this, as compiling clears the screen
+        UI.error("Found old snapshot configuration file 'snapshot.js'")
+        UI.error("You updated to snapshot 1.0 which now uses UI Automation")
+        UI.error("Please follow the migration guide: https://github.com/fastlane/fastlane/blob/master/snapshot/MigrationGuide.md")
+        UI.error("And read the updated documentation: https://docs.fastlane.tools/actions/snapshot/")
+        sleep(3) # to be sure the user sees this, as compiling clears the screen
       end
 
       Snapshot.config[:output_directory] = File.expand_path(Snapshot.config[:output_directory])
@@ -36,7 +36,7 @@ module Snapshot
 
       clear_previous_screenshots if Snapshot.config[:clear_previous_screenshots]
 
-      UI.success "Building and running project - this might take some time..."
+      UI.success("Building and running project - this might take some time...")
 
       launcher_config = SimulatorLauncherConfiguration.new(snapshot_config: Snapshot.config)
 
@@ -79,16 +79,16 @@ module Snapshot
         headings: ["Device"] + results.values.first.keys,
         title: "snapshot results"
       }
-      puts ""
-      puts Terminal::Table.new(params)
-      puts ""
+      puts("")
+      puts(Terminal::Table.new(params))
+      puts("")
     end
 
     def clear_previous_screenshots
-      UI.important "Clearing previously generated screenshots"
+      UI.important("Clearing previously generated screenshots")
       path = File.join(Snapshot.config[:output_directory], "*", "*.png")
       Dir[path].each do |current|
-        UI.verbose "Deleting #{current}"
+        UI.verbose("Deleting #{current}")
         File.delete(current)
       end
     end
@@ -119,15 +119,15 @@ module Snapshot
     def verify_helper_is_current
       return if Snapshot.config[:skip_helper_version_check]
       current_version = version_of_bundled_helper
-      UI.verbose "Checking that helper files contain #{current_version}"
+      UI.verbose("Checking that helper files contain #{current_version}")
 
       helper_files = Update.find_helper
       helper_files.each do |path|
         content = File.read(path)
 
         unless content.include?(current_version)
-          UI.error "Your '#{path}' is outdated, please run `fastlane snapshot update`"
-          UI.error "to update your Helper file"
+          UI.error("Your '#{path}' is outdated, please run `fastlane snapshot update`")
+          UI.error("to update your Helper file")
           UI.user_error!("Please update your Snapshot Helper file using `fastlane snapshot update`")
         end
       end

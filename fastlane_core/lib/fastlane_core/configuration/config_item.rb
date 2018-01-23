@@ -99,8 +99,8 @@ module FastlaneCore
                    code_gen_sensitive: false,
                    code_gen_default_value: nil,
                    display_in_shell: true)
-      UI.user_error!("key must be a symbol") unless key.kind_of? Symbol
-      UI.user_error!("env_name must be a String") unless (env_name || '').kind_of? String
+      UI.user_error!("key must be a symbol") unless key.kind_of?(Symbol)
+      UI.user_error!("env_name must be a String") unless (env_name || '').kind_of?(String)
 
       if short_option
         UI.user_error!("short_option for key :#{key} must of type String") unless short_option.kind_of?(String)
@@ -113,7 +113,7 @@ module FastlaneCore
 
       if conflicting_options
         conflicting_options.each do |conflicting_option_key|
-          UI.user_error!("Conflicting option key must be a symbol") unless conflicting_option_key.kind_of? Symbol
+          UI.user_error!("Conflicting option key must be a symbol") unless conflicting_option_key.kind_of?(Symbol)
         end
       end
 
@@ -210,7 +210,7 @@ module FastlaneCore
           begin
             @verify_block.call(value)
           rescue => ex
-            UI.error "Error setting value '#{value}' for option '#{@key}'"
+            UI.error("Error setting value '#{value}' for option '#{@key}'")
             raise Interface::FastlaneError.new, ex.to_s
           end
         end

@@ -208,7 +208,7 @@ module Fastlane
 
       while e.respond_to?("cause") && (e = e.cause)
         exception_array << "cause: #{e.class}"
-        exception_array << backtrace
+        exception_array << e.backtrace
       end
       return "{\"payload\":{\"status\":\"failure\",\"failure_information\":#{exception_array.flatten}}}"
     end

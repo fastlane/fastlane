@@ -15,7 +15,7 @@ module Spaceship
           search_platform = search_platform.to_sym if search_platform
 
           platform = versions.detect do |p|
-            ['ios', 'osx', 'appletvos'].include? p['platformString']
+            ['ios', 'osx', 'appletvos'].include?(p['platformString'])
           end
 
           raise "Could not find platform 'ios', 'osx' or 'appletvos'" unless platform

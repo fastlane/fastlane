@@ -56,7 +56,7 @@ Before starting to use _match_, make sure to read the [codesigning.guide](https:
 💥  | Easily reset your existing profiles and certificates if your current account has expired or invalid profiles
 ♻️  | Automatically renew your provisioning profiles to include all your devices using the `--force` option
 👥  | Support for multiple Apple accounts and multiple teams
-✨ | Tightly integrated with [fastlane](https://fastlane.tools) to work seamlessly with [gym](https://github.com/fastlane/fastlane/tree/master/gym) and other build tools
+✨ | Tightly integrated with [fastlane](https://fastlane.tools) to work seamlessly with [gym](https://docs.fastlane.tools/actions/gym/) and other build tools
 
 For more information about the concept, visit [codesigning.guide](https://codesigning.guide).
 
@@ -83,7 +83,7 @@ This will create a `Matchfile` in your current directory (or in your `./fastlane
 Example content (for more advanced setups check out the [fastlane section](#fastlane)):
 
 ```ruby-skip-tests
-git_url "https://github.com/fastlane/fastlane/tree/master/certificates"
+git_url "https://github.com/fastlane/certificates"
 
 app_identifier "tools.fastlane.app"
 username "user@fastlane.tools"
@@ -138,7 +138,7 @@ If you have several targets with different bundle identifiers, supply them as a 
 fastlane match appstore -a tools.fastlane.app,tools.fastlane.app.watchkitapp
 ```
 
-You can make this even easier using [fastlane](https://github.com/fastlane/fastlane/tree/master/fastlane) by creating a `certificates` lane like this:
+You can make this even easier using [fastlane](https://fastlane.tools) by creating a `certificates` lane like this:
 
 ```ruby
 lane :certificates do
@@ -292,6 +292,7 @@ To revoke all certificates and provisioning profiles for a specific environment:
 ```no-highlight
 fastlane match nuke development
 fastlane match nuke distribution
+fastlane match nuke enterprise
 ```
 
 <img src="/img/actions/match_nuke.gif" width="550" />
@@ -349,4 +350,4 @@ Because of the potentially dangerous nature of In-House profiles please use _mat
 - Even if your certificates are leaked, they can't be used to cause any harm without your iTunes Connect login credentials
 - Use In-House enterprise profile with _match_ with caution
 - If you use GitHub or Bitbucket we encourage enabling 2 factor authentication for all accounts that have access to the certificates repo
-- The complete source code of _match_ is fully open source on [GitHub](https://github.com/fastlane/fastlane/tree/master/match)
+- The complete source code of _match_ is fully open source on [GitHub](https://docs.fastlane.tools/actions/match/)

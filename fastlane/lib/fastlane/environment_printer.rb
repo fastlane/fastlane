@@ -8,7 +8,7 @@ module Fastlane
         env_info.gsub!(sensitive_element, "#########")
       end
 
-      puts env_info
+      puts(env_info)
       UI.important("Take notice that this output may contain sensitive information, or simply information that you don't want to make public.")
       if FastlaneCore::Helper.mac? && UI.interactive? && UI.confirm("🙄  Wow, that's a lot of markdown text... should fastlane put it into your clipboard, so you can easily paste it on GitHub?")
         copy_to_clipboard(env_info)
@@ -76,7 +76,7 @@ module Fastlane
           table << "| #{plugin} | #{installed_version} | #{update_status} |\n"
         end
 
-        rendered_table = MarkdownTableFormatter.new table
+        rendered_table = MarkdownTableFormatter.new(table)
         env_output << rendered_table.to_md
       end
 
@@ -119,7 +119,7 @@ module Fastlane
         table << "| #{current_gem.name} | #{current_gem.version} | #{update_status} |\n"
       end
 
-      rendered_table = MarkdownTableFormatter.new table
+      rendered_table = MarkdownTableFormatter.new(table)
       env_output << rendered_table.to_md
 
       env_output << "\n\n"
@@ -138,7 +138,7 @@ module Fastlane
           table << "| #{current_gem.name} | #{current_gem.version} |\n"
         end
       end
-      rendered_table = MarkdownTableFormatter.new table
+      rendered_table = MarkdownTableFormatter.new(table)
 
       env_output << rendered_table.to_md
       env_output << "</details>\n\n"
@@ -169,7 +169,7 @@ module Fastlane
         table << "|-----|---------|----|\n"
         table << env_table
       end
-      rendered_table = MarkdownTableFormatter.new table
+      rendered_table = MarkdownTableFormatter.new(table)
       env_output << rendered_table.to_md
       env_output << "\n\n"
     end

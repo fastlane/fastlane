@@ -46,7 +46,7 @@ module FastlaneCore
     end
 
     def self.show_update_status(gem_name, current_version)
-      fork do
+      Thread.new do
         begin
           send_completion_events_for(gem_name)
         rescue
@@ -64,24 +64,24 @@ module FastlaneCore
     # appropriate message to the user
     def self.show_update_message(gem_name, current_version)
       available = server_results[gem_name]
-      puts ""
-      puts '#######################################################################'.green
+      puts("")
+      puts('#######################################################################'.green)
       if available
-        puts "# #{gem_name} #{available} is available. You are on #{current_version}.".green
+        puts("# #{gem_name} #{available} is available. You are on #{current_version}.".green)
       else
-        puts "# An update for #{gem_name} is available. You are on #{current_version}.".green
+        puts("# An update for #{gem_name} is available. You are on #{current_version}.".green)
       end
-      puts "# You should use the latest version.".green
-      puts "# Please update using `#{self.update_command(gem_name: gem_name)}`.".green
+      puts("# You should use the latest version.".green)
+      puts("# Please update using `#{self.update_command(gem_name: gem_name)}`.".green)
 
-      puts "# To see what's new, open https://github.com/fastlane/#{gem_name}/releases.".green if FastlaneCore::Env.truthy?("FASTLANE_HIDE_CHANGELOG")
+      puts("# To see what's new, open https://github.com/fastlane/#{gem_name}/releases.".green) if FastlaneCore::Env.truthy?("FASTLANE_HIDE_CHANGELOG")
 
       if !Helper.bundler? && !Helper.contained_fastlane? && Random.rand(5) == 1
         # We want to show this message from time to time, if the user doesn't use bundler, nor bundled fastlane
-        puts '#######################################################################'.green
-        puts "# Run `sudo gem cleanup` from time to time to speed up fastlane".green
+        puts('#######################################################################'.green)
+        puts("# Run `sudo gem cleanup` from time to time to speed up fastlane".green)
       end
-      puts '#######################################################################'.green
+      puts('#######################################################################'.green)
       Changelog.show_changes(gem_name, current_version, update_gem_command: UpdateChecker.update_command(gem_name: gem_name)) unless FastlaneCore::Env.truthy?("FASTLANE_HIDE_CHANGELOG")
 
       ensure_rubygems_source
@@ -107,7 +107,7 @@ module FastlaneCore
     def self.ensure_rubygems_source
       return if Helper.contained_fastlane?
       return if `gem sources`.include?("https://rubygems.org")
-      puts ""
+      puts("")
       UI.error("RubyGems is not listed as your Gem source")
       UI.error("You can run `gem sources` to see all your sources")
       UI.error("Please run the following command to fix this:")
