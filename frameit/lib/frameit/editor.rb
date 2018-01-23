@@ -220,11 +220,10 @@ module Frameit
 
     def resize_text(text)
       width = text.width
-      ratio = (width + (keyword_padding + horizontal_frame_padding) * 2) / image.width.to_f
+      ratio = width / (image.width.to_f - horizontal_frame_padding * 2)
       if ratio > 1.0
         # too large - resizing now
-        smaller = (1.0 / ratio)
-        text.resize("#{(smaller * text.width).round}x")
+        text.resize("#{((1.0 / ratio) * text.width).round}x")
       end
     end
 
@@ -233,16 +232,12 @@ module Frameit
       resize_text(title)
       resize_text(keyword)
 
-      title_width = title.width
-      keyword_width = keyword.width
-
-      vertical_padding = vertical_frame_padding
+      vertical_padding = vertical_frame_padding # assign padding to variable
       keyword_top_space = vertical_padding
-
       spacing_between_title_and_keyword = (title.height / 2)
       title_top_space = vertical_padding + keyword.height + spacing_between_title_and_keyword
-      title_left_space = (background.width / 2.0 - title_width / 2.0).round
-      keyword_left_space = (background.width / 2.0 - keyword_width / 2.0).round
+      title_left_space = (background.width / 2.0 - title.width / 2.0).round
+      keyword_left_space = (background.width / 2.0 - keyword.width / 2.0).round
 
       self.space_to_device += title.height + keyword.height + spacing_between_title_and_keyword + vertical_padding
       title_below_image = fetch_config['title_below_image']
@@ -252,8 +247,7 @@ module Frameit
         c.geometry("+#{keyword_left_space}+#{keyword_top_space}") unless title_below_image
         c.geometry("+#{keyword_left_space}+#{background.height - space_to_device + keyword_top_space}") if title_below_image
       end
-      # Then, put the title on top of the screenshot next to the keyword
-      # Then, put the title above/below of the screenshot next to the keyword
+      # Place the title below the keyword
       background = background.composite(title, "png") do |c|
         c.compose("Over")
         c.geometry("+#{title_left_space}+#{title_top_space}") unless title_below_image
@@ -277,24 +271,26 @@ module Frameit
       sum_width = title.width
       sum_width += keyword.width + keyword_padding if keyword
 
-      # Resize the 2 labels if necessary
-      smaller = 1.0 # default
-      ratio = (sum_width + (keyword_padding + horizontal_frame_padding) * 2) / image.width.to_f
-      if ratio > 1.0
-        # too large - resizing now
-        smaller = (1.0 / ratio)
+      title_below_image = fetch_config['title_below_image']
 
-        UI.verbose("Text for image #{self.screenshot.path} is quite long, reducing font size by #{(ratio - 1.0).round(2)}")
+      # Resize the 2 labels if they exceed the available space either horizontally or vertically:
+      image_scale_factor = 1.0 # default
+      ratio_horizontal = sum_width / (image.width.to_f - horizontal_frame_padding * 2) # The fraction of the text images compared to the left and right padding
+      ratio_vertical = title.height.to_f / actual_font_size # The fraction of the actual height of the images compared to the available space
+      if ratio_horizontal > 1.0 || ratio_vertical > 1.0
+        # If either is too large, resize with the maximum ratio:
+        image_scale_factor = (1.0 / [ratio_horizontal, ratio_vertical].max)
 
-        title.resize("#{(smaller * title.width).round}x")
-        keyword.resize("#{(smaller * keyword.width).round}x") if keyword
-        sum_width *= smaller
+        UI.verbose("Text for image #{self.screenshot.path} is quite long, reducing font size by #{(100 * (1.0 - image_scale_factor)).round(1)}%")
+
+        title.resize("#{(image_scale_factor * title.width).round}x")
+        keyword.resize("#{(image_scale_factor * keyword.width).round}x") if keyword
+        sum_width *= image_scale_factor
       end
 
-      vertical_padding = vertical_frame_padding
+      vertical_padding = vertical_frame_padding # assign padding to variable
       top_space = vertical_padding + (actual_font_size - title.height) / 2
       left_space = (background.width / 2.0 - sum_width / 2.0).round
-      title_below_image = fetch_config['title_below_image']
 
       self.space_to_device += actual_font_size + vertical_padding
 
@@ -306,7 +302,7 @@ module Frameit
           c.geometry("+#{left_space}+#{background.height - space_to_device + top_space}") if title_below_image
         end
 
-        left_space += keyword.width + (keyword_padding * smaller)
+        left_space += keyword.width + (keyword_padding * image_scale_factor)
       end
 
       # Then, put the title on top of the screenshot next to the keyword
@@ -320,6 +316,7 @@ module Frameit
 
     def actual_font_size
       font_scale_factor = fetch_config['font_scale_factor'] || 0.1
+      UI.user_error!("Parameter 'font_scale_factor' can not be 0. Please provide a value larger than 0.0 (default = 0.1).") if font_scale_factor == 0.0
       [@image.width * font_scale_factor].max.round
     end
 
