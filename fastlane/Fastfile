@@ -12,13 +12,13 @@ end
 
 desc("Verifies all tests pass and the current state of the repo is valid")
 lane(:validate_repo) do
-  verify_source
+  lint_source
   execute_tests
   validate_docs
 end
 
 desc("Verifies source code is in a good state")
-lane(:verify_source) do
+lane(:lint_source) do
   # Verifying that no debug code is in the code base
   #
   ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "playground.rb", exclude_dirs: ["\.bundle"]) # debugging code
