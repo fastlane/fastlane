@@ -59,7 +59,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq %(security delete-keychain #{keychain.shellescape})
+        expect(result).to eq(%(security delete-keychain #{keychain.shellescape}))
       end
 
       it "works with absolute keychain path" do

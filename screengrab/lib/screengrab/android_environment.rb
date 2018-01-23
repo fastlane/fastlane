@@ -1,3 +1,4 @@
+require_relative 'module'
 require 'fastlane_core/command_executor'
 
 module Screengrab

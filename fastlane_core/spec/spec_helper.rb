@@ -38,7 +38,7 @@ end
 # completes, restores the ENV to its previous state.
 def with_env_values(hash)
   hash.each do |k, v|
-    stub_const 'ENV', ENV.to_h.merge(k => v)
+    stub_const('ENV', ENV.to_h.merge(k => v))
   end
 end
 
