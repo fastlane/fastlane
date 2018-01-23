@@ -101,7 +101,7 @@ end
 def du_upload_geojson_success
   stub_request(:post, "https://du-itc.itunes.apple.com/upload/geo-json").
     with(body: du_upload_valid_geojson.bytes,
-           headers: { 'Accept' => 'application/json, text/plain, */*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Connection' => 'keep-alive', 'Content-Length' => '224', 'Content-Type' => 'application/json', 'Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088',
+           headers: { 'Accept' => 'application/json, text/plain, */*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Connection' => 'keep-alive', 'Content-Length' => du_upload_valid_geojson.file_size, 'Content-Type' => 'application/json', 'Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088',
                      'X-Apple-Jingle-Correlation-Key' => 'iOS App:AdamId=898536088:Version=0.9.13', 'X-Apple-Upload-Appleid' => '898536088', 'X-Apple-Upload-Contentproviderid' => '1234567', 'X-Apple-Upload-Itctoken' => 'sso token for image',
                      'X-Apple-Upload-Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088', 'X-Original-Filename' => 'ftl_FAKEMD5_upload_valid.geojson' }).
     to_return(status: 201, body: du_read_upload_geojson_response_success, headers: { 'Content-Type' => 'application/json' })
@@ -110,7 +110,7 @@ end
 def du_upload_geojson_failure
   stub_request(:post, "https://du-itc.itunes.apple.com/upload/geo-json").
     with(body: du_upload_invalid_geojson.bytes,
-           headers: { 'Accept' => 'application/json, text/plain, */*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Connection' => 'keep-alive', 'Content-Length' => '243', 'Content-Type' => 'application/json', 'Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088',
+           headers: { 'Accept' => 'application/json, text/plain, */*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Connection' => 'keep-alive', 'Content-Length' => du_upload_invalid_geojson.file_size, 'Content-Type' => 'application/json', 'Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088',
                      'X-Apple-Jingle-Correlation-Key' => 'iOS App:AdamId=898536088:Version=0.9.13', 'X-Apple-Upload-Appleid' => '898536088', 'X-Apple-Upload-Contentproviderid' => '1234567', 'X-Apple-Upload-Itctoken' => 'sso token for image',
                      'X-Apple-Upload-Referrer' => 'https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088', 'X-Original-Filename' => 'ftl_FAKEMD5_upload_invalid.GeoJSON' }).
     to_return(status: 400, body: du_read_upload_geojson_response_failed, headers: { 'Content-Type' => 'application/json' })
