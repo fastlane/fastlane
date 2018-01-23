@@ -234,7 +234,7 @@ module Frameit
 
       vertical_padding = vertical_frame_padding # assign padding to variable
       keyword_top_space = vertical_padding
-      spacing_between_title_and_keyword = (title.height / 2)
+      spacing_between_title_and_keyword = (actual_font_size / 2)
       title_top_space = vertical_padding + keyword.height + spacing_between_title_and_keyword
       title_left_space = (background.width / 2.0 - title.width / 2.0).round
       keyword_left_space = (background.width / 2.0 - keyword.width / 2.0).round
@@ -257,7 +257,7 @@ module Frameit
     end
 
     def put_title_into_background(background, stack_title)
-      text_images = build_text_images(image.width - 2 * horizontal_frame_padding, image.height - 2 * vertical_frame_padding)
+      text_images = build_text_images(image.width - 2 * horizontal_frame_padding, image.height - 2 * vertical_frame_padding, stack_title)
 
       keyword = text_images[:keyword]
       title = text_images[:title]
@@ -326,7 +326,7 @@ module Frameit
     end
 
     # This will build up to 2 individual images with the title and optional keyword, which will then be added to the real image
-    def build_text_images(max_width, max_height)
+    def build_text_images(max_width, max_height, stack_title)
       words = [:keyword, :title].keep_if { |a| fetch_text(a) } # optional keyword/title
       results = {}
       trim_boxes = {}
@@ -364,7 +364,7 @@ module Frameit
 
         results[key] = text_image
 
-        # Natively trimming the image with .trim will result in the loss of the common baseline between the text in all images.
+        # Natively trimming the image with .trim will result in the loss of the common baseline between the text in all images when side-by-side (e.g. stack_title is false).
         # Hence retrieve the calculated trim bounding box without actually trimming:
         calculated_trim_box = text_image.identify do |b|
           b.format("%@") # CALCULATED: trim bounding box (without actually trimming), see: http://www.imagemagick.org/script/escape.php
@@ -387,31 +387,34 @@ module Frameit
         trim_boxes[key] = trim_box
       end
 
-      # Crop images based on top_vertical_trim_offset and bottom_vertical_trim_offset to maintain text baseline:
+      # Crop text images:
       words.each do |key|
         # Get matching trim box:
         trim_box = trim_boxes[key]
 
-        # Determine the trim area by maintaining the same vertical top offset based on the smallest value from all trim boxes (top_vertical_trim_offset).
-        # When the vertical top offset is larger than the smallest vertical top offset, the trim box needs to be adjusted:
-        if trim_box.offset_y > top_vertical_trim_offset
-          # Increase the height of the trim box with the difference in vertical top offset:
-          trim_box.height += trim_box.offset_y - top_vertical_trim_offset
-          # Change the vertical top offset to match that of the others:
-          trim_box.offset_y = top_vertical_trim_offset
+        # For side-by-side text images (e.g. stack_title is false) adjust the trimbox based on top_vertical_trim_offset and bottom_vertical_trim_offset to maintain the text baseline:
+        unless stack_title
+          # Determine the trim area by maintaining the same vertical top offset based on the smallest value from all trim boxes (top_vertical_trim_offset).
+          # When the vertical top offset is larger than the smallest vertical top offset, the trim box needs to be adjusted:
+          if trim_box.offset_y > top_vertical_trim_offset
+            # Increase the height of the trim box with the difference in vertical top offset:
+            trim_box.height += trim_box.offset_y - top_vertical_trim_offset
+            # Change the vertical top offset to match that of the others:
+            trim_box.offset_y = top_vertical_trim_offset
 
-          UI.verbose("Trim box for key \"#{key}\" is adjusted to align top: #{trim_box}\n")
+            UI.verbose("Trim box for key \"#{key}\" is adjusted to align top: #{trim_box}\n")
+          end
+
+          # Check if the height needs to be adjusted to reach the bottom offset:
+          if (trim_box.offset_y + trim_box.height) < bottom_vertical_trim_offset
+            # Set the height of the trim box to the difference between vertical bottom and top offset:
+            trim_box.height = bottom_vertical_trim_offset - trim_box.offset_y
+
+            UI.verbose("Trim box for key \"#{key}\" is adjusted to align bottom: #{trim_box}\n")
+          end
         end
 
-        # Check if the height needs to be adjusted to reach the bottom offset:
-        if (trim_box.offset_y + trim_box.height) < bottom_vertical_trim_offset
-          # Set the height of the trim box to the difference between vertical bottom and top offset:
-          trim_box.height = bottom_vertical_trim_offset - trim_box.offset_y
-
-          UI.verbose("Trim box for key \"#{key}\" is adjusted to align bottom: #{trim_box}\n")
-        end
-
-        # Crop image with adjusted trim box parameters in MiniMagick string format:
+        # Crop image with (adjusted) trim box parameters in MiniMagick string format:
         results[key].crop(trim_box.string_format)
       end
 
