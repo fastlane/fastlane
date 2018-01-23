@@ -4,9 +4,25 @@ describe Fastlane do
       it "executes the correct git command" do
         allow(Fastlane::Actions).to receive(:sh)
           .with("git rev-parse -q --verify refs/tags/1.2.0", anything)
-          .and_return("")
+          .and_return("12345")
         result = Fastlane::FastFile.new.parse("lane :test do
           git_tag_exists(tag: '1.2.0')
+        end").runner.execute(:test)
+      end
+
+      it "executes the correct git command remote" do
+        allow(Fastlane::Actions).to receive(:sh)
+          .with("git ls-remote -q --exit-code origin refs/tags/1.2.0", anything)
+          .and_return("12345")
+        result = Fastlane::FastFile.new.parse("lane :test do
+          git_tag_exists(tag: '1.2.0', remote: true)
+        end").runner.execute(:test)
+
+        allow(Fastlane::Actions).to receive(:sh)
+          .with("git ls-remote -q --exit-code huga refs/tags/1.2.0", anything)
+          .and_return("12345")
+        result = Fastlane::FastFile.new.parse("lane :test do
+          git_tag_exists(tag: '1.2.0', remote: true, remote_name: 'huga')
         end").runner.execute(:test)
       end
 
