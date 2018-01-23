@@ -282,8 +282,6 @@ module Frameit
         image_scale_factor = (1.0 / [ratio_horizontal, ratio_vertical].max)
 
         UI.verbose("Text for image #{self.screenshot.path} is quite long, reducing font size by #{(100 * (1.0 - image_scale_factor)).round(1)}%")
-        # When the height is reduced more than the width, show a hint to use 'font_scale_factor':
-        UI.message("Hint: Your text height is reduced to fit, probably you use multi-line text. Please consider to use parameter 'font_scale_factor' in your Framefile.json with a value larger than #{fetch_config['font_scale_factor'] || 0.1}. This will create more space #{title_below_image ? 'below' : 'above'} the device frame.") if ratio_vertical > ratio_horizontal
 
         title.resize("#{(image_scale_factor * title.width).round}x")
         keyword.resize("#{(image_scale_factor * keyword.width).round}x") if keyword
