@@ -94,7 +94,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             copy_artifacts(artifacts: '#{source_path}', target_path: '#{target_path}', fail_on_missing: true)
           end").runner.execute(:test)
-        end.to raise_error("Not all files were present in copy artifacts. Missing #{source_path}")
+        end.to raise_error "Not all files were present in copy artifacts. Missing #{source_path}"
 
         expect(File.exist?(source_path)).to eq(false)
       end
