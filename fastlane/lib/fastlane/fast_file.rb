@@ -20,16 +20,16 @@ module Fastlane
 
       # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
       if content.tr!('“”‘’‛', %(""'''))
-        UI.error "Your #{File.basename(path)} has had smart quotes sanitised. " \
+        UI.error("Your #{File.basename(path)} has had smart quotes sanitised. " \
                 'To avoid issues in the future, you should not use ' \
                 'TextEdit for editing it. If you are not using TextEdit, ' \
-                'you should turn off smart quotes in your editor of choice.'
+                'you should turn off smart quotes in your editor of choice.')
       end
 
       content.scan(/^\s*require (.*)/).each do |current|
         gem_name = current.last
         next if gem_name.include?(".") # these are local gems
-        UI.important("You require a gem, if this is a third party gem, please use `fastlane_require #{gem_name}` to ensure the gem is installed locally")
+        UI.important("You have require'd a gem, if this is a third party gem, please use `fastlane_require #{gem_name}` to ensure the gem is installed locally.")
       end
 
       parse(content, @path)
@@ -249,14 +249,14 @@ module Fastlane
 
           branch_option = "--branch #{branch}" if branch != 'HEAD'
 
-          UI.message "Cloning remote git repo..."
+          UI.message("Cloning remote git repo...")
           Actions.sh("GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}")
 
           unless version.nil?
             req = Gem::Requirement.new(version)
             all_tags = fetch_remote_tags(folder: clone_folder)
             checkout_param = all_tags.select { |t| req =~ FastlaneCore::TagVersion.new(t) }.last
-            UI.user_error! "No tag found matching #{version.inspect}" if checkout_param.nil?
+            UI.user_error!("No tag found matching #{version.inspect}") if checkout_param.nil?
           end
 
           Actions.sh("cd '#{clone_folder}' && git checkout #{checkout_param} '#{path}'")
@@ -285,7 +285,7 @@ module Fastlane
     #####################################################
 
     def fetch_remote_tags(folder: nil)
-      UI.message "Fetching remote git tags..."
+      UI.message("Fetching remote git tags...")
       Actions.sh("cd '#{folder}' && GIT_TERMINAL_PROMPT=0 git fetch --all --tags -q")
 
       # Fetch all possible tags

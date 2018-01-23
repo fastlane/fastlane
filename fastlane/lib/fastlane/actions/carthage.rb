@@ -10,9 +10,9 @@ module Fastlane
         cmd << command_name
 
         if command_name == "archive" && params[:frameworks].count > 0
-          cmd.concat params[:frameworks]
+          cmd.concat(params[:frameworks])
         elsif (command_name == "update" || command_name == "build") && params[:dependencies].count > 0
-          cmd.concat params[:dependencies]
+          cmd.concat(params[:dependencies])
         end
 
         cmd << "--output #{params[:output]}" if params[:output]
@@ -63,7 +63,7 @@ module Fastlane
                                        description: "Carthage command (one of: #{available_commands.join(', ')})",
                                        default_value: 'bootstrap',
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid command. Use one of the following: #{available_commands.join(', ')}") unless available_commands.include? value
+                                         UI.user_error!("Please pass a valid command. Use one of the following: #{available_commands.join(', ')}") unless available_commands.include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :dependencies,
                                        description: "Carthage dependencies to update or build",
@@ -190,7 +190,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.authors

@@ -9,7 +9,7 @@ describe Spaceship::Tunes::IAP do
     end
 
     it "Finds a specific product" do
-      expect(app.in_app_purchases.find("go.find.me")).not_to eq(nil)
+      expect(app.in_app_purchases.find("go.find.me")).not_to(eq(nil))
       expect(app.in_app_purchases.find("go.find.me").reference_name).to eq("localizeddemo")
     end
 

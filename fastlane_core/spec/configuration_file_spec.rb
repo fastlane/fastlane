@@ -1,7 +1,7 @@
 describe FastlaneCore do
   describe FastlaneCore::ConfigurationFile do
     describe "Properly loads and handles various configuration files" do
-      let (:options) do
+      let(:options) do
         [
           FastlaneCore::ConfigItem.new(key: :devices,
                                        description: "desc",
@@ -146,7 +146,7 @@ describe FastlaneCore do
             if arguments == ["parameter"]
               expect do
                 block.call(arguments.first, "custom")
-              end.to raise_error "Yeah: parameter custom"
+              end.to raise_error("Yeah: parameter custom")
             else UI.user_error!("no")
             end
           else UI.user_error!("no")

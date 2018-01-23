@@ -4,13 +4,13 @@ describe Fastlane do
       it "raises an error if file does not exist" do
         expect do
           Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/fastfileNotHere')
-        end.to raise_exception "Could not find Fastfile at path './fastlane/spec/fixtures/fastfiles/fastfileNotHere'"
+        end.to raise_exception("Could not find Fastfile at path './fastlane/spec/fixtures/fastfiles/fastfileNotHere'")
       end
 
       it "raises an error if unknow method is called" do
         expect do
           Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileInvalid')
-        end.to raise_exception "Could not find action, lane or variable 'laneasdf'. Check out the documentation for more details: https://docs.fastlane.tools/actions"
+        end.to raise_exception("Could not find action, lane or variable 'laneasdf'. Check out the documentation for more details: https://docs.fastlane.tools/actions")
       end
     end
 
@@ -49,25 +49,25 @@ describe Fastlane do
       end
 
       it "takes the block and lane name" do
-        @ff.lane :my_name do
+        @ff.lane(:my_name) do
         end
       end
 
       it "raises an error if name contains spaces" do
         expect(UI).to receive(:user_error!).with("lane name must not contain any spaces")
-        @ff.lane :"my name" do
+        @ff.lane(:"my name") do
         end
       end
 
       it "raises an error if the name is on a black list" do
         expect(UI).to receive(:user_error!).with("Lane name 'run' is invalid")
-        @ff.lane :run do
+        @ff.lane(:run) do
         end
       end
 
       it "raises an error if name is not a symbol" do
         expect(UI).to receive(:user_error!).with("lane name must start with :")
-        @ff.lane "string" do
+        @ff.lane("string") do
         end
       end
     end
@@ -107,7 +107,7 @@ describe Fastlane do
       it "calls all error blocks if multiple are given (android - witherror)" do
         expect do
           @ff.runner.execute('witherror', 'android')
-        end.to raise_error 'my exception'
+        end.to raise_error('my exception')
 
         expect(File.exist?('/tmp/fastlane/before_all_android.txt')).to eq(true)
         expect(File.exist?('/tmp/fastlane/after_all_android.txt')).to eq(false)
@@ -193,7 +193,7 @@ describe Fastlane do
         expect(UI).to receive(:important).with("Setting '[:windows, :neogeo]' as extra SupportedPlatforms")
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileAddNewPlatform')
         expect(UI).to receive(:message).with("echo :windows")
-        ff.runner.execute(:echo, :windows)
+        ff.runner.execute(:echo_lane, :windows)
       end
 
       it "before_each and after_each are called every time" do
@@ -280,14 +280,14 @@ describe Fastlane do
           ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           expect do
             ff.runner.execute(:invalid, :ios)
-          end.to raise_error "Could not find action, lane or variable 'wrong_platform'. Check out the documentation for more details: https://docs.fastlane.tools/actions"
+          end.to raise_error("Could not find action, lane or variable 'wrong_platform'. Check out the documentation for more details: https://docs.fastlane.tools/actions")
         end
 
         it "raises an exception when not passing a hash" do
           ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           expect do
             ff.runner.execute(:invalid_parameters, :ios)
-          end.to raise_error "Parameters for a lane must always be a hash"
+          end.to raise_error("Parameters for a lane must always be a hash")
         end
       end
 
@@ -346,7 +346,7 @@ describe Fastlane do
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile')
         expect do
           ff.import('./import1/Fastfile')
-        end.not_to raise_error
+        end.not_to(raise_error)
       end
 
       it "raises an error if lane is not available" do

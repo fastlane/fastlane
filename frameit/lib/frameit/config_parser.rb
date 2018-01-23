@@ -16,8 +16,8 @@ module Frameit
       begin
         @data = JSON.parse(data)
       rescue => ex
-        UI.error ex.message
-        UI.user_error! "Invalid JSON file at path '#{@path}'. Make sure it's a valid JSON file"
+        UI.error(ex.message)
+        UI.user_error!("Invalid JSON file at path '#{@path}'. Make sure it's a valid JSON file")
       end
 
       self
@@ -26,7 +26,7 @@ module Frameit
     # Fetches the finished configuration for a given path. This will try to look for a specific value
     # and fallback to a default value if nothing was found
     def fetch_value(path)
-      specific = @data['data'].find { |a| path.include? a['filter'] }
+      specific = @data['data'].find { |a| path.include?(a['filter']) }
 
       default = @data['default']
 
@@ -41,19 +41,19 @@ module Frameit
     # Use absolute paths instead of relative
     def change_paths_to_absolutes!(values)
       values.each do |key, value|
-        if value.kind_of? Hash
+        if value.kind_of?(Hash)
           change_paths_to_absolutes!(value) # recursive call
-        elsif value.kind_of? Array
+        elsif value.kind_of?(Array)
           value.each do |current|
-            change_paths_to_absolutes!(current) if current.kind_of? Hash # recursive call
+            change_paths_to_absolutes!(current) if current.kind_of?(Hash) # recursive call
           end
         else
-          if ['font', 'background'].include? key
+          if ['font', 'background'].include?(key)
             # Change the paths to relative ones
             # `replace`: to change the content of the string, so it's actually stored
             if @path # where is the config file. We don't have a config file in tests
               containing_folder = File.expand_path('..', @path)
-              value.replace File.join(containing_folder, value)
+              value.replace(File.join(containing_folder, value))
             end
           end
         end
@@ -75,10 +75,10 @@ module Frameit
             value.each do |current|
               UI.user_error!("You must specify a font path") if current.fetch('font', '').length == 0
               UI.user_error!("Could not find font at path '#{File.expand_path(current.fetch('font'))}'") unless File.exist?(current.fetch('font'))
-              UI.user_error!("`supported` must be an array") unless current.fetch('supported', []).kind_of? Array
+              UI.user_error!("`supported` must be an array") unless current.fetch('supported', []).kind_of?(Array)
             end
           when 'background'
-            UI.user_error!("Could not find background image at path '#{File.expand_path(value)}'") unless File.exist? value
+            UI.user_error!("Could not find background image at path '#{File.expand_path(value)}'") unless File.exist?(value)
           when 'color'
             UI.user_error!("Invalid color '#{value}'. Must be valid Hex #123123") unless value.include?("#")
           when 'padding'
@@ -86,7 +86,7 @@ module Frameit
               UI.user_error!("padding must be type integer or pair of integers of format 'AxB' or a percentage of screen size")
             end
           when 'show_complete_frame', 'title_below_image'
-            UI.user_error! "'#{key}' must be a Boolean" unless [true, false].include?(value)
+            UI.user_error!("'#{key}' must be a Boolean") unless [true, false].include?(value)
           when 'font_scale_factor'
             UI.user_error!("font_scale_factor must be numeric") unless value.kind_of?(Numeric)
           end

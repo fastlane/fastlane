@@ -1,11 +1,11 @@
 module Fastlane
   class PluginGeneratorUI
     def success(text)
-      puts text.green
+      puts(text.green)
     end
 
     def message(text)
-      puts text
+      puts(text)
     end
 
     def input(text)

@@ -184,24 +184,24 @@ module Fastlane
           # e.g. https://api.github.com/repos/fastlane/fastlane
           url = self.homepage.gsub("github.com/", "api.github.com/repos/")
           url = url[0..-2] if url.end_with?("/") # what is this, 2001? We got to remove the trailing `/` otherwise GitHub will fail
-          puts "Fetching #{url}"
+          puts("Fetching #{url}")
           conn = Faraday.new(url: url) do |builder|
             # The order below IS important
             # See bug here https://github.com/lostisland/faraday_middleware/issues/105
-            builder.use FaradayMiddleware::FollowRedirects
-            builder.adapter Faraday.default_adapter
+            builder.use(FaradayMiddleware::FollowRedirects)
+            builder.adapter(Faraday.default_adapter)
           end
           conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
           response = conn.get('')
           repo_details = JSON.parse(response.body)
 
           url += "/stats/contributors"
-          puts "Fetching #{url}"
+          puts("Fetching #{url}")
           conn = Faraday.new(url: url) do |builder|
             # The order below IS important
             # See bug here https://github.com/lostisland/faraday_middleware/issues/105
-            builder.use FaradayMiddleware::FollowRedirects
-            builder.adapter Faraday.default_adapter
+            builder.use(FaradayMiddleware::FollowRedirects)
+            builder.adapter(Faraday.default_adapter)
           end
 
           conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
@@ -214,11 +214,11 @@ module Fastlane
           self.data[:github_forks] = repo_details["forks_count"].to_i
           self.data[:github_contributors] = contributor_details.count
         rescue => ex
-          puts "error fetching #{self}"
-          puts self.homepage
-          puts "Chances are high you exceeded the GitHub API limit"
-          puts ex
-          puts ex.backtrace
+          puts("error fetching #{self}")
+          puts(self.homepage)
+          puts("Chances are high you exceeded the GitHub API limit")
+          puts(ex)
+          puts(ex.backtrace)
           raise ex
         end
       end
@@ -282,10 +282,10 @@ module Fastlane
               self.state.pop if is_end?(line)
             end
             next unless debug_state
-            puts "Current line: #{line}"
-            puts "Full State: #{state}"
-            puts "Current action name: #{name}, category: #{category}, description: \"#{description}\", details: \"#{details}\""
-            puts "Last string statement: #{last_string_statement}, last method name: #{last_method_name}"
+            puts("Current line: #{line}")
+            puts("Full State: #{state}")
+            puts("Current action name: #{name}, category: #{category}, description: \"#{description}\", details: \"#{details}\"")
+            puts("Last string statement: #{last_string_statement}, last method name: #{last_method_name}")
           end
           actions
         end

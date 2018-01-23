@@ -83,7 +83,7 @@ describe Scan do
       expect do
         options = { project: path }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-      end.to raise_error "Project file not found at path '#{path}'"
+      end.to raise_error("Project file not found at path '#{path}'")
     end
 
     describe "Supports toolchain" do

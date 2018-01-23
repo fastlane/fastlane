@@ -30,10 +30,10 @@ module Fastlane
     class << self
       attr_accessor :runner
 
-      extend Forwardable
+      extend(Forwardable)
 
       # to allow a simple `sh` in the custom actions
-      def_delegator Actions, :sh_control_output, :sh
+      def_delegator(Actions, :sh_control_output, :sh)
     end
 
     def self.run(params)

@@ -11,7 +11,7 @@ module FastlaneCore
       ids = installed_identies
       finger_print = sha1_fingerprint(path)
 
-      return ids.include? finger_print
+      return ids.include?(finger_print)
     end
 
     # Legacy Method, use `installed?` instead
@@ -35,7 +35,7 @@ module FastlaneCore
 
       ids = []
       available.split("\n").each do |current|
-        next if current.include? "REVOKED"
+        next if current.include?("REVOKED")
         begin
           (ids << current.match(/.*\) ([[:xdigit:]]*) \".*/)[1])
         rescue
@@ -63,8 +63,27 @@ module FastlaneCore
       filename = file.path
       keychain = wwdr_keychain
       keychain = "-k #{keychain.shellescape}" unless keychain.empty?
-      Helper.backticks("curl -f -o #{filename} #{url} && security import #{filename} #{keychain}", print: FastlaneCore::Globals.verbose?)
-      UI.user_error!("Could not install WWDR certificate") unless $?.success?
+
+      require 'open3'
+
+      import_command = "curl -f -o #{filename} #{url} && security import #{filename} #{keychain}"
+      UI.verbose("Installing WWDR Cert: #{import_command}")
+
+      stdout, stderr, _status = Open3.capture3(import_command)
+      if FastlaneCore::Globals.verbose?
+        UI.command_output(stdout)
+        UI.command_output(stderr)
+      end
+
+      unless $?.success?
+        UI.verbose("Failed to install WWDR Certificate, checking output to see why")
+        # Check the command output, WWDR might already exist
+        unless /The specified item already exists in the keychain./ =~ stderr
+          UI.user_error!("Could not install WWDR certificate")
+        end
+        UI.verbose("WWDR Certificate was already installed")
+      end
+      return true
     end
 
     def self.wwdr_keychain

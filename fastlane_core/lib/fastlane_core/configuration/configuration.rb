@@ -70,9 +70,9 @@ module FastlaneCore
     end
 
     def verify_input_types
-      UI.user_error!("available_options parameter must be an array of ConfigItems but is #{@available_options.class}") unless @available_options.kind_of? Array
+      UI.user_error!("available_options parameter must be an array of ConfigItems but is #{@available_options.class}") unless @available_options.kind_of?(Array)
       @available_options.each do |item|
-        UI.user_error!("available_options parameter must be an array of ConfigItems. Found #{item.class}.") unless item.kind_of? ConfigItem
+        UI.user_error!("available_options parameter must be an array of ConfigItems. Found #{item.class}.") unless item.kind_of?(ConfigItem)
       end
       UI.user_error!("values parameter must be a hash") unless @values.kind_of?(Hash)
     end
@@ -209,6 +209,7 @@ module FastlaneCore
 
     # Returns the value for a certain key. fastlane_core tries to fetch the value from different sources
     # if 'ask' is true and the value is not present, the user will be prompted to provide a value
+    # rubocop:disable Metrics/PerceivedComplexity
     def fetch(key, ask: true)
       UI.user_error!("Key '#{key}' must be a symbol. Example :app_id.") unless key.kind_of?(Symbol)
 
@@ -239,13 +240,13 @@ module FastlaneCore
       end
 
       while value.nil?
-        UI.important("To not be asked about this value, you can specify it using '#{option.key}'")
+        UI.important("To not be asked about this value, you can specify it using '#{option.key}'") if ENV["FASTLANE_ONBOARDING_IN_PROCESS"].to_s.length == 0
         value = option.sensitive ? UI.password("#{option.description}: ") : UI.input("#{option.description}: ")
         # Also store this value to use it from now on
         begin
           set(key, value)
         rescue => ex
-          puts ex
+          puts(ex)
           value = nil
         end
       end
@@ -257,11 +258,12 @@ module FastlaneCore
       # Found out via https://github.com/fastlane/fastlane/issues/11243
       return self[key]
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     # Overwrites or sets a new value for a given key
     # @param key [Symbol] Must be a symbol
     def set(key, value)
-      UI.user_error!("Key '#{key}' must be a symbol. Example :#{key}.") unless key.kind_of? Symbol
+      UI.user_error!("Key '#{key}' must be a symbol. Example :#{key}.") unless key.kind_of?(Symbol)
       option = option_for_key(key)
 
       unless option

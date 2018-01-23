@@ -8,7 +8,7 @@ module PEM
 
   tmp_dir = Dir.tmpdir
   TMP_FOLDER = "#{tmp_dir}/fastlane/PEM/"
-  FileUtils.mkdir_p TMP_FOLDER
+  FileUtils.mkdir_p(TMP_FOLDER)
 
   ENV['FASTLANE_TEAM_ID'] ||= ENV["PEM_TEAM_ID"]
   ENV['DELIVER_USER'] ||= ENV["PEM_USERNAME"]

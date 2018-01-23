@@ -57,19 +57,19 @@ module Fastlane
 
     def self.confirm_troubleshoot
       if Helper.is_ci?
-        UI.error "---"
-        UI.error "You are trying to use '--troubleshoot' on CI"
-        UI.error "this option is not usable in CI, as it is insecure"
-        UI.error "---"
+        UI.error("---")
+        UI.error("You are trying to use '--troubleshoot' on CI")
+        UI.error("this option is not usable in CI, as it is insecure")
+        UI.error("---")
         UI.user_error!("Do not use --troubleshoot in CI")
       end
       # maybe already set by 'start'
       return if $troubleshoot
-      UI.error "---"
-      UI.error "Are you sure you want to enable '--troubleshoot'?"
-      UI.error "All commmands will run in full unfiltered output mode."
-      UI.error "Sensitive data, like passwords, could be printed to the log."
-      UI.error "---"
+      UI.error("---")
+      UI.error("Are you sure you want to enable '--troubleshoot'?")
+      UI.error("All commmands will run in full unfiltered output mode.")
+      UI.error("Sensitive data, like passwords, could be printed to the log.")
+      UI.error("---")
       if UI.confirm("Do you really want to enable --troubleshoot")
         $troubleshoot = true
       end
@@ -100,7 +100,8 @@ module Fastlane
       command :trigger do |c|
         c.syntax = 'fastlane [lane]'
         c.description = 'Run a specific lane. Pass the lane name and optionally the platform first.'
-        c.option '--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`'
+        c.option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
+        c.option('--disable_runner_upgrades', 'Prevents fastlane from attempting to update FastlaneRunner swift project')
 
         c.action do |args, options|
           if ensure_fastfile
@@ -113,28 +114,18 @@ module Fastlane
         c.syntax = 'fastlane init'
         c.description = 'Helps you with your initial fastlane setup'
 
-        c.option '-u STRING', '--user STRING', String, 'iOS projects only: Your Apple ID'
+        c.option('-u STRING', '--user STRING', String, 'iOS projects only: Your Apple ID')
 
-        CrashlyticsBetaCommandLineHandler.apply_options(c)
-
-        c.action do |args, options|
-          if args[0] == 'beta'
-            beta_info = CrashlyticsBetaCommandLineHandler.info_from_options(options)
-            Fastlane::CrashlyticsBeta.new(beta_info, Fastlane::CrashlyticsBetaUi.new).run
-          else
-            is_swift_fastfile = args.include?("swift")
-            Fastlane::Setup.new.run(user: options.user, is_swift_fastfile: is_swift_fastfile)
-          end
-        end
-      end
-
-      command :init_swift do |c|
-        c.syntax = 'fastlane init_swift'
-        c.description = 'Helps you with your initial fastlane setup for Swift'
-        c.option '-u STRING', '--user STRING', String, 'iOS projects only: Your Apple ID'
+        # CrashlyticsBetaCommandLineHandler.apply_options(c)
 
         c.action do |args, options|
-          Fastlane::Setup.new.run(user: options.user, is_swift_fastfile: true)
+          # if args[0] == 'beta'
+          #   beta_info = CrashlyticsBetaCommandLineHandler.info_from_options(options)
+          #   Fastlane::CrashlyticsBeta.new(beta_info, Fastlane::CrashlyticsBetaUi.new).run
+          # else
+          is_swift_fastfile = args.include?("swift")
+          Fastlane::Setup.start(user: options.user, is_swift_fastfile: is_swift_fastfile)
+          # end
         end
       end
 
@@ -142,7 +133,7 @@ module Fastlane
         c.syntax = 'fastlane new_action'
         c.description = 'Create a new custom action for fastlane.'
 
-        c.option '--name STRING', String, 'Name of your new action'
+        c.option('--name STRING', String, 'Name of your new action')
 
         c.action do |args, options|
           Fastlane::NewAction.run(new_action_name: options.name)
@@ -152,8 +143,8 @@ module Fastlane
       command :socket_server do |c|
         c.syntax = 'fastlane start_server'
         c.description = 'Starts local socket server and enables only a single local connection'
-        c.option '-s', '--stay_alive', 'Keeps socket server up even after error or disconnects, requires CTRL-C to kill.'
-        c.option '-c seconds', '--connection_timeout', 'Sets connection established timeout'
+        c.option('-s', '--stay_alive', 'Keeps socket server up even after error or disconnects, requires CTRL-C to kill.')
+        c.option('-c seconds', '--connection_timeout', 'Sets connection established timeout')
         c.action do |args, options|
           default_connection_timeout = 5
           stay_alive = options.stay_alive || false
@@ -173,14 +164,14 @@ module Fastlane
             stay_alive: stay_alive
           )
           result = server.start
-          UI.success "Result: #{result}" if result
+          UI.success("Result: #{result}") if result
         end
       end
 
       command :lanes do |c|
         c.syntax = 'fastlane lanes'
         c.description = 'Lists all available lanes and shows their description'
-        c.option "-j", "--json", "Output the lanes in JSON instead of text"
+        c.option("-j", "--json", "Output the lanes in JSON instead of text")
 
         c.action do |args, options|
           if options.json || ensure_fastfile
@@ -202,11 +193,11 @@ module Fastlane
         c.action do |args, options|
           if ensure_fastfile
             ff = Fastlane::FastFile.new(FastlaneCore::FastlaneFolder.fastfile_path)
-            UI.message "Available lanes:"
+            UI.message("Available lanes:")
             ff.runner.available_lanes.each do |lane|
-              UI.message "- #{lane}"
+              UI.message("- #{lane}")
             end
-            UI.important "Execute using `fastlane [lane_name]`"
+            UI.important("Execute using `fastlane [lane_name]`")
           end
         end
       end
@@ -214,12 +205,12 @@ module Fastlane
       command :docs do |c|
         c.syntax = 'fastlane docs'
         c.description = 'Generate a markdown based documentation based on the Fastfile'
-        c.option '-f', '--force', 'Overwrite the existing README.md in the ./fastlane folder'
+        c.option('-f', '--force', 'Overwrite the existing README.md in the ./fastlane folder')
 
         c.action do |args, options|
           if ensure_fastfile
             ff = Fastlane::FastFile.new(File.join(FastlaneCore::FastlaneFolder.path || '.', 'Fastfile'))
-            UI.message "You don't need to run `fastlane docs` manually any more, this will be done automatically for you when running a lane."
+            UI.message("You don't need to run `fastlane docs` manually any more, this will be done automatically for you when running a lane.")
             Fastlane::DocsGenerator.run(ff)
           end
         end
@@ -232,7 +223,7 @@ module Fastlane
         c.action do |args, options|
           require 'fastlane/one_off'
           result = Fastlane::OneOff.execute(args: args)
-          UI.success "Result: #{result}" if result
+          UI.success("Result: #{result}") if result
         end
       end
 
@@ -240,7 +231,7 @@ module Fastlane
         c.syntax = 'fastlane actions'
         c.description = 'Lists all available fastlane actions'
 
-        c.option '--platform STRING', String, 'Only show actions available on the given platform'
+        c.option('--platform STRING', String, 'Only show actions available on the given platform')
 
         c.action do |args, options|
           require 'fastlane/documentation/actions_list'
@@ -260,7 +251,7 @@ module Fastlane
       command :enable_auto_complete do |c|
         c.syntax = 'fastlane enable_auto_complete'
         c.description = 'Enable tab auto completion'
-        c.option '-c STRING[,STRING2]', '--custom STRING[,STRING2]', String, 'Add custom command(s) for which tab auto complete should be enabled too'
+        c.option('-c STRING[,STRING2]', '--custom STRING[,STRING2]', String, 'Add custom command(s) for which tab auto complete should be enabled too')
 
         c.action do |args, options|
           require 'fastlane/auto_complete'
@@ -342,7 +333,7 @@ module Fastlane
         end
       end
 
-      default_command :trigger
+      default_command(:trigger)
       run!
     end
 
@@ -354,7 +345,9 @@ module Fastlane
       return true if FastlaneCore::FastlaneFolder.setup?
 
       create = UI.confirm('Could not find fastlane in current directory. Make sure to have your fastlane configuration files inside a folder called "fastlane". Would you like to set fastlane up?')
-      Fastlane::Setup.new.run if create
+      if create
+        Fastlane::Setup.start
+      end
       return false
     end
   end

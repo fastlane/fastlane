@@ -128,7 +128,7 @@ open class Snapshot: NSObject {
             waitForLoadingIndicatorToDisappear(within: timeout)
         }
 
-        print("snapshot: \(name)") // more information about this, check out https://github.com/fastlane/fastlane/tree/master/snapshot#how-does-it-work
+        print("snapshot: \(name)") // more information about this, check out https://docs.fastlane.tools/actions/snapshot/#how-does-it-work
 
         sleep(1) // Waiting for the animation to be finished (kind of)
 
@@ -166,7 +166,7 @@ open class Snapshot: NSObject {
                 throw SnapshotError.cannotDetectUser
             }
 
-            guard let usersDir =  FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
+            guard let usersDir = FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
                 throw SnapshotError.cannotFindHomeDirectory
             }
 

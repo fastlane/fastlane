@@ -1,73 +1,16 @@
-# Customize this file, documentation can be found here:
-# https://docs.fastlane.tools/actions/
-# All available actions: https://docs.fastlane.tools/actions
-# can also be listed using the `fastlane actions` command
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
 
-# Change the syntax highlighting to Ruby
-# All lines starting with a # are ignored when running `fastlane`
-
-# If you want to automatically update fastlane if a new version is available:
+# Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
-
-# This is the minimum version number required.
-# Update this, if you use features of a newer version
-min_fastlane_version("[[FASTLANE_VERSION]]")
 
 default_platform(:ios)
 
 platform :ios do
-  before_all do
-    # ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
-    cocoapods
-    carthage
-  end
-
-  desc "Runs all the tests"
-  lane :test do
-    run_tests
-  end
-
-  desc "Submit a new Beta Build to Apple TestFlight"
-  desc "This will also make sure the profile is up to date"
-  lane :beta do
-    # sync_code_signing(type: "appstore") # more information: https://codesigning.guide
-    build_app[[SCHEME]] # more options available
-    upload_to_testflight
-
-    # sh "your_script.sh"
-    # You can also use other beta testing services here (run `fastlane actions`)
-  end
-
-  desc "Deploy a new version to the App Store"
-  lane :release do
-    # sync_code_signing(type: "appstore")
-    capture_screenshots
-    build_app[[SCHEME]] # more options available
-    upload_to_app_store(force: true)
-    # frame_screenshots
-  end
-
-  # You can define as many lanes as you want
-
-  after_all do |lane|
-    # This block is called, only if the executed lane was successful
-
-    # slack(
-    #   message: "Successfully deployed new App Update."
-    # )
-  end
-
-  error do |lane, exception|
-    # slack(
-    #   message: exception.message,
-    #   success: false
-    # )
-  end
+[[LANES]]
 end
-
-
-# More information about multiple platforms in fastlane: https://docs.fastlane.tools/advanced/#control-configuration-by-lane-and-by-platform
-# All available actions: https://docs.fastlane.tools/actions
-
-# fastlane reports which actions are used. No personal data is recorded.
-# Learn more at https://docs.fastlane.tools/#metrics

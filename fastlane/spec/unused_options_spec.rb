@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::Action do
     describe "No unused options" do
-      let (:all_exceptions) do
+      let(:all_exceptions) do
         %w(
           pilot
           appstore
@@ -59,6 +59,9 @@ describe Fastlane do
           upload_to_app_store
           upload_to_play_store
           upload_to_testflight
+          puts
+          println
+          echo
         )
       end
 

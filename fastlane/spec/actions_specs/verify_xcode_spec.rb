@@ -39,7 +39,7 @@ describe Fastlane::Actions::VerifyXcodeAction do
 
       expect do
         Fastlane::Actions::VerifyXcodeAction.verify_codesign({ xcode_path: '' })
-      end.to raise_error FastlaneCore::Interface::FastlaneError
+      end.to raise_error(FastlaneCore::Interface::FastlaneError)
     end
   end
 end

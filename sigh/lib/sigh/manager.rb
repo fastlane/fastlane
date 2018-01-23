@@ -25,7 +25,7 @@ module Sigh
 
       install_profile(output) unless Sigh.config[:skip_install]
 
-      puts output.green
+      puts(output.green)
 
       return File.expand_path(output)
     end

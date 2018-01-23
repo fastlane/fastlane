@@ -11,7 +11,7 @@ describe Scan::SlackPoster do
             project: './scan/examples/standard/app.xcodeproj'
           })
 
-          expect(Slack::Notifier).not_to receive(:new)
+          expect(Slack::Notifier).not_to(receive(:new))
 
           Scan::SlackPoster.new.run({ tests: 0, failures: 0 })
         end
@@ -28,7 +28,7 @@ describe Scan::SlackPoster do
             skip_slack: true
           })
 
-          expect(Slack::Notifier).not_to receive(:new)
+          expect(Slack::Notifier).not_to(receive(:new))
 
           Scan::SlackPoster.new.run({ tests: 0, failures: 0 })
         end
@@ -43,7 +43,7 @@ describe Scan::SlackPoster do
             skip_slack: true
           })
 
-          expect(Slack::Notifier).not_to receive(:new)
+          expect(Slack::Notifier).not_to(receive(:new))
 
           Scan::SlackPoster.new.run({ tests: 0, failures: 0 })
         end
@@ -57,7 +57,7 @@ describe Scan::SlackPoster do
             project: './scan/examples/standard/app.xcodeproj'
           })
 
-          expect(Slack::Notifier).not_to receive(:new)
+          expect(Slack::Notifier).not_to(receive(:new))
 
           Scan::SlackPoster.new.run({ tests: 0, failures: 0 })
         end
@@ -73,7 +73,7 @@ describe Scan::SlackPoster do
             slack_url: ''
           })
 
-          expect(Slack::Notifier).not_to receive(:new)
+          expect(Slack::Notifier).not_to(receive(:new))
 
           Scan::SlackPoster.new.run({ tests: 0, failures: 0 })
         end
@@ -84,8 +84,7 @@ describe Scan::SlackPoster do
       fake_notifier = "fake_notifier"
       fake_result = "fake_result"
       expect(Slack::Notifier).to receive(:new).and_return(fake_notifier)
-      expect(fake_notifier).to receive(:username=)
-      expect(fake_notifier).to receive(:ping).and_return(fake_result)
+      expect(fake_notifier).to receive(:ping).and_return([fake_result])
       expect(fake_result).to receive(:code).and_return(200)
     end
 

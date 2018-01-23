@@ -13,7 +13,7 @@ UI = FastlaneCore::UI
 
 unless ENV["DEBUG"]
   fastlane_tests_tmpdir = "#{Dir.tmpdir}/fastlane_tests"
-  $stdout.puts "Changing stdout to #{fastlane_tests_tmpdir}, set `DEBUG` environment variable to print to stdout (e.g. when using `pry`)"
+  $stdout.puts("Changing stdout to #{fastlane_tests_tmpdir}, set `DEBUG` environment variable to print to stdout (e.g. when using `pry`)")
   $stdout = File.open(fastlane_tests_tmpdir, "w")
 end
 
@@ -94,7 +94,7 @@ RSpec.configure do |config|
         super unless metadata[:skip]
       end
     end
-    config.extend HookOverrides
+    config.extend(HookOverrides)
 
   end
 end

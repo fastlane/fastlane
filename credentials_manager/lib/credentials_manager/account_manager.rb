@@ -57,16 +57,16 @@ module CredentialsManager
     # @param force: if false, the user is asked before it gets deleted
     # @return: Did the user decide to remove the old entry and enter a new password?
     def invalid_credentials(force: false)
-      puts "The login credentials for '#{user}' seem to be wrong".red
+      puts("The login credentials for '#{user}' seem to be wrong".red)
 
       if fetch_password_from_env
-        puts "The password was taken from the environment variable"
-        puts "Please make sure it is correct"
+        puts("The password was taken from the environment variable")
+        puts("Please make sure it is correct")
         return false
       end
 
       if force || agree("Do you want to re-enter your password? (y/n)", true)
-        puts "Removing Keychain entry for user '#{user}'...".yellow
+        puts("Removing Keychain entry for user '#{user}'...".yellow)
         remove_from_keychain
         ask_for_login
         return true
@@ -104,16 +104,18 @@ module CredentialsManager
     private
 
     def ask_for_login
-      puts "-------------------------------------------------------------------------------------".green
-      puts "Please provide your Apple Developer Program account credentials".green
-      puts "The login information you enter will be stored in your macOS Keychain".green
-      if default_prefix?
-        # We don't want to show this message, if we ask for the application specific password
-        # which has a different prefix
-        puts "You can also pass the password using the `FASTLANE_PASSWORD` environment variable".green
-        puts "More information about it on GitHub: https://github.com/fastlane/fastlane/tree/master/credentials_manager".green
+      if ENV["FASTLANE_HIDE_LOGIN_INFORMATION"].to_s.length == 0
+        puts("-------------------------------------------------------------------------------------".green)
+        puts("Please provide your Apple Developer Program account credentials".green)
+        puts("The login information you enter will be stored in your macOS Keychain".green)
+        if default_prefix?
+          # We don't want to show this message, if we ask for the application specific password
+          # which has a different prefix
+          puts("You can also pass the password using the `FASTLANE_PASSWORD` environment variable".green)
+          puts("See more information about it on GitHub: https://github.com/fastlane/fastlane/tree/master/credentials_manager".green)
+        end
+        puts("-------------------------------------------------------------------------------------".green)
       end
-      puts "-------------------------------------------------------------------------------------".green
 
       if @user.to_s.length == 0
         raise "Missing username, and running in non-interactive shell" if $stdout.isatty == false
@@ -138,7 +140,7 @@ module CredentialsManager
       if add_to_keychain
         return true
       else
-        puts "Could not store password in keychain".red
+        puts("Could not store password in keychain".red)
         return false
       end
     end
