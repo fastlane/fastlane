@@ -94,9 +94,9 @@ module Match
       command << "-a"
       command << "-d" unless encrypt
       # to show an error message if something goes wrong
-      unless FastlaneCore::Globals.verbose? 
-        unless Helper.is_windows?
-          command << "&> /dev/null" 
+      unless FastlaneCore::Globals.verbose?
+        if !Helper.is_windows?
+          command << "&> /dev/null"
         else
           command << "2> nul"
         end
