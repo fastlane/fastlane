@@ -437,7 +437,7 @@ describe FastlaneCore do
         end.to raise_error(Timeout::Error)
 
         # on mac this before only partially works as expected
-        if FastlaneCore::Helper.is_mac?
+        if FastlaneCore::Helper.mac?
           # this shows the current implementation issue
           # Timeout doesn't kill the running process
           # i.e. see fastlane/fastlane_core#102

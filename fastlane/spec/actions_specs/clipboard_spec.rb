@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Clipboard Integration" do
-      if FastlaneCore::Helper.is_mac?
+      if FastlaneCore::Helper.mac?
         it "properly stores the value in the clipboard" do
           str = "Some value: #{Time.now.to_i}"
 

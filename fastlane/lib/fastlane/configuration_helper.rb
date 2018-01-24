@@ -7,7 +7,7 @@ module Fastlane
         # default use case
         return FastlaneCore::Configuration.create(action.available_options, params)
       elsif first_element
-        UI.error("Old configuration format for action '#{action}'") if Helper.is_test?
+        UI.error("Old configuration format for action '#{action}'") if Helper.test?
         return params
       else
 

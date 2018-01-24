@@ -37,7 +37,7 @@ module Fastlane
 
         slack_attachment = generate_slack_attachments(options)
 
-        return [notifier, slack_attachment] if Helper.is_test? # tests will verify the slack attachments and other properties
+        return [notifier, slack_attachment] if Helper.test? # tests will verify the slack attachments and other properties
 
         begin
           results = notifier.ping('', icon_url: icon_url, attachments: [slack_attachment])

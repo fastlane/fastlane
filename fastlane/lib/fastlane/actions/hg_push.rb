@@ -8,7 +8,7 @@ module Fastlane
         command << '--force' if params[:force]
         command << params[:destination] unless params[:destination].empty?
 
-        return command.join(' ') if Helper.is_test?
+        return command.join(' ') if Helper.test?
 
         Actions.sh(command.join(' '))
         UI.success('Successfully pushed changes to remote 🚀.')

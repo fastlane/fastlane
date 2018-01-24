@@ -26,7 +26,7 @@ module Fastlane
         lane = platform_lane_info[0]
       end
 
-      dot_env = Helper.is_test? ? nil : options.env
+      dot_env = Helper.test? ? nil : options.env
 
       if FastlaneCore::FastlaneFolder.swift?
         disable_runner_upgrades = options.disable_runner_upgrades || false

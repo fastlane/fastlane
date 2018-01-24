@@ -24,7 +24,7 @@ describe Fastlane do
     describe "#should_run" do
       context "when running on CI" do
         before do
-          expect(Fastlane::Helper).to receive(:is_ci?).and_return(true)
+          expect(Fastlane::Helper).to receive(:ci?).and_return(true)
         end
 
         it "returns true when :force is true" do
@@ -38,7 +38,7 @@ describe Fastlane do
 
       context "when not running on CI" do
         before do
-          expect(Fastlane::Helper).to receive(:is_ci?).and_return(false)
+          expect(Fastlane::Helper).to receive(:ci?).and_return(false)
         end
 
         it "returns false when :force is not set" do

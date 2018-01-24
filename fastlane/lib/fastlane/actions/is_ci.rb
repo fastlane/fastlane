@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class IsCiAction < Action
       def self.run(params)
-        Helper.is_ci?
+        Helper.ci?
       end
 
       #####################################################

@@ -8,7 +8,7 @@ module Fastlane
         if params[:force] || Actions.lane_context[SharedValues::GIT_REPO_WAS_CLEAN_ON_START]
           paths = params[:files]
 
-          return paths if Helper.is_test?
+          return paths if Helper.test?
 
           if paths.nil?
             Actions.sh('git reset --hard HEAD')

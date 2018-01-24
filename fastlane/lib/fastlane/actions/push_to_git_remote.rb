@@ -25,7 +25,7 @@ module Fastlane
 
         # execute our command
         Actions.sh('pwd')
-        return command.join(' ') if Helper.is_test?
+        return command.join(' ') if Helper.test?
 
         Actions.sh(command.join(' '))
         UI.message('Successfully pushed to remote.')

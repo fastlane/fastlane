@@ -11,7 +11,7 @@ module Fastlane
         # will reanable it when it is fixed
         # result = Fastlane::Actions.sh(command.join(' '), log: false)
         shell_command = command.join(' ')
-        return shell_command if Helper.is_test?
+        return shell_command if Helper.test?
         result = Actions.sh(shell_command)
         fail_on_error(result)
       end

@@ -198,7 +198,7 @@ module FastlaneCore
       paths += Dir["./fastlane/#{config_file_name}"]
       paths += Dir["./.fastlane/#{config_file_name}"]
       paths += Dir["./#{config_file_name}"]
-      paths += Dir["./fastlane_core/spec/fixtures/#{config_file_name}"] if Helper.is_test?
+      paths += Dir["./fastlane_core/spec/fixtures/#{config_file_name}"] if Helper.test?
       return nil if paths.count == 0
       return paths.first
     end
@@ -231,7 +231,7 @@ module FastlaneCore
       return value unless value.nil? and !option.optional and ask
 
       # fallback to asking
-      if Helper.is_test? or !UI.interactive?
+      if Helper.test? or !UI.interactive?
         # Since we don't want to be asked on tests, we'll just call the verify block with no value
         # to raise the exception that is shown when the user passes an invalid value
         set(key, '')

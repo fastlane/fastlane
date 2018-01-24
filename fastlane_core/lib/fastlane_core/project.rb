@@ -131,7 +131,7 @@ module FastlaneCore
         elsif automated_scheme_selection? && schemes.include?(project_name)
           UI.important("Using scheme matching project name (#{project_name}).")
           options[:scheme] = project_name
-        elsif Helper.is_ci?
+        elsif Helper.ci?
           UI.error("Multiple schemes found but you haven't specified one.")
           UI.error("Since this is a CI, please pass one using the `scheme` option")
           show_scheme_shared_information

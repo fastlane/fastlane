@@ -10,17 +10,17 @@ module Fastlane
 
         xcodeproj_path = params[:xcodeproj] ? File.expand_path(File.join('.', params[:xcodeproj])) : nil
 
-        if Helper.is_test?
+        if Helper.test?
           xcodeproj_path = "/tmp/Test.xcodeproj"
         end
 
         # get the repo root path
-        repo_path = Helper.is_test? ? '/tmp/repo' : Actions.sh('hg root').strip
+        repo_path = Helper.test? ? '/tmp/repo' : Actions.sh('hg root').strip
         repo_pathname = Pathname.new(repo_path)
 
         if xcodeproj_path
           # ensure that the xcodeproj passed in was OK
-          unless Helper.is_test?
+          unless Helper.test?
             UI.user_error!("Could not find the specified xcodeproj: #{xcodeproj_path}") unless File.directory?(xcodeproj_path)
           end
         else
@@ -42,7 +42,7 @@ module Fastlane
         end
 
         # find the pbxproj path, relative to hg directory
-        if Helper.is_test?
+        if Helper.test?
           hg_dirty_files = params[:test_dirty_files].split(",")
           expected_changed_files = params[:test_expected_files].split(",")
         else
@@ -94,7 +94,7 @@ module Fastlane
 
         # create a commit with a message
         command = "hg commit -m '#{params[:message]}'"
-        return command if Helper.is_test?
+        return command if Helper.test?
         begin
           Actions.sh(command)
 

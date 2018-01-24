@@ -17,7 +17,7 @@ unless ENV["DEBUG"]
   $stdout = File.open(fastlane_tests_tmpdir, "w")
 end
 
-if FastlaneCore::Helper.is_mac?
+if FastlaneCore::Helper.mac?
   xcode_path = FastlaneCore::Helper.xcode_path
   unless xcode_path.include?("Contents/Developer")
     UI.error("Seems like you didn't set the developer tools path correctly")
@@ -71,7 +71,7 @@ RSpec.configure do |config|
   config.example_status_persistence_file_path = "#{Dir.tmpdir}/rspec_failed_tests.txt"
 
   # skip some tests if not running on mac
-  unless FastlaneCore::Helper.is_mac?
+  unless FastlaneCore::Helper.mac?
 
     # define metadata tags that also imply :skip
     config.define_derived_metadata(:requires_xcode) do |meta|
@@ -104,7 +104,7 @@ RSpec.configure do |config|
   end
 
   # skip some more tests if run on on Windows
-  if FastlaneCore::Helper.is_windows?
+  if FastlaneCore::Helper.windows?
     config.define_derived_metadata(:requires_xar) do |meta|
       meta[:skip] = "Skipped: Requires `xar` to be installed (which is not possible on Windows and no workaround has been implemented)"
     end
