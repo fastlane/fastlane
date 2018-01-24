@@ -85,7 +85,7 @@ module Screengrab
     end
 
     def executable_command?(cmd_path)
-      cmd_path && (File.executable?(cmd_path) || Helper.is_windows?) && !File.directory?(cmd_path)
+      Helper.executable?(cmd_path)
     end
   end
 end

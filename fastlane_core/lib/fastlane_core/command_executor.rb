@@ -19,7 +19,7 @@ module FastlaneCore
         ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
           exts.each do |ext|
             cmd_path = File.join(path, "#{cmd}#{ext}")
-            return cmd_path if (File.executable?(cmd_path) || (Helper.is_windows? && File.exist?(cmd_path))) && !File.directory?(cmd_path)
+            return cmd_path if Helper.executable?(cmd_path)
           end
         end
 
