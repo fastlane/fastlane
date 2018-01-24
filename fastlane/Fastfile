@@ -34,9 +34,9 @@ lane(:lint_source) do
 
   Dir.chdir("..") do
     # Verify shell code style
-    if FastlaneCore::Helper.is_mac?
+    if FastlaneCore::Helper.mac?
       sh('find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +')
-    elsif !FastlaneCore::Helper.is_windows?
+    elsif !FastlaneCore::Helper.windows?
       sh('find . -regextype posix-egrep -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +')
     end
   end

@@ -108,7 +108,7 @@ describe FastlaneCore do
     describe "#send_launch_analytic_events_for" do
       before do
         ENV.delete("FASTLANE_OPT_OUT_USAGE")
-        allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
       end
 
       it "sends no events when opted out" do
@@ -128,7 +128,7 @@ describe FastlaneCore do
       end
 
       it "identifies CI correctly" do
-        allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(true)
+        allow(FastlaneCore::Helper).to receive(:ci?).and_return(true)
 
         expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
           expect(analytics.size).to eq(1)
@@ -155,7 +155,7 @@ describe FastlaneCore do
     describe "#send_completion_events_for" do
       before do
         ENV.delete("FASTLANE_OPT_OUT_USAGE")
-        allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
       end
 
       it "sends no events when opted out" do

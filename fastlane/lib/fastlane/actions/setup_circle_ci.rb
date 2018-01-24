@@ -49,7 +49,7 @@ module Fastlane
       end
 
       def self.should_run?(params)
-        Helper.is_ci? || params[:force]
+        Helper.ci? || params[:force]
       end
 
       #####################################################

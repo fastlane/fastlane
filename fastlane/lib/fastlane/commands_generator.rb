@@ -56,7 +56,7 @@ module Fastlane
     end
 
     def self.confirm_troubleshoot
-      if Helper.is_ci?
+      if Helper.ci?
         UI.error("---")
         UI.error("You are trying to use '--troubleshoot' on CI")
         UI.error("this option is not usable in CI, as it is insecure")
