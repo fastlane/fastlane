@@ -93,14 +93,6 @@ module Match
       command << "-out #{tmpfile.shellescape}"
       command << "-a"
       command << "-d" unless encrypt
-      # to show an error message if something goes wrong
-      unless FastlaneCore::Globals.verbose?
-        if !Helper.windows?
-          command << "&> /dev/null"
-        else
-          command << "2> nul"
-        end
-      end
 
       _out, err, st = Open3.capture3(command.join(' '))
       success = st.success?
@@ -109,6 +101,12 @@ module Match
       # but at least outputs an error message
       unless err.to_s.empty?
         success = false
+      end
+
+      # to show an error message if something goes wrong
+      if FastlaneCore::Globals.verbose?
+        UI.error("`openssl` failed with an error:")
+        UI.error(err)
       end
 
       UI.crash!("Error decrypting '#{path}'") unless success
