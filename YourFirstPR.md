@@ -78,6 +78,8 @@ bundle exec rspec ./fastlane/spec/fastlane_require_spec.rb:17
 
 The number is the line number of the unit test (`it ... do`) or unit test group (`describe ... do`) you want to run.
 
+Instead of using the line number you can also use a filter with the `it "something", now: true` notation and then use `bundle exec rspec -t now` to run this tagged test. (Note that `now` can be any random string of your choice.)
+
 ### Code style
 
 To verify and auto-fix the code style
