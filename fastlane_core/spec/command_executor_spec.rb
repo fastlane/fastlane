@@ -17,7 +17,7 @@ describe FastlaneCore do
         expect($?).to receive(:exitstatus).and_return(0)
 
         # Make a fake child process so we have a valid PID and $? is set correctly
-        expect(PTY).to receive(:spawn) do |command, &block|
+        expect(FastlaneCore::FastlanePty).to receive(:spawn) do |command, &block|
           expect(command).to eq('ls')
           block.yield(fake_std_in, 'not_really_std_out', child_process_id)
         end
