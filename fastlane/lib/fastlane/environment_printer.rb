@@ -258,7 +258,7 @@ module Fastlane
         env_output << "<summary>`#{fastlane_path}`</summary>\n"
         env_output << "\n"
         env_output << "```ruby\n"
-        env_output <<  File.read(fastlane_path)
+        env_output <<  File.read(fastlane_path, encoding: "utf-8")
         env_output <<  "\n```\n"
         env_output << "</details>"
       else
@@ -272,7 +272,7 @@ module Fastlane
         env_output << "<summary>`#{appfile_path}`</summary>\n"
         env_output << "\n"
         env_output << "```ruby\n"
-        env_output <<  File.read(appfile_path)
+        env_output <<  File.read(appfile_path, encoding: "utf-8")
         env_output <<  "\n```\n"
         env_output << "</details>"
       else
