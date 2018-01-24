@@ -9,7 +9,6 @@ require_relative 'env'
 
 module FastlaneCore
   module Helper
-
     # fastlane
     #
 
@@ -356,6 +355,5 @@ module FastlaneCore
       UI.deprecated("Helper.log is deprecated. Use `UI` class instead")
       UI.current.log
     end
-
   end
 end
