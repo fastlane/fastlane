@@ -93,8 +93,13 @@ module Match
       command << "-out #{tmpfile.shellescape}"
       command << "-a"
       command << "-d" unless encrypt
-      unless Helper.is_windows?
-        command << "&> /dev/null" unless FastlaneCore::Globals.verbose? # to show an error message if something goes wrong
+      # to show an error message if something goes wrong
+      unless FastlaneCore::Globals.verbose? 
+        unless Helper.is_windows?
+          command << "&> /dev/null" 
+        else
+          command << "2> nul"
+        end
       end
 
       _out, err, st = Open3.capture3(command.join(' '))
