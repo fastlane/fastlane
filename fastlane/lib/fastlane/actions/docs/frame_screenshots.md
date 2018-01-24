@@ -96,6 +96,38 @@ A working example can be found in the [fastlane examples](https://github.com/fas
 Use it to define the general information:
 
 TODO list parameters first, then show example
+### Framefile parameters
+| Key | Description |
+|-----|-------------|
+| `stack_title` | Specifies whether _frameit_ should display the keyword above the title when both keyword and title are defined. If it is false, the title and keyword will be displayed side by side when both keyword and title are defined. <P>Default value: `false` |
+| `title_below_image` | Specifies whether _frameit_ should place the title and optional keyword below the device frame. If it is false, it will be placed above the device frame. <P>Default value: `false` |
+| `show_complete_frame` | Specifies whether _frameit_ should shrink the device frame so that it is completely shown in the framed screenshot. If it is false, clipping of the device frame might occur at the bottom (when `title_below_image` is `false`) or top (when `title_below_image` is `true`) of the framed screenshot. <P>Default value: `false` |
+| `filter` | A part of the screenshot named for which the given option should be used. If a screenshot is named `iPhone5_Brainstorming.png` the first entry in the `data` array will be used. |
+
+TODO: When rephrasing `filter`, I realised that it are not 'just' parameters, but they are part of a JSON scheme. So maybe a better way is to depict the data in JSON format:
+
+| Key | Subkey(s) | Description |
+|-----|---------|----|
+| `device_frame_version` | NA | TODO: |
+| `default` | | All the parameters that are defined within this key are applied for all screenshots. |
+| | `keyword` | TODO: Link to the table below |
+| | `title` | TODO: Link to the table below |
+| | `stack_title` | Specifies whether _frameit_ should display the keyword above the title when both keyword and title are defined. If it is false, the title and keyword will be displayed side by side when both keyword and title are defined. <P>Default value: `false` |
+| | `title_below_image` | Specifies whether _frameit_ should place the title and optional keyword below the device frame. If it is false, it will be placed above the device frame. <P>Default value: `false` |
+| | `show_complete_frame` | Specifies whether _frameit_ should shrink the device frame so that it is completely shown in the framed screenshot. If it is false, clipping of the device frame might occur at the bottom (when `title_below_image` is `false`) or top (when `title_below_image` is `true`) of the framed screenshot. <P>Default value: `false` |
+| `data` | An array with the following keys for each screenshot: | This allows to define specific settings for individual screenshots. For example a different text color for each keyword. |
+| | `filter` | Mandatory when using `data`. <BR>This will link the individual configuration to the screenshot, based on part of the file name. <P>Examples:<BR>If a screenshot is named `iPhone 8-Brainstorming.png` you can use value `Brainstorming` for `filter`. All other keys from that array element will only be applied on this specific screenshot. |
+| | `keyword` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
+| | `title` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
+
+#### Framefile `keyword` and `title` parameters
+| Key | Description |
+|-----|-------------|
+| `font` | TODO: |
+| `color` | TODO: |
+| `text` | TODO: |
+
+
 ```json
 {
   "device_frame_version": "latest",
