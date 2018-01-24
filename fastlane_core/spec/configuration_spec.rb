@@ -136,7 +136,7 @@ describe FastlaneCore do
 
       describe "#sensitive flag" do
         before(:each) do
-          allow(FastlaneCore::Helper).to receive(:itest?).and_return(false)
+          allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
           allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
           allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
         end
