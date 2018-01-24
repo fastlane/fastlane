@@ -10,7 +10,7 @@ module Fastlane
 
         PEM.config = params
 
-        if Helper.is_test?
+        if Helper.test?
           profile_path = './test.pem'
         else
           profile_path = PEM::Manager.start

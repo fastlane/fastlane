@@ -22,7 +22,7 @@ module Deliver
     def self.language_folders(root, ignore_validation)
       folders = Dir.glob(File.join(root, '*'))
 
-      if Helper.is_test?
+      if Helper.test?
         available_languages = FastlaneCore::Languages::ALL_LANGUAGES
       else
         available_languages = Spaceship::Tunes.client.available_languages.sort

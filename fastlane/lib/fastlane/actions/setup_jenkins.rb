@@ -19,7 +19,7 @@ module Fastlane
 
       def self.run(params)
         # Stop if not executed by CI
-        if !Helper.is_ci? && !params[:force]
+        if !Helper.ci? && !params[:force]
           UI.important("Not executed by Continuous Integration system.")
           return
         end
