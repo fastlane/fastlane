@@ -10,7 +10,7 @@ module FastlaneCore
   # Verifies, the user runs the latest version of this gem
   class UpdateChecker
     def self.start_looking_for_update(gem_name)
-      return if Helper.is_test?
+      return if Helper.test?
       return if FastlaneCore::Env.truthy?("FASTLANE_SKIP_UPDATE_CHECK")
 
       @start_time = Time.now
@@ -124,7 +124,7 @@ module FastlaneCore
 
     def self.send_launch_analytic_events_for(gem_name)
       return if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
-      ci = Helper.is_ci?.to_s
+      ci = Helper.ci?.to_s
       app_id_guesser = FastlaneCore::AppIdentifierGuesser.new(args: ARGV, gem_name: gem_name)
       project_hash = app_id_guesser.p_hash
       p_hash = project_hash if project_hash
@@ -198,7 +198,7 @@ module FastlaneCore
     def self.send_completion_events_for(gem_name)
       return if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
 
-      ci = Helper.is_ci?.to_s
+      ci = Helper.ci?.to_s
       install_method = if Helper.rubygems?
                          'gem'
                        elsif Helper.bundler?
