@@ -1,6 +1,6 @@
 require 'shellwords'
 require 'fileutils'
-require 'credentials_manager/account_manager'
+require_relative from_credentials_manager/'account_manager'
 
 require_relative 'features'
 require_relative 'helper'

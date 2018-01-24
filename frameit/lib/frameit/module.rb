@@ -1,4 +1,4 @@
-require 'fastlane_core/helper'
+require_relative from_fastlane_core/'helper'
 
 require_relative 'config_parser'
 

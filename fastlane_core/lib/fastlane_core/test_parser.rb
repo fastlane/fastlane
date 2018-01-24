@@ -1,6 +1,6 @@
 require 'plist'
 
-require 'fastlane/junit_generator'
+require_relative from_fastlane/'junit_generator'
 
 require_relative 'ui/ui'
 require_relative 'print_table'

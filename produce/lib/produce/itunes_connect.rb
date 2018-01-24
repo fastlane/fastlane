@@ -1,5 +1,5 @@
-require 'spaceship'
-require 'spaceship/tunes/tunes'
+require_relative from_spaceship
+require_relative from_spaceship/'tunes/tunes'
 require_relative 'module'
 require_relative 'available_default_languages'
 

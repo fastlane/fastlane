@@ -1,5 +1,5 @@
 require 'commander'
-require 'fastlane/new_action'
+require_relative from_fastlane/'new_action'
 
 HighLine.track_eof = false
 
@@ -50,7 +50,7 @@ module Fastlane
         $stdout = STDOUT
         $stderr = STDERR
 
-        require "fastlane/environment_printer"
+        require_relative from_fastlane/'environment_printer'
         Fastlane::EnvironmentPrinter.output
       end
     end
@@ -154,8 +154,8 @@ module Fastlane
             UI.important("stay_alive is set, but the connection timeout is not, this will give you #{default_connection_timeout} seconds to (re)connect")
           end
 
-          require 'fastlane/server/socket_server'
-          require 'fastlane/server/socket_server_action_command_executor'
+          require_relative from_fastlane/'server/socket_server'
+          require_relative from_fastlane/'server/socket_server_action_command_executor'
 
           command_executor = SocketServerActionCommandExecutor.new
           server = Fastlane::SocketServer.new(
@@ -175,7 +175,7 @@ module Fastlane
 
         c.action do |args, options|
           if options.json || ensure_fastfile
-            require 'fastlane/lane_list'
+            require_relative from_fastlane/'lane_list'
             path = FastlaneCore::FastlaneFolder.fastfile_path
 
             if options.json
@@ -221,7 +221,7 @@ module Fastlane
         c.description = 'Run a fastlane one-off action without a full lane'
 
         c.action do |args, options|
-          require 'fastlane/one_off'
+          require_relative from_fastlane/'one_off'
           result = Fastlane::OneOff.execute(args: args)
           UI.success("Result: #{result}") if result
         end
@@ -234,7 +234,7 @@ module Fastlane
         c.option('--platform STRING', String, 'Only show actions available on the given platform')
 
         c.action do |args, options|
-          require 'fastlane/documentation/actions_list'
+          require_relative from_fastlane/'documentation/actions_list'
           Fastlane::ActionsList.run(filter: args.first, platform: options.platform)
         end
       end
@@ -243,7 +243,7 @@ module Fastlane
         c.syntax = 'fastlane action [tool_name]'
         c.description = 'Shows more information for a specific command'
         c.action do |args, options|
-          require 'fastlane/documentation/actions_list'
+          require_relative from_fastlane/'documentation/actions_list'
           Fastlane::ActionsList.run(filter: args.first)
         end
       end
@@ -254,7 +254,7 @@ module Fastlane
         c.option('-c STRING[,STRING2]', '--custom STRING[,STRING2]', String, 'Add custom command(s) for which tab auto complete should be enabled too')
 
         c.action do |args, options|
-          require 'fastlane/auto_complete'
+          require_relative from_fastlane/'auto_complete'
           Fastlane::AutoComplete.execute(args, options)
         end
       end
@@ -263,7 +263,7 @@ module Fastlane
         c.syntax = 'fastlane env'
         c.description = 'Print your fastlane environment, use this when you submit an issue on GitHub'
         c.action do |args, options|
-          require "fastlane/environment_printer"
+          require_relative from_fastlane/'environment_printer'
           Fastlane::EnvironmentPrinter.output
         end
       end
@@ -272,7 +272,7 @@ module Fastlane
         c.syntax = 'fastlane update_fastlane'
         c.description = 'Update fastlane to the latest release'
         c.action do |args, options|
-          require 'fastlane/one_off'
+          require_relative from_fastlane/'one_off'
           Fastlane::OneOff.run(action: "update_fastlane", parameters: {})
         end
       end

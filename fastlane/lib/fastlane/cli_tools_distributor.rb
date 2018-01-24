@@ -1,3 +1,5 @@
+require_relative '../../../fastlane_core/lib/fastlane_core/require_relative_helper'
+
 module Fastlane
   # This class is responsible for checking the ARGV
   # to see if the user wants to launch another fastlane
@@ -34,11 +36,11 @@ module Fastlane
 
           # this might take a long time if there is no Gemfile :(
           # That's why we show the loading indicator here also
-          require "fastlane"
+          require_relative from_fastlane
 
           require_fastlane_spinner.success
         else
-          require "fastlane"
+          require_relative from_fastlane
         end
         # We want to avoid printing output other than the version number if we are running `fastlane -v`
         unless running_version_command? || running_init_command?
@@ -68,7 +70,7 @@ module Fastlane
           #   fastlane sigh
           #   fastlane snapshot
           #
-          require tool_name
+          require_relative from_base/"#{tool_name}/lib/#{tool_name}"
           begin
             # First, remove the tool's name from the arguments
             # Since it will be parsed by the `commander` at a later point
@@ -89,15 +91,16 @@ module Fastlane
           end
           commands_generator.start
         elsif tool_name == "fastlane-credentials"
-          require 'credentials_manager'
+          require_relative from_credentials_manager
           ARGV.shift
           CredentialsManager::CLI.new.run
         else
           # Triggering fastlane to call a lane
-          require "fastlane/commands_generator"
+          require_relative from_fastlane/'commands_generator'
           Fastlane::CommandsGenerator.start
         end
       ensure
+        require_relative from_fastlane_core/'update_checker/update_checker'
         FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
       end
 

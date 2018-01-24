@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/check_app_store_metadata'
+    require_relative from_fastlane/'actions/check_app_store_metadata'
     class PrecheckAction < CheckAppStoreMetadataAction
       #####################################################
       # @!group Documentation

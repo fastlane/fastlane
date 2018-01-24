@@ -1,4 +1,4 @@
-require 'credentials_manager/appfile_config'
+require_relative from_credentials_manager/'appfile_config'
 
 require_relative 'env'
 require_relative 'configuration/configuration'

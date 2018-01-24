@@ -1,5 +1,5 @@
 require 'commander'
-require 'fastlane/version'
+require_relative from_fastlane/'version'
 
 require_relative 'options'
 require_relative 'resign'
@@ -91,7 +91,7 @@ module Sigh
 
         c.action do |args, options|
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
-          require 'sigh/repair'
+          require_relative from_sigh/'repair'
           Sigh::Repair.new.repair_all
         end
       end

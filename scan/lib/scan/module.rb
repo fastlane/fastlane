@@ -1,5 +1,5 @@
-require 'fastlane_core/helper'
-require 'fastlane/boolean'
+require_relative from_fastlane_core/'helper'
+require_relative from_fastlane/'boolean'
 require_relative 'detect_values'
 
 module Scan

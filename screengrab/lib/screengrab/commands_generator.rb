@@ -1,8 +1,8 @@
 require 'commander'
 
-require 'fastlane/version'
-require 'fastlane_core/fastlane_folder'
-require 'fastlane_core/configuration/configuration'
+require_relative from_fastlane/'version'
+require_relative from_fastlane_core/'fastlane_folder'
+require_relative from_fastlane_core/'configuration/configuration'
 require_relative 'android_environment'
 require_relative 'dependency_checker'
 require_relative 'runner'
@@ -55,7 +55,7 @@ module Screengrab
         c.description = "Creates a new Screengrabfile in the current directory"
 
         c.action do |args, options|
-          require 'screengrab/setup'
+          require_relative from_screengrab/'setup'
           path = Screengrab::Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
           is_swift_fastfile = args.include?("swift")
           Screengrab::Setup.create(path, is_swift_fastfile: is_swift_fastfile)

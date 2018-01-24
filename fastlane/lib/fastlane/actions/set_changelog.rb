@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class SetChangelogAction < Action
       def self.run(params)
-        require 'spaceship'
+        require_relative from_spaceship
 
         UI.message("Login to iTunes Connect (#{params[:username]})")
         Spaceship::Tunes.login(params[:username])

@@ -7,7 +7,7 @@
 require 'tempfile'
 require 'xcodeproj'
 
-require 'fastlane_core/core_ext/cfpropertylist'
+require_relative from_fastlane_core/'core_ext/cfpropertylist'
 require_relative '../module'
 require_relative '../error_handler'
 require_relative 'build_command_generator'

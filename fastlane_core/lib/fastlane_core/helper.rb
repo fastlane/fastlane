@@ -6,6 +6,7 @@ require 'pathname'
 require_relative 'fastlane_folder'
 require_relative 'ui/ui'
 require_relative 'env'
+require_relative 'require_relative_helper'
 
 module FastlaneCore
   module Helper
