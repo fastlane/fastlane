@@ -325,7 +325,7 @@ module FastlaneCore
 
     # checks if a given path is an executable file
     def self.executable?(cmd_path)
-      cmd_path && (File.executable?(cmd_path) || (Helper.is_windows? && File.exist?(cmd_path))) && !File.directory?(cmd_path)
+      cmd_path && (File.executable?(cmd_path) || (Helper.windows? && File.exist?(cmd_path))) && !File.directory?(cmd_path)
     end
   end
 end
