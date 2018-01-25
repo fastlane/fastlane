@@ -3,18 +3,18 @@
 # https://github.com/DragonBox/u3d/blob/59e471ad78ac00cb629f479dbe386c5ad2dc5075/lib/u3d_core/command_runner.rb#L88-L96
 module FastlaneCore
   class FastlanePty
-    def self.spawn(*command, &block)
+    def self.spawn(command, &block)
       require 'pty'
-      PTY.spawn(command) do |stdout, stdin, pid|
-        block.call(stdin, stdout, pid)
+      PTY.spawn(command) do |command_stdout, command_stdin, pid|
+        block.call(command_stdout, command_stdin, pid)
       end
     rescue LoadError
       require 'open3'
-      Open3.popen2e(command) do |r, w, p|
-        yield(w, r, p.value.pid) # note the inversion
+      Open3.popen2e(command) do |command_stdin, command_stdout, p| # note the inversion
+        yield(command_stdout, command_stdin, p.value.pid)
 
-        r.close
-        w.close
+        command_stdin.close
+        command_stdout.close
         p.value.exitstatus
       end
     end
