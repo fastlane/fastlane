@@ -2385,6 +2385,10 @@ func pushToGitRemote(localBranch: String? = nil,
                                                                                                     RubyCommand.Argument(name: "remote", value: remote)])
   _ = runner.executeCommand(command)
 }
+func puts(message: String) {
+  let command = RubyCommand(commandID: "", methodName: "puts", className: nil, args: [RubyCommand.Argument(name: "message", value: message)])
+  _ = runner.executeCommand(command)
+}
 @discardableResult func readPodspec(path: String) -> [String : String] {
   let command = RubyCommand(commandID: "", methodName: "read_podspec", className: nil, args: [RubyCommand.Argument(name: "path", value: path)])
   return parseDictionary(fromString: runner.executeCommand(command))
