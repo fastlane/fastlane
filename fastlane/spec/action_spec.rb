@@ -17,7 +17,7 @@ describe Fastlane do
     describe "can call alias action" do
       it "redirects to the correct class and method" do
         result = Fastlane::FastFile.new.parse("lane :test do
-          println \"alias\"
+          println(message:\"alias\")
         end").runner.execute(:test)
       end
 
