@@ -181,7 +181,7 @@ module Match
       return unless @dir
 
       result = Dir.chdir(@dir) do
-        FastlaneCore::CommandExecutor.execute(command: "git branch --list origin/#{branch.shellescape} --no-color -r",
+        FastlaneCore::CommandExecutor.execute(command: "git --no-pager branch --list origin/#{branch.shellescape} --no-color -r",
                                               print_all: FastlaneCore::Globals.verbose?,
                                               print_command: FastlaneCore::Globals.verbose?)
       end
