@@ -66,7 +66,19 @@ If you know exactly which `_spec.rb` file you want to run, use
 bundle exec rspec ./fastlane/spec/fastlane_require_spec.rb
 ```
 
-(replace `./fastlane/spec/fastlane_require_spec.rb` with the path of your test file of course)
+Replace `./fastlane/spec/fastlane_require_spec.rb` with the path of your test file of course.
+
+#### Specific unit test (group) in a specific test file
+
+If you know the specific unit test or unit test group you want to run, use
+
+```
+bundle exec rspec ./fastlane/spec/fastlane_require_spec.rb:17
+```
+
+The number is the line number of the unit test (`it ... do`) or unit test group (`describe ... do`) you want to run.
+
+Instead of using the line number you can also use a filter with the `it "something", now: true` notation and then use `bundle exec rspec -t now` to run this tagged test. (Note that `now` can be any random string of your choice.)
 
 ### Code style
 
