@@ -18,5 +18,12 @@ describe Fastlane do
                                                                   nil)
       Fastlane::CommandLineHandler.handle(["ios", "deploy", "key:true", "key2:false"], {})
     end
+
+    it "allows lane name contains `:'" do
+      expect(Fastlane::LaneManager).to receive(:cruise_lane).with("ios", "update:version:major",
+                                                                  { key: true },
+                                                                  nil)
+      Fastlane::CommandLineHandler.handle(["ios", "update:version:major", "key:true"], {})
+    end
   end
 end

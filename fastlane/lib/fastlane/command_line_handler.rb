@@ -5,7 +5,13 @@ module Fastlane
     # @param [Array] args A hash of all options (e.g. --env NAME)
     def self.handle(args, options)
       lane_parameters = {} # the parameters we'll pass to the lane
-      platform_lane_info = [] # the part that's responsible for the lane/platform definition
+      platform_lane_info = args.slice!(0, 1) # the part that's responsible for the lane/platform definition
+      platform_or_lane = platform_lane_info[0]
+      if platform_or_lane && SupportedPlatforms.all.include?(platform_or_lane.to_sym)
+        # keep the lane name if platform name was given
+        platform_lane_info << args.shift
+      end
+
       args.each do |current|
         if current.include?(":") # that's a key/value which we want to pass to the lane
           key, value = current.split(":", 2)
