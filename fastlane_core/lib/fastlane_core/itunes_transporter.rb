@@ -44,9 +44,9 @@ module FastlaneCore
       end
 
       begin
-        FastlaneCore::FastlanePty.spawn(command) do |stdin, stdout, pid|
+        FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
           begin
-            stdin.each do |line|
+            command_stdout.each do |line|
               @all_lines << line
               parse_line(line, hide_output) # this is where the parsing happens
             end
