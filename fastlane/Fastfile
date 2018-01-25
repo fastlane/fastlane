@@ -48,7 +48,7 @@ lane(:execute_tests) do
 
   # Verifying the --help command
   Dir.chdir("..") do
-    cmd = (Helper.windows?) ? "cd bin && fastlane --help" : "PAGER=cat bin/fastlane --help"
+    cmd = Helper.windows? ? "cd bin && fastlane --help" : "PAGER=cat bin/fastlane --help"
     content = sh(cmd)
     ["--version", "https://fastlane.tools", "fastlane"].each do |current|
       UI.user_error!("--help missing information: '#{current}'") unless content.include?(current)
