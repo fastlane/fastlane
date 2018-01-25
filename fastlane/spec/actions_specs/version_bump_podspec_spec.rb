@@ -26,14 +26,21 @@ describe Fastlane do
 
       context "when semantic version" do
         it "returns the current version once parsed" do
-          test_content = 'version = "1.3.2"'
+          test_content = 'spec.version = "1.3.2"'
+          result = @version_podspec_file.parse(test_content)
+          expect(result).to eq('1.3.2')
+          expect(@version_podspec_file.version_value).to eq('1.3.2')
+        end
+
+        it "works with CocoaPods 1.4.0 with the new `swift_version` parameter" do
+          test_content = "spec.version = '1.3.2'\nspec.swift_version = '4.0'"
           result = @version_podspec_file.parse(test_content)
           expect(result).to eq('1.3.2')
           expect(@version_podspec_file.version_value).to eq('1.3.2')
         end
 
         it "bumps the patch version when passing 'patch'" do
-          test_content = 'version = "1.3.2"'
+          test_content = 'spec.version = "1.3.2"'
           @version_podspec_file.parse(test_content)
           result = @version_podspec_file.bump_version('patch')
           expect(result).to eq('1.3.3')
@@ -41,7 +48,7 @@ describe Fastlane do
         end
 
         it "bumps the minor version when passing 'minor'" do
-          test_content = 'version = "1.3.2"'
+          test_content = 'spec.version = "1.3.2"'
           @version_podspec_file.parse(test_content)
           result = @version_podspec_file.bump_version('minor')
           expect(result).to eq('1.4.0')
@@ -49,7 +56,7 @@ describe Fastlane do
         end
 
         it "bumps the major version when passing 'major'" do
-          test_content = 'version = "1.3.2"'
+          test_content = 'something.version = "1.3.2"'
           @version_podspec_file.parse(test_content)
           result = @version_podspec_file.bump_version('major')
           expect(result).to eq('2.0.0')
