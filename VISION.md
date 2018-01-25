@@ -39,7 +39,7 @@ Each _fastlane_ tool has a specific purpose and should be kept focused on the fu
 
 ## _fastlane_’s Relationship with [Google](https://google.com)
 
-Google supports app development teams with the best tools for building, understanding, and growing their mobile app businesses through [Firebase](https://firebase.google.com] and [Fabric](https://get.fabric.io/).
+Google supports app development teams with the best tools for building, understanding, and growing their mobile app businesses through [Firebase](https://firebase.google.com) and [Fabric](https://get.fabric.io/).
 
 Google has recognized _fastlane_ as the best tool for tackling tough beta and release deployment challenges. The team’s mission is to make _fastlane_ the de facto tool to automate beta deployments and app store releases for iOS and Android apps.
 
