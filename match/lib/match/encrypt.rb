@@ -97,16 +97,17 @@ module Match
       _out, err, st = Open3.capture3(command.join(' '))
       success = st.success?
 
-      # Ubuntu `openssl` does not fail on failure
-      # but at least outputs an error message
       unless err.to_s.empty?
-        success = false
-      end
+        # to show an error message if something goes wrong
+        if FastlaneCore::Globals.verbose?
+          UI.error("`openssl` failed with an error:")
+          UI.error(err)
+        end
 
-      # to show an error message if something goes wrong
-      if FastlaneCore::Globals.verbose?
-        UI.error("`openssl` failed with an error:")
-        UI.error(err)
+        # Ubuntu `openssl` does not fail on failure
+        # but at least outputs an error message -
+        # so we use that as indication of failure
+        success = false
       end
 
       UI.crash!("Error decrypting '#{path}'") unless success
