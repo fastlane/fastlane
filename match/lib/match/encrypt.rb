@@ -99,7 +99,6 @@ module Match
     end
 
     def decrypt(path: nil, password: nil)
-      stored_data = ""
       stored_data = Base64.decode64(File.read(path))
       salt = stored_data[8..15]
       data_to_decrypt = stored_data[16..-1]
