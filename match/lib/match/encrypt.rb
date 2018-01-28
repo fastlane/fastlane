@@ -93,7 +93,7 @@ module Match
       encrypted_data = "Salted__" + salt + cipher.update(data_to_encrypt) + cipher.final
 
       File.write(path, Base64.encode64(encrypted_data))
-    rescue FastlaneCore::Interface::FastlaneError => user_error
+    rescue FastlaneCore::Interface::FastlaneError
       raise
     rescue => error
       UI.error(error.to_s)
