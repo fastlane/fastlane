@@ -1,5 +1,15 @@
+require 'mini_magick'
+
+require_relative 'template_finder'
+require_relative 'trim_box'
+require_relative 'module'
+require_relative 'offsets'
+require_relative 'config_parser'
+require_relative 'strings_parser'
+
 module Frameit
-  class Editor
+  # Currently the class is 2 lines too long. Reevaluate refactoring when it's length changes significantly
+  class Editor # rubocop:disable Metrics/ClassLength
     attr_accessor :screenshot # reference to the screenshot object to fetch the path, title, etc.
     attr_accessor :frame # the frame of the device
     attr_accessor :image # the current image used for editing
@@ -11,7 +21,8 @@ module Frameit
 
       if load_frame # Mac doesn't need a frame
         self.frame = MiniMagick::Image.open(load_frame)
-        self.frame.rotate(90) unless self.screenshot.portrait? # we use portrait device frames for landscape screenshots
+        # Rotate the frame according to the device orientation
+        self.frame.rotate(self.rotation_for_device_orientation)
       elsif self.class == Editor
         # Couldn't find device frame (probably an iPhone 4, for which there are no images available any more)
         # Message is already shown elsewhere
@@ -36,13 +47,19 @@ module Frameit
       @image = MiniMagick::Image.open(screenshot.path)
     end
 
+    def rotation_for_device_orientation
+      return 90 if self.screenshot.landscape_right?
+      return -90 if self.screenshot.landscape_left?
+      return 0
+    end
+
     private
 
     def store_result
       output_path = screenshot.path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
       image.format("png")
       image.write(output_path)
-      UI.success "Added frame: '#{File.expand_path(output_path)}'"
+      UI.success("Added frame: '#{File.expand_path(output_path)}'")
     end
 
     # puts the screenshot into the frame
@@ -50,21 +67,18 @@ module Frameit
       # We have to rotate the screenshot, since the offset information is for portrait
       # only. Instead of doing the calculations ourselves, it's much easier to let
       # imagemagick do the hard lifting for landscape screenshots
-      unless self.screenshot.portrait?
-        frame.rotate(-90)
-        @image.rotate(-90)
-      end
+      rotation = self.rotation_for_device_orientation
+      frame.rotate(-rotation)
+      @image.rotate(-rotation)
 
       @image = frame.composite(image, "png") do |c|
-        c.compose "DstOver"
-        c.geometry offset['offset']
+        c.compose("DstOver")
+        c.geometry(offset['offset'])
       end
 
-      # We have to revert the state to be landscape screenshots
-      unless self.screenshot.portrait?
-        frame.rotate(90)
-        @image.rotate(90)
-      end
+      # Revert the rotation from above
+      frame.rotate(rotation)
+      @image.rotate(rotation)
     end
 
     def offset
@@ -75,7 +89,7 @@ module Frameit
       if @offset_information and (@offset_information['offset'] or @offset_information['offset'])
         return @offset_information
       end
-      UI.user_error! "Could not find offset_information for '#{screenshot}'"
+      UI.user_error!("Could not find offset_information for '#{screenshot}'")
     end
 
     #########################################################################################
@@ -125,11 +139,11 @@ module Frameit
           image_width = [frame_width, @image.width].min
           image_height = [frame_height, image_width / image_aspect_ratio].min
           image_width = image_height * image_aspect_ratio
-          @image.resize "#{image_width}x#{image_height}" if image_width < @image.width || image_height < @image.height
+          @image.resize("#{image_width}x#{image_height}") if image_width < @image.width || image_height < @image.height
         else
           # the screenshot size is only limited by width.
           # If higher than the frame, the screenshot is cut off at the bottom
-          @image.resize "#{frame_width}x" if frame_width < @image.width
+          @image.resize("#{frame_width}x") if frame_width < @image.width
         end
       end
 
@@ -170,8 +184,8 @@ module Frameit
       background = MiniMagick::Image.open(fetch_config['background'])
 
       if background.height != screenshot.size[1]
-        background.resize "#{screenshot.size[0]}x#{screenshot.size[1]}^" # `^` says it should fill area
-        background.merge! ["-gravity", "center", "-crop", "#{screenshot.size[0]}x#{screenshot.size[1]}+0+0"] # crop from center
+        background.resize("#{screenshot.size[0]}x#{screenshot.size[1]}^") # `^` says it should fill area
+        background.merge!(["-gravity", "center", "-crop", "#{screenshot.size[0]}x#{screenshot.size[1]}+0+0"]) # crop from center
       end
       background
     end
@@ -181,13 +195,13 @@ module Frameit
       title_below_image = fetch_config['title_below_image']
 
       @image = background.composite(image, "png") do |c|
-        c.compose "Over"
+        c.compose("Over")
         if title_below_image
           show_complete_frame = fetch_config['show_complete_frame']
-          c.geometry "+#{left_space}+#{background.height - image.height - space_to_device}" unless show_complete_frame
-          c.geometry "+#{left_space}+#{vertical_frame_padding}" if show_complete_frame
+          c.geometry("+#{left_space}+#{background.height - image.height - space_to_device}") unless show_complete_frame
+          c.geometry("+#{left_space}+#{vertical_frame_padding}") if show_complete_frame
         else
-          c.geometry "+#{left_space}+#{space_to_device}"
+          c.geometry("+#{left_space}+#{space_to_device}")
         end
       end
 
@@ -200,17 +214,16 @@ module Frameit
 
       multiplicator = (screenshot_width.to_f / offset['width'].to_f) # by how much do we have to change this?
       new_frame_width = multiplicator * frame.width # the new width for the frame
-      frame.resize "#{new_frame_width.round}x" # resize it to the calculated width
+      frame.resize("#{new_frame_width.round}x") # resize it to the calculated width
       modify_offset(multiplicator) # modify the offset to properly insert the screenshot into the frame later
     end
 
     def resize_text(text)
       width = text.width
-      ratio = (width + (keyword_padding + horizontal_frame_padding) * 2) / image.width.to_f
+      ratio = width / (image.width.to_f - horizontal_frame_padding * 2)
       if ratio > 1.0
         # too large - resizing now
-        smaller = (1.0 / ratio)
-        text.resize "#{(smaller * text.width).round}x"
+        text.resize("#{((1.0 / ratio) * text.width).round}x")
       end
     end
 
@@ -219,40 +232,35 @@ module Frameit
       resize_text(title)
       resize_text(keyword)
 
-      title_width = title.width
-      keyword_width = keyword.width
-
-      vertical_padding = vertical_frame_padding
+      vertical_padding = vertical_frame_padding # assign padding to variable
       keyword_top_space = vertical_padding
-
-      spacing_between_title_and_keyword = (title.height / 2)
+      spacing_between_title_and_keyword = (actual_font_size / 2)
       title_top_space = vertical_padding + keyword.height + spacing_between_title_and_keyword
-      title_left_space = (background.width / 2.0 - title_width / 2.0).round
-      keyword_left_space = (background.width / 2.0 - keyword_width / 2.0).round
+      title_left_space = (background.width / 2.0 - title.width / 2.0).round
+      keyword_left_space = (background.width / 2.0 - keyword.width / 2.0).round
 
       self.space_to_device += title.height + keyword.height + spacing_between_title_and_keyword + vertical_padding
       title_below_image = fetch_config['title_below_image']
       # keyword
       background = background.composite(keyword, "png") do |c|
-        c.compose "Over"
-        c.geometry "+#{keyword_left_space}+#{keyword_top_space}" unless title_below_image
-        c.geometry "+#{keyword_left_space}+#{background.height - space_to_device + keyword_top_space}" if title_below_image
+        c.compose("Over")
+        c.geometry("+#{keyword_left_space}+#{keyword_top_space}") unless title_below_image
+        c.geometry("+#{keyword_left_space}+#{background.height - space_to_device + keyword_top_space}") if title_below_image
       end
-      # Then, put the title on top of the screenshot next to the keyword
-      # Then, put the title above/below of the screenshot next to the keyword
+      # Place the title below the keyword
       background = background.composite(title, "png") do |c|
-        c.compose "Over"
-        c.geometry "+#{title_left_space}+#{title_top_space}" unless title_below_image
-        c.geometry "+#{title_left_space}+#{background.height - space_to_device + title_top_space}" if title_below_image
+        c.compose("Over")
+        c.geometry("+#{title_left_space}+#{title_top_space}") unless title_below_image
+        c.geometry("+#{title_left_space}+#{background.height - space_to_device + title_top_space}") if title_below_image
       end
       background
     end
 
     def put_title_into_background(background, stack_title)
-      title_images = build_title_images(image.width - 2 * horizontal_frame_padding, image.height - 2 * vertical_frame_padding)
+      text_images = build_text_images(image.width - 2 * horizontal_frame_padding, image.height - 2 * vertical_frame_padding, stack_title)
 
-      keyword = title_images[:keyword]
-      title = title_images[:title]
+      keyword = text_images[:keyword]
+      title = text_images[:title]
 
       if stack_title && !keyword.nil? && !title.nil? && keyword.width > 0 && title.width > 0
         background = put_title_into_background_stacked(background, title, keyword)
@@ -263,49 +271,52 @@ module Frameit
       sum_width = title.width
       sum_width += keyword.width + keyword_padding if keyword
 
-      # Resize the 2 labels if necessary
-      smaller = 1.0 # default
-      ratio = (sum_width + (keyword_padding + horizontal_frame_padding) * 2) / image.width.to_f
-      if ratio > 1.0
-        # too large - resizing now
-        smaller = (1.0 / ratio)
+      title_below_image = fetch_config['title_below_image']
 
-        UI.verbose("Text for image #{self.screenshot.path} is quite long, reducing font size by #{(ratio - 1.0).round(2)}")
+      # Resize the 2 labels if they exceed the available space either horizontally or vertically:
+      image_scale_factor = 1.0 # default
+      ratio_horizontal = sum_width / (image.width.to_f - horizontal_frame_padding * 2) # The fraction of the text images compared to the left and right padding
+      ratio_vertical = title.height.to_f / actual_font_size # The fraction of the actual height of the images compared to the available space
+      if ratio_horizontal > 1.0 || ratio_vertical > 1.0
+        # If either is too large, resize with the maximum ratio:
+        image_scale_factor = (1.0 / [ratio_horizontal, ratio_vertical].max)
 
-        title.resize "#{(smaller * title.width).round}x"
-        keyword.resize "#{(smaller * keyword.width).round}x" if keyword
-        sum_width *= smaller
+        UI.verbose("Text for image #{self.screenshot.path} is quite long, reducing font size by #{(100 * (1.0 - image_scale_factor)).round(1)}%")
+
+        title.resize("#{(image_scale_factor * title.width).round}x")
+        keyword.resize("#{(image_scale_factor * keyword.width).round}x") if keyword
+        sum_width *= image_scale_factor
       end
 
-      vertical_padding = vertical_frame_padding
+      vertical_padding = vertical_frame_padding # assign padding to variable
       top_space = vertical_padding + (actual_font_size - title.height) / 2
       left_space = (background.width / 2.0 - sum_width / 2.0).round
-      title_below_image = fetch_config['title_below_image']
 
       self.space_to_device += actual_font_size + vertical_padding
 
       # First, put the keyword on top of the screenshot, if we have one
       if keyword
         background = background.composite(keyword, "png") do |c|
-          c.compose "Over"
-          c.geometry "+#{left_space}+#{top_space}" unless title_below_image
-          c.geometry "+#{left_space}+#{background.height - space_to_device + top_space}" if title_below_image
+          c.compose("Over")
+          c.geometry("+#{left_space}+#{top_space}") unless title_below_image
+          c.geometry("+#{left_space}+#{background.height - space_to_device + top_space}") if title_below_image
         end
 
-        left_space += keyword.width + (keyword_padding * smaller)
+        left_space += keyword.width + (keyword_padding * image_scale_factor)
       end
 
       # Then, put the title on top of the screenshot next to the keyword
       background = background.composite(title, "png") do |c|
-        c.compose "Over"
-        c.geometry "+#{left_space}+#{top_space}" unless title_below_image
-        c.geometry "+#{left_space}+#{background.height - space_to_device + top_space}" if title_below_image
+        c.compose("Over")
+        c.geometry("+#{left_space}+#{top_space}") unless title_below_image
+        c.geometry("+#{left_space}+#{background.height - space_to_device + top_space}") if title_below_image
       end
       background
     end
 
     def actual_font_size
       font_scale_factor = fetch_config['font_scale_factor'] || 0.1
+      UI.user_error!("Parameter 'font_scale_factor' can not be 0. Please provide a value larger than 0.0 (default = 0.1).") if font_scale_factor == 0.0
       [@image.width * font_scale_factor].max.round
     end
 
@@ -314,18 +325,21 @@ module Frameit
       (actual_font_size / 3.0).round
     end
 
-    # This will build 2 individual images with the title, which will then be added to the real image
-    def build_title_images(max_width, max_height)
+    # This will build up to 2 individual images with the title and optional keyword, which will then be added to the real image
+    def build_text_images(max_width, max_height, stack_title)
       words = [:keyword, :title].keep_if { |a| fetch_text(a) } # optional keyword/title
       results = {}
+      trim_boxes = {}
+      top_vertical_trim_offset = Float::INFINITY # Init at a large value, as the code will search for a minimal value.
+      bottom_vertical_trim_offset = 0
       words.each do |key|
         # Create empty background
         empty_path = File.join(Frameit::ROOT, "lib/assets/empty.png")
-        title_image = MiniMagick::Image.open(empty_path)
+        text_image = MiniMagick::Image.open(empty_path)
         image_height = max_height # gets trimmed afterwards anyway, and on the iPad the `y` would get cut
-        title_image.combine_options do |i|
+        text_image.combine_options do |i|
           # Oversize as the text might be larger than the actual image. We're trimming afterwards anyway
-          i.resize "#{max_width * 5.0}x#{image_height}!" # `!` says it should ignore the ratio
+          i.resize("#{max_width * 5.0}x#{image_height}!") # `!` says it should ignore the ratio
         end
 
         current_font = font(key)
@@ -333,24 +347,77 @@ module Frameit
         UI.verbose("Using #{current_font} as font the #{key} of #{screenshot.path}") if current_font
         UI.verbose("Adding text '#{text}'")
 
-        text.gsub! '\n', "\n"
+        text.gsub!('\n', "\n")
         text.gsub!(/(?<!\\)(')/) { |s| "\\#{s}" } # escape unescaped apostrophes with a backslash
 
         interline_spacing = fetch_config['interline_spacing']
 
         # Add the actual title
-        title_image.combine_options do |i|
-          i.font current_font if current_font
-          i.gravity "Center"
-          i.pointsize actual_font_size
-          i.draw "text 0,0 '#{text}'"
-          i.interline_spacing interline_spacing if interline_spacing
-          i.fill fetch_config[key.to_s]['color']
+        text_image.combine_options do |i|
+          i.font(current_font) if current_font
+          i.gravity("Center")
+          i.pointsize(actual_font_size)
+          i.draw("text 0,0 '#{text}'")
+          i.interline_spacing(interline_spacing) if interline_spacing
+          i.fill(fetch_config[key.to_s]['color'])
         end
-        title_image.trim # remove white space
 
-        results[key] = title_image
+        results[key] = text_image
+
+        # Natively trimming the image with .trim will result in the loss of the common baseline between the text in all images when side-by-side (e.g. stack_title is false).
+        # Hence retrieve the calculated trim bounding box without actually trimming:
+        calculated_trim_box = text_image.identify do |b|
+          b.format("%@") # CALCULATED: trim bounding box (without actually trimming), see: http://www.imagemagick.org/script/escape.php
+        end
+
+        # Create a Trimbox object from the MiniMagick .identify string with syntax "<width>x<height>+<offset_x>+<offset_y>":
+        trim_box = Frameit::Trimbox.new(calculated_trim_box)
+
+        # Get the minimum top offset of the trim box:
+        if trim_box.offset_y < top_vertical_trim_offset
+          top_vertical_trim_offset = trim_box.offset_y
+        end
+
+        # Get the maximum bottom offset of the trim box, this is the top offset + height:
+        if (trim_box.offset_y + trim_box.height) > bottom_vertical_trim_offset
+          bottom_vertical_trim_offset = trim_box.offset_y + trim_box.height
+        end
+
+        # Store for the crop action:
+        trim_boxes[key] = trim_box
       end
+
+      # Crop text images:
+      words.each do |key|
+        # Get matching trim box:
+        trim_box = trim_boxes[key]
+
+        # For side-by-side text images (e.g. stack_title is false) adjust the trim box based on top_vertical_trim_offset and bottom_vertical_trim_offset to maintain the text baseline:
+        unless stack_title
+          # Determine the trim area by maintaining the same vertical top offset based on the smallest value from all trim boxes (top_vertical_trim_offset).
+          # When the vertical top offset is larger than the smallest vertical top offset, the trim box needs to be adjusted:
+          if trim_box.offset_y > top_vertical_trim_offset
+            # Increase the height of the trim box with the difference in vertical top offset:
+            trim_box.height += trim_box.offset_y - top_vertical_trim_offset
+            # Change the vertical top offset to match that of the others:
+            trim_box.offset_y = top_vertical_trim_offset
+
+            UI.verbose("Trim box for key \"#{key}\" is adjusted to align top: #{trim_box}\n")
+          end
+
+          # Check if the height needs to be adjusted to reach the bottom offset:
+          if (trim_box.offset_y + trim_box.height) < bottom_vertical_trim_offset
+            # Set the height of the trim box to the difference between vertical bottom and top offset:
+            trim_box.height = bottom_vertical_trim_offset - trim_box.offset_y
+
+            UI.verbose("Trim box for key \"#{key}\" is adjusted to align bottom: #{trim_box}\n")
+          end
+        end
+
+        # Crop image with (adjusted) trim box parameters in MiniMagick string format:
+        results[key].crop(trim_box.string_format)
+      end
+
       results
     end
 
@@ -368,26 +435,27 @@ module Frameit
 
     # Fetches the title + keyword for this particular screenshot
     def fetch_text(type)
-      UI.user_error! "Valid parameters :keyword, :title" unless [:keyword, :title].include? type
+      UI.user_error!("Valid parameters :keyword, :title") unless [:keyword, :title].include?(type)
 
       # Try to get it from a keyword.strings or title.strings file
       strings_path = File.join(File.expand_path("..", screenshot.path), "#{type}.strings")
-      if File.exist? strings_path
+      if File.exist?(strings_path)
         parsed = StringsParser.parse(strings_path)
-        result = parsed.find { |k, v| screenshot.path.upcase.include? k.upcase }
-        return result.last if result
+        text_array = parsed.find { |k, v| screenshot.path.upcase.include?(k.upcase) }
+        return text_array.last if text_array && text_array.last.length > 0 # Ignore empty string
       end
+
+      UI.verbose("Falling back to text in Framefile.json as there was nothing specified in the #{type}.strings file")
 
       # No string files, fallback to Framefile config
-      result = fetch_config[type.to_s]['text'] if fetch_config[type.to_s]
-      UI.verbose("Falling back to default text as there was nothing specified in the .strings file")
+      text = fetch_config[type.to_s]['text'] if fetch_config[type.to_s] && fetch_config[type.to_s]['text'] && fetch_config[type.to_s]['text'].length > 0 # Ignore empty string
 
-      if type == :title and !result
+      if type == :title and !text
         # title is mandatory
-        UI.user_error! "Could not get title for screenshot #{screenshot.path}. Please provide one in your Framefile.json"
+        UI.user_error!("Could not get title for screenshot #{screenshot.path}. Please provide one in your Framefile.json or title.strings")
       end
 
-      return result
+      return text
     end
 
     # The font we want to use
@@ -400,7 +468,7 @@ module Frameit
         fonts.each do |font|
           if font['supported']
             font['supported'].each do |language|
-              if screenshot.path.include? language
+              if screenshot.path.include?(language)
                 return font["font"]
               end
             end

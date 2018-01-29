@@ -1,6 +1,32 @@
-require 'snapshot/simulator_launchers/simulator_launcher_base'
+require 'fastlane_core/test_parser'
+require_relative 'simulator_launcher_base'
 
 module Snapshot
+  class CPUInspector
+    def self.hwprefs_available?
+      `which hwprefs` != ''
+    end
+
+    def self.cpu_count
+      @cpu_count ||=
+        case RUBY_PLATFORM
+        when /darwin9/
+          `hwprefs cpu_count`.to_i
+        when /darwin10/
+          (hwprefs_available? ? `hwprefs thread_count` : `sysctl -n hw.physicalcpu_max`).to_i
+        when /linux/
+          UI.user_error!("We detected that you are running snapshot on Linux, but snapshot is only supported on macOS")
+        when /freebsd/
+          UI.user_error!("We detected that you are running snapshot on FreeBSD, but snapshot is only supported on macOS")
+        else
+          if RbConfig::CONFIG['host_os'] =~ /darwin/
+            (hwprefs_available? ? `hwprefs thread_count` : `sysctl -n hw.physicalcpu_max`).to_i
+          else
+            UI.crash!("Cannot find the machine's processor count.")
+          end
+        end
+    end
+  end
   class SimulatorLauncher < SimulatorLauncherBase
     # With Xcode 9's ability to run tests on multiple concurrent simulators,
     # this method sets the maximum number of simulators to run simultaneously
@@ -31,7 +57,10 @@ module Snapshot
           # Break up the array of devices into chunks that can
           # be run simultaneously.
           if launcher_config.concurrent_simulators?
-            device_batches = launcher_config.devices.each_slice(default_number_of_simultaneous_simulators).to_a
+            all_devices = launcher_config.devices
+            # We have to break up the concurrent simulators by device version too, otherwise there is an error (see #10969)
+            by_simulator_version = all_devices.group_by { |d| FastlaneCore::DeviceManager.latest_simulator_version_for_device(d) }.values
+            device_batches = by_simulator_version.flat_map { |a| a.each_slice(default_number_of_simultaneous_simulators).to_a }
           else
             # Put each device in it's own array to run tests one at a time
             device_batches = launcher_config.devices.map { |d| [d] }
@@ -89,7 +118,7 @@ module Snapshot
                                                 cleanup_after_failure(devices, language, locale, launch_args, return_code)
 
                                                 # no exception raised... that means we need to retry
-                                                UI.error "Caught error... #{return_code}"
+                                                UI.error("Caught error... #{return_code}")
 
                                                 self.current_number_of_retries_due_to_failing_simulator += 1
                                                 if self.current_number_of_retries_due_to_failing_simulator < 20 && return_code != 65
@@ -172,32 +201,6 @@ module Snapshot
       FileUtils.mkdir_p(containing)
 
       return File.join(containing, file_name)
-    end
-  end
-
-  class CPUInspector
-    def self.hwprefs_available?
-      `which hwprefs` != ''
-    end
-
-    def self.cpu_count
-      @cpu_count ||=
-        case RUBY_PLATFORM
-        when /darwin9/
-          `hwprefs cpu_count`.to_i
-        when /darwin10/
-          (hwprefs_available? ? `hwprefs thread_count` : `sysctl -n hw.physicalcpu_max`).to_i
-        when /linux/
-          UI.user_error!("We detected that you are running snapshot on Linux, but snapshot is only supported on macOS")
-        when /freebsd/
-          UI.user_error!("We detected that you are running snapshot on FreeBSD, but snapshot is only supported on macOS")
-        else
-          if RbConfig::CONFIG['host_os'] =~ /darwin/
-            (hwprefs_available? ? `hwprefs thread_count` : `sysctl -n hw.physicalcpu_max`).to_i
-          else
-            UI.crash!("Cannot find the machine's processor count.")
-          end
-        end
     end
   end
 end

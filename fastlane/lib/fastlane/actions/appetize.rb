@@ -38,9 +38,9 @@ module Fastlane
         http.use_ssl = true
 
         if params[:platform] == 'ios'
-          UI.message "Uploading ipa to appetize... this might take a while"
+          UI.message("Uploading ipa to appetize... this might take a while")
         else
-          UI.message "Uploading apk to appetize... this might take a while"
+          UI.message("Uploading apk to appetize... this might take a while")
         end
 
         response = http.request(req)
@@ -81,7 +81,7 @@ module Fastlane
         Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL] = manage_url
         return true
       rescue => ex
-        UI.error ex
+        UI.error(ex)
         UI.user_error!("Error uploading to Appetize.io: #{response.body}")
       end
       private_class_method :parse_response

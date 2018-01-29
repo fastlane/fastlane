@@ -1,3 +1,6 @@
+require_relative 'tunes_base'
+require_relative 'application'
+
 module Spaceship
   module Tunes
     class Member < TunesBase

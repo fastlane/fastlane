@@ -3,8 +3,8 @@ module Fastlane
     class SetupTravisAction < Action
       def self.run(params)
         # Stop if not executed by CI
-        if !Helper.is_ci? && !params[:force]
-          UI.message "Currently not running on CI system, skipping travis setup"
+        if !Helper.ci? && !params[:force]
+          UI.message("Currently not running on CI system, skipping travis setup")
           return
         end
 
@@ -14,7 +14,7 @@ module Fastlane
         ENV["MATCH_KEYCHAIN_NAME"] = keychain_name
         ENV["MATCH_KEYCHAIN_PASSWORD"] = password
 
-        UI.message "Creating temporary keychain: \"#{keychain_name}\"."
+        UI.message("Creating temporary keychain: \"#{keychain_name}\".")
         Actions::CreateKeychainAction.run(
           name: keychain_name,
           default_keychain: true,

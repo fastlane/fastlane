@@ -4,7 +4,7 @@ describe FastlaneCore do
       def within_a_temp_dir
         Dir.mktmpdir do |dir|
           FileUtils.cd(dir) do
-            yield dir if block_given?
+            yield(dir) if block_given?
           end
         end
       end
@@ -69,7 +69,7 @@ describe FastlaneCore do
           FileUtils.mkdir_p(workspaces)
 
           expect(FastlaneCore::Project).to receive(:choose).and_return(workspaces.last)
-          expect(FastlaneCore::Project).not_to receive(:select_project)
+          expect(FastlaneCore::Project).not_to(receive(:select_project))
 
           config = FastlaneCore::Configuration.new(options, {})
           FastlaneCore::Project.detect_projects(config)
@@ -84,7 +84,7 @@ describe FastlaneCore do
           FileUtils.mkdir_p(projects)
 
           expect(FastlaneCore::Project).to receive(:choose).and_return(projects.last)
-          expect(FastlaneCore::Project).not_to receive(:select_project)
+          expect(FastlaneCore::Project).not_to(receive(:select_project))
 
           config = FastlaneCore::Configuration.new(options, {})
           FastlaneCore::Project.detect_projects(config)
@@ -156,9 +156,11 @@ describe FastlaneCore do
     end
 
     it "raises an exception if path was not found" do
+      tmp_path = Dir.mktmpdir
+      path = "#{tmp_path}/notHere123"
       expect do
-        FastlaneCore::Project.new(project: "/tmp/notHere123")
-      end.to raise_error "Could not find project at path '/tmp/notHere123'"
+        FastlaneCore::Project.new(project: path)
+      end.to raise_error("Could not find project at path '#{path}'")
     end
 
     describe "Valid Standard Project" do
@@ -179,27 +181,27 @@ describe FastlaneCore do
         expect(@project.project_name).to eq("Example")
       end
 
-      it "#schemes returns all available schemes" do
+      it "#schemes returns all available schemes", requires_xcodebuild: true do
         expect(@project.schemes).to eq(["Example"])
       end
 
-      it "#configurations returns all available configurations" do
+      it "#configurations returns all available configurations", requires_xcodebuild: true do
         expect(@project.configurations).to eq(["Debug", "Release", "SpecialConfiguration"])
       end
 
-      it "#app_name" do
+      it "#app_name", requires_xcode: true do
         expect(@project.app_name).to eq("ExampleProductName")
       end
 
-      it "#mac?" do
+      it "#mac?", requires_xcode: true do
         expect(@project.mac?).to eq(false)
       end
 
-      it "#ios?" do
+      it "#ios?", requires_xcode: true do
         expect(@project.ios?).to eq(true)
       end
 
-      it "#tvos?" do
+      it "#tvos?", requires_xcode: true do
         expect(@project.tvos?).to eq(false)
       end
     end
@@ -213,11 +215,11 @@ describe FastlaneCore do
         @workspace = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
-      it "#schemes returns all schemes" do
+      it "#schemes returns all schemes", requires_xcodebuild: true do
         expect(@workspace.schemes).to eq(["Example"])
       end
 
-      it "#schemes returns all configurations" do
+      it "#schemes returns all configurations", requires_xcodebuild: true do
         expect(@workspace.configurations).to eq([])
       end
     end
@@ -228,19 +230,19 @@ describe FastlaneCore do
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
-      it "#mac?" do
+      it "#mac?", requires_xcode: true do
         expect(@project.mac?).to eq(true)
       end
 
-      it "#ios?" do
+      it "#ios?", requires_xcode: true do
         expect(@project.ios?).to eq(false)
       end
 
-      it "#tvos?" do
+      it "#tvos?", requires_xcode: true do
         expect(@project.tvos?).to eq(false)
       end
 
-      it "schemes" do
+      it "schemes", requires_xcodebuild: true do
         expect(@project.schemes).to eq(["Mac"])
       end
     end
@@ -251,19 +253,19 @@ describe FastlaneCore do
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
-      it "#mac?" do
+      it "#mac?", requires_xcode: true do
         expect(@project.mac?).to eq(false)
       end
 
-      it "#ios?" do
+      it "#ios?", requires_xcode: true do
         expect(@project.ios?).to eq(false)
       end
 
-      it "#tvos?" do
+      it "#tvos?", requires_xcode: true do
         expect(@project.tvos?).to eq(true)
       end
 
-      it "schemes" do
+      it "schemes", requires_xcodebuild: true do
         expect(@project.schemes).to eq(["ExampleTVOS"])
       end
     end
@@ -274,23 +276,23 @@ describe FastlaneCore do
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
-      it "supported_platforms" do
+      it "supported_platforms", requires_xcode: true do
         expect(@project.supported_platforms).to eq([:macOS, :iOS, :tvOS, :watchOS])
       end
 
-      it "#mac?" do
+      it "#mac?", requires_xcode: true do
         expect(@project.mac?).to eq(true)
       end
 
-      it "#ios?" do
+      it "#ios?", requires_xcode: true do
         expect(@project.ios?).to eq(true)
       end
 
-      it "#tvos?" do
+      it "#tvos?", requires_xcode: true do
         expect(@project.tvos?).to eq(true)
       end
 
-      it "schemes" do
+      it "schemes", requires_xcodebuild: true do
         expect(@project.schemes).to eq(["CrossPlatformFramework"])
       end
     end
@@ -321,11 +323,11 @@ describe FastlaneCore do
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
-      it "IPHONEOS_DEPLOYMENT_TARGET should be 9.0" do
+      it "IPHONEOS_DEPLOYMENT_TARGET should be 9.0", requires_xcode: true do
         expect(@project.build_settings(key: "IPHONEOS_DEPLOYMENT_TARGET")).to eq("9.0")
       end
 
-      it "PRODUCT_BUNDLE_IDENTIFIER should be tools.fastlane.app" do
+      it "PRODUCT_BUNDLE_IDENTIFIER should be tools.fastlane.app", requires_xcode: true do
         expect(@project.build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")).to eq("tools.fastlane.app")
       end
     end
@@ -339,11 +341,11 @@ describe FastlaneCore do
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
-      it "IPHONEOS_DEPLOYMENT_TARGET should be 9.0" do
+      it "IPHONEOS_DEPLOYMENT_TARGET should be 9.0", requires_xcode: true do
         expect(@project.build_settings(key: "IPHONEOS_DEPLOYMENT_TARGET")).to eq("9.0")
       end
 
-      it "PRODUCT_BUNDLE_IDENTIFIER should be tools.fastlane.app.special" do
+      it "PRODUCT_BUNDLE_IDENTIFIER should be tools.fastlane.app.special", requires_xcode: true do
         expect(@project.build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")).to eq("tools.fastlane.app.special")
       end
     end
@@ -417,7 +419,7 @@ describe FastlaneCore do
       end
 
       it "runs simple commands" do
-        cmd = 'echo "HO"'
+        cmd = 'echo HO' # note: this command is deliberately not using `"` around `HO` as `echo` would echo those back on Windows
         expect(FastlaneCore::Project.run_command(cmd)).to eq("HO\n")
       end
 
@@ -430,18 +432,20 @@ describe FastlaneCore do
         text = "FOOBAR" # random text
         count = count_processes(text)
         cmd = "ruby -e 'sleep 3; puts \"#{text}\"'"
-        # this doesn't work
         expect do
           FastlaneCore::Project.run_command(cmd, timeout: 1)
         end.to raise_error(Timeout::Error)
 
-        # this shows the current implementation issue
-        # Timeout doesn't kill the running process
-        # i.e. see fastlane/fastlane_core#102
-        expect(count_processes(text)).to eq(count + 1)
-        sleep(5)
-        expect(count_processes(text)).to eq(count)
-        # you would be expected to be able to see the number of processes go back to count right away.
+        # on mac this before only partially works as expected
+        if FastlaneCore::Helper.mac?
+          # this shows the current implementation issue
+          # Timeout doesn't kill the running process
+          # i.e. see fastlane/fastlane_core#102
+          expect(count_processes(text)).to eq(count + 1)
+          sleep(5)
+          expect(count_processes(text)).to eq(count)
+          # you would be expected to be able to see the number of processes go back to count right away.
+        end
       end
 
       it "retries and kills" do
@@ -456,7 +460,7 @@ describe FastlaneCore do
       end
     end
 
-    describe 'xcodebuild_list_silent option' do
+    describe 'xcodebuild_list_silent option', requires_xcodebuild: true do
       it 'is not silent by default' do
         project = FastlaneCore::Project.new(
           { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" },
@@ -468,7 +472,7 @@ describe FastlaneCore do
         project.configurations
       end
 
-      it 'makes the raw_info method be silent if configured' do
+      it 'makes the raw_info method be silent if configured', requires_xcodebuild: true do
         project = FastlaneCore::Project.new(
           { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" },
           xcodebuild_list_silent: true,
@@ -480,10 +484,10 @@ describe FastlaneCore do
       end
     end
 
-    describe 'xcodebuild_suppress_stderr option' do
+    describe 'xcodebuild_suppress_stderr option', requires_xcode: true do
       it 'generates an xcodebuild -list command without stderr redirection by default' do
         project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
-        expect(project.build_xcodebuild_list_command).not_to match(%r{2> /dev/null})
+        expect(project.build_xcodebuild_list_command).not_to(match(%r{2> /dev/null}))
       end
 
       it 'generates an xcodebuild -list command that redirects stderr to /dev/null' do
@@ -496,15 +500,37 @@ describe FastlaneCore do
 
       it 'generates an xcodebuild -showBuildSettings command without stderr redirection by default' do
         project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
-        expect(project.build_xcodebuild_showbuildsettings_command).not_to match(%r{2> /dev/null})
+        expect(project.build_xcodebuild_showbuildsettings_command).not_to(match(%r{2> /dev/null}))
       end
 
-      it 'generates an xcodebuild -showBuildSettings command that redirects stderr to /dev/null' do
+      it 'generates an xcodebuild -showBuildSettings command that redirects stderr to /dev/null', requires_xcode: true do
         project = FastlaneCore::Project.new(
           { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" },
           xcodebuild_suppress_stderr: true
         )
         expect(project.build_xcodebuild_showbuildsettings_command).to match(%r{2> /dev/null})
+      end
+    end
+
+    describe "#project_paths" do
+      it "works with basic projects" do
+        project = FastlaneCore::Project.new({
+          project: "gym/lib"
+        })
+
+        expect(project.project_paths).to be_an(Array)
+        expect(project.project_paths).to eq([File.expand_path("gym/lib")])
+      end
+
+      it "works with workspaces" do
+        workspace_path = "gym/spec/fixtures/projects/cocoapods/Example.xcworkspace"
+        project = FastlaneCore::Project.new({
+          workspace: workspace_path
+        })
+
+        expect(project.project_paths).to eq([
+                                              File.expand_path(workspace_path.gsub("xcworkspace", "xcodeproj")) # this should point to the included Xcode project
+                                            ])
       end
     end
   end

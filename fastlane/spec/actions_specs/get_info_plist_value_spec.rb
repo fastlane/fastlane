@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "get_info_plist" do
-      let (:plist_path) { "./fastlane/spec/fixtures/plist/Info.plist" }
+      let(:plist_path) { "./fastlane/spec/fixtures/plist/Info.plist" }
 
       it "fetches the value from the plist" do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)

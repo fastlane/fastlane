@@ -7,7 +7,7 @@
 require 'shellwords'
 
 # The concrete implementations
-require 'gym/generators/package_command_generator_xcode7'
+require_relative 'package_command_generator_xcode7'
 
 module Gym
   class PackageCommandGenerator

@@ -2,7 +2,9 @@
 
 ## Prerequisites
 
-Before you start working on _fastlane_, you should have [Bundler][bundler] installed. Bundler is a ruby project that allows you to specify all ruby dependencies in a file called the `Gemfile`. If you want to learn more about how Bundler works, check out [their website][bundler help].
+Before you start working on _fastlane_, make sure you had a look at [CONTRIBUTING.md](CONTRIBUTING.md).
+
+For working on _fastlane_ you should have [Bundler][bundler] installed. Bundler is a ruby project that allows you to specify all ruby dependencies in a file called the `Gemfile`. If you want to learn more about how Bundler works, check out [their website][bundler help].
 
 ## Finding things to work on
 
@@ -15,6 +17,7 @@ If you want to work on something else, e.g. new functionality or fixing a bug, i
 - Click the “Fork” button in the upper right corner of the [main _fastlane_ repo][fastlane]
 - Clone your fork:
   - `git clone git@github.com:<YOUR_GITHUB_USER>/fastlane.git`
+  - Learn more about how to manage your fork: https://help.github.com/articles/working-with-forks/
 - Install dependencies:
   - Run `bundle install` in the project root
   - If there are dependency errors, you might also need to run `bundle update`
@@ -39,13 +42,43 @@ You can also run those steps independently or on a more fine grained way.
 
 Make sure to run the automated tests using `bundle exec` to ensure you’re running the correct version of `rspec` and `rubocop`
 
-First, navigate into the root of the _fastlane_ project and run unit tests using
+#### All unit tests
+
+First, navigate into the root of the _fastlane_ project and run all unit tests using
 
 ```
 bundle exec rspec
 ```
 
-If you want to run tests only for one tool, use `bundle exec rspec [tool_name]`
+#### Unit tests for one specific tool
+
+If you want to run tests only for one tool, use
+
+```
+bundle exec rspec [tool_name]
+```
+
+#### Unit tests in one specific test file
+
+If you know exactly which `_spec.rb` file you want to run, use
+
+```
+bundle exec rspec ./fastlane/spec/fastlane_require_spec.rb
+```
+
+Replace `./fastlane/spec/fastlane_require_spec.rb` with the path of your test file of course.
+
+#### Specific unit test (group) in a specific test file
+
+If you know the specific unit test or unit test group you want to run, use
+
+```
+bundle exec rspec ./fastlane/spec/fastlane_require_spec.rb:17
+```
+
+The number is the line number of the unit test (`it ... do`) or unit test group (`describe ... do`) you want to run.
+
+Instead of using the line number you can also use a filter with the `it "something", now: true` notation and then use `bundle exec rspec -t now` to run this tagged test. (Note that `now` can be any random string of your choice.)
 
 ### Code style
 
@@ -75,7 +108,7 @@ bundle show fastlane
 
 which should print out the path to your local development environment.
 
-From now on, every time you introduce a change to your local _fastlane_ code base, you can immediately test it by running `bundle exec fastlane …`.
+From now on, every time you introduce a change to your local _fastlane_ code base, you can immediately test it by running `bundle exec fastlane …`. (Note that just using `fastlane …` without `bundle exec` will **not** use your local _fastlane_ code base!)
 
 If you want to run a command with your normal _fastlane_ installation, simply do not run the command with the `bundle exec` prefix.
 
@@ -98,7 +131,7 @@ _fastlane_ changes a lot and is in constant flux. We usually merge multiple PRs 
 After your contribution is merged, it’s not immediately available to all users. Your change will be shipped as part of the next release, which is usually once per week. If your change is time critical, please let us know so we can schedule a release for your change.
 
 <!-- Links -->
-[you can do this]: https://github.com/fastlane/fastlane/issues?utf8=✓&q=is%3Aopen%20is%3Aissue%20label%3A%22you%20can%20do%20this%22%20
+[you can do this]: https://github.com/fastlane/fastlane/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+label%3A%22complexity%3A+you+can+do+this%22+
 [fastlane]: https://github.com/fastlane/fastlane
 [pr template]: .github/PULL_REQUEST_TEMPLATE.md
 [bundler]: https://bundler.io

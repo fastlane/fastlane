@@ -1,6 +1,7 @@
-require 'fastlane_core'
-require 'credentials_manager'
-Dir[File.dirname(__FILE__) + '/rules/*.rb'].each { |file| require file }
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
+
+require_relative 'rules/all'
 
 module Precheck
   class Options
@@ -28,6 +29,7 @@ module Precheck
                                      short_option: "-a",
                                      env_name: "PRECHECK_APP_IDENTIFIER",
                                      description: "The bundle identifier of your app",
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
@@ -39,6 +41,7 @@ module Precheck
                                      env_name: "PRECHECK_TEAM_ID",
                                      description: "The ID of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
@@ -48,6 +51,7 @@ module Precheck
                                      env_name: "PRECHECK_TEAM_NAME",
                                      description: "The name of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s

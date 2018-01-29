@@ -9,7 +9,7 @@ describe Fastlane do
         let(:expected_command) { "#{File.expand_path('README.md').shellescape} tasks -p ." }
 
         it "prints the command and the command's output by default" do
-          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: true, print_command_output: true, error_callback: nil).and_call_original
+          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: true, print_command_output: true).and_call_original
 
           Fastlane::FastFile.new.parse("lane :build do
             gradle(
@@ -20,7 +20,7 @@ describe Fastlane do
         end
 
         it "suppresses the command text and prints the command's output" do
-          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: false, print_command_output: true, error_callback: nil).and_call_original
+          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: false, print_command_output: true).and_call_original
 
           Fastlane::FastFile.new.parse("lane :build do
             gradle(
@@ -32,7 +32,7 @@ describe Fastlane do
         end
 
         it "prints the command text and suppresses the command's output" do
-          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: true, print_command_output: false, error_callback: nil).and_call_original
+          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: true, print_command_output: false).and_call_original
 
           Fastlane::FastFile.new.parse("lane :build do
             gradle(
@@ -44,7 +44,7 @@ describe Fastlane do
         end
 
         it "suppresses the command text and suppresses the command's output" do
-          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: false, print_command_output: false, error_callback: nil).and_call_original
+          expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: false, print_command_output: false).and_call_original
 
           Fastlane::FastFile.new.parse("lane :build do
             gradle(
@@ -66,7 +66,8 @@ describe Fastlane do
       end
 
       it "correctly escapes the gradle path" do
-        gradle_path = '/fake gradle/path' # this value is interesting because it contains a space in the path
+        tmp_path = Dir.mktmpdir
+        gradle_path = "#{tmp_path}/fake gradle/path" # this value is interesting because it contains a space in the path
         allow(File).to receive(:exist?).and_call_original
         allow(File).to receive(:exist?).with(gradle_path).and_return(true)
 

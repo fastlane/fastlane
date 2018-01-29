@@ -1,3 +1,11 @@
+require 'fastlane_core/fastlane_folder'
+require 'fastlane_core/ipa_file_analyser'
+require 'fastlane_core/pkg_file_analyser'
+require 'spaceship/tunes/tunes'
+require 'spaceship/tunes/application'
+
+require_relative 'module'
+
 module Deliver
   class DetectValues
     def run!(options, skip_params = {})
@@ -30,7 +38,7 @@ module Deliver
     def find_app(options)
       search_by = options[:app_identifier]
       search_by = options[:app] if search_by.to_s.length == 0
-      app = Spaceship::Application.find(search_by, mac: options[:platform] == "osx")
+      app = Spaceship::Tunes::Application.find(search_by, mac: options[:platform] == "osx")
       if app
         options[:app] = app
       else

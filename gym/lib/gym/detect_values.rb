@@ -1,4 +1,8 @@
-require 'cfpropertylist'
+require 'fastlane_core/core_ext/cfpropertylist'
+require 'fastlane_core/project'
+require_relative 'module'
+require_relative 'code_signing_mapping'
+
 module Gym
   # This class detects all kinds of default values
   class DetectValues
@@ -15,19 +19,27 @@ module Gym
       Gym.project = FastlaneCore::Project.new(config)
 
       # Go into the project's folder, as there might be a Gymfile there
-      Dir.chdir(File.expand_path("..", Gym.project.path)) do
-        config.load_configuration_file(Gym.gymfile_name)
+      project_path = File.expand_path("..", Gym.project.path)
+      unless File.expand_path(".") == project_path
+        Dir.chdir(project_path) do
+          config.load_configuration_file(Gym.gymfile_name)
+        end
       end
 
       detect_scheme
       detect_platform # we can only do that *after* we have the scheme
-      detect_selected_provisioning_profiles # we can only do that *aftet* we have the platform
+      detect_selected_provisioning_profiles # we can only do that *after* we have the platform
       detect_configuration
       detect_toolchain
 
       config[:output_name] ||= Gym.project.app_name
 
       config[:build_path] ||= archive_path_from_local_xcode_preferences
+
+      # Make sure the output name is valid and remove a trailing `.ipa` extension
+      # as it will be added by gym for free
+      config[:output_name].gsub!(".ipa", "")
+      config[:output_name].gsub!(File::SEPARATOR, "_")
 
       return config
     end
@@ -117,7 +129,7 @@ module Gym
       if config[:configuration]
         # Verify the configuration is available
         unless configurations.include?(config[:configuration])
-          UI.error "Couldn't find specified configuration '#{config[:configuration]}'."
+          UI.error("Couldn't find specified configuration '#{config[:configuration]}'.")
           config[:configuration] = nil
         end
       end

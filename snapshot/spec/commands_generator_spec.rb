@@ -35,7 +35,7 @@ describe Snapshot::CommandsGenerator do
   end
 
   describe ":reset_simulators option handling" do
-    it "can use the ios_version short flag" do
+    it "can use the ios_version short flag", requires_xcodebuild: true do
       stub_commander_runner_args(['reset_simulators', '-i', '9.3.5,10.0'])
 
       allow(Snapshot::DetectValues).to receive(:set_additional_default_values)
@@ -44,7 +44,7 @@ describe Snapshot::CommandsGenerator do
       Snapshot::CommandsGenerator.start
     end
 
-    it "can use the ios_version flag" do
+    it "can use the ios_version flag", requires_xcodebuild: true do
       stub_commander_runner_args(['reset_simulators', '--ios_version', '9.3.5,10.0'])
 
       allow(Snapshot::DetectValues).to receive(:set_additional_default_values)
@@ -53,7 +53,7 @@ describe Snapshot::CommandsGenerator do
       Snapshot::CommandsGenerator.start
     end
 
-    it "can use the force flag" do
+    it "can use the force flag", requires_xcodebuild: true do
       stub_commander_runner_args(['reset_simulators', '--ios_version', '9.3.5,10.0', '--force'])
 
       allow(Snapshot::DetectValues).to receive(:set_additional_default_values)

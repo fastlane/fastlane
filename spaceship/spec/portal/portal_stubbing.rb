@@ -4,6 +4,10 @@ class PortalStubbing
       File.read(File.join('spaceship', 'spec', 'portal', 'fixtures', filename))
     end
 
+    def adp_read_binary_fixture_file(filename)
+      File.binread(File.join('spaceship', 'spec', 'portal', 'fixtures', filename))
+    end
+
     # Necessary, as we're now running this in a different context
     def stub_request(*args)
       WebMock::API.stub_request(*args)
@@ -186,7 +190,7 @@ class PortalStubbing
         to_return(status: 200, body: adp_read_fixture_file("list_certificates_filtered.json"), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:get, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/downloadCertificateContent.action?certificateId=XC5PH8DAAA&teamId=XXXXXXXXXX&type=R58UK2EAAA").
-        to_return(status: 200, body: adp_read_fixture_file('aps_development.cer'))
+        to_return(status: 200, body: adp_read_binary_fixture_file('aps_development.cer')) # note: binary!
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/submitCertificateRequest.action").
         with(body: { "appIdId" => "2HNR359G63", "csrContent" => adp_read_fixture_file('certificateSigningRequest.certSigningRequest'), "type" => "BKLRAVXMGM", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('submitCertificateRequest.action.json'), headers: { 'Content-Type' => 'application/json' })

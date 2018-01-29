@@ -1,3 +1,5 @@
+require_relative 'app_version_promocodes'
+
 module Spaceship
   module Tunes
     # Represents the information about the generation of promocodes

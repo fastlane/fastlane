@@ -61,7 +61,7 @@ module Fastlane
             config_item = available_options.find { |a| a.key == current_argument }
             UI.user_error!("Unknown parameter '#{current_argument}' for action '#{method_sym}'") if config_item.nil?
 
-            if config_item.data_type && !value.kind_of?(config_item.data_type) && !config_item.optional
+            if config_item.data_type && !value.kind_of?(config_item.data_type) && !config_item.optional && !config_item.skip_type_validation
               UI.user_error!("'#{current_argument}' value must be a #{config_item.data_type}! Found #{value.class} instead.")
             end
           end

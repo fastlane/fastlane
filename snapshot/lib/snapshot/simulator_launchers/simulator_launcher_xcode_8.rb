@@ -1,4 +1,7 @@
-require 'snapshot/simulator_launchers/simulator_launcher_base'
+require_relative 'simulator_launcher_base'
+require_relative '../error_handler'
+require_relative '../collector'
+require_relative '../test_command_generator_xcode_8'
 
 module Snapshot
   class SimulatorLauncherXcode8 < SimulatorLauncherBase
@@ -31,13 +34,13 @@ module Snapshot
     def run_for_device_and_language(language, locale, device, launch_arguments, retries = 0)
       return launch_one_at_a_time(language, locale, device, launch_arguments)
     rescue => ex
-      UI.error ex.to_s # show the reason for failure to the user, but still maybe retry
+      UI.error(ex.to_s) # show the reason for failure to the user, but still maybe retry
 
       if retries < launcher_config.number_of_retries
-        UI.important "Tests failed, re-trying #{retries + 1} out of #{launcher_config.number_of_retries + 1} times"
+        UI.important("Tests failed, re-trying #{retries + 1} out of #{launcher_config.number_of_retries + 1} times")
         run_for_device_and_language(language, locale, device, launch_arguments, retries + 1)
       else
-        UI.error "Backtrace:\n\t#{ex.backtrace.join("\n\t")}" if FastlaneCore::Globals.verbose?
+        UI.error("Backtrace:\n\t#{ex.backtrace.join("\n\t")}") if FastlaneCore::Globals.verbose?
         self.collected_errors << ex
         raise ex if launcher_config.stop_after_first_error
         return false # for the results
@@ -88,7 +91,7 @@ module Snapshot
                                                 ErrorHandler.handle_test_error(output, return_code)
 
                                                 # no exception raised... that means we need to retry
-                                                UI.error "Caught error... #{return_code}"
+                                                UI.error("Caught error... #{return_code}")
 
                                                 self.current_number_of_retries_due_to_failing_simulator += 1
                                                 if self.current_number_of_retries_due_to_failing_simulator < 20

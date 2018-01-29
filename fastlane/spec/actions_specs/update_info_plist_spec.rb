@@ -1,14 +1,14 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Update Info Plist Integration" do
-      let (:test_path) { "/tmp/fastlane/tests/fastlane" }
-      let (:fixtures_path) { "./fastlane/spec/fixtures/xcodeproj" }
-      let (:proj_file) { "bundle.xcodeproj" }
-      let (:xcodeproj) { File.join(test_path, proj_file) }
-      let (:plist_path) { "Info.plist" }
-      let (:scheme) { "bundle" }
-      let (:app_identifier) { "com.test.plist" }
-      let (:display_name) { "Update Info Plist Test" }
+      let(:test_path) { "/tmp/fastlane/tests/fastlane" }
+      let(:fixtures_path) { "./fastlane/spec/fixtures/xcodeproj" }
+      let(:proj_file) { "bundle.xcodeproj" }
+      let(:xcodeproj) { File.join(test_path, proj_file) }
+      let(:plist_path) { "Info.plist" }
+      let(:scheme) { "bundle" }
+      let(:app_identifier) { "com.test.plist" }
+      let(:display_name) { "Update Info Plist Test" }
 
       before do
         # Set up example info.plist
@@ -98,7 +98,7 @@ describe Fastlane do
             plist_path: 'NOEXIST-#{plist_path}'
           })
         end").runner.execute(:test)
-        expect(result).to eq false
+        expect(result).to eq(false)
       end
 
       after do

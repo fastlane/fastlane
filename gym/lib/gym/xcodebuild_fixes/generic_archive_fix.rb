@@ -1,5 +1,8 @@
 require 'shellwords'
 
+require_relative '../module'
+require_relative '../generators/build_command_generator'
+
 module Gym
   class XcodebuildFixes
     class << self
@@ -12,11 +15,11 @@ module Gym
       # This is a workaround for this bug
       # https://github.com/CocoaPods/CocoaPods/issues/4178
       def generic_archive_fix
-        UI.verbose "Looking For Orphaned WatchKit2 Applications"
+        UI.verbose("Looking For Orphaned WatchKit2 Applications")
 
         Dir.glob("#{BuildCommandGenerator.archive_path}/Products/Applications/*.app").each do |app_path|
           if is_watchkit_app?(app_path)
-            UI.verbose "Removing Orphaned WatchKit2 Application #{app_path}"
+            UI.verbose("Removing Orphaned WatchKit2 Application #{app_path}")
             FileUtils.rm_rf(app_path)
           end
         end

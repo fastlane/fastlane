@@ -1,3 +1,4 @@
+require_relative 'iap_family_list'
 
 module Spaceship
   module Tunes

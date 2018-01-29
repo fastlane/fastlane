@@ -8,7 +8,7 @@ module Fastlane
       require 'shellwords'
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.run(params)
@@ -64,7 +64,7 @@ module Fastlane
         if Helper.test?
           Actions.lane_context[SharedValues::VERSION_NUMBER] = command
         else
-          Actions.sh command
+          Actions.sh(command)
           Actions.lane_context[SharedValues::VERSION_NUMBER] = next_version_number
         end
 
@@ -93,7 +93,7 @@ module Fastlane
                                        description: "The type of this version bump. Available: patch, minor, major",
                                        default_value: "patch",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Available values are 'patch', 'minor' and 'major'") unless ['patch', 'minor', 'major'].include? value
+                                         UI.user_error!("Available values are 'patch', 'minor' and 'major'") unless ['patch', 'minor', 'major'].include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :version_number,
                                        env_name: "FL_VERSION_NUMBER_VERSION_NUMBER",
@@ -103,7 +103,7 @@ module Fastlane
                                        env_name: "FL_VERSION_NUMBER_PROJECT",
                                        description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
+                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
                                          UI.user_error!("Could not find Xcode project") unless File.exist?(value)
                                        end,
                                        optional: true)
@@ -114,6 +114,10 @@ module Fastlane
         [
           ['VERSION_NUMBER', 'The new version number']
         ]
+      end
+
+      def self.return_type
+        :string
       end
 
       def self.return_value

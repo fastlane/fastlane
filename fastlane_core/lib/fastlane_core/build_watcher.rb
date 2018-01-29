@@ -1,3 +1,7 @@
+require 'spaceship/test_flight/build'
+
+require_relative 'ui/ui'
+
 module FastlaneCore
   class BuildWatcher
     class << self
@@ -24,7 +28,7 @@ module FastlaneCore
             return matched_build
           end
 
-          sleep poll_interval
+          sleep(poll_interval)
         end
       end
 

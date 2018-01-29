@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Backup xcarchive Integration" do
-      let(:tmp_path) { "/tmp/fastlane/tests" }
+      let(:tmp_path) { Dir.mktmpdir }
       let(:source_path) { "#{tmp_path}/fastlane" }
       let(:destination_path) { "#{source_path}/dest" }
       let(:xcarchive_file) { "fake.xcarchive" }
