@@ -31,7 +31,7 @@ module Fastlane
                                          UI.user_error!("Please pass a path to the `version_get_podspec` action") if value.length == 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :require_variable_prefix,
-                                       env_name: "FL_VERSION_BUMP_PODSPEC_VERSSION_REQIURE_VARIABLE_PREFIX",
+                                       env_name: "FL_VERSION_BUMP_PODSPEC_VERSION_REQUIRE_VARIABLE_PREFIX",
                                        description: "true by default, this is used for non CocoaPods version bumps only",
                                        default_value: true)
         ]
