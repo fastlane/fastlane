@@ -10,7 +10,7 @@ module Fastlane
 
         UI.user_error!("Could not find podspec file at path #{podspec_path}") unless File.exist?(podspec_path)
 
-        version_podspec_file = Helper::PodspecHelper.new(podspec_path)
+        version_podspec_file = Helper::PodspecHelper.new(podspec_path, params[:require_variable_prefix])
 
         if params[:version_number]
           new_version = params[:version_number]
@@ -66,7 +66,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version_appendix,
                                        env_name: "FL_VERSION_BUMP_PODSPEC_VERSION_APPENDIX",
                                        description: "Change version appendix to a specific value. For example 1.4.14.4.1 -> 1.4.14.5",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :require_variable_prefix,
+                                       env_name: "FL_VERSION_BUMP_PODSPEC_VERSSION_REQIURE_VARIABLE_PREFIX",
+                                       description: "true by default, this is used for non CocoaPods version bumps only",
+                                       default_value: true)
         ]
       end
 
