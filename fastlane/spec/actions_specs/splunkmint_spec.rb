@@ -154,7 +154,7 @@ describe Fastlane do
         expect(result).to include('--verbose')
         expect(result).to include("--header 'X-Splunk-Mint-Auth-Token: e05ba40754c4869fb7e0b61'")
         expect(result).to include("--header 'X-Splunk-Mint-apikey: 33823d3a'")
-        expect(result).not_to(include('-x'))
+        expect(result).not_to(include('-x '))
         expect(result).not_to(include('--proxy-user'))
       end
 
@@ -180,7 +180,7 @@ describe Fastlane do
         expect(result).to include("--header 'X-Splunk-Mint-Auth-Token: e05ba40754c4869fb7e0b61'")
         expect(result).to include("--header 'X-Splunk-Mint-apikey: 33823d3a'")
         expect(result).to include('--progress-bar -o /dev/null --no-buffer')
-        expect(result).not_to(include('-x'))
+        expect(result).not_to(include('-x '))
         expect(result).not_to(include('--proxy-user'))
       end
     end
