@@ -68,7 +68,7 @@ module Fastlane
                                        description: "Change version appendix to a specific value. For example 1.4.14.4.1 -> 1.4.14.5",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :require_variable_prefix,
-                                       env_name: "FL_VERSION_BUMP_PODSPEC_VERSSION_REQIURE_VARIABLE_PREFIX",
+                                       env_name: "FL_VERSION_BUMP_PODSPEC_VERSION_REQUIRE_VARIABLE_PREFIX",
                                        description: "true by default, this is used for non CocoaPods version bumps only",
                                        default_value: true)
         ]
