@@ -14,11 +14,15 @@
 
 <!-- The output of `--capture_output` could contain sensitive data such as application ids, certificate ids, or email addreses, Please make sure you double check the output and replace anything sensitive you don't wish to submit in the issue -->
 
-[INSERT OUTPUT HERE]
+<details>
+  <pre>[INSERT OUTPUT HERE]</pre>
+</details>
 
 ### Environment
 
 <!-- Please run `fastlane env` and copy the output below. This will help us help you :+1:
 If you used `--capture_output` option, please remove this block as it is already included there. -->
 
-[INSERT OUTPUT HERE]
+<details>
+  <pre>[INSERT OUTPUT HERE]</pre>
+</details>
