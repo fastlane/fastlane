@@ -35,9 +35,7 @@ module Match
       cert = OpenSSL::X509::Certificate.new(File.read(cer_certificate_path))
 
       # openssl output:
-      # subject= /UID={User ID}/CN={Certificate Name}/OU={Certificate User}/O={Organisation}/C={Country}\n
-      # notBefore={Start datetime}\n
-      # notAfter={End datetime}
+      # subject= /UID={User ID}/CN={Certificate Name}/OU={Certificate User}/O={Organisation}/C={Country}
       cert_info = cert.subject.to_s.gsub(/\s*subject=\s*/, "").tr("/", "\n")
       out_array = cert_info.split("\n")
       openssl_keys_to_readable_keys = {
