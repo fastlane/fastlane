@@ -93,14 +93,20 @@ module Match
       command << "-out #{tmpfile.shellescape}"
       command << "-a"
       command << "-d" unless encrypt
-      command << "&> /dev/null" unless FastlaneCore::Globals.verbose? # to show an error message if something goes wrong
 
       _out, err, st = Open3.capture3(command.join(' '))
       success = st.success?
 
-      # Ubuntu `openssl` does not fail on failure
-      # but at least outputs an error message
       unless err.to_s.empty?
+        # to show an error message if something goes wrong
+        if FastlaneCore::Globals.verbose?
+          UI.error("`openssl` failed with an error:")
+          UI.error(err)
+        end
+
+        # Ubuntu `openssl` does not fail on failure
+        # but at least outputs an error message -
+        # so we use that as indication of failure
         success = false
       end
 
