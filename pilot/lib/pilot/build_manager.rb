@@ -145,7 +145,7 @@ module Pilot
       uploaded_build.export_compliance.encryption_updated = false
 
       if options[:groups] || options[:distribute_external]
-        uploaded_build.beta_review_info.demo_account_required ||= false # this needs to be set for iTC to continue
+        uploaded_build.beta_review_info.demo_account_required = options[:demo_account_required] # this needs to be set for iTC to continue
         uploaded_build.submit_for_testflight_review!
       end
 
