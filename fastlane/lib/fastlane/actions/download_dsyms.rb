@@ -84,7 +84,7 @@ module Fastlane
         end
 
         if (Actions.lane_context[SharedValues::DSYM_PATHS] || []).count == 0
-          UI.error("No dSYM files found on iTunes Connect - this usually happens when no recompling happened yet")
+          UI.error("No dSYM files found on iTunes Connect - this usually happens when no recompiling has happened yet")
         end
       end
       # rubocop:enable Metrics/PerceivedComplexity
