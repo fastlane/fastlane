@@ -52,7 +52,7 @@ module Match
                       .compact
                       .map { |k, v| [openssl_keys_to_readable_keys.fetch(k, k), v] }
                       .append([openssl_keys_to_readable_keys.fetch("notBefore"), cert.not_before])
-                      .append([openssl_keys_to_readable_keys.fetch("notAfter"), cert.not_before])
+                      .append([openssl_keys_to_readable_keys.fetch("notAfter"), cert.not_after])
     rescue => ex
       UI.error(ex)
       return {}
