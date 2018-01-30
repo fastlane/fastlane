@@ -42,7 +42,7 @@ module Gym
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
         options << config[:xcargs] if config[:xcargs]
-        options << "OTHER_SWIFT_FLAGS=\"\$(inherited) -Xfrontend -debug-time-function-bodies\"" if config[:analyze_build_time]
+        options << "OTHER_SWIFT_FLAGS=\"-Xfrontend -debug-time-function-bodies\"" if config[:analyze_build_time]
 
         options
       end
