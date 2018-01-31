@@ -26,7 +26,7 @@ module Deliver
           # We have to nil check for languages not activated
           next if v.screenshots[language].nil?
           v.screenshots[language].each_with_index do |t, index|
-            v.upload_screenshot!(nil, t.sort_order, t.language, t.device_type, false)
+            v.upload_screenshot!(nil, t.sort_order, t.language, t.device_type, t.is_imessage)
           end
         end
       end
