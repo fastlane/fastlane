@@ -68,12 +68,6 @@ module Snapshot
 
           @recording_pid = {}
           dir_name = locale || language
-          listener = CommandListener.new do |cmd, args|
-            UI.verbose("cmd '#{cmd}' - '#{args}'")
-            start_recording(dir_name, args["device"].first, args["name"].first) if cmd == "startRecording"
-            stop_recording(args["device"].first) if cmd == "stopRecording"
-          end
-          File.write(File.join(CACHE_DIR, "Command_listener_port.txt"), listener.server.addr[1])
 
           device_batches.each do |devices|
             languages_finished[language] = launch_simultaneously(devices, language, locale, launch_args)
