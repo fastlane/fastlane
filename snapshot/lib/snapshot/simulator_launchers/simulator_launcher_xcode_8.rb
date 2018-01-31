@@ -92,7 +92,6 @@ module Snapshot
                                             loading: "Loading...",
                                               error: proc do |output, return_code|
                                                 ErrorHandler.handle_test_error(output, return_code)
-                                                listener.close
                                                 stop_recording
 
                                                 # no exception raised... that means we need to retry
@@ -106,7 +105,6 @@ module Snapshot
                                                   UI.crash!("Too many errors... no more retries...")
                                                 end
                                               end)
-      listener.close
       stop_recording
     end
 
