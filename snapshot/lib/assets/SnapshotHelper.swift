@@ -130,19 +130,6 @@ open class Snapshot: NSObject {
             print("Couldn't detect/set launch_arguments...")
         }
     }
-
-    class func getCommandListenerPort() -> String? {
-        let path = cacheDirectory.appendingPathComponent("Command_listener_port.txt")
-        var port: String?
-        do {
-            let trimCharacterSet = CharacterSet.whitespacesAndNewlines
-            port = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
-        } catch {
-            print("Couldn't get the command listener port...")
-        }
-        return port
-    }
-    
     open class func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20) {
         if timeout > 0 {
             waitForLoadingIndicatorToDisappear(within: timeout)
