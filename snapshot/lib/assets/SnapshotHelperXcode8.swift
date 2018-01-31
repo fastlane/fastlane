@@ -33,11 +33,15 @@ func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
 }
 
 func startRecording(name: String) {
-    sendCommand(command: "startRecording?name=\(name)")
+    //TODO
+    //sendCommand(commnad: "startRecording",args: "name=\(name)")
+    //start_recording(dir_name, args["device"].first, args["name"].first)
+
 }
 
 func stopRecording() {
-    sendCommand(command: "stopRecording")
+    //TODO
+    //stop_recording(args["device"].first)
 }
 
 open class Snapshot: NSObject {

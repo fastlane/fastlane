@@ -39,11 +39,15 @@ func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20) {
 }
 
 func startRecording(name: String) {
-    sendCommand(commnad: "startRecording",args: "name=\(name)")
+    //TODO
+    //sendCommand(commnad: "startRecording",args: "name=\(name)")
+    //start_recording(dir_name, args["device"].first, args["name"].first)
+
 }
 
 func stopRecording() {
-    sendCommand(commnad: "stopRecording")
+    //TODO
+    //stop_recording(args["device"].first)
 }
 
 enum SnapshotError: Error, CustomDebugStringConvertible {
