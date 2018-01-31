@@ -82,8 +82,6 @@ module Snapshot
           end
         }
       ]
-
-      dir_name = locale || language
       
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: true,
@@ -123,8 +121,8 @@ module Snapshot
                                                        end,
                                                 error: proc do |output, return_code|
                                                          ErrorHandler.handle_test_error(output, return_code)
-                                                         UI.error "Caught error... #{return_code}"
-                                                         UI.error "Caught output... #{output}"
+                                                         UI.error("Caught error... #{return_code}")
+                                                         UI.error("Caught output... #{output}")
                                                        end)
       end
     end
