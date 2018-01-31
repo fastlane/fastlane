@@ -317,8 +317,8 @@ module FastlaneCore
             UI.error("Could not read build settings. Make sure that the scheme \"#{options[:scheme]}\" is configured for running by going to Product → Scheme → Edit Scheme…, selecting the \"Build\" section, checking the \"Run\" checkbox and closing the scheme window.")
           end
         rescue Timeout::Error
-          raise FastlaneCore::Interface::FastlaneDependencyCausedException.new, "xcodebuild -showBuildSettings timed-out after #{timeout} seconds and #{retries} retries." \
-            " You can override the timeout value with the environment variable FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT," \
+          raise FastlaneCore::Interface::FastlaneDependencyCausedException.new, "xcodebuild -showBuildSettings timed out after #{retries + 1} retries with a base timeout of #{timeout}." \
+            " You can override the base timeout value with the environment variable FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT," \
             " and the number of retries with the environment variable FASTLANE_XCODEBUILD_SETTINGS_RETRIES ".red
         end
       end
@@ -394,8 +394,8 @@ module FastlaneCore
         retries = FastlaneCore::Project.xcode_list_retries
         @raw = FastlaneCore::Project.run_command(command, timeout: timeout, retries: retries, print: !silent)
       rescue Timeout::Error
-        UI.user_error!("xcodebuild -list timed-out after #{timeout * retries} seconds. You might need to recreate the user schemes." \
-          " You can override the timeout value with the environment variable FASTLANE_XCODE_LIST_TIMEOUT")
+        UI.user_error!("xcodebuild -list timed out after #{retries + 1} retries with a base timeout of #{timeout}. You might need to recreate the user schemes." \
+            " You can override the base timeout value with the environment variable FASTLANE_XCODE_LIST_TIMEOUT")
       end
 
       UI.user_error!("Error parsing xcode file using `#{command}`") if @raw.length == 0
@@ -405,7 +405,7 @@ module FastlaneCore
 
     # @internal to module
     def self.xcode_list_timeout
-      (ENV['FASTLANE_XCODE_LIST_TIMEOUT'] || 10).to_i
+      (ENV['FASTLANE_XCODE_LIST_TIMEOUT'] || 3).to_i
     end
 
     # @internal to module
@@ -415,7 +415,7 @@ module FastlaneCore
 
     # @internal to module
     def self.xcode_build_settings_timeout
-      (ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] || 10).to_i
+      (ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] || 3).to_i
     end
 
     # @internal to module
@@ -424,7 +424,9 @@ module FastlaneCore
     end
 
     # @internal to module
-    # runs the specified command with the specified number of retries, killing each run if it times out
+    # runs the specified command with the specified number of retries, killing each run if it times out.
+    # the first run times out after specified timeout elapses, and each successive run times out after
+    # a doubling of the previous timeout has elapsed.
     # @raises Timeout::Error if all tries result in a timeout
     # @returns the output of the command
     # Note: - currently affected by https://github.com/fastlane/fastlane/issues/1504
@@ -438,22 +440,27 @@ module FastlaneCore
 
       total_tries = retries + 1
       try = 1
+      try_timeout = timeout
       begin
-        Timeout.timeout(timeout) do
+        Timeout.timeout(try_timeout) do
           # Using Helper.backticks didn't work here. `Timeout` doesn't time out, and the command hangs forever
           result = `#{command}`.to_s
         end
       rescue Timeout::Error
         try_limit_reached = try >= total_tries
 
-        message = "Command timed out after #{timeout} seconds on try #{try} of #{total_tries}"
-        message += ", trying again..." unless try_limit_reached
+        # Try harder on each iteration
+        next_timeout = try_timeout * 2
+
+        message = "Command timed out after #{try_timeout} seconds on try #{try} of #{total_tries}"
+        message += ", trying again with a #{next_timeout} second timeout..." unless try_limit_reached
 
         UI.important(message)
 
         raise if try_limit_reached
 
         try += 1
+        try_timeout = next_timeout
         retry
       end
 
