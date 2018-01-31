@@ -46,19 +46,6 @@ func stopRecording() {
     sendCommand(commnad: "stopRecording")
 }
 
-func sendCommand(commnad: String,args: String = "") {
-    guard var simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let port = Snapshot.getCommandListenerPort() else { return }
-    simulator = simulator.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
-    if let url = URL(string: "http://localhost:\(port)/\(commnad)?device=\(simulator)&\(args)") {
-        let (_, _, error) = URLSession.shared.synchronousDataTask(with: url)
-        if (error != nil) {
-            print("Error sending commnad: \(String(describing: error))")
-        }
-    } else {
-        print("Error sending commnad: bad URL")
-    }
-}
-
 enum SnapshotError: Error, CustomDebugStringConvertible {
     case cannotDetectUser
     case cannotFindHomeDirectory
