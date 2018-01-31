@@ -120,7 +120,7 @@ module Snapshot
                                                 cleanup_after_failure(devices, language, locale, launch_args, return_code)
 
                                                 # no exception raised... that means we need to retry
-                                                UI.error("Caught error... #{return_code}")
+                                                UI.error "Caught error... #{return_code}"
 
                                                 self.current_number_of_retries_due_to_failing_simulator += 1
                                                 if self.current_number_of_retries_due_to_failing_simulator < 20 && return_code != 65
