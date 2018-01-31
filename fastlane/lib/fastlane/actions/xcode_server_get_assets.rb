@@ -80,7 +80,7 @@ module Fastlane
             UI.important("Archive #{archive_path} already exists, not unzipping again...")
           else
             # unzip the archive
-            sh "unzip -q \"#{zipped_archive_path}\" -d \"#{archive_dir_path}\""
+            sh("unzip -q \"#{zipped_archive_path}\" -d \"#{archive_dir_path}\"")
           end
 
           # reload asset entries to also contain the xcarchive file
@@ -149,7 +149,7 @@ module Fastlane
             out_folder = File.join(dir, "out_#{rand(1_000_000)}")
             FileUtils.mkdir_p(out_folder)
 
-            action.sh "cd \"#{out_folder}\"; cat \"#{temp_file}\" | gzip -d | tar -x"
+            action.sh("cd \"#{out_folder}\"; cat \"#{temp_file}\" | gzip -d | tar -x")
 
             # then pull the real name from headers
             asset_filename = response.headers['Content-Disposition'].split(';')[1].split('=')[1].delete('"')
@@ -283,12 +283,16 @@ module Fastlane
         ]
       end
 
+      def self.return_type
+        :array_of_strings
+      end
+
       def self.authors
         ["czechboy0"]
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

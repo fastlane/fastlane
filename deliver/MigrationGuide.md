@@ -6,7 +6,7 @@ Originally `deliver` was designed to be "The Continuous Delivery tool for iOS". 
 
 ### What do I have to do to get my setup working again?
 
-In general, check out the latest documentation for the [Deliverfile](https://github.com/fastlane/fastlane/blob/master/deliver/Deliverfile.md).
+In general, check out the latest documentation for the [Deliverfile](https://docs.fastlane.tools/actions/deliver/).
 
 With 1.0 the app will not be submitted to Review by default. You can use the `fastlane deliver --submit_for_review` to submit after the upload.
 
@@ -43,23 +43,23 @@ From     | To              | Note
 `title`  | `name` | requires `name({ "en-US" => "App name" })`
 `changelog` | `release_notes`
 `keywords` |   | requires a simple string instead of arrays
-`ratings_config_path` | `app_rating_config_path` | [New Format](https://github.com/fastlane/fastlane/blob/master/deliver/Deliverfile.md#app_rating_config_path)
-`submit_further_information` | `submission_information` | [New Format](https://github.com/fastlane/fastlane/blob/master/deliver/Deliverfile.md#submission_information)
+`ratings_config_path` | `app_rating_config_path` | [New Format](https://docs.fastlane.tools/actions/deliver/#editing-the-deliverfile)
+`submit_further_information` | `submission_information` | [New Format](https://docs.fastlane.tools/actions/deliver/#editing-the-deliverfile)
 
 **The following commands have been removed:**
 
 Removed                   | Use instead
 --------------------------|------------------------------------------------------------
-`deliver testflight` | [pilot](https://github.com/fastlane/fastlane/tree/master/pilot)
-`testflight` | [pilot](https://github.com/fastlane/fastlane/tree/master/pilot)
+`deliver testflight` | [pilot](https://docs.fastlane.tools/actions/pilot/)
+`testflight` | [pilot](https://docs.fastlane.tools/actions/pilot/)
 
 **The following codes/values have been changed:**
 
 Changed                   | &nbsp;
 --------------------------|------------------------
-Language Codes | [Reference.md](https://github.com/fastlane/fastlane/blob/master/deliver/Reference.md)
-Age Rating | [Reference.md](https://github.com/fastlane/fastlane/blob/master/deliver/Reference.md)
-App Categories | [Reference.md](https://github.com/fastlane/fastlane/blob/master/deliver/Reference.md)
+Language Codes | [Reference.md](https://docs.fastlane.tools/actions/deliver/#reference)
+Age Rating | [Reference.md](https://docs.fastlane.tools/actions/deliver/#reference)
+App Categories | [Reference.md](https://docs.fastlane.tools/actions/deliver/#reference)
 
 ### What's different now? :recycle: 
 
@@ -70,10 +70,10 @@ App Categories | [Reference.md](https://github.com/fastlane/fastlane/blob/master
 - Removed a lot of legacy code. Did you know `deliver` is now one year old? A lot of things have changed since then
 - Improved the selection of the newly uploaded build and waiting for processing to be finished, which is possible thanks to `spaceship`
 - Updating the app metadata and uploading of the screenshots now happen using `spaceship` instead of the iTunes Transporter, which means changes will immediately visible after running `deliver` :sparkles: 
-- Removed the `deliver beta` and `testflight` commands, as there is now a dedicated tool called [pilot](https://github.com/fastlane/fastlane/tree/master/pilot)
+- Removed the `deliver beta` and `testflight` commands, as there is now a dedicated tool called [pilot](https://docs.fastlane.tools/actions/pilot/)
 - All parameters are now in the config system, which means you can pass values using the `Deliverfile`, from within your `Fastfile` or as command line parameter
 <img width="500" alt="screenshot 2015-09-26 21 57 15" src="https://cloud.githubusercontent.com/assets/869950/10121297/c6ea1c7a-6499-11e5-8d2b-301f86faacf0.png">
 - The preview doesn't highlight changes with blue any more
-- Screenshot are uploaded every time. This is on the [next-tasks list](https://github.com/fastlane/deliver/issues/353)
+- Screenshot are uploaded every time. This is on the [next-tasks list](https://github.com/fastlane/fastlane/issues/2212)
 
 If you run into any issues with the new version of `deliver` please submit an issue on GitHub.

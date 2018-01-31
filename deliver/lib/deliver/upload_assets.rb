@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Deliver
   class UploadAssets
     SUPPORTED_ICON_EXTENSIONS = [".png", ".jpg", ".jpeg"]

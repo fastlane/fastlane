@@ -1,4 +1,5 @@
 require 'fastlane/actions/actions_helper'
+require 'forwardable'
 
 module Fastlane
   class Action
@@ -18,8 +19,21 @@ module Fastlane
       :deprecated # This should be the last item
     ]
 
+    RETURN_TYPES = [
+      :string,
+      :array_of_strings,
+      :hash_of_strings,
+      :bool,
+      :int
+    ]
+
     class << self
       attr_accessor :runner
+
+      extend(Forwardable)
+
+      # to allow a simple `sh` in the custom actions
+      def_delegator(Actions, :sh_control_output, :sh)
     end
 
     def self.run(params)
@@ -48,6 +62,11 @@ module Fastlane
       # [
       #   ['IPA_OUTPUT_PATH', 'The path to the newly generated ipa file']
       # ]
+      nil
+    end
+
+    def self.return_type
+      # Describes what type of data is expected to be returned, see RETURN_TYPES
       nil
     end
 
@@ -91,11 +110,6 @@ module Fastlane
     # Return nil if you don't want any logging in the terminal/JUnit Report
     def self.step_text
       self.action_name
-    end
-
-    # to allow a simple `sh` in the custom actions
-    def self.sh(command, print_command: true, print_command_output: true, error_callback: nil)
-      Fastlane::Actions.sh_control_output(command, print_command: print_command, print_command_output: print_command_output, error_callback: error_callback)
     end
 
     # Documentation category, available values defined in AVAILABLE_CATEGORIES

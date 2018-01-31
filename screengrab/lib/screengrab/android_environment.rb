@@ -1,3 +1,6 @@
+require_relative 'module'
+require 'fastlane_core/command_executor'
+
 module Screengrab
   class AndroidEnvironment
     attr_reader :android_home
@@ -82,7 +85,7 @@ module Screengrab
     end
 
     def executable_command?(cmd_path)
-      cmd_path && File.executable?(cmd_path) && !File.directory?(cmd_path)
+      Helper.executable?(cmd_path)
     end
   end
 end

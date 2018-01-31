@@ -1,9 +1,14 @@
+require_relative 'base'
+
 module Spaceship::TestFlight
   class Group < Base
     attr_accessor :id
     attr_accessor :name
     attr_accessor :is_default_external_group
     attr_accessor :is_internal_group
+    attr_accessor :provider_id
+    attr_accessor :is_active
+    attr_accessor :created
 
     attr_accessor :app_id
 
@@ -12,8 +17,18 @@ module Spaceship::TestFlight
       'name' => :name,
       'isInternalGroup' => :is_internal_group,
       'appAdamId' => :app_id,
-      'isDefaultExternalGroup' => :is_default_external_group
+      'isDefaultExternalGroup' => :is_default_external_group,
+      'providerId' => :provider_id,
+      'active' => :is_active,
+      'created' => :created
     })
+
+    def self.create!(app_id: nil, group_name: nil)
+      group = self.find(app_id: app_id, group_name: group_name)
+      return group unless group.nil?
+      data = client.create_group_for_app(app_id: app_id, group_name: group_name)
+      self.new(data)
+    end
 
     def self.all(app_id: nil)
       groups = client.get_groups(app_id: app_id)
@@ -48,12 +63,16 @@ module Spaceship::TestFlight
     def add_tester!(tester)
       # This post request creates an account-level tester and then makes it available to the app, or just makes
       # it available to the app if it already exists
-      tester_data = client.create_app_level_tester(app_id: self.app_id,
-                                               first_name: tester.first_name,
-                                                last_name: tester.last_name,
-                                                    email: tester.email)
+      client.create_app_level_tester(app_id: self.app_id,
+                                 first_name: tester.first_name,
+                                  last_name: tester.last_name,
+                                      email: tester.email)
       # This put request adds the tester to the group
-      client.put_tester_to_group(group_id: self.id, tester_id: tester_data['id'], app_id: self.app_id)
+      client.post_tester_to_group(group_id: self.id,
+                                     email: tester.email,
+                                first_name: tester.first_name,
+                                 last_name: tester.last_name,
+                                    app_id: self.app_id)
     end
 
     def remove_tester!(tester)
@@ -61,19 +80,11 @@ module Spaceship::TestFlight
     end
 
     def self.add_tester_to_groups!(tester: nil, app: nil, groups: nil)
-      if tester.kind_of?(Spaceship::Tunes::Tester::Internal)
-        self.internal_group(app_id: app.apple_id).add_tester!(tester)
-      else
-        self.perform_for_groups_in_app(app: app, groups: groups) { |group| group.add_tester!(tester) }
-      end
+      self.perform_for_groups_in_app(app: app, groups: groups) { |group| group.add_tester!(tester) }
     end
 
     def self.remove_tester_from_groups!(tester: nil, app: nil, groups: nil)
-      if tester.kind_of?(Spaceship::Tunes::Tester::Internal)
-        self.internal_group(app_id: app.apple_id).remove_tester!(tester)
-      else
-        self.perform_for_groups_in_app(app: app, groups: groups) { |group| group.remove_tester!(tester) }
-      end
+      self.perform_for_groups_in_app(app: app, groups: groups) { |group| group.remove_tester!(tester) }
     end
 
     def default_external_group?
@@ -82,6 +93,10 @@ module Spaceship::TestFlight
 
     def internal_group?
       is_internal_group
+    end
+
+    def active?
+      is_active
     end
 
     def self.perform_for_groups_in_app(app: nil, groups: nil, &block)

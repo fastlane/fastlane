@@ -1,3 +1,5 @@
+require_relative 'build_details'
+
 module Spaceship
   module Tunes
     # Represents a build which is inside the build train

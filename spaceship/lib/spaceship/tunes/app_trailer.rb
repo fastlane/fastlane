@@ -1,3 +1,5 @@
+require_relative 'tunes_base'
+
 module Spaceship
   module Tunes
     # Represents a preview video hosted on iTunes Connect. Used for icons, screenshots, etc

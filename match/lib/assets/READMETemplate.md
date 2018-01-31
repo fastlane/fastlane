@@ -1,4 +1,4 @@
-## [fastlane match](https://github.com/fastlane/fastlane/tree/master/match#readme)
+## [fastlane match](https://docs.fastlane.tools/actions/match/)
 
 This repository contains all your certificates and provisioning profiles needed to build and sign your applications. They are encrypted using OpenSSL via a passphrase.
 
@@ -14,25 +14,13 @@ Make sure you have the latest version of the Xcode command line tools installed:
 xcode-select --install
 ```
 
-### Choose your installation method:
+Install _fastlane_ using
 
-<table width="100%" >
-<tr>
-<th width="33%"><a href="http://brew.sh">Homebrew</a></td>
-<th width="33%">Installer Script</td>
-<th width="33%">Rubygems</td>
-</tr>
-<tr>
-<td width="33%" align="center">macOS</td>
-<td width="33%" align="center">macOS</td>
-<td width="33%" align="center">macOS or Linux with Ruby 2.0.0 or above</td>
-</tr>
-<tr> 
-<td width="33%"><code>brew cask install fastlane</code></td>
-<td width="33%"><a href="https://download.fastlane.tools">Download the zip file</a>. Then double click on the <code>install</code> script (or run it in a terminal window).</td>
-<td width="33%"><code>sudo gem install fastlane -NV</code></td>
-</tr>
-</table>
+```
+[sudo] gem install fastlane -NV
+```
+
+or alternatively using `brew cask install fastlane`
 
 ### Usage
 
@@ -51,7 +39,7 @@ fastlane match development
 fastlane match enterprise
 ```
 
-For more information open [fastlane match git repo](https://github.com/fastlane/fastlane/tree/master/match#readme)
+For more information open [fastlane match git repo](https://docs.fastlane.tools/actions/match/)
 
 ### Content
 
@@ -65,4 +53,4 @@ This directory contains all provisioning profiles
 
 ------------------------------------
 
-For more information open [fastlane match git repo](https://github.com/fastlane/fastlane/tree/master/match#readme)
+For more information open [fastlane match git repo](https://docs.fastlane.tools/actions/match/)

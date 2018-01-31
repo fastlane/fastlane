@@ -1,4 +1,11 @@
 require 'fileutils'
+require 'fastlane_core/globals'
+require 'fastlane_core/cert_checker'
+require 'fastlane_core/keychain_importer'
+require 'fastlane_core/print_table'
+require 'spaceship'
+
+require_relative 'module'
 
 module Cert
   class Runner
@@ -6,17 +13,17 @@ module Cert
       run
 
       installed = FastlaneCore::CertChecker.installed?(ENV["CER_FILE_PATH"])
-      UI.message "Verifying the certificate is properly installed locally..."
+      UI.message("Verifying the certificate is properly installed locally...")
       UI.user_error!("Could not find the newly generated certificate installed", show_github_issues: true) unless installed
-      UI.success "Successfully installed certificate #{ENV['CER_CERTIFICATE_ID']}"
+      UI.success("Successfully installed certificate #{ENV['CER_CERTIFICATE_ID']}")
       return ENV["CER_FILE_PATH"]
     end
 
     def login
-      UI.message "Starting login with user '#{Cert.config[:username]}'"
+      UI.message("Starting login with user '#{Cert.config[:username]}'")
       Spaceship.login(Cert.config[:username], nil)
       Spaceship.select_team
-      UI.message "Successfully logged in"
+      UI.message("Successfully logged in")
     end
 
     def run
@@ -50,7 +57,7 @@ module Cert
       to_revoke = expired_certs
 
       if to_revoke.empty?
-        UI.success "No expired certificates were found to revoke! 👍"
+        UI.success("No expired certificates were found to revoke! 👍")
         return
       end
 
@@ -58,16 +65,16 @@ module Cert
 
       to_revoke.each do |certificate|
         begin
-          UI.message "#{certificate.id} #{certificate.name} has expired, revoking..."
+          UI.message("#{certificate.id} #{certificate.name} has expired, revoking...")
           certificate.revoke!
           revoke_count += 1
         rescue => e
-          UI.error "An error occurred while revoking #{certificate.id} #{certificate.name}"
-          UI.error "#{e.message}\n#{e.backtrace.join("\n")}" if FastlaneCore::Globals.verbose?
+          UI.error("An error occurred while revoking #{certificate.id} #{certificate.name}")
+          UI.error("#{e.message}\n#{e.backtrace.join("\n")}") if FastlaneCore::Globals.verbose?
         end
       end
 
-      UI.success "#{revoke_count} expired certificate#{'s' if revoke_count != 1} #{revoke_count == 1 ? 'has' : 'have'} been revoked! 👍"
+      UI.success("#{revoke_count} expired certificate#{'s' if revoke_count != 1} #{revoke_count == 1 ? 'has' : 'have'} been revoked! 👍")
     end
 
     def expired_certs
@@ -90,7 +97,7 @@ module Cert
           ENV["CER_CERTIFICATE_ID"] = certificate.id
           ENV["CER_FILE_PATH"] = path
 
-          UI.success "Found the certificate #{certificate.id} (#{certificate.name}) which is installed on the local machine. Using this one."
+          UI.success("Found the certificate #{certificate.id} (#{certificate.name}) which is installed on the local machine. Using this one.")
 
           return path
         elsif File.exist?(private_key_path)
@@ -102,17 +109,17 @@ module Cert
           ENV["CER_CERTIFICATE_ID"] = certificate.id
           ENV["CER_FILE_PATH"] = path
 
-          UI.success "Found the cached certificate #{certificate.id} (#{certificate.name}). Using this one."
+          UI.success("Found the cached certificate #{certificate.id} (#{certificate.name}). Using this one.")
 
           return path
         else
-          UI.error "Certificate #{certificate.id} (#{certificate.name}) can't be found on your local computer"
+          UI.error("Certificate #{certificate.id} (#{certificate.name}) can't be found on your local computer")
         end
 
         File.delete(path) # as apparently this certificate is pretty useless without a private key
       end
 
-      UI.important "Couldn't find an existing certificate... creating a new one"
+      UI.important("Couldn't find an existing certificate... creating a new one")
       return nil
     end
 
@@ -175,7 +182,7 @@ module Cert
       ENV["CER_CERTIFICATE_ID"] = certificate.id
       ENV["CER_FILE_PATH"] = cert_path
 
-      UI.success "Successfully generated #{certificate.id} which was imported to the local machine."
+      UI.success("Successfully generated #{certificate.id} which was imported to the local machine.")
 
       return cert_path
     end

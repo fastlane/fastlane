@@ -22,31 +22,40 @@ module Fastlane
         require 'slack-notifier'
 
         options[:message] = self.trim_message(options[:message].to_s || '')
-        options[:message] = Slack::Notifier::LinkFormatter.format(options[:message])
-
-        notifier = Slack::Notifier.new(options[:slack_url])
-
-        notifier.username = options[:use_webhook_configured_username_and_icon] ? nil : options[:username]
-        icon_url = options[:use_webhook_configured_username_and_icon] ? nil : options[:icon_url]
+        options[:message] = Slack::Notifier::Util::LinkFormatter.format(options[:message])
 
         if options[:channel].to_s.length > 0
-          notifier.channel = options[:channel]
-          notifier.channel = ('#' + notifier.channel) unless ['#', '@'].include?(notifier.channel[0]) # send message to channel by default
+          channel = options[:channel]
+          channel = ('#' + options[:channel]) unless ['#', '@'].include?(channel[0]) # send message to channel by default
         end
+
+        username = options[:use_webhook_configured_username_and_icon] ? nil : options[:username]
+
+        notifier = Slack::Notifier.new(options[:slack_url], channel: channel, username: username)
+
+        icon_url = options[:use_webhook_configured_username_and_icon] ? nil : options[:icon_url]
 
         slack_attachment = generate_slack_attachments(options)
 
-        return [notifier, slack_attachment] if Helper.is_test? # tests will verify the slack attachments and other properties
+        return [notifier, slack_attachment] if Helper.test? # tests will verify the slack attachments and other properties
 
-        result = notifier.ping '',
-                               icon_url: icon_url,
-                               attachments: [slack_attachment]
-
-        if result.code.to_i == 200
-          UI.success('Successfully sent Slack notification')
-        else
-          UI.verbose(result)
-          UI.user_error!("Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile, this is usually caused by a misspelled or changed group/channel name or an expired SLACK_URL")
+        begin
+          results = notifier.ping('', icon_url: icon_url, attachments: [slack_attachment])
+        rescue => exception
+          UI.error("Exception: #{exception}")
+        ensure
+          result = results.first
+          if !result.nil? && result.code.to_i == 200
+            UI.success('Successfully sent Slack notification')
+          else
+            UI.verbose(result) unless result.nil?
+            message = "Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile, this is usually caused by a misspelled or changed group/channel name or an expired SLACK_URL"
+            if options[:fail_on_error]
+              UI.user_error!(message)
+            else
+              UI.error(message)
+            end
+          end
         end
       end
 
@@ -75,7 +84,7 @@ module Fastlane
                                        sensitive: true,
                                        description: "Create an Incoming WebHook for your Slack group",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Invalid URL, must start with https://") unless value.start_with? "https://"
+                                         UI.user_error!("Invalid URL, must start with https://") unless value.start_with?("https://")
                                        end),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "FL_SLACK_USERNAME",
@@ -107,6 +116,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :success,
                                        env_name: "FL_SLACK_SUCCESS",
                                        description: "Was this build successful? (true/false)",
+                                       optional: true,
+                                       default_value: true,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :fail_on_error,
+                                       env_name: "FL_SLACK_FAIL_ON_ERROR",
+                                       description: "Should an error sending the slack notification cause a failure? (true/false)",
                                        optional: true,
                                        default_value: true,
                                        is_string: false)
@@ -171,7 +186,7 @@ module Fastlane
         slack_attachment[:fields] += options[:payload].map do |k, v|
           {
             title: k.to_s,
-            value: Slack::Notifier::LinkFormatter.format(v.to_s),
+            value: Slack::Notifier::Util::LinkFormatter.format(v.to_s),
             short: false
           }
         end

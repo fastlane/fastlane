@@ -1,6 +1,9 @@
 require "colored"
 require "credentials_manager"
 
+require_relative 'tunes/tunes'
+require_relative 'portal/portal'
+
 module Spaceship
   class Playground
     def initialize(username: nil)
@@ -30,37 +33,37 @@ module Spaceship
 
     def run
       begin
-        puts "Logging into to iTunes Connect (#{@username})..."
+        puts("Logging into to iTunes Connect (#{@username})...")
         Spaceship::Tunes.login(@username)
-        puts "Successfully logged in to iTunes Connect".green
-        puts ""
+        puts("Successfully logged in to iTunes Connect".green)
+        puts("")
       rescue
-        puts "Could not login to iTunes Connect...".red
+        puts("Could not login to iTunes Connect...".red)
       end
       begin
-        puts "Logging into the Developer Portal (#{@username})..."
+        puts("Logging into the Developer Portal (#{@username})...")
         Spaceship::Portal.login(@username)
-        puts "Successfully logged in to the Developer Portal".green
-        puts ""
+        puts("Successfully logged in to the Developer Portal".green)
+        puts("")
       rescue
-        puts "Could not login to the Developer Portal...".red
+        puts("Could not login to the Developer Portal...".red)
       end
 
-      puts "---------------------------------------".green
-      puts "| Welcome to the spaceship playground |".green
-      puts "---------------------------------------".green
-      puts ""
-      puts "Enter #{'docs'.yellow} to open up the documentation"
-      puts "Enter #{'exit'.yellow} to exit the spaceship playground"
-      puts "Enter #{'_'.yellow} to access the return value of the last executed command"
-      puts ""
-      puts "Just enter the commands and confirm with Enter".green
+      puts("---------------------------------------".green)
+      puts("| Welcome to the spaceship playground |".green)
+      puts("---------------------------------------".green)
+      puts("")
+      puts("Enter #{'docs'.yellow} to open up the documentation")
+      puts("Enter #{'exit'.yellow} to exit the spaceship playground")
+      puts("Enter #{'_'.yellow} to access the return value of the last executed command")
+      puts("")
+      puts("Just enter the commands and confirm with Enter".green)
 
       # rubocop:disable Lint/Debugger
       binding.pry(quiet: true)
       # rubocop:enable Lint/Debugger
 
-      puts "" # Fixes https://github.com/fastlane/spaceship/issues/203
+      puts("") # Fixes https://github.com/fastlane/fastlane/issues/3493
     end
 
     def docs

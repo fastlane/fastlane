@@ -8,7 +8,7 @@ describe Gym do
     allow(Gym).to receive(:project).and_return(@project)
   end
 
-  describe Gym::PackageCommandGeneratorXcode7 do
+  describe Gym::PackageCommandGeneratorXcode7, requires_xcodebuild: true do
     it "passes xcargs through to xcode build wrapper " do
       options = {
         project: "./gym/examples/standard/Example.xcodeproj",

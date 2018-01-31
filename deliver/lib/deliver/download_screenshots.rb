@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Deliver
   class DownloadScreenshots
     def self.run(options, path)
@@ -10,7 +12,7 @@ module Deliver
     end
 
     def self.download(options, folder_path)
-      v = options[:app].latest_version
+      v = options[:use_live_version] ? options[:app].live_version : options[:app].latest_version
 
       v.screenshots.each do |language, screenshots|
         screenshots.each do |screenshot|

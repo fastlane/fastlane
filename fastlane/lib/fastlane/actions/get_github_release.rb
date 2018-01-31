@@ -108,7 +108,7 @@ module Fastlane
                                        env_name: "FL_GET_GITHUB_RELEASE_URL",
                                        description: "The path to your repo, e.g. 'KrauseFx/fastlane'",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please only pass the path, e.g. 'KrauseFx/fastlane'") if value.include? "github.com"
+                                         UI.user_error!("Please only pass the path, e.g. 'KrauseFx/fastlane'") if value.include?("github.com")
                                          UI.user_error!("Please only pass the path, e.g. 'KrauseFx/fastlane'") if value.split('/').count != 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :server_url,
@@ -117,7 +117,7 @@ module Fastlane
                                        default_value: "https://api.github.com",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server") unless value.include? "//"
+                                         UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server") unless value.include?("//")
                                        end),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_GET_GITHUB_RELEASE_VERSION",

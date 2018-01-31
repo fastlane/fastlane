@@ -1,5 +1,6 @@
-require "fastlane_core"
-require "credentials_manager"
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
+require_relative 'module'
 
 module Gym
   class Options
@@ -61,11 +62,7 @@ module Gym
                                      short_option: "-n",
                                      env_name: "GYM_OUTPUT_NAME",
                                      description: "The name of the resulting ipa file",
-                                     optional: true,
-                                     verify_block: proc do |value|
-                                       value.gsub!(".ipa", "")
-                                       value.gsub!(File::SEPARATOR, "_")
-                                     end),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :configuration,
                                      short_option: "-q",
                                      env_name: "GYM_CONFIGURATION",
@@ -92,12 +89,14 @@ module Gym
                                      env_name: "GYM_INCLUDE_SYMBOLS",
                                      description: "Should the ipa file include symbols?",
                                      is_string: false,
+                                     type: Boolean,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :include_bitcode,
                                      short_option: "-z",
                                      env_name: "GYM_INCLUDE_BITCODE",
                                      description: "Should the ipa file include bitcode?",
                                      is_string: false,
+                                     type: Boolean,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :export_method,
                                      short_option: "-j",
@@ -114,6 +113,8 @@ module Gym
                                      description: "Specifies path to export options plist. Use 'xcodebuild -help' to print the full set of available options",
                                      is_string: false,
                                      optional: true,
+                                     type: Hash,
+                                     skip_type_validation: true,
                                      conflict_block: proc do |value|
                                        UI.user_error!("'#{value.key}' must be false to use 'export_options'")
                                      end),
@@ -129,6 +130,13 @@ module Gym
                                      env_name: "GYM_SKIP_BUILD_ARCHIVE",
                                      description: "Export ipa from previously built xarchive. Uses archive_path as source",
                                      is_string: false,
+                                     type: Boolean,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :skip_archive,
+                                     env_name: "GYM_SKIP_ARCHIVE",
+                                     description: "After building, don't archive, effectively not including -archivePath param",
+                                     is_string: false,
+                                     type: Boolean,
                                      optional: true),
         # Very optional
         FastlaneCore::ConfigItem.new(key: :build_path,

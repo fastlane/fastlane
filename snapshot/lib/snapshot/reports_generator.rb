@@ -1,10 +1,12 @@
-require 'erb'
-require 'fastimage'
+require_relative 'module'
 
 module Snapshot
   class ReportsGenerator
+    require 'erb'
+    require 'fastimage'
+
     def generate
-      UI.message "Generating HTML Report"
+      UI.message("Generating HTML Report")
 
       screens_path = Snapshot.config[:output_directory]
 
@@ -27,13 +29,13 @@ module Snapshot
       end
 
       html_path = File.join(Snapshot::ROOT, "lib", "snapshot/page.html.erb")
-      html = ERB.new(File.read(html_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
+      html = ERB.new(File.read(html_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
       export_path = "#{screens_path}/screenshots.html"
       File.write(export_path, html)
 
       export_path = File.expand_path(export_path)
-      UI.success "Successfully created HTML file with an overview of all the screenshots: '#{export_path}'"
+      UI.success("Successfully created HTML file with an overview of all the screenshots: '#{export_path}'")
       system("open '#{export_path}'") unless Snapshot.config[:skip_open_summary]
     end
 
@@ -78,6 +80,7 @@ module Snapshot
         'iPhone 6' => "iPhone 6 (4.7-Inch)",
         'iPhone 5s' => "iPhone 5 (4-Inch)",
         'iPhone SE' => "iPhone SE",
+        'iPhone 4s' => "iPhone 4 (3.5-Inch)",
         'iPad Air' => 'iPad Air',
         'iPad Air 2' => 'iPad Air 2',
         'iPad (5th generation)' => 'iPad (5th generation)',

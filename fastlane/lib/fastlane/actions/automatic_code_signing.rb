@@ -16,7 +16,7 @@ module Fastlane
           return false
         end
 
-        target_dictionary = project.targets.map { |f| { name: f.name, uuid: f.uuid } }
+        target_dictionary = project.targets.map { |f| { name: f.name, uuid: f.uuid, build_configuration_list: f.build_configuration_list } }
         changed_targets = []
         project.root_object.attributes["TargetAttributes"].each do |target, sett|
           found_target = target_dictionary.detect { |h| h[:uuid] == target }
@@ -28,11 +28,33 @@ module Fastlane
             end
           end
 
-          sett["ProvisioningStyle"] = params[:use_automatic_signing] ? 'Automatic' : 'Manual'
+          style_value = params[:use_automatic_signing] ? 'Automatic' : 'Manual'
+          build_configuration_list = found_target[:build_configuration_list]
+          build_configuration_list.set_setting("CODE_SIGN_STYLE", style_value)
+          sett["ProvisioningStyle"] = style_value
+
           if params[:team_id]
             sett["DevelopmentTeam"] = params[:team_id]
             UI.important("Set Team id to: #{params[:team_id]} for target: #{found_target[:name]}")
           end
+          if params[:code_sign_identity]
+            build_configuration_list.set_setting("CODE_SIGN_IDENTITY", params[:code_sign_identity])
+            UI.important("Set Code Sign identity to: #{params[:code_sign_identity]} for target: #{found_target[:name]}")
+          end
+          if params[:profile_name]
+            build_configuration_list.set_setting("PROVISIONING_PROFILE_SPECIFIER", params[:profile_name])
+            UI.important("Set Provisioning Profile name to: #{params[:profile_name]} for target: #{found_target[:name]}")
+          end
+          # Since Xcode 8, this is no longer needed, you simply use PROVISIONING_PROFILE_SPECIFIER
+          if params[:profile_uuid]
+            build_configuration_list.set_setting("PROVISIONING_PROFILE", params[:profile_uuid])
+            UI.important("Set Provisioning Profile UUID to: #{params[:profile_uuid]} for target: #{found_target[:name]}")
+          end
+          if params[:bundle_identifier]
+            build_configuration_list.set_setting("PRODUCT_BUNDLE_IDENTIFIER", params[:bundle_identifier])
+            UI.important("Set Bundle identifier to: #{params[:bundle_identifier]} for target: #{found_target[:name]}")
+          end
+
           changed_targets << found_target[:name]
         end
         project.save
@@ -44,7 +66,7 @@ module Fastlane
             UI.important("\t* #{target[:name]}")
           end
         else
-          UI.success("Successfully updated project settings to use ProvisioningStyle '#{params[:use_automatic_signing] ? 'Automatic' : 'Manual'}'")
+          UI.success("Successfully updated project settings to use Code Sign Style = '#{params[:use_automatic_signing] ? 'Automatic' : 'Manual'}'")
           UI.success("Modified Targets:")
           changed_targets.each do |target|
             UI.success("\t * #{target}")
@@ -63,11 +85,11 @@ module Fastlane
       end
 
       def self.description
-        "Updates the Xcode 8 Automatic Codesigning Flag"
+        "Configures Xcode's Codesigning options"
       end
 
       def self.details
-        "Updates the Xcode 8 Automatic Codesigning Flag of all targets in the project"
+        "Configures Xcode's Codesigning options of all targets in the project"
       end
 
       def self.available_options
@@ -75,6 +97,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_PROJECT_SIGNING_PROJECT_PATH",
                                        description: "Path to your Xcode project",
+                                       code_gen_sensitive: true,
                                        default_value: Dir['*.xcodeproj'].first,
                                        verify_block: proc do |value|
                                          UI.user_error!("Path is invalid") unless File.exist?(File.expand_path(value))
@@ -85,16 +108,36 @@ module Fastlane
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :team_id,
-                                        env_name: "FASTLANE_TEAM_ID",
-                                        optional: true,
-                                        description: "Team ID, is used when upgrading project",
-                                        is_string: true),
+                                       env_name: "FASTLANE_TEAM_ID",
+                                       optional: true,
+                                       description: "Team ID, is used when upgrading project",
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :targets,
                                        env_name: "FL_PROJECT_SIGNING_TARGETS",
                                        optional: true,
                                        type: Array,
                                        description: "Specify targets you want to toggle the signing mech. (default to all targets)",
-                                       is_string: false)
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :code_sign_identity,
+                                       env_name: "FL_CODE_SIGN_IDENTITY",
+                                       description: "Code signing identity type (iPhone Development, iPhone Distribution)",
+                                       optional: true,
+                                       is_string: true),
+          FastlaneCore::ConfigItem.new(key: :profile_name,
+                                       env_name: "FL_PROVISIONING_PROFILE_SPECIFIER",
+                                       description: "Provisioning profile name to use for code signing",
+                                       optional: true,
+                                       is_string: true),
+          FastlaneCore::ConfigItem.new(key: :profile_uuid,
+                                       env_name: "FL_PROVISIONING_PROFILE",
+                                       description: "Provisioning profile UUID to use for code signing",
+                                       optional: true,
+                                       is_string: true),
+          FastlaneCore::ConfigItem.new(key: :bundle_identifier,
+                                       env_name: "FL_APP_IDENTIFIER",
+                                       description: "Application Product Bundle Identifier",
+                                       optional: true,
+                                       is_string: true)
         ]
       end
 
@@ -147,7 +190,7 @@ module Fastlane
       end
 
       def self.authors
-        ["mathiasAichinger", "hjanuschka"]
+        ["mathiasAichinger", "hjanuschka", "p4checo", "portellaa", "aeons"]
       end
 
       def self.is_supported?(platform)

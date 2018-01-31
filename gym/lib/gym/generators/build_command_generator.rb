@@ -1,4 +1,5 @@
 require 'shellwords'
+require_relative '../module'
 
 module Gym
   # Responsible for building the fully working xcodebuild command
@@ -37,7 +38,7 @@ module Gym
         options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
         options << "-destination '#{config[:destination]}'" if config[:destination]
         options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
-        options << "-archivePath #{archive_path.shellescape}"
+        options << "-archivePath #{archive_path.shellescape}" unless config[:skip_archive]
         options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
         options << config[:xcargs] if config[:xcargs]
@@ -51,7 +52,7 @@ module Gym
 
         actions = []
         actions << :clean if config[:clean]
-        actions << :archive
+        actions << :archive unless config[:skip_archive]
 
         actions
       end
@@ -105,7 +106,7 @@ module Gym
       def build_path
         unless Gym.cache[:build_path]
           Gym.cache[:build_path] = Gym.config[:build_path]
-          FileUtils.mkdir_p Gym.cache[:build_path]
+          FileUtils.mkdir_p(Gym.cache[:build_path])
         end
         Gym.cache[:build_path]
       end

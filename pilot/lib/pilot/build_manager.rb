@@ -1,4 +1,10 @@
 require 'tmpdir'
+require 'terminal-table'
+
+require 'fastlane_core/itunes_transporter'
+require 'fastlane_core/build_watcher'
+require 'fastlane_core/ipa_upload_package_builder'
+require_relative 'manager'
 
 module Pilot
   class BuildManager < Manager
@@ -35,7 +41,13 @@ module Pilot
       end
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, poll_interval: config[:wait_processing_interval])
+      app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
+      app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, train_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval], strict_build_watch: config[:wait_for_uploaded_build])
+
+      unless latest_build.train_version == app_version && latest_build.build_version == app_build
+        UI.important("Uploaded app #{app_version} - #{app_build}, but received build #{latest_build.train_version} - #{latest_build.build_version}. If you want to wait for uploaded build to be finished processing, use the `wait_for_uploaded_build` option")
+      end
 
       distribute(options, build: latest_build)
     end
@@ -57,7 +69,7 @@ module Pilot
         app_test_info.test_info.description = options[:beta_app_description] if options[:beta_app_description]
         begin
           app_test_info.save_for_app!(app_id: build.app_id)
-          UI.success "Successfully set the beta_app_feedback_email and/or beta_app_description"
+          UI.success("Successfully set the beta_app_feedback_email and/or beta_app_description")
         rescue => ex
           UI.user_error!("Could not set beta_app_feedback_email and/or beta_app_description: #{ex}")
         end
@@ -66,7 +78,7 @@ module Pilot
       if should_update_build_information?(options)
         begin
           build.update_build_information!(whats_new: options[:changelog])
-          UI.success "Successfully set the changelog for build"
+          UI.success("Successfully set the changelog for build")
         rescue => ex
           UI.user_error!("Could not set changelog: #{ex}")
         end
@@ -90,11 +102,11 @@ module Pilot
       builds.sort! { |a, b| a.upload_date <=> b.upload_date }
       rows = builds.collect { |build| describe_build(build) }
 
-      puts Terminal::Table.new(
-        title: "#{app.name} Builds".green,
-        headings: ["Version #", "Build #", "Testing", "Installs", "Sessions"],
-        rows: FastlaneCore::PrintTable.transform_output(rows)
-      )
+      puts(Terminal::Table.new(
+             title: "#{app.name} Builds".green,
+             headings: ["Version #", "Build #", "Installs"],
+             rows: FastlaneCore::PrintTable.transform_output(rows)
+      ))
     end
 
     def self.truncate_changelog(changelog)
@@ -103,7 +115,7 @@ module Pilot
         original_length = changelog.length
         bottom_message = "..."
         changelog = "#{changelog[0...max_changelog_length - bottom_message.length]}#{bottom_message}"
-        UI.important "Changelog has been truncated since it exceeds Apple's #{max_changelog_length} character limit. It currently contains #{original_length} characters."
+        UI.important("Changelog has been truncated since it exceeds Apple's #{max_changelog_length} character limit. It currently contains #{original_length} characters.")
       end
       return changelog
     end
@@ -113,9 +125,7 @@ module Pilot
     def describe_build(build)
       row = [build.train_version,
              build.build_version,
-             build.testing_status,
-             build.install_count,
-             build.session_count]
+             build.install_count]
 
       return row
     end
@@ -135,7 +145,7 @@ module Pilot
       uploaded_build.export_compliance.encryption_updated = false
 
       if options[:groups] || options[:distribute_external]
-        uploaded_build.beta_review_info.demo_account_required = false
+        uploaded_build.beta_review_info.demo_account_required ||= false # this needs to be set for iTC to continue
         uploaded_build.submit_for_testflight_review!
       end
 

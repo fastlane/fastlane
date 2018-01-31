@@ -1,5 +1,6 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
+require_relative 'module'
 
 module Screengrab
   class Options
@@ -14,6 +15,7 @@ module Screengrab
         FastlaneCore::ConfigItem.new(key: :android_home,
                                      short_option: "-n",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: ENV['ANDROID_HOME'] || ENV['ANDROID_SDK'],
                                      description: "Path to the root of your Android SDK installation, e.g. ~/tools/android-sdk-macosx"),
         FastlaneCore::ConfigItem.new(key: :build_tools_version,
@@ -44,6 +46,7 @@ module Screengrab
                                      env_name: 'SCREENGRAB_APP_PACKAGE_NAME',
                                      short_option: "-a",
                                      description: "The package name of the app under test (e.g. com.yourcompany.yourapp)",
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:package_name)),
         FastlaneCore::ConfigItem.new(key: :tests_package_name,
                                      env_name: 'SCREENGRAB_TESTS_PACKAGE_NAME',
@@ -83,18 +86,20 @@ module Screengrab
                                      optional: true,
                                      description: "The path to the APK for the app under test",
                                      short_option: "-k",
+                                     code_gen_sensitive: true,
                                      default_value: Dir[File.join("app", "build", "outputs", "apk", "app-debug.apk")].last,
                                      verify_block: proc do |value|
-                                       UI.user_error! "Could not find APK file at path '#{value}'" unless File.exist?(value)
+                                       UI.user_error!("Could not find APK file at path '#{value}'") unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :tests_apk_path,
                                      env_name: 'SCREENGRAB_TESTS_APK_PATH',
                                      optional: true,
                                      description: "The path to the APK for the the tests bundle",
                                      short_option: "-b",
+                                     code_gen_sensitive: true,
                                      default_value: Dir[File.join("app", "build", "outputs", "apk", "app-debug-androidTest-unaligned.apk")].last,
                                      verify_block: proc do |value|
-                                       UI.user_error! "Could not find APK file at path '#{value}'" unless File.exist?(value)
+                                       UI.user_error!("Could not find APK file at path '#{value}'") unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :specific_device,
                                      env_name: 'SCREENGRAB_SPECIFIC_DEVICE',
@@ -107,7 +112,7 @@ module Screengrab
                                      short_option: "-d",
                                      default_value: "phone",
                                      verify_block: proc do |value|
-                                       UI.user_error! "device_type must be one of: #{DEVICE_TYPES}" unless DEVICE_TYPES.include?(value)
+                                       UI.user_error!("device_type must be one of: #{DEVICE_TYPES}") unless DEVICE_TYPES.include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :exit_on_test_failure,
                                      env_name: 'EXIT_ON_TEST_FAILURE',

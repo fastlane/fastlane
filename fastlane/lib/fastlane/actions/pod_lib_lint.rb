@@ -106,7 +106,7 @@ module Fastlane
           '# Allow warnings during pod lint
           pod_lib_lint(allow_warnings: true)',
           '# If the podspec has a dependency on another private pod, then you will have to supply the sources
-          pod_lib_lint(sources: ["https://github.com/MyGithubPage/Specs", "https://github.com/CocoaPods/Specs"])'
+          pod_lib_lint(sources: ["https://github.com/username/Specs", "https://github.com/CocoaPods/Specs"])'
         ]
       end
 

@@ -7,10 +7,12 @@ module Fastlane
 
         plugins = fetch_plugins.sort_by { |v| v.data[:overall_score] }.reverse
 
-        result = "# Available Plugins\n\n\n"
+        result = "<!--\nAuto generated, please only modify https://github.com/fastlane/fastlane/blob/master/fastlane/actions/plugin_scores.rb\n-->\n"
+        result += "{!docs/setup-fastlane-header.md!}\n"
+        result += "# Available Plugins\n\n\n"
         result += plugins.collect do |current_plugin|
           @plugin = current_plugin
-          result = ERB.new(File.read(params[:template_path]), 0, '-').result(binding) # http://www.rrn.dk/rubys-erb-templating-system
+          result = ERB.new(File.read(params[:template_path]), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
         end.join("\n")
 
         File.write(File.join("docs", params[:output_path]), result)
@@ -21,7 +23,7 @@ module Fastlane
         plugins = []
         loop do
           url = "https://rubygems.org/api/v1/search.json?query=fastlane-plugin-&page=#{page}"
-          puts "RubyGems API Request: #{url}"
+          puts("RubyGems API Request: #{url}")
           results = JSON.parse(open(url).read)
           break if results.count == 0
 

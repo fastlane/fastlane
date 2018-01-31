@@ -1,3 +1,6 @@
+require_relative '../client'
+require_relative 'utilities'
+
 module Spaceship
   # This class is used to upload Digital files (Images, Videos, JSON files) onto the du-itc service.
   # Its implementation is tied to the tunes module (in particular using +AppVersion+ instances)
@@ -19,7 +22,7 @@ module Spaceship
     end
 
     def upload_purchase_review_screenshot(app_id, upload_file, content_provider_id, sso_token_for_image)
-      upload_file(app_id: app_id, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: 'MZPFT.SortedScreenShot')
+      upload_file(app_id: app_id, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: get_picture_type(upload_file))
     end
 
     def upload_large_icon(app_version, upload_file, content_provider_id, sso_token_for_image)
@@ -42,6 +45,16 @@ module Spaceship
       upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: screenshot_picture_type(device, nil))
     end
 
+    def get_picture_type(upload_file)
+      resolution = Utilities.resolution(upload_file.file_path)
+      result = device_resolution_map.find do |key, resolutions|
+        resolutions.include?(resolution)
+      end
+      raise "Unknown device for screen resolution #{resolution}" if result.nil?
+
+      picture_type_map[result[0]]
+    end
+
     private
 
     def upload_file(app_version: nil, upload_file: nil, path: nil, content_provider_id: nil, sso_token: nil, du_validation_rule_set: nil, app_id: nil)
@@ -60,7 +73,7 @@ module Spaceship
       end
 
       r = request(:post) do |req|
-        req.url "#{self.class.hostname}#{path}"
+        req.url("#{self.class.hostname}#{path}")
         req.body = upload_file.bytes
         req.headers['Accept'] = 'application/json, text/plain, */*'
         req.headers['Content-Type'] = upload_file.content_type
@@ -91,8 +104,10 @@ module Spaceship
         watch:        "MZPFT.SortedN27ScreenShot",
         ipad:         "MZPFT.SortedTabletScreenShot",
         ipadPro:      "MZPFT.SortedJ99ScreenShot",
+        ipad105:      "MZPFT.SortedJ207ScreenShot",
         iphone6:      "MZPFT.SortedN61ScreenShot",
         iphone6Plus:  "MZPFT.SortedN56ScreenShot",
+        iphone58:     "MZPFT.SortedD22ScreenShot",
         iphone4:      "MZPFT.SortedN41ScreenShot",
         iphone35:     "MZPFT.SortedScreenShot",
         appleTV:      "MZPFT.SortedATVScreenShot",
@@ -105,16 +120,34 @@ module Spaceship
       {
         ipad:         "MZPFT.SortedTabletMessagesScreenShot",
         ipadPro:      "MZPFT.SortedJ99MessagesScreenShot",
+        ipad105:      "MZPFT.SortedJ207MessagesScreenShot",
         iphone6:      "MZPFT.SortedN61MessagesScreenShot",
         iphone6Plus:  "MZPFT.SortedN56MessagesScreenShot",
+        iphone58:     "MZPFT.SortedD22MessagesScreenShot",
         iphone4:      "MZPFT.SortedN41MessagesScreenShot"
+      }
+    end
+
+    def device_resolution_map
+      # rubocop:enable Layout/ExtraSpacing
+      {
+        watch:        [[312, 390]],
+        ipad:         [[1024, 748], [1024, 768], [2048, 1496], [2048, 1536], [768, 1004], [768, 1024], [1536, 2008], [1536, 2048]],
+        ipadPro:      [[2048, 2732], [2732, 2048]],
+        ipad105:      [[1668, 2224], [2224, 1668]],
+        iphone6:      [[750, 1334], [1334, 750]],
+        iphone6Plus:  [[1242, 2208], [2208, 1242]],
+        iphone4:      [[640, 1096], [640, 1136], [1136, 600], [1136, 640]],
+        iphone35:     [[640, 960], [640, 920], [960, 600], [960, 640]],
+        appleTV:      [[1920, 1080]],
+        desktop:      [[1280, 800], [1440, 900], [2560, 1600], [2880, 1800]]
       }
     end
 
     def screenshot_picture_type(device, is_messages)
       map = is_messages ? messages_picture_type_map : picture_type_map
       device = device.to_sym
-      raise "Unknown picture type for device: #{device}" unless map.key? device
+      raise "Unknown picture type for device: #{device}" unless map.key?(device)
       map[device]
     end
 

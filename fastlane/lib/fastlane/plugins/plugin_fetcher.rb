@@ -12,7 +12,7 @@ module Fastlane
       page = 1
       plugins = []
       loop do
-        url = "https://rubygems.org/api/v1/search.json?query=#{PluginManager.plugin_prefix}#{search_query}&page=#{page}"
+        url = "https://rubygems.org/api/v1/search.json?query=#{PluginManager.plugin_prefix}&page=#{page}"
         FastlaneCore::UI.verbose("RubyGems API Request: #{url}")
         results = JSON.parse(open(url).read)
         break if results.count == 0
@@ -25,7 +25,7 @@ module Fastlane
 
       return plugins if search_query.to_s.length == 0
       plugins.keep_if do |current|
-        current.full_name.include?(search_query)
+        current.full_name.include?(search_query) or current.info.include?(search_query)
       end
 
       return plugins

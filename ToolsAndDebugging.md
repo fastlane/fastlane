@@ -22,7 +22,7 @@ bundle exec fastlane beta --verbose
 If you need the breakpoint when running tests, make sure to have the `DEBUG` environment variable set, as the default test runner will remove all output from stdout, and therefore not showing the output of `pry`:
 
 ```
-DEBUG= bundle exec rspec
+DEBUG=1 bundle exec rspec
 ```
 
 You will then jump into an interactive debugger that allows you to print out variables, call methods and [much more](https://github.com/pry/pry/wiki).

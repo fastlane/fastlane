@@ -4,36 +4,7 @@
 
 -----
 
-
 # Documentation
-
-- [Actions.md](https://docs.fastlane.tools/actions) for all the built-in integrations
-- [Code signing guide](Codesigning) How to get started with code signing and resolve common issues
-- [FAQs](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/FAQs.md) for frequently asked questions
-- [Advanced.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Advanced.md) for more advanced settings and tips
-- [Platforms.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md) for more information about the cross-platform support of `fastlane`.
-- [Appfile.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Appfile.md) describes the `Appfile`
-- [Android.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Android.md) Getting started with fastlane for Android
-- [Gitignore.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Gitignore.md) Recommended content for your `.gitignore` file
-- [UI.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md) More information about how to print out text and ask the user for inputs
-
-### Plugins
-
-- [Plugins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Plugins.md) Getting started with using and building fastlane plugins
-- [AvailablePlugins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/AvailablePlugins.md) A list of all available fastlane plugins
-- [PluginsTroubleshooting.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/PluginsTroubleshooting.md) for help when plugins don't work
-
-### CI Systems
-
-- [Jenkins.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md) for Jenkins specific help
-- [Circle.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Circle.md) for Circle CI specific help
-- [Bamboo.md](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Bamboo.md) for Bamboo specific help
-
------
-
-<h4 align="center">For fastlane guides, check out the new <a href="https://docs.fastlane.tools">docs.fastlane.tools</a> page</h4>
-
------
 
 ## Fastfile
 
