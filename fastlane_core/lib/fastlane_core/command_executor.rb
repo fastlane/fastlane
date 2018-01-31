@@ -55,7 +55,6 @@ module FastlaneCore
                 pid_created.call(pid)
               end
               command_stdout.each do |l|
-
                 line = l.strip # strip so that \n gets removed
                 output << line
 
