@@ -1,4 +1,5 @@
 require 'fastlane_core/test_parser'
+require_relative '../error_handler'
 require_relative 'simulator_launcher_base'
 
 module Snapshot
