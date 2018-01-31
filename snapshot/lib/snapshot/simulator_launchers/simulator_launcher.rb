@@ -67,7 +67,6 @@ module Snapshot
           end
 
           @recording_pid = {}
-          dir_name = locale || language
 
           device_batches.each do |devices|
             languages_finished[language] = launch_simultaneously(devices, language, locale, launch_args)
