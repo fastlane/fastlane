@@ -104,22 +104,6 @@ open class Snapshot: NSObject {
         }
     }
 
-    class func getCommandListenerPort() -> String? {
-        guard let prefix = pathPrefix() else {
-            return nil
-        }
-        
-        let path = prefix.appendingPathComponent("Command_listener_port.txt")
-        var port: String?
-        do {
-            let trimCharacterSet = CharacterSet.whitespacesAndNewlines
-            port = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
-        } catch {
-            print("Couldn't get the command listener port...")
-        }
-        return port
-    }
-
     open class func snapshot(_ name: String, waitForLoadingIndicator: Bool = true) {
         if waitForLoadingIndicator {
             waitForLoadingIndicatorToDisappear()
