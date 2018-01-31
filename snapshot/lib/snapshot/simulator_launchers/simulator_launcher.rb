@@ -72,8 +72,6 @@ module Snapshot
           device_batches.each do |devices|
             languages_finished[language] = launch_simultaneously(devices, language, locale, launch_args)
           end
-
-          listener.close
         end
       end
       launcher_config.devices.each_with_object({}) do |device, results_hash|
