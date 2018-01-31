@@ -82,7 +82,6 @@ module Snapshot
           end
         }
       ]
-      
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: true,
                                       print_command: true,
