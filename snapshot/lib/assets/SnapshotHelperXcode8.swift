@@ -40,18 +40,6 @@ func stopRecording() {
     sendCommand(command: "stopRecording")
 }
 
-func sendCommand(command: String) {
-    guard let port = Snapshot.getCommandListenerPort() else {
-        return
-    }
-    if let url = URL(string: "http://localhost:\(port)/\(command)") {
-        let (_, _, error) = URLSession.shared.synchronousDataTask(with: url)
-        if (error != nil) {
-            print("Error sending command: \(String(describing: error))")
-        }
-    }
-}
-
 open class Snapshot: NSObject {
 
     open class func setupSnapshot(_ app: XCUIApplication) {
