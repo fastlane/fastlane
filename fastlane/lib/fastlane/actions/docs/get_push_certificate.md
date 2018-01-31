@@ -98,8 +98,6 @@ If you need the `p12` in your keychain, perhaps to test push with an app like [K
     Enter Export Password:
       <enter a password for encrypting the new p12 file>
 
-##### [Do you like fastlane? Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools)
-
 ## Environment Variables
 
 Run `fastlane action pem` to get a list of available environment variables.
