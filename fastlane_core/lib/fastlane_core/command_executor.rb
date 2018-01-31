@@ -51,11 +51,10 @@ module FastlaneCore
         begin
           FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
             begin
-
-                if pid_created
-                  pid_created.call(pid)
-                end
-                command_stdout.each do |l|
+              if pid_created
+                pid_created.call(pid)
+              end
+              command_stdout.each do |l|
 
                 line = l.strip # strip so that \n gets removed
                 output << line
