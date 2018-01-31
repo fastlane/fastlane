@@ -60,4 +60,3 @@ module Snapshot
     xcode_version.split(".").first.to_i >= 7
   end
 end
-
