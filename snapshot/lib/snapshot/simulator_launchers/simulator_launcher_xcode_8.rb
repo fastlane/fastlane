@@ -84,12 +84,7 @@ module Snapshot
       ]
 
       dir_name = locale || language
-      listener = CommandListener.new do |cmd, args|
-        start_recording(dir_name, device_type, args["name"].first) if cmd == "startRecording"
-        stop_recording if cmd == "stopRecording"
-      end
-      File.write(File.join(CACHE_DIR, "Command_listener_port.txt"), listener.server.addr[1])
-
+      
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: true,
                                       print_command: true,
