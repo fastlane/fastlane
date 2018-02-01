@@ -242,10 +242,12 @@ Layout/SpaceAroundOperators:
 AllCops:
   TargetRubyVersion: 2.0
   Include:
-    - '**/fastlane/Fastfile'
+    - '*/lib/assets/*Template'
+    - '*/lib/assets/*TemplateAndroid'
   Exclude:
     - '**/lib/assets/custom_action_template.rb'
     - './vendor/**/*'
+    - '**/lib/assets/DefaultFastfileTemplate'
 
 # They have not to be snake_case
 Style/FileName:
