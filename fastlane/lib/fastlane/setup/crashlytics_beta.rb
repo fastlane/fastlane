@@ -93,9 +93,9 @@ module Fastlane
 
     def fastfile_template
       <<-eos
-fastlane_version "#{Fastlane::VERSION}"
+fastlane_version("#{Fastlane::VERSION}")
 
-default_platform :ios
+default_platform(:ios)
 
 platform :ios do
 #{lane_template}
