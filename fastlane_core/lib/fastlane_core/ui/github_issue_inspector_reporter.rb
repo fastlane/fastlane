@@ -28,8 +28,8 @@ module Fastlane
       print_open_link_hint
     end
 
-    # Called once the report has been recieved, but when there are no issues found.
-    def inspector_recieved_empty_report(report, inspector)
+    # Called once the report has been received, but when there are no issues found.
+    def inspector_received_empty_report(report, inspector)
       puts("Found no similar issues. To create a new issue, please visit:")
       puts("https://github.com/#{inspector.repo_owner}/#{inspector.repo_name}/issues/new")
       puts("Run `fastlane env` to append the fastlane environment to your issue")
