@@ -302,6 +302,7 @@ Style/MethodCallWithArgsParentheses:
     - 'desc'
     - 'lane'
     - 'private_lane'
+    - 'platform'
     # rspec tests code below
     - 'to'
     - 'describe'

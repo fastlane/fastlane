@@ -11,6 +11,6 @@
 
 default_platform(:ios)
 
-platform(:ios) do
+platform :ios do
 [[LANES]]
 end
