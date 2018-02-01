@@ -106,6 +106,8 @@ module Fastlane
         type = "Bool"
       elsif default_value.kind_of?(Array)
         type = "[String]"
+      elsif default_value.kind_of?(Hash)
+        type = "[String : Any]"
       end
       return "#{type}#{optional_specifier}"
     end
