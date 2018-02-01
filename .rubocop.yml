@@ -112,7 +112,7 @@ Layout/AlignHash:
 Layout/DotPosition:
   Enabled: false
 
-# We allow !! as it's an easy way to convert ot boolean
+# We allow !! as it's an easy way to convert to boolean
 Style/DoubleNegation:
   Enabled: false
 
