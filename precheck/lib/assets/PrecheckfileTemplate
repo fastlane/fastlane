@@ -24,4 +24,4 @@
 # placeholder_text(level: :error)
 # test_words(level: :error)
 # unreachable_urls(level: :error)
-# custom_text(data: ['fabric'], level: :warn)
+# custom_text(data: ["fabric"], level: :warn)
