@@ -33,7 +33,7 @@ func addGitTag(tag: String? = nil,
                                                                                              RubyCommand.Argument(name: "sign", value: sign)])
   _ = runner.executeCommand(command)
 }
-func appStoreBuildNumber(initialBuildNumber: String = "1",
+func appStoreBuildNumber(initialBuildNumber: String,
                          appIdentifier: String,
                          username: String,
                          teamId: String? = nil,
@@ -3801,4 +3801,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.3]
+// FastlaneRunnerAPIVersion [0.9.4]
