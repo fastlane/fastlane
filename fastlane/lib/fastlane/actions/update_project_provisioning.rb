@@ -22,7 +22,7 @@ module Fastlane
         unless File.exist?(params[:certificate])
           UI.message("Downloading root certificate from (#{ROOT_CERTIFICATE_URL}) to path '#{params[:certificate]}'")
           require 'open-uri'
-          File.open(params[:certificate], "w") do |file|
+          File.open(params[:certificate], "w:ASCII-8BIT") do |file|
             file.write(open(ROOT_CERTIFICATE_URL, "rb").read)
           end
         end
