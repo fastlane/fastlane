@@ -8,6 +8,10 @@ module Pilot
       options[:changelog] = self.class.truncate_changelog(options[:changelog]) if options[:changelog]
 
       UI.user_error!("No ipa file given") unless config[:ipa]
+      
+if options[:changelog] == nil and options[:distribute_external] === true
+UI.user_error!("No changelog provided")
+end
 
       UI.success("Ready to upload new build to TestFlight (App: #{app.apple_id})...")
 
