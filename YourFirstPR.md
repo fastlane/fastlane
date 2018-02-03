@@ -114,7 +114,6 @@ If you want to run a command with your normal _fastlane_ installation, simply do
 
 To fully remove your local _fastlane_ from your local project again, delete the `Gemfile` you created above.
 
-
 ## Submitting the PR
 
 When the coding is done and you’re finished testing your changes, you are ready to submit the PR to the [_fastlane_ main repo][fastlane]. Everything you need to know about submitting the PR itself is inside our [Pull Request Template][pr template]. Some best practices are:

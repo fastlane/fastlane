@@ -28,9 +28,7 @@ DEBUG=1 bundle exec rspec
 You will then jump into an interactive debugger that allows you to print out variables, call methods and [much more](https://github.com/pry/pry/wiki).
 To continue running the original script use `control` + `d`
 
-
 ## Test your local _fastlane_ code base with your setup
-
 
 After introducing some changes to the _fastlane_ source code, you probably want to test the changes for your application. The easiest way to do so it use [bundler](https://bundler.io/).
 
@@ -51,7 +49,6 @@ which should print out the path to your local development environment.
 From now on, every time you introduce a change to your local _fastlane_ code base, you can immediately test it by running `bundle exec fastlane …`
 
 ## Debugging and patching _[spaceship](https://spaceship.airforce)_ issues
-
 
 ### Introduction to _spaceship_
 
