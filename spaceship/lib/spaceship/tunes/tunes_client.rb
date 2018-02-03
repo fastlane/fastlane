@@ -1006,7 +1006,10 @@ module Spaceship
 
       if !errors.nil? and !errors.empty? and errors.first.include?("Problem processing review submission.")
         if reject_if_waiting_for_review
+          puts("Found a version already submitted. Going to reject the previously submitted version.")
           reject_app_submission(app_id, version)
+          puts("Rejected previously submitted app version.")
+          puts("Going to submit app for review again...")
           send_app_submission(app_id, version, data)
           return
         else
