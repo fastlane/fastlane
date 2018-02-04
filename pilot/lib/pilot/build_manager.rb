@@ -15,7 +15,7 @@ module Pilot
 
       UI.user_error!("No ipa file given") unless config[:ipa]
 
-      if options[:changelog].nil? and options[:distribute_external] === true
+      if options[:changelog].nil? and options[:distribute_external] == true
         UI.user_error!("No changelog provided")
       end
 
