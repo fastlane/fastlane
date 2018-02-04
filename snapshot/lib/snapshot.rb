@@ -17,12 +17,12 @@ require_relative 'snapshot/simulator_launchers/launcher_configuration'
 require_relative 'snapshot/simulator_launchers/simulator_launcher'
 require_relative 'snapshot/simulator_launchers/simulator_launcher_xcode_8'
 require_relative 'snapshot/module'
-#require 'snapshot/command_listener'
-require_relative 'snapshot/command_listener'
-#require 'fastlane_core'
-require_relative 'fastlane_core'
-#require 'open3'
-require_relative 'open3'
+require 'snapshot/command_listener'
+#require_relative 'snapshot/command_listener'
+require 'fastlane_core'
+#require_relative 'fastlane_core'
+require 'open3'
+#require_relative 'open3'
 
 module Snapshot
   # Use this to just setup the configuration attribute and set it later somewhere else
