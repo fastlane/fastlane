@@ -48,13 +48,13 @@ module Fastlane
               Actions.sh("unzip -qo #{current_path.shellescape}")
               work_q = Queue.new
               Dir["*.dSYM"].each do |sub|
-                work_q.push sub
+                work_q.push(sub)
               end
               execute_uploads(params, max_worker_threads, work_q)
             end
           end
         else
-          UI.error "Don't know how to handle '#{current_path}'"
+          UI.error("Don't know how to handle '#{current_path}'")
         end
       end
 
@@ -68,7 +68,7 @@ module Fastlane
                 upload_dsym(params, current_path)
               end
             rescue => ex
-              UI.error ex.to_s
+              UI.error(ex.to_s)
             end
           end
         end
@@ -87,7 +87,7 @@ module Fastlane
           UI.verbose("upload_dsym using command: #{command_to_execute}")
           Actions.sh(command_to_execute, log: false)
         rescue => ex
-          UI.error ex.to_s # it fails, however we don't want to fail everything just for this
+          UI.error(ex.to_s) # it fails, however we don't want to fail everything just for this
         end
       end
 

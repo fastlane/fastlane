@@ -19,8 +19,8 @@ describe Commander::Runner do
         #
         # This is not ideal, but the downside is potential broken tests in the future,
         # which we can quickly adjust.
-        global_option '--format', String
-        global_option '--out', String
+        global_option('--format', String)
+        global_option('--out', String)
 
         command :run do |c|
           c.action do |args, options|
@@ -28,7 +28,7 @@ describe Commander::Runner do
           end
         end
 
-        default_command :run
+        default_command(:run)
 
         run!
       end

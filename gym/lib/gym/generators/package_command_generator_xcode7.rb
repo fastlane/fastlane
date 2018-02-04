@@ -5,6 +5,12 @@
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
 
 require 'tempfile'
+require 'xcodeproj'
+
+require 'fastlane_core/core_ext/cfpropertylist'
+require_relative '../module'
+require_relative '../error_handler'
+require_relative 'build_command_generator'
 
 module Gym
   # Responsible for building the fully working xcodebuild command
@@ -121,7 +127,7 @@ module Gym
       def keys_to_symbols(hash)
         # Convert keys to symbols
         hash = hash.each_with_object({}) do |(k, v), memo|
-          memo[k.to_sym] = v
+          memo[k.b.to_s.to_sym] = v
           memo
         end
         hash
@@ -135,7 +141,10 @@ module Gym
             hash = normalize_export_options(Gym.config[:export_options])
           else
             # Reads options from file
-            hash = Plist.parse_xml(Gym.config[:export_options])
+            plist_file_path = Gym.config[:export_options]
+            UI.user_error!("Couldn't find plist file at path #{File.expand_path(plist_file_path)}") unless File.exist?(plist_file_path)
+            hash = Plist.parse_xml(plist_file_path)
+            UI.user_error!("Couldn't read provided plist at path #{File.expand_path(plist_file_path)}") if hash.nil?
             # Convert keys to symbols
             hash = keys_to_symbols(hash)
           end
@@ -156,8 +165,6 @@ module Gym
       end
 
       def config_content
-        require 'plist'
-
         hash = read_export_options
 
         # Overrides export options if needed
@@ -168,7 +175,7 @@ module Gym
         end
 
         # xcodebuild will not use provisioning profiles
-        # if we doens't specify signingStyle as manual
+        # if we don't specify signingStyle as manual
         if Helper.xcode_at_least?("9.0") && hash[:provisioningProfiles]
           hash[:signingStyle] = 'manual'
         end
@@ -182,16 +189,24 @@ module Gym
         if FastlaneCore::Globals.verbose?
           UI.message("This results in the following plist file:")
           UI.command_output("-----------------------------------------")
-          UI.command_output(to_plist(hash))
+          UI.command_output(hash.to_plist)
           UI.command_output("-----------------------------------------")
         end
 
-        to_plist(hash)
+        hash.to_plist
       end
 
-      # Avoids a Hash#to_plist conflict between CFPropertyList and plist gems
-      def to_plist(hash)
-        Plist::Emit.dump(hash, true)
+      def signing_style
+        projects = Gym.project.project_paths
+        project = projects.first
+        xcodeproj = Xcodeproj::Project.open(project)
+        xcodeproj.root_object.attributes["TargetAttributes"].each do |target, sett|
+          return sett["ProvisioningStyle"].to_s.downcase
+        end
+      rescue => e
+        UI.verbose(e.to_s)
+        UI.error("Unable to read provisioning style from .pbxproj file.")
+        return "automatic"
       end
     end
   end

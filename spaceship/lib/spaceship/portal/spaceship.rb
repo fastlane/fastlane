@@ -1,3 +1,6 @@
+require_relative 'portal_client'
+require_relative 'app_service'
+
 module Spaceship
   module Portal
     class << self
@@ -17,7 +20,7 @@ module Spaceship
       #
       # @raise InvalidUserCredentialsError: raised if authentication failed
       #
-      # @return (Spaceship::Client) The client the login method was called for
+      # @return (Spaceship::Portal::Client) The client the login method was called for
       def login(user = nil, password = nil)
         @client = PortalClient.login(user, password)
       end
@@ -41,47 +44,47 @@ module Spaceship
 
       # @return (Class) Access the apps for the spaceship
       def app
-        Spaceship::App.set_client(@client)
+        Spaceship::Portal::App.set_client(@client)
       end
 
       # @return (Class) Access the pass types for the spaceship
       def passbook
-        Spaceship::Passbook.set_client(@client)
+        Spaceship::Portal::Passbook.set_client(@client)
       end
 
       # @return (Class) Access the website pushes for the spaceship
       def website_push
-        Spaceship::WebsitePush.set_client(@client)
+        Spaceship::Portal::WebsitePush.set_client(@client)
       end
 
       # @return (Class) Access the app groups for the spaceship
       def app_group
-        Spaceship::AppGroup.set_client(@client)
+        Spaceship::Portal::AppGroup.set_client(@client)
       end
 
       # @return (Class) Access app services for the spaceship
       def app_service
-        Spaceship::AppService
+        Spaceship::Portal::AppService
       end
 
       # @return (Class) Access the devices for the spaceship
       def device
-        Spaceship::Device.set_client(@client)
+        Spaceship::Portal::Device.set_client(@client)
       end
 
       # @return (Class) Access the certificates for the spaceship
       def certificate
-        Spaceship::Certificate.set_client(@client)
+        Spaceship::Portal::Certificate.set_client(@client)
       end
 
       # @return (Class) Access the provisioning profiles for the spaceship
       def provisioning_profile
-        Spaceship::ProvisioningProfile.set_client(@client)
+        Spaceship::Portal::ProvisioningProfile.set_client(@client)
       end
 
       # @return (Class) Access the merchants for the spaceship
       def merchant
-        Spaceship::Merchant.set_client(@client)
+        Spaceship::Portal::Merchant.set_client(@client)
       end
     end
   end

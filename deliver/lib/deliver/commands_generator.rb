@@ -1,6 +1,11 @@
 require 'commander'
-require 'deliver/download_screenshots'
 require 'fastlane/version'
+
+require_relative 'download_screenshots'
+require_relative 'options'
+require_relative 'module'
+require_relative 'generate_summary'
+require_relative 'runner'
 
 HighLine.track_eof = false
 
@@ -41,7 +46,7 @@ module Deliver
       program :description, Deliver::DESCRIPTION
       program :help, 'Author', 'Felix Krause <deliver@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/deliver#readme'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/deliver/'
       program :help_formatter, :compact
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
@@ -63,9 +68,10 @@ module Deliver
           loaded = true if File.exist?(File.join(FastlaneCore::FastlaneFolder.path || ".", "metadata"))
           unless loaded
             if UI.confirm("No deliver configuration found in the current directory. Do you want to setup deliver?")
+              is_swift = UI.confirm("Would you like to use Swift instead of Ruby?")
               require 'deliver/setup'
               Deliver::Runner.new(options) # to login...
-              Deliver::Setup.new.run(options)
+              Deliver::Setup.new.run(options, is_swift: is_swift)
               return 0
             end
           end
@@ -122,7 +128,7 @@ module Deliver
           options.load_configuration_file("Deliverfile")
           Deliver::Runner.new(options)
           html_path = Deliver::GenerateSummary.new.run(options)
-          UI.success "Successfully generated HTML report at '#{html_path}'"
+          UI.success("Successfully generated HTML report at '#{html_path}'")
           system("open '#{html_path}'") unless options[:force]
         end
       end
@@ -171,7 +177,7 @@ module Deliver
         end
       end
 
-      default_command :run
+      default_command(:run)
 
       run!
     end

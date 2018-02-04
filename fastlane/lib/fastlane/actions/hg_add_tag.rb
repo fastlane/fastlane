@@ -8,7 +8,7 @@ module Fastlane
         UI.message("Adding mercurial tag '#{tag}' 🎯.")
 
         command = "hg tag \"#{tag}\""
-        return command if Helper.is_test?
+        return command if Helper.test?
 
         Actions.sh(command)
       end

@@ -1,6 +1,6 @@
 describe Match::Generator do
-  describe 'calling through to other tools ' do
-    it 'configures cert correctly for nested execution' do
+  describe 'calling through to other tools' do
+    it 'configures cert correctly for nested execution', requires_keychain: true do
       require 'cert'
 
       config = FastlaneCore::Configuration.create(Cert::Options.available_options, {

@@ -24,7 +24,7 @@ describe Spaceship::Tunes::Availability do
       expect(availability.territories.length).to eq(2)
       territory_0 = availability.territories[0]
 
-      expect(territory_0).not_to be_nil
+      expect(territory_0).not_to(be_nil)
       expect(territory_0.code).to eq('GB')
       expect(territory_0.currency_code).to eq('GBP')
       expect(territory_0.name).to eq('United Kingdom')

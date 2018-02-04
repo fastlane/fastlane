@@ -7,8 +7,8 @@ tool_name = File.basename($0)
 
 full_params = ARGV.shelljoin
 
-puts "[WARNING] You are calling #{tool_name} directly. Usage of the tool name without the `fastlane` prefix is deprecated in fastlane 2.0".yellow
-puts "Please update your scripts to use `fastlane #{tool_name} #{full_params}` instead.".yellow
+puts("[WARNING] You are calling #{tool_name} directly. Usage of the tool name without the `fastlane` prefix is deprecated in fastlane 2.0".yellow)
+puts("Please update your scripts to use `fastlane #{tool_name} #{full_params}` instead.".yellow)
 
 exec_arr = ["fastlane", tool_name] + ARGV
 

@@ -1,4 +1,6 @@
-require 'snapshot/test_command_generator_base'
+require_relative 'test_command_generator_base'
+require_relative 'module'
+require_relative 'latest_os_version'
 
 module Snapshot
   # Responsible for building the fully working xcodebuild command
@@ -39,7 +41,7 @@ module Snapshot
         elsif device.os_version != os_version
           UI.important("Using device named '#{device_name}' with version '#{device.os_version}' because no match was found for version '#{os_version}'")
         end
-        value = "platform=#{os} Simulator,id=#{device.udid},OS=#{os_version}"
+        value = "platform=#{os} Simulator,id=#{device.udid},OS=#{device.os_version}"
 
         return ["-destination '#{value}'"]
       end

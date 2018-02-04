@@ -1,3 +1,5 @@
+require_relative 'portal_base'
+
 module Spaceship
   module Portal
     # Represents an app group of the Apple Dev Portal

@@ -1,9 +1,11 @@
-require 'erb'
+require_relative 'module'
 
 module Screengrab
   class ReportsGenerator
+    require 'erb'
+
     def generate
-      UI.message "Generating HTML Report"
+      UI.message("Generating HTML Report")
 
       screens_path = Screengrab.config[:output_directory]
 
@@ -21,13 +23,13 @@ module Screengrab
       end
 
       html_path = File.join(Screengrab::ROOT, "lib", "screengrab/page.html.erb")
-      html = ERB.new(File.read(html_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
+      html = ERB.new(File.read(html_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
       export_path = "#{screens_path}/screenshots.html"
       File.write(export_path, html)
 
       export_path = File.expand_path(export_path)
-      UI.success "Successfully created HTML file with an overview of all the screenshots: '#{export_path}'"
+      UI.success("Successfully created HTML file with an overview of all the screenshots: '#{export_path}'")
       system("open '#{export_path}'") unless Screengrab.config[:skip_open_summary]
     end
   end

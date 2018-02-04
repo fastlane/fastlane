@@ -1,5 +1,7 @@
-require "fastlane_core"
-require "credentials_manager"
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
+
+require_relative 'module'
 
 module Pilot
   class Options
@@ -18,25 +20,28 @@ module Pilot
                                      env_name: "PILOT_APP_IDENTIFIER",
                                      description: "The bundle identifier of the app to upload or manage testers (optional)",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: ENV["TESTFLIGHT_APP_IDENTITIFER"] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
         FastlaneCore::ConfigItem.new(key: :app_platform,
                                      short_option: "-m",
                                      env_name: "PILOT_PLATFORM",
                                      description: "The platform to use (optional)",
                                      optional: true,
+                                     default_value: 'ios',
                                      verify_block: proc do |value|
-                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include? value
+                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :ipa,
                                      short_option: "-i",
                                      optional: true,
                                      env_name: "PILOT_IPA",
                                      description: "Path to the ipa file to upload",
+                                     code_gen_sensitive: true,
                                      default_value: Dir["*.ipa"].sort_by { |x| File.mtime(x) }.last,
                                      verify_block: proc do |value|
                                        value = File.expand_path(value)
-                                       UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist? value
-                                       UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with? ".ipa"
+                                       UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with?(".ipa")
                                      end),
         FastlaneCore::ConfigItem.new(key: :changelog,
                                      short_option: "-w",
@@ -77,11 +82,17 @@ module Pilot
                                      env_name: "PILOT_APPLE_ID",
                                      description: "The unique App ID provided by iTunes Connect",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: ENV["TESTFLIGHT_APPLE_ID"]),
         FastlaneCore::ConfigItem.new(key: :distribute_external,
                                      is_string: false,
                                      env_name: "PILOT_DISTRIBUTE_EXTERNAL",
                                      description: "Should the build be distributed to external testers?",
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :demo_account_required,
+                                     is_string: false,
+                                     env_name: "DEMO_ACCOUNT_REQUIRED",
+                                     description: "Do you need a demo account when Apple does review?",
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :first_name,
                                      short_option: "-f",
@@ -99,7 +110,7 @@ module Pilot
                                      description: "The tester's email",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       UI.user_error!("Please pass a valid email address") unless value.include? "@"
+                                       UI.user_error!("Please pass a valid email address") unless value.include?("@")
                                      end),
         FastlaneCore::ConfigItem.new(key: :testers_file_path,
                                      short_option: "-c",
@@ -122,6 +133,7 @@ module Pilot
                                      description: "The ID of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
                                      is_string: false, # as we also allow integers, which we convert to strings anyway
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
@@ -131,6 +143,7 @@ module Pilot
                                      env_name: "PILOT_TEAM_NAME",
                                      description: "The name of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
@@ -140,6 +153,7 @@ module Pilot
                                      description: "The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!",
                                      optional: true,
                                      is_string: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
@@ -158,7 +172,12 @@ module Pilot
                                      type: Array,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :wait_for_uploaded_build,
+                                     env_name: "PILOT_WAIT_FOR_UPLOADED_BUILD",
+                                     description: "Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used",
+                                     is_string: false,
+                                     default_value: false)
       ]
     end
   end

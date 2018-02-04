@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class NumberOfCommitsAction < Action
       def self.is_git?
-        Actions.sh 'git rev-parse HEAD'
+        Actions.sh('git rev-parse HEAD')
         return true
       rescue
         return false
@@ -31,6 +31,10 @@ module Fastlane
 
       def self.return_value
         "The total number of all commits in current git branch"
+      end
+
+      def self.return_type
+        :int
       end
 
       def self.available_options

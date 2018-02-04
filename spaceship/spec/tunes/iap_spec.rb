@@ -9,7 +9,7 @@ describe Spaceship::Tunes::IAP do
     end
 
     it "Finds a specific product" do
-      expect(app.in_app_purchases.find("go.find.me")).not_to eq(nil)
+      expect(app.in_app_purchases.find("go.find.me")).not_to(eq(nil))
       expect(app.in_app_purchases.find("go.find.me").reference_name).to eq("localizeddemo")
     end
 
@@ -21,6 +21,7 @@ describe Spaceship::Tunes::IAP do
 
     describe "Create new IAP" do
       it "create consumable" do
+        expect(client.du_client).to receive(:get_picture_type).and_return("SortedScreenShot")
         expect(client.du_client).to receive(:upload_purchase_review_screenshot).and_return({ "token" => "tok", "height" => 100, "width" => 200, "md5" => "xxxx" })
         expect(Spaceship::UploadFile).to receive(:from_path).with("ftl_FAKEMD5_screenshot1024.jpg").and_return(du_uploadimage_correct_screenshot)
         app.in_app_purchases.create!(

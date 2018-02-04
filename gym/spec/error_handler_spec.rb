@@ -11,7 +11,7 @@ describe Gym do
 %)
   end
 
-  describe Gym::ErrorHandler do
+  describe Gym::ErrorHandler, requires_xcodebuild: true do
     before(:each) { Gym.config = @config }
 
     def mock_gym_path(content)
@@ -53,6 +53,36 @@ Code signing is required for product type 'Application' in SDK 'iOS 11.0'
       expect(UI).to receive(:command_output).at_least(:once) # as this is called multiple times before
 
       Gym::ErrorHandler.handle_build_error(code_signing_output)
+    end
+
+    it "prints mismatch between the export_method and the selected profiles only once" do
+      mock_gym_path(@output)
+      expect(UI).to receive(:build_failure!).with("Error building the application - see the log above", error_info: @output)
+
+      Gym.config[:export_method] = 'app-store'
+      Gym.config[:export_options][:provisioningProfiles] = {
+        'com.sample.app' => 'In House Ad Hoc'
+      }
+
+      expect(UI).to receive(:error).with(/There seems to be a mismatch between/).once
+      allow(UI).to receive(:error)
+
+      Gym::ErrorHandler.handle_build_error(@output)
+    end
+
+    it "does not print mismatch if the export_method and the selected profiles matched" do
+      mock_gym_path(@output)
+      expect(UI).to receive(:build_failure!).with("Error building the application - see the log above", error_info: @output)
+
+      Gym.config[:export_method] = 'enterprise'
+      Gym.config[:export_options][:provisioningProfiles] = {
+        'com.sample.app' => 'In House Ad Hoc' # `enterprise` take precedence over `ad-hoc`
+      }
+
+      expect(UI).to receive(:error).with(/There seems to be a mismatch between/).never
+      allow(UI).to receive(:error)
+
+      Gym::ErrorHandler.handle_build_error(@output)
     end
   end
 end

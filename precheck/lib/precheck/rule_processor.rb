@@ -1,6 +1,9 @@
-require 'spaceship'
+require 'spaceship/tunes/language_item'
 require 'fastlane/markdown_table_formatter'
-require 'precheck/item_to_check'
+
+require_relative 'module'
+require_relative 'item_to_check'
+require_relative 'rule'
 
 module Precheck
   # encapsulated the results of the rule processing, needed to return not just an array of the results of our
@@ -59,7 +62,7 @@ module Precheck
 
         if rule_level == RULE_LEVELS[:skip]
           skipped_rules << rule
-          UI.message "Skipped: #{rule.class.friendly_name}-> #{rule.description}".yellow
+          UI.message("Skipped: #{rule.class.friendly_name}-> #{rule.description}".yellow)
           next
         end
 
@@ -95,12 +98,12 @@ module Precheck
         if rule_failed_at_least_once
           message = "😵  Failed: #{rule.class.friendly_name}-> #{rule.description}"
           if rule_level == RULE_LEVELS[:error]
-            UI.error message
+            UI.error(message)
           else
-            UI.important message
+            UI.important(message)
           end
         else
-          UI.message "✅  Passed: #{rule.class.friendly_name}"
+          UI.message("✅  Passed: #{rule.class.friendly_name}")
         end
       end
 
@@ -179,14 +182,14 @@ module Precheck
 
       should_include_iap = Precheck.config[:include_in_app_purchases]
       if should_include_iap
-        UI.message "Reading in-app purchases. If you have a lot, this might take a while"
-        UI.message "You can disable IAP checking by setting the `include_in_app_purchases` flag to `false`"
+        UI.message("Reading in-app purchases. If you have a lot, this might take a while")
+        UI.message("You can disable IAP checking by setting the `include_in_app_purchases` flag to `false`")
         in_app_purchases = app.in_app_purchases.all
         in_app_purchases ||= []
         in_app_purchases.each do |purchase|
           items += collect_iap_language_items(purchase_edit_versions: purchase.edit.versions)
         end
-        UI.message "Done reading in-app purchases"
+        UI.message("Done reading in-app purchases")
       end
 
       return items

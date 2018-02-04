@@ -1,5 +1,7 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
+
+require_relative 'module'
 
 module PEM
   class Options
@@ -22,6 +24,7 @@ module PEM
                                      env_name: "PEM_ACTIVE_DAYS_LIMIT",
                                      description: "If the current certificate is active for less than this number of days, generate a new one. Default value is 30 days",
                                      default_value: 30,
+                                     is_string: false,
                                      verify_block: proc do |value|
                                        UI.user_error!("Value of active_days_limit must be a positive integer or left blank") unless value.kind_of?(Integer) && value > 0
                                      end),
@@ -40,6 +43,7 @@ module PEM
                                      short_option: "-a",
                                      env_name: "PEM_APP_IDENTIFIER",
                                      description: "The bundle identifier of your app",
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
@@ -49,6 +53,7 @@ module PEM
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
                                      env_name: "PEM_TEAM_ID",
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      description: "The ID of your Developer Portal team if you're in multiple teams",
                                      optional: true,
@@ -60,6 +65,7 @@ module PEM
                                      env_name: "PEM_TEAM_NAME",
                                      description: "The name of your Developer Portal team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s

@@ -1,3 +1,7 @@
+require_relative 'ui/ui'
+require_relative 'globals'
+require_relative 'fastlane_pty'
+
 module FastlaneCore
   # Executes commands and takes care of error handling and more
   class CommandExecutor
@@ -11,12 +15,13 @@ module FastlaneCore
       def which(cmd)
         # PATHEXT contains the list of file extensions that Windows considers executable, semicolon separated.
         # e.g. ".COM;.EXE;.BAT;.CMD"
-        exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
+        exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : []
+        exts << '' # Always have an empty string (= no file extension)
 
         ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
           exts.each do |ext|
             cmd_path = File.join(path, "#{cmd}#{ext}")
-            return cmd_path if File.executable?(cmd_path) && !File.directory?(cmd_path)
+            return cmd_path if Helper.executable?(cmd_path)
           end
         end
 
@@ -44,12 +49,13 @@ module FastlaneCore
         end
 
         begin
-          PTY.spawn(command) do |stdin, stdout, pid|
+          FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
             begin
               if pid_created
                 pid_created.call(pid)
               end
               stdin.each do |l|
+              #command_stdout.each do |l|
                 line = l.strip # strip so that \n gets removed
                 output << line
 
@@ -74,7 +80,7 @@ module FastlaneCore
           # > invalid byte sequence in US-ASCII (ArgumentError)
           output << ex.to_s
           o = output.join("\n")
-          puts o
+          puts(o)
           if error
             error.call(o, nil)
           else
@@ -86,8 +92,8 @@ module FastlaneCore
         status = $?.exitstatus
         if status != 0
           o = output.join("\n")
-          puts o # the user has the right to see the raw output
-          UI.error "Exit status: #{status}"
+          puts(o) # the user has the right to see the raw output
+          UI.error("Exit status: #{status}")
           if error
             error.call(o, status)
           else

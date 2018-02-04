@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         # Warning about usinging new plugin
         UI.important("It's recommended to use the official Sentry Fastlane plugin")
-        UI.important("Github: https://github.com/getsentry/fastlane-plugin-sentry")
+        UI.important("GitHub: https://github.com/getsentry/fastlane-plugin-sentry")
         UI.important("Installation: fastlane add_plugin sentry")
 
         Actions.verify_gem!('rest-client')
@@ -40,7 +40,7 @@ module Fastlane
           resource = RestClient::Resource.new(url, headers: { Authorization: "Bearer #{auth_token}" })
         end
 
-        UI.message "Will upload dSYM(s) to #{url}"
+        UI.message("Will upload dSYM(s) to #{url}")
 
         # Upload dsym(s)
         dsym_paths += [dsym_path]
@@ -53,13 +53,13 @@ module Fastlane
       end
 
       def self.upload_dsym(resource, dsym)
-        UI.message "Uploading... #{dsym}"
+        UI.message("Uploading... #{dsym}")
         resource.post(file: File.new(dsym, 'rb')) unless Helper.test?
-        UI.success 'dSYM successfully uploaded to Sentry!'
+        UI.success('dSYM successfully uploaded to Sentry!')
 
         dsym
       rescue
-        UI.user_error! 'Error while trying to upload dSYM to Sentry'
+        UI.user_error!('Error while trying to upload dSYM to Sentry')
       end
 
       #####################################################

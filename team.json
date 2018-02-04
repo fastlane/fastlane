@@ -1,0 +1,74 @@
+{
+  "KrauseFx": {
+    "name": "Felix Krause",
+    "twitter": "KrauseFx",
+    "slogan": "Professional iOS Code Signing Issue Resolver"
+  },
+  "taquitos": {
+    "name": "Joshua Liebowitz",
+    "twitter": "taquitos"
+  },
+  "milch": {
+    "name": "Manu Wallner",
+    "twitter": "acrooow"
+  },
+  "hjanuschka": {
+    "name": "Helmut Januschka",
+    "twitter": "hjanuschka"
+  },
+  "lacostej": {
+    "name": "Jérôme Lacoste",
+    "twitter": "lacostej"
+  },
+  "giginet": {
+    "name": "Kohki Miki",
+    "twitter": "giginet"
+  },
+  "janpio": {
+    "name": "Jan Piotrowski",
+    "twitter": "Sujan"
+  },
+  "AliSoftware": {
+    "name": "Olivier Halligon",
+    "twitter": "aligatr"
+  },
+  "mgrebenets": {
+    "name": "Maksym Grebenets",
+    "twitter": "mgrebenets"
+  },
+  "jdee": {
+    "name": "Jimmy Dee"
+  },
+  "joshdholtz": {
+    "name": "Josh Holtz",
+    "twitter": "joshdholtz"
+  },
+  "matthewellis": {
+    "name": "Matthew Ellis",
+    "twitter": "mellis1995"
+  },
+  "getaaron": {
+    "name": "Aaron Brager",
+    "twitter": "getaaron"
+  },
+  "nafu": {
+    "name": "Fumiya Nakamura",
+    "twitter": "nafu003"
+  },
+  "DanToml": {
+    "name": "Danielle Tomlinson",
+    "twitter": "DanToml"
+  },
+  "lmirosevic": {
+    "name": "Luka Mirosevic",
+    "twitter": "lmirosevic"
+  },
+  "revolter": {
+    "name": "Iulian Onofrei",
+    "twitter": "Revolt666"
+  },
+  "snatchev": {
+    "name": "Stefan Natchev",
+    "twitter": "snatchev"
+  }
+}

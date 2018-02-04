@@ -97,7 +97,7 @@ describe Match do
           with(to_params).
           and_return(nil)
 
-        command = "git branch --list origin/#{git_branch} --no-color -r"
+        command = "git --no-pager branch --list origin/#{git_branch} --no-color -r"
         to_params = {
           command: command,
           print_all: nil,

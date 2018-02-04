@@ -1,5 +1,10 @@
-require 'faraday'
 require 'json'
+
+require_relative '../env'
+require_relative '../helper'
+require_relative '../globals'
+require_relative '../ui/ui'
+require_relative 'crash_report_generator'
 
 module FastlaneCore
   class CrashReporter
@@ -57,7 +62,7 @@ module FastlaneCore
         UI.message("Sending crash report...")
         UI.message("The stack trace is sanitized so no personal information is sent.")
         UI.message("To see what we are sending, look here: #{crash_report_path}")
-        UI.message("Learn more at https://github.com/fastlane/fastlane#crash-reporting")
+        UI.message("Learn more at https://docs.fastlane.tools/actions/opt_out_crash_reporting/")
         UI.message("You can disable crash reporting by adding `opt_out_crash_reporting` at the top of your Fastfile")
       end
 
@@ -87,6 +92,7 @@ module FastlaneCore
       end
 
       def send_report(payload: "{}")
+        require 'faraday'
         connection = Faraday.new(url: "https://clouderrorreporting.googleapis.com/v1beta1/projects/fastlane-166414/events:report?key=AIzaSyAMACPfuI-wi4grJWEZjcPvhfV2Rhmddwo")
         connection.post do |request|
           request.headers['Content-Type'] = 'application/json'

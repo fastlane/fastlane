@@ -1,34 +1,8 @@
-<h3 align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
-    <img src="../fastlane/assets/fastlane.png" width="150" />
-    <br />
-    fastlane
-  </a>
-</h3>
-<p align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/pilot">pilot</a> &bull;
-  <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/precheck">precheck</a>
-</p>
-
--------
-
 FastlaneCore
 ============
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/fastlane_core/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
 
 All shared code of the fastlane tools is stored in this repository.
 
@@ -45,6 +19,56 @@ This gem contains all shared classes and code:
 - More helper methods and classes
 
 You can hide the inline changelog by setting the `FASTLANE_HIDE_CHANGELOG` environment variable
+
+## Timestamps
+
+To hide timestamps in each row, set the `FASTLANE_HIDE_TIMESTAMP` environment variable.
+
+## Interacting with the user
+
+Instead of using `puts`, `raise` and `gets`, please use the helper class `UI` across all fastlane tools:
+
+```ruby
+UI.message "Neutral message (usually white)"
+UI.success "Successfully finished processing (usually green)"
+UI.error "Wahaha, what's going on here! (usually red)"
+UI.important "Make sure to use Windows (usually yellow)"
+
+UI.header "Inputs" # a big box
+
+name = UI.input("What's your name? ")
+if UI.confirm("Are you '#{name}'?")
+  UI.success "Oh yeah"
+else
+  UI.error "Wups, invalid"
+end
+
+UI.password("Your password please: ") # password inputs are hidden
+
+###### A "Dropdown" for the user
+project = UI.select("Select your project: ", ["Test Project", "Test Workspace"])
+
+UI.success("Okay #{name}, you selected '#{project}'")
+
+###### To run a command use
+FastlaneCore::CommandExecutor.execute(command: "ls",
+                                    print_all: true,
+                                        error: proc do |error_output|
+                                          # handle error here
+                                        end)
+
+###### or if you just want to receive a simple value use this only if the command doesn't take long
+diff = Helper.backticks("git diff")
+
+###### fastlane "crash" because of a user error everything that is caused by the user and is not unexpected
+UI.user_error!("You don't have a project in the current directory")
+
+###### an actual crash when something unexpected happened
+UI.crash!("Network timeout")
+
+###### a deprecation message
+UI.deprecated("The '--key' parameter is deprecated")
+```
 
 # Code of Conduct
 Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).

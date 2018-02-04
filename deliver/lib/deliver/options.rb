@@ -1,7 +1,11 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
+
+require_relative 'module'
+require_relative 'upload_assets'
 
 module Deliver
+  # rubocop:disable Metrics/ClassLength
   class Options
     def self.available_options
       user = CredentialsManager::AppfileConfig.try_fetch_value(:itunes_connect_id)
@@ -19,6 +23,7 @@ module Deliver
                                      env_name: "DELIVER_APP_IDENTIFIER",
                                      description: "The bundle identifier of your app",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
         FastlaneCore::ConfigItem.new(key: :app,
                                      short_option: "-p",
@@ -37,6 +42,7 @@ module Deliver
                                      optional: true,
                                      env_name: "DELIVER_IPA_PATH",
                                      description: "Path to your ipa file",
+                                     code_gen_sensitive: true,
                                      default_value: Dir["*.ipa"].sort_by { |x| File.mtime(x) }.last,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find ipa file at path '#{File.expand_path(value)}'") unless File.exist?(value)
@@ -51,6 +57,7 @@ module Deliver
                                      optional: true,
                                      env_name: "DELIVER_PKG_PATH",
                                      description: "Path to your pkg file",
+                                     code_gen_sensitive: true,
                                      default_value: Dir["*.pkg"].sort_by { |x| File.mtime(x) }.last,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find pkg file at path '#{File.expand_path(value)}'") unless File.exist?(value)
@@ -67,7 +74,7 @@ module Deliver
                                      optional: true,
                                      default_value: "ios",
                                      verify_block: proc do |value|
-                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include? value
+                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :metadata_path,
                                      short_option: '-m',
@@ -79,6 +86,10 @@ module Deliver
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_binary_upload,
                                      description: "Skip uploading an ipa or pkg to iTunes Connect",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :use_live_version,
+                                     description: "Force usage of live version rather than edit version",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_screenshots,
@@ -111,11 +122,20 @@ module Deliver
                                      description: "Should the app be automatically released once it's approved?",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :auto_release_date,
+                                     env_name: "DELIVER_AUTO_RELEASE_DATE",
+                                     description: "Date in milliseconds for automatically releasing on pending approval",
+                                     is_string: false,
+                                     optional: true,
+                                     conflicting_options: [:automatic_release],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'auto_release_date' and '#{value.key}' options together.")
+                                     end),
         FastlaneCore::ConfigItem.new(key: :phased_release,
                                      description: "Enable the phased release feature of iTC",
                                      optional: true,
                                      is_string: false,
-                                     default_value: nil),
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :price_tier,
                                      short_option: "-r",
                                      description: "The price tier of this application",
@@ -136,7 +156,7 @@ module Deliver
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find config file at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                       UI.user_error! "'#{value}' doesn't seem to be a JSON file" unless FastlaneCore::Helper.json_file?(File.expand_path(value))
+                                       UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless FastlaneCore::Helper.json_file?(File.expand_path(value))
                                      end),
         FastlaneCore::ConfigItem.new(key: :submission_information,
                                      short_option: "-b",
@@ -149,6 +169,7 @@ module Deliver
                                      description: "The ID of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
                                      is_string: false, # as we also allow integers, which we convert to strings anyway
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
@@ -158,6 +179,7 @@ module Deliver
                                      env_name: "DELIVER_TEAM_NAME",
                                      description: "The name of your iTunes Connect team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
@@ -168,6 +190,7 @@ module Deliver
                                      description: "The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!",
                                      optional: true,
                                      is_string: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
@@ -177,6 +200,7 @@ module Deliver
                                      env_name: "DELIVER_DEV_PORTAL_TEAM_NAME",
                                      description: "The name of your Developer Portal team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s
@@ -254,11 +278,13 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :trade_representative_contact_information,
                                      description: "Metadata: A hash containing the trade representative contact information",
                                      optional: true,
-                                     is_string: false),
+                                     is_string: false,
+                                     type: Hash),
         FastlaneCore::ConfigItem.new(key: :app_review_information,
                                      description: "Metadata: A hash containing the review information",
                                      optional: true,
-                                     is_string: false),
+                                     is_string: false,
+                                     type: Hash),
         # Localised
         FastlaneCore::ConfigItem.new(key: :description,
                                      description: "Metadata: The localised app description",
@@ -272,6 +298,7 @@ module Deliver
                                      description: "Metadata: The localised app subtitle",
                                      optional: true,
                                      is_string: false,
+                                     type: Hash,
                                      verify_block: proc do |value|
                                        UI.user_error!(":subtitle must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                      end),
@@ -279,6 +306,7 @@ module Deliver
                                      description: "Metadata: An array of localised keywords",
                                      optional: true,
                                      is_string: false,
+                                     type: Hash,
                                      verify_block: proc do |value|
                                        UI.user_error!(":keywords must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                        value.each do |language, keywords|
@@ -293,6 +321,7 @@ module Deliver
                                      description: "Metadata: An array of localised promotional texts",
                                      optional: true,
                                      is_string: false,
+                                     type: Hash,
                                      verify_block: proc do |value|
                                        UI.user_error!(":keywords must be a hash, with the language being the key") unless value.kind_of?(Hash)
                                      end),
@@ -322,8 +351,15 @@ module Deliver
                                      env_name: "DELIVER_IGNORE_LANGUAGE_DIRECTORY_VALIDATION",
                                      description: "Ignore errors when invalid languages are found in metadata and screeenshot directories",
                                      default_value: false,
-                                     is_string: false)
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :precheck_include_in_app_purchases,
+                                     env_name: "PRECHECK_INCLUDE_IN_APP_PURCHASES",
+                                     description: "Should precheck check in-app purchases?",
+                                     is_string: false,
+                                     optional: true,
+                                     default_value: true)
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

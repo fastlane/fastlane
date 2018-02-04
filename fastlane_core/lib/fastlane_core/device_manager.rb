@@ -1,6 +1,9 @@
 require 'open3'
 require 'plist'
 
+require_relative 'command_executor'
+require_relative 'helper'
+
 module FastlaneCore
   class DeviceManager
     class << self
@@ -17,6 +20,18 @@ module FastlaneCore
         output = ''
         Open3.popen3('xcrun simctl list devices') do |stdin, stdout, stderr, wait_thr|
           output = stdout.read
+        end
+
+        runtime_info = ''
+        Open3.popen3('xcrun simctl list runtimes') do |stdin, stdout, stderr, wait_thr|
+          # This regex outputs the version info in the format "<platform> <version><exact version>"
+          runtime_info = stdout.read.lines.map { |v| v.sub(/(\w+ \S+)\s*\((\S+)\s[\S\s]*/, "\\1 \\2") }.drop(1)
+        end
+        exact_versions = Hash.new({})
+        runtime_info.each do |r|
+          platform, general, exact = r.split
+          exact_versions[platform] = {} unless exact_versions.include?(platform)
+          exact_versions[platform][general] = exact
         end
 
         unless output.include?("== Devices ==")
@@ -40,7 +55,8 @@ module FastlaneCore
             name = matches.join(' ')
 
             if matches.count && (os_type == requested_os_type || requested_os_type == "")
-              @devices << Device.new(name: name, os_type: os_type, os_version: os_version, udid: udid, state: state, is_simulator: true)
+              # This is disabled here because the Device is defined later in the file, and that's a problem for the cop
+              @devices << Device.new(name: name, os_type: os_type, os_version: (exact_versions[os_type][os_version] || os_version), udid: udid, state: state, is_simulator: true)
             end
           end
         end
@@ -107,6 +123,13 @@ module FastlaneCore
         if is_supported_device && has_serial_number
           discovered_device_udids << usb_item['serial_num']
         end
+      end
+
+      def latest_simulator_version_for_device(device)
+        simulators.select { |s| s.name == device }
+                  .sort_by { |s| Gem::Version.create(s.os_version) }
+                  .last
+                  .os_version
       end
 
       # The code below works from Xcode 7 on
@@ -232,7 +255,7 @@ module FastlaneCore
 
         simulator_path = File.join(Helper.xcode_path, 'Applications', 'Simulator.app')
 
-        UI.verbose "Launching #{simulator_path} for device: #{device.name} (#{device.udid})"
+        UI.verbose("Launching #{simulator_path} for device: #{device.name} (#{device.udid})")
 
         Helper.backticks("open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}", print: FastlaneCore::Globals.verbose?)
       end
@@ -263,7 +286,7 @@ module FastlaneCore
 
         FileUtils.rm_f(logfile_dst)
         FileUtils.cp(logfile_src, logfile_dst)
-        UI.success "Copying file '#{logfile_src}' to '#{logfile_dst}'..."
+        UI.success("Copying file '#{logfile_src}' to '#{logfile_dst}'...")
       end
 
       def copy_logarchive(device, log_identity, logs_destination_dir)

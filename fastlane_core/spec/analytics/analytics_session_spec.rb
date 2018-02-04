@@ -1,5 +1,6 @@
 describe FastlaneCore::AnalyticsSession do
   let(:oauth_app_name) { 'fastlane-tests' }
+  let(:configuration_language) { 'ruby' }
   let(:p_hash) { 'some.phash.value' }
   let(:session_id) { 's0m3s3ss10n1D' }
   let(:timestamp_millis) { 1_507_142_046 }
@@ -11,6 +12,7 @@ describe FastlaneCore::AnalyticsSession do
   before(:each) do
     # This value needs to be set or our event fixtures will not match
     allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
+    allow(FastlaneCore::Helper).to receive(:operating_system).and_return('macOS')
   end
 
   context 'single action execution' do
@@ -21,7 +23,8 @@ describe FastlaneCore::AnalyticsSession do
         FastlaneCore::ActionLaunchContext.new(
           action_name: action_name,
           p_hash: p_hash,
-          platform: 'ios'
+          platform: 'ios',
+          configuration_language: configuration_language
         )
       end
 
@@ -109,7 +112,8 @@ describe FastlaneCore::AnalyticsSession do
         FastlaneCore::ActionLaunchContext.new(
           action_name: action_1_name,
           p_hash: p_hash,
-          platform: 'ios'
+          platform: 'ios',
+          configuration_language: configuration_language
         )
       end
       let(:action_1_completion_context) do
@@ -123,7 +127,8 @@ describe FastlaneCore::AnalyticsSession do
         FastlaneCore::ActionLaunchContext.new(
           action_name: action_2_name,
           p_hash: p_hash,
-          platform: 'ios'
+          platform: 'ios',
+          configuration_language: configuration_language
         )
       end
       let(:action_2_completion_context) do
@@ -250,7 +255,7 @@ describe FastlaneCore::AnalyticsSession do
           event[:action][:name] == 'completed'
         end
         expect(completion_events.count).to eq(4)
-        expect(FastlaneCore.session.client).not_to receive(:post_events)
+        expect(FastlaneCore.session.client).not_to(receive(:post_events))
         FastlaneCore.session.finalize_session
       end
     end

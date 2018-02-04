@@ -11,16 +11,16 @@ module Fastlane
         # will reanable it when it is fixed
         # result = Fastlane::Actions.sh(command.join(' '), log: false)
         shell_command = command.join(' ')
-        return shell_command if Helper.is_test?
+        return shell_command if Helper.test?
         result = Actions.sh(shell_command)
         fail_on_error(result)
       end
 
       def self.fail_on_error(result)
         if result != "200"
-          UI.crash! "Server error, failed to upload the dSYM file."
+          UI.crash!("Server error, failed to upload the dSYM file.")
         else
-          UI.success 'dSYM successfully uploaded to Apteligent!'
+          UI.success('dSYM successfully uploaded to Apteligent!')
         end
       end
 

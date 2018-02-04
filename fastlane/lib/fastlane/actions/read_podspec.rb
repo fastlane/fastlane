@@ -61,7 +61,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code
@@ -77,6 +77,10 @@ module Fastlane
         {
           'version' => 1.0
         }
+      end
+
+      def self.return_type
+        :hash_of_strings
       end
 
       def self.category
