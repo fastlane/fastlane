@@ -18,47 +18,43 @@ require_relative 'snapshot/simulator_launchers/simulator_launcher'
 require_relative 'snapshot/simulator_launchers/simulator_launcher_xcode_8'
 require_relative 'snapshot/module'
 require 'snapshot/command_listener'
-#require_relative 'snapshot/command_listener'
-#require 'fastlane_core'
-#require_relative 'fastlane_core'
-require 'open3'
-#require_relative 'open3'
-
-module Snapshot
-  # Use this to just setup the configuration attribute and set it later somewhere else
-  class << self
-    attr_accessor :config
-
-    attr_accessor :project
-
-    attr_accessor :cache
-
-    def config=(value)
-      @config = value
-      DetectValues.set_additional_default_values
-      @cache = {}
-    end
-
-    def snapfile_name
-      "Snapfile"
-    end
-
-    def kill_simulator
-      `killall 'iOS Simulator' &> /dev/null`
-      `killall Simulator &> /dev/null`
-    end
-  end
-
-  Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
-  UI = FastlaneCore::UI
-  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
-  DESCRIPTION = "Automate taking localized screenshots of your iOS and tvOS apps on every device"
-  CACHE_DIR = File.join(Dir.home, "Library/Caches/tools.fastlane")
-  SCREENSHOTS_DIR = File.join(CACHE_DIR, 'screenshots')
-
-  Snapshot::DependencyChecker.check_dependencies
-
-  def self.min_xcode7?
-    xcode_version.split(".").first.to_i >= 7
-  end
-end
+#require 'open3'
+#
+#module Snapshot
+#  # Use this to just setup the configuration attribute and set it later somewhere else
+#  class << self
+#    attr_accessor :config
+#
+#    attr_accessor :project
+#
+#    attr_accessor :cache
+#
+#    def config=(value)
+#      @config = value
+#      DetectValues.set_additional_default_values
+#      @cache = {}
+#    end
+#
+#    def snapfile_name
+#      "Snapfile"
+#    end
+#
+#    def kill_simulator
+#      `killall 'iOS Simulator' &> /dev/null`
+#      `killall Simulator &> /dev/null`
+#    end
+#  end
+#
+#  Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
+#  UI = FastlaneCore::UI
+#  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
+#  DESCRIPTION = "Automate taking localized screenshots of your iOS and tvOS apps on every device"
+#  CACHE_DIR = File.join(Dir.home, "Library/Caches/tools.fastlane")
+#  SCREENSHOTS_DIR = File.join(CACHE_DIR, 'screenshots')
+#
+#  Snapshot::DependencyChecker.check_dependencies
+#
+#  def self.min_xcode7?
+#    xcode_version.split(".").first.to_i >= 7
+#  end
+#end
