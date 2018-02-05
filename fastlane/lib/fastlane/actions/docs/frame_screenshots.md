@@ -116,9 +116,9 @@ The general parameters are defined in the `default` key and can be:
 
 | Key | Description | Default value |
 |-----|-------------|---------------|
-| `background` | TODO | TODO |
+| `background` | The background that should be used for the framed screenshot. Specify the (relative) path to the image file (e.g. *.jpg). This parameter is mandatory. | NA |
 | `keyword` | An object that contains up to 3 keys to describe the optional keyword. See [table](#keyword-and-title-parameters) below. | NA |
-| `title` | An object that contains up to 3 keys to describe the mandatory title. TODO: Link to the table below | NA |
+| `title` | An object that contains up to 3 keys to describe the mandatory title. See [table](#keyword-and-title-parameters) below. | NA |
 | `stack_title` | Specifies whether _frameit_ should display the keyword above the title when both keyword and title are defined. If it is false, the title and keyword will be displayed side by side when both keyword and title are defined. | `false` |
 | `title_below_image` | Specifies whether _frameit_ should place the title and optional keyword below the device frame. If it is false, it will be placed above the device frame. | `false` |
 | `show_complete_frame` | Specifies whether _frameit_ should shrink the device frame so that it is completely shown in the framed screenshot. If it is false, clipping of the device frame might occur at the bottom (when `title_below_image` is `false`) or top (when `title_below_image` is `true`) of the framed screenshot. | `false` |
@@ -143,7 +143,7 @@ The `keyword` and `title` parameters are both used in `default` and `data`. They
 |-----|-------------|---------------|
 | `color` | The font color for the text. Specify a hex/html color code. <P> TODO: The `color` value is directly used by Editor.rb to call MiniMagick function `-fill`. This supports 3 different inputs see:  http://www.imagemagick.org/script/command-line-options.php?#fill | `#000000` (black) |
 | `font` | The font family for the text. Specify the (relative) path to the font file (e.g. a TrueType Font). | TODO: It's not in the Editor.rb class, but uses the MiniMagick default which is system dependent. |
-| `text` | The text that should be used for the `keyword` or `title`. <P> Note: If you want to use localised text, use `.strings` files (TODO: Link). | NA |
+| `text` | The text that should be used for the `keyword` or `title`. <P> Note: If you want to use localised text, use [`.strings` files](#strings-files). | NA |
 
 # Example
 ```json
@@ -207,7 +207,7 @@ You can find a more complex [configuration](https://github.com/fastlane/examples
 
 The `Framefile.json` should be in the `screenshots` folder, as seen in the [example](https://github.com/fastlane/examples/tree/master/MindNode/screenshots).
 
-#### `.strings` files
+#### <a name="strings-files"></a>`.strings` files
 
 To define the title and optionally the keyword, put two `.strings` files into the language folder (e.g. [en-US in the example project](https://github.com/fastlane/examples/tree/master/MindNode/screenshots/en-US))
 
