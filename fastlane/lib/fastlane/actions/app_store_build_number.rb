@@ -69,7 +69,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :initial_build_number,
                                        env_name: "INITIAL_BUILD_NUMBER",
                                        description: "sets the build number to given value if no build is in current train",
-                                       default_value: 1,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        short_option: "-a",

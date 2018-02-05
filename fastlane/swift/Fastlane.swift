@@ -33,7 +33,7 @@ func addGitTag(tag: String? = nil,
                                                                                              RubyCommand.Argument(name: "sign", value: sign)])
   _ = runner.executeCommand(command)
 }
-func appStoreBuildNumber(initialBuildNumber: String = "1",
+func appStoreBuildNumber(initialBuildNumber: String,
                          appIdentifier: String,
                          username: String,
                          teamId: String? = nil,
@@ -1323,6 +1323,10 @@ func dsymZip(archivePath: String? = nil,
                                                                                           RubyCommand.Argument(name: "all", value: all)])
   _ = runner.executeCommand(command)
 }
+func echo(message: String? = nil) {
+  let command = RubyCommand(commandID: "", methodName: "echo", className: nil, args: [RubyCommand.Argument(name: "message", value: message)])
+  _ = runner.executeCommand(command)
+}
 func ensureGitBranch(branch: String = "master") {
   let command = RubyCommand(commandID: "", methodName: "ensure_git_branch", className: nil, args: [RubyCommand.Argument(name: "branch", value: branch)])
   _ = runner.executeCommand(command)
@@ -2317,6 +2321,10 @@ func precheck(appIdentifier: String = precheckfile.appIdentifier,
                                                                                           RubyCommand.Argument(name: "free_stuff_in_iap", value: freeStuffInIap)])
   _ = runner.executeCommand(command)
 }
+func println(message: String? = nil) {
+  let command = RubyCommand(commandID: "", methodName: "println", className: nil, args: [RubyCommand.Argument(name: "message", value: message)])
+  _ = runner.executeCommand(command)
+}
 func produce(username: String,
              appIdentifier: String,
              bundleIdentifierSuffix: String? = nil,
@@ -2385,7 +2393,7 @@ func pushToGitRemote(localBranch: String? = nil,
                                                                                                     RubyCommand.Argument(name: "remote", value: remote)])
   _ = runner.executeCommand(command)
 }
-func puts(message: String) {
+func puts(message: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "puts", className: nil, args: [RubyCommand.Argument(name: "message", value: message)])
   _ = runner.executeCommand(command)
 }
@@ -3666,15 +3674,19 @@ func verifyXcode(xcodePath: String) {
 func versionBumpPodspec(path: String,
                         bumpType: String = "patch",
                         versionNumber: String? = nil,
-                        versionAppendix: String? = nil) {
+                        versionAppendix: String? = nil,
+                        requireVariablePrefix: Bool = true) {
   let command = RubyCommand(commandID: "", methodName: "version_bump_podspec", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
                                                                                                       RubyCommand.Argument(name: "bump_type", value: bumpType),
                                                                                                       RubyCommand.Argument(name: "version_number", value: versionNumber),
-                                                                                                      RubyCommand.Argument(name: "version_appendix", value: versionAppendix)])
+                                                                                                      RubyCommand.Argument(name: "version_appendix", value: versionAppendix),
+                                                                                                      RubyCommand.Argument(name: "require_variable_prefix", value: requireVariablePrefix)])
   _ = runner.executeCommand(command)
 }
-func versionGetPodspec(path: String) {
-  let command = RubyCommand(commandID: "", methodName: "version_get_podspec", className: nil, args: [RubyCommand.Argument(name: "path", value: path)])
+func versionGetPodspec(path: String,
+                       requireVariablePrefix: Bool = true) {
+  let command = RubyCommand(commandID: "", methodName: "version_get_podspec", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
+                                                                                                     RubyCommand.Argument(name: "require_variable_prefix", value: requireVariablePrefix)])
   _ = runner.executeCommand(command)
 }
 func xcarchive() {
@@ -3789,4 +3801,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.2]
+// FastlaneRunnerAPIVersion [0.9.4]

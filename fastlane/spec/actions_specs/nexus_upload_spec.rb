@@ -121,7 +121,7 @@ describe Fastlane do
         expect(result).to include('-u admin:admin123')
         expect(result).to include('--verbose')
         expect(result).to include('http://localhost:8081/my-nexus/service/local/artifact/maven/content')
-        expect(result).not_to(include('-x'))
+        expect(result).not_to(include('-x '))
         expect(result).not_to(include('--proxy-user'))
       end
     end
