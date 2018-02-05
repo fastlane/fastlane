@@ -85,9 +85,9 @@ When using _frameit_ without titles on top, the screenshots will have the full r
 
 ## Advanced Usage (optional)
 
-### Titles and Background
+### Text and Background
 
-With _frameit_ it's possible to add a custom background, title and text colors to your screenshots.
+With _frameit_ it's possible to add a custom background and text below or above the framed screenshots in fonts and colors you define.
 
 A working example can be found in the [fastlane examples](https://github.com/fastlane/examples/tree/master/MindNode/screenshots) project.
 
@@ -111,10 +111,12 @@ It has the following JSON structure:
 TODO list parameters first, then show example
 
 ### General parameters
+
 The general parameters are defined in the `default` key and can be:
 
 | Key | Description | Default value |
 |-----|-------------|---------------|
+| `background` | TODO | TODO |
 | `keyword` | An object that contains up to 3 keys to describe the optional keyword. TODO: Link to the table below | NA |
 | `title` | An object that contains up to 3 keys to describe the mandatory title. TODO: Link to the table below | NA |
 | `stack_title` | Specifies whether _frameit_ should display the keyword above the title when both keyword and title are defined. If it is false, the title and keyword will be displayed side by side when both keyword and title are defined. | `false` |
@@ -123,6 +125,7 @@ The general parameters are defined in the `default` key and can be:
 | `padding` | TODO: | `50` |
 
 ### Specific parameters
+
 The screenshot specific parameters are related to the keyword and title texts.
 These are defined in the `data` key. This is an array with the following keys for each screenshot:
 
@@ -133,6 +136,7 @@ These are defined in the `data` key. This is an array with the following keys fo
 | `title` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
 
 #### Framefile `keyword` and `title` parameters
+
 The `keyword` and `title` parameters are both used in `default` and `data`. They both consist of the following optional keys:
 | Key | Description | Default value |
 |-----|-------------|---------------|
