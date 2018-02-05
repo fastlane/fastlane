@@ -93,14 +93,20 @@ module Match
       command << "-out #{tmpfile.shellescape}"
       command << "-a"
       command << "-d" unless encrypt
-      command << "&> /dev/null" unless FastlaneCore::Globals.verbose? # to show an error message if something goes wrong
 
       _out, err, st = Open3.capture3(command.join(' '))
       success = st.success?
 
-      # Ubuntu `openssl` does not fail on failure
-      # but at least outputs an error message
       unless err.to_s.empty?
+        # to show an error message if something goes wrong
+        if FastlaneCore::Globals.verbose?
+          UI.error("`openssl` failed with an error:")
+          UI.error(err)
+        end
+
+        # Ubuntu `openssl` does not fail on failure
+        # but at least outputs an error message -
+        # so we use that as indication of failure
         success = false
       end
 
@@ -108,7 +114,7 @@ module Match
 
       # On non-Mac systems (more specific Ubuntu Linux) it might take some time for the file to actually be there (see #11182).
       # To try to circumvent this flakyness (in tests), we wait a bit until the file appears (max 2s) (usually only 0.1 is actually waited)
-      unless FastlaneCore::Helper.is_mac?
+      unless FastlaneCore::Helper.mac?
         count = 0
         # sleep until file exists or 20*0.1s (=2s) passed
         until File.exist?(tmpfile) || count == 20

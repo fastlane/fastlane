@@ -14,7 +14,7 @@ File.write("#{lib}/fastlane/plugins/template/.rubocop.yml", YAML.dump(config))
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
-  spec.authors       = ["Josh Holtz", "Maksym Grebenets", "Manu Wallner", "Helmut Januschka", "Jérôme Lacoste", "Luka Mirosevic", "Jimmy Dee", "Danielle Tomlinson", "Aaron Brager", "Stefan Natchev", "Iulian Onofrei", "Olivier Halligon", "Jan Piotrowski", "Fumiya Nakamura", "Kohki Miki", "Joshua Liebowitz", "Matthew Ellis", "Felix Krause"]
+  spec.authors       = ["Fumiya Nakamura", "Maksym Grebenets", "Joshua Liebowitz", "Jérôme Lacoste", "Luka Mirosevic", "Jimmy Dee", "Jan Piotrowski", "Aaron Brager", "Kohki Miki", "Stefan Natchev", "Olivier Halligon", "Felix Krause", "Matthew Ellis", "Josh Holtz", "Iulian Onofrei", "Manu Wallner", "Danielle Tomlinson", "Helmut Januschka"]
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
   spec.description   = Fastlane::DESCRIPTION
@@ -39,7 +39,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('terminal-notifier', '>= 1.6.2', '< 2.0.0') # macOS notifications
   spec.add_dependency('terminal-table', '>= 1.4.5', '< 2.0.0') # Actions documentation
   spec.add_dependency('plist', '>= 3.1.0', '< 4.0.0') # Needed for set_build_number_repository and get_info_plist_value actions
-  spec.add_dependency('CFPropertyList', '>= 2.3', '< 3.0.0') # Needed to be able to read binary plist format
+  spec.add_dependency('CFPropertyList', '>= 2.3', '< 4.0.0') # Needed to be able to read binary plist format
   spec.add_dependency('addressable', '>= 2.3', '< 3.0.0') # Support for URI templates
   spec.add_dependency('multipart-post', '~> 2.0.0') # Needed for uploading builds to appetize
   spec.add_dependency('word_wrap', '~> 1.0.0') # to add line breaks for tables with long strings

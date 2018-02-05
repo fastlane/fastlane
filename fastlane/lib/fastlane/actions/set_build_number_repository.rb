@@ -50,7 +50,7 @@ module Fastlane
                                        verify_block: proc do |value|
                                          path = File.expand_path(value)
                                          UI.user_error!("Please pass the path to the project, not the workspace") if path.end_with?(".xcworkspace")
-                                         UI.user_error!("Could not find Xcode project at #{path}") unless Helper.is_test? || File.exist?(path)
+                                         UI.user_error!("Could not find Xcode project at #{path}") unless Helper.test? || File.exist?(path)
                                        end)
         ]
       end

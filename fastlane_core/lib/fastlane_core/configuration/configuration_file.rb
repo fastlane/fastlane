@@ -31,7 +31,7 @@ module FastlaneCore
       self.options = {}
 
       @block_for_missing = block_for_missing
-      content = File.read(path)
+      content = File.read(path, encoding: "utf-8")
 
       # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
       if content.tr!('“”‘’‛', %(""'''))

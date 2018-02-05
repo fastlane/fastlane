@@ -10,13 +10,22 @@ init:
 install:
   - set PATH=C:\Ruby24-x64\bin;%PATH%
   - bundle install
+  - cinst gtk-runtime # includes iconv
 
 environment:
   LC_ALL: en_US.UTF-8
   LANG: en_US.UTF-8
   FASTLANE_ITUNES_TRANSPORTER_PATH: C:/tmp
 
+before_test:
+  - ruby -v
+  - which ruby
+  - gem -v
+  - bundle -v
+  - which iconv
+  - which openssl
+
 build: off
 
 test_script:
-  - bundle exec fastlane test
+  - bundle exec fastlane execute_tests

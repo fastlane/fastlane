@@ -66,7 +66,19 @@ If you know exactly which `_spec.rb` file you want to run, use
 bundle exec rspec ./fastlane/spec/fastlane_require_spec.rb
 ```
 
-(replace `./fastlane/spec/fastlane_require_spec.rb` with the path of your test file of course)
+Replace `./fastlane/spec/fastlane_require_spec.rb` with the path of your test file of course.
+
+#### Specific unit test (group) in a specific test file
+
+If you know the specific unit test or unit test group you want to run, use
+
+```
+bundle exec rspec ./fastlane/spec/fastlane_require_spec.rb:17
+```
+
+The number is the line number of the unit test (`it ... do`) or unit test group (`describe ... do`) you want to run.
+
+Instead of using the line number you can also use a filter with the `it "something", now: true` notation and then use `bundle exec rspec -t now` to run this tagged test. (Note that `now` can be any random string of your choice.)
 
 ### Code style
 
@@ -78,9 +90,11 @@ bundle exec rubocop -a
 
 If you want to run code style verification only for one tool, use `bundle exec rubocop -a [tool_name]`
 
-### Test the changes for your application
+<!-- Make sure that this section is the same as the one in `ToolsAndDebugging.md` -->
 
-After introducing some changes to the _fastlane_ source code, you probably want to test the changes for your application.
+## Test your local _fastlane_ code base with your setup
+
+After introducing some changes to the _fastlane_ source code, you probably want to test the changes for your application. The easiest way to do so it use [bundler](https://bundler.io/).
 
 Copy the Gemfile [.assets/Gemfile](.assets/Gemfile) from your local _fastlane_ clone and drop it into your project's root folder.
 
@@ -101,7 +115,6 @@ From now on, every time you introduce a change to your local _fastlane_ code bas
 If you want to run a command with your normal _fastlane_ installation, simply do not run the command with the `bundle exec` prefix.
 
 To fully remove your local _fastlane_ from your local project again, delete the `Gemfile` you created above.
-
 
 ## Submitting the PR
 

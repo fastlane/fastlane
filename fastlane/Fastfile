@@ -11,14 +11,14 @@ lane(:test) do |options|
 end
 
 desc("Verifies all tests pass and the current state of the repo is valid")
-private_lane(:validate_repo) do
-  verify_source
+lane(:validate_repo) do
+  lint_source
   execute_tests
   validate_docs
 end
 
 desc("Verifies source code is in a good state")
-private_lane(:verify_source) do
+lane(:lint_source) do
   # Verifying that no debug code is in the code base
   #
   ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "playground.rb", exclude_dirs: ["\.bundle"]) # debugging code
@@ -34,22 +34,22 @@ private_lane(:verify_source) do
 
   Dir.chdir("..") do
     # Verify shell code style
-    if FastlaneCore::Helper.is_mac?
+    if FastlaneCore::Helper.mac?
       sh('find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +')
-    else
+    elsif !FastlaneCore::Helper.windows?
       sh('find . -regextype posix-egrep -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +')
     end
   end
 end
 
 desc("Runs the tests")
-private_lane(:execute_tests) do
+lane(:execute_tests) do
   version = local_version # has to be outside of the `Dir.chdir`
 
   # Verifying the --help command
-  #
   Dir.chdir("..") do
-    content = sh("PAGER=cat bin/fastlane --help")
+    cmd = Helper.windows? ? "cd bin && fastlane --help" : "PAGER=cat bin/fastlane --help"
+    content = sh(cmd)
     ["--version", "https://fastlane.tools", "fastlane"].each do |current|
       UI.user_error!("--help missing information: '#{current}'") unless content.include?(current)
     end
@@ -86,7 +86,7 @@ lane(:bump) do |options|
 
   # Verify everything is in a consistent state
   latest_version = current_version
-  local_version = version_get_podspec(path: version_file_path)
+  local_version = version_get_podspec(path: version_file_path, require_variable_prefix: false)
   UI.user_error!("Version on RubyGems doesn't match local repo: #{latest_version} != #{local_version}") if latest_version != local_version
 
   changelog_text = show_changelog
@@ -95,10 +95,10 @@ lane(:bump) do |options|
   bump_type ||= 'patch'
 
   slug = "fastlane/fastlane"
-  new_version = version_bump_podspec(path: version_file_path, bump_type: bump_type)
+  new_version = version_bump_podspec(path: version_file_path, bump_type: bump_type, require_variable_prefix: false)
 
   # Everything looks good, let's generate the Swift API
-  generated_files = generate_swift_api
+  generated_files = generate_swift_api(fastlane_version: new_version)
 
   # Alright, now let's update our FastlaneSwiftRunner manifest
   generated_files << generate_fastlane_swift_runner_manifest
@@ -147,7 +147,7 @@ end
 
 desc("Generate the Swift api and test it")
 lane(:generate_swift_api) do |options|
-  require "../fastlane/lib/fastlane/version.rb" # ensure we use the version we are releasing with
+  Fastlane::VERSION = options[:fastlane_version]
   require "../fastlane/lib/fastlane/swift_fastlane_api_generator.rb"
   swift_generator = Fastlane::SwiftFastlaneAPIGenerator.new
   generated_files = swift_generator.generate_swift
@@ -310,7 +310,7 @@ end
 # Docs
 
 desc("Validates the docs still are good")
-private_lane(:validate_docs) do
+lane(:validate_docs) do
   # Test if generating the docs is successful
   clone_docs do
     generate_markdown_docs(target_path: ".")

@@ -190,7 +190,7 @@ module FastlaneCore
     end
 
     def ci?
-      return Helper.is_ci?
+      return Helper.ci?
     end
 
     def operating_system_version

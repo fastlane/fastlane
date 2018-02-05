@@ -156,9 +156,11 @@ describe FastlaneCore do
     end
 
     it "raises an exception if path was not found" do
+      tmp_path = Dir.mktmpdir
+      path = "#{tmp_path}/notHere123"
       expect do
-        FastlaneCore::Project.new(project: "/tmp/notHere123")
-      end.to raise_error("Could not find project at path '/tmp/notHere123'")
+        FastlaneCore::Project.new(project: path)
+      end.to raise_error("Could not find project at path '#{path}'")
     end
 
     describe "Valid Standard Project" do
@@ -301,7 +303,7 @@ describe FastlaneCore do
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
         expect(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2> /dev/null"
-        expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 10, retries: 3, print: false }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
+        expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 3, retries: 3, print: false }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
         expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
       end
 
@@ -310,7 +312,7 @@ describe FastlaneCore do
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
         expect(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
         command = "xcodebuild clean -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2> /dev/null"
-        expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 10, retries: 3, print: false }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
+        expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 3, retries: 3, print: false }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
         expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
       end
     end
@@ -353,7 +355,7 @@ describe FastlaneCore do
         ENV['FASTLANE_XCODE_LIST_TIMEOUT'] = nil
       end
       it "returns default value" do
-        expect(FastlaneCore::Project.xcode_list_timeout).to eq(10)
+        expect(FastlaneCore::Project.xcode_list_timeout).to eq(3)
       end
       it "returns specified value" do
         ENV['FASTLANE_XCODE_LIST_TIMEOUT'] = '5'
@@ -374,7 +376,7 @@ describe FastlaneCore do
         ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = nil
       end
       it "returns default value" do
-        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(10)
+        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(3)
       end
       it "returns specified value" do
         ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = '5'
@@ -417,7 +419,7 @@ describe FastlaneCore do
       end
 
       it "runs simple commands" do
-        cmd = 'echo "HO"'
+        cmd = 'echo HO' # note: this command is deliberately not using `"` around `HO` as `echo` would echo those back on Windows
         expect(FastlaneCore::Project.run_command(cmd)).to eq("HO\n")
       end
 
@@ -435,7 +437,7 @@ describe FastlaneCore do
         end.to raise_error(Timeout::Error)
 
         # on mac this before only partially works as expected
-        if FastlaneCore::Helper.is_mac?
+        if FastlaneCore::Helper.mac?
           # this shows the current implementation issue
           # Timeout doesn't kill the running process
           # i.e. see fastlane/fastlane_core#102
@@ -453,7 +455,7 @@ describe FastlaneCore do
         expect(FastlaneCore::Project).to receive(:`).and_call_original.exactly(4).times
 
         expect do
-          FastlaneCore::Project.run_command(cmd, timeout: 1, retries: 3)
+          FastlaneCore::Project.run_command(cmd, timeout: 0.2, retries: 3)
         end.to raise_error(Timeout::Error)
       end
     end

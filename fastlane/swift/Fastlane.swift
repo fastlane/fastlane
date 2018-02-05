@@ -33,7 +33,7 @@ func addGitTag(tag: String? = nil,
                                                                                              RubyCommand.Argument(name: "sign", value: sign)])
   _ = runner.executeCommand(command)
 }
-func appStoreBuildNumber(initialBuildNumber: String = "1",
+func appStoreBuildNumber(initialBuildNumber: String,
                          appIdentifier: String,
                          username: String,
                          teamId: String? = nil,
@@ -229,6 +229,7 @@ func appstore(username: String,
               metadataPath: String? = nil,
               screenshotsPath: String? = nil,
               skipBinaryUpload: Bool = false,
+              useLiveVersion: Bool = false,
               skipScreenshots: Bool = false,
               appVersion: String? = nil,
               skipMetadata: Bool = false,
@@ -283,6 +284,7 @@ func appstore(username: String,
                                                                                           RubyCommand.Argument(name: "metadata_path", value: metadataPath),
                                                                                           RubyCommand.Argument(name: "screenshots_path", value: screenshotsPath),
                                                                                           RubyCommand.Argument(name: "skip_binary_upload", value: skipBinaryUpload),
+                                                                                          RubyCommand.Argument(name: "use_live_version", value: useLiveVersion),
                                                                                           RubyCommand.Argument(name: "skip_screenshots", value: skipScreenshots),
                                                                                           RubyCommand.Argument(name: "app_version", value: appVersion),
                                                                                           RubyCommand.Argument(name: "skip_metadata", value: skipMetadata),
@@ -1167,6 +1169,7 @@ func deliver(username: String = deliverfile.username,
              metadataPath: String? = deliverfile.metadataPath,
              screenshotsPath: String? = deliverfile.screenshotsPath,
              skipBinaryUpload: Bool = deliverfile.skipBinaryUpload,
+             useLiveVersion: Bool = deliverfile.useLiveVersion,
              skipScreenshots: Bool = deliverfile.skipScreenshots,
              appVersion: String? = deliverfile.appVersion,
              skipMetadata: Bool = deliverfile.skipMetadata,
@@ -1221,6 +1224,7 @@ func deliver(username: String = deliverfile.username,
                                                                                          RubyCommand.Argument(name: "metadata_path", value: metadataPath),
                                                                                          RubyCommand.Argument(name: "screenshots_path", value: screenshotsPath),
                                                                                          RubyCommand.Argument(name: "skip_binary_upload", value: skipBinaryUpload),
+                                                                                         RubyCommand.Argument(name: "use_live_version", value: useLiveVersion),
                                                                                          RubyCommand.Argument(name: "skip_screenshots", value: skipScreenshots),
                                                                                          RubyCommand.Argument(name: "app_version", value: appVersion),
                                                                                          RubyCommand.Argument(name: "skip_metadata", value: skipMetadata),
@@ -1317,6 +1321,10 @@ func dsymZip(archivePath: String? = nil,
   let command = RubyCommand(commandID: "", methodName: "dsym_zip", className: nil, args: [RubyCommand.Argument(name: "archive_path", value: archivePath),
                                                                                           RubyCommand.Argument(name: "dsym_path", value: dsymPath),
                                                                                           RubyCommand.Argument(name: "all", value: all)])
+  _ = runner.executeCommand(command)
+}
+func echo(message: String? = nil) {
+  let command = RubyCommand(commandID: "", methodName: "echo", className: nil, args: [RubyCommand.Argument(name: "message", value: message)])
   _ = runner.executeCommand(command)
 }
 func ensureGitBranch(branch: String = "master") {
@@ -2313,6 +2321,10 @@ func precheck(appIdentifier: String = precheckfile.appIdentifier,
                                                                                           RubyCommand.Argument(name: "free_stuff_in_iap", value: freeStuffInIap)])
   _ = runner.executeCommand(command)
 }
+func println(message: String? = nil) {
+  let command = RubyCommand(commandID: "", methodName: "println", className: nil, args: [RubyCommand.Argument(name: "message", value: message)])
+  _ = runner.executeCommand(command)
+}
 func produce(username: String,
              appIdentifier: String,
              bundleIdentifierSuffix: String? = nil,
@@ -2379,6 +2391,10 @@ func pushToGitRemote(localBranch: String? = nil,
                                                                                                     RubyCommand.Argument(name: "force", value: force),
                                                                                                     RubyCommand.Argument(name: "tags", value: tags),
                                                                                                     RubyCommand.Argument(name: "remote", value: remote)])
+  _ = runner.executeCommand(command)
+}
+func puts(message: String? = nil) {
+  let command = RubyCommand(commandID: "", methodName: "puts", className: nil, args: [RubyCommand.Argument(name: "message", value: message)])
   _ = runner.executeCommand(command)
 }
 @discardableResult func readPodspec(path: String) -> [String : String] {
@@ -3443,6 +3459,7 @@ func uploadToAppStore(username: String,
                       metadataPath: String? = nil,
                       screenshotsPath: String? = nil,
                       skipBinaryUpload: Bool = false,
+                      useLiveVersion: Bool = false,
                       skipScreenshots: Bool = false,
                       appVersion: String? = nil,
                       skipMetadata: Bool = false,
@@ -3497,6 +3514,7 @@ func uploadToAppStore(username: String,
                                                                                                      RubyCommand.Argument(name: "metadata_path", value: metadataPath),
                                                                                                      RubyCommand.Argument(name: "screenshots_path", value: screenshotsPath),
                                                                                                      RubyCommand.Argument(name: "skip_binary_upload", value: skipBinaryUpload),
+                                                                                                     RubyCommand.Argument(name: "use_live_version", value: useLiveVersion),
                                                                                                      RubyCommand.Argument(name: "skip_screenshots", value: skipScreenshots),
                                                                                                      RubyCommand.Argument(name: "app_version", value: appVersion),
                                                                                                      RubyCommand.Argument(name: "skip_metadata", value: skipMetadata),
@@ -3656,15 +3674,19 @@ func verifyXcode(xcodePath: String) {
 func versionBumpPodspec(path: String,
                         bumpType: String = "patch",
                         versionNumber: String? = nil,
-                        versionAppendix: String? = nil) {
+                        versionAppendix: String? = nil,
+                        requireVariablePrefix: Bool = true) {
   let command = RubyCommand(commandID: "", methodName: "version_bump_podspec", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
                                                                                                       RubyCommand.Argument(name: "bump_type", value: bumpType),
                                                                                                       RubyCommand.Argument(name: "version_number", value: versionNumber),
-                                                                                                      RubyCommand.Argument(name: "version_appendix", value: versionAppendix)])
+                                                                                                      RubyCommand.Argument(name: "version_appendix", value: versionAppendix),
+                                                                                                      RubyCommand.Argument(name: "require_variable_prefix", value: requireVariablePrefix)])
   _ = runner.executeCommand(command)
 }
-func versionGetPodspec(path: String) {
-  let command = RubyCommand(commandID: "", methodName: "version_get_podspec", className: nil, args: [RubyCommand.Argument(name: "path", value: path)])
+func versionGetPodspec(path: String,
+                       requireVariablePrefix: Bool = true) {
+  let command = RubyCommand(commandID: "", methodName: "version_get_podspec", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
+                                                                                                     RubyCommand.Argument(name: "require_variable_prefix", value: requireVariablePrefix)])
   _ = runner.executeCommand(command)
 }
 func xcarchive() {
@@ -3779,4 +3801,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.1]
+// FastlaneRunnerAPIVersion [0.9.4]
