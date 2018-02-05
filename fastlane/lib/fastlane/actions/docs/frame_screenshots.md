@@ -117,7 +117,7 @@ The general parameters are defined in the `default` key and can be:
 | Key | Description | Default value |
 |-----|-------------|---------------|
 | `background` | TODO | TODO |
-| `keyword` | An object that contains up to 3 keys to describe the optional keyword. TODO: Link to the table below | NA |
+| `keyword` | An object that contains up to 3 keys to describe the optional keyword. See [table](#keyword-and-title-parameters) below. | NA |
 | `title` | An object that contains up to 3 keys to describe the mandatory title. TODO: Link to the table below | NA |
 | `stack_title` | Specifies whether _frameit_ should display the keyword above the title when both keyword and title are defined. If it is false, the title and keyword will be displayed side by side when both keyword and title are defined. | `false` |
 | `title_below_image` | Specifies whether _frameit_ should place the title and optional keyword below the device frame. If it is false, it will be placed above the device frame. | `false` |
@@ -135,9 +135,10 @@ These are defined in the `data` key. This is an array with the following keys fo
 | `keyword` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
 | `title` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
 
-#### Framefile `keyword` and `title` parameters
+#### <a name="keyword-and-title-parameters"></a>Framefile `keyword` and `title` parameters
 
 The `keyword` and `title` parameters are both used in `default` and `data`. They both consist of the following optional keys:
+
 | Key | Description | Default value |
 |-----|-------------|---------------|
 | `color` | The font color for the text. Specify a hex/html color code. <P> TODO: The `color` value is directly used by Editor.rb to call MiniMagick function `-fill`. This supports 3 different inputs see:  http://www.imagemagick.org/script/command-line-options.php?#fill | `#000000` (black) |
