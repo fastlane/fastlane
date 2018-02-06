@@ -81,6 +81,12 @@ module Match
       end
     end
 
+    # We encrypt with MD5 because that was the most common default value in older fastlane versions which used the local OpenSSL installation
+    # A more secure key and IV generation is needed in the future
+    # IV should be randomly generated and provided unencrypted
+    # salt should be randomly generated and provided unencrypted (like in the current implementation)
+    # key should be generated with OpenSSL::KDF::pbkdf2_hmac with properly chosen parameters
+    # Short explanation about salt and IV: https://stackoverflow.com/a/1950674/6324550
     def encrypt(path: nil, password: nil)
       UI.user_error!("No password supplied") if password.to_s.strip.length == 0
 
@@ -100,6 +106,8 @@ module Match
       UI.crash!("Error encrypting '#{path}'")
     end
 
+    # The encryption parameters in this implementations reflect the old behaviour which depended on the users' local OpenSSL version
+    # 1.0.x OpenSSL and earlier versions use MD5, 1.1.0c and newer uses SHA256, we try both before giving an error
     def decrypt(path: nil, password: nil, hash_algorithm: "MD5")
       stored_data = Base64.decode64(File.read(path))
       salt = stored_data[8..15]
