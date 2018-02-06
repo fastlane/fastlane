@@ -100,21 +100,26 @@ module Match
       UI.crash!("Error encrypting '#{path}'")
     end
 
-    def decrypt(path: nil, password: nil)
+    def decrypt(path: nil, password: nil, hash_algorithm: "MD5")
       stored_data = Base64.decode64(File.read(path))
       salt = stored_data[8..15]
       data_to_decrypt = stored_data[16..-1]
 
       decipher = OpenSSL::Cipher.new('AES-256-CBC')
       decipher.decrypt
-      decipher.pkcs5_keyivgen(password, salt, 1, "MD5")
+      decipher.pkcs5_keyivgen(password, salt, 1, hash_algorithm)
 
       decrypted_data = decipher.update(data_to_decrypt) + decipher.final
 
       File.write(path, decrypted_data)
     rescue => error
-      UI.error(error.to_s)
-      UI.crash!("Error decrypting '#{path}'")
+      fallback_hash_algorithm = "SHA256"
+      if hash_algorithm != fallback_hash_algorithm
+        decrypt(path, password, fallback_hash_algorithm)
+      else
+        UI.error(error.to_s)
+        UI.crash!("Error decrypting '#{path}'")
+      end
     end
   end
 end
