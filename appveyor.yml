@@ -23,7 +23,6 @@ before_test:
   - gem -v
   - bundle -v
   - which iconv
-  - which openssl
 
 build: off
 

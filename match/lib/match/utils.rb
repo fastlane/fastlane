@@ -1,4 +1,5 @@
 require 'fastlane_core/keychain_importer'
+require 'openssl'
 require_relative 'module'
 
 module Match
@@ -31,15 +32,11 @@ module Match
     end
 
     def self.get_cert_info(cer_certificate_path)
-      command = "openssl x509 -inform der -in #{cer_certificate_path.shellescape} -subject -dates -noout"
-      command << " &" # start in separate process
-      output = Helper.backticks(command, print: FastlaneCore::Globals.verbose?)
+      cert = OpenSSL::X509::Certificate.new(File.read(cer_certificate_path))
 
       # openssl output:
-      # subject= /UID={User ID}/CN={Certificate Name}/OU={Certificate User}/O={Organisation}/C={Country}\n
-      # notBefore={Start datetime}\n
-      # notAfter={End datetime}
-      cert_info = output.gsub(/\s*subject=\s*/, "").tr("/", "\n")
+      # subject= /UID={User ID}/CN={Certificate Name}/OU={Certificate User}/O={Organisation}/C={Country}
+      cert_info = cert.subject.to_s.gsub(/\s*subject=\s*/, "").tr("/", "\n")
       out_array = cert_info.split("\n")
       openssl_keys_to_readable_keys = {
            'UID' => 'User ID',
@@ -54,6 +51,8 @@ module Match
       return out_array.map { |x| x.split(/=+/) if x.include?("=") }
                       .compact
                       .map { |k, v| [openssl_keys_to_readable_keys.fetch(k, k), v] }
+                      .append([openssl_keys_to_readable_keys.fetch("notBefore"), cert.not_before])
+                      .append([openssl_keys_to_readable_keys.fetch("notAfter"), cert.not_after])
     rescue => ex
       UI.error(ex)
       return {}
