@@ -164,6 +164,12 @@ describe Fastlane do
         Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileLaneNameEqualsActionName')
       end
 
+      it "prefers a lane over a built-in action" do
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileLaneNameEqualsActionName')
+        result = ff.runner.execute(:test_lane)
+        expect(result).to eq("laneResult")
+      end
+
       it "allows calling a lane directly even with a default_platform" do
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileGrouped')
         result = ff.runner.execute(:test)
