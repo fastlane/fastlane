@@ -42,7 +42,7 @@ describe Fastlane do
 
         expect(result).to eq("git tag -am builds/test/#{prefix}#{build_number}\\ \\(fastlane\\) \'builds/test/#{prefix}#{build_number}\'")
       end
-      
+
       it "allows you to specify a postfix" do
         postfix = '-RC1'
 
