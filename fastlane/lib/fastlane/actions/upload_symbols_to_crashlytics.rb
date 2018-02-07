@@ -8,6 +8,11 @@ module Fastlane
 
         find_binary_path(params)
         find_api_token(params)
+        find_gsp_path(params)
+
+        if !params[:api_token] && !params[:gsp_path]
+          UI.user_error!('Either Fabric API key or path to Firebase Crashlytics GoogleService-Info.plist must be given.')
+        end
 
         dsym_paths = []
         dsym_paths << params[:dsym_path] if params[:dsym_path]
@@ -79,7 +84,8 @@ module Fastlane
         UI.message("Uploading '#{path}'...")
         command = []
         command << File.expand_path(params[:binary_path]).shellescape
-        command << "-a #{params[:api_token]}"
+        command << "-a #{params[:api_token]}" if params[:api_token]
+        command << "-gsp #{params[:gsp_path]}" if params[:gsp_path]
         command << "-p #{params[:platform] == 'appletvos' ? 'tvos' : params[:platform]}"
         command << File.expand_path(path).shellescape
         begin
@@ -101,7 +107,15 @@ module Fastlane
             UI.verbose("found an APIKey in #{current}")
           end
         end
-        UI.user_error!("Please provide an api_token using api_token:") unless params[:api_token]
+      end
+
+      def self.find_gsp_path(params)
+        if params[:gsp_path].to_s.length > 0
+          params[:gsp_path] = File.expand_path(params[:gsp_path])
+        else
+          gsp_path = Dir["./**/GoogleService-Info.plist"].first
+          params[:gsp_path] = File.expand_path(gsp_path) unless gsp_path.nil?
+        end
       end
 
       def self.find_binary_path(params)
@@ -148,6 +162,15 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("No API token for Crashlytics given, pass using `api_token: 'token'`") if value.to_s.length == 0
                                        end),
+          FastlaneCore::ConfigItem.new(key: :gsp_path,
+                                      env_name: "GOOGLE_SERVICES_INFO_PLIST_PATH",
+                                      sensitive: true,
+                                      optional: true,
+                                      description: "Path to GoogleService-Info.plist",
+                                      verify_block: proc do |value|
+                                        UI.user_error!("Couldn't find file at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                        UI.user_error!("No Path to GoogleService-Info.plist for Firebase Crashlytics given, pass using `gsp_path: 'path'`") if value.to_s.length == 0
+                                      end),
           FastlaneCore::ConfigItem.new(key: :binary_path,
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_BINARY_PATH",
                                        description: "The path to the upload-symbols file of the Fabric app",
