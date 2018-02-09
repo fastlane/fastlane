@@ -163,14 +163,14 @@ module Fastlane
                                          UI.user_error!("No API token for Crashlytics given, pass using `api_token: 'token'`") if value.to_s.length == 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :gsp_path,
-                                      env_name: "GOOGLE_SERVICES_INFO_PLIST_PATH",
-                                      sensitive: true,
-                                      optional: true,
-                                      description: "Path to GoogleService-Info.plist",
-                                      verify_block: proc do |value|
-                                        UI.user_error!("Couldn't find file at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                        UI.user_error!("No Path to GoogleService-Info.plist for Firebase Crashlytics given, pass using `gsp_path: 'path'`") if value.to_s.length == 0
-                                      end),
+                                       env_name: "GOOGLE_SERVICES_INFO_PLIST_PATH",
+                                       code_gen_sensitive: true,
+                                       optional: true,
+                                       description: "Path to GoogleService-Info.plist",
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find file at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                         UI.user_error!("No Path to GoogleService-Info.plist for Firebase Crashlytics given, pass using `gsp_path: 'path'`") if value.to_s.length == 0
+                                       end),
           FastlaneCore::ConfigItem.new(key: :binary_path,
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_BINARY_PATH",
                                        description: "The path to the upload-symbols file of the Fabric app",
