@@ -183,17 +183,19 @@
           case 27: // Esc
             overlay.style.display = "none";
             break;
-          case 34: // right-arrow, Page Down, keypad right, ...
-          case 39:
-          case 54:
-          case 102:
+          case 34: // Page Down
+          case 39: // Right arrow
+          case 54: // Keypad right
+          case 76: // l
+          case 102: // Keypad right
             e.preventDefault();
             doClick(imageDisplay);
             break;
-          case 33: // left-arrow, Page Up, keypad right, ...
-          case 37:
-          case 52:
-          case 100:
+          case 33: // Page up
+          case 37: // Left arrow
+          case 52: // Keypad left
+          case 72: // h
+          case 100: // Keypad left
             e.preventDefault();
             document.getElementById('imageDisplay').dataset.counter -= 2; // hacky
             doClick(imageDisplay);
