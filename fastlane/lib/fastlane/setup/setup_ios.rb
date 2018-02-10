@@ -380,7 +380,7 @@ module Fastlane
           UI.important("Alright, we won't create the app for you. Be aware, the build is probably going to fail when you try it")
         end
       else
-        UI.success("✅  Your app '#{self.app_identifier}' is available on iTunes Connect")
+        UI.success("✅  Your app '#{self.app_identifier}' is available in your Apple Developer Portal")
       end
     end
 
