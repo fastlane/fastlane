@@ -1,3 +1,14 @@
+require 'fastlane_core/cert_checker'
+require 'fastlane_core/provisioning_profile'
+require 'fastlane_core/print_table'
+require 'spaceship/client'
+require_relative 'generator'
+require_relative 'git_helper'
+require_relative 'module'
+require_relative 'table_printer'
+require_relative 'spaceship_ensure'
+require_relative 'utils'
+
 module Match
   class Runner
     attr_accessor :files_to_commmit
@@ -31,6 +42,10 @@ module Match
         app_identifiers = params[:app_identifier].to_s.split(/\s*,\s*/).uniq
       end
 
+      # sometimes we get an array with arrays, this is a bug. To unblock people using match, I suggest we flatten!
+      # then in the future address the root cause of https://github.com/fastlane/fastlane/issues/11324
+      app_identifiers.flatten!
+
       # Verify the App ID (as we don't want 'match' to fail at a later point)
       if spaceship
         app_identifiers.each do |app_identifier|
@@ -62,7 +77,7 @@ module Match
         TablePrinter.print_summary(app_identifier: app_identifier, type: params[:type], platform: params[:platform])
       end
 
-      UI.success "All required keys, certificates and provisioning profiles are installed 🙌".green
+      UI.success("All required keys, certificates and provisioning profiles are installed 🙌".green)
     rescue Spaceship::Client::UnexpectedResponse, Spaceship::Client::InvalidUserCredentialsError, Spaceship::Client::NoUserCredentialsError => ex
       UI.error("An error occurred while verifying your certificates and profiles with the Apple Developer Portal.")
       UI.error("If you already have your certificates stored in git, you can run `fastlane match` in readonly mode")
@@ -80,7 +95,7 @@ module Match
       keys = Dir[File.join(params[:workspace], "certs", cert_type.to_s, "*.p12")]
 
       if certs.count == 0 or keys.count == 0
-        UI.important "Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now"
+        UI.important("Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now")
         UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
         cert_path = Generator.generate_certificate(params, cert_type)
         private_key_path = cert_path.gsub(".cer", ".p12")
@@ -89,10 +104,10 @@ module Match
         self.files_to_commmit << private_key_path
       else
         cert_path = certs.last
-        UI.message "Installing certificate..."
+        UI.message("Installing certificate...")
 
         if FastlaneCore::CertChecker.installed?(cert_path)
-          UI.verbose "Certificate '#{File.basename(cert_path)}' is already installed on this machine"
+          UI.verbose("Certificate '#{File.basename(cert_path)}' is already installed on this machine")
         else
           Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
         end
@@ -130,20 +145,20 @@ module Match
         else
           # App Store provisioning profiles don't contain device identifiers and
           # thus shouldn't be renewed if the device count has changed.
-          UI.important "Warning: `force_for_new_devices` is set but is ignored for App Store provisioning profiles."
-          UI.important "You can safely stop specifying `force_for_new_devices` when running Match for type 'appstore'."
+          UI.important("Warning: `force_for_new_devices` is set but is ignored for App Store provisioning profiles.")
+          UI.important("You can safely stop specifying `force_for_new_devices` when running Match for type 'appstore'.")
         end
       end
 
       if profile.nil? or params[:force]
         if params[:readonly]
-          all_profiles = Dir.entries(base_dir).reject { |f| f.start_with? "." }
-          UI.error "No matching provisioning profiles found for '#{profile_name}'"
-          UI.error "A new one cannot be created because you enabled `readonly`"
-          UI.error "Provisioning profiles in your repo for type `#{prov_type}`:"
-          all_profiles.each { |p| UI.error "- '#{p}'" }
-          UI.error "If you are certain that a profile should exist, double-check the recent changes to your match repository"
-          UI.user_error! "No matching provisioning profiles found and can not create a new one because you enabled `readonly`. Check the output above for more information."
+          all_profiles = Dir.entries(base_dir).reject { |f| f.start_with?(".") }
+          UI.error("No matching provisioning profiles found for '#{profile_name}'")
+          UI.error("A new one cannot be created because you enabled `readonly`")
+          UI.error("Provisioning profiles in your repo for type `#{prov_type}`:")
+          all_profiles.each { |p| UI.error("- '#{p}'") }
+          UI.error("If you are certain that a profile should exist, double-check the recent changes to your match repository")
+          UI.user_error!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`. Check the output above for more information.")
         end
         profile = Generator.generate_provisioning_profile(params: params,
                                                        prov_type: prov_type,

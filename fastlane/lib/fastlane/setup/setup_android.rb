@@ -1,71 +1,97 @@
 module Fastlane
   class SetupAndroid < Setup
-    def run
-      response = UI.confirm('Do you have everything committed in version control? If not please do so now!')
-      return unless response
+    attr_accessor :json_key_file
+    attr_accessor :package_name
 
-      FastlaneCore::FastlaneFolder.create_folder! unless Helper.is_test?
-      FileUtils.mkdir(File.join(folder, 'actions')) unless File.directory?(File.join(folder, 'actions'))
-      generate_appfile
-      generate_fastfile
-      show_analytics
+    def setup_android
+      self.platform = :android
+      self.is_swift_fastfile = false
+
+      welcome_to_fastlane
+
+      self.fastfile_content = fastfile_template_content
+      self.appfile_content = appfile_template_content
+
+      fetch_information_for_appfile
+
+      FastlaneCore::FastlaneFolder.create_folder!
 
       init_supply
 
-      UI.success('Successfully finished setting up fastlane')
+      self.append_lane([
+                         "desc \"Runs all the tests\"",
+                         "lane :test do",
+                         "  gradle(task: \"test\")",
+                         "end"
+                       ])
+
+      self.append_lane([
+                         "desc \"Submit a new Beta Build to Crashlytics Beta\"",
+                         "lane :beta do",
+                         "  gradle(task: \"assembleRelease\")",
+                         "  crashlytics",
+                         "",
+                         "  # sh \"your_script.sh\"",
+                         "  # You can also use other beta testing services here",
+                         "end"
+                       ])
+
+      self.append_lane([
+                         "desc \"Deploy a new version to the Google Play\"",
+                         "lane :deploy do",
+                         "  gradle(task: \"assembleRelease\")",
+                         "  upload_to_play_store",
+                         "end"
+                       ])
+
+      self.lane_to_mention = "test"
+
+      finish_up
     end
 
-    def generate_appfile
-      UI.message('------------------------------')
-      UI.success('To not re-enter your packagename and issuer every time you run one of the fastlane tools or fastlane, these will be stored in a so-called Appfile.')
+    def fetch_information_for_appfile
+      UI.message('')
+      UI.message("To avoid re-entering your package name and issuer every time you run fastlane, we'll store those in a so-called Appfile.")
 
-      package_name = UI.input("Package Name (com.krausefx.app): ")
-      puts ""
-      puts "To automatically upload builds and metadata to Google Play, fastlane needs a service action json secret file".yellow
-      puts "Feel free to just click Enter to skip not provide certain things"
-      puts "Follow the Setup Guide on how to get the Json file: https://github.com/fastlane/fastlane/tree/master/supply#setup".yellow
-      json_key_file = UI.input("Path to the json secret file: ")
+      self.package_name = UI.input("Package Name (com.krausefx.app): ")
+      puts("")
+      puts("To automatically upload builds and metadata to Google Play, fastlane needs a service action json secret file".yellow)
+      puts("Follow the Setup Guide on how to get the Json file: https://docs.fastlane.tools/actions/supply/".yellow)
+      puts("Feel free to press Enter at any time in order to skip providing pieces of information when asked")
+      self.json_key_file = UI.input("Path to the json secret file: ")
 
-      template = File.read("#{Fastlane::ROOT}/lib/assets/AppfileTemplateAndroid")
-      template.gsub!('[[JSON_KEY_FILE]]', json_key_file)
-      template.gsub!('[[PACKAGE_NAME]]', package_name)
-      path = File.join(folder, 'Appfile')
-      File.write(path, template)
-      UI.success("Created new file '#{path}'. Edit it to manage your preferred app metadata information.")
-    end
-
-    def generate_fastfile
-      template = File.read("#{Fastlane::ROOT}/lib/assets/FastfileTemplateAndroid")
-
-      template.gsub!('[[FASTLANE_VERSION]]', Fastlane::VERSION)
-
-      path = File.join(folder, 'Fastfile')
-      File.write(path, template)
-      UI.success("Created new file '#{path}'. Edit it to manage your own deployment lanes.")
+      self.appfile_content.gsub!("[[JSON_KEY_FILE]]", self.json_key_file)
+      self.appfile_content.gsub!("[[PACKAGE_NAME]]", self.package_name)
     end
 
     def init_supply
       UI.message("")
-      question = "Do you plan on uploading metadata, screenshots and builds to Google Play using fastlane?".yellow
+      question = "Do you plan on uploading metadata, screenshots, and builds to Google Play using fastlane?".yellow
       UI.message(question)
-      UI.message("This will download your existing metadata and screenshots into the `fastlane` folder")
-      if UI.confirm(question)
+      UI.message("We will now download your existing metadata and screenshots into the `fastlane` folder so fastlane can manage it")
+      if UI.confirm("Download existing metadata and setup metadata management?")
         begin
           require 'supply'
           require 'supply/setup'
-          Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, {})
+          supply_config = {
+            json_key: self.json_key_file,
+            package_name: self.package_name
+          }
+          Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, supply_config)
           Supply::Setup.new.perform_download
         rescue => ex
           UI.error(ex.to_s)
-          UI.error("supply failed, but don't worry, you can launch supply using `fastlane supply init` whenever you want.")
+          UI.error("Setting up `supply` (metadata management action) failed, but don't worry, you can try setting it up again using `fastlane supply init` whenever you want.")
         end
       else
-        UI.success("You can run `fastlane supply init` to do so at a later point.")
+        UI.success("You can run `fastlane supply init` to set up metadata management at a later point.")
       end
     end
 
-    def folder
-      FastlaneCore::FastlaneFolder.path
+    def finish_up
+      self.fastfile_content.gsub!(":ios", ":android")
+
+      super
     end
   end
 end

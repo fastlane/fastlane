@@ -1,3 +1,6 @@
+require_relative 'person'
+require_relative 'invite'
+
 module Spaceship
   module Portal
     class Persons < PortalBase

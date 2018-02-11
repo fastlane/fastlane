@@ -123,12 +123,12 @@
         for (index = 0; index < screenshotLink.length; ++index) {
           screenshotLink[index].addEventListener('click', function(e) {
             e.preventDefault();
-            
+
             var img = e.target;
             if (e.target.tagName == 'A') {
               img = e.target.children[0];
             }
-            
+
             // beautify
             var tmpImg = new Image();
             tmpImg.src = img.src;
@@ -145,20 +145,20 @@
             imageDisplay.src             = img.src;
             imageDisplay.alt             = img.alt;
             imageDisplay.dataset.counter = img.dataset.counter;
-            
+
             imageInfo.innerHTML          = '<h3>'+img.alt+'</h3>';
             imageInfo.innerHTML         += img.src.split("/").pop();
             imageInfo.innerHTML         += '<br />'+tmpImg.height+'&times;'+tmpImg.width+'px';
-                    
+
             overlay.style.display        = "block";
           });
         }
-        
+
         imageDisplay.addEventListener('click', function(e) {
           e.stopPropagation(); // !
-          
+
           overlay.style.display = "none";
-          
+
           img_counter = parseInt(e.target.dataset.counter) + 1;
           try {
             link = document.body.querySelector('img[data-counter="'+img_counter+'"]').parentNode;
@@ -175,7 +175,7 @@
         overlay.addEventListener('click', function(e) {
           overlay.style.display = "none";
         })
-        
+
       function keyPressed(e) {
         e = e || window.event;
         var charCode = e.keyCode || e.which;
@@ -183,17 +183,19 @@
           case 27: // Esc
             overlay.style.display = "none";
             break;
-          case 34: // right-arrow, Page Down, keypad right, ...
-          case 39:
-          case 54:
-          case 102:
+          case 34: // Page Down
+          case 39: // Right arrow
+          case 54: // Keypad right
+          case 76: // l
+          case 102: // Keypad right
             e.preventDefault();
             doClick(imageDisplay);
             break;
-          case 33: // left-arrow, Page Up, keypad right, ...
-          case 37:
-          case 52:
-          case 100:
+          case 33: // Page up
+          case 37: // Left arrow
+          case 52: // Keypad left
+          case 72: // h
+          case 100: // Keypad left
             e.preventDefault();
             document.getElementById('imageDisplay').dataset.counter -= 2; // hacky
             doClick(imageDisplay);

@@ -1,0 +1,105 @@
+module Fastlane
+  module Actions
+    module SharedValues
+      SCAN_DERIVED_DATA_PATH = :SCAN_DERIVED_DATA_PATH
+      SCAN_GENERATED_PLIST_FILE = :SCAN_GENERATED_PLIST_FILE
+      SCAN_GENERATED_PLIST_FILES = :SCAN_GENERATED_PLIST_FILES
+    end
+
+    class RunTestsAction < Action
+      def self.run(values)
+        require 'scan'
+        plist_files_before = []
+
+        begin
+          destination = values[:destination] # save destination value which can be later overridden
+          Scan.config = values # we set this here to auto-detect missing values, which we need later on
+          unless values[:derived_data_path].to_s.empty?
+            plist_files_before = test_summary_filenames(values[:derived_data_path])
+          end
+
+          values[:destination] = destination # restore destination value
+          Scan::Manager.new.work(values)
+
+          return true
+        rescue => ex
+          if values[:fail_build]
+            raise ex
+          end
+        ensure
+          unless values[:derived_data_path].to_s.empty?
+            Actions.lane_context[SharedValues::SCAN_DERIVED_DATA_PATH] = values[:derived_data_path]
+            plist_files_after = test_summary_filenames(values[:derived_data_path])
+            all_test_summaries = (plist_files_after - plist_files_before)
+            Actions.lane_context[SharedValues::SCAN_GENERATED_PLIST_FILES] = all_test_summaries
+            Actions.lane_context[SharedValues::SCAN_GENERATED_PLIST_FILE] = all_test_summaries.last
+          end
+        end
+      end
+
+      def self.description
+        "Easily run tests of your iOS app (via _scan_)"
+      end
+
+      def self.details
+        "More information: https://docs.fastlane.tools/actions/scan/"
+      end
+
+      def self.author
+        "KrauseFx"
+      end
+
+      def self.available_options
+        require 'scan'
+
+        FastlaneCore::CommanderGenerator.new.generate(Scan::Options.available_options) + [
+          FastlaneCore::ConfigItem.new(key: :fail_build,
+                                       env_name: "SCAN_FAIL_BUILD",
+                                       description: "Should this step stop the build if the tests fail? Set this to false if you're using trainer",
+                                       is_string: false,
+                                       default_value: true)
+        ]
+      end
+
+      def self.is_supported?(platform)
+        [:ios, :mac].include?(platform)
+      end
+
+      private_class_method
+
+      def self.test_summary_filenames(derived_data_path)
+        Dir["#{derived_data_path}/**/Logs/Test/*TestSummaries.plist"]
+      end
+
+      def self.example_code
+        [
+          'run_tests',
+          'scan # alias for "run_tests"',
+          'run_tests(
+            workspace: "App.xcworkspace",
+            scheme: "MyTests",
+            clean: false
+          )',
+          '# Build For Testing
+          run_tests(
+             derived_data_path: "my_folder",
+             build_for_testing: true
+          )',
+          '# run tests using derived data from prev. build
+          run_tests(
+             derived_data_path: "my_folder",
+             test_without_building: true
+          )',
+          '# or run it from an existing xctestrun package
+          run_tests(
+             xctestrun: "/path/to/mytests.xctestrun"
+          )'
+        ]
+      end
+
+      def self.category
+        :testing
+      end
+    end
+  end
+end

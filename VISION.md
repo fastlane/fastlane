@@ -37,10 +37,10 @@ Each _fastlane_ tool has a specific purpose and should be kept focused on the fu
 * [scan](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
 * [precheck](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
 
-## _fastlane_’s Relationship with [Google](https://google.com) and [Fabric](https://get.fabric.io/)
+## _fastlane_’s Relationship with [Google](https://google.com)
 
-Google supports app development teams with the best tools for building, understanding, and growing their mobile app businesses through [Fabric](https://get.fabric.io/).
+Google supports app development teams with the best tools for building, understanding, and growing their mobile app businesses through [Firebase](https://firebase.google.com) and [Fabric](https://get.fabric.io/).
 
 Google has recognized _fastlane_ as the best tool for tackling tough beta and release deployment challenges. The team’s mission is to make _fastlane_ the de facto tool to automate beta deployments and app store releases for iOS and Android apps.
 
-Google intends to keep _fastlane_ open source and available as a standalone tool for users who are not using Fabric. Google is also committed to increasing use of _fastlane_ by promoting it through Fabric products and websites, and developing integrations with Fabric tools to help them work better together.
+Google intends to keep _fastlane_ open source and available as a standalone tool for users who are not using Firebase or Fabric. Google is also committed to increasing use of _fastlane_ by promoting it through other products and websites, and developing integrations with Firebase and Fabric tools to help them work better together.

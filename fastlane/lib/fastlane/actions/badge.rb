@@ -38,6 +38,7 @@ module Fastlane
 
       def self.details
         [
+          "[Please use the badge fastlane plugin instead: https://github.com/HazAT/fastlane-plugin-badge]",
           "This action will add a light/dark badge onto your app icon.",
           "You can also provide your custom badge/overlay or add an shield for more customization more info:",
           "https://github.com/HazAT/badge",

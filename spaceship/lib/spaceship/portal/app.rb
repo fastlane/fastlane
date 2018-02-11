@@ -1,3 +1,6 @@
+require_relative 'portal_base'
+require_relative 'app_group'
+
 module Spaceship
   module Portal
     # Represents an App ID from the Developer Portal
@@ -107,7 +110,7 @@ module Spaceship
       end
 
       def associated_groups
-        return unless raw_data.key?('associatedApplicationGroups')
+        return unless raw_data['associatedApplicationGroups']
 
         @associated_groups ||= raw_data['associatedApplicationGroups'].map do |info|
           Spaceship::Portal::AppGroup.new(info)

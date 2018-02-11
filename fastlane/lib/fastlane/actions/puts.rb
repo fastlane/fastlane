@@ -2,7 +2,15 @@ module Fastlane
   module Actions
     class PutsAction < Action
       def self.run(params)
-        UI.message params.join(' ')
+        # display text from the message param (most likely coming from Swift)
+        # if called like `puts 'hi'` then params won't be a configuration item, so we have to check
+        if params.kind_of?(FastlaneCore::Configuration) && params[:message]
+          UI.message(params[:message])
+          return
+        end
+
+        # no paramter included in the call means treat this like a normal fastlane ruby call
+        UI.message(params.join(' '))
       end
 
       #####################################################
@@ -11,6 +19,16 @@ module Fastlane
 
       def self.description
         "Prints out the given text"
+      end
+
+      def self.available_options
+        [
+          FastlaneCore::ConfigItem.new(key: :message,
+                                       env_name: "FL_PUTS_MESSAGE",
+                                       description: "Message to be printed out. Fastlane.swift only",
+                                       optional: true,
+                                       is_string: true)
+        ]
       end
 
       def self.authors
@@ -22,7 +40,9 @@ module Fastlane
       end
 
       def self.alias_used(action_alias, params)
-        UI.important("#{action_alias} called, please use 'puts' instead!")
+        if !params.kind_of?(FastlaneCore::Configuration) || params[:message].nil?
+          UI.important("#{action_alias} called, please use 'puts' instead!")
+        end
       end
 
       def self.aliases

@@ -80,6 +80,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :other_fields,
                                        description: 'Dictionary of your app fields. Podio supports several field types, see https://developers.podio.com/doc/items',
                                        is_string: false,
+                                       type: Hash,
                                        optional: true)
         ]
       end
@@ -128,11 +129,11 @@ module Fastlane
       end
 
       def self.authenticate(client_id, client_secret, app_id, app_token)
-        auth_response = RestClient.post AUTH_URL, grant_type: 'app',
+        auth_response = RestClient.post(AUTH_URL, grant_type: 'app',
                                                   app_id: app_id,
                                                   app_token: app_token,
                                                   client_id: client_id,
-                                                  client_secret: client_secret
+                                                  client_secret: client_secret)
         UI.user_error!("Failed to authenticate with Podio API") if auth_response.code != 200
 
         auth_response_dictionary = JSON.parse(auth_response.body)
@@ -153,7 +154,7 @@ module Fastlane
 
       def self.get_existing_item(auth_config, identifying_value, app_id)
         filter_request_body = { query: identifying_value, limit: 1, ref_type: 'item' }.to_json
-        filter_response = RestClient.post "#{BASE_URL}/search/app/#{app_id}/", filter_request_body, auth_config
+        filter_response = RestClient.post("#{BASE_URL}/search/app/#{app_id}/", filter_request_body, auth_config)
         UI.user_error!("Failed to search for already existing item #{identifying_value}") if filter_response.code != 200
 
         existing_items = JSON.parse(filter_response.body)
@@ -172,7 +173,7 @@ module Fastlane
 
       def self.create_item(auth_config, identifying_field, identifying_value, app_id)
         item_request_body = { fields: { identifying_field => identifying_value } }.to_json
-        item_response = RestClient.post "#{BASE_URL}/item/app/#{app_id}", item_request_body, auth_config
+        item_response = RestClient.post("#{BASE_URL}/item/app/#{app_id}", item_request_body, auth_config)
         UI.user_error!("Failed to create item \"#{identifying_value}\"") if item_response.code != 200
 
         item_response_dictionary = JSON.parse(item_response.body)
@@ -182,14 +183,14 @@ module Fastlane
       def self.update_item(auth_config, item_id, fields)
         if fields.length > 0
           item_request_body = { fields: fields }.to_json
-          item_response = RestClient.put "#{BASE_URL}/item/#{item_id}", item_request_body, auth_config
+          item_response = RestClient.put("#{BASE_URL}/item/#{item_id}", item_request_body, auth_config)
           UI.user_error!("Failed to update item values \"#{fields}\"") unless item_response.code != 200 || item_response.code != 204
         end
       end
 
       def self.get_embed_id(auth_config, url)
         embed_request_body = { url: url }.to_json
-        embed_response = RestClient.post "#{BASE_URL}/embed/", embed_request_body, auth_config
+        embed_response = RestClient.post("#{BASE_URL}/embed/", embed_request_body, auth_config)
         UI.user_error!("Failed to create embed for link #{link}") if embed_response.code != 200
 
         embed_response_dictionary = JSON.parse(embed_response.body)

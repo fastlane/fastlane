@@ -1,3 +1,5 @@
+require "rubygems/requirement"
+
 module Fastlane
   class FastFile
     # Stores all relevant information from the currently running process
@@ -14,20 +16,20 @@ module Fastlane
       return unless (path || '').length > 0
       UI.user_error!("Could not find Fastfile at path '#{path}'") unless File.exist?(path)
       @path = File.expand_path(path)
-      content = File.read(path)
+      content = File.read(path, encoding: "utf-8")
 
       # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
       if content.tr!('“”‘’‛', %(""'''))
-        UI.error "Your #{File.basename(path)} has had smart quotes sanitised. " \
+        UI.error("Your #{File.basename(path)} has had smart quotes sanitised. " \
                 'To avoid issues in the future, you should not use ' \
                 'TextEdit for editing it. If you are not using TextEdit, ' \
-                'you should turn off smart quotes in your editor of choice.'
+                'you should turn off smart quotes in your editor of choice.')
       end
 
       content.scan(/^\s*require (.*)/).each do |current|
         gem_name = current.last
         next if gem_name.include?(".") # these are local gems
-        UI.important("You require a gem, if this is a third party gem, please use `fastlane_require #{gem_name}` to ensure the gem is installed locally")
+        UI.important("You have require'd a gem, if this is a third party gem, please use `fastlane_require #{gem_name}` to ensure the gem is installed locally.")
       end
 
       parse(content, @path)
@@ -174,10 +176,14 @@ module Fastlane
     end
 
     # Execute shell command
-    def sh(command, log: true, error_callback: nil)
-      command_header = log ? command : "shell command"
+    def sh(*command, log: true, error_callback: nil, &b)
+      FastFile.sh(*command, log: log, error_callback: error_callback, &b)
+    end
+
+    def self.sh(*command, log: true, error_callback: nil, &b)
+      command_header = log ? Actions.shell_command_from_args(*command) : "shell command"
       Actions.execute_action(command_header) do
-        Actions.sh_no_action(command, log: log, error_callback: error_callback)
+        Actions.sh_no_action(*command, log: log, error_callback: error_callback, &b)
       end
     end
 
@@ -225,7 +231,8 @@ module Fastlane
     # @param url [String] The git URL to clone the repository from
     # @param branch [String] The branch to checkout in the repository
     # @param path [String] The path to the Fastfile
-    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile')
+    # @param version [String, Array] Version requirement for repo tags
+    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil)
       UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
 
       Actions.execute_action('import_from_git') do
@@ -235,26 +242,31 @@ module Fastlane
 
         # Checkout the repo
         repo_name = url.split("/").last
+        checkout_param = branch
 
         Dir.mktmpdir("fl_clone") do |tmp_path|
           clone_folder = File.join(tmp_path, repo_name)
 
-          branch_option = ""
           branch_option = "--branch #{branch}" if branch != 'HEAD'
 
-          clone_command = "GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}"
+          UI.message("Cloning remote git repo...")
+          Actions.sh("GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}")
 
-          UI.message "Cloning remote git repo..."
-          Actions.sh(clone_command)
+          unless version.nil?
+            req = Gem::Requirement.new(version)
+            all_tags = fetch_remote_tags(folder: clone_folder)
+            checkout_param = all_tags.select { |t| req =~ FastlaneCore::TagVersion.new(t) }.last
+            UI.user_error!("No tag found matching #{version.inspect}") if checkout_param.nil?
+          end
 
-          Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{path}'")
+          Actions.sh("cd '#{clone_folder}' && git checkout #{checkout_param} '#{path}'")
 
           # We also want to check out all the local actions of this fastlane setup
           containing = path.split(File::SEPARATOR)[0..-2]
           containing = "." if containing.count == 0
           actions_folder = File.join(containing, "actions")
           begin
-            Actions.sh("cd '#{clone_folder}' && git checkout #{branch} '#{actions_folder}'")
+            Actions.sh("cd '#{clone_folder}' && git checkout #{checkout_param} '#{actions_folder}'")
           rescue
             # We don't care about a failure here, as local actions are optional
           end
@@ -266,6 +278,24 @@ module Fastlane
           return return_value
         end
       end
+    end
+
+    #####################################################
+    # @!group Versioning helpers
+    #####################################################
+
+    def fetch_remote_tags(folder: nil)
+      UI.message("Fetching remote git tags...")
+      Actions.sh("cd '#{folder}' && GIT_TERMINAL_PROMPT=0 git fetch --all --tags -q")
+
+      # Fetch all possible tags
+      git_tags_string = Actions.sh("cd '#{folder}' && git tag -l")
+      git_tags = git_tags_string.split("\n")
+
+      # Sort tags based on their version number
+      return git_tags
+             .select { |tag| FastlaneCore::TagVersion.correct?(tag) }
+             .sort_by { |tag| FastlaneCore::TagVersion.new(tag) }
     end
 
     #####################################################
@@ -300,7 +330,7 @@ module Fastlane
     end
 
     def action_launched(action_name)
-      action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name, args: ARGV)
+      action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name, configuration_language: "ruby", args: ARGV)
       FastlaneCore.session.action_launched(launch_context: action_launch_context)
     end
 

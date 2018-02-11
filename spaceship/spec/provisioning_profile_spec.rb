@@ -64,14 +64,14 @@ describe Spaceship::ProvisioningProfile do
     it 'should use the Xcode api to get provisioning profiles and their appIds' do
       ENV['SPACESHIP_AVOID_XCODE_API'] = nil
       expect(client).to receive(:provisioning_profiles_via_xcode_api).and_call_original
-      expect(client).not_to receive(:provisioning_profiles)
-      expect(client).not_to receive(:provisioning_profile_details)
+      expect(client).not_to(receive(:provisioning_profiles))
+      expect(client).not_to(receive(:provisioning_profile_details))
       Spaceship::ProvisioningProfile.find_by_bundle_id(bundle_id: 'some-fake-id')
     end
 
     it 'should use the developer portal api to get provisioning profiles and their appIds' do
       ENV['SPACESHIP_AVOID_XCODE_API'] = 'true'
-      expect(client).not_to receive(:provisioning_profiles_via_xcode_api)
+      expect(client).not_to(receive(:provisioning_profiles_via_xcode_api))
       expect(client).to receive(:provisioning_profiles).and_call_original
       expect(client).to receive(:provisioning_profile_details).and_call_original.exactly(7).times
       Spaceship::ProvisioningProfile.find_by_bundle_id(bundle_id: 'some-fake-id')
@@ -202,7 +202,7 @@ describe Spaceship::ProvisioningProfile do
     it 'raises an error if the user wants to create a profile for a non-existing app' do
       expect do
         Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: 'notExisting', certificate: certificate)
-      end.to raise_error "Could not find app with bundle id 'notExisting'"
+      end.to raise_error("Could not find app with bundle id 'notExisting'")
     end
 
     describe 'modify devices to prevent having devices on profile types where it does not make sense' do

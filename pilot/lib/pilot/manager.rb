@@ -1,4 +1,12 @@
-require "fastlane_core"
+require 'credentials_manager/appfile_config'
+
+require 'fastlane_core/print_table'
+require 'spaceship'
+require 'spaceship/tunes/tunes'
+require 'spaceship/tunes/members'
+require 'spaceship/test_flight'
+require 'fastlane_core/ipa_file_analyser'
+require_relative 'module'
 
 module Pilot
   class Manager
@@ -21,7 +29,7 @@ module Pilot
     def app
       @apple_id ||= fetch_app_id
 
-      @app ||= Spaceship::Application.find(@apple_id)
+      @app ||= Spaceship::Tunes::Application.find(@apple_id)
       unless @app
         UI.user_error!("Could not find app with #{(config[:apple_id] || config[:app_identifier])}")
       end
@@ -39,7 +47,7 @@ module Pilot
       config[:app_identifier] = fetch_app_identifier
 
       if config[:app_identifier]
-        @app ||= Spaceship::Application.find(config[:app_identifier])
+        @app ||= Spaceship::Tunes::Application.find(config[:app_identifier])
         UI.user_error!("Couldn't find app '#{config[:app_identifier]}' on the account of '#{config[:username]}' on iTunes Connect") unless @app
         app_id ||= @app.apple_id
       end
@@ -62,7 +70,7 @@ module Pilot
       result ||= FastlaneCore::IpaFileAnalyser.fetch_app_platform(config[:ipa]) if config[:ipa]
       if required
         result ||= UI.input("Please enter the app's platform (appletvos, ios, osx): ")
-        UI.user_error!("App Platform must be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include? result
+        UI.user_error!("App Platform must be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include?(result)
         UI.verbose("App Platform (#{result})")
       end
       return result

@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Screengrab
   class DependencyChecker
     def self.check(android_env)
@@ -18,11 +20,11 @@ module Screengrab
 
     def self.raise_missing_adb(android_home)
       if android_home
-        UI.error "The `adb` command could not be found relative to your provided ANDROID_HOME at #{android_home}"
-        UI.error "Please ensure that the Android SDK is installed and the platform-tools directory is present"
+        UI.error("The `adb` command could not be found relative to your provided ANDROID_HOME at #{android_home}")
+        UI.error("Please ensure that the Android SDK is installed and the platform-tools directory is present")
       else
-        UI.error 'The `adb` command could not be found on your PATH'
-        UI.error 'Please ensure that the Android SDK is installed and the platform-tools directory is present and on your PATH'
+        UI.error('The `adb` command could not be found on your PATH')
+        UI.error('Please ensure that the Android SDK is installed and the platform-tools directory is present and on your PATH')
       end
 
       UI.user_error!('adb command not found')
@@ -39,17 +41,17 @@ module Screengrab
 
     def self.warn_missing_aapt(android_home)
       if android_home
-        UI.important "The `aapt` command could not be found relative to your provided ANDROID_HOME at #{android_home}"
-        UI.important "Please ensure that the Android SDK is installed and you have the build tools downloaded"
+        UI.important("The `aapt` command could not be found relative to your provided ANDROID_HOME at #{android_home}")
+        UI.important("Please ensure that the Android SDK is installed and you have the build tools downloaded")
       else
-        UI.important "The `aapt` command could not be found on your PATH"
-        UI.important "Please ensure that the Android SDK is installed and you have the build tools downloaded and present on your PATH"
+        UI.important("The `aapt` command could not be found on your PATH")
+        UI.important("Please ensure that the Android SDK is installed and you have the build tools downloaded and present on your PATH")
       end
     end
 
     def self.warn_if_command_path_not_relative_to_android_home(cmd_name, android_home, cmd_path)
       if android_home && cmd_path && !cmd_path.start_with?(android_home)
-        UI.important "Using `#{cmd_name}` found at #{cmd_path} which is not within the specified ANDROID_HOME at #{android_home}"
+        UI.important("Using `#{cmd_name}` found at #{cmd_path} which is not within the specified ANDROID_HOME at #{android_home}")
       end
     end
   end

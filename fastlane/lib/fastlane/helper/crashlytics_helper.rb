@@ -43,7 +43,11 @@ module Fastlane
 
           UI.user_error!("The `crashlytics_path` must be a jar file for Android") unless params[:crashlytics_path].end_with?(".jar") || Helper.test?
 
-          command = ["java"]
+          if ENV['JAVA_HOME'].nil?
+            command = ["java"]
+          else
+            command = ["#{ENV['JAVA_HOME']}/bin/java"]
+          end
           command << "-jar #{File.expand_path(params[:crashlytics_path])}"
           command << "-androidRes ."
           command << "-apiKey #{params[:api_token]}"
@@ -80,15 +84,15 @@ module Fastlane
             http_conn = Net::HTTP.new(uri.host, uri.port)
             http_conn.use_ssl = true
             result = http_conn.request_get(uri.path)
-            UI.error! "#{result.message} (#{result.code})" unless result.kind_of? Net::HTTPSuccess
+            UI.error!("#{result.message} (#{result.code})") unless result.kind_of?(Net::HTTPSuccess)
             File.write(zip_path, result.body)
 
             # Now unzip the file
-            Action.sh "unzip '#{zip_path}' -d '#{containing}'"
+            Action.sh("unzip '#{zip_path}' -d '#{containing}'")
 
             UI.user_error!("Couldn't find 'crashlytics-devtools.jar'") unless File.exist?(jar_path)
 
-            UI.success "Successfully downloaded Crashlytics Support Library to '#{jar_path}'"
+            UI.success("Successfully downloaded Crashlytics Support Library to '#{jar_path}'")
           rescue => ex
             UI.user_error!("Error fetching remote file: #{ex}")
           end

@@ -1,3 +1,6 @@
+require_relative 'configuration/configuration'
+require_relative 'helper'
+
 module FastlaneCore
   class PrintTable
     class << self
@@ -33,9 +36,9 @@ module FastlaneCore
 
         params[:title] = title.green if title
 
-        puts ""
-        puts Terminal::Table.new(params)
-        puts ""
+        puts("")
+        puts(Terminal::Table.new(params))
+        puts("")
 
         return params
       end
@@ -115,8 +118,8 @@ module FastlaneCore
           next if hide_keys.include?(prefixed_key)
           value = mask if mask_keys.include?(prefixed_key)
 
-          if value.respond_to? :key
-            rows.concat self.collect_rows(options: value, hide_keys: hide_keys, mask_keys: mask_keys, prefix: "#{prefix}#{key}.", mask: mask)
+          if value.respond_to?(:key)
+            rows.concat(self.collect_rows(options: value, hide_keys: hide_keys, mask_keys: mask_keys, prefix: "#{prefix}#{key}.", mask: mask))
           else
             rows << [prefixed_key, value]
           end

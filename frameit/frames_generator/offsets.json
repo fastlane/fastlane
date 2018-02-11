@@ -24,6 +24,10 @@
       "offset": "+104+380",
       "width": 1242
     },
+    "iPhone X": {
+      "offset": "+85+77",
+      "width": 1125
+    },
     "iPad Air 2": {
       "offset": "+111+224",
       "width": 1536

@@ -10,17 +10,17 @@ module Fastlane
 
         xcodeproj_path = params[:xcodeproj] ? File.expand_path(File.join('.', params[:xcodeproj])) : nil
 
-        if Helper.is_test?
+        if Helper.test?
           xcodeproj_path = "/tmp/Test.xcodeproj"
         end
 
         # get the repo root path
-        repo_path = Helper.is_test? ? '/tmp/repo' : Actions.sh('hg root').strip
+        repo_path = Helper.test? ? '/tmp/repo' : Actions.sh('hg root').strip
         repo_pathname = Pathname.new(repo_path)
 
         if xcodeproj_path
           # ensure that the xcodeproj passed in was OK
-          unless Helper.is_test?
+          unless Helper.test?
             UI.user_error!("Could not find the specified xcodeproj: #{xcodeproj_path}") unless File.directory?(xcodeproj_path)
           end
         else
@@ -42,7 +42,7 @@ module Fastlane
         end
 
         # find the pbxproj path, relative to hg directory
-        if Helper.is_test?
+        if Helper.test?
           hg_dirty_files = params[:test_dirty_files].split(",")
           expected_changed_files = params[:test_expected_files].split(",")
         else
@@ -79,7 +79,7 @@ module Fastlane
         # check if the files changed are the ones we expected to change (these should be only the files that have version info in them)
         dirty_set = Set.new(hg_dirty_files.map(&:downcase))
         expected_set = Set.new(expected_changed_files.map(&:downcase))
-        changed_files_as_expected = dirty_set.subset? expected_set
+        changed_files_as_expected = dirty_set.subset?(expected_set)
         unless changed_files_as_expected
           unless params[:force]
             str = ["Found unexpected uncommitted changes in the working directory. Expected these files to have changed:",
@@ -94,7 +94,7 @@ module Fastlane
 
         # create a commit with a message
         command = "hg commit -m '#{params[:message]}'"
-        return command if Helper.is_test?
+        return command if Helper.test?
         begin
           Actions.sh(command)
 
@@ -120,7 +120,7 @@ module Fastlane
                                        description: "The path to your project file (Not the workspace). If you have only one, this is optional",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
+                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
                                          UI.user_error!("Could not find Xcode project") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :force,
@@ -158,7 +158,7 @@ module Fastlane
           "- All .plist files",
           "- The `.xcodeproj/project.pbxproj` file",
           "Then commits those files to the repo.",
-          "Customise the message with the `:message` option, defaults to 'Version Bump'",
+          "Customize the message with the `:message` option, defaults to 'Version Bump'",
           "If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the [`clean_build_artifacts`](#clean_build_artifacts) action to clean those temporary files up before running this action."
         ].join("\n")
       end

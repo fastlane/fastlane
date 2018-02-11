@@ -1,5 +1,9 @@
 require "digest/md5"
 
+require_relative 'globals'
+require_relative 'ui/ui'
+require_relative 'module'
+
 module FastlaneCore
   # Builds a package for the binary ready to be uploaded with the iTunes Transporter
   class IpaUploadPackageBuilder
@@ -9,8 +13,8 @@ module FastlaneCore
 
     def generate(app_id: nil, ipa_path: nil, package_path: nil, platform: nil)
       self.package_path = File.join(package_path, "#{app_id}.itmsp")
-      FileUtils.rm_rf self.package_path if File.directory?(self.package_path)
-      FileUtils.mkdir_p self.package_path
+      FileUtils.rm_rf(self.package_path) if File.directory?(self.package_path)
+      FileUtils.mkdir_p(self.package_path)
 
       ipa_path = copy_ipa(ipa_path)
       @data = {
@@ -23,7 +27,7 @@ module FastlaneCore
       }
 
       xml_path = File.join(FastlaneCore::ROOT, "lib/assets/XMLTemplate.xml.erb")
-      xml = ERB.new(File.read(xml_path)).result(binding) # http://www.rrn.dk/rubys-erb-templating-system
+      xml = ERB.new(File.read(xml_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
       File.write(File.join(self.package_path, METADATA_FILE_NAME), xml)
       UI.success("Wrote XML data to '#{self.package_path}'") if FastlaneCore::Globals.verbose?

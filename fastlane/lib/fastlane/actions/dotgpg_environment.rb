@@ -25,6 +25,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :dotgpg_file,
                                        env_name: "DOTGPG_FILE",
                                        description: "Path to your gpg file",
+                                       code_gen_sensitive: true,
                                        default_value: Dir["dotgpg/*.gpg"].last,
                                        optional: false,
                                        verify_block: proc do |value|

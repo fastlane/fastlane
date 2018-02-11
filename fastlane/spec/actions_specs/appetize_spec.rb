@@ -62,9 +62,9 @@ describe Fastlane do
               url: '#{url}'
             })
           end").runner.execute(:test)
-        end.not_to raise_error
+        end.not_to(raise_error)
 
-        expect(http).not_to receive(:request).with(JSON.generate(params))
+        expect(http).not_to(receive(:request).with(JSON.generate(params)))
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_PUBLIC_KEY]).to eql('sKdfjL')
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_APP_URL]).to eql('https://appetize.io/app/sKdfjL')
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_MANAGE_URL]).to eql('https://appetize.io/manage/private_Djksfj')

@@ -1,5 +1,7 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require 'credentials_manager/appfile_config'
+require 'fastlane_core/configuration/config_item'
+
+require_relative 'module'
 
 module Cert
   class Options
@@ -26,6 +28,7 @@ module Cert
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
                                      env_name: "CERT_TEAM_ID",
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      description: "The ID of your Developer Portal team if you're in multiple teams",
                                      optional: true,
@@ -37,6 +40,7 @@ module Cert
                                      env_name: "CERT_TEAM_NAME",
                                      description: "The name of your Developer Portal team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s
@@ -50,6 +54,7 @@ module Cert
                                      short_option: "-k",
                                      env_name: "CERT_KEYCHAIN_PATH",
                                      description: "Path to a custom keychain",
+                                     code_gen_sensitive: true,
                                      default_value: Dir["#{Dir.home}/Library/Keychains/login.keychain", "#{Dir.home}/Library/Keychains/login.keychain-db"].last,
                                      verify_block: proc do |value|
                                        value = File.expand_path(value)

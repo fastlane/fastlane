@@ -1,5 +1,7 @@
 require 'zip'
-require 'plist'
+
+require_relative 'core_ext/cfpropertylist'
+require_relative 'ui/ui'
 
 module FastlaneCore
   class IpaFileAnalyser
@@ -17,12 +19,19 @@ module FastlaneCore
       return nil
     end
 
+    # Fetches the app build number from the given ipa file.
+    def self.fetch_app_build(path)
+      plist = self.fetch_info_plist_file(path)
+      return plist['CFBundleVersion'] if plist
+      return nil
+    end
+
     # Fetches the app platform from the given ipa file.
     def self.fetch_app_platform(path)
       plist = self.fetch_info_plist_file(path)
       platform = "ios"
       platform = plist['DTPlatformName'] if plist
-      platform = "ios" if platform == "iphoneos" # via https://github.com/fastlane/spaceship/issues/247
+      platform = "ios" if platform == "iphoneos" # via https://github.com/fastlane/fastlane/issues/3484
       return platform
     end
 
@@ -38,10 +47,9 @@ module FastlaneCore
           # The XML file has to be properly unpacked first
           tmp_path = File.join(tmp, "Info.plist")
           File.open(tmp_path, 'wb') do |output|
-            output.write zipfile.read(file)
+            output.write(zipfile.read(file))
           end
-          system("plutil -convert xml1 #{tmp_path}")
-          result = Plist.parse_xml(tmp_path)
+          result = CFPropertyList.native_types(CFPropertyList::List.new(file: tmp_path).value)
 
           if result['CFBundleIdentifier'] or result['CFBundleVersion']
             return result

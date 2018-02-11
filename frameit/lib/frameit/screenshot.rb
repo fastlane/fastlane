@@ -1,3 +1,10 @@
+require 'deliver/app_screenshot'
+
+require_relative 'editor'
+require_relative 'mac_editor'
+require_relative 'device_types'
+require_relative 'module'
+
 module Frameit
   # Represents one screenshot
   class Screenshot
@@ -9,7 +16,7 @@ module Frameit
     # path: Path to screenshot
     # color: Color to use for the frame
     def initialize(path, color)
-      UI.user_error!("Couldn't find file at path '#{path}'") unless File.exist? path
+      UI.user_error!("Couldn't find file at path '#{path}'") unless File.exist?(path)
       @color = color
       @path = path
       @size = FastImage.size(path)
@@ -19,8 +26,11 @@ module Frameit
 
     # Device name for a given screen size. Used to use the correct template
     def device_name
+      # rubocop:disable Require/MissingRequireStatement
       sizes = Deliver::AppScreenshot::ScreenSize
       case @screen_size
+      when sizes::IOS_58
+        return 'iPhone X'
       when sizes::IOS_55
         return Frameit.config[:use_legacy_iphone6s] ? 'iPhone 6s Plus' : 'iPhone 7 Plus'
       when sizes::IOS_47
@@ -36,8 +46,9 @@ module Frameit
       when sizes::MAC
         return 'MacBook'
       else
-        UI.error "Unknown device type for size #{@screen_size} for path '#{path}'"
+        UI.error("Unknown device type for size #{@screen_size} for path '#{path}'")
       end
+      # rubocop:enable Require/MissingRequireStatement
     end
 
     def color
@@ -49,9 +60,9 @@ module Frameit
       return @color
     end
 
-    # Is the device a 3x device? (e.g. 6 Plus)
+    # Is the device a 3x device? (e.g. iPhone 6 Plus, iPhone X)
     def triple_density?
-      (screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55)
+      (screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || screen_size == Deliver::AppScreenshot::ScreenSize::IOS_58)
     end
 
     # Super old devices (iPhone 4)
@@ -69,8 +80,37 @@ module Frameit
       return Orientation::LANDSCAPE
     end
 
+    def frame_orientation
+      filename = File.basename(self.path, ".*")
+      block = Frameit.config[:force_orientation_block]
+
+      unless block.nil?
+        orientation = block.call(filename)
+        valid = [:landscape_left, :landscape_right, :portrait, nil]
+        UI.user_error("orientation_block must return #{valid[0..-2].join(', ')} or nil") unless valid.include?(orientation)
+      end
+
+      puts("Forced orientation: #{orientation}") unless orientation.nil?
+
+      return orientation unless orientation.nil?
+      return :portrait if self.orientation_name == Orientation::PORTRAIT
+      return :landscape_right # Default landscape orientation
+    end
+
     def portrait?
-      return (orientation_name == Orientation::PORTRAIT)
+      return (frame_orientation == :portrait)
+    end
+
+    def landscape_left?
+      return (frame_orientation == :landscape_left)
+    end
+
+    def landscape_right?
+      return (frame_orientation == :landscape_right)
+    end
+
+    def landscape?
+      return self.landscape_left? || self.landscape_right
     end
 
     def to_s

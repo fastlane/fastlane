@@ -10,9 +10,9 @@ module Fastlane
         cmd << command_name
 
         if command_name == "archive" && params[:frameworks].count > 0
-          cmd.concat params[:frameworks]
-        elsif command_name == "update" && params[:dependencies].count > 0
-          cmd.concat params[:dependencies]
+          cmd.concat(params[:frameworks])
+        elsif (command_name == "update" || command_name == "build") && params[:dependencies].count > 0
+          cmd.concat(params[:dependencies])
         end
 
         cmd << "--output #{params[:output]}" if params[:output]
@@ -28,6 +28,7 @@ module Fastlane
         cmd << "--toolchain #{params[:toolchain]}" if params[:toolchain]
         cmd << "--project-directory #{params[:project_directory]}" if params[:project_directory]
         cmd << "--cache-builds" if params[:cache_builds]
+        cmd << "--new-resolver" if params[:new_resolver]
 
         Actions.sh(cmd.join(' '))
       end
@@ -62,10 +63,10 @@ module Fastlane
                                        description: "Carthage command (one of: #{available_commands.join(', ')})",
                                        default_value: 'bootstrap',
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid command. Use one of the following: #{available_commands.join(', ')}") unless available_commands.include? value
+                                         UI.user_error!("Please pass a valid command. Use one of the following: #{available_commands.join(', ')}") unless available_commands.include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :dependencies,
-                                       description: "Carthage dependencies to update",
+                                       description: "Carthage dependencies to update or build",
                                        default_value: [],
                                        is_string: false,
                                        type: Array),
@@ -73,42 +74,32 @@ module Fastlane
                                        env_name: "FL_CARTHAGE_USE_SSH",
                                        description: "Use SSH for downloading GitHub repositories",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for use_ssh. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :use_submodules,
                                        env_name: "FL_CARTHAGE_USE_SUBMODULES",
                                        description: "Add dependencies as Git submodules",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for use_submodules. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :use_binaries,
                                        env_name: "FL_CARTHAGE_USE_BINARIES",
                                        description: "Check out dependency repositories even when prebuilt frameworks exist",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for use_binaries. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :no_build,
                                        env_name: "FL_CARTHAGE_NO_BUILD",
                                        description: "When bootstrapping Carthage do not build",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for no_build. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :no_skip_current,
                                        env_name: "FL_CARTHAGE_NO_SKIP_CURRENT",
                                        description: "Don't skip building the Carthage project (in addition to its dependencies)",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for no_skip_current. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :derived_data,
                                        env_name: "FL_CARTHAGE_DERIVED_DATA",
                                        description: "Use derived data folder at path",
@@ -117,10 +108,8 @@ module Fastlane
                                        env_name: "FL_CARTHAGE_VERBOSE",
                                        description: "Print xcodebuild output inline",
                                        is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid value for verbose. Use one of the following: true, false") unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
-                                       end),
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        env_name: "FL_CARTHAGE_PLATFORM",
                                        description: "Define which platform to build for",
@@ -163,7 +152,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :project_directory,
                                        env_name: "FL_CARTHAGE_PROJECT_DIRECTORY",
                                        description: "Define the directory containing the Carthage project",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :new_resolver,
+                                       env_name: "FL_CARTHAGE_NEW_RESOLVER",
+                                       description: "Use new resolver when resolving dependency graph",
+                                       is_string: false,
+                                       optional: true,
+                                       type: Boolean)
         ]
       end
 
@@ -174,7 +169,7 @@ module Fastlane
             frameworks: ["MyFramework1", "MyFramework2"],   # Specify which frameworks to archive (only for the archive command)
             output: "MyFrameworkBundle.framework.zip",      # Specify the output archive name (only for the archive command)
             command: "bootstrap",                           # One of: build, bootstrap, update, archive. (default: bootstrap)
-            dependencies: ["Alamofire", "Notice"],          # Specify which dependencies to update (only for the update command)
+            dependencies: ["Alamofire", "Notice"],          # Specify which dependencies to update or build (only for update and build commands)
             use_ssh: false,                                 # Use SSH for downloading GitHub repositories.
             use_submodules: false,                          # Add dependencies as Git submodules.
             use_binaries: true,                             # Check out dependency repositories even when prebuilt frameworks exist
@@ -184,7 +179,8 @@ module Fastlane
             platform: "all",                                # Define which platform to build for (one of ‘all’, ‘Mac’, ‘iOS’, ‘watchOS’, ‘tvOS‘, or comma-separated values of the formers except for ‘all’)
             configuration: "Release",                       # Build configuration to use when building
             cache_builds: true,                             # By default Carthage will rebuild a dependency regardless of whether its the same resolved version as before.
-            toolchain: "com.apple.dt.toolchain.Swift_2_3"   # Specify the xcodebuild toolchain
+            toolchain: "com.apple.dt.toolchain.Swift_2_3",  # Specify the xcodebuild toolchain
+            new_resolver: false                             # Use the new resolver to resolve depdendency graph
           )'
         ]
       end
@@ -194,11 +190,11 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.authors
-        ["bassrock", "petester42", "jschmid", "JaviSoto", "uny", "phatblat", "bfcrampton", "antondomashnev"]
+        ["bassrock", "petester42", "jschmid", "JaviSoto", "uny", "phatblat", "bfcrampton", "antondomashnev", "gbrhaz"]
       end
     end
   end
