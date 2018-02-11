@@ -42,20 +42,20 @@ func startRecording(name: String) {
     sendCommand(command: "startRecording",args: "name=\(name)")
 }
 
-func stopRecording() {
-    sendCommand(command: "stopRecording")
+func stopRecording(name: String) {
+    sendCommand(command: "stopRecording",args: "name=\(name)")
 }
 
 func sendCommand(command: String,args: String = "") {
     guard var simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let port = Snapshot.getCommandListenerPort() else { return }
     simulator = simulator.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
-    if let url = URL(string: "http://localhost:\(port)/\(commnad)?device=\(simulator)&\(args)") {
+    if let url = URL(string: "http://localhost:\(port)/\(command)?device=\(simulator)&\(args)") {
         let (_, _, error) = URLSession.shared.synchronousDataTask(with: url)
         if (error != nil) {
-            print("Error sending commnad: \(String(describing: error))")
+            print("Error sending command: \(String(describing: error))")
         }
     } else {
-        print("Error sending commnad: bad URL")
+        print("Error sending command: bad URL")
     }
 }
 

@@ -71,7 +71,7 @@ module Snapshot
           listener = CommandListener.new do |cmd, args|
             UI.verbose("cmd '#{cmd}' - '#{args}'")
             start_recording(dir_name, args["device"].first, args["name"].first) if cmd == "startRecording"
-            stop_recording(args["device"].first) if cmd == "stopRecording"
+            stop_recording(dir_name, args["device"].first, args["name"].first) if cmd == "stopRecording"
           end
           File.write(File.join(CACHE_DIR, "Command_listener_port.txt"), listener.server.addr[1])
 
@@ -153,6 +153,20 @@ module Snapshot
       name = name.gsub(/[^0-9A-Za-z.\-]/, '_')
       folder = File.join(Snapshot.config[:video_output_directory], dir_name, device)
       FileUtils.mkdir_p(folder)
+
+      Thread.new do
+        sleep(0.5)
+        FastlaneCore::CommandExecutor.execute(command: "sh /Users/jm/Dropbox/Code_ObjC/STT_V2_HD/fastlane/Promo/process-start-audio-record.sh",
+                                            print_all: true,
+                                        print_command: true,
+                                              loading: "Recording audio...",
+                                                error: proc do |output, return_code|
+                                                         ErrorHandler.handle_test_error(output, return_code)
+                                                         UI.error "Caught error... #{return_code}"
+                                                         UI.error "Caught output... #{output}"
+                                                       end)
+      end
+
       Thread.new do
         FastlaneCore::CommandExecutor.execute(command: "xcrun simctl io #{device_udid} recordVideo #{folder}/#{name}.mp4",
                                             print_all: true,
@@ -169,13 +183,32 @@ module Snapshot
       end
     end
 
-    def stop_recording(device)
+    def stop_recording(dir_name, device, name)
       device_udid = TestCommandGenerator.device_udid(device)
       pid = @recording_pid[device_udid]
       return if pid.nil?
+      device = device.gsub(/[^0-9A-Za-z.\-]/, '_')
+ +    name = name.gsub(/[^0-9A-Za-z.\-]/, '_')
+ +    folder = File.join(Snapshot.config[:video_output_directory], dir_name, device)
+
       UI.message("stop_recording")
       Process.kill("SIGINT", pid)
       @recording_pid[device_udid] = nil
+
+      Thread.new do
+        sleep(5)
+        FastlaneCore::CommandExecutor.execute(command: "sh /Users/jm/Dropbox/Code_ObjC/STT_V2_HD/fastlane/Promo/process-stop-audio-record.sh #{name} #{folder}/#{name}.mp4 #{folder}/#{name}-video.mp4",
+                                            print_all: true,
+                                        print_command: true,
+                                              loading: "Processing audio / video operations...",
+                                                error: proc do |output, return_code|
+                                                         ErrorHandler.handle_test_error(output, return_code)
+                                                         UI.error "Caught error... #{return_code}"
+                                                         UI.error "Caught output... #{output}"
+                                                       end)
+      end
+      sleep(5)
+
     end
 
     def cleanup_after_failure(devices, language, locale, launch_args, return_code)

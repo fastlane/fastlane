@@ -36,8 +36,8 @@ func startRecording(name: String) {
     sendCommand(command: "startRecording?name=\(name)")
 }
 
-func stopRecording() {
-    sendCommand(command: "stopRecording")
+func stopRecording(name: String) {
+    sendCommand(command: "stopRecording?name=\(name)")
 }
 
 func sendCommand(command: String) {
