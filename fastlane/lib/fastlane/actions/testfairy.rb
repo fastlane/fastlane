@@ -76,8 +76,6 @@ module Fastlane
             [key, value.join(',')]
           when :metrics
             [key, metrics_to_client.call(value).join(',')]
-          when :icon_watermark
-            ['icon-watermark', value]
           when :comment
             [key, value]
           when :auto_update
