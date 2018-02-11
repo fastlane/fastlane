@@ -62,7 +62,18 @@ describe Spaceship::Tunes::IAP do
             tier: 1
           }
         ]
-        expect(client).to receive(:update_recurring_iap_pricing!).with(app_id: '898536088', purchase_id: "1195137657", pricing_intervals: pricing_intervals)
+        transformed_pricing_intervals = pricing_intervals.map do |interval|
+          {
+            "value" =>  {
+              "tierStem" =>  interval[:tier],
+              "priceTierEffectiveDate" =>  interval[:begin_date],
+              "priceTierEndDate" =>  interval[:end_date],
+              "country" =>  interval[:country] || "WW",
+              "grandfathered" =>  interval[:grandfathered]
+            }
+          }
+        end
+        expect(client).to receive(:update_recurring_iap_pricing!).with(app_id: '898536088', purchase_id: "1195137657", pricing_intervals: transformed_pricing_intervals)
 
         app.in_app_purchases.create!(
           type: Spaceship::Tunes::IAPType::RECURRING,

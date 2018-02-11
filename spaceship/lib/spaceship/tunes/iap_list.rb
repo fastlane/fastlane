@@ -60,8 +60,9 @@ module Spaceship
         attrs[:application] = application
 
         if attrs["addOnType"] == Spaceship::Tunes::IAPType::RECURRING
-          attrs["pricingIntervals"] = client.load_recurring_iap_pricing(app_id: application.apple_id,
-                                                                        purchase_id: self.purchase_id)["subscriptions"]
+          raw_pricing_data = client.load_recurring_iap_pricing(app_id: application.apple_id,
+                                                               purchase_id: self.purchase_id)
+          attrs["pricingData"] = raw_pricing_data
         end
 
         Tunes::IAPDetail.new(attrs)
