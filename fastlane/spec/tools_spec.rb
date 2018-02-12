@@ -12,8 +12,10 @@ describe Fastlane do
 
     it "warns the user when a lane is called like a tool" do
       ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile1')
+      expect(UI).to receive(:error).with("------------------------------------------------")
       expect(UI).to receive(:error).with("Lane name 'gym' should not be used because it is the name of a fastlane tool")
       expect(UI).to receive(:error).with("It is recommended to not use 'gym' as the name of your lane")
+      expect(UI).to receive(:error).with("------------------------------------------------")
       ff.lane(:gym) do
       end
     end
