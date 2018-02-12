@@ -53,18 +53,24 @@ module Fastlane
 
         # Loop through all app versions and download their dSYM
         app.all_build_train_numbers(platform: platform).each do |train_number|
+          UI.verbose("Found train: #{train_number}, comparing to supplied version: #{version}")
           if version && version != train_number
+            UI.verbose("Version #{version} doesn't match: #{train_number}")
             next
           end
           app.all_builds_for_train(train: train_number, platform: platform).each do |build|
+            UI.verbose("Found build version: #{build.build_version}, comparing to supplied build_number: #{build_number}")
             if build_number && build.build_version != build_number
+              UI.verbose("build_version: #{build.build_version} doesn't match: #{build_number}")
               next
             end
 
             begin
               # need to call reload here or dsym_url is nil
+              UI.verbose("Build_version: #{build.build_version} matches #{build_number}, grabbing dsym_url")
               build.reload
               download_url = build.dsym_url
+              UI.verbose("dsym_url: #{download_url}")
             rescue Spaceship::TunesClient::ITunesConnectError => ex
               UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
             end
