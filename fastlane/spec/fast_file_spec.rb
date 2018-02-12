@@ -160,7 +160,9 @@ describe Fastlane do
       end
 
       it "prints a warning if a lane is called like an action" do
-        expect(UI).to receive(:important).with("Name of the lane 'cocoapods' is already taken by the action named 'cocoapods'")
+        expect(UI).to receive(:error).with("------------------------------------------------")
+        expect(UI).to receive(:error).with("Name of the lane 'cocoapods' is already taken by the action named 'cocoapods'")
+        expect(UI).to receive(:error).with("------------------------------------------------")
         Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileLaneNameEqualsActionName')
       end
 
