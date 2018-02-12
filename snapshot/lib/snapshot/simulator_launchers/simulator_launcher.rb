@@ -195,19 +195,16 @@ module Snapshot
       Process.kill("SIGINT", pid)
       @recording_pid[device_udid] = nil
 
-      Thread.new do
-        sleep(5)
-        FastlaneCore::CommandExecutor.execute(command: "sh /Users/jm/Dropbox/Code_ObjC/STT_V2_HD/fastlane/Promo/process-stop-audio-record.sh #{name} #{folder}/#{name}.mp4 #{folder}/#{name}-video.mp4",
-                                            print_all: true,
-                                        print_command: true,
-                                              loading: "Processing audio / video operations...",
-                                                error: proc do |output, return_code|
-                                                         ErrorHandler.handle_test_error(output, return_code)
-                                                         UI.error "Caught error... #{return_code}"
-                                                         UI.error "Caught output... #{output}"
-                                                       end)
-      end
       sleep(5)
+      FastlaneCore::CommandExecutor.execute(command: "sh /Users/jm/Dropbox/Code_ObjC/STT_V2_HD/fastlane/Promo/process-stop-audio-record.sh #{name} #{folder}/#{name}.mp4 #{folder}/#{name}-video.mp4",
+                                          print_all: true,
+                                      print_command: true,
+                                            loading: "Processing audio / video operations...",
+                                              error: proc do |output, return_code|
+                                                       ErrorHandler.handle_test_error(output, return_code)
+                                                       UI.error "Caught error... #{return_code}"
+                                                       UI.error "Caught output... #{output}"
+                                                     end)
 
     end
 
