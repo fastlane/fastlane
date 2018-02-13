@@ -108,6 +108,8 @@ module Fastlane
         type = "[String]"
       elsif default_value.kind_of?(Hash)
         type = "[String : Any]"
+      elsif default_value.kind_of?(Integer)
+        type = "Int"
       end
       return "#{type}#{optional_specifier}"
     end
