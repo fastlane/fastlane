@@ -133,7 +133,7 @@ open class Snapshot: NSObject {
         sleep(1) // Waiting for the animation to be finished (kind of)
 
         #if os(OSX)
-            XCUIApplication().typeKey(XCUIKeyboardKeySecondaryFn, modifierFlags: [])
+            Snapshot.app.typeKey(XCUIKeyboardKeySecondaryFn, modifierFlags: [])
         #else
             let screenshot = app.windows.firstMatch.screenshot()
             guard let simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
@@ -152,7 +152,7 @@ open class Snapshot: NSObject {
             return
         #endif
 
-        let networkLoadingIndicator = XCUIApplication().otherElements.deviceStatusBars.networkLoadingIndicators.element
+        let networkLoadingIndicator = Snapshot.app.otherElements.deviceStatusBars.networkLoadingIndicators.element
         let networkLoadingIndicatorDisappeared = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: networkLoadingIndicator)
         _ = XCTWaiter.wait(for: [networkLoadingIndicatorDisappeared], timeout: timeout)
     }
@@ -223,7 +223,7 @@ private extension XCUIElementQuery {
     }
 
     var deviceStatusBars: XCUIElementQuery {
-        let deviceWidth = XCUIApplication().frame.width
+        let deviceWidth = Snapshot.app.frame.width
 
         let isStatusBar = NSPredicate { (evaluatedObject, _) in
             guard let element = evaluatedObject as? XCUIElementAttributes else { return false }
