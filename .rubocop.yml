@@ -297,7 +297,9 @@ Style/MethodCallWithArgsParentheses:
     - 'raise'
     - 'attr_accessor'
     - 'attr_reader'
+    - 'desc'
     - 'lane'
+    - 'private_lane'
     # rspec tests code below
     - 'to'
     - 'describe'

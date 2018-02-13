@@ -5,20 +5,20 @@ skip_docs # Do not create fastlane/README.txt
 
 # Test and Validate
 
-desc("Runs the unit tests and other verifications for the fastlane repo")
-lane(:test) do |options|
+desc "Runs the unit tests and other verifications for the fastlane repo"
+lane :test do |options|
   validate_repo
 end
 
-desc("Verifies all tests pass and the current state of the repo is valid")
-lane(:validate_repo) do
+desc "Verifies all tests pass and the current state of the repo is valid"
+lane :validate_repo do
   lint_source
   execute_tests
   validate_docs
 end
 
-desc("Verifies source code is in a good state")
-lane(:lint_source) do
+desc "Verifies source code is in a good state"
+lane :lint_source do
   # Verifying that no debug code is in the code base
   #
   ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "playground.rb", exclude_dirs: ["\.bundle"]) # debugging code
@@ -42,8 +42,8 @@ lane(:lint_source) do
   end
 end
 
-desc("Runs the tests")
-lane(:execute_tests) do
+desc "Runs the tests"
+lane :execute_tests do
   version = local_version # has to be outside of the `Dir.chdir`
 
   # Verifying the --help command
@@ -72,8 +72,8 @@ end
 
 # Release Management
 
-desc("Increment the version number of this gem, after generating new Swift API")
-lane(:bump) do |options|
+desc "Increment the version number of this gem, after generating new Swift API"
+lane :bump do |options|
   verify_env_variables
   ensure_git_branch(branch: "master")
   ensure_git_status_clean
@@ -145,8 +145,8 @@ lane(:bump) do |options|
   sh("git checkout master")
 end
 
-desc("Generate the Swift api and test it")
-lane(:generate_swift_api) do |options|
+desc "Generate the Swift api and test it"
+lane :generate_swift_api do |options|
   Fastlane::VERSION = options[:fastlane_version]
   require "../fastlane/lib/fastlane/swift_fastlane_api_generator.rb"
   swift_generator = Fastlane::SwiftFastlaneAPIGenerator.new
@@ -160,8 +160,8 @@ lane(:generate_swift_api) do |options|
   generated_files
 end
 
-desc("Generate the FastlaneSwiftRunner project manifest")
-lane(:generate_fastlane_swift_runner_manifest) do |options|
+desc "Generate the FastlaneSwiftRunner project manifest"
+lane :generate_fastlane_swift_runner_manifest do |options|
   # Don't attempt to upgrade config files, like Fastfile.swift, Deliverfile.swift, etc...
   non_upgrade_set = TOOL_CONFIG_FILES.map { |tool_name| "#{tool_name}.swift" }.to_set
 
@@ -184,9 +184,9 @@ lane(:generate_fastlane_swift_runner_manifest) do |options|
   manifest_path
 end
 
-desc("Does everything that's needed for a release")
-desc("This includes running tests and verifying the GitHub release")
-lane(:release) do
+desc "Does everything that's needed for a release"
+desc "This includes running tests and verifying the GitHub release"
+lane :release do
   verify_env_variables
   slack_train_start(distance: 2,
                        train: "🚀",
@@ -275,8 +275,8 @@ lane(:release) do
   slack_train
 end
 
-desc("Notifies Fabric Slack to run CI Job for Mac App")
-private_lane(:send_mac_app_ci_reminder) do
+desc "Notifies Fabric Slack to run CI Job for Mac App"
+private_lane :send_mac_app_ci_reminder do
   if ENV['FABRIC_SLACK_URL']
     slack(
       slack_url: ENV['FABRIC_SLACK_URL'],
@@ -287,8 +287,8 @@ private_lane(:send_mac_app_ci_reminder) do
   end
 end
 
-desc("Print out the changelog since the last tagged release and open the GitHub page with the changes")
-lane(:show_changelog) do |options|
+desc "Print out the changelog since the last tagged release and open the GitHub page with the changes"
+lane :show_changelog do |options|
   old_version = options[:old_version] || current_version
 
   changes = sh("git log --pretty='* %s via %aN' #{old_version}...HEAD --no-merges ..", log: $verbose).gsub("\n\n", "\n")
@@ -301,16 +301,16 @@ lane(:show_changelog) do |options|
   changes # return the text without the modified colors
 end
 
-desc("Add a git tag in the fastlane repo for this release")
-private_lane(:add_fastlane_git_tag) do |options|
+desc "Add a git tag in the fastlane repo for this release"
+private_lane :add_fastlane_git_tag do |options|
   `git tag -am #{options[:message].shellescape} #{options[:tag].shellescape}`
   push_git_tags
 end
 
 # Docs
 
-desc("Validates the docs still are good")
-lane(:validate_docs) do
+desc "Validates the docs still are good"
+lane :validate_docs do
   # Test if generating the docs is successful
   clone_docs do
     generate_markdown_docs(target_path: ".")
@@ -320,8 +320,8 @@ lane(:validate_docs) do
   verify_docs
 end
 
-desc("Makes sure the tests on https://docs.fastlane.tools still work with the latest version")
-lane(:verify_docs) do
+desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
+lane :verify_docs do
   clone_docs do
     Bundler.with_clean_env do
       puts(`sed -i -e "s/activate_bin_path/bin_path/g" $(which bundle)`) # workaround for bundler https://github.com/bundler/bundler/issues/4602#issuecomment-233619696
@@ -331,9 +331,9 @@ lane(:verify_docs) do
   end
 end
 
-desc("Update the actions.md on https://docs.fastlane.tools")
-desc("This will also automatically submit a pull request to fastlane/docs")
-lane(:update_docs) do
+desc "Update the actions.md on https://docs.fastlane.tools"
+desc "This will also automatically submit a pull request to fastlane/docs"
+lane :update_docs do
   verify_env_variables
 
   template_path = File.expand_path("./assets/render_plugin.md.erb")
@@ -420,24 +420,24 @@ end
 
 # Helper
 
-desc("Ensure all the requirement environment variables are provided")
-desc("this way the deployment script will fail early (and often)")
-private_lane(:verify_env_variables) do
+desc "Ensure all the requirement environment variables are provided"
+desc "this way the deployment script will fail early (and often)"
+private_lane :verify_env_variables do
   ["GITHUB_USER_NAME", "GITHUB_API_TOKEN"].each do |variable|
     next if ENV[variable].to_s.length > 0
     UI.user_error!("Missing ENV variables #{variable}, make sure to provide one for fastlane to be successful")
   end
 end
 
-desc("Get the local version number per version.rb")
-private_lane(:local_version) do
+desc "Get the local version number per version.rb"
+private_lane :local_version do
   require "../fastlane/lib/fastlane/version.rb"
 
   Fastlane::VERSION
 end
 
-desc("Get the version number of the last release")
-private_lane(:current_version) do
+desc "Get the version number of the last release"
+private_lane :current_version do
   puts("Checking the latest version on RubyGems")
   download(url: "https://rubygems.org/api/v1/gems/fastlane.json")["version"]
 end
