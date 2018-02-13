@@ -18,10 +18,10 @@ module Spaceship
     end
 
     # Public getter for all UI related code
-    # rubocop:disable Naming/MethodName
+    # rubocop:disable Style/MethodName
     def UI
       UserInterface.new(self)
     end
-    # rubocop:enable Naming/MethodName
+    # rubocop:enable Style/MethodName
   end
 end
