@@ -1515,7 +1515,7 @@ func getProvisioningProfile(adhoc: Bool = false,
 }
 func getPushCertificate(development: Bool = false,
                         generateP12: Bool = true,
-                        activeDaysLimit: String = "30",
+                        activeDaysLimit: Int = 30,
                         force: Bool = false,
                         savePrivateKey: Bool = true,
                         appIdentifier: String,
