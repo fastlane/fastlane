@@ -130,13 +130,15 @@ module Gym
       bcsymbolmaps_directory = File.expand_path("../../BCSymbolMaps", PackageCommandGenerator.dsym_path)
       available_dsyms = Dir.glob("#{containing_directory}/*.dSYM")
 
-      UI.message("Mapping dSYM(s) using generated BCSymbolMaps") unless Gym.config[:silent]
-      available_dsyms.each do |dsym|
-        command = []
-        command << "dsymutil"
-        command << "--symbol-map #{bcsymbolmaps_directory.shellescape}"
-        command << dsym.shellescape
-        Helper.backticks(command.join(" "), print: !Gym.config[:silent])
+      if Dir.exist?(bcsymbolmaps_directory)
+        UI.message("Mapping dSYM(s) using generated BCSymbolMaps") unless Gym.config[:silent]
+        available_dsyms.each do |dsym|
+          command = []
+          command << "dsymutil"
+          command << "--symbol-map #{bcsymbolmaps_directory.shellescape}"
+          command << dsym.shellescape
+          Helper.backticks(command.join(" "), print: !Gym.config[:silent])
+        end
       end
 
       UI.message("Compressing #{available_dsyms.count} dSYM(s)") unless Gym.config[:silent]
