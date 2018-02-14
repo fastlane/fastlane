@@ -48,6 +48,7 @@ module Fastlane
       end
 
       def self.resolve_path(path, xcodeproj_path)
+        return nil unless path
         project_dir = File.dirname(xcodeproj_path)
         # SRCROOT, SOURCE_ROOT and PROJECT_DIR are the same
         %w{SRCROOT SOURCE_ROOT PROJECT_DIR}.each do |variable_name|
