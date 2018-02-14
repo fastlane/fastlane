@@ -129,16 +129,16 @@ module Gym
       containing_directory = File.expand_path("..", PackageCommandGenerator.dsym_path)
       bcsymbolmaps_directory = File.expand_path("../../BCSymbolMaps", PackageCommandGenerator.dsym_path)
       available_dsyms = Dir.glob("#{containing_directory}/*.dSYM")
-      
+
       UI.message("Mapping dSYM(s) using generated BCSymbolMaps") unless Gym.config[:silent]
       available_dsyms.each do |dsym|
-      	command = []
+        command = []
         command << "dsymutil"
         command << "--symbol-map #{bcsymbolmaps_directory}"
         command << dsym
         Helper.backticks(command.join(" "), print: !Gym.config[:silent])
       end
-      
+
       UI.message("Compressing #{available_dsyms.count} dSYM(s)") unless Gym.config[:silent]
 
       output_path = File.expand_path(File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".app.dSYM.zip"))
