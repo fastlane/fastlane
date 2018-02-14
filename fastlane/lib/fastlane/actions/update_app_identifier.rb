@@ -23,7 +23,7 @@ module Fastlane
           configs = project.objects.select { |obj| obj.isa == 'XCBuildConfiguration' && !obj.build_settings[identifier_key].nil? }
           UI.user_error!("Info plist uses $(#{identifier_key}), but xcodeproj does not") unless configs.count > 0
 
-          configs = configs.select { |obj| obj.build_settings[info_plist_key] == params[:plist_path] }
+          configs = configs.select { |obj| resolve_path(obj.build_settings[info_plist_key], params[:xcodeproj]) == info_plist_path }
           UI.user_error!("Xcodeproj doesn't have configuration with info plist #{params[:plist_path]}.") unless configs.count > 0
 
           # For each of the build configurations, set app identifier
