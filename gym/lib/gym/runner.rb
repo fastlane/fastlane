@@ -136,7 +136,7 @@ module Gym
         command << "dsymutil"
         command << "--symbol-map #{bcsymbolmaps_directory}"
         command << dsym
-        Actions.sh(command.join(" "), log: false)
+        Helper.backticks(command.join(" "), print: !Gym.config[:silent])
       end
       
       UI.message("Compressing #{available_dsyms.count} dSYM(s)") unless Gym.config[:silent]
