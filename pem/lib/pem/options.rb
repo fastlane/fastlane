@@ -25,6 +25,7 @@ module PEM
                                      description: "If the current certificate is active for less than this number of days, generate a new one. Default value is 30 days",
                                      default_value: 30,
                                      is_string: false,
+                                     type: Integer,
                                      verify_block: proc do |value|
                                        UI.user_error!("Value of active_days_limit must be a positive integer or left blank") unless value.kind_of?(Integer) && value > 0
                                      end),
