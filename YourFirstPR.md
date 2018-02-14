@@ -28,7 +28,7 @@ If you want to work on something else, e.g. new functionality or fixing a bug, i
 
 ## Testing your changes
 
-[Testing _fastlane_](Testing.md) is so important, that the instructions have their own documentation file. They include [how to test your local changes](Testing.md#Testing-your-local-changes) and [how to test your local fastlane code base with your setup](Testing.md#Test-your-local-fastlane-code-base-with-your-setup).
+[Testing _fastlane_](Testing.md) is so important, that the instructions have their own documentation file. They include [how to test your local changes](Testing.md#testing-your-local-changes) and [how to test your local fastlane code base with your setup](Testing.md#test-your-local-fastlane-code-base-with-your-setup).
 
 ## Submitting the PR
 
