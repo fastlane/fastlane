@@ -134,8 +134,8 @@ module Gym
       available_dsyms.each do |dsym|
         command = []
         command << "dsymutil"
-        command << "--symbol-map #{bcsymbolmaps_directory}"
-        command << dsym
+        command << "--symbol-map #{bcsymbolmaps_directory.shellescape}"
+        command << dsym.shellescape
         Helper.backticks(command.join(" "), print: !Gym.config[:silent])
       end
 
