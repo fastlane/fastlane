@@ -35,6 +35,7 @@ module Fastlane
 
           if params[:team_id]
             sett["DevelopmentTeam"] = params[:team_id]
+            build_configuration_list.set_setting("DEVELOPMENT_TEAM", params[:team_id])
             UI.important("Set Team id to: #{params[:team_id]} for target: #{found_target[:name]}")
           end
           if params[:code_sign_identity]
