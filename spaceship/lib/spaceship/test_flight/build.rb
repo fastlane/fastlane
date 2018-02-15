@@ -90,7 +90,8 @@ module Spaceship
         ready_to_submit: 'testflight.build.state.submit.ready',
         ready_to_test: 'testflight.build.state.testing.ready',
         export_compliance_missing: 'testflight.build.state.export.compliance.missing',
-        review_rejected: 'testflight.build.state.review.rejected'
+        review_rejected: 'testflight.build.state.review.rejected',
+        approved: 'testflight.build.state.review.approved'
       }
 
       # Find a Build by `build_id`.
@@ -155,6 +156,10 @@ module Spaceship
         external_state == BUILD_STATES[:review_rejected]
       end
 
+      def approved?
+        external_state == BUILD_STATES[:approved]
+      end
+
       def processed?
         active? || ready_to_submit? || export_compliance_missing? || review_rejected?
       end
@@ -201,6 +206,7 @@ module Spaceship
 
       def submit_for_testflight_review!
         return if ready_to_test?
+        return if approved?
         client.post_for_testflight_review(app_id: app_id, build_id: id, build: self)
       end
 
