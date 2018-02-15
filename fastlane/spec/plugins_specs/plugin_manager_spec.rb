@@ -121,6 +121,12 @@ describe Fastlane do
           expect(FastlaneCore::UI.current).to receive(:select).and_return("RubyGems.org ('fastlane' seems to not be available there)")
           expect(plugin_manager.gem_dependency_suffix("fastlane")).to eq("")
         end
+
+        it "supports specifying a custom source" do
+          expect(FastlaneCore::UI.current).to receive(:select).and_return("Other Gem Server")
+          expect(FastlaneCore::UI.current).to receive(:input).and_return("https://gems.mycompany.com")
+          expect(plugin_manager.gem_dependency_suffix("fastlane")).to eq(", source: 'https://gems.mycompany.com'")
+        end
       end
     end
 
