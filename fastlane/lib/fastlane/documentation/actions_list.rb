@@ -135,6 +135,8 @@ module Fastlane
       else
         puts("No available options".yellow)
       end
+      puts("- = this parameter doesn't have a default value")
+      puts("* = this default value is dependent on the user's system")
       puts("")
     end
 
@@ -190,7 +192,8 @@ module Fastlane
       if options.kind_of?(Array)
         options.each do |current|
           if current.kind_of?(FastlaneCore::ConfigItem)
-            rows << [current.key.to_s.yellow, current.description, current.env_name, current.default_value]
+            default = current.default_value.nil? ? "-" : "#{current.default_value}#{' *' if current.default_value_dynamic}"
+            rows << [current.key.to_s.yellow, current.description, current.env_name, default]
           elsif current.kind_of?(Array)
             # Legacy actions that don't use the new config manager
             UI.user_error!("Invalid number of elements in this row: #{current}. Must be 2 or 3") unless [2, 3].include?(current.count)
