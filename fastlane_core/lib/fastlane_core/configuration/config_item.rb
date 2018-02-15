@@ -86,6 +86,7 @@ module FastlaneCore
     # @param deprecated (String) Set if the option is deprecated. A deprecated option should be optional and is made optional if the parameter isn't set, and fails otherwise
     # @param sensitive (Boolean) Set if the variable is sensitive, such as a password or API token, to prevent echoing when prompted for the parameter
     # @param display_in_shell (Boolean) Set if the variable can be used from shell
+    # rubocop:disable Metrics/ParameterLists
     def initialize(key: nil,
                    env_name: nil,
                    description: nil,
@@ -157,6 +158,7 @@ module FastlaneCore
 
       update_code_gen_default_value_if_able!
     end
+    # rubocop:enable Metrics/ParameterLists
 
     # if code_gen_default_value is nil, use the default value if it isn't a `code_gen_sensitive` value
     def update_code_gen_default_value_if_able!
