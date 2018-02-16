@@ -12,7 +12,7 @@ module FastlaneCore
         interface_methods = FastlaneCore::Interface.instance_methods - Object.instance_methods
         UI.user_error!("Unknown method '#{method_sym}', supported #{interface_methods}") unless interface_methods.include?(method_sym)
 
-        @ui_object.send(method_sym, *args)
+        self.ui_object.send(method_sym, *args)
       end
 
       attr_writer(:ui_object)
