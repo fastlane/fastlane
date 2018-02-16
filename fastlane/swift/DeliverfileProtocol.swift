@@ -9,6 +9,7 @@ protocol DeliverfileProtocol: class {
   var metadataPath: String? { get }
   var screenshotsPath: String? { get }
   var skipBinaryUpload: Bool { get }
+  var useLiveVersion: Bool { get }
   var skipScreenshots: Bool { get }
   var appVersion: String? { get }
   var skipMetadata: Bool { get }
@@ -66,6 +67,7 @@ extension DeliverfileProtocol {
   var metadataPath: String? { return nil }
   var screenshotsPath: String? { return nil }
   var skipBinaryUpload: Bool { return false }
+  var useLiveVersion: Bool { return false }
   var skipScreenshots: Bool { return false }
   var appVersion: String? { return nil }
   var skipMetadata: Bool { return false }
@@ -112,7 +114,6 @@ extension DeliverfileProtocol {
   var precheckIncludeInAppPurchases: Bool { return true }
 }
 
-
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.1]
+// FastlaneRunnerAPIVersion [0.9.2]

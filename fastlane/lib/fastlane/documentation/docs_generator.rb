@@ -14,25 +14,11 @@ module Fastlane
       output << "xcode-select --install"
       output << "```"
       output << ""
-      output << "## Choose your installation method:"
-      output << ""
-      output << "<table width=\"100%\" >"
-      output << "<tr>"
-      output << "<th width=\"33%\"><a href=\"http://brew.sh\">Homebrew</a></th>"
-      output << "<th width=\"33%\">Installer Script</th>"
-      output << "<th width=\"33%\">RubyGems</th>"
-      output << "</tr>"
-      output << "<tr>"
-      output << "<td width=\"33%\" align=\"center\">macOS</td>"
-      output << "<td width=\"33%\" align=\"center\">macOS</td>"
-      output << "<td width=\"33%\" align=\"center\">macOS or Linux with Ruby 2.0.0 or above</td>"
-      output << "</tr>"
-      output << "<tr>"
-      output << "<td width=\"33%\"><code>brew cask install fastlane</code></td>"
-      output << "<td width=\"33%\"><a href=\"https://download.fastlane.tools\">Download the zip file</a>. Then double click on the <code>install</code> script (or run it in a terminal window).</td>"
-      output << "<td width=\"33%\"><code>sudo gem install fastlane -NV</code></td>"
-      output << "</tr>"
-      output << "</table>"
+      output << "Install _fastlane_ using"
+      output << "```"
+      output << "[sudo] gem install fastlane -NV"
+      output << "```"
+      output << "or alternatively using `brew cask install fastlane`"
       output << ""
       output << "# Available Actions"
 
@@ -65,7 +51,7 @@ module Fastlane
 
       begin
         File.write(output_path, output.join("\n"))
-        UI.success "Successfully generated documentation at path '#{File.expand_path(output_path)}'" if FastlaneCore::Globals.verbose?
+        UI.success("Successfully generated documentation at path '#{File.expand_path(output_path)}'") if FastlaneCore::Globals.verbose?
       rescue => ex
         UI.error(ex)
         UI.error("Couldn't save fastlane documentation at path '#{File.expand_path(output_path)}', make sure you have write access to the containing directory.")

@@ -47,9 +47,8 @@ module Fastlane
             Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS].each do |profile_path|
               begin
                 profile = FastlaneCore::ProvisioningProfile.parse(profile_path)
-                profile_team_id = profile["TeamIdentifier"].first
-                next if profile_team_id != values[:export_team_id] && !values[:export_team_id].nil?
-                bundle_id = profile["Entitlements"]["application-identifier"].gsub("#{profile_team_id}.", "")
+                app_id_prefix = profile["ApplicationIdentifierPrefix"].first
+                bundle_id = profile["Entitlements"]["application-identifier"].gsub("#{app_id_prefix}.", "")
                 values[:export_options][:provisioningProfiles][bundle_id] = profile["Name"]
               rescue => ex
                 UI.error("Couldn't load profile at path: #{profile_path}")
@@ -107,7 +106,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code
@@ -121,7 +120,7 @@ module Fastlane
             clean: true,
             output_directory: "path/to/dir", # Destination directory. Defaults to current directory.
             output_name: "my-app.ipa",       # specify the name of the .ipa file to generate (including file extension)
-            sdk: "10.0"                      # use SDK as the name or path of the base SDK when building the project.
+            sdk: "iOS 11.1"                  # use SDK as the name or path of the base SDK when building the project.
           )',
           'gym         # alias for "build_ios_app"',
           'build_app   # alias for "build_ios_app"'

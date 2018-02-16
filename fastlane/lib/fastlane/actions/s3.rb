@@ -275,7 +275,7 @@ module Fastlane
         # writing to an object will create an object version
         # instead of replacing the existing object.
         # http://docs.aws.amazon.com/AWSRubySDK/latest/AWS/S3/ObjectVersion.html
-        if obj.kind_of? AWS::S3::ObjectVersion
+        if obj.kind_of?(AWS::S3::ObjectVersion)
           obj = obj.object
         end
 
@@ -376,11 +376,13 @@ module Fastlane
                                        env_name: "S3_BUCKET",
                                        description: "AWS bucket name",
                                        optional: true,
+                                       code_gen_sensitive: true,
                                        default_value: ENV['AWS_BUCKET_NAME']),
           FastlaneCore::ConfigItem.new(key: :region,
                                        env_name: "S3_REGION",
                                        description: "AWS region (for bucket creation) ",
                                        optional: true,
+                                       code_gen_sensitive: true,
                                        default_value: ENV['AWS_REGION']),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "S3_PATH",

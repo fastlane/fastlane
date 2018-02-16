@@ -43,6 +43,18 @@ describe Fastlane do
         expect(result).to eq("git tag -am builds/test/#{prefix}#{build_number}\\ \\(fastlane\\) \'builds/test/#{prefix}#{build_number}\'")
       end
 
+      it "allows you to specify a postfix" do
+        postfix = '-RC1'
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          add_git_tag ({
+            postfix: '#{postfix}',
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq("git tag -am builds/test/#{build_number}#{postfix}\\ \\(fastlane\\) \'builds/test/#{build_number}#{postfix}\'")
+      end
+
       it "allows you to specify your own tag" do
         tag = '2.0.0'
 

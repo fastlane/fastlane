@@ -1,3 +1,6 @@
+require_relative '../print_table'
+require_relative '../ui/ui'
+
 module FastlaneCore
   # Responsible for loading configuration files
   class ConfigurationFile
@@ -28,7 +31,7 @@ module FastlaneCore
       self.options = {}
 
       @block_for_missing = block_for_missing
-      content = File.read(path)
+      content = File.read(path, encoding: "utf-8")
 
       # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
       if content.tr!('“”‘’‛', %(""'''))
@@ -66,10 +69,10 @@ module FastlaneCore
         [key, value] if value.to_s.length > 0
       end.compact
 
-      puts ""
-      puts Terminal::Table.new(rows: FastlaneCore::PrintTable.transform_output(rows),
-                              title: "Detected Values from '#{self.configfile_path}'")
-      puts ""
+      puts("")
+      puts(Terminal::Table.new(rows: FastlaneCore::PrintTable.transform_output(rows),
+                              title: "Detected Values from '#{self.configfile_path}'"))
+      puts("")
     end
 
     # This is used to display only the values that have changed in the summary table

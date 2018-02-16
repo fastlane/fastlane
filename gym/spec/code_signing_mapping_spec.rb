@@ -26,7 +26,7 @@ describe Gym::CodeSigningMapping do
   end
 
   describe "#detect_project_profile_mapping" do
-    it "returns the mapping of the selected provisioning profiles" do
+    it "returns the mapping of the selected provisioning profiles", requires_xcode: true do
       workspace_path = "gym/spec/fixtures/projects/cocoapods/Example.xcworkspace"
       project = FastlaneCore::Project.new({
         workspace: workspace_path
@@ -37,7 +37,7 @@ describe Gym::CodeSigningMapping do
   end
 
   describe "#detect_project_profile_mapping_for_tv_os" do
-    it "returns the mapping of the selected provisioning profiles for tv_os" do
+    it "returns the mapping of the selected provisioning profiles for tv_os", requires_xcode: true do
       workspace_path = "gym/spec/fixtures/projects/cocoapods/Example.xcworkspace"
       project = FastlaneCore::Project.new({
         workspace: workspace_path
@@ -49,7 +49,7 @@ describe Gym::CodeSigningMapping do
   end
 
   describe "#merge_profile_mapping" do
-    let (:csm) { Gym::CodeSigningMapping.new }
+    let(:csm) { Gym::CodeSigningMapping.new }
 
     it "only mapping from Xcode Project is available" do
       result = csm.merge_profile_mapping(primary_mapping: {},
@@ -164,19 +164,19 @@ describe Gym::CodeSigningMapping do
       context "when build_setting include TEST_TARGET_NAME" do
         it "is test target" do
           build_settings = { "TEST_TARGET_NAME" => "Sample" }
-          expect(csm.test_target?(build_settings)).to be true
+          expect(csm.test_target?(build_settings)).to be(true)
         end
       end
       context "when build_setting include TEST_HOST" do
         it "is test target" do
           build_settings = { "TEST_HOST" => "Sample" }
-          expect(csm.test_target?(build_settings)).to be true
+          expect(csm.test_target?(build_settings)).to be(true)
         end
       end
       context "when build_setting include neither TEST_HOST nor TEST_TARGET_NAME" do
         it "is not test target" do
           build_settings = {}
-          expect(csm.test_target?(build_settings)).to be false
+          expect(csm.test_target?(build_settings)).to be(false)
         end
       end
     end

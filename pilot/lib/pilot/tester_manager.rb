@@ -1,6 +1,7 @@
-require "fastlane_core"
-require "pilot/tester_util"
 require 'terminal-table'
+
+require_relative 'manager'
+require_relative 'tester_util'
 
 module Pilot
   class TesterManager < Manager
@@ -98,7 +99,7 @@ module Pilot
 
     def find_app(app_filter: nil)
       if app_filter
-        app = Spaceship::Application.find(app_filter)
+        app = Spaceship::Tunes::Application.find(app_filter)
         UI.user_error!("Could not find an app by #{app_filter}") unless app
         return app
       end
@@ -132,7 +133,7 @@ module Pilot
       current_user_email = Spaceship::Tunes.client.user_email
       current_user_apple_id = Spaceship::Tunes.client.user
 
-      current_user = Spaceship::Members.find(current_user_email)
+      current_user = Spaceship::Tunes::Members.find(current_user_email)
       unless current_user
         UI.user_error!("Unable to find a member for AppleID: #{current_user_apple_id}, email: #{current_user_email}")
       end
@@ -158,7 +159,7 @@ module Pilot
     end
 
     def list_testers_by_app(app_filter)
-      app = Spaceship::Application.find(app_filter)
+      app = Spaceship::Tunes::Application.find(app_filter)
       UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
       testers = Spaceship::TestFlight::Tester.all(app_id: app.apple_id)
       list_by_app(testers, "All Testers")
@@ -181,12 +182,12 @@ module Pilot
 
     # Requires a block that accepts a tester and returns an array of tester column values
     def list(all_testers, title, headings)
-      rows = all_testers.map { |tester| yield tester }
-      puts Terminal::Table.new(
-        title: title.green,
-        headings: headings,
-        rows: FastlaneCore::PrintTable.transform_output(rows)
-      )
+      rows = all_testers.map { |tester| yield(tester) }
+      puts(Terminal::Table.new(
+             title: title.green,
+             headings: headings,
+             rows: FastlaneCore::PrintTable.transform_output(rows)
+      ))
     end
 
     # Print out all the details of a specific tester
@@ -208,10 +209,10 @@ module Pilot
         rows << ["Latest Install Date", tester.pretty_install_date]
       end
 
-      puts Terminal::Table.new(
-        title: tester.email.green,
-        rows: FastlaneCore::PrintTable.transform_output(rows)
-      )
+      puts(Terminal::Table.new(
+             title: tester.email.green,
+             rows: FastlaneCore::PrintTable.transform_output(rows)
+      ))
     end
   end
 end

@@ -1,7 +1,10 @@
-require 'pty'
 require 'shellwords'
 require 'fileutils'
 require 'credentials_manager/account_manager'
+
+require_relative 'features'
+require_relative 'helper'
+require_relative 'fastlane_pty'
 
 module FastlaneCore
   # The TransporterInputError occurs when you passed wrong inputs to the {Deliver::ItunesTransporter}
@@ -28,7 +31,7 @@ module FastlaneCore
     private_constant :ERROR_REGEX, :WARNING_REGEX, :OUTPUT_REGEX, :RETURN_VALUE_REGEX, :SKIP_ERRORS
 
     def execute(command, hide_output)
-      return command if Helper.is_test?
+      return command if Helper.test?
 
       @errors = []
       @warnings = []
@@ -41,9 +44,9 @@ module FastlaneCore
       end
 
       begin
-        PTY.spawn(command) do |stdin, stdout, pid|
+        FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
           begin
-            stdin.each do |line|
+            command_stdout.each do |line|
               @all_lines << line
               parse_line(line, hide_output) # this is where the parsing happens
             end
@@ -107,10 +110,10 @@ module FastlaneCore
         UI.error("[Transporter Error Output]: #{$1}")
 
         # Check if it's a login error
-        if $1.include? "Your Apple ID or password was entered incorrectly" or
-           $1.include? "This Apple ID has been locked for security reasons"
+        if $1.include?("Your Apple ID or password was entered incorrectly") or
+           $1.include?("This Apple ID has been locked for security reasons")
 
-          unless Helper.is_test?
+          unless Helper.test?
             CredentialsManager::AccountManager.new(user: @user).invalid_credentials
             UI.error("Please run this tool again to apply the new password")
           end
@@ -252,7 +255,7 @@ module FastlaneCore
     end
 
     def java_code_option
-      if Helper.is_mac? && Helper.xcode_at_least?(9)
+      if Helper.mac? && Helper.xcode_at_least?(9)
         return "-jar #{Helper.transporter_java_jar_path.shellescape}"
       else
         return "-classpath #{Helper.transporter_java_jar_path.shellescape} com.apple.transporter.Application"
@@ -334,7 +337,7 @@ module FastlaneCore
         return download(app_id, dir)
       end
 
-      return result if Helper.is_test?
+      return result if Helper.test?
 
       itmsp_path = File.join(dir, "#{app_id}.itmsp")
       successful = result && File.directory?(itmsp_path)
@@ -373,7 +376,7 @@ module FastlaneCore
       if result
         UI.header("Successfully uploaded package to iTunes Connect. It might take a few minutes until it's visible online.")
 
-        FileUtils.rm_rf(actual_dir) unless Helper.is_test? # we don't need the package any more, since the upload was successful
+        FileUtils.rm_rf(actual_dir) unless Helper.test? # we don't need the package any more, since the upload was successful
       else
         handle_error(@password)
       end

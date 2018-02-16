@@ -160,7 +160,7 @@ describe Deliver::UploadMetadata do
       it "auto_release_date is not called" do
         options = { app: app }
         uploader.upload(options)
-        expect(version).to_not have_received(:auto_release_date=).with(2)
+        expect(version).to_not(have_received(:auto_release_date=).with(2))
       end
     end
   end
@@ -197,7 +197,7 @@ describe Deliver::UploadMetadata do
     context 'without value' do
       it "toggle_phased_release is not called" do
         uploader.upload(app: app)
-        expect(version).not_to have_received(:toggle_phased_release).with(enabled: false)
+        expect(version).not_to(have_received(:toggle_phased_release).with(enabled: false))
       end
     end
   end
@@ -213,7 +213,7 @@ describe Deliver::UploadMetadata do
 
     def create_filesystem_language(name)
       require 'fileutils'
-      FileUtils.mkdir_p "#{tmpdir}/#{name}"
+      FileUtils.mkdir_p("#{tmpdir}/#{name}")
     end
 
     context "detected languages with only file system" do

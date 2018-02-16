@@ -1,5 +1,6 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require 'fastlane_core/configuration/configuration'
+require 'credentials_manager/appfile_config'
+require_relative 'module'
 
 module Sigh
   class Options
@@ -41,6 +42,7 @@ module Sigh
                                      short_option: "-a",
                                      env_name: "SIGH_APP_IDENTIFIER",
                                      description: "The bundle identifier of your app",
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
@@ -52,6 +54,7 @@ module Sigh
                                      env_name: "SIGH_TEAM_ID",
                                      description: "The ID of your Developer Portal team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
@@ -61,6 +64,7 @@ module Sigh
                                      env_name: "SIGH_TEAM_NAME",
                                      description: "The name of your Developer Portal team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s

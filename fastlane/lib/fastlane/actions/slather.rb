@@ -18,6 +18,7 @@ module Fastlane
           simple_output: '--simple-output',
           gutter_json: '--gutter-json',
           cobertura_xml: '--cobertura-xml',
+          llvm_cov: '--llvm-cov',
           html: '--html',
           show: '--show',
 
@@ -47,7 +48,7 @@ module Fastlane
         validate_params!(params)
 
         command = build_command(params)
-        sh command
+        sh(command)
       end
 
       def self.has_config_file
@@ -204,6 +205,11 @@ Slather is available at https://github.com/SlatherOrg/slather
                                        is_string: false,
                                        type: Boolean,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :llvm_cov,
+                                       env_name: "FL_SLATHER_LLVM_COV_ENABLED",
+                                       description: "Tell slather that it should output results as llvm-cov show format",
+                                       is_string: false,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :html,
                                        env_name: "FL_SLATHER_HTML_ENABLED",
                                        description: "Tell slather that it should output results as static HTML pages",
@@ -274,7 +280,7 @@ Slather is available at https://github.com/SlatherOrg/slather
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

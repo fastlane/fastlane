@@ -1,4 +1,4 @@
 hello(param1: "world")
 
-lane :empty do
+lane(:empty) do
 end

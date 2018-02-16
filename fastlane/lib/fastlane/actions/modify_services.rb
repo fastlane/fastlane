@@ -58,7 +58,11 @@ module Fastlane
             passbook: 'passbook',
             push_notification: 'push_notification',
             siri_kit: 'sirikit',
-            vpn_configuration: 'vpn_conf'
+            vpn_configuration: 'vpn_conf',
+            network_extension: 'network_extension',
+            hotspot: 'hotspot',
+            multipath: 'multipath',
+            nfc_tag_reading: 'nfc_tag_reading'
         }
       end
 
@@ -75,7 +79,7 @@ module Fastlane
       def self.details
         [
           "Options are same as 'enable_services' in produce action",
-          "https://github.com/fastlane/fastlane/tree/master/produce"
+          "https://docs.fastlane.tools/actions/produce/"
         ].join("\n")
       end
 
@@ -93,6 +97,7 @@ module Fastlane
                                        env_name: "PRODUCE_APP_IDENTIFIER",
                                        short_option: "-a",
                                        description: "App Identifier (Bundle ID, e.g. com.krausefx.app)",
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
           FastlaneCore::ConfigItem.new(key: :services,
                                        display_in_shell: false,
@@ -105,7 +110,7 @@ module Fastlane
                                          allowed_keys = Produce::DeveloperCenter::ALLOWED_SERVICES.keys
                                          UI.user_error!("enable_services has to be of type Hash") unless value.kind_of?(Hash)
                                          value.each do |key, v|
-                                           UI.user_error!("The key: '#{key}' is not supported in `enable_services' - following keys are available: [#{allowed_keys.join(',')}]") unless allowed_keys.include? key.to_sym
+                                           UI.user_error!("The key: '#{key}' is not supported in `enable_services' - following keys are available: [#{allowed_keys.join(',')}]") unless allowed_keys.include?(key.to_sym)
                                          end
                                        end),
           FastlaneCore::ConfigItem.new(key: :team_id,
@@ -113,6 +118,7 @@ module Fastlane
                                        env_name: "PRODUCE_TEAM_ID",
                                        description: "The ID of your Developer Portal team if you're in multiple teams",
                                        optional: true,
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_TEAM_ID"] = value.to_s
@@ -122,6 +128,7 @@ module Fastlane
                                        env_name: "PRODUCE_TEAM_NAME",
                                        description: "The name of your Developer Portal team if you're in multiple teams",
                                        optional: true,
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_TEAM_NAME"] = value.to_s

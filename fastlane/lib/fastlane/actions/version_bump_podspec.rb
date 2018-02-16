@@ -8,9 +8,9 @@ module Fastlane
       def self.run(params)
         podspec_path = params[:path]
 
-        UI.user_error!("Could not find podspec file at path #{podspec_path}") unless File.exist? podspec_path
+        UI.user_error!("Could not find podspec file at path #{podspec_path}") unless File.exist?(podspec_path)
 
-        version_podspec_file = Helper::PodspecHelper.new(podspec_path)
+        version_podspec_file = Helper::PodspecHelper.new(podspec_path, params[:require_variable_prefix])
 
         if params[:version_number]
           new_version = params[:version_number]
@@ -47,6 +47,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_VERSION_BUMP_PODSPEC_PATH",
                                        description: "You must specify the path to the podspec file to update",
+                                       code_gen_sensitive: true,
                                        default_value: Dir["*.podspec"].last,
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a path to the `version_bump_podspec` action") if value.length == 0
@@ -56,7 +57,7 @@ module Fastlane
                                        description: "The type of this version bump. Available: patch, minor, major",
                                        default_value: "patch",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Available values are 'patch', 'minor' and 'major'") unless ['patch', 'minor', 'major'].include? value
+                                         UI.user_error!("Available values are 'patch', 'minor' and 'major'") unless ['patch', 'minor', 'major'].include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :version_number,
                                        env_name: "FL_VERSION_BUMP_PODSPEC_VERSION_NUMBER",
@@ -65,7 +66,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version_appendix,
                                        env_name: "FL_VERSION_BUMP_PODSPEC_VERSION_APPENDIX",
                                        description: "Change version appendix to a specific value. For example 1.4.14.4.1 -> 1.4.14.5",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :require_variable_prefix,
+                                       env_name: "FL_VERSION_BUMP_PODSPEC_VERSION_REQUIRE_VARIABLE_PREFIX",
+                                       description: "true by default, this is used for non CocoaPods version bumps only",
+                                       default_value: true)
         ]
       end
 
@@ -80,7 +85,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

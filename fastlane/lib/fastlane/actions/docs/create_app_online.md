@@ -204,7 +204,11 @@ lane :release do
       passbook: "on",                # Valid values: "on", "off"
       push_notification: "on",       # Valid values: "on", "off"
       siri_kit: "on",                # Valid values: "on", "off"
-      vpn_configuration: "on"       # Valid values: "on", "off"
+      vpn_configuration: "on",       # Valid values: "on", "off"
+      network_extension: "on",       # Valid values: "on", "off"
+      hotspot: "on",                 # Valid values: "on", "off"
+      multipath: "on",               # Valid values: "on", "off"
+      nfc_tag_reading: "on",         # Valid values: "on", "off"
     }
   )
 
@@ -220,7 +224,7 @@ apple_id ENV['PRODUCE_APPLE_ID']
 
 This will tell _deliver_, which `App ID` to use, since the app is not yet available in the App Store.
 
-You'll still have to fill out the remaining information (like screenshots, app description and pricing). You can use [deliver](https://github.com/fastlane/fastlane/tree/master/deliver) to upload your app metadata using a CLI
+You'll still have to fill out the remaining information (like screenshots, app description and pricing). You can use [deliver](https://docs.fastlane.tools/actions/deliver/) to upload your app metadata using a CLI
 
 ## How is my password stored?
 

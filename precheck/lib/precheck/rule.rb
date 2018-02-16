@@ -1,6 +1,9 @@
-require 'fastlane_core'
-require 'precheck/item_to_check'
-require 'precheck/rule_check_result'
+require 'credentials_manager/appfile_config'
+require 'fastlane_core/configuration/config_item'
+
+require_relative 'module'
+require_relative 'item_to_check'
+require_relative 'rule_check_result'
 
 module Precheck
   VALIDATION_STATES = {
@@ -141,7 +144,7 @@ module Precheck
     def perform_check(item: nil)
       if item.item_data.to_s == "" && item.is_optional
         # item is optional, and empty, so that's totally fine
-        check_result = RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:passed])
+        check_result = RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
         return RuleCheckResult.new(item, check_result, self)
       end
 
@@ -156,13 +159,13 @@ module Precheck
   # URLRule rule_block
   class TextRule < Rule
     def handle_item?(item)
-      (item.kind_of? TextItemToCheck) ? true : false
+      item.kind_of?(TextItemToCheck) ? true : false
     end
   end
 
   class URLRule < Rule
     def handle_item?(item)
-      (item.kind_of? URLItemToCheck) ? true : false
+      item.kind_of?(URLItemToCheck) ? true : false
     end
   end
 end

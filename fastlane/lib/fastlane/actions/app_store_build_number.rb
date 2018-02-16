@@ -69,12 +69,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :initial_build_number,
                                        env_name: "INITIAL_BUILD_NUMBER",
                                        description: "sets the build number to given value if no build is in current train",
-                                       default_value: 1,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        short_option: "-a",
                                        env_name: "FASTLANE_APP_IDENTIFIER",
                                        description: "The bundle identifier of your app",
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
           FastlaneCore::ConfigItem.new(key: :username,
                                        short_option: "-u",
@@ -87,6 +87,7 @@ module Fastlane
                                        description: "The ID of your iTunes Connect team if you're in multiple teams",
                                        optional: true,
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
@@ -110,13 +111,14 @@ module Fastlane
                                        is_string: true,
                                        default_value: "ios",
                                        verify_block: proc do |value|
-                                         UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include? value
+                                         UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :team_name,
                                        short_option: "-e",
                                        env_name: "LATEST_TESTFLIGHT_BUILD_NUMBER_TEAM_NAME",
                                        description: "The name of your iTunes Connect team if you're in multiple teams",
                                        optional: true,
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s

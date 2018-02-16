@@ -12,6 +12,7 @@ describe FastlaneCore::AnalyticsSession do
   before(:each) do
     # This value needs to be set or our event fixtures will not match
     allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
+    allow(FastlaneCore::Helper).to receive(:operating_system).and_return('macOS')
   end
 
   context 'single action execution' do
@@ -254,7 +255,7 @@ describe FastlaneCore::AnalyticsSession do
           event[:action][:name] == 'completed'
         end
         expect(completion_events.count).to eq(4)
-        expect(FastlaneCore.session.client).not_to receive(:post_events)
+        expect(FastlaneCore.session.client).not_to(receive(:post_events))
         FastlaneCore.session.finalize_session
       end
     end

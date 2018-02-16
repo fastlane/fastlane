@@ -1,5 +1,6 @@
-require 'fastlane_core/android_package_name_guesser'
-require 'fastlane_core/ios_app_identifier_guesser'
+require_relative '../android_package_name_guesser'
+require_relative '../ios_app_identifier_guesser'
+require_relative '../env'
 
 module FastlaneCore
   class AppIdentifierGuesser
@@ -26,7 +27,7 @@ module FastlaneCore
     end
 
     # To not count the same projects multiple time for the number of launches
-    # Learn more at https://github.com/fastlane/fastlane#metrics
+    # Learn more at https://docs.fastlane.tools/#metrics
     # Use the `FASTLANE_OPT_OUT_USAGE` variable to opt out
     # The resulting value is e.g. ce12f8371df11ef6097a83bdf2303e4357d6f5040acc4f76019489fa5deeae0d
     def generate_p_hash(app_id)
@@ -34,7 +35,6 @@ module FastlaneCore
         return nil
       end
 
-      require 'credentials_manager'
       return Digest::SHA256.hexdigest("p#{app_id}fastlan3_SAlt") # hashed + salted the bundle identifier
     rescue
       return nil # we don't want this method to cause a crash

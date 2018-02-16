@@ -1,4 +1,6 @@
-require 'fastlane_core/analytics/analytics_ingester_client'
+require_relative 'analytics_ingester_client'
+require_relative 'action_launch_context'
+require_relative 'analytics_event_builder'
 
 module FastlaneCore
   class AnalyticsSession
@@ -152,7 +154,7 @@ module FastlaneCore
 
     def finalize_session
       # If our users want to opt out of usage metrics, don't post the events.
-      # Learn more at https://github.com/fastlane/fastlane#metrics
+      # Learn more at https://docs.fastlane.tools/#metrics
       return if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
 
       client.post_events(@events)
@@ -168,10 +170,7 @@ module FastlaneCore
     end
 
     def operating_system
-      return "macOS" if RUBY_PLATFORM.downcase.include?("darwin")
-      return "Windows" if RUBY_PLATFORM.downcase.include?("mswin")
-      return "Linux" if RUBY_PLATFORM.downcase.include?("linux")
-      return "Unknown"
+      return Helper.operating_system
     end
 
     def install_method
@@ -191,7 +190,7 @@ module FastlaneCore
     end
 
     def ci?
-      return Helper.is_ci?
+      return Helper.ci?
     end
 
     def operating_system_version

@@ -391,7 +391,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             carthage
           end").runner.execute(:test)
-        end.not_to raise_error
+        end.not_to(raise_error)
       end
 
       it "works with valid parameters" do
@@ -404,7 +404,7 @@ describe Fastlane do
               platform: 'iOS'
             )
           end").runner.execute(:test)
-        end.not_to raise_error
+        end.not_to(raise_error)
       end
 
       it "works with cache_builds" do
@@ -418,7 +418,22 @@ describe Fastlane do
               platform: 'iOS'
             )
           end").runner.execute(:test)
-        end.not_to raise_error
+        end.not_to(raise_error)
+      end
+
+      it "works with new resolver" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              use_ssh: true,
+              use_submodules: true,
+              use_binaries: false,
+              cache_builds: true,
+              platform: 'iOS',
+              new_resolver: true
+            )
+          end").runner.execute(:test)
+        end.not_to(raise_error)
       end
 
       context "when specify framework" do

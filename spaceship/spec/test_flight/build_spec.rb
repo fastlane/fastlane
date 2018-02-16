@@ -273,7 +273,7 @@ describe Spaceship::TestFlight::Build do
       end
     end
 
-    RSpec::Matchers.define :same_test_info do |other_test_info|
+    RSpec::Matchers.define(:same_test_info) do |other_test_info|
       match do |args|
         args[:build].test_info.to_s == other_test_info.to_s
       end

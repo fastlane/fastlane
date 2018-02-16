@@ -1,3 +1,5 @@
+require "rubygems/requirement"
+
 module Fastlane
   class FastFile
     # Stores all relevant information from the currently running process
@@ -14,20 +16,20 @@ module Fastlane
       return unless (path || '').length > 0
       UI.user_error!("Could not find Fastfile at path '#{path}'") unless File.exist?(path)
       @path = File.expand_path(path)
-      content = File.read(path)
+      content = File.read(path, encoding: "utf-8")
 
       # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
       if content.tr!('“”‘’‛', %(""'''))
-        UI.error "Your #{File.basename(path)} has had smart quotes sanitised. " \
+        UI.error("Your #{File.basename(path)} has had smart quotes sanitised. " \
                 'To avoid issues in the future, you should not use ' \
                 'TextEdit for editing it. If you are not using TextEdit, ' \
-                'you should turn off smart quotes in your editor of choice.'
+                'you should turn off smart quotes in your editor of choice.')
       end
 
       content.scan(/^\s*require (.*)/).each do |current|
         gem_name = current.last
         next if gem_name.include?(".") # these are local gems
-        UI.important("You require a gem, if this is a third party gem, please use `fastlane_require #{gem_name}` to ensure the gem is installed locally")
+        UI.important("You have require'd a gem, if this is a third party gem, please use `fastlane_require #{gem_name}` to ensure the gem is installed locally.")
       end
 
       parse(content, @path)
@@ -229,7 +231,7 @@ module Fastlane
     # @param url [String] The git URL to clone the repository from
     # @param branch [String] The branch to checkout in the repository
     # @param path [String] The path to the Fastfile
-    # @param verion [String] Version of the required Fastlane version
+    # @param version [String, Array] Version requirement for repo tags
     def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil)
       UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
 
@@ -247,17 +249,14 @@ module Fastlane
 
           branch_option = "--branch #{branch}" if branch != 'HEAD'
 
-          UI.message "Cloning remote git repo..."
+          UI.message("Cloning remote git repo...")
           Actions.sh("GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}")
 
           unless version.nil?
-            git_tags = fetch_remote_tags(folder: clone_folder)
-
-            # Separate version from optimistic operator
-            version_number = version(version_string: version)
-            operator = operator(version_string: version)
-
-            checkout_param = checkout_param_for_operator(operator: operator, version: version_number, git_tags: git_tags)
+            req = Gem::Requirement.new(version)
+            all_tags = fetch_remote_tags(folder: clone_folder)
+            checkout_param = all_tags.select { |t| req =~ FastlaneCore::TagVersion.new(t) }.last
+            UI.user_error!("No tag found matching #{version.inspect}") if checkout_param.nil?
           end
 
           Actions.sh("cd '#{clone_folder}' && git checkout #{checkout_param} '#{path}'")
@@ -286,82 +285,17 @@ module Fastlane
     #####################################################
 
     def fetch_remote_tags(folder: nil)
-      UI.message "Fetching remote git tags..."
+      UI.message("Fetching remote git tags...")
       Actions.sh("cd '#{folder}' && GIT_TERMINAL_PROMPT=0 git fetch --all --tags -q")
 
       # Fetch all possible tags
       git_tags_string = Actions.sh("cd '#{folder}' && git tag -l")
       git_tags = git_tags_string.split("\n")
 
-      # Delete tags that are not a real version number
-      git_tags.delete_if { |tag| Gem::Version.correct?(tag) != 0 }
-
       # Sort tags based on their version number
-      git_tags.sort_by { |tag| Gem::Version.new(tag) }
-
       return git_tags
-    end
-
-    def checkout_param_for_operator(operator: nil, version: nil, git_tags: nil)
-      # ~> should select the latest version withing constraints.
-      # -> should select a specific version without fallback.
-      if operator == "~>"
-        return checkout_param_twiddle_wakka(version: version, git_tags: git_tags)
-
-      elsif operator == "->" || operator.nil?
-        return checkout_param_specific_version(version: version, git_tags: git_tags)
-
-      else
-        UI.user_error!("The specified operator \"#{operator}\" in \"#{version}\" is unknown. Please use one of these '~> ->'")
-      end
-    end
-
-    def checkout_param_specific_version(version: nil, git_tags: nil)
-      # Search matching version in array
-      matching_git_tags = git_tags.select do |tag|
-        tag == version
-      end
-
-      UI.user_error!("The specified version \"#{version}\" doesn't exist") if matching_git_tags.count == 0
-      return matching_git_tags.last
-    end
-
-    def checkout_param_twiddle_wakka(version: nil, git_tags: nil)
-      # Drop last specified digit in version
-      last_dot_index = version.rindex('.')
-      version_range = version[0..last_dot_index - 1]
-
-      # Search matching version in array
-      matching_git_tags = git_tags.select do |tag|
-        tag.start_with?(version_range)
-      end
-
-      UI.user_error!("No version found within the \"#{version_range}.*\" range") if matching_git_tags.count == 0
-
-      return matching_git_tags.last
-    end
-
-    def operator(version_string: nil)
-      version_info = version_range_info(version_string: version_string)
-
-      # version_info will have 2 elements if an optimistic operator is specified.
-      if version_info.count > 1
-
-        # Optimistic operator is always the first part. e.g.: ["~>", "2.0.0"]
-        return version_info.first
-      end
-
-      return nil
-    end
-
-    def version(version_string: nil)
-      version_info = version_range_info(version_string: version_string)
-      return version_info.last
-    end
-
-    def version_range_info(version_string: nil)
-      # Separate version from optimistic operator
-      return version_string.split(" ")
+             .select { |tag| FastlaneCore::TagVersion.correct?(tag) }
+             .sort_by { |tag| FastlaneCore::TagVersion.new(tag) }
     end
 
     #####################################################

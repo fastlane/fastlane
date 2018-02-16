@@ -10,7 +10,7 @@ module Fastlane
       def self.run(options)
         return if options[:no_update] # this is used to update itself
 
-        tools_to_update = options[:tools].split ',' unless options[:tools].nil?
+        tools_to_update = options[:tools].split(',') unless options[:tools].nil?
         tools_to_update ||= all_installed_tools
 
         if tools_to_update.count == 0
@@ -36,8 +36,8 @@ module Fastlane
         end
 
         unless updater.respond_to?(:highest_installed_gems)
-          UI.important "The update_fastlane action requires rubygems version 2.1.0 or greater."
-          UI.important "Please update your version of ruby gems before proceeding."
+          UI.important("The update_fastlane action requires rubygems version 2.1.0 or greater.")
+          UI.important("Please update your version of ruby gems before proceeding.")
           UI.command "gem install rubygems-update"
           UI.command "update_rubygems"
           UI.command "gem update --system"
@@ -89,7 +89,7 @@ module Fastlane
         UI.message("fastlane.tools successfully updated! I will now restart myself... 😴")
 
         # Set no_update to true so we don't try to update again
-        exec "FL_NO_UPDATE=true #{$PROGRAM_NAME} #{ARGV.join ' '}"
+        exec("FL_NO_UPDATE=true #{$PROGRAM_NAME} #{ARGV.join(' ')}")
       end
 
       def self.show_information_about_nightly_builds
@@ -104,7 +104,7 @@ module Fastlane
       end
 
       def self.all_installed_tools
-        Gem::Specification.select { |s| ALL_TOOLS.include? s.name }.map(&:name).uniq
+        Gem::Specification.select { |s| ALL_TOOLS.include?(s.name) }.map(&:name).uniq
       end
 
       def self.description

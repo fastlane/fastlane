@@ -7,7 +7,7 @@ module MockAPI
 
     before do
       if request.post?
-        content_type :json
+        content_type(:json)
       end
     end
 
