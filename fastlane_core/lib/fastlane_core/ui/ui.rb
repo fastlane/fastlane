@@ -1,6 +1,8 @@
 module FastlaneCore
   class UI
     class << self
+      attr_accessor(:ui_object)
+
       def ui_object
         require_relative 'implementations/shell'
         @ui_object ||= Shell.new
@@ -14,8 +16,6 @@ module FastlaneCore
 
         self.ui_object.send(method_sym, *args)
       end
-
-      attr_writer(:ui_object)
     end
   end
 end
