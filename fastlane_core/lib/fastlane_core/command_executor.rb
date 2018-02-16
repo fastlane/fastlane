@@ -31,11 +31,12 @@ module FastlaneCore
       # @param command [String] The command to be executed
       # @param print_all [Boolean] Do we want to print out the command output while running?
       # @param print_command [Boolean] Should we print the command that's being executed
+      # @param pid_created [Block] A block that's called when the new process is spawned and we have a PID, it can be used later on to control the new process
       # @param error [Block] A block that's called if an error occurs
       # @param prefix [Array] An array containing a prefix + block which might get applied to the output
       # @param loading [String] A loading string that is shown before the first output
       # @return [String] All the output as string
-      def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil)
+      def execute(command: nil, print_all: false, print_command: true, pid_created: nil, error: nil, prefix: nil, loading: nil)
         print_all = true if FastlaneCore::Globals.verbose?
         prefix ||= {}
 
@@ -50,7 +51,11 @@ module FastlaneCore
         begin
           FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
             begin
-              command_stdout.each do |l|
+              if pid_created
+                pid_created.call(pid)
+              end
+              stdin.each do |l|
+              #command_stdout.each do |l|
                 line = l.strip # strip so that \n gets removed
                 output << line
 

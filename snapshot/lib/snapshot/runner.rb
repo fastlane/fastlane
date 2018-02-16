@@ -25,6 +25,7 @@ module Snapshot
       end
 
       Snapshot.config[:output_directory] = File.expand_path(Snapshot.config[:output_directory])
+      Snapshot.config[:video_output_directory] = File.expand_path(Snapshot.config[:video_output_directory])
 
       verify_helper_is_current
 
