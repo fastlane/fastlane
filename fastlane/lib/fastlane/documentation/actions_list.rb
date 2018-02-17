@@ -193,9 +193,9 @@ module Fastlane
         options.each do |current|
           if current.kind_of?(FastlaneCore::ConfigItem)
             current_default = current.default_value
-            # rubocop:disable Metrics/BlockNesting
+            # rubocop:disable Metrics/BlockNesting, Style/NestedTernaryOperator
             default = current.default_value_dynamic ? "#{current_default} *".strip : (current_default.nil? ? "-" : current_default)
-            # rubocop:enable Metrics/BlockNesting
+            # rubocop:enable Metrics/BlockNesting, Style/NestedTernaryOperator
             rows << [current.key.to_s.yellow, current.description, current.env_name, default]
           elsif current.kind_of?(Array)
             # Legacy actions that don't use the new config manager
