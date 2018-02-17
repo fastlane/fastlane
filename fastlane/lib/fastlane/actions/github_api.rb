@@ -91,6 +91,7 @@ module Fastlane
                                          code_gen_sensitive: true,
                                          is_string: true,
                                          default_value: ENV["GITHUB_API_TOKEN"],
+                                         default_value_dynamic: true,
                                          optional: false),
             FastlaneCore::ConfigItem.new(key: :http_method,
                                          env_name: "FL_GITHUB_API_HTTP_METHOD",

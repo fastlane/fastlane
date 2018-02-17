@@ -53,6 +53,7 @@ module Fastlane
                                        is_string: true,
                                        sensitive: true,
                                        default_value: Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY],
+                                       default_value_dynamic: true,
                                        optional: false,
                                        verify_block: proc do |value|
                                          if value.start_with?("private_")

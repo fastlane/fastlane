@@ -103,6 +103,7 @@ module Fastlane
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_FILE",
                                        description: "Path to provisioning profile (.mobileprovision)",
                                        default_value: Actions.lane_context[SharedValues::SIGH_PROFILE_PATH],
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Path to provisioning profile is invalid") unless File.exist?(value)
                                        end),

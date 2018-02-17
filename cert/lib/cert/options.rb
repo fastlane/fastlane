@@ -24,12 +24,14 @@ module Cert
                                      short_option: "-u",
                                      env_name: "CERT_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: user),
+                                     default_value: user,
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
                                      env_name: "CERT_TEAM_ID",
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                     default_value_dynamic: true,
                                      description: "The ID of your Developer Portal team if you're in multiple teams",
                                      optional: true,
                                      verify_block: proc do |value|
@@ -42,6 +44,7 @@ module Cert
                                      optional: true,
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
@@ -56,6 +59,7 @@ module Cert
                                      description: "Path to a custom keychain",
                                      code_gen_sensitive: true,
                                      default_value: Dir["#{Dir.home}/Library/Keychains/login.keychain", "#{Dir.home}/Library/Keychains/login.keychain-db"].last,
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        value = File.expand_path(value)
                                        UI.user_error!("Keychain not found at path '#{value}'") unless File.exist?(value)

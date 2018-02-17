@@ -107,6 +107,7 @@ module Fastlane
                                        is_string: true,
                                        code_gen_sensitive: true,
                                        default_value: ENV["GITHUB_API_TOKEN"],
+                                       default_value_dynamic: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :branch,
                                        env_name: "FL_COMMIT_GITHUB_FILE_BRANCH",

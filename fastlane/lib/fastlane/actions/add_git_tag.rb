@@ -60,6 +60,7 @@ module Fastlane
                                        env_name: "FL_GIT_TAG_BUILD_NUMBER",
                                        description: "The build number. Defaults to the result of increment_build_number if you\'re using it",
                                        default_value: Actions.lane_context[Actions::SharedValues::BUILD_NUMBER],
+                                       default_value_dynamic: true,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "FL_GIT_TAG_MESSAGE",

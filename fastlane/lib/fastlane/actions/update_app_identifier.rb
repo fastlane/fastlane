@@ -81,6 +81,7 @@ module Fastlane
                                        description: "Path to your Xcode project",
                                        code_gen_sensitive: true,
                                        default_value: Dir['*.xcodeproj'].first,
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass the path to the project, not the workspace") unless value.end_with?(".xcodeproj")
                                          UI.user_error!("Could not find Xcode project") unless File.exist?(value)
@@ -95,7 +96,8 @@ module Fastlane
                                        env_name: 'FL_UPDATE_APP_IDENTIFIER',
                                        description: 'The app Identifier you want to set',
                                        code_gen_sensitive: true,
-                                       default_value: ENV['PRODUCE_APP_IDENTIFIER'] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier))
+                                       default_value: ENV['PRODUCE_APP_IDENTIFIER'] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                       default_value_dynamic: true)
         ]
       end
 

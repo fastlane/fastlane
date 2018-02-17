@@ -56,14 +56,16 @@ module Fastlane
                                        short_option: "-u",
                                        env_name: "XCODE_INSTALL_USER",
                                        description: "Your Apple ID Username",
-                                       default_value: user),
+                                       default_value: user,
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        short_option: "-b",
                                        env_name: "XCODE_INSTALL_TEAM_ID",
                                        description: "The ID of your team if you're in multiple teams",
                                        optional: true,
                                        code_gen_sensitive: true,
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id))
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                       default_value_dynamic: true)
         ]
       end
 

@@ -143,14 +143,16 @@ module Fastlane
                                        short_option: "-u",
                                        env_name: "DOWNLOAD_DSYMS_USERNAME",
                                        description: "Your Apple ID Username for iTunes Connect",
-                                       default_value: user),
+                                       default_value: user,
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        short_option: "-a",
                                        env_name: "DOWNLOAD_DSYMS_APP_IDENTIFIER",
                                        description: "The bundle identifier of your app",
                                        optional: false,
                                        code_gen_sensitive: true,
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        short_option: "-k",
                                        env_name: "DOWNLOAD_DSYMS_TEAM_ID",
@@ -159,6 +161,7 @@ module Fastlane
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
                                        end),
@@ -169,6 +172,7 @@ module Fastlane
                                        optional: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                        end),

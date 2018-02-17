@@ -12,7 +12,8 @@ module Supply
                                      short_option: "-p",
                                      description: "The package name of the application to use",
                                      code_gen_sensitive: true,
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:package_name)),
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:package_name),
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :track,
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",
@@ -36,7 +37,8 @@ module Supply
                                      short_option: "-m",
                                      optional: true,
                                      description: "Path to the directory containing the metadata files",
-                                     default_value: (Dir["./fastlane/metadata/android"] + Dir["./metadata"]).first),
+                                     default_value: (Dir["./fastlane/metadata/android"] + Dir["./metadata"]).first,
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :key,
                                      env_name: "SUPPLY_KEY",
                                      short_option: "-k",
@@ -45,6 +47,7 @@ module Supply
                                      description: "The p12 File used to authenticate with Google",
                                      code_gen_sensitive: true,
                                      default_value: Dir["*.p12"].first || CredentialsManager::AppfileConfig.try_fetch_value(:keyfile),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find p12 file at path '#{File.expand_path(value)}'") unless File.exist?(File.expand_path(value))
                                      end),
@@ -56,6 +59,7 @@ module Supply
                                      description: "The issuer of the p12 file (email address of the service account)",
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:issuer),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        UI.important("DEPRECATED --issuer OPTION. Use --json_key instead")
                                      end),
@@ -67,6 +71,7 @@ module Supply
                                      description: "The service account json file used to authenticate with Google",
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless FastlaneCore::Helper.json_file?(File.expand_path(value))
                                        UI.user_error!("Could not find service account json file at path '#{File.expand_path(value)}'") unless File.exist?(File.expand_path(value))
@@ -79,6 +84,7 @@ module Supply
                                      description: "The service account json used to authenticate with Google",
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        begin
                                          JSON.parse(value)
@@ -93,6 +99,7 @@ module Supply
                                      conflicting_options: [:apk_paths],
                                      code_gen_sensitive: true,
                                      default_value: Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-Release.apk")].last,
+                                     default_value_dynamic: true,
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find apk file at path '#{value}'") unless File.exist?(value)

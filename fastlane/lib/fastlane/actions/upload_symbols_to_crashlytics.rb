@@ -149,6 +149,7 @@ module Fastlane
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DSYM_PATH",
                                        description: "Path to the DSYM file or zip to upload",
                                        default_value: ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] || (Dir["./**/*.dSYM"] + Dir["./**/*.dSYM.zip"]).sort_by { |f| File.mtime(f) }.last,
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find file at path '#{File.expand_path(value)}'") unless File.exist?(value)

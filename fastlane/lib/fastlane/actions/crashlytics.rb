@@ -78,6 +78,7 @@ module Fastlane
                                        env_name: "CRASHLYTICS_IPA_PATH",
                                        description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || ipa_path_default,
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
@@ -87,6 +88,7 @@ module Fastlane
                                        env_name: "CRASHLYTICS_APK_PATH",
                                        description: "Path to your APK file",
                                        default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] || apk_path_default,
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find apk file at path '#{value}'") unless File.exist?(value)

@@ -59,6 +59,7 @@ module Fastlane
                                        env_name: "FL_RESIGN_IPA",
                                        description: "Path to the ipa file to resign. Optional if you use the _gym_ or _xcodebuild_ action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
                                        end),
@@ -75,6 +76,7 @@ module Fastlane
                                        env_name: "FL_RESIGN_PROVISIONING_PROFILE",
                                        description: "Path to your provisioning_profile. Optional if you use _sigh_",
                                        default_value: Actions.lane_context[SharedValues::SIGH_PROFILE_PATH],
+                                       default_value_dynamic: true,
                                        is_string: false,
                                        verify_block: proc do |value|
                                          files = case value

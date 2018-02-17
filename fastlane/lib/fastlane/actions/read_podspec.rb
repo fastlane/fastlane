@@ -44,6 +44,7 @@ module Fastlane
                                        env_name: "FL_READ_PODSPEC_PATH",
                                        description: "Path to the podspec to be read",
                                        default_value: Dir['*.podspec*'].first,
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("File #{value} not found") unless File.exist?(value)
                                        end)

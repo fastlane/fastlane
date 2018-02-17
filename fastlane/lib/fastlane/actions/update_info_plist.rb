@@ -95,6 +95,7 @@ module Fastlane
                                        description: 'The App Identifier of your app',
                                        code_gen_sensitive: true,
                                        default_value: ENV['PRODUCE_APP_IDENTIFIER'],
+                                       default_value_dynamic: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :display_name,
                                        env_name: 'FL_UPDATE_PLIST_DISPLAY_NAME',
