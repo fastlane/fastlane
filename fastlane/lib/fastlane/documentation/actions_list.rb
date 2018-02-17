@@ -192,8 +192,9 @@ module Fastlane
       if options.kind_of?(Array)
         options.each do |current|
           if current.kind_of?(FastlaneCore::ConfigItem)
+            current_default = current.default_value
             # rubocop:disable Metrics/BlockNesting
-            default = current.default_value.nil? ? "-" : "#{current.default_value}#{' *' if current.default_value_dynamic}"
+            default = current.default_value_dynamic ? "#{current_default} *".strip : (current_default.nil? ? "-" : current_default)
             # rubocop:enable Metrics/BlockNesting
             rows << [current.key.to_s.yellow, current.description, current.env_name, default]
           elsif current.kind_of?(Array)
