@@ -10,7 +10,7 @@ describe FastlaneCore do
         special_chars = %w[! @ # $ % ^ & * ( ) + = [ ] " ' ; : < > ? / \ | { } , ~ `]
 
         special_chars.each do |special_char|
-          expect(unique_path).not_to include(special_char)
+          expect(unique_path).not_to(include(special_char))
         end
       end
 
@@ -18,7 +18,7 @@ describe FastlaneCore do
         okay_chars = %w[- . _]
 
         okay_chars.each do |okay_char|
-          expect(unique_path).not_to start_with(okay_char)
+          expect(unique_path).not_to(start_with(okay_char))
         end
       end
     end
