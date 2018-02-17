@@ -5,10 +5,11 @@ if RUBY_VERSION < '2.0.0'
 end
 
 begin
+  require 'tmpdir'
   require 'bootsnap'
   require 'fastlane/version'
   Bootsnap.setup(
-    cache_dir: "/tmp/fastlane-#{RUBY_VERSION}-#{Fastlane::VERSION}",
+    cache_dir: "#{Dir.tmpdir}/fastlane-#{RUBY_VERSION}-#{Fastlane::VERSION}",
     load_path_cache: true,
     autoload_paths_cache: false,
     disable_trace: true,
