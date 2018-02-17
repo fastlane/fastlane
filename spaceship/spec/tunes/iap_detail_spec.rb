@@ -125,6 +125,21 @@ describe Spaceship::Tunes::IAPDetail do
       expect(edited.pricing_intervals).to eq([{ tier: 4, begin_date: nil, end_date: nil, grandfathered: nil, country: "WW" }])
     end
 
+    it "saved with changed pricing detail" do
+      edited = app.in_app_purchases.find("x.a.a.b.b.c.d.x.y.z").edit
+      edited.pricing_intervals = [
+        {
+          country: "WW",
+          begin_date: nil,
+          end_date: nil,
+          tier: 4
+        }
+      ]
+      expect(client).to receive(:update_iap!).with(app_id: '898536088', purchase_id: "1195137657", data: edited.raw_data)
+      expect(client).to receive(:update_recurring_iap_pricing!).with(app_id: '898536088', purchase_id: "1195137657", pricing_intervals: edited.raw_data["pricingIntervals"])
+      edited.save!
+    end
+
     it "saved with changed versions" do
       edited = app.in_app_purchases.find("go.find.me").edit
       expect(client).to receive(:update_iap!).with(app_id: '898536088', purchase_id: "1195137656", data: edited.raw_data)

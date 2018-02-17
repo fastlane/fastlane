@@ -1103,6 +1103,24 @@ module Spaceship
       end
     end
 
+    def update_recurring_iap_pricing!(app_id: nil, purchase_id: nil, pricing_intervals: nil)
+      with_tunes_retry do
+        r = request(:post) do |req|
+          pricing_data = {}
+          req.url("ra/apps/#{app_id}/iaps/#{purchase_id}/pricing/subscriptions")
+          pricing_data["subscriptions"] = pricing_intervals
+          req.body = pricing_data.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_itc_response(r.body)
+      end
+    end
+
+    def load_recurring_iap_pricing(app_id: nil, purchase_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps/#{purchase_id}/pricing")
+      parse_response(r, 'data')
+    end
+
     def create_iap_family(app_id: nil, name: nil, product_id: nil, reference_name: nil, versions: [])
       r = request(:get, "ra/apps/#{app_id}/iaps/family/template")
       data = parse_response(r, 'data')

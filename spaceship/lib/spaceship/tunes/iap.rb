@@ -1,3 +1,4 @@
+require 'spaceship/tunes/errors'
 require 'spaceship/tunes/iap_list'
 require 'spaceship/tunes/iap_detail'
 require 'spaceship/tunes/iap_status'
@@ -75,6 +76,33 @@ module Spaceship
                            family_id: family_id,
                            subscription_duration: subscription_duration,
                            subscription_free_trial: subscription_free_trial)
+
+        # Update pricing for a recurring subscription.
+        if type == Spaceship::Tunes::IAPType::RECURRING && pricing_intervals
+          # There are cases where the product that was just created is not immediately found,
+          # and in order to update its pricing the purchase_id is needed. Therefore polling is done
+          # for 4 times until it is found. If it's not found after 4 tries, a PotentialServerError
+          # exception is raised.
+          product = find_product_with_retries(product_id, 4)
+          transformed_pricing_intervals = transform_pricing_intervals(pricing_intervals)
+          client.update_recurring_iap_pricing!(app_id: self.application.apple_id,
+                                               purchase_id: product.purchase_id,
+                                               pricing_intervals: transformed_pricing_intervals)
+        end
+      end
+
+      def transform_pricing_intervals(pricing_intervals)
+        pricing_intervals.map do |interval|
+          {
+            "value" =>  {
+              "tierStem" =>  interval[:tier],
+              "priceTierEffectiveDate" =>  interval[:begin_date],
+              "priceTierEndDate" =>  interval[:end_date],
+              "country" =>  interval[:country] || "WW",
+              "grandfathered" =>  interval[:grandfathered]
+            }
+          }
+        end
       end
 
       # find a specific product
@@ -102,6 +130,23 @@ module Spaceship
           return_iaps << loaded_iap
         end
         return_iaps
+      end
+
+      private
+
+      def find_product_with_retries(product_id, max_tries)
+        try_number = 0
+        product = nil
+        until product
+          if try_number > max_tries
+            raise PotentialServerError.new, "Failed to find the product with id=#{product_id}. "\
+            "This can be caused either by a server error or due to the removal of the product."
+          end
+          product = find(product_id)
+          try_number += 1
+        end
+
+        product
       end
     end
   end
