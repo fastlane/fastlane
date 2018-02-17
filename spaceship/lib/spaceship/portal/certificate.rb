@@ -1,6 +1,7 @@
 require 'openssl'
 
 require_relative 'app'
+require_relative 'website_push'
 
 module Spaceship
   module Portal
