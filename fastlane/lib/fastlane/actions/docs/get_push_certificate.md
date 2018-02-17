@@ -10,7 +10,7 @@ _pem_ does all that for you, just by simply running _pem_.
 
 _pem_ creates new .pem, .cer, and .p12 files to be uploaded to your push server if a valid push notification profile is needed. _pem_ does not cover uploading the file to your server.
 
-To automate iOS Provisioning profiles you can use [match](https://docs.fastlane.tools/actions/match/).
+To automate iOS Provisioning profiles you can use [_match_](https://docs.fastlane.tools/actions/match/).
 
 -------
 
@@ -104,7 +104,7 @@ Run `fastlane action pem` to get a list of available environment variables.
 
 # How does it work?
 
-_pem_ uses [spaceship](https://spaceship.airforce) to communicate with the Apple Developer Portal to request a new push certificate for you.
+_pem_ uses [_spaceship_](https://spaceship.airforce) to communicate with the Apple Developer Portal to request a new push certificate for you.
 
 ## How is my password stored?
 ``_pem_`` uses the [password manager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from _fastlane_. Take a look the [CredentialsManager README](https://github.com/fastlane/fastlane/tree/master/credentials_manager) for more information.
