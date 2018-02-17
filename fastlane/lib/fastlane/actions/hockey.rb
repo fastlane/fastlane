@@ -5,6 +5,7 @@ module Fastlane
       HOCKEY_BUILD_INFORMATION = :HOCKEY_BUILD_INFORMATION # contains all keys/values from the HockeyApp API, like :title, :bundle_identifier
     end
 
+    # rubocop:disable Metrics/ClassLength
     class HockeyAction < Action
       def self.connection(options)
         require 'faraday'
@@ -383,5 +384,6 @@ module Fastlane
         :beta
       end
     end
+    # rubocop:enable Metrics/ClassLength
   end
 end

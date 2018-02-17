@@ -27,6 +27,7 @@ module Fastlane
       path: '-P'
     }
 
+    # rubocop:disable Metrics/ClassLength
     class S3Action < Action
       def self.run(config)
         # Calling fetch on config so that default values will be used
@@ -452,5 +453,6 @@ module Fastlane
           "Install using `fastlane add_plugin aws_s3`."
       end
     end
+    # rubocop:enable Metrics/ClassLength
   end
 end
