@@ -84,6 +84,7 @@ module Fastlane
                                      env_name: "TRYOUTS_BUILD_FILE",
                                      description: "Path to your IPA or APK file. Optional if you use the _gym_ or _xcodebuild_ action",
                                      default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Couldn't find build file at path '#{value}'") unless File.exist?(value)
                                      end),

@@ -598,7 +598,8 @@ describe FastlaneCore do
                                      type: Array, # we actually allow String and Array here
                                      skip_type_validation: true,
                                      code_gen_sensitive: true,
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier))
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                     default_value_dynamic: true)
             config = FastlaneCore::Configuration.create([config_item], {})
 
             config.set(:app_identifiers, nil)
