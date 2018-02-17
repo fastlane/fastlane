@@ -191,6 +191,7 @@ module Fastlane
                                        env_name: "FL_HOCKEY_APK",
                                        description: "Path to your APK file",
                                        default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find apk file at path '#{value}'") unless File.exist?(value)
@@ -210,6 +211,7 @@ module Fastlane
                                        env_name: "FL_HOCKEY_IPA",
                                        description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action. For Mac zip the .app. For Android provide path to .apk file. In addition you could use this to upload .msi, .zip, .pkg, etc if you use the 'create_update' mechanism",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
@@ -222,6 +224,7 @@ module Fastlane
                                        env_name: "FL_HOCKEY_DSYM",
                                        description: "Path to your symbols file. For iOS and Mac provide path to app.dSYM.zip. For Android provide path to mappings.txt file",
                                        default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          # validation is done in the action
@@ -238,7 +241,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :notes,
                                        env_name: "FL_HOCKEY_NOTES",
                                        description: "Beta Notes",
-                                       default_value: Actions.lane_context[SharedValues::FL_CHANGELOG] || "No changelog given"),
+                                       default_value: Actions.lane_context[SharedValues::FL_CHANGELOG] || "No changelog given",
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :notify,
                                        env_name: "FL_HOCKEY_NOTIFY",
                                        description: "Notify testers? \"1\" for yes",
