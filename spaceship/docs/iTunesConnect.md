@@ -3,7 +3,7 @@ iTunes Connect API
 
 # Usage
 
-To quickly play around with `spaceship` launch `irb` in your terminal and execute `require "spaceship"`.
+To quickly play around with _spaceship_ launch `irb` in your terminal and execute `require "spaceship"`.
 
 In general the classes are pre-fixed with the `Tunes` module.
 
@@ -69,7 +69,7 @@ You can have up to 2 app versions at the same time. One is usually the version a
 
 While you usually can modify some values in the production version (e.g. app description), most options are already locked.
 
-With `spaceship` you can access the versions like this
+With _spaceship_ you can access the versions like this
 
 ```ruby
 app.live_version # the version that's currently available in the App Store
@@ -301,7 +301,7 @@ Spaceship::TestFlight::Tester.create_app_level_tester(
 )
 
 ```
-Right now, `spaceship` can't modify or create internal testers.
+Right now, _spaceship_ can't modify or create internal testers.
 
 ```ruby
 # Load all sandbox testers

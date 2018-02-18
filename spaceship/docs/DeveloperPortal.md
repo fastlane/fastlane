@@ -3,7 +3,7 @@ Developer Portal API
 
 # Usage
 
-To quickly play around with `spaceship` launch `irb` in your terminal and execute `require "spaceship"`.
+To quickly play around with _spaceship_ launch `irb` in your terminal and execute `require "spaceship"`.
 
 ## Login
 
@@ -318,7 +318,7 @@ profiles = Spaceship::Portal.provisioning_profile.in_house.all
 
 ## Multiple Spaceships
 
-Sometimes one `spaceship` just isn't enough. That's why this library has its own Spaceship Launcher to launch and use multiple `spaceships` at the same time :rocket:
+Sometimes one _spaceship_ just isn't enough. That's why this library has its own Spaceship Launcher to launch and use multiple _spaceships_ at the same time :rocket:
 
 ```ruby
 # Launch 2 spaceships

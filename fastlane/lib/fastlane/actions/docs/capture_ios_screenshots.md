@@ -120,7 +120,7 @@ To quick start your UI tests, you can use the UI Test recorder. You only have to
 fastlane snapshot
 ```
 
-Your screenshots will be stored in the `./screenshots/` folder by default (or `./fastlane/screenshots` if you're using [fastlane](https://fastlane.tools))
+Your screenshots will be stored in the `./screenshots/` folder by default (or `./fastlane/screenshots` if you're using [_fastlane_](https://fastlane.tools))
 
 New with Xcode 9, *snapshot* can run multiple simulators concurrently. This is the default behavior in order to take your screenshots as quickly as possible. This can be disabled to run each device, one at a time, by setting the `:concurrent_simulators` option to `false`.
 
@@ -301,7 +301,7 @@ Radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152) has be
 
 ## Frame the screenshots
 
-If you want to add frames around the screenshots and even put a title on top, check out [frameit](https://docs.fastlane.tools/actions/frameit/).
+If you want to add frames around the screenshots and even put a title on top, check out [_frameit_](https://docs.fastlane.tools/actions/frameit/).
 
 ## Available language codes
 ```ruby

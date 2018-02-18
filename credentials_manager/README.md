@@ -44,7 +44,7 @@ If you don't want to have your password stored in the Keychain set the `FASTLANE
 
 ## Implementing a custom solution
 
-All ```fastlane``` tools are Ruby-based, and you can take a look at the source code to easily implement your own authentication solution.
+All _fastlane_ tools are Ruby-based, and you can take a look at the source code to easily implement your own authentication solution.
 
 ```ruby
 require 'credentials_manager'
@@ -55,7 +55,7 @@ puts data.password
 ```
 
 # Code of Conduct
-Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 

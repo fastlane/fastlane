@@ -20,22 +20,22 @@ With these challenges in mind, [_fastlane_ plugin system](https://fabric.io/blog
 
 Each _fastlane_ tool has a specific purpose and should be kept focused on the functionality required for that task.
 
-* [deliver](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata, and your app binary to the App Store
-* [supply](https://github.com/fastlane/fastlane/tree/master/supply): Upload your Android app and its metadata to Google Play
-* [snapshot](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS apps on every device
-* [screengrab](https://github.com/fastlane/fastlane/tree/master/screengrab): Automate taking localized screenshots of your Android app on every device
-* [frameit](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
-* [pem](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification certificates
-* [sigh](https://github.com/fastlane/fastlane/tree/master/sigh): Because you would rather spend your time building stuff than fighting provisioning
-* [produce](https://github.com/fastlane/fastlane/tree/master/produce): Create new iOS apps on iTunes Connect and Apple Developer Portal using the command line
-* [cert](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
-* [spaceship](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Developer Portal and iTunes Connect
-* [pilot](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
+* [_deliver_](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata, and your app binary to the App Store
+* [_supply_](https://github.com/fastlane/fastlane/tree/master/supply): Upload your Android app and its metadata to Google Play
+* [_snapshot_](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS apps on every device
+* [_screengrab_](https://github.com/fastlane/fastlane/tree/master/screengrab): Automate taking localized screenshots of your Android app on every device
+* [_frameit_](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
+* [_pem_](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification certificates
+* [_sigh_](https://github.com/fastlane/fastlane/tree/master/sigh): Because you would rather spend your time building stuff than fighting provisioning
+* [_produce_](https://github.com/fastlane/fastlane/tree/master/produce): Create new iOS apps on iTunes Connect and Apple Developer Portal using the command line
+* [_cert_](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
+* [_spaceship_](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Developer Portal and iTunes Connect
+* [_pilot_](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
 * [boarding](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
-* [gym](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
-* [match](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using Git
-* [scan](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
-* [precheck](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
+* [_gym_](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
+* [_match_](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using Git
+* [_scan_](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
+* [_precheck_](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
 
 ## _fastlane_’s Relationship with [Google](https://google.com)
 

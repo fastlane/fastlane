@@ -15,6 +15,7 @@ lane :validate_repo do
   lint_source
   execute_tests
   validate_docs
+  ensure_tool_name_formatting
 end
 
 desc "Verifies source code is in a good state"
@@ -440,4 +441,26 @@ desc "Get the version number of the last release"
 private_lane :current_version do
   puts("Checking the latest version on RubyGems")
   download(url: "https://rubygems.org/api/v1/gems/fastlane.json")["version"]
+end
+
+desc "Ensure the correct formatting for the fastlane tools"
+private_lane :ensure_tool_name_formatting do
+  UI.message("🕗  Verifying tool name formatting...")
+  require 'fastlane/tools'
+  errors = []
+  Dir.chdir("..") do
+    Dir["**/*.md"].each do |path|
+      content = File.read(path)
+      Fastlane::TOOLS.each do |tool|
+        errors << "Use _#{tool}_ instead of `#{tool}` to mention a tool in the docs in '#{path}'" if content.include?("`#{tool}`")
+        errors << "Use [_#{tool}_] instead of [#{tool}] to mention a tool in the docs in '#{path}'" if content.include?("[#{tool}]")
+        if content.include?("_#{tool.to_s.capitalize}_") || content.include?("`#{tool.to_s.capitalize}`")
+          errors << "fastlane tools have to be formatted in lower case: #{tool} in '#{path}'"
+        end
+      end
+    end
+  end
+  errors.each { |a| UI.error(a) }
+  UI.user_error!("Invalid formatting of one of the fastlane tools") unless errors.empty?
+  UI.success("✅  fastlane tools formatting is correct")
 end

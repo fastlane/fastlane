@@ -14,7 +14,7 @@ If you want to work on something else, e.g. new functionality or fixing a bug, i
 
 ## Checking out the _fastlane_ repo
 
-- Click the “Fork” button in the upper right corner of the [main _fastlane_ repo][fastlane]
+- Click the “Fork” button in the upper right corner of the [main _fastlane_ repo][fastlane repo]
 - Clone your fork:
   - `git clone git@github.com:<YOUR_GITHUB_USER>/fastlane.git`
   - Learn more about how to manage your fork: https://help.github.com/articles/working-with-forks/
@@ -32,7 +32,7 @@ If you want to work on something else, e.g. new functionality or fixing a bug, i
 
 ## Submitting the PR
 
-When the coding is done and you’re finished testing your changes, you are ready to submit the PR to the [_fastlane_ main repo][fastlane]. Everything you need to know about submitting the PR itself is inside our [Pull Request Template][pr template]. Some best practices are:
+When the coding is done and you’re finished testing your changes, you are ready to submit the PR to the [_fastlane_ main repo][fastlane repo]. Everything you need to know about submitting the PR itself is inside our [Pull Request Template][pr template]. Some best practices are:
 
 - Use a descriptive title
 - Link the issues that are related to your PR in the body
@@ -47,7 +47,7 @@ After your contribution is merged, it’s not immediately available to all users
 
 <!-- Links -->
 [you can do this]: https://github.com/fastlane/fastlane/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+label%3A%22complexity%3A+you+can+do+this%22+
-[fastlane]: https://github.com/fastlane/fastlane
+[fastlane repo]: https://github.com/fastlane/fastlane
 [pr template]: .github/PULL_REQUEST_TEMPLATE.md
 [bundler]: https://bundler.io
 [bundler help]: https://bundler.io/v1.12/#getting-started
