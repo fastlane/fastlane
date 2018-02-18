@@ -95,10 +95,10 @@ module Produce
         elsif k.to_sym == :icloud
           case v
           when SERVICE_LEGACY
-            enabled_clean_options[app_service.icloud.on.service_id] = app_service.icloud.on
+            enabled_clean_options[app_service.cloud.on.service_id] = app_service.cloud.on
             enabled_clean_options[app_service.cloud_kit.xcode5_compatible.service_id] = app_service.cloud_kit.xcode5_compatible
           when SERVICE_CLOUDKIT
-            enabled_clean_options[app_service.icloud.on.service_id] = app_service.icloud.on
+            enabled_clean_options[app_service.i_cloud.on.service_id] = app_service.i_cloud.on
             enabled_clean_options[app_service.cloud_kit.cloud_kit.service_id] = app_service.cloud_kit.cloud_kit
           end
         else
