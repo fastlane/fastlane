@@ -38,11 +38,11 @@ It will only be called, if the selected lane was executed **successfully**.
 
 ```ruby
 after_all do |lane|
-  say "Successfully finished deployment (#{lane})!"
+  say("Successfully finished deployment (#{lane})!")
   slack(
     message: "Successfully submitted new App Update"
   )
-  sh "./send_screenshots_to_team.sh" # Example
+  sh("./send_screenshots_to_team.sh") # Example
 end
 ```
 
