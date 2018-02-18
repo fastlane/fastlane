@@ -113,14 +113,14 @@ Since you might want to manually trigger a new build but don't want to specify a
 Run `fastlane gym init` to create a new configuration file. Example:
 
 ```ruby-skip-tests
-scheme "Example"
+scheme("Example")
 
-sdk "iphoneos9.0"
+sdk("iphoneos9.0")
 
-clean true
+clean(true)
 
-output_directory "./build"    # store the ipa in this folder
-output_name "MyApp"           # the name of the ipa file
+output_directory("./build")    # store the ipa in this folder
+output_name("MyApp")           # the name of the ipa file
 ```
 
 ## Export options
@@ -128,7 +128,7 @@ output_name "MyApp"           # the name of the ipa file
 Since Xcode 7, _gym_ is using new Xcode API which allows us to specify export options using `plist` file. By default _gym_ creates this file for you and you are able to modify some parameters by using `export_method`, `export_team_id`, `include_symbols` or `include_bitcode`. If you want to have more options, like creating manifest file for app thinning, you can provide your own `plist` file:
 
 ```ruby-skip-tests
-export_options "./ExportOptions.plist"
+export_options("./ExportOptions.plist")
 ```
 
 or you can provide hash of values directly in the `Gymfile`:

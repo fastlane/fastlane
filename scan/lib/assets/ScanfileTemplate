@@ -6,8 +6,8 @@
 
 # Remove the # in front of the line to enable the option
 
-# scheme "Example"
+# scheme("Example")
 
-# open_report true
+# open_report(true)
 
-# clean true
+# clean(true)

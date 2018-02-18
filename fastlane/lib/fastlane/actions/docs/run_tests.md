@@ -124,12 +124,12 @@ Since you might want to manually trigger the tests but don't want to specify all
 Run `fastlane scan init` to create a new configuration file. Example:
 
 ```ruby-skip-tests
-scheme "Example"
-devices ["iPhone 6s", "iPad Air"]
+scheme("Example")
+devices(["iPhone 6s", "iPad Air"])
 
-clean true
+clean(true)
 
-output_types "html"
+output_types("html")
 ```
 
 # Automating the whole process

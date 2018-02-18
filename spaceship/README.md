@@ -79,7 +79,7 @@ profile = Spaceship.provisioning_profile.app_store.create!(bundle_id: app.bundle
                                                          certificate: cert)
 
 # Print the name and download the new profile
-puts "Created Profile " + profile.name
+puts("Created Profile " + profile.name)
 profile.download
 ```
 

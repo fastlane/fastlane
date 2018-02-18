@@ -54,7 +54,7 @@ Follow the `danger` guide to authenticate with GitHub
 Edit `Dangerfile` and replace the content with
 
 ```ruby
-puts "Running fastlane to generate and upload an ipa file..."
+puts("Running fastlane to generate and upload an ipa file...")
 
 options = {
   xcodebuild: {
