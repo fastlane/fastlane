@@ -48,7 +48,7 @@ _gym_ uses the latest APIs to build and sign your application which results in m
 🏁 | Beautiful inline build output
 📖    | Helps you resolve common build errors like code signing issues
 🚠 | Sensible defaults: Automatically detect the project, its schemes and more
-🔗  | Works perfectly with [fastlane](https://fastlane.tools) and other tools
+🔗  | Works perfectly with [_fastlane_](https://fastlane.tools) and other tools
 📦 | Automatically generates an `ipa` and a compressed `dSYM` file
 🚅 | Don't remember any complicated build commands, just _gym_
 🔧  | Easy and dynamic configuration using parameters and environment variables
@@ -155,7 +155,7 @@ export_options(
 )
 ```
 
-**Note**: If you use [fastlane](https://fastlane.tools) with [match](https://fastlane.tools/match) you don't need to provide those values manually.
+**Note**: If you use [_fastlane_](https://fastlane.tools) with [_match_](https://fastlane.tools/match) you don't need to provide those values manually.
 
 For the list of available options run `xcodebuild -help`.
 
@@ -166,7 +166,7 @@ For the list of available options run `xcodebuild -help`.
 
 ## Automating the whole process
 
-_gym_ works great together with [fastlane](https://fastlane.tools), which connects all deployment tools into one streamlined workflow.
+_gym_ works great together with [_fastlane_](https://fastlane.tools), which connects all deployment tools into one streamlined workflow.
 
 Using _fastlane_ you can define a configuration like
 
