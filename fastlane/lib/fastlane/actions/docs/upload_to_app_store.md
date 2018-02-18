@@ -21,12 +21,12 @@ _deliver_ uploads screenshots, metadata and binaries to iTunes Connect. Use _del
 - Upload hundreds of localized screenshots completely automatically
 - Upload a new ipa/pkg file to iTunes Connect without Xcode from any Mac
 - Maintain your app metadata locally and push changes back to iTunes Connect
-- Easily implement a real Continuous Deployment process using [fastlane](https://fastlane.tools)
+- Easily implement a real Continuous Deployment process using [_fastlane_](https://fastlane.tools)
 - Store the configuration in git to easily deploy from **any** Mac, including your Continuous Integration server
 - Get a HTML preview of the fetched metadata before uploading the app metadata and screenshots to iTC
-- Automatically uses [precheck](/actions/precheck) to ensure your app has the highest chances of passing app review the first time
+- Automatically uses [_precheck_](/actions/precheck) to ensure your app has the highest chances of passing app review the first time
 
-To upload builds to TestFlight check out [pilot](/actions/pilot).
+To upload builds to TestFlight check out [_pilot_](/actions/pilot).
 
 # Quick Start
 
@@ -42,7 +42,7 @@ From now on, you can run `fastlane deliver` to deploy a new update, or just uplo
 
 # Usage
 
-Check out your local `./fastlane/metadata` and `./fastlane/screenshots` folders (if you don't use [fastlane](https://fastlane.tools) it's `./metadata` instead)
+Check out your local `./fastlane/metadata` and `./fastlane/screenshots` folders (if you don't use [_fastlane_](https://fastlane.tools) it's `./metadata` instead)
 
 ![/img/actions/deliver_metadata.png](/img/actions/deliver_metadata.png)
 
@@ -66,7 +66,7 @@ or you can specify path to `pkg` file for macOS apps:
 fastlane deliver --pkg "MacApp.pkg"
 ```
 
-If you use [fastlane](https://fastlane.tools) you don't have to manually specify the path to your `ipa`/`pkg` file.
+If you use [_fastlane_](https://fastlane.tools) you don't have to manually specify the path to your `ipa`/`pkg` file.
 
 This is just a small sub-set of what you can do with _deliver_, check out the full documentation in [#more-options](#more-options)
 
@@ -137,7 +137,7 @@ A path to a signed ipa file, which will be uploaded. If you don't provide this v
 ipa "App.ipa"
 ```
 
-if you use [fastlane](https://fastlane.tools) the ipa file will automatically be detected.
+if you use [_fastlane_](https://fastlane.tools) the ipa file will automatically be detected.
 
 ##### pkg
 A path to a signed pkg file, which will be uploaded. Submission logic of ipa applies to pkg files.
@@ -405,7 +405,7 @@ Before actually uploading anything to iTunes, _deliver_ will generate a HTML sum
 _deliver_ uses the following techniques under the hood:
 
 - The iTMSTransporter tool is used to upload the binary to iTunes Connect. iTMSTransporter is a command line tool provided by Apple.
-- For all metadata related actions _deliver_ uses [spaceship](https://github.com/fastlane/fastlane/tree/master/spaceship)
+- For all metadata related actions _deliver_ uses [_spaceship_](https://github.com/fastlane/fastlane/tree/master/spaceship)
 
 # Tips
 
@@ -635,7 +635,7 @@ In this case, default values for keywords, urls, name and release notes are used
 
 ## Automatically create screenshots
 
-If you want to integrate _deliver_ with [snapshot](https://docs.fastlane.tools/actions/snapshot/), check out [fastlane](https://fastlane.tools)!
+If you want to integrate _deliver_ with [_snapshot_](https://docs.fastlane.tools/actions/snapshot/), check out [_fastlane_](https://fastlane.tools)!
 
 ## Jenkins integration
 Detailed instructions about how to set up _deliver_ and _fastlane_ in `Jenkins` can be found in the [fastlane README](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration).

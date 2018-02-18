@@ -28,7 +28,7 @@ DEBUG=1 bundle exec rspec
 You will then jump into an interactive debugger that allows you to print out variables, call methods and [much more](https://github.com/pry/pry/wiki).
 To continue running the original script use `control` + `d`
 
-## Debugging and patching _[spaceship](https://spaceship.airforce)_ issues
+## Debugging and patching [_spaceship_](https://spaceship.airforce) issues
 
 ### Introduction to _spaceship_
 

@@ -8,7 +8,7 @@ Also, whenever you submit a comment, don’t ask users for their personal inform
 
 ## How we use GitHub Labels
 
-Issues and PRs may get marked with labels to help the fastlane team communicate with each other and with the community as a whole. Usually most issues and PRs will get two different labels, one for the tool it affects (e.g. `fastlane`, `fastlane_core`, `supply`, ...) and one that represents some general information about the state or nature of the issue/PR.
+Issues and PRs may get marked with labels to help the fastlane team communicate with each other and with the community as a whole. Usually most issues and PRs will get two different labels, one for the tool it affects (e.g. _fastlane_, `fastlane_core`, _supply_, ...) and one that represents some general information about the state or nature of the issue/PR.
 
 If you identify an issue that seems interesting but not time-critical, and is simple for new contributors to dive into, we recommend adding the “you can do this” label. PRs labeled “you can do this” should have very clear descriptions of the problem and solution. Remember that someone who is new to fastlane will need some coaching to be successful!
 
@@ -27,7 +27,7 @@ If you identify an issue that seems interesting but not time-critical, and is si
 
 ### Tool Labels
 
-Each tool has it’s own label, e.g. `fastlane`, `fastlane_core` and `gym`.
+Each tool has it’s own label, e.g. _fastlane_, `fastlane_core` and _gym_.
 
 ## How to review Pull Requests
 
