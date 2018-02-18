@@ -83,10 +83,10 @@ This will create a `Matchfile` in your current directory (or in your `./fastlane
 Example content (for more advanced setups check out the [fastlane section](#fastlane)):
 
 ```ruby-skip-tests
-git_url "https://github.com/fastlane/certificates"
+git_url("https://github.com/fastlane/certificates")
 
-app_identifier "tools.fastlane.app"
-username "user@fastlane.tools"
+app_identifier("tools.fastlane.app")
+username("user@fastlane.tools")
 ```
 
 #### Important: Use one git branch per team

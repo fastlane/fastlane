@@ -183,7 +183,7 @@ The `Snapfile` can contain all the options that are also available on `fastlane 
 
 
 ```ruby-skip-tests
-scheme "UITests"
+scheme("UITests")
 
 devices([
   "iPhone 6",
@@ -202,11 +202,11 @@ languages([
 launch_arguments(["-username Felix"])
 
 # The directory in which the screenshots should be stored
-output_directory './screenshots'
+output_directory('./screenshots')
 
-clear_previous_screenshots true
+clear_previous_screenshots(true)
 
-add_photos ["MyTestApp/Assets/demo.jpg"]
+add_photos(["MyTestApp/Assets/demo.jpg"])
 ```
 
 ### Completely reset all simulators
