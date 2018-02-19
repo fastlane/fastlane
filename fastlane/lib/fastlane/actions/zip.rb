@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class ZipAction < Action
       def self.run(params)
-        UI.message "Compressing #{params[:path]}..."
+        UI.message("Compressing #{params[:path]}...")
 
         params[:output_path] ||= params[:path]
 
@@ -19,10 +19,10 @@ module Fastlane
         Dir.chdir(File.expand_path("..", params[:path])) do # required to properly zip
           zip_options = params[:verbose] ? "r" : "rq"
 
-          Actions.sh "zip -#{zip_options} #{absolute_output_path.shellescape} #{File.basename(params[:path]).shellescape}"
+          Actions.sh("zip -#{zip_options} #{absolute_output_path.shellescape} #{File.basename(params[:path]).shellescape}")
         end
 
-        UI.success "Successfully generated zip file at path '#{File.expand_path(absolute_output_path)}'"
+        UI.success("Successfully generated zip file at path '#{File.expand_path(absolute_output_path)}'")
         return File.expand_path(absolute_output_path)
       end
 
@@ -82,6 +82,10 @@ module Fastlane
 
       def self.return_value
         "The path to the output zip file"
+      end
+
+      def self.return_type
+        :string
       end
 
       def self.authors

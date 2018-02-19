@@ -43,7 +43,9 @@ module Fastlane
                                        description: "Provide the UDID of the device to register as"),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                      env_name: "REGISTER_DEVICE_TEAM_ID",
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                       default_value_dynamic: true,
                                      description: "The ID of your Developer Portal team if you're in multiple teams",
                                      optional: true,
                                      verify_block: proc do |value|
@@ -53,14 +55,17 @@ module Fastlane
                                        env_name: "REGISTER_DEVICE_TEAM_NAME",
                                        description: "The name of your Developer Portal team if you're in multiple teams",
                                        optional: true,
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                        end),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "DELIVER_USER",
                                        description: "Optional: Your Apple ID",
-                                       default_value: user)
+                                       default_value: user,
+                                       default_value_dynamic: true)
         ]
       end
 
@@ -89,6 +94,10 @@ module Fastlane
             username: "luka@goonbee.com"   # Optional, lets you override the Apple Member Center username.
           )'
         ]
+      end
+
+      def self.return_type
+        :string
       end
 
       def self.category

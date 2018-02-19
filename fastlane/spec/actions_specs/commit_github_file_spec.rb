@@ -16,11 +16,13 @@ describe Fastlane do
         end
 
         it 'correctly submits to github' do
-          path = '/test/assets/TEST_FILE.md'
+          current_dir = Dir.pwd
+          path = "test/assets/TEST_FILE.md"
+          file = "#{current_dir}/fastlane/#{path}"
           content = 'test'
-          allow(File).to receive(:exist?).with(path).and_return(true).at_least(:once)
+          allow(File).to receive(:exist?).with(file).and_return(true).at_least(:once)
           allow(File).to receive(:exist?).and_return(:default)
-          allow(File).to receive(:open).with(path).and_return(StringIO.new(content))
+          allow(File).to receive(:open).with(file).and_return(StringIO.new(content))
 
           result = Fastlane::FastFile.new.parse("
             lane :test do
@@ -28,7 +30,7 @@ describe Fastlane do
                 api_token: '12345abcde',
                 repository_name: 'fastlane/fastlane',
                 message: 'Add my new file',
-                path: '/test/assets/TEST_FILE.md'
+                path: '#{path}'
               )
             end
           ").runner.execute(:test)

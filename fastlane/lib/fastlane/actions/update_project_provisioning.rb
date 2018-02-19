@@ -22,7 +22,7 @@ module Fastlane
         unless File.exist?(params[:certificate])
           UI.message("Downloading root certificate from (#{ROOT_CERTIFICATE_URL}) to path '#{params[:certificate]}'")
           require 'open-uri'
-          File.open(params[:certificate], "w") do |file|
+          File.open(params[:certificate], "w:ASCII-8BIT") do |file|
             file.write(open(ROOT_CERTIFICATE_URL, "rb").read)
           end
         end
@@ -103,6 +103,7 @@ module Fastlane
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_FILE",
                                        description: "Path to provisioning profile (.mobileprovision)",
                                        default_value: Actions.lane_context[SharedValues::SIGH_PROFILE_PATH],
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Path to provisioning profile is invalid") unless File.exist?(value)
                                        end),
@@ -138,7 +139,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

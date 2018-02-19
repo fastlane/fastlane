@@ -68,6 +68,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :xcarchive,
                                        description: 'Path to your xcarchive file. Optional if you use the `xcodebuild` action',
                                        default_value: Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE],
+                                       default_value_dynamic: true,
                                        optional: false,
                                        env_name: 'BACKUP_XCARCHIVE_ARCHIVE',
                                        verify_block: proc do |value|
@@ -110,7 +111,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

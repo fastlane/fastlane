@@ -10,12 +10,12 @@ module Fastlane
         require 'faraday_middleware'
 
         connection = Faraday.new(url: "https://upload.testfairy.com") do |builder|
-          builder.request :multipart
-          builder.request :url_encoded
-          builder.request :retry, max: 3, interval: 5
-          builder.response :json, content_type: /\bjson$/
-          builder.use FaradayMiddleware::FollowRedirects
-          builder.adapter :net_http
+          builder.request(:multipart)
+          builder.request(:url_encoded)
+          builder.request(:retry, max: 3, interval: 5)
+          builder.response(:json, content_type: /\bjson$/)
+          builder.use(FaradayMiddleware::FollowRedirects)
+          builder.adapter(:net_http)
         end
 
         options[:file] = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa and File.exist?(ipa)
@@ -76,8 +76,6 @@ module Fastlane
             [key, value.join(',')]
           when :metrics
             [key, metrics_to_client.call(value).join(',')]
-          when :icon_watermark
-            ['icon-watermark', value]
           when :comment
             [key, value]
           when :auto_update
@@ -143,6 +141,7 @@ module Fastlane
                                        env_name: 'TESTFAIRY_IPA_PATH',
                                        description: 'Path to your IPA file for iOS or APK for Android',
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
                                        end),
@@ -152,6 +151,7 @@ module Fastlane
                                        env_name: "FL_TESTFAIRY_SYMBOLS_FILE",
                                        description: "Symbols mapping file",
                                        default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find dSYM file at path '#{value}'") unless File.exist?(value)
                                        end),
@@ -172,11 +172,6 @@ module Fastlane
           # video
           # video-quality
           # video-rate
-          FastlaneCore::ConfigItem.new(key: :icon_watermark,
-                                       optional: true,
-                                       env_name: "FL_TESTFAIRY_ICON_WATERMARK",
-                                       description: "Add a small watermark to app icon",
-                                       default_value: 'off'),
           FastlaneCore::ConfigItem.new(key: :comment,
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_COMMENT",
@@ -185,7 +180,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :auto_update,
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_AUTO_UPDATE",
-                                       description: "Allows easy upgrade of all users to current version",
+                                       description: "Allows an easy upgrade of all users to the current version. The default is 'off', to enable set as 'on'",
                                        default_value: 'off'),
           # not well documented
           FastlaneCore::ConfigItem.new(key: :notify,
@@ -227,7 +222,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :android].include? platform
+        [:ios, :android].include?(platform)
       end
     end
   end

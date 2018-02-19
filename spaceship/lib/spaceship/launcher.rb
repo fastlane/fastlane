@@ -1,3 +1,5 @@
+require_relative 'portal/portal_client'
+
 module Spaceship
   class Launcher
     attr_accessor :client
@@ -68,27 +70,27 @@ module Spaceship
 
     # @return (Class) Access the apps for this spaceship
     def app
-      Spaceship::App.set_client(@client)
+      Spaceship::Portal::App.set_client(@client)
     end
 
     # @return (Class) Access the app groups for this spaceship
     def app_group
-      Spaceship::AppGroup.set_client(@client)
+      Spaceship::Portal::AppGroup.set_client(@client)
     end
 
     # @return (Class) Access the devices for this spaceship
     def device
-      Spaceship::Device.set_client(@client)
+      Spaceship::Portal::Device.set_client(@client)
     end
 
     # @return (Class) Access the certificates for this spaceship
     def certificate
-      Spaceship::Certificate.set_client(@client)
+      Spaceship::Portal::Certificate.set_client(@client)
     end
 
     # @return (Class) Access the provisioning profiles for this spaceship
     def provisioning_profile
-      Spaceship::ProvisioningProfile.set_client(@client)
+      Spaceship::Portal::ProvisioningProfile.set_client(@client)
     end
   end
 end

@@ -1,4 +1,6 @@
-require 'fastlane_core/analytics/analytics_ingester_client'
+require_relative 'analytics_ingester_client'
+require_relative 'action_launch_context'
+require_relative 'analytics_event_builder'
 
 module FastlaneCore
   class AnalyticsSession
@@ -51,6 +53,13 @@ module FastlaneCore
         primary_target_hash: {
           name: 'fastlane_version',
           detail: fastlane_version
+        }
+      )
+
+      @events << builder.launched_event(
+        primary_target_hash: {
+          name: 'configuration_language',
+          detail: launch_context.configuration_language
         }
       )
 
@@ -145,7 +154,7 @@ module FastlaneCore
 
     def finalize_session
       # If our users want to opt out of usage metrics, don't post the events.
-      # Learn more at https://github.com/fastlane/fastlane#metrics
+      # Learn more at https://docs.fastlane.tools/#metrics
       return if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
 
       client.post_events(@events)
@@ -161,10 +170,7 @@ module FastlaneCore
     end
 
     def operating_system
-      return "macOS" if RUBY_PLATFORM.downcase.include?("darwin")
-      return "Windows" if RUBY_PLATFORM.downcase.include?("mswin")
-      return "Linux" if RUBY_PLATFORM.downcase.include?("linux")
-      return "Unknown"
+      return Helper.operating_system
     end
 
     def install_method
@@ -184,14 +190,14 @@ module FastlaneCore
     end
 
     def ci?
-      return Helper.is_ci?
+      return Helper.ci?
     end
 
     def operating_system_version
       os = self.operating_system
       case os
       when "macOS"
-        return `SW_VERS -productVersion`.strip
+        return system('sw_vers', out: File::NULL) ? `sw_vers -productVersion`.strip : 'unknown'
       else
         # Need to test in Windows and Linux... not sure this is enough
         return Gem::Platform.local.version

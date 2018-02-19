@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Deliver
   # upload description, rating, etc.
   class UploadMetadata
@@ -44,7 +46,7 @@ module Deliver
     }
 
     # Localized app details values, that are editable in live state
-    LOCALISED_LIVE_VALUES = [:description, :release_notes, :support_url, :marketing_url]
+    LOCALISED_LIVE_VALUES = [:description, :release_notes, :support_url, :marketing_url, :promotional_text]
 
     # Non localized app details values, that are editable in live state
     NON_LOCALISED_LIVE_VALUES = [:privacy_url]
@@ -58,6 +60,8 @@ module Deliver
     ALL_META_SUB_DIRS = [TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR, REVIEW_INFORMATION_DIR]
 
     # rubocop:disable Metrics/PerceivedComplexity
+
+    require_relative 'loader'
 
     # Make sure to call `load_from_filesystem` before calling upload
     def upload(options)
@@ -115,14 +119,16 @@ module Deliver
       end
 
       v.release_on_approval = options[:automatic_release]
+      v.auto_release_date = options[:auto_release_date] unless options[:auto_release_date].nil?
       v.toggle_phased_release(enabled: !!options[:phased_release]) unless options[:phased_release].nil?
 
       set_trade_representative_contact_information(v, options)
       set_review_information(v, options)
       set_app_rating(v, options)
 
-      UI.message("Uploading metadata to iTunes Connect")
+      Helper.show_loading_indicator("Uploading metadata to iTunes Connect")
       v.save!
+      Helper.hide_loading_indicator
       begin
         details.save!
         UI.success("Successfully uploaded set of metadata to iTunes Connect")
@@ -243,8 +249,9 @@ module Deliver
         v.create_languages(enabled_languages)
         lng_text = "language"
         lng_text += "s" if enabled_languages.count != 1
-        UI.message("Activating #{lng_text} #{enabled_languages.join(', ')}...")
+        Helper.show_loading_indicator("Activating #{lng_text} #{enabled_languages.join(', ')}...")
         v.save!
+        Helper.hide_loading_indicator
       end
       true
     end

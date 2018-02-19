@@ -4,8 +4,8 @@ describe Fastlane do
 
     describe "Xcodebuild Integration" do
       before :each do
-        Fastlane::Actions.lane_context.delete :IPA_OUTPUT_PATH
-        Fastlane::Actions.lane_context.delete :XCODEBUILD_ARCHIVE
+        Fastlane::Actions.lane_context.delete(:IPA_OUTPUT_PATH)
+        Fastlane::Actions.lane_context.delete(:XCODEBUILD_ARCHIVE)
       end
 
       it "works with all parameters" do

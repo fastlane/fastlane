@@ -25,6 +25,6 @@ class TestCommanderProgram
       end
     end
 
-    default_command :test
+    default_command(:test)
   end
 end

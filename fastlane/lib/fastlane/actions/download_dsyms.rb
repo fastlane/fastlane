@@ -5,6 +5,7 @@ module Fastlane
     end
 
     class DownloadDsymsAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         require 'spaceship'
         require 'net/http'
@@ -29,8 +30,12 @@ module Fastlane
         # Set version if it is latest
         if version == 'latest'
           # Try to grab the edit version first, else fallback to live version
+          UI.message("Looking for latest version...")
           latest_version = app.edit_version(platform: platform) || app.live_version(platform: platform)
-          version = nil
+
+          UI.user_error!("Could not find latest version for your app, please try setting a specific version") if latest_version.version.nil?
+
+          version = latest_version.version
           build_number = latest_version.build_version
         end
 
@@ -48,22 +53,30 @@ module Fastlane
 
         # Loop through all app versions and download their dSYM
         app.all_build_train_numbers(platform: platform).each do |train_number|
+          UI.verbose("Found train: #{train_number}, comparing to supplied version: #{version}")
           if version && version != train_number
+            UI.verbose("Version #{version} doesn't match: #{train_number}")
             next
           end
           app.all_builds_for_train(train: train_number, platform: platform).each do |build|
+            UI.verbose("Found build version: #{build.build_version}, comparing to supplied build_number: #{build_number}")
             if build_number && build.build_version != build_number
+              UI.verbose("build_version: #{build.build_version} doesn't match: #{build_number}")
               next
             end
 
             begin
-              download_url = build.details.dsym_url
+              # need to call reload here or dsym_url is nil
+              UI.verbose("Build_version: #{build.build_version} matches #{build_number}, grabbing dsym_url")
+              build.reload
+              download_url = build.dsym_url
+              UI.verbose("dsym_url: #{download_url}")
             rescue Spaceship::TunesClient::ITunesConnectError => ex
               UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
             end
 
             if download_url
-              result = self.download download_url
+              result = self.download(download_url)
               path   = write_dsym(result, app.bundle_id, train_number, build.build_version, output_directory)
               UI.success("🔑  Successfully downloaded dSYM file for #{train_number} - #{build.build_version} to '#{path}'")
 
@@ -77,16 +90,17 @@ module Fastlane
         end
 
         if (Actions.lane_context[SharedValues::DSYM_PATHS] || []).count == 0
-          UI.error("No dSYM files found on iTunes Connect - this usually happens when no recompling happened yet")
+          UI.error("No dSYM files found on iTunes Connect - this usually happens when no recompiling has happened yet")
         end
       end
+      # rubocop:enable Metrics/PerceivedComplexity
 
       def self.write_dsym(data, bundle_id, train_number, build_number, output_directory)
         file_name = "#{bundle_id}-#{train_number}-#{build_number}.dSYM.zip"
         if output_directory
           file_name = output_directory + file_name
         end
-        File.write(file_name, data)
+        File.binwrite(file_name, data)
         file_name
       end
 
@@ -129,20 +143,25 @@ module Fastlane
                                        short_option: "-u",
                                        env_name: "DOWNLOAD_DSYMS_USERNAME",
                                        description: "Your Apple ID Username for iTunes Connect",
-                                       default_value: user),
+                                       default_value: user,
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        short_option: "-a",
                                        env_name: "DOWNLOAD_DSYMS_APP_IDENTIFIER",
                                        description: "The bundle identifier of your app",
                                        optional: false,
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
+                                       code_gen_sensitive: true,
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        short_option: "-k",
                                        env_name: "DOWNLOAD_DSYMS_TEAM_ID",
                                        description: "The ID of your iTunes Connect team if you're in multiple teams",
                                        optional: true,
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
                                        end),
@@ -151,15 +170,18 @@ module Fastlane
                                        env_name: "DOWNLOAD_DSYMS_TEAM_NAME",
                                        description: "The name of your iTunes Connect team if you're in multiple teams",
                                        optional: true,
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                        end),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        short_option: "-p",
                                        env_name: "DOWNLOAD_DSYMS_PLATFORM",
-                                       description: "The app platform for dSYMs you wish to download",
-                                       optional: true),
+                                       description: "The app platform for dSYMs you wish to download (ios, appletvos)",
+                                       optional: true,
+                                       default_value: :ios),
           FastlaneCore::ConfigItem.new(key: :version,
                                        short_option: "-v",
                                        env_name: "DOWNLOAD_DSYMS_VERSION",

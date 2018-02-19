@@ -1,6 +1,12 @@
 require "commander"
-require "pilot/options"
-require "fastlane_core"
+
+require 'fastlane_core/configuration/configuration'
+require_relative 'module'
+require_relative 'tester_importer'
+require_relative 'tester_exporter'
+require_relative 'tester_manager'
+require_relative 'build_manager'
+require_relative 'options'
 
 HighLine.track_eof = false
 
@@ -44,7 +50,7 @@ module Pilot
       program :description, Pilot::DESCRIPTION
       program :help, "Author", "Felix Krause <pilot@krausefx.com>"
       program :help, "Website", "https://fastlane.tools"
-      program :help, "GitHub", "https://github.com/fastlane/fastlane/tree/master/pilot"
+      program :help, "Documentation", "https://docs.fastlane.tools/actions/pilot/"
       program :help_formatter, :compact
 
       global_option("--verbose") { FastlaneCore::Globals.verbose = true }
@@ -104,6 +110,7 @@ module Pilot
 
         c.action do |args, options|
           config = create_config(options)
+          UI.user_error!("You must include an `app_identifier` to list testers") unless config[:app_identifier]
           Pilot::TesterManager.new.list_testers(config)
         end
       end
@@ -154,7 +161,7 @@ module Pilot
         end
       end
 
-      default_command :help
+      default_command(:help)
 
       run!
     end

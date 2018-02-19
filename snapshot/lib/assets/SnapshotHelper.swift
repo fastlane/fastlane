@@ -58,6 +58,7 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
     }
 }
 
+@objcMembers
 open class Snapshot: NSObject {
     static var app: XCUIApplication!
     static var cacheDirectory: URL!
@@ -112,7 +113,7 @@ open class Snapshot: NSObject {
         do {
             let launchArguments = try String(contentsOf: path, encoding: String.Encoding.utf8)
             let regex = try NSRegularExpression(pattern: "(\\\".+?\\\"|\\S+)", options: [])
-            let matches = regex.matches(in: launchArguments, options: [], range: NSRange(location:0, length:launchArguments.characters.count))
+            let matches = regex.matches(in: launchArguments, options: [], range: NSRange(location: 0, length: launchArguments.count))
             let results = matches.map { result -> String in
                 (launchArguments as NSString).substring(with: result.range)
             }
@@ -127,7 +128,7 @@ open class Snapshot: NSObject {
             waitForLoadingIndicatorToDisappear(within: timeout)
         }
 
-        print("snapshot: \(name)") // more information about this, check out https://github.com/fastlane/fastlane/tree/master/snapshot#how-does-it-work
+        print("snapshot: \(name)") // more information about this, check out https://docs.fastlane.tools/actions/snapshot/#how-does-it-work
 
         sleep(1) // Waiting for the animation to be finished (kind of)
 
@@ -153,7 +154,7 @@ open class Snapshot: NSObject {
 
         let networkLoadingIndicator = XCUIApplication().otherElements.deviceStatusBars.networkLoadingIndicators.element
         let networkLoadingIndicatorDisappeared = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: networkLoadingIndicator)
-        XCTWaiter.wait(for: [networkLoadingIndicatorDisappeared], timeout: timeout)
+        _ = XCTWaiter.wait(for: [networkLoadingIndicatorDisappeared], timeout: timeout)
     }
 
     class func pathPrefix() throws -> URL? {
@@ -165,7 +166,7 @@ open class Snapshot: NSObject {
                 throw SnapshotError.cannotDetectUser
             }
 
-            guard let usersDir =  FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
+            guard let usersDir = FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
                 throw SnapshotError.cannotFindHomeDirectory
             }
 
@@ -242,4 +243,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.6]
+// SnapshotHelperVersion [1.8]

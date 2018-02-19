@@ -1,3 +1,6 @@
+require_relative 'base'
+require_relative 'build'
+
 module Spaceship::TestFlight
   class BuildTrains < Base
     ##
@@ -9,12 +12,13 @@ module Spaceship::TestFlight
     #
     # See `Spaceship::TestFlight::Build#reload`
 
-    def self.all(app_id: nil, platform: nil)
+    def self.all(app_id: nil, platform: nil, retry_count: 3)
       data = client.get_build_trains(app_id: app_id, platform: platform)
       trains = {}
+
       data.each do |train_version|
-        builds_data = client.get_builds_for_train(app_id: app_id, platform: platform, train_version: train_version)
-        trains[train_version] = builds_data.map { |attrs| Build.new(attrs) }
+        builds_data = client.get_builds_for_train(app_id: app_id, platform: platform, train_version: train_version, retry_count: retry_count)
+        trains[train_version] = builds_data.map { |attrs| Spaceship::TestFlight::Build.new(attrs) }
       end
 
       self.new(trains)
@@ -31,6 +35,10 @@ module Spaceship::TestFlight
 
     def values
       @trains.values
+    end
+
+    def versions
+      @trains.keys
     end
   end
 end

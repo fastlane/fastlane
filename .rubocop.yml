@@ -1,3 +1,7 @@
+require:
+  - rubocop/require_tools
+  - ./rubocop/fork_usage.rb
+
 Style/MultipleComparison:
   Enabled: false
 
@@ -83,6 +87,20 @@ Lint/UselessAssignment:
   Exclude:
     - '**/spec/**/*'
 
+# In specs requires are done automatically
+Require/MissingRequireStatement:
+  Exclude:
+    - '**/spec/**/*.rb'
+    - '**/spec_helper.rb'
+    - 'spaceship/lib/spaceship/babosa_fix.rb'
+    - '**/Fastfile'
+    - '**/*.gemspec'
+    - 'rakelib/**/*'
+    - '**/*.rake'
+    - '**/Rakefile'
+    - 'fastlane/**/*' # TODO: remove
+    - 'supply/**/*' # TODO: remove
+
 # We could potentially enable the 2 below:
 Layout/IndentHash:
   Enabled: false
@@ -94,7 +112,7 @@ Layout/AlignHash:
 Layout/DotPosition:
   Enabled: false
 
-# We allow !! as it's an easy way to convert ot boolean
+# We allow !! as it's an easy way to convert to boolean
 Style/DoubleNegation:
   Enabled: false
 
@@ -224,10 +242,12 @@ Layout/SpaceAroundOperators:
 AllCops:
   TargetRubyVersion: 2.0
   Include:
-    - '**/fastlane/Fastfile'
+    - '*/lib/assets/*Template'
+    - '*/lib/assets/*TemplateAndroid'
   Exclude:
     - '**/lib/assets/custom_action_template.rb'
     - './vendor/**/*'
+    - '**/lib/assets/DefaultFastfileTemplate'
 
 # They have not to be snake_case
 Style/FileName:
@@ -261,3 +281,32 @@ Style/IfInsideElse:
 # Sometimes we just want to 'collect'
 Style/CollectionMethods:
   Enabled: false
+
+# Check whether fork is handled correctly on all platforms
+CrossPlatform/ForkUsage:
+  Exclude:
+    - '**/plugins/template/**/*'
+
+# ( ) for method calls
+Style/MethodCallWithArgsParentheses:
+  Enabled: true
+  IgnoredMethods:
+    - 'require'
+    - 'require_relative'
+    - 'gem'
+    - 'program'
+    - 'command'
+    - 'raise'
+    - 'attr_accessor'
+    - 'attr_reader'
+    - 'desc'
+    - 'lane'
+    - 'private_lane'
+    - 'platform'
+    # rspec tests code below
+    - 'to'
+    - 'describe'
+    - 'it'
+    - 'context'
+    - 'before'
+    - 'after'

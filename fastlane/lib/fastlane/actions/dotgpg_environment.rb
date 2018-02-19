@@ -25,7 +25,9 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :dotgpg_file,
                                        env_name: "DOTGPG_FILE",
                                        description: "Path to your gpg file",
+                                       code_gen_sensitive: true,
                                        default_value: Dir["dotgpg/*.gpg"].last,
+                                       default_value_dynamic: true,
                                        optional: false,
                                        verify_block: proc do |value|
                                          UI.user_error!("Dotgpg file '#{File.expand_path(value)}' not found") unless File.exist?(value)

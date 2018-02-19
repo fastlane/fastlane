@@ -1,3 +1,8 @@
+<!--
+This file is auto-generated and will be re-generated every time the docs are updated.
+To modify it, go to its source at https://github.com/fastlane/fastlane.
+-->
+
 # <%= @action.action_name %>
 
 <% action = @action %>
@@ -22,7 +27,7 @@ Returns | <%= action.return_value %>
 
 <% if (action.example_code || []).count > 0 %>
 
-**<%= action.example_code.count %> Example<%= (action.example_code.count > 1) ? "s" : "" %>**
+## <%= action.example_code.count %> Example<%= (action.example_code.count > 1) ? "s" : "" %>
 <% action.example_code.each do |current_sample| %>
 ```ruby
 <%= current_sample.gsub("          ", "") %>
@@ -32,16 +37,17 @@ Returns | <%= action.return_value %>
 
 <% if action.available_options && action.available_options.first.kind_of?(FastlaneCore::ConfigItem) %>
 
-**Parameters**
+## Parameters
 
-Key | Description
-----|------------
+Key | Description | Default
+----|-------------|--------
 <%- (action.available_options || []).each do |config_item| -%>
   <%- next unless config_item.kind_of?(FastlaneCore::ConfigItem) -%>
   <%- next if config_item.description.to_s.length == 0 -%>
-  `<%= config_item.key %>` | <%= config_item.description %>
+  `<%= config_item.key %>` | <%= config_item.description %> | <%= config_item.default_value.nil? ? "-" : (config_item.default_value_dynamic ? "*" : config_item.default_value) %>
 <%- end %>
-
+_- = this parameter doesn't have a default value_<br/>
+_* = this default value is dependent on the user's system_
 <% end %><%# End of action.available_options... %>
 
 <hr />

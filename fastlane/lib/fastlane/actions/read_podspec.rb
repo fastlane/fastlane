@@ -44,6 +44,7 @@ module Fastlane
                                        env_name: "FL_READ_PODSPEC_PATH",
                                        description: "Path to the podspec to be read",
                                        default_value: Dir['*.podspec*'].first,
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("File #{value} not found") unless File.exist?(value)
                                        end)
@@ -61,7 +62,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code
@@ -77,6 +78,10 @@ module Fastlane
         {
           'version' => 1.0
         }
+      end
+
+      def self.return_type
+        :hash_of_strings
       end
 
       def self.category

@@ -28,11 +28,11 @@ module Fastlane
 
         url = TRYOUTS_API_BUILD_RELEASE_TEMPLATE % params[:app_id]
         connection = Faraday.new(url) do |builder|
-          builder.request :multipart
-          builder.request :url_encoded
-          builder.response :json, content_type: /\bjson$/
-          builder.use FaradayMiddleware::FollowRedirects
-          builder.adapter :net_http
+          builder.request(:multipart)
+          builder.request(:url_encoded)
+          builder.response(:json, content_type: /\bjson$/)
+          builder.use(FaradayMiddleware::FollowRedirects)
+          builder.adapter(:net_http)
         end
 
         options = {}
@@ -53,7 +53,7 @@ module Fastlane
         end
 
         post_request.on_complete do |env|
-          yield env[:status], env[:body] if block_given?
+          yield(env[:status], env[:body]) if block_given?
         end
       end
 
@@ -84,6 +84,7 @@ module Fastlane
                                      env_name: "TRYOUTS_BUILD_FILE",
                                      description: "Path to your IPA or APK file. Optional if you use the _gym_ or _xcodebuild_ action",
                                      default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Couldn't find build file at path '#{value}'") unless File.exist?(value)
                                      end),

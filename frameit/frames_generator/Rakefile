@@ -7,17 +7,17 @@ DEVICES_TO_SKIP = [
   "Apple iMac.png" # we don't currently support iMac
 ]
 
-task :generate_device_frames do
+task(:generate_device_frames) do
   MiniMagick.configure do |config|
     config.validate_on_create = false
   end
 
-  puts "Download and extract the latest devices from Facebook"
-  puts ""
-  puts "  http://facebook.design/devices"
-  puts ""
+  puts("Download and extract the latest devices from Facebook")
+  puts("")
+  puts("  http://facebook.design/devices")
+  puts("")
   confirm
-  puts "Move the content of the zip file into './raw'"
+  puts("Move the content of the zip file into './raw'")
   mkdir("raw") unless File.directory?("raw")
   system("open ./raw")
   confirm
@@ -25,51 +25,58 @@ task :generate_device_frames do
   # Let's find all the image resources we need and copy it into the correct directory
   current_time = Time.now.to_i.to_s
   output = File.join("output", current_time)
-  sh "rm -rf output"
+  sh("rm -rf output")
   mkdir_p(output) unless File.directory?(output)
 
   image_assets = []
   (Dir["raw/Phones/Apple*/Device/*.png"] + Dir["raw/Computers/Apple*/Device/*.png"] + Dir["raw/Tablets/Apple*/Device/*.png"]).each do |current_raw|
-    next if DEVICES_TO_SKIP.include?(File.basename(current_raw))
+    basename = File.basename(current_raw)
+    next if DEVICES_TO_SKIP.include?(basename)
 
     cp(current_raw, output)
-
-    output_file_path = File.join(output, File.basename(current_raw))
-    convert_image_resource(output_file_path)
-    image_assets << File.basename(current_raw)
+    output_file_path = File.join(output, basename)
+    sanitaized_basename = sanitize_filename(basename)
+    sanitaized_file_path = File.join(output, sanitaized_basename)
+    mv(output_file_path, sanitaized_file_path) unless output_file_path == sanitaized_file_path
+    convert_image_resource(sanitaized_file_path)
+    image_assets << sanitaized_basename
   end
 
   raise "Could not find any images, make sure to copy all extracted files into ./raw" if image_assets.count < 10
 
   File.write(File.join(output, "files.json"), image_assets.to_json)
-  puts "Wrote names of available files to files.json"
+  puts("Wrote names of available files to files.json")
 
   File.write(File.join(output, "version.txt"), current_time)
-  puts "Wrote the current time stamp to version.txt"
+  puts("Wrote the current time stamp to version.txt")
 
   cp("offsets.json", File.join(output, "offsets.json"))
-  puts "Copied over offsets.json"
+  puts("Copied over offsets.json")
 
   cp_r(output, "output/latest")
 
   system("open ./output")
-  puts "Done writing all the things to './output', please upload both the 'latest' and the time stamp '#{current_time}' folder to GitHub".green
-  puts "To do so, clone https://github.com/fastlane/frameit-frames, make sure to check out the `gh-pages` branch".green
-  puts "and overwrite the 'latest' folder, and copy the time stamp folder into the root.".green
-  puts "Push the changes, and run `fastlane frameit update_frames` to ensure everything worked as expected".green
+  puts("Done writing all the things to './output', please upload both the 'latest' and the time stamp '#{current_time}' folder to GitHub".green)
+  puts("To do so, clone https://github.com/fastlane/frameit-frames, make sure to check out the `gh-pages` branch".green)
+  puts("and overwrite the 'latest' folder, and copy the time stamp folder into the root.".green)
+  puts("Push the changes, and run `fastlane frameit update_frames` to ensure everything worked as expected".green)
 end
 
 def confirm
-  puts "Press any key when you're ready to continue".yellow
+  puts("Press any key when you're ready to continue".yellow)
   gets
+end
+
+def sanitize_filename(filename)
+  filename.gsub('Grey', 'Gray')
 end
 
 # This will remove the white space around the actual frame
 def convert_image_resource(path)
-  puts "Updating and trimming image file '#{path}'"
+  puts("Updating and trimming image file '#{path}'")
   image = MiniMagick::Image.open(path)
   image.trim
   image.write(path)
 end
 
-task default: [:generate_device_frames]
+task(default: [:generate_device_frames])

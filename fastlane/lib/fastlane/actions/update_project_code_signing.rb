@@ -37,11 +37,15 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :udid,
                                        env_name: "FL_PROJECT_SIGNING_UDID",
                                        description: "DEPRECATED: see :uuid",
-                                       default_value: ENV["SIGH_UUID"]),
+                                       code_gen_sensitive: true,
+                                       default_value: ENV["SIGH_UUID"],
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :uuid,
                                        env_name: "FL_PROJECT_SIGNING_UUID",
                                        description: "The UUID of the provisioning profile you want to use",
-                                       default_value: ENV["SIGH_UUID"])
+                                       code_gen_sensitive: true,
+                                       default_value: ENV["SIGH_UUID"],
+                                       default_value_dynamic: true)
         ]
       end
 

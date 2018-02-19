@@ -9,7 +9,7 @@ describe Spaceship::Tunes::IAP do
     end
 
     it "Finds a specific product" do
-      expect(app.in_app_purchases.find("go.find.me")).not_to eq(nil)
+      expect(app.in_app_purchases.find("go.find.me")).not_to(eq(nil))
       expect(app.in_app_purchases.find("go.find.me").reference_name).to eq("localizeddemo")
     end
 
@@ -21,6 +21,7 @@ describe Spaceship::Tunes::IAP do
 
     describe "Create new IAP" do
       it "create consumable" do
+        expect(client.du_client).to receive(:get_picture_type).and_return("SortedScreenShot")
         expect(client.du_client).to receive(:upload_purchase_review_screenshot).and_return({ "token" => "tok", "height" => 100, "width" => 200, "md5" => "xxxx" })
         expect(Spaceship::UploadFile).to receive(:from_path).with("ftl_FAKEMD5_screenshot1024.jpg").and_return(du_uploadimage_correct_screenshot)
         app.in_app_purchases.create!(
@@ -49,6 +50,48 @@ describe Spaceship::Tunes::IAP do
                 tier: 1
               }
             ]
+        )
+      end
+
+      it "create auto renewable subscription with pricing" do
+        pricing_intervals = [
+          {
+            country: "WW",
+            begin_date: nil,
+            end_date: nil,
+            tier: 1
+          }
+        ]
+        transformed_pricing_intervals = pricing_intervals.map do |interval|
+          {
+            "value" =>  {
+              "tierStem" =>  interval[:tier],
+              "priceTierEffectiveDate" =>  interval[:begin_date],
+              "priceTierEndDate" =>  interval[:end_date],
+              "country" =>  interval[:country] || "WW",
+              "grandfathered" =>  interval[:grandfathered]
+            }
+          }
+        end
+        expect(client).to receive(:update_recurring_iap_pricing!).with(app_id: '898536088', purchase_id: "1195137657", pricing_intervals: transformed_pricing_intervals)
+
+        app.in_app_purchases.create!(
+          type: Spaceship::Tunes::IAPType::RECURRING,
+          versions: {
+            'en-US' => {
+              name: "test name2",
+              description: "Description has at least 10 characters"
+            },
+            'de-DE' => {
+              name: "test name german2",
+              description: "German has at least 10 characters"
+            }
+          },
+          reference_name: "localizeddemo",
+          product_id: "x.a.a.b.b.c.d.x.y.z",
+          cleared_for_sale: true,
+          review_notes: "Some Review Notes here bla bla bla",
+          pricing_intervals: pricing_intervals
         )
       end
     end

@@ -18,7 +18,7 @@ describe Fastlane do
         end
 
         it 'requires message' do
-          expect { run_flock token: 'xxx' }.to(
+          expect { run_flock(token: 'xxx') }.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
               expect(error.message).to match(/message/)
             end
@@ -26,7 +26,7 @@ describe Fastlane do
         end
 
         it 'requires token' do
-          expect { run_flock message: 'xxx' }.to(
+          expect { run_flock(message: 'xxx') }.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
               expect(error.message).to match(/token/)
             end
@@ -36,14 +36,14 @@ describe Fastlane do
         it 'allows environment variables' do
           ENV['FL_FLOCK_MESSAGE'] = 'xxx'
           ENV['FL_FLOCK_TOKEN'] = 'xxx'
-          expect { run_flock }.to_not raise_error
+          expect { run_flock }.to_not(raise_error)
         end
       end
 
       it 'fails on non 200 response' do
         stub_request(:post, "#{FLOCK_BASE_URL}/token").
           to_return(status: 400)
-        expect { run_flock message: 'message', token: 'token' }.to(
+        expect { run_flock(message: 'message', token: 'token') }.to(
           raise_error(FastlaneCore::Interface::FastlaneError) do |error|
             expect(error.message).to match(/Error sending message to Flock/)
           end
@@ -55,14 +55,14 @@ describe Fastlane do
           with(body: '{"text":"message"}',
                headers: { 'Content-Type' => 'application/json' }).
           to_return(status: 200)
-        run_flock message: 'message', token: 'token'
+        run_flock(message: 'message', token: 'token')
       end
 
       it 'handles quotes in message' do
         message = %("that's what", she said)
         stub_request(:post, //).
           with(body: %({"text":"\\"that's what\\", she said"}))
-        run_flock message: message, token: 'xxx'
+        run_flock(message: message, token: 'xxx')
       end
     end
   end

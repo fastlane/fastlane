@@ -32,8 +32,8 @@ describe Fastlane do
 
         notifier, attachments = Fastlane::Actions::SlackAction.run(arguments)
 
-        expect(notifier.default_payload[:username]).to eq('fastlane')
-        expect(notifier.default_payload[:channel]).to eq(channel)
+        expect(notifier.config.defaults[:username]).to eq('fastlane')
+        expect(notifier.config.defaults[:channel]).to eq(channel)
 
         expect(attachments[:color]).to eq('danger')
         expect(attachments[:text]).to eq(message)

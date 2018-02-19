@@ -37,11 +37,9 @@ Object[] screengrabVersion(File propsFile) {
     int versionMajor = (versionProps['major'] ?: 0) as int
     int versionMinor = (versionProps['minor'] ?: 0) as int
     int versionPatch = (versionProps['patch'] ?: 0) as int
-    
+
     String versionNameString = [versionMajor, versionMinor, versionPatch].join('.')
     int versionCodeInt = (1000000 * versionMajor) + (10000 * versionMinor) + (100 * versionPatch)
 
     [versionNameString, versionCodeInt]
 }
-
-

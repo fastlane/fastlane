@@ -1,3 +1,4 @@
+require_relative 'tunes_base'
 
 module Spaceship
   module Tunes
@@ -16,7 +17,9 @@ module Spaceship
 
       # To pass from the user
 
+      # @deprecated Setted automatically by <tt>add_id_info_uses_idfa</tt> usage
       # @return (Boolean) Ad ID Info - Limits ads tracking
+      # <b>DEPRECATED:</b> Use <tt>add_id_info_uses_idfa</tt> instead.
       attr_accessor :add_id_info_limits_tracking
 
       # @return (Boolean) Ad ID Info - Serves ads
@@ -69,7 +72,6 @@ module Spaceship
 
       attr_mapping({
         # Ad ID Info Section
-        'adIdInfo.limitsTracking.value' => :add_id_info_limits_tracking,
         'adIdInfo.servesAds.value' => :add_id_info_serves_ads,
         'adIdInfo.tracksAction.value' => :add_id_info_tracks_action,
         'adIdInfo.tracksInstall.value' => :add_id_info_tracks_install,
@@ -129,6 +131,16 @@ module Spaceship
           raw_data_clone.set(["contentRights"], nil)
         end
         raw_data_clone.delete("version")
+
+        # Check whether the application makes use of IDFA or not
+        # and automatically set the mandatory limitsTracking value in the request JSON accordingly.
+        if !self.add_id_info_uses_idfa.nil? && self.add_id_info_uses_idfa == true
+          # Application uses IDFA, before sending for submission limitsTracking key in the request JSON must be set to true (agreement).
+          raw_data_clone.set(
+            ["adIdInfo", "limitsTracking", "value"],
+            true
+          )
+        end
 
         client.send_app_submission(application.apple_id, application.edit_version.version_id, raw_data_clone)
         @submitted_for_review = true

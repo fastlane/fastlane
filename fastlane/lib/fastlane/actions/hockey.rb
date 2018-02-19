@@ -5,6 +5,7 @@ module Fastlane
       HOCKEY_BUILD_INFORMATION = :HOCKEY_BUILD_INFORMATION # contains all keys/values from the HockeyApp API, like :title, :bundle_identifier
     end
 
+    # rubocop:disable Metrics/ClassLength
     class HockeyAction < Action
       def self.connection(options)
         require 'faraday'
@@ -15,11 +16,11 @@ module Fastlane
           url: base_url
         }
         Faraday.new(foptions) do |builder|
-          builder.request :multipart
-          builder.request :url_encoded
-          builder.response :json, content_type: /\bjson$/
-          builder.use FaradayMiddleware::FollowRedirects
-          builder.adapter :net_http
+          builder.request(:multipart)
+          builder.request(:url_encoded)
+          builder.response(:json, content_type: /\bjson$/)
+          builder.use(FaradayMiddleware::FollowRedirects)
+          builder.adapter(:net_http)
         end
       end
 
@@ -80,6 +81,12 @@ module Fastlane
           dsym_io = Faraday::UploadIO.new(dsym, 'application/octet-stream') if dsym and File.exist?(dsym)
         end
 
+        # https://support.hockeyapp.net/discussions/problems/83559
+        # Should not set status to "2" (downloadable) until after the app is uploaded, so allow the caller
+        # to specify a different status for the `create` step
+        update_status = options[:status]
+        options[:status] = options[:create_status]
+
         response = connection.get do |req|
           req.url("/api/2/apps/#{app_id}/app_versions/new")
           req.headers['X-HockeyAppToken'] = api_token
@@ -99,6 +106,8 @@ module Fastlane
         if dsym
           options[:dsym] = dsym_io
         end
+
+        options[:status] = update_status
 
         connection.put do |req|
           req.options.timeout = options.delete(:timeout)
@@ -183,6 +192,7 @@ module Fastlane
                                        env_name: "FL_HOCKEY_APK",
                                        description: "Path to your APK file",
                                        default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find apk file at path '#{value}'") unless File.exist?(value)
@@ -202,6 +212,7 @@ module Fastlane
                                        env_name: "FL_HOCKEY_IPA",
                                        description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action. For Mac zip the .app. For Android provide path to .apk file. In addition you could use this to upload .msi, .zip, .pkg, etc if you use the 'create_update' mechanism",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
@@ -214,6 +225,7 @@ module Fastlane
                                        env_name: "FL_HOCKEY_DSYM",
                                        description: "Path to your symbols file. For iOS and Mac provide path to app.dSYM.zip. For Android provide path to mappings.txt file",
                                        default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          # validation is done in the action
@@ -230,7 +242,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :notes,
                                        env_name: "FL_HOCKEY_NOTES",
                                        description: "Beta Notes",
-                                       default_value: Actions.lane_context[SharedValues::FL_CHANGELOG] || "No changelog given"),
+                                       default_value: Actions.lane_context[SharedValues::FL_CHANGELOG] || "No changelog given",
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :notify,
                                        env_name: "FL_HOCKEY_NOTIFY",
                                        description: "Notify testers? \"1\" for yes",
@@ -238,6 +251,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :status,
                                        env_name: "FL_HOCKEY_STATUS",
                                        description: "Download status: \"1\" = No user can download; \"2\" = Available for download (only possible with full-access token)",
+                                       default_value: "2"),
+          FastlaneCore::ConfigItem.new(key: :create_status,
+                                       env_name: "FL_HOCKEY_CREATE_STATUS",
+                                       description: "Download status for initial version creation when create_update is true: \"1\" = No user can download; \"2\" = Available for download (only possible with full-access token)",
                                        default_value: "2"),
           FastlaneCore::ConfigItem.new(key: :notes_type,
                                       env_name: "FL_HOCKEY_NOTES_TYPE",
@@ -367,5 +384,6 @@ module Fastlane
         :beta
       end
     end
+    # rubocop:enable Metrics/ClassLength
   end
 end

@@ -106,7 +106,7 @@ module Fastlane
         if File.directory?(absolute_path)
           Dir.mktmpdir do |dir|
             tmpzip = File.join(dir, File.basename(absolute_path) + '.zip')
-            sh "cd \"#{File.dirname(absolute_path)}\"; zip -r --symlinks \"#{tmpzip}\" \"#{File.basename(absolute_path)}\" 2>&1 >/dev/null"
+            sh("cd \"#{File.dirname(absolute_path)}\"; zip -r --symlinks \"#{tmpzip}\" \"#{File.basename(absolute_path)}\" 2>&1 >/dev/null")
             self.upload_file(tmpzip, upload_url_template, api_token)
           end
         else
@@ -159,7 +159,7 @@ module Fastlane
                                        env_name: "FL_SET_GITHUB_RELEASE_REPOSITORY_NAME",
                                        description: "The path to your repo, e.g. 'fastlane/fastlane'",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please only pass the path, e.g. 'fastlane/fastlane'") if value.include? "github.com"
+                                         UI.user_error!("Please only pass the path, e.g. 'fastlane/fastlane'") if value.include?("github.com")
                                          UI.user_error!("Please only pass the path, e.g. 'fastlane/fastlane'") if value.split('/').count != 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :server_url,
@@ -168,14 +168,16 @@ module Fastlane
                                        default_value: "https://api.github.com",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server/api/v3") unless value.include? "//"
+                                         UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server/api/v3") unless value.include?("//")
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_GITHUB_RELEASE_API_TOKEN",
                                        description: "Personal API Token for GitHub - generate one at https://github.com/settings/tokens",
                                        sensitive: true,
+                                       code_gen_sensitive: true,
                                        is_string: true,
                                        default_value: ENV["GITHUB_API_TOKEN"],
+                                       default_value_dynamic: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :tag_name,
                                        env_name: "FL_SET_GITHUB_RELEASE_TAG_NAME",
@@ -197,7 +199,8 @@ module Fastlane
                                        description: "Description of this release",
                                        is_string: true,
                                        optional: true,
-                                       default_value: Actions.lane_context[SharedValues::FL_CHANGELOG]),
+                                       default_value: Actions.lane_context[SharedValues::FL_CHANGELOG],
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :is_draft,
                                        env_name: "FL_SET_GITHUB_RELEASE_IS_DRAFT",
                                        description: "Whether the release should be marked as draft",
@@ -216,7 +219,7 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        verify_block: proc do |value|
-                                         UI.user_error!("upload_assets must be an Array of paths to assets") unless value.kind_of? Array
+                                         UI.user_error!("upload_assets must be an Array of paths to assets") unless value.kind_of?(Array)
                                        end)
         ]
       end
@@ -234,6 +237,10 @@ module Fastlane
           "A hash containing all relevant information of this release",
           "Access things like 'html_url', 'tag_name', 'name', 'body'"
         ].join("\n")
+      end
+
+      def self.return_type
+        :hash_of_strings
       end
 
       def self.authors

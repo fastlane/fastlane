@@ -30,7 +30,7 @@ module Fastlane
         unless changelog
           path = default_changelog_path
           UI.message("Looking for changelog in '#{path}'...")
-          if File.exist? path
+          if File.exist?(path)
             changelog = File.read(path)
           else
             UI.error("Couldn't find changelog.txt")
@@ -97,12 +97,15 @@ module Fastlane
                                      short_option: "-a",
                                      env_name: "FASTLANE_APP_IDENTIFIER",
                                      description: "The bundle identifier of your app",
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
+                                     code_gen_sensitive: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "FASTLANE_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: user),
+                                     default_value: user,
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_SET_CHANGELOG_VERSION",
                                        description: "The version number to create/update",
@@ -117,7 +120,9 @@ module Fastlane
                                        description: "The ID of your iTunes Connect team if you're in multiple teams",
                                        optional: true,
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
                                        end),
@@ -126,7 +131,9 @@ module Fastlane
                                        env_name: "FL_SET_CHANGELOG_TEAM_NAME",
                                        description: "The name of your iTunes Connect team if you're in multiple teams",
                                        optional: true,
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                        end)
@@ -138,7 +145,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

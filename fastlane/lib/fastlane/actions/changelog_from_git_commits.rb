@@ -37,9 +37,9 @@ module Fastlane
         changelog = changelog.gsub("\n\n", "\n") if changelog # as there are duplicate newlines
         Actions.lane_context[SharedValues::FL_CHANGELOG] = changelog
 
-        puts ""
-        puts changelog
-        puts ""
+        puts("")
+        puts(changelog)
+        puts("")
 
         changelog
       end
@@ -115,8 +115,9 @@ module Fastlane
                                        description: "Whether or not to include any commits that are merges\n" + '(DEPRECATED - use :merge_commit_filtering)'.red,
                                        optional: true,
                                        is_string: false,
+                                       type: Boolean,
                                        verify_block: proc do |value|
-                                         UI.important "The :include_merges option is deprecated. Please use :merge_commit_filtering instead" unless value.nil?
+                                         UI.important("The :include_merges option is deprecated. Please use :merge_commit_filtering instead") unless value.nil?
                                        end),
           FastlaneCore::ConfigItem.new(key: :merge_commit_filtering,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_MERGE_COMMIT_FILTERING',
@@ -132,6 +133,10 @@ module Fastlane
 
       def self.return_value
         "Returns a String containing your formatted git commits"
+      end
+
+      def self.return_type
+        :string
       end
 
       def self.author

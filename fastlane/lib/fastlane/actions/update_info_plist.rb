@@ -76,7 +76,7 @@ module Fastlane
                                        description: "Path to your Xcode project",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
+                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
                                          UI.user_error!("Could not find Xcode project") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :plist_path,
@@ -93,7 +93,9 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        env_name: 'FL_UPDATE_PLIST_APP_IDENTIFIER',
                                        description: 'The App Identifier of your app',
+                                       code_gen_sensitive: true,
                                        default_value: ENV['PRODUCE_APP_IDENTIFIER'],
+                                       default_value_dynamic: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :display_name,
                                        env_name: 'FL_UPDATE_PLIST_DISPLAY_NAME',
@@ -133,10 +135,6 @@ module Fastlane
               urlScheme = plist["CFBundleURLTypes"].find{|scheme| scheme["CFBundleURLName"] == "com.acme.default-url-handler"}
               urlScheme[:CFBundleURLSchemes] = ["acme-production"]
             }
-          )',
-          'zip(
-            path: "MyApp.app",
-            output_path: "Latest.app.zip"
           )'
         ]
       end

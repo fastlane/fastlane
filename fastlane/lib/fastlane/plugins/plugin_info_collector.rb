@@ -24,7 +24,7 @@ module Fastlane
 
       loop do
         if !first_try || plugin_name.to_s.empty?
-          plugin_name = @ui.input("\nWhat would you like to be the name of your plugin?")
+          plugin_name = @ui.input("What would you like to be the name of your plugin?")
         end
         first_try = false
 
@@ -103,7 +103,7 @@ module Fastlane
       return initial_author if author_valid?(initial_author)
       author = nil
       loop do
-        author = @ui.input("\nWhat is the plugin author's name?")
+        author = @ui.input("What is the plugin author's name?")
         break if author_valid?(author)
 
         @ui.message('An author name is required.')
@@ -126,7 +126,7 @@ module Fastlane
     end
 
     def collect_email(initial_email = nil)
-      return initial_email || @ui.input("\nWhat is the plugin author's email address?")
+      return initial_email || @ui.input("What is the plugin author's email address?")
     end
 
     #
@@ -136,7 +136,7 @@ module Fastlane
     def collect_summary
       summary = nil
       loop do
-        summary = @ui.input("\nPlease enter a short summary of this fastlane plugin:")
+        summary = @ui.input("Please enter a short summary of this fastlane plugin:")
         break if summary_valid?(summary)
 
         @ui.message('A summary is required.')
@@ -153,19 +153,7 @@ module Fastlane
     #
 
     def collect_details
-      details = nil
-      loop do
-        details = @ui.input("\nPlease enter a detailed description of this fastlane plugin:")
-        break if details_valid?(details)
-
-        @ui.message('A detailed description is required.')
-      end
-
-      details
-    end
-
-    def details_valid?(details)
-      !details.to_s.strip.empty?
+      return @ui.input("Please enter a detailed description of this fastlane plugin:").to_s
     end
   end
 end

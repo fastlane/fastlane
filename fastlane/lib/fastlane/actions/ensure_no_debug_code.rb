@@ -9,7 +9,7 @@ module Fastlane
 
         if params[:extensions]
           params[:extensions].each do |extension|
-            extension.delete!('.') if extension.include? "."
+            extension.delete!('.') if extension.include?(".")
             extensions << extension
           end
         end
@@ -28,7 +28,7 @@ module Fastlane
           end
         end
 
-        return command if Helper.is_test?
+        return command if Helper.test?
 
         UI.important(command)
         results = `#{command}` # we don't use `sh` as the return code of grep is wrong for some reason

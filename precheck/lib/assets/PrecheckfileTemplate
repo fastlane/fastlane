@@ -1,5 +1,5 @@
 # For more information about this configuration visit
-# https://github.com/fastlane/fastlane/tree/master/precheck#precheckfile
+# https://docs.fastlane.tools/actions/precheck/
 
 # In general, you can use the options available
 # fastlane precheck --help
@@ -13,7 +13,7 @@
 # :warn
 # when triggered, this rule will warn you of a potential problem
 
-# :fail
+# :error
 # when triggered, this rule will cause an error to be displayed and it will prevent any further fastlane commands from running after precheck finishes
 
 # Examples:
@@ -25,4 +25,3 @@
 # test_words(level: :error)
 # unreachable_urls(level: :error)
 # custom_text(data: ["fabric"], level: :warn)
-
