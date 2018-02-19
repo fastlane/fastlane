@@ -6,6 +6,9 @@ require 'spaceship/tunes/iap_family_list'
 require 'spaceship/tunes/iap_families'
 require 'spaceship/tunes/iap_family_details'
 require 'spaceship/tunes/iap_families'
+require 'spaceship/tunes/iap_subscription_pricing'
+require 'spaceship/tunes/iap_subscription_pricing_intro_offer_type'
+require 'spaceship/tunes/iap_subscription_pricing_intro_offer'
 require 'spaceship/tunes/iap_subscription_pricing_tier'
 
 module Spaceship
@@ -61,7 +64,8 @@ module Spaceship
                   pricing_intervals: nil,
                   family_id: nil,
                   subscription_free_trial: nil,
-                  subscription_duration: nil)
+                  subscription_duration: nil,
+                  intro_offers: nil)
 
         client.create_iap!(app_id: self.application.apple_id,
                            type: type,
@@ -75,6 +79,57 @@ module Spaceship
                            family_id: family_id,
                            subscription_duration: subscription_duration,
                            subscription_free_trial: subscription_free_trial)
+
+        # Update pricing for a recurring subscription.
+        if type == Spaceship::Tunes::IAPType::RECURRING && pricing_intervals
+          # There are cases where the product that was just created is not immediately found,
+          # and in order to update its pricing the purchase_id is needed. Therefore polling is done
+          # for 4 times until it is found. If it's not found after 4 tries, a PotentialServerError
+          # exception is raised.
+          product = find_product_with_retries(product_id, 4)
+
+          transformed_pricing_intervals = transform_pricing_intervals(pricing_intervals)
+          client.update_recurring_iap_pricing_subscriptions!(app_id: self.application.apple_id,
+                                                             purchase_id: product.purchase_id,
+                                                             pricing_intervals: transformed_pricing_intervals)
+
+
+          transformed_intro_offers = transform_intro_offers(intro_offers)
+          client.update_recurring_iap_pricing_intro_offers!(app_id: self.application.apple_id,
+                                                            purchase_id: product.purchase_id,
+                                                            intro_offers: transformed_intro_offers)
+        end
+
+      end
+
+      def transform_pricing_intervals(pricing_intervals)
+        pricing_intervals.map do |interval|
+          {
+              "value" =>  {
+                  "tierStem" =>  interval[:tier],
+                  "priceTierEffectiveDate" =>  interval[:begin_date],
+                  "priceTierEndDate" =>  interval[:end_date],
+                  "country" =>  interval[:country] || "WW",
+                  "grandfathered" =>  interval[:grandfathered]
+              }
+          }
+        end
+      end
+
+      def transform_intro_offers(intro_offers)
+        intro_offers.map do |intro_offer|
+          {
+              "value" =>  {
+                  "country" =>  intro_offer[:country],
+                  "durationType" =>  intro_offer[:duration_type],
+                  "startDate" =>  intro_offer[:start_date],
+                  "endDate" =>  intro_offer[:end_date],
+                  "numOfPeriods" =>  intro_offer[:num_of_periods],
+                  "offerModeType" =>  intro_offer[:offer_mode_type],
+                  "tierStem" =>  intro_offer[:tier_stem],
+              }
+          }
+        end
       end
 
       # find a specific product
@@ -103,6 +158,21 @@ module Spaceship
         end
         return_iaps
       end
+
+      def find_product_with_retries(product_id, max_tries)
+        try_number = 0
+        product = nil
+        until product
+          if try_number > max_tries
+            raise PotentialServerError.new, "Failed to find the product with id=#{product_id}. This can be caused either by a server error or due to the removal of the product."
+          end
+          product = find(product_id)
+          try_number += 1
+        end
+
+        product
+      end
+
     end
   end
 end
