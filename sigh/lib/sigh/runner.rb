@@ -237,7 +237,7 @@ module Sigh
         filters << "Certificate ID: '#{Sigh.config[:cert_id]}' " if Sigh.config[:cert_id]
         UI.important("No certificates for filter: #{filters}") if filters.length > 0
         message = "Could not find a matching code signing identity for type '#{profile_type.to_s.split(':').last}'. "
-        message += "It is recommended to use match to manage code signing for you, more information on https://codesigning.guide."
+        message += "It is recommended to use match to manage code signing for you, more information on https://codesigning.guide. "
         message += "If you don't want to do so, you can also use cert to generate a new one: https://fastlane.tools/cert"
         UI.user_error!(message)
       end
