@@ -102,6 +102,7 @@ v.set_rating({
 })
 # Available values:
 # https://github.com/fastlane/fastlane/blob/master/deliver/assets/example_rating_config.json
+# https://docs.fastlane.tools/actions/deliver/#reference (Open "View all available categories, languages, etc.")
 
 # Push the changes back to the server
 v.save!
