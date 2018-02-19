@@ -38,6 +38,10 @@ module Spaceship
       # @return (Hash) subscription pricing target
       attr_accessor :subscription_price_target
 
+      # @return (Hash) Relevant only for recurring subscriptions. Holds pricing related data, such
+      # as subscription pricing, intro offers, etc.
+      attr_accessor :raw_pricing_data
+
       attr_mapping({
         'adamId' => :purchase_id,
         'referenceName.value' => :reference_name,
@@ -47,6 +51,15 @@ module Spaceship
         'freeTrialDurationType.value' => :subscription_free_trial,
         'clearedForSale.value' => :cleared_for_sale
       })
+
+      def setup
+        @raw_pricing_data = @raw_data["pricingData"]
+        @raw_data.delete("pricingData")
+
+        if @raw_pricing_data
+          @raw_data.set(["pricingIntervals"], @raw_pricing_data["subscriptions"])
+        end
+      end
 
       # @return (Hash) Hash of languages
       # @example: {
@@ -104,6 +117,7 @@ module Spaceship
           }
         end
         raw_data.set(["pricingIntervals"], new_intervals)
+        @raw_pricing_data["subscriptions"] = new_intervals if @raw_pricing_data
       end
 
       # @return (Array) pricing intervals
@@ -117,7 +131,7 @@ module Spaceship
       #    }
       #  ]
       def pricing_intervals
-        @pricing_intervals ||= raw_data["pricingIntervals"].map do |interval|
+        @pricing_intervals ||= (raw_data["pricingIntervals"] || []).map do |interval|
           {
             tier: interval["value"]["tierStem"].to_i,
             begin_date: interval["value"]["priceTierEffectiveDate"],
@@ -201,6 +215,12 @@ module Spaceship
         end
         # Update the Purchase
         client.update_iap!(app_id: application.apple_id, purchase_id: self.purchase_id, data: raw_data)
+
+        # Update pricing for a recurring subscription.
+        if raw_data["addOnType"] == Spaceship::Tunes::IAPType::RECURRING
+          client.update_recurring_iap_pricing!(app_id: application.apple_id, purchase_id: self.purchase_id,
+                                               pricing_intervals: raw_data["pricingIntervals"])
+        end
       end
 
       # Deletes In-App-Purchase

@@ -17,18 +17,20 @@ describe Sigh do
     end
 
     it "Create provisioning options from hash" do
+      tmp_path = Dir.mktmpdir
       provisioning_profiles = {
-        "at.fastlane" => "/folder/mobile.mobileprovision",
-        "at.fastlane.today" => "/folder/mobile.today.mobileprovision"
+        "at.fastlane" => "#{tmp_path}/folder/mobile.mobileprovision",
+        "at.fastlane.today" => "#{tmp_path}/folder/mobile.today.mobileprovision"
       }
       provisioning_options = @resign.create_provisioning_options(provisioning_profiles)
-      expect(provisioning_options).to eq("-p at.fastlane=/folder/mobile.mobileprovision -p at.fastlane.today=/folder/mobile.today.mobileprovision")
+      expect(provisioning_options).to eq("-p at.fastlane=#{tmp_path}/folder/mobile.mobileprovision -p at.fastlane.today=#{tmp_path}/folder/mobile.today.mobileprovision")
     end
 
     it "Create provisioning options from array" do
-      provisioning_profiles = ["/folder/mobile.mobileprovision"]
+      tmp_path = Dir.mktmpdir
+      provisioning_profiles = ["#{tmp_path}/folder/mobile.mobileprovision"]
       provisioning_options = @resign.create_provisioning_options(provisioning_profiles)
-      expect(provisioning_options).to eq("-p /folder/mobile.mobileprovision")
+      expect(provisioning_options).to eq("-p #{tmp_path}/folder/mobile.mobileprovision")
     end
 
     it "Installed identities parser" do

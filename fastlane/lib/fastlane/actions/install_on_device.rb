@@ -56,6 +56,7 @@ module Fastlane
                                        optional: true,
                                        is_string: true,
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || Dir["*.ipa"].first,
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          unless Helper.test?
                                            UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist?(value)

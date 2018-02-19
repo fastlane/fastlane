@@ -116,9 +116,10 @@ module Fastlane
       selection_git_url = "Git URL"
       selection_path = "Local Path"
       selection_rubygems = "RubyGems.org ('#{plugin_name}' seems to not be available there)"
+      selection_gem_server = "Other Gem Server"
       selection = UI.select(
         "Seems like the plugin is not available on RubyGems, what do you want to do?",
-        [selection_git_url, selection_path, selection_rubygems]
+        [selection_git_url, selection_path, selection_rubygems, selection_gem_server]
       )
 
       if selection == selection_git_url
@@ -129,6 +130,9 @@ module Fastlane
         return ", path: '#{path}'"
       elsif selection == selection_rubygems
         return ""
+      elsif selection == selection_gem_server
+        source_url = UI.input('Please enter the gem source URL which hosts the plugin you want to use, including the protocol (e.g. https:// or git://)')
+        return ", source: '#{source_url}'"
       else
         UI.user_error!("Unknown input #{selection}")
       end

@@ -1,4 +1,3 @@
-require 'pty'
 require 'open3'
 require 'fileutils'
 require 'terminal-table'
@@ -88,7 +87,7 @@ module Scan
         UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
       end
 
-      if !Helper.is_ci? && Scan.cache[:open_html_report_path]
+      if !Helper.ci? && Scan.cache[:open_html_report_path]
         `open --hide '#{Scan.cache[:open_html_report_path]}'`
       end
     end

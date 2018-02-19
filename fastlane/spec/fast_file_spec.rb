@@ -160,8 +160,16 @@ describe Fastlane do
       end
 
       it "prints a warning if a lane is called like an action" do
-        expect(UI).to receive(:important).with("Name of the lane 'cocoapods' is already taken by the action named 'cocoapods'")
+        expect(UI).to receive(:error).with("------------------------------------------------")
+        expect(UI).to receive(:error).with("Name of the lane 'cocoapods' is already taken by the action named 'cocoapods'")
+        expect(UI).to receive(:error).with("------------------------------------------------")
         Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileLaneNameEqualsActionName')
+      end
+
+      it "prefers a lane over a built-in action" do
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileLaneNameEqualsActionName')
+        result = ff.runner.execute(:test_lane)
+        expect(result).to eq("laneResult")
       end
 
       it "allows calling a lane directly even with a default_platform" do

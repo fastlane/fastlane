@@ -7,7 +7,7 @@ module Fastlane
 
         changelog = ""
 
-        if Helper.is_ci? || Helper.is_test?
+        if Helper.ci? || Helper.test?
           # The "BUILD_URL" environment variable is set automatically by Jenkins in every build
           jenkins_api_url = URI(ENV["BUILD_URL"] + "api/json\?wrapper\=changes\&xpath\=//changeSet//comment")
           begin

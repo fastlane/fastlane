@@ -19,8 +19,11 @@ module Gym
       Gym.project = FastlaneCore::Project.new(config)
 
       # Go into the project's folder, as there might be a Gymfile there
-      Dir.chdir(File.expand_path("..", Gym.project.path)) do
-        config.load_configuration_file(Gym.gymfile_name)
+      project_path = File.expand_path("..", Gym.project.path)
+      unless File.expand_path(".") == project_path
+        Dir.chdir(project_path) do
+          config.load_configuration_file(Gym.gymfile_name)
+        end
       end
 
       detect_scheme

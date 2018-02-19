@@ -136,7 +136,7 @@ describe FastlaneCore do
 
       describe "#sensitive flag" do
         before(:each) do
-          allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
+          allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
           allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
           allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
         end
@@ -585,7 +585,7 @@ describe FastlaneCore do
           end
 
           it "auto converts the value after asking the user for one" do
-            allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
+            allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
             allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
             allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
 
@@ -598,7 +598,8 @@ describe FastlaneCore do
                                      type: Array, # we actually allow String and Array here
                                      skip_type_validation: true,
                                      code_gen_sensitive: true,
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier))
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                     default_value_dynamic: true)
             config = FastlaneCore::Configuration.create([config_item], {})
 
             config.set(:app_identifiers, nil)
@@ -668,7 +669,7 @@ describe FastlaneCore do
           end
 
           it "asks if no other option" do
-            allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
+            allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
             allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
             allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
 

@@ -9,48 +9,21 @@ require_relative 'env'
 
 module FastlaneCore
   module Helper
-    # This method is deprecated, use the `UI` class
-    # https://docs.fastlane.tools/advanced/#user-input-and-output
-    def self.log
-      UI.deprecated("Helper.log is deprecated. Use `UI` class instead")
-      UI.current.log
+    # fastlane
+    #
+
+    def self.fastlane_enabled?
+      # This is called from the root context on the first start
+      @enabled ||= !FastlaneCore::FastlaneFolder.path.nil?
     end
 
-    # Runs a given command using backticks (`)
-    # and prints them out using the UI.command method
-    def self.backticks(command, print: true)
-      UI.command(command) if print
-      result = `#{command}`
-      UI.command_output(result) if print
-      return result
+    # Checks if fastlane is enabled for this project and returns the folder where the configuration lives
+    def self.fastlane_enabled_folder_path
+      fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
     end
 
-    # @return true if the currently running program is a unit test
-    def self.test?
-      Object.const_defined?("SpecHelper")
-    end
-
-    # @return true if it is enabled to execute external commands
-    def self.sh_enabled?
-      !self.test?
-    end
-
-    # removes ANSI colors from string
-    def self.strip_ansi_colors(str)
-      str.gsub(/\e\[([;\d]+)?m/, '')
-    end
-
-    # checks if given file is a valid json file
-    # base taken from: http://stackoverflow.com/a/26235831/1945875
-    def self.json_file?(filename)
-      return false unless File.exist?(filename)
-      begin
-        JSON.parse(File.read(filename))
-        return true
-      rescue JSON::ParserError
-        return false
-      end
-    end
+    # fastlane installation method
+    #
 
     # @return [boolean] true if executing with bundler (like 'bundle exec fastlane [action]')
     def self.bundler?
@@ -83,6 +56,19 @@ module FastlaneCore
       !self.bundler? && !self.contained_fastlane? && !self.homebrew? && !self.mac_app?
     end
 
+    # environment
+    #
+
+    # @return true if the currently running program is a unit test
+    def self.test?
+      Object.const_defined?("SpecHelper")
+    end
+
+    # @return true if it is enabled to execute external commands
+    def self.sh_enabled?
+      !self.test?
+    end
+
     # @return [boolean] true if building in a known CI environment
     def self.ci?
       # Check for Jenkins, Travis CI, ... environment variables
@@ -113,23 +99,6 @@ module FastlaneCore
       (/darwin/ =~ RUBY_PLATFORM) != nil
     end
 
-    # Use Helper.test? and Helper.ci? instead (legacy calls)
-    def self.is_test?
-      self.test?
-    end
-
-    def self.is_ci?
-      ci?
-    end
-
-    def self.is_mac?
-      self.mac?
-    end
-
-    def self.is_windows?
-      self.windows?
-    end
-
     # Do we want to disable the colored output?
     def self.colors_disabled?
       FastlaneCore::Env.truthy?("FASTLANE_DISABLE_COLORS")
@@ -145,13 +114,13 @@ module FastlaneCore
       return ENV["FL_BUILDLOG_PATH"] || "~/Library/Logs"
     end
 
-    # All Xcode Related things
+    # Xcode
     #
 
     # @return the full path to the Xcode developer tools of the currently
     #  running system
     def self.xcode_path
-      return "" unless self.is_mac?
+      return "" unless self.mac?
 
       if self.xcode_server?
         # Xcode server always creates a link here
@@ -170,7 +139,7 @@ module FastlaneCore
 
     # @return The version of the currently used Xcode installation (e.g. "7.0")
     def self.xcode_version
-      return nil unless self.is_mac?
+      return nil unless self.mac?
       return @xcode_version if @xcode_version && @developer_dir == ENV['DEVELOPER_DIR']
 
       xcodebuild_path = "#{xcode_path}/usr/bin/xcodebuild"
@@ -199,6 +168,9 @@ module FastlaneCore
       Gem::Version.new(v) >= Gem::Version.new(version)
     end
 
+    # iTMSTransporter
+    #
+
     def self.transporter_java_executable_path
       return File.join(self.transporter_java_path, 'bin', 'java')
     end
@@ -223,6 +195,24 @@ module FastlaneCore
     def self.transporter_path
       return File.join(self.itms_path, 'bin', 'iTMSTransporter')
     end
+
+    # @return the full path to the iTMSTransporter executable
+    def self.itms_path
+      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
+      return '' unless self.mac? # so tests work on Linux and Windows too
+
+      [
+        "../Applications/Application Loader.app/Contents/MacOS/itms",
+        "../Applications/Application Loader.app/Contents/itms"
+      ].each do |path|
+        result = File.expand_path(File.join(self.xcode_path, path))
+        return result if File.exist?(result)
+      end
+      UI.user_error!("Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.")
+    end
+
+    # keychain
+    #
 
     def self.keychain_path(keychain_name)
       # Existing code expects that a keychain name will be expanded into a default path to Library/Keychains
@@ -259,44 +249,25 @@ module FastlaneCore
       keychain_path
     end
 
-    # @return the full path to the iTMSTransporter executable
-    def self.itms_path
-      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
-      return '' unless self.is_mac? # so tests work on Linx too
-
-      [
-        "../Applications/Application Loader.app/Contents/MacOS/itms",
-        "../Applications/Application Loader.app/Contents/itms"
-      ].each do |path|
-        result = File.expand_path(File.join(self.xcode_path, path))
-        return result if File.exist?(result)
-      end
-      UI.user_error!("Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.")
-    end
-
-    def self.fastlane_enabled?
-      # This is called from the root context on the first start
-      @enabled ||= !FastlaneCore::FastlaneFolder.path.nil?
-    end
-
-    # Checks if fastlane is enabled for this project and returns the folder where the configuration lives
-    def self.fastlane_enabled_folder_path
-      fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
-    end
-
-    # <b>DEPRECATED:</b> Use the `ROOT` constant from the appropriate tool module instead
-    # e.g. File.join(Sigh::ROOT, 'lib', 'assets', 'resign.sh')
+    # helper methods
     #
-    # Path to the installed gem to load resources (e.g. resign.sh)
-    def self.gem_path(gem_name)
-      UI.deprecated('`Helper.gem_path` is deprecated. Use the `ROOT` constant from the appropriate tool module instead.')
 
-      if !Helper.is_test? and Gem::Specification.find_all_by_name(gem_name).any?
-        return Gem::Specification.find_by_name(gem_name).gem_dir
-      else
-        return './'
-      end
+    # Runs a given command using backticks (`)
+    # and prints them out using the UI.command method
+    def self.backticks(command, print: true)
+      UI.command(command) if print
+      result = `#{command}`
+      UI.command_output(result) if print
+      return result
     end
+
+    # removes ANSI colors from string
+    def self.strip_ansi_colors(str)
+      str.gsub(/\e\[([;\d]+)?m/, '')
+    end
+
+    # loading indicator
+    #
 
     def self.should_show_loading_indicator?
       return false if FastlaneCore::Env.truthy?("FASTLANE_DISABLE_ANIMATION")
@@ -321,6 +292,68 @@ module FastlaneCore
       if self.should_show_loading_indicator? && @require_fastlane_spinner
         @require_fastlane_spinner.success
       end
+    end
+
+    # files
+    #
+
+    # checks if a given path is an executable file
+    def self.executable?(cmd_path)
+      # no executable files on Windows, so existing is enough there
+      cmd_path && !File.directory?(cmd_path) && (File.executable?(cmd_path) || (self.windows? && File.exist?(cmd_path)))
+    end
+
+    # checks if given file is a valid json file
+    # base taken from: http://stackoverflow.com/a/26235831/1945875
+    def self.json_file?(filename)
+      return false unless File.exist?(filename)
+      begin
+        JSON.parse(File.read(filename))
+        return true
+      rescue JSON::ParserError
+        return false
+      end
+    end
+
+    # deprecated
+    #
+
+    # Use Helper.test?, Helper.ci?, Helper.mac? or Helper.windows? instead (legacy calls)
+    def self.is_test?
+      self.test?
+    end
+
+    def self.is_ci?
+      ci?
+    end
+
+    def self.is_mac?
+      self.mac?
+    end
+
+    def self.is_windows?
+      self.windows?
+    end
+
+    # <b>DEPRECATED:</b> Use the `ROOT` constant from the appropriate tool module instead
+    # e.g. File.join(Sigh::ROOT, 'lib', 'assets', 'resign.sh')
+    #
+    # Path to the installed gem to load resources (e.g. resign.sh)
+    def self.gem_path(gem_name)
+      UI.deprecated('`Helper.gem_path` is deprecated. Use the `ROOT` constant from the appropriate tool module instead.')
+
+      if !Helper.test? and Gem::Specification.find_all_by_name(gem_name).any?
+        return Gem::Specification.find_by_name(gem_name).gem_dir
+      else
+        return './'
+      end
+    end
+
+    # This method is deprecated, use the `UI` class
+    # https://docs.fastlane.tools/advanced/#user-input-and-output
+    def self.log
+      UI.deprecated("Helper.log is deprecated. Use `UI` class instead")
+      UI.current.log
     end
   end
 end

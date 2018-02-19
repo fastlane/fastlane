@@ -11,9 +11,11 @@ describe Gym do
 
   describe Gym::BuildCommandGenerator do
     it "raises an exception when project path wasn't found" do
+      tmp_path = Dir.mktmpdir
+      path = "#{tmp_path}/notExistent"
       expect do
-        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, { project: "/notExistent" })
-      end.to raise_error("Project file not found at path '/notExistent'")
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, { project: path })
+      end.to raise_error("Project file not found at path '#{path}'")
     end
 
     it "supports additional parameters", requires_xcodebuild: true do
@@ -209,7 +211,7 @@ describe Gym do
                                "-project ./gym/examples/standard/Example.xcodeproj",
                                "-destination 'generic/platform=iOS'",
                                "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
-                               "OTHER_SWIFT_FLAGS=\"$(inherited) -Xfrontend -debug-time-function-bodies\"",
+                               "OTHER_SWIFT_FLAGS=\"-Xfrontend -debug-time-function-bodies\"",
                                :archive,
                                "| tee #{log_path.shellescape}",
                                "| grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt",

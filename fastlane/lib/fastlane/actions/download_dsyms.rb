@@ -53,18 +53,24 @@ module Fastlane
 
         # Loop through all app versions and download their dSYM
         app.all_build_train_numbers(platform: platform).each do |train_number|
+          UI.verbose("Found train: #{train_number}, comparing to supplied version: #{version}")
           if version && version != train_number
+            UI.verbose("Version #{version} doesn't match: #{train_number}")
             next
           end
           app.all_builds_for_train(train: train_number, platform: platform).each do |build|
+            UI.verbose("Found build version: #{build.build_version}, comparing to supplied build_number: #{build_number}")
             if build_number && build.build_version != build_number
+              UI.verbose("build_version: #{build.build_version} doesn't match: #{build_number}")
               next
             end
 
             begin
               # need to call reload here or dsym_url is nil
+              UI.verbose("Build_version: #{build.build_version} matches #{build_number}, grabbing dsym_url")
               build.reload
               download_url = build.dsym_url
+              UI.verbose("dsym_url: #{download_url}")
             rescue Spaceship::TunesClient::ITunesConnectError => ex
               UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
             end
@@ -84,7 +90,7 @@ module Fastlane
         end
 
         if (Actions.lane_context[SharedValues::DSYM_PATHS] || []).count == 0
-          UI.error("No dSYM files found on iTunes Connect - this usually happens when no recompling happened yet")
+          UI.error("No dSYM files found on iTunes Connect - this usually happens when no recompiling has happened yet")
         end
       end
       # rubocop:enable Metrics/PerceivedComplexity
@@ -137,14 +143,16 @@ module Fastlane
                                        short_option: "-u",
                                        env_name: "DOWNLOAD_DSYMS_USERNAME",
                                        description: "Your Apple ID Username for iTunes Connect",
-                                       default_value: user),
+                                       default_value: user,
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        short_option: "-a",
                                        env_name: "DOWNLOAD_DSYMS_APP_IDENTIFIER",
                                        description: "The bundle identifier of your app",
                                        optional: false,
                                        code_gen_sensitive: true,
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        short_option: "-k",
                                        env_name: "DOWNLOAD_DSYMS_TEAM_ID",
@@ -153,6 +161,7 @@ module Fastlane
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
                                        end),
@@ -163,6 +172,7 @@ module Fastlane
                                        optional: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                        end),

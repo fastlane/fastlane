@@ -15,6 +15,14 @@ module Pilot
 
       UI.user_error!("No ipa file given") unless config[:ipa]
 
+      if options[:changelog].nil? and options[:distribute_external] == true
+        if UI.interactive?
+          options[:changelog] = UI.input("No changelog provided for new build. Please provide a changelog. You can also provide a changelog using the `changelog` option")
+        else
+          UI.user_error!("No changelog provided for new build. Please either disable `distribute_external` or provide a changelog using the `changelog` option")
+        end
+      end
+
       UI.success("Ready to upload new build to TestFlight (App: #{app.apple_id})...")
 
       dir = Dir.mktmpdir
@@ -145,7 +153,7 @@ module Pilot
       uploaded_build.export_compliance.encryption_updated = false
 
       if options[:groups] || options[:distribute_external]
-        uploaded_build.beta_review_info.demo_account_required ||= false # this needs to be set for iTC to continue
+        uploaded_build.beta_review_info.demo_account_required = options[:demo_account_required] # this needs to be set for iTC to continue
         uploaded_build.submit_for_testflight_review!
       end
 

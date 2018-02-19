@@ -33,7 +33,7 @@ func addGitTag(tag: String? = nil,
                                                                                              RubyCommand.Argument(name: "sign", value: sign)])
   _ = runner.executeCommand(command)
 }
-func appStoreBuildNumber(initialBuildNumber: String = "1",
+func appStoreBuildNumber(initialBuildNumber: String,
                          appIdentifier: String,
                          username: String,
                          teamId: String? = nil,
@@ -345,7 +345,7 @@ func artifactory(file: String,
                  endpoint: String,
                  username: String,
                  password: String,
-                 properties: String = "{}",
+                 properties: [String : Any] = [:],
                  sslPemFile: String? = nil,
                  sslVerify: Bool = true,
                  proxyUsername: String? = nil,
@@ -1068,8 +1068,8 @@ func createAppOnline(username: String,
                      companyName: String? = nil,
                      skipItc: Bool = false,
                      itcUsers: [String]? = nil,
-                     enabledFeatures: String = "{}",
-                     enableServices: String = "{}",
+                     enabledFeatures: [String : Any] = [:],
+                     enableServices: [String : Any] = [:],
                      skipDevcenter: Bool = false,
                      teamId: String? = nil,
                      teamName: String? = nil,
@@ -1323,6 +1323,10 @@ func dsymZip(archivePath: String? = nil,
                                                                                           RubyCommand.Argument(name: "all", value: all)])
   _ = runner.executeCommand(command)
 }
+func echo(message: String? = nil) {
+  let command = RubyCommand(commandID: "", methodName: "echo", className: nil, args: [RubyCommand.Argument(name: "message", value: message)])
+  _ = runner.executeCommand(command)
+}
 func ensureGitBranch(branch: String = "master") {
   let command = RubyCommand(commandID: "", methodName: "ensure_git_branch", className: nil, args: [RubyCommand.Argument(name: "branch", value: branch)])
   _ = runner.executeCommand(command)
@@ -1511,7 +1515,7 @@ func getProvisioningProfile(adhoc: Bool = false,
 }
 func getPushCertificate(development: Bool = false,
                         generateP12: Bool = true,
-                        activeDaysLimit: String = "30",
+                        activeDaysLimit: Int = 30,
                         force: Bool = false,
                         savePrivateKey: Bool = true,
                         appIdentifier: String,
@@ -1572,12 +1576,12 @@ func gitTagExists(tag: String) {
 func githubApi(serverUrl: String = "https://api.github.com",
                apiToken: String,
                httpMethod: String = "GET",
-               body: String = "{}",
+               body: [String : Any] = [:],
                rawBody: String? = nil,
                path: String? = nil,
                url: String? = nil,
-               errorHandlers: String = "{}",
-               headers: String = "{}",
+               errorHandlers: [String : Any] = [:],
+               headers: [String : Any] = [:],
                secure: Bool = true) {
   let command = RubyCommand(commandID: "", methodName: "github_api", className: nil, args: [RubyCommand.Argument(name: "server_url", value: serverUrl),
                                                                                             RubyCommand.Argument(name: "api_token", value: apiToken),
@@ -2209,6 +2213,7 @@ func pilot(username: String,
            updateBuildInfoOnUpload: Bool = false,
            appleId: String? = nil,
            distributeExternal: Bool = false,
+           demoAccountRequired: Bool = false,
            firstName: String? = nil,
            lastName: String? = nil,
            email: String? = nil,
@@ -2232,6 +2237,7 @@ func pilot(username: String,
                                                                                        RubyCommand.Argument(name: "update_build_info_on_upload", value: updateBuildInfoOnUpload),
                                                                                        RubyCommand.Argument(name: "apple_id", value: appleId),
                                                                                        RubyCommand.Argument(name: "distribute_external", value: distributeExternal),
+                                                                                       RubyCommand.Argument(name: "demo_account_required", value: demoAccountRequired),
                                                                                        RubyCommand.Argument(name: "first_name", value: firstName),
                                                                                        RubyCommand.Argument(name: "last_name", value: lastName),
                                                                                        RubyCommand.Argument(name: "email", value: email),
@@ -2317,6 +2323,10 @@ func precheck(appIdentifier: String = precheckfile.appIdentifier,
                                                                                           RubyCommand.Argument(name: "free_stuff_in_iap", value: freeStuffInIap)])
   _ = runner.executeCommand(command)
 }
+func println(message: String? = nil) {
+  let command = RubyCommand(commandID: "", methodName: "println", className: nil, args: [RubyCommand.Argument(name: "message", value: message)])
+  _ = runner.executeCommand(command)
+}
 func produce(username: String,
              appIdentifier: String,
              bundleIdentifierSuffix: String? = nil,
@@ -2328,8 +2338,8 @@ func produce(username: String,
              companyName: String? = nil,
              skipItc: Bool = false,
              itcUsers: [String]? = nil,
-             enabledFeatures: String = "{}",
-             enableServices: String = "{}",
+             enabledFeatures: [String : Any] = [:],
+             enableServices: [String : Any] = [:],
              skipDevcenter: Bool = false,
              teamId: String? = nil,
              teamName: String? = nil,
@@ -2383,6 +2393,10 @@ func pushToGitRemote(localBranch: String? = nil,
                                                                                                     RubyCommand.Argument(name: "force", value: force),
                                                                                                     RubyCommand.Argument(name: "tags", value: tags),
                                                                                                     RubyCommand.Argument(name: "remote", value: remote)])
+  _ = runner.executeCommand(command)
+}
+func puts(message: String? = nil) {
+  let command = RubyCommand(commandID: "", methodName: "puts", className: nil, args: [RubyCommand.Argument(name: "message", value: message)])
   _ = runner.executeCommand(command)
 }
 @discardableResult func readPodspec(path: String) -> [String : String] {
@@ -2879,9 +2893,9 @@ func slack(message: String? = nil,
            slackUrl: String,
            username: String = "fastlane",
            iconUrl: String = "https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png",
-           payload: String = "{}",
+           payload: [String : Any] = [:],
            defaultPayloads: [String]? = nil,
-           attachmentProperties: String = "{}",
+           attachmentProperties: [String : Any] = [:],
            success: Bool = true,
            failOnError: Bool = true) {
   let command = RubyCommand(commandID: "", methodName: "slack", className: nil, args: [RubyCommand.Argument(name: "message", value: message),
@@ -3212,7 +3226,6 @@ func testfairy(apiKey: String,
                symbolsFile: String? = nil,
                testersGroups: [String] = [],
                metrics: [String] = [],
-               iconWatermark: String = "off",
                comment: String = "No comment provided",
                autoUpdate: String = "off",
                notify: String = "off",
@@ -3222,7 +3235,6 @@ func testfairy(apiKey: String,
                                                                                            RubyCommand.Argument(name: "symbols_file", value: symbolsFile),
                                                                                            RubyCommand.Argument(name: "testers_groups", value: testersGroups),
                                                                                            RubyCommand.Argument(name: "metrics", value: metrics),
-                                                                                           RubyCommand.Argument(name: "icon_watermark", value: iconWatermark),
                                                                                            RubyCommand.Argument(name: "comment", value: comment),
                                                                                            RubyCommand.Argument(name: "auto_update", value: autoUpdate),
                                                                                            RubyCommand.Argument(name: "notify", value: notify),
@@ -3241,6 +3253,7 @@ func testflight(username: String,
                 updateBuildInfoOnUpload: Bool = false,
                 appleId: String? = nil,
                 distributeExternal: Bool = false,
+                demoAccountRequired: Bool = false,
                 firstName: String? = nil,
                 lastName: String? = nil,
                 email: String? = nil,
@@ -3264,6 +3277,7 @@ func testflight(username: String,
                                                                                             RubyCommand.Argument(name: "update_build_info_on_upload", value: updateBuildInfoOnUpload),
                                                                                             RubyCommand.Argument(name: "apple_id", value: appleId),
                                                                                             RubyCommand.Argument(name: "distribute_external", value: distributeExternal),
+                                                                                            RubyCommand.Argument(name: "demo_account_required", value: demoAccountRequired),
                                                                                             RubyCommand.Argument(name: "first_name", value: firstName),
                                                                                             RubyCommand.Argument(name: "last_name", value: lastName),
                                                                                             RubyCommand.Argument(name: "email", value: email),
@@ -3411,11 +3425,13 @@ func updateUrlSchemes(path: String,
 }
 func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/Themoji.dSYM.zip",
                                 apiToken: String? = nil,
+                                gspPath: String? = nil,
                                 binaryPath: String? = nil,
                                 platform: String = "ios",
                                 dsymWorkerThreads: Int = 1) {
   let command = RubyCommand(commandID: "", methodName: "upload_symbols_to_crashlytics", className: nil, args: [RubyCommand.Argument(name: "dsym_path", value: dsymPath),
                                                                                                                RubyCommand.Argument(name: "api_token", value: apiToken),
+                                                                                                               RubyCommand.Argument(name: "gsp_path", value: gspPath),
                                                                                                                RubyCommand.Argument(name: "binary_path", value: binaryPath),
                                                                                                                RubyCommand.Argument(name: "platform", value: platform),
                                                                                                                RubyCommand.Argument(name: "dsym_worker_threads", value: dsymWorkerThreads)])
@@ -3603,6 +3619,7 @@ func uploadToTestflight(username: String,
                         updateBuildInfoOnUpload: Bool = false,
                         appleId: String? = nil,
                         distributeExternal: Bool = false,
+                        demoAccountRequired: Bool = false,
                         firstName: String? = nil,
                         lastName: String? = nil,
                         email: String? = nil,
@@ -3626,6 +3643,7 @@ func uploadToTestflight(username: String,
                                                                                                       RubyCommand.Argument(name: "update_build_info_on_upload", value: updateBuildInfoOnUpload),
                                                                                                       RubyCommand.Argument(name: "apple_id", value: appleId),
                                                                                                       RubyCommand.Argument(name: "distribute_external", value: distributeExternal),
+                                                                                                      RubyCommand.Argument(name: "demo_account_required", value: demoAccountRequired),
                                                                                                       RubyCommand.Argument(name: "first_name", value: firstName),
                                                                                                       RubyCommand.Argument(name: "last_name", value: lastName),
                                                                                                       RubyCommand.Argument(name: "email", value: email),
@@ -3662,15 +3680,19 @@ func verifyXcode(xcodePath: String) {
 func versionBumpPodspec(path: String,
                         bumpType: String = "patch",
                         versionNumber: String? = nil,
-                        versionAppendix: String? = nil) {
+                        versionAppendix: String? = nil,
+                        requireVariablePrefix: Bool = true) {
   let command = RubyCommand(commandID: "", methodName: "version_bump_podspec", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
                                                                                                       RubyCommand.Argument(name: "bump_type", value: bumpType),
                                                                                                       RubyCommand.Argument(name: "version_number", value: versionNumber),
-                                                                                                      RubyCommand.Argument(name: "version_appendix", value: versionAppendix)])
+                                                                                                      RubyCommand.Argument(name: "version_appendix", value: versionAppendix),
+                                                                                                      RubyCommand.Argument(name: "require_variable_prefix", value: requireVariablePrefix)])
   _ = runner.executeCommand(command)
 }
-func versionGetPodspec(path: String) {
-  let command = RubyCommand(commandID: "", methodName: "version_get_podspec", className: nil, args: [RubyCommand.Argument(name: "path", value: path)])
+func versionGetPodspec(path: String,
+                       requireVariablePrefix: Bool = true) {
+  let command = RubyCommand(commandID: "", methodName: "version_get_podspec", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
+                                                                                                     RubyCommand.Argument(name: "require_variable_prefix", value: requireVariablePrefix)])
   _ = runner.executeCommand(command)
 }
 func xcarchive() {
@@ -3785,4 +3807,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.2]
+// FastlaneRunnerAPIVersion [0.9.5]

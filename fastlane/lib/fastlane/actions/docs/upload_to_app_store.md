@@ -21,12 +21,12 @@ _deliver_ uploads screenshots, metadata and binaries to iTunes Connect. Use _del
 - Upload hundreds of localized screenshots completely automatically
 - Upload a new ipa/pkg file to iTunes Connect without Xcode from any Mac
 - Maintain your app metadata locally and push changes back to iTunes Connect
-- Easily implement a real Continuous Deployment process using [fastlane](https://fastlane.tools)
+- Easily implement a real Continuous Deployment process using [_fastlane_](https://fastlane.tools)
 - Store the configuration in git to easily deploy from **any** Mac, including your Continuous Integration server
 - Get a HTML preview of the fetched metadata before uploading the app metadata and screenshots to iTC
-- Automatically uses [precheck](/actions/precheck) to ensure your app has the highest chances of passing app review the first time
+- Automatically uses [_precheck_](/actions/precheck) to ensure your app has the highest chances of passing app review the first time
 
-To upload builds to TestFlight check out [pilot](/actions/pilot).
+To upload builds to TestFlight check out [_pilot_](/actions/pilot).
 
 # Quick Start
 
@@ -42,7 +42,7 @@ From now on, you can run `fastlane deliver` to deploy a new update, or just uplo
 
 # Usage
 
-Check out your local `./fastlane/metadata` and `./fastlane/screenshots` folders (if you don't use [fastlane](https://fastlane.tools) it's `./metadata` instead)
+Check out your local `./fastlane/metadata` and `./fastlane/screenshots` folders (if you don't use [_fastlane_](https://fastlane.tools) it's `./metadata` instead)
 
 ![/img/actions/deliver_metadata.png](/img/actions/deliver_metadata.png)
 
@@ -66,7 +66,7 @@ or you can specify path to `pkg` file for macOS apps:
 fastlane deliver --pkg "MacApp.pkg"
 ```
 
-If you use [fastlane](https://fastlane.tools) you don't have to manually specify the path to your `ipa`/`pkg` file.
+If you use [_fastlane_](https://fastlane.tools) you don't have to manually specify the path to your `ipa`/`pkg` file.
 
 This is just a small sub-set of what you can do with _deliver_, check out the full documentation in [#more-options](#more-options)
 
@@ -134,15 +134,15 @@ Your Apple ID email address
 A path to a signed ipa file, which will be uploaded. If you don't provide this value, only app metadata will be uploaded. If you want to submit the app for review make sure to either use `fastlane deliver --submit_for_review` or add `submit_for_review true` to your `Deliverfile`
 
 ```ruby-skip-tests
-ipa "App.ipa"
+ipa("App.ipa")
 ```
 
-if you use [fastlane](https://fastlane.tools) the ipa file will automatically be detected.
+if you use [_fastlane_](https://fastlane.tools) the ipa file will automatically be detected.
 
 ##### pkg
 A path to a signed pkg file, which will be uploaded. Submission logic of ipa applies to pkg files.
 ```ruby-skip-tests
-pkg "MacApp.pkg"
+pkg("MacApp.pkg")
 ```
 
 ##### app_version
@@ -150,7 +150,7 @@ pkg "MacApp.pkg"
 Optional, as it is usually automatically detected. Specify the version that should be created / edited on iTunes Connect:
 
 ```ruby-skip-tests
-app_version "2.0"
+app_version("2.0")
 ```
 
 ##### skip_app_version_update
@@ -164,7 +164,7 @@ This could be useful in the case if you are generating a lot of uploads while no
 The default value is false.
 
 ```ruby-skip-tests
-skip_app_version_update true
+skip_app_version_update(true)
 ```
 
 ##### submit_for_review
@@ -172,7 +172,7 @@ skip_app_version_update true
 Add this to your `Deliverfile` to automatically submit the app for review after uploading metadata/binary. This will select the latest build.
 
 ```ruby-skip-tests
-submit_for_review true
+submit_for_review(true)
 ```
 
 ##### screenshots_path
@@ -190,7 +190,7 @@ If you run `deliver init` this will automatically be created for you.
 ##### force
 
 ```ruby-skip-tests
-force true
+force(true)
 ```
 If set to `true`, no HTML report will be generated before the actual upload. You can also pass `--force` when calling _deliver_.
 
@@ -256,9 +256,9 @@ submission_information({
 Should the app be released to all users once Apple approves it? If set to `false`, you'll have to manually release the update once it got approved.
 
 ```ruby-skip-tests
-automatic_release true
+automatic_release(true)
 # or
-automatic_release false
+automatic_release(false)
 ```
 
 ##### phased_release
@@ -266,9 +266,9 @@ automatic_release false
 Enable or disable the phased releases feature of iTunes Connect. If set to `true`, the update will be released over a 7 day period. Default behavior is to leave whatever you defined on iTunes Connect.
 
 ```ruby-skip-tests
-phased_release true
+phased_release(true)
 # or
-phased_release false
+phased_release(false)
 ```
 
 ##### app_rating_config_path
@@ -339,13 +339,13 @@ promotional_text(
 ##### app_icon
 A path to a new app icon, which must be exactly 1024x1024px
 ```ruby-skip-tests
-app_icon './AppIcon.png'
+app_icon('./AppIcon.png')
 ```
 
 ##### apple_watch_app_icon
 A path to a new app icon for the  Watch, which must be exactly 1024x1024px
 ```ruby-skip-tests
-apple_watch_app_icon './AppleWatchAppIcon.png'
+apple_watch_app_icon('./AppleWatchAppIcon.png')
 ```
 
 ##### platform
@@ -368,7 +368,7 @@ The available options:
 ##### copyright
 The up to date copyright information.
 ```ruby-skip-tests
-copyright "#{Time.now.year} Felix Krause"
+copyright("#{Time.now.year} Felix Krause")
 ```
 
 ##### primary_category
@@ -405,7 +405,7 @@ Before actually uploading anything to iTunes, _deliver_ will generate a HTML sum
 _deliver_ uses the following techniques under the hood:
 
 - The iTMSTransporter tool is used to upload the binary to iTunes Connect. iTMSTransporter is a command line tool provided by Apple.
-- For all metadata related actions _deliver_ uses [spaceship](https://github.com/fastlane/fastlane/tree/master/spaceship)
+- For all metadata related actions _deliver_ uses [_spaceship_](https://github.com/fastlane/fastlane/tree/master/spaceship)
 
 # Tips
 
@@ -635,7 +635,7 @@ In this case, default values for keywords, urls, name and release notes are used
 
 ## Automatically create screenshots
 
-If you want to integrate _deliver_ with [snapshot](https://docs.fastlane.tools/actions/snapshot/), check out [fastlane](https://fastlane.tools)!
+If you want to integrate _deliver_ with [_snapshot_](https://docs.fastlane.tools/actions/snapshot/), check out [_fastlane_](https://fastlane.tools)!
 
 ## Jenkins integration
 Detailed instructions about how to set up _deliver_ and _fastlane_ in `Jenkins` can be found in the [fastlane README](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration).

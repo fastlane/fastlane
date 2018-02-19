@@ -112,7 +112,7 @@ Layout/AlignHash:
 Layout/DotPosition:
   Enabled: false
 
-# We allow !! as it's an easy way to convert ot boolean
+# We allow !! as it's an easy way to convert to boolean
 Style/DoubleNegation:
   Enabled: false
 
@@ -242,10 +242,12 @@ Layout/SpaceAroundOperators:
 AllCops:
   TargetRubyVersion: 2.0
   Include:
-    - '**/fastlane/Fastfile'
+    - '*/lib/assets/*Template'
+    - '*/lib/assets/*TemplateAndroid'
   Exclude:
     - '**/lib/assets/custom_action_template.rb'
     - './vendor/**/*'
+    - '**/lib/assets/DefaultFastfileTemplate'
 
 # They have not to be snake_case
 Style/FileName:
@@ -297,7 +299,10 @@ Style/MethodCallWithArgsParentheses:
     - 'raise'
     - 'attr_accessor'
     - 'attr_reader'
+    - 'desc'
     - 'lane'
+    - 'private_lane'
+    - 'platform'
     # rspec tests code below
     - 'to'
     - 'describe'

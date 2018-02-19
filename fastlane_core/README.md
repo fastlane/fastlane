@@ -29,18 +29,18 @@ To hide timestamps in each row, set the `FASTLANE_HIDE_TIMESTAMP` environment va
 Instead of using `puts`, `raise` and `gets`, please use the helper class `UI` across all fastlane tools:
 
 ```ruby
-UI.message "Neutral message (usually white)"
-UI.success "Successfully finished processing (usually green)"
-UI.error "Wahaha, what's going on here! (usually red)"
-UI.important "Make sure to use Windows (usually yellow)"
+UI.message("Neutral message (usually white)")
+UI.success("Successfully finished processing (usually green)")
+UI.error("Wahaha, what's going on here! (usually red)")
+UI.important("Make sure to use Windows (usually yellow)")
 
-UI.header "Inputs" # a big box
+UI.header("Inputs") # a big box
 
 name = UI.input("What's your name? ")
 if UI.confirm("Are you '#{name}'?")
-  UI.success "Oh yeah"
+  UI.success("Oh yeah")
 else
-  UI.error "Wups, invalid"
+  UI.error("Wups, invalid")
 end
 
 UI.password("Your password please: ") # password inputs are hidden
@@ -71,7 +71,7 @@ UI.deprecated("The '--key' parameter is deprecated")
 ```
 
 # Code of Conduct
-Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
