@@ -21,6 +21,7 @@ describe Match do
       repo_dir = Dir.mktmpdir
       cert_path = File.join(repo_dir, "something.cer")
       profile_path = "./match/spec/fixtures/test.mobileprovision"
+      keychain_path = FastlaneCore::Helper.keychain_path("login.keychain") # can be .keychain or .keychain-db
       destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
 
       expect(Match::GitHelper).to receive(:clone).with(git_url, true, skip_docs: false, branch: "master", git_full_name: nil, git_user_email: nil, clone_branch_directly: false).and_return(repo_dir)
@@ -29,7 +30,7 @@ describe Match do
                                                                             prov_type: :appstore,
                                                                        certificate_id: "something",
                                                                        app_identifier: values[:app_identifier]).and_return(profile_path)
-      expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path).and_return(destination)
+      expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path, keychain_path).and_return(destination)
       expect(Match::GitHelper).to receive(:commit_changes).with(
         repo_dir,
         "[fastlane] Updated appstore and platform ios",
