@@ -20,9 +20,10 @@ This gem contains all shared classes and code:
 
 You can hide the inline changelog by setting the `FASTLANE_HIDE_CHANGELOG` environment variable
 
-## Timestamps
+## Output environment variables
 
-To hide timestamps in each row, set the `FASTLANE_HIDE_TIMESTAMP` environment variable.
+- To hide timestamps in each row, set the `FASTLANE_HIDE_TIMESTAMP` environment variable to true.
+- To disable output formatting, set the `FASTLANE_DISABLE_OUTPUT_FORMAT` environment variable to true.
 
 ## Interacting with the user
 
