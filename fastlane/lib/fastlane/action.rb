@@ -150,16 +150,16 @@ module Fastlane
       nil
     end
 
-    def self.is_compatible?(operating_system, compatibility = nil)
-      # UI.crash!("Implementing `is_compatible?` for all actions is mandatory. Please update #{self}")
+    def self.is_compatible?(operating_system, action_compatibility = {})
       # TODO find way to throw warning/error message when method is not implemented in child class that is being called
-      if compatibility.nil?
-        compatibility = {
-          "MacOS"   => true,  # We assume macOS to be good 
-          "Linux"   => nil,
-          "Windows" => nil
-        }
-      end
+      default_compatibility = {
+        #                   # Unless specified otherwise...
+        "MacOS"   => true,  # we assume action on macOS will work
+        "Linux"   => nil,   # we assume action on Linux might be ok
+        "Windows" => nil,   # we assume action on Windows might be ok
+        "Unkown"  => false  # we assume action on other OS will not work
+      }
+      compatibility = default_compatibility.merge(action_compatibility)
       return compatibility[operating_system]
     end
   end
