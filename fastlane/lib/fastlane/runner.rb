@@ -309,10 +309,10 @@ module Fastlane
         operating_system = Helper.operating_system
         compat = class_ref.is_compatible?(operating_system)
         if compat.nil?
-          UI.important("Action '#{name}' might (!) not be compatible to run on operating system '#{operating_system}'.")
+          UI.message("Action '#{name}' might (!) not be compatible to run on operating system '#{operating_system}'.")
         elsif !compat
-          UI.important("Action '#{name}' is not compatible to run on operating system '#{operating_system}'.")
-          # TODO exit/exception here instead of crash
+          UI.error("Action '#{name}' is not compatible to run on operating system '#{operating_system}'.")
+          # TODO exit/exception/error here instead of crash in action that will not work
         end
       end
     end
