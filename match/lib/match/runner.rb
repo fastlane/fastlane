@@ -135,13 +135,14 @@ module Match
       profile_name = names.join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
       base_dir = File.join(params[:workspace], "profiles", prov_type.to_s)
       profiles = Dir[File.join(base_dir, "#{profile_name}.mobileprovision")]
+      keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
 
       # Install the provisioning profiles
       profile = profiles.last
 
       if params[:force_for_new_devices] && !params[:readonly]
         if prov_type != :appstore
-          params[:force] = device_count_different?(profile: profile) unless params[:force]
+          params[:force] = device_count_different?(profile: profile, keychain_path: keychain_path) unless params[:force]
         else
           # App Store provisioning profiles don't contain device identifiers and
           # thus shouldn't be renewed if the device count has changed.
@@ -167,9 +168,8 @@ module Match
         self.files_to_commmit << profile
       end
 
-      installed_profile = FastlaneCore::ProvisioningProfile.install(profile)
-
-      parsed = FastlaneCore::ProvisioningProfile.parse(profile)
+      installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
+      parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       uuid = parsed["UUID"]
 
       if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
@@ -204,9 +204,9 @@ module Match
       return uuid
     end
 
-    def device_count_different?(profile: nil)
+    def device_count_different?(profile: nil, keychain_path: nil)
       if profile
-        parsed = FastlaneCore::ProvisioningProfile.parse(profile)
+        parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
         uuid = parsed["UUID"]
         portal_profile = Spaceship.provisioning_profile.all.detect { |i| i.uuid == uuid }
 
