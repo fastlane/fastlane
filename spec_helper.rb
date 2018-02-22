@@ -89,10 +89,13 @@ RSpec.configure do |config|
     config.define_derived_metadata(:requires_security) do |meta|
       meta[:skip] = "Skipped: Requires `security` to be installed (which is not possible on this platform and no workaround has been implemented)"
     end
+    config.define_derived_metadata(:requires_xcodeproj) do |meta|
+      meta[:skip] = "Skipped: Requires `xcodeproj` which is unfortunately currently broken on Windows: https://github.com/CocoaPods/Xcodeproj/issues/549"
+    end
 
-    # also skip `before()` for test groups that are skipped because of their tags
-    # only works for `describe` groups (that are parents of the `before`, not if the tag is set on `it`
-    # caution! has unexpected side effect on usage of `skip: false` for individual examples
+    # also skip `before()` for test groups that are skipped because of their tags.
+    # only works for `describe` groups (that are parents of the `before`, not if the tag is set on `it`.
+    # caution: has unexpected side effect on usage of `skip: false` for individual examples,
     # see https://groups.google.com/d/msg/rspec/5qeKQr_7G7k/Pb3ss2hOAAAJ
     module HookOverrides
       def before(*args)
