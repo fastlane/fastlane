@@ -90,7 +90,7 @@ RSpec.configure do |config|
       meta[:skip] = "Skipped: Requires `security` to be installed (which is not possible on this platform and no workaround has been implemented)"
     end
     config.define_derived_metadata(:requires_xcodeproj) do |meta|
-      meta[:skip] = "Skipped: Requires `xcodeproj` which is unfortunately broken on Windows right now: https://github.com/CocoaPods/Xcodeproj/issues/549"
+      meta[:skip] = "Skipped: Requires `xcodeproj` which is unfortunately currently broken on Windows: https://github.com/CocoaPods/Xcodeproj/issues/549"
     end
 
     # also skip `before()` for test groups that are skipped because of their tags.
