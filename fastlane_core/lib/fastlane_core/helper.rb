@@ -324,7 +324,7 @@ module FastlaneCore
     end
 
     def self.is_ci?
-      ci?
+      self.ci?
     end
 
     def self.is_mac?

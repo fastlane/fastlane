@@ -45,7 +45,7 @@ module Fastlane
     end
 
     def self.details
-      nil # this is your change to provide a more detailed description of this action
+      nil # this is your chance to provide a more detailed description of this action
     end
 
     def self.available_options
