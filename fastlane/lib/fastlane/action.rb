@@ -149,5 +149,18 @@ module Fastlane
     def self.deprecated_notes
       nil
     end
+
+    def self.is_compatible?(operating_system, compatibility = nil)
+      # UI.crash!("Implementing `is_compatible?` for all actions is mandatory. Please update #{self}")
+      # TODO find way to throw warning/error message when method is not implemented in child class that is being called
+      if compatibility.nil?
+        compatibility = {
+          "MacOS"   => true,  # We assume macOS to be good 
+          "Linux"   => nil,
+          "Windows" => nil
+        }
+      end
+      return compatibility[operating_system]
+    end
   end
 end

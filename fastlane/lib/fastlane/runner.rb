@@ -222,6 +222,8 @@ module Fastlane
       end
 
       verify_supported_os(method_sym, class_ref)
+      verify_compatible_os(method_sym, class_ref)
+
 
       begin
         # https://github.com/fastlane/fastlane/issues/11913
@@ -298,6 +300,19 @@ module Fastlane
           unless class_ref.is_supported?(platform)
             UI.important("Action '#{name}' isn't known to support operating system '#{platform}'.")
           end
+        end
+      end
+    end
+
+    def verify_compatible_os(name, class_ref)
+      if class_ref.respond_to?(:is_compatible?)
+        operating_system = Helper.operating_system
+        compat = class_ref.is_compatible?(operating_system)
+        if compat.nil?
+          UI.important("Action '#{name}' might (!) not be compatible to run on operating system '#{operating_system}'.")
+        elsif !compat
+          UI.important("Action '#{name}' is not compatible to run on operating system '#{operating_system}'.")
+          # TODO exit/exception here instead of crash
         end
       end
     end
