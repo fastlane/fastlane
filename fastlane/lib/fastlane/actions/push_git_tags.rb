@@ -29,7 +29,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_PUSH_GIT_FORCE",
-                                       description: "Force push to remote. Defaults to false",
+                                       description: "Force push to remote",
                                        is_string: false,
                                        default_value: false,
                                        optional: true),

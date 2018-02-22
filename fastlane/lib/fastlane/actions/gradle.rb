@@ -113,7 +113,7 @@ module Fastlane
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :project_dir,
                                        env_name: 'FL_GRADLE_PROJECT_DIR',
-                                       description: 'The root directory of the gradle project. Defaults to `.`',
+                                       description: 'The root directory of the gradle project',
                                        default_value: '.',
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :gradle_path,

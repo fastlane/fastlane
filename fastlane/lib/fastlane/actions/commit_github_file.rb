@@ -126,6 +126,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "FL_COMMIT_GITHUB_FILE_MESSAGE",
                                        description: "The commit message. Defaults to the file name",
+                                       default_value_dynamic: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :secure,
                                        env_name: "FL_COMMIT_GITHUB_FILE_SECURE",

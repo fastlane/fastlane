@@ -163,6 +163,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :destination,
                                        env_name: "IPA_DESTINATION",
                                        description: "Build destination. Defaults to current directory",
+                                       default_value_dynamic: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :embed,
                                        env_name: "IPA_EMBED",

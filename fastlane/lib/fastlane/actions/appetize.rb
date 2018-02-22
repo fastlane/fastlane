@@ -115,7 +115,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        env_name: "APPETIZE_PLATFORM",
-                                       description: "Platform. Either `ios` or `android`. Default is `ios`",
+                                       description: "Platform. Either `ios` or `android`",
                                        is_string: true,
                                        default_value: 'ios'),
           FastlaneCore::ConfigItem.new(key: :path,
