@@ -46,7 +46,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :grouping,
                                        env_name: "FL_GIT_TAG_GROUPING",
-                                       description: "Is used to keep your tags organised under one 'folder'. Defaults to 'builds'",
+                                       description: "Is used to keep your tags organised under one 'folder'",
                                        default_value: 'builds'),
           FastlaneCore::ConfigItem.new(key: :prefix,
                                        env_name: "FL_GIT_TAG_PREFIX",

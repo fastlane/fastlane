@@ -82,7 +82,7 @@ module Fastlane
                                          UI.user_error!("Couldn't find the destination folder at '#{value}'") if !Helper.test? && !File.directory?(value) && !File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :zip,
-                                       description: 'Enable compression of the archive. Default value `true`',
+                                       description: 'Enable compression of the archive',
                                        is_string: false,
                                        default_value: true,
                                        optional: true,
@@ -92,7 +92,7 @@ module Fastlane
                                        optional: true,
                                        env_name: 'BACKUP_XCARCHIVE_ZIP_FILENAME'),
           FastlaneCore::ConfigItem.new(key: :versioned,
-                                       description: 'Create a versioned (date and app version) subfolder where to put the archive. Default value `true`',
+                                       description: 'Create a versioned (date and app version) subfolder where to put the archive',
                                        is_string: false,
                                        default_value: true,
                                        optional: true,
@@ -120,7 +120,7 @@ module Fastlane
             xcarchive: "/path/to/file.xcarchive", # Optional if you use the `xcodebuild` action
             destination: "/somewhere/else/file.xcarchive", # Where the backup should be created
             zip: false, # Enable compression of the archive. Defaults to `true`.
-            versioned: true # Create a versioned (date and app version) subfolder where to put the archive. Default value `true`
+            versioned: true # Create a versioned (date and app version) subfolder where to put the archive
           )'
         ]
       end
