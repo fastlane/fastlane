@@ -277,5 +277,12 @@ module FastlaneCore
     def to_s
       [@key, @description].join(": ")
     end
+
+    def doc_default_value
+      return "-" if self.default_value.nil?
+      return "*" if self.default_value_dynamic
+
+      self.default_value
+    end
   end
 end
