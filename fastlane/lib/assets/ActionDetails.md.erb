@@ -46,7 +46,7 @@ Key | Description | Default
   <%- next if config_item.description.to_s.length == 0 -%>
   `<%= config_item.key %>` | <%= config_item.description %> | <%= config_item.doc_default_value %>
 <%- end %>
-_* = default value is dependent on the user's system_
+<em id="dynamic">* = default value is dependent on the user's system</em>
 <% end %><%# End of action.available_options... %>
 
 <hr />
