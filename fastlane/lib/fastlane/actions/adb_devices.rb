@@ -68,6 +68,15 @@ module Fastlane
       def self.is_supported?(platform)
         platform == :android
       end
+
+      def self.is_compatible?(operating_system)
+        compatibility = {
+          "MacOS"   => true,
+          "Linux"   => true,
+          "Windows" => true
+        }
+        super(operating_system, compatibility)
+      end
     end
   end
 end
