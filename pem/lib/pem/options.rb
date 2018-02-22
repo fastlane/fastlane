@@ -22,7 +22,7 @@ module PEM
                                      default_value: true),
         FastlaneCore::ConfigItem.new(key: :active_days_limit,
                                      env_name: "PEM_ACTIVE_DAYS_LIMIT",
-                                     description: "If the current certificate is active for less than this number of days, generate a new one. Default value is 30 days",
+                                     description: "If the current certificate is active for less than this number of days, generate a new one",
                                      default_value: 30,
                                      is_string: false,
                                      type: Integer,
