@@ -196,6 +196,7 @@ describe Fastlane::PluginGenerator do
       expect(action_class.authors).to eq([author])
       expect(action_class.available_options).to eq([])
       expect(action_class.is_supported?(:ios)).to be(true)
+      expect(action_class.is_compatible?(:macos)).to be(true)
     end
 
     it "creates a complete, valid gemspec" do

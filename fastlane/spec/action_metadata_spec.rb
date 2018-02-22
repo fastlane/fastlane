@@ -41,6 +41,10 @@ describe Fastlane::Action do
         action.is_supported?(nil) # this will raise an exception if the method is not implemented
       end
 
+      it "implements is_compatible?" do
+        action.is_compatible?(nil) # this will raise an exception if the method is not implemented
+      end
+
       it "defines valid authors" do
         authors = Array(action.author || action.authors)
         expect(authors.count).to be >= 1, "Action '#{name}' must have at least one author"
