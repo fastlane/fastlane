@@ -7,6 +7,16 @@ describe Fastlane do
       allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
     end
 
+    after :all do
+      project = Xcodeproj::Project.open("./fastlane/spec/fixtures/xcodeproj/automatic_code_signing.xcodeproj")
+      project.targets.each do |target|
+        target.build_configurations.each do |configuration|
+          configuration.build_settings.delete('CODE_SIGN_STYLE')
+        end
+      end
+      project.save
+    end
+
     it "enable_automatic_code_signing" do
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Automatic'")
