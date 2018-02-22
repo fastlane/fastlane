@@ -135,7 +135,6 @@ module Fastlane
       else
         puts("No available options".yellow)
       end
-      puts("- = this parameter doesn't have a default value")
       puts("* = this default value is dependent on the user's system")
       puts("")
     end

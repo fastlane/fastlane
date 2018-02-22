@@ -280,7 +280,7 @@ module FastlaneCore
 
     def doc_default_value
       return "*" if self.default_value_dynamic
-      return "-" if self.default_value.nil?
+      return "" if self.default_value.nil?
       return "`''`" if self.default_value.instance_of?(String) && self.default_value.empty?
 
       "`#{self.default_value}`"
@@ -288,7 +288,7 @@ module FastlaneCore
 
     def help_default_value
       return "#{self.default_value} *".strip if self.default_value_dynamic
-      return "-" if self.default_value.nil?
+      return "" if self.default_value.nil?
 
       self.default_value
     end
