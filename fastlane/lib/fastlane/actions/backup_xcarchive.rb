@@ -89,6 +89,7 @@ module Fastlane
                                        env_name: 'BACKUP_XCARCHIVE_ZIP'),
           FastlaneCore::ConfigItem.new(key: :zip_filename,
                                        description: 'Filename of the compressed archive. Will be appended by `.xcarchive.zip`. Default value is the output xcarchive filename',
+                                       default_value_dynamic: true,
                                        optional: true,
                                        env_name: 'BACKUP_XCARCHIVE_ZIP_FILENAME'),
           FastlaneCore::ConfigItem.new(key: :versioned,
