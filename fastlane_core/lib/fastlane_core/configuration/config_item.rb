@@ -285,5 +285,12 @@ module FastlaneCore
 
       "`#{self.default_value}`"
     end
+
+    def help_default_value
+      return "#{self.default_value} *".strip if self.default_value_dynamic
+      return "-" if self.default_value.nil?
+
+      self.default_value
+    end
   end
 end
