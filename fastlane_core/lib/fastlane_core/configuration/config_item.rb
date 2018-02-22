@@ -283,7 +283,7 @@ module FastlaneCore
       return "*" if self.default_value_dynamic
       return "`''`" if self.default_value.instance_of?(String) && self.default_value.empty?
 
-      self.default_value
+      "`#{self.default_value}`"
     end
   end
 end
