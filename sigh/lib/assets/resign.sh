@@ -638,6 +638,71 @@ function resign {
         # Start with using what comes in provisioning profile entitlements before patching
         cp -f "$PROFILE_ENTITLEMENTS" "$PATCHED_ENTITLEMENTS"
 
+        log "Removing blacklisted keys from patched profile"
+        # See https://github.com/facebook/buck/issues/798 and https://github.com/facebook/buck/pull/802/files
+
+        # Update in https://github.com/facebook/buck/commit/99c0fbc3ab5ecf04d186913374f660683deccdef
+        # Update in https://github.com/facebook/buck/commit/36db188da9f6acbb9df419dc1904315ab00c4e19
+
+        # Buck changes referenced above are not self-explanatory and do not seem exhaustive or up-to-date
+        # Comments below explain the rules applied to each key in order to make realignment with future Xcode export logic easier
+        BLACKLISTED_KEYS=(\
+            # PP list identifiers inconsistent with app-defined ones and this key does not seem to appear in IPA entitlements, so ignore it
+            "com.apple.developer.icloud-container-development-container-identifiers" \
+            # This key has an invalid generic value in PP (actual value is set by Xcode during export), see dedicated processing a few blocks below
+            "com.apple.developer.icloud-container-environment" \
+            # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
+            "com.apple.developer.icloud-container-identifiers" \
+            # PP enable all available services and not app-defined ones, must use App entitlements value
+            "com.apple.developer.icloud-services" \
+            # Was already blacklisted in previous version, but has someone ever seen this key in a PP?
+            "com.apple.developer.restricted-resource-mode" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.nfc.readersession.formats" \
+            # PP list a single TeamID.* identifier and not app-defined ones, must use App entitlements value
+            "com.apple.developer.pass-type-identifiers" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.siri" \
+            # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
+            "com.apple.developer.ubiquity-container-identifiers" \
+            # PP define a generic TeamID.* identifier and not the app-defined one, must use App entitlements value
+            "com.apple.developer.ubiquity-kvstore-identifier" \
+            # If actually used by the App, this value will be set in its entitlements
+            "inter-app-audio" \
+            # PP define a generic TeamID.* identifier and not the app-defined one, must use App entitlements value
+            "keychain-access-groups" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.homekit" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.healthkit" \
+            # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
+            "com.apple.developer.in-app-payments" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.networking.vpn.api" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.networking.HotspotConfiguration" \
+            # PP list all available extensions and not app-defined ones, must use App entitlements value
+            "com.apple.developer.networking.networkextension" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.networking.multipath" \
+            # PP enable all domains via a non-AppStore-compliant '*' value, must use App entitlements value
+            "com.apple.developer.associated-domains" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.default-data-protection" \
+            # PP seem to list the same groups as the App, but use App entitlements value to be sure
+            "com.apple.security.application-groups" \
+            # Was already blacklisted in previous version, seems to be an artifact from an old Xcode release
+            "com.apple.developer.maps" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.external-accessory.wireless-configuration"
+        )
+
+        # Blacklisted keys must not be included into new profile, so remove them from patched profile
+        for KEY in "${BLACKLISTED_KEYS[@]}"; do
+            log "Removing blacklisted key: $KEY"
+            PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
+        done
+
         # Get the old and new app identifier (prefix)
         APP_ID_KEY="application-identifier"
         # Extract just the identifier from the value
@@ -664,13 +729,22 @@ function resign {
         # There can be only one ID_TYPE specified
         # If entitlements use more than one ID type for single entitlement, then this way of resigning will not work
         # instead an entitlements file must be provided explicitly
-        ENTITLEMENTS_TRANSFER_RULES=("com.apple.developer.associated-domains" \
+        ENTITLEMENTS_TRANSFER_RULES=(\
+            "com.apple.developer.associated-domains" \
+            "com.apple.developer.default-data-protection" \
             "com.apple.developer.healthkit" \
             "com.apple.developer.homekit" \
+            "com.apple.developer.icloud-container-environment" \
             "com.apple.developer.icloud-container-identifiers" \
             "com.apple.developer.icloud-services" \
             "com.apple.developer.in-app-payments" \
+            "com.apple.developer.networking.HotspotConfiguration" \
+            "com.apple.developer.networking.multipath" \
+            "com.apple.developer.networking.networkextension" \
             "com.apple.developer.networking.vpn.api" \
+            "com.apple.developer.nfc.readersession.formats" \
+            "com.apple.developer.pass-type-identifiers|TEAM_ID" \
+            "com.apple.developer.siri" \
             "com.apple.developer.ubiquity-container-identifiers" \
             "com.apple.developer.ubiquity-kvstore-identifier|TEAM_ID" \
             "com.apple.external-accessory.wireless-configuration" \
@@ -689,6 +763,22 @@ function resign {
             if [[ -z "$ENTITLEMENTS_VALUE" ]]; then
                 log "No value for '$KEY'"
                 continue
+            fi
+
+            if [[ "$KEY" == "com.apple.developer.icloud-container-environment" ]]; then
+                # Add specific iCloud Environment key to patched entitlements
+                # This value is set by Xcode during export (manually selected for Development and AdHoc, automatically set to Production for Store)
+                # Would need an additional dedicated option to specify the iCloud environment to be used (Development or Production)
+                # For now, we assume Production is to be used when signing with a Distribution certificate, Development if not
+                if [[ "$CERTIFICATE" =~ "Distribution:" ]]; then
+                    ICLOUD_ENV="Production"
+                else
+                    ICLOUD_ENV="Development"
+                fi
+                log "Overriding value for $KEY"
+                log "Old value: $ENTITLEMENTS_VALUE"
+                log "New value: $ICLOUD_ENV"
+                ENTITLEMENTS_VALUE="$ICLOUD_ENV"
             fi
 
             log "App entitlements value for key '$KEY':"
@@ -711,7 +801,7 @@ function resign {
                 log "Replacing old app identifier prefix '$OLD_APP_ID' with new value '$NEW_APP_ID'"
                 sed -i .bak "s/$OLD_APP_ID/$NEW_APP_ID/g" "$PATCHED_ENTITLEMENTS"
             elif [[ "$ID_TYPE" == "TEAM_ID" ]]; then
-                # Replace new team identifier with new value
+                # Replace old team identifier with new value
                 log "Replacing old team ID '$OLD_TEAM_ID' with new team ID: '$NEW_TEAM_ID'"
                 sed -i .bak "s/$OLD_TEAM_ID/$NEW_TEAM_ID/g" "$PATCHED_ENTITLEMENTS"
             else
@@ -725,33 +815,6 @@ function resign {
         NEW_BUNDLE_ID="$(bundle_id_for_provison "$NEW_PROVISION")"
         log "Replacing old bundle ID '$OLD_BUNDLE_ID' with new bundle ID '$NEW_BUNDLE_ID' in patched entitlements"
         sed -i .bak "s/$OLD_BUNDLE_ID/$NEW_BUNDLE_ID/g" "$PATCHED_ENTITLEMENTS"
-
-        log "Removing blacklisted keys from patched profile"
-        # See https://github.com/facebook/buck/issues/798 and https://github.com/facebook/buck/pull/802/files
-
-        # Update in https://github.com/facebook/buck/commit/99c0fbc3ab5ecf04d186913374f660683deccdef
-        # Update in https://github.com/facebook/buck/commit/36db188da9f6acbb9df419dc1904315ab00c4e19
-        BLACKLISTED_KEYS=(\
-            "com.apple.developer.icloud-container-development-container-identifiers" \
-            "com.apple.developer.icloud-container-environment" \
-            "com.apple.developer.icloud-container-identifiers" \
-            "com.apple.developer.icloud-services" \
-            "com.apple.developer.restricted-resource-mode" \
-            "com.apple.developer.ubiquity-container-identifiers" \
-            "com.apple.developer.ubiquity-kvstore-identifier" \
-            "inter-app-audio" \
-            "com.apple.developer.homekit" \
-            "com.apple.developer.healthkit" \
-            "com.apple.developer.in-app-payments" \
-            "com.apple.developer.maps" \
-            "com.apple.external-accessory.wireless-configuration"
-        )
-
-        # Blacklisted keys must not be included into new profile, so remove them from patched profile
-        for KEY in "${BLACKLISTED_KEYS[@]}"; do
-            log "Removing blacklisted key: $KEY"
-            PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
-        done
 
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and patched entitlements:"
