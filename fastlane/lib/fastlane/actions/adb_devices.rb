@@ -72,7 +72,7 @@ module Fastlane
       def self.is_compatible?(operating_system)
         compatibility = {
           "MacOS"   => true,
-          "Linux"   => true,
+          "Linux"   => false,
           "Windows" => true
         }
         super(operating_system, compatibility)
