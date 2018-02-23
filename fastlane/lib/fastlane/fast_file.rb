@@ -330,13 +330,15 @@ module Fastlane
     end
 
     def action_launched(action_name)
-      action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name, configuration_language: "ruby", args: ARGV)
-      FastlaneCore.session.action_launched(launch_context: action_launch_context)
+      # https://github.com/fastlane/fastlane/issues/11913
+      # action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name, configuration_language: "ruby", args: ARGV)
+      # FastlaneCore.session.action_launched(launch_context: action_launch_context)
     end
 
     def action_completed(action_name, status: nil)
-      completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV, status: status)
-      FastlaneCore.session.action_completed(completion_context: completion_context)
+      # https://github.com/fastlane/fastlane/issues/11913
+      # completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV, status: status)
+      # FastlaneCore.session.action_completed(completion_context: completion_context)
     end
   end
 end
