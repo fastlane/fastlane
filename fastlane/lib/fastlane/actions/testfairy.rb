@@ -180,7 +180,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :auto_update,
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_AUTO_UPDATE",
-                                       description: "Allows an easy upgrade of all users to the current version. The default is 'off', to enable set as 'on'",
+                                       description: "Allows an easy upgrade of all users to the current version. To enable set to 'on'",
                                        default_value: 'off'),
           # not well documented
           FastlaneCore::ConfigItem.new(key: :notify,
