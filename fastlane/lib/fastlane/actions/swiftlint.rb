@@ -72,7 +72,7 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :mode,
-                                       description: "SwiftLint mode: :lint (default) or :autocorrect; default is :lint",
+                                       description: "SwiftLint mode: :lint or :autocorrect",
                                        is_string: false,
                                        default_value: :lint,
                                        optional: true),
