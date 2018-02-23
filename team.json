@@ -1,8 +1,7 @@
 {
   "KrauseFx": {
     "name": "Felix Krause",
-    "twitter": "KrauseFx",
-    "slogan": "Professional iOS Code Signing Issue Resolver"
+    "twitter": "KrauseFx"
   },
   "taquitos": {
     "name": "Joshua Liebowitz",
@@ -70,5 +69,13 @@
   "snatchev": {
     "name": "Stefan Natchev",
     "twitter": "snatchev"
+  },
+  "minuscorp": {
+    "name": "Jorge Revuelta H",
+    "twitter": "minuscorp"
+  },
+  "AndrewMcBurney": {
+    "name": "Andrew McBurney",
+    "twitter": "armcburney"
   }
 }
