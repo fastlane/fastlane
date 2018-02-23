@@ -479,8 +479,8 @@ describe Spaceship::AppVersion, all: true do
 
         it "prevents from using too large sort_order" do
           expect do
-            version.upload_screenshot!(screenshot_path, 6, "English", 'iphone4', false)
-          end.to raise_error("sort_order must not be > 5")
+            version.upload_screenshot!(screenshot_path, 11, "English", 'iphone4', false)
+          end.to raise_error("sort_order must not be > 10")
         end
 
         # not really sure if we want to enforce that
