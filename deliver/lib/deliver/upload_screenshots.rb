@@ -55,7 +55,7 @@ module Deliver
 
           index = indized[screenshot.language][screenshot.formatted_name]
 
-          if index > 5
+          if index > 10
             UI.error("Too many screenshots found for device '#{screenshot.formatted_name}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
             next
           end
