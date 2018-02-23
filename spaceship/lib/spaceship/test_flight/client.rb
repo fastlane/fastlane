@@ -92,11 +92,13 @@ module Spaceship
       #   {"b6f65dbd-c845-4d91-bc39-0b661d608970" => "Boarding",
       #    "70402368-9deb-409f-9a26-bb3f215dfee3" => "Automatic"}
       def get_groups(app_id: nil)
-        return @cached_groups if @cached_groups
+        @cached_groups = {} unless @cached_groups
+
+        return @cached_groups[app_id] if @cached_groups[app_id]
         assert_required_params(__method__, binding)
 
         response = request(:get, "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/groups")
-        @cached_groups = handle_response(response)
+        @cached_groups[app_id] = handle_response(response)
       end
 
       def create_group_for_app(app_id: nil, group_name: nil)
