@@ -282,6 +282,7 @@ module FastlaneCore
       return "[*](#parameters-legend-dynamic)" if self.default_value_dynamic
       return "" if self.default_value.nil?
       return "`''`" if self.default_value.instance_of?(String) && self.default_value.empty?
+      return "`:#{self.default_value}`" if self.default_value.instance_of?(Symbol)
 
       "`#{self.default_value}`"
     end
@@ -290,6 +291,7 @@ module FastlaneCore
       return "#{self.default_value} *".strip if self.default_value_dynamic
       return "" if self.default_value.nil?
       return "''" if self.default_value.instance_of?(String) && self.default_value.empty?
+      return ":#{self.default_value}" if self.default_value.instance_of?(Symbol)
 
       self.default_value
     end
