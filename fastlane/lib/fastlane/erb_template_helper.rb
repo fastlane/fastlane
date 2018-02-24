@@ -18,7 +18,7 @@ module Fastlane
     end
   end
   class ErbalT < OpenStruct
-    def initialize(hash, trim_mode)
+    def initialize(hash, trim_mode = nil)
       super(hash)
       @trim_mode = trim_mode
     end
