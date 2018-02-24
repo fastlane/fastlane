@@ -279,7 +279,7 @@ module FastlaneCore
     end
 
     def doc_default_value
-      return "[*](#dynamic)" if self.default_value_dynamic
+      return "[*](#parameters-legend-dynamic)" if self.default_value_dynamic
       return "" if self.default_value.nil?
       return "`''`" if self.default_value.instance_of?(String) && self.default_value.empty?
 
