@@ -92,8 +92,6 @@ module Pilot
         end
       end
 
-      require 'pry'
-      binding.pry
       if config[:notify_external_testers]
         build.auto_notify_enabled = config[:notify_external_testers]
       else 
