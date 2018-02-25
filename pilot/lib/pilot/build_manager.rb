@@ -94,7 +94,7 @@ module Pilot
 
       if config[:notify_external_testers]
         build.auto_notify_enabled = config[:notify_external_testers]
-      else 
+      else
         build.auto_notify_enabled = true
       end
 
