@@ -2,6 +2,7 @@ module Fastlane
   module Helper
     module PluginScoresHelper
       require 'faraday'
+      require 'yaml'
 
       class FastlanePluginRating
         attr_accessor :key
@@ -37,8 +38,9 @@ module Fastlane
         attr_accessor :raw_hash
 
         attr_accessor :data
+        attr_accessor :cache
 
-        def initialize(hash)
+        def initialize(hash, cache_path)
           if ENV["GITHUB_USER_NAME"].to_s.length == 0 || ENV["GITHUB_API_TOKEN"].to_s.length == 0
             raise "Missing ENV variables GITHUB_USER_NAME and/or GITHUB_API_TOKEN"
           end
@@ -59,12 +61,27 @@ module Fastlane
             has_mit_license: includes_license?("MIT"),
             has_gnu_license: includes_license?("GNU") || includes_license?("GPL"),
             major_release: Gem::Version.new(hash["version"]) >= Gem::Version.new("1.0.0"),
-            actions: []
+            actions: [],
+            sha: hash["sha"]
           }
 
+          if File.exist?(cache_path)
+            self.cache = YAML.load_file(cache_path)
+          else
+            self.cache = {}
+          end
+
           if has_github_page
-            self.append_git_data
-            self.append_github_data
+            is_cached = self.load_cache
+
+            if !is_cached
+              self.append_git_data
+              self.append_github_data
+            end
+          end
+
+          File.open(cache_path, 'w') do |file|
+            file.write(self.cache.to_yaml)
           end
 
           self.data[:overall_score] = 0
@@ -139,6 +156,35 @@ module Fastlane
           self.raw_hash["licenses"].any? { |l| l.include?(license) }
         end
 
+        def load_cache
+          if self.cache.has_key?(self.name)
+            cache_data = self.cache[self.name]
+          else
+            cache_data = {}
+          end
+
+          self.cache[self.name] = cache_data
+
+          if self.data[:sha] == cache_data[:sha]
+            self.data[:initial_commit] = cache_data[:initial_commit]
+            self.data[:age_in_days] = (DateTime.now - self.data[:initial_commit]).to_i
+            self.data[:readme_score] = cache_data[:readme_score]
+            self.data[:tests] = cache_data[:tests]
+            self.data[:actions] = cache_data[:actions]
+            self.data[:sha] = cache_data[:sha]
+
+            self.data[:github_stars] = cache_data[:github_stars]
+            self.data[:github_subscribers] = cache_data[:github_subscribers]
+            self.data[:github_issues] = cache_data[:github_issues]
+            self.data[:github_forks] = cache_data[:github_forks]
+            self.data[:github_contributors] = cache_data[:github_contributors]
+
+            return true
+          end
+
+          return false
+        end
+
         # Everything that needs to be fetched from the content of the Git repo
         def append_git_data
           Dir.mktmpdir("fastlane-plugin") do |tmp|
@@ -175,6 +221,15 @@ module Fastlane
               end
               # Result of the above is an array of arrays, this merges all of them into data[:actions]
               self.data[:actions].concat(*actions)
+
+              cache_data = self.cache[self.name]
+
+              cache_data[:initial_commit] = self.data[:initial_commit]
+              cache_data[:age_in_days] = self.data[:age_in_days]
+              cache_data[:readme_score] = self.data[:readme_score]
+              cache_data[:tests] = self.data[:tests]
+              cache_data[:actions] = self.data[:actions]
+              cache_data[:sha] = self.data[:sha]
             end
           end
         end
@@ -213,6 +268,14 @@ module Fastlane
           self.data[:github_issues] = repo_details["open_issues_count"].to_i
           self.data[:github_forks] = repo_details["forks_count"].to_i
           self.data[:github_contributors] = contributor_details.count
+
+          cache_data = self.cache[self.name]
+
+          cache_data[:github_stars] = self.data[:github_stars]
+          cache_data[:github_subscribers] = self.data[:github_subscribers]
+          cache_data[:github_issues] = self.data[:github_issues]
+          cache_data[:github_forks] = self.data[:github_forks]
+          cache_data[:github_contributors] = self.data[:github_contributors]
         rescue => ex
           puts("error fetching #{self}")
           puts(self.homepage)
