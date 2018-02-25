@@ -62,6 +62,8 @@ module Spaceship
       end
 
       def post_for_testflight_review(app_id: nil, build_id: nil, build: nil)
+        # require 'pry'
+        # binding.pry
         assert_required_params(__method__, binding)
 
         response = request(:post) do |req|
