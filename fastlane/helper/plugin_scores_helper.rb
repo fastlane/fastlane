@@ -74,7 +74,7 @@ module Fastlane
           if has_github_page
             is_cached = self.load_cache
 
-            if !is_cached
+            unless is_cached
               self.append_git_data
               self.append_github_data
             end
@@ -157,7 +157,7 @@ module Fastlane
         end
 
         def load_cache
-          if self.cache.has_key?(self.name)
+          if self.cache.key?(self.name)
             cache_data = self.cache[self.name]
           else
             cache_data = {}
