@@ -69,8 +69,9 @@ module Commander
           FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_RELEASE}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
         end
 
-        action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(@program[:name], args: ARGV)
-        FastlaneCore.session.action_launched(launch_context: action_launch_context)
+        # https://github.com/fastlane/fastlane/issues/11913
+        # action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(@program[:name], args: ARGV)
+        # FastlaneCore.session.action_launched(launch_context: action_launch_context)
 
         return_value = run_active_command
 
@@ -130,16 +131,18 @@ module Commander
         rescue_connection_failed_error(e)
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         rescue_unknown_error(e)
-      ensure
-        FastlaneCore.session.finalize_session
+        # https://github.com/fastlane/fastlane/issues/11913
+        # ensure
+        #   FastlaneCore.session.finalize_session
       end
     end
 
     def action_completed(action_name, status: nil, exception: nil)
-      if exception.nil? || exception.fastlane_should_report_metrics?
-        action_completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV, status: status)
-        FastlaneCore.session.action_completed(completion_context: action_completion_context)
-      end
+      # https://github.com/fastlane/fastlane/issues/11913
+      # if exception.nil? || exception.fastlane_should_report_metrics?
+      #   action_completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV, status: status)
+      #   FastlaneCore.session.action_completed(completion_context: action_completion_context)
+      # end
     end
 
     def rescue_file_error(e)
