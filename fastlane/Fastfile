@@ -338,6 +338,7 @@ lane :update_docs do
   verify_env_variables
 
   template_path = File.expand_path("./assets/render_plugin.md.erb")
+  plugin_scores_cache_path = File.expand_path("./plugin_scores_cache.yml")
   clone_docs do
     docs_path = generate_markdown_docs(target_path: ".")
     yml_path = File.expand_path("./mkdocs.yml")
@@ -366,7 +367,8 @@ lane :update_docs do
       sh("git checkout -b 'update-actions-md-#{Time.now.to_i}'")
       plugins_path = "docs/plugins/available-plugins.md"
       plugin_scores(template_path: template_path,
-                      output_path: plugins_path)
+                      output_path: plugins_path,
+                       cache_path: plugin_scores_cache_path)
 
       Dir.chdir("fastlane") do # this is an assumption of fastlane, that we have to .. when shelling out
         # Commit the changes
