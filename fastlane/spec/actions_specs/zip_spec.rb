@@ -20,7 +20,7 @@ describe Fastlane do
         expect(Fastlane::Actions).to receive(:sh).with("zip -rq #{File.expand_path(@path)}.zip archive.rb")
 
         result = Fastlane::FastFile.new.parse("lane :test do
-          zip(path: '#{@path}', verbose: 'false')
+          zip(path: '#{@path}', verbose: false)
         end").runner.execute(:test)
       end
 

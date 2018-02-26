@@ -240,7 +240,7 @@ module FastlaneCore
       elsif allow_shell_conversion
         return Shellwords.join(value) if value.kind_of?(Array)
         return value.map { |k, v| "#{k.to_s.shellescape}=#{v.shellescape}" }.join(' ') if value.kind_of?(Hash)
-      else
+      elsif data_type != String
         # Special treatment if the user specified true, false or YES, NO
         # There is no boolean type, so we just do it here
         if %w(YES yes true TRUE).include?(value)
