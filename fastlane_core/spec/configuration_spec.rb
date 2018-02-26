@@ -322,6 +322,27 @@ describe FastlaneCore do
           expect(config[:false_value2]).to eq(false)
         end
 
+        it "doesn't auto convert booleans as strings to booleans if type is explicitly set to String" do
+          c = [
+            FastlaneCore::ConfigItem.new(key: :true_value, type: String),
+            FastlaneCore::ConfigItem.new(key: :true_value2, type: String),
+            FastlaneCore::ConfigItem.new(key: :false_value, type: String),
+            FastlaneCore::ConfigItem.new(key: :false_value2, type: String)
+          ]
+
+          config = FastlaneCore::Configuration.create(c, {
+            true_value: "true",
+            true_value2: "YES",
+            false_value: "false",
+            false_value2: "NO"
+          })
+
+          expect(config[:true_value]).to eq("true")
+          expect(config[:true_value2]).to eq("YES")
+          expect(config[:false_value]).to eq("false")
+          expect(config[:false_value2]).to eq("NO")
+        end
+
         it "auto converts strings to integers" do
           c = [
             FastlaneCore::ConfigItem.new(key: :int_value,
