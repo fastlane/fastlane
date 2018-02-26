@@ -56,7 +56,8 @@ module Frameit
                              elsif f.end_with?("force_landscaperight")
                                :landscape_right
                              end
-                           end)
+                           end,
+                           default_value_dynamic: true)
       ]
     end
   end

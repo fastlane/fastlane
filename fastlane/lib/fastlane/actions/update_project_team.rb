@@ -33,6 +33,7 @@ module Fastlane
                                        env_name: "FL_PROJECT_SIGNING_PROJECT_PATH",
                                        description: "Path to your Xcode project",
                                        default_value: Dir['*.xcodeproj'].first,
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Path is invalid") unless File.exist?(value)
                                        end),
@@ -40,7 +41,8 @@ module Fastlane
                                        env_name: "FL_PROJECT_TEAM_ID",
                                        description: "The Team ID you want to use",
                                        code_gen_sensitive: true,
-                                       default_value: ENV["TEAM_ID"] || CredentialsManager::AppfileConfig.try_fetch_value(:team_id))
+                                       default_value: ENV["TEAM_ID"] || CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                       default_value_dynamic: true)
         ]
       end
 

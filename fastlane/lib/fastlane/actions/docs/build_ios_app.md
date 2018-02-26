@@ -48,7 +48,7 @@ _gym_ uses the latest APIs to build and sign your application which results in m
 🏁 | Beautiful inline build output
 📖    | Helps you resolve common build errors like code signing issues
 🚠 | Sensible defaults: Automatically detect the project, its schemes and more
-🔗  | Works perfectly with [fastlane](https://fastlane.tools) and other tools
+🔗  | Works perfectly with [_fastlane_](https://fastlane.tools) and other tools
 📦 | Automatically generates an `ipa` and a compressed `dSYM` file
 🚅 | Don't remember any complicated build commands, just _gym_
 🔧  | Easy and dynamic configuration using parameters and environment variables
@@ -113,14 +113,14 @@ Since you might want to manually trigger a new build but don't want to specify a
 Run `fastlane gym init` to create a new configuration file. Example:
 
 ```ruby-skip-tests
-scheme "Example"
+scheme("Example")
 
-sdk "iphoneos9.0"
+sdk("iphoneos9.0")
 
-clean true
+clean(true)
 
-output_directory "./build"    # store the ipa in this folder
-output_name "MyApp"           # the name of the ipa file
+output_directory("./build")    # store the ipa in this folder
+output_name("MyApp")           # the name of the ipa file
 ```
 
 ## Export options
@@ -128,7 +128,7 @@ output_name "MyApp"           # the name of the ipa file
 Since Xcode 7, _gym_ is using new Xcode API which allows us to specify export options using `plist` file. By default _gym_ creates this file for you and you are able to modify some parameters by using `export_method`, `export_team_id`, `include_symbols` or `include_bitcode`. If you want to have more options, like creating manifest file for app thinning, you can provide your own `plist` file:
 
 ```ruby-skip-tests
-export_options "./ExportOptions.plist"
+export_options("./ExportOptions.plist")
 ```
 
 or you can provide hash of values directly in the `Gymfile`:
@@ -155,7 +155,7 @@ export_options(
 )
 ```
 
-**Note**: If you use [fastlane](https://fastlane.tools) with [match](https://fastlane.tools/match) you don't need to provide those values manually.
+**Note**: If you use [_fastlane_](https://fastlane.tools) with [_match_](https://fastlane.tools/match) you don't need to provide those values manually.
 
 For the list of available options run `xcodebuild -help`.
 
@@ -166,7 +166,7 @@ For the list of available options run `xcodebuild -help`.
 
 ## Automating the whole process
 
-_gym_ works great together with [fastlane](https://fastlane.tools), which connects all deployment tools into one streamlined workflow.
+_gym_ works great together with [_fastlane_](https://fastlane.tools), which connects all deployment tools into one streamlined workflow.
 
 Using _fastlane_ you can define a configuration like
 

@@ -13,13 +13,18 @@ module Fastlane
       File.read(template_filepath)
     end
 
-    def self.render(template, template_vars_hash)
-      Fastlane::ErbalT.new(template_vars_hash).render(template)
+    def self.render(template, template_vars_hash, trim_mode = nil)
+      Fastlane::ErbalT.new(template_vars_hash, trim_mode).render(template)
     end
   end
   class ErbalT < OpenStruct
+    def initialize(hash, trim_mode = nil)
+      super(hash)
+      @trim_mode = trim_mode
+    end
+
     def render(template)
-      ERB.new(template).result(binding)
+      ERB.new(template, nil, @trim_mode).result(binding)
     end
   end
 end

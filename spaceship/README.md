@@ -33,7 +33,7 @@
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
 
-`spaceship` exposes both the Apple Developer Center and the iTunes Connect API. This fast and powerful API powers parts of fastlane, and can be leveraged for more advanced fastlane features. Scripting your Developer Center workflow has never been easier!
+_spaceship_ exposes both the Apple Developer Center and the iTunes Connect API. This fast and powerful API powers parts of fastlane, and can be leveraged for more advanced fastlane features. Scripting your Developer Center workflow has never been easier!
 
 Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.com/fastlanetools)
 
@@ -55,7 +55,7 @@ Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.co
 
 Up until now, the [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. With spaceship it is possible to directly access the underlying APIs using a simple HTTP client only.
 
-Using spaceship, the execution time of [sigh](https://docs.fastlane.tools/actions/sigh/) was reduced from over 1 minute to less than 5 seconds.
+Using spaceship, the execution time of [_sigh_](https://docs.fastlane.tools/actions/sigh/) was reduced from over 1 minute to less than 5 seconds.
 
 spaceship uses a combination of 3 different API endpoints, used by the Apple Developer Portal and Xcode. As no API offers everything we need, spaceship combines all APIs for you. [More details about the APIs](#technical-details).
 
@@ -79,13 +79,13 @@ profile = Spaceship.provisioning_profile.app_store.create!(bundle_id: app.bundle
                                                          certificate: cert)
 
 # Print the name and download the new profile
-puts "Created Profile " + profile.name
+puts("Created Profile " + profile.name)
 profile.download
 ```
 
 ## Speed
 
-How fast are tools using `spaceship` compared to web scraping?
+How fast are tools using _spaceship_ compared to web scraping?
 
 ![assets/SpaceshipRecording.gif](assets/SpaceshipRecording.gif)
 
@@ -97,11 +97,11 @@ How fast are tools using `spaceship` compared to web scraping?
 
 ## Playground
 
-To try `spaceship`, just run `fastlane spaceship`. It will automatically start the `spaceship playground`. It makes it super easy to try `spaceship` :rocket:
+To try _spaceship_, just run `fastlane spaceship`. It will automatically start the `spaceship playground`. It makes it super easy to try _spaceship_ :rocket:
 
 ![assets/docs/Playground.png](assets/docs/Playground.png)
 
-This requires you to install `pry` using `sudo gem install pry`. `pry` is not installed by default, as most [fastlane](https://fastlane.tools) users won't need the `spaceship playground`. You can add the `pry` dependency to your `Gemfile`.
+This requires you to install `pry` using `sudo gem install pry`. `pry` is not installed by default, as most [_fastlane_](https://fastlane.tools) users won't need the `spaceship playground`. You can add the `pry` dependency to your `Gemfile`.
 
 ## Apple Developer Portal API
 
@@ -151,9 +151,9 @@ All [fastlane tools](https://fastlane.tools) that communicate with Apple's web s
 
 ## HTTP Client
 
-Up until now all [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. `spaceship` uses a simple HTTP client only, resulting in much less overhead and extremely improved speed.
+Up until now all [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. _spaceship_ uses a simple HTTP client only, resulting in much less overhead and extremely improved speed.
 
-Advantages of `spaceship` (HTTP client) over web scraping:
+Advantages of _spaceship_ (HTTP client) over web scraping:
 
 - Blazing fast :rocket: 90% faster than previous methods
 - No more overhead by loading images, HTML, JS and CSS files on each page load
@@ -185,22 +185,22 @@ Overview of the used API endpoints
 - `https://du-itc.itunesconnect.apple.com`:
   - Upload icons, screenshots, trailers ...
 
-`spaceship` uses all those API points to offer this seamless experience.
+_spaceship_ uses all those API points to offer this seamless experience.
 
 ## Magic involved
 
-`spaceship` does a lot of magic to get everything working so neatly:
+_spaceship_ does a lot of magic to get everything working so neatly:
 
 - **Sensible Defaults**: You only have to provide the mandatory information (e.g. new provisioning profiles contain all devices by default)
-- **Local Validation**: When pushing changes back to the Apple Dev Portal `spaceship` will make sure only valid data is sent to Apple (e.g. automatic repairing of provisioning profiles)
-- **Various request/response types**: When working with the different API endpoints, `spaceship` has to deal with `JSON`, `XML`, `txt`, `plist` and sometimes even `HTML` responses and requests.
-- **Automatic Pagination**: Even if you have thousands of apps, profiles or certificates, `spaceship` **can** handle your scale. It was heavily tested by first using `spaceship` to create hundreds of profiles and then accessing them using `spaceship`.
-- **Session, Cookie and CSRF token**: All the security aspects are handled by `spaceship`.
-- **Profile Magic**: Create and upload code signing requests, all managed by `spaceship`
-- **Multiple Spaceship**: You can launch multiple `spaceships` with different Apple accounts to do things like syncing the registered devices.
+- **Local Validation**: When pushing changes back to the Apple Dev Portal _spaceship_ will make sure only valid data is sent to Apple (e.g. automatic repairing of provisioning profiles)
+- **Various request/response types**: When working with the different API endpoints, _spaceship_ has to deal with `JSON`, `XML`, `txt`, `plist` and sometimes even `HTML` responses and requests.
+- **Automatic Pagination**: Even if you have thousands of apps, profiles or certificates, _spaceship_ **can** handle your scale. It was heavily tested by first using _spaceship_ to create hundreds of profiles and then accessing them using _spaceship_.
+- **Session, Cookie and CSRF token**: All the security aspects are handled by _spaceship_.
+- **Profile Magic**: Create and upload code signing requests, all managed by _spaceship_
+- **Multiple Spaceship**: You can launch multiple _spaceships_ with different Apple accounts to do things like syncing the registered devices.
 
 # Code of Conduct
-Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

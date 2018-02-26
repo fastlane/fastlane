@@ -63,7 +63,7 @@ fastlane scan
 
 ### Why _scan_?
 
-_scan_ uses the latest APIs and tools to make running tests plain simple and offer a great integration into your existing workflow, like [fastlane](https://fastlane.tools) or Jenkins.
+_scan_ uses the latest APIs and tools to make running tests plain simple and offer a great integration into your existing workflow, like [_fastlane_](https://fastlane.tools) or Jenkins.
 
 |          |  scan Features  |
 |----------|-----------------|
@@ -71,7 +71,7 @@ _scan_ uses the latest APIs and tools to make running tests plain simple and off
 🚠 | Sensible defaults: Automatically detect the project, schemes and more
 📊 | Support for HTML, JSON and JUnit reports
 🔎 | Xcode duplicated your simulators again? _scan_ will handle this for you
-🔗  | Works perfectly with [fastlane](https://fastlane.tools) and other tools
+🔗  | Works perfectly with [_fastlane_](https://fastlane.tools) and other tools
 🚅 | Don't remember any complicated build commands, just _scan_
 🔧  | Easy and dynamic configuration using parameters and environment variables
 📢 | Beautiful slack notifications of the test results
@@ -100,7 +100,7 @@ If you need to use a different xcode install, use `xcode-select` or define `DEVE
 
     DEVELOPER_DIR="/Applications/Xcode6.2.app" scan
 
-To run _scan_ on multiple devices via [fastlane](https://fastlane.tools), add this to your `Fastfile`:
+To run _scan_ on multiple devices via [_fastlane_](https://fastlane.tools), add this to your `Fastfile`:
 
 ```ruby
 scan(
@@ -124,17 +124,17 @@ Since you might want to manually trigger the tests but don't want to specify all
 Run `fastlane scan init` to create a new configuration file. Example:
 
 ```ruby-skip-tests
-scheme "Example"
-devices ["iPhone 6s", "iPad Air"]
+scheme("Example")
+devices(["iPhone 6s", "iPad Air"])
 
-clean true
+clean(true)
 
-output_types "html"
+output_types("html")
 ```
 
 # Automating the whole process
 
-_scan_ works great together with [fastlane](https://fastlane.tools), which connects all deployment tools into one streamlined workflow.
+_scan_ works great together with [_fastlane_](https://fastlane.tools), which connects all deployment tools into one streamlined workflow.
 
 Using _fastlane_ you can define a configuration like
 

@@ -134,7 +134,7 @@ module Fastlane
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :no_update,
                                        env_name: "FL_NO_UPDATE",
-                                       description: "Don't update during this run. Defaults to false. This is used internally",
+                                       description: "Don't update during this run. This is used internally",
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :tools,
