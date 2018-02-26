@@ -48,6 +48,7 @@ module Spaceship
       attr_accessor :invite_count
       attr_accessor :crash_count
 
+      attr_accessor :auto_notify_enabled
       attr_accessor :did_notify
 
       attr_accessor :upload_date
@@ -73,6 +74,7 @@ module Spaceship
         'installCount' => :install_count,
         'inviteCount' => :invite_count,
         'crashCount' => :crash_count,
+        'autoNotifyEnabled' => :auto_notify_enabled,
         'didNotify' => :did_notify,
         'uploadDate' => :upload_date,
         'id' => :id,
