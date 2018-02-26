@@ -12,11 +12,14 @@ module FastlaneCore
   # Specifically, in AnalyticsSession.finalize_session
   # Learn more at https://docs.fastlane.tools/#metrics
   def self.session
-    @session ||= AnalyticsSession.new
+    return nil
+    # https://github.com/fastlane/fastlane/issues/11913
+    # @session ||= AnalyticsSession.new
   end
 
   def self.reset_session
-    @session = nil
+    # https://github.com/fastlane/fastlane/issues/11913
+    # @session = nil
   end
 
   # A directory that's being used to user-wide fastlane configs
