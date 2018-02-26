@@ -92,6 +92,12 @@ module Pilot
         end
       end
 
+      if config[:notify_external_testers]
+        build.auto_notify_enabled = config[:notify_external_testers]
+      else
+        build.auto_notify_enabled = true
+      end
+
       return if config[:skip_submission]
       distribute_build(build, options)
       type = options[:distribute_external] ? 'External' : 'Internal'

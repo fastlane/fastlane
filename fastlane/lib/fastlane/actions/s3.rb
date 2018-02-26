@@ -27,6 +27,7 @@ module Fastlane
       path: '-P'
     }
 
+    # rubocop:disable Metrics/ClassLength
     class S3Action < Action
       def self.run(config)
         # Calling fetch on config so that default values will be used
@@ -324,12 +325,14 @@ module Fastlane
                                        env_name: "",
                                        description: ".ipa file for the build ",
                                        optional: true,
-                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]),
+                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :dsym,
                                        env_name: "",
                                        description: "zipped .dsym package for the build ",
                                        optional: true,
-                                       default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH]),
+                                       default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :upload_metadata,
                                        env_name: "",
                                        description: "Upload relevant metadata for this build",
@@ -365,25 +368,29 @@ module Fastlane
                                        description: "AWS Access Key ID ",
                                        sensitive: true,
                                        optional: true,
-                                       default_value: ENV['AWS_ACCESS_KEY_ID']),
+                                       default_value: ENV['AWS_ACCESS_KEY_ID'],
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :secret_access_key,
                                        env_name: "S3_SECRET_ACCESS_KEY",
                                        description: "AWS Secret Access Key ",
                                        sensitive: true,
                                        optional: true,
-                                       default_value: ENV['AWS_SECRET_ACCESS_KEY']),
+                                       default_value: ENV['AWS_SECRET_ACCESS_KEY'],
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :bucket,
                                        env_name: "S3_BUCKET",
                                        description: "AWS bucket name",
                                        optional: true,
                                        code_gen_sensitive: true,
-                                       default_value: ENV['AWS_BUCKET_NAME']),
+                                       default_value: ENV['AWS_BUCKET_NAME'],
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :region,
                                        env_name: "S3_REGION",
                                        description: "AWS region (for bucket creation) ",
                                        optional: true,
                                        code_gen_sensitive: true,
-                                       default_value: ENV['AWS_REGION']),
+                                       default_value: ENV['AWS_REGION'],
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "S3_PATH",
                                        description: "S3 'path'. Values from Info.plist will be substituted for keys wrapped in {}  ",
@@ -446,5 +453,6 @@ module Fastlane
           "Install using `fastlane add_plugin aws_s3`."
       end
     end
+    # rubocop:enable Metrics/ClassLength
   end
 end

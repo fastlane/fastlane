@@ -107,7 +107,7 @@ module Fastlane
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :mount_path,
                                        env_name: "FL_NEXUS_MOUNT_PATH",
-                                       description: "Nexus mount path. Defaults to /nexus",
+                                       description: "Nexus mount path",
                                        default_value: "/nexus",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :username,

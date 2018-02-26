@@ -5,7 +5,7 @@ module Fastlane
         require_relative '../helper/plugin_scores_helper.rb'
         require "erb"
 
-        plugins = fetch_plugins.sort_by { |v| v.data[:overall_score] }.reverse
+        plugins = fetch_plugins(params[:cache_path]).sort_by { |v| v.data[:overall_score] }.reverse
 
         result = "<!--\nAuto generated, please only modify https://github.com/fastlane/fastlane/blob/master/fastlane/actions/plugin_scores.rb\n-->\n"
         result += "{!docs/setup-fastlane-header.md!}\n"
@@ -18,7 +18,7 @@ module Fastlane
         File.write(File.join("docs", params[:output_path]), result)
       end
 
-      def self.fetch_plugins
+      def self.fetch_plugins(cache_path)
         page = 1
         plugins = []
         loop do
@@ -30,7 +30,7 @@ module Fastlane
           plugins += results.collect do |current|
             next if self.hidden_plugins.include?(current['name'])
 
-            Fastlane::Helper::PluginScoresHelper::FastlanePluginScore.new(current)
+            Fastlane::Helper::PluginScoresHelper::FastlanePluginScore.new(current, cache_path)
           end.compact
 
           page += 1
@@ -43,7 +43,8 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :output_path),
-          FastlaneCore::ConfigItem.new(key: :template_path)
+          FastlaneCore::ConfigItem.new(key: :template_path),
+          FastlaneCore::ConfigItem.new(key: :cache_path)
         ]
       end
 

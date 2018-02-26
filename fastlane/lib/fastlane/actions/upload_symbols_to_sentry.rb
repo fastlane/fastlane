@@ -112,6 +112,7 @@ module Fastlane
                                        env_name: "SENTRY_DSYM_PATH",
                                        description: "Path to your symbols file. For iOS and Mac provide path to app.dSYM.zip",
                                        default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          # validation is done in the action
@@ -120,6 +121,7 @@ module Fastlane
                                        env_name: "SENTRY_DSYM_PATHS",
                                        description: "Path to an array of your symbols file. For iOS and Mac provide path to app.dSYM.zip",
                                        default_value: Actions.lane_context[SharedValues::DSYM_PATHS],
+                                       default_value_dynamic: true,
                                        is_string: false,
                                        optional: true,
                                        verify_block: proc do |value|

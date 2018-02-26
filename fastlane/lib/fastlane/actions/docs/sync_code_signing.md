@@ -56,7 +56,7 @@ Before starting to use _match_, make sure to read the [codesigning.guide](https:
 💥  | Easily reset your existing profiles and certificates if your current account has expired or invalid profiles
 ♻️  | Automatically renew your provisioning profiles to include all your devices using the `--force` option
 👥  | Support for multiple Apple accounts and multiple teams
-✨ | Tightly integrated with [fastlane](https://fastlane.tools) to work seamlessly with [gym](https://docs.fastlane.tools/actions/gym/) and other build tools
+✨ | Tightly integrated with [_fastlane_](https://fastlane.tools) to work seamlessly with [_gym_](https://docs.fastlane.tools/actions/gym/) and other build tools
 
 For more information about the concept, visit [codesigning.guide](https://codesigning.guide).
 
@@ -83,10 +83,10 @@ This will create a `Matchfile` in your current directory (or in your `./fastlane
 Example content (for more advanced setups check out the [fastlane section](#fastlane)):
 
 ```ruby-skip-tests
-git_url "https://github.com/fastlane/certificates"
+git_url("https://github.com/fastlane/certificates")
 
-app_identifier "tools.fastlane.app"
-username "user@fastlane.tools"
+app_identifier("tools.fastlane.app")
+username("user@fastlane.tools")
 ```
 
 #### Important: Use one git branch per team
@@ -138,7 +138,7 @@ If you have several targets with different bundle identifiers, supply them as a 
 fastlane match appstore -a tools.fastlane.app,tools.fastlane.app.watchkitapp
 ```
 
-You can make this even easier using [fastlane](https://fastlane.tools) by creating a `certificates` lane like this:
+You can make this even easier using [_fastlane_](https://fastlane.tools) by creating a `certificates` lane like this:
 
 ```ruby
 lane :certificates do
@@ -196,7 +196,7 @@ Additionally, _match_ creates a nice repo `README.md` for you, making it easy to
 
 #### fastlane
 
-Add _match_ to your `Fastfile` to automatically fetch the latest code signing certificates with [fastlane](https://fastlane.tools).
+Add _match_ to your `Fastfile` to automatically fetch the latest code signing certificates with [_fastlane_](https://fastlane.tools).
 
 ```
 match(type: "appstore")
@@ -252,7 +252,7 @@ _match_ can even use the same one Git repository for all bundle identifiers.
 
 [Docs on how to set up your Xcode project](/codesigning/xcode-project/)
 
-#### To build from the command line using [fastlane](https://fastlane.tools)
+#### To build from the command line using [_fastlane_](https://fastlane.tools)
 
 _match_ automatically pre-fills environment variables with the UUIDs of the correct provisioning profiles, ready to be used in your Xcode project.
 

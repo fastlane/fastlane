@@ -487,7 +487,7 @@ module Spaceship
       # @param is_messages (Bool): True if the screenshot is for iMessage
       def upload_screenshot!(screenshot_path, sort_order, language, device, is_messages)
         raise "sort_order must be higher than 0" unless sort_order > 0
-        raise "sort_order must not be > 5" if sort_order > 5
+        raise "sort_order must not be > 10" if sort_order > 10
         # this will also check both language and device parameters
         device_lang_screenshots = screenshots_data_for_language_and_device(language, device, is_messages)["value"]
 

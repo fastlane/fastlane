@@ -47,6 +47,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :archive_path,
                                        description: 'Path to your xcarchive file. Optional if you use the `xcodebuild` action',
                                        default_value: Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        env_name: 'DSYM_ZIP_XCARCHIVE_PATH',
                                        verify_block: proc do |value|

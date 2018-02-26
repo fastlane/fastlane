@@ -26,7 +26,7 @@ sudo gem install fastlane
 
 ##### Gradle dependency
 ```java
-androidTestCompile 'tools.fastlane:screengrab:x.x.x'
+androidTestCompile('tools.fastlane:screengrab:x.x.x')
 ```
 
 The latest version is [ ![Download](https://api.bintray.com/packages/fastlane/fastlane/screengrab/images/download.svg) ](https://bintray.com/fastlane/fastlane/screengrab/_latestVersion)
@@ -83,16 +83,16 @@ The `Screengrabfile` is written in Ruby, so you may find it helpful to use an ed
 ```ruby-skip-tests
 # remove the leading '#' to uncomment lines
 
-# app_package_name 'your.app.package'
-# use_tests_in_packages ['your.screenshot.tests.package']
+# app_package_name('your.app.package')
+# use_tests_in_packages(['your.screenshot.tests.package'])
 
-# app_apk_path 'path/to/your/app.apk'
-# tests_apk_path 'path/to/your/tests.apk'
+# app_apk_path('path/to/your/app.apk')
+# tests_apk_path('path/to/your/tests.apk')
 
-locales ['en-US', 'fr-FR', 'it-IT']
+locales(['en-US', 'fr-FR', 'it-IT'])
 
 # clear all previously generated screenshots in your local output directory before creating new ones
-clear_previous_screenshots true
+clear_previous_screenshots(true)
 ```
 
 For more information about all available options run

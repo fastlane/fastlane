@@ -84,29 +84,27 @@ Here a few links to get started:
 - Create a new UI Test target in your Xcode project ([top part of this article](https://krausefx.com/blog/run-xcode-7-ui-tests-from-the-command-line))
 - Run `fastlane snapshot init` in your project folder
 - Add the ./SnapshotHelper.swift to your UI Test target (You can move the file anywhere you want)
- - **Note:** if you're using Xcode 8, add the ./SnapshotHelperXcode8.swift to your UI Test target
-- (Objective C only) add the bridging header to your test class.
- - `#import "MYUITests-Swift.h"`
- - The bridging header is named after your test target with -Swift.h appended.
+  - (Xcode 8 only) add the ./SnapshotHelperXcode8.swift to your UI Test target
+- (Objective C only) add the bridging header to your test class:
+  - `#import "MYUITests-Swift.h"`  
+    (The bridging header is named after your test target with `-Swift.h` appended.)
 - In your UI Test class, click the `Record` button on the bottom left and record your interaction
 - To take a snapshot, call the following between interactions
- -  Swift: `snapshot("01LoginScreen")`
- -  Objective C: `[Snapshot snapshot:@"01LoginScreen" timeWaitingForIdle:10];`
-- Add the following code to your `setUp()` method
-
-**Swift**
-```swift
-let app = XCUIApplication()
-setupSnapshot(app)
-app.launch()
-```
-
-**Objective C**
-```objective-c
-XCUIApplication *app = [[XCUIApplication alloc] init];
-[Snapshot setupSnapshot:app];
-[app launch];
-```
+  -  Swift: `snapshot("01LoginScreen")`
+  -  Objective C: `[Snapshot snapshot:@"01LoginScreen" timeWaitingForIdle:10];`
+- Add the following code to your `setUp()` method:
+  - Swift:
+    ```swift
+    let app = XCUIApplication()
+    setupSnapshot(app)
+    app.launch()
+    ```
+  - Objective C:  
+    ```objective-c
+    XCUIApplication *app = [[XCUIApplication alloc] init];
+    [Snapshot setupSnapshot:app];
+    [app launch];
+    ```
 
 _Make sure you only have one `launch` call in your test class, as Xcode adds one automatically on new test files._
 
@@ -122,7 +120,7 @@ To quick start your UI tests, you can use the UI Test recorder. You only have to
 fastlane snapshot
 ```
 
-Your screenshots will be stored in the `./screenshots/` folder by default (or `./fastlane/screenshots` if you're using [fastlane](https://fastlane.tools))
+Your screenshots will be stored in the `./screenshots/` folder by default (or `./fastlane/screenshots` if you're using [_fastlane_](https://fastlane.tools))
 
 New with Xcode 9, *snapshot* can run multiple simulators concurrently. This is the default behavior in order to take your screenshots as quickly as possible. This can be disabled to run each device, one at a time, by setting the `:concurrent_simulators` option to `false`.
 
@@ -185,7 +183,7 @@ The `Snapfile` can contain all the options that are also available on `fastlane 
 
 
 ```ruby-skip-tests
-scheme "UITests"
+scheme("UITests")
 
 devices([
   "iPhone 6",
@@ -204,11 +202,11 @@ languages([
 launch_arguments(["-username Felix"])
 
 # The directory in which the screenshots should be stored
-output_directory './screenshots'
+output_directory('./screenshots')
 
-clear_previous_screenshots true
+clear_previous_screenshots(true)
 
-add_photos ["MyTestApp/Assets/demo.jpg"]
+add_photos(["MyTestApp/Assets/demo.jpg"])
 ```
 
 ### Completely reset all simulators
@@ -222,6 +220,10 @@ fastlane snapshot reset_simulators
 **Warning**: This will delete **all** your simulators and replace by new ones! This is useful, if you run into weird problems when running _snapshot_.
 
 You can use the environment variable `SNAPSHOT_FORCE_DELETE` to stop asking for confirmation before deleting.
+
+```no-highlight
+SNAPSHOT_FORCE_DELETE=1 fastlane snapshot reset_simulators
+```
 
 ## Update snapshot helpers
 
@@ -303,7 +305,7 @@ Radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152) has be
 
 ## Frame the screenshots
 
-If you want to add frames around the screenshots and even put a title on top, check out [frameit](https://docs.fastlane.tools/actions/frameit/).
+If you want to add frames around the screenshots and even put a title on top, check out [_frameit_](https://docs.fastlane.tools/actions/frameit/).
 
 ## Available language codes
 ```ruby

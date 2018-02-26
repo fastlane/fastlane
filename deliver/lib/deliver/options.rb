@@ -17,14 +17,16 @@ module Deliver
                                      short_option: "-u",
                                      env_name: "DELIVER_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: user),
+                                     default_value: user,
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "DELIVER_APP_IDENTIFIER",
                                      description: "The bundle identifier of your app",
                                      optional: true,
                                      code_gen_sensitive: true,
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :app,
                                      short_option: "-p",
                                      env_name: "DELIVER_APP_ID",
@@ -44,6 +46,7 @@ module Deliver
                                      description: "Path to your ipa file",
                                      code_gen_sensitive: true,
                                      default_value: Dir["*.ipa"].sort_by { |x| File.mtime(x) }.last,
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find ipa file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with?(".ipa")
@@ -59,6 +62,7 @@ module Deliver
                                      description: "Path to your pkg file",
                                      code_gen_sensitive: true,
                                      default_value: Dir["*.pkg"].sort_by { |x| File.mtime(x) }.last,
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find pkg file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be a pkg file") unless value.end_with?(".pkg")
@@ -171,6 +175,7 @@ module Deliver
                                      is_string: false, # as we also allow integers, which we convert to strings anyway
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
                                      end),
@@ -181,6 +186,7 @@ module Deliver
                                      optional: true,
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                      end),
@@ -192,6 +198,7 @@ module Deliver
                                      is_string: true,
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
@@ -202,6 +209,7 @@ module Deliver
                                      optional: true,
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),

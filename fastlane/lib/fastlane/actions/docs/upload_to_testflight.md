@@ -26,7 +26,7 @@ _pilot_ uses [spaceship.airforce](https://spaceship.airforce) to interact with i
 
 # Usage
 
-For all commands you can specify the Apple ID to use using `-u felix@krausefx.com`. If you execute _pilot_ in a project already using [fastlane](https://fastlane.tools) the username and app identifier will automatically be determined.
+For all commands you can specify the Apple ID to use using `-u felix@krausefx.com`. If you execute _pilot_ in a project already using [_fastlane_](https://fastlane.tools) the username and app identifier will automatically be determined.
 
 ## Uploading builds
 
@@ -61,7 +61,7 @@ _pilot_ does all kinds of magic for you:
 - Automatically detects the bundle identifier from your `ipa` file
 - Automatically fetch the AppID of your app based on the bundle identifier
 
-_pilot_ uses [spaceship](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary. Because iTunes Transporter's upload capability is only supported on OS X, `pilot upload` does not work on Linux, as described [in this issue](https://github.com/fastlane/fastlane/issues/5789)
+_pilot_ uses [_spaceship_](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary. Because iTunes Transporter's upload capability is only supported on OS X, `pilot upload` does not work on Linux, as described [in this issue](https://github.com/fastlane/fastlane/issues/5789)
 
 ## List builds
 

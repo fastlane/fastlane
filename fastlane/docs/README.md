@@ -8,7 +8,7 @@
 
 ## Fastfile
 
-The Fastfile is used to configure [fastlane](https://fastlane.tools). Open it in your favourite text editor, using Ruby syntax highlighting.
+The Fastfile is used to configure [_fastlane_](https://fastlane.tools). Open it in your favourite text editor, using Ruby syntax highlighting.
 
 Defining lanes is easy. 
 
@@ -38,11 +38,11 @@ It will only be called, if the selected lane was executed **successfully**.
 
 ```ruby
 after_all do |lane|
-  say "Successfully finished deployment (#{lane})!"
+  say("Successfully finished deployment (#{lane})!")
   slack(
     message: "Successfully submitted new App Update"
   )
-  sh "./send_screenshots_to_team.sh" # Example
+  sh("./send_screenshots_to_team.sh") # Example
 end
 ```
 
@@ -63,7 +63,7 @@ end
 
 ## Extensions
 
-Why only use the default actions? Create your own to extend the functionality of `fastlane`.
+Why only use the default actions? Create your own to extend the functionality of _fastlane_.
 
 The build step you create will behave exactly like the built in actions.
 
@@ -71,7 +71,7 @@ Just run `fastlane new_action`. Then enter the name of the action and edit the g
 
 From then on, you can just start using your action in your `Fastfile`.
 
-If you think your extension can be used by other developers as well, let me know, and we can bundle it with `fastlane`.
+If you think your extension can be used by other developers as well, let me know, and we can bundle it with _fastlane_.
 
 To call another action from within your action, just use the same code you would use in a `Fastfile`:
 

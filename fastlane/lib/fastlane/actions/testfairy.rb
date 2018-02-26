@@ -141,6 +141,7 @@ module Fastlane
                                        env_name: 'TESTFAIRY_IPA_PATH',
                                        description: 'Path to your IPA file for iOS or APK for Android',
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
                                        end),
@@ -150,6 +151,7 @@ module Fastlane
                                        env_name: "FL_TESTFAIRY_SYMBOLS_FILE",
                                        description: "Symbols mapping file",
                                        default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find dSYM file at path '#{value}'") unless File.exist?(value)
                                        end),
@@ -178,7 +180,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :auto_update,
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_AUTO_UPDATE",
-                                       description: "Allows an easy upgrade of all users to the current version. The default is 'off', to enable set as 'on'",
+                                       description: "Allows an easy upgrade of all users to the current version. To enable set to 'on'",
                                        default_value: 'off'),
           # not well documented
           FastlaneCore::ConfigItem.new(key: :notify,
