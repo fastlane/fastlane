@@ -338,8 +338,8 @@ lane :update_docs do
   verify_env_variables
 
   template_path = File.expand_path("./assets/render_plugin.md.erb")
-  plugin_scores_cache_path = File.expand_path("./plugin_scores_cache.yml")
   clone_docs do
+    plugin_scores_cache_path = File.expand_path("./plugin_scores_cache.yml")
     docs_path = generate_markdown_docs(target_path: ".")
     yml_path = File.expand_path("./mkdocs.yml")
     actions_md_path = File.expand_path(File.join(docs_path, "docs/actions.md"))
@@ -372,7 +372,7 @@ lane :update_docs do
 
       Dir.chdir("fastlane") do # this is an assumption of fastlane, that we have to .. when shelling out
         # Commit the changes
-        changes_to_commit = [actions_md_path, "Gemfile.lock", plugins_path, yml_path] + action_docs + custom_assets
+        changes_to_commit = [plugin_scores_cache_path, actions_md_path, "Gemfile.lock", plugins_path, yml_path] + action_docs + custom_assets
         git_add(path: changes_to_commit)
         git_commit(path: changes_to_commit,
                 message: "Update docs for latest fastlane release (actions.md, available-plugins.md) 🚀")
