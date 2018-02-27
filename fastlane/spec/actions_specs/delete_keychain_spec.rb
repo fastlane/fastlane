@@ -1,7 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Delete keychain Integration" do
-
       it "works with keychain name found locally" do
         keychain = File.expand_path('test.keychain')
         keychains = double("keychains")
