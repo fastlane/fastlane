@@ -53,6 +53,7 @@ module Fastlane
                                        env_name: "FL_ZIP_VERBOSE",
                                        description: "Enable verbose output of zipped file",
                                        default_value: true,
+                                       type: Boolean,
                                        optional: true)
         ]
       end
