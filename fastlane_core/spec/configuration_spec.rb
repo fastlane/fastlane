@@ -391,6 +391,52 @@ describe FastlaneCore do
             @config = FastlaneCore::Configuration.create([c], {})
           end.to raise_error("Invalid default value for output, doesn't match verify_block")
         end
+
+        it "calls verify_block for non nil values" do
+          c = FastlaneCore::ConfigItem.new(key: :param,
+                                      env_name: "PARAM",
+                                   description: "Description",
+                                          type: Object,
+                                  verify_block: proc do |value|
+                                    UI.user_error!("'#{value}' is not valid!")
+                                  end)
+          [true, false, '', 'a string', ['an array'], {}, :hash].each do |value|
+            expect do
+              c.valid?(value)
+            end.to raise_error("'#{value}' is not valid!")
+          end
+        end
+
+        it "passes for nil values" do
+          c = FastlaneCore::ConfigItem.new(key: :param,
+                                      env_name: "param",
+                                   description: "Description",
+                                  verify_block: proc do |value|
+                                    UI.user_error!("'#{value}' is not valid!")
+                                  end)
+
+          expect(c.valid?(nil)).to eq(true)
+        end
+
+        it "verifies type" do
+          c = FastlaneCore::ConfigItem.new(key: :param,
+                                      env_name: "param",
+                                          type: Float,
+                                   description: "Description")
+          expect do
+            c.valid?('a string')
+          end.to raise_error("'param' value must be a Float! Found String instead.")
+        end
+
+        it "skips type verification" do
+          c = FastlaneCore::ConfigItem.new(key: :param,
+                                      env_name: "param",
+                                          type: Float,
+                          skip_type_validation: true,
+                                   description: "Description")
+
+          expect(c.valid?('a string')).to eq(true)
+        end
       end
 
       describe "deprecation", focus: true do
