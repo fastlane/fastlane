@@ -205,22 +205,21 @@ module FastlaneCore
     # Raises an exception if the value is invalid
     def valid?(value)
       # we also allow nil values, which do not have to be verified.
-      if value
-        # Verify that value is the type that we're expecting, if we are expecting a type
+      return true if value.nil?
 
-        if data_type == Fastlane::Boolean
-          ensure_boolean_type_passes_validation(value)
-        else
-          ensure_generic_type_passes_validation(value)
-        end
+      # Verify that value is the type that we're expecting, if we are expecting a type
+      if data_type == Fastlane::Boolean
+        ensure_boolean_type_passes_validation(value)
+      else
+        ensure_generic_type_passes_validation(value)
+      end
 
-        if @verify_block
-          begin
-            @verify_block.call(value)
-          rescue => ex
-            UI.error("Error setting value '#{value}' for option '#{@key}'")
-            raise Interface::FastlaneError.new, ex.to_s
-          end
+      if @verify_block
+        begin
+          @verify_block.call(value)
+        rescue => ex
+          UI.error("Error setting value '#{value}' for option '#{@key}'")
+          raise Interface::FastlaneError.new, ex.to_s
         end
       end
 
