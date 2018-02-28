@@ -99,6 +99,9 @@ module FastlaneCore
     end
 
     def content_error(content, error_line)
+      error_line = error_line.to_i
+      return unless error_line > 0
+      
       contents = content.split(/\r?\n/).map(&:chomp)
 
       start_line = error_line - 2 < 1 ? 1 : error_line - 2
