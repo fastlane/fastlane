@@ -98,20 +98,18 @@ module FastlaneCore
       success("-" * i)
     end
 
-    def content_error(path, error_line)
-      content = File.readlines(path)
+    def content_error(content, error_line)
+      contents = content.split(/\r?\n/).map(&:chomp)
 
       start_line = error_line - 2 < 1 ? 1 : error_line - 2
-      end_line = error_line + 2 < content.length ? error_line + 2 : content.length
+      end_line = error_line + 2 < contents.length ? error_line + 2 : contents.length
 
-      UI.error("Error in your #{File.basename(path)} at line #{error_line}\n")
       Range.new(start_line, end_line).each do |line|
         str = line == error_line ? " => " : "    "
         str << line.to_s.rjust(Math.log10(end_line) + 1)
-        str << ":\t\t#{content[line - 1].chomp}"
+        str << ":\t\t#{contents[line - 1]}"
         puts(str.red)
       end
-      puts("") if end_line == error_line
     end
 
     #####################################################

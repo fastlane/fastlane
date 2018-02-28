@@ -49,7 +49,8 @@ module FastlaneCore
         print_resulting_config_values unless skip_printing_values # only on success
       rescue SyntaxError => ex
         line = ex.to_s.match(/\(eval\):(\d+)/)[1].to_i
-        UI.content_error(path, line)
+        UI.error("Error in your #{File.basename(path)} at line #{line}\n")
+        UI.content_error(content, line)
         UI.user_error!("Syntax error in your configuration file '#{path}' on line #{line}: #{ex}")
       rescue => ex
         raise ExceptionWhileParsingError.new(ex, self.options), "Error while parsing config file at #{path}"

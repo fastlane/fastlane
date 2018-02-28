@@ -57,7 +57,8 @@ module Fastlane
           # rubocop:enable Security/Eval
         rescue SyntaxError => ex
           line = ex.to_s.match(/#{Regexp.escape(relative_path)}:(\d+)/)[1].to_i
-          UI.content_error(path, line)
+          UI.error("Error in your Fastfile at line #{line}\n")
+          UI.content_error(data, line)
           UI.user_error!("Syntax error in your Fastfile on line #{line}: #{ex}")
         end
       end

@@ -78,7 +78,7 @@ module FastlaneCore
       not_implemented(__method__)
     end
 
-    def content_error(path, error_line)
+    def content_error(content, error_line)
       not_implemented(__method__)
     end
 
