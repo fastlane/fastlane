@@ -248,6 +248,16 @@ match(app_identifier: ["tools.fastlane.app", "tools.fastlane.app.today_widget"],
 
 _match_ can even use the same one Git repository for all bundle identifiers.
 
+##### Templates (aka: custom entitlements)
+
+Match can generate profiles that contain custom entitlements by passing in the entitlement's name with the `template_name` parameter.
+
+```
+match(git_url: "https://github.com/fastlane/certificates",
+      type: "development",
+      template_name: "Apple Pay Pass Suppression Development")
+```
+
 ### Setup Xcode project
 
 [Docs on how to set up your Xcode project](/codesigning/xcode-project/)
