@@ -156,7 +156,7 @@ module Match
                                      end),
         FastlaneCore::ConfigItem.new(key: :template_name,
                                      env_name: "MATCH_PROVISIONING_PROFILE_TEMPLATE_NAME",
-                                     description: "The name of provisioning profile template. If the developer account has provisioning profile templates, template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile",
+                                     description: "The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. \"Apple Pay Pass Suppression Development\")",
                                      optional: true,
                                      default_value: nil)
       ]
