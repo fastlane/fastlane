@@ -78,6 +78,10 @@ module FastlaneCore
       not_implemented(__method__)
     end
 
+    # Print lines of content around specific line where
+    #   failed to parse.
+    #
+    #   This message will be shown as error
     def content_error(content, error_line)
       not_implemented(__method__)
     end
