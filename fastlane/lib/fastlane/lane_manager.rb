@@ -58,7 +58,7 @@ module Fastlane
       rescue NameError => ex
         print_lane_context
         line = ex.backtrace.first.match("Fastfile:(\\d+):")[1]
-        UI.error("Error in your Fastfile at line #{line}\n")
+        UI.error("Error in your Fastfile at line #{line}")
         UI.content_error(File.read(FastlaneCore::FastlaneFolder.fastfile_path, encoding: "utf-8"), line)
         e = ex
       rescue Exception => ex # rubocop:disable Lint/RescueException
