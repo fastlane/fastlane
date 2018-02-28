@@ -5,7 +5,7 @@ describe Fastlane do
       it "doesn't work outside CI" do
         stub_const("ENV", {})
 
-        expect(UI).to receive(:message).with("Currently not running on CI system, skipping travis setup")
+        expect(UI).to receive(:important).with("Currently not running on CI system, skipping travis setup")
 
         Fastlane::FastFile.new.parse("lane :test do
           setup_travis

@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         # Stop if not executed by CI
         if !Helper.ci? && !params[:force]
-          UI.message("Currently not running on CI system, skipping travis setup")
+          UI.important("Currently not running on CI system, skipping travis setup")
           return
         end
 
