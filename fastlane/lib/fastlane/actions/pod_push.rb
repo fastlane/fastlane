@@ -2,11 +2,15 @@ module Fastlane
   module Actions
     class PodPushAction < Action
       def self.run(params)
+        command = ''
+
+        command << "bundle exec" if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
+
         if params[:repo]
           repo = params[:repo]
-          command = "pod repo push #{repo}"
+          command << "pod repo push #{repo}"
         else
-          command = 'pod trunk push'
+          command << 'pod trunk push'
         end
 
         if params[:path]
@@ -54,6 +58,10 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
+                                         description: "Use bundle exec when there is a Gemfile presented",
+                                         is_string: false,
+                                         default_value: false),
           FastlaneCore::ConfigItem.new(key: :path,
                                        description: "The Podspec you want to push",
                                        optional: true,
