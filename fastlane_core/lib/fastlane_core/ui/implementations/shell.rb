@@ -101,7 +101,7 @@ module FastlaneCore
     def content_error(content, error_line)
       error_line = error_line.to_i
       return unless error_line > 0
-      
+
       contents = content.split(/\r?\n/).map(&:chomp)
 
       start_line = error_line - 2 < 1 ? 1 : error_line - 2
@@ -110,8 +110,8 @@ module FastlaneCore
       Range.new(start_line, end_line).each do |line|
         str = line == error_line ? " => " : "    "
         str << line.to_s.rjust(Math.log10(end_line) + 1)
-        str << ":\t\t#{contents[line - 1]}"
-        puts(str.red)
+        str << ":\t#{contents[line - 1]}"
+        error(str)
       end
     end
 
