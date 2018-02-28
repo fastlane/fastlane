@@ -55,21 +55,18 @@ module Fastlane
       e = nil
       begin
         ff.runner.execute(lane, platform, parameters)
+      rescue NameError => ex
+        print_lane_context
+        line = ex.backtrace.first.match("Fastfile:(\\d+):")[1].to_i
+        UI.content_error(FastlaneCore::FastlaneFolder.fastfile_path, line)
+        e = ex
       rescue Exception => ex # rubocop:disable Lint/RescueException
         # We also catch Exception, since the implemented action might send a SystemExit signal
         # (or similar). We still want to catch that, since we want properly finish running fastlane
         # Tested with `xcake`, which throws a `Xcake::Informative` object
 
         print_lane_context
-
-        if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
-          matched_fastfile_error = ex.backtrace.first.match("Fastfile:(\\d+):")
-          if matched_fastfile_error
-            print_fastfile_lines(matched_fastfile_error[1].to_i)
-          else
-            UI.error(ex.to_s)
-          end
-        end
+        UI.error(ex.to_s) if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
         e = ex
       end
 
@@ -135,20 +132,6 @@ module Fastlane
         return platform, lane_name # yeah
       else
         UI.user_error!("Run `fastlane` the next time you need to build, test or release your app 🚀")
-      end
-    end
-
-    def self.print_fastfile_lines(error_line)
-      content = File.readlines(FastlaneCore::FastlaneFolder.fastfile_path)
-
-      start_line = 1 > error_line - 2 ? 1 : error_line - 2
-      end_line = error_line + 2 < content.length ? error_line + 2 : content.length
-      UI.error "Error at line #{error_line} in Fastfile"
-      Range.new(start_line, end_line).each do |line|
-        str = line == error_line ? " => " : "    "
-        str << line.to_s.rjust(Math.log10(end_line) + 1)
-        str << ":\t\t#{content[line - 1].chomp}"
-        puts(str.red)
       end
     end
   end
