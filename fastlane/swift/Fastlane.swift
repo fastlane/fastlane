@@ -2215,6 +2215,7 @@ func pilot(username: String,
            updateBuildInfoOnUpload: Bool = false,
            appleId: String? = nil,
            distributeExternal: Bool = false,
+           notifyExternalTesters: Bool = true,
            demoAccountRequired: Bool = false,
            firstName: String? = nil,
            lastName: String? = nil,
@@ -2239,6 +2240,7 @@ func pilot(username: String,
                                                                                        RubyCommand.Argument(name: "update_build_info_on_upload", value: updateBuildInfoOnUpload),
                                                                                        RubyCommand.Argument(name: "apple_id", value: appleId),
                                                                                        RubyCommand.Argument(name: "distribute_external", value: distributeExternal),
+                                                                                       RubyCommand.Argument(name: "notify_external_testers", value: notifyExternalTesters),
                                                                                        RubyCommand.Argument(name: "demo_account_required", value: demoAccountRequired),
                                                                                        RubyCommand.Argument(name: "first_name", value: firstName),
                                                                                        RubyCommand.Argument(name: "last_name", value: lastName),
@@ -2254,9 +2256,11 @@ func pilot(username: String,
   _ = runner.executeCommand(command)
 }
 func pluginScores(outputPath: String,
-                  templatePath: String) {
+                  templatePath: String,
+                  cachePath: String) {
   let command = RubyCommand(commandID: "", methodName: "plugin_scores", className: nil, args: [RubyCommand.Argument(name: "output_path", value: outputPath),
-                                                                                               RubyCommand.Argument(name: "template_path", value: templatePath)])
+                                                                                               RubyCommand.Argument(name: "template_path", value: templatePath),
+                                                                                               RubyCommand.Argument(name: "cache_path", value: cachePath)])
   _ = runner.executeCommand(command)
 }
 func podLibLint(useBundleExec: Bool = true,
@@ -3255,6 +3259,7 @@ func testflight(username: String,
                 updateBuildInfoOnUpload: Bool = false,
                 appleId: String? = nil,
                 distributeExternal: Bool = false,
+                notifyExternalTesters: Bool = true,
                 demoAccountRequired: Bool = false,
                 firstName: String? = nil,
                 lastName: String? = nil,
@@ -3279,6 +3284,7 @@ func testflight(username: String,
                                                                                             RubyCommand.Argument(name: "update_build_info_on_upload", value: updateBuildInfoOnUpload),
                                                                                             RubyCommand.Argument(name: "apple_id", value: appleId),
                                                                                             RubyCommand.Argument(name: "distribute_external", value: distributeExternal),
+                                                                                            RubyCommand.Argument(name: "notify_external_testers", value: notifyExternalTesters),
                                                                                             RubyCommand.Argument(name: "demo_account_required", value: demoAccountRequired),
                                                                                             RubyCommand.Argument(name: "first_name", value: firstName),
                                                                                             RubyCommand.Argument(name: "last_name", value: lastName),
@@ -3621,6 +3627,7 @@ func uploadToTestflight(username: String,
                         updateBuildInfoOnUpload: Bool = false,
                         appleId: String? = nil,
                         distributeExternal: Bool = false,
+                        notifyExternalTesters: Bool = true,
                         demoAccountRequired: Bool = false,
                         firstName: String? = nil,
                         lastName: String? = nil,
@@ -3645,6 +3652,7 @@ func uploadToTestflight(username: String,
                                                                                                       RubyCommand.Argument(name: "update_build_info_on_upload", value: updateBuildInfoOnUpload),
                                                                                                       RubyCommand.Argument(name: "apple_id", value: appleId),
                                                                                                       RubyCommand.Argument(name: "distribute_external", value: distributeExternal),
+                                                                                                      RubyCommand.Argument(name: "notify_external_testers", value: notifyExternalTesters),
                                                                                                       RubyCommand.Argument(name: "demo_account_required", value: demoAccountRequired),
                                                                                                       RubyCommand.Argument(name: "first_name", value: firstName),
                                                                                                       RubyCommand.Argument(name: "last_name", value: lastName),
@@ -3809,4 +3817,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.6]
+// FastlaneRunnerAPIVersion [0.9.7]
