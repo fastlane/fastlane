@@ -33,6 +33,14 @@ module FastlaneCore
     def execute(command, hide_output)
       return command if Helper.test?
 
+      # Workaround because the traditional transporter broke on 1st March 2018
+      # More information https://github.com/fastlane/fastlane/issues/11958
+      # As there was no communication from Apple, we don't know if this is a temporary
+      # server outage, or something they changed without giving a heads-up
+      if ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"].to_s.length == 0
+        ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV"
+      end
+
       @errors = []
       @warnings = []
       @all_lines = []
