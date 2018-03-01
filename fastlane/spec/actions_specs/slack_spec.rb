@@ -64,7 +64,7 @@ describe Fastlane do
           channel: channel,
           default_payloads: [:lane],
           attachment_properties: {
-            thumb_url: 'https://example.com/path/to/thumb.png',
+            icon_url: 'https://example.com/path/to/icon.png',
             fields: [{
               title: 'My Field',
               value: 'My Value',
@@ -84,7 +84,7 @@ describe Fastlane do
         expect(fields[1][:value]).to eq('My Value')
         expect(fields[1][:short]).to eq(true)
 
-        expect(attachments[:thumb_url]).to eq('https://example.com/path/to/thumb.png')
+        expect(attachments[:icon_url]).to eq('https://example.com/path/to/icon.png')
       end
 
       it "parses default_payloads from a comma delimited string" do
