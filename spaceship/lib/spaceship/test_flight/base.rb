@@ -8,6 +8,10 @@ module Spaceship
         @client ||= Client.client_with_authorization_from(Spaceship::Tunes.client)
       end
 
+      def self.invalidate_client
+        @client = nil
+      end
+
       ##
       # Have subclasses inherit the client from their superclass
       #
