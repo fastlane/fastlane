@@ -28,7 +28,7 @@ module Fastlane
 
         if devices
           device_objs = devices.map do |k, v|
-            UI.user_error!("Passed invalid UDID: #{v} for device: #{k}") unless UDID_REGEXP =~ v
+            UI.user_error!("Passed invalid UDID: #{v} for device: #{k}") unless udid_regexp =~ v
             next if existing_devices.map(&:udid).include?(v)
             Spaceship::Device.create!(name: k, udid: v, mac: mac)
           end
@@ -42,7 +42,7 @@ module Fastlane
             next if existing_devices.map(&:udid).include?(device[0])
 
             UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (http://devimages.apple.com/downloads/devices/Multiple-Upload-Samples.zip)") unless device.count == 2
-            UI.user_error!("Passed invalid UDID: #{device[0]} for device: #{device[1]}") unless UDID_REGEXP =~ device[0]
+            UI.user_error!("Passed invalid UDID: #{device[0]} for device: #{device[1]}") unless udid_regexp =~ device[0]
 
             Spaceship::Device.create!(name: device[1], udid: device[0], mac: mac)
           end
