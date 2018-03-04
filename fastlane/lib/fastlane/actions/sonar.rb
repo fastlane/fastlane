@@ -31,7 +31,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Invokes sonar-scanner to run SonarQube analysis on unit test results, coverage reports, and security vulnerabilities"
+        "Invokes sonar-scanner to run SonarQube analysis in the project workspace"
       end
 
       def self.details
