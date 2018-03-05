@@ -15,7 +15,6 @@ This gem contains all shared classes and code:
 - Checking for updates for a specific gem and showing an update message
 - All output of all tools with different logging levels
 - Finding of the current Xcode and iTunes Transporter path
-- Crash Reporting
 - More helper methods and classes
 
 You can hide the inline changelog by setting the `FASTLANE_HIDE_CHANGELOG` environment variable

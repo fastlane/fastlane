@@ -1,7 +1,6 @@
 require 'precheck/options'
 require 'precheck/runner'
 require 'fastlane_core/configuration/configuration'
-require 'fastlane_core/crash_reporter/crash_reporter'
 require 'fastlane_core/ipa_upload_package_builder'
 require 'fastlane_core/pkg_upload_package_builder'
 require 'fastlane_core/itunes_transporter'
@@ -78,9 +77,6 @@ module Deliver
         UI.error("fastlane precheck just tried to inspect your app's metadata for App Store guideline violations and ran into a problem. We're not sure what the problem was, but precheck failed to finished. You can run it in verbose mode if you want to see the whole error. We'll have a fix out soon 🚀")
         UI.verbose(ex.inspect)
         UI.verbose(ex.backtrace.join("\n"))
-
-        # always report this back, since this is a new tool, we don't want to crash, but we still want to see this
-        FastlaneCore::CrashReporter.report_crash(exception: ex)
       end
 
       return precheck_success
