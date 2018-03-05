@@ -336,7 +336,7 @@ desc "Update the actions.md on https://docs.fastlane.tools"
 desc "This will also automatically submit a pull request to fastlane/docs"
 lane :update_docs do |options|
   debug = options[:debug]
-  verify_env_variables
+  verify_env_variables unless debug
 
   template_path = File.expand_path("./assets/render_plugin.md.erb")
   clone_docs(debug: debug) do
