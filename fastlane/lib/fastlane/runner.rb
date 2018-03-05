@@ -266,14 +266,11 @@ module Fastlane
       rescue FastlaneCore::Interface::FastlaneCommonException => e # these are exceptions that we dont count as crashes
         raise e
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
-        FastlaneCore::CrashReporter.report_crash(exception: e)
         action_completed(method_sym.to_s, status: FastlaneCore::ActionCompletionStatus::USER_ERROR, exception: e)
         raise e
       rescue Exception => e # rubocop:disable Lint/RescueException
         # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         # Catches all exceptions, since some plugins might use system exits to get out
-        FastlaneCore::CrashReporter.report_crash(exception: e)
-
         action_completed(method_sym.to_s, status: FastlaneCore::ActionCompletionStatus::FAILED, exception: e)
         raise e
       end
