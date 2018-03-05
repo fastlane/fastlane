@@ -131,6 +131,7 @@ The bundle identifier (e.g. "com.krausefx.app")
 Your Apple ID email address
 
 ##### ipa
+
 A path to a signed ipa file, which will be uploaded. If you don't provide this value, only app metadata will be uploaded. If you want to submit the app for review make sure to either use `fastlane deliver --submit_for_review` or add `submit_for_review true` to your `Deliverfile`
 
 ```ruby-skip-tests
@@ -411,8 +412,46 @@ _deliver_ uses the following techniques under the hood:
 
 ## Available language codes
 ```no-highlight
-no, en-US, en-CA, fi, ru, zh-Hans, nl-NL, zh-Hant, en-AU, id, de-DE, sv, ko, ms, pt-BR, el, es-ES, it, fr-CA, es-MX, pt-PT, vi, th, ja, fr-FR, da, tr, en-GB
+<%= FastlaneCore::Languages::ALL_LANGUAGES.join(', ') %>
 ```
+
+## Available Metadata Folder Options
+
+_deliver_ allows for metadata to be set through `.txt` files in the metadata folder. This metadata folder location is defaulted to `./fastlane/metadata` but can be overridden through the `metadata_path` parameter. Below are all allowed metadata options.
+
+<%- require 'deliver' -%>
+
+### Non-Localized Metadata
+
+Key | Editable While Live | Directory | Filename
+----|--------|--------|--------
+<%- (Deliver::UploadMetadata::NON_LOCALISED_VERSION_VALUES + Deliver::UploadMetadata::NON_LOCALISED_APP_VALUES).each do |value| -%>
+  `<%= value %>` | <%= Deliver::UploadMetadata::NON_LOCALISED_LIVE_VALUES.include?(value) ? 'Yes' : 'No' %> | `<metadata_path>` | `<%= value %>.txt`
+<%- end %>
+
+### Localized Metadata
+
+Key | Editable While Live | Directory | Filename
+----|--------|--------|--------
+<%- (Deliver::UploadMetadata::LOCALISED_APP_VALUES + Deliver::UploadMetadata::LOCALISED_VERSION_VALUES).each do |value| -%>
+  `<%= value %>` | <%= Deliver::UploadMetadata::LOCALISED_LIVE_VALUES.include?(value) ? 'Yes' : 'No' %> | `<metadata_path>/<lang>/` | `<%= value %>.txt`
+<%- end %>
+
+### Trade Representative Contact Information Metadata
+
+Key | Editable While Live | Directory | Filename
+----|--------|--------|--------
+<%- Deliver::UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.each do |key, value| -%>
+  `<%= value %>` | Yes | `<metadata_path>/<%= Deliver::UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR %>` | `<%= value %>.txt`
+<%- end %>
+
+### Review Information Metadata
+
+Key | Editable While Live | Directory | Filename
+----|--------|--------|--------
+<%- Deliver::UploadMetadata::REVIEW_INFORMATION_VALUES.each do |key, value| -%>
+  `<%= value %>` | Yes | `<metadata_path>/<%= Deliver::UploadMetadata::REVIEW_INFORMATION_DIR %>` | `<%= value %>.txt`
+<%- end %>
 
 ## Reference
 

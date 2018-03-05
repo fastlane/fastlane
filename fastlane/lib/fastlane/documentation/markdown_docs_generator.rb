@@ -54,6 +54,19 @@ module Fastlane
         UI.verbose("Using custom md file for action #{action.action_name}")
         return File.read(custom_file_location)
       end
+      return load_custom_action_md_erb(action)
+    end
+
+    def load_custom_action_md_erb(action)
+      # check if there is a custom detail view as markdown ERB available in the fastlane code base
+      custom_file_location = File.join(Fastlane::ROOT, custom_action_docs_path, "#{action.action_name}.md.erb")
+      if File.exist?(custom_file_location)
+        UI.verbose("Using custom md.erb file for action #{action.action_name}")
+
+        result = ERB.new(File.read(custom_file_location), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
+
+        return result
+      end
       return nil
     end
 
@@ -71,6 +84,8 @@ module Fastlane
       all_actions_ref_yml = []
       FileUtils.mkdir_p(File.join(docs_dir, "actions"))
       ActionsList.all_actions do |action|
+        @action = action # to provide a reference in the .html.erb template
+
         # Make sure to always assign `@custom_content`, as we're in a loop and `@` is needed for the `erb`
         @custom_content = load_custom_action_md(action)
 
@@ -83,7 +98,6 @@ module Fastlane
         end
 
         template = File.join(Fastlane::ROOT, "lib/assets/ActionDetails.md.erb")
-        @action = action # to provide a reference in the .html.erb template
         result = ERB.new(File.read(template), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
         file_name = File.join("actions", "#{action.action_name}.md")
