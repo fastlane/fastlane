@@ -38,10 +38,12 @@ class Exception
   end
 
   def fastlane_should_report_metrics?
-    if fastlane_crash_came_from_plugin? || fastlane_crash_came_from_custom_action?
-      false
-    else
-      true
-    end
+    # https://github.com/fastlane/fastlane/issues/11913
+    return false
+    # if fastlane_crash_came_from_plugin? || fastlane_crash_came_from_custom_action?
+    #   false
+    # else
+    #   true
+    # end
   end
 end

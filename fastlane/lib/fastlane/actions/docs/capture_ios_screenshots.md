@@ -221,6 +221,10 @@ fastlane snapshot reset_simulators
 
 You can use the environment variable `SNAPSHOT_FORCE_DELETE` to stop asking for confirmation before deleting.
 
+```no-highlight
+SNAPSHOT_FORCE_DELETE=1 fastlane snapshot reset_simulators
+```
+
 ## Update snapshot helpers
 
 Some updates require the helper files to be updated. _snapshot_ will automatically warn you and tell you how to update.

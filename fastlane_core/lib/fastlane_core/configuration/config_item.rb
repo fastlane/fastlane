@@ -205,22 +205,21 @@ module FastlaneCore
     # Raises an exception if the value is invalid
     def valid?(value)
       # we also allow nil values, which do not have to be verified.
-      if value
-        # Verify that value is the type that we're expecting, if we are expecting a type
+      return true if value.nil?
 
-        if data_type == Fastlane::Boolean
-          ensure_boolean_type_passes_validation(value)
-        else
-          ensure_generic_type_passes_validation(value)
-        end
+      # Verify that value is the type that we're expecting, if we are expecting a type
+      if data_type == Fastlane::Boolean
+        ensure_boolean_type_passes_validation(value)
+      else
+        ensure_generic_type_passes_validation(value)
+      end
 
-        if @verify_block
-          begin
-            @verify_block.call(value)
-          rescue => ex
-            UI.error("Error setting value '#{value}' for option '#{@key}'")
-            raise Interface::FastlaneError.new, ex.to_s
-          end
+      if @verify_block
+        begin
+          @verify_block.call(value)
+        rescue => ex
+          UI.error("Error setting value '#{value}' for option '#{@key}'")
+          raise Interface::FastlaneError.new, ex.to_s
         end
       end
 
@@ -240,7 +239,7 @@ module FastlaneCore
       elsif allow_shell_conversion
         return Shellwords.join(value) if value.kind_of?(Array)
         return value.map { |k, v| "#{k.to_s.shellescape}=#{v.shellescape}" }.join(' ') if value.kind_of?(Hash)
-      else
+      elsif data_type != String
         # Special treatment if the user specified true, false or YES, NO
         # There is no boolean type, so we just do it here
         if %w(YES yes true TRUE).include?(value)
@@ -276,6 +275,24 @@ module FastlaneCore
 
     def to_s
       [@key, @description].join(": ")
+    end
+
+    def doc_default_value
+      return "[*](#parameters-legend-dynamic)" if self.default_value_dynamic
+      return "" if self.default_value.nil?
+      return "`''`" if self.default_value.instance_of?(String) && self.default_value.empty?
+      return "`:#{self.default_value}`" if self.default_value.instance_of?(Symbol)
+
+      "`#{self.default_value}`"
+    end
+
+    def help_default_value
+      return "#{self.default_value} *".strip if self.default_value_dynamic
+      return "" if self.default_value.nil?
+      return "''" if self.default_value.instance_of?(String) && self.default_value.empty?
+      return ":#{self.default_value}" if self.default_value.instance_of?(Symbol)
+
+      self.default_value
     end
   end
 end

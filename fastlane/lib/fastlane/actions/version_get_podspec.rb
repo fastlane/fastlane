@@ -34,6 +34,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :require_variable_prefix,
                                        env_name: "FL_VERSION_BUMP_PODSPEC_VERSION_REQUIRE_VARIABLE_PREFIX",
                                        description: "true by default, this is used for non CocoaPods version bumps only",
+                                       is_string: false,
                                        default_value: true)
         ]
       end
