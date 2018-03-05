@@ -58,7 +58,7 @@ module Fastlane
     end
 
     def load_custom_action_md_erb(action)
-      # check if there is a custom detail view in markdown available in the fastlane code base
+      # check if there is a custom detail view as markdown ERB available in the fastlane code base
       custom_file_location = File.join(Fastlane::ROOT, custom_action_docs_path, "#{action.action_name}.md.erb")
       if File.exist?(custom_file_location)
         UI.verbose("Using custom md.erb file for action #{action.action_name}")
