@@ -9,7 +9,7 @@ describe Scan do
 
       it "fetches the path from the Xcode config", requires_xcodebuild: true do
         derived_data = Scan.config[:derived_data_path]
-        expect(derived_data).to match(%r{/.*Xcode/DerivedData/app-\w*$})
+        expect(derived_data).to match(File.expand_path("./scan/examples/standard/"))
       end
     end
 
