@@ -125,7 +125,7 @@ module Fastlane
       end
 
       # Creating alias for mapping "swift init" to "init swift"
-      alias_command :'swift init', :'init', 'swift'
+      alias_command(:'swift init', :init, 'swift')
 
       command :new_action do |c|
         c.syntax = 'fastlane new_action'
