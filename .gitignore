@@ -2,6 +2,7 @@
 *.rbc
 /.config
 coverage/
+/ExampleAppDerivedData/
 /InstalledFiles
 /pkg/
 /spec/reports/
