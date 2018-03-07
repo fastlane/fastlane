@@ -97,7 +97,7 @@ module Fastlane
       end
 
       return Thread.new do
-        Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lane #{lane}#{parameter_string} > /dev/null))
+        Actions.sh(%(swift run --package-path fastlane/swift/FastlaneMarathonWrapper FastlaneMarathonWrapper run fastlane/swift/FastlaneExecutor.swift lane #{lane}#{parameter_string}))
       end
     end
 
@@ -166,54 +166,56 @@ module Fastlane
       setup_message << "To edit your new Fastfile.swift, type: `open #{FastlaneCore::FastlaneFolder.swift_runner_project_path}`"
 
       # Go through and link up whatever we generated during `fastlane init swift` so the user can edit them easily
-      self.link_user_configs_to_project(updated_message: setup_message.join("\n"))
+      # self.link_user_configs_to_project(updated_message: setup_message.join("\n"))
     end
 
     def self.link_user_configs_to_project(updated_message: nil)
-      tool_files_folder = FastlaneCore::FastlaneFolder.path
+      # tool_files_folder = FastlaneCore::FastlaneFolder.path
 
-      # All the tools that could have <tool name>file.swift their paths, and where we expect to find the user's tool files.
-      all_user_tool_file_paths = TOOL_CONFIG_FILES.map do |tool_name|
-        [
-          File.join(tool_files_folder, "#{tool_name}.swift"),
-          "../#{tool_name}.swift",
-          "../../#{tool_name}.swift"
-        ]
-      end
+      # # All the tools that could have <tool name>file.swift their paths, and where we expect to find the user's tool files.
+      # all_user_tool_file_paths = TOOL_CONFIG_FILES.map do |tool_name|
+      #   [
+      #     File.join(tool_files_folder, "#{tool_name}.swift"),
+      #     "../#{tool_name}.swift",
+      #     "../../#{tool_name}.swift"
+      #   ]
+      # end
 
-      # Tool files the user now provides
-      new_user_tool_file_paths = collect_tool_paths_for_replacement(all_user_tool_file_paths: all_user_tool_file_paths, look_for_new_configs: true)
+      # # Tool files the user now provides
+      # new_user_tool_file_paths = collect_tool_paths_for_replacement(all_user_tool_file_paths: all_user_tool_file_paths, look_for_new_configs: true)
 
-      # Tool files we provide AND the user doesn't provide
-      user_tool_files_possibly_removed = collect_tool_paths_for_replacement(all_user_tool_file_paths: all_user_tool_file_paths, look_for_new_configs: false)
+      # # Tool files we provide AND the user doesn't provide
+      # user_tool_files_possibly_removed = collect_tool_paths_for_replacement(all_user_tool_file_paths: all_user_tool_file_paths, look_for_new_configs: false)
 
-      fastlane_runner_project = self.runner_project
-      runner_target = target_for_fastlane_runner_project(runner_project: fastlane_runner_project)
-      target_file_refs = target_source_file_refs(target: runner_target)
+      # fastlane_runner_project = self.runner_project
+      # runner_target = target_for_fastlane_runner_project(runner_project: fastlane_runner_project)
+      # target_file_refs = target_source_file_refs(target: runner_target)
 
-      # Swap in all new user supplied configs into the project
-      project_modified = swap_paths_in_target(
-        target: runner_target,
-        file_refs_to_swap: target_file_refs,
-        expected_path_to_replacement_path_tuples: new_user_tool_file_paths
-      )
+      # # Swap in all new user supplied configs into the project
+      # project_modified = swap_paths_in_target(
+      #   target: runner_target,
+      #   file_refs_to_swap: target_file_refs,
+      #   expected_path_to_replacement_path_tuples: new_user_tool_file_paths
+      # )
 
-      # Swap out any configs the user has removed, inserting fastlane defaults
-      project_modified = swap_paths_in_target(
-        target: runner_target,
-        file_refs_to_swap: target_file_refs,
-        expected_path_to_replacement_path_tuples: user_tool_files_possibly_removed
-      ) || project_modified
+      # # Swap out any configs the user has removed, inserting fastlane defaults
+      # project_modified = swap_paths_in_target(
+      #   target: runner_target,
+      #   file_refs_to_swap: target_file_refs,
+      #   expected_path_to_replacement_path_tuples: user_tool_files_possibly_removed
+      # ) || project_modified
 
-      if project_modified
-        fastlane_runner_project.save
-        updated_message ||= "Updated #{FastlaneCore::FastlaneFolder.swift_runner_project_path}"
-        UI.success(updated_message)
-      else
-        UI.success("FastlaneSwiftRunner project is up-to-date")
-      end
+      # if project_modified
+      #   fastlane_runner_project.save
+      #   updated_message ||= "Updated #{FastlaneCore::FastlaneFolder.swift_runner_project_path}"
+      #   UI.success(updated_message)
+      # else
+      #   UI.success("FastlaneSwiftRunner project is up-to-date")
+      # end
 
-      return project_modified
+      # return project_modified
+
+      return false
     end
 
     def self.start_socket_thread
@@ -228,72 +230,76 @@ module Fastlane
     end
 
     def self.ensure_runner_built!
-      UI.verbose("Checking for new user-provided tool configuration files")
-      # if self.link_user_configs_to_project returns true, that means we need to rebuild the runner
-      runner_needs_building = self.link_user_configs_to_project
+      Actions.sh(%(swift run --package-path fastlane/swift/FastlaneMarathonWrapper FastlaneMarathonWrapper install fastlane/swift/FastlaneExecutor.swift --force))
+      # UI.verbose("Checking for new user-provided tool configuration files")
+      # # if self.link_user_configs_to_project returns true, that means we need to rebuild the runner
+      # runner_needs_building = self.link_user_configs_to_project
 
-      if FastlaneCore::FastlaneFolder.swift_runner_built?
-        runner_last_modified_age = File.mtime(FastlaneCore::FastlaneFolder.swift_runner_path).to_i
-        fastfile_last_modified_age = File.mtime(FastlaneCore::FastlaneFolder.fastfile_path).to_i
+      # if FastlaneCore::FastlaneFolder.swift_runner_built?
+      #   runner_last_modified_age = File.mtime(FastlaneCore::FastlaneFolder.swift_runner_path).to_i
+      #   fastfile_last_modified_age = File.mtime(FastlaneCore::FastlaneFolder.fastfile_path).to_i
 
-        if runner_last_modified_age < fastfile_last_modified_age
-          # It's older than the Fastfile, so build it again
-          UI.verbose("Found changes to user's Fastfile.swift, setting re-build runner flag")
-          runner_needs_building = true
-        end
-      else
-        # Runner isn't built yet, so build it
-        UI.verbose("No runner found, setting re-build runner flag")
-        runner_needs_building = true
-      end
+      #   if runner_last_modified_age < fastfile_last_modified_age
+      #     # It's older than the Fastfile, so build it again
+      #     UI.verbose("Found changes to user's Fastfile.swift, setting re-build runner flag")
+      #     runner_needs_building = true
+      #   end
+      # else
+      #   # Runner isn't built yet, so build it
+      #   UI.verbose("No runner found, setting re-build runner flag")
+      #   runner_needs_building = true
+      # end
 
-      if runner_needs_building
-        self.build_runner!
-      end
+      # if runner_needs_building
+      #   self.build_runner!
+      # end
     end
 
     # do we have the latest FastlaneSwiftRunner code from the current version of fastlane?
     def self.ensure_runner_up_to_date_fastlane!
       upgraded = false
-      upgrader = SwiftRunnerUpgrader.new
+      # upgrader = SwiftRunnerUpgrader.new
 
-      upgrade_needed = upgrader.upgrade_if_needed!(dry_run: true)
-      if upgrade_needed
-        UI.message("It looks like your `FastlaneSwiftRunner` project is not up-to-date".green)
-        UI.message("If you don't update it, fastlane could fail".green)
-        UI.message("We can try to automatically update it for you, usually this works 🎈 🐐".green)
-        user_wants_upgrade = UI.confirm("Should we try to upgrade just your `FastlaneSwiftRunner` project?")
+      # upgrade_needed = upgrader.upgrade_if_needed!(dry_run: true)
+      # if upgrade_needed
+      #   UI.message("It looks like your `FastlaneSwiftRunner` project is not up-to-date".green)
+      #   UI.message("If you don't update it, fastlane could fail".green)
+      #   UI.message("We can try to automatically update it for you, usually this works 🎈 🐐".green)
+      #   user_wants_upgrade = UI.confirm("Should we try to upgrade just your `FastlaneSwiftRunner` project?")
 
-        UI.important("Ok, if things break, you can try to run this lane again and you'll be prompted to upgrade another time") unless user_wants_upgrade
+      #   UI.important("Ok, if things break, you can try to run this lane again and you'll be prompted to upgrade another time") unless user_wants_upgrade
 
-        if user_wants_upgrade
-          upgraded = upgrader.upgrade_if_needed!
-          UI.success("Updated your FastlaneSwiftRunner project with the newest runner code") if upgraded
-          self.build_runner! if upgraded
-        end
-      end
+      #   if user_wants_upgrade
+      #     upgraded = upgrader.upgrade_if_needed!
+      #     UI.success("Updated your FastlaneSwiftRunner project with the newest runner code") if upgraded
+      #     self.build_runner! if upgraded
+      #   end
+      # end
 
       return upgraded
     end
 
     def self.build_runner!
-      UI.verbose("Building FastlaneSwiftRunner")
-      require 'fastlane_core'
-      require 'gym'
-      require 'gym/generators/build_command_generator'
+      # UI.verbose("Building FastlaneSwiftRunner")
 
-      project_options = {
-          project: FastlaneCore::FastlaneFolder.swift_runner_project_path,
-          skip_archive: true
-        }
-      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, project_options)
-      build_command = Gym::BuildCommandGenerator.generate
+      # Actions.sh(%(swift build --package-path fastlane/swift/FastlaneSwiftRunner))
 
-      FastlaneCore::CommandExecutor.execute(
-        command: build_command,
-        print_all: false,
-        print_command: !Gym.config[:silent]
-      )
+      # require 'fastlane_core'
+      # require 'gym'
+      # require 'gym/generators/build_command_generator'
+
+      # project_options = {
+      #     project: FastlaneCore::FastlaneFolder.swift_runner_project_path,
+      #     skip_archive: true
+      #   }
+      # Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, project_options)
+      # build_command = Gym::BuildCommandGenerator.generate
+
+      # FastlaneCore::CommandExecutor.execute(
+      #   command: build_command,
+      #   print_all: false,
+      #   print_command: !Gym.config[:silent]
+      # )
     end
   end
 end

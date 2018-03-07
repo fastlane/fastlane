@@ -16,7 +16,6 @@ module Fastlane
   class SwiftRunnerUpgrader
     API_VERSION_REGEX = /FastlaneRunnerAPIVersion\s*\[\s*([0-9]+.[0-9]+.[0-9]+)\s*\]/ # also used by SwiftFastlaneAPIGenerator
 
-    attr_accessor :target_project # project we'll be updating
     attr_accessor :fastlane_runner_target # FastlaneRunner xcodeproj target
     attr_accessor :manifest_hash # hash of file names to group names they belong to
     attr_accessor :manifest_groups # unique list of group names that came from the manifest

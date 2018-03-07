@@ -86,7 +86,7 @@ module Fastlane
       verify_app_exists_itc!
 
       if self.is_swift_fastfile
-        lane = ["func betaLane() {",
+        lane = ["public func betaLane() {",
                 "desc(\"Push a new beta build to TestFlight\")",
                 increment_build_number_if_applicable,
                 "\tbuildApp(#{project_prefix}scheme: \"#{self.scheme}\")",
@@ -142,7 +142,7 @@ module Fastlane
       end
 
       if self.is_swift_fastfile
-        lane = ["func releaseLane() {",
+        lane = ["public func releaseLane() {",
                 "desc(\"Push a new release build to the App Store\")",
                 increment_build_number_if_applicable,
                 "\tbuildApp(#{project_prefix}scheme: \"#{self.scheme}\")"]
@@ -214,7 +214,7 @@ module Fastlane
       end
 
       if self.is_swift_fastfile
-        lane = ["func screenshotsLane() {",
+        lane = ["public func screenshotsLane() {",
                 "desc(\"Generate new localized screenshots\")",
                 "\tcaptureScreenshots(#{project_prefix}scheme: \"#{ui_testing_scheme}\")"]
 
@@ -242,7 +242,7 @@ module Fastlane
       UI.header("Setting up fastlane so you can manually configure it")
 
       if self.is_swift_fastfile
-        append_lane(["func customLane() {",
+        append_lane(["public func customLane() {",
                      "desc(\"Description of what the lane does\")",
                      "\t// add actions here: https://docs.fastlane.tools/actions",
                      "}"])

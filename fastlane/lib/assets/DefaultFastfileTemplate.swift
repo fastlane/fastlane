@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import FastlaneSwift
 
 class Fastfile: LaneFile {
 [[LANES]]
