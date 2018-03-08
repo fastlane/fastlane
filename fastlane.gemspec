@@ -92,7 +92,7 @@ Gem::Specification.new do |spec|
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.
-  spec.add_dependency('google-api-client', '>= 0.13.1', '< 0.14.0') # Google API Client to access Play Publishing API
+  spec.add_dependency('google-api-client', '>= 0.19.0', '< 0.20.0') # Google API Client to access Play Publishing API
 
   # Development only
   spec.add_development_dependency('rake', '< 12')
