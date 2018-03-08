@@ -60,6 +60,7 @@ fastlane/swift/FastlaneRunner
 vendor
 
 # iOS specific ignores, used in sample projects inside the repo
+DerivedData
 *.pbxuser
 !default.pbxuser
 *.mode1v3

@@ -3,13 +3,15 @@ describe Scan do
     describe 'Xcode config handling' do
       before do
         options = { project: "./scan/examples/standard/app.xcodeproj" }
+        FileUtils.mkdir_p("./scan/examples/standard/app.xcodeproj/project.xcworkspace/xcuserdata/#{ENV['USER']}.xcuserdatad/")
+        FileUtils.copy("./scan/examples/standard/WorkspaceSettings.xcsettings", "./scan/examples/standard/app.xcodeproj/project.xcworkspace/xcuserdata/#{ENV['USER']}.xcuserdatad/WorkspaceSettings.xcsettings")
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
         @project = FastlaneCore::Project.new(Scan.config)
       end
 
       it "fetches the path from the Xcode config", requires_xcodebuild: true do
         derived_data = Scan.config[:derived_data_path]
-        expect(derived_data).to match(%r{/.*Xcode/DerivedData/app-\w*$})
+        expect(derived_data).to match(File.expand_path("./scan/examples/standard/"))
       end
     end
 
