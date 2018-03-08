@@ -323,7 +323,7 @@ module Fastlane
         if self.is_swift_fastfile
           self.append_team("var itcTeam: String? { return \"#{self.itc_team_id}\" } // iTunes Connect Team ID")
         else
-          self.append_team("itc_team_id \"#{self.itc_team_id}\" # iTunes Connect Team ID")
+          self.append_team("itc_team_id(\"#{self.itc_team_id}\") # iTunes Connect Team ID")
         end
       end
 
@@ -334,7 +334,7 @@ module Fastlane
         if self.is_swift_fastfile
           self.append_team("var teamID: String { return \"#{self.adp_team_id}\" } // Apple Developer Portal Team ID")
         else
-          self.append_team("team_id \"#{self.adp_team_id}\" # Developer Portal Team ID")
+          self.append_team("team_id(\"#{self.adp_team_id}\") # Developer Portal Team ID")
         end
       end
 
