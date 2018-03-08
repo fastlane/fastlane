@@ -13,20 +13,21 @@ module Fastlane
         # Create CFBundleURLTypes array with empty scheme if none exist
         unless hash['CFBundleURLTypes']
           hash['CFBundleURLTypes'] = [{
-            'CFBundleTypeRole': 'Editor',
-            'CFBundleURLSchemes': []
+            'CFBundleTypeRole' => 'Editor',
+            'CFBundleURLSchemes' => []
           }]
         end
 
         # Updates schemes with update block if exists
-        # Otherwise updates with array of strings
+        # Else updates with array of strings if exist
+        # Otherwise shows error to user
         if update_url_schemes
           new_schemes = update_url_schemes.call(hash['CFBundleURLTypes'].first['CFBundleURLSchemes'])
 
           # Verify array of strings
           string = "The URL schemes must be an array of strings, got '#{new_schemes}'."
           verify_schemes!(new_schemes, string)
-          
+
           hash['CFBundleURLTypes'].first['CFBundleURLSchemes'] = new_schemes
         elsif url_schemes
           hash['CFBundleURLTypes'].first['CFBundleURLSchemes'] = url_schemes
@@ -76,8 +77,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :update_url_schemes,
             description: "Block that is called to update schemes with current schemes passed in as parameter",
             optional: true,
-            is_string: false
-          )
+            is_string: false)
         ]
       end
 
@@ -112,7 +112,7 @@ module Fastlane
             update_url_schemes: proc do |schemes|
               schemes + ["anotherscheme"]
             end
-          )',
+          )'
         ]
       end
 
