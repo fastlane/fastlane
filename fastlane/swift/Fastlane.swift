@@ -3426,12 +3426,14 @@ func updateUrbanAirshipConfiguration(plistPath: String,
   _ = runner.executeCommand(command)
 }
 func updateUrlSchemes(path: String,
-                      urlSchemes: String) {
+                      urlSchemes: String? = nil,
+                      updateUrlSchemes: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "update_url_schemes", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
-                                                                                                    RubyCommand.Argument(name: "url_schemes", value: urlSchemes)])
+                                                                                                    RubyCommand.Argument(name: "url_schemes", value: urlSchemes),
+                                                                                                    RubyCommand.Argument(name: "update_url_schemes", value: updateUrlSchemes)])
   _ = runner.executeCommand(command)
 }
-func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/Themoji.dSYM.zip",
+func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/Themoji.dSYM",
                                 apiToken: String? = nil,
                                 gspPath: String? = nil,
                                 binaryPath: String? = nil,
@@ -3817,4 +3819,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.7]
+// FastlaneRunnerAPIVersion [0.9.8]
