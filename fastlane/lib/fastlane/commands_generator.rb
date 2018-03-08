@@ -116,8 +116,6 @@ module Fastlane
 
         c.option('-u STRING', '--user STRING', String, 'iOS projects only: Your Apple ID')
 
-        # CrashlyticsBetaCommandLineHandler.apply_options(c)
-
         c.action do |args, options|
           is_swift_fastfile = args.include?("swift")
           Fastlane::Setup.start(user: options.user, is_swift_fastfile: is_swift_fastfile)
