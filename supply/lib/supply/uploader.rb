@@ -5,7 +5,7 @@ module Supply
 
       client.begin_edit(package_name: Supply.config[:package_name])
 
-      UI.user_error!("No local metadata found, make sure to run `fastlane supply init` to setup supply") unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths]
+      verify_config!
 
       if metadata_path
         UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
@@ -35,6 +35,12 @@ module Supply
         UI.message("Uploading all changes to Google Play...")
         client.commit_current_edit!
         UI.success("Successfully finished the upload to Google Play")
+      end
+    end
+
+    def verify_config!
+      unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths] || (Supply.config[:track] && Supply.config[:track_promote_to])
+        UI.user_error!("No local metadata, apks, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
       end
     end
 
@@ -106,6 +112,7 @@ module Supply
 
     def upload_binaries
       apk_paths = [Supply.config[:apk]] unless (apk_paths = Supply.config[:apk_paths])
+      apk_paths.compact!
 
       apk_version_codes = []
 
@@ -120,7 +127,9 @@ module Supply
         end
       end
 
-      update_track(apk_version_codes)
+      # Only update tracks if we have version codes
+      # Updating a track with empty version codes can completely clear out a track
+      update_track(apk_version_codes) unless apk_version_codes.empty?
     end
 
     private
