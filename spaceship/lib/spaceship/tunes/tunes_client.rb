@@ -997,8 +997,6 @@ module Spaceship
         req.headers['Content-Type'] = 'application/json'
       end
 
-      handle_itc_response(r.body)
-
       app_version = app_version(app_id, false)
 
       if reject_if_waiting_for_review
@@ -1011,6 +1009,7 @@ module Spaceship
           return
         end
       end
+      handle_itc_response(r.body)
 
       # iTunes Connect still returns a success status code even the submission
       # was failed because of Ad ID info.  This checks for any section error
@@ -1023,22 +1022,6 @@ module Spaceship
       else
         raise "Something went wrong when submitting the app for review. Make sure to pass valid options to submit your app for review"
       end
-
-      parse_response(r, 'data')
-    end
-
-    #####################################################
-    # @!group Reject App Submission
-    #####################################################
-    def reject_app_submission(app_id, version)
-      raise "app_id is required" unless app_id
-
-      r = request(:post) do |req|
-        req.url("ra/apps/#{app_id}/versions/#{version}/reject")
-        req.headers['Content-Type'] = 'application/json'
-      end
-
-      handle_itc_response(r.body)
 
       parse_response(r, 'data')
     end
