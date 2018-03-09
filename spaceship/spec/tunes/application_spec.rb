@@ -131,7 +131,8 @@ describe Spaceship::Application do
       require_relative '../mock_servers'
 
       before do
-        Spaceship::TestFlight::Base.client = mock_client
+        allow(Spaceship::TestFlight::Base).to receive(:client).and_return(mock_client)
+        allow(mock_client).to receive(:team_id).and_return('')
         mock_client_response(:get_build_trains) do
           ['1.0', '1.1']
         end
