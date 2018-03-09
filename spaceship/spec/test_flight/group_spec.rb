@@ -4,7 +4,8 @@ describe Spaceship::TestFlight::Group do
   let(:mock_client) { double('MockClient') }
 
   before do
-    Spaceship::TestFlight::Base.client = mock_client
+    allow(Spaceship::TestFlight::Base).to receive(:client).and_return(mock_client)
+    allow(mock_client).to receive(:team_id).and_return('')
   end
 
   context 'attr_mapping' do
