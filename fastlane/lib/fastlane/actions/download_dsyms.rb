@@ -15,10 +15,6 @@ module Fastlane
         Spaceship::Tunes.select_team
         UI.message("Login successful")
 
-        # The TestFlight client's cookie and team ID can drift from the iTC
-        # client's cookie and team ID after logging in or switching teams
-        Spaceship::TestFlight::Base.invalidate_client
-
         # Get App
         app = Spaceship::Application.find(params[:app_identifier])
         unless app

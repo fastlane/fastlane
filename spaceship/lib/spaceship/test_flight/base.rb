@@ -5,11 +5,12 @@ module Spaceship
   module TestFlight
     class Base < Spaceship::Base
       def self.client
-        @client ||= Client.client_with_authorization_from(Spaceship::Tunes.client)
-      end
-
-      def self.invalidate_client
-        @client = nil
+        # Initialize new client if none or team changed
+        if @client.nil? || @client.team_id != Spaceship::Tunes.client.team_id
+          @client = Client.client_with_authorization_from(Spaceship::Tunes.client)
+        end
+      
+        @client
       end
 
       ##
