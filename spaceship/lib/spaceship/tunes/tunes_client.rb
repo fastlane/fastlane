@@ -1004,8 +1004,10 @@ module Spaceship
       messages = r.body.fetch("messages", {})
       errors = messages.fetch('error', nil)
 
-      if !errors.nil? and !errors.empty? and errors.first.include?("Problem processing review submission.")
-        if reject_if_waiting_for_review
+      app_version = app_version(app_id, false)
+
+      if reject_if_waiting_for_review
+        if app_version[:canRejectVersion]
           puts("Found a version already submitted. Going to reject the previously submitted version.")
           reject_app_submission(app_id, version)
           puts("Rejected previously submitted app version.")
