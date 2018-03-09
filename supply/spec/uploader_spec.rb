@@ -2,6 +2,64 @@ require 'fileutils'
 
 describe Supply do
   describe Supply::Uploader do
+    describe "#verify_config!" do
+      let(:subject) { Supply::Uploader.new }
+
+      it "raises error if empty config" do
+        Supply.config = {}
+        expect do
+          subject.verify_config!
+        end.to raise_error("No local metadata, apks, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+      end
+
+      it "raises error if only track" do
+        Supply.config = {
+          track: 'alpha'
+        }
+        expect do
+          subject.verify_config!
+        end.to raise_error("No local metadata, apks, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+      end
+
+      it "raises error if only track_promote_to" do
+        Supply.config = {
+          track_promote_to: 'beta'
+        }
+        expect do
+          subject.verify_config!
+        end.to raise_error("No local metadata, apks, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+      end
+
+      it "does not raise error if only metadata" do
+        Supply.config = {
+          metadata_path: 'some/path'
+        }
+        subject.verify_config!
+      end
+
+      it "does not raise error if only apk" do
+        Supply.config = {
+          apk: 'some/path/app.apk'
+        }
+        subject.verify_config!
+      end
+
+      it "does not raise error if only apk_paths" do
+        Supply.config = {
+          apk_paths: ['some/path/app1.apk', 'some/path/app2.apk']
+        }
+        subject.verify_config!
+      end
+
+      it "does not raise error if only track and track_promote_to" do
+        Supply.config = {
+          track: 'alpha',
+          track_promote_to: 'beta'
+        }
+        subject.verify_config!
+      end
+    end
+
     describe "#find_obbs" do
       let(:subject) { Supply::Uploader.new }
 
