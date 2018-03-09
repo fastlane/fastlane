@@ -14,7 +14,7 @@ describe Supply do
 
       it "raises error if only track" do
         Supply.config = {
-          'track': 'alpha'
+          track: 'alpha'
         }
         expect do
           subject.verify_config!
@@ -23,7 +23,7 @@ describe Supply do
 
       it "raises error if only track_promote_to" do
         Supply.config = {
-          'track_promote_to': 'beta'
+          track_promote_to: 'beta'
         }
         expect do
           subject.verify_config!
@@ -32,29 +32,29 @@ describe Supply do
 
       it "does not raise error if only metadata" do
         Supply.config = {
-          'metadata_path': 'some/path'
+          metadata_path: 'some/path'
         }
         subject.verify_config!
       end
 
       it "does not raise error if only apk" do
         Supply.config = {
-          'apk': 'some/path/app.apk'
+          apk: 'some/path/app.apk'
         }
         subject.verify_config!
       end
 
       it "does not raise error if only apk_paths" do
         Supply.config = {
-          'apk_paths': ['some/path/app1.apk', 'some/path/app2.apk']
+          apk_paths: ['some/path/app1.apk', 'some/path/app2.apk']
         }
         subject.verify_config!
       end
 
       it "does not raise error if only track and track_promote_to" do
         Supply.config = {
-          'track': 'alpha',
-          'track_promote_to': 'beta'
+          track: 'alpha',
+          track_promote_to: 'beta'
         }
         subject.verify_config!
       end
