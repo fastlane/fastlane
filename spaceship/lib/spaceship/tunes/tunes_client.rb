@@ -1001,9 +1001,6 @@ module Spaceship
 
       handle_itc_response(r.body)
 
-      messages = r.body.fetch("messages", {})
-      errors = messages.fetch('error', nil)
-
       app_version = app_version(app_id, false)
 
       if reject_if_waiting_for_review
