@@ -223,8 +223,6 @@ module Spaceship
           raise_insuffient_permission_error!
         elsif flaky_api_call
           raise ITunesConnectPotentialServerError.new, errors.join(' ')
-        elsif errors.count == 1 and errors.first.first.include?("Problem processing review submission.")
-          # This could be because the app is in "Waiting for review" status on itc
         else
           raise ITunesConnectError.new, errors.join(' ')
         end
@@ -1011,8 +1009,6 @@ module Spaceship
           puts("Going to submit app for review again...")
           send_app_submission(app_id, version, data)
           return
-        else
-          raise ITunesConnectError.new, r.body['messages']["error"].first
         end
       end
 
