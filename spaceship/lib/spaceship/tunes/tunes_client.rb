@@ -1000,7 +1000,7 @@ module Spaceship
       app_version = app_version(app_id, false)
 
       if reject_if_waiting_for_review
-        if app_version[:canRejectVersion]
+        if app_version['canRejectVersion']
           puts("Found a version already submitted. Going to reject the previously submitted version.")
           reject!(app_id, version)
           puts("Rejected previously submitted app version.")
