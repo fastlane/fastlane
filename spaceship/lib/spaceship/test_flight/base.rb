@@ -6,10 +6,10 @@ module Spaceship
     class Base < Spaceship::Base
       def self.client
         # Initialize new client if none or team changed
-        if @client.nil? || @client.team_id != Spaceship::Tunes.client.team_id
+        if Spaceship::Tunes.client && (@client.nil? || @client.team_id != Spaceship::Tunes.client.team_id)
           @client = Client.client_with_authorization_from(Spaceship::Tunes.client)
         end
-      
+
         @client
       end
 
