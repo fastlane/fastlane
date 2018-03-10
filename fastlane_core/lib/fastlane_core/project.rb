@@ -1,5 +1,6 @@
 require_relative 'xcodebuild_list_output_parser'
 require_relative 'helper'
+require 'xcodeproj'
 
 module FastlaneCore
   # Represents an Xcode project
@@ -100,9 +101,28 @@ module FastlaneCore
       end
     end
 
+    # returns the Xcodeproj::Workspace or nil if it is a project
+    def workspace
+      return nil unless workspace?
+      @workspace ||= Xcodeproj::Workspace.new_from_xcworkspace(path)
+    end
+
+
+    # returns the Xcodeproj::Project or nil if it is a workspace
+    def project
+      return nil if workspace?
+      @project ||= Xcodeproj::Project.open(path)
+    end
+
     # Get all available schemes in an array
     def schemes
-      parsed_info.schemes
+      @schemes ||= if workspace?
+                     workspace.schemes.select do |k,v|
+                       !v.include?("Pods/Pods.xcodeproj")
+                     end.keys
+                   else
+                     Xcodeproj::Project.schemes(path)
+                   end
     end
 
     # Let the user select a scheme

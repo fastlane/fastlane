@@ -177,11 +177,19 @@ describe FastlaneCore do
         expect(@project.is_workspace).to eq(false)
       end
 
+      it "#workspace" do
+        expect(@project.workspace).to be_nil
+      end
+
+      it "#project" do
+        expect(@project.project).to_not(be_nil)
+      end
+
       it "#project_name" do
         expect(@project.project_name).to eq("Example")
       end
 
-      it "#schemes returns all available schemes", requires_xcodebuild: true do
+      it "#schemes returns all available schemes" do
         expect(@project.schemes).to eq(["Example"])
       end
 
@@ -215,7 +223,7 @@ describe FastlaneCore do
         @workspace = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
-      it "#schemes returns all schemes", requires_xcodebuild: true do
+      it "#schemes returns all schemes" do
         expect(@workspace.schemes).to eq(["Example"])
       end
 
