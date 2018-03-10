@@ -1,4 +1,3 @@
-require_relative 'xcodebuild_list_output_parser'
 require_relative 'helper'
 require 'xcodeproj'
 
@@ -468,13 +467,6 @@ module FastlaneCore
     end
 
     private
-
-    def parsed_info
-      unless @parsed_info
-        @parsed_info = FastlaneCore::XcodebuildListOutputParser.new(raw_info(silent: xcodebuild_list_silent))
-      end
-      @parsed_info
-    end
 
     # If scheme not specified, do we want the scheme
     # matching project name?
