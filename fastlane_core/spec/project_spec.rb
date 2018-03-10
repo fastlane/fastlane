@@ -193,7 +193,7 @@ describe FastlaneCore do
         expect(@project.schemes).to eq(["Example"])
       end
 
-      it "#configurations returns all available configurations", requires_xcodebuild: true do
+      it "#configurations returns all available configurations" do
         expect(@project.configurations).to eq(["Debug", "Release", "SpecialConfiguration"])
       end
 
@@ -227,7 +227,7 @@ describe FastlaneCore do
         expect(@workspace.schemes).to eq(["Example"])
       end
 
-      it "#schemes returns all configurations", requires_xcodebuild: true do
+      it "#schemes returns all configurations" do
         expect(@workspace.configurations).to eq([])
       end
     end

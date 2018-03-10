@@ -107,7 +107,6 @@ module FastlaneCore
       @workspace ||= Xcodeproj::Workspace.new_from_xcworkspace(path)
     end
 
-
     # returns the Xcodeproj::Project or nil if it is a workspace
     def project
       return nil if workspace?
@@ -117,8 +116,8 @@ module FastlaneCore
     # Get all available schemes in an array
     def schemes
       @schemes ||= if workspace?
-                     workspace.schemes.select do |k,v|
-                       !v.include?("Pods/Pods.xcodeproj")
+                     workspace.schemes.reject do |k, v|
+                       v.include?("Pods/Pods.xcodeproj")
                      end.keys
                    else
                      Xcodeproj::Project.schemes(path)
@@ -175,7 +174,27 @@ module FastlaneCore
 
     # Get all available configurations in an array
     def configurations
-      parsed_info.configurations
+      @configurations ||= if workspace?
+                            workspace
+                              .file_references
+                              .map(&:path)
+                              .reject { |p| p.include?("Pods/Pods.xcodeproj") }
+                              .map do |p|
+                                # To maintain backwards compatibility, we
+                                # silently ignore non-existent projects from
+                                # workspaces.
+                                begin
+                                  Xcodeproj::Project.open(p).build_configurations
+                                rescue
+                                  []
+                                end
+                              end
+                              .flatten
+                              .compact
+                              .map(&:name)
+                          else
+                            project.build_configurations.map(&:name)
+                          end
     end
 
     # Returns bundle_id and sets the scheme for xcrun
