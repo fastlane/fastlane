@@ -177,15 +177,23 @@ describe FastlaneCore do
         expect(@project.is_workspace).to eq(false)
       end
 
+      it "#workspace" do
+        expect(@project.workspace).to be_nil
+      end
+
+      it "#project" do
+        expect(@project.project).to_not(be_nil)
+      end
+
       it "#project_name" do
         expect(@project.project_name).to eq("Example")
       end
 
-      it "#schemes returns all available schemes", requires_xcodebuild: true do
+      it "#schemes returns all available schemes" do
         expect(@project.schemes).to eq(["Example"])
       end
 
-      it "#configurations returns all available configurations", requires_xcodebuild: true do
+      it "#configurations returns all available configurations" do
         expect(@project.configurations).to eq(["Debug", "Release", "SpecialConfiguration"])
       end
 
@@ -215,11 +223,11 @@ describe FastlaneCore do
         @workspace = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
       end
 
-      it "#schemes returns all schemes", requires_xcodebuild: true do
+      it "#schemes returns all schemes" do
         expect(@workspace.schemes).to eq(["Example"])
       end
 
-      it "#schemes returns all configurations", requires_xcodebuild: true do
+      it "#schemes returns all configurations" do
         expect(@workspace.configurations).to eq([])
       end
     end
@@ -350,27 +358,6 @@ describe FastlaneCore do
       end
     end
 
-    describe "Project.xcode_list_timeout" do
-      before do
-        ENV['FASTLANE_XCODE_LIST_TIMEOUT'] = nil
-      end
-      it "returns default value" do
-        expect(FastlaneCore::Project.xcode_list_timeout).to eq(3)
-      end
-      it "returns specified value" do
-        ENV['FASTLANE_XCODE_LIST_TIMEOUT'] = '5'
-        expect(FastlaneCore::Project.xcode_list_timeout).to eq(5)
-      end
-      it "returns 0 if empty" do
-        ENV['FASTLANE_XCODE_LIST_TIMEOUT'] = ''
-        expect(FastlaneCore::Project.xcode_list_timeout).to eq(0)
-      end
-      it "returns 0 if garbage" do
-        ENV['FASTLANE_XCODE_LIST_TIMEOUT'] = 'hiho'
-        expect(FastlaneCore::Project.xcode_list_timeout).to eq(0)
-      end
-    end
-
     describe 'Project.xcode_build_settings_timeout' do
       before do
         ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = nil
@@ -460,44 +447,7 @@ describe FastlaneCore do
       end
     end
 
-    describe 'xcodebuild_list_silent option', requires_xcodebuild: true do
-      it 'is not silent by default' do
-        project = FastlaneCore::Project.new(
-          { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" },
-          xcodebuild_suppress_stderr: true
-        )
-
-        expect(project).to receive(:raw_info).with(silent: false).and_call_original
-
-        project.configurations
-      end
-
-      it 'makes the raw_info method be silent if configured', requires_xcodebuild: true do
-        project = FastlaneCore::Project.new(
-          { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" },
-          xcodebuild_list_silent: true,
-          xcodebuild_suppress_stderr: true
-        )
-        expect(project).to receive(:raw_info).with(silent: true).and_call_original
-
-        project.configurations
-      end
-    end
-
     describe 'xcodebuild_suppress_stderr option', requires_xcode: true do
-      it 'generates an xcodebuild -list command without stderr redirection by default' do
-        project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
-        expect(project.build_xcodebuild_list_command).not_to(match(%r{2> /dev/null}))
-      end
-
-      it 'generates an xcodebuild -list command that redirects stderr to /dev/null' do
-        project = FastlaneCore::Project.new(
-          { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" },
-          xcodebuild_suppress_stderr: true
-        )
-        expect(project.build_xcodebuild_list_command).to match(%r{2> /dev/null})
-      end
-
       it 'generates an xcodebuild -showBuildSettings command without stderr redirection by default' do
         project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
         expect(project.build_xcodebuild_showbuildsettings_command).not_to(match(%r{2> /dev/null}))
