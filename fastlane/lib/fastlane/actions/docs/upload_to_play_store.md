@@ -115,6 +115,7 @@ And you can supply screenshots by creating directories with the following names,
 - `wearScreenshots/`
 
 Note that these will replace the current images and screenshots on the play store listing, not add to them.
+Note: The above screenshots directories should be inside the `images` directory.
 
 ## Changelogs (What's new)
 
