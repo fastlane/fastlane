@@ -22,10 +22,14 @@ module Fastlane
           '-terse'
         ].join(' ')
 
-        line = ""
+        resolved_version_number = ""
         scheme = params[:scheme] || ""
         target = params[:target] || ""
         results = []
+
+        # Creates a map with target as key and plist absolute file path as value
+        # Used for comparing passed in target
+        target_plist_map = generate_target_plist_mapping(folder)
 
         if Helper.test?
           results = [
@@ -48,45 +52,74 @@ module Fastlane
           # emulating the actual behavior or the -terse1 flag correctly
           project_string = ".xcodeproj"
           results.any? do |result|
-            if result.include?(project_string)
-              line = result
+            plist_path = result.partition('=').first
+            version_number = result.partition('=').last
+
+            if plist_path.include?(project_string)
+              resolved_version_number = version_number
               break
             end
           end
         else
           # This iteration finds the first folder structure or info plist
-          # matching the specified target
+          # matching the specified target 
           scheme_string = "/#{scheme}"
           target_string = "/#{target}/"
           plist_target_string = "/#{target}-"
+
           results.any? do |result|
+            plist_path = File.absolute_path(result.partition('=').first.tr('"', ''))
+            version_number = result.partition('=').last
+
             if !target.empty?
-              if result.include?(target_string)
-                line = result
+              if plist_path.include?(target_string)
+                resolved_version_number = version_number
                 break
-              elsif result.include?(plist_target_string)
-                line = result
+              elsif plist_path.include?(plist_target_string)
+                resolved_version_number = version_number
+                break
+              elsif target_plist_map[target] == plist_path
+                resolved_version_number = version_number
                 break
               end
             else
-              if result.include?(scheme_string)
-                line = result
+              if plist_path.include?(scheme_string)
+                resolved_version_number = version_number
                 break
               end
             end
           end
         end
 
-        version_number = line.partition('=').last
+        # version_number = line.partition('=').last
 
         # Store the number in the shared hash
-        Actions.lane_context[SharedValues::VERSION_NUMBER] = version_number
+        Actions.lane_context[SharedValues::VERSION_NUMBER] = resolved_version_number
 
         # Return the version number because Swift might need this return value
-        return version_number
+        return resolved_version_number
       rescue => ex
         UI.error('Before being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html')
         raise ex
+      end
+
+      def self.generate_target_plist_mapping(folder)
+        map = {}
+        
+        require 'xcodeproj'
+        project_path = Dir.glob("#{folder}/*.xcodeproj").first
+        if project_path
+          project = Xcodeproj::Project.open(project_path)
+          map = project.targets.reduce(map) do |map, target|
+            info_plist_file = target.common_resolved_build_setting("INFOPLIST_FILE")
+            map[target.name] = File.absolute_path(info_plist_file)
+            map
+          end
+        else
+          UI.verbose("Unable to create find Xcode project in folder: #{folder}")
+        end
+
+        map
       end
 
       #####################################################
