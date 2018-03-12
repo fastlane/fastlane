@@ -1,5 +1,5 @@
 require:
-#  - rubocop/require_tools
+  - rubocop/require_tools
   - ./rubocop/fork_usage.rb
 
 Style/MultipleComparison:
