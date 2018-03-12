@@ -29,7 +29,7 @@ module Snapshot
       end
 
       def destination(devices)
-        puts "devices: #{devices.inspect}"
+        puts("devices: #{devices.inspect}")
         unless verify_devices_share_os(devices)
           UI.user_error!('All devices provided to snapshot should run the same operating system')
         end
