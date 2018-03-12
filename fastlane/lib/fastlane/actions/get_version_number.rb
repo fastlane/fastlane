@@ -45,9 +45,10 @@ module Fastlane
             '"get_version_number.xcodeproj/../supporting_files/TargetC_internal-Info.plist"=7.5.2',
             '"get_version_number.xcodeproj/../supporting_files/TargetC_production-Info.plist"=6.4.9'
           ]
+        else
+          # Using `` instead of Actions.sh since agvtools needs to actually run during tests
+          results = `#{command}`.split("\n")
         end
-        # Using `` instead of Actions.sh since agvtools needs to actually run during tests
-        results = `#{command}`.split("\n")
 
         if target.empty? && scheme.empty?
           # Sometimes the results array contains nonsense as the first element
