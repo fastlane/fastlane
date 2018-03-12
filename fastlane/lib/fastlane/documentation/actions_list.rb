@@ -146,7 +146,7 @@ module Fastlane
       puts(Terminal::Table.new(
              title: "#{name} Output Variables".green,
              headings: ['Key', 'Description'],
-             rows: FastlaneCore::PrintTable.transform_output(output.map { |key, desc| [key.yellow, desc] })
+             rows: FastlaneCore::PrintTable.transform_output(output.map { |key, desc| [key.to_s.yellow, desc] })
       ))
       puts("Access the output values using `lane_context[SharedValues::VARIABLE_NAME]`")
       puts("")
