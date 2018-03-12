@@ -31,6 +31,21 @@ module Fastlane
         # Used for comparing passed in target
         target_plist_map = generate_target_plist_mapping(folder)
 
+        if Helper.test?
+          # These lines are based off of fixtures of working project at
+          # ./fastlane/spec/fixtures/actions/get_version_number/get_version_number/
+          results = [
+            '"get_version_number.xcodeproj/../SampleProject-Info.plist"=4.3.2',
+            '"get_version_number.xcodeproj/../SampleProject_tests/Info.plist"=1.0',
+            '"get_version_number.xcodeproj/../Target-for-D/Plist-For-D-Target.plist"=7.8.9',
+            '"get_version_number.xcodeproj/../TargetA/TargetA-Info.plist"=4.3.2',
+            '"get_version_number.xcodeproj/../TargetATests/Info.plist"=4.3.2',
+            '"get_version_number.xcodeproj/../TargetB/TargetB-Info.plist"=5.4.3',
+            '"get_version_number.xcodeproj/../TargetBTests/Info.plist"=5.4.3',
+            '"get_version_number.xcodeproj/../supporting_files/TargetC_internal-Info.plist"=7.5.2',
+            '"get_version_number.xcodeproj/../supporting_files/TargetC_production-Info.plist"=6.4.9'
+          ]
+        end
         # Using `` instead of Actions.sh since agvtools needs to actually run during tests
         results = `#{command}`.split("\n")
 
