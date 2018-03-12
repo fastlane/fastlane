@@ -79,7 +79,6 @@ module Snapshot
         return devices.count == 1
       end
 
-      # rubocop:disable Require/MissingRequireStatement
       def get_device_type_with_simctl(device_names)
         return device_names if Helper.test?
 
@@ -92,7 +91,6 @@ module Snapshot
           end
         end.compact
       end
-      # rubocop:enable Require/MissingRequireStatement
     end
   end
 end
