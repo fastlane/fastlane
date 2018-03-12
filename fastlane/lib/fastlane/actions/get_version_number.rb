@@ -31,20 +31,7 @@ module Fastlane
         # Used for comparing passed in target
         target_plist_map = generate_target_plist_mapping(folder)
 
-        # if Helper.test?
-        #   results = [
-        #     '$(date +%s)n    /usr/libexec/Plistbuddy -c "Set CFBundleVersion $buildnum" "${plist}"n',
-        #     '"SampleProject.xcodeproj/../TargetA/TargetA-Info.plist"=4.3.2',
-        #     '"SampleProject.xcodeproj/../TargetATests/Info.plist"=4.3.2',
-        #     '"SampleProject.xcodeproj/../TargetB/TargetB-Info.plist"=5.4.3',
-        #     '"SampleProject.xcodeproj/../TargetBTests/Info.plist"=5.4.3',
-        #     '"SampleProject.xcodeproj/../SampleProject/supporting_files/TargetC_internal-Info.plist"=7.5.2',
-        #     '"SampleProject.xcodeproj/../SampleProject/supporting_files/TargetC_production-Info.plist"=6.4.9',
-        #     '"SampleProject.xcodeproj/../SampleProject_tests/Info.plist"=1.0'
-        #   ]
-        # else
-          # results = Actions.sh(command).split("\n")
-        # end
+        # Using `` instead of Actions.sh since agvtools needs to actually run during tests
         results = `#{command}`.split("\n")
 
         if target.empty? && scheme.empty?
