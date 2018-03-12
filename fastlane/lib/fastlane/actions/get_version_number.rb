@@ -114,16 +114,18 @@ module Fastlane
       def self.generate_target_plist_mapping(folder)
         map = {}
 
-        require 'xcodeproj'
-        project_path = Dir.glob("#{folder}/*.xcodeproj").first
-        if project_path
-          project = Xcodeproj::Project.open(project_path)
-          map = project.targets.each_with_object(map) do |target, memo|
-            info_plist_file = target.common_resolved_build_setting("INFOPLIST_FILE")
-            memo[target.name] = File.absolute_path(info_plist_file)
+        if Helper.mac?
+          require 'xcodeproj'
+          project_path = Dir.glob("#{folder}/*.xcodeproj").first
+          if project_path
+            project = Xcodeproj::Project.open(project_path)
+            map = project.targets.each_with_object(map) do |target, memo|
+              info_plist_file = target.common_resolved_build_setting("INFOPLIST_FILE")
+              memo[target.name] = File.absolute_path(info_plist_file)
+            end
+          else
+            UI.verbose("Unable to create find Xcode project in folder: #{folder}")
           end
-        else
-          UI.verbose("Unable to create find Xcode project in folder: #{folder}")
         end
 
         map

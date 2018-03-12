@@ -62,10 +62,12 @@ describe Fastlane do
       end
 
       it "gets the correct version number for 'TargetD' with xcodeproj fallback (plist named differently than target)" do
-        result = Fastlane::FastFile.new.parse("lane :test do
-          get_version_number(xcodeproj: '#{path}', target: 'TargetD')
-        end").runner.execute(:test)
-        expect(result).to eq("7.8.9")
+        if FastlaneCore::Helper.mac?
+          result = Fastlane::FastFile.new.parse("lane :test do
+            get_version_number(xcodeproj: '#{path}', target: 'TargetD')
+          end").runner.execute(:test)
+          expect(result).to eq("7.8.9")
+        end
       end
 
       it "raises an exception when use passes workspace" do
