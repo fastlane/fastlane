@@ -307,6 +307,7 @@ Style/MethodCallWithArgsParentheses:
     - 'to'
     - 'describe'
     - 'it'
+    - 'be'
     - 'context'
     - 'before'
     - 'after'
