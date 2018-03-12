@@ -4,132 +4,80 @@ module Fastlane
       require 'shellwords'
 
       def self.run(params)
-        # More information about how to set up your project and how it works:
-        # https://developer.apple.com/library/ios/qa/qa1827/_index.html
-
         folder = params[:xcodeproj] ? File.join(params[:xcodeproj], '..') : '.'
-
-        command_prefix = [
-          'cd',
-          File.expand_path(folder).shellescape,
-          '&&'
-        ].join(' ')
-
-        command = [
-          command_prefix,
-          'agvtool',
-          'what-marketing-version',
-          '-terse'
-        ].join(' ')
-
-        resolved_version_number = ""
         scheme = params[:scheme] || ""
-        target = params[:target] || ""
-        results = []
+        target_name = params[:target]
+        configuration = params[:configuration]
 
-        # Creates a map with target as key and plist absolute file path as value
-        # Used for comparing passed in target
-        target_plist_map = generate_target_plist_mapping(folder)
-
-        if Helper.test?
-          # These lines are based off of fixtures of working project at
-          # ./fastlane/spec/fixtures/actions/get_version_number/get_version_number/
-          results = [
-            '"get_version_number.xcodeproj/../SampleProject-Info.plist"=4.3.2',
-            '"get_version_number.xcodeproj/../SampleProject_tests/Info.plist"=1.0',
-            '"get_version_number.xcodeproj/../Target-for-D/Plist-For-D-Target.plist"=7.8.9',
-            '"get_version_number.xcodeproj/../TargetA/TargetA-Info.plist"=4.3.2',
-            '"get_version_number.xcodeproj/../TargetATests/Info.plist"=4.3.2',
-            '"get_version_number.xcodeproj/../TargetB/TargetB-Info.plist"=5.4.3',
-            '"get_version_number.xcodeproj/../TargetBTests/Info.plist"=5.4.3',
-            '"get_version_number.xcodeproj/../supporting_files/TargetC_internal-Info.plist"=7.5.2',
-            '"get_version_number.xcodeproj/../supporting_files/TargetC_production-Info.plist"=6.4.9'
-          ]
-        else
-          # Using `` instead of Actions.sh since agvtools needs to actually run during tests
-          results = `#{command}`.split("\n")
-        end
-
-        if target.empty? && scheme.empty?
-          # Sometimes the results array contains nonsense as the first element
-          # This iteration finds the first 'real' result and returns that
-          # emulating the actual behavior or the -terse1 flag correctly
-          project_string = ".xcodeproj"
-          results.any? do |result|
-            plist_path = result.partition('=').first
-            version_number = result.partition('=').last
-
-            if plist_path.include?(project_string)
-              resolved_version_number = version_number
-              break
-            end
-          end
-        else
-          # This iteration finds the first folder structure or info plist
-          # matching the specified target
-          scheme_string = "/#{scheme}"
-          target_string = "/#{target}/"
-          plist_target_string = "/#{target}-"
-
-          results.any? do |result|
-            relative_plist_path = result.partition('=').first
-            version_number = result.partition('=').last
-
-            # Remove quotes from path string and make absolute
-            # for map comparision (if needed)
-            clean_plist_path = relative_plist_path.tr('"', '')
-            plist_path = File.absolute_path(clean_plist_path)
-
-            if !target.empty?
-              if plist_path.include?(target_string)
-                resolved_version_number = version_number
-                break
-              elsif plist_path.include?(plist_target_string)
-                resolved_version_number = version_number
-                break
-              elsif target_plist_map[target] == plist_path
-                resolved_version_number = version_number
-                break
-              end
-            else
-              if plist_path.include?(scheme_string)
-                resolved_version_number = version_number
-                break
-              end
-            end
-          end
-        end
-
-        # version_number = line.partition('=').last
+        # Get version_number 
+        project = get_project!(folder)
+        target = get_target!(project, target_name)
+        plist_file = get_plist!(folder, target, configuration)
+        version_number = get_version_number!(plist_file)
 
         # Store the number in the shared hash
-        Actions.lane_context[SharedValues::VERSION_NUMBER] = resolved_version_number
+        Actions.lane_context[SharedValues::VERSION_NUMBER] = version_number
 
         # Return the version number because Swift might need this return value
-        return resolved_version_number
-      rescue => ex
-        UI.error('Before being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html')
-        raise ex
+        return version_number
       end
 
-      def self.generate_target_plist_mapping(folder)
-        map = {}
+      def self.get_project!(folder)
+        require 'xcodeproj'
+        project_path = Dir.glob("#{folder}/*.xcodeproj").first
+        if project_path
+          project = Xcodeproj::Project.open(project_path)
+        else
+          UI.user_error!("Unable to find Xcode project in folder: #{folder}")
+        end
+      end
 
-        if Helper.mac?
-          require 'xcodeproj'
-          project_path = Dir.glob("#{folder}/*.xcodeproj").first
-          if project_path
-            project = Xcodeproj::Project.open(project_path)
-            map = project.targets.each_with_object(map) do |target, memo|
-              info_plist_file = target.common_resolved_build_setting("INFOPLIST_FILE")
-              memo[target.name] = File.absolute_path(info_plist_file)
-            end
-          else
-            UI.verbose("Unable to create find Xcode project in folder: #{folder}")
-          end
+      def self.get_target!(project, target_name)
+        targets = project.targets
+
+        # Prompt targets if no name
+        unless target_name
+          options = targets.map(&:name)
+          target_name = UI.select("What target would you like to use?", options)
         end
 
-        map
+        # Find target
+        target = targets.find do |target|
+          target.name == target_name
+        end
+        UI.user_error!("Cannot find target named '#{target_name}'") unless target
+
+        target
+      end
+
+      def self.get_plist!(folder, target, configuration = nil)
+        plist_files = target.resolved_build_setting("INFOPLIST_FILE")
+        plist_files_count = plist_files.values.compact.uniq.count
+
+        # Get plist file for specified configuration
+        # Or: Prompt for configuration if plist has different files in each configurations
+        # Else: Get first(only) plist value
+        if configuration
+          plist_file = plist_files[configuration]
+        elsif plist_files_count > 1
+          options = plist_files.keys
+          selected = UI.select("What build configuration would you like to use?", options)
+          plist_file = plist_files[selected]
+        else
+          plist_file = plist_files.values.first
+        end
+
+        plist_file = File.absolute_path(File.join(folder, plist_file))
+        UI.user_error!("Cannot find plist file: #{plist_file}") unless File.exists?(plist_file)
+
+        plist_file
+      end
+
+      def self.get_version_number!(plist_file)
+        plist = Xcodeproj::Plist.read_from_path(plist_file)
+        UI.user_error!("Unable to read plist: #{plist_file}") unless plist
+
+        plist["CFBundleShortVersionString"]
       end
 
       #####################################################
@@ -169,6 +117,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :target,
                              env_name: "FL_VERSION_NUMBER_TARGET",
                              description: "Specify a specific target if you have multiple per project, optional",
+                             optional: true),
+          FastlaneCore::ConfigItem.new(key: :configuration,
+                             env_name: "FL_VERSION_NUMBER_CONFIGURATION",
+                             description: "Specify a specific configuration if you have multiple per target, optional",
                              optional: true)
         ]
       end
