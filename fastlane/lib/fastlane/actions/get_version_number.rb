@@ -56,8 +56,13 @@ module Fastlane
           plist_target_string = "/#{target}-"
 
           results.any? do |result|
-            plist_path = File.absolute_path(result.partition('=').first.tr('"', ''))
+            relative_plist_path = result.partition('=').first
             version_number = result.partition('=').last
+
+            # Remove quotes from path string and make absolute
+            # for map comparision (if needed)
+            clean_plist_path = relative_plist_path.tr('"', '')
+            plist_path = File.absolute_path(clean_plist_path)
 
             if !target.empty?
               if plist_path.include?(target_string)
