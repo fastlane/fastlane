@@ -1,6 +1,8 @@
 require:
   - rubocop/require_tools
   - ./rubocop/fork_usage.rb
+  Exclude:
+    - '**/simctl/xcode/path.rb'
 
 Style/MultipleComparison:
   Enabled: false
