@@ -61,7 +61,7 @@ describe Fastlane do
         expect(result).to eq("4.3.2")
       end
 
-      it "gets the correct version number for 'TargetD' (plist named differently than target)" do
+      it "gets the correct version number for 'TargetD' with xcodeproj fallback (plist named differently than target)" do
         result = Fastlane::FastFile.new.parse("lane :test do
           get_version_number(xcodeproj: '#{path}', target: 'TargetD')
         end").runner.execute(:test)

@@ -50,7 +50,7 @@ module Fastlane
           end
         else
           # This iteration finds the first folder structure or info plist
-          # matching the specified target 
+          # matching the specified target
           scheme_string = "/#{scheme}"
           target_string = "/#{target}/"
           plist_target_string = "/#{target}-"
@@ -93,15 +93,14 @@ module Fastlane
 
       def self.generate_target_plist_mapping(folder)
         map = {}
-        
+
         require 'xcodeproj'
         project_path = Dir.glob("#{folder}/*.xcodeproj").first
         if project_path
           project = Xcodeproj::Project.open(project_path)
-          map = project.targets.reduce(map) do |map, target|
+          map = project.targets.each_with_object(map) do |target, map|
             info_plist_file = target.common_resolved_build_setting("INFOPLIST_FILE")
             map[target.name] = File.absolute_path(info_plist_file)
-            map
           end
         else
           UI.verbose("Unable to create find Xcode project in folder: #{folder}")
