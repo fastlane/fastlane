@@ -18,7 +18,7 @@ module Fastlane
       # https://github.com/fastlane/fastlane/issues/11913
       # FastlaneCore.session.is_fastfile = true
 
-      load_dot_env(env)
+      Fastlane::Helper::DotenvHelper.load_dot_env(env)
 
       started = Time.now
       e = nil
