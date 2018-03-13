@@ -8,8 +8,8 @@ module Fastlane
         require 'xcodeproj'
 
         # Check if parameters are set
-        if params[:app_identifier] or params[:display_name] or params[:block]
-          if (params[:app_identifier] or params[:display_name]) and params[:block]
+        if params[:app_identifier] || params[:display_name] || params[:block]
+          if (params[:app_identifier] || params[:display_name]) && params[:block]
             UI.important("block parameter can not be specified with app_identifier or display_name")
             return false
           end

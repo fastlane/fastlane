@@ -16,7 +16,7 @@ require_relative 'simulator_launchers/launcher_configuration'
 module Snapshot
   class Runner
     def work
-      if File.exist?("./fastlane/snapshot.js") or File.exist?("./snapshot.js")
+      if File.exist?("./fastlane/snapshot.js") || File.exist?("./snapshot.js")
         UI.error("Found old snapshot configuration file 'snapshot.js'")
         UI.error("You updated to snapshot 1.0 which now uses UI Automation")
         UI.error("Please follow the migration guide: https://github.com/fastlane/fastlane/blob/master/snapshot/MigrationGuide.md")

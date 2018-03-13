@@ -16,7 +16,7 @@ module Fastlane
           profile_path = PEM::Manager.start
         end
 
-        if success_block and profile_path
+        if success_block && profile_path
           success_block.call(File.expand_path(profile_path)) if success_block
         end
       end

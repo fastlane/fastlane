@@ -61,7 +61,7 @@ module Fastlane
                              optional: true,
                              verify_block: proc do |value|
                                UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
-                               UI.user_error!("Could not find Xcode project") if !File.exist?(value) and !Helper.test?
+                               UI.user_error!("Could not find Xcode project") if !File.exist?(value) && !Helper.test?
                              end),
           FastlaneCore::ConfigItem.new(key: :hide_error_when_versioning_disabled,
                              env_name: "FL_BUILD_NUMBER_HIDE_ERROR_WHEN_VERSIONING_DISABLED",

@@ -39,7 +39,7 @@ module Fastlane
       def self.upload_build(api_token, ipa, options)
         connection = self.connection(options)
 
-        options[:ipa] = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa and File.exist?(ipa)
+        options[:ipa] = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa && File.exist?(ipa)
 
         dsym_filename = options.delete(:dsym_filename)
         if dsym_filename
@@ -74,11 +74,11 @@ module Fastlane
         options.delete(:apk)
         app_id = options.delete(:public_identifier)
 
-        ipaio = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa and File.exist?(ipa)
+        ipaio = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa && File.exist?(ipa)
         dsym = options.delete(:dsym)
 
         if dsym
-          dsym_io = Faraday::UploadIO.new(dsym, 'application/octet-stream') if dsym and File.exist?(dsym)
+          dsym_io = Faraday::UploadIO.new(dsym, 'application/octet-stream') if dsym && File.exist?(dsym)
         end
 
         # https://support.hockeyapp.net/discussions/problems/83559
@@ -206,7 +206,7 @@ module Fastlane
                                        sensitive: true,
                                        description: "API Token for Hockey Access",
                                        verify_block: proc do |value|
-                                         UI.user_error!("No API token for Hockey given, pass using `api_token: 'token'`") unless value and !value.empty?
+                                         UI.user_error!("No API token for Hockey given, pass using `api_token: 'token'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "FL_HOCKEY_IPA",
