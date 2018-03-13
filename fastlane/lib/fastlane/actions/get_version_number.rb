@@ -25,7 +25,7 @@ module Fastlane
         require 'xcodeproj'
         project_path = Dir.glob("#{folder}/*.xcodeproj").first
         if project_path
-          project = Xcodeproj::Project.open(project_path)
+          return Xcodeproj::Project.open(project_path)
         else
           UI.user_error!("Unable to find Xcode project in folder: #{folder}")
         end
@@ -41,8 +41,8 @@ module Fastlane
         end
 
         # Find target
-        target = targets.find do |target|
-          target.name == target_name
+        target = targets.find do |t|
+          t.name == target_name
         end
         UI.user_error!("Cannot find target named '#{target_name}'") unless target
 
