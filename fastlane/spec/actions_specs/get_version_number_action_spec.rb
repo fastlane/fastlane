@@ -70,7 +70,7 @@ describe Fastlane do
         end.to raise_error(FastlaneCore::Interface::FastlaneCrash, /non-interactive mode/)
       end
 
-      it "get correct version for different configurations", requires_xcodeproj: true do
+      it "gets correct version for different configurations", requires_xcodeproj: true do
         result = Fastlane::FastFile.new.parse("lane :test do
           get_version_number(xcodeproj: '#{path}', target: 'TargetDifferentConfigurations', configuration: 'Debug')
         end").runner.execute(:test)

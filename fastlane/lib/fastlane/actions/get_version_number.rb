@@ -5,11 +5,10 @@ module Fastlane
 
       def self.run(params)
         folder = params[:xcodeproj] ? File.join(params[:xcodeproj], '..') : '.'
-        scheme = params[:scheme] || ""
         target_name = params[:target]
         configuration = params[:configuration]
 
-        # Get version_number 
+        # Get version_number
         project = get_project!(folder)
         target = get_target!(project, target_name)
         plist_file = get_plist!(folder, target, configuration)
@@ -68,7 +67,7 @@ module Fastlane
         end
 
         plist_file = File.absolute_path(File.join(folder, plist_file))
-        UI.user_error!("Cannot find plist file: #{plist_file}") unless File.exists?(plist_file)
+        UI.user_error!("Cannot find plist file: #{plist_file}") unless File.exist?(plist_file)
 
         plist_file
       end
@@ -90,9 +89,7 @@ module Fastlane
 
       def self.details
         [
-          "This action will return the current version number set on your project.",
-          "You first have to set up your Xcode project, if you haven't done it already:",
-          "https://developer.apple.com/library/ios/qa/qa1827/_index.html"
+          "This action will return the current version number set on your project."
         ].join(' ')
       end
 
@@ -106,14 +103,6 @@ module Fastlane
                                UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
                                UI.user_error!("Could not find Xcode project at path '#{File.expand_path(value)}'") if !File.exist?(value) and !Helper.test?
                              end),
-          FastlaneCore::ConfigItem.new(key: :scheme,
-                             env_name: "FL_VERSION_NUMBER_SCHEME",
-                             description: "Specify a specific scheme if you have multiple per project, optional. " \
-                                          "This parameter is deprecated and will be removed in a future release. " \
-                                          "Please use the 'target' parameter instead. The behavior of this parameter " \
-                                          "is currently undefined if your scheme name doesn't match your target name",
-                             optional: true,
-                             deprecated: true),
           FastlaneCore::ConfigItem.new(key: :target,
                              env_name: "FL_VERSION_NUMBER_TARGET",
                              description: "Specify a specific target if you have multiple per project, optional",
@@ -132,7 +121,7 @@ module Fastlane
       end
 
       def self.authors
-        ["Liquidsoul"]
+        ["Liquidsoul", "joshdholtz"]
       end
 
       def self.is_supported?(platform)
