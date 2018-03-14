@@ -40,7 +40,7 @@ module Fastlane
           UI.message("Fetching the latest build number for version #{version_number}")
 
           # Fetches build history to get list of latest build trains
-          data = Spaceship::Tunes.client.all_build_history(app_id: app.apple_id, platform: platform)
+          data = Spaceship::Tunes.client.all_build_trains(app_id: app.apple_id, platform: platform)
           trains = data["trains"]
 
           # Parse data to get build number
