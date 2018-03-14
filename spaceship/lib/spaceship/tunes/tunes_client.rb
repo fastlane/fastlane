@@ -840,7 +840,7 @@ module Spaceship
     end
 
     # All build trains, even if there is no TestFlight
-    def all_build_trains(app_id: nil, platform: 'ios')
+    def all_build_history(app_id: nil, platform: 'ios')
       platform = 'ios' if platform.nil?
       r = request(:get, "ra/apps/#{app_id}/buildHistory?platform=#{platform}")
       handle_itc_response(r.body)

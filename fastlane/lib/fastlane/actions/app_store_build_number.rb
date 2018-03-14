@@ -39,13 +39,27 @@ module Fastlane
 
           UI.message("Fetching the latest build number for version #{version_number}")
 
-          begin
-            build_nr = app.all_builds_for_train(train: version_number, platform: platform).map(&:build_version).map(&:to_i).sort.last
-            if build_nr.nil? && params[:initial_build_number]
-              UI.message("Could not find a build on iTC. Using supplied 'initial_build_number' option")
-              build_nr = params[:initial_build_number]
+          # Fetches build history to get list of latest build trains
+          data = Spaceship::Tunes.client.all_build_history(app_id: app.apple_id, platform: platform)
+          trains = data["trains"]
+
+          # Parse data to get build number
+          if trains
+            # Get train matching version number
+            train = trains.find do |t|
+              t["versionString"] == version_number
             end
-          rescue
+
+            # Get latest build number from train's builds
+            if train && train["items"]
+              build_nr = train["items"].map do |build|
+                build["buildVersion"]
+              end.map(&:to_i).sort.last
+            end
+          end
+
+          # Handle not having a build number
+          unless build_nr
             UI.user_error!("Could not find a build on iTC - and 'initial_build_number' option is not set") unless params[:initial_build_number]
             build_nr = params[:initial_build_number]
           end
