@@ -106,7 +106,7 @@ Inside of a given locale directory is a folder called `images`. Here you can sup
 - `promoGraphic`
 - `tvBanner`
 
-And you can supply screenshots by creating directories with the following names, containing PNGs or JPEGs (image names are irrelevant):
+You can also supply screenshots by creating directories within the `images` directory with the following names, containing PNGs or JPEGs (image names are irrelevant):
 
 - `phoneScreenshots/`
 - `sevenInchScreenshots/` (7-inch tablets)
