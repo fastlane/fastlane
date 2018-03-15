@@ -27,7 +27,6 @@ module Deliver
 
       # Finalize app submission
       submission.complete!
-
       UI.success("Successfully submitted the app for review!")
     end
 

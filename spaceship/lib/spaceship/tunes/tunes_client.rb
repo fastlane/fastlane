@@ -997,6 +997,8 @@ module Spaceship
         req.headers['Content-Type'] = 'application/json'
       end
 
+      handle_itc_response(r.body)
+
       # iTunes Connect still returns a success status code even the submission
       # was failed because of Ad ID info.  This checks for any section error
       # keys in returned adIdInfo and prints them out.

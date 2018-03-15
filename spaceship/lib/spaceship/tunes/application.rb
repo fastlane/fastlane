@@ -238,7 +238,7 @@ module Spaceship
 
       def reject_version_if_possible!
         if edit_version.can_reject_version
-          resp = client.reject!(apple_id, edit_version.version_id)
+          client.reject!(apple_id, edit_version.version_id)
         end
       end
 
