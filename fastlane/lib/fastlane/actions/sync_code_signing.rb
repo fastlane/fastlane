@@ -68,7 +68,10 @@ module Fastlane
       end
 
       def self.output
-        []
+        [
+          ['MATCH_PROFILES_UUID', 'Collection: The UUIDs of the profiles returned by match for each app_identifier'],
+          ['MATCH_PROFILES_NAME', 'Collection: The names of the profiles returned by match for each app_identifier']
+        ]
       end
 
       def self.return_value
