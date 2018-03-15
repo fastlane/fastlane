@@ -987,7 +987,7 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def send_app_submission(app_id, version, data, reject_if_waiting_for_review = false)
+    def send_app_submission(app_id, version, data)
       raise "app_id is required" unless app_id
 
       # ra/apps/1039164429/version/submit/complete
@@ -996,20 +996,6 @@ module Spaceship
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
       end
-
-      app_version = app_version(app_id, false)
-
-      if reject_if_waiting_for_review
-        if app_version['canRejectVersion']
-          puts("Found a version already submitted. Going to reject the previously submitted version.")
-          reject!(app_id, version)
-          puts("Rejected previously submitted app version.")
-          puts("Going to submit app for review again...")
-          send_app_submission(app_id, version, data)
-          return
-        end
-      end
-      handle_itc_response(r.body)
 
       # iTunes Connect still returns a success status code even the submission
       # was failed because of Ad ID info.  This checks for any section error

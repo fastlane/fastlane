@@ -125,7 +125,7 @@ module Spaceship
       end
 
       # Save and complete the app submission
-      def complete!(reject_if_waiting_for_review = false)
+      def complete!
         raw_data_clone = raw_data.dup
         if self.content_rights_has_rights.nil? || self.content_rights_contains_third_party_content.nil?
           raw_data_clone.set(["contentRights"], nil)
@@ -142,7 +142,7 @@ module Spaceship
           )
         end
 
-        client.send_app_submission(application.apple_id, application.edit_version.version_id, raw_data_clone, reject_if_waiting_for_review)
+        client.send_app_submission(application.apple_id, application.edit_version.version_id, raw_data_clone)
 
         @submitted_for_review = true
       end
