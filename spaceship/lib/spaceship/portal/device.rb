@@ -148,7 +148,7 @@ module Spaceship
             raise "You cannot create a device without a device_id (UDID) and name"
           end
 
-          raise "Device name must be 50 characters or less. \"#{name}\" has a #{name.length}-character length." if name.length > 50
+          raise "Device name must be 50 characters or less. \"#{name}\" has a #{name.length} character length." if name.length > 50
 
           # Find the device by UDID, raise an exception if it already exists
           existing = self.find_by_udid(udid, mac: mac)

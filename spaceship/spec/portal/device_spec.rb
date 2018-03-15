@@ -113,7 +113,7 @@ describe Spaceship::Device do
     it "should fail to create a device name longer than 50 characters" do
       expect do
         Spaceship::Device.create!(name: "Demo Device (Apple Watch Series 3 - 42mm GPS Black)", udid: "7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
-      end.to raise_error("Device name must be 50 characters or less. \"Demo Device (Apple Watch Series 3 - 42mm GPS Black)\" has a 51-character length.")
+      end.to raise_error("Device name must be 50 characters or less. \"Demo Device (Apple Watch Series 3 - 42mm GPS Black)\" has a 51 character length.")
     end
 
     it "doesn't trigger an ITC call if the device ID is already registered" do
