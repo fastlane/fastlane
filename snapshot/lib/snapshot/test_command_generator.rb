@@ -29,7 +29,6 @@ module Snapshot
       end
 
       def destination(devices)
-        puts("devices: #{devices.inspect}")
         unless verify_devices_share_os(devices)
           UI.user_error!('All devices provided to snapshot should run the same operating system')
         end
@@ -79,13 +78,22 @@ module Snapshot
         return devices.count == 1
       end
 
+      private
+
+      # Creates an alias for require to prevent `rubocop/require_tools`
+      # from failing. This eventually change it when `simctl` doesn't 
+      # execute shell commands at the top-level anymore
+      alias silence_the_horrible_require_checker require
+
       def get_device_type_with_simctl(device_names)
         return device_names if Helper.test?
 
+        silence_the_horrible_require_checker("simctl")
+
         # Gets actual simctl device type from device name
-        require 'simctl'
         return device_names.map do |device_name|
-          device = SimCtl.device(name: device_name)
+          # Disable checking due to alias-ed require above
+          device = SimCtl.device(name: device_name) # rubocop:disable Require/MissingRequireStatement
           if device
             device.devicetype.name
           end
