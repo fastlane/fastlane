@@ -52,7 +52,10 @@ module Snapshot
         return [destinations.join(' ')]
       end
 
-      def verify_devices_share_os(devices)
+      def verify_devices_share_os(device_names)
+        # Get device types based off of device name
+        devices = get_device_type_with_simctl(device_names)
+
         # Check each device to see if it is an iOS device
         all_ios = devices.map do |device|
           device = device.downcase
@@ -73,6 +76,30 @@ module Snapshot
         # device in the array, and they are not all iOS or tvOS
         # as checked above, that would imply that this is a mixed bag
         return devices.count == 1
+      end
+
+      private
+
+      # Creates an alias for require to prevent `rubocop/require_tools`
+      # from failing. This eventually change it when `simctl` doesn't
+      # execute shell commands at the top-level anymore
+      #
+      # Issue: https://github.com/fastlane/fastlane/issues/12071
+      alias silence_the_horrible_require_checker require
+
+      def get_device_type_with_simctl(device_names)
+        return device_names if Helper.test?
+
+        silence_the_horrible_require_checker("simctl")
+
+        # Gets actual simctl device type from device name
+        return device_names.map do |device_name|
+          # Disable checking due to alias-ed require above
+          device = SimCtl.device(name: device_name) # rubocop:disable Require/MissingRequireStatement
+          if device
+            device.devicetype.name
+          end
+        end.compact
       end
     end
   end
