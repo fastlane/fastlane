@@ -45,7 +45,7 @@ module Deliver
 
       UI.success("Finished the upload to iTunes Connect") unless options[:skip_binary_upload]
 
-      reject_version_if_possible if options[:reject_if_waiting_for_review]
+      reject_version_if_possible if options[:reject_if_possible]
 
       precheck_success = precheck_app
       submit_for_review if options[:submit_for_review] && precheck_success
