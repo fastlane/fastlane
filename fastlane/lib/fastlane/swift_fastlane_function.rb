@@ -214,7 +214,6 @@ module Fastlane
 
     def implementation
       args = build_argument_list
-
       implm = "  let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: ["
       # Get the indent of the first argument in the list to give each
       # subsequent argument it's own line with proper indenting

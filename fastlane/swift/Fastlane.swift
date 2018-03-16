@@ -1155,6 +1155,14 @@ func danger(useBundleExec: Bool = true,
                                                                                         RubyCommand.Argument(name: "pr", value: pr)])
   _ = runner.executeCommand(command)
 }
+func debug() {
+  let command = RubyCommand(commandID: "", methodName: "debug", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
+func defaultPlatform() {
+  let command = RubyCommand(commandID: "", methodName: "default_platform", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
 func deleteKeychain(name: String? = nil,
                     keychainPath: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "delete_keychain", className: nil, args: [RubyCommand.Argument(name: "name", value: name),
@@ -1369,6 +1377,10 @@ func erb(template: String,
   let command = RubyCommand(commandID: "", methodName: "erb", className: nil, args: [RubyCommand.Argument(name: "template", value: template),
                                                                                      RubyCommand.Argument(name: "destination", value: destination),
                                                                                      RubyCommand.Argument(name: "placeholders", value: placeholders)])
+  _ = runner.executeCommand(command)
+}
+func fastlaneVersion() {
+  let command = RubyCommand(commandID: "", methodName: "fastlane_version", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
 func flock(message: String,
@@ -1731,6 +1743,10 @@ func hgCommitVersionBump(message: String = "Version Bump",
                                                                                                         RubyCommand.Argument(name: "test_expected_files", value: testExpectedFiles)])
   _ = runner.executeCommand(command)
 }
+func hgEnsureCleanStatus() {
+  let command = RubyCommand(commandID: "", methodName: "hg_ensure_clean_status", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
 func hgPush(force: Bool = false,
             destination: String = "") {
   let command = RubyCommand(commandID: "", methodName: "hg_push", className: nil, args: [RubyCommand.Argument(name: "force", value: force),
@@ -1937,6 +1953,10 @@ func laneContext() {
   let command = RubyCommand(commandID: "", methodName: "lane_context", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+@discardableResult func lastGitCommit() -> [String : String] {
+  let command = RubyCommand(commandID: "", methodName: "last_git_commit", className: nil, args: [])
+  return parseDictionary(fromString: runner.executeCommand(command))
+}
 @discardableResult func lastGitTag() -> String {
   let command = RubyCommand(commandID: "", methodName: "last_git_tag", className: nil, args: [])
   return runner.executeCommand(command)
@@ -2053,6 +2073,10 @@ func match(gitUrl: String = matchfile.gitUrl,
                                                                                        RubyCommand.Argument(name: "template_name", value: templateName)])
   _ = runner.executeCommand(command)
 }
+func minFastlaneVersion() {
+  let command = RubyCommand(commandID: "", methodName: "min_fastlane_version", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
 func modifyServices(username: String,
                     appIdentifier: String,
                     services: [String : Any] = [:],
@@ -2119,6 +2143,10 @@ func notification(title: String = "fastlane",
                                                                                               RubyCommand.Argument(name: "execute", value: execute)])
   _ = runner.executeCommand(command)
 }
+func notify() {
+  let command = RubyCommand(commandID: "", methodName: "notify", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
 @discardableResult func numberOfCommits(all: String? = nil) -> Int {
   let command = RubyCommand(commandID: "", methodName: "number_of_commits", className: nil, args: [RubyCommand.Argument(name: "all", value: all)])
   return parseInt(fromString: runner.executeCommand(command))
@@ -2173,6 +2201,14 @@ func onesignal(authToken: String,
                                                                                            RubyCommand.Argument(name: "apns_p12", value: apnsP12),
                                                                                            RubyCommand.Argument(name: "apns_p12_password", value: apnsP12Password),
                                                                                            RubyCommand.Argument(name: "apns_env", value: apnsEnv)])
+  _ = runner.executeCommand(command)
+}
+func optOutCrashReporting() {
+  let command = RubyCommand(commandID: "", methodName: "opt_out_crash_reporting", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
+func optOutUsage() {
+  let command = RubyCommand(commandID: "", methodName: "opt_out_usage", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
 func pem(development: Bool = false,
@@ -2501,6 +2537,10 @@ func rubocop() {
   let command = RubyCommand(commandID: "", methodName: "rubocop", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+func rubyVersion() {
+  let command = RubyCommand(commandID: "", methodName: "ruby_version", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
 func runTests(workspace: String? = nil,
               project: String? = nil,
               device: String? = nil,
@@ -2613,6 +2653,10 @@ func s3(ipa: String? = nil,
                                                                                     RubyCommand.Argument(name: "path", value: path),
                                                                                     RubyCommand.Argument(name: "source", value: source),
                                                                                     RubyCommand.Argument(name: "acl", value: acl)])
+  _ = runner.executeCommand(command)
+}
+func say() {
+  let command = RubyCommand(commandID: "", methodName: "say", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
 func scan(workspace: String? = scanfile.workspace,
@@ -2893,6 +2937,10 @@ func sigh(adhoc: Bool = false,
                                                                                       RubyCommand.Argument(name: "template_name", value: templateName)])
   _ = runner.executeCommand(command)
 }
+func skipDocs() {
+  let command = RubyCommand(commandID: "", methodName: "skip_docs", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
 func slack(message: String? = nil,
            channel: String? = nil,
            useWebhookConfiguredUsernameAndIcon: Bool = false,
@@ -2919,6 +2967,10 @@ func slack(message: String? = nil,
 }
 func slackTrain() {
   let command = RubyCommand(commandID: "", methodName: "slack_train", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
+func slackTrainCrash() {
+  let command = RubyCommand(commandID: "", methodName: "slack_train_crash", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
 func slackTrainStart(distance: Int = 5,
@@ -3225,6 +3277,14 @@ func syncCodeSigning(gitUrl: String,
                                                                                                    RubyCommand.Argument(name: "skip_docs", value: skipDocs),
                                                                                                    RubyCommand.Argument(name: "platform", value: platform),
                                                                                                    RubyCommand.Argument(name: "template_name", value: templateName)])
+  _ = runner.executeCommand(command)
+}
+func teamId() {
+  let command = RubyCommand(commandID: "", methodName: "team_id", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
+func teamName() {
+  let command = RubyCommand(commandID: "", methodName: "team_name", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
 func testfairy(apiKey: String,
@@ -3685,6 +3745,10 @@ func verifyBuild(provisioningType: String? = nil,
                                                                                               RubyCommand.Argument(name: "ipa_path", value: ipaPath)])
   _ = runner.executeCommand(command)
 }
+func verifyPodKeys() {
+  let command = RubyCommand(commandID: "", methodName: "verify_pod_keys", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
 func verifyXcode(xcodePath: String) {
   let command = RubyCommand(commandID: "", methodName: "verify_xcode", className: nil, args: [RubyCommand.Argument(name: "xcode_path", value: xcodePath)])
   _ = runner.executeCommand(command)
@@ -3731,6 +3795,10 @@ func xcexport() {
                                                                                                RubyCommand.Argument(name: "team_id", value: teamId)])
   return runner.executeCommand(command)
 }
+func xcodeSelect() {
+  let command = RubyCommand(commandID: "", methodName: "xcode_select", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
 @discardableResult func xcodeServerGetAssets(host: String,
                                              botName: String,
                                              integrationNumber: String? = nil,
@@ -3759,6 +3827,10 @@ func xcov() {
 }
 func xctest() {
   let command = RubyCommand(commandID: "", methodName: "xctest", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
+func xctool() {
+  let command = RubyCommand(commandID: "", methodName: "xctool", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
 func xcversion(version: String) {
@@ -3819,4 +3891,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.8]
+// FastlaneRunnerAPIVersion [0.9.9]
