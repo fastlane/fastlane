@@ -194,11 +194,18 @@ module Fastlane
           return_value: closure_arg,
           return_value_type: :string # always assume string for closure error_callback
         )
-        closure_arg = ', "closure_argument_value": ' + closure_arg
       end
 
       Thread.current[:exception] = nil
-      return '{"payload":{"status":"ready_for_next", "return_object":' + return_object + closure_arg + '}}'
+
+      payload = {
+        payload: {
+          status: "ready_for_next",
+          return_object: return_object,
+          closure_argument_value: closure_arg
+        }
+      }
+      return JSON.generate(payload)
     rescue StandardError => e
       Thread.current[:exception] = e
 
@@ -210,7 +217,14 @@ module Fastlane
         exception_array << "cause: #{e.class}"
         exception_array << e.backtrace
       end
-      return "{\"payload\":{\"status\":\"failure\",\"failure_information\":#{exception_array.flatten}}}"
+
+      payload = {
+        payload: {
+          status: "failure",
+          failure_information: exception_array.flatten
+        }
+      }
+      return JSON.generate(payload)
     end
   end
 end
