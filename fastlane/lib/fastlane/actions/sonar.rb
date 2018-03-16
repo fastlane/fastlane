@@ -56,7 +56,7 @@ module Fastlane
                                         description: "The path to your sonar project configuration file; defaults to `sonar-project.properties`", # default is enforced by sonar-scanner binary
                                         optional: true,
                                         verify_block: proc do |value|
-                                          UI.user_error!("Couldn't find file at path '#{value}'") unless value.nil? or File.exist?(value)
+                                          UI.user_error!("Couldn't find file at path '#{value}'") unless value.nil? || File.exist?(value)
                                         end),
           FastlaneCore::ConfigItem.new(key: :project_key,
                                        env_name: "FL_SONAR_RUNNER_PROJECT_KEY",

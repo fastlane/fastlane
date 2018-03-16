@@ -238,7 +238,7 @@ module Fastlane
             # Since we usually just need the passed hash, we'll just use the first object if there is only one
             if arguments.count == 0
               arguments = ConfigurationHelper.parse(class_ref, {}) # no parameters => empty hash
-            elsif arguments.count == 1 and arguments.first.kind_of?(Hash)
+            elsif arguments.count == 1 && arguments.first.kind_of?(Hash)
               arguments = ConfigurationHelper.parse(class_ref, arguments.first) # Correct configuration passed
             elsif !class_ref.available_options
               # This action does not use the new action format
@@ -309,7 +309,7 @@ module Fastlane
     def add_lane(lane, override = false)
       lanes[lane.platform] ||= {}
 
-      if !override and lanes[lane.platform][lane.name]
+      if !override && lanes[lane.platform][lane.name]
         UI.user_error!("Lane '#{lane.name}' was defined multiple times!")
       end
 

@@ -182,7 +182,7 @@ module Spaceship
           hash.each do |key, value|
             errors += handle_response_hash.call(value, current_language)
 
-            next unless key == 'errorKeys' and value.kind_of?(Array) and value.count > 0
+            next unless key == 'errorKeys' && value.kind_of?(Array) && value.count > 0
             # Prepend the error with the language so it's easier to understand for the user
             errors += value.collect do |current_error_message|
               current_language ? "[#{current_language}]: #{current_error_message}" : current_error_message
@@ -215,11 +215,11 @@ module Spaceship
 
       if errors.count > 0 # they are separated by `.` by default
         # Sample `error` content: [["Forbidden"]]
-        if errors.count == 1 and errors.first == "You haven't made any changes."
+        if errors.count == 1 && errors.first == "You haven't made any changes."
           # This is a special error which we really don't care about
-        elsif errors.count == 1 and errors.first.include?("try again later")
+        elsif errors.count == 1 && errors.first.include?("try again later")
           raise ITunesConnectTemporaryError.new, errors.first
-        elsif errors.count == 1 and errors.first.include?("Forbidden")
+        elsif errors.count == 1 && errors.first.include?("Forbidden")
           raise_insuffient_permission_error!
         elsif flaky_api_call
           raise ITunesConnectPotentialServerError.new, errors.join(' ')

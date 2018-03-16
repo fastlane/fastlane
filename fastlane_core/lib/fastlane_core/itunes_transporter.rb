@@ -118,7 +118,7 @@ module FastlaneCore
         UI.error("[Transporter Error Output]: #{$1}")
 
         # Check if it's a login error
-        if $1.include?("Your Apple ID or password was entered incorrectly") or
+        if $1.include?("Your Apple ID or password was entered incorrectly") ||
            $1.include?("This Apple ID has been locked for security reasons")
 
           unless Helper.test?
@@ -148,7 +148,7 @@ module FastlaneCore
         end
       end
 
-      if !hide_output and line =~ OUTPUT_REGEX
+      if !hide_output && line =~ OUTPUT_REGEX
         # General logging for debug purposes
         unless output_done
           UI.verbose("[Transporter]: #{$1}")

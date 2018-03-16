@@ -262,7 +262,7 @@ module Spaceship
           app = Spaceship::Portal::App.find(bundle_id, mac: mac)
           raise "Could not find app with bundle id '#{bundle_id}'" unless app
 
-          raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? and sub_platform != 'tvOS'
+          raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? && sub_platform != 'tvOS'
 
           # Fill in sensible default values
           name ||= [bundle_id, self.pretty_type].join(' ')
@@ -278,8 +278,8 @@ module Spaceship
           # Fix https://github.com/KrauseFx/fastlane/issues/349
           certificate_parameter = certificate_parameter.first if certificate_parameter.count == 1
 
-          if devices.nil? or devices.count == 0
-            if self == Development or self == AdHoc
+          if devices.nil? || devices.count == 0
+            if self == Development || self == AdHoc
               # For Development and AdHoc we usually want all compatible devices by default
               if mac
                 devices = Spaceship::Portal::Device.all_macs
@@ -364,7 +364,7 @@ module Spaceship
         #   This may also contain invalid or expired profiles
         def find_by_bundle_id(bundle_id: nil, mac: false, sub_platform: nil)
           raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
-          raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? and sub_platform != 'tvOS'
+          raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? && sub_platform != 'tvOS'
           find_tvos_profiles = sub_platform == 'tvOS'
           all(mac: mac).find_all do |profile|
             profile.app.bundle_id == bundle_id && profile.tvos? == find_tvos_profiles
