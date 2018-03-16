@@ -81,7 +81,7 @@ module Snapshot
       private
 
       # Creates an alias for require to prevent `rubocop/require_tools`
-      # from failing. This eventually change it when `simctl` doesn't 
+      # from failing. This eventually change it when `simctl` doesn't
       # execute shell commands at the top-level anymore
       alias silence_the_horrible_require_checker require
 
