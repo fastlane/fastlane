@@ -321,7 +321,7 @@ func parseInt(fromString: String, function: String = #function) -> Int {
     end
 
     def process_action(action: nil)
-      options = action.available_options or []
+      options = action.available_options || []
 
       action_name = action.action_name
       keys = []
