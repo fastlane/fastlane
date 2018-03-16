@@ -65,9 +65,9 @@ module Fastlane
               next
             end
 
-            # Need to check for a build_id
-            # No build_id means dsym is not ready
-            if build.build_id
+            # Need to check for a build.id
+            # No build.id means dsym is not ready
+            if build.id
               begin
                 # need to call reload here or dsym_url is nil
                 UI.verbose("Build_version: #{build.build_version} matches #{build_number}, grabbing dsym_url")
