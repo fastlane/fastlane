@@ -462,6 +462,23 @@ describe FastlaneCore do
       end
     end
 
+    describe 'xcodebuild_xcconfig option', requires_xcode: true do
+      it 'generates an xcodebuild -showBuildSettings command without xcconfig by default' do
+        project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+        expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+      end
+
+      it 'generates an xcodebuild -showBuildSettings command that includes xcconfig if provided in options', requires_xcode: true do
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          xcconfig: "/path/to/some.xcconfig"
+        })
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -xcconfig /path/to/some.xcconfig"
+        expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+      end
+    end
+
     describe "#project_paths" do
       it "works with basic projects" do
         project = FastlaneCore::Project.new({
