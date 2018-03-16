@@ -6,8 +6,6 @@ module Deliver
       app = options[:app]
       select_build(options)
 
-      app.reject_version_if_possible! if options[:reject_if_waiting_for_review]
-
       UI.message("Submitting the app for review...")
       submission = app.create_submission
 

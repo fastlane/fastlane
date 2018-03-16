@@ -237,9 +237,12 @@ module Spaceship
       end
 
       def reject_version_if_possible!
-        if edit_version.can_reject_version
+        can_reject = edit_version.can_reject_version
+        if can_reject_version
           client.reject!(apple_id, edit_version.version_id)
         end
+
+        return can_reject
       end
 
       # set the price tier. This method doesn't require `save` to be called
