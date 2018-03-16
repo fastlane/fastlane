@@ -6,6 +6,7 @@ require_relative 'app_submission'
 require_relative 'app_version'
 require_relative 'app_version_generated_promocodes'
 require_relative 'app_version_history'
+require_relative 'build_train'
 require_relative 'iap'
 require_relative 'tunes_base'
 require_relative 'version_set'
@@ -294,6 +295,30 @@ module Spaceship
       #   this include pre-processing or standard processing
       def all_processing_builds(platform: nil)
         return TestFlight::Build.all_processing_builds(app_id: self.apple_id, platform: platform || self.platform)
+      end
+
+      def tunes_all_build_trains(app_id: nil, platform: nil)
+        resp = client.all_build_trains(app_id: apple_id, platform: platform)
+        trains = resp["trains"] or []
+        trains.map do |attrs|
+          attrs['application'] = self
+          Tunes::BuildTrain.factory(attrs)
+        end
+      end
+
+      def tunes_all_builds_for_train(train: nil, platform: nil)
+        resp = client.all_builds_for_train(app_id: apple_id, train: train, platform: platform)
+        items = resp["items"] or []
+        items.map do |attrs|
+          attrs['apple_id'] = apple_id
+          Tunes::Build.factory(attrs)
+        end
+      end
+
+      def tunes_build_details(train: nil, build_number: nil, platform: nil)
+        resp = client.build_details(app_id: apple_id, train: train, build_number: build_number, platform: platform)
+        resp['apple_id'] = apple_id
+        Tunes::BuildDetails.factory(resp)
       end
 
       # Get all builds that are already processed for all build trains

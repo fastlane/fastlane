@@ -38,6 +38,7 @@ module Spaceship
       attr_reader :invalid_builds
 
       attr_mapping(
+        'application' => 'application',
         'versionString' => :version_string,
         'platform' => :platform,
         'externalTesting.value' => :external_testing_enabled,
