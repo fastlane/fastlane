@@ -57,6 +57,7 @@ describe Fastlane do
         values = Fastlane::FastFile.new.parse("lane :test do
             hockey({
               api_token: 'xxx',
+              bundle_version: '25',
               upload_dsym_only: true,
               dsym: './fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip'
             })
@@ -75,6 +76,7 @@ describe Fastlane do
         expect(values[:notes_type]).to eq(1.to_s)
         expect(values[:upload_dsym_only]).to eq(true)
         expect(values[:strategy]).to eq("add")
+        expect(values[:bundle_version]).to eq("25")
       end
 
       it "raises an error if both ipa and apk provided" do
