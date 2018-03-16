@@ -44,8 +44,9 @@ module Deliver
 
       UI.success("Finished the upload to iTunes Connect") unless options[:skip_binary_upload]
 
-      precheck_success = precheck_app
+      reject_version_if_possible if options[:reject_if_possible]
 
+      precheck_success = precheck_app
       submit_for_review if options[:submit_for_review] && precheck_success
     end
 
@@ -158,6 +159,13 @@ module Deliver
       transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
       result = transporter.upload(options[:app].apple_id, package_path)
       UI.user_error!("Could not upload binary to iTunes Connect. Check out the error above", show_github_issues: true) unless result
+    end
+
+    def reject_version_if_possible
+      app = options[:app]
+      if app.reject_version_if_possible!
+        UI.success("Successfully rejected previous version!")
+      end
     end
 
     def submit_for_review
