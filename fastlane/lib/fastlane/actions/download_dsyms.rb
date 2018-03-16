@@ -65,14 +65,18 @@ module Fastlane
               next
             end
 
-            begin
-              # need to call reload here or dsym_url is nil
-              UI.verbose("Build_version: #{build.build_version} matches #{build_number}, grabbing dsym_url")
-              build.reload
-              download_url = build.dsym_url
-              UI.verbose("dsym_url: #{download_url}")
-            rescue Spaceship::TunesClient::ITunesConnectError => ex
-              UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
+            # Need to check for a build.id
+            # No build.id means dsym is not ready
+            if build.id
+              begin
+                # need to call reload here or dsym_url is nil
+                UI.verbose("Build_version: #{build.build_version} matches #{build_number}, grabbing dsym_url")
+                build.reload
+                download_url = build.dsym_url
+                UI.verbose("dsym_url: #{download_url}")
+              rescue Spaceship::TunesClient::ITunesConnectError => ex
+                UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
+              end
             end
 
             if download_url
