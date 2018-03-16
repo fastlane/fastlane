@@ -43,7 +43,7 @@ module FastlaneCore
         command = command.join(" ") if command.kind_of?(Array)
         UI.command(command) if print_command
 
-        if print_all and loading # this is only used to show the "Loading text"...
+        if print_all && loading # this is only used to show the "Loading text"...
           UI.command_output(loading)
         end
 

@@ -7,7 +7,7 @@ module Fastlane
         end
 
         version = swiftlint_version(executable: params[:executable])
-        if params[:mode] == :autocorrect and version < Gem::Version.new('0.5.0') and !Helper.test?
+        if params[:mode] == :autocorrect && version < Gem::Version.new('0.5.0') && !Helper.test?
           UI.user_error!("Your version of swiftlint (#{version}) does not support autocorrect mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
         end
 

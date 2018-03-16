@@ -41,7 +41,7 @@ module Scan
         }
       end
 
-      if results[:tests] and results[:failures]
+      if results[:tests] && results[:failures]
         attachments << {
           text: "Successful Tests: #{results[:tests] - results[:failures]}",
           color: "good",

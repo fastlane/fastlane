@@ -74,7 +74,7 @@ module Fastlane
                                        description: "Add your custom overlay/badge image",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("custom should be a valid file path") unless value and File.exist?(value)
+                                         UI.user_error!("custom should be a valid file path") unless value && File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :no_badge,
                                        env_name: "FL_BADGE_NO_BADGE",

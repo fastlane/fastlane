@@ -89,7 +89,7 @@ module Spaceship
         req.headers['Connection'] = "keep-alive"
       end
 
-      if r.status == 500 and r.body.include?("Server Error")
+      if r.status == 500 && r.body.include?("Server Error")
         return upload_file(app_version: app_version, upload_file: upload_file, path: path, content_provider_id: content_provider_id, sso_token: sso_token, du_validation_rule_set: du_validation_rule_set, app_id: app_id)
       end
 

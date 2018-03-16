@@ -48,7 +48,7 @@ module Fastlane
                                        description: "The path to the entitlement file which contains the app group identifiers", # a short description of this parameter
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a path to an entitlements file. ") unless value.include?(".entitlements")
-                                         UI.user_error!("Could not find entitlements file") if !File.exist?(value) and !Helper.test?
+                                         UI.user_error!("Could not find entitlements file") if !File.exist?(value) && !Helper.test?
                                        end),
           FastlaneCore::ConfigItem.new(key: :app_group_identifiers,
                                        env_name: "FL_UPDATE_APP_GROUP_IDENTIFIER_APP_GROUP_IDENTIFIERS",

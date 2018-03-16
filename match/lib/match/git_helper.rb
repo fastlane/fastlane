@@ -59,7 +59,7 @@ module Match
 
       checkout_branch(branch) unless branch == "master"
 
-      if !Helper.test? and GitHelper.match_version(@dir).nil? and manual_password.nil? and File.exist?(File.join(@dir, "README.md"))
+      if !Helper.test? && GitHelper.match_version(@dir).nil? && manual_password.nil? && File.exist?(File.join(@dir, "README.md"))
         UI.important("Migrating to new match...")
         ChangePassword.update(params: { git_url: git_url,
                                     git_branch: branch,

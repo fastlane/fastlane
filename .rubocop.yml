@@ -179,7 +179,8 @@ Style/IfUnlessModifier:
 
 # and and or is okay
 Style/AndOr:
-  Enabled: false
+  Enabled: true
+  EnforcedStyle: conditionals
 
 # Configuration parameters: CountComments.
 Metrics/ClassLength:

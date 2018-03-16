@@ -340,7 +340,7 @@ module Spaceship
     #
     # @return (Spaceship::Client) The client the login method was called for
     def login(user = nil, password = nil)
-      if user.to_s.empty? or password.to_s.empty?
+      if user.to_s.empty? || password.to_s.empty?
         require 'credentials_manager/account_manager'
 
         keychain_entry = CredentialsManager::AccountManager.new(user: user, password: password)
@@ -348,7 +348,7 @@ module Spaceship
         password = keychain_entry.password
       end
 
-      if user.to_s.strip.empty? or password.to_s.strip.empty?
+      if user.to_s.strip.empty? || password.to_s.strip.empty?
         raise NoUserCredentialsError.new, "No login data provided"
       end
 
@@ -657,9 +657,9 @@ module Spaceship
 
     # Is called from `parse_response` to store the latest csrf_token (if available)
     def store_csrf_tokens(response)
-      if response and response.headers
+      if response && response.headers
         tokens = response.headers.select { |k, v| %w(csrf csrf_ts).include?(k) }
-        if tokens and !tokens.empty?
+        if tokens && !tokens.empty?
           @csrf_tokens = tokens
         end
       end

@@ -232,7 +232,7 @@ module Deliver
     def self.calculate_screen_size(path)
       size = FastImage.size(path)
 
-      UI.user_error!("Could not find or parse file at path '#{path}'") if size.nil? or size.count == 0
+      UI.user_error!("Could not find or parse file at path '#{path}'") if size.nil? || size.count == 0
 
       # Walk up two directories and test if we need to handle a platform that doesn't support landscape
       path_component = Pathname.new(path).each_filename.to_a[-3]
@@ -246,12 +246,12 @@ module Deliver
       devices.each do |device_type, array|
         array.each do |resolution|
           if skip_landscape
-            if size[0] == resolution[0] and size[1] == resolution[1] # portrait
+            if size[0] == (resolution[0]) && size[1] == (resolution[1]) # portrait
               return device_type
             end
           else
-            if (size[0] == resolution[0] and size[1] == resolution[1]) or # portrait
-               (size[1] == resolution[0] and size[0] == resolution[1]) # landscape
+            if (size[0] == (resolution[0]) && size[1] == (resolution[1])) || # portrait
+               (size[1] == (resolution[0]) && size[0] == (resolution[1])) # landscape
               return device_type
             end
           end

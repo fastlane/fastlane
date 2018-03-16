@@ -126,7 +126,7 @@ Slather is available at https://github.com/SlatherOrg/slather
                                        env_name: "FL_SLATHER_PROJ", # The name of the environment variable
                                        description: "The project file that slather looks at", # a short description of this parameter
                                        verify_block: proc do |value|
-                                         UI.user_error!("No project file specified, pass using `proj: 'Project.xcodeproj'`") unless value and !value.empty?
+                                         UI.user_error!("No project file specified, pass using `proj: 'Project.xcodeproj'`") unless value && !value.empty?
                                        end,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :workspace,

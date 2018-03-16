@@ -70,7 +70,7 @@ module Fastlane
 
         output = verify(command: command, must_includes: must_includes, params: params)
 
-        if output.include?("source=Mac App Store") or output.include?("source=Apple") or output.include?("source=Apple System")
+        if output.include?("source=Mac App Store") || output.include?("source=Apple") || output.include?("source=Apple System")
           UI.success("Successfully verified Xcode installation at path '#{params[:xcode_path]}' 🎧")
         else
           show_and_raise_error("Invalid Download Source of Xcode: #{output}", params[:xcode_path])

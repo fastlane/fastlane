@@ -186,7 +186,7 @@ module Fastlane
             'X-XCSAPIVersion' => 1 # XCS API version with this API, Xcode needs this otherwise it explodes in a 500 error fire. Currently Xcode 7 Beta 5 is on Version 5.
           }
 
-          if @username and @password
+          if @username && @password
             userpass = "#{@username}:#{@password}"
             headers['Authorization'] = "Basic #{Base64.strict_encode64(userpass)}"
           end

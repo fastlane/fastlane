@@ -29,7 +29,7 @@ module CredentialsManager
 
       path ||= self.class.default_path
 
-      if path and File.exist?(path) # it might not exist, we still want to use the default values
+      if path && File.exist?(path) # it might not exist, we still want to use the default values
         full_path = File.expand_path(path)
         Dir.chdir(File.expand_path('..', path)) do
           content = File.read(full_path, encoding: "utf-8")

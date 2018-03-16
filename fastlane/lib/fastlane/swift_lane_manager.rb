@@ -7,8 +7,8 @@ module Fastlane
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # @param env Dot Env Information
     def self.cruise_lane(lane, parameters = nil, env = nil, disable_runner_upgrades: false)
-      UI.user_error!("lane must be a string") unless lane.kind_of?(String) or lane.nil?
-      UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) or parameters.nil?
+      UI.user_error!("lane must be a string") unless lane.kind_of?(String) || lane.nil?
+      UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) || parameters.nil?
 
       # xcodeproj has a bug in certain versions that causes it to change directories
       # and not return to the original working directory

@@ -7,9 +7,9 @@ module Fastlane
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # @param env Dot Env Information
     def self.cruise_lane(platform, lane, parameters = nil, env = nil)
-      UI.user_error!("lane must be a string") unless lane.kind_of?(String) or lane.nil?
-      UI.user_error!("platform must be a string") unless platform.kind_of?(String) or platform.nil?
-      UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) or parameters.nil?
+      UI.user_error!("lane must be a string") unless lane.kind_of?(String) || lane.nil?
+      UI.user_error!("platform must be a string") unless platform.kind_of?(String) || platform.nil?
+      UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) || parameters.nil?
 
       ff = Fastlane::FastFile.new(FastlaneCore::FastlaneFolder.fastfile_path)
 
@@ -29,7 +29,7 @@ module Fastlane
         end
       end
 
-      if !platform and lane
+      if !platform && lane
         # Either, the user runs a specific lane in root or want to auto complete the available lanes for a platform
         # e.g. `fastlane ios` should list all available iOS actions
         if ff.is_platform_block?(lane)

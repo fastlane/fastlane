@@ -86,7 +86,7 @@ module Frameit
 
       @offset_information = fetch_config['offset'] || Offsets.image_offset(screenshot).dup
 
-      if @offset_information and (@offset_information['offset'] or @offset_information['offset'])
+      if @offset_information && (@offset_information['offset'] || @offset_information['offset'])
         return @offset_information
       end
       UI.user_error!("Could not find offset_information for '#{screenshot}'")
@@ -450,7 +450,7 @@ module Frameit
       # No string files, fallback to Framefile config
       text = fetch_config[type.to_s]['text'] if fetch_config[type.to_s] && fetch_config[type.to_s]['text'] && fetch_config[type.to_s]['text'].length > 0 # Ignore empty string
 
-      if type == :title and !text
+      if type == :title && !text
         # title is mandatory
         UI.user_error!("Could not get title for screenshot #{screenshot.path}. Please provide one in your Framefile.json or title.strings")
       end
