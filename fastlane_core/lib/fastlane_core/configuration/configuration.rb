@@ -216,9 +216,9 @@ module FastlaneCore
       option = verify_options_key!(key)
 
       # Same order as https://docs.fastlane.tools/advanced/#priorities-of-parameters-and-options
-      value = if @values.key?(key) and !@values[key].nil?
+      value = if @values.key?(key) && !@values[key].nil?
                 @values[key]
-              elsif option.env_name and !ENV[option.env_name].nil?
+              elsif option.env_name && !ENV[option.env_name].nil?
                 ENV[option.env_name].dup
               elsif self.config_file_options.key?(key)
                 self.config_file_options[key]
@@ -227,11 +227,11 @@ module FastlaneCore
               end
 
       value = option.auto_convert_value(value)
-      value = nil if value.nil? and !option.string? # by default boolean flags are false
-      return value unless value.nil? and !option.optional and ask
+      value = nil if value.nil? && !option.string? # by default boolean flags are false
+      return value unless value.nil? && !option.optional && ask
 
       # fallback to asking
-      if Helper.test? or !UI.interactive?
+      if Helper.test? || !UI.interactive?
         # Since we don't want to be asked on tests, we'll just call the verify block with no value
         # to raise the exception that is shown when the user passes an invalid value
         set(key, '')

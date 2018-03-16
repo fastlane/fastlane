@@ -18,7 +18,7 @@ module Fastlane
           builder.adapter(:net_http)
         end
 
-        options[:file] = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa and File.exist?(ipa)
+        options[:file] = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa && File.exist?(ipa)
 
         symbols_file = options.delete(:symbols_file)
         if symbols_file

@@ -342,7 +342,7 @@ module FastlaneCore
     def self.gem_path(gem_name)
       UI.deprecated('`Helper.gem_path` is deprecated. Use the `ROOT` constant from the appropriate tool module instead.')
 
-      if !Helper.test? and Gem::Specification.find_all_by_name(gem_name).any?
+      if !Helper.test? && Gem::Specification.find_all_by_name(gem_name).any?
         return Gem::Specification.find_by_name(gem_name).gem_dir
       else
         return './'

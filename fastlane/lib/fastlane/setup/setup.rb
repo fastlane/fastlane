@@ -34,7 +34,7 @@ module Fastlane
     # Start the setup process
     # rubocop:disable Metrics/BlockNesting
     def self.start(user: nil, is_swift_fastfile: false)
-      if FastlaneCore::FastlaneFolder.setup? and !Helper.test?
+      if FastlaneCore::FastlaneFolder.setup? && !Helper.test?
         require 'fastlane/lane_list'
         Fastlane::LaneList.output(FastlaneCore::FastlaneFolder.fastfile_path)
         UI.important("------------------")

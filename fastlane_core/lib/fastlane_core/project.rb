@@ -7,7 +7,7 @@ module FastlaneCore
     class << self
       # Project discovery
       def detect_projects(config)
-        if config[:workspace].to_s.length > 0 and config[:project].to_s.length > 0
+        if config[:workspace].to_s.length > 0 && config[:project].to_s.length > 0
           UI.user_error!("You can only pass either a workspace or a project path, not both")
         end
 
@@ -25,7 +25,7 @@ module FastlaneCore
 
         return if config[:workspace].to_s.length > 0
 
-        if config[:workspace].to_s.length == 0 and config[:project].to_s.length == 0
+        if config[:workspace].to_s.length == 0 && config[:project].to_s.length == 0
           project = Dir["./*.xcodeproj"]
           if project.count > 1
             puts("Select Project: ")
@@ -35,7 +35,7 @@ module FastlaneCore
           end
         end
 
-        if config[:workspace].nil? and config[:project].nil?
+        if config[:workspace].nil? && config[:project].nil?
           select_project(config)
         end
       end
@@ -83,7 +83,7 @@ module FastlaneCore
       self.xcodebuild_list_silent = xcodebuild_list_silent
       self.xcodebuild_suppress_stderr = xcodebuild_suppress_stderr
 
-      if !path or !File.directory?(path)
+      if !path || !File.directory?(path)
         UI.user_error!("Could not find project at path '#{path}'")
       end
     end
@@ -144,7 +144,7 @@ module FastlaneCore
           preferred = schemes.find_all { |a| a.downcase.include?(preferred_to_include.downcase) }
         end
 
-        if preferred_to_include and preferred.count == 1
+        if preferred_to_include && preferred.count == 1
           options[:scheme] = preferred.last
         elsif automated_scheme_selection? && schemes.include?(project_name)
           UI.important("Using scheme matching project name (#{project_name}).")
