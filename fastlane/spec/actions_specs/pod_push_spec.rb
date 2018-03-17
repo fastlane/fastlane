@@ -76,7 +76,7 @@ describe Fastlane do
         context "false" do
           it "does not appends bundle exec at the beginning of the command" do
             result = Fastlane::FastFile.new.parse("lane :test do
-              pod_push(use_bundle_exec: true)
+              pod_push(use_bundle_exec: false)
             end").runner.execute(:test)
 
             expect(result).to eq("pod trunk push")
