@@ -2,7 +2,6 @@ require 'fastlane_core/cert_checker'
 require 'fastlane_core/provisioning_profile'
 require 'fastlane_core/print_table'
 require 'spaceship/client'
-require 'fastlane/actions/lane_context'
 require_relative 'generator'
 require_relative 'git_helper'
 require_relative 'module'
@@ -172,8 +171,6 @@ module Match
       installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       uuid = parsed["UUID"]
-      Fastlane::Actions.lane_context[:MATCH_PROFILES_UUID] = Fastlane::Actions.lane_context[:MATCH_PROFILES_UUID].to_a << uuid
-      Fastlane::Actions.lane_context[:MATCH_PROFILES_NAME] = Fastlane::Actions.lane_context[:MATCH_PROFILES_NAME].to_a << parsed["Name"]
 
       if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
         # This profile is invalid, let's remove the local file and generate a new one
