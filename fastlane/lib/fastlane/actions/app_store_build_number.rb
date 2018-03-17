@@ -24,7 +24,8 @@ module Fastlane
           unless version_number
             # Automatically fetch the latest version in testflight
             begin
-              testflight_version = app.all_build_train_numbers(platform: platform).sort_by { |v| Gem::Version.new(v) }.last
+              train_numbers = app.all_build_train_numbers(platform: platform)
+              testflight_version = self.order_versions(train_numbers).last
             rescue
               testflight_version = params[:version]
             end
@@ -40,7 +41,8 @@ module Fastlane
           UI.message("Fetching the latest build number for version #{version_number}")
 
           begin
-            build_nr = app.all_builds_for_train(train: version_number, platform: platform).map(&:build_version).map(&:to_i).sort.last
+            build_numbers = app.all_builds_for_train(train: version_number, platform: platform).map(&:build_version)
+            build_nr = self.order_versions(build_numbers).last
             if build_nr.nil? && params[:initial_build_number]
               UI.message("Could not find a build on iTC. Using supplied 'initial_build_number' option")
               build_nr = params[:initial_build_number]
@@ -52,6 +54,10 @@ module Fastlane
         end
         UI.message("Latest upload for version #{version_number} is build: #{build_nr}")
         Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER] = build_nr
+      end
+
+      def self.order_versions(versions)
+        versions.map(&:to_s).sort_by { |v| Gem::Version.new(v) }
       end
 
       #####################################################
