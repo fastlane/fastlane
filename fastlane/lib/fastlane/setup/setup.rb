@@ -54,6 +54,7 @@ module Fastlane
       spinner.auto_spin
 
       ios_projects = Dir["**/*.xcodeproj"] + Dir["**/*.xcworkspace"]
+      ios_projects.delete_if { |path| path.match("fastlane/swift/FastlaneSwiftRunner/FastlaneSwiftRunner.xcodeproj") }
       android_projects = Dir["**/*.gradle"]
 
       spinner.success
