@@ -15,7 +15,7 @@ module Pilot
 
       UI.user_error!("No ipa file given") unless config[:ipa]
 
-      if options[:changelog].nil? and options[:distribute_external] == true
+      if options[:changelog].nil? && options[:distribute_external] == true
         if UI.interactive?
           options[:changelog] = UI.input("No changelog provided for new build. Please provide a changelog. You can also provide a changelog using the `changelog` option")
         else
@@ -62,7 +62,7 @@ module Pilot
 
     def distribute(options, build: nil)
       start(options)
-      if config[:apple_id].to_s.length == 0 and config[:app_identifier].to_s.length == 0
+      if config[:apple_id].to_s.length == 0 && config[:app_identifier].to_s.length == 0
         config[:app_identifier] = UI.input("App Identifier: ")
       end
 
@@ -92,11 +92,7 @@ module Pilot
         end
       end
 
-      if config[:notify_external_testers]
-        build.auto_notify_enabled = config[:notify_external_testers]
-      else
-        build.auto_notify_enabled = true
-      end
+      build.auto_notify_enabled = config[:notify_external_testers]
 
       return if config[:skip_submission]
       distribute_build(build, options)
@@ -106,7 +102,7 @@ module Pilot
 
     def list(options)
       start(options)
-      if config[:apple_id].to_s.length == 0 and config[:app_identifier].to_s.length == 0
+      if config[:apple_id].to_s.length == 0 && config[:app_identifier].to_s.length == 0
         config[:app_identifier] = UI.input("App Identifier: ")
       end
 

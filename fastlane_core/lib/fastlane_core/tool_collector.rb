@@ -59,7 +59,7 @@ module FastlaneCore
     def did_finish
       return false if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
 
-      if !did_show_message? and !Helper.ci?
+      if !did_show_message? && !Helper.ci?
         show_message
       end
 

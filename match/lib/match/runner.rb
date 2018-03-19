@@ -67,7 +67,7 @@ module Match
       end
 
       # Done
-      if self.files_to_commmit.count > 0 and !params[:readonly]
+      if self.files_to_commmit.count > 0 && !params[:readonly]
         message = GitHelper.generate_commit_message(params)
         GitHelper.commit_changes(params[:workspace], message, params[:git_url], params[:git_branch], self.files_to_commmit)
       end
@@ -94,7 +94,7 @@ module Match
       certs = Dir[File.join(params[:workspace], "certs", cert_type.to_s, "*.cer")]
       keys = Dir[File.join(params[:workspace], "certs", cert_type.to_s, "*.p12")]
 
-      if certs.count == 0 or keys.count == 0
+      if certs.count == 0 || keys.count == 0
         UI.important("Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now")
         UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
         cert_path = Generator.generate_certificate(params, cert_type)
@@ -151,7 +151,7 @@ module Match
         end
       end
 
-      if profile.nil? or params[:force]
+      if profile.nil? || params[:force]
         if params[:readonly]
           all_profiles = Dir.entries(base_dir).reject { |f| f.start_with?(".") }
           UI.error("No matching provisioning profiles found for '#{profile_name}'")

@@ -6,7 +6,8 @@ describe Spaceship::TestFlight::Build do
 
   before do
     # Use a simple client for all data models
-    Spaceship::TestFlight::Base.client = mock_client
+    allow(Spaceship::TestFlight::Base).to receive(:client).and_return(mock_client)
+    allow(mock_client).to receive(:team_id).and_return('')
   end
 
   context '.find' do

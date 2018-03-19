@@ -8,7 +8,7 @@ module Fastlane
       # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         oclint_path = params[:oclint_path]
-        if `which #{oclint_path}`.to_s.empty? and !Helper.test?
+        if `which #{oclint_path}`.to_s.empty? && !Helper.test?
           UI.user_error!("You have to install oclint or provide path to oclint binary. Fore more details: ") + "http://docs.oclint.org/en/stable/intro/installation.html".yellow
         end
 

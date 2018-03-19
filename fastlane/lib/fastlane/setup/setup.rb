@@ -34,7 +34,7 @@ module Fastlane
     # Start the setup process
     # rubocop:disable Metrics/BlockNesting
     def self.start(user: nil, is_swift_fastfile: false)
-      if FastlaneCore::FastlaneFolder.setup? and !Helper.test?
+      if FastlaneCore::FastlaneFolder.setup? && !Helper.test?
         require 'fastlane/lane_list'
         Fastlane::LaneList.output(FastlaneCore::FastlaneFolder.fastfile_path)
         UI.important("------------------")
@@ -349,10 +349,3 @@ end
 
 require 'fastlane/setup/setup_ios'
 require 'fastlane/setup/setup_android'
-require 'fastlane/setup/crashlytics_beta_ui'
-require 'fastlane/setup/crashlytics_beta'
-require 'fastlane/setup/crashlytics_project_parser'
-require 'fastlane/setup/crashlytics_beta_info'
-require 'fastlane/setup/crashlytics_beta_info_collector'
-require 'fastlane/setup/crashlytics_beta_command_line_handler'
-require 'fastlane/setup/crashlytics_beta_user_email_fetcher'

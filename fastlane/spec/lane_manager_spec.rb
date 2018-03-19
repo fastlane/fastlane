@@ -59,7 +59,7 @@ describe Fastlane do
               ENV.delete(k.to_s)
             end
             Dir.chdir(dir) do
-              ff = Fastlane::LaneManager.load_dot_env(envs)
+              ff = Fastlane::Helper::DotenvHelper.load_dot_env(envs)
               expected_values.each do |k, v|
                 expect(ENV[k.to_s]).to eq(v)
               end

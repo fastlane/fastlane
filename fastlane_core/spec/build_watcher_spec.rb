@@ -155,7 +155,7 @@ describe FastlaneCore::BuildWatcher do
       expect(Spaceship::TestFlight::Build).to receive(:builds_for_train).and_return([], [ready_build])
       expect(FastlaneCore::BuildWatcher).to receive(:sleep)
 
-      expect(UI).to receive(:message).with("Build doesn't show up in the build list anymore, waiting for it to appear again")
+      expect(UI).to receive(:message).with("Build doesn't show up in the build list anymore, waiting for it to appear again (check your email for processing issues if this continues)")
       expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.train_version} - #{ready_build.build_version}")
       found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '1.0', build_version: '1')
 

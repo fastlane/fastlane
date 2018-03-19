@@ -37,6 +37,14 @@ module Snapshot
                                      description: "Pass additional arguments to xcodebuild for the test phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
                                      optional: true,
                                      type: :shell_string),
+        FastlaneCore::ConfigItem.new(key: :xcconfig,
+                                     short_option: "-y",
+                                     env_name: "SNAPSHOT_XCCONFIG",
+                                     description: "Use an extra XCCONFIG file to build your app",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("File not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :devices,
                                      description: "A list of devices you want to take the screenshots from",
                                      short_option: "-d",

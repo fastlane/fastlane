@@ -46,10 +46,10 @@ module Deliver
     }
 
     # Localized app details values, that are editable in live state
-    LOCALISED_LIVE_VALUES = [:description, :release_notes, :support_url, :marketing_url, :promotional_text]
+    LOCALISED_LIVE_VALUES = [:description, :release_notes, :support_url, :marketing_url, :promotional_text, :privacy_url]
 
     # Non localized app details values, that are editable in live state
-    NON_LOCALISED_LIVE_VALUES = [:privacy_url]
+    NON_LOCALISED_LIVE_VALUES = [:copyright]
 
     # Directory name it contains trade representative contact information
     TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR = "trade_representative_contact_information"

@@ -125,7 +125,7 @@ module Match
                                      description: nil,
                                      verify_block: proc do |value|
                                        unless Helper.test?
-                                         if value.start_with?("/var/folders") or value.include?("tmp/") or value.include?("temp/")
+                                         if value.start_with?("/var/folders") || value.include?("tmp/") || value.include?("temp/")
                                            # that's fine
                                          else
                                            UI.user_error!("Specify the `git_url` instead of the `path`")
