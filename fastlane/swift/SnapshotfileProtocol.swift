@@ -2,6 +2,7 @@ protocol SnapshotfileProtocol: class {
   var workspace: String? { get }
   var project: String? { get }
   var xcargs: String? { get }
+  var xcconfig: String? { get }
   var devices: [String]? { get }
   var languages: [String] { get }
   var launchArguments: [String] { get }
@@ -36,6 +37,7 @@ extension SnapshotfileProtocol {
   var workspace: String? { return nil }
   var project: String? { return nil }
   var xcargs: String? { return nil }
+  var xcconfig: String? { return nil }
   var devices: [String]? { return nil }
   var languages: [String] { return ["en-US"] }
   var launchArguments: [String] { return [""] }
@@ -66,7 +68,6 @@ extension SnapshotfileProtocol {
   var concurrentSimulators: Bool { return true }
 }
 
-
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.2]
+// FastlaneRunnerAPIVersion [0.9.3]

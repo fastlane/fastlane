@@ -16,6 +16,7 @@ protocol DeliverfileProtocol: class {
   var skipAppVersionUpdate: Bool { get }
   var force: Bool { get }
   var submitForReview: Bool { get }
+  var rejectIfPossible: Bool { get }
   var automaticRelease: Bool { get }
   var autoReleaseDate: String? { get }
   var phasedRelease: Bool { get }
@@ -74,6 +75,7 @@ extension DeliverfileProtocol {
   var skipAppVersionUpdate: Bool { return false }
   var force: Bool { return false }
   var submitForReview: Bool { return false }
+  var rejectIfPossible: Bool { return false }
   var automaticRelease: Bool { return false }
   var autoReleaseDate: String? { return nil }
   var phasedRelease: Bool { return false }
@@ -116,4 +118,4 @@ extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.2]
+// FastlaneRunnerAPIVersion [0.9.3]
