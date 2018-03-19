@@ -4,7 +4,7 @@
 
 ###### Easily put your screenshots into the right device frames
 
-_frameit_ allows you to put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Use _frameit_ to prepare perfect screenshots for the App Store, your website, QA or emails. TODO advanced features
+_frameit_ allows you to put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Use _frameit_ to prepare perfect screenshots for the App Store, your website, QA or emails.
 
 -------
 
@@ -27,7 +27,7 @@ Put a gorgeous device frame around your iOS and macOS screenshots just by runnin
 
 - iPhone, iPad and Mac
 - Portrait and Landscape modes
-- Several device colors
+- Several device frame colors
 
 The complete and updated list of supported devices and colors can be found [here](https://github.com/fastlane/frameit-frames/tree/gh-pages/latest)
 
@@ -81,7 +81,7 @@ To download the latest frames
 
     fastlane frameit download_frames
 
-When using _frameit_ without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store. TODO Option to also scale those?
+When using _frameit_ without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store.
 
 ## Advanced Usage (optional)
 
@@ -197,7 +197,7 @@ You can find a more complex [configuration](https://github.com/fastlane/examples
 
 The `Framefile.json` should be in the `screenshots` folder, as seen in the [example](https://github.com/fastlane/examples/tree/master/MindNode/screenshots).
 
-### <a name="strings-files"></a>`.strings` files
+### `.strings` files
 
 To define the title and optionally the keyword, put two `.strings` files into the language folder (e.g. [en-US in the example project](https://github.com/fastlane/examples/tree/master/MindNode/screenshots/en-US))
 
@@ -244,14 +244,13 @@ Check out the [MindNode example project](https://github.com/fastlane/examples/tr
 
 # Tips
 
-## Upload screenshots to iTC
-
-Use [deliver](https://docs.fastlane.tools/actions/deliver/) to upload all screenshots to iTunes Connect completely automatically 🚀
-TODO Android
-
 ## Generate localized screenshots
 
 Check out [_snapshot_](https://docs.fastlane.tools/actions/snapshot/) to automatically generate screenshots using ```UI Automation```.
+
+## Upload screenshots
+
+Use [deliver](https://docs.fastlane.tools/actions/deliver/) to upload iOS screenshots to iTunes Connect, or [supply](https://docs.fastlane.tools/actions/supply/) to upload Android screenshots to Play Store completely automatically 🚀
 
 ## Alternative location to store device_frames
 
