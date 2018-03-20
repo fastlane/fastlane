@@ -6,6 +6,7 @@ describe Fastlane do
       let(:proj_file) { "bundle.xcodeproj" }
       let(:xcodeproj) { File.join(test_path, proj_file) }
       let(:plist_path) { "Info.plist" }
+      let(:invalid_plist_path) { "Info-invalid.plist" }
       let(:scheme) { "bundle" }
       let(:app_identifier) { "com.test.plist" }
       let(:display_name) { "Update Info Plist Test" }
@@ -19,6 +20,7 @@ describe Fastlane do
         # Copy .xcodeproj fixture, as it will be modified during the test
         FileUtils.cp_r(source, destination)
         File.write(File.join(test_path, plist_path), '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>CFBundleDisplayName</key><string>empty</string><key>CFBundleIdentifier</key><string>empty</string></dict></plist>')
+        File.write(File.join(test_path, invalid_plist_path), '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>CFBundleDisplayName</key>empty</string><key>CFBundleIdentifier</key><string>empty</string></dict></plist>')
       end
 
       it "updates the info plist based on the given properties" do
@@ -60,6 +62,19 @@ describe Fastlane do
           })
         end").runner.execute(:test)
         expect(result).to include("TEST_PLIST_SUCCESSFULLY_RETRIEVED")
+      end
+      
+      it "throws an error when the info plist file format in not valid" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            update_info_plist ({
+              xcodeproj: '#{xcodeproj}',
+              plist_path: '#{invalid_plist_path}',
+              app_identifier: '#{app_identifier}',
+              display_name: '#{display_name}'
+            })
+          end").runner.execute(:test)
+        end.to raise_error(CFFormatError) 
       end
 
       it "throws an error when the info plist file does not exist" do
