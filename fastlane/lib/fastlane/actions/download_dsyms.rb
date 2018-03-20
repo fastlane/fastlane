@@ -52,9 +52,9 @@ module Fastlane
         UI.message(message.join(" "))
 
         app.tunes_all_build_trains(platform: platform).each do |train|
-          UI.verbose("Found train: #{train}, comparing to supplied version: #{version}")
+          UI.verbose("Found train: #{train.version_string}, comparing to supplied version: #{version}")
           if version && version != train.version_string
-            UI.verbose("Version #{version} doesn't match: #{train_number}")
+            UI.verbose("Version #{version} doesn't match: #{train.version_string}")
             next
           end
           app.tunes_all_builds_for_train(train: train.version_string, platform: platform).each do |build|
