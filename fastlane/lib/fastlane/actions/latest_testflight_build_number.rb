@@ -121,7 +121,7 @@ module Fastlane
 
       def self.example_code
         [
-          'latest_testflight_build_number(version: "1.3")',
+          'latest_testflight_build_number(version: "1.3").to_i',
           'increment_build_number({
             build_number: latest_testflight_build_number + 1
           })'
