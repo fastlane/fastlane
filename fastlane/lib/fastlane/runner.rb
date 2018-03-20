@@ -19,23 +19,7 @@ module Fastlane
     # @param platform The name of the platform to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     def execute(lane, platform = nil, parameters = nil)
-      UI.crash!("No lane given") unless lane
-
-      self.current_lane = lane.to_sym
-      self.current_platform = (platform ? platform.to_sym : nil)
-
-      lane_obj = lanes.fetch(current_platform, {}).fetch(current_lane, nil)
-
-      UI.user_error!("Could not find lane '#{full_lane_name}'. Available lanes: #{available_lanes.join(', ')}") unless lane_obj
-      UI.user_error!("You can't call the private lane '#{lane}' directly") if lane_obj.is_private
-
-      ENV["FASTLANE_LANE_NAME"] = current_lane.to_s
-      ENV["FASTLANE_PLATFORM_NAME"] = (current_platform ? current_platform.to_s : nil)
-
-      Actions.lane_context[Actions::SharedValues::PLATFORM_NAME] = current_platform
-      Actions.lane_context[Actions::SharedValues::LANE_NAME] = full_lane_name
-
-      UI.success("Driving the lane '#{full_lane_name}' 🚀")
+      return
 
       return_val = nil
 
