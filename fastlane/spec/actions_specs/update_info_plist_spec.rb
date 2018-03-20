@@ -74,7 +74,7 @@ describe Fastlane do
               display_name: '#{display_name}'
             })
           end").runner.execute(:test)
-        end.to raise_error(CFFormatError) 
+        end.to raise_error(CFFormatError)
       end
 
       it "throws an error when the info plist file does not exist" do
