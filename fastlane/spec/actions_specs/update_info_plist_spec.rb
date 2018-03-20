@@ -63,7 +63,7 @@ describe Fastlane do
         end").runner.execute(:test)
         expect(result).to include("TEST_PLIST_SUCCESSFULLY_RETRIEVED")
       end
-      
+
       it "throws an error when the info plist file format in not valid" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
