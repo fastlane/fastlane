@@ -85,6 +85,7 @@ module Fastlane
       FileUtils.mkdir_p(File.join(docs_dir, "actions"))
       ActionsList.all_actions do |action|
         @action = action # to provide a reference in the .html.erb template
+        @action_filename = "#{action.action_name}.rb"
 
         # Make sure to always assign `@custom_content`, as we're in a loop and `@` is needed for the `erb`
         @custom_content = load_custom_action_md(action)
