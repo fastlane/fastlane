@@ -112,12 +112,21 @@ module FastlaneCore
       @project ||= Xcodeproj::Project.open(path)
     end
 
+    # xcodeproj doesn't include schemes that are under the .xcworkspace folder.
+    # So, get a list of them to include.
+    # This is based on xcodeproj's Project::schemes method.
+    def workspace_contained_schemes
+      Dir[File.join(path, 'xcshareddata', 'xcschemes', '*.xcscheme')].map do |scheme|
+        File.basename(scheme, '.xcscheme')
+      end
+    end
+
     # Get all available schemes in an array
     def schemes
       @schemes ||= if workspace?
                      workspace.schemes.reject do |k, v|
                        v.include?("Pods/Pods.xcodeproj")
-                     end.keys
+                     end.keys + self.workspace_contained_schemes
                    else
                      Xcodeproj::Project.schemes(path)
                    end
