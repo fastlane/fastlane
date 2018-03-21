@@ -115,6 +115,8 @@ module FastlaneCore
     # xcodeproj doesn't include schemes that are under the .xcworkspace folder.
     # So, get a list of them to include.
     # This is based on xcodeproj's Project::schemes method.
+    # To Do: When Xcodeproj merges https://github.com/CocoaPods/Xcodeproj/issues/557, we
+    # should remove this code and make sure to call Workspace.load_schemes
     def workspace_contained_schemes
       Dir[File.join(path, 'xcshareddata', 'xcschemes', '*.xcscheme')].map do |scheme|
         File.basename(scheme, '.xcscheme')
