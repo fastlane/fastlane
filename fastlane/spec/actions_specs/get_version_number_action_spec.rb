@@ -65,6 +65,18 @@ describe Fastlane do
         expect(result).to eq("4.3.2")
       end
 
+      it "raises if one target and specified wrong target name", requires_xcodeproj: true do
+        allow_any_instance_of(Xcodeproj::Project).to receive(:targets).and_wrap_original do |m, *args|
+          [m.call(*args).first]
+        end
+
+        expect do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            get_version_number(xcodeproj: '#{path}', target: 'ThisIsNotATarget')
+          end").runner.execute(:test)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Cannot find target named 'ThisIsNotATarget'")
+      end
+
       it "raises if in non-interactive mode with no target", requires_xcodeproj: true do
         expect do
           result = Fastlane::FastFile.new.parse("lane :test do

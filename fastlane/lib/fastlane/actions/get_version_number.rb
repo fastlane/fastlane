@@ -34,13 +34,13 @@ module Fastlane
       def self.get_target!(project, target_name)
         targets = project.targets
 
-        # Returns if only one target
-        if targets.count == 1
-          return targets.first
-        end
-
         # Prompt targets if no name
         unless target_name
+          # Returns if only one target
+          if targets.count == 1
+            return targets.first
+          end
+
           options = targets.map(&:name)
           target_name = UI.select("What target would you like to use?", options)
         end
