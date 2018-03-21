@@ -36,6 +36,11 @@ module Fastlane
 
         # Prompt targets if no name
         unless target_name
+          # Returns if only one target
+          if targets.count == 1
+            return targets.first
+          end
+
           options = targets.map(&:name)
           target_name = UI.select("What target would you like to use?", options)
         end
