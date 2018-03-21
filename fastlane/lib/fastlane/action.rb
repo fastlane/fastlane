@@ -162,7 +162,7 @@ module Fastlane
         "MacOS"   => true,  # we assume action on macOS will work
         "Linux"   => nil,   # we assume action on Linux might be ok
         "Windows" => nil,   # we assume action on Windows might be ok
-        "Unkown"  => false  # we assume action on other OS will not work
+        "Unknown" => false  # we assume action on other OS will not work
       }
       compatibility = default_compatibility.merge(action_compatibility)
       return compatibility[operating_system]
