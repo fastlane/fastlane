@@ -47,14 +47,32 @@ module Fastlane
       "lib/fastlane/actions/"
     end
 
+    def where_is(klass)
+      # Gets all source files for action
+      methods = klass.methods(false).map { |m| klass.method(m) }
+      source_files = methods
+                     .map(&:source_location)
+                     .compact
+                     .map { |(file, line)| file }
+                     .uniq
+
+      # Return file or error if multiples
+      if source_files.size == 1
+        return source_files.first
+      else
+        UI.crash!("Multiple source files were found for action `#{klass}`")
+      end
+    end
+
     def filename_for_action(action)
-      require 'where_is'
-      filename = File.basename(Where.is(action)[0])
+      absolute_path = where_is(action)
+      filename = File.basename(absolute_path)
 
       path = File.join(Fastlane::ROOT, actions_path, filename)
       unless File.exist?(path)
-        UI.message("Cannot find action `#{action.action_name}` at #{path}")
-        return ""
+        UI.error("Action '#{action.name}' not found in root fastlane project... skipping")
+        UI.verbose("Action '#{action.name}' found at #{path}")
+        return nil
       end
       filename
     end
@@ -102,6 +120,10 @@ module Fastlane
       ActionsList.all_actions do |action|
         @action = action # to provide a reference in the .html.erb template
         @action_filename = filename_for_action(action)
+
+        unless @action_filename
+          next
+        end
 
         # Make sure to always assign `@custom_content`, as we're in a loop and `@` is needed for the `erb`
         @custom_content = load_custom_action_md(action)
