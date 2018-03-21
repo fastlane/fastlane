@@ -43,6 +43,22 @@ module Fastlane
       @_launches ||= JSON.parse(File.read(File.join(Fastlane::ROOT, "assets/action_ranking.json"))) # root because we're in a temporary directory here
     end
 
+    def actions_path
+      "lib/fastlane/actions/"
+    end
+
+    def filename_for_action(action)
+      require 'where_is'
+      filename = File.basename(Where.is(action)[0])
+
+      path = File.join(Fastlane::ROOT, actions_path, filename)
+      unless File.exist?(path)
+        UI.message("Cannot find action `#{action.action_name}` at #{path}")
+        return ""
+      end
+      filename
+    end
+
     def custom_action_docs_path
       "lib/fastlane/actions/docs/"
     end
@@ -85,7 +101,7 @@ module Fastlane
       FileUtils.mkdir_p(File.join(docs_dir, "actions"))
       ActionsList.all_actions do |action|
         @action = action # to provide a reference in the .html.erb template
-        @action_filename = "#{action.action_name}.rb"
+        @action_filename = filename_for_action(action)
 
         # Make sure to always assign `@custom_content`, as we're in a loop and `@` is needed for the `erb`
         @custom_content = load_custom_action_md(action)
