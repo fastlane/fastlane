@@ -34,6 +34,11 @@ module Fastlane
       def self.get_target!(project, target_name)
         targets = project.targets
 
+        # Returns if only one target
+        if targets.count == 1
+          return targets.first
+        end
+
         # Prompt targets if no name
         unless target_name
           options = targets.map(&:name)
