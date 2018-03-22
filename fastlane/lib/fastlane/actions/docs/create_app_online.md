@@ -193,7 +193,7 @@ lane :release do
     # App services can be enabled during app creation
     enable_services: {
       app_group: "on",               # Valid values: "on", "off"
-      ahealth_kitpple_pay: "on",               # Valid values: "on", "off"
+      apple_pay: "on",               # Valid values: "on", "off"
       associated_domains: "on",      # Valid values: "on", "off"
       data_protection: "complete",   # Valid values: "complete", "unlessopen", "untilfirstauth",
       game_center: "on",             # Valid values: "on", "off"
