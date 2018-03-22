@@ -330,7 +330,7 @@ module Fastlane
         UI.message("\t\thttps://docs.fastlane.tools/getting-started/ios/beta-deployment/".cyan)
         UI.message("🚀  Learn more about how to automate the App Store release process:")
         UI.message("\t\thttps://docs.fastlane.tools/getting-started/ios/appstore-deployment/".cyan)
-        UI.message("👩‍⚕️  Lern more about how to setup code signing with fastlane")
+        UI.message("👩‍⚕️  Learn more about how to setup code signing with fastlane")
         UI.message("\t\thttps://docs.fastlane.tools/codesigning/getting-started/".cyan)
       end
 
