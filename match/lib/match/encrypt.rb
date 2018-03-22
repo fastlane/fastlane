@@ -119,7 +119,7 @@ module Match
 
       decrypted_data = decipher.update(data_to_decrypt) + decipher.final
 
-      File.write(path, decrypted_data)
+      File.binwrite(path, decrypted_data)
     rescue => error
       fallback_hash_algorithm = "SHA256"
       if hash_algorithm != fallback_hash_algorithm
