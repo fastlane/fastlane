@@ -2,6 +2,8 @@ module Fastlane
   module Actions
     module SharedValues
       MATCH_PROVISIONING_PROFILE_MAPPING = :MATCH_PROVISIONING_PROFILE_MAPPING
+      MATCH_PROFILES_UUIDS = :MATCH_PROFILES_UUIDS
+      MATCH_PROFILES_NAMES = :MATCH_PROFILES_NAMES
     end
 
     class SyncCodeSigningAction < Action
@@ -13,6 +15,7 @@ module Fastlane
 
         define_profile_type(params)
         define_provisioning_profile_mapping(params)
+        define_shared_values(params)
       end
 
       def self.define_profile_type(params)
@@ -50,6 +53,25 @@ module Fastlane
         Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING] = mapping
       end
 
+      def self.define_shared_values(params)
+        profiles_uuids = []
+        profiles_names = []
+
+        Array(params[:app_identifier]).each do |app_identifier|
+          env_variable_name = Match::Utils.environment_variable_name(app_identifier: app_identifier,
+                                                                               type: Match.profile_type_sym(params[:type]),
+                                                                           platform: params[:platform])
+          environment_variable_name_profile_name = Match::Utils.environment_variable_name_profile_name(app_identifier: app_identifier,
+                                                                                                                 type: Match.profile_type_sym(params[:type]),
+                                                                                                             platform: params[:platform])
+          profiles_uuids << ENV[env_variable_name]
+          profiles_names << ENV[environment_variable_name_profile_name]
+        end
+
+        Actions.lane_context[SharedValues::MATCH_PROFILES_UUIDS] = profiles_uuids
+        Actions.lane_context[SharedValues::MATCH_PROFILES_NAMES] = profiles_names
+      end
+
       #####################################################
       # @!group Documentation
       #####################################################
@@ -68,7 +90,10 @@ module Fastlane
       end
 
       def self.output
-        []
+        [
+          ['MATCH_PROFILES_UUIDS', 'Collection: The UUIDs of the profiles returned by match for each app_identifier'],
+          ['MATCH_PROFILES_NAMES', 'Collection: The names of the profiles returned by match for each app_identifier']
+        ]
       end
 
       def self.return_value
