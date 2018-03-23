@@ -2,6 +2,21 @@
 
 version: "{build}"
 
+# branches to build
+branches:
+  # whitelist
+  only:
+    - master
+
+# Do not build on tags (GitHub and BitBucket)
+skip_tags: true
+
+# Do not build additional commits to feature branch with open Pull Requests
+skip_branch_with_pr: true
+
+# Rolling builds
+# can only be configured via UI: https://www.appveyor.com/docs/build-configuration/#rolling-builds
+
 init:
   - git config --global core.autocrlf true
 
