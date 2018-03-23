@@ -5,7 +5,7 @@ module Supply
   class Options
     # rubocop:disable Metrics/PerceivedComplexity
     def self.available_options
-      valid_tracks = %w(production beta alpha rollout)
+      valid_tracks = %w(production beta alpha internal rollout)
       @options ||= [
         FastlaneCore::ConfigItem.new(key: :package_name,
                                      env_name: "SUPPLY_PACKAGE_NAME",
