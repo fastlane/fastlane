@@ -71,8 +71,6 @@ describe Fastlane do
           targets.select do |target|
             target.name == "TargetA" || target.name == "TargetATests" || target.name == "TargetBTests"
           end
-          # expect(targets.count).to eq(3)
-          # targets
         end
 
         result = Fastlane::FastFile.new.parse("lane :test do
