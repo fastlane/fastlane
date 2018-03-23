@@ -1,5 +1,7 @@
 <h3 align="center">
-  <img src="fastlane/assets/fastlane_text.png" alt="fastlane Logo" width=500 />
+  <a href="https://github.com/fastlane/fastlane/blob/master/fastlane/assets/fastlane_text.png">
+  <img src="https://github.com/fastlane/fastlane/blob/master/fastlane/assets/fastlane_text.png?raw=true" alt="fastlane Logo" width="500">
+  </a>
 </h3>
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
