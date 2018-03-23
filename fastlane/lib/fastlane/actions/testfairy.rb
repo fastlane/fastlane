@@ -5,11 +5,13 @@ module Fastlane
     end
 
     class TestfairyAction < Action
-      def self.upload_build(ipa, options)
+      def self.upload_build(api_url, ipa, options)
         require 'faraday'
         require 'faraday_middleware'
 
-        connection = Faraday.new(url: "https://upload.testfairy.com") do |builder|
+        UI.success("Uploading to #{api_url}...")
+
+        connection = Faraday.new(url: api_url) do |builder|
           builder.request(:multipart)
           builder.request(:url_encoded)
           builder.request(:retry, max: 3, interval: 5)
@@ -64,7 +66,10 @@ module Fastlane
           end
         end
 
-        client_options = Hash[params.values.map do |key, value|
+        # Rejecting key `api_url` as we don't need it in options
+        client_options = Hash[params.values.reject do |key, value|
+          key == :api_url
+        end.map do |key, value|
           case key
           when :api_key
             [key, value]
@@ -91,7 +96,7 @@ module Fastlane
 
         return params[:ipa] if Helper.test?
 
-        response = self.upload_build(params[:ipa], client_options)
+        response = self.upload_build(params[:api_url], params[:ipa], client_options)
         if parse_response(response)
           UI.success("Build URL: #{Actions.lane_context[SharedValues::TESTFAIRY_BUILD_URL]}")
           UI.success("Build successfully uploaded to TestFairy.")
@@ -155,6 +160,12 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find dSYM file at path '#{value}'") unless File.exist?(value)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :api_url,
+                                       env_name: "FL_TESTFAIRY_API_URL", # The name of the environment variable
+                                       description: "API URL for TestFairy", # a short description of this parameter
+                                       default_value: "https://upload.testfairy.com",
+                                       is_string: true,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :testers_groups,
                                        optional: true,
                                        type: Array,
