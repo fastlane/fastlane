@@ -181,7 +181,7 @@ module Supply
       max_apk_version_code = apk_version_codes.max
       max_tracks_version_code = nil
 
-      tracks = ["production", "rollout", "beta", "alpha"]
+      tracks = ["production", "rollout", "beta", "alpha", "internal"]
       config_track_index = tracks.index(Supply.config[:track])
 
       tracks.each_index do |track_index|
