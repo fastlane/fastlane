@@ -2333,14 +2333,16 @@ func podLibLint(useBundleExec: Bool = true,
                                                                                               RubyCommand.Argument(name: "quick", value: quick)])
   _ = runner.executeCommand(command)
 }
-func podPush(path: String? = nil,
+func podPush(useBundleExec: Bool = false,
+             path: String? = nil,
              repo: String? = nil,
              allowWarnings: String? = nil,
              useLibraries: String? = nil,
              sources: String? = nil,
              swiftVersion: String? = nil,
              verbose: Bool = false) {
-  let command = RubyCommand(commandID: "", methodName: "pod_push", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
+  let command = RubyCommand(commandID: "", methodName: "pod_push", className: nil, args: [RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec),
+                                                                                          RubyCommand.Argument(name: "path", value: path),
                                                                                           RubyCommand.Argument(name: "repo", value: repo),
                                                                                           RubyCommand.Argument(name: "allow_warnings", value: allowWarnings),
                                                                                           RubyCommand.Argument(name: "use_libraries", value: useLibraries),
@@ -3911,4 +3913,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.9]
+// FastlaneRunnerAPIVersion [0.9.10]
