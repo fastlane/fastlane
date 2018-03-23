@@ -8,6 +8,17 @@ module Fastlane
       def self.run(params)
         require 'spaceship'
 
+        build_nr = get_build_number(params)
+
+        # Convert build_nr to int (for legacy use) if no "." in string
+        if build_nr.kind_of?(String) && !build_nr.include?(".")
+          build_nr = build_nr.to_i
+        end
+
+        Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER] = build_nr
+      end
+
+      def self.get_build_number(params)
         UI.message("Login to iTunes Connect (#{params[:username]})")
         Spaceship::Tunes.login(params[:username])
         Spaceship::Tunes.select_team
@@ -53,7 +64,8 @@ module Fastlane
           end
         end
         UI.message("Latest upload for version #{version_number} is build: #{build_nr}")
-        Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER] = build_nr
+
+        build_nr
       end
 
       def self.order_versions(versions)
