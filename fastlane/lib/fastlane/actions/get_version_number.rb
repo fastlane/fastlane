@@ -36,8 +36,12 @@ module Fastlane
 
         # Prompt targets if no name
         unless target_name
-          # Returns if only one target
-          if targets.count == 1
+
+          # Gets non-test targets
+          non_test_targets = targets.reject(&:test_target_type?)
+
+          # Returns if only one non-test target
+          if non_test_targets.count == 1
             return targets.first
           end
 
@@ -69,6 +73,12 @@ module Fastlane
           plist_file = plist_files[selected]
         else
           plist_file = plist_files.values.first
+        end
+
+        # $(SRCROOT) is the path of where the XcodeProject is
+        # We can just set this as empty string since we join with `folder` below
+        if plist_file.include?("$(SRCROOT)/")
+          plist_file.gsub!("$(SRCROOT)/", "")
         end
 
         plist_file = File.absolute_path(File.join(folder, plist_file))
