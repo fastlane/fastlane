@@ -11,3 +11,6 @@
 # open_report(true)
 
 # clean(true)
+
+# Enable skip_build to skip debug builds for faster test performance
+skip_build(true)
