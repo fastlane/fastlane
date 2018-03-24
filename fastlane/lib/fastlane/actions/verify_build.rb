@@ -1,5 +1,4 @@
 require 'plist'
-require 'terminal-table'
 
 module Fastlane
   module Actions
@@ -66,6 +65,7 @@ module Fastlane
         values['app_name'] = plist['AppIDName']
         values['provisioning_uuid'] = plist['UUID']
         values['team_name'] = plist['TeamName']
+        values['team_identifier'] = plist['TeamIdentifier'].first
 
         application_identifier_prefix = plist['ApplicationIdentifierPrefix'][0]
         full_bundle_identifier = "#{application_identifier_prefix}.#{values['bundle_identifier']}"
@@ -77,28 +77,8 @@ module Fastlane
       end
 
       def self.print_values(values)
-        table = Terminal::Table.new do |t|
-          t.title = 'Summary for VERIFY_BUILD'.green
-          t.headings = 'Key', 'Value'
-          values.each do |key, value|
-            columns = []
-            columns << key
-            columns << case value
-                       when Hash
-                         value.map { |k, v| "#{k}: #{v}" }.join("\n")
-                       when Array
-                         value.join("\n")
-                       else
-                         value.to_s
-                       end
-
-            t << columns
-          end
-        end
-
-        puts("")
-        puts(table)
-        puts("")
+        FastlaneCore::PrintTable.print_values(config: values,
+                                             title: "Summary for verify_build #{Fastlane::VERSION}")
       end
 
       def self.evaulate(params, values)
