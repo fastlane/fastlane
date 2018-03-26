@@ -161,7 +161,12 @@ open class Snapshot: NSObject {
                 return
             }
             
-            let screenshot = app.windows.firstMatch.screenshot()
+            guard let window = app.windows.allElementsBoundByIndex.first(where: { $0.frame.isEmpty == false }) else {
+                print("Couldn't find an element window in XCUIApplication with a non-empty frame.")
+                return
+            }
+
+            let screenshot = window.screenshot()
             guard let simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
             let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
             do {
