@@ -348,7 +348,8 @@ module Screengrab
     end
 
     def run_adb_command(command, print_all: false, print_command: false)
-      output = @executor.execute(command: command,
+      adb_path = @android_env.adb_path.chomp("adb")
+      output = @executor.execute(command: adb_path + command,
                                  print_all: print_all,
                                  print_command: print_command) || ''
       output.lines.reject do |line|
