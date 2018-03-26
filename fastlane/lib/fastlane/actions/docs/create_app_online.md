@@ -113,7 +113,7 @@ fastlane produce enable_services --help
     --push-notification  Enable Push notification (only enables the service, does not configure certificates)
     --sirikit            Enable SiriKit
     --vpn-conf           Enable VPN Configuration
-    --nfc_tag_reading    Enable NFC Tag Reading
+    --nfc-tag-reading    Enable NFC Tag Reading
 ```
 
 ```no-highlight
@@ -136,7 +136,7 @@ fastlane produce disable_services --help
     --push-notification  Disable Push notifications
     --sirikit            Disable SiriKit
     --vpn-conf           Disable VPN Configuration
-    --nfc_tag_reading    Disable NFC Tag Reading
+    --nfc-tag-reading    Disable NFC Tag Reading
 ```
 
 ## Creating Apple Pay merchants and associating them with an App ID
