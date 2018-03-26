@@ -28,8 +28,7 @@ module Fastlane
         return_value = ""
       end
 
-      # quirks_mode because sometimes the built-in library is used for some folks and that needs quirks_mode: true
-      return JSON.generate(return_value.to_s, quirks_mode: true)
+      return_value
     end
 
     def process_value_as_array_of_strings(return_value: nil)
