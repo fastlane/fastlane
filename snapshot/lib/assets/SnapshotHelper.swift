@@ -278,4 +278,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.9]
+// SnapshotHelperVersion [1.10]
