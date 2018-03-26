@@ -22,13 +22,14 @@ module Fastlane
         line.strip!
         if line.start_with?("func")
           current_lane_name = self.lane_name_from_swift_line(potential_lane_line: line)
+          lanes_by_name[current_lane_name] = Fastlane::Lane.new(platform: nil, name: current_lane_name.to_sym, description: [])
         elsif line.start_with?("desc")
           lane_description = self.desc_entry_for_swift_lane(named: current_lane_name, potential_desc_line: line)
           unless lane_description
             next
           end
 
-          lanes_by_name[current_lane_name] = Fastlane::Lane.new(platform: nil, name: current_lane_name.to_sym, description: [lane_description])
+          lanes_by_name[current_lane_name].description = [lane_description]
           current_lane_name = nil
         end
       end
