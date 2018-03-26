@@ -8,7 +8,7 @@ describe Snapshot do
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("9.0").and_return(true)
 
         helper_version = runner.version_of_bundled_helper
-        expect(helper_version).to match(/^SnapshotHelperVersion \[\d+.\d+\]$$/)
+        expect(helper_version).to match(/^SnapshotHelperVersion \[\d+.\d+\]$/)
       end
     end
     describe 'Parses embedded SnapshotHelperXcode8.swift' do
