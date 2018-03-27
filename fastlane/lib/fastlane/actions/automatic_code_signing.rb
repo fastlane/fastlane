@@ -40,6 +40,9 @@ module Fastlane
           end
           if params[:code_sign_identity]
             build_configuration_list.set_setting("CODE_SIGN_IDENTITY", params[:code_sign_identity])
+            build_configuration_list.set_setting("CODE_SIGN_IDENTITY[sdk=*]", params[:code_sign_identity])
+            build_configuration_list.set_setting("CODE_SIGN_IDENTITY[sdk=iphoneos*]", params[:code_sign_identity])
+            build_configuration_list.set_setting("CODE_SIGN_IDENTITY[sdk=appletvos*]", params[:code_sign_identity])
             UI.important("Set Code Sign identity to: #{params[:code_sign_identity]} for target: #{found_target[:name]}")
           end
           if params[:profile_name]
