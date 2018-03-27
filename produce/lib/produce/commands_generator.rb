@@ -60,6 +60,7 @@ module Produce
         c.option('--push-notification', 'Enable Push notification (only enables the service, does not configure certificates)')
         c.option('--sirikit', 'Enable SiriKit')
         c.option('--vpn-conf', 'Enable VPN Configuration')
+        c.option('--nfc-tag-reading', 'Enable NFC Tag Reading')
 
         FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
 
@@ -93,6 +94,7 @@ module Produce
         c.option('--push-notification', 'Disable Push notifications')
         c.option('--sirikit', 'Disable SiriKit')
         c.option('--vpn-conf', 'Disable VPN Configuration')
+        c.option('--nfc-tag-reading', 'Disable NFC Tag Reading')
 
         FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
 
