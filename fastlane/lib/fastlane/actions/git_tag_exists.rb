@@ -2,8 +2,19 @@ module Fastlane
   module Actions
     class GitTagExistsAction < Action
       def self.run(params)
-        result = Actions.sh("git rev-parse -q --verify refs/tags/#{params[:tag].shellescape} || true", log: FastlaneCore::Globals.verbose?).chomp
-        !result.empty?
+        tag_ref = "refs/tags/#{params[:tag].shellescape}"
+        if params[:remote]
+          command = "git ls-remote -q --exit-code #{params[:remote_name].shellescape} #{tag_ref}"
+        else
+          command = "git rev-parse -q --verify #{tag_ref}"
+        end
+        exists = true
+        Actions.sh(
+          command,
+          log: FastlaneCore::Globals.verbose?,
+          error_callback: ->(result) { exists = false }
+        )
+        exists
       end
 
       #####################################################
@@ -21,7 +32,16 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :tag,
-                                       description: "The tag name that should be checked")
+                                       description: "The tag name that should be checked"),
+          FastlaneCore::ConfigItem.new(key: :remote,
+                                       description: "Whether to check remote. Defaults to `false`",
+                                       type: Boolean,
+                                       default_value: false,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :remote_name,
+                                       description: "The remote to check. Defaults to `origin`",
+                                       default_value: 'origin',
+                                       optional: true)
         ]
       end
 
