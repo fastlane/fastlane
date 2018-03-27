@@ -131,7 +131,7 @@ module FastlaneCore
       if options[:scheme].to_s.length > 0
         # Verify the scheme is available
         unless schemes.include?(options[:scheme].to_s)
-          UI.error("Couldn't find specified scheme '#{options[:scheme]}'.")
+          UI.error("Couldn't find specified scheme '#{options[:scheme]}'. Please make sure that the scheme is shared, see https://developer.apple.com/library/content/documentation/IDEs/Conceptual/xcode_guide-continuous_integration/ConfigureBots.html#//apple_ref/doc/uid/TP40013292-CH9-SW3")
           options[:scheme] = nil
         end
       end
