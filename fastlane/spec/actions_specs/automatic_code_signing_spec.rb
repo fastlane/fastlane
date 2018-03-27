@@ -128,6 +128,15 @@ describe Fastlane do
         target.build_configuration_list.get_setting("CODE_SIGN_IDENTITY").map do |build_config, value|
           expect(value).to eq("iPhone Distribution")
         end
+        target.build_configuration_list.get_setting("CODE_SIGN_IDENTITY[sdk=*]").map do |build_config, value|
+          expect(value).to eq("iPhone Distribution")
+        end
+        target.build_configuration_list.get_setting("CODE_SIGN_IDENTITY[sdk=iphoneos*]").map do |build_config, value|
+          expect(value).to eq("iPhone Distribution")
+        end
+        target.build_configuration_list.get_setting("CODE_SIGN_IDENTITY[sdk=appletvos*]").map do |build_config, value|
+          expect(value).to eq("iPhone Distribution")
+        end
       end
     end
 
