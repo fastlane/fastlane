@@ -9,6 +9,10 @@ module Match
     require 'security'
     require 'shellwords'
 
+    def self.openssl_version
+      OpenSSL::OPENSSL_VERSION
+    end
+
     def server_name(git_url)
       ["match", git_url].join("_")
     end

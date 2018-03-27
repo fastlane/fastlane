@@ -6,6 +6,7 @@ require_relative 'encrypt'
 module Match
   class GitHelper
     MATCH_VERSION_FILE_NAME = "match_version.txt"
+    OPENSSL_VERSION_FILE_NAME = "openssl_version.txt"
 
     def self.clone(git_url,
                    shallow_clone,
@@ -59,6 +60,16 @@ module Match
 
       checkout_branch(branch) unless branch == "master"
 
+      # makes it backwards compatible allowing checkout and decryption of repo
+      # if open ssl version file not exist
+      openssl_version_file = File.join(@dir, OPENSSL_VERSION_FILE_NAME)
+      if File.exist?(openssl_version_file)
+        repo_openssl_version = File.read(openssl_version_file)
+        if repo_openssl_version != Encrypt.openssl_version.to_s
+          UI.user_error!("Repository was encrypted using '#{repo_openssl_version}' and currently used version is '#{Encrypt.openssl_version}'")
+        end
+      end
+
       if !Helper.test? && GitHelper.match_version(@dir).nil? && manual_password.nil? && File.exist?(File.join(@dir, "README.md"))
         UI.important("Migrating to new match...")
         ChangePassword.update(params: { git_url: git_url,
@@ -100,7 +111,14 @@ module Match
         Encrypt.new.encrypt_repo(path: path, git_url: git_url)
         commands = []
 
+        write_openssl_version_file = !File.exist?(OPENSSL_VERSION_FILE_NAME) || File.read(OPENSSL_VERSION_FILE_NAME) != Encrypt.openssl_version.to_s
+        if write_openssl_version_file
+          File.write(OPENSSL_VERSION_FILE_NAME, Encrypt.openssl_version) # stored unencrypted
+        end
+
         if files_to_commmit.count > 0 # e.g. for nuke this is treated differently
+          files_to_commmit << OPENSSL_VERSION_FILE_NAME if write_openssl_version_file
+
           if !File.exist?(MATCH_VERSION_FILE_NAME) || File.read(MATCH_VERSION_FILE_NAME) != Fastlane::VERSION.to_s
             files_to_commmit << MATCH_VERSION_FILE_NAME
             File.write(MATCH_VERSION_FILE_NAME, Fastlane::VERSION) # stored unencrypted
