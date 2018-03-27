@@ -1599,8 +1599,12 @@ func gitSubmoduleUpdate(recursive: Bool = false,
                                                                                                       RubyCommand.Argument(name: "init", value: `init`)])
   _ = runner.executeCommand(command)
 }
-func gitTagExists(tag: String) {
-  let command = RubyCommand(commandID: "", methodName: "git_tag_exists", className: nil, args: [RubyCommand.Argument(name: "tag", value: tag)])
+func gitTagExists(tag: String,
+                  remote: Bool = false,
+                  remoteName: String = "origin") {
+  let command = RubyCommand(commandID: "", methodName: "git_tag_exists", className: nil, args: [RubyCommand.Argument(name: "tag", value: tag),
+                                                                                                RubyCommand.Argument(name: "remote", value: remote),
+                                                                                                RubyCommand.Argument(name: "remote_name", value: remoteName)])
   _ = runner.executeCommand(command)
 }
 func githubApi(serverUrl: String = "https://api.github.com",
@@ -3913,4 +3917,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.10]
+// FastlaneRunnerAPIVersion [0.9.11]
