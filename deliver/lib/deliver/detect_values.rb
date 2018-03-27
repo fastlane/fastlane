@@ -38,6 +38,9 @@ module Deliver
     def find_app(options)
       search_by = options[:app_identifier]
       search_by = options[:app] if search_by.to_s.length == 0
+
+      puts "PLATFORM: #{options[:platform]}"
+
       app = Spaceship::Tunes::Application.find(search_by, mac: options[:platform] == "osx")
       if app
         options[:app] = app
@@ -71,6 +74,8 @@ module Deliver
     end
 
     def find_platform(options)
+      puts "ipa: #{options[:ipa]}"
+      puts "pkg: #{options[:pkg]}"
       if options[:ipa]
         options[:platform] ||= FastlaneCore::IpaFileAnalyser.fetch_app_platform(options[:ipa])
       elsif options[:pkg]
