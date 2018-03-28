@@ -61,6 +61,7 @@ describe Fastlane do
             testfairy({
               ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
               api_key: 'thisistest',
+              upload_url: 'https://your-subdomain.testfairy.com',
               comment: 'Test Comment!',
               testers_groups: ['group1', 'group2']
             })
