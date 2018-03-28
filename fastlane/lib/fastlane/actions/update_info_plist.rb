@@ -41,7 +41,8 @@ module Fastlane
               plist['CFBundleIdentifier'] = params[:app_identifier] if params[:app_identifier]
               plistp['CFBundleDisplayName'] = params[:display_name] if params[:display_name]
               params[:block].call(plist) if params[:block]
-            })
+            }
+          )
         else
           UI.important("You haven't specified any parameters to update your plist.")
           false
