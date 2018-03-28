@@ -34,18 +34,14 @@ module Fastlane
           # Read existing plist file
           info_plist_path = File.join(folder, "..", params[:plist_path])
           UI.user_error!("Couldn't find info plist file at path '#{info_plist_path}'") unless File.exist?(info_plist_path)
-          plist = Xcodeproj::Plist.read_from_path(info_plist_path)
 
-          # Update plist values
-          plist['CFBundleIdentifier'] = params[:app_identifier] if params[:app_identifier]
-          plist['CFBundleDisplayName'] = params[:display_name] if params[:display_name]
-          params[:block].call(plist) if params[:block]
-
-          # Write changes to file
-          Xcodeproj::Plist.write_to_path(plist, info_plist_path)
-
-          UI.success("Updated #{params[:plist_path]} 💾.")
-          File.read(info_plist_path)
+          other_action.update_plist(
+            plist_path: info_plist_path,
+            block: lambda { |plist|
+              plist['CFBundleIdentifier'] = params[:app_identifier] if params[:app_identifier]
+              plistp['CFBundleDisplayName'] = params[:display_name] if params[:display_name]
+              params[:block].call(plist) if params[:block]
+            })
         else
           UI.important("You haven't specified any parameters to update your plist.")
           false
