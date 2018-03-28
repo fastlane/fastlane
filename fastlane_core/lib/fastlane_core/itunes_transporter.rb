@@ -42,6 +42,7 @@ module FastlaneCore
       end
 
       @errors = []
+      @returnederrors = []
       @warnings = []
       @all_lines = []
 
@@ -99,7 +100,7 @@ module FastlaneCore
         UI.important("Although errors occurred during execution of iTMSTransporter, it returned success status.")
       end
 
-      exit_status.zero?
+      return exit_status.zero?, @returnederrors
     end
 
     private
@@ -115,7 +116,9 @@ module FastlaneCore
 
       elsif line =~ ERROR_REGEX
         @errors << $1
-        UI.error("[Transporter Error Output]: #{$1}")
+        # Instead of printing this again maybe just save it to be used later?
+        @returnederrors << "[Transporter Error Output]: #{$1}"
+        # UI.error("[Transporter Error Output]: #{$1}")
 
         # Check if it's a login error
         if $1.include?("Your Apple ID or password was entered incorrectly") ||
@@ -125,7 +128,7 @@ module FastlaneCore
             CredentialsManager::AccountManager.new(user: @user).invalid_credentials
             UI.error("Please run this tool again to apply the new password")
           end
-        elsif $1.include?("Redundant Binary Upload. There already exists a binary upload with build")
+        elsif $1.include?("Redundant Binary Upload. You've already uploaded a build with build")
           UI.error($1)
           UI.error("You have to change the build number of your app to upload your ipa file")
         end
@@ -375,7 +378,7 @@ module FastlaneCore
       UI.verbose(@transporter_executor.build_upload_command(@user, 'YourPassword', actual_dir, @provider_short_name))
 
       begin
-        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
+        result, transportererrors = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return upload(app_id, dir)
@@ -389,7 +392,7 @@ module FastlaneCore
         handle_error(@password)
       end
 
-      result
+      return result, transportererrors
     end
 
     private

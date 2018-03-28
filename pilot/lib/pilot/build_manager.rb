@@ -34,10 +34,12 @@ module Pilot
                                                                       platform: platform)
 
       transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
-      result = transporter.upload(app.apple_id, package_path)
+      result, transportererrors = transporter.upload(app.apple_id, package_path)
 
       unless result
-        UI.user_error!("Error uploading ipa file, for more information see above")
+        transportererrorstring = transportererrors.join("\n")
+        transportererrorstring.gsub!(/"/, "")
+        UI.user_error!("Error uploading ipa file: \n #{transportererrorstring}")
       end
 
       UI.success("Successfully uploaded the new binary to iTunes Connect")
