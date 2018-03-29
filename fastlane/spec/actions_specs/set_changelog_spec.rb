@@ -16,7 +16,7 @@ describe Fastlane do
       context 'with invalid app_identifier' do
         let(:validPlatform_lane) { "lane :test do set_changelog(app_identifier: 'x.y.z', platform: 'ios', changelog: 'custom changelog', username: 'name@example.com') end" }
 
-        it 'blabla' do
+        it 'raises a Fastlane error' do
           allow(Spaceship::Tunes).to receive(:login).and_return(true)
           allow(Spaceship::Tunes).to receive(:select_team).and_return(true)
           allow(Spaceship::Application).to receive(:find).and_return(nil)
