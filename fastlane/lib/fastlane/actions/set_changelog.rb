@@ -17,7 +17,7 @@ module Fastlane
         unless version_number
           # Automatically fetch the latest version
           UI.message("Fetching the latest version for this app")
-          if app.edit_version(platform: platform) and app.edit_version(platform: platform).version
+          if app.edit_version(platform: platform) && app.edit_version(platform: platform).version
             version_number = app.edit_version(platform: platform).version
           else
             UI.message("You have to specify a new version number: ")
