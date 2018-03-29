@@ -9,3 +9,6 @@ gemspec(path: ".")
 
 plugins_path = File.join(File.expand_path("..", __FILE__), 'fastlane', 'Pluginfile')
 eval_gemfile(plugins_path)
+
+# THIS IS TEMPORARY TO MAKE SURE MY CHANGES FAIL/PASS PROPERLY
+gem "simctl", git: "https://github.com/joshdholtz/simctl.git"
