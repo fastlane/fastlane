@@ -4,6 +4,7 @@ describe Fastlane do
       let(:swiftlint_gem_version) { Gem::Version.new('0.9.2') }
       let(:output_file) { "swiftlint.result.json" }
       let(:config_file) { ".swiftlint-ci.yml" }
+      let(:path) { "/path/to/lint" }
 
       before :each do
         allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(swiftlint_gem_version)
@@ -98,6 +99,18 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(result).to eq("swiftlint lint --strict --config #{config_file} > #{output_file}")
+        end
+      end
+
+      context "when specify path options" do
+        it "adds path option" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              path: '#{path}'
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint --path #{path}")
         end
       end
 
