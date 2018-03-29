@@ -15,7 +15,6 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq(" /usr/local/android-sdk/platform-tools/adb test")
-
       end
     end
   end
