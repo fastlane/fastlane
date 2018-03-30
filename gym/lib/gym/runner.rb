@@ -259,7 +259,7 @@ module Gym
     end
 
     def build_mac_pkg(app_path)
-      if Gym.confg[:export_method] != 'app-store'
+      if Gym.config[:export_method] != 'app-store'
         UI.message('Skipping packing of Mac app since `export_method` is not `app-store`')
         return
       end
