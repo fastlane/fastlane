@@ -55,7 +55,7 @@ module Spaceship
       Multipath = AppService.new_service("MP49FN762P")
       NetworkExtension = AppService.new_service("NWEXT04537")
       NFCTagReading = AppService.new_service("NFCTRMAY17")
-      PersonalVPN = AppService.new_service("V66P55NK2I");
+      PersonalVPN = AppService.new_service("V66P55NK2I")
       Passbook = AppService.new_service("pass")
       PushNotification = AppService.new_service("push")
       SiriKit = AppService.new_service("SI015DKUHP")
