@@ -11,4 +11,5 @@ plugins_path = File.join(File.expand_path("..", __FILE__), 'fastlane', 'Pluginfi
 eval_gemfile(plugins_path)
 
 # THIS IS TEMPORARY TO MAKE SURE MY CHANGES FAIL/PASS PROPERLY
-gem "simctl", git: "https://github.com/joshdholtz/simctl.git", ref: "e9a4ce1a6299acca886ccc4391252afdc391bbb9"
+# gem "simctl", git: "https://github.com/joshdholtz/simctl.git", ref: "e9a4ce1a6299acca886ccc4391252afdc391bbb9"
+gem "simctl", path: "../simctl"
