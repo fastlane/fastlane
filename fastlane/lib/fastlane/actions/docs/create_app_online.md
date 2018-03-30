@@ -146,7 +146,7 @@ fastlane produce disable_services --help
     --sirikit            Disable SiriKit
     --vpn-conf           Disable VPN Configuration (deprecated)
     --wallet             Disable Wallet
-    --nfc-tag-reading    Disable NFC Tag Reading
+    --wireless-conf      Disable Wireless Accessory Configuration
 ```
 
 ## Creating Apple Pay merchants and associating them with an App ID
