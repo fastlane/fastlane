@@ -105,14 +105,17 @@ fastlane produce enable_services --help
     --game-center        Enable Game Center
     --healthkit          Enable HealthKit
     --homekit            Enable HomeKit
+    --hotspot            Enable Hotspot
     --wireless-conf      Enable Wireless Accessory Configuration
     --icloud STRING      Enable iCloud, suitable values are "legacy" and "cloudkit"
     --in-app-purchase    Enable In-App Purchase
     --inter-app-audio    Enable Inter-App-Audio
+    --multipath          Enable Multipath
     --passbook           Enable Passbook
     --push-notification  Enable Push notification (only enables the service, does not configure certificates)
     --sirikit            Enable SiriKit
     --vpn-conf           Enable VPN Configuration
+    --nfc-tag-reading    Enable NFC Tag Reading
 ```
 
 ```no-highlight
@@ -127,14 +130,17 @@ fastlane produce disable_services --help
     --game-center        Disable Game Center
     --healthkit          Disable HealthKit
     --homekit            Disable HomeKit
+    --hotspot            Disable Hotspot
     --wireless-conf      Disable Wireless Accessory Configuration
     --icloud             Disable iCloud
     --in-app-purchase    Disable In-App Purchase
     --inter-app-audio    Disable Inter-App-Audio
+    --multipath          Disable Multipath
     --passbook           Disable Passbook
     --push-notification  Disable Push notifications
     --sirikit            Disable SiriKit
     --vpn-conf           Disable VPN Configuration
+    --nfc-tag-reading    Disable NFC Tag Reading
 ```
 
 ## Creating Apple Pay merchants and associating them with an App ID
