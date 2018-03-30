@@ -112,6 +112,7 @@ fastlane produce enable_services --help
     --multipath          Enable Multipath
     --network-extension  Enable Network Extensions
     --nfc-tag-reading    Enable NFC Tag Reading
+    --personal-vpn       Enable Personal VPN
     --passbook           Enable Passbook (deprecated)
     --push-notification  Enable Push notification (only enables the service, does not configure certificates)
     --sirikit            Enable SiriKit
