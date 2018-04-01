@@ -80,7 +80,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :path,
                                        description: "Specify path to lint",
                                        is_string: true,
-                                       optional: true),
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :output_file,
                                        description: 'Path to output SwiftLint result',
                                        optional: true),
