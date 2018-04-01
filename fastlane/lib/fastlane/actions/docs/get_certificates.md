@@ -78,5 +78,9 @@ _cert_ uses the [password manager](https://github.com/fastlane/fastlane/tree/mas
 
 # Tips
 
-## Use the 'Provisioning Quicklook plugin'
-Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning) to easily preview provisioning profile files and certificates.
+## Use 'ProvisionQL' for advanced Quick Look in Finder
+
+Install [ProvisionQL](https://github.com/ealeksandrov/ProvisionQL).
+
+It will show you `mobileprovision` files like this:
+![img/actions/QuickLookScreenshot-Provision.png](/img/actions/QuickLookScreenshot-Provision.png)

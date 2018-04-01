@@ -171,12 +171,12 @@ _sigh_ uses the [CredentialsManager](https://github.com/fastlane/fastlane/tree/m
 
 # Tips
 
+## Use 'ProvisionQL' for advanced Quick Look in Finder
 
-## Use the 'Provisioning Quicklook plugin'
-Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
+Install [ProvisionQL](https://github.com/ealeksandrov/ProvisionQL).
 
-It will show you the `mobileprovision` files like this:
-![img/actions/QuickLookScreenshot.png](/img/actions/QuickLookScreenshot.png)
+It will show you `mobileprovision` files like this:
+![img/actions/QuickLookScreenshot-Provision.png](/img/actions/QuickLookScreenshot-Provision.png)
 
 ## App Identifier couldn't be found
 
