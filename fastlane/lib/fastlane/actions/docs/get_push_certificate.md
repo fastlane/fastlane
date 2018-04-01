@@ -108,11 +108,3 @@ _pem_ uses [_spaceship_](https://spaceship.airforce) to communicate with the App
 
 ## How is my password stored?
 ``_pem_`` uses the [password manager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from _fastlane_. Take a look the [CredentialsManager README](https://github.com/fastlane/fastlane/tree/master/credentials_manager) for more information.
-
-# Tips
-
-## Use the 'Provisioning Quicklook plugin'
-Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
-
-It will show you the ``_pem_`` files like this:
-![img/actions/QuickLookScreenshot.png](/img/actions/QuickLookScreenshot.png)
