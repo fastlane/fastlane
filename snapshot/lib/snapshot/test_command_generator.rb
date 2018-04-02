@@ -80,22 +80,14 @@ module Snapshot
 
       private
 
-      # Creates an alias for require to prevent `rubocop/require_tools`
-      # from failing. This eventually change it when `simctl` doesn't
-      # execute shell commands at the top-level anymore
-      #
-      # Issue: https://github.com/fastlane/fastlane/issues/12071
-      alias silence_the_horrible_require_checker require
-
       def get_device_type_with_simctl(device_names)
         return device_names if Helper.test?
 
-        silence_the_horrible_require_checker("simctl")
+        require("simctl")
 
         # Gets actual simctl device type from device name
         return device_names.map do |device_name|
-          # Disable checking due to alias-ed require above
-          device = SimCtl.device(name: device_name) # rubocop:disable Require/MissingRequireStatement
+          device = SimCtl.device(name: device_name)
           if device
             device.devicetype.name
           end
