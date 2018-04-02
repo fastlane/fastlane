@@ -152,16 +152,16 @@ module Produce
         if on
           case options.icloud
           when "legacy"
-            app.update_service(Spaceship.app_service.icloud.on)
+            app.update_service(Spaceship.app_service.cloud.on)
             app.update_service(Spaceship.app_service.cloud_kit.xcode5_compatible)
           when "cloudkit"
-            app.update_service(Spaceship.app_service.icloud.on)
+            app.update_service(Spaceship.app_service.cloud.on)
             app.update_service(Spaceship.app_service.cloud_kit.cloud_kit)
           else
             UI.user_error!("Unknown service '#{options.icloud}'. Valid values: 'legacy', 'cloudkit'")
           end
         else
-          app.update_service(Spaceship.app_service.icloud.off)
+          app.update_service(Spaceship.app_service.cloud.off)
         end
       end
 
