@@ -144,13 +144,13 @@ module Produce
             app.update_service(Spaceship.app_service.cloud.on)
             app.update_service(Spaceship.app_service.cloud_kit.xcode5_compatible)
           when "cloudkit"
-            app.update_service(Spaceship.app_service.i_cloud.on)
+            app.update_service(Spaceship.app_service.cloud.on)
             app.update_service(Spaceship.app_service.cloud_kit.cloud_kit)
           else
             UI.user_error!("Unknown service '#{options.icloud}'. Valid values: 'legacy', 'cloudkit'")
           end
         else
-          app.update_service(Spaceship.app_service.icloud.off)
+          app.update_service(Spaceship.app_service.cloud.off)
         end
       end
 
