@@ -37,8 +37,9 @@ module Produce
 
     def valid_services_for(options)
       allowed_keys = [:app_group, :apple_pay, :associated_domains, :data_protection, :game_center, :healthkit, :homekit,
-                      :wireless_conf, :icloud, :in_app_purchase, :inter_app_audio, :passbook, :push_notification, :sirikit,
-                      :vpn_conf, :network_extension, :hotspot, :multipath, :nfc_tag_reading]
+                      :hotspot, :icloud, :in_app_purchase, :inter_app_audio, :multipath, :network_extension,
+                      :nfc_tag_reading, :personal_vpn, :passbook, :push_notification, :sirikit, :vpn_conf,
+                      :wallet, :wireless_conf]
       options.__hash__.select { |key, value| allowed_keys.include?(key) }
     end
 
@@ -125,6 +126,16 @@ module Produce
         end
       end
 
+      if options.wallet
+        UI.message("\tWallet")
+
+        if on
+          app.update_service(Spaceship.app_service.wallet.on)
+        else
+          app.update_service(Spaceship.app_service.wallet.off)
+        end
+      end
+
       if options.wireless_conf
         UI.message("\tWireless Accessory Configuration")
 
@@ -174,6 +185,17 @@ module Produce
         end
       end
 
+      if options.personal_vpn
+        UI.message("\tPersonal VPN")
+
+        if on
+          app.update_service(Spaceship.app_service.personal_vpn.on)
+        else
+          app.update_service(Spaceship.app_service.personal_vpn.off)
+        end
+      end
+
+      # deprecated
       if options.passbook
         UI.message("\tPassbook")
 
@@ -204,6 +226,7 @@ module Produce
         end
       end
 
+      # deprecated
       if options.vpn_conf
         UI.message("\tVPN Configuration")
 
