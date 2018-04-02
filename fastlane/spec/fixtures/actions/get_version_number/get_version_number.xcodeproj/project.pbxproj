@@ -6,6 +6,19 @@
 	objectVersion = 48;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		03B8E43E20729336001D1742 /* AggTarget */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 03B8E44120729336001D1742 /* Build configuration list for PBXAggregateTarget "AggTarget" */;
+			buildPhases = (
+			);
+			dependencies = (
+			);
+			name = AggTarget;
+			productName = AggTarget;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		03AB82E52056A51B00BAAFD1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AB82E42056A51B00BAAFD1 /* AppDelegate.swift */; };
 		03AB82E72056A51B00BAAFD1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AB82E62056A51B00BAAFD1 /* ViewController.swift */; };
@@ -510,6 +523,10 @@
 					03AB839D2057212800BAAFD1 = {
 						ProvisioningStyle = Automatic;
 					};
+					03B8E43E20729336001D1742 = {
+						CreatedOnToolsVersion = 9.3;
+						ProvisioningStyle = Automatic;
+					};
 					03CFC56E206409ED00CD6CB1 = {
 						ProvisioningStyle = Automatic;
 					};
@@ -539,6 +556,7 @@
 				03AB83822056B27800BAAFD1 /* SampleProject */,
 				03AB839D2057212800BAAFD1 /* TargetDifferentConfigurations */,
 				03CFC56E206409ED00CD6CB1 /* TargetSRC */,
+				03B8E43E20729336001D1742 /* AggTarget */,
 			);
 		};
 /* End PBXProject section */
@@ -1251,6 +1269,24 @@
 			};
 			name = Release;
 		};
+		03B8E43F20729336001D1742 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WPBN76YKX2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		03B8E44020729336001D1742 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WPBN76YKX2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		03CFC57A206409ED00CD6CB1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1381,6 +1417,15 @@
 			buildConfigurations = (
 				03AB83A92057212800BAAFD1 /* Debug */,
 				03AB83AA2057212800BAAFD1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		03B8E44120729336001D1742 /* Build configuration list for PBXAggregateTarget "AggTarget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				03B8E43F20729336001D1742 /* Debug */,
+				03B8E44020729336001D1742 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

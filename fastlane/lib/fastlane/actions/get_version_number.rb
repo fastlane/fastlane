@@ -38,7 +38,10 @@ module Fastlane
         unless target_name
 
           # Gets non-test targets
-          non_test_targets = targets.reject(&:test_target_type?)
+          non_test_targets = targets.reject do |t|
+            # Not all targets respond to `test_target_type?`
+            t.respond_to?(:test_target_type?) && t.test_target_type?
+          end
 
           # Returns if only one non-test target
           if non_test_targets.count == 1
