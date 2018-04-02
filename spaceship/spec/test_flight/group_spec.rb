@@ -88,6 +88,13 @@ describe Spaceship::TestFlight::Group do
       end
     end
 
+    context '.delete!' do
+      it 'removes a group for correct parameters' do
+        expect(mock_client).to receive(:delete_group_for_app).with(app_id: 'app-id', group_id: 2)
+        Spaceship::TestFlight::Group.delete!(app_id: 'app-id', group_name: 'Group 2')
+      end
+    end
+
     context '.default_external_group' do
       it 'returns the default external group' do
         group = Spaceship::TestFlight::Group.default_external_group(app_id: 'app-id')

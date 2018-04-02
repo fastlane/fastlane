@@ -30,6 +30,11 @@ module Spaceship::TestFlight
       self.new(data)
     end
 
+    def self.delete!(app_id: nil, group_name: nil)
+      group = self.find(app_id: app_id, group_name: group_name)
+      client.delete_group_for_app(app_id: app_id, group_id: group.id)
+    end
+
     def self.all(app_id: nil)
       groups = client.get_groups(app_id: app_id)
       groups.map { |g| self.new(g) }

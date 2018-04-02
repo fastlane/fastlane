@@ -133,6 +133,14 @@ describe Spaceship::TestFlight::Client do
     end
   end
 
+  context '#delete_group_for_app' do
+    it 'executes the request' do
+      MockAPI::TestFlightServer.delete('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id') {}
+      subject.delete_group_for_app(app_id: app_id, group_id: 'fake-group-id')
+      expect(WebMock).to have_requested(:delete, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id')
+    end
+  end
+
   context '#get_groups' do
     it 'executes the request' do
       MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups') {}
