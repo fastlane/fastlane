@@ -105,14 +105,20 @@ fastlane produce enable_services --help
     --game-center        Enable Game Center
     --healthkit          Enable HealthKit
     --homekit            Enable HomeKit
-    --wireless-conf      Enable Wireless Accessory Configuration
+    --hotspot            Enable Hotspot
     --icloud STRING      Enable iCloud, suitable values are "legacy" and "cloudkit"
     --in-app-purchase    Enable In-App Purchase
     --inter-app-audio    Enable Inter-App-Audio
-    --passbook           Enable Passbook
+    --multipath          Enable Multipath
+    --network-extension  Enable Network Extensions
+    --nfc-tag-reading    Enable NFC Tag Reading
+    --personal-vpn       Enable Personal VPN
+    --passbook           Enable Passbook (deprecated)
     --push-notification  Enable Push notification (only enables the service, does not configure certificates)
     --sirikit            Enable SiriKit
-    --vpn-conf           Enable VPN Configuration
+    --vpn-conf           Enable VPN Configuration (deprecated)
+    --wallet             Enable Wallet
+    --wireless-conf      Enable Wireless Accessory Configuration
 ```
 
 ```no-highlight
@@ -127,14 +133,20 @@ fastlane produce disable_services --help
     --game-center        Disable Game Center
     --healthkit          Disable HealthKit
     --homekit            Disable HomeKit
-    --wireless-conf      Disable Wireless Accessory Configuration
+    --hotspot            Disable Hotspot
     --icloud             Disable iCloud
     --in-app-purchase    Disable In-App Purchase
     --inter-app-audio    Disable Inter-App-Audio
-    --passbook           Disable Passbook
+    --multipath          Disable Multipath
+    --network-extension  Disable Network Extensions
+    --nfc-tag-reading    Disable NFC Tag Reading
+    --personal-vpn       Disable Personal VPN
+    --passbook           Disable Passbook (deprecated)
     --push-notification  Disable Push notifications
     --sirikit            Disable SiriKit
-    --vpn-conf           Disable VPN Configuration
+    --vpn-conf           Disable VPN Configuration (deprecated)
+    --wallet             Disable Wallet
+    --wireless-conf      Disable Wireless Accessory Configuration
 ```
 
 ## Creating Apple Pay merchants and associating them with an App ID
@@ -197,18 +209,21 @@ lane :release do
       game_center: "on",             # Valid values: "on", "off"
       health_kit: "on",              # Valid values: "on", "off"
       home_kit: "on",                # Valid values: "on", "off"
-      wireless_accessory: "on",      # Valid values: "on", "off"
+      hotspot: "on",                 # Valid values: "on", "off"
       icloud: "cloudkit",            # Valid values: "legacy", "cloudkit"
       in_app_purchase: "on",         # Valid values: "on", "off"
       inter_app_audio: "on",         # Valid values: "on", "off"
       passbook: "on",                # Valid values: "on", "off"
+      multipath: "on",               # Valid values: "on", "off"
+      network_extensions: "on",      # Valid values: "on", "off"
+      nfc_tag_reading: "on",         # Valid values: "on", "off"
+      personal_vpn: "on",            # Valid values: "on", "off"
+      passbook: "on",                # Valid values: "on", "off" (deprecated)
       push_notification: "on",       # Valid values: "on", "off"
       siri_kit: "on",                # Valid values: "on", "off"
-      vpn_configuration: "on",       # Valid values: "on", "off"
-      network_extension: "on",       # Valid values: "on", "off"
-      hotspot: "on",                 # Valid values: "on", "off"
-      multipath: "on",               # Valid values: "on", "off"
-      nfc_tag_reading: "on",         # Valid values: "on", "off"
+      vpn_configuration: "on",       # Valid values: "on", "off" (deprecated)
+      wallet: "on",                  # Valid values: "on", "off"
+      wireless_accessory: "on",      # Valid values: "on", "off"
     }
   )
 
