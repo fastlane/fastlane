@@ -13,11 +13,12 @@ module Fastlane
         UI.user_error!("Couldn't find app with identifier #{params[:app_identifier]}") if app.nil?
 
         version_number = params[:version]
+        platform = params[:platform]
         unless version_number
           # Automatically fetch the latest version
           UI.message("Fetching the latest version for this app")
-          if app.edit_version && app.edit_version.version
-            version_number = app.edit_version.version
+          if app.edit_version(platform: platform) && app.edit_version(platform: platform).version
+            version_number = app.edit_version(platform: platform).version
           else
             UI.message("You have to specify a new version number: ")
             version_number = STDIN.gets.strip
@@ -41,7 +42,7 @@ module Fastlane
 
         UI.important("Going to update the changelog to:\n\n#{changelog}\n\n")
 
-        if (v = app.edit_version)
+        if (v = app.edit_version(platform: platform))
           if v.version != version_number
             # Version is already there, make sure it matches the one we want to create
             UI.message("Changing existing version number from '#{v.version}' to '#{version_number}'")
@@ -54,7 +55,7 @@ module Fastlane
           UI.message("Creating the new version: #{version_number}")
           app.create_version!(version_number)
           app = Spaceship::Application.find(params[:app_identifier]) # Replace with .reload method once available
-          v = app.edit_version
+          v = app.edit_version(platform: platform)
         end
 
         v.release_notes.languages.each do |lang|
@@ -99,13 +100,13 @@ module Fastlane
                                      description: "The bundle identifier of your app",
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
-                                       default_value_dynamic: true),
+                                     default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "FASTLANE_USERNAME",
                                      description: "Your Apple ID Username",
                                      default_value: user,
-                                       default_value_dynamic: true),
+                                     default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_SET_CHANGELOG_VERSION",
                                        description: "The version number to create/update",
@@ -136,6 +137,14 @@ module Fastlane
                                        default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :platform,
+                                       env_name: "FL_SET_CHANGELOG_PLATFORM",
+                                       description: "The platform of the app (ios, appletvos, mac)",
+                                       default_value: "ios",
+                                       verify_block: proc do |value|
+                                         available = ['ios', 'appletvos', 'mac']
+                                         UI.user_error!("Invalid platform '#{value}', must be #{available.join(', ')}") unless available.include?(value)
                                        end)
         ]
       end
@@ -145,7 +154,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        [:ios, :appletvos, :mac].include?(platform)
       end
 
       def self.example_code
