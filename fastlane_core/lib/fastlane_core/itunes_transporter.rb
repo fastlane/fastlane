@@ -116,6 +116,7 @@ module FastlaneCore
 
       elsif line =~ ERROR_REGEX
         @errors << $1
+        # It looks like this causes errors to be printed twice
         # Instead of printing this again maybe just save it to be used later?
         @returnederrors << "[Transporter Error Output]: #{$1}"
         # UI.error("[Transporter Error Output]: #{$1}")
