@@ -122,7 +122,7 @@ describe Fastlane do
                 path: '#{path}'
               )
             end").runner.execute(:test)
-          end.to raise_error(%r{Couldn't find path '.*#{path}'})
+          end.to raise_error(/Couldn't find path '.*#{path}'/)
         end
       end
 
