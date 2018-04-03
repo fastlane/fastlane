@@ -2487,12 +2487,14 @@ func registerDevices(devices: [String : Any]? = nil,
                      devicesFile: String? = nil,
                      teamId: String? = nil,
                      teamName: String? = nil,
-                     username: String) {
+                     username: String,
+                     platform: String = "ios") {
   let command = RubyCommand(commandID: "", methodName: "register_devices", className: nil, args: [RubyCommand.Argument(name: "devices", value: devices),
                                                                                                   RubyCommand.Argument(name: "devices_file", value: devicesFile),
                                                                                                   RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                                   RubyCommand.Argument(name: "team_name", value: teamName),
-                                                                                                  RubyCommand.Argument(name: "username", value: username)])
+                                                                                                  RubyCommand.Argument(name: "username", value: username),
+                                                                                                  RubyCommand.Argument(name: "platform", value: platform)])
   _ = runner.executeCommand(command)
 }
 func resetGitRepo(files: String? = nil,
@@ -3314,6 +3316,7 @@ func teamName() {
 func testfairy(apiKey: String,
                ipa: String,
                symbolsFile: String? = nil,
+               uploadUrl: String = "https://upload.testfairy.com",
                testersGroups: [String] = [],
                metrics: [String] = [],
                comment: String = "No comment provided",
@@ -3323,6 +3326,7 @@ func testfairy(apiKey: String,
   let command = RubyCommand(commandID: "", methodName: "testfairy", className: nil, args: [RubyCommand.Argument(name: "api_key", value: apiKey),
                                                                                            RubyCommand.Argument(name: "ipa", value: ipa),
                                                                                            RubyCommand.Argument(name: "symbols_file", value: symbolsFile),
+                                                                                           RubyCommand.Argument(name: "upload_url", value: uploadUrl),
                                                                                            RubyCommand.Argument(name: "testers_groups", value: testersGroups),
                                                                                            RubyCommand.Argument(name: "metrics", value: metrics),
                                                                                            RubyCommand.Argument(name: "comment", value: comment),
@@ -3917,4 +3921,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.11]
+// FastlaneRunnerAPIVersion [0.9.12]
