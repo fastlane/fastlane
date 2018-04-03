@@ -130,7 +130,7 @@ module Fastlane
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :code_sign_identity,
                                        env_name: "FL_CODE_SIGN_IDENTITY",
-                                       description: "Code signing identity type (iPhone Development, iPhone Distribution)",
+                                       description: "Code signing identity type (iPhone Developer, iPhone Distribution)",
                                        optional: true,
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :profile_name,
