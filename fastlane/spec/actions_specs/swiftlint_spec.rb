@@ -103,7 +103,7 @@ describe Fastlane do
 
       context "when specify path options" do
         it "adds path option" do
-          path = "spec/fixtures"
+          path = "./spec/fixtures"
           result = Fastlane::FastFile.new.parse("
             lane :test do
               swiftlint(
@@ -115,14 +115,14 @@ describe Fastlane do
         end
 
         it "adds invalid path option" do
-          path = "/path/to/lint"
+          path = "./non/existent/path"
           expect do
             Fastlane::FastFile.new.parse("lane :test do
               swiftlint(
                 path: '#{path}'
               )
             end").runner.execute(:test)
-          end.to raise_error("Couldn't find path '#{path}'")
+          end.to raise_error(%r{Couldn't find path '.*#{path}'})
         end
       end
 
