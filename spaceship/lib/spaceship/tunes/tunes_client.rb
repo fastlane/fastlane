@@ -56,9 +56,12 @@ module Spaceship
 
     # Shows a team selection for the user in the terminal. This should not be
     # called on CI systems
-    def select_team
-      t_id = (ENV['FASTLANE_ITC_TEAM_ID'] || '').strip
-      t_name = (ENV['FASTLANE_ITC_TEAM_NAME'] || '').strip
+    #
+    # @param team_id (String) (optional): The ID of a iTunesConnect team
+    # @param team_name (String) (optional): The name of a iTunesConnect team
+    def select_team(team_id: team_id = nil, team_name: team_name = nil)
+      t_id = (team_id || ENV['FASTLANE_ITC_TEAM_ID'] || '').strip
+      t_name = (team_name || ENV['FASTLANE_ITC_TEAM_NAME'] || '').strip
 
       if t_name.length > 0 && t_id.length.zero? # we prefer IDs over names, they are unique
         puts("Looking for iTunes Connect Team with name #{t_name}") if Spaceship::Globals.verbose?
