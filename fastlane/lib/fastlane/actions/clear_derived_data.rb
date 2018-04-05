@@ -14,9 +14,10 @@ module Fastlane
       def self.xcode_preferences
         file = File.expand_path("~/Library/Preferences/com.apple.dt.Xcode.plist")
         if File.exist?(file)
-          return CFPropertyList.native_types(CFPropertyList::List.new(file: file).value)
+          plist = CFPropertyList::List.new(file: file).value
+          return CFPropertyList.native_types(plist) unless plist.nil?
         end
-        return ''
+        return nil
       end
 
       #####################################################
@@ -32,11 +33,18 @@ module Fastlane
       end
 
       def self.available_options
+        path = begin
+                 xcode_preferences['IDECustomDerivedDataLocation']
+               rescue
+                 nil
+               end
+        path ||= "~/Library/Developer/Xcode/DerivedData"
         [
           FastlaneCore::ConfigItem.new(key: :derived_data_path,
                                        env_name: "DERIVED_DATA_PATH",
                                        description: "Custom path for derivedData",
-                                       default_value: xcode_preferences['IDECustomDerivedDataLocation'] || "~/Library/Developer/Xcode/DerivedData")
+                                       default_value_dynamic: true,
+                                       default_value: path)
         ]
       end
 
