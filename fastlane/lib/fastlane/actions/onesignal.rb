@@ -95,7 +95,7 @@ module Fastlane
                                        optional: true),
 
           FastlaneCore::ConfigItem.new(key: :android_gcm_sender_id,
-                                       env_name: "android_gcm_sender_id",
+                                       env_name: "ANDROID_GCM_SENDER_ID",
                                        description: "GCM SENDER ID",
                                        sensitive: true,
                                        optional: true),
