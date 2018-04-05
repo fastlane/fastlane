@@ -33,11 +33,7 @@ module Fastlane
       end
 
       def self.available_options
-        path = begin
-                 xcode_preferences['IDECustomDerivedDataLocation']
-               rescue
-                 nil
-               end
+        path = xcode_preferences ? xcode_preferences['IDECustomDerivedDataLocation'] : nil
         path ||= "~/Library/Developer/Xcode/DerivedData"
         [
           FastlaneCore::ConfigItem.new(key: :derived_data_path,
