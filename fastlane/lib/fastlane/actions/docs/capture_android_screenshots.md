@@ -74,6 +74,19 @@ However, UI Automator requires a device with **API level >= 18**, so it is not y
 Screengrab.setDefaultScreenshotStrategy(new UiAutomatorScreenshotStrategy());
 ```
 
+## Improved screenshot capture with Falcon
+
+As of _screengrab_ 1.2.0, you can specify a new strategy to delegate to [Falcon](https://github.com/jraska/Falcon). Falcon may work better than UI Automator in some situations and also provides similar benefits as UI Automator:
+
+* Multi-window situations are correctly captured (dialogs, etc.)
+* Works on Android N
+
+Falcon requires a device with **API level >= 10**. To enable it for all screenshots by default, make the following call before your tests run:
+
+```java
+Screengrab.setDefaultScreenshotStrategy(new FalconScreenshotStrategy(activityRule.getActivity()));
+```
+
 ## Advanced Screengrabfile Configuration
 
 Running `fastlane screengrab init` generated a Screengrabfile which can store all of your configuration options. Since most values will not change often for your project, it is recommended to store them there.
