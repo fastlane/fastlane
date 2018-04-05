@@ -16,7 +16,7 @@ module Fastlane
         app_name = params[:app_name]
         apns_p12_password = params[:apns_p12_password]
         android_token = params[:android_token]
-        android_sender_id = params[:android_sender_id]
+        android_gcm_sender_id = params[:android_gcm_sender_id]
 
         payload = {}
         payload['name'] = app_name
@@ -31,7 +31,7 @@ module Fastlane
         end
 
         payload["gcm_key"] = android_token unless android_token.nil?
-        payload["android_gcm_sender_id"] = android_sender_id unless android_sender_id.nil?
+        payload["android_gcm_sender_id"] = android_gcm_sender_id unless android_gcm_sender_id.nil?
 
         # here's the actual lifting - POST to OneSignal
 
@@ -94,9 +94,9 @@ module Fastlane
                                        sensitive: true,
                                        optional: true),
 
-          FastlaneCore::ConfigItem.new(key: :android_sender_id,
-                                       env_name: "ANDROID_SENDER_ID",
-                                       description: "ANDROID SENDER ID",
+          FastlaneCore::ConfigItem.new(key: :android_gcm_sender_id,
+                                       env_name: "android_gcm_sender_id",
+                                       description: "GCM SENDER ID",
                                        sensitive: true,
                                        optional: true),
 
@@ -140,7 +140,7 @@ module Fastlane
             auth_token: "Your OneSignal Auth Token",
             app_name: "Name for OneSignal App",
             android_token: "Your Android GCM key (optional)",
-            android_sender_id: "Your Google Project/Sender ID number (optional)",
+            android_gcm_sender_id: "Your Android GCM Sender ID (optional)",
             apns_p12: "Path to Apple .p12 file (optional)",
             apns_p12_password: "Password for .p12 file (optional)",
             apns_env: "production/sandbox (defaults to production)"
