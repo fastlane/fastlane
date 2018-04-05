@@ -9,8 +9,6 @@ import com.jraska.falcon.Falcon;
 /**
  * <p>Screenshot strategy that delegates to Falcon for screenshot capture. <b>Requires
  * API level &gt;= 10</b></p>
- *
- * </ul>
  */
 public class FalconScreenshotStrategy implements ScreenshotStrategy {
 
