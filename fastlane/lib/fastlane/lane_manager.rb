@@ -59,9 +59,7 @@ module Fastlane
         ff.runner.execute(lane, platform, parameters)
       rescue NameError => ex
         print_lane_context
-        line = ex.backtrace.first.match("Fastfile:(\\d+):")[1]
-        UI.error("Error in your Fastfile at line #{line}")
-        UI.content_error(File.read(FastlaneCore::FastlaneFolder.fastfile_path, encoding: "utf-8"), line)
+        print_error_line(ex)
         e = ex
       rescue Exception => ex # rubocop:disable Lint/RescueException
         # We also catch Exception, since the implemented action might send a SystemExit signal
@@ -69,6 +67,7 @@ module Fastlane
         # Tested with `xcake`, which throws a `Xcake::Informative` object
 
         print_lane_context
+        print_error_line(ex)
         UI.error(ex.to_s) if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
         e = ex
       end

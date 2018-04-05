@@ -75,5 +75,14 @@ module Fastlane
         rows: FastlaneCore::PrintTable.transform_output(rows)
       }))
     end
+
+    def self.print_error_line(ex)
+      error_line = ex.backtrace.grep(/Fastfile:\d+:/).first
+      return if error_line.nil?
+
+      line = error_line.match("Fastfile:(\\d+):")[1]
+      UI.error("Error in your Fastfile at line #{line}")
+      UI.content_error(File.read(FastlaneCore::FastlaneFolder.fastfile_path, encoding: "utf-8"), line)
+    end
   end
 end
