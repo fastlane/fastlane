@@ -121,6 +121,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :ssl_verify,
                                        env_name: "FL_ARTIFACTORY_SSL_VERIFY",
                                        description: "Verify SSL",
+                                       is_string: false,
                                        default_value: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_username,

@@ -33,7 +33,7 @@ module Deliver
       app = options[:app]
       v = app.edit_version
 
-      if options[:build_number] and options[:build_number] != "latest"
+      if options[:build_number] && options[:build_number] != "latest"
         UI.message("Selecting existing build-number: #{options[:build_number]}")
         build = v.candidate_builds.detect { |a| a.build_version == options[:build_number] }
         unless build

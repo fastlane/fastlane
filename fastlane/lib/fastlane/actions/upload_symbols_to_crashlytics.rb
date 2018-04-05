@@ -85,7 +85,7 @@ module Fastlane
         command = []
         command << File.expand_path(params[:binary_path]).shellescape
         command << "-a #{params[:api_token]}" if params[:api_token]
-        command << "-gsp #{params[:gsp_path]}" if params[:gsp_path]
+        command << "-gsp #{params[:gsp_path].shellescape}" if params[:gsp_path]
         command << "-p #{params[:platform] == 'appletvos' ? 'tvos' : params[:platform]}"
         command << File.expand_path(path).shellescape
         begin
@@ -110,6 +110,8 @@ module Fastlane
       end
 
       def self.find_gsp_path(params)
+        return if params[:api_token]
+
         if params[:gsp_path].to_s.length > 0
           params[:gsp_path] = File.expand_path(params[:gsp_path])
         else

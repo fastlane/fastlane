@@ -2,6 +2,64 @@ require 'fileutils'
 
 describe Supply do
   describe Supply::Uploader do
+    describe "#verify_config!" do
+      let(:subject) { Supply::Uploader.new }
+
+      it "raises error if empty config" do
+        Supply.config = {}
+        expect do
+          subject.verify_config!
+        end.to raise_error("No local metadata, apks, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+      end
+
+      it "raises error if only track" do
+        Supply.config = {
+          track: 'alpha'
+        }
+        expect do
+          subject.verify_config!
+        end.to raise_error("No local metadata, apks, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+      end
+
+      it "raises error if only track_promote_to" do
+        Supply.config = {
+          track_promote_to: 'beta'
+        }
+        expect do
+          subject.verify_config!
+        end.to raise_error("No local metadata, apks, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+      end
+
+      it "does not raise error if only metadata" do
+        Supply.config = {
+          metadata_path: 'some/path'
+        }
+        subject.verify_config!
+      end
+
+      it "does not raise error if only apk" do
+        Supply.config = {
+          apk: 'some/path/app.apk'
+        }
+        subject.verify_config!
+      end
+
+      it "does not raise error if only apk_paths" do
+        Supply.config = {
+          apk_paths: ['some/path/app1.apk', 'some/path/app2.apk']
+        }
+        subject.verify_config!
+      end
+
+      it "does not raise error if only track and track_promote_to" do
+        Supply.config = {
+          track: 'alpha',
+          track_promote_to: 'beta'
+        }
+        subject.verify_config!
+      end
+    end
+
     describe "#find_obbs" do
       let(:subject) { Supply::Uploader.new }
 
@@ -100,27 +158,28 @@ describe Supply do
 
       it 'remove lesser than the greatest of any later (i.e. production) track' do
         allow(client).to receive(:track_version_codes) do |track|
-          next [103] if track.eql?('production')
-          next [102] if track.eql?('rollout')
-          next [101] if track.eql?('beta')
+          next [104] if track.eql?('production')
+          next [103] if track.eql?('rollout')
+          next [102] if track.eql?('beta')
+          next [101] if track.eql?('alpha')
           []
         end
 
         allow(client).to receive(:update_track) do |track, rollout, apk_version_code|
-          expect(track).to eq('beta').or(eq('rollout'))
+          expect(track).to eq('beta').or(eq('rollout')).or(eq('alpha'))
           expect(rollout).to eq(1.0)
           expect(apk_version_code).to be_empty
         end
 
-        expect(client).to receive(:update_track).exactly(2).times
+        expect(client).to receive(:update_track).exactly(3).times
 
         Supply.config = {
-          track: 'alpha'
+          track: 'internal'
         }
         Supply::Uploader.new.check_superseded_tracks([104])
       end
 
-      it 'remove lesser than the currently being uploaded if it is in an earlier (i.e. alpha) track' do
+      it 'remove lesser than the current beta being uploaded if it is in an earlier track' do
         allow(client).to receive(:track_version_codes) do |track|
           next [100] if track.eql?('alpha')
           []
@@ -140,26 +199,47 @@ describe Supply do
         Supply::Uploader.new.check_superseded_tracks([101])
       end
 
-      it 'combined case' do
+      it 'remove lesser than the current alpha being uploaded if it is in an earlier track' do
         allow(client).to receive(:track_version_codes) do |track|
-          next [102] if track.eql?('production')
-          next [101] if track.eql?('rollout')
-          next [103] if track.eql?('alpha')
+          next [100] if track.eql?('internal')
           []
         end
 
         allow(client).to receive(:update_track) do |track, rollout, apk_version_code|
-          expect(track).to eq('rollout').or(eq('alpha'))
+          expect(track).to eq('internal')
           expect(rollout).to eq(1.0)
           expect(apk_version_code).to be_empty
         end
 
-        expect(client).to receive(:update_track).exactly(2).times
+        expect(client).to receive(:update_track).exactly(1).times
+
+        Supply.config = {
+          track: 'alpha'
+        }
+        Supply::Uploader.new.check_superseded_tracks([101])
+      end
+
+      it 'combined case' do
+        allow(client).to receive(:track_version_codes) do |track|
+          next [103] if track.eql?('production')
+          next [102] if track.eql?('rollout')
+          next [104] if track.eql?('alpha')
+          next [101] if track.eql?('internal')
+          []
+        end
+
+        allow(client).to receive(:update_track) do |track, rollout, apk_version_code|
+          expect(track).to eq('rollout').or(eq('alpha')).or(eq('internal'))
+          expect(rollout).to eq(1.0)
+          expect(apk_version_code).to be_empty
+        end
+
+        expect(client).to receive(:update_track).exactly(3).times
 
         Supply.config = {
           track: 'beta'
         }
-        Supply::Uploader.new.check_superseded_tracks([104])
+        Supply::Uploader.new.check_superseded_tracks([105])
       end
     end
   end

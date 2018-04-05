@@ -23,7 +23,7 @@ module Spaceship
     def initialize(user = nil, password = nil)
       @client = PortalClient.new
 
-      if user or password
+      if user || password
         @client.login(user, password)
       end
     end

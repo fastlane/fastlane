@@ -220,7 +220,7 @@ module Fastlane
                 FastlaneActionFileParser.new.parse_file(action_file)
               end
               # Result of the above is an array of arrays, this merges all of them into data[:actions]
-              self.data[:actions].concat(*actions)
+              self.data[:actions] = actions.flatten
 
               cache_data = self.cache[self.name]
 

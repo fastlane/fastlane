@@ -22,6 +22,7 @@ describe Fastlane do
       context "when git status is not clean" do
         before :each do
           allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain").and_return("M fastlane/lib/fastlane/actions/ensure_git_status_clean.rb")
+          allow(Fastlane::Actions).to receive(:sh).with("git diff").and_return("+ \"this is a new line\"")
         end
 
         context "with show_uncommitted_changes flag" do
@@ -39,6 +40,34 @@ describe Fastlane do
               expect(FastlaneCore::UI).to receive(:user_error!).with("Git repository is dirty! Please ensure the repo is in a clean state by committing/stashing/discarding all changes first.")
               Fastlane::FastFile.new.parse("lane :test do
                 ensure_git_status_clean(show_uncommitted_changes: false)
+              end").runner.execute(:test)
+            end
+          end
+        end
+
+        context "without show_uncommitted_changes flag" do
+          it "outputs short error message with full diff" do
+            expect(FastlaneCore::UI).to receive(:user_error!).with("Git repository is dirty! Please ensure the repo is in a clean state by committing/stashing/discarding all changes first.")
+            Fastlane::FastFile.new.parse("lane :test do
+              ensure_git_status_clean
+            end").runner.execute(:test)
+          end
+        end
+        context "with show_diff flag" do
+          context "true" do
+            it "outputs reach error message" do
+              expect(FastlaneCore::UI).to receive(:user_error!).with("Git repository is dirty! Please ensure the repo is in a clean state by committing/stashing/discarding all changes first.\nGit diff: \n+ \"this is a new line\"")
+              Fastlane::FastFile.new.parse("lane :test do
+                ensure_git_status_clean(show_diff: true)
+              end").runner.execute(:test)
+            end
+          end
+
+          context "false" do
+            it "outputs short error message" do
+              expect(FastlaneCore::UI).to receive(:user_error!).with("Git repository is dirty! Please ensure the repo is in a clean state by committing/stashing/discarding all changes first.")
+              Fastlane::FastFile.new.parse("lane :test do
+                ensure_git_status_clean(show_diff: false)
               end").runner.execute(:test)
             end
           end

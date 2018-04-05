@@ -134,25 +134,25 @@ export_options("./ExportOptions.plist")
 or you can provide hash of values directly in the `Gymfile`:
 
 ```ruby-skip-tests
-export_options(
+export_options: {
   method: "ad-hoc",
   manifest: {
     appURL: "https://example.com/My App.ipa",
   },
   thinning: "<thin-for-all-variants>"
-)
+}
 ```
 
 Optional: If _gym_ can't automatically detect the provisioning profiles to use, you can pass a mapping of bundle identifiers to provisioning profiles:
 
 ```ruby-skip-tests
-export_options(
+export_options: {
   method: "app-store",
   provisioningProfiles: { 
     "com.example.bundleid" => "Provisioning Profile Name",
     "com.example.bundleid2" => "Provisioning Profile Name 2"
   }
-)
+}
 ```
 
 **Note**: If you use [_fastlane_](https://fastlane.tools) with [_match_](https://fastlane.tools/match) you don't need to provide those values manually.
@@ -234,5 +234,9 @@ Using this method there are no workarounds for WatchKit or Swift required, as it
 
 Note: the [xcbuild-safe.sh script](https://github.com/fastlane/fastlane/blob/master/gym/lib/assets/wrap_xcodebuild/xcbuild-safe.sh) wraps around xcodebuild to workaround some incompatibilities.
 
-## Use the 'Provisioning Quicklook plugin'
-Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning).
+## Use 'ProvisionQL' for advanced Quick Look in Finder
+
+Install [ProvisionQL](https://github.com/ealeksandrov/ProvisionQL).
+
+It will show you `ipa` files like this:
+![img/actions/QuickLookScreenshot-App.png](/img/actions/QuickLookScreenshot-App.png)

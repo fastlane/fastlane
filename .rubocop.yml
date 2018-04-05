@@ -179,7 +179,8 @@ Style/IfUnlessModifier:
 
 # and and or is okay
 Style/AndOr:
-  Enabled: false
+  Enabled: true
+  EnforcedStyle: conditionals
 
 # Configuration parameters: CountComments.
 Metrics/ClassLength:
@@ -307,6 +308,7 @@ Style/MethodCallWithArgsParentheses:
     - 'to'
     - 'describe'
     - 'it'
+    - 'be'
     - 'context'
     - 'before'
     - 'after'

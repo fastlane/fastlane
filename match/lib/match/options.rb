@@ -125,7 +125,7 @@ module Match
                                      description: nil,
                                      verify_block: proc do |value|
                                        unless Helper.test?
-                                         if value.start_with?("/var/folders") or value.include?("tmp/") or value.include?("temp/")
+                                         if value.start_with?("/var/folders") || value.include?("tmp/") || value.include?("temp/")
                                            # that's fine
                                          else
                                            UI.user_error!("Specify the `git_url` instead of the `path`")
@@ -156,7 +156,7 @@ module Match
                                      end),
         FastlaneCore::ConfigItem.new(key: :template_name,
                                      env_name: "MATCH_PROVISIONING_PROFILE_TEMPLATE_NAME",
-                                     description: "The name of provisioning profile template. If the developer account has provisioning profile templates, template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile",
+                                     description: "The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. \"Apple Pay Pass Suppression Development\")",
                                      optional: true,
                                      default_value: nil)
       ]

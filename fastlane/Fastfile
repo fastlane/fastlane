@@ -334,12 +334,13 @@ end
 
 desc "Update the actions.md on https://docs.fastlane.tools"
 desc "This will also automatically submit a pull request to fastlane/docs"
-lane :update_docs do
-  verify_env_variables
+lane :update_docs do |options|
+  debug = options[:debug]
+  verify_env_variables unless debug
 
   template_path = File.expand_path("./assets/render_plugin.md.erb")
-  plugin_scores_cache_path = File.expand_path("./plugin_scores_cache.yml")
-  clone_docs do
+  clone_docs(debug: debug) do
+    plugin_scores_cache_path = File.expand_path("./plugin_scores_cache.yml")
     docs_path = generate_markdown_docs(target_path: ".")
     yml_path = File.expand_path("./mkdocs.yml")
     actions_md_path = File.expand_path(File.join(docs_path, "docs/actions.md"))
@@ -364,15 +365,17 @@ lane :update_docs do
       UI.success("No changes in the actions.md ✅")
     else
       # Create a new branch
-      sh("git checkout -b 'update-actions-md-#{Time.now.to_i}'")
+      sh("git checkout -b 'update-actions-md-#{Time.now.to_i}'") unless debug
       plugins_path = "docs/plugins/available-plugins.md"
       plugin_scores(template_path: template_path,
                       output_path: plugins_path,
                        cache_path: plugin_scores_cache_path)
 
+      next if debug
+
       Dir.chdir("fastlane") do # this is an assumption of fastlane, that we have to .. when shelling out
         # Commit the changes
-        changes_to_commit = [actions_md_path, "Gemfile.lock", plugins_path, yml_path] + action_docs + custom_assets
+        changes_to_commit = [plugin_scores_cache_path, actions_md_path, "Gemfile.lock", plugins_path, yml_path] + action_docs + custom_assets
         git_add(path: changes_to_commit)
         git_commit(path: changes_to_commit,
                 message: "Update docs for latest fastlane release (actions.md, available-plugins.md) 🚀")
@@ -392,15 +395,23 @@ lane :update_docs do
   end
 end
 
-def clone_docs
-  require 'tmpdir'
-  git_url = ENV['FASTLANE_DOCS_GIT_URL'] || "https://github.com/fastlane/docs"
+def clone_docs(debug: false)
+  if debug
+    clone_url = ENV['FASTLANE_DOCS_CLONE_URL'] || "../../docs"
 
-  Dir.mktmpdir("fl_clone") do |tmp_dir|
-    Dir.chdir(tmp_dir) do
-      sh("git clone #{git_url} --depth=1")
-      Dir.chdir("docs") do
-        yield
+    Dir.chdir(clone_url) do
+      yield
+    end
+  else
+    require 'tmpdir'
+    git_url = ENV['FASTLANE_DOCS_GIT_URL'] || "https://github.com/fastlane/docs"
+
+    Dir.mktmpdir("fl_clone") do |tmp_dir|
+      Dir.chdir(tmp_dir) do
+        sh("git clone #{git_url} --depth=1")
+        Dir.chdir("docs") do
+          yield
+        end
       end
     end
   end

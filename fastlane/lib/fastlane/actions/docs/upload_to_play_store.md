@@ -37,7 +37,7 @@ Setup consists of setting up your Google Developers Service Account
 1. Click the **Create Service Account** button and follow the **Google API Console** link in the dialog
 1. Click the **Create Service account** button at the top of the developers console screen
 1. Provide a name for the service account
-1. Click **Select a role** and choose **Project > Service Account Actor**
+1. Click **Select a role** and choose **Service Accounts > Service Account User**
 1. Check the **Furnish a new private key** checkbox
 1. Select **JSON** as the Key type
 1. Click **Create** to close the dialog
@@ -106,7 +106,7 @@ Inside of a given locale directory is a folder called `images`. Here you can sup
 - `promoGraphic`
 - `tvBanner`
 
-And you can supply screenshots by creating directories with the following names, containing PNGs or JPEGs (image names are irrelevant):
+You can also supply screenshots by creating directories within the `images` directory with the following names, containing PNGs or JPEGs (image names are irrelevant):
 
 - `phoneScreenshots/`
 - `sevenInchScreenshots/` (7-inch tablets)

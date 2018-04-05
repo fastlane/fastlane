@@ -100,13 +100,13 @@ module Fastlane
                                        env_name: "SENTRY_ORG_SLUG",
                                        description: "Organization slug for Sentry project",
                                        verify_block: proc do |value|
-                                         UI.user_error!("No organization slug for SentryAction given, pass using `org_slug: 'org'`") unless value and !value.empty?
+                                         UI.user_error!("No organization slug for SentryAction given, pass using `org_slug: 'org'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :project_slug,
                                        env_name: "SENTRY_PROJECT_SLUG",
                                        description: "Project slug for Sentry",
                                        verify_block: proc do |value|
-                                         UI.user_error!("No project slug for SentryAction given, pass using `project_slug: 'project'`") unless value and !value.empty?
+                                         UI.user_error!("No project slug for SentryAction given, pass using `project_slug: 'project'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :dsym_path,
                                        env_name: "SENTRY_DSYM_PATH",

@@ -4,7 +4,8 @@ describe Spaceship::TestFlight::Group do
   let(:mock_client) { double('MockClient') }
 
   before do
-    Spaceship::TestFlight::Base.client = mock_client
+    allow(Spaceship::TestFlight::Base).to receive(:client).and_return(mock_client)
+    allow(mock_client).to receive(:team_id).and_return('')
   end
 
   context 'attr_mapping' do
@@ -84,6 +85,13 @@ describe Spaceship::TestFlight::Group do
         expect(group.name).to eq('group-name')
         expect(group.id).to eq(3)
         expect(group).to be_instance_of(Spaceship::TestFlight::Group)
+      end
+    end
+
+    context '.delete!' do
+      it 'removes a group for correct parameters' do
+        expect(mock_client).to receive(:delete_group_for_app).with(app_id: 'app-id', group_id: 2)
+        Spaceship::TestFlight::Group.delete!(app_id: 'app-id', group_name: 'Group 2')
       end
     end
 

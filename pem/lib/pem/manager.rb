@@ -62,8 +62,8 @@ module PEM
         filename_base = PEM.config[:pem_name] || "#{certificate_type}_#{PEM.config[:app_identifier]}"
         filename_base = File.basename(filename_base, ".pem") # strip off the .pem if it was provided.
 
-        output_path = PEM.config[:output_path]
-        FileUtils.mkdir_p(File.expand_path(output_path))
+        output_path = File.expand_path(PEM.config[:output_path])
+        FileUtils.mkdir_p(output_path)
 
         if PEM.config[:save_private_key]
           private_key_path = File.join(output_path, "#{filename_base}.pkey")

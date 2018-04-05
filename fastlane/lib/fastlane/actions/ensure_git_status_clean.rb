@@ -16,6 +16,10 @@ module Fastlane
         else
           error_message = "Git repository is dirty! Please ensure the repo is in a clean state by committing/stashing/discarding all changes first."
           error_message += "\nUncommitted changes:\n#{repo_status}" if params[:show_uncommitted_changes]
+          if params[:show_diff]
+            repo_diff = Actions.sh("git diff")
+            error_message += "\nGit diff: \n#{repo_diff}"
+          end
           UI.user_error!(error_message)
         end
       end
@@ -53,6 +57,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :show_uncommitted_changes,
                                        env_name: "FL_ENSURE_GIT_STATUS_CLEAN_SHOW_UNCOMMITTED_CHANGES",
                                        description: "The flag whether to show uncommitted changes if the repo is dirty",
+                                       optional: true,
+                                       default_value: false,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :show_diff,
+                                       env_name: "FL_ENSURE_GIT_STATUS_CLEAN_SHOW_DIFF",
+                                       description: "The flag whether to show the git diff if the repo is dirty",
                                        optional: true,
                                        default_value: false,
                                        is_string: false)

@@ -5,7 +5,7 @@ module Supply
   class Options
     # rubocop:disable Metrics/PerceivedComplexity
     def self.available_options
-      valid_tracks = %w(production beta alpha rollout)
+      valid_tracks = %w(production beta alpha internal rollout)
       @options ||= [
         FastlaneCore::ConfigItem.new(key: :package_name,
                                      env_name: "SUPPLY_PACKAGE_NAME",
@@ -68,7 +68,7 @@ module Supply
                                      short_option: "-j",
                                      conflicting_options: [:issuer, :key, :json_key_data],
                                      optional: true, # this shouldn't be optional but is until --key and --issuer are completely removed
-                                     description: "The service account json file used to authenticate with Google",
+                                     description: "The path to a file containing service account JSON, used to authenticate with Google",
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
                                      default_value_dynamic: true,
@@ -81,7 +81,7 @@ module Supply
                                      short_option: "-c",
                                      conflicting_options: [:issuer, :key, :json_key],
                                      optional: true,
-                                     description: "The service account json used to authenticate with Google",
+                                     description: "The raw service account JSON data used to authenticate with Google",
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
                                      default_value_dynamic: true,

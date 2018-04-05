@@ -222,7 +222,7 @@ module Sigh
         end
       end
 
-      if certificates.count > 1 and !Sigh.config[:development]
+      if certificates.count > 1 && !Sigh.config[:development]
         UI.important("Found more than one code signing identity. Choosing the first one. Check out `fastlane sigh --help` to see all available options.")
         UI.important("Available Code Signing Identities for current filters:")
         certificates.each do |c|

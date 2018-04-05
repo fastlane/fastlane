@@ -70,7 +70,7 @@ module Fastlane
                                      sensitive: true,
                                      description: "API Token for Installr Access",
                                      verify_block: proc do |value|
-                                       UI.user_error!("No API token for Installr given, pass using `api_token: 'token'`") unless value and !value.empty?
+                                       UI.user_error!("No API token for Installr given, pass using `api_token: 'token'`") unless value && !value.empty?
                                      end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                      env_name: "INSTALLR_IPA_PATH",
