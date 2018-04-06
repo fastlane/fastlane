@@ -27,11 +27,33 @@ describe Fastlane do
         end
       end
 
+      context "as string with spaces in name" do
+        let(:path) { "my file.txt" }
+
+        it "executes the correct git command" do
+          allow(Fastlane::Actions).to receive(:sh).with("git add my\\ file.txt", anything).and_return("")
+          result = Fastlane::FastFile.new.parse("lane :test do
+            git_add(path: '#{path}')
+          end").runner.execute(:test)
+        end
+      end
+
+      context "as array with spaces in name and directory" do
+        let(:path) { ["my file.txt", "some dir/your file.txt"] }
+
+        it "executes the correct git command" do
+          allow(Fastlane::Actions).to receive(:sh).with("git add my\\ file.txt some\\ dir/your\\ file.txt", anything).and_return("")
+          result = Fastlane::FastFile.new.parse("lane :test do
+            git_add(path: #{path})
+          end").runner.execute(:test)
+        end
+      end
+
       context "as string with wildcards" do
         it "executes the correct git command" do
           allow(Fastlane::Actions).to receive(:sh).with("git add *.txt", anything).and_return("")
           result = Fastlane::FastFile.new.parse("lane :test do
-            git_add(path: '*.txt')
+            git_add(path: '*.txt', shell_escape: false)
           end").runner.execute(:test)
         end
       end
@@ -42,7 +64,7 @@ describe Fastlane do
         it "executes the correct git command" do
           allow(Fastlane::Actions).to receive(:sh).with("git add *.h *.m", anything).and_return("")
           result = Fastlane::FastFile.new.parse("lane :test do
-            git_add(path: #{path})
+            git_add(path: #{path}, shell_escape: false)
           end").runner.execute(:test)
         end
       end
