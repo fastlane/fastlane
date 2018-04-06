@@ -19,6 +19,7 @@ module PEM
                                      env_name: "PEM_WEBSITE_PUSH",
                                      description: "Create a Website Push certificate",
                                      is_string: false,
+                                     conflicting_options: [:development],
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :generate_p12,
                                      env_name: "PEM_GENERATE_P12_FILE",
