@@ -153,7 +153,7 @@ module Fastlane
         [
           "A hash containing all relevant information for this commit",
           "Access things like 'html_url', 'sha', 'message'"
-        ].join("\n")
+        ].join("<br>")
       end
 
       def self.authors

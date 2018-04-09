@@ -236,7 +236,7 @@ module Fastlane
         [
           "A hash containing all relevant information of this release",
           "Access things like 'html_url', 'tag_name', 'name', 'body'"
-        ].join("\n")
+        ].join("<br>")
       end
 
       def self.return_type
