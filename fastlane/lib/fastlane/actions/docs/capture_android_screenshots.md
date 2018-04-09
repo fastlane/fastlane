@@ -57,7 +57,7 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 - Then, before running `fastlane screengrab` you'll need a debug and test apk
   - You can create your APKs with `./gradlew assembleDebug assembleAndroidTest`
 - Once complete run `fastlane screengrab` in your app project directory to generate screenshots
-    - You will be prompted to provide any required parameters which are not in your **Screengrabfile** or provided as command line arguments
+  - You will be prompted to provide any required parameters which are not in your **Screengrabfile** or provided as command line arguments
 - Your screenshots will be saved to `fastlane/metadata/android` in the directory where you ran _screengrab_
 
 ## Improved screenshot capture with UI Automator
