@@ -22,7 +22,7 @@ If you identify an issue that seems interesting but not time-critical, and is si
 | bug | We've acknowledged the issue as a defect |
 | duplicate | Another issue/PR already exists that we think captures the problem/request |
 | feature | The issue represents a request for an enhancement or new feature |
-| you can do this | We're not actively looking at solving this issue, but community help would be appreciated.  |
+| you can do this | We're not actively looking at solving this issue, but community help would be appreciated |
 | question | Someone is looking for help, but isn't describing a problem with the software |
 
 ### Tool Labels
