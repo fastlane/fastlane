@@ -35,8 +35,13 @@ describe Spaceship::Client do
       end
 
       it "set custom Team ID" do
+        allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([
+                                                                                       { 'teamId' => 'XXXXXXXXXX', 'currentTeamMember' => { 'teamMemberId' => '' } },
+                                                                                       { 'teamId' => 'ABCDEF', 'currentTeamMember' => { 'teamMemberId' => '' } }
+                                                                                     ])
+
         team_id = "ABCDEF"
-        subject.team_id = team_id
+        subject.select_team(team_id: team_id)
         expect(subject.team_id).to eq(team_id)
       end
 

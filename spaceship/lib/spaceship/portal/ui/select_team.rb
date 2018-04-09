@@ -47,7 +47,7 @@ module Spaceship
       end
       # rubocop:enable Require/MissingRequireStatement
 
-      def select_team
+      def select_team(team_id: team_id = nil, team_name: team_name = nil)
         teams = client.teams
 
         if teams.count == 0
@@ -57,8 +57,8 @@ module Spaceship
           raise "Your account is in no teams"
         end
 
-        team_id = (ENV['FASTLANE_TEAM_ID'] || '').strip
-        team_name = (ENV['FASTLANE_TEAM_NAME'] || '').strip
+        team_id = (team_id || ENV['FASTLANE_TEAM_ID'] || '').strip
+        team_name = (team_name || ENV['FASTLANE_TEAM_NAME'] || '').strip
 
         if team_id.length > 0
           # User provided a value, let's see if it's valid

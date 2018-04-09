@@ -68,10 +68,7 @@ module Match
                                      optional: true,
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
-                                     default_value_dynamic: true,
-                                     verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
-                                     end),
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :git_full_name,
                                      env_name: "MATCH_GIT_FULL_NAME",
                                      description: "git user full name to commit",
@@ -89,10 +86,7 @@ module Match
                                      optional: true,
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
-                                     default_value_dynamic: true,
-                                     verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_NAME"] = value.to_s
-                                     end),
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :verbose,
                                      env_name: "MATCH_VERBOSE",
                                      description: "Print out extra information and all commands",

@@ -30,7 +30,7 @@ module Match
                                            clone_branch_directly: params[:clone_branch_directly])
 
       unless params[:readonly]
-        self.spaceship = SpaceshipEnsure.new(params[:username])
+        self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name])
         if params[:type] == "enterprise" && !Spaceship.client.in_house?
           UI.user_error!("You defined the profile type 'enterprise', but your Apple account doesn't support In-House profiles")
         end
