@@ -369,7 +369,7 @@ lane :update_docs do |options|
       plugins_path = "docs/plugins/available-plugins.md"
       plugin_scores(template_path: template_path,
                       output_path: plugins_path,
-                       cache_path: plugin_scores_cache_path)
+                       cache_path: plugin_scores_cache_path) unless options[:skip_plugin_scores]
 
       next if debug
 
