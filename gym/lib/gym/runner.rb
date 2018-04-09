@@ -273,7 +273,7 @@ module Gym
       plist_path = Gym.project.build_settings(key: "INFOPLIST_FILE")
       entitlements_path = Gym.project.build_settings(key: "CODE_SIGN_ENTITLEMENTS")
 
-      UI.crash!("Cannot find Info.plist file for project at '#{plist_file}'") unless File.exist?(plist_path)
+      UI.crash!("Cannot find Info.plist file for project at '#{plist_path}'") unless File.exist?(plist_path)
       UI.crash!("Cannot find entitlements file for project at '#{entitlements_path}'") unless File.exist?(entitlements_path)
 
       # Generates names and paths
