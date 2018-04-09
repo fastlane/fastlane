@@ -1000,7 +1000,7 @@ module Spaceship
       handle_itc_response(r.body)
 
       # iTunes Connect still returns a success status code even the submission
-      # was failed because of Ad ID info.  This checks for any section error
+      # was failed because of Ad ID info. This checks for any section error
       # keys in returned adIdInfo and prints them out.
       ad_id_error_keys = r.body.fetch('data').fetch('adIdInfo').fetch('sectionErrorKeys')
       if ad_id_error_keys.any?
