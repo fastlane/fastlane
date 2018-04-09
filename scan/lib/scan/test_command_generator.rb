@@ -49,6 +49,7 @@ module Scan
       # they are present at all
       options += config[:only_testing].map { |test_id| "-only-testing:#{test_id}" } if config[:only_testing]
       options += config[:skip_testing].map { |test_id| "-skip-testing:#{test_id}" } if config[:skip_testing]
+      options << "> /dev/null" if config[:suppress_xcode_output]
 
       options
     end

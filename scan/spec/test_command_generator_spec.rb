@@ -580,5 +580,13 @@ describe Scan do
         end.to raise_error("'device' value must be a String! Found Array instead.")
       end
     end
+
+    it "supports xcode output suppressing", requires_xcodebuild: true do
+      options = { suppress_xcode_output: true, project: "./scan/examples/standard/app.xcodeproj" }
+      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+      result = @test_command_generator.generate
+      expect(result).to include("> /dev/null")
+    end
   end
 end
