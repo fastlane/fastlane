@@ -16,6 +16,7 @@ lane :validate_repo do
   execute_tests
   validate_docs
   ensure_tool_name_formatting
+  ensure_code_samples
 end
 
 desc "Verifies source code is in a good state"
@@ -478,4 +479,17 @@ private_lane :ensure_tool_name_formatting do
   errors.each { |a| UI.error(a) }
   UI.user_error!("Invalid formatting of one of the fastlane tools") unless errors.empty?
   UI.success("✅  fastlane tools formatting is correct")
+end
+
+# Run the code samples, yo
+private_lane :ensure_code_samples do
+  UI.message("🕗  Verifying all code samples work with the current fastlane release")
+  all_content = ""
+  ActionsList.all_actions do |action|
+    all_content += "```ruby\n"
+    all_content += action.example_code.map { |code| code.gsub(/^\s+/, '') }.join("\n") if action.example_code
+    all_content += "\n```"
+  end
+  test_sample_code(content: all_content) # to not have to call the action 200 times
+  UI.success("✅  All fastlane code samples work as expected")
 end

@@ -139,7 +139,7 @@ module Fastlane
         [
           'swiftlint(
             mode: :lint,                          # SwiftLint mode: :lint (default) or :autocorrect
-            path: "/path/to/lint"                 # Specify path to lint (optional)
+            path: "/path/to/lint",                 # Specify path to lint (optional)
             output_file: "swiftlint.result.json", # The path of the output file (optional)
             config_file: ".swiftlint-ci.yml",     # The path of the configuration file (optional)
             files: [                              # List of files to process (optional)
