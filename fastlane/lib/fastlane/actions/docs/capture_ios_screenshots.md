@@ -93,18 +93,22 @@ Here a few links to get started:
   -  Swift: `snapshot("01LoginScreen")`
   -  Objective C: `[Snapshot snapshot:@"01LoginScreen" timeWaitingForIdle:10];`
 - Add the following code to your `setUp()` method:
-  - Swift:
-    ```swift
-    let app = XCUIApplication()
-    setupSnapshot(app)
-    app.launch()
-    ```
-  - Objective C:  
-    ```objective-c
-    XCUIApplication *app = [[XCUIApplication alloc] init];
-    [Snapshot setupSnapshot:app];
-    [app launch];
-    ```
+
+**Swift:**
+
+```swift
+let app = XCUIApplication()
+setupSnapshot(app)
+app.launch()
+```
+
+**Objective C:**
+
+```objective-c
+XCUIApplication *app = [[XCUIApplication alloc] init];
+[Snapshot setupSnapshot:app];
+[app launch];
+```
 
 _Make sure you only have one `launch` call in your test class, as Xcode adds one automatically on new test files._
 
