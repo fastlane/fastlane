@@ -177,7 +177,7 @@ module Sigh
         elsif profile_type == Spaceship.provisioning_profile.InHouse
           certificates = Spaceship.certificate.in_house.all
         else
-          certificates = Spaceship.certificate.production.all # Ad hoc or App Store
+          certificates = Spaceship.certificate.production.all | Spaceship.certificate.in_house.all # Ad hoc or App Store
         end
 
       when 'macos'
