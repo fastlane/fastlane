@@ -5,6 +5,16 @@ describe Fastlane do
       let(:not_an_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/not-an-ipa.ipa") }
       let(:correctly_signed_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/very-capable-app.ipa") }
       let(:incorrectly_signed_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/ContainsWatchApp.ipa") }
+      let(:expected_title) { "Summary for verify_build #{Fastlane::VERSION}" }
+      let(:expected_app_info) do
+        {
+          "bundle_identifier" => "org.fastlane.very-capable-app",
+          "team_identifier" => "TestFixture",
+          "app_name" => "very-capable-app",
+          "provisioning_uuid" => "12345678-1234-1234-1234-123456789012",
+          "team_name" => "TestFixture"
+        }
+      end
 
       before(:each) do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::IPA_OUTPUT_PATH] = nil
@@ -15,6 +25,7 @@ describe Fastlane do
         it "uses the ipa output path from lane context" do
           Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::IPA_OUTPUT_PATH] = correctly_signed_ipa
 
+          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_app_info, title: expected_title)
           expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
           Fastlane::FastFile.new.parse("lane :test do
                 verify_build
@@ -22,6 +33,7 @@ describe Fastlane do
         end
 
         it "uses ipa set via ipa_path" do
+          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_app_info, title: expected_title)
           expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
           Fastlane::FastFile.new.parse("lane :test do
                 verify_build(
