@@ -17,12 +17,12 @@ To modify it, go to its source at https://github.com/fastlane/fastlane/blob/mast
 <%= "> #{action.details.gsub("\n\n", "\n")}" unless action.details.to_s.empty? %>
 <% end %>
 
-<%= action.action_name %> |
------|----
+<%= action.action_name %> ||
+---|---
 Supported platforms | <%= [:ios, :android, :mac].find_all { |a| action.is_supported?(a) }.join(", ") %>
 Author | @<%= Array(action.author || action.authors).join(", @") %>
 <%- unless action.return_value.to_s.empty? -%>
-Returns | <%= action.return_value %>
+Returns | <%= action.return_value.gsub("\n", "<br>") %>
 <%- end -%>
 
 <% if (action.example_code || []).count > 0 %>
