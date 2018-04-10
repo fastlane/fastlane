@@ -5,11 +5,7 @@ module Fastlane
 
     class AdbDevicesAction < Action
       def self.run(params)
-        adb_path = params[:adb_path]
-        if adb_path == "adb" && params[:android_home]
-          adb_path = Pathname.new(params[:android_home]).join("platform-tools/adb").to_s
-        end
-        adb = Helper::AdbHelper.new(adb_path: adb_path)
+        adb = Helper::AdbHelper.new(adb_path: params[:adb_path])
         result = adb.load_all_devices
         return result
       end
@@ -30,14 +26,9 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :android_home,
-                                       optional: true,
-                                       default_value: ENV['ANDROID_HOME'] || ENV['ANDROID_SDK_ROOT'] || ENV['ANDROID_SDK'],
-                                       default_value_dynamic: true,
-                                       description: "Path to the root of your Android SDK installation, e.g. ~/tools/android-sdk-macosx"),
           FastlaneCore::ConfigItem.new(key: :adb_path,
                                        env_name: "FL_ADB_PATH",
-                                       description: "The path to your `adb` binary",
+                                       description: "The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT environment variable is set)",
                                        is_string: true,
                                        optional: true,
                                        default_value: "adb")
