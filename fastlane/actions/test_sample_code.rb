@@ -2,13 +2,11 @@ module Fastlane
   module Actions
     class TestSampleCodeAction < Action
       def self.run(params)
-        content = File.read(params[:path])
-
+        content = params[:content] || File.read(params[:path])
         fill_in_env_variables
 
-        # /m says we ignore new line
         errors = []
-        content.scan(/```ruby\n([^`]*)\n```/m).each do |current_match|
+        content.scan(/```ruby\n(((.|\n)(?!```))*)\n```/).each do |current_match|
           current_match = current_match.first # we only expect one match
           next if current_match.include?("sh(") # we don't want to run any shell scripts
 
@@ -29,7 +27,7 @@ module Fastlane
           end
         end
 
-        UI.error("Found errors in the documentation, more information above") unless errors.empty?
+        UI.error("Found errors in the documentation, more information below") unless errors.empty?
         errors.each do |ex|
           UI.error(ex)
         end
@@ -92,7 +90,8 @@ module Fastlane
       # Metadata
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :path)
+          FastlaneCore::ConfigItem.new(key: :path),
+          FastlaneCore::ConfigItem.new(key: :content)
         ]
       end
 
