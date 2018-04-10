@@ -15,7 +15,7 @@ module Match
   end
 
   def self.cert_type_sym(type)
-    return :enterprise if type == "enterprise"
+    return :enterprise if type == "enterprise" || (type == "adhoc" && Spaceship.client.in_house?)
     return :development if type == "development"
     return :distribution if ["adhoc", "appstore", "distribution"].include?(type)
     raise "Unknown cert type: '#{type}'"
