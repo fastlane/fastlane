@@ -39,7 +39,7 @@ module Fastlane
             plist_path: info_plist_path,
             block: lambda { |plist|
               plist['CFBundleIdentifier'] = params[:app_identifier] if params[:app_identifier]
-              plistp['CFBundleDisplayName'] = params[:display_name] if params[:display_name]
+              plist['CFBundleDisplayName'] = params[:display_name] if params[:display_name]
               params[:block].call(plist) if params[:block]
             }
           )
