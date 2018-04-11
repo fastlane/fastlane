@@ -61,6 +61,7 @@ describe Fastlane do
       after do
         # Clean up files
         File.delete(File.join(test_path, plist_path))
+        FileUtils.rm_rf(xcodeproj)
       end
     end
   end

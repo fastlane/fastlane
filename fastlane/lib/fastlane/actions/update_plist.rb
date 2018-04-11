@@ -10,11 +10,12 @@ module Fastlane
         # Check if parameters are set
         if params[:block]
           if params[:plist_path].nil?
-            UI.user_error!("You must specify either a plist path or a scheme")
+            UI.user_error!("You must specify a plist path")
           end
 
           # Read existing plist file
           plist_path = params[:plist_path]
+
           UI.user_error!("Couldn't find plist file at path '#{plist_path}'") unless File.exist?(plist_path)
           plist = Xcodeproj::Plist.read_from_path(plist_path)
 
