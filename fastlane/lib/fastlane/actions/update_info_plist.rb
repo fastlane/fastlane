@@ -35,7 +35,7 @@ module Fastlane
           info_plist_path = File.join(folder, "..", params[:plist_path])
           UI.user_error!("Couldn't find info plist file at path '#{info_plist_path}'") unless File.exist?(info_plist_path)
 
-          other_action.update_plist(
+          UpdatePlistAction.run(
             plist_path: info_plist_path,
             block: lambda { |plist|
               plist['CFBundleIdentifier'] = params[:app_identifier] if params[:app_identifier]
