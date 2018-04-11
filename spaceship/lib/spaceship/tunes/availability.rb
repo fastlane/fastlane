@@ -9,6 +9,12 @@ module Spaceship
       # @return (Array of Spaceship::Tunes::Territory objects) A list of the territories
       attr_accessor :territories
 
+      # @return (Bool) Cleared for preorder
+      attr_accessor :cleared_for_preorder
+
+      # @return (String) App available date in format of "YYYY-MM-DD"
+      attr_accessor :app_available_date
+
       attr_mapping(
         'theWorld' => :include_future_territories
       )
@@ -30,7 +36,27 @@ module Spaceship
       end
 
       def territories
+        return @territories unless @territories.nil?
         @territories ||= raw_data['countries'].map { |info| Territory.new(info) }
+      end
+
+      def cleared_for_preorder
+        return @cleared_for_preorder unless @cleared_for_preorder.nil?
+
+        value = false
+        if (pre_order = raw_data['preOrder']) && (hash = pre_order['clearedForPreOrder'])
+          value = hash['value']
+        end
+        @cleared_for_preorder ||= value
+      end
+
+      def app_available_date
+        return @app_available_date unless @app_available_date.nil?
+
+        if (pre_order = raw_data['preOrder']) && (hash = pre_order['appAvailableDate'])
+          value = hash['value']
+        end
+        @app_available_date ||= value
       end
     end
   end

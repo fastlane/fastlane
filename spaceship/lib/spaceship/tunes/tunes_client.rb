@@ -605,6 +605,17 @@ module Spaceship
       data["countries"] = availability.territories.map { |territory| { 'code' => territory.code } }
       data["theWorld"] = availability.include_future_territories.nil? ? true : availability.include_future_territories
 
+      # InitializespreOrder (if needed)
+      data["preOrder"] ||= {}
+
+      # Sets app_available_date to nil if cleared_for_preorder if false
+      # This is need for apps that have never set either of these before
+      # API will error out if cleared_for_preorder is false and app_available_date has a date
+      cleared_for_preorder = availability.cleared_for_preorder
+      app_available_date = cleared_for_preorder ? availability.app_available_date : nil
+      data["preOrder"]["clearedForPreOrder"] = { "value" => cleared_for_preorder, "isEditable" => false, "isRequired" => false, "errorKeys" => nil }
+      data["preOrder"]["appAvailableDate"] = { "value" => app_available_date, "isEditable" => false, "isRequired" => false, "errorKeys" => nil }
+
       # send the changes back to Apple
       r = request(:post) do |req|
         req.url("ra/apps/#{app_id}/pricing/intervals")
