@@ -14,26 +14,26 @@ File.write("#{lib}/fastlane/plugins/template/.rubocop.yml", YAML.dump(config))
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
-  spec.authors       = ["Kohki Miki",
-                        "Helmut Januschka",
-                        "Joshua Liebowitz",
-                        "Jan Piotrowski",
-                        "Jorge Revuelta H",
-                        "Maksym Grebenets",
-                        "Danielle Tomlinson",
-                        "Olivier Halligon",
-                        "Fumiya Nakamura",
-                        "Felix Krause",
-                        "Manu Wallner",
-                        "Andrew McBurney",
+  spec.authors       = ["Manu Wallner",
+                        "Aaron Brager",
                         "Matthew Ellis",
                         "Jimmy Dee",
+                        "Felix Krause",
+                        "Jan Piotrowski",
+                        "Luka Mirosevic",
+                        "Fumiya Nakamura",
+                        "Maksym Grebenets",
+                        "Danielle Tomlinson",
                         "Iulian Onofrei",
+                        "Jorge Revuelta H",
+                        "Helmut Januschka",
+                        "Joshua Liebowitz",
                         "Stefan Natchev",
                         "Jérôme Lacoste",
-                        "Josh Holtz",
-                        "Luka Mirosevic",
-                        "Aaron Brager"]
+                        "Andrew McBurney",
+                        "Olivier Halligon",
+                        "Kohki Miki",
+                        "Josh Holtz"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -89,7 +89,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('bundler', '>= 1.12.0', '< 2.0.0') # Used for fastlane plugins
   spec.add_dependency('faraday', '~> 0.9') # Used for deploygate, hockey and testfairy actions
   spec.add_dependency('faraday_middleware', '~> 0.9') # same as faraday
-  spec.add_dependency('simctl', '~> 1.6') # Used for querying and interacting with iOS simulators
+  spec.add_dependency('simctl', '~> 1.6.3') # Used for querying and interacting with iOS simulators
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.

@@ -17,7 +17,7 @@ module Gym
       unless Gym.config[:skip_build_archive]
         build_app
       end
-      verify_archive
+      verify_archive unless Gym.config[:skip_archive]
       FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
       if Gym.project.ios? || Gym.project.tvos?

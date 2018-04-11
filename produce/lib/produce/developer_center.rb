@@ -23,18 +23,20 @@ module Produce
       game_center: [SERVICE_ON, SERVICE_OFF],
       health_kit: [SERVICE_ON, SERVICE_OFF],
       home_kit: [SERVICE_ON, SERVICE_OFF],
-      wireless_accessory: [SERVICE_ON, SERVICE_OFF],
+      hotspot: [SERVICE_ON, SERVICE_OFF],
       icloud: [SERVICE_LEGACY, SERVICE_CLOUDKIT],
       in_app_purchase: [SERVICE_ON, SERVICE_OFF],
       inter_app_audio: [SERVICE_ON, SERVICE_OFF],
+      multipath: [SERVICE_ON, SERVICE_OFF],
+      network_extension: [SERVICE_ON, SERVICE_OFF],
+      nfc_tag_reading: [SERVICE_ON, SERVICE_OFF],
+      personal_vpn: [SERVICE_ON, SERVICE_OFF],
       passbook: [SERVICE_ON, SERVICE_OFF],
       push_notification: [SERVICE_ON, SERVICE_OFF],
       siri_kit: [SERVICE_ON, SERVICE_OFF],
       vpn_configuration: [SERVICE_ON, SERVICE_OFF],
-      network_extension: [SERVICE_ON, SERVICE_OFF],
-      hotspot: [SERVICE_ON, SERVICE_OFF],
-      multipath: [SERVICE_ON, SERVICE_OFF],
-      nfc_tag_reading: [SERVICE_ON, SERVICE_OFF]
+      wallet: [SERVICE_ON, SERVICE_OFF],
+      wireless_accessory: [SERVICE_ON, SERVICE_OFF]
     }
 
     def run
@@ -98,7 +100,7 @@ module Produce
             enabled_clean_options[app_service.cloud.on.service_id] = app_service.cloud.on
             enabled_clean_options[app_service.cloud_kit.xcode5_compatible.service_id] = app_service.cloud_kit.xcode5_compatible
           when SERVICE_CLOUDKIT
-            enabled_clean_options[app_service.i_cloud.on.service_id] = app_service.i_cloud.on
+            enabled_clean_options[app_service.cloud.on.service_id] = app_service.cloud.on
             enabled_clean_options[app_service.cloud_kit.cloud_kit.service_id] = app_service.cloud_kit.cloud_kit
           end
         else

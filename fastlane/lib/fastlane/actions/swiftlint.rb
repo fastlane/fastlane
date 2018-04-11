@@ -13,6 +13,7 @@ module Fastlane
 
         command = (params[:executable] || "swiftlint").dup
         command << " #{params[:mode]}"
+        command << " --path #{params[:path].shellescape}" if params[:path]
         command << supported_option_switch(params, :strict, "0.9.2", true)
         command << " --config #{params[:config_file].shellescape}" if params[:config_file]
         command << " --reporter #{params[:reporter]}" if params[:reporter]
@@ -76,6 +77,13 @@ module Fastlane
                                        is_string: false,
                                        default_value: :lint,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :path,
+                                       description: "Specify path to lint",
+                                       is_string: true,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :output_file,
                                        description: 'Path to output SwiftLint result',
                                        optional: true),
@@ -131,6 +139,7 @@ module Fastlane
         [
           'swiftlint(
             mode: :lint,                          # SwiftLint mode: :lint (default) or :autocorrect
+            path: "/path/to/lint"                 # Specify path to lint (optional)
             output_file: "swiftlint.result.json", # The path of the output file (optional)
             config_file: ".swiftlint-ci.yml",     # The path of the configuration file (optional)
             files: [                              # List of files to process (optional)

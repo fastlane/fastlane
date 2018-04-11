@@ -65,8 +65,11 @@ module Spaceship
 
     # Shows a team selection for the user in the terminal. This should not be
     # called on CI systems
-    def select_team
-      @current_team_id = self.UI.select_team
+    #
+    # @param team_id (String) (optional): The ID of a Developer Portal team
+    # @param team_name (String) (optional): The name of a Developer Portal team
+    def select_team(team_id: team_id = nil, team_name: team_name = nil)
+      @current_team_id = self.UI.select_team(team_id: team_id, team_name: team_name)
     end
 
     # Set a new team ID which will be used from now on

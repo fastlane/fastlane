@@ -1574,8 +1574,10 @@ func getPushCertificate(development: Bool = false,
   return runner.executeCommand(command)
 }
 func gitAdd(path: String? = nil,
+            shellEscape: Bool = true,
             pathspec: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "git_add", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
+                                                                                         RubyCommand.Argument(name: "shell_escape", value: shellEscape),
                                                                                          RubyCommand.Argument(name: "pathspec", value: pathspec)])
   _ = runner.executeCommand(command)
 }
@@ -2212,12 +2214,14 @@ func oclint(oclintPath: String = "oclint",
 func onesignal(authToken: String,
                appName: String,
                androidToken: String? = nil,
+               androidGcmSenderId: String? = nil,
                apnsP12: String? = nil,
                apnsP12Password: String? = nil,
                apnsEnv: String = "production") {
   let command = RubyCommand(commandID: "", methodName: "onesignal", className: nil, args: [RubyCommand.Argument(name: "auth_token", value: authToken),
                                                                                            RubyCommand.Argument(name: "app_name", value: appName),
                                                                                            RubyCommand.Argument(name: "android_token", value: androidToken),
+                                                                                           RubyCommand.Argument(name: "android_gcm_sender_id", value: androidGcmSenderId),
                                                                                            RubyCommand.Argument(name: "apns_p12", value: apnsP12),
                                                                                            RubyCommand.Argument(name: "apns_p12_password", value: apnsP12Password),
                                                                                            RubyCommand.Argument(name: "apns_env", value: apnsEnv)])
@@ -2487,12 +2491,14 @@ func registerDevices(devices: [String : Any]? = nil,
                      devicesFile: String? = nil,
                      teamId: String? = nil,
                      teamName: String? = nil,
-                     username: String) {
+                     username: String,
+                     platform: String = "ios") {
   let command = RubyCommand(commandID: "", methodName: "register_devices", className: nil, args: [RubyCommand.Argument(name: "devices", value: devices),
                                                                                                   RubyCommand.Argument(name: "devices_file", value: devicesFile),
                                                                                                   RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                                   RubyCommand.Argument(name: "team_name", value: teamName),
-                                                                                                  RubyCommand.Argument(name: "username", value: username)])
+                                                                                                  RubyCommand.Argument(name: "username", value: username),
+                                                                                                  RubyCommand.Argument(name: "platform", value: platform)])
   _ = runner.executeCommand(command)
 }
 func resetGitRepo(files: String? = nil,
@@ -2826,13 +2832,15 @@ func setChangelog(appIdentifier: String,
                   version: String? = nil,
                   changelog: String? = nil,
                   teamId: String? = nil,
-                  teamName: String? = nil) {
+                  teamName: String? = nil,
+                  platform: String = "ios") {
   let command = RubyCommand(commandID: "", methodName: "set_changelog", className: nil, args: [RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                RubyCommand.Argument(name: "username", value: username),
                                                                                                RubyCommand.Argument(name: "version", value: version),
                                                                                                RubyCommand.Argument(name: "changelog", value: changelog),
                                                                                                RubyCommand.Argument(name: "team_id", value: teamId),
-                                                                                               RubyCommand.Argument(name: "team_name", value: teamName)])
+                                                                                               RubyCommand.Argument(name: "team_name", value: teamName),
+                                                                                               RubyCommand.Argument(name: "platform", value: platform)])
   _ = runner.executeCommand(command)
 }
 @discardableResult func setGithubRelease(repositoryName: String,
@@ -3238,6 +3246,7 @@ func supply(packageName: String,
   _ = runner.executeCommand(command)
 }
 func swiftlint(mode: String = "lint",
+               path: String? = nil,
                outputFile: String? = nil,
                configFile: String? = nil,
                strict: Bool = false,
@@ -3247,6 +3256,7 @@ func swiftlint(mode: String = "lint",
                quiet: Bool = false,
                executable: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "swiftlint", className: nil, args: [RubyCommand.Argument(name: "mode", value: mode),
+                                                                                           RubyCommand.Argument(name: "path", value: path),
                                                                                            RubyCommand.Argument(name: "output_file", value: outputFile),
                                                                                            RubyCommand.Argument(name: "config_file", value: configFile),
                                                                                            RubyCommand.Argument(name: "strict", value: strict),
@@ -3314,6 +3324,7 @@ func teamName() {
 func testfairy(apiKey: String,
                ipa: String,
                symbolsFile: String? = nil,
+               uploadUrl: String = "https://upload.testfairy.com",
                testersGroups: [String] = [],
                metrics: [String] = [],
                comment: String = "No comment provided",
@@ -3323,6 +3334,7 @@ func testfairy(apiKey: String,
   let command = RubyCommand(commandID: "", methodName: "testfairy", className: nil, args: [RubyCommand.Argument(name: "api_key", value: apiKey),
                                                                                            RubyCommand.Argument(name: "ipa", value: ipa),
                                                                                            RubyCommand.Argument(name: "symbols_file", value: symbolsFile),
+                                                                                           RubyCommand.Argument(name: "upload_url", value: uploadUrl),
                                                                                            RubyCommand.Argument(name: "testers_groups", value: testersGroups),
                                                                                            RubyCommand.Argument(name: "metrics", value: metrics),
                                                                                            RubyCommand.Argument(name: "comment", value: comment),
@@ -3517,7 +3529,7 @@ func updateUrlSchemes(path: String,
                                                                                                     RubyCommand.Argument(name: "update_url_schemes", value: updateUrlSchemes)])
   _ = runner.executeCommand(command)
 }
-func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/Themoji.dSYM",
+func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/Themoji.dSYM.zip",
                                 apiToken: String? = nil,
                                 gspPath: String? = nil,
                                 binaryPath: String? = nil,
@@ -3917,4 +3929,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.11]
+// FastlaneRunnerAPIVersion [0.9.13]
