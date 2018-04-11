@@ -1,3 +1,4 @@
+require 'spaceship'
 require 'fastlane_core/helper'
 
 module Match
