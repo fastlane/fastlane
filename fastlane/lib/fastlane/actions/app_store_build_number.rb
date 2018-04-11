@@ -2,75 +2,20 @@ module Fastlane
   module Actions
     module SharedValues
       LATEST_BUILD_NUMBER = :LATEST_BUILD_NUMBER
-      LATEST_VERSION_NUMBER = :LATEST_VERSION_NUMBER
     end
 
-    class AppStoreBuildInfoAction < Action
+    class AppStoreBuildNumberAction < Action
       def self.run(params)
-        require 'spaceship'
-
-        build_nr = get_build_number(params)
-
-        # Convert build_nr to int (for legacy use) if no "." in string
-        if build_nr.kind_of?(String) && !build_nr.include?(".")
-          build_nr = build_nr.to_i
-        end
-
-        Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER] = build_nr
+        AppStoreBuildInfoAction.run(
+          
+          )
       end
 
       def self.get_build_number(params)
-        UI.message("Login to iTunes Connect (#{params[:username]})")
-        Spaceship::Tunes.login(params[:username])
-        Spaceship::Tunes.select_team
-        UI.message("Login successful")
 
-        platform = params[:platform]
-
-        app = Spaceship::Tunes::Application.find(params[:app_identifier])
-        if params[:live]
-          UI.message("Fetching the latest build number for live-version")
-          build_nr = app.live_version.current_build_number
-        else
-          version_number = params[:version]
-          unless version_number
-            # Automatically fetch the latest version in testflight
-            begin
-              train_numbers = app.all_build_train_numbers(platform: platform)
-              testflight_version = self.order_versions(train_numbers).last
-            rescue
-              testflight_version = params[:version]
-            end
-
-            if testflight_version
-              version_number = testflight_version
-            else
-              version_number = UI.input("You have to specify a new version number, as there are multiple to choose from")
-            end
-
-          end
-
-          UI.message("Fetching the latest build number for version #{version_number}")
-
-          begin
-            build_numbers = app.all_builds_for_train(train: version_number, platform: platform).map(&:build_version)
-            build_nr = self.order_versions(build_numbers).last
-            if build_nr.nil? && params[:initial_build_number]
-              UI.message("Could not find a build on iTC. Using supplied 'initial_build_number' option")
-              build_nr = params[:initial_build_number]
-            end
-          rescue
-            UI.user_error!("Could not find a build on iTC - and 'initial_build_number' option is not set") unless params[:initial_build_number]
-            build_nr = params[:initial_build_number]
-          end
-        end
-        UI.message("Latest upload for version #{version_number} is build: #{build_nr}")
-
-        build_nr
       end
 
       def self.order_versions(versions)
-        versions.map(&:to_s).sort_by { |v| Gem::Version.new(v) }
       end
 
       #####################################################
@@ -161,12 +106,12 @@ module Fastlane
 
       def self.example_code
         [
-          'app_store_build_info',
-          'app_store_build_info(
+          'app_store_build_number',
+          'app_store_build_number(
             app_identifier: "app.identifier",
             username: "user@host.com"
           )',
-          'app_store_build_info(
+          'app_store_build_number(
             live: false,
             app_identifier: "app.identifier",
             version: "1.2.9"
