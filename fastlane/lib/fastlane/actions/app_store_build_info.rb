@@ -4,7 +4,7 @@ module Fastlane
       LATEST_BUILD_NUMBER = :LATEST_BUILD_NUMBER
     end
 
-    class AppStoreBuildNumberAction < Action
+    class AppStoreBuildInfoAction < Action
       def self.run(params)
         require 'spaceship'
 
