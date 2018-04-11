@@ -22,7 +22,7 @@ describe Fastlane do
       it "updates the plist based on the given block" do
         result = Fastlane::FastFile.new.parse("lane :test do
           update_plist ({
-            plist_path: '#{plist_path}',
+            plist_path: '#{test_path}/#{plist_path}',
             block: lambda { |plist|
               plist['CFBundleIdentifier'] = '#{app_identifier}'
               plist['CFBundleDisplayName'] = '#{display_name}'
