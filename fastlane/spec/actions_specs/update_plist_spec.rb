@@ -20,11 +20,9 @@ describe Fastlane do
       end
 
       it "updates the plist based on the given block" do
-        full_path = [test_path, proj_file, '..', "NOEXIST-#{plist_path}"].join(File::SEPARATOR)
-
         result = Fastlane::FastFile.new.parse("lane :test do
           update_plist ({
-            plist_path: '#{full_path}',
+            plist_path: '#{plist_path}',
             block: lambda { |plist|
               plist['CFBundleIdentifier'] = '#{app_identifier}'
               plist['CFBundleDisplayName'] = '#{display_name}'
