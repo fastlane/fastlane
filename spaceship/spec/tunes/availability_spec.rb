@@ -68,6 +68,15 @@ describe Spaceship::Tunes::Availability do
         expect(availability.territories.length).to eq(1)
         expect(availability.territories[0].code).to eq("US")
       end
+
+      it "correctly sets preorder" do
+        TunesStubbing.itc_stub_set_preorder_cleared
+
+        # currently countries in list are US and GB
+        availability = Spaceship::Tunes::Availability.from_territories(["US"], cleared_for_preorder: true)
+        # availability.cleared_for_preorder = false
+        availability = client.update_availability!(app.apple_id, availability)
+      end
     end
 
     describe "with countries as Territories" do

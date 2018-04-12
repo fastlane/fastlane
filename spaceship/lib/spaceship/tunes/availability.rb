@@ -32,6 +32,8 @@ module Spaceship
             territories
           end
         obj.include_future_territories = params.fetch(:include_future_territories, true)
+        obj.cleared_for_preorder = params.fetch(:cleared_for_preorder, false)
+        obj.app_available_date = params.fetch(:app_available_date, nil)
         return obj
       end
 
