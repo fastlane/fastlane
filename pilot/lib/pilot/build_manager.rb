@@ -1,5 +1,6 @@
 require 'tmpdir'
 require 'terminal-table'
+require 'emoji_regex'
 
 require 'fastlane_core/itunes_transporter'
 require 'fastlane_core/build_watcher'
@@ -11,7 +12,7 @@ module Pilot
     def upload(options)
       start(options)
 
-      options[:changelog] = self.class.truncate_changelog(options[:changelog]) if options[:changelog]
+      options[:changelog] = self.class.sanitize_changelog(options[:changelog]) if options[:changelog]
 
       UI.user_error!("No ipa file given") unless config[:ipa]
 
@@ -127,7 +128,20 @@ module Pilot
         changelog = "#{changelog[0...max_changelog_length - bottom_message.length]}#{bottom_message}"
         UI.important("Changelog has been truncated since it exceeds Apple's #{max_changelog_length} character limit. It currently contains #{original_length} characters.")
       end
-      return changelog
+      changelog
+    end
+
+    def self.strip_emoji(changelog)
+      if changelog && changelog =~ EmojiRegex::Regex
+        changelog.gsub!(EmojiRegex::Regex, "")
+        UI.important("Emoji symbols have been removed from the changelog, since they're not allowed by Apple.")
+      end
+      changelog
+    end
+
+    def self.sanitize_changelog(changelog)
+      changelog = strip_emoji(changelog)
+      truncate_changelog(changelog)
     end
 
     private
