@@ -131,13 +131,17 @@ module Pilot
       changelog
     end
 
-    def self.sanitize_changelog(changelog)
-      changelog = truncate_changelog(changelog)
+    def self.strip_emoji(changelog)
       if changelog && changelog =~ EmojiRegex::Regex
         changelog.gsub!(EmojiRegex::Regex, "")
         UI.important("Emoji symbols have been removed from the changelog, since they're not allowed by Apple.")
       end
       changelog
+    end
+
+    def self.sanitize_changelog(changelog)
+      changelog = strip_emoji(changelog)
+      truncate_changelog(changelog)
     end
 
     private
