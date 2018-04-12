@@ -112,7 +112,10 @@ module Fastlane
       end
 
       if action.details
-        rows << [action.details]
+        action.details.split("\n").each do |detail|
+          rows << (detail.empty? ? [' '] : [detail])
+        end
+
         rows << [' ']
       end
 

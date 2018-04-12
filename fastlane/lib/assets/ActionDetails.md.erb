@@ -8,13 +8,13 @@ To modify it, go to its source at https://github.com/fastlane/fastlane/blob/mast
 <% action = @action %>
 <%= action.description %>
 
-<%= "> #{action.deprecated_notes.gsub("\n\n", "\n")}" unless action.deprecated_notes.to_s.empty? %>
+<%= "> #{action.deprecated_notes.gsub("\n", "<br>")}" unless action.deprecated_notes.to_s.empty? %>
 
 <% if @custom_content %>
 <%= @custom_content %>
 <hr />
 <% else %>
-<%= "> #{action.details.gsub("\n\n", "\n")}" unless action.details.to_s.empty? %>
+<%= "> #{action.details.gsub("\n", "<br>")}" unless action.details.to_s.empty? %>
 <% end %>
 
 <%= action.action_name %> ||
