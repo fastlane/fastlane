@@ -224,7 +224,6 @@ module Fastlane
       verify_supported_os(method_sym, class_ref)
       verify_compatible_os(method_sym, class_ref)
 
-
       begin
         # https://github.com/fastlane/fastlane/issues/11913
         # launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(method_sym.to_s, configuration_language: configuration_language, args: ARGV)
