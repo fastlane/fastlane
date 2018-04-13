@@ -102,7 +102,7 @@ module Fastlane
       end
 
       rows << [0, "cancel", "No selection, exit fastlane!"]
-      
+
       require 'terminal-table'
 
       table = Terminal::Table.new(
