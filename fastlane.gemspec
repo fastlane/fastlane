@@ -14,26 +14,26 @@ File.write("#{lib}/fastlane/plugins/template/.rubocop.yml", YAML.dump(config))
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
-  spec.authors       = ["Manu Wallner",
-                        "Aaron Brager",
-                        "Matthew Ellis",
-                        "Jimmy Dee",
-                        "Felix Krause",
-                        "Jan Piotrowski",
+  spec.authors       = ["Felix Krause",
                         "Luka Mirosevic",
+                        "Olivier Halligon",
+                        "Danielle Tomlinson",
+                        "Jérôme Lacoste",
+                        "Stefan Natchev",
+                        "Helmut Januschka",
+                        "Jorge Revuelta H",
+                        "Kohki Miki",
+                        "Iulian Onofrei",
+                        "Jimmy Dee",
+                        "Josh Holtz",
+                        "Joshua Liebowitz",
+                        "Jan Piotrowski",
+                        "Andrew McBurney",
                         "Fumiya Nakamura",
                         "Maksym Grebenets",
-                        "Danielle Tomlinson",
-                        "Iulian Onofrei",
-                        "Jorge Revuelta H",
-                        "Helmut Januschka",
-                        "Joshua Liebowitz",
-                        "Stefan Natchev",
-                        "Jérôme Lacoste",
-                        "Andrew McBurney",
-                        "Olivier Halligon",
-                        "Kohki Miki",
-                        "Josh Holtz"]
+                        "Manu Wallner",
+                        "Aaron Brager",
+                        "Matthew Ellis"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
