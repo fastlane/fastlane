@@ -312,7 +312,7 @@ module Fastlane
           UI.message("Action '#{name}' might (!) not be compatible to run on operating system '#{operating_system}'.")
         elsif !compat
           UI.user_error!("Action '#{name}' is not compatible to run on operating system '#{operating_system}'.")
-          # TODO exit/exception/error here instead of crash in action that will not work
+          # TO DO exit/exception/error here instead of crash in action that will not work
         end
       end
     end
