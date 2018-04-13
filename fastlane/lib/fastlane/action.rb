@@ -151,7 +151,7 @@ module Fastlane
     end
 
     def self.is_compatible?(operating_system, action_compatibility = {})
-      # TODO find way to motivate developer to do so implement `is_compatible` in action
+      # TO DO find way to motivate developer to do so implement `is_compatible` in action
       # e.g. throw warning/error message/whatever when `is_compatible` is not implemented in child class (actual action) that is being called
       # similar to what `is_supported?` does:
       # if action_compatibility == {}
