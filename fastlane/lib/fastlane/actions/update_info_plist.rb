@@ -37,7 +37,7 @@ module Fastlane
 
           UpdatePlistAction.run(
             plist_path: info_plist_path,
-            block: lambda { |plist|
+            block: proc do |plist|
               plist['CFBundleIdentifier'] = params[:app_identifier] if params[:app_identifier]
               plist['CFBundleDisplayName'] = params[:display_name] if params[:display_name]
               params[:block].call(plist) if params[:block]
