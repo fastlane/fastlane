@@ -11,12 +11,6 @@
   "countriesChanged": true,
   "countries": [
     {
-      "code": "FR"
-    },
-    {
-      "code": "GB"
-    },
-    {
       "code": "US"
     }
   ],
@@ -44,14 +38,14 @@
   "unavailableDate": -2,
   "creatingApp": false,
   "hasApprovedVersion": false,
-  "preOrder":{  
-    "clearedForPreOrder":{  
-      "value":false,
+  "preOrder":{
+    "clearedForPreOrder":{
+      "value":true,
       "isEditable":true,
       "isRequired":true,
       "errorKeys":null
     },
-    "appAvailableDate":{  
+    "appAvailableDate":{
       "value":null,
       "isEditable":true,
       "isRequired":true,
