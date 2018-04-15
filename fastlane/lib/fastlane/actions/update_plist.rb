@@ -73,7 +73,7 @@ module Fastlane
             block: proc do |plist|
               urlScheme = plist["CFBundleURLTypes"].find{|scheme| scheme["CFBundleURLName"] == "com.acme.default-url-handler"}
               urlScheme[:CFBundleURLSchemes] = ["acme-production"]
-            }
+            end
           )'
         ]
       end
