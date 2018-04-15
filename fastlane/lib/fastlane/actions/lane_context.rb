@@ -28,6 +28,10 @@ module Fastlane
         []
       end
 
+      def self.return_type
+        :hash_of_strings
+      end
+
       def self.authors
         ["KrauseFx"]
       end
