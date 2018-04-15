@@ -71,7 +71,7 @@ module Fastlane
         [
           'update_plist( # Advanced processing: find URL scheme for particular key and replace value
             plist_path: "path/to/Info.plist",
-            block: lambda { |plist|
+            block: proc do |plist|
               urlScheme = plist["CFBundleURLTypes"].find{|scheme| scheme["CFBundleURLName"] == "com.acme.default-url-handler"}
               urlScheme[:CFBundleURLSchemes] = ["acme-production"]
             }
