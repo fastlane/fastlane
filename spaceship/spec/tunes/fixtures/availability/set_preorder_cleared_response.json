@@ -12,20 +12,6 @@
     "countriesChanged": false,
     "countries": [
       {
-        "code": "FR",
-        "name": "France",
-        "region": "Europe",
-        "regionLocaleKey": "ITC.region.EUR",
-        "currencyCodeISO3A": "EUR"
-      },
-      {
-        "code": "GB",
-        "name": "United Kingdom",
-        "region": "Europe",
-        "regionLocaleKey": "ITC.region.EUR",
-        "currencyCodeISO3A": "GBP"
-      },
-      {
         "code": "US",
         "name": "United States",
         "region": "The United States and Canada",
@@ -40,7 +26,7 @@
     "bitcodeAutoRecompileDisAllowed": false,
     "b2bAppEnabled": false,
     "educationalDiscount": true,
-    "theWorld": false,
+    "theWorld": true,
     "pricingIntervalsFieldTO": {
       "value": [
         {
@@ -59,7 +45,7 @@
     "hasApprovedVersion": false,
     "preOrder":{  
       "clearedForPreOrder":{  
-        "value":false,
+        "value":true,
         "isEditable":true,
         "isRequired":true,
         "errorKeys":null
