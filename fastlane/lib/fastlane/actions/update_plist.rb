@@ -57,8 +57,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :block,
                                        is_string: false,
-                                       description: 'A block to process plist with custom logic',
-                                       optional: true)
+                                       description: 'A block to process plist with custom logic')
 
         ]
       end
