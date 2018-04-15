@@ -84,7 +84,7 @@ module Fastlane
       def self.details
         [
           "This action allows you to update the URL schemes of the app before building it.",
-          "For example, you can use this to set a different url scheme for the alpha",
+          "For example, you can use this to set a different URL scheme for the alpha",
           "or beta version of the app."
         ].join("\n")
       end

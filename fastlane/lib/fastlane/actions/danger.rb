@@ -34,7 +34,7 @@ module Fastlane
       def self.details
         [
           "Formalize your Pull Request etiquette.",
-          "More information: https://github.com/danger/danger"
+          "More information: [https://github.com/danger/danger](https://github.com/danger/danger)."
         ].join("\n")
       end
 

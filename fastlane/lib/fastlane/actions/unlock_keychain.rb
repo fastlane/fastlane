@@ -61,8 +61,8 @@ module Fastlane
       end
 
       def self.details
-        "Unlocks the given keychain file and adds it to the keychain search list\n" \
-        "Keychains can be replaced with `add_to_search_list: :replace`"
+        "Unlocks the given keychain file and adds it to the keychain search list.\n" \
+        "Keychains can be replaced with `add_to_search_list: :replace`."
       end
 
       def self.available_options

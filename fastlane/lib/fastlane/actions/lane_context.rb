@@ -15,8 +15,8 @@ module Fastlane
 
       def self.details
         [
-          "Access the fastlane lane context values",
-          "More information about how the lane context works: https://docs.fastlane.tools/advanced/#lane-context"
+          "Access the fastlane lane context values.",
+          "More information about how the lane context works: [https://docs.fastlane.tools/advanced/#lane-context](https://docs.fastlane.tools/advanced/#lane-context)."
         ].join("\n")
       end
 

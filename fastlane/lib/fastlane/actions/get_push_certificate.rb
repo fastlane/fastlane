@@ -33,12 +33,14 @@ module Fastlane
         [
           "Additionally to the available options, you can also specify a block that only gets executed if a new",
           "profile was created. You can use it to upload the new profile to your server.",
-          "Use it like this: ",
+          "Use it like this:",
+          "```ruby",
           "get_push_certificate(",
           "  new_profile: proc do ",
           "    # your upload code",
           "  end",
-          ")"
+          ")",
+          "```"
         ].join("\n")
       end
 

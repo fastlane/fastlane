@@ -27,7 +27,7 @@ module Fastlane
       end
 
       def self.details
-        "Tell _fastlane_ to not automatically create a `fastlane/README.md` when running _fastlane_. You can always trigger the creation of this file manually by running `fastlane docs`"
+        "Tell _fastlane_ to not automatically create a `fastlane/README.md` when running _fastlane_. You can always trigger the creation of this file manually by running `fastlane docs`."
       end
 
       def self.authors

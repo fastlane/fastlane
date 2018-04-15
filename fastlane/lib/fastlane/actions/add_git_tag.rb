@@ -34,7 +34,7 @@ module Fastlane
           "- `postfix` is anything you want to stick at the end of the version number, e.g. '-RC1'",
           "- `build_number` is the build number, which defaults to the value emitted by the `increment_build_number` action",
           "",
-          "For example for build 1234 in the 'appstore' lane it will tag the commit with `builds/appstore/1234`"
+          "For example, for build 1234 in the 'appstore' lane, it will tag the commit with `builds/appstore/1234`."
         ].join("\n")
       end
 

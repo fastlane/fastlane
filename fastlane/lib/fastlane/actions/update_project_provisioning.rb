@@ -80,13 +80,13 @@ module Fastlane
 
       def self.details
         [
-          "You should check out the code signing guide before using this action: https://docs.fastlane.tools/codesigning/getting-started/",
-          "This action retrieves a provisioning profile UUID from a provisioning profile (.mobileprovision) to set",
-          "up the xcode projects' code signing settings in *.xcodeproj/project.pbxproj",
-          "The `target_filter` value can be used to only update code signing for specified targets",
-          "The `build_configuration` value can be used to only update code signing for specified build configurations of the targets passing through the `target_filter`",
-          "Example Usage is the WatchKit Extension or WatchKit App, where you need separate provisioning profiles",
-          "Example: `update_project_provisioning(xcodeproj: \"..\", target_filter: \".*WatchKit App.*\")"
+          "You should check out the [code signing guide](https://docs.fastlane.tools/codesigning/getting-started/) before using this action.",
+          "This action retrieves a provisioning profile UUID from a provisioning profile (`.mobileprovision`) to set",
+          "up the Xcode projects' code signing settings in `*.xcodeproj/project.pbxproj`.",
+          "The `:target_filter` value can be used to only update code signing for the specified targets.",
+          "The `:build_configuration` value can be used to only update code signing for the specified build configurations of the targets passing through the `:target_filter`.",
+          "Example usage is the WatchKit Extension or WatchKit App, where you need separate provisioning profiles.",
+          "Example: `update_project_provisioning(xcodeproj: \"..\", target_filter: \".*WatchKit App.*\")`."
         ].join("\n")
       end
 

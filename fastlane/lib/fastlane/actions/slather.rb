@@ -111,8 +111,8 @@ module Fastlane
 
       def self.details
         return <<-eos
-Slather works with multiple code coverage formats including Xcode7 code coverage.
-Slather is available at https://github.com/SlatherOrg/slather
+Slather works with multiple code coverage formats, including Xcode 7 code coverage.
+Slather is available at [https://github.com/SlatherOrg/slather](https://github.com/SlatherOrg/slather).
         eos
       end
 

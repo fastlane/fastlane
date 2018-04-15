@@ -23,7 +23,7 @@ module Fastlane
       end
 
       def self.details
-        "Keychains can be deleted after being creating with `create_keychain`"
+        "Keychains can be deleted after being created with `create_keychain`"
       end
 
       def self.description

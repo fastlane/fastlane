@@ -74,7 +74,7 @@ module Fastlane
         [
           "This action allows you to upload symbolication files to Sentry.",
           "It's extra useful if you use it to download the latest dSYM files from Apple when you",
-          "use Bitcode"
+          "use Bitcode."
         ].join(" ")
       end
 
@@ -158,9 +158,11 @@ module Fastlane
       end
 
       def self.deprecated_notes
-        "Please use the `sentry` plugin instead.\n" \
-          "Install using `fastlane add_plugin sentry`.\n" \
-          "Replace `upload_symbols_to_sentry` with `sentry_upload_dsym`"
+        [
+          "Please use the `sentry` plugin instead.",
+          "Install using `fastlane add_plugin sentry`.",
+          "Replace `upload_symbols_to_sentry(...)` with `sentry_upload_dsym(...)`."
+        ].join("\n")
       end
     end
   end

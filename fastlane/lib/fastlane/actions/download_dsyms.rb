@@ -126,7 +126,7 @@ module Fastlane
       def self.details
         [
           "This action downloads dSYM files from Apple iTunes Connect after",
-          "the ipa got re-compiled by Apple. Useful if you have Bitcode enabled",
+          "the ipa gets re-compiled by Apple. Useful if you have Bitcode enabled.",
           "```ruby",
           "lane :refresh_dsyms do",
           "  download_dsyms                  # Download dSYM files from iTC",

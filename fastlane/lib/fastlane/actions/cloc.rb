@@ -28,7 +28,7 @@ module Fastlane
       def self.details
         [
           "This action will run cloc to generate a SLOC report that the Jenkins SLOCCount plugin can read.",
-          "See https://wiki.jenkins-ci.org/display/JENKINS/SLOCCount+Plugin and https://github.com/AlDanial/cloc for more information."
+          "See [https://wiki.jenkins-ci.org/display/JENKINS/SLOCCount+Plugin](https://wiki.jenkins-ci.org/display/JENKINS/SLOCCount+Plugin) and [https://github.com/AlDanial/cloc](https://github.com/AlDanial/cloc) for more information."
         ].join("\n")
       end
 
