@@ -92,7 +92,6 @@ module Deliver
         base_dir = File.join(path, UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR)
         FileUtils.mkdir_p(base_dir)
         resulting_path = File.join(base_dir, "#{option_name}.txt")
-        next if content.to_s.chomp.length == 0 # as many developers won't need trade information
         File.write(resulting_path, content)
         UI.message("Writing to '#{resulting_path}'")
       end
