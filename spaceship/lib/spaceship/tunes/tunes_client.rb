@@ -605,8 +605,6 @@ module Spaceship
       data["countries"] = availability.territories.map { |territory| { 'code' => territory.code } }
       data["theWorld"] = availability.include_future_territories.nil? ? true : availability.include_future_territories
 
-      puts "before data.to_json: #{data.to_json}"
-
       # InitializespreOrder (if needed)
       data["preOrder"] ||= {}
 
@@ -617,8 +615,6 @@ module Spaceship
       app_available_date = cleared_for_preorder ? availability.app_available_date : nil
       data["preOrder"]["clearedForPreOrder"] = { "value" => cleared_for_preorder, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
       data["preOrder"]["appAvailableDate"] = { "value" => app_available_date, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
-      
-      puts "after data.to_json: #{data.to_json}"
 
       # send the changes back to Apple
       r = request(:post) do |req|

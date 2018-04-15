@@ -38,7 +38,6 @@ module Spaceship
       end
 
       def territories
-        return @territories unless @territories.nil?
         @territories ||= raw_data['countries'].map { |info| Territory.new(info) }
       end
 

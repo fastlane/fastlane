@@ -51,7 +51,7 @@
         "errorKeys":null
       },
       "appAvailableDate":{  
-        "value":null,
+        "value":"2020-02-20",
         "isEditable":true,
         "isRequired":true,
         "errorKeys":null

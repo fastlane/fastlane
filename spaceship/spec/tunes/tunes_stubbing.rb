@@ -440,8 +440,15 @@ class TunesStubbing
 
     def itc_stub_set_preorder_cleared
       stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
-        with(body: JSON.parse(itc_read_fixture_file(File.join('availability', 'remove_request.json'))).to_json).
-        to_return(status: 200, body: itc_read_fixture_file(File.join('availability', 'remove_response.json')),
+        with(body: JSON.parse(itc_read_fixture_file(File.join('availability', 'set_preorder_cleared_request.json'))).to_json).
+        to_return(status: 200, body: itc_read_fixture_file(File.join('availability', 'set_preorder_cleared_response.json')),
+                  headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_set_preorder_cleared_with_date
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        with(body: JSON.parse(itc_read_fixture_file(File.join('availability', 'set_preorder_cleared_with_date_request.json'))).to_json).
+        to_return(status: 200, body: itc_read_fixture_file(File.join('availability', 'set_preorder_cleared_with_date_response.json')),
                   headers: { 'Content-Type' => 'application/json' })
     end
 
