@@ -6,7 +6,7 @@ module Fastlane
     class AdbDevicesAction < Action
       def self.run(params)
         adb = Helper::AdbHelper.new(adb_path: params[:adb_path])
-        result = adb.load_all_devices
+        result = adb.load_all_devices(true)
         return result
       end
 
