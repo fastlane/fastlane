@@ -45,7 +45,6 @@ module FastlaneCore
     def copy_ipa(ipa_path)
       ipa_file_name = unique_ipa_path(ipa_path)
       resulting_path = File.join(self.package_path, ipa_file_name)
-
       FileUtils.cp(ipa_path, resulting_path)
 
       return resulting_path
