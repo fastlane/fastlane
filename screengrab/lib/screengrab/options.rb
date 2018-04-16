@@ -109,7 +109,7 @@ module Screengrab
         FastlaneCore::ConfigItem.new(key: :specific_device,
                                      env_name: 'SCREENGRAB_SPECIFIC_DEVICE',
                                      optional: true,
-                                     description: "Use the device or emulator with the given serial number or qualifier",
+                                     description: "Use the device or emulator with the given name, serial number, qualifier (name require `telnet` to be installed)",
                                      short_option: "-s"),
         FastlaneCore::ConfigItem.new(key: :device_type,
                                      env_name: 'SCREENGRAB_DEVICE_TYPE',
