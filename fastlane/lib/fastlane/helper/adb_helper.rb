@@ -52,9 +52,7 @@ module Fastlane
 
         # Iterates devices to load name from telnet for emulators
         # and adb from actual devices
-        if load_names &&
-
-           self.devices
+        if load_names
           self.devices.each do |device|
             if device.serial.include?('emulator-')
               load_name_from_telnet(device) if has_telnet_installed
@@ -63,6 +61,8 @@ module Fastlane
             end
           end
         end
+
+        self.devices
       end
 
       private
