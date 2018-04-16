@@ -73,7 +73,7 @@ describe Fastlane::Helper::AdbHelper do
         adb_response = strip_heredoc(<<-ADB_OUTPUT)
           List of devices attached
           emulator-5554 offline
-          T065002LTT  device
+          T065002LTT  device usb:437387264X product:ghost_retail model:XT1053 device:ghost
 
         ADB_OUTPUT
 
