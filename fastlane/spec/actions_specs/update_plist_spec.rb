@@ -23,10 +23,10 @@ describe Fastlane do
         result = Fastlane::FastFile.new.parse("lane :test do
           update_plist ({
             plist_path: '#{test_path}/#{plist_path}',
-            block: lambda { |plist|
+            block: proc do |plist|
               plist['CFBundleIdentifier'] = '#{app_identifier}'
               plist['CFBundleDisplayName'] = '#{display_name}'
-            }
+            end
           })
         end").runner.execute(:test)
         expect(result).to include("<string>#{display_name}</string>")
@@ -41,9 +41,9 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             update_plist ({
               plist_path: 'NOEXIST-#{plist_path}',
-              block: lambda { |plist|
+              block: prod do |plist|
                 plist['CFBundleDisplayName'] = '#{app_identifier}'
-              }
+              end
             })
           end").runner.execute(:test)
         end.to raise_error("Couldn't find plist file at path 'NOEXIST-#{plist_path}'")
