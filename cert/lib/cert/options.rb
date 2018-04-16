@@ -48,6 +48,12 @@ module Cert
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
+        FastlaneCore::ConfigItem.new(key: :filename,
+                                     short_option: "-q",
+                                     env_name: "CERT_FILE_NAME",
+                                     optional: true,
+                                     description: "The filename of certificate to store",
+                                     is_string: true),
         FastlaneCore::ConfigItem.new(key: :output_path,
                                      short_option: "-o",
                                      env_name: "CERT_OUTPUT_PATH",
