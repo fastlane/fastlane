@@ -6,6 +6,11 @@ describe Fastlane::Helper::AdbHelper do
         List of devices attached
 
         ADB_OUTPUT
+
+        allow(Fastlane::Actions).to receive(:sh).and_return(adb_response)
+        devices = Fastlane::Helper::AdbHelper.new.load_all_devices
+
+        expect(devices.count).to eq(0)
       end
     end
 
