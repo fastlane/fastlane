@@ -41,21 +41,12 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             update_plist ({
               plist_path: 'NOEXIST-#{plist_path}',
-              block: prod do |plist|
+              block: proc do |plist|
                 plist['CFBundleDisplayName'] = '#{app_identifier}'
               end
             })
           end").runner.execute(:test)
         end.to raise_error("Couldn't find plist file at path 'NOEXIST-#{plist_path}'")
-      end
-
-      it "returns 'false' if no plist parameters are specified" do
-        result = Fastlane::FastFile.new.parse("lane :test do
-          update_plist ({
-            plist_path: 'NOEXIST-#{plist_path}'
-          })
-        end").runner.execute(:test)
-        expect(result).to eq(false)
       end
 
       after do
