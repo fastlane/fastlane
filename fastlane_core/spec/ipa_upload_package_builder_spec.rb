@@ -5,6 +5,10 @@ describe FastlaneCore do
     let(:uploader) { FastlaneCore::IpaUploadPackageBuilder.new }
     let(:unique_path) { uploader.unique_ipa_path(path) }
 
+    let(:ipa_with_spaces) { 'iOS App With Spaces' }
+    let(:path_with_spaces) { File.expand_path("../fixtures/ipas/#{ipa_with_spaces}.ipa", __FILE__) }
+    let(:unique_path_with_spaces) { uploader.unique_ipa_path(path_with_spaces) }
+
     def special_chars?(string)
       string =~ /^[A-Za-z0-9_\.]+$/ ? false : true
     end
@@ -42,6 +46,10 @@ describe FastlaneCore do
         okay_chars.each do |okay_char|
           expect(unique_path).not_to(start_with(okay_char))
         end
+      end
+
+      it 'does not contain any spaces' do
+        expect(unique_path_with_spaces.include?(' ')).to eq(false)
       end
     end
   end
