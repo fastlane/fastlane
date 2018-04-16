@@ -90,7 +90,7 @@ module Fastlane
       def has_brew_tool!(tool)
         unless `which #{tool}`.include?(tool.to_s)
           UI.error('#############################################################')
-          UI.error("# You have to install the #{tool} to use load_name")
+          UI.error("# You have to install the #{tool} to load device names")
           UI.error("# Install it using 'brew update && brew install #{tool}'")
           UI.error("# If you don't have homebrew: http://brew.sh")
           UI.error('#############################################################')
