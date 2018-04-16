@@ -25,7 +25,7 @@ module Fastlane
         "Creates the given application on iTC and the Dev Portal (via _produce_)"
       end
 
-      def details
+      def self.details
         [
           'Create new apps on iTunes Connect and Apple Developer Portal via _produce_.',
           'If the app already exists, `create_app_online` will not do anything.',
