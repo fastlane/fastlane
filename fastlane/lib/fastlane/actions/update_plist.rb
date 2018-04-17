@@ -7,29 +7,23 @@ module Fastlane
       def self.run(params)
         require 'xcodeproj'
 
-        # Check if parameters are set
-        if params[:block]
-          if params[:plist_path].nil?
-            UI.user_error!("You must specify a plist path")
-          end
-
-          # Read existing plist file
-          plist_path = params[:plist_path]
-
-          UI.user_error!("Couldn't find plist file at path '#{plist_path}'") unless File.exist?(plist_path)
-          plist = Xcodeproj::Plist.read_from_path(plist_path)
-
-          params[:block].call(plist) if params[:block]
-
-          # Write changes to file
-          Xcodeproj::Plist.write_to_path(plist, plist_path)
-
-          UI.success("Updated #{params[:plist_path]} 💾.")
-          File.read(plist_path)
-        else
-          UI.important("You haven't specified any parameters to update your plist.")
-          false
+        if params[:plist_path].nil?
+          UI.user_error!("You must specify a plist path")
         end
+
+        # Read existing plist file
+        plist_path = params[:plist_path]
+
+        UI.user_error!("Couldn't find plist file at path '#{plist_path}'") unless File.exist?(plist_path)
+        plist = Xcodeproj::Plist.read_from_path(plist_path)
+
+        params[:block].call(plist) if params[:block]
+
+        # Write changes to file
+        Xcodeproj::Plist.write_to_path(plist, plist_path)
+
+        UI.success("Updated #{params[:plist_path]} 💾.")
+        File.read(plist_path)
       end
 
       #####################################################
