@@ -329,13 +329,13 @@ openssl aes-256-cbc -k <password> -in <fileYouWantToDecryptPath> -out <decrypted
 
 _match_ stores the certificate (.cer) and the private key (.p12) files separately. The following steps will repackage the separate certificate and private key into a single .p12 file.
 
-Decrypt your cert found in certs/<type>/<unique-id>.cer as a pem file
+Decrypt your cert found in certs/`<type>`/`<unique-id>`.cer as a pem file
 ```no-highlight
 openssl aes-256-cbc -k "<password>" -in "certs/<type>/<unique-id>.cer" -out "cert.dem" -a -d
 openssl x509 -inform der -in cert.der -out cert.pem
 ```
 
-Decrypt your private key found in certs/<type>/<unique-id>.p12 as a pem file
+Decrypt your private key found in certs/`<type>`/`<unique-id>`.p12 as a pem file
 ```no-highlight
 openssl aes-256-cbc -k "<password>" -in "certs/distribution/<unique-id>.p12" -out "key.pem" -a -d
 ```
