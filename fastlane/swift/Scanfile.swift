@@ -18,4 +18,4 @@ class Scanfile: ScanfileProtocol {
 
 
 
-// Generated with fastlane 2.92.0
+// Generated with fastlane 2.92.1
