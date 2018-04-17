@@ -77,9 +77,11 @@ module Fastlane
       end
 
       def self.details
-        "Commits a file directly to GitHub. You must provide your GitHub Personal token (get one from [https://github.com/settings/tokens/new](https://github.com/settings/tokens/new)), the repository name and the relative file path from the root git project.
-        Out parameters provide the commit sha created, which can be used for later usage for examples such as releases, the direct download link and the full response JSON.
-        Documentation: [https://developer.github.com/v3/repos/contents/#create-a-file](https://developer.github.com/v3/repos/contents/#create-a-file)."
+        [
+          "Commits a file directly to GitHub. You must provide your GitHub Personal token (get one from [https://github.com/settings/tokens/new](https://github.com/settings/tokens/new)), the repository name and the relative file path from the root git project.",
+          "Out parameters provide the commit sha created, which can be used for later usage for examples such as releases, the direct download link and the full response JSON.",
+          "Documentation: [https://developer.github.com/v3/repos/contents/#create-a-file](https://developer.github.com/v3/repos/contents/#create-a-file)."
+        ].join("\n")
       end
 
       def self.available_options

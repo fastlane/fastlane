@@ -449,8 +449,10 @@ module Fastlane
       end
 
       def self.deprecated_notes
-        "Please use the `aws_s3` plugin instead.\n" \
+        [
+          "Please use the `aws_s3` plugin instead.",
           "Install using `fastlane add_plugin aws_s3`."
+        ].join("\n")
       end
     end
     # rubocop:enable Metrics/ClassLength

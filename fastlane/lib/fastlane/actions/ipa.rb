@@ -228,10 +228,12 @@ module Fastlane
       end
 
       def self.deprecated_notes
-        "You are using legacy `shenzhen` to build your app, which will be removed soon!\n" \
-        "It is recommended to upgrade to _gym_.\n" \
-        "To do so, just replace `ipa(...)` with `gym(...)` in your Fastfile.\n" \
-        "To make code signing work, follow [https://docs.fastlane.tools/codesigning/xcode-project](https://docs.fastlane.tools/codesigning/xcode-project)."
+        [
+          "You are using legacy `shenzhen` to build your app, which will be removed soon!",
+          "It is recommended to upgrade to _gym_.",
+          "To do so, just replace `ipa(...)` with `gym(...)` in your Fastfile.",
+          "To make code signing work, follow [https://docs.fastlane.tools/codesigning/xcode-project](https://docs.fastlane.tools/codesigning/xcode-project)."
+        ].join("\n")
       end
     end
   end
