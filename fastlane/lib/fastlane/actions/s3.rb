@@ -316,7 +316,7 @@ module Fastlane
           "Upload a new build to Amazon S3 to distribute the build to beta testers.",
           "Works for both Ad Hoc and Enterprise signed applications. This step will generate the necessary HTML, plist, and version files for you.",
           "It is recommended to **not** store the AWS access keys in the `Fastfile`. The uploaded `version.json` file provides an easy way for apps to poll if a new update is available."
-        ].join(" ")
+        ].join("\n")
       end
 
       def self.available_options

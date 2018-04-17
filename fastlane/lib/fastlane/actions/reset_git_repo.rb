@@ -50,7 +50,7 @@ module Fastlane
           "Untracked files like `.env` will also be deleted, unless `:skip_clean` is true.",
           "It's a pretty drastic action so it comes with a sort of safety latch. It will only proceed with the reset if this condition is met:",
           "- You have called the `ensure_git_status_clean` action prior to calling this action. This ensures that your repo started off in a clean state, so the only things that will get destroyed by this action are files that are created as a byproduct of the fastlane run."
-        ].join(' ')
+        ].join("\n")
       end
 
       def self.example_code
