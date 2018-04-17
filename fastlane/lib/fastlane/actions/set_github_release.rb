@@ -146,11 +146,7 @@ module Fastlane
       end
 
       def self.details
-        "Creates a new release on GitHub. You must provide your GitHub Personal token
-        (get one from [https://github.com/settings/tokens/new](https://github.com/settings/tokens/new)), the repository name
-        and tag name. By default, that's `master`. If the tag doesn't exist, one will be created on the commit or branch passed in as
-        commitish. Out parameters provide the release's id, which can be used for later editing and the
-        release HTML link to GitHub. You can also specify a list of assets to be uploaded to the release with the `:upload_assets` parameter."
+        "Creates a new release on GitHub. You must provide your GitHub Personal token (get one from [https://github.com/settings/tokens/new](https://github.com/settings/tokens/new)), the repository name and tag name. By default, that's `master`. If the tag doesn't exist, one will be created on the commit or branch passed in as commitish. Out parameters provide the release's id, which can be used for later editing and the release HTML link to GitHub. You can also specify a list of assets to be uploaded to the release with the `:upload_assets` parameter."
       end
 
       def self.available_options

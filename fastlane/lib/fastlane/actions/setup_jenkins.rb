@@ -96,8 +96,7 @@ module Fastlane
           "- Produce result bundle (gym and scan).",
           "",
           "This action helps with Jenkins integration. Creates own derived data for each job. All build results like IPA files and archives will be stored in the `./output` directory.",
-          "The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), the selected keychain",
-          "will be automatically unlocked and the selected code signing identity will be used. By default this action will only work when _fastlane_ is executed on a CI system."
+          "The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), the selected keychain will be automatically unlocked and the selected code signing identity will be used. By default this action will only work when _fastlane_ is executed on a CI system."
         ].join("\n")
       end
 

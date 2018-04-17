@@ -19,10 +19,7 @@ module Fastlane
 
       def self.details
         [
-          "You may provide multiple provisioning profiles if the application contains",
-          "nested applications or app extensions, which need their own provisioning",
-          "profile. You can do so by passing an array of provisiong profile strings or a",
-          "hash that associates provisioning profile values to bundle identifier keys.",
+          "You may provide multiple provisioning profiles if the application contains nested applications or app extensions, which need their own provisioning profile. You can do so by passing an array of provisiong profile strings or a hash that associates provisioning profile values to bundle identifier keys.",
           "",
           "resign(ipa: \"path\", signing_identity: \"identity\", provisioning_profile: {",
           "  \"com.example.awesome-app\" => \"App.mobileprovision\",",

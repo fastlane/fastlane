@@ -35,8 +35,7 @@ module Fastlane
 
       def self.details
         [
-          "To obtain the token, create a new [incoming message webhook](https://dev.flock.co/wiki/display/FlockAPI/Incoming+Webhooks)",
-          "in your Flock admin panel."
+          "To obtain the token, create a new [incoming message webhook](https://dev.flock.co/wiki/display/FlockAPI/Incoming+Webhooks) in your Flock admin panel."
         ].join("\n")
       end
 

@@ -56,9 +56,8 @@ module Fastlane
 
       def self.details
         [
-          "You don't want any debug code to slip into production. This can be used",
-          "to check if there is any debug code still in your codebase or if you have",
-          "things like `// TO DO` or similar."
+          "You don't want any debug code to slip into production.",
+          "This can be used to check if there is any debug code still in your codebase or if you have things like `// TO DO` or similar."
         ].join("\n")
       end
 

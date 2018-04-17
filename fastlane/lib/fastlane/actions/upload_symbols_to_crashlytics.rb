@@ -137,11 +137,7 @@ module Fastlane
 
       def self.details
         [
-          "This action allows you to upload symbolication files to Crashlytics.",
-          "It's extra useful if you use it to download the latest dSYM files from Apple when you",
-          "use Bitcode. This action will not fail the build if one of the uploads failed.",
-          "The reason for that is that sometimes some of dSYM files are invalid, and we don't want",
-          "them to fail the complete build."
+          "This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode. This action will not fail the build if one of the uploads failed. The reason for that is that sometimes some of dSYM files are invalid, and we don't want them to fail the complete build."
         ].join(" ")
       end
 

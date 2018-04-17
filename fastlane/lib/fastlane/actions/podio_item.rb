@@ -25,11 +25,9 @@ module Fastlane
       end
 
       def self.details
-        "Use this action to create or update an item within your Podio app
-        (see [https://help.podio.com/hc/en-us/articles/201019278-Creating-apps-](https://help.podio.com/hc/en-us/articles/201019278-Creating-apps-)).
+        "Use this action to create or update an item within your Podio app (see [https://help.podio.com/hc/en-us/articles/201019278-Creating-apps-](https://help.podio.com/hc/en-us/articles/201019278-Creating-apps-)).
         Pass in dictionary with field keys and their values.
-        Field key is located under `Modify app` -> `Advanced` -> `Developer` -> `External ID`
-        (see [https://developers.podio.com/examples/items](https://developers.podio.com/examples/items))."
+        Field key is located under `Modify app` -> `Advanced` -> `Developer` -> `External ID` (see [https://developers.podio.com/examples/items](https://developers.podio.com/examples/items))."
       end
 
       def self.available_options

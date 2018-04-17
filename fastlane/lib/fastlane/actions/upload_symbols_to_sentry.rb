@@ -72,9 +72,7 @@ module Fastlane
 
       def self.details
         [
-          "This action allows you to upload symbolication files to Sentry.",
-          "It's extra useful if you use it to download the latest dSYM files from Apple when you",
-          "use Bitcode."
+          "This action allows you to upload symbolication files to Sentry. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode."
         ].join(" ")
       end
 

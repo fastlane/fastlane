@@ -15,8 +15,7 @@ module Fastlane
 
       def self.details
         [
-          "The return value of this method is true if fastlane is currently executed on",
-          "Travis, Jenkins, Circle or a similar CI service"
+          "The return value of this method is true if fastlane is currently executed on Travis, Jenkins, Circle or a similar CI service"
         ].join("\n")
       end
 
