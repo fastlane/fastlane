@@ -65,7 +65,7 @@ module Fastlane
             end
 
             unless codesigning_identity.nil?
-              unless build_configuration.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"].nil?
+              if build_configuration.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] != nil
                 build_configuration.build_settings["CODE_SIGN_IDENTITY"] = codesigning_identity
                 build_configuration.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = codesigning_identity
               else
