@@ -155,7 +155,10 @@ module Fastlane
       end
 
       def self.details
-        "Returns the current build number of either the live or testflight version - it is useful for getting the build_number of the current or ready-for-sale app version, and it also works on non-live testflight version. If you need to handle more build-trains please see `latest_testflight_build_number`."
+        [
+          "Returns the current build number of either the live or testflight version - it is useful for getting the build_number of the current or ready-for-sale app version, and it also works on non-live testflight version.",
+          "If you need to handle more build-trains please see `latest_testflight_build_number`."
+        ].join("\n")
       end
 
       def self.example_code
