@@ -868,6 +868,7 @@ func cert(development: Bool = false,
           username: String,
           teamId: String? = nil,
           teamName: String? = nil,
+          filename: String? = nil,
           outputPath: String = ".",
           keychainPath: String,
           keychainPassword: String? = nil,
@@ -877,6 +878,7 @@ func cert(development: Bool = false,
                                                                                       RubyCommand.Argument(name: "username", value: username),
                                                                                       RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                       RubyCommand.Argument(name: "team_name", value: teamName),
+                                                                                      RubyCommand.Argument(name: "filename", value: filename),
                                                                                       RubyCommand.Argument(name: "output_path", value: outputPath),
                                                                                       RubyCommand.Argument(name: "keychain_path", value: keychainPath),
                                                                                       RubyCommand.Argument(name: "keychain_password", value: keychainPassword),
@@ -1460,6 +1462,7 @@ func getCertificates(development: Bool = false,
                      username: String,
                      teamId: String? = nil,
                      teamName: String? = nil,
+                     filename: String? = nil,
                      outputPath: String = ".",
                      keychainPath: String,
                      keychainPassword: String? = nil,
@@ -1469,6 +1472,7 @@ func getCertificates(development: Bool = false,
                                                                                                   RubyCommand.Argument(name: "username", value: username),
                                                                                                   RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                                   RubyCommand.Argument(name: "team_name", value: teamName),
+                                                                                                  RubyCommand.Argument(name: "filename", value: filename),
                                                                                                   RubyCommand.Argument(name: "output_path", value: outputPath),
                                                                                                   RubyCommand.Argument(name: "keychain_path", value: keychainPath),
                                                                                                   RubyCommand.Argument(name: "keychain_password", value: keychainPassword),
@@ -1971,9 +1975,9 @@ func jira(url: String,
                                                                                       RubyCommand.Argument(name: "comment_text", value: commentText)])
   _ = runner.executeCommand(command)
 }
-func laneContext() {
+@discardableResult func laneContext() -> [String : String] {
   let command = RubyCommand(commandID: "", methodName: "lane_context", className: nil, args: [])
-  _ = runner.executeCommand(command)
+  return parseDictionary(fromString: runner.executeCommand(command))
 }
 @discardableResult func lastGitCommit() -> [String : String] {
   let command = RubyCommand(commandID: "", methodName: "last_git_commit", className: nil, args: [])
@@ -3929,4 +3933,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.13]
+// FastlaneRunnerAPIVersion [0.9.14]
