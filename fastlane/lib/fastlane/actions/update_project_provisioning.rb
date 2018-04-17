@@ -65,12 +65,10 @@ module Fastlane
             end
 
             unless codesigning_identity.nil?
-              if build_configuration.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] != nil
-                build_configuration.build_settings["CODE_SIGN_IDENTITY"] = codesigning_identity
+              unless build_configuration.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"].nil?
                 build_configuration.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = codesigning_identity
-              else
-                build_configuration.build_settings["CODE_SIGN_IDENTITY"] = codesigning_identity
               end
+              build_configuration.build_settings["CODE_SIGN_IDENTITY"] = codesigning_identity
             end
 
             build_configuration.build_settings["PROVISIONING_PROFILE"] = data["UUID"]
