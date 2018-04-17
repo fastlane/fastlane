@@ -5,7 +5,6 @@ module Fastlane
 
     class UpdateInfoPlistAction < Action
       def self.run(params)
-
         # Check if parameters are set
         if params[:app_identifier] || params[:display_name] || params[:block]
           if (params[:app_identifier] || params[:display_name]) && params[:block]
