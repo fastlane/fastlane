@@ -36,8 +36,7 @@ module FastlaneCore
     end
 
     def unique_ipa_path(ipa_path)
-      basename = File.basename(ipa_path, '.ipa').gsub(' ', '_')
-      "#{basename}_#{Digest::SHA256.file(ipa_path).hexdigest}.ipa"
+      "#{Digest::SHA256.file(ipa_path).hexdigest}.ipa"
     end
 
     private
