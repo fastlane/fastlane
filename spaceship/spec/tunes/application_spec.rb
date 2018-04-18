@@ -79,7 +79,7 @@ describe Spaceship::Application do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.100")
-        end.to raise_error "You must choose a primary language. You must choose a primary language."
+        end.to raise_error("You must choose a primary language. You must choose a primary language.")
       end
 
       it "raises an error if bundle is wildcard and bundle_id_suffix has not specified" do
@@ -88,7 +88,7 @@ describe Spaceship::Application do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.*")
-        end.to raise_error "You must enter a Bundle ID Suffix. You must enter a Bundle ID Suffix."
+        end.to raise_error("You must enter a Bundle ID Suffix. You must enter a Bundle ID Suffix.")
       end
 
       it "raises an error if the bundle id is not populated" do
@@ -97,7 +97,7 @@ describe Spaceship::Application do
           Spaceship::Tunes::Application.create!(name: "My name",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.123")
-        end.to raise_error "requested bundle id not available"
+        end.to raise_error("requested bundle id not available")
       end
     end
 
@@ -116,7 +116,7 @@ describe Spaceship::Application do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.100")
-        end.to raise_error "You must provide a company name to use on the App Store. You must provide a company name to use on the App Store."
+        end.to raise_error("You must provide a company name to use on the App Store. You must provide a company name to use on the App Store.")
       end
     end
 

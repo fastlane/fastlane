@@ -293,7 +293,7 @@ module Spaceship
 
       # check if the bundle id exists in the list of bundle ids
       available_bundle_ids = data['bundleIds']
-      raise 'requested bundle id not available' unless available_bundle_ids.keys.include? bundle_id
+      raise 'requested bundle id not available' unless available_bundle_ids.keys.include?(bundle_id)
 
       # Now fill in the values we have
       # some values are nil, that's why there is a hash
