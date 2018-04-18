@@ -59,7 +59,7 @@ module Spaceship
     #
     # @param team_id (String) (optional): The ID of a iTunesConnect team
     # @param team_name (String) (optional): The name of a iTunesConnect team
-    def select_team(team_id: team_id = nil, team_name: team_name = nil)
+    def select_team(team_id: nil, team_name: nil)
       t_id = (team_id || ENV['FASTLANE_ITC_TEAM_ID'] || '').strip
       t_name = (team_name || ENV['FASTLANE_ITC_TEAM_NAME'] || '').strip
 
