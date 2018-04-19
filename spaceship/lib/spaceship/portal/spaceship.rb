@@ -39,7 +39,7 @@ module Spaceship
       #
       # @return (String) The ID of the select team. You also get the value if
       #   the user is only in one team.
-      def select_team(team_id: team_id = nil, team_name: team_name = nil)
+      def select_team(team_id: nil, team_name: nil)
         @client.select_team(team_id: team_id, team_name: team_name)
       end
 
@@ -98,7 +98,7 @@ module Spaceship
       Spaceship::Portal.login(user, password)
     end
 
-    def select_team(team_id: team_id = nil, team_name: team_name = nil)
+    def select_team(team_id: nil, team_name: nil)
       Spaceship::Portal.select_team(team_id: team_id, team_name: team_name)
     end
 
