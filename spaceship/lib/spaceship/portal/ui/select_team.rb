@@ -47,7 +47,7 @@ module Spaceship
       end
       # rubocop:enable Require/MissingRequireStatement
 
-      def select_team(team_id: team_id = nil, team_name: team_name = nil)
+      def select_team(team_id: nil, team_name: nil)
         teams = client.teams
 
         if teams.count == 0
