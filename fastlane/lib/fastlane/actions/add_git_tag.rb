@@ -26,18 +26,17 @@ module Fastlane
       end
 
       def self.details
-        list = <<~LIST
-          - `grouping` is just to keep your tags organised under one 'folder', defaults to 'builds'
-          - `lane` is the name of the current fastlane lane
-          - `prefix` is anything you want to stick in front of the version number, e.g. 'v'
-          - `postfix` is anything you want to stick at the end of the version number, e.g. '-RC1'
-          - `build_number` is the build number, which defaults to the value emitted by the `increment_build_number` action
+        list = <<~LIST.markdown_list
+          `grouping` is just to keep your tags organised under one 'folder', defaults to 'builds'
+          `lane` is the name of the current fastlane lane
+          `prefix` is anything you want to stick in front of the version number, e.g. 'v'
+          `postfix` is anything you want to stick at the end of the version number, e.g. '-RC1'
+          `build_number` is the build number, which defaults to the value emitted by the `increment_build_number` action
         LIST
 
         [
-          "This will automatically tag your build with the following format: `<grouping>/<lane>/<prefix><build_number>`, where:",
+          "This will automatically tag your build with the following format: `<grouping>/<lane>/<prefix><build_number>`, where:".markdown_preserve_newlines,
           list,
-          "",
           "For example, for build 1234 in the 'appstore' lane, it will tag the commit with `builds/appstore/1234`."
         ].join("\n")
       end

@@ -124,7 +124,7 @@ module Fastlane
       end
 
       def self.details
-        sample = <<~SAMPLE
+        sample = <<~SAMPLE.markdown_sample
           ```ruby
           lane :refresh_dsyms do
             download_dsyms                  # Download dSYM files from iTC
@@ -135,7 +135,7 @@ module Fastlane
         SAMPLE
 
         [
-          "This action downloads dSYM files from Apple iTunes Connect after the ipa gets re-compiled by Apple. Useful if you have Bitcode enabled.",
+          "This action downloads dSYM files from Apple iTunes Connect after the ipa gets re-compiled by Apple. Useful if you have Bitcode enabled.".markdown_preserve_newlines,
           sample
         ].join("\n")
       end

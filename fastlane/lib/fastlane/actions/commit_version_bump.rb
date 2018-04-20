@@ -184,16 +184,15 @@ module Fastlane
       end
 
       def self.details
-        list = <<~LIST
-          - All `.plist` files
-          - The `.xcodeproj/project.pbxproj` file
+        list = <<~LIST.markdown_list
+          All `.plist` files
+          The `.xcodeproj/project.pbxproj` file
         LIST
 
         [
           "This action will create a 'Version Bump' commit in your repo. Useful in conjunction with `increment_build_number`.",
-          "It checks the repo to make sure that only the relevant files have changed. These are the files that `increment_build_number` (`agvtool`) touches:",
+          "It checks the repo to make sure that only the relevant files have changed. These are the files that `increment_build_number` (`agvtool`) touches:".markdown_preserve_newlines,
           list,
-          "",
           "Then commits those files to the repo.",
           "Customize the message with the `:message` option. It defaults to 'Version Bump'.",
           "If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the [clean_build_artifacts](https://docs.fastlane.tools/actions/clean_build_artifacts/) action to clean those temporary files up before running this action."

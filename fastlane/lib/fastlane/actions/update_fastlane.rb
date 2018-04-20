@@ -112,7 +112,7 @@ module Fastlane
       end
 
       def self.details
-        sample = <<~SAMPLE
+        sample = <<~SAMPLE.markdown_sample
           ```bash
           export GEM_HOME=~/.gems
           export PATH=$PATH:~/.gems/bin
@@ -124,7 +124,7 @@ module Fastlane
           "",
           "If you are using rbenv or rvm, everything should be good to go. However, if you are using the system's default ruby, some additional setup is needed for this action to work correctly. In short, fastlane needs to be able to access your gem library without running in `sudo` mode.",
           "",
-          "The simplest possible fix for this is putting the following lines into your `~/.bashrc` or `~/.zshrc` file:",
+          "The simplest possible fix for this is putting the following lines into your `~/.bashrc` or `~/.zshrc` file:".markdown_preserve_newlines,
           sample,
           "After the above changes, restart your terminal, then run `mkdir $GEM_HOME` to create the new gem directory. After this, you're good to go!",
           "",
