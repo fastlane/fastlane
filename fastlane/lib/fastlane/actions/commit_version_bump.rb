@@ -184,11 +184,15 @@ module Fastlane
       end
 
       def self.details
+        list = <<~LIST
+          - All `.plist` files
+          - The `.xcodeproj/project.pbxproj` file
+        LIST
+
         [
           "This action will create a 'Version Bump' commit in your repo. Useful in conjunction with `increment_build_number`.",
           "It checks the repo to make sure that only the relevant files have changed. These are the files that `increment_build_number` (`agvtool`) touches:",
-          "- All `.plist` files",
-          "- The `.xcodeproj/project.pbxproj` file",
+          list,
           "",
           "Then commits those files to the repo.",
           "Customize the message with the `:message` option. It defaults to 'Version Bump'.",

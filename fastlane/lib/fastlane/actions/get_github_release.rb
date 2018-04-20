@@ -53,6 +53,7 @@ module Fastlane
 
       def self.details
         sample = <<~SAMPLE.chomp
+          ```no-highlight
           {
             "url"=>"https://api.github.com/repos/KrauseFx/fastlane/releases/1537713",
              "assets_url"=>"https://api.github.com/repos/KrauseFx/fastlane/releases/1537713/assets",
@@ -90,13 +91,12 @@ module Fastlane
              "body"=> ...Markdown...
             "This is one of the biggest updates of _fastlane_ yet"
           }
+          ```
         SAMPLE
 
         [
           "This will return all information about a release. For example:",
-          "```no-highlight",
-          sample,
-          "```"
+          sample
         ].join("\n")
       end
 
