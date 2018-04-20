@@ -77,7 +77,16 @@ module Snapshot
 
         paths.each do |path|
           UI.message("Adding '#{path}'")
-          Helper.backticks("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape} &> /dev/null")
+
+          # Attempting addmedia since addphoto and addvideo are deprecated
+          output = Helper.backticks("xcrun simctl addmedia #{device_udid} #{path.shellescape} &> /dev/null")
+
+          # Run legacy addphoto and addvideo if addmedia isn't found
+          # Output will be empty strin gif it was a success
+          # Output will contain "usage: simctl" if command not found
+          if output.include?('usage: simctl')
+            Helper.backticks("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape} &> /dev/null")
+          end
         end
       end
     end
