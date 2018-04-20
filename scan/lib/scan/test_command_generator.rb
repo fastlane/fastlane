@@ -141,7 +141,7 @@ module Scan
     def result_bundle_path
       unless Scan.cache[:result_bundle_path]
         path = File.join(Scan.config[:output_directory], Scan.config[:scheme]) + ".test_result"
-        if FileUtils.directory?(path)
+        if File.directory?(path)
           FileUtils.remove_dir(path)
         end
         Scan.cache[:result_bundle_path] = path
