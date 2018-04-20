@@ -157,8 +157,15 @@ class String
     self.gsub(/(\n|$)/, '|\1') # prepend new lines with "|" so the erb template knows *not* to replace them with "<br>"s
   end
 
+  def dedent!
+    first_line_indent = self.match(/^\s*/)[0]
+
+    self.gsub!(/^#{first_line_indent}/, "")
+  end
+
   def markdown_sample(is_first = false)
     self.chomp! # remove the last new line added by the heredoc
+    self.dedent! # remove the leading whitespace (similar to the squigly heredoc `<<~`)
     self.prepend("\n") unless is_first
     self << "\n>" # continue the quote
     self.markdown_preserve_newlines

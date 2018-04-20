@@ -112,7 +112,7 @@ module Fastlane
       end
 
       def self.details
-        sample = <<~SAMPLE.markdown_sample
+        sample = <<-SAMPLE.markdown_sample
           ```bash
           export GEM_HOME=~/.gems
           export PATH=$PATH:~/.gems/bin

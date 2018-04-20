@@ -61,7 +61,7 @@ module Fastlane
       end
 
       def self.details
-        list = <<~LIST.markdown_list(true)
+        list = <<-LIST.markdown_list(true)
           Creates a new temporary keychain for use with match
           Switches match to `readonly` mode to not create new profiles/cert on CI
           Sets up log and test result paths to be easily collectible

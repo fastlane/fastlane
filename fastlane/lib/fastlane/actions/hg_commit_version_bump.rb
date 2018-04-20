@@ -152,7 +152,7 @@ module Fastlane
       end
 
       def self.details
-        list = <<~LIST.markdown_list
+        list = <<-LIST.markdown_list
           All `.plist` files
           The `.xcodeproj/project.pbxproj` file
         LIST

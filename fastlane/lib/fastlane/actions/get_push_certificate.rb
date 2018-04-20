@@ -30,7 +30,7 @@ module Fastlane
       end
 
       def self.details
-        sample = <<~SAMPLE.markdown_sample
+        sample = <<-SAMPLE.markdown_sample
           ```ruby
           get_push_certificate(
             new_profile: proc do

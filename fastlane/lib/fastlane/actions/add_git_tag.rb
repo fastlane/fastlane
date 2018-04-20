@@ -26,7 +26,7 @@ module Fastlane
       end
 
       def self.details
-        list = <<~LIST.markdown_list
+        list = <<-LIST.markdown_list
           `grouping` is just to keep your tags organised under one 'folder', defaults to 'builds'
           `lane` is the name of the current fastlane lane
           `prefix` is anything you want to stick in front of the version number, e.g. 'v'

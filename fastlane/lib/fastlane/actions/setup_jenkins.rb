@@ -88,7 +88,7 @@ module Fastlane
       end
 
       def self.details
-        list = <<~LIST.markdown_list(true)
+        list = <<-LIST.markdown_list(true)
           Adds and unlocks keychains from Jenkins 'Keychains and Provisioning Profiles Plugin'
           Sets code signing identity from Jenkins 'Keychains and Provisioning Profiles Plugin'
           Sets output directory to './output' (gym, scan and backup_xcarchive)

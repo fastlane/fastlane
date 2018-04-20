@@ -18,7 +18,7 @@ module Fastlane
       end
 
       def self.details
-        sample = <<~SAMPLE.markdown_sample
+        sample = <<-SAMPLE.markdown_sample
           ```ruby
           resign(ipa: "path", signing_identity: "identity", provisioning_profile: {
             "com.example.awesome-app" => "App.mobileprovision",
