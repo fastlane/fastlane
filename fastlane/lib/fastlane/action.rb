@@ -160,15 +160,19 @@ class String
   def markdown_sample(is_first = false)
     self.chomp! # remove the last new line added by the heredoc
     self.dedent! # remove the leading whitespace (similar to the squigly heredoc `<<~`)
-    self.prepend("\n") unless is_first
-    self << "\n>" # continue the quote
-    self.markdown_preserve_newlines
+    self.markdown_details(is_first)
   end
 
   def markdown_list(is_first = false)
     self.gsub!(/^/, "- ") # add list dashes
     self.prepend(">") unless is_first # the empty line that will be added breaks the quote
-    self.markdown_sample(is_first)
+    self.markdown_details(is_first)
+  end
+
+  def markdown_details(is_first)
+    self.prepend("\n") unless is_first
+    self << "\n>" # continue the quote
+    self.markdown_preserve_newlines
   end
 
   def dedent!
