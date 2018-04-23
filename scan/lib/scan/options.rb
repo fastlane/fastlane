@@ -179,7 +179,7 @@ module Scan
                                      short_option: "-z",
                                      env_name: "SCAN_RESULT_BUNDLE",
                                      is_string: false,
-                                     description: "Location of the Xcode result bundle",
+                                     description: "Should an Xcode result bundle be generated in the output directory",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :sdk,
                                      short_option: "-k",
