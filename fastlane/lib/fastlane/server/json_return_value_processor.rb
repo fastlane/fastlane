@@ -17,6 +17,8 @@ module Fastlane
         return process_value_as_array_of_strings(return_value: return_value)
       when :hash_of_strings
         return process_value_as_hash_of_strings(return_value: return_value)
+      when :hash
+        return process_value_as_hash_of_strings(return_value: return_value)
       else
         UI.verbose("Unknown return type defined: #{return_value_type} for value: #{return_value}")
         return process_value_as_string(return_value: return_value)
