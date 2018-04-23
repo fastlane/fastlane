@@ -50,9 +50,9 @@ public class LaneFile: NSObject, LaneFileProtocol {
         return String(laneName.prefix(laneName.count - 12))
     }
 
-	private static func trimLaneWithoutOptionsFromName(laneName: String) -> String {
-		return String(laneName.prefix(laneName.count - 16))
-	}
+    private static func trimLaneWithoutOptionsFromName(laneName: String) -> String {
+        return String(laneName.prefix(laneName.count - 16))
+    }
 
     private static var laneFunctionNames: [String] {
         var lanes: [String] = []
