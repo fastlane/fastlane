@@ -159,6 +159,7 @@ module Gym
                                      env_name: "GYM_RESULT_BUNDLE",
                                      is_string: false,
                                      description: "Should an Xcode result bundle be generated in the output directory",
+                                     default_value: false,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :buildlog_path,
                                      short_option: "-l",
