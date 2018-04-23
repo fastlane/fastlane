@@ -111,16 +111,16 @@ public class LaneFile: NSObject, LaneFileProtocol {
         let lowerCasedLaneRequested = named.lowercased()
 
         guard let laneMethod = currentLanes[lowerCasedLaneRequested] else {
-			let laneNames = self.laneFunctionNames.compactMap { functionName in
-				let laneFunctionName = functionName.lowercased()
-				if laneFunctionName.hasSuffix("lane") {
-					return trimLaneFromName(laneName: laneFunctionName)
-				} else if laneFunctionName.hasSuffix("lanewithoptions:") {
-					return trimLaneWithoutOptionsFromName(laneName: laneFunctionName)
-				} else  {
-					return nil
-				}
-			}.joined(separator: ", ")
+            let laneNames = self.laneFunctionNames.compactMap { functionName in
+                let laneFunctionName = functionName.lowercased()
+                if laneFunctionName.hasSuffix("lane") {
+                    return trimLaneFromName(laneName: laneFunctionName)
+                } else if laneFunctionName.hasSuffix("lanewithoptions:") {
+                    return trimLaneWithoutOptionsFromName(laneName: laneFunctionName)
+                } else {
+                    return nil
+                }
+            }.joined(separator: ", ")
 
             let message = "[!] Could not find lane '\(named)'. Available lanes: \(laneNames)"
             log(message: message)
