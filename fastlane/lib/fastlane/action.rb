@@ -23,6 +23,7 @@ module Fastlane
       :string,
       :array_of_strings,
       :hash_of_strings,
+      :hash,
       :bool,
       :int
     ]
