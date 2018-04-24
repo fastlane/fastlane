@@ -19,7 +19,7 @@ protocol GymfileProtocol: class {
   var buildPath: String? { get }
   var archivePath: String? { get }
   var derivedDataPath: String? { get }
-  var resultBundle: String? { get }
+  var resultBundle: Bool { get }
   var buildlogPath: String { get }
   var sdk: String? { get }
   var toolchain: String? { get }
@@ -60,7 +60,7 @@ extension GymfileProtocol {
   var buildPath: String? { return nil }
   var archivePath: String? { return nil }
   var derivedDataPath: String? { return nil }
-  var resultBundle: String? { return nil }
+  var resultBundle: Bool { return false }
   var buildlogPath: String { return "~/Library/Logs/gym" }
   var sdk: String? { return nil }
   var toolchain: String? { return nil }
@@ -82,4 +82,4 @@ extension GymfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.1]
+// FastlaneRunnerAPIVersion [0.9.2]

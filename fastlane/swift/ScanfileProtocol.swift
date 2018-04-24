@@ -21,7 +21,7 @@ protocol ScanfileProtocol: class {
   var buildForTesting: Bool? { get }
   var xctestrun: String? { get }
   var derivedDataPath: String? { get }
-  var resultBundle: String? { get }
+  var resultBundle: Bool { get }
   var sdk: String? { get }
   var openReport: Bool { get }
   var configuration: String? { get }
@@ -63,7 +63,7 @@ extension ScanfileProtocol {
   var buildForTesting: Bool? { return nil }
   var xctestrun: String? { return nil }
   var derivedDataPath: String? { return nil }
-  var resultBundle: String? { return nil }
+  var resultBundle: Bool { return false }
   var sdk: String? { return nil }
   var openReport: Bool { return false }
   var configuration: String? { return nil }
@@ -82,7 +82,6 @@ extension ScanfileProtocol {
   var failBuild: Bool { return true }
 }
 
-
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.1]
+// FastlaneRunnerAPIVersion [0.9.2]

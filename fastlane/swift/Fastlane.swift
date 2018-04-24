@@ -481,7 +481,7 @@ func buildApp(workspace: String? = nil,
               buildPath: String? = nil,
               archivePath: String? = nil,
               derivedDataPath: String? = nil,
-              resultBundle: String? = nil,
+              resultBundle: Bool = false,
               buildlogPath: String = "~/Library/Logs/gym",
               sdk: String? = nil,
               toolchain: String? = nil,
@@ -559,7 +559,7 @@ func buildIosApp(workspace: String? = nil,
                  buildPath: String? = nil,
                  archivePath: String? = nil,
                  derivedDataPath: String? = nil,
-                 resultBundle: String? = nil,
+                 resultBundle: Bool = false,
                  buildlogPath: String = "~/Library/Logs/gym",
                  sdk: String? = nil,
                  toolchain: String? = nil,
@@ -1695,7 +1695,7 @@ func gym(workspace: String? = gymfile.workspace,
          buildPath: String? = gymfile.buildPath,
          archivePath: String? = gymfile.archivePath,
          derivedDataPath: String? = gymfile.derivedDataPath,
-         resultBundle: String? = gymfile.resultBundle,
+         resultBundle: Bool = gymfile.resultBundle,
          buildlogPath: String = gymfile.buildlogPath,
          sdk: String? = gymfile.sdk,
          toolchain: String? = gymfile.toolchain,
@@ -1975,7 +1975,7 @@ func jira(url: String,
                                                                                       RubyCommand.Argument(name: "comment_text", value: commentText)])
   _ = runner.executeCommand(command)
 }
-@discardableResult func laneContext() -> [String : String] {
+@discardableResult func laneContext() -> [String : Any] {
   let command = RubyCommand(commandID: "", methodName: "lane_context", className: nil, args: [])
   return parseDictionary(fromString: runner.executeCommand(command))
 }
@@ -2595,7 +2595,7 @@ func runTests(workspace: String? = nil,
               buildForTesting: Bool? = nil,
               xctestrun: String? = nil,
               derivedDataPath: String? = nil,
-              resultBundle: String? = nil,
+              resultBundle: Bool = false,
               sdk: String? = nil,
               openReport: Bool = false,
               configuration: String? = nil,
@@ -2713,7 +2713,7 @@ func scan(workspace: String? = scanfile.workspace,
           buildForTesting: Bool? = scanfile.buildForTesting,
           xctestrun: String? = scanfile.xctestrun,
           derivedDataPath: String? = scanfile.derivedDataPath,
-          resultBundle: String? = scanfile.resultBundle,
+          resultBundle: Bool = scanfile.resultBundle,
           sdk: String? = scanfile.sdk,
           openReport: Bool = scanfile.openReport,
           configuration: String? = scanfile.configuration,
@@ -3483,6 +3483,12 @@ func updateInfoPlist(xcodeproj: String? = nil,
                                                                                                    RubyCommand.Argument(name: "block", value: block)])
   _ = runner.executeCommand(command)
 }
+func updatePlist(plistPath: String? = nil,
+                 block: String) {
+  let command = RubyCommand(commandID: "", methodName: "update_plist", className: nil, args: [RubyCommand.Argument(name: "plist_path", value: plistPath),
+                                                                                              RubyCommand.Argument(name: "block", value: block)])
+  _ = runner.executeCommand(command)
+}
 func updateProjectCodeSigning(path: String,
                               udid: String,
                               uuid: String) {
@@ -3902,6 +3908,14 @@ func parseArray(fromString: String, function: String = #function) -> [String] {
 }
 
 func parseDictionary(fromString: String, function: String = #function) -> [String : String] {
+    return parseDictionaryHelper(fromString: fromString, function: function) as! [String: String]
+}
+
+func parseDictionary(fromString: String, function: String = #function) -> [String : Any] {
+    return parseDictionaryHelper(fromString: fromString, function: function)
+}
+
+func parseDictionaryHelper(fromString: String, function: String = #function) -> [String : Any] {
   verbose(message: "parsing an Array from data: \(fromString), from function: \(function)")
   let potentialDictionary: String
   if fromString.count < 2 {
@@ -3910,7 +3924,7 @@ func parseDictionary(fromString: String, function: String = #function) -> [Strin
   } else {
       potentialDictionary = fromString
   }
-  let dictionary: [String : String] = try! JSONSerialization.jsonObject(with: potentialDictionary.data(using: .utf8)!, options: []) as! [String : String]
+  let dictionary: [String : Any] = try! JSONSerialization.jsonObject(with: potentialDictionary.data(using: .utf8)!, options: []) as! [String : Any]
   return dictionary
 }
 
@@ -3933,4 +3947,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.14]
+// FastlaneRunnerAPIVersion [0.9.15]
