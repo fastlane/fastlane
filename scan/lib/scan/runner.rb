@@ -87,9 +87,31 @@ module Scan
         UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
       end
 
+      zip_derived_data if Scan.config[:should_zip_derived_data]
+
       if !Helper.ci? && Scan.cache[:open_html_report_path]
         `open --hide '#{Scan.cache[:open_html_report_path]}'`
       end
+    end
+
+    def zip_derived_data
+      derived_data_path = Scan.config[:derived_data_path]
+
+      # Gets derived data parent directory and derived data directory name
+      containing_directory = File.expand_path("..", derived_data_path)
+      path_to_zip = File.basename(derived_data_path)
+
+      # Gets absolute path of output directory
+      output_directory = File.absolute_path(Scan.config[:output_directory])
+      output_path = File.join(output_directory, "derived_data.zip")
+
+      # Zips derived data directory and moves it to output directory
+      command = "cd '#{containing_directory}' && zip -r '#{output_path}' #{path_to_zip}"
+
+      UI.message("Zipping derived data")
+      UI.command(command)
+      Helper.backticks(command, print: false)
+      UI.message("Succesfully zipped derived data: #{output_path}")
     end
 
     def test_results
