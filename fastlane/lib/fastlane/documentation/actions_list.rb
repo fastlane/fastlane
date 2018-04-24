@@ -115,6 +115,7 @@ module Fastlane
         details = action.details
         details.gsub!(/^>/, "") # remove Markdown quotes
         details.gsub!(/\[http[^\]]+\]\(([^)]+)\)/, '\1 🔗') # remove Markdown links
+        details.gsub!(/\[([^\]]+)\]\(([^\)]+)\)/, '"\1" (\2 🔗)') # remove Markdown links with custom text
         details.gsub!("|", "") # remove new line preserve markers
         details.split("\n").each do |detail|
           row = detail.empty? ? ' ' : detail
