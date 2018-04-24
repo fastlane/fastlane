@@ -106,5 +106,32 @@ describe Scan do
         end
       end
     end
+
+    describe "#zip_derived_data" do
+      it "doesn't zip data when :should_zip_derived_data is false", requires_xcodebuild: true do
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+          output_directory: '/tmp/scan_results',
+          project: './scan/examples/standard/app.xcodeproj',
+          should_zip_derived_data: false
+        })
+
+        scan = Scan::Runner.new
+        scan.zip_derived_data
+        expect(Fastlane::Helper).to receive(:backticks).with(anything).exactly(0).times
+      end
+
+      it "zips data when :should_zip_derived_data is true", requires_xcodebuild: true do
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+          output_directory: '/tmp/scan_results',
+          project: './scan/examples/standard/app.xcodeproj',
+          should_zip_derived_data: true
+        })
+
+        scan = Scan::Runner.new
+        scan.zip_derived_data
+        Fastlane::Helper.backticks("ls")
+        expect(Fastlane::Helper).to receive(:backticks).with(anything).and_return(anything).exactly(1).times
+      end
+    end
   end
 end

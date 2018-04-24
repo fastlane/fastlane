@@ -87,7 +87,7 @@ module Scan
         UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
       end
 
-      zip_derived_data if Scan.config[:should_zip_derived_data]
+      zip_derived_data
 
       if !Helper.ci? && Scan.cache[:open_html_report_path]
         `open --hide '#{Scan.cache[:open_html_report_path]}'`
