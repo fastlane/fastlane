@@ -30,11 +30,8 @@ module Fastlane
           UI.user_error!("Unable to unzip ipa") unless $? == 0
           # Adding extra ** for edge-case ipas where Payload directory is nested.
           app_path = Dir["#{dir}/**/Payload/*.app"].first
-          puts build_path
-          puts app_path
         else
           app_path = build_path
-          puts app_path
         end
 
         app_path
