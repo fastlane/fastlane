@@ -107,30 +107,36 @@ describe Scan do
       end
     end
 
-    describe "#zip_derived_data" do
-      it "doesn't zip data when :should_zip_derived_data is false", requires_xcodebuild: true do
+    describe "#zip_build_products" do
+      it "doesn't zip data when :should_zip_build_products is false", requires_xcodebuild: true do
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
           output_directory: '/tmp/scan_results',
           project: './scan/examples/standard/app.xcodeproj',
-          should_zip_derived_data: false
+          should_zip_build_products: false
         })
 
-        scan = Scan::Runner.new
-        scan.zip_derived_data
         expect(Fastlane::Helper).to receive(:backticks).with(anything).exactly(0).times
+
+        scan = Scan::Runner.new
+        scan.zip_build_products
       end
 
-      it "zips data when :should_zip_derived_data is true", requires_xcodebuild: true do
+      it "zips data when :should_zip_build_products is true", requires_xcodebuild: true do
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
           output_directory: '/tmp/scan_results',
+          derived_data_path: '/tmp/derived_data/app',
           project: './scan/examples/standard/app.xcodeproj',
-          should_zip_derived_data: true
+          should_zip_build_products: true
         })
 
+        path = File.join(Scan.config[:derived_data_path], "Build")
+
+        expect(Fastlane::Helper).to receive(:backticks)
+          .with("cd '#{path}' && zip -r '/tmp/scan_results/build_products.zip' Products", { print: false })
+          .exactly(1).times
+
         scan = Scan::Runner.new
-        scan.zip_derived_data
-        Fastlane::Helper.backticks("ls")
-        expect(Fastlane::Helper).to receive(:backticks).with(anything).and_return(anything).exactly(1).times
+        scan.zip_build_products
       end
     end
   end
