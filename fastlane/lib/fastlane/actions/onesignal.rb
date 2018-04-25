@@ -62,7 +62,7 @@ module Fastlane
       end
 
       def self.details
-        "You can use this action to automatically create a OneSignal application. You can also upload a .p12 with password, a GCM key, or both"
+        "You can use this action to automatically create a OneSignal application. You can also upload a `.p12` with password, a GCM key, or both."
       end
 
       def self.available_options

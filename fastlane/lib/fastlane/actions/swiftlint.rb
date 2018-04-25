@@ -67,9 +67,6 @@ module Fastlane
         "Run swift code validation using SwiftLint"
       end
 
-      def self.details
-      end
-
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :mode,

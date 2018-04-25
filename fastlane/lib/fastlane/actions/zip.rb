@@ -34,9 +34,6 @@ module Fastlane
         "Compress a file or folder to a zip"
       end
 
-      def self.details
-      end
-
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :path,

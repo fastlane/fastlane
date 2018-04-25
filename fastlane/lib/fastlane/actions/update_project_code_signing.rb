@@ -66,9 +66,10 @@ module Fastlane
       end
 
       def self.deprecated_notes
-        "You shouldn't use update_project_code_signing.\n" \
-          "Have you considered using the recommended way to do code signing?\n" \
-          "https://docs.fastlane.tools/codesigning/getting-started/"
+        [
+          "You shouldn't use `update_project_code_signing`.",
+          "Have you considered using the recommended way to do code signing: [https://docs.fastlane.tools/codesigning/getting-started/](https://docs.fastlane.tools/codesigning/getting-started/)?"
+        ].join("\n")
       end
     end
   end

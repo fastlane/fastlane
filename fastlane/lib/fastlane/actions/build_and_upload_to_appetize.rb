@@ -39,8 +39,8 @@ module Fastlane
 
       def self.details
         [
-          "This should be called from danger",
-          "More information in the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)"
+          "This should be called from danger.",
+          "More information in the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)."
         ].join("\n")
       end
 

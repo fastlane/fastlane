@@ -104,7 +104,7 @@ module Fastlane
 
       def self.details
         [
-          "You can retrieve your username and API token on [your settings page](https://deploygate.com/settings)",
+          "You can retrieve your username and API token on [your settings page](https://deploygate.com/settings).",
           "More information about the available options can be found in the [DeployGate Push API document](https://deploygate.com/docs/api)."
         ].join("\n")
       end

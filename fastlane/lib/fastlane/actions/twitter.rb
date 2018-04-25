@@ -23,7 +23,7 @@ module Fastlane
       end
 
       def self.details
-        "Post a tweet on twitter. Requires you to setup an app on twitter.com and obtain consumer and access_token."
+        "Post a tweet on Twitter. Requires you to setup an app on [twitter.com](https://twitter.com) and obtain `consumer` and `access_token`."
       end
 
       def self.available_options

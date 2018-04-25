@@ -16,10 +16,6 @@ module Fastlane
         "Executes a git submodule command"
       end
 
-      def self.details
-        nil
-      end
-
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :recursive,

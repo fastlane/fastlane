@@ -31,7 +31,7 @@ module Fastlane
       end
 
       def self.details
-        "More information: https://docs.fastlane.tools/actions/supply/"
+        "More information: [https://docs.fastlane.tools/actions/supply/](https://docs.fastlane.tools/actions/supply/)"
       end
 
       def self.available_options

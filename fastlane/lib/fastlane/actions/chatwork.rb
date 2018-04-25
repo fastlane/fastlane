@@ -72,7 +72,7 @@ module Fastlane
       end
 
       def self.details
-        "Information on how to obtain an API token: http://developer.chatwork.com/ja/authenticate.html"
+        "Information on how to obtain an API token: [http://developer.chatwork.com/ja/authenticate.html](http://developer.chatwork.com/ja/authenticate.html)"
       end
 
       def self.example_code

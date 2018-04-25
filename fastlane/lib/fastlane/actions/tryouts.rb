@@ -62,7 +62,7 @@ module Fastlane
       end
 
       def self.details
-        "More information http://tryouts.readthedocs.org/en/latest/releases.html#create-release"
+        "More information: [http://tryouts.readthedocs.org/en/latest/releases.html#create-release](http://tryouts.readthedocs.org/en/latest/releases.html#create-release)"
       end
 
       def self.available_options

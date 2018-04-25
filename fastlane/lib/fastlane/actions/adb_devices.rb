@@ -19,9 +19,7 @@ module Fastlane
       end
 
       def self.details
-        [
-          "Fetches device list via adb, e.g. run an adb command on all connected devices."
-        ].join("\n")
+        "Fetches device list via adb, e.g. run an adb command on all connected devices."
       end
 
       def self.available_options

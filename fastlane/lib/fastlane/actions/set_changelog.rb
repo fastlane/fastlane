@@ -85,7 +85,7 @@ module Fastlane
         [
           "This is useful if you have only one changelog for all languages.",
           "You can store the changelog in `#{default_changelog_path}` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same \"What's new\"-text for all languages.",
-          "Defining the version is optional, fastlane will try to automatically detect it if you don't provide one"
+          "Defining the version is optional. _fastlane_ will try to automatically detect it if you don't provide one."
         ].join("\n")
       end
 

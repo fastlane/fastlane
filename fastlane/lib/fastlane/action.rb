@@ -46,7 +46,7 @@ module Fastlane
     end
 
     def self.details
-      nil # this is your change to provide a more detailed description of this action
+      nil # this is your chance to provide a more detailed description of this action
     end
 
     def self.available_options
@@ -150,5 +150,40 @@ module Fastlane
     def self.deprecated_notes
       nil
     end
+  end
+end
+
+class String
+  def markdown_preserve_newlines
+    self.gsub(/(\n|$)/, '|\1') # prepend new lines with "|" so the erb template knows *not* to replace them with "<br>"s
+  end
+
+  def markdown_sample(is_first = false)
+    self.markdown_clean_heredoc!
+    self.markdown_details(is_first)
+  end
+
+  def markdown_list(is_first = false)
+    self.markdown_clean_heredoc!
+    self.gsub!(/^/, "- ") # add list dashes
+    self.prepend(">") unless is_first # the empty line that will be added breaks the quote
+    self.markdown_details(is_first)
+  end
+
+  def markdown_details(is_first)
+    self.prepend("\n") unless is_first
+    self << "\n>" # continue the quote
+    self.markdown_preserve_newlines
+  end
+
+  def markdown_clean_heredoc!
+    self.chomp! # remove the last new line added by the heredoc
+    self.dedent! # remove the leading whitespace (similar to the squigly heredoc `<<~`)
+  end
+
+  def dedent!
+    first_line_indent = self.match(/^\s*/)[0]
+
+    self.gsub!(/^#{first_line_indent}/, "")
   end
 end

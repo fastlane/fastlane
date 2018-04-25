@@ -48,7 +48,7 @@ module Fastlane
       end
 
       def self.details
-        "You can use this action to get the number of commits of this branch. This is useful if you want to set the build number to the number of commits. See `fastlane actions number_of_commits` for more details"
+        "You can use this action to get the number of commits of this branch. This is useful if you want to set the build number to the number of commits. See `fastlane actions number_of_commits` for more details."
       end
 
       def self.authors
