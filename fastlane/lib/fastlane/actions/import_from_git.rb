@@ -14,10 +14,7 @@ module Fastlane
       end
 
       def self.details
-        [
-          "This is useful if you have shared lanes across multiple apps and you want to store the Fastfile",
-          "in a remote git repository."
-        ].join("\n")
+        "This is useful if you have shared lanes across multiple apps and you want to store the Fastfile in a remote git repository."
       end
 
       def self.available_options

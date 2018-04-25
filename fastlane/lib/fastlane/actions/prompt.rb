@@ -34,8 +34,8 @@ module Fastlane
 
       def self.details
         [
-          "You can use `prompt` to ask the user for a value or to just let the user confirm the next step",
-          "When this is executed on a CI service, the passed `ci_input` value will be returned",
+          "You can use `prompt` to ask the user for a value or to just let the user confirm the next step.",
+          "When this is executed on a CI service, the passed `ci_input` value will be returned.",
           "This action also supports multi-line inputs using the `multi_line_end_keyword` option."
         ].join("\n")
       end

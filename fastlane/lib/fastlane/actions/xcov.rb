@@ -15,7 +15,7 @@ module Fastlane
       def self.details
         [
           "Create nice code coverage reports and post coverage summaries on Slack *(xcov gem is required)*.",
-          "More information: https://github.com/nakiostudio/xcov"
+          "More information: [https://github.com/nakiostudio/xcov](https://github.com/nakiostudio/xcov)."
         ].join("\n")
       end
 

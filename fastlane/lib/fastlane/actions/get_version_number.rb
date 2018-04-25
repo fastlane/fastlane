@@ -106,9 +106,7 @@ module Fastlane
       end
 
       def self.details
-        [
-          "This action will return the current version number set on your project."
-        ].join(' ')
+        "This action will return the current version number set on your project."
       end
 
       def self.available_options

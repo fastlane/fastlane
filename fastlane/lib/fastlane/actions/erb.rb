@@ -19,8 +19,8 @@ module Fastlane
 
       def self.details
         [
-          "Renders an ERB template with `placeholders` given as a hash via parameter,",
-          "if no :destination is set, returns rendered template as string"
+          "Renders an ERB template with `:placeholders` given as a hash via parameter.",
+          "If no `:destination` is set, it returns the rendered template as string."
         ].join("\n")
       end
 

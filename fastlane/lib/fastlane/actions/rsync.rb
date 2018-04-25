@@ -22,7 +22,7 @@ module Fastlane
       end
 
       def self.details
-        "A wrapper around rsync, rsync is a tool that lets you synchronize files, including permissions and so on for a more detailed information about rsync please see rsync(1) manpage."
+        "A wrapper around `rsync`, which is a tool that lets you synchronize files, including permissions and so on. For a more detailed information about `rsync`, please see [rsync(1) man page](https://linux.die.net/man/1/rsync)."
       end
 
       def self.available_options
