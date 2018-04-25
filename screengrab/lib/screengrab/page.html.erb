@@ -65,12 +65,12 @@
     </style>
   </head>
   <body><% image_counter = 0 %><% @data.each do |language, content| %>
-    <h1 class="language"><%= language %></h1>
+    <h1 id="<%= language %>" class="language"><%= language %></h1>
     <hr>
     <table><% content.each do |device_name, screens| %>
       <tr>
         <th colspan="<%= screens.count %>">
-          <span class="deviceName"><%= device_name %></span>
+          <span id="<%= language %>-<%= device_name %>" class="deviceName"><%= device_name %></span>
         </th>
       </tr>
       <tr><% screens.each do |screen_path| %><% next if screen_path.include?"_framed.png" %>
