@@ -99,15 +99,14 @@ module Scan
       derived_data_path = Scan.config[:derived_data_path]
 
       # Gets derived data parent directory and derived data directory name
-      containing_directory = File.join(derived_data_path, "Build")
-      path_to_zip = "Products"
+      containing_directory = File.join(derived_data_path, "Build/Products")
 
       # Gets absolute path of output directory
       output_directory = File.absolute_path(Scan.config[:output_directory])
       output_path = File.join(output_directory, "build_products.zip")
 
       # Zips derived data directory and moves it to output directory
-      command = "cd '#{containing_directory}' && zip -r '#{output_path}' #{path_to_zip}"
+      command = "cd '#{containing_directory}' && zip -r '#{output_path}' *"
 
       UI.message("Zipping derived data")
       UI.command(command)

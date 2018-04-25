@@ -129,10 +129,10 @@ describe Scan do
           should_zip_build_products: true
         })
 
-        path = File.join(Scan.config[:derived_data_path], "Build")
+        path = File.join(Scan.config[:derived_data_path], "Build/Products")
 
         expect(Fastlane::Helper).to receive(:backticks)
-          .with("cd '#{path}' && zip -r '/tmp/scan_results/build_products.zip' Products", { print: false })
+          .with("cd '#{path}' && zip -r '/tmp/scan_results/build_products.zip' *", { print: false })
           .exactly(1).times
 
         scan = Scan::Runner.new
