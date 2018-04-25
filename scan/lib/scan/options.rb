@@ -151,6 +151,12 @@ module Scan
                                      env_name: "SCAN_MAX_CONCURRENT_SIMULATORS",
                                      description: "Constrain the number of simulator devices on which to test concurrently. Equivalent to -maximum-concurrent-test-simulator-destinations",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :disable_concurrent_testing,
+                                     type: Boolean,
+                                     default_value: false,
+                                     env_name: "SCAN_DISABLE_CONCURRENT_TESTING",
+                                     description: "Do not run test bundles in parallel on the specified destinations. Testing will occur on each destination serially. Equivalent to -disable-concurrent-testing",
+                                     optional: true),
 
         FastlaneCore::ConfigItem.new(key: :test_without_building,
                                      short_option: "-T",
