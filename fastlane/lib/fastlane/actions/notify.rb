@@ -33,7 +33,7 @@ module Fastlane
       end
 
       def self.deprecated_notes
-        "It's recommended to use the new 'notification' method instead of 'notify'"
+        "It's recommended to use the new `notification` action instead of `notify`"
       end
     end
   end

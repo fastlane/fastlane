@@ -19,9 +19,7 @@ module Fastlane
       end
 
       def self.details
-        [
-          "see adb --help for more details"
-        ].join("\n")
+        "see adb --help for more details"
       end
 
       def self.available_options

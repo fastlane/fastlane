@@ -25,10 +25,6 @@ module Fastlane
         "Checks if the git tag with the given name exists in the current repo"
       end
 
-      def self.details
-        nil
-      end
-
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :tag,

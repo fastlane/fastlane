@@ -28,7 +28,7 @@ module Fastlane
       end
 
       def self.details
-        "This is useful for introspecting Info.plist files for .ipa files that have already been built."
+        "This is useful for introspecting Info.plist files for `.ipa` files that have already been built."
       end
 
       def self.available_options
