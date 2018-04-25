@@ -146,6 +146,10 @@ module Scan
                                      env_name: "SCAN_FORMATTER",
                                      description: "A custom xcpretty formatter to use",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :max_concurrent_simulators,
+                                     env_name: "SCAN_MAX_CONCURRENT_SIMULATORS",
+                                     description: "Constrain the number of simulator devices on which to test concurrently. Equivalent to -maximum-concurrent-test-simulator-destinations",
+                                     optional: true),
 
         FastlaneCore::ConfigItem.new(key: :test_without_building,
                                      short_option: "-T",
