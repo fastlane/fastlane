@@ -52,7 +52,6 @@ module Fastlane
 
     def self.lane_name_from_swift_line(potential_lane_line: nil)
       function_name_match = SWIFT_FUNCTION_REGEX.match(potential_lane_line)
-
       unless function_name_match
         return nil
       end
