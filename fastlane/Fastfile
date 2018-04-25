@@ -358,8 +358,10 @@ lane :update_docs do |options|
       File.expand_path(current_output_path) # to make sure we commit the change
     end
 
-    Bundler.with_clean_env do
-      sh("bundle update")
+    unless options[:skip_bundle_update]
+      Bundler.with_clean_env do
+        sh("bundle update")
+      end
     end
 
     if `git status --porcelain`.length == 0
