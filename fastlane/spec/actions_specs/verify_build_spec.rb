@@ -8,7 +8,7 @@ describe Fastlane do
       let(:correctly_signed_app) { File.expand_path("./fastlane_core/spec/fixtures/bundles/very-capable-app.app") }
       let(:correctly_signed_app_with_spaces) { File.expand_path("./fastlane_core/spec/fixtures/bundles/very capable app.app") }
       let(:incorrectly_signed_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/ContainsWatchApp.ipa") }
-      let(:ipa_path_with_spaces) { File.expand_path("./fastlane_core/spec/fixtures/ipas/iOS App With Spaces.ipa") }
+      let(:simulator_app) { File.expand_path("./fastlane_core/spec/fixtures/bundles/simulator-app.app") }
       let(:expected_title) { "Summary for verify_build #{Fastlane::VERSION}" }
       let(:expected_app_info) do
         {
@@ -186,6 +186,17 @@ describe Fastlane do
             )
           end").runner.execute(:test)
         end.to raise_error("Unable to unzip ipa")
+      end
+
+      it "raises an error if app is built for iOS simulator" do
+        expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to extract profile").and_call_original
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            verify_build(
+              build_path: '#{simulator_app}'
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Unable to extract profile")
       end
     end
   end

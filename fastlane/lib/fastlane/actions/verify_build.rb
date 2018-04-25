@@ -28,9 +28,13 @@ module Fastlane
         if File.extname(build_path) =~ /\.(ipa|zip)/
           `unzip #{build_path.shellescape} -d #{dir.shellescape} -x '__MACOSX/*' '*.DS_Store'`
           UI.user_error!("Unable to unzip ipa") unless $? == 0
-          app_path = Dir["#{dir}/Payload/*.app"].first
+          # Adding extra ** for edge-case ipas where Payload directory is nested.
+          app_path = Dir["#{dir}/**/Payload/*.app"].first
+          puts build_path
+          puts app_path
         else
           app_path = build_path
+          puts app_path
         end
 
         app_path
