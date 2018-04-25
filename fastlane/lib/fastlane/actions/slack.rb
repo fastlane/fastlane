@@ -40,7 +40,7 @@ module Fastlane
         return [notifier, slack_attachment] if Helper.test? # tests will verify the slack attachments and other properties
 
         begin
-          results = notifier.ping('', icon_url: icon_url, attachments: [slack_attachment])
+          results = notifier.ping(text: options[:message], fallback: options[:message], link_names: options[:link_names], icon_url: icon_url, attachments: [slack_attachment])
         rescue => exception
           UI.error("Exception: #{exception}")
         ensure
@@ -124,6 +124,12 @@ module Fastlane
                                        description: "Should an error sending the slack notification cause a failure? (true/false)",
                                        optional: true,
                                        default_value: true,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :link_names,
+                                       env_name: "FL_SLACK_LINK_NAMES",
+                                       description: "Find and link channel names and usernames. (true/false)",
+                                       optional: true,
+                                       default_value: false,
                                        is_string: false)
         ]
       end
@@ -175,8 +181,6 @@ module Fastlane
         should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].join(" ").include?(payload_name.to_s) }
 
         slack_attachment = {
-          fallback: options[:message],
-          text: options[:message],
           color: color,
           mrkdwn_in: ["pretext", "text", "fields", "message"],
           fields: []
