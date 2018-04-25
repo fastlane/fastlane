@@ -4,8 +4,11 @@ describe Fastlane do
       let(:no_such_file) { "no-such-file.ipa" }
       let(:not_an_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/not-an-ipa.ipa") }
       let(:correctly_signed_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/very-capable-app.ipa") }
+      let(:correctly_signed_ipa_with_spaces) { File.expand_path("./fastlane_core/spec/fixtures/ipas/very capable app.ipa") }
       let(:correctly_signed_app) { File.expand_path("./fastlane_core/spec/fixtures/bundles/very-capable-app.app") }
+      let(:correctly_signed_app_with_spaces) { File.expand_path("./fastlane_core/spec/fixtures/bundles/very capable app.app") }
       let(:incorrectly_signed_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/ContainsWatchApp.ipa") }
+      let(:ipa_path_with_spaces) { File.expand_path("./fastlane_core/spec/fixtures/ipas/iOS App With Spaces.ipa") }
       let(:expected_title) { "Summary for verify_build #{Fastlane::VERSION}" }
       let(:expected_app_info) do
         {
@@ -43,12 +46,32 @@ describe Fastlane do
           end").runner.execute(:test)
         end
 
+        it "uses ipa set via ipa_path that contains spaces" do
+          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_app_info, title: expected_title)
+          expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
+          Fastlane::FastFile.new.parse("lane :test do
+            verify_build(
+              ipa_path: '#{correctly_signed_ipa_with_spaces}'
+            )
+          end").runner.execute(:test)
+        end
+
         it "uses app bundle set via build_path" do
           expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_app_info, title: expected_title)
           expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
           Fastlane::FastFile.new.parse("lane :test do
             verify_build(
               build_path: '#{correctly_signed_app}'
+            )
+          end").runner.execute(:test)
+        end
+
+        it "uses app bundle set via build_path that contains spaces" do
+          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_app_info, title: expected_title)
+          expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
+          Fastlane::FastFile.new.parse("lane :test do
+            verify_build(
+              build_path: '#{correctly_signed_app_with_spaces}'
             )
           end").runner.execute(:test)
         end

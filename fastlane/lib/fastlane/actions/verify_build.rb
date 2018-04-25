@@ -26,10 +26,9 @@ module Fastlane
         build_path = File.expand_path(build_path)
 
         if File.extname(build_path) =~ /\.(ipa|zip)/
-          `unzip #{build_path} -d #{dir} -x '__MACOSX/*' '*.DS_Store'`
+          `unzip #{build_path.shellescape} -d #{dir.shellescape} -x '__MACOSX/*' '*.DS_Store'`
           UI.user_error!("Unable to unzip ipa") unless $? == 0
-
-          app_path = Dir["#{dir}/**/Payload/*.app"].first
+          app_path = Dir["#{dir}/Payload/*.app"].first
         else
           app_path = build_path
         end
@@ -38,7 +37,7 @@ module Fastlane
       end
 
       def self.gather_cert_info(app_path)
-        cert_info = `codesign -vv -d #{app_path} 2>&1`
+        cert_info = `codesign -vv -d #{app_path.shellescape} 2>&1`
         UI.user_error!("Unable to verify code signing") unless $? == 0
 
         values = {}
@@ -61,7 +60,7 @@ module Fastlane
       end
 
       def self.update_with_profile_info(app_path, values)
-        profile = `cat #{app_path}/embedded.mobileprovision | security cms -D`
+        profile = `cat #{app_path.shellescape}/embedded.mobileprovision | security cms -D`
         UI.user_error!("Unable to extract profile") unless $? == 0
 
         plist = Plist.parse_xml(profile)
