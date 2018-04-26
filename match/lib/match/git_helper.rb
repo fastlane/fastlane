@@ -14,7 +14,8 @@ module Match
                    branch: "master",
                    git_full_name: nil,
                    git_user_email: nil,
-                   clone_branch_directly: false)
+                   clone_branch_directly: false,
+                   digest: nil)
       # Note: if you modify the parameters above, don't forget to also update the method call in
       # - runner.rb
       # - nuke.rb
@@ -69,7 +70,7 @@ module Match
         return self.clone(git_url, shallow_clone)
       end
 
-      Encrypt.new.decrypt_repo(path: @dir, git_url: git_url, manual_password: manual_password)
+      Encrypt.new.decrypt_repo(path: @dir, git_url: git_url, manual_password: manual_password, digest: digest)
 
       return @dir
     end
@@ -92,12 +93,12 @@ module Match
       end
     end
 
-    def self.commit_changes(path, message, git_url, branch = "master", files_to_commmit = nil)
+    def self.commit_changes(path, message, git_url, branch = "master", files_to_commmit = nil, digest: nil)
       files_to_commmit ||= []
       Dir.chdir(path) do
         return if `git status`.include?("nothing to commit")
 
-        Encrypt.new.encrypt_repo(path: path, git_url: git_url)
+        Encrypt.new.encrypt_repo(path: path, git_url: git_url, digest: digest)
         commands = []
 
         if files_to_commmit.count > 0 # e.g. for nuke this is treated differently

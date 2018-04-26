@@ -27,7 +27,8 @@ module Match
                                            branch: params[:git_branch],
                                            git_full_name: params[:git_full_name],
                                            git_user_email: params[:git_user_email],
-                                           clone_branch_directly: params[:clone_branch_directly])
+                                           clone_branch_directly: params[:clone_branch_directly],
+                                           digest: params[:digest])
 
       unless params[:readonly]
         self.spaceship = SpaceshipEnsure.new(params[:username])
@@ -69,7 +70,7 @@ module Match
       # Done
       if self.files_to_commmit.count > 0 and !params[:readonly]
         message = GitHelper.generate_commit_message(params)
-        GitHelper.commit_changes(params[:workspace], message, params[:git_url], params[:git_branch], self.files_to_commmit)
+        GitHelper.commit_changes(params[:workspace], message, params[:git_url], params[:git_branch], self.files_to_commmit, digest: params[:digest])
       end
 
       # Print a summary table for each app_identifier

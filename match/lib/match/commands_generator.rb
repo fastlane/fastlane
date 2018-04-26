@@ -112,7 +112,8 @@ module Match
           decrypted_repo = Match::GitHelper.clone(params[:git_url],
                                                   params[:shallow_clone],
                                                   branch: params[:git_branch],
-                                                  clone_branch_directly: params[:clone_branch_directly])
+                                                  clone_branch_directly: params[:clone_branch_directly],
+                                                  digest: params[:digest])
           UI.success "Repo is at: '#{decrypted_repo}'"
         end
       end

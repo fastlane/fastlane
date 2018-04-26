@@ -29,6 +29,13 @@ module Match
                                          UI.user_error!("Unsupported environment #{value}, must be in #{Match.environments.join(', ')}")
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :digest,
+                                       short_option: "-m",
+                                       env_name: "MATCH_DIGEST",
+                                       description: "Specify the Message Digest to use for crypt routines",
+                                       is_string: true,
+                                       default_value: "md5"),
+
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "MATCH_APP_IDENTIFIER",

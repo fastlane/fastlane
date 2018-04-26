@@ -17,12 +17,13 @@ module Match
                                   branch: params[:git_branch],
                                   git_full_name: params[:git_full_name],
                                   git_user_email: params[:git_user_email],
-                                  clone_branch_directly: params[:clone_branch_directly])
+                                  clone_branch_directly: params[:clone_branch_directly],
+                                  digest: params[:digest])
       Encrypt.new.clear_password(params[:git_url])
       Encrypt.new.store_password(params[:git_url], to)
 
       message = "[fastlane] Changed passphrase"
-      GitHelper.commit_changes(workspace, message, params[:git_url], params[:git_branch])
+      GitHelper.commit_changes(workspace, message, params[:git_url], params[:git_branch], digest: params[:digest])
     end
 
     def self.ask_password(message: "Passphrase for Git Repo: ", confirm: true)
