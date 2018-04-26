@@ -21,20 +21,24 @@ module Fastlane
       end
 
       def self.app_path(params, dir)
-        ipa_path = params[:ipa_path] || Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || ''
-        UI.user_error!("Unable to find ipa file '#{ipa_path}'.") unless File.exist?(ipa_path)
-        ipa_path = File.expand_path(ipa_path)
+        build_path = params[:ipa_path] || params[:build_path] || Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || ''
+        UI.user_error!("Unable to find file '#{build_path}'") unless File.exist?(build_path)
+        build_path = File.expand_path(build_path)
 
-        `unzip '#{ipa_path}' -d #{dir}`
-        UI.user_error!("Unable to unzip ipa") unless $? == 0
-
-        app_path = File.expand_path("#{dir}/Payload/*.app")
+        if File.extname(build_path) =~ /\.(ipa|zip)/
+          `unzip #{build_path.shellescape} -d #{dir.shellescape} -x '__MACOSX/*' '*.DS_Store'`
+          UI.user_error!("Unable to unzip ipa") unless $? == 0
+          # Adding extra ** for edge-case ipas where Payload directory is nested.
+          app_path = Dir["#{dir}/**/Payload/*.app"].first
+        else
+          app_path = build_path
+        end
 
         app_path
       end
 
       def self.gather_cert_info(app_path)
-        cert_info = `codesign -vv -d #{app_path} 2>&1`
+        cert_info = `codesign -vv -d #{app_path.shellescape} 2>&1`
         UI.user_error!("Unable to verify code signing") unless $? == 0
 
         values = {}
@@ -57,7 +61,7 @@ module Fastlane
       end
 
       def self.update_with_profile_info(app_path, values)
-        profile = `cat #{app_path}/embedded.mobileprovision | security cms -D`
+        profile = `cat #{app_path.shellescape}/embedded.mobileprovision | security cms -D`
         UI.user_error!("Unable to extract profile") unless $? == 0
 
         plist = Plist.parse_xml(profile)
@@ -149,6 +153,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :ipa_path,
                                        env_name: "FL_VERIFY_BUILD_IPA_PATH",
                                        description: "Explicitly set the ipa path",
+                                       conflicting_options: [:build_path],
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :build_path,
+                                       env_name: "FL_VERIFY_BUILD_BUILD_PATH",
+                                       description: "Explicitly set the ipa or app path",
+                                       conflicting_options: [:ipa_path],
                                        optional: true)
         ]
       end

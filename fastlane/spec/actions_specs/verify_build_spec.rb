@@ -4,7 +4,11 @@ describe Fastlane do
       let(:no_such_file) { "no-such-file.ipa" }
       let(:not_an_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/not-an-ipa.ipa") }
       let(:correctly_signed_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/very-capable-app.ipa") }
+      let(:correctly_signed_ipa_with_spaces) { File.expand_path("./fastlane_core/spec/fixtures/ipas/very capable app.ipa") }
+      let(:correctly_signed_app) { File.expand_path("./fastlane_core/spec/fixtures/bundles/very-capable-app.app") }
+      let(:correctly_signed_app_with_spaces) { File.expand_path("./fastlane_core/spec/fixtures/bundles/very capable app.app") }
       let(:incorrectly_signed_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/ContainsWatchApp.ipa") }
+      let(:simulator_app) { File.expand_path("./fastlane_core/spec/fixtures/bundles/simulator-app.app") }
       let(:expected_title) { "Summary for verify_build #{Fastlane::VERSION}" }
       let(:expected_app_info) do
         {
@@ -28,18 +32,85 @@ describe Fastlane do
           expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_app_info, title: expected_title)
           expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
           Fastlane::FastFile.new.parse("lane :test do
-                verify_build
-            end").runner.execute(:test)
+            verify_build
+          end").runner.execute(:test)
         end
 
         it "uses ipa set via ipa_path" do
           expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_app_info, title: expected_title)
           expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
           Fastlane::FastFile.new.parse("lane :test do
-                verify_build(
-                    ipa_path: '#{correctly_signed_ipa}'
-                )
+            verify_build(
+              ipa_path: '#{correctly_signed_ipa}'
+            )
+          end").runner.execute(:test)
+        end
+
+        it "uses ipa set via ipa_path that contains spaces" do
+          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_app_info, title: expected_title)
+          expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
+          Fastlane::FastFile.new.parse("lane :test do
+            verify_build(
+              ipa_path: '#{correctly_signed_ipa_with_spaces}'
+            )
+          end").runner.execute(:test)
+        end
+
+        it "uses app bundle set via build_path" do
+          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_app_info, title: expected_title)
+          expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
+          Fastlane::FastFile.new.parse("lane :test do
+            verify_build(
+              build_path: '#{correctly_signed_app}'
+            )
+          end").runner.execute(:test)
+        end
+
+        it "uses app bundle set via build_path that contains spaces" do
+          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_app_info, title: expected_title)
+          expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
+          Fastlane::FastFile.new.parse("lane :test do
+            verify_build(
+              build_path: '#{correctly_signed_app_with_spaces}'
+            )
+          end").runner.execute(:test)
+        end
+
+        it "raises an error if app is built for iOS simulator" do
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to extract profile").and_call_original
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              verify_build(
+                build_path: '#{simulator_app}'
+              )
             end").runner.execute(:test)
+          end.to raise_error("Unable to extract profile")
+        end
+      end
+
+      describe "Conflicting options" do
+        it "raises an error if both build_path and ipa_path options are specified" do
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Unresolved conflict between options: 'build_path' and 'ipa_path'").and_call_original
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              verify_build(
+                build_path: 'path/to/build',
+                ipa_path: 'path/to/ipa'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Unresolved conflict between options: 'build_path' and 'ipa_path'")
+        end
+
+        it "raises an error if both ipa_path and build_path options are specified" do
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Unresolved conflict between options: 'ipa_path' and 'build_path'").and_call_original
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              verify_build(
+                ipa_path: 'path/to/ipa',
+                build_path: 'path/to/build'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Unresolved conflict between options: 'ipa_path' and 'build_path'")
         end
       end
 
@@ -47,36 +118,62 @@ describe Fastlane do
         it "raises an error if ipa file path set via lane context does not exist" do
           Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::IPA_OUTPUT_PATH] = no_such_file
 
-          expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to find ipa file '#{no_such_file}'.").and_call_original
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to find file '#{no_such_file}'").and_call_original
           expect do
             Fastlane::FastFile.new.parse("lane :test do
-                verify_build
+              verify_build
             end").runner.execute(:test)
-          end.to raise_error("Unable to find ipa file '#{no_such_file}'.")
+          end.to raise_error("Unable to find file '#{no_such_file}'")
         end
 
         it "raises an error if specified ipa file does not exist" do
-          expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to find ipa file '#{no_such_file}'.").and_call_original
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to find file '#{no_such_file}'").and_call_original
           expect do
             Fastlane::FastFile.new.parse("lane :test do
-                verify_build(
-                    ipa_path: '#{no_such_file}'
-                )
+              verify_build(
+                ipa_path: '#{no_such_file}'
+              )
             end").runner.execute(:test)
-          end.to raise_error("Unable to find ipa file '#{no_such_file}'.")
+          end.to raise_error("Unable to find file '#{no_such_file}'")
         end
 
         it "ignores ipa path from lane context if custom ipa is specified" do
           Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::IPA_OUTPUT_PATH] = correctly_signed_ipa
 
-          expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to find ipa file '#{no_such_file}'.").and_call_original
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to find file '#{no_such_file}'").and_call_original
           expect do
             Fastlane::FastFile.new.parse("lane :test do
-                verify_build(
-                    ipa_path: '#{no_such_file}'
-                )
+              verify_build(
+                ipa_path: '#{no_such_file}'
+              )
             end").runner.execute(:test)
-          end.to raise_error("Unable to find ipa file '#{no_such_file}'.")
+          end.to raise_error("Unable to find file '#{no_such_file}'")
+        end
+      end
+
+      describe "Missing build file" do
+        it "raises an error if specified build file does not exist" do
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to find file '#{no_such_file}'").and_call_original
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              verify_build(
+                build_path: '#{no_such_file}'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Unable to find file '#{no_such_file}'")
+        end
+
+        it "ignores ipa path from lane context if custom build path is specified" do
+          Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::IPA_OUTPUT_PATH] = correctly_signed_ipa
+
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to find file '#{no_such_file}'").and_call_original
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              verify_build(
+                build_path: '#{no_such_file}'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Unable to find file '#{no_such_file}'")
         end
       end
 
@@ -84,9 +181,9 @@ describe Fastlane do
         expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to verify code signing").and_call_original
         expect do
           Fastlane::FastFile.new.parse("lane :test do
-              verify_build(
-                  ipa_path: '#{incorrectly_signed_ipa}'
-              )
+            verify_build(
+              build_path: '#{incorrectly_signed_ipa}'
+            )
           end").runner.execute(:test)
         end.to raise_error("Unable to verify code signing")
       end
@@ -95,9 +192,9 @@ describe Fastlane do
         expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to unzip ipa").and_call_original
         expect do
           Fastlane::FastFile.new.parse("lane :test do
-              verify_build(
-                  ipa_path: '#{not_an_ipa}'
-              )
+            verify_build(
+              ipa_path: '#{not_an_ipa}'
+            )
           end").runner.execute(:test)
         end.to raise_error("Unable to unzip ipa")
       end
