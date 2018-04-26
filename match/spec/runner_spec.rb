@@ -23,7 +23,7 @@ describe Match do
       profile_path = "./match/spec/fixtures/test.mobileprovision"
       destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
 
-      expect(Match::GitHelper).to receive(:clone).with(git_url, true, skip_docs: false, branch: "master", git_full_name: nil, git_user_email: nil, clone_branch_directly: false).and_return(repo_dir)
+      expect(Match::GitHelper).to receive(:clone).with(git_url, true, skip_docs: false, branch: "master", git_full_name: nil, git_user_email: nil, clone_branch_directly: false, digest: "md5").and_return(repo_dir)
       expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution).and_return(cert_path)
       expect(Match::Generator).to receive(:generate_provisioning_profile).with(params: config,
                                                                             prov_type: :appstore,
@@ -39,7 +39,7 @@ describe Match do
           File.join(repo_dir, "something.cer"),
           File.join(repo_dir, "something.p12"), # this is important, as a cert consists out of 2 files
           "./match/spec/fixtures/test.mobileprovision"
-        ]
+        ], digest: "md5"
       )
 
       spaceship = "spaceship"
@@ -74,7 +74,7 @@ describe Match do
       cert_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.cer"
       key_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.p12"
 
-      expect(Match::GitHelper).to receive(:clone).with(git_url, false, skip_docs: false, branch: "master", git_full_name: nil, git_user_email: nil, clone_branch_directly: false).and_return(repo_dir)
+      expect(Match::GitHelper).to receive(:clone).with(git_url, false, skip_docs: false, branch: "master", git_full_name: nil, git_user_email: nil, clone_branch_directly: false, digest: "md5").and_return(repo_dir)
       expect(Match::Utils).to receive(:import).with(key_path, keychain, password: nil).and_return(nil)
       expect(Match::GitHelper).to_not receive(:commit_changes)
 

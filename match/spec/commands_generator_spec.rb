@@ -79,7 +79,7 @@ describe Match::CommandsGenerator do
     it "can use the git_url short flag from tool options" do
       stub_commander_runner_args(['decrypt', '-r', 'git@github.com:you/your_repo.git'])
 
-      expect_githelper_clone_with('git@github.com:you/your_repo.git', false, { branch: 'master', clone_branch_directly: false })
+      expect_githelper_clone_with('git@github.com:you/your_repo.git', false, { branch: 'master', clone_branch_directly: false, digest: 'md5' })
 
       Match::CommandsGenerator.start
     end
@@ -87,7 +87,7 @@ describe Match::CommandsGenerator do
     it "can use the shallow_clone flag from tool options" do
       stub_commander_runner_args(['decrypt', '-r', 'git@github.com:you/your_repo.git', '--shallow_clone', 'true'])
 
-      expect_githelper_clone_with('git@github.com:you/your_repo.git', true, { branch: 'master', clone_branch_directly: false })
+      expect_githelper_clone_with('git@github.com:you/your_repo.git', true, { branch: 'master', clone_branch_directly: false, digest: "md5" })
 
       Match::CommandsGenerator.start
     end
