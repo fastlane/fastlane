@@ -1,5 +1,4 @@
 require "securerandom"
-
 require_relative '../client'
 require_relative '../du/du_client'
 require_relative '../du/upload_file'
@@ -11,7 +10,6 @@ require_relative 'iap_subscription_pricing_tier'
 require_relative 'pricing_tier'
 require_relative 'territory'
 require_relative 'user_detail'
-
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -613,8 +611,10 @@ module Spaceship
       # API will error out if cleared_for_preorder is false and app_available_date has a date
       cleared_for_preorder = availability.cleared_for_preorder
       app_available_date = cleared_for_preorder ? availability.app_available_date : nil
+      data["b2bAppEnabled"] = availability.b2b_app_enabled
       data["preOrder"]["clearedForPreOrder"] = { "value" => cleared_for_preorder, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
       data["preOrder"]["appAvailableDate"] = { "value" => app_available_date, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
+      data["b2bUsers"] = availability.b2b_app_enabled ? availability.b2b_users.map { |user| { "value" => { "add" => user.add, "delete" => user.delete, "dsUsername" => user.ds_username } } } : []
 
       # send the changes back to Apple
       r = request(:post) do |req|
