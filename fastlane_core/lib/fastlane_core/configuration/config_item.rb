@@ -32,7 +32,7 @@ module FastlaneCore
 
     # An optional block which is called when a new value is set.
     #   Check value is valid. This could be type checks or if a folder/file exists
-    #   You have to raise a specific exception if something goes wrong. Append .red after the string
+    #   You have to raise a specific exception if something goes wrong. Use `user_error!` for the message
     attr_accessor :verify_block
 
     # [Boolean] is false by default. If set to true, also string values will not be asked to the user
