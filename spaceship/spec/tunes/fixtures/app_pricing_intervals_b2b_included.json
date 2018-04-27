@@ -1,0 +1,102 @@
+{
+  "data": {
+    "sectionErrorKeys": [
+
+    ],
+    "sectionInfoKeys": [
+
+    ],
+    "sectionWarningKeys": [
+
+    ],
+    "countriesChanged": false,
+    "countries": [
+      {
+        "code": "GB",
+        "name": "United Kingdom",
+        "region": "Europe",
+        "regionLocaleKey": "ITC.region.EUR",
+        "currencyCodeISO3A": "GBP"
+      },
+      {
+        "code": "US",
+        "name": "United States",
+        "region": "The United States and Canada",
+        "regionLocaleKey": "ITC.region.NAM",
+        "currencyCodeISO3A": "USD"
+      }
+    ],
+    "b2BAppFlagDisabled": false,
+    "educationDiscountDisabledFlag": false,
+    "hotFudgeFeatureEnabled": true,
+    "coldFudgeFeatureEnabled": false,
+    "bitcodeAutoRecompileDisAllowed": false,
+    "b2bAppEnabled": true,
+    "educationalDiscount": true,
+    "theWorld": true,
+    "pricingIntervalsFieldTO": {
+      "value": [
+        {
+          "priceTierEffectiveDate": null,
+          "priceTierEndDate": null,
+          "tierStem": "0"
+        }
+      ],
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "availableDate": 1476687600000,
+    "unavailableDate": -2,
+    "creatingApp": false,
+    "hasApprovedVersion": false,
+    "preOrder":{  
+      "clearedForPreOrder":{  
+        "value":false,
+        "isEditable":true,
+        "isRequired":true,
+        "errorKeys":null
+      },
+      "appAvailableDate":{  
+        "value":null,
+        "isEditable":true,
+        "isRequired":true,
+        "errorKeys":null
+      },
+      "preOrderAvailableDate":null
+    },
+    "appVersionsForOTAByPlatforms": {
+      "iOS": [
+
+      ]
+    },
+    "b2bUsers": [
+      {
+        "value": {
+          "dsUsername":"b2b1@abc.com",
+          "delete":false,"add":false,
+          "company":"b2b1"
+        },
+        "isEditable":true,
+        "isRequired":false,
+        "errorKeys":null
+      },
+      {
+        "value": {
+          "dsUsername":"b2b2@salesforce.com",
+          "delete":false,"add":false,
+          "company":"b2b2"
+        },
+        "isEditable":true,
+        "isRequired":false,
+        "errorKeys":null
+      }
+    ]
+  },
+  "messages": {
+    "warn": null,
+    "info": null,
+    "error": null
+  },
+  "statusCode": "SUCCESS"
+}
