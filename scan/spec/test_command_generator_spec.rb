@@ -219,7 +219,6 @@ describe Scan do
       end
     end
 
-
     describe "Test Max Concurrent Simulators" do
       before do
         options = { project: "./scan/examples/standard/app.xcodeproj", max_concurrent_simulators: 3 }
