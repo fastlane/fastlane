@@ -33,6 +33,8 @@ module Fastlane
 
         notifier = Slack::Notifier.new(options[:slack_url], channel: channel, username: username)
 
+        link_names = options[:link_names]
+
         icon_url = options[:use_webhook_configured_username_and_icon] ? nil : options[:icon_url]
 
         slack_attachment = generate_slack_attachments(options)
@@ -40,7 +42,7 @@ module Fastlane
         return [notifier, slack_attachment] if Helper.test? # tests will verify the slack attachments and other properties
 
         begin
-          results = notifier.ping('', icon_url: icon_url, attachments: [slack_attachment])
+          results = notifier.ping('', link_names: link_names, icon_url: icon_url, attachments: [slack_attachment])
         rescue => exception
           UI.error("Exception: #{exception}")
         ensure
@@ -124,6 +126,12 @@ module Fastlane
                                        description: "Should an error sending the slack notification cause a failure? (true/false)",
                                        optional: true,
                                        default_value: true,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :link_names,
+                                       env_name: "FL_SLACK_LINK_NAMES",
+                                       description: "Find and link channel names and usernames (true/false)",
+                                       optional: true,
+                                       default_value: false,
                                        is_string: false)
         ]
       end
