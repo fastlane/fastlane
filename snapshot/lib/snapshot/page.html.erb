@@ -70,7 +70,7 @@
     <table><% content.each do |device_name, screens| %>
       <tr>
         <th colspan="<%= screens.count %>">
-          <span id="<%= language %>-<%= device_name %>" class="deviceName"><%= device_name %></span>
+          <a id="<%= language %>-<%= device_name %>" class="deviceName" href="#<%= language %>-<%= device_name %>"><%= device_name %></a>
         </th>
       </tr>
       <tr><% screens.each do |screen_path| %><% next if screen_path.include?"_framed.png" %>
