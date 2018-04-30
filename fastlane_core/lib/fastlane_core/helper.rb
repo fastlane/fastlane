@@ -266,6 +266,21 @@ module FastlaneCore
       str.gsub(/\e\[([;\d]+)?m/, '')
     end
 
+    # Zips directory
+    def self.zip_directory(path, output_path, contents_only: false, print: true)
+      if contents_only
+        command = "cd '#{path}' && zip -r '#{output_path}' *"
+      else
+        containing_path = File.expand_path("..", path)
+        contents_path = File.basename(path)
+
+        command = "cd '#{containing_path}' && zip -r '#{output_path}' '#{contents_path}'"
+      end
+
+      UI.command(command) unless print
+      Helper.backticks(command, print: print)
+    end
+
     # loading indicator
     #
 

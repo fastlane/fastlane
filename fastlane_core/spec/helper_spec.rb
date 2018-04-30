@@ -102,5 +102,28 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.xcode_version).to match(/^\d[\.\d]+$/)
       end
     end
+
+    describe "#zip_directory" do
+      let(:directory) { File.absolute_path('/tmp/directory') }
+      let(:directory_to_zip) { File.absolute_path('/tmp/directory/to_zip') }
+      let(:the_zip) { File.absolute_path('/tmp/thezip.zip') }
+
+      it "creates correct zip command with contents_only set to false with default print option (true)" do
+        expect(FastlaneCore::Helper).to receive(:backticks)
+          .with("cd '#{directory}' && zip -r '#{the_zip}' 'to_zip'", print: true)
+          .exactly(1).times
+
+        FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: false)
+      end
+
+      it "creates correct zip command with contents_only set to true with print set to false" do
+        expect(FastlaneCore::Helper).to receive(:backticks)
+          .with("cd '#{directory_to_zip}' && zip -r '#{the_zip}' *", print: false)
+          .exactly(1).times
+        expect(FastlaneCore::UI).to receive(:command).exactly(1).times
+
+        FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: true, print: false)
+      end
+    end
   end
 end
