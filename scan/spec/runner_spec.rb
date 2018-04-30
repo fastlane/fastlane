@@ -130,9 +130,12 @@ describe Scan do
         })
 
         path = File.join(Scan.config[:derived_data_path], "Build/Products")
+        path = File.absolute_path(path)
+
+        output_path = File.absolute_path('/tmp/scan_results/build_products.zip')
 
         expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd '#{path}' && zip -r '/tmp/scan_results/build_products.zip' *", { print: false })
+          .with("cd '#{path}' && zip -r '#{output_path}' *", { print: false })
           .exactly(1).times
 
         scan = Scan::Runner.new

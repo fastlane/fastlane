@@ -104,21 +104,25 @@ describe FastlaneCore do
     end
 
     describe "#zip_directory" do
+      let (:directory) { File.absolute_path('/tmp/directory') }
+      let (:directory_to_zip) { File.absolute_path('/tmp/directory/to_zip') }
+      let (:the_zip) { File.absolute_path('/tmp/thezip.zip') }
+
       it "creates correct zip command with contents_only set to false with default print option (true)" do
         expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd '/tmp/directory' && zip -r '/tmp/thezip.zip' 'to_zip'", print: true)
+          .with("cd '#{directory}' && zip -r '#{the_zip}' 'to_zip'", print: true)
           .exactly(1).times
 
-        FastlaneCore::Helper.zip_directory('/tmp/directory/to_zip', '/tmp/thezip.zip', contents_only: false)
+        FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: false)
       end
 
       it "creates correct zip command with contents_only set to true with print set to false" do
         expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd '/tmp/directory/to_zip' && zip -r '/tmp/thezip.zip' *", print: false)
+          .with("cd '#{directory_to_zip}' && zip -r '#{the_zip}' *", print: false)
           .exactly(1).times
         expect(FastlaneCore::UI).to receive(:command).exactly(1).times
 
-        FastlaneCore::Helper.zip_directory('/tmp/directory/to_zip', '/tmp/thezip.zip', contents_only: true, print: false)
+        FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: true, print: false)
       end
     end
   end
