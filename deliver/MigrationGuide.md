@@ -72,7 +72,9 @@ App Categories | [Reference.md](https://docs.fastlane.tools/actions/deliver/#ref
 - Updating the app metadata and uploading of the screenshots now happen using _spaceship_ instead of the iTunes Transporter, which means changes will immediately visible after running _deliver_ :sparkles: 
 - Removed the `deliver beta` and `testflight` commands, as there is now a dedicated tool called [_pilot_](https://docs.fastlane.tools/actions/pilot/)
 - All parameters are now in the config system, which means you can pass values using the `Deliverfile`, from within your `Fastfile` or as command line parameter
+
 <img width="500" alt="screenshot 2015-09-26 21 57 15" src="https://cloud.githubusercontent.com/assets/869950/10121297/c6ea1c7a-6499-11e5-8d2b-301f86faacf0.png">
+
 - The preview doesn't highlight changes with blue any more
 - Screenshot are uploaded every time. This is on the [next-tasks list](https://github.com/fastlane/fastlane/issues/2212)
 
