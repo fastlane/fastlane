@@ -18,7 +18,11 @@ module Fastlane
           user_input = STDIN.gets(end_tag).chomp.gsub(end_tag, "").strip
         else
           # Standard one line input
-          user_input = STDIN.gets.chomp.strip while (user_input || "").length == 0
+          if params[:secure_text]
+            user_input = STDIN.noecho(&:gets).chomp while (user_input || "").length == 0
+          else 
+            user_input = STDIN.gets.chomp.strip while (user_input || "").length == 0
+          end
         end
 
         return user_input
@@ -50,6 +54,10 @@ module Fastlane
                                        default_value: ''),
           FastlaneCore::ConfigItem.new(key: :boolean,
                                        description: "Is that a boolean question (yes/no)? This will add (y/n) at the end",
+                                       default_value: false,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :secure_text,
+                                       description: "Is that a secure text (yes/no)?",
                                        default_value: false,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :multi_line_end_keyword,
