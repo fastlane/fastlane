@@ -104,9 +104,9 @@ describe FastlaneCore do
     end
 
     describe "#zip_directory" do
-      let (:directory) { File.absolute_path('/tmp/directory') }
-      let (:directory_to_zip) { File.absolute_path('/tmp/directory/to_zip') }
-      let (:the_zip) { File.absolute_path('/tmp/thezip.zip') }
+      let(:directory) { File.absolute_path('/tmp/directory') }
+      let(:directory_to_zip) { File.absolute_path('/tmp/directory/to_zip') }
+      let(:the_zip) { File.absolute_path('/tmp/thezip.zip') }
 
       it "creates correct zip command with contents_only set to false with default print option (true)" do
         expect(FastlaneCore::Helper).to receive(:backticks)
