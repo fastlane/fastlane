@@ -20,7 +20,7 @@ module Fastlane
           # Standard one line input
           if params[:secure_text]
             user_input = STDIN.noecho(&:gets).chomp while (user_input || "").length == 0
-          else 
+          else
             user_input = STDIN.gets.chomp.strip while (user_input || "").length == 0
           end
         end
