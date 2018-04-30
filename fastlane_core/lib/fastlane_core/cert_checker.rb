@@ -6,10 +6,10 @@ require_relative 'helper'
 module FastlaneCore
   # This class checks if a specific certificate is installed on the current mac
   class CertChecker
-    def self.installed?(path)
+    def self.installed?(path, in_keychain: nil)
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
-      ids = installed_identies
+      ids = installed_identies(in_keychain: in_keychain)
       finger_print = sha1_fingerprint(path)
 
       return ids.include?(finger_print)
@@ -20,7 +20,7 @@ module FastlaneCore
       installed?(path)
     end
 
-    def self.installed_identies
+    def self.installed_identies(in_keychain: nil)
       install_wwdr_certificate unless wwdr_certificate_installed?
 
       available = list_available_identities
@@ -47,8 +47,10 @@ module FastlaneCore
       return ids
     end
 
-    def self.list_available_identities
-      `security find-identity -v -p codesigning`
+    def self.list_available_identities(in_keychain: nil)
+      commands = ['security find-identity -v -p codesigning']
+      commands << in_keychain if in_keychain
+      `#{commands.join(' ')}`
     end
 
     def self.wwdr_certificate_installed?
