@@ -203,7 +203,8 @@ To define the title and optionally the keyword, put two `.strings` files into th
 
 The `keyword.strings` and `title.strings` are standard `.strings` file you already use for your iOS apps, making it easy to use your existing translation service to get localized titles.
 
-**Notes** 
+**Notes**
+
 - These `.strings` files **MUST** be utf-16 encoded (UTF-16 BE with BOM). They also must begin with an empty line. If you are having trouble see [issue #1740](https://github.com/fastlane/fastlane/issues/1740)
 - You **MUST** provide a background if you want titles. _frameit_ will not add the tiles if a background is not specified.
 
