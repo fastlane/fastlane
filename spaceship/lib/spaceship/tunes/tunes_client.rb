@@ -612,6 +612,7 @@ module Spaceship
       cleared_for_preorder = availability.cleared_for_preorder
       app_available_date = cleared_for_preorder ? availability.app_available_date : nil
       data["b2bAppEnabled"] = availability.b2b_app_enabled
+      data["educationalDiscount"] = availability.educational_discount
       data["preOrder"]["clearedForPreOrder"] = { "value" => cleared_for_preorder, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
       data["preOrder"]["appAvailableDate"] = { "value" => app_available_date, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
       data["b2bUsers"] = availability.b2b_app_enabled ? availability.b2b_users.map { |user| { "value" => { "add" => user.add, "delete" => user.delete, "dsUsername" => user.ds_username } } } : []

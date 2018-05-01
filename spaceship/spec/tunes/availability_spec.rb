@@ -163,6 +163,13 @@ describe Spaceship::Tunes::Availability do
         availability = client.availability(app.apple_id)
         expect { availability.enable_b2b_app! }.to raise_error("Not possible to enable b2b on this app")
       end
+
+      it "works correctly" do
+        availability = client.availability(app.apple_id)
+        new_availability = availability.enable_b2b_app!
+        expect(new_availability.b2b_app_enabled).to eq(true)
+        expect(new_availability.educational_discount).to eq(false)
+      end
     end
 
     describe "add_b2b_users" do
