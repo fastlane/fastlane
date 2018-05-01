@@ -219,6 +219,34 @@ describe Scan do
       end
     end
 
+    describe "Test Max Concurrent Simulators" do
+      before do
+        options = { project: "./scan/examples/standard/app.xcodeproj", max_concurrent_simulators: 3 }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      end
+
+      it "uses the correct number of concurrent simulators", requires_xcodebuild: true do
+        log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+        result = @test_command_generator.generate
+        expect(result).to include("-maximum-concurrent-test-simulator-destinations 3")
+      end
+    end
+
+    describe "Test Disable Concurrent Simulators" do
+      before do
+        options = { project: "./scan/examples/standard/app.xcodeproj", disable_concurrent_testing: true }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      end
+
+      it "disables concurrent simulators", requires_xcodebuild: true do
+        log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+        result = @test_command_generator.generate
+        expect(result).to include("-disable-concurrent-testing")
+      end
+    end
+
     describe "with Scan option :include_simulator_logs" do
       context "extract system.logarchive" do
         it "copies all device logs to the output directory", requires_xcodebuild: true do
