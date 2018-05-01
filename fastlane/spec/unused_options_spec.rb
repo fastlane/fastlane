@@ -62,6 +62,7 @@ describe Fastlane do
           puts
           println
           echo
+          xcov
         )
       end
 
