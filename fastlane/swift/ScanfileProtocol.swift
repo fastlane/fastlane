@@ -17,10 +17,13 @@ protocol ScanfileProtocol: class {
   var buildlogPath: String { get }
   var includeSimulatorLogs: Bool { get }
   var formatter: String? { get }
+  var maxConcurrentSimulators: Int? { get }
+  var disableConcurrentTesting: Bool { get }
   var testWithoutBuilding: Bool? { get }
   var buildForTesting: Bool? { get }
   var xctestrun: String? { get }
   var derivedDataPath: String? { get }
+  var shouldZipBuildProducts: Bool { get }
   var resultBundle: Bool { get }
   var sdk: String? { get }
   var openReport: Bool { get }
@@ -59,10 +62,13 @@ extension ScanfileProtocol {
   var buildlogPath: String { return "~/Library/Logs/scan" }
   var includeSimulatorLogs: Bool { return false }
   var formatter: String? { return nil }
+  var maxConcurrentSimulators: Int? { return nil }
+  var disableConcurrentTesting: Bool { return false }
   var testWithoutBuilding: Bool? { return nil }
   var buildForTesting: Bool? { return nil }
   var xctestrun: String? { return nil }
   var derivedDataPath: String? { return nil }
+  var shouldZipBuildProducts: Bool { return false }
   var resultBundle: Bool { return false }
   var sdk: String? { return nil }
   var openReport: Bool { return false }
@@ -84,4 +90,4 @@ extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.2]
+// FastlaneRunnerAPIVersion [0.9.3]
