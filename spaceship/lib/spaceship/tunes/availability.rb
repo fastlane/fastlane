@@ -22,6 +22,8 @@ module Spaceship
       # @return (Bool) b2b available for distribution
       attr_accessor :b2b_unavailable
 
+      # @return (Array of Spaceship::Tunes::B2bUser objects) A list of users set by user - if not
+      # then the b2b user list that is currently set
       attr_accessor :b2b_users
 
       attr_mapping(
@@ -82,21 +84,18 @@ module Spaceship
       # Sets the b2b flag. If you call Save on app_details without adding any b2b users
       # it will result in an error.
       def enable_b2b_app!
-        print("b2b : " + b2b_unavailable.to_s)
         raise "Not possible to enable b2b on this app" if b2b_unavailable
         @b2b_app_enabled = true
-        return self
+        self
       end
 
-      # just adds to the availability, You will still have to call update_availabilty
+      # just adds users to the availability, You will still have to call update_availabilty
       def add_b2b_users(user_list = [])
         raise "Cannot add b2b users if b2b is not enabled" unless b2b_app_enabled
-        b2b_user_array = []
-        user_list.each do |user|
-          b2b_user_array.push(B2bUser.from_username(user))
+        @b2b_users = user_list.map do |user|
+          B2bUser.from_username(user)
         end
-        @b2b_users = b2b_user_array
-        return self
+        self
       end
     end
   end
