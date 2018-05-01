@@ -35,15 +35,16 @@ module Fastlane
           else
             changelog = Actions.git_log_between(params[:pretty], from, to, merge_commit_filtering, params[:date_format], params[:ancestry_path])
           end
+
+          changelog = changelog.gsub("\n\n", "\n") if changelog # as there are duplicate newlines
+          Actions.lane_context[SharedValues::FL_CHANGELOG] = changelog
+
+          puts("")
+          puts(changelog)
+          puts("")
+
+          changelog
         end
-        changelog = changelog.gsub("\n\n", "\n") if changelog # as there are duplicate newlines
-        Actions.lane_context[SharedValues::FL_CHANGELOG] = changelog
-
-        puts("")
-        puts(changelog)
-        puts("")
-
-        changelog
       end
 
       #####################################################
@@ -89,8 +90,7 @@ module Fastlane
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_PATH',
                                        description: 'Path of the git repository',
                                        optional: true,
-                                       default_value: './'
-                                       ),
+                                       default_value: './'),
           FastlaneCore::ConfigItem.new(key: :pretty,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_PRETTY',
                                        description: 'The format applied to each commit while generating the collected value',
