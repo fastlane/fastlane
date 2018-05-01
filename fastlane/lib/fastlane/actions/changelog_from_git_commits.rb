@@ -30,8 +30,6 @@ module Fastlane
         end
 
         Dir.chdir(params[:path]) do
-          require 'pry'
-          binding.pry
           if params[:commits_count]
             changelog = Actions.git_log_last_commits(params[:pretty], params[:commits_count], merge_commit_filtering, params[:date_format], params[:ancestry_path])
           else
