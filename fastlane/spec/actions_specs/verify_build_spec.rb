@@ -5,10 +5,15 @@ describe Fastlane do
       let(:not_an_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/not-an-ipa.ipa") }
       let(:correctly_signed_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/very-capable-app.ipa") }
       let(:correctly_signed_ipa_with_spaces) { File.expand_path("./fastlane_core/spec/fixtures/ipas/very capable app.ipa") }
-      let(:correctly_signed_app) { File.expand_path("./fastlane_core/spec/fixtures/bundles/very-capable-app.app") }
-      let(:correctly_signed_app_with_spaces) { File.expand_path("./fastlane_core/spec/fixtures/bundles/very capable app.app") }
+      let(:correctly_signed_xcarchive) { File.expand_path("./fastlane_core/spec/fixtures/archives/very-capable-app.xcarchive") }
+      let(:correctly_signed_xcarchive_with_spaces) { File.expand_path("./fastlane_core/spec/fixtures/archives/very capable app.xcarchive") }
+      let(:correctly_signed_app) { File.expand_path("./fastlane_core/spec/fixtures/archives/very-capable-app.xcarchive/Products/Applications/very-capable-app.app") }
+      let(:correctly_signed_app_with_spaces) { File.expand_path("./fastlane_core/spec/fixtures/archives/very capable app.xcarchive/Products/Applications/very capable app.app") }
       let(:incorrectly_signed_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/ContainsWatchApp.ipa") }
+      let(:ipa_with_no_app) { File.expand_path("./fastlane_core/spec/fixtures/ipas/no-app-bundle.ipa") }
       let(:simulator_app) { File.expand_path("./fastlane_core/spec/fixtures/bundles/simulator-app.app") }
+      let(:not_an_app) { File.expand_path("./fastlane_core/spec/fixtures/bundles/not-an-app.txt") }
+      let(:archive_with_no_app) { File.expand_path("./fastlane_core/spec/fixtures/archives/no-app-bundle.xcarchive") }
       let(:expected_title) { "Summary for verify_build #{Fastlane::VERSION}" }
       let(:expected_app_info) do
         {
@@ -85,6 +90,26 @@ describe Fastlane do
               )
             end").runner.execute(:test)
           end.to raise_error("Unable to extract profile")
+        end
+
+        it "uses xcarchive set via build_path" do
+          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_app_info, title: expected_title)
+          expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
+          Fastlane::FastFile.new.parse("lane :test do
+            verify_build(
+              build_path: '#{correctly_signed_xcarchive}'
+            )
+          end").runner.execute(:test)
+        end
+
+        it "uses xcarchive set via build_path that contain spaces" do
+          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_app_info, title: expected_title)
+          expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
+          Fastlane::FastFile.new.parse("lane :test do
+            verify_build(
+              build_path: '#{correctly_signed_xcarchive_with_spaces}'
+            )
+          end").runner.execute(:test)
         end
       end
 
@@ -177,26 +202,74 @@ describe Fastlane do
         end
       end
 
-      it "raises an error if ipa is not signed correctly" do
-        expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to verify code signing").and_call_original
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            verify_build(
-              build_path: '#{incorrectly_signed_ipa}'
-            )
-          end").runner.execute(:test)
-        end.to raise_error("Unable to verify code signing")
+      describe "Invalid build file" do
+        it "raises an error if ipa is not signed correctly" do
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to verify code signing").and_call_original
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              verify_build(
+                build_path: '#{incorrectly_signed_ipa}'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Unable to verify code signing")
+        end
+
+        it "raises an error if ipa is not a valid zip archive" do
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to unzip ipa").and_call_original
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              verify_build(
+                ipa_path: '#{not_an_ipa}'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Unable to unzip ipa")
+        end
+
+        it "raises an error if build path is not a valid app file" do
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to verify code signing").and_call_original
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              verify_build(
+                build_path: '#{not_an_app}'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Unable to verify code signing")
+        end
       end
 
-      it "raises an error if ipa is not a valid zip archive" do
-        expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to unzip ipa").and_call_original
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            verify_build(
-              ipa_path: '#{not_an_ipa}'
-            )
-          end").runner.execute(:test)
-        end.to raise_error("Unable to unzip ipa")
+      describe "Missing app file" do
+        it "raises an error if ipa_path does not contain an app file" do
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to find app file").and_call_original
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              verify_build(
+                ipa_path: '#{ipa_with_no_app}'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Unable to find app file")
+        end
+
+        it "raises an error if build_path does not contain an app file" do
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to find app file").and_call_original
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              verify_build(
+                build_path: '#{ipa_with_no_app}'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Unable to find app file")
+        end
+
+        it "raises an error if xcarchive does not contain an app file" do
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to find app file").and_call_original
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              verify_build(
+                build_path: '#{archive_with_no_app}'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Unable to find app file")
+        end
       end
     end
   end
