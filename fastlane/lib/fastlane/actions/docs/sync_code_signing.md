@@ -322,7 +322,7 @@ You'll be asked for the new password on all your machines on the next run.
 If you want to manually decrypt a file you can.
 
 ```no-highlight
-openssl aes-256-cbc -k <password> -in <fileYouWantToDecryptPath> -out <decryptedFilePath> -a -d
+openssl aes-256-cbc -k "<password>" -in "<fileYouWantToDecryptPath>" -out "<decryptedFilePath>" -a -d
 ```
 
 #### Export Distribution Certificate and Private Key as Single .p12 File
