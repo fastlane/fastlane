@@ -28,7 +28,7 @@ module Fastlane
         sudo_needed = !File.writable?(gem_dir)
 
         if sudo_needed
-          UI.important("It seems that your Gem directory is not writable by your current User.")
+          UI.important("It seems that your Gem directory is not writable by your current user.")
           UI.important("fastlane would need sudo rights to update itself, however, running 'sudo fastlane' is not recommended.")
           UI.important("If you still want to use this action, please read the documentation on a guide how to set this up:")
           UI.important("https://docs.fastlane.tools/actions/#update_fastlane")
