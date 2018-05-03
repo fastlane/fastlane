@@ -99,14 +99,27 @@ describe Fastlane do
           build_settings: {
             'CODE_SIGN_IDENTITY' => 'iPhone Developer: Josh',
             'JOBS' => 16,
-            'PROVISIONING_PROFILE' => 'JoshIsCoolProfile'
+            'PROVISIONING_PROFILE' => 'JoshIsCoolProfile',
+            'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) NDEBUG=1'
           }
         )
       end").runner.execute(:test)
 
-        expect(result).to include('CODE_SIGN_IDENTITY="iPhone Developer: Josh"')
-        expect(result).to include('JOBS="16"')
-        expect(result).to include('PROVISIONING_PROFILE="JoshIsCoolProfile"')
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "xcodebuild " \
+          + "CODE_SIGN_IDENTITY=\"iPhone Developer: Josh\" " \
+          + "JOBS=\"16\" " \
+          + "PROVISIONING_PROFILE=\"JoshIsCoolProfile\" " \
+          + "GCC_PREPROCESSOR_DEFINITIONS=\"\\$(inherited) NDEBUG=1\" " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "| tee '#{build_log_path}' | xcpretty --color --simple"
+        )
+
+        # expect(result).to include('CODE_SIGN_IDENTITY="iPhone Developer: Josh"')
+        # expect(result).to include('JOBS="16"')
+        # expect(result).to include('PROVISIONING_PROFILE="JoshIsCoolProfile"')
       end
 
       it "works with export_options_plist as hash" do
