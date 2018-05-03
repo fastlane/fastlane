@@ -43,12 +43,14 @@ module FastlaneCore
 
       begin
         # rubocop:disable Security/Eval
-        eval(content) # this is okay in this case
+        puts(eval(content)) # this is okay in this case
         # rubocop:enable Security/Eval
 
         print_resulting_config_values unless skip_printing_values # only on success
       rescue SyntaxError => ex
         line = ex.to_s.match(/\(eval\):(\d+)/)[1]
+        UI.error("Error in your #{File.basename(path)} at line #{line}")
+        UI.content_error(content, line)
         UI.user_error!("Syntax error in your configuration file '#{path}' on line #{line}: #{ex}")
       rescue => ex
         raise ExceptionWhileParsingError.new(ex, self.options), "Error while parsing config file at #{path}"
