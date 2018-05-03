@@ -83,10 +83,17 @@ describe "Build Manager" do
       allow(mock_base_client).to receive(:add_group_to_build)
       allow(Spaceship::TestFlight::Group).to receive(:default_external_group).and_return(mock_default_external_group)
       # used to return the approved build if we recover from the 504
-      allow(Spaceship::TestFlight::Build).to receive(:find).and_return(approved_mock_build)
     end
-    it "recovers if there is a 504" do
+    it "doesnt recover if there is a 504 and the build is not approved" do
       allow(mock_base_client).to receive(:post_for_testflight_review).and_raise(Spaceship::Client::InternalServerError, "Server error got 504")
+      allow(Spaceship::TestFlight::Build).to receive(:find).and_return(ready_to_submit_mock_build)
+      expect(FastlaneCore::UI).to receive(:message).with('Distributing new build to testers:  - ')
+      expect(FastlaneCore::UI).to receive(:message).with('Submitting the build for review timed out, trying to recover.')
+      expect { fake_build_manager.distribute(distribute_options, build: ready_to_submit_mock_build) }.to raise_error(Spaceship::Client::InternalServerError, "Server error got 504")
+    end
+    it "recovers if there is a 504 and the build is approved" do
+      allow(mock_base_client).to receive(:post_for_testflight_review).and_raise(Spaceship::Client::InternalServerError, "Server error got 504")
+      allow(Spaceship::TestFlight::Build).to receive(:find).and_return(approved_mock_build)
       expect(FastlaneCore::UI).to receive(:message).with('Distributing new build to testers:  - ')
       expect(FastlaneCore::UI).to receive(:message).with('Submitting the build for review timed out, trying to recover.')
       fake_build_manager.distribute(distribute_options, build: ready_to_submit_mock_build)
