@@ -139,7 +139,7 @@ describe FastlaneCore do
       end
 
       it "contains p_hash event and uses the bundle identifier and hashes the value if available" do
-        ENV["PILOT_APP_IDENTIFIER"] = "com.krausefx.app"
+        stub_const('ENV', { 'PILOT_APP_IDENTIFIER' => 'com.krausefx.app' })
         p_hashed_id = hash_of(ENV["PILOT_APP_IDENTIFIER"])
 
         expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
