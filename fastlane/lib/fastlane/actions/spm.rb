@@ -9,9 +9,15 @@ module Fastlane
         cmd << "--package-path #{params[:package_path]}" if params[:package_path]
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
         cmd << "--verbose" if params[:verbose]
+        if params[:xcpretty_output]
+          cmd += ["2>&1", "|", "xcpretty", "--#{params[:xcpretty_output]}"]
+          cmd = %w(set -o pipefail &&) + cmd
+        end
         cmd << params[:command] if package_commands.include?(params[:command])
 
-        sh(cmd.join(" "))
+        FastlaneCore::CommandExecutor.execute(command: cmd.join(" "),
+                                              print_all: true,
+                                              print_command: true)
       end
 
       #####################################################
@@ -46,6 +52,13 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a valid configuration: (debug|release)") unless valid_configurations.include?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :xcpretty_output,
+                                       env_name: "FL_SPM_XCPRETTY_OUTPUT",
+                                       description: "Specifies the output type for xcpretty. eg. 'test', or 'simple'",
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Please pass a valid xcpretty output type: (#{xcpretty_output_types.join('|')})") unless xcpretty_output_types.include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        short_option: "-v",
@@ -89,6 +102,10 @@ module Fastlane
 
       def self.valid_configurations
         %w(debug release)
+      end
+
+      def self.xcpretty_output_types
+        %w(simple test knock tap)
       end
     end
   end
