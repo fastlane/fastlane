@@ -269,7 +269,8 @@ module Commander
     end
 
     def reraise_formatted!(e, message)
-      raise e, "[!] #{message}".red, e.backtrace
+      backtrace = FastlaneCore::Env.truthy?("FASTLANE_HIDE_BACKTRACE") ? [] : e.backtrace
+      raise e, "[!] #{message}".red, backtrace
     end
 
     def show_github_issues(message_or_error)
