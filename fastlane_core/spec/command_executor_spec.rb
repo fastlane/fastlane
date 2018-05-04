@@ -1,5 +1,9 @@
 describe FastlaneCore do
   describe FastlaneCore::CommandExecutor do
+    before do
+      allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true)
+    end
+
     describe "execute" do
       it 'handles reading which throws a EIO exception' do
         explodes_on_strip = 'danger! lasers!'
