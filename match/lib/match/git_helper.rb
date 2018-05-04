@@ -25,7 +25,7 @@ module Match
 
       @dir = Dir.mktmpdir
 
-      command = "git clone '#{git_url}' '#{@dir}'"
+      command = %(git clone "#{git_url}" '#{@dir}')
       if shallow_clone
         command << " --depth 1 --no-single-branch"
       elsif clone_branch_directly

@@ -18,7 +18,7 @@ describe Match do
         expect(Dir).to receive(:mktmpdir).and_return(path)
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         shallow_clone = false
-        command = "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}'"
+        command = "GIT_TERMINAL_PROMPT=0 git clone \"#{git_url}\" '#{path}'"
         to_params = {
           command: command,
           print_all: nil,
@@ -40,7 +40,7 @@ describe Match do
         expect(Dir).to receive(:mktmpdir).and_return(path)
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         shallow_clone = true
-        command = "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}' --depth 1 --no-single-branch"
+        command = "GIT_TERMINAL_PROMPT=0 git clone \"#{git_url}\" '#{path}' --depth 1 --no-single-branch"
         to_params = {
           command: command,
           print_all: nil,
@@ -62,7 +62,7 @@ describe Match do
         expect(Dir).to receive(:mktmpdir).and_return(path)
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         shallow_clone = false
-        command = "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}'"
+        command = "GIT_TERMINAL_PROMPT=0 git clone \"#{git_url}\" '#{path}'"
         to_params = {
           command: command,
           print_all: nil,
@@ -85,7 +85,7 @@ describe Match do
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         git_branch = "test"
         shallow_clone = false
-        command = "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}'"
+        command = "GIT_TERMINAL_PROMPT=0 git clone \"#{git_url}\" '#{path}'"
         to_params = {
           command: command,
           print_all: nil,
