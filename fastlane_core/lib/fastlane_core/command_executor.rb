@@ -47,8 +47,6 @@ module FastlaneCore
           UI.command_output(loading)
         end
 
-        return command unless Helper.sh_enabled? # only for the tests
-
         begin
           FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
             begin

@@ -1,5 +1,12 @@
 describe Fastlane do
   describe Fastlane::FastFile do
+    before do
+      # Force FastlaneCore::CommandExecutor.execute to return command
+      allow(FastlaneCore::CommandExecutor).to receive(:execute).and_wrap_original do |m, *args|
+        args[0][:command]
+      end
+    end
+
     describe "SPM Integration" do
       it "raises an error if command is invalid" do
         expect do
