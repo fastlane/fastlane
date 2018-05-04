@@ -1,5 +1,12 @@
 describe Fastlane do
   describe Fastlane::FastFile do
+    before do
+      # Force FastlaneCore::CommandExecutor.execute to return command
+      allow(FastlaneCore::CommandExecutor).to receive(:execute).and_wrap_original do |m, *args|
+        args[0][:command]
+      end
+    end
+
     describe "SPM Integration" do
       it "raises an error if command is invalid" do
         expect do
@@ -186,6 +193,39 @@ describe Fastlane do
               )
             end").runner.execute(:test)
           end.to raise_error("Please pass a valid configuration: (debug|release)")
+        end
+
+        it "raises an error if xcpretty output tyep is invalid" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              spm(
+                command: '#{command}',
+                xcpretty_output: 'foobar'
+              )
+            end").runner.execute(:test)
+          end.to raise_error(/^Please pass a valid xcpretty output type: /)
+        end
+
+        it "set pipefail with xcpretty" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+              spm(
+                command: '#{command}',
+                xcpretty_output: 'simple'
+              )
+            end").runner.execute(:test)
+
+          expect(result).to match(/^set -o pipefail && swift /)
+        end
+
+        it "use xcpretty if xcpretty_output is specified" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+              spm(
+                command: '#{command}',
+                xcpretty_output: 'simple'
+              )
+            end").runner.execute(:test)
+
+          expect(result).to match(/2>&1 | xcpretty --simple$/)
         end
       end
     end
