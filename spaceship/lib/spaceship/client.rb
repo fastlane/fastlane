@@ -186,6 +186,56 @@ module Spaceship
       @current_team_id = team_id
     end
 
+    # @return (String) The currently selected Team Name
+    def team_name
+      return @current_team_name if @current_team_name
+
+      if teams.count > 1
+        puts("The current user is in #{teams.count} teams. Pass a team Name or call `select_team` to choose a team. Using the first one for now.")
+      end
+      @current_team_name ||= teams[0]['contentProvider']['name']
+    end
+
+    # Set a new team Name which will be used from now on
+    def team_name=(team_name)
+      # First, we verify the team actually exists, because otherwise iTC would return the
+      # following confusing error message
+      #
+      #     invalid content provider name
+      #
+      available_teams = teams.collect do |team|
+        {
+          team_id: (team["contentProvider"] || {})["contentProviderId"],
+          team_name: (team["contentProvider"] || {})["name"]
+        }
+      end
+      require 'pry'
+      binding.pry
+      
+      result = available_teams.find do |available_team|
+        team_name.to_s == available_team[:team_name].to_s
+      end
+
+      unless result
+        error_string = "Could not set team Name to '#{team_name}', only found the following available teams:\n\n#{available_teams.map { |team| "- #{team[:team_id]} (#{team[:team_name]})" }.join("\n")}\n"
+        raise Tunes::Error.new, error_string
+      end
+
+      # TODO: Commented because this call is returning error. Discuss with joshdholtz to see what endpoint should be called here.
+      # response = request(:post) do |req|
+      #   req.url("ra/v1/session/webSession")
+      #   req.body = {
+      #     name: team_name,
+      #     dsId: user_detail_data.ds_id # https://github.com/fastlane/fastlane/issues/6711
+      #   }.to_json
+      #   req.headers['Content-Type'] = 'application/json'
+      # end
+
+      # handle_itc_response(response.body)
+
+      @current_team_name = team_name
+    end
+
     # @return (Hash) Fetches all information of the currently used team
     def team_information
       teams.find do |t|
