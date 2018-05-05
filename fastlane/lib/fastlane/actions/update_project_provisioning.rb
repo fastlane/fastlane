@@ -40,7 +40,7 @@ module Fastlane
 
         target_filter = params[:target_filter] || params[:build_configuration_filter]
         configuration = params[:build_configuration]
-        codesigning_identity = params[:codesigning_identity]
+        code_signing_identity = params[:code_signing_identity]
 
         # manipulate project file
         UI.success("Going to update project '#{folder}' with UUID")
@@ -64,11 +64,9 @@ module Fastlane
               next
             end
 
-            unless codesigning_identity.nil?
-              unless build_configuration.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"].nil?
-                build_configuration.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = codesigning_identity
-              end
-              build_configuration.build_settings["CODE_SIGN_IDENTITY"] = codesigning_identity
+            codesign_build_settings_keys = build_configuration.build_settings.keys.select { |key| key.to_s.match(/CODE_SIGN_IDENTITY.*/) }
+            codesign_build_settings_keys.each do |setting|
+              build_configuration.build_settings[setting] = code_signing_identity
             end
 
             build_configuration.build_settings["PROVISIONING_PROFILE"] = data["UUID"]
@@ -139,7 +137,7 @@ module Fastlane
                                        env_name: "FL_PROJECT_PROVISIONING_CERTIFICATE_PATH",
                                        description: "Path to apple root certificate",
                                        default_value: "/tmp/AppleIncRootCertificate.cer"),
-          FastlaneCore::ConfigItem.new(key: :codesigning_identity,
+          FastlaneCore::ConfigItem.new(key: :code_signing_identity,
                                        env_name: "FL_PROJECT_PROVISIONING_CODE_SIGN_IDENTITY",
                                        description: "Code sign identity for build configuration",
                                        optional: true)
@@ -161,7 +159,7 @@ module Fastlane
             profile: "./watch_app_store.mobileprovision", # optional if you use sigh
             target_filter: ".*WatchKit Extension.*", # matches name or type of a target
             build_configuration: "Release",
-            codesigning_identity: "iPhone Development" #specified the codesigning identity
+            code_signing_identity: "iPhone Development" # optionally specify the codesigning identity
           )'
         ]
       end
