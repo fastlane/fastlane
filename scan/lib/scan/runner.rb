@@ -80,6 +80,8 @@ module Scan
       copy_simulator_logs
 
       if result[:failures] > 0
+        open_report
+
         UI.test_failure!("Tests have failed")
       end
 
@@ -88,7 +90,10 @@ module Scan
       end
 
       zip_build_products
+      open_report
+    end
 
+    def open_report
       if !Helper.ci? && Scan.cache[:open_html_report_path]
         `open --hide '#{Scan.cache[:open_html_report_path]}'`
       end
