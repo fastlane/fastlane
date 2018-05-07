@@ -1,6 +1,6 @@
 ---
-name: ✨ Feature Request
-about: A suggestion for a new feature 🚀
+name: 🚀 Feature Request
+about: A suggestion for a new feature ✨
 
 ---
 
