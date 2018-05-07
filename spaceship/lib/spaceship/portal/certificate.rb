@@ -202,6 +202,22 @@ module Spaceship
           return [csr, key]
         end
 
+        def create_apple_pay_certificate_signing_request
+          OpenSSL::PKey::EC.send(:alias_method, :private?, :private_key?)
+
+          ec_domain_key, ec_public = OpenSSL::PKey::EC.new('prime256v1'), OpenSSL::PKey::EC.new('prime256v1')
+          ec_domain_key.generate_key
+          ec_public.public_key = ec_domain_key.public_key
+
+          csr = OpenSSL::X509::Request.new
+          csr.subject = OpenSSL::X509::Name.new([
+                                                  ['CN', 'PEM', OpenSSL::ASN1::UTF8STRING]
+                                                ])
+          csr.public_key = ec_public
+          csr.sign ec_domain_key, OpenSSL::Digest::SHA256.new
+          return [csr, ec_domain_key]
+        end
+
         # Create a new object based on a hash.
         # This is used to create a new object based on the server response.
         def factory(attrs)
@@ -284,6 +300,8 @@ module Spaceship
         #  Spaceship::Certificate::Production.create!(csr: csr)
         # @return (Certificate): The newly created certificate
         def create!(csr: nil, bundle_id: nil)
+          require 'pry'
+          binding.pry
           type = CERTIFICATE_TYPE_IDS.key(self)
           mac = MAC_CERTIFICATE_TYPE_IDS.include?(type)
 

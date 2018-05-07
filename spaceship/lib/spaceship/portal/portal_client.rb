@@ -526,6 +526,8 @@ module Spaceship
     end
 
     def create_certificate!(type, csr, app_id = nil, mac = false)
+      require 'pry'
+      binding.pry
       ensure_csrf(Spaceship::Portal::Certificate)
 
       r = request(:post, "account/#{platform_slug(mac)}/certificate/submitCertificateRequest.action", {
