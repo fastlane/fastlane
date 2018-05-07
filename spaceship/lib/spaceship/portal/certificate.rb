@@ -136,7 +136,7 @@ module Spaceship
       class Passbook < Certificate; end
 
       # ApplePay certificate
-      class ApplePay < Certificate; end
+      class ApplePayCertificate < Certificate; end
 
       # A Mac push notification certificate for development environment
       class MacDevelopmentPush < PushCertificate; end
@@ -154,7 +154,7 @@ module Spaceship
         "Y3B2F3TYSI" => Passbook,
         "3T2ZP62QW8" => WebsitePush,
         "E5D663CMZW" => VoipPush,
-        "4APLUP237T" => ApplePay
+        "4APLUP237T" => ApplePayCertificate
       }
 
       OLDER_IOS_CERTIFICATE_TYPES = [

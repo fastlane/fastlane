@@ -12,15 +12,26 @@ module Fastlane
         Spaceship.client.select_team
         UI.message("Successfully logged in")
 
-        create_certificate
+        create_certificate(params)
       end
 
-      def self.create_certificate
+      def self.create_certificate(params)
         UI.important("Creating a new Apple Pay certificate.")
         csr, pkey = Spaceship.certificate.create_certificate_signing_request
 
-        puts(csr)
-        puts(pkey)
+        # puts(csr)
+        # puts(pkey)
+
+        begin 
+        	puts params[:app_identifier]
+        	cert = certificate.create!(csr: csr, bundle_id: params[:app_identifier])
+        rescue => ex
+        	raise ex
+        end
+      end
+
+      def self.certificate
+      	Spaceship.certificate.apple_pay_certificate
       end
 
       #####################################################
@@ -43,6 +54,9 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "username",
+                                       description: ""),
+              FastlaneCore::ConfigItem.new(key: :app_identifier,
+                                       env_name: "app_identifier",
                                        description: "")
         ]
       end
