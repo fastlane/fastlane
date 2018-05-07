@@ -209,8 +209,6 @@ module Spaceship
           team_name: (team["contentProvider"] || {})["name"]
         }
       end
-      require 'pry'
-      binding.pry
 
       result = available_teams.find do |available_team|
         team_name.to_s == available_team[:team_name].to_s
