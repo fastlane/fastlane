@@ -1,6 +1,6 @@
 ---
 name: 😱 Regression
-about: If a recent release broke a feature 😬 (Please make sure you know last known working release version)
+about: If a recent release broke a feature 😬 (Please make sure you know the last known working release version)
 
 ---
 
