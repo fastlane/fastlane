@@ -22,7 +22,12 @@ module Fastlane
         begin
           cert = certificate.create!(csr: csr, bundle_id: params[:merchant_bundle_id])
         rescue => ex
-          raise ex
+          if ex.to_s.include?("You already have a current")
+            UI.message(ex.to_s)
+            UI.user_error!("You already have 2 apple pay certificates for this merchant. You'll need to revoke an old certificate to make room for a new one")
+          else
+            raise ex
+          end
         end
       end
 
