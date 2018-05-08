@@ -9,7 +9,7 @@ module Fastlane
       def self.run(params)
         UI.message("Starting login with user '#{params[:username]}'")
         Spaceship.login(params[:username], nil)
-        Spaceship.client.select_team
+        Spaceship.client.select_team(team_id: params[:team_id], team_name: params[:team_name])
         UI.message("Successfully logged in")
 
         create_certificate(params)
