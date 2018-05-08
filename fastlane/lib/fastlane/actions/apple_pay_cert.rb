@@ -79,11 +79,11 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :username,
-                                       env_name: "username",
-                                       description: ""),
+                                       env_name: "APPLE_PAY_USERNAME",
+                                       description: "Your Apple ID Username"),
           FastlaneCore::ConfigItem.new(key: :merchant_bundle_id,
-                                   env_name: "merchant_bundle_id",
-                                   description: ""),
+                                   env_name: "APPLE_PAY_MERCHANT_BUNDLE_ID",
+                                   description: "You merchant bundle identifier (e.g: merchant.com.example"),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                  short_option: "-b",
                                  env_name: "APPLE_PAY_CERT_TEAM_ID",
@@ -132,7 +132,16 @@ module Fastlane
 
       def self.example_code
         [
-
+        	'apple_pay_cert(
+      			merchant_bundle_id: "merchant.com.rtayal.app",
+      			p12_password: "test"
+      		)',
+      		'apple_pay_cert(
+      			username: "test@example.com",
+      			merchant_bundle_id: "merchant.com.rtayal.app",
+      			p12_password: "test",
+      			team_id: "XXXXXXX"
+      		)'
         ]
       end
 
