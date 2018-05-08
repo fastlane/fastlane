@@ -520,6 +520,10 @@ module Spaceship
       r = request(:get, "ra/apps/#{app_id}/pricing/intervals")
       data = parse_response(r, 'data')
 
+      # preOrder isn't needed for for the request and has some
+      # values that can cause a failure (invalid dates) so we are removing it
+      data.delete('preOrder')
+
       first_price = (data["pricingIntervalsFieldTO"]["value"] || []).count == 0 # first price
       data["pricingIntervalsFieldTO"]["value"] ||= []
       data["pricingIntervalsFieldTO"]["value"] << {} if data["pricingIntervalsFieldTO"]["value"].count == 0

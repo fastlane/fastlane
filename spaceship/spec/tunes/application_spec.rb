@@ -339,5 +339,18 @@ describe Spaceship::Application do
         expect(availability.inspect).to include("Tunes::Availability")
       end
     end
+
+    describe "#update_price_tier" do
+      let(:app) { Spaceship::Application.all.first }
+      let(:effective_date) { 1_525_488_436 }
+      before { TunesStubbing.itc_stub_app_pricing_intervals }
+
+      it "inspect works" do
+        allow_any_instance_of(Time).to receive(:to_i).and_return(effective_date)
+        TunesStubbing.itc_stub_update_price_tier
+
+        app.update_price_tier!(3)
+      end
+    end
   end
 end
