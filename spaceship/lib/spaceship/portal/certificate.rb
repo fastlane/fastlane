@@ -205,7 +205,8 @@ module Spaceship
         def create_apple_pay_certificate_signing_request
           OpenSSL::PKey::EC.send(:alias_method, :private?, :private_key?)
 
-          ec_domain_key, ec_public = OpenSSL::PKey::EC.new('prime256v1'), OpenSSL::PKey::EC.new('prime256v1')
+          ec_domain_key = OpenSSL::PKey::EC.new('prime256v1')
+          ec_public = OpenSSL::PKey::EC.new('prime256v1')
           ec_domain_key.generate_key
           ec_public.public_key = ec_domain_key.public_key
 
@@ -214,7 +215,7 @@ module Spaceship
                                                   ['CN', 'PEM', OpenSSL::ASN1::UTF8STRING]
                                                 ])
           csr.public_key = ec_public
-          csr.sign ec_domain_key, OpenSSL::Digest::SHA256.new
+          csr.sign(ec_domain_key, OpenSSL::Digest::SHA256.new)
           return [csr, ec_domain_key]
         end
 
@@ -300,7 +301,6 @@ module Spaceship
         #  Spaceship::Certificate::Production.create!(csr: csr)
         # @return (Certificate): The newly created certificate
         def create!(csr: nil, bundle_id: nil)
-          
           type = CERTIFICATE_TYPE_IDS.key(self)
           mac = MAC_CERTIFICATE_TYPE_IDS.include?(type)
 
@@ -321,10 +321,10 @@ module Spaceship
           # if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
           if type == '4APLUP237T'
             response = client.create_certificate_apple_pay!(type, csr.to_pem, merchant_id, mac)
-          else 
+          else
             response = client.create_certificate!(type, csr.to_pem, app_id, mac)
           end
-          
+
           # munge the response to make it work for the factory
           response['certificateTypeDisplayId'] = response['certificateType']['certificateTypeDisplayId']
           self.new(response)
