@@ -19,14 +19,8 @@ module Fastlane
         UI.important("Creating a new Apple Pay certificate.")
         csr, pkey = Spaceship.certificate.create_apple_pay_certificate_signing_request
 
-        puts(csr)
-        # puts(pkey)
-
         begin 
-        	puts params[:app_identifier]
-        	# require 'pry'
-        	# binding.pry
-        	cert = certificate.create!(csr: csr, bundle_id: params[:app_identifier])
+        	cert = certificate.create!(csr: csr, bundle_id: params[:merchant_bundle_id])
         rescue => ex
         	raise ex
         end
@@ -45,11 +39,11 @@ module Fastlane
       end
 
       def self.description
-        'Update a Info.plist file with bundle identifier and display name'
+        'Creates Apple Pay certificate.'
       end
 
       def self.details
-        "This action allows you to modify your `Info.plist` file before building. This may be useful if you want a separate build for alpha, beta or nightly builds, but don't want a separate target."
+        "This action allows you to create Apple Pay merchant certificate."
       end
 
       def self.available_options
@@ -57,8 +51,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "username",
                                        description: ""),
-              FastlaneCore::ConfigItem.new(key: :app_identifier,
-                                       env_name: "app_identifier",
+              FastlaneCore::ConfigItem.new(key: :merchant_bundle_id,
+                                       env_name: "merchant_bundle_id",
                                        description: "")
         ]
       end
