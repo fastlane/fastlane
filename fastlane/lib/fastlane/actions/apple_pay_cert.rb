@@ -53,7 +53,29 @@ module Fastlane
                                        description: ""),
               FastlaneCore::ConfigItem.new(key: :merchant_bundle_id,
                                        env_name: "merchant_bundle_id",
-                                       description: "")
+                                       description: ""),
+              FastlaneCore::ConfigItem.new(key: :team_id,
+                                     short_option: "-b",
+                                     env_name: "APPLE_PAY_CERT_TEAM_ID",
+                                     code_gen_sensitive: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                     default_value_dynamic: true,
+                                     description: "The ID of your Developer Portal team if you're in multiple teams",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :team_name,
+                                     short_option: "-l",
+                                     env_name: "APPLE_PAY_CERT_TEAM_NAME",
+                                     description: "The name of your Developer Portal team if you're in multiple teams",
+                                     optional: true,
+                                     code_gen_sensitive: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                     default_value_dynamic: true,
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_NAME"] = value.to_s
+                                     end),
         ]
       end
 
