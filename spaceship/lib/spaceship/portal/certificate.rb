@@ -300,8 +300,7 @@ module Spaceship
         #  Spaceship::Certificate::Production.create!(csr: csr)
         # @return (Certificate): The newly created certificate
         def create!(csr: nil, bundle_id: nil)
-          require 'pry'
-          binding.pry
+          
           type = CERTIFICATE_TYPE_IDS.key(self)
           mac = MAC_CERTIFICATE_TYPE_IDS.include?(type)
 
@@ -310,6 +309,10 @@ module Spaceship
             app = Spaceship::Portal::App.set_client(client).find(bundle_id)
             raise "Could not find app with bundle id '#{bundle_id}'" unless app
             app_id = app.app_id
+          else
+            merchant = Spaceship::Portal.merchant.find(bundle_id)
+            raise "Could not find merchant with bundle id '#{bundle_id}" unless merchant
+            merchant_id = merchant.merchant_id
           end
 
           # ensure csr is a OpenSSL::X509::Request
@@ -317,7 +320,7 @@ module Spaceship
 
           # if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
           if type == '4APLUP237T'
-            response = client.create_certificate_apple_pay!(type, csr.to_pem, app_id, mac)
+            response = client.create_certificate_apple_pay!(type, csr.to_pem, merchant_id, mac)
           else 
             response = client.create_certificate!(type, csr.to_pem, app_id, mac)
           end

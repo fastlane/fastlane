@@ -528,8 +528,6 @@ module Spaceship
     def create_certificate!(type, csr, app_id = nil, mac = false)
       
       ensure_csrf(Spaceship::Portal::Certificate)
-      require 'pry'
-      binding.pry
       r = request(:post, "account/#{platform_slug(mac)}/certificate/submitCertificateRequest.action", {
         teamId: team_id,
         type: type,
@@ -539,17 +537,15 @@ module Spaceship
       parse_response(r, 'certRequest')
     end
 
-    def create_certificate_apple_pay!(type, csr, app_id = nil, mac = false)
+    def create_certificate_apple_pay!(type, csr, merchant_id = nil, mac = false)
       
       ensure_csrf(Spaceship::Portal::Certificate)
-      # require 'pry'
-      # binding.pry
       r = request(:post, "account/#{platform_slug(mac)}/certificate/submitCertificateRequest.action", {
         teamId: team_id,
         type: type,
         csrContent: csr,
-        omcId: 'C75T39R462', # optional //TODO: remove the hard coded id. Find the id dynamically.
-        specialIdentifierDisplayId: 'C75T39R462'
+        omcId: merchant_id,
+        specialIdentifierDisplayId: merchant_id
       })
       parse_response(r, 'certRequest')
     end
