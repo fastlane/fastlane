@@ -26,11 +26,14 @@ module Frameit
     # Fetches the finished configuration for a given path. This will try to look for a specific value
     # and fallback to a default value if nothing was found
     def fetch_value(path)
-      specific = @data['data'].find { |a| path.include?(a['filter']) }
+      specifics = @data['data'].select { |a| path.include?(a['filter']) }
 
       default = @data['default']
 
-      values = default.fastlane_deep_merge(specific || {})
+      values = default.clone
+      specifics.each do |specific|
+        values = values.fastlane_deep_merge(specific)
+      end
 
       change_paths_to_absolutes!(values)
       validate_values(values)
