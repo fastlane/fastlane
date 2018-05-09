@@ -10,7 +10,7 @@ module Fastlane
           UI.success("Collecting the last #{params[:commits_count]} Git commits")
         else
           if params[:between]
-            if params[:between].include?(",") #running from shell
+            if params[:between].include?(",") # running from shell
               from, to = params[:between].split(",", 2)
             else
               from, to = params[:between]
@@ -76,10 +76,10 @@ module Fastlane
                                        is_string: false,
                                        conflicting_options: [:commits_count],
                                        verify_block: proc do |value|
-                                         if !value.kind_of?(String)
+                                         unless value.kind_of?(String)
                                            UI.user_error!(":between must be of type array") unless value.kind_of?(Array)
                                            UI.user_error!(":between must not contain nil values") if value.any?(&:nil?)
-                                           UI.user_error!(":between must be an array of size 2") unless (value || []).size == 2 
+                                           UI.user_error!(":between must be an array of size 2") unless (value || []).size == 2
                                          end
                                        end),
           FastlaneCore::ConfigItem.new(key: :commits_count,
