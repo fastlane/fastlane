@@ -20,7 +20,6 @@ module Fastlane
       end
 
       def self.get_build_number(params)
-        
         UI.message("Login to iTunes Connect (#{params[:username]})")
         Spaceship::Tunes.login(params[:username])
         Spaceship::Tunes.select_team
