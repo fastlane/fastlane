@@ -20,6 +20,7 @@ module Fastlane
       end
 
       def self.get_build_number(params)
+        
         UI.message("Login to iTunes Connect (#{params[:username]})")
         Spaceship::Tunes.login(params[:username])
         Spaceship::Tunes.select_team
@@ -30,7 +31,9 @@ module Fastlane
         app = Spaceship::Tunes::Application.find(params[:app_identifier])
         if params[:live]
           UI.message("Fetching the latest build number for live-version")
-          build_nr = app.live_version.current_build_number
+          live_version = app.live_version
+          build_nr = live_version.current_build_number
+          Actions.lane_context[SharedValues::LATEST_VERSION_NUMBER] = live_version.version
         else
           version_number = params[:version]
           unless version_number
