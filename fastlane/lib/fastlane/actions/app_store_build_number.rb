@@ -6,7 +6,8 @@ module Fastlane
 
     class AppStoreBuildNumberAction < Action
       def self.run(params)
-        AppStoreBuildInfoAction.run(params)
+        build_number = AppStoreBuildInfoAction.run(params)
+        Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER] = build_number
       end
 
       #####################################################
