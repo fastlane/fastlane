@@ -10,6 +10,17 @@ module Fastlane
           UI.success("Collecting the last #{params[:commits_count]} Git commits")
         else
           if params[:between]
+            args.each do |current|
+            if current.include?(":") # that's a key/value which we want to pass to the lane
+              key, value = current.split(":", 2)
+              UI.user_error!("Please pass values like this: key:value") unless key.length > 0
+              value = CommandLineHandler.convert_value(value)
+              UI.verbose("Using #{key}: #{value}")
+              action_parameters[key.to_sym] = value
+            else
+              action_name ||= current
+            end
+          end
             from, to = params[:between]
           else
             from = Actions.last_git_tag_name(params[:match_lightweight_tag], params[:tag_match_pattern])
