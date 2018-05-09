@@ -1,7 +1,7 @@
 module Fastlane
   class LaneList
     # Print out the result of `generate`
-    SWIFT_FUNCTION_REGEX = /\s*func\s*(\w*)\s*\(\s*\)\s*/
+    SWIFT_FUNCTION_REGEX = /\s*func\s*(\w*)\s*\((.*)\)\s*/
     SWIFT_DESC_REGEX = /\s*desc\s*\(\s*"(.*)"\s*\)\s*/
     def self.output(path)
       puts(generate(path))
@@ -20,8 +20,7 @@ module Fastlane
 
       lane_content.split("\n").reject(&:empty?).each do |line|
         line.strip!
-        if line.start_with?("func")
-          current_lane_name = self.lane_name_from_swift_line(potential_lane_line: line)
+        if line.start_with?("func") && (current_lane_name = self.lane_name_from_swift_line(potential_lane_line: line))
           lanes_by_name[current_lane_name] = Fastlane::Lane.new(platform: nil, name: current_lane_name.to_sym, description: [])
         elsif line.start_with?("desc")
           lane_description = self.desc_entry_for_swift_lane(named: current_lane_name, potential_desc_line: line)

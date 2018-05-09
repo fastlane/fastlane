@@ -481,7 +481,7 @@ func buildApp(workspace: String? = nil,
               buildPath: String? = nil,
               archivePath: String? = nil,
               derivedDataPath: String? = nil,
-              resultBundle: String? = nil,
+              resultBundle: Bool = false,
               buildlogPath: String = "~/Library/Logs/gym",
               sdk: String? = nil,
               toolchain: String? = nil,
@@ -559,7 +559,7 @@ func buildIosApp(workspace: String? = nil,
                  buildPath: String? = nil,
                  archivePath: String? = nil,
                  derivedDataPath: String? = nil,
-                 resultBundle: String? = nil,
+                 resultBundle: Bool = false,
                  buildlogPath: String = "~/Library/Logs/gym",
                  sdk: String? = nil,
                  toolchain: String? = nil,
@@ -868,6 +868,7 @@ func cert(development: Bool = false,
           username: String,
           teamId: String? = nil,
           teamName: String? = nil,
+          filename: String? = nil,
           outputPath: String = ".",
           keychainPath: String,
           keychainPassword: String? = nil,
@@ -877,6 +878,7 @@ func cert(development: Bool = false,
                                                                                       RubyCommand.Argument(name: "username", value: username),
                                                                                       RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                       RubyCommand.Argument(name: "team_name", value: teamName),
+                                                                                      RubyCommand.Argument(name: "filename", value: filename),
                                                                                       RubyCommand.Argument(name: "output_path", value: outputPath),
                                                                                       RubyCommand.Argument(name: "keychain_path", value: keychainPath),
                                                                                       RubyCommand.Argument(name: "keychain_password", value: keychainPassword),
@@ -1460,6 +1462,7 @@ func getCertificates(development: Bool = false,
                      username: String,
                      teamId: String? = nil,
                      teamName: String? = nil,
+                     filename: String? = nil,
                      outputPath: String = ".",
                      keychainPath: String,
                      keychainPassword: String? = nil,
@@ -1469,6 +1472,7 @@ func getCertificates(development: Bool = false,
                                                                                                   RubyCommand.Argument(name: "username", value: username),
                                                                                                   RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                                   RubyCommand.Argument(name: "team_name", value: teamName),
+                                                                                                  RubyCommand.Argument(name: "filename", value: filename),
                                                                                                   RubyCommand.Argument(name: "output_path", value: outputPath),
                                                                                                   RubyCommand.Argument(name: "keychain_path", value: keychainPath),
                                                                                                   RubyCommand.Argument(name: "keychain_password", value: keychainPassword),
@@ -1691,7 +1695,7 @@ func gym(workspace: String? = gymfile.workspace,
          buildPath: String? = gymfile.buildPath,
          archivePath: String? = gymfile.archivePath,
          derivedDataPath: String? = gymfile.derivedDataPath,
-         resultBundle: String? = gymfile.resultBundle,
+         resultBundle: Bool = gymfile.resultBundle,
          buildlogPath: String = gymfile.buildlogPath,
          sdk: String? = gymfile.sdk,
          toolchain: String? = gymfile.toolchain,
@@ -1971,9 +1975,9 @@ func jira(url: String,
                                                                                       RubyCommand.Argument(name: "comment_text", value: commentText)])
   _ = runner.executeCommand(command)
 }
-func laneContext() {
+@discardableResult func laneContext() -> [String : Any] {
   let command = RubyCommand(commandID: "", methodName: "lane_context", className: nil, args: [])
-  _ = runner.executeCommand(command)
+  return parseDictionary(fromString: runner.executeCommand(command))
 }
 @discardableResult func lastGitCommit() -> [String : String] {
   let command = RubyCommand(commandID: "", methodName: "last_git_commit", className: nil, args: [])
@@ -2436,10 +2440,12 @@ func produce(username: String,
 @discardableResult func prompt(text: String = "Please enter some text: ",
                                ciInput: String = "",
                                boolean: Bool = false,
+                               secureText: Bool = false,
                                multiLineEndKeyword: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "prompt", className: nil, args: [RubyCommand.Argument(name: "text", value: text),
                                                                                         RubyCommand.Argument(name: "ci_input", value: ciInput),
                                                                                         RubyCommand.Argument(name: "boolean", value: boolean),
+                                                                                        RubyCommand.Argument(name: "secure_text", value: secureText),
                                                                                         RubyCommand.Argument(name: "multi_line_end_keyword", value: multiLineEndKeyword)])
   return runner.executeCommand(command)
 }
@@ -2587,11 +2593,14 @@ func runTests(workspace: String? = nil,
               buildlogPath: String = "~/Library/Logs/scan",
               includeSimulatorLogs: Bool = false,
               formatter: String? = nil,
+              maxConcurrentSimulators: Int? = nil,
+              disableConcurrentTesting: Bool = false,
               testWithoutBuilding: Bool? = nil,
               buildForTesting: Bool? = nil,
               xctestrun: String? = nil,
               derivedDataPath: String? = nil,
-              resultBundle: String? = nil,
+              shouldZipBuildProducts: Bool = false,
+              resultBundle: Bool = false,
               sdk: String? = nil,
               openReport: Bool = false,
               configuration: String? = nil,
@@ -2626,10 +2635,13 @@ func runTests(workspace: String? = nil,
                                                                                            RubyCommand.Argument(name: "buildlog_path", value: buildlogPath),
                                                                                            RubyCommand.Argument(name: "include_simulator_logs", value: includeSimulatorLogs),
                                                                                            RubyCommand.Argument(name: "formatter", value: formatter),
+                                                                                           RubyCommand.Argument(name: "max_concurrent_simulators", value: maxConcurrentSimulators),
+                                                                                           RubyCommand.Argument(name: "disable_concurrent_testing", value: disableConcurrentTesting),
                                                                                            RubyCommand.Argument(name: "test_without_building", value: testWithoutBuilding),
                                                                                            RubyCommand.Argument(name: "build_for_testing", value: buildForTesting),
                                                                                            RubyCommand.Argument(name: "xctestrun", value: xctestrun),
                                                                                            RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath),
+                                                                                           RubyCommand.Argument(name: "should_zip_build_products", value: shouldZipBuildProducts),
                                                                                            RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                            RubyCommand.Argument(name: "sdk", value: sdk),
                                                                                            RubyCommand.Argument(name: "open_report", value: openReport),
@@ -2705,11 +2717,14 @@ func scan(workspace: String? = scanfile.workspace,
           buildlogPath: String = scanfile.buildlogPath,
           includeSimulatorLogs: Bool = scanfile.includeSimulatorLogs,
           formatter: String? = scanfile.formatter,
+          maxConcurrentSimulators: Int? = scanfile.maxConcurrentSimulators,
+          disableConcurrentTesting: Bool = scanfile.disableConcurrentTesting,
           testWithoutBuilding: Bool? = scanfile.testWithoutBuilding,
           buildForTesting: Bool? = scanfile.buildForTesting,
           xctestrun: String? = scanfile.xctestrun,
           derivedDataPath: String? = scanfile.derivedDataPath,
-          resultBundle: String? = scanfile.resultBundle,
+          shouldZipBuildProducts: Bool = scanfile.shouldZipBuildProducts,
+          resultBundle: Bool = scanfile.resultBundle,
           sdk: String? = scanfile.sdk,
           openReport: Bool = scanfile.openReport,
           configuration: String? = scanfile.configuration,
@@ -2744,10 +2759,13 @@ func scan(workspace: String? = scanfile.workspace,
                                                                                       RubyCommand.Argument(name: "buildlog_path", value: buildlogPath),
                                                                                       RubyCommand.Argument(name: "include_simulator_logs", value: includeSimulatorLogs),
                                                                                       RubyCommand.Argument(name: "formatter", value: formatter),
+                                                                                      RubyCommand.Argument(name: "max_concurrent_simulators", value: maxConcurrentSimulators),
+                                                                                      RubyCommand.Argument(name: "disable_concurrent_testing", value: disableConcurrentTesting),
                                                                                       RubyCommand.Argument(name: "test_without_building", value: testWithoutBuilding),
                                                                                       RubyCommand.Argument(name: "build_for_testing", value: buildForTesting),
                                                                                       RubyCommand.Argument(name: "xctestrun", value: xctestrun),
                                                                                       RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath),
+                                                                                      RubyCommand.Argument(name: "should_zip_build_products", value: shouldZipBuildProducts),
                                                                                       RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                       RubyCommand.Argument(name: "sdk", value: sdk),
                                                                                       RubyCommand.Argument(name: "open_report", value: openReport),
@@ -2981,7 +2999,8 @@ func slack(message: String? = nil,
            defaultPayloads: [String]? = nil,
            attachmentProperties: [String : Any] = [:],
            success: Bool = true,
-           failOnError: Bool = true) {
+           failOnError: Bool = true,
+           linkNames: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "slack", className: nil, args: [RubyCommand.Argument(name: "message", value: message),
                                                                                        RubyCommand.Argument(name: "channel", value: channel),
                                                                                        RubyCommand.Argument(name: "use_webhook_configured_username_and_icon", value: useWebhookConfiguredUsernameAndIcon),
@@ -2992,7 +3011,8 @@ func slack(message: String? = nil,
                                                                                        RubyCommand.Argument(name: "default_payloads", value: defaultPayloads),
                                                                                        RubyCommand.Argument(name: "attachment_properties", value: attachmentProperties),
                                                                                        RubyCommand.Argument(name: "success", value: success),
-                                                                                       RubyCommand.Argument(name: "fail_on_error", value: failOnError)])
+                                                                                       RubyCommand.Argument(name: "fail_on_error", value: failOnError),
+                                                                                       RubyCommand.Argument(name: "link_names", value: linkNames)])
   _ = runner.executeCommand(command)
 }
 func slackTrain() {
@@ -3479,6 +3499,12 @@ func updateInfoPlist(xcodeproj: String? = nil,
                                                                                                    RubyCommand.Argument(name: "block", value: block)])
   _ = runner.executeCommand(command)
 }
+func updatePlist(plistPath: String? = nil,
+                 block: String) {
+  let command = RubyCommand(commandID: "", methodName: "update_plist", className: nil, args: [RubyCommand.Argument(name: "plist_path", value: plistPath),
+                                                                                              RubyCommand.Argument(name: "block", value: block)])
+  _ = runner.executeCommand(command)
+}
 func updateProjectCodeSigning(path: String,
                               udid: String,
                               uuid: String) {
@@ -3773,14 +3799,16 @@ func verifyBuild(provisioningType: String? = nil,
                  teamName: String? = nil,
                  appName: String? = nil,
                  bundleIdentifier: String? = nil,
-                 ipaPath: String? = nil) {
+                 ipaPath: String? = nil,
+                 buildPath: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "verify_build", className: nil, args: [RubyCommand.Argument(name: "provisioning_type", value: provisioningType),
                                                                                               RubyCommand.Argument(name: "provisioning_uuid", value: provisioningUuid),
                                                                                               RubyCommand.Argument(name: "team_identifier", value: teamIdentifier),
                                                                                               RubyCommand.Argument(name: "team_name", value: teamName),
                                                                                               RubyCommand.Argument(name: "app_name", value: appName),
                                                                                               RubyCommand.Argument(name: "bundle_identifier", value: bundleIdentifier),
-                                                                                              RubyCommand.Argument(name: "ipa_path", value: ipaPath)])
+                                                                                              RubyCommand.Argument(name: "ipa_path", value: ipaPath),
+                                                                                              RubyCommand.Argument(name: "build_path", value: buildPath)])
   _ = runner.executeCommand(command)
 }
 func verifyPodKeys() {
@@ -3859,8 +3887,62 @@ func xcodebuild() {
   let command = RubyCommand(commandID: "", methodName: "xcodebuild", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
-func xcov() {
-  let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [])
+func xcov(workspace: String? = nil,
+          project: String? = nil,
+          scheme: String? = nil,
+          configuration: String? = nil,
+          sourceDirectory: String? = nil,
+          derivedDataPath: String? = nil,
+          outputDirectory: String = "./xcov_report",
+          htmlReport: Bool = true,
+          markdownReport: Bool = false,
+          jsonReport: Bool = false,
+          minimumCoveragePercentage: Int = 0,
+          slackUrl: String? = nil,
+          slackChannel: String? = nil,
+          skipSlack: Bool = false,
+          slackUsername: String = "xcov",
+          slackMessage: String = "Your *xcov* coverage report",
+          ignoreFilePath: String = "./.xcovignore",
+          includeTestTargets: Bool = false,
+          excludeTargets: String? = nil,
+          includeTargets: String? = nil,
+          onlyProjectTargets: Bool = false,
+          disableCoveralls: Bool = false,
+          coverallsServiceName: String? = nil,
+          coverallsServiceJobId: String? = nil,
+          coverallsRepoToken: String? = nil,
+          xcconfig: String? = nil,
+          ideFoundationPath: String = "/Applications/Xcode92/Xcode.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          legacySupport: Bool = false) {
+  let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
+                                                                                      RubyCommand.Argument(name: "project", value: project),
+                                                                                      RubyCommand.Argument(name: "scheme", value: scheme),
+                                                                                      RubyCommand.Argument(name: "configuration", value: configuration),
+                                                                                      RubyCommand.Argument(name: "source_directory", value: sourceDirectory),
+                                                                                      RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath),
+                                                                                      RubyCommand.Argument(name: "output_directory", value: outputDirectory),
+                                                                                      RubyCommand.Argument(name: "html_report", value: htmlReport),
+                                                                                      RubyCommand.Argument(name: "markdown_report", value: markdownReport),
+                                                                                      RubyCommand.Argument(name: "json_report", value: jsonReport),
+                                                                                      RubyCommand.Argument(name: "minimum_coverage_percentage", value: minimumCoveragePercentage),
+                                                                                      RubyCommand.Argument(name: "slack_url", value: slackUrl),
+                                                                                      RubyCommand.Argument(name: "slack_channel", value: slackChannel),
+                                                                                      RubyCommand.Argument(name: "skip_slack", value: skipSlack),
+                                                                                      RubyCommand.Argument(name: "slack_username", value: slackUsername),
+                                                                                      RubyCommand.Argument(name: "slack_message", value: slackMessage),
+                                                                                      RubyCommand.Argument(name: "ignore_file_path", value: ignoreFilePath),
+                                                                                      RubyCommand.Argument(name: "include_test_targets", value: includeTestTargets),
+                                                                                      RubyCommand.Argument(name: "exclude_targets", value: excludeTargets),
+                                                                                      RubyCommand.Argument(name: "include_targets", value: includeTargets),
+                                                                                      RubyCommand.Argument(name: "only_project_targets", value: onlyProjectTargets),
+                                                                                      RubyCommand.Argument(name: "disable_coveralls", value: disableCoveralls),
+                                                                                      RubyCommand.Argument(name: "coveralls_service_name", value: coverallsServiceName),
+                                                                                      RubyCommand.Argument(name: "coveralls_service_job_id", value: coverallsServiceJobId),
+                                                                                      RubyCommand.Argument(name: "coveralls_repo_token", value: coverallsRepoToken),
+                                                                                      RubyCommand.Argument(name: "xcconfig", value: xcconfig),
+                                                                                      RubyCommand.Argument(name: "ideFoundationPath", value: ideFoundationPath),
+                                                                                      RubyCommand.Argument(name: "legacy_support", value: legacySupport)])
   _ = runner.executeCommand(command)
 }
 func xctest() {
@@ -3898,6 +3980,14 @@ func parseArray(fromString: String, function: String = #function) -> [String] {
 }
 
 func parseDictionary(fromString: String, function: String = #function) -> [String : String] {
+    return parseDictionaryHelper(fromString: fromString, function: function) as! [String: String]
+}
+
+func parseDictionary(fromString: String, function: String = #function) -> [String : Any] {
+    return parseDictionaryHelper(fromString: fromString, function: function)
+}
+
+func parseDictionaryHelper(fromString: String, function: String = #function) -> [String : Any] {
   verbose(message: "parsing an Array from data: \(fromString), from function: \(function)")
   let potentialDictionary: String
   if fromString.count < 2 {
@@ -3906,7 +3996,7 @@ func parseDictionary(fromString: String, function: String = #function) -> [Strin
   } else {
       potentialDictionary = fromString
   }
-  let dictionary: [String : String] = try! JSONSerialization.jsonObject(with: potentialDictionary.data(using: .utf8)!, options: []) as! [String : String]
+  let dictionary: [String : Any] = try! JSONSerialization.jsonObject(with: potentialDictionary.data(using: .utf8)!, options: []) as! [String : Any]
   return dictionary
 }
 
@@ -3929,4 +4019,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.13]
+// FastlaneRunnerAPIVersion [0.9.16]

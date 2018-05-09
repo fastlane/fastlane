@@ -438,6 +438,27 @@ class TunesStubbing
                   headers: { 'Content-Type' => 'application/json' })
     end
 
+    def itc_stub_update_price_tier
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        with(body: JSON.parse(itc_read_fixture_file(File.join('update_price_tier', 'update_price_tier_request.json'))).to_json).
+        to_return(status: 200, body: itc_read_fixture_file(File.join('app_pricing_intervals.json')),
+                  headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_set_preorder_cleared
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        with(body: JSON.parse(itc_read_fixture_file(File.join('availability', 'set_preorder_cleared_request.json'))).to_json).
+        to_return(status: 200, body: itc_read_fixture_file(File.join('availability', 'set_preorder_cleared_response.json')),
+                  headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_set_preorder_cleared_with_date
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        with(body: JSON.parse(itc_read_fixture_file(File.join('availability', 'set_preorder_cleared_with_date_request.json'))).to_json).
+        to_return(status: 200, body: itc_read_fixture_file(File.join('availability', 'set_preorder_cleared_with_date_response.json')),
+                  headers: { 'Content-Type' => 'application/json' })
+    end
+
     def itc_stub_members
       # resend notification
       stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/helmut@januschka.com/resendInvitation").

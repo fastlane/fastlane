@@ -29,8 +29,10 @@ module Fastlane
       end
 
       def self.details
-        "If building your app requires a specific version of Xcode, you can invoke this command before using gym.\n
-        For example, to ensure that a beta version of Xcode is not accidentally selected to build, which would make uploading to TestFlight fail."
+        [
+          "If building your app requires a specific version of Xcode, you can invoke this command before using gym.",
+          "For example, to ensure that a beta version of Xcode is not accidentally selected to build, which would make uploading to TestFlight fail."
+        ].join("\n")
       end
 
       def self.available_options

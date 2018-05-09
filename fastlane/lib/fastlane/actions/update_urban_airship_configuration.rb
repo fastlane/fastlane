@@ -25,7 +25,7 @@ module Fastlane
       end
 
       def self.details
-        "This action updates the AirshipConfig.plist need to configure the Urban Airship SDK at runtime, allowing keys and secrets to easily be set for Enterprise and Production versions of the application."
+        "This action updates the `AirshipConfig.plist` needed to configure the Urban Airship SDK at runtime, allowing keys and secrets to easily be set for the Enterprise and Production versions of the application."
       end
 
       def self.available_options

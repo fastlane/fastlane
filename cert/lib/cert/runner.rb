@@ -89,7 +89,7 @@ module Cert
           next
         end
 
-        path = store_certificate(certificate)
+        path = store_certificate(certificate, Cert.config[:filename])
         private_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
 
         if FastlaneCore::CertChecker.installed?(path)
@@ -170,7 +170,7 @@ module Cert
       private_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
       File.write(private_key_path, pkey)
 
-      cert_path = store_certificate(certificate)
+      cert_path = store_certificate(certificate, Cert.config[:filename])
 
       # Import all the things into the Keychain
       keychain = File.expand_path(Cert.config[:keychain_path])
@@ -187,8 +187,10 @@ module Cert
       return cert_path
     end
 
-    def store_certificate(certificate)
-      path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.cer"))
+    def store_certificate(certificate, filename = nil)
+      cert_name = filename ? filename : certificate.id
+      cert_name = "#{cert_name}.cer" unless File.extname(cert_name) == ".cer"
+      path = File.expand_path(File.join(Cert.config[:output_path], cert_name))
       raw_data = certificate.download_raw
       File.write(path, raw_data)
       return path

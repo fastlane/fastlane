@@ -57,12 +57,17 @@ module Fastlane
       e = nil
       begin
         ff.runner.execute(lane, platform, parameters)
+      rescue NameError => ex
+        print_lane_context
+        print_error_line(ex)
+        e = ex
       rescue Exception => ex # rubocop:disable Lint/RescueException
         # We also catch Exception, since the implemented action might send a SystemExit signal
         # (or similar). We still want to catch that, since we want properly finish running fastlane
         # Tested with `xcake`, which throws a `Xcake::Informative` object
 
         print_lane_context
+        print_error_line(ex)
         UI.error(ex.to_s) if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
         e = ex
       end
@@ -102,6 +107,8 @@ module Fastlane
       end
 
       rows << [0, "cancel", "No selection, exit fastlane!"]
+
+      require 'terminal-table'
 
       table = Terminal::Table.new(
         title: "Available lanes to run",

@@ -14,26 +14,26 @@ File.write("#{lib}/fastlane/plugins/template/.rubocop.yml", YAML.dump(config))
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
-  spec.authors       = ["Manu Wallner",
-                        "Aaron Brager",
-                        "Matthew Ellis",
-                        "Jimmy Dee",
-                        "Felix Krause",
-                        "Jan Piotrowski",
-                        "Luka Mirosevic",
-                        "Fumiya Nakamura",
-                        "Maksym Grebenets",
-                        "Danielle Tomlinson",
-                        "Iulian Onofrei",
+  spec.authors       = ["Stefan Natchev",
                         "Jorge Revuelta H",
+                        "Andrew McBurney",
+                        "Maksym Grebenets",
+                        "Felix Krause",
+                        "Danielle Tomlinson",
+                        "Jan Piotrowski",
+                        "Josh Holtz",
+                        "Iulian Onofrei",
+                        "Kohki Miki",
+                        "Jérôme Lacoste",
+                        "Olivier Halligon",
+                        "Fumiya Nakamura",
                         "Helmut Januschka",
                         "Joshua Liebowitz",
-                        "Stefan Natchev",
-                        "Jérôme Lacoste",
-                        "Andrew McBurney",
-                        "Olivier Halligon",
-                        "Kohki Miki",
-                        "Josh Holtz"]
+                        "Jimmy Dee",
+                        "Manu Wallner",
+                        "Aaron Brager",
+                        "Matthew Ellis",
+                        "Luka Mirosevic"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -95,6 +95,8 @@ Gem::Specification.new do |spec|
   # If you upgrade this gem, make sure to upgrade the users of it as well.
   spec.add_dependency('google-api-client', '>= 0.13.1', '< 0.14.0') # Google API Client to access Play Publishing API
 
+  spec.add_dependency('emoji_regex', '~> 0.1') # Used to scan for Emoji in the changelog
+
   # Development only
   spec.add_development_dependency('rake', '< 12')
   spec.add_development_dependency('rspec', '~> 3.5.0')
@@ -112,4 +114,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('rest-client', '>= 1.8.0')
   spec.add_development_dependency('fakefs', '~> 0.8.1')
   spec.add_development_dependency('sinatra', '~> 1.4.8')
+  spec.add_development_dependency('xcov', '~> 1.4.1') # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
 end

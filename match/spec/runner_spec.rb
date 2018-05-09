@@ -80,7 +80,7 @@ describe Match do
       expect(Match::GitHelper).to_not(receive(:commit_changes))
 
       # To also install the certificate, fake that
-      expect(FastlaneCore::CertChecker).to receive(:installed?).with(cert_path).and_return(false)
+      expect(FastlaneCore::CertChecker).to receive(:installed?).with(cert_path, in_keychain: nil).and_return(false)
       expect(Match::Utils).to receive(:import).with(cert_path, keychain, password: nil).and_return(nil)
 
       spaceship = "spaceship"

@@ -8,6 +8,7 @@
 - [ ] I searched for [existing GitHub issues](https://github.com/fastlane/fastlane/issues)
 
 ### Issue Description
+<!-- Please include what's happening, expected behavior, and any relevant code samples -->
 
 ##### Complete output when running fastlane, including the stack trace and command used
 <!-- You can use: `--capture_output` as the last commandline argument to get that collected for you -->
