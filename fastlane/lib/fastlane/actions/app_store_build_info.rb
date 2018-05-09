@@ -106,7 +106,7 @@ module Fastlane
                                        default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        short_option: "-k",
-                                       env_name: "APPSTORE_BUILD_NUMBER_LIVE_TEAM_ID",
+                                       env_name: "APPSTORE_BUILD_INFO_LIVE_TEAM_ID",
                                        description: "The ID of your iTunes Connect team if you're in multiple teams",
                                        optional: true,
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
@@ -118,7 +118,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :live,
                                        short_option: "-l",
-                                       env_name: "APPSTORE_BUILD_NUMBER_LIVE",
+                                       env_name: "APPSTORE_BUILD_INFO_LIVE",
                                        description: "Query the live version (ready-for-sale)",
                                        optional: true,
                                        is_string: false,
