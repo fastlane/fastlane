@@ -128,7 +128,7 @@ module FastlaneCore
         optional = true if optional.nil?
         UI.crash!("Deprecated option must be optional") unless optional
         # deprecated options are marked deprecated in their description
-        description = "[DEPRECATED!] #{deprecated} - #{description}"
+        description = "**DEPRECATED** #{description}"
       end
 
       optional = false if optional.nil?
