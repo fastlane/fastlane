@@ -32,7 +32,7 @@ describe Fastlane::Actions::EnsureXcodeVersionAction do
         ensure_xcode_version(version: '8.0')
       end").runner.execute(:test)
     end
-    
+
     it "properly compares versions, not just strings" do
       expect(Fastlane::Actions::EnsureXcodeVersionAction).to receive(:sh).and_return(matching_response)
       expect(UI).to receive(:success).with(/Driving the lane/)
@@ -44,7 +44,7 @@ describe Fastlane::Actions::EnsureXcodeVersionAction do
     end
 
     describe "loads a .xcode-version file if it exists" do
-      let (:xcode_version_path) { ".xcode-version" }
+      let(:xcode_version_path) { ".xcode-version" }
       before do
         expect(Fastlane::Actions::EnsureXcodeVersionAction).to receive(:sh).and_return(matching_response)
         expect(Dir).to receive(:glob).with(".xcode-version").and_return([xcode_version_path])
