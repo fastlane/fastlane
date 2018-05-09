@@ -50,6 +50,8 @@ module Fastlane
 
           end
 
+          Actions.lane_context[SharedValues::LATEST_VERSION_NUMBER] = version_number
+
           UI.message("Fetching the latest build number for version #{version_number}")
 
           begin
@@ -151,12 +153,13 @@ module Fastlane
 
       def self.output
         [
-          ['LATEST_BUILD_NUMBER', 'The latest build number of either live or testflight version']
+          ['LATEST_BUILD_NUMBER', 'The latest build number of either live or testflight version'],
+          ['LATEST_VERSION_NUMBER', 'The latest version number of either live or testflight version']
         ]
       end
 
       def self.details
-        "Returns the current build number of either the live or testflight version - it is useful for getting the build_number of the current or ready-for-sale app version, and it also works on non-live testflight version. If you need to handle more build-trains please see `latest_testflight_build_number`"
+        "Returns the current build number and version number of either the live or testflight version - it is useful for getting the build_number of the current or ready-for-sale app version, and it also works on non-live testflight version. If you need to handle more build-trains please see `latest_testflight_build_number`"
       end
 
       def self.example_code
@@ -175,7 +178,7 @@ module Fastlane
       end
 
       def self.authors
-        ["hjanuschka"]
+        ["rishabhtayal"]
       end
 
       def self.category

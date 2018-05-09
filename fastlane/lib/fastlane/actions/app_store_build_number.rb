@@ -6,16 +6,7 @@ module Fastlane
 
     class AppStoreBuildNumberAction < Action
       def self.run(params)
-        AppStoreBuildInfoAction.run(
-          
-          )
-      end
-
-      def self.get_build_number(params)
-
-      end
-
-      def self.order_versions(versions)
+        AppStoreBuildInfoAction.run(params)
       end
 
       #####################################################
