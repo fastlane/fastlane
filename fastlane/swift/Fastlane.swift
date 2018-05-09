@@ -887,6 +887,7 @@ func cert(development: Bool = false,
 }
 @discardableResult func changelogFromGitCommits(between: String? = nil,
                                                 commitsCount: Int? = nil,
+                                                path: String = "./",
                                                 pretty: String = "%B",
                                                 dateFormat: String? = nil,
                                                 ancestryPath: Bool = false,
@@ -896,6 +897,7 @@ func cert(development: Bool = false,
                                                 mergeCommitFiltering: String = "include_merges") -> String {
   let command = RubyCommand(commandID: "", methodName: "changelog_from_git_commits", className: nil, args: [RubyCommand.Argument(name: "between", value: between),
                                                                                                             RubyCommand.Argument(name: "commits_count", value: commitsCount),
+                                                                                                            RubyCommand.Argument(name: "path", value: path),
                                                                                                             RubyCommand.Argument(name: "pretty", value: pretty),
                                                                                                             RubyCommand.Argument(name: "date_format", value: dateFormat),
                                                                                                             RubyCommand.Argument(name: "ancestry_path", value: ancestryPath),
@@ -3201,11 +3203,13 @@ func spm(command: String = "build",
          buildPath: String? = nil,
          packagePath: String? = nil,
          configuration: String? = nil,
+         xcprettyOutput: String? = nil,
          verbose: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "spm", className: nil, args: [RubyCommand.Argument(name: "command", value: command),
                                                                                      RubyCommand.Argument(name: "build_path", value: buildPath),
                                                                                      RubyCommand.Argument(name: "package_path", value: packagePath),
                                                                                      RubyCommand.Argument(name: "configuration", value: configuration),
+                                                                                     RubyCommand.Argument(name: "xcpretty_output", value: xcprettyOutput),
                                                                                      RubyCommand.Argument(name: "verbose", value: verbose)])
   _ = runner.executeCommand(command)
 }
@@ -4019,4 +4023,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.16]
+// FastlaneRunnerAPIVersion [0.9.17]
