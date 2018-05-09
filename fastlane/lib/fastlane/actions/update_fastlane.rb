@@ -146,7 +146,7 @@ module Fastlane
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :tools,
                                        env_name: "FL_TOOLS_TO_UPDATE",
-                                       description: "Comma separated list of fastlane tools to update (e.g. fastlane,deliver,sigh)",
+                                       description: "Comma separated list of fastlane tools to update (e.g. `fastlane,deliver,sigh`)",
                                        deprecated: true,
                                        optional: true)
         ]

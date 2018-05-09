@@ -36,7 +36,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :udid,
                                        env_name: "FL_PROJECT_SIGNING_UDID",
-                                       description: "DEPRECATED: see :uuid",
+                                       description: "DEPRECATED: see `:uuid`",
                                        code_gen_sensitive: true,
                                        default_value: ENV["SIGH_UUID"],
                                        default_value_dynamic: true),
