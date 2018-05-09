@@ -24,7 +24,7 @@ module Fastlane
 
       def self.example_code
         [
-          'say "I can speak"'
+          'say("I can speak")'
         ]
       end
 
