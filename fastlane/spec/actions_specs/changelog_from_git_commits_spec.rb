@@ -163,6 +163,10 @@ describe Fastlane do
 
         expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
       end
+
+      it "Runs between option from command line" do
+        expect(system("fastlane run changelog_from_git_commits between:123456,HEAD")).to be
+      end
     end
   end
 end
