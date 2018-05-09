@@ -83,7 +83,7 @@ module FastlaneCore
     # @param optional (Boolean) is false by default. If set to true, also string values will not be asked to the user
     # @param conflicting_options ([]) array of conflicting option keys(@param key). This allows to resolve conflicts intelligently
     # @param conflict_block an optional block which is called when options conflict happens
-    # @param deprecated (String) Set if the option is deprecated. A deprecated option should be optional and is made optional if the parameter isn't set, and fails otherwise
+    # @param deprecated (Boolean|String) Set if the option is deprecated. A deprecated option should be optional and is made optional if the parameter isn't set, and fails otherwise
     # @param sensitive (Boolean) Set if the variable is sensitive, such as a password or API token, to prevent echoing when prompted for the parameter
     # @param display_in_shell (Boolean) Set if the variable can be used from shell
     # rubocop:disable Metrics/ParameterLists
@@ -127,8 +127,20 @@ module FastlaneCore
         # deprecated options are automatically optional
         optional = true if optional.nil?
         UI.crash!("Deprecated option must be optional") unless optional
+
         # deprecated options are marked deprecated in their description
-        description = "**DEPRECATED** #{description}"
+        initial_description = description
+
+        has_description = !initial_description.to_s.empty?
+
+        description = "**DEPRECATED!**"
+
+        if deprecated.kind_of?(String)
+          description << " #{deprecated}"
+          description << " -" if has_description
+        end
+
+        description << " #{initial_description}" if has_description
       end
 
       optional = false if optional.nil?
