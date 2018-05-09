@@ -59,7 +59,9 @@ module Fastlane
       end
 
       def self.example_code
-        ['ensure_xcode_version(version: "7.2")']
+        [
+          'ensure_xcode_version(version: "7.2")'
+        ]
       end
 
       def self.category
