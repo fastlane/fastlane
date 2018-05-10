@@ -3,9 +3,8 @@ require 'credentials_manager/appfile_config'
 
 module Supply
   class Options
-    # rubocop:disable Metrics/PerceivedComplexity
     def self.available_options
-      valid_tracks = %w(production beta alpha internal rollout)
+      default_tracks = %w(production beta alpha internal rollout)
       @options ||= [
         FastlaneCore::ConfigItem.new(key: :package_name,
                                      env_name: "SUPPLY_PACKAGE_NAME",
@@ -17,12 +16,8 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :track,
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",
-                                     description: "The track of the application to use: #{valid_tracks.join(', ')}",
-                                     default_value: 'production',
-                                     verify_block: proc do |value|
-                                       available = valid_tracks
-                                       UI.user_error!("Invalid value '#{value}', must be #{available.join(', ')}") unless available.include?(value)
-                                     end),
+                                     description: "The track of the application to use. The default available tracks are: #{default_tracks.join(', ')}",
+                                     default_value: 'production'),
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
                                      description: "The percentage of the user fraction when uploading to the rollout track",
@@ -146,11 +141,7 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :track_promote_to,
                                      env_name: "SUPPLY_TRACK_PROMOTE_TO",
                                      optional: true,
-                                     description: "The track to promote to: #{valid_tracks.join(', ')}",
-                                     verify_block: proc do |value|
-                                       available = valid_tracks
-                                       UI.user_error!("Invalid value '#{value}', must be #{available.join(', ')}") unless available.include?(value)
-                                     end),
+                                     description: "The track to promote to. The default available tracks are: #{default_tracks.join(', ')}"),
         FastlaneCore::ConfigItem.new(key: :validate_only,
                                      env_name: "SUPPLY_VALIDATE_ONLY",
                                      optional: true,
@@ -195,6 +186,5 @@ module Supply
 
       ]
     end
-    # rubocop:enable Metrics/PerceivedComplexity
   end
 end
