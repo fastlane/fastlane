@@ -172,14 +172,20 @@ module Match
         self.files_to_commmit << profile
       end
 
-      installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       uuid = parsed["UUID"]
 
-      if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
-        # This profile is invalid, let's remove the local file and generate a new one
-        File.delete(profile)
-        # This method will be called again, no need to modify `files_to_commmit`
+      if spaceship
+        if spaceship.profile_exists(username: params[:username], uuid: uuid)
+          # This profile is valid, so install
+          installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
+        else
+          # This profile is invalid, let's remove the local file and generate a new one
+          File.delete(profile)
+          # This method will be called again, no need to modify `files_to_commmit`
+          return nil
+        end
+      else
         return nil
       end
 
