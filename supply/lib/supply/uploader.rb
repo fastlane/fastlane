@@ -184,6 +184,11 @@ module Supply
       tracks = ["production", "rollout", "beta", "alpha", "internal"]
       config_track_index = tracks.index(Supply.config[:track])
 
+      # Custom "closed" tracks are now allowed (https://support.google.com/googleplay/android-developer/answer/3131213)
+      # Custom tracks have an equal level with alpha (alpha is considered a closed track as well)
+      # If a track index is not found, we will assume is a custom track so an alpha index is given
+      config_track_index = tracks.index("alpha") unless config_track_index
+
       tracks.each_index do |track_index|
         track = tracks[track_index]
         track_version_codes = client.track_version_codes(track).sort

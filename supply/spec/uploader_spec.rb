@@ -241,6 +241,54 @@ describe Supply do
         }
         Supply::Uploader.new.check_superseded_tracks([105])
       end
+
+      it 'combined case with custom track as alpha' do
+        allow(client).to receive(:track_version_codes) do |track|
+          next [103] if track.eql?('production')
+          next [102] if track.eql?('rollout')
+          next [105] if track.eql?('alpha')
+          next [104] if track.eql?('custom')
+          next [101] if track.eql?('internal')
+          []
+        end
+
+        allow(client).to receive(:update_track) do |track, rollout, apk_version_code|
+          expect(track).to eq('rollout').or(eq('alpha')).or(eq('custom')).or(eq('internal'))
+          expect(rollout).to eq(1.0)
+          expect(apk_version_code).to be_empty
+        end
+
+        expect(client).to receive(:update_track).exactly(2).times
+
+        Supply.config = {
+          track: 'alpha'
+        }
+        Supply::Uploader.new.check_superseded_tracks([106])
+      end
+
+      it 'combined case with custom track as custom' do
+        allow(client).to receive(:track_version_codes) do |track|
+          next [103] if track.eql?('production')
+          next [102] if track.eql?('rollout')
+          next [105] if track.eql?('alpha')
+          next [104] if track.eql?('custom')
+          next [101] if track.eql?('internal')
+          []
+        end
+
+        allow(client).to receive(:update_track) do |track, rollout, apk_version_code|
+          expect(track).to eq('rollout').or(eq('alpha')).or(eq('custom')).or(eq('internal'))
+          expect(rollout).to eq(1.0)
+          expect(apk_version_code).to be_empty
+        end
+
+        expect(client).to receive(:update_track).exactly(2).times
+
+        Supply.config = {
+          track: 'custom'
+        }
+        Supply::Uploader.new.check_superseded_tracks([106])
+      end
     end
   end
 end
