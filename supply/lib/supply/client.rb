@@ -210,11 +210,14 @@ module Supply
     def upload_apk(path_to_apk)
       ensure_active_edit!
 
+      puts "path_to_apk: #{path_to_apk}"
+
       result_upload = call_google_api do
         android_publisher.upload_apk(
           current_package_name,
           current_edit.id,
-          upload_source: path_to_apk
+          upload_source: path_to_apk,
+          content_type: 'application/octet-stream'
         )
       end
 

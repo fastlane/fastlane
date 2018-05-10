@@ -39,8 +39,8 @@ module Supply
     end
 
     def verify_config!
-      unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths] || (Supply.config[:track] && Supply.config[:track_promote_to])
-        UI.user_error!("No local metadata, apks, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+      unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths] || Supply.config[:aab] || (Supply.config[:track] && Supply.config[:track_promote_to])
+        UI.user_error!("No local metadata, apks, aab, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
       end
     end
 
@@ -111,7 +111,7 @@ module Supply
     end
 
     def upload_binaries
-      apk_paths = [Supply.config[:apk]] unless (apk_paths = Supply.config[:apk_paths])
+      apk_paths = [Supply.config[:apk] || Supply.config[:aab]] unless (apk_paths = Supply.config[:apk_paths])
       apk_paths.compact!
 
       apk_version_codes = []
