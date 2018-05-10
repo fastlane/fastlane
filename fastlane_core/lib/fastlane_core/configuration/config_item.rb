@@ -129,18 +129,7 @@ module FastlaneCore
         UI.crash!("Deprecated option must be optional") unless optional
 
         # deprecated options are marked deprecated in their description
-        initial_description = description
-
-        has_description = !initial_description.to_s.empty?
-
-        description = "**DEPRECATED!**"
-
-        if deprecated.kind_of?(String)
-          description << " #{deprecated}"
-          description << " -" if has_description
-        end
-
-        description << " #{initial_description}" if has_description
+        description = deprecated_description(description, deprecated)
       end
 
       optional = false if optional.nil?
@@ -287,6 +276,21 @@ module FastlaneCore
 
     def to_s
       [@key, @description].join(": ")
+    end
+
+    def deprecated_description(initial_description, deprecated)
+      has_description = !initial_description.to_s.empty?
+
+      description = "**DEPRECATED!**"
+
+      if deprecated.kind_of?(String)
+        description << " #{deprecated}"
+        description << " -" if has_description
+      end
+
+      description << " #{initial_description}" if has_description
+
+      description
     end
 
     def doc_default_value
