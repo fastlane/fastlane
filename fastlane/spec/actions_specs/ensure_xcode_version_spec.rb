@@ -26,11 +26,50 @@ describe Fastlane::Actions::EnsureXcodeVersionAction do
 
     it "presents an error when the version does not match" do
       expect(Fastlane::Actions::EnsureXcodeVersionAction).to receive(:sh).and_return(different_response)
-      expect(UI).to receive(:user_error!)
+      expect(UI).to receive(:user_error!).with("Selected Xcode version doesn't match your requirement.\nExpected: Xcode 8.0\nActual: Xcode 7.3\n")
 
       result = Fastlane::FastFile.new.parse("lane :test do
         ensure_xcode_version(version: '8.0')
       end").runner.execute(:test)
+    end
+
+    it "properly compares versions, not just strings" do
+      expect(Fastlane::Actions::EnsureXcodeVersionAction).to receive(:sh).and_return(matching_response)
+      expect(UI).to receive(:success).with(/Driving the lane/)
+      expect(UI).to receive(:success).with(/Selected Xcode version is correct/)
+
+      result = Fastlane::FastFile.new.parse("lane :test do
+        ensure_xcode_version(version: '8')
+      end").runner.execute(:test)
+    end
+
+    describe "loads a .xcode-version file if it exists" do
+      let(:xcode_version_path) { ".xcode-version" }
+      before do
+        expect(Fastlane::Actions::EnsureXcodeVersionAction).to receive(:sh).and_return(matching_response)
+        expect(Dir).to receive(:glob).with(".xcode-version").and_return([xcode_version_path])
+      end
+
+      it "succeeds if the numbers match" do
+        expect(UI).to receive(:success).with(/Driving the lane/)
+        expect(UI).to receive(:success).with(/Selected Xcode version is correct/)
+
+        expect(File).to receive(:read).with(xcode_version_path).and_return("8.0")
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          ensure_xcode_version
+        end").runner.execute(:test)
+      end
+
+      it "fails if the numbers don't match" do
+        expect(UI).to receive(:user_error!).with("Selected Xcode version doesn't match your requirement.\nExpected: Xcode 9.0\nActual: Xcode 8.0\n")
+
+        expect(File).to receive(:read).with(xcode_version_path).and_return("9.0")
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          ensure_xcode_version
+        end").runner.execute(:test)
+      end
     end
   end
 end
