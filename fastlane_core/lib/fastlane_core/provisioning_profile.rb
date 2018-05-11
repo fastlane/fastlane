@@ -71,6 +71,21 @@ module FastlaneCore
         destination
       end
 
+      # Installs a provisioning profile for Xcode to use
+      def uninstall(path, keychain_path = nil)
+        UI.message("Delete provisioning profile...")
+        unless path.nil?
+          profile_filename = uuid(path, keychain_path) + ".mobileprovision"
+          destination = File.join(profiles_path, profile_filename)
+          if File.exist?(destination)
+            File.delete(destination)
+          end
+          if File.exist?(path)
+            File.delete(path)
+          end
+        end
+      end
+
       private
 
       def decode(path, keychain_path = nil)
