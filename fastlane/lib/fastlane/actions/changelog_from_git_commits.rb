@@ -28,10 +28,8 @@ module Fastlane
         if params[:include_merges] == false
           merge_commit_filtering = :exclude_merges
         end
-        
-        if params[:path] == nil
-          params[:path] = './'
-        end
+
+        params[:path] = './' unless params[:path]
 
         Dir.chdir(params[:path]) do
           if params[:commits_count]
