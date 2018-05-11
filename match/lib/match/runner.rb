@@ -199,6 +199,7 @@ module Match
             installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
           else
             # This profile is invalid, let's remove the local file and generate a new one
+            FastlaneCore::ProvisioningProfile.uninstall(profile, keychain_path)
             File.delete(profile)
             # This method will be called again, no need to modify `files_to_commmit`
             return nil
