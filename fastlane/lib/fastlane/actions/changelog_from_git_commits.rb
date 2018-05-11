@@ -29,6 +29,8 @@ module Fastlane
           merge_commit_filtering = :exclude_merges
         end
 
+        params[:path] = './' unless params[:path]
+
         Dir.chdir(params[:path]) do
           if params[:commits_count]
             changelog = Actions.git_log_last_commits(params[:pretty], params[:commits_count], merge_commit_filtering, params[:date_format], params[:ancestry_path])
