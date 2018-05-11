@@ -155,6 +155,24 @@ module Match
         end
       end
 
+      if !profile.nil?
+        check_parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
+        uuid = check_parsed["UUID"]
+        if spaceship
+          if spaceship.profile_exists(username: params[:username], uuid: uuid)
+            # This profile is valid, so install
+          else
+            # This profile is invalid, let's remove the local file and generate a new one
+            File.delete(profile)
+            profile = nil
+            # This method will be called again, no need to modify `files_to_commmit`
+            return nil
+          end
+        else
+          return nil
+        end
+      end
+
       if profile.nil? || params[:force]
         if params[:readonly]
           all_profiles = Dir.entries(base_dir).reject { |f| f.start_with?(".") }
@@ -172,21 +190,22 @@ module Match
         self.files_to_commmit << profile
       end
 
-      parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
-      uuid = parsed["UUID"]
-
-      if spaceship
-        if spaceship.profile_exists(username: params[:username], uuid: uuid)
-          # This profile is valid, so install
-          installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
+      if !profile.nil?
+        parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
+        uuid = parsed["UUID"]
+        if spaceship
+          if spaceship.profile_exists(username: params[:username], uuid: uuid)
+            # This profile is valid, so install
+            installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
+          else
+            # This profile is invalid, let's remove the local file and generate a new one
+            File.delete(profile)
+            # This method will be called again, no need to modify `files_to_commmit`
+            return nil
+          end
         else
-          # This profile is invalid, let's remove the local file and generate a new one
-          File.delete(profile)
-          # This method will be called again, no need to modify `files_to_commmit`
           return nil
         end
-      else
-        return nil
       end
 
       Utils.fill_environment(Utils.environment_variable_name(app_identifier: app_identifier,
