@@ -42,7 +42,7 @@ module FastlaneCore
       end
 
       @errors = []
-      @returnederrors = []
+      @errors_to_show = []
       @warnings = []
       @all_lines = []
 
@@ -100,7 +100,11 @@ module FastlaneCore
         UI.important("Although errors occurred during execution of iTMSTransporter, it returned success status.")
       end
 
-      return exit_status.zero?, @returnederrors
+      return exit_status.zero?
+    end
+
+    def gather_errors
+      @errors_to_show
     end
 
     private
@@ -118,7 +122,7 @@ module FastlaneCore
         @errors << $1
         # It looks like this causes errors to be printed twice
         # Instead of printing this again maybe just save it to be used later?
-        @returnederrors << "[Transporter Error Output]: #{$1}"
+        @errors_to_show << "[Transporter Error Output]: #{$1}"
         # UI.error("[Transporter Error Output]: #{$1}")
 
         # Check if it's a login error
@@ -379,7 +383,7 @@ module FastlaneCore
       UI.verbose(@transporter_executor.build_upload_command(@user, 'YourPassword', actual_dir, @provider_short_name))
 
       begin
-        result, transportererrors = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return upload(app_id, dir)
@@ -393,7 +397,11 @@ module FastlaneCore
         handle_error(@password)
       end
 
-      return result, transportererrors
+      return result
+    end
+
+    def returned_errors
+      @transporter_executor.gather_errors
     end
 
     private
