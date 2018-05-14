@@ -36,6 +36,7 @@ module Frameit
           end
 
           UI.message("Framing screenshot '#{full_path}'")
+          Helper.show_loading_indicator('')
 
           begin
             screenshot = Screenshot.new(full_path, color)
@@ -44,6 +45,7 @@ module Frameit
             UI.error(ex.to_s)
             UI.error("Backtrace:\n\t#{ex.backtrace.join("\n\t")}") if FastlaneCore::Globals.verbose?
           end
+          Helper.hide_loading_indicator
         end
       else
         UI.error("Could not find screenshots in current directory: '#{File.expand_path(path)}'")
