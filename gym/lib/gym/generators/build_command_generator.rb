@@ -65,7 +65,7 @@ module Gym
       def pipe
         pipe = []
         pipe << "| tee #{xcodebuild_log_path.shellescape}"
-        pipe << "| grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt" if Gym.config[:analyze_build_time]
+        pipe << "| bash -c 'tee >(grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt)'" if Gym.config[:analyze_build_time]
         unless Gym.config[:disable_xcpretty]
           formatter = Gym.config[:xcpretty_formatter]
           pipe << "| xcpretty"
