@@ -14,7 +14,7 @@ To modify it, go to its source at https://github.com/fastlane/fastlane/blob/mast
 <%= @custom_content %>
 <hr />
 <% else %>
-<%= "> #{action.details.gsub("\n", "<br>")}" unless action.details.to_s.empty? %>
+<%= "> #{action.details.gsub(/(?<!\|)\n/, "<br>").gsub(/\|(?=\n|$)/, "")}" unless action.details.to_s.empty? %>
 <% end %>
 
 <%= action.action_name %> ||

@@ -84,9 +84,7 @@ module Fastlane
       end
 
       def self.details
-        [
-          'Run `./gradlew tasks` to get a list of all available gradle tasks for your project'
-        ].join("\n")
+        'Run `./gradlew tasks` to get a list of all available gradle tasks for your project'
       end
 
       def self.available_options

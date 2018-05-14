@@ -17,7 +17,7 @@ module Fastlane
       end
 
       def self.details
-        "More information about dotgpg can be found at https://github.com/ConradIrwin/dotgpg"
+        "More information about dotgpg can be found at [https://github.com/ConradIrwin/dotgpg](https://github.com/ConradIrwin/dotgpg)."
       end
 
       def self.available_options

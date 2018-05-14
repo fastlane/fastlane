@@ -59,7 +59,7 @@ module Spaceship
     #
     # @param team_id (String) (optional): The ID of a iTunesConnect team
     # @param team_name (String) (optional): The name of a iTunesConnect team
-    def select_team(team_id: team_id = nil, team_name: team_name = nil)
+    def select_team(team_id: nil, team_name: nil)
       t_id = (team_id || ENV['FASTLANE_ITC_TEAM_ID'] || '').strip
       t_name = (team_name || ENV['FASTLANE_ITC_TEAM_NAME'] || '').strip
 
@@ -519,6 +519,10 @@ module Spaceship
     def update_price_tier!(app_id, price_tier)
       r = request(:get, "ra/apps/#{app_id}/pricing/intervals")
       data = parse_response(r, 'data')
+
+      # preOrder isn't needed for for the request and has some
+      # values that can cause a failure (invalid dates) so we are removing it
+      data.delete('preOrder')
 
       first_price = (data["pricingIntervalsFieldTO"]["value"] || []).count == 0 # first price
       data["pricingIntervalsFieldTO"]["value"] ||= []

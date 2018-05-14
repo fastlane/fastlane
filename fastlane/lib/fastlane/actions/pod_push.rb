@@ -52,10 +52,6 @@ module Fastlane
         "Push a Podspec to Trunk or a private repository"
       end
 
-      def self.details
-        ""
-      end
-
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :use_bundle_exec,

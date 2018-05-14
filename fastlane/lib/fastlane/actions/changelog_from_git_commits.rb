@@ -29,19 +29,24 @@ module Fastlane
           merge_commit_filtering = :exclude_merges
         end
 
-        if params[:commits_count]
-          changelog = Actions.git_log_last_commits(params[:pretty], params[:commits_count], merge_commit_filtering, params[:date_format], params[:ancestry_path])
-        else
-          changelog = Actions.git_log_between(params[:pretty], from, to, merge_commit_filtering, params[:date_format], params[:ancestry_path])
+        params[:path] = './' unless params[:path]
+
+        Dir.chdir(params[:path]) do
+          if params[:commits_count]
+            changelog = Actions.git_log_last_commits(params[:pretty], params[:commits_count], merge_commit_filtering, params[:date_format], params[:ancestry_path])
+          else
+            changelog = Actions.git_log_between(params[:pretty], from, to, merge_commit_filtering, params[:date_format], params[:ancestry_path])
+          end
+
+          changelog = changelog.gsub("\n\n", "\n") if changelog # as there are duplicate newlines
+          Actions.lane_context[SharedValues::FL_CHANGELOG] = changelog
+
+          puts("")
+          puts(changelog)
+          puts("")
+
+          changelog
         end
-        changelog = changelog.gsub("\n\n", "\n") if changelog # as there are duplicate newlines
-        Actions.lane_context[SharedValues::FL_CHANGELOG] = changelog
-
-        puts("")
-        puts(changelog)
-        puts("")
-
-        changelog
       end
 
       #####################################################
@@ -83,6 +88,11 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!(":commits_count must be >= 1") unless value.to_i >= 1
                                        end),
+          FastlaneCore::ConfigItem.new(key: :path,
+                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_PATH',
+                                       description: 'Path of the git repository',
+                                       optional: true,
+                                       default_value: './'),
           FastlaneCore::ConfigItem.new(key: :pretty,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_PRETTY',
                                        description: 'The format applied to each commit while generating the collected value',

@@ -14,26 +14,26 @@ File.write("#{lib}/fastlane/plugins/template/.rubocop.yml", YAML.dump(config))
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
-  spec.authors       = ["Felix Krause",
-                        "Luka Mirosevic",
-                        "Olivier Halligon",
-                        "Danielle Tomlinson",
-                        "Jérôme Lacoste",
-                        "Stefan Natchev",
-                        "Helmut Januschka",
-                        "Jorge Revuelta H",
-                        "Kohki Miki",
-                        "Iulian Onofrei",
-                        "Jimmy Dee",
-                        "Josh Holtz",
-                        "Joshua Liebowitz",
-                        "Jan Piotrowski",
-                        "Andrew McBurney",
+  spec.authors       = ["Stefan Natchev",
                         "Fumiya Nakamura",
-                        "Maksym Grebenets",
+                        "Joshua Liebowitz",
+                        "Iulian Onofrei",
                         "Manu Wallner",
+                        "Jorge Revuelta H",
+                        "Olivier Halligon",
+                        "Luka Mirosevic",
+                        "Jimmy Dee",
+                        "Helmut Januschka",
+                        "Jan Piotrowski",
+                        "Kohki Miki",
+                        "Andrew McBurney",
                         "Aaron Brager",
-                        "Matthew Ellis"]
+                        "Matthew Ellis",
+                        "Felix Krause",
+                        "Maksym Grebenets",
+                        "Jérôme Lacoste",
+                        "Josh Holtz",
+                        "Danielle Tomlinson"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -114,4 +114,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('rest-client', '>= 1.8.0')
   spec.add_development_dependency('fakefs', '~> 0.8.1')
   spec.add_development_dependency('sinatra', '~> 1.4.8')
+  spec.add_development_dependency('xcov', '~> 1.4.1') # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
 end

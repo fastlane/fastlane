@@ -111,7 +111,7 @@ module Fastlane
       def self.mailgunit(options)
         sandbox_domain = options[:postmaster].split("@").last
         params = {
-          from: "#{options[:from]}<#{options[:postmaster]}>",
+          from: "#{options[:from]} <#{options[:postmaster]}>",
           to: (options[:to]).to_s,
           subject: options[:subject],
           html: mail_template(options)

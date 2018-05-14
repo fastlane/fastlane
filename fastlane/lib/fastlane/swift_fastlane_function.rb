@@ -53,6 +53,8 @@ module Fastlane
         return "[String]"
       when :hash_of_strings
         return "[String : String]"
+      when :hash
+        return "[String : Any]"
       when :bool
         return "Bool"
       when :int
@@ -196,6 +198,8 @@ module Fastlane
       when :array_of_strings
         returned_object = "parseArray(fromString: #{returned_object})"
       when :hash_of_strings
+        returned_object = "parseDictionary(fromString: #{returned_object})"
+      when :hash
         returned_object = "parseDictionary(fromString: #{returned_object})"
       when :bool
         returned_object = "parseBool(fromString: #{returned_object})"

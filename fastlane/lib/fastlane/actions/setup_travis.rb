@@ -40,11 +40,14 @@ module Fastlane
       end
 
       def self.details
+        list = <<-LIST.markdown_list(true)
+          Creates a new temporary keychain for use with match
+          Switches match to `readonly` mode to not create new profiles/cert on CI
+        LIST
+
         [
-          "- Creates a new temporary keychain for use with match",
-          "- Switches match to `readonly` mode to not create new profiles/cert on CI",
-          "",
-          "This action helps with Travis integration, add this to the top of your Fastfile if you use Travis"
+          list,
+          "This action helps with Travis integration. Add this to the top of your Fastfile if you use Travis."
         ].join("\n")
       end
 

@@ -73,7 +73,7 @@ module Fastlane
         [
           "This will register an iOS device with the Developer Portal so that you can include it in your provisioning profiles.",
           "This is an optimistic action, in that it will only ever add a device to the member center. If the device has already been registered within the member center, it will be left alone in the member center.",
-          "The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option."
+          "The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `:username` option."
         ].join("\n")
       end
 
