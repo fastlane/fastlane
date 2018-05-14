@@ -50,14 +50,14 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 
 ##### Configuring your <a href="#ui-tests">UI Tests</a> for Screenshots
 
-1.  Add `@ClassRule public static final LocaleTestRule localeTestRule = new LocaleTestRule();` to your tests class to handle automatic switching of locales
-2.  To capture screenshots, add the following to your tests `Screengrab.screenshot("name_of_screenshot_here");` on the appropriate screens
+1. Add `@ClassRule public static final LocaleTestRule localeTestRule = new LocaleTestRule();` to your tests class to handle automatic switching of locales
+2. To capture screenshots, add the following to your tests `Screengrab.screenshot("name_of_screenshot_here");` on the appropriate screens
 
 # Generating Screenshots with Screengrab
 - Then, before running `fastlane screengrab` you'll need a debug and test apk
   - You can create your APKs with `./gradlew assembleDebug assembleAndroidTest`
 - Once complete run `fastlane screengrab` in your app project directory to generate screenshots
-    - You will be prompted to provide any required parameters which are not in your **Screengrabfile** or provided as command line arguments
+  - You will be prompted to provide any required parameters which are not in your **Screengrabfile** or provided as command line arguments
 - Your screenshots will be saved to `fastlane/metadata/android` in the directory where you ran _screengrab_
 
 ## Improved screenshot capture with UI Automator
@@ -72,6 +72,19 @@ However, UI Automator requires a device with **API level >= 18**, so it is not y
 
 ```java
 Screengrab.setDefaultScreenshotStrategy(new UiAutomatorScreenshotStrategy());
+```
+
+## Improved screenshot capture with Falcon
+
+As of _screengrab_ 1.2.0, you can specify a new strategy to delegate to [Falcon](https://github.com/jraska/Falcon). Falcon may work better than UI Automator in some situations and also provides similar benefits as UI Automator:
+
+* Multi-window situations are correctly captured (dialogs, etc.)
+* Works on Android N
+
+Falcon requires a device with **API level >= 10**. To enable it for all screenshots by default, make the following call before your tests run:
+
+```java
+Screengrab.setDefaultScreenshotStrategy(new FalconScreenshotStrategy(activityRule.getActivity()));
 ```
 
 ## Advanced Screengrabfile Configuration

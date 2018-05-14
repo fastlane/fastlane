@@ -56,9 +56,12 @@ module Spaceship
 
     # Shows a team selection for the user in the terminal. This should not be
     # called on CI systems
-    def select_team
-      t_id = (ENV['FASTLANE_ITC_TEAM_ID'] || '').strip
-      t_name = (ENV['FASTLANE_ITC_TEAM_NAME'] || '').strip
+    #
+    # @param team_id (String) (optional): The ID of a iTunesConnect team
+    # @param team_name (String) (optional): The name of a iTunesConnect team
+    def select_team(team_id: team_id = nil, team_name: team_name = nil)
+      t_id = (team_id || ENV['FASTLANE_ITC_TEAM_ID'] || '').strip
+      t_name = (team_name || ENV['FASTLANE_ITC_TEAM_NAME'] || '').strip
 
       if t_name.length > 0 && t_id.length.zero? # we prefer IDs over names, they are unique
         puts("Looking for iTunes Connect Team with name #{t_name}") if Spaceship::Globals.verbose?
@@ -602,6 +605,17 @@ module Spaceship
       data["countries"] = availability.territories.map { |territory| { 'code' => territory.code } }
       data["theWorld"] = availability.include_future_territories.nil? ? true : availability.include_future_territories
 
+      # InitializespreOrder (if needed)
+      data["preOrder"] ||= {}
+
+      # Sets app_available_date to nil if cleared_for_preorder if false
+      # This is need for apps that have never set either of these before
+      # API will error out if cleared_for_preorder is false and app_available_date has a date
+      cleared_for_preorder = availability.cleared_for_preorder
+      app_available_date = cleared_for_preorder ? availability.app_available_date : nil
+      data["preOrder"]["clearedForPreOrder"] = { "value" => cleared_for_preorder, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
+      data["preOrder"]["appAvailableDate"] = { "value" => app_available_date, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
+
       # send the changes back to Apple
       r = request(:post) do |req|
         req.url("ra/apps/#{app_id}/pricing/intervals")
@@ -1000,7 +1014,7 @@ module Spaceship
       handle_itc_response(r.body)
 
       # iTunes Connect still returns a success status code even the submission
-      # was failed because of Ad ID info.  This checks for any section error
+      # was failed because of Ad ID info. This checks for any section error
       # keys in returned adIdInfo and prints them out.
       ad_id_error_keys = r.body.fetch('data').fetch('adIdInfo').fetch('sectionErrorKeys')
       if ad_id_error_keys.any?

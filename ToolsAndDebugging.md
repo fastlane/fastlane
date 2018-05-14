@@ -77,7 +77,7 @@ If it is a server issue, it’s best to [file a radar](https://bugreport.apple.c
 
 <img src=".assets/ToolingCharlesEnableSSL.png" align="right" width="180" />
 
-This section explains how you can set up [Charles Proxy](https://www.charlesproxy.com/) to track local https traffic and inspect the requests and their responses. Charles is a paid application with a free option that’s usually good enough for a quick debugging session limited to 15 minutes.  If you prefer a free open source alternative, check out [mitmproxy](https://mitmproxy.org/).
+This section explains how you can set up [Charles Proxy](https://www.charlesproxy.com/) to track local https traffic and inspect the requests and their responses. Charles is a paid application with a free option that’s usually good enough for a quick debugging session limited to 15 minutes. If you prefer a free open source alternative, check out [mitmproxy](https://mitmproxy.org/).
 
 First, download and install the latest version of [Charles Proxy](https://www.charlesproxy.com/). After the first launch, you’ll have to install its [Root Certificate](https://www.charlesproxy.com/documentation/using-charles/ssl-certificates/).
 

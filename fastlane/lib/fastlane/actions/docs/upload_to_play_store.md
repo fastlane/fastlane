@@ -137,7 +137,7 @@ You can add changelog files under the `changelogs/` directory for each locale. T
 
 A common Play publishing scenario might involve uploading an APK version to a test track, testing it, and finally promoting that version to production.
 
-This can be done using the `--track_promote_to` parameter.  The `--track_promote_to` parameter works with the `--track` parameter to command the Play API to promote existing Play track APK version(s) (those active on the track identified by the `--track` param value) to a new track (`--track_promote_to` value).
+This can be done using the `--track_promote_to` parameter. The `--track_promote_to` parameter works with the `--track` parameter to command the Play API to promote existing Play track APK version(s) (those active on the track identified by the `--track` param value) to a new track (`--track_promote_to` value).
 
 ## Retrieve Track Version Codes
 

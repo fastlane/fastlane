@@ -4,7 +4,7 @@ require_relative 'module'
 module Match
   # Ensures the certificate and profiles are also available on iTunes Connect
   class SpaceshipEnsure
-    def initialize(user)
+    def initialize(user, team_id, team_name)
       # We'll try to manually fetch the password
       # to tell the user that a password is optional
       require 'credentials_manager/account_manager'
@@ -20,7 +20,7 @@ module Match
 
       UI.message("Verifying that the certificate and profile are still valid on the Dev Portal...")
       Spaceship.login(user)
-      Spaceship.select_team
+      Spaceship.select_team(team_id: team_id, team_name: team_name)
     end
 
     def bundle_identifier_exists(username: nil, app_identifier: nil)
