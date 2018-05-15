@@ -197,9 +197,11 @@ describe Gym do
     end
 
     describe "Analyze Build Time Example" do
-      it "uses the correct build command with the example project", requires_xcodebuild: true do
-        log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
+      before do
+        @log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
+      end
 
+      it "uses the correct build command with the example project when option is enabled", requires_xcodebuild: true do
         options = { project: "./gym/examples/standard/Example.xcodeproj", analyze_build_time: true, scheme: 'Example' }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
@@ -213,10 +215,35 @@ describe Gym do
                                "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                                "OTHER_SWIFT_FLAGS=\"-Xfrontend -debug-time-function-bodies\"",
                                :archive,
-                               "| tee #{log_path.shellescape}",
-                               "| grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt",
+                               "| tee #{@log_path.shellescape}",
                                "| xcpretty"
                              ])
+
+        result = Gym::BuildCommandGenerator.post_build
+        expect(result).to eq([
+                               "grep -E '^[0-9.]+ms' #{@log_path.shellescape} | grep -vE '^0\.[0-9]' | sort -nr > culprits.txt"
+                             ])
+      end
+
+      it "uses the correct build command with the example project when option is disabled", requires_xcodebuild: true do
+        options = { project: "./gym/examples/standard/Example.xcodeproj", analyze_build_time: false, scheme: 'Example' }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::BuildCommandGenerator.generate
+        expect(result).to eq([
+                               "set -o pipefail &&",
+                               "xcodebuild",
+                               "-scheme Example",
+                               "-project ./gym/examples/standard/Example.xcodeproj",
+                               "-destination 'generic/platform=iOS'",
+                               "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                               :archive,
+                               "| tee #{@log_path.shellescape}",
+                               "| xcpretty"
+                             ])
+
+        result = Gym::BuildCommandGenerator.post_build
+        expect(result).to eq([])
       end
     end
   end
