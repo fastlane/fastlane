@@ -36,11 +36,10 @@ module Spaceship
       )
 
       # Create a new object based on a set of territories.
+      # This will override any values already set for cleared_for_preorder, app_available_date, b2b_unavailable,
+      # b2b_app_enabled, and educational_discount
       # @param territories (Array of String or Spaceship::Tunes::Territory objects): A list of the territories
       # @param params (Hash): Optional parameters (include_future_territories (Bool, default: true) Are future territories included?)
-      # This method has serious implications on vpp + educational discount but i don't want to break
-      # existing support. please be very careful when using this and provide appropriate params.
-      # In future, we should create availability from territories as an instance method not as a class method.
       def self.from_territories(territories = [], params = {})
         # Initializes the DataHash with our preOrder structure so values
         # that are being modified will be saved
