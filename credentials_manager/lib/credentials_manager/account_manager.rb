@@ -6,6 +6,10 @@ require_relative 'appfile_config'
 module CredentialsManager
   class AccountManager
     DEFAULT_PREFIX = "deliver"
+
+    # Is used for iTunes Transporter
+    attr_reader :prefix
+
     # @param prefix [String] Very optional, is used for the
     #   iTunes Transporter which uses application specific passwords
     # @param note [String] An optional note that will be shown next
