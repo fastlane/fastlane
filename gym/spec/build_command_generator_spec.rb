@@ -214,7 +214,7 @@ describe Gym do
                                "OTHER_SWIFT_FLAGS=\"-Xfrontend -debug-time-function-bodies\"",
                                :archive,
                                "| tee #{log_path.shellescape}",
-                               "| grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt",
+                               "| bash -c 'tee >(grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt)'",
                                "| xcpretty"
                              ])
       end
