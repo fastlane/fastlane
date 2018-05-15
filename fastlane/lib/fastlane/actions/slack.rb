@@ -46,7 +46,7 @@ module Fastlane
         rescue => exception
           UI.error("Exception: #{exception}")
         ensure
-          result = results.first
+          result = results.first if results
           if !result.nil? && result.code.to_i == 200
             UI.success('Successfully sent Slack notification')
           else
