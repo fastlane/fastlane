@@ -170,7 +170,16 @@ module Pilot
 
       if options[:groups] || options[:distribute_external]
         uploaded_build.beta_review_info.demo_account_required = options[:demo_account_required] # this needs to be set for iTC to continue
-        uploaded_build.submit_for_testflight_review!
+        begin
+          uploaded_build.submit_for_testflight_review!
+        rescue => ex
+          # iTunes Connect currently may 504 on this request even though it manages to get the build in
+          # the approved state, this is a temporary workaround.
+          raise ex unless ex.to_s.include?("504")
+          UI.message("Submitting the build for review timed out, trying to recover.")
+          updated_build = Spaceship::TestFlight::Build.find(app_id: uploaded_build.app_id, build_id: uploaded_build.id)
+          raise ex unless updated_build.approved?
+        end
       end
 
       if options[:groups]
