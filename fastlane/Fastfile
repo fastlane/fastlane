@@ -446,6 +446,7 @@ private_lane :verify_env_variables do
     next if ENV[variable].to_s.length > 0
     UI.user_error!("Missing ENV variables #{variable}, make sure to provide one for fastlane to be successful")
   end
+  UI.user_error!("You're not logged in RubyGems. Log in using `gem push` if using RubyGems < 2.7.0 or `gem signin` if using RubyGems >=2.7.0") unless File.file?(File.expand_path("~/.gem/credentials"))
 end
 
 desc "Get the local version number per version.rb"
