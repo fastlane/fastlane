@@ -4,7 +4,7 @@ about: A suggestion for a new feature ✨
 
 ---
 
-### Feature Rquest
+### Feature Request
 
 #### Motivation Behind Feature
 <!-- Why should this feature be implemented? What problem does it solve? -->
