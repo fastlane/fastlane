@@ -59,6 +59,7 @@ module Frameit
       output_path = screenshot.path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
       image.format("png")
       image.write(output_path)
+      Helper.hide_loading_indicator
       UI.success("Added frame: '#{File.expand_path(output_path)}'")
     end
 
