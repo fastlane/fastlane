@@ -53,7 +53,7 @@ describe FastlaneCore do
       end
 
       it "returns true when building in AppCenter" do
-        stub_const('ENV', { 'APPCENTER_OUTPUT_DIRECTORY' => '/path/to/a/build' })
+        stub_const('ENV', { 'APPCENTER_BUILD_ID' => '185' })
         expect(FastlaneCore::Helper.ci?).to be(true)
       end
 
