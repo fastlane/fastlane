@@ -698,6 +698,9 @@ module Spaceship
             next if device_language_details["screenshots"].nil?
             next if device_language_details["screenshots"]["value"].count > 0
 
+            next if device_language_details["trailers"].nil?
+            next if device_language_details["trailers"]["value"].count > 0
+
             # The current row includes screenshots for all device types
             # so we need to enable scaling for both iOS and watchOS apps
             device_language_details["scaled"]["value"] = true if device_language_details["scaled"]
