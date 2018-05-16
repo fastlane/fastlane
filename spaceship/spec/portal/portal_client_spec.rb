@@ -51,6 +51,29 @@ describe Spaceship::Client do
       end
     end
 
+    describe '#team_name' do
+      it 'returns the default team_name' do
+        puts subject.team_name
+        expect(subject.team_name).to eq('SpaceShip')
+      end
+
+      it "set custom Team Name" do
+        allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([
+                                                                                       { 'teamId' => 'XXXXXXXXXX', 'currentTeamMember' => { 'teamMemberId' => '' } },
+                                                                                       { 'teamId' => 'ABCDEF', 'currentTeamMember' => { 'teamMemberId' => '' } }
+                                                                                     ])
+
+        team_name = "ABCDEF"
+        subject.select_team(team_name: team_name)
+        expect(subject.team_name).to eq(team_name)
+      end
+
+      it "shows a warning when user is in multiple teams and didn't call select_team" do
+        PortalStubbing.adp_stub_multiple_teams
+        expect(subject.team_name).to eq("SecondTeam")
+      end
+    end
+
     describe "csrf_tokens" do
       it "uses the stored token for all upcoming requests" do
         # Temporary stub a request to require the csrf_tokens
