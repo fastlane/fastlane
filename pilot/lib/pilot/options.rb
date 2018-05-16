@@ -179,7 +179,7 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :groups,
                                      short_option: "-g",
                                      env_name: "PILOT_GROUPS",
-                                     description: "Associate tester to one group or more by group name / group id. E.g. '-g \"Team 1\",\"Team 2\"'",
+                                     description: "Associate tester to one group or more by group name / group id. E.g. `-g \"Team 1\",\"Team 2\"`",
                                      optional: true,
                                      type: Array,
                                      verify_block: proc do |value|

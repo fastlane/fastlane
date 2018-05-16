@@ -172,11 +172,11 @@ module Fastlane
             team_id: "XXXX"
           )',
           '# Only specific targets
-            disable_automatic_code_signing(
-              path: "demo-project/demo/demo.xcodeproj",
-              use_automatic_signing: false,
-              targets: ["demo"]
-            )
+          disable_automatic_code_signing(
+            path: "demo-project/demo/demo.xcodeproj",
+            use_automatic_signing: false,
+            targets: ["demo"]
+          )
           ',
           ' # via generic action
           automatic_code_signing(

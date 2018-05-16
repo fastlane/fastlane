@@ -81,9 +81,7 @@ module Fastlane
       end
 
       def self.example_code
-        [
-
-        ]
+        nil
       end
 
       def self.category

@@ -34,16 +34,16 @@ module Fastlane
 
       def self.example_code
         [
-          'xctool :test',
+          'xctool(:test)',
 
           '# If you prefer to have the build configuration stored in the `Fastfile`:
-          xctool :test, [
+          xctool(:test, [
             "--workspace", "\'AwesomeApp.xcworkspace\'",
             "--scheme", "\'Schema Name\'",
             "--configuration", "Debug",
             "--sdk", "iphonesimulator",
             "--arch", "i386"
-          ].join(" ")'
+          ].join(" "))'
         ]
       end
 
