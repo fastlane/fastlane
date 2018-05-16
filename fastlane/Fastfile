@@ -17,6 +17,7 @@ lane :validate_repo do
   validate_docs
   ensure_tool_name_formatting
   ensure_code_samples
+  ensure_actions_config_items_formatting
 end
 
 desc "Verifies source code is in a good state"
@@ -337,7 +338,11 @@ desc "Update the actions.md on https://docs.fastlane.tools"
 desc "This will also automatically submit a pull request to fastlane/docs"
 lane :update_docs do |options|
   debug = options[:debug]
-  verify_env_variables unless debug
+
+  unless debug
+    verify_env_variables
+    ensure_actions_config_items_formatting
+  end
 
   template_path = File.expand_path("./assets/render_plugin.md.erb")
   clone_docs(debug: debug) do
@@ -495,4 +500,27 @@ private_lane :ensure_code_samples do
   end
   test_sample_code(content: all_content) # to not have to call the action 200 times
   UI.success("✅  All fastlane code samples work as expected")
+end
+
+private_lane :ensure_actions_config_items_formatting do
+  UI.message("🕗  Verifying actions' config items formatting...")
+
+  errors = []
+
+  require 'fastlane_core/configuration/config_item'
+
+  ActionsList.all_actions do |action|
+    next if action.available_options.nil?
+
+    action.available_options.each do |option|
+      next unless option.kind_of?(FastlaneCore::ConfigItem)
+
+      errors << "Remove the '\\n' from the config item ':#{option.key}' of the action '#{action.action_name}'" if option.description && option.description =~ /\n|\\n/
+    end
+  end
+
+  errors.each { |a| UI.error(a) }
+
+  UI.user_error!("Invalid formatting of one of the actions' config items") unless errors.empty?
+  UI.success("✅  fastlane actions' config items formatting is correct")
 end

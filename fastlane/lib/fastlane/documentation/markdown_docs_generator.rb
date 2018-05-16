@@ -131,8 +131,8 @@ module Fastlane
         if action.superclass != Fastlane::Action
           # This means, the current method is an alias
           # meaning we're gonna look if the parent class
-          # as a custom md file.
-          # e.g. `deliver.rb` super class is `upload_to_app_store.rb`
+          # has a custom md file.
+          # e.g. `DeliverAction`'s superclass is `UploadToAppStoreAction`
           @custom_content ||= load_custom_action_md(action.superclass)
         end
 
