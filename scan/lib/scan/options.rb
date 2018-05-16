@@ -289,7 +289,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
                                      env_name: "SCAN_CUSTOM_REPORT_FILE_NAME",
                                      description: "Sets custom full report file name when generating a single report",
-                                     deprecated: "Use --output_files",
+                                     deprecated: "Use `--output_files` instead",
                                      conflicting_options: [:output_files],
                                      optional: true,
                                      is_string: true)

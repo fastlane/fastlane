@@ -47,7 +47,9 @@ module Fastlane
       end
 
       def self.example_code
-        ['ensure_git_status_clean']
+        [
+          'ensure_git_status_clean'
+        ]
       end
 
       def self.available_options

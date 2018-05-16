@@ -37,7 +37,7 @@ module Fastlane
 
       def self.example_code
         [
-          'import "./path/to/other/Fastfile"'
+          'import("./path/to/other/Fastfile")'
         ]
       end
 
