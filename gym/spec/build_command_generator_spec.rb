@@ -243,7 +243,7 @@ describe Gym do
                              ])
 
         result = Gym::BuildCommandGenerator.post_build
-        expect(result).to eq([])
+        expect(result).to be_empty
       end
     end
   end
