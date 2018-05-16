@@ -10,9 +10,9 @@ module Fastlane
           UI.success("Collecting the last #{params[:commits_count]} Git commits")
         else
           if params[:between]
-            if params[:between].include?(",") # running from shell
+            if params[:between].is_a?(String) && params[:between].include?(",") # :between is string
               from, to = params[:between].split(",", 2)
-            else
+            elsif params[:between].is_a?(Array)
               from, to = params[:between]
             end
           else
@@ -76,7 +76,9 @@ module Fastlane
                                        is_string: false,
                                        conflicting_options: [:commits_count],
                                        verify_block: proc do |value|
-                                         unless value.kind_of?(String)
+                                         if value.kind_of?(String)
+                                          UI.user_error!(":between must contain comma") unless value.include?(',')
+                                         else
                                            UI.user_error!(":between must be of type array") unless value.kind_of?(Array)
                                            UI.user_error!(":between must not contain nil values") if value.any?(&:nil?)
                                            UI.user_error!(":between must be an array of size 2") unless (value || []).size == 2

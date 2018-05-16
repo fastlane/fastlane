@@ -159,6 +159,22 @@ describe Fastlane do
       it "Runs between option from command line" do
         expect(system("fastlane run changelog_from_git_commits between:123456,HEAD")).to be
       end
+
+      it "Accepts string value for :between" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(between: 'abcd,1234')
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" abcd...1234")
+      end
+
+      it "Does not accept string if it does not contain comma" do
+        expect do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            changelog_from_git_commits(between: 'abcd1234')
+          end").runner.execute(:test)
+        end.to raise_error(":between must contain comma")
+      end
     end
   end
 end
