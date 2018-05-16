@@ -93,8 +93,8 @@ module Spaceship
         super || false
       end
 
-      # Sets the b2b flag. If you call Save on app_details without adding any b2b users
-      # it will result in an error.
+      # Sets `b2b_app_enabled` to true and `educational_discount` to false
+      # Requires users to be added with `add_b2b_users` otherwise `update_availability` will error
       def enable_b2b_app!
         raise "Not possible to enable b2b on this app" if b2b_unavailable
         @b2b_app_enabled = true
@@ -103,7 +103,7 @@ module Spaceship
         self
       end
 
-      # just adds users to the availability, You will still have to call update_availabilty
+      # Adds users for b2b enabled apps
       def add_b2b_users(user_list = [])
         raise "Cannot add b2b users if b2b is not enabled" unless b2b_app_enabled
         @b2b_users = user_list.map do |user|
