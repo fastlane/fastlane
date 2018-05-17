@@ -1,64 +1,12 @@
 module Fastlane
   module Actions
-    class CrashlyticsAction < Action
+    class AppcenterAction < Action
       def self.run(params)
-        params[:groups] = params[:groups].join(",") if params[:groups].kind_of?(Array)
-        params[:emails] = params[:emails].join(",") if params[:emails].kind_of?(Array)
-
-        params.values # to validate all inputs before looking for the ipa/apk
-
-        # We need to store notes in a file, because the crashlytics CLI (iOS) says so
-        if params[:notes]
-          UI.error("Overwriting :notes_path, because you specified :notes") if params[:notes_path]
-
-          params[:notes_path] = Helper::CrashlyticsHelper.write_to_tempfile(params[:notes], 'changelog').path
-        elsif Actions.lane_context[SharedValues::FL_CHANGELOG] && !params[:notes_path]
-          UI.message("Sending FL_CHANGELOG as release notes to Beta by Crashlytics")
-
-          params[:notes_path] = Helper::CrashlyticsHelper.write_to_tempfile(
-            Actions.lane_context[SharedValues::FL_CHANGELOG], 'changelog'
-          ).path
-        end
-
-        if params[:ipa_path]
-          command = Helper::CrashlyticsHelper.generate_ios_command(params)
-        elsif params[:apk_path]
-          command = Helper::CrashlyticsHelper.generate_android_command(params)
-        else
-          UI.user_error!("You have to either pass an ipa or an apk file to the Crashlytics action")
-        end
-
-        UI.success('Uploading the build to Crashlytics Beta. Time for some ☕️.')
-
-        sanitizer = proc do |message|
-          message.gsub(params[:api_token], '[[API_TOKEN]]')
-                 .gsub(params[:build_secret], '[[BUILD_SECRET]]')
-        end
-
-        UI.verbose(sanitizer.call(command.join(' '))) if FastlaneCore::Globals.verbose?
-
-        error_callback = proc do |error|
-          clean_error = sanitizer.call(error)
-          UI.user_error!(clean_error)
-        end
-
-        result = Actions.sh_control_output(
-          command.join(" "),
-          print_command: false,
-          print_command_output: false,
-          error_callback: error_callback
-        )
-
-        return command if Helper.test?
-
-        UI.verbose(sanitizer.call(result)) if FastlaneCore::Globals.verbose?
-
-        UI.success('Build successfully uploaded to Crashlytics Beta 🌷')
-        UI.success('Visit https://fabric.io/_/beta to add release notes and notify testers.')
+        puts "This is fine!"
       end
 
       def self.description
-        "Upload a new build to Crashlytics Beta"
+        "Upload a new build to Appcenter"
       end
 
       def self.available_options
@@ -156,7 +104,7 @@ module Fastlane
       end
 
       def self.author
-        ["KrauseFx", "pedrogimenez"]
+        ["RishabhTayal"]
       end
 
       def self.details
@@ -168,13 +116,7 @@ module Fastlane
 
       def self.example_code
         [
-          'crashlytics',
-          'crashlytics(
-            crashlytics_path: "./Pods/Crashlytics/", # path to your Crashlytics submit binary.
-            api_token: "...",
-            build_secret: "...",
-            ipa_path: "./app.ipa"
-          )'
+          'appcenter'
         ]
       end
 
