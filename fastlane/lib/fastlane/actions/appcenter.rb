@@ -9,11 +9,11 @@ module Fastlane
         require 'uri'
         require 'json'
         require 'rest-client'
+        require 'pry'
 
         # Create a release upload
-        uri = URI.parse(appcenter_url(params) + '/release_uploads')
-        response = create_request(uri, params: params)
-
+      
+        response = create_release_uploads(params)
          json = parse_response(response) # this will raise an exception if something goes wrong
 
          if json['upload_url'] && json['upload_id']
@@ -22,12 +22,12 @@ module Fastlane
 
           ipa_filename = params[:ipa]
           # if upload_build?(upload_url, ipa_filename)
-            uri = URI.parse(appcenter_url(params) + "/release_uploads/#{upload_id}")
-            body = {
-               status: "committed"
-            }
-            response = create_request(uri, params: params, body: body)
-            puts response
+            response = finalize_upload(upload_id, params)
+            json = parse_response(response)
+            if json['release_id'] != nil
+              puts 'all good 🙌'
+            end
+            # puts response
             # puts uri
           # else
 
@@ -36,8 +36,28 @@ module Fastlane
 
       end
 
-      def self.upload_build?(upload_url, file_path)
+      def self.appcenter_url(options)
+        "https://api.appcenter.ms/v0.1/apps/#{options[:owner]}/#{options[:app_name]}"
+      end
+      private_class_method :appcenter_url
 
+      def self.create_release_uploads(params)
+        uri = URI.parse(appcenter_url(params) + '/release_uploads')
+        req = Net::HTTP::Post.new(uri.request_uri, { 'Content-Type' => 'application/json' })
+        
+        req['X-API-Token'] = params[:api_token]  
+      
+        # req.body = JSON.generate(body)  
+        
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+
+        response = http.request(req)
+        response
+      end
+      private_class_method :create_release_uploads
+
+      def self.upload_build?(upload_url, file_path)
         params = { :ipa => File.new(file_path, 'rb') }
         response = RestClient.post(upload_url, params)
         if response.code == 204
@@ -49,32 +69,22 @@ module Fastlane
       end
       private_class_method :upload_build?
 
-      def self.appcenter_url(options)
-        "https://api.appcenter.ms/v0.1/apps/#{options[:owner]}/#{options[:app_name]}"
-      end
-      private_class_method :appcenter_url
+      def self.finalize_upload(upload_id, params)
+        uri = URI.parse('https://api.appcenter.ms/v0.1/apps/rtayal11-k5gi/Shopify-Test/release_uploads/a0967e20-3c13-0136-17ea-12b638cfd350') #appcenter_url(params) + "/release_uploads/#{upload_id}")
 
-      def self.create_request(uri, params=nil, body=nil)
-        
-        # response = RestClient.post(uri, params)
-        # puts response
-        req = Net::HTTP::Post.new(uri.request_uri, { 'Content-Type' => 'application/json' })
-        
-        if params != nil
-          req['X-API-Token'] = params[:api_token]  
-        end
-        
-        if body != nil
-          req.body = JSON.generate(body)  
-        end
-        
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
+
+        req = Net::HTTP::Patch.new(uri)
+        req['X-API-Token'] = params[:api_token]  
+        req["Content-Type"] ='application/json'
+        req["Accept"] = 'application/json'
+        req.body = JSON.generate({ status: "committed" })  
 
         response = http.request(req)
         response
       end
-      private_class_method :create_request
+      private_class_method :finalize_upload
 
       def self.parse_response(response)
         body = JSON.parse(response.body)
