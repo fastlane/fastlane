@@ -9,36 +9,46 @@ module Fastlane
         require 'uri'
         require 'json'
 
-        uri = URI.parse(appcenter_url(params))
-        req = create_request(uri)
-        req.basic_auth(params[:api_token], nil)
+        # Create a release upload
+        uri = URI.parse(appcenter_url(params) + '/release_uploads')
+        response = create_request(uri, params)
 
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.use_ssl = true
+        # req.basic_auth(params[:api_token], nil)
 
-        response = http.request(req)
-
-        parse_response(response) # this will raise an exception if something goes wrong
+         json = parse_response(response) # this will raise an exception if something goes wrong
+         puts json['upload_url']
+         if json['upload_url']
+          upload_build     
+         end
 
       end
+
+      def self.upload_build
+      end
+      private_class_method :upload_build
 
       def self.appcenter_url(options)
         "https://api.appcenter.ms/v0.1/apps/#{options[:owner]}/#{options[:app_name]}"
       end
       private_class_method :appcenter_url
 
-      def self.create_request(uri)
-        puts "uri: #{uri.request_uri}"
+      def self.create_request(uri, params)
+        puts "uri: #{uri}"
         req = Net::HTTP::Post.new(uri.request_uri, { 'Content-Type' => 'application/json' })
+        req['X-API-Token'] = params[:api_token]
           # req.body = JSON.generate(params)
         
-        req
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+
+        response = http.request(req)
+        response
       end
       private_class_method :create_request
 
       def self.parse_response(response)
         body = JSON.parse(response.body)
-        puts body
+        return body
         # app_url = body['appURL']
         # manage_url = body['manageURL']
         # public_key = body['publicKey']
@@ -46,7 +56,6 @@ module Fastlane
         # Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY] = public_key
         # Actions.lane_context[SharedValues::APPETIZE_APP_URL] = app_url
         # Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL] = manage_url
-        return true
       rescue => ex
         UI.error(ex)
         UI.user_error!("Error uploading to Appcenter.ms: #{response.body}")
