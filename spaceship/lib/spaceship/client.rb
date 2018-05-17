@@ -186,27 +186,16 @@ module Spaceship
       @current_team_id = team_id
     end
 
-    # @return (String) The currently selected Team Name
-    def team_name
-      available_teams = teams.collect do |team|
-        {
-          team_id: (team["contentProvider"] || {})["contentProviderId"],
-          team_name: (team["contentProvider"] || {})["name"]
-        }
-      end
-
-      result = available_teams.find do |available_team|
-        team_id.to_s == available_team[:team_id].to_s
-      end
-
-      result[:team_name]
-    end
-
     # @return (Hash) Fetches all information of the currently used team
     def team_information
       teams.find do |t|
         t['teamId'] == team_id
       end
+    end
+
+    # @return (String) Fetches name from currently used team
+    def team_name
+      (team_information || {})['name']
     end
 
     # Instantiates a client but with a cookie derived from another client.

@@ -53,24 +53,24 @@ describe Spaceship::Client do
 
     describe '#team_name' do
       it 'returns the default team_name' do
-        puts subject.team_name
         expect(subject.team_name).to eq('SpaceShip')
       end
 
-      it "set custom Team Name" do
+      it "returns team_name from selected team_id" do
         allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([
-                                                                                       { 'teamId' => 'XXXXXXXXXX', 'currentTeamMember' => { 'teamMemberId' => '' } },
-                                                                                       { 'teamId' => 'ABCDEF', 'currentTeamMember' => { 'teamMemberId' => '' } }
+                                                                                       { 'teamId' => 'XXXXXXXXXX', 'name' => 'SpaceShip', 'currentTeamMember' => { 'teamMemberId' => '' } },
+                                                                                       { 'teamId' => 'ABCDEF', 'name' => 'PirateShip', 'currentTeamMember' => { 'teamMemberId' => '' } }
                                                                                      ])
 
-        team_name = "ABCDEF"
-        subject.select_team(team_name: team_name)
-        expect(subject.team_name).to eq(team_name)
+        team_id = "ABCDEF"
+        subject.select_team(team_id: team_id)
+        expect(subject.team_id).to eq(team_id)
+        expect(subject.team_name).to eq('PirateShip')
       end
 
-      it "shows a warning when user is in multiple teams and didn't call select_team" do
-        PortalStubbing.adp_stub_multiple_teams
-        expect(subject.team_name).to eq("SecondTeam")
+      it "return nil if no teams" do
+        allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([])
+        expect(subject.team_name).to eq(nil)
       end
     end
 
