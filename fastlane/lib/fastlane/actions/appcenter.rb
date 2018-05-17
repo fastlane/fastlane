@@ -8,35 +8,65 @@ module Fastlane
         require 'net/http/post/multipart'
         require 'uri'
         require 'json'
+        require 'rest-client'
 
         # Create a release upload
         uri = URI.parse(appcenter_url(params) + '/release_uploads')
-        response = create_request(uri, params)
-
-        # req.basic_auth(params[:api_token], nil)
+        response = create_request(uri, params: params)
 
          json = parse_response(response) # this will raise an exception if something goes wrong
-         puts json['upload_url']
-         if json['upload_url']
-          upload_build     
+
+         if json['upload_url'] && json['upload_id']
+          upload_url = json['upload_url']
+          upload_id = json['upload_id']
+
+          ipa_filename = params[:ipa]
+          # if upload_build?(upload_url, ipa_filename)
+            uri = URI.parse(appcenter_url(params) + "/release_uploads/#{upload_id}")
+            body = {
+               status: "committed"
+            }
+            response = create_request(uri, params: params, body: body)
+            puts response
+            # puts uri
+          # else
+
+          # end
          end
 
       end
 
-      def self.upload_build
+      def self.upload_build?(upload_url, file_path)
+
+        params = { :ipa => File.new(file_path, 'rb') }
+        response = RestClient.post(upload_url, params)
+        if response.code == 204
+          # appcenter returns empty content on successful upload. Empty content = 204
+          return true
+        else
+          return false
+        end
       end
-      private_class_method :upload_build
+      private_class_method :upload_build?
 
       def self.appcenter_url(options)
         "https://api.appcenter.ms/v0.1/apps/#{options[:owner]}/#{options[:app_name]}"
       end
       private_class_method :appcenter_url
 
-      def self.create_request(uri, params)
-        puts "uri: #{uri}"
+      def self.create_request(uri, params=nil, body=nil)
+        
+        # response = RestClient.post(uri, params)
+        # puts response
         req = Net::HTTP::Post.new(uri.request_uri, { 'Content-Type' => 'application/json' })
-        req['X-API-Token'] = params[:api_token]
-          # req.body = JSON.generate(params)
+        
+        if params != nil
+          req['X-API-Token'] = params[:api_token]  
+        end
+        
+        if body != nil
+          req.body = JSON.generate(body)  
+        end
         
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
@@ -82,7 +112,33 @@ module Fastlane
                                        env_name: "APPCENTER_APP_NAME",
                                        description: "Appcenter app name",
                                        is_string: true
-                                       )
+                                       ),
+          FastlaneCore::ConfigItem.new(key: :apk,
+                                       env_name: "APPCENTER_APK",
+                                       description: "Path to your APK file",
+                                       default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH],
+                                       default_value_dynamic: true,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find apk file at path '#{value}'") unless File.exist?(value)
+                                       end,
+                                       conflicting_options: [:ipa],
+                                       conflict_block: proc do |value|
+                                         UI.user_error!("You can't use 'apk' and '#{value.key}' options in one run")
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :ipa,
+                                       env_name: "APPCENTER_IPA",
+                                       description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action. For Android provide path to .apk file",
+                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
+                                       end,
+                                       conflicting_options: [:apk],
+                                       conflict_block: proc do |value|
+                                         UI.user_error!("You can't use 'ipa' and '#{value.key}' options in one run")
+                                       end)
         ]
       end
 
