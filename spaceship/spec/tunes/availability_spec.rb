@@ -18,6 +18,18 @@ describe Spaceship::Tunes::Availability do
       expect(availability.include_future_territories).to be_truthy
     end
 
+    it "correctly parses b2b app enabled" do
+      availability = client.availability(app.apple_id)
+
+      expect(availability.b2b_app_enabled).to be(false)
+    end
+
+    it "correctly parses b2b app flag enabled" do
+      availability = client.availability(app.apple_id)
+
+      expect(availability.b2b_unavailable).to be(false)
+    end
+
     it "correctly parses the territories" do
       availability = client.availability(app.apple_id)
 
@@ -30,6 +42,15 @@ describe Spaceship::Tunes::Availability do
       expect(territory_0.name).to eq('United Kingdom')
       expect(territory_0.region).to eq('Europe')
       expect(territory_0.region_locale_key).to eq('ITC.region.EUR')
+    end
+
+    it "correctly parses b2b users" do
+      TunesStubbing.itc_stub_app_pricing_intervals_vpp
+      availability = client.availability(app.apple_id)
+      expect(availability.b2b_users.length).to eq(2)
+      b2b_user_0 = availability.b2b_users[0]
+      expect(b2b_user_0).not_to(be_nil)
+      expect(b2b_user_0.ds_username).to eq('b2b1@abc.com')
     end
   end
 
@@ -134,6 +155,37 @@ describe Spaceship::Tunes::Availability do
       availability = client.update_availability!(app.apple_id, availability)
 
       expect(availability.include_future_territories).to be_falsey
+    end
+
+    describe "enable_b2b_app!" do
+      it "throws exception if b2b cannot be enabled" do
+        TunesStubbing.itc_stub_app_pricing_intervals_b2b_disabled
+        availability = client.availability(app.apple_id)
+        expect { availability.enable_b2b_app! }.to raise_error("Not possible to enable b2b on this app")
+      end
+
+      it "works correctly" do
+        availability = client.availability(app.apple_id)
+        new_availability = availability.enable_b2b_app!
+        expect(new_availability.b2b_app_enabled).to eq(true)
+        expect(new_availability.educational_discount).to eq(false)
+      end
+    end
+
+    describe "add_b2b_users" do
+      it "throws exception if b2b app not enabled" do
+        availability = client.availability(app.apple_id)
+        expect { availability.add_b2b_users(["abc@def.com"]) }.to raise_error("Cannot add b2b users if b2b is not enabled")
+      end
+
+      it "works correctly" do
+        TunesStubbing.itc_stub_app_pricing_intervals_vpp
+        availability = client.availability(app.apple_id)
+        new_availability = availability.add_b2b_users(["abc@def.com"])
+        expect(new_availability).to be_an_instance_of(Spaceship::Tunes::Availability)
+        expect(new_availability.b2b_users.length).to eq(1)
+        expect(new_availability.b2b_users.first.ds_username).to eq("abc@def.com")
+      end
     end
   end
 end
