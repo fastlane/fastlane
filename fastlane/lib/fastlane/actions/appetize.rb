@@ -60,7 +60,7 @@ module Fastlane
 
       def self.create_request(uri, params)
         if params[:url]
-          req = Net::HTTP::Post.new(uri.request_uri, initheader: { 'Content-Type' => 'application/json' })
+          req = Net::HTTP::Post.new(uri.request_uri, { 'Content-Type' => 'application/json' })
           req.body = JSON.generate(params)
         else
           req = Net::HTTP::Post::Multipart.new(uri.path, params)
