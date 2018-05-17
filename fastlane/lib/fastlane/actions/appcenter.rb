@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class AppcenterAction < Action
       def self.run(params)
-        puts "This is fine!"
+        puts("This is fine!")
 
         require 'net/http'
         require 'net/http/post/multipart'
@@ -13,32 +13,27 @@ module Fastlane
 
         # Create a release upload
         response = create_release_uploads(params)
-         json = parse_response(response) # this will raise an exception if something goes wrong
+        json = parse_response(response) # this will raise an exception if something goes wrong
 
-         if json['upload_url'] && json['upload_id']
+        if json['upload_url'] && json['upload_id']
           upload_url = json['upload_url']
           upload_id = json['upload_id']
 
           ipa_filename = params[:ipa]
-          response = upload_build(upload_url, ipa_filename)
-          if response.code == 204
-            response = finalize_upload(upload_id, params)
-            json = parse_response(response)
-            if json['release_id'] != nil
-              response = distribute_release(params, json['release_id'], params[:destination_name], params[:release_notes])
-              if response.code == '200'
-                puts 'all good 🙌'
-                puts response.body
-                puts json['release_id']
-              else
-                puts 'all not good 💣'  
-              end
+          upload_build(upload_url, ipa_filename)
+          response = finalize_upload(upload_id, params)
+          json = parse_response(response)
+          unless json['release_id'].nil?
+            response = distribute_release(params, json['release_id'], params[:destination_name], params[:release_notes])
+            if response.code == '200'
+              puts('all good 🙌')
+              puts(response.body)
+              puts(json['release_id'])
+            else
+              puts('all not good 💣')
             end
-          else
-
           end
-         end
-
+        end
       end
 
       def self.appcenter_url(options)
@@ -49,11 +44,11 @@ module Fastlane
       def self.create_release_uploads(params)
         uri = URI.parse(appcenter_url(params) + '/release_uploads')
         req = Net::HTTP::Post.new(uri.request_uri, { 'Content-Type' => 'application/json' })
-        
-        req['X-API-Token'] = params[:api_token]  
-      
-        # req.body = JSON.generate(body)  
-        
+
+        req['X-API-Token'] = params[:api_token]
+
+        # req.body = JSON.generate(body)
+
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
 
@@ -63,23 +58,25 @@ module Fastlane
       private_class_method :create_release_uploads
 
       def self.upload_build(upload_url, file_path)
-        params = { :ipa => File.new(file_path, 'rb') }
+        params = { ipa: File.new(file_path, 'rb') }
         response = RestClient.post(upload_url, params)
-        response
+        if response.code != 204
+          UI.error("error while uploading")
+        end
       end
       private_class_method :upload_build
 
       def self.finalize_upload(upload_id, params)
-        uri = URI.parse('https://api.appcenter.ms/v0.1/apps/rtayal11-k5gi/Shopify-Test/release_uploads/a0967e20-3c13-0136-17ea-12b638cfd350') #appcenter_url(params) + "/release_uploads/#{upload_id}")
+        uri = URI.parse('https://api.appcenter.ms/v0.1/apps/rtayal11-k5gi/Shopify-Test/release_uploads/a0967e20-3c13-0136-17ea-12b638cfd350') # appcenter_url(params) + "/release_uploads/#{upload_id}")
 
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
 
         req = Net::HTTP::Patch.new(uri)
-        req['X-API-Token'] = params[:api_token]  
-        req["Content-Type"] ='application/json'
+        req['X-API-Token'] = params[:api_token]
+        req["Content-Type"] = 'application/json'
         req["Accept"] = 'application/json'
-        req.body = JSON.generate({ status: "committed" })  
+        req.body = JSON.generate({ status: "committed" })
 
         response = http.request(req)
         response
@@ -93,10 +90,10 @@ module Fastlane
         http.use_ssl = true
 
         req = Net::HTTP::Patch.new(uri)
-        req['X-API-Token'] = params[:api_token]  
-        req["Content-Type"] ='application/json'
+        req['X-API-Token'] = params[:api_token]
+        req["Content-Type"] = 'application/json'
         req["Accept"] = 'application/json'
-        req.body = JSON.generate({ destination_name: destination_name, release_notes: release_notes })  
+        req.body = JSON.generate({ destination_name: destination_name, release_notes: release_notes })
 
         response = http.request(req)
         response
@@ -121,28 +118,23 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "APPCENTER_API_TOKEN",
                                        description: "Appcenter API token",
-                                       is_string: true
-                                       ),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :owner,
                                        env_name: "APPCENTER_OWNER",
                                        description: "Appcenter owner",
-                                       is_string: true
-                                       ),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :app_name,
                                        env_name: "APPCENTER_APP_NAME",
                                        description: "Appcenter app name",
-                                       is_string: true
-                                       ),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :destination_name,
                                        env_name: "APPCENTER_DESTINATION_NAME",
                                        description: "Appcenter distribution group",
-                                       is_string: true
-                                       ),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :release_notes,
                                        env_name: "APPCENTER_RELEASE_NOTES",
                                        description: "Release notes",
-                                       is_string: true
-                                       ),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :apk,
                                        env_name: "APPCENTER_APK",
                                        description: "Path to your APK file",
