@@ -107,7 +107,7 @@ module Gym
     # Post-processing of build_app
     def post_build_app
       command = BuildCommandGenerator.post_build
-      
+
       return if command.empty?
 
       print_command(command, "Generated Post-Build Command") if FastlaneCore::Globals.verbose?
