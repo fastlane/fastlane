@@ -59,6 +59,11 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :api_token,
+                                       env_name: "APPCENTER_API_TOKEN",
+                                       description: "Appcenter API token",
+                                       is_string: true
+                                       ),
           FastlaneCore::ConfigItem.new(key: :owner,
                                        env_name: "APPCENTER_OWNER",
                                        description: "Appcenter owner",
