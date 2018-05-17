@@ -11,6 +11,7 @@ module Fastlane
         require 'rest-client'
         require 'pry'
 
+        Helper.show_loading_indicator("Starting build upload to Appcenter...")
         # Create a release upload
         response = create_release_uploads(params)
         json = parse_response(response) # this will raise an exception if something goes wrong
@@ -34,6 +35,8 @@ module Fastlane
             end
           end
         end
+        Helper.hide_loading_indicator
+        UI.success("successfully uploaded to Appcenter ✅")
       end
 
       def self.appcenter_url(options)
