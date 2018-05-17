@@ -12,7 +12,6 @@ module Fastlane
         require 'pry'
 
         # Create a release upload
-      
         response = create_release_uploads(params)
          json = parse_response(response) # this will raise an exception if something goes wrong
 
@@ -21,17 +20,23 @@ module Fastlane
           upload_id = json['upload_id']
 
           ipa_filename = params[:ipa]
-          # if upload_build?(upload_url, ipa_filename)
+          response = upload_build(upload_url, ipa_filename)
+          if response.code == 204
             response = finalize_upload(upload_id, params)
             json = parse_response(response)
             if json['release_id'] != nil
-              puts 'all good 🙌'
+              response = distribute_release(params, json['release_id'], params[:destination_name], params[:release_notes])
+              if response.code == '200'
+                puts 'all good 🙌'
+                puts response.body
+                puts json['release_id']
+              else
+                puts 'all not good 💣'  
+              end
             end
-            # puts response
-            # puts uri
-          # else
+          else
 
-          # end
+          end
          end
 
       end
@@ -57,17 +62,12 @@ module Fastlane
       end
       private_class_method :create_release_uploads
 
-      def self.upload_build?(upload_url, file_path)
+      def self.upload_build(upload_url, file_path)
         params = { :ipa => File.new(file_path, 'rb') }
         response = RestClient.post(upload_url, params)
-        if response.code == 204
-          # appcenter returns empty content on successful upload. Empty content = 204
-          return true
-        else
-          return false
-        end
+        response
       end
-      private_class_method :upload_build?
+      private_class_method :upload_build
 
       def self.finalize_upload(upload_id, params)
         uri = URI.parse('https://api.appcenter.ms/v0.1/apps/rtayal11-k5gi/Shopify-Test/release_uploads/a0967e20-3c13-0136-17ea-12b638cfd350') #appcenter_url(params) + "/release_uploads/#{upload_id}")
@@ -86,16 +86,26 @@ module Fastlane
       end
       private_class_method :finalize_upload
 
+      def self.distribute_release(params, release_id, destination_name, release_notes)
+        uri = URI.parse(appcenter_url(params) + "/releases/#{release_id}")
+
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+
+        req = Net::HTTP::Patch.new(uri)
+        req['X-API-Token'] = params[:api_token]  
+        req["Content-Type"] ='application/json'
+        req["Accept"] = 'application/json'
+        req.body = JSON.generate({ destination_name: destination_name, release_notes: release_notes })  
+
+        response = http.request(req)
+        response
+      end
+      private_class_method :distribute_release
+
       def self.parse_response(response)
         body = JSON.parse(response.body)
         return body
-        # app_url = body['appURL']
-        # manage_url = body['manageURL']
-        # public_key = body['publicKey']
-
-        # Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY] = public_key
-        # Actions.lane_context[SharedValues::APPETIZE_APP_URL] = app_url
-        # Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL] = manage_url
       rescue => ex
         UI.error(ex)
         UI.user_error!("Error uploading to Appcenter.ms: #{response.body}")
@@ -121,6 +131,16 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :app_name,
                                        env_name: "APPCENTER_APP_NAME",
                                        description: "Appcenter app name",
+                                       is_string: true
+                                       ),
+          FastlaneCore::ConfigItem.new(key: :destination_name,
+                                       env_name: "APPCENTER_DESTINATION_NAME",
+                                       description: "Appcenter distribution group",
+                                       is_string: true
+                                       ),
+          FastlaneCore::ConfigItem.new(key: :release_notes,
+                                       env_name: "APPCENTER_RELEASE_NOTES",
+                                       description: "Release notes",
                                        is_string: true
                                        ),
           FastlaneCore::ConfigItem.new(key: :apk,
