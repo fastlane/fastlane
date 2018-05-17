@@ -52,6 +52,11 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.ci?).to be(true)
       end
 
+      it "returns true when building in AppCenter" do
+        stub_const('ENV', { 'APPCENTER_BUILD_ID' => '185' })
+        expect(FastlaneCore::Helper.ci?).to be(true)
+      end
+
       it "returns true when building in Xcode Server" do
         stub_const('ENV', { 'XCS' => true })
         expect(FastlaneCore::Helper.ci?).to be(true)
