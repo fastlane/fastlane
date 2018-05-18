@@ -111,7 +111,7 @@ module Gym
                                      end),
         FastlaneCore::ConfigItem.new(key: :export_options,
                                      env_name: "GYM_EXPORT_OPTIONS",
-                                     description: "A path to an export options plist when running gym from the command line; a hash with export options when using gym as a Fastlane action. Use 'xcodebuild -help' to print the full set of available options.",
+                                     description: "Path to an export options plist or a hash with export options. Use 'xcodebuild -help' to print the full set of available options.",
                                      is_string: false,
                                      optional: true,
                                      type: Hash,
