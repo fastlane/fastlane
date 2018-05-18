@@ -40,6 +40,7 @@ module Fastlane
 
         target_filter = params[:target_filter] || params[:build_configuration_filter]
         configuration = params[:build_configuration]
+        code_signing_identity = params[:code_signing_identity]
 
         # manipulate project file
         UI.success("Going to update project '#{folder}' with UUID")
@@ -61,6 +62,13 @@ module Fastlane
             else
               UI.important("Skipping configuration #{config_name} as it doesn't match the filter '#{configuration}'")
               next
+            end
+
+            if code_signing_identity
+              codesign_build_settings_keys = build_configuration.build_settings.keys.select { |key| key.to_s.match(/CODE_SIGN_IDENTITY.*/) }
+              codesign_build_settings_keys.each do |setting|
+                build_configuration.build_settings[setting] = code_signing_identity
+              end
             end
 
             build_configuration.build_settings["PROVISIONING_PROFILE"] = data["UUID"]
@@ -129,7 +137,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :certificate,
                                        env_name: "FL_PROJECT_PROVISIONING_CERTIFICATE_PATH",
                                        description: "Path to apple root certificate",
-                                       default_value: "/tmp/AppleIncRootCertificate.cer")
+                                       default_value: "/tmp/AppleIncRootCertificate.cer"),
+          FastlaneCore::ConfigItem.new(key: :code_signing_identity,
+                                       env_name: "FL_PROJECT_PROVISIONING_CODE_SIGN_IDENTITY",
+                                       description: "Code sign identity for build configuration",
+                                       optional: true)
         ]
       end
 
@@ -147,7 +159,8 @@ module Fastlane
             xcodeproj: "Project.xcodeproj",
             profile: "./watch_app_store.mobileprovision", # optional if you use sigh
             target_filter: ".*WatchKit Extension.*", # matches name or type of a target
-            build_configuration: "Release"
+            build_configuration: "Release",
+            code_signing_identity: "iPhone Development" # optionally specify the codesigning identity
           )'
         ]
       end
