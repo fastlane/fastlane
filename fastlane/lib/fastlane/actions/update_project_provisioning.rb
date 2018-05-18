@@ -64,9 +64,11 @@ module Fastlane
               next
             end
 
-            codesign_build_settings_keys = build_configuration.build_settings.keys.select { |key| key.to_s.match(/CODE_SIGN_IDENTITY.*/) }
-            codesign_build_settings_keys.each do |setting|
-              build_configuration.build_settings[setting] = code_signing_identity
+            if code_signing_identity
+              codesign_build_settings_keys = build_configuration.build_settings.keys.select { |key| key.to_s.match(/CODE_SIGN_IDENTITY.*/) }
+              codesign_build_settings_keys.each do |setting|
+                build_configuration.build_settings[setting] = code_signing_identity
+              end
             end
 
             build_configuration.build_settings["PROVISIONING_PROFILE"] = data["UUID"]
