@@ -545,10 +545,11 @@ describe Fastlane do
         context "when command is archive" do
           let(:command) { 'archive' }
           it "--log-path option is not present" do
-            result = Fastlane::FastFile.new.parse("lane :test do
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
                 carthage(command: '#{command}', log_path: 'bla.log')
               end").runner.execute(:test)
-            expect(result).to eq("carthage archive")
+            end.to raise_error("Log path option is available only for 'build', 'bootstrap', 'update' command.")
           end
         end
 

@@ -44,8 +44,8 @@ module Fastlane
           UI.user_error!("Output option is available only for 'archive' command.")
         end
 
-        unless %w(build bootstrap update).include?(command_name)
-          params[:log_path] = nil
+        if params[:log_path] && !%w(build bootstrap update).include?(command_name)
+          UI.user_error!("Log path option is available only for 'build', 'bootstrap', 'update' command.")
         end
       end
 
