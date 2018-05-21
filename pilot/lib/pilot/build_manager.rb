@@ -173,8 +173,6 @@ module Pilot
         begin
           uploaded_build.submit_for_testflight_review!
         rescue => ex
-          require 'pry'
-          binding.pry
           # iTunes Connect currently may 504 on this request even though it manages to get the build in
           # the approved state, this is a temporary workaround.
           if ex.to_s.include?("504")
