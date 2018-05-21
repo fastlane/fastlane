@@ -64,7 +64,7 @@ module Fastlane
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :repo_update,
                                        env_name: "FL_COCOAPODS_REPO_UPDATE",
-                                       description: "Run `pod repo update` before install",
+                                       description: "Add `--repo-update` flag to `pod install` command",
                                        is_string: false,
                                        default_value: false,
                                        conflicting_options: [:try_repo_update_on_error]),
