@@ -181,6 +181,8 @@ module Pilot
           elsif ex.to_s.include?("another build is already in review")
             puts "another build is already in review"
             waiting_for_review_build = Spaceship::TestFlight::Build.all_waiting_for_review(app_id: uploaded_build.app_id, platform: :ios)
+            waiting_for_review_build.first.expire!
+            distribute_build(uploaded_build, options)
             return
           else
             raise ex
