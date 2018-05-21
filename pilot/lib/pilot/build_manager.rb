@@ -178,12 +178,12 @@ module Pilot
           # iTunes Connect currently may 504 on this request even though it manages to get the build in
           # the approved state, this is a temporary workaround.
           if ex.to_s.include?("504")
-            elsif ex.to_s.include?("another build is already in review")
-              puts "another build is already in review"
-              updated_build = Spaceship::TestFlight::Build.all_waiting_for_review(app_id: uploaded_build.app_id, platform: :ios)
-              return
-              else
-                raise ex
+          elsif ex.to_s.include?("another build is already in review")
+            puts "another build is already in review"
+            waiting_for_review_build = Spaceship::TestFlight::Build.all_waiting_for_review(app_id: uploaded_build.app_id, platform: :ios)
+            return
+          else
+            raise ex
           end
           # raise ex unless ex.to_s.include?("504")
           UI.message("Submitting the build for review timed out, trying to recover.")
