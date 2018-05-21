@@ -210,8 +210,6 @@ module Supply
     def upload_apk(path_to_apk)
       ensure_active_edit!
 
-      puts "path_to_apk: #{path_to_apk}"
-
       result_upload = call_google_api do
         android_publisher.upload_apk(
           current_package_name,
@@ -233,10 +231,24 @@ module Supply
           current_edit.id,
           apk_version_code,
           "proguard",
-          upload_source: path_to_mapping,
+          upload_source: path_to_mapping
+        )
+      end
+    end
+
+    def upload_bundle(path_to_aab)
+      ensure_active_edit!
+
+      result_upload = call_google_api do
+        android_publisher.upload_edit_bundle(
+          current_package_name,
+          self.current_edit.id,
+          upload_source: path_to_aab,
           content_type: "application/octet-stream"
         )
       end
+
+      return result_upload.version_code
     end
 
     # Updates the track for the provided version code(s)
