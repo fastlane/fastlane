@@ -193,6 +193,11 @@ module Spaceship
       end
     end
 
+    # @return (String) Fetches name from currently used team
+    def team_name
+      (team_information || {})['name']
+    end
+
     # Instantiates a client but with a cookie derived from another client.
     #
     # HACK: since the `@cookie` is not exposed, we use this hacky way of sharing the instance.

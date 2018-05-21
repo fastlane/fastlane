@@ -51,6 +51,29 @@ describe Spaceship::Client do
       end
     end
 
+    describe '#team_name' do
+      it 'returns the default team_name' do
+        expect(subject.team_name).to eq('SpaceShip')
+      end
+
+      it "returns team_name from selected team_id" do
+        allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([
+                                                                                       { 'teamId' => 'XXXXXXXXXX', 'name' => 'SpaceShip', 'currentTeamMember' => { 'teamMemberId' => '' } },
+                                                                                       { 'teamId' => 'ABCDEF', 'name' => 'PirateShip', 'currentTeamMember' => { 'teamMemberId' => '' } }
+                                                                                     ])
+
+        team_id = "ABCDEF"
+        subject.select_team(team_id: team_id)
+        expect(subject.team_id).to eq(team_id)
+        expect(subject.team_name).to eq('PirateShip')
+      end
+
+      it "return nil if no teams" do
+        allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([])
+        expect(subject.team_name).to eq(nil)
+      end
+    end
+
     describe "csrf_tokens" do
       it "uses the stored token for all upcoming requests" do
         # Temporary stub a request to require the csrf_tokens
