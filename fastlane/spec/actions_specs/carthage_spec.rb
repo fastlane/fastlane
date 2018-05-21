@@ -549,7 +549,7 @@ describe Fastlane do
               Fastlane::FastFile.new.parse("lane :test do
                 carthage(command: '#{command}', log_path: 'bla.log')
               end").runner.execute(:test)
-            end.to raise_error("Log path option is available only for 'build', 'bootstrap', 'update' command.")
+            end.to raise_error("Log path option is available only for 'build', 'bootstrap', and 'update' command.")
           end
         end
 

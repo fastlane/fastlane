@@ -45,7 +45,7 @@ module Fastlane
         end
 
         if params[:log_path] && !%w(build bootstrap update).include?(command_name)
-          UI.user_error!("Log path option is available only for 'build', 'bootstrap', 'update' command.")
+          UI.user_error!("Log path option is available only for 'build', 'bootstrap', and 'update' command.")
         end
       end
 
