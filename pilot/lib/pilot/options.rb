@@ -191,9 +191,9 @@ module Pilot
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :reject_previously_submitted_build,
-                                        short_option: "-b",
+                                     short_option: "-b",
                                      env_name: "PILOT_REJECT_PREVIOUS_BUILD",
-                                     description: "some desecription",
+                                     description: "Expire previous if it's 'waiting for review'",
                                      is_string: false,
                                      default_value: false)
       ]
