@@ -24,7 +24,7 @@ module Supply
       end
 
       upload_binaries unless Supply.config[:skip_upload_apk]
-      upload_bundles
+      upload_bundles unless Supply.config[:skip_upload_aab]
 
       promote_track if Supply.config[:track_promote_to]
 

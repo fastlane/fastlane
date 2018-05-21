@@ -115,7 +115,7 @@ module Supply
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
                                        value.each do |path|
-                                         UI.user_error!("Could not find apk file at pat-h '#{path}'") unless File.exist?(path)
+                                         UI.user_error!("Could not find apk file at path '#{path}'") unless File.exist?(path)
                                          UI.user_error!("file at path '#{path}' is not an apk") unless path.end_with?('.apk')
                                        end
                                      end),
@@ -136,6 +136,12 @@ module Supply
                                      env_name: "SUPPLY_SKIP_UPLOAD_APK",
                                      optional: true,
                                      description: "Whether to skip uploading APK",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_upload_aab,
+                                     env_name: "SUPPLY_SKIP_UPLOAD_AAB",
+                                     optional: true,
+                                     description: "Whether to skip uploading AAB",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_upload_metadata,
