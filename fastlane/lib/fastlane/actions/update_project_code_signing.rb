@@ -35,8 +35,8 @@ module Fastlane
                                          UI.user_error!("Path is invalid") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :udid,
+                                       deprecated: "Use `:uuid` instead",
                                        env_name: "FL_PROJECT_SIGNING_UDID",
-                                       description: "DEPRECATED: see :uuid",
                                        code_gen_sensitive: true,
                                        default_value: ENV["SIGH_UUID"],
                                        default_value_dynamic: true),
@@ -58,7 +58,7 @@ module Fastlane
       end
 
       def self.example_code
-        []
+        nil
       end
 
       def self.category

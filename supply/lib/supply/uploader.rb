@@ -24,6 +24,7 @@ module Supply
       end
 
       upload_binaries unless Supply.config[:skip_upload_apk]
+      upload_bundles unless Supply.config[:skip_upload_aab]
 
       promote_track if Supply.config[:track_promote_to]
 
@@ -39,8 +40,17 @@ module Supply
     end
 
     def verify_config!
-      unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths] || (Supply.config[:track] && Supply.config[:track_promote_to])
-        UI.user_error!("No local metadata, apks, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+      unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths] || Supply.config[:aab] || (Supply.config[:track] && Supply.config[:track_promote_to])
+        UI.user_error!("No local metadata, apks, aab, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+      end
+
+      # Can't upload both at apk and aab at same time
+      # Need to error out users when there both apks and aabs are detected
+      apk_paths = [Supply.config[:apk], Supply.config[:apk_paths]].flatten.compact
+      could_upload_apk = !apk_paths.empty? && !Supply.config[:skip_upload_apk]
+      could_upload_aab = Supply.config[:aab] && !Supply.config[:skip_upload_aab]
+      if could_upload_apk && could_upload_aab
+        UI.user_error!("Cannot provide both apk(s) and aab - use `skip_upload_apk`, `skip_upload_aab`, or  make sure to remove any existing .apk or .aab files that are no longer needed")
       end
     end
 
@@ -132,6 +142,18 @@ module Supply
       update_track(apk_version_codes) unless apk_version_codes.empty?
     end
 
+    def upload_bundles
+      aab_path = Supply.config[:aab]
+      return unless aab_path
+
+      UI.message("Preparing aab at path '#{aab_path}' for upload...")
+      apk_version_codes = [client.upload_bundle(aab_path)]
+
+      # Only update tracks if we have version codes
+      # Updating a track with empty version codes can completely clear out a track
+      update_track(apk_version_codes) unless apk_version_codes.empty?
+    end
+
     private
 
     ##
@@ -183,6 +205,11 @@ module Supply
 
       tracks = ["production", "rollout", "beta", "alpha", "internal"]
       config_track_index = tracks.index(Supply.config[:track])
+
+      # Custom "closed" tracks are now allowed (https://support.google.com/googleplay/android-developer/answer/3131213)
+      # Custom tracks have an equal level with alpha (alpha is considered a closed track as well)
+      # If a track index is not found, we will assume is a custom track so an alpha index is given
+      config_track_index = tracks.index("alpha") unless config_track_index
 
       tracks.each_index do |track_index|
         track = tracks[track_index]

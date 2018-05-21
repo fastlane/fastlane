@@ -438,6 +438,13 @@ class TunesStubbing
                   headers: { 'Content-Type' => 'application/json' })
     end
 
+    def itc_stub_update_price_tier
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        with(body: JSON.parse(itc_read_fixture_file(File.join('update_price_tier', 'update_price_tier_request.json'))).to_json).
+        to_return(status: 200, body: itc_read_fixture_file(File.join('app_pricing_intervals.json')),
+                  headers: { 'Content-Type' => 'application/json' })
+    end
+
     def itc_stub_set_preorder_cleared
       stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
         with(body: JSON.parse(itc_read_fixture_file(File.join('availability', 'set_preorder_cleared_request.json'))).to_json).
@@ -450,6 +457,18 @@ class TunesStubbing
         with(body: JSON.parse(itc_read_fixture_file(File.join('availability', 'set_preorder_cleared_with_date_request.json'))).to_json).
         to_return(status: 200, body: itc_read_fixture_file(File.join('availability', 'set_preorder_cleared_with_date_response.json')),
                   headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_app_pricing_intervals_vpp
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        to_return(status: 200, body: itc_read_fixture_file(File.join('app_pricing_intervals_b2b_included.json')),
+                    headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_app_pricing_intervals_b2b_disabled
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        to_return(status: 200, body: itc_read_fixture_file(File.join('app_pricing_intervals_b2b_flag_disabled.json')),
+                    headers: { 'Content-Type' => 'application/json' })
     end
 
     def itc_stub_members
