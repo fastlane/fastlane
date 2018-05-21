@@ -29,8 +29,8 @@ module Match
                                            git_user_email: params[:git_user_email],
                                            clone_branch_directly: params[:clone_branch_directly])
 
+      self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name])
       unless params[:readonly]
-        self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name])
         if params[:type] == "enterprise" && !Spaceship.client.in_house?
           UI.user_error!("You defined the profile type 'enterprise', but your Apple account doesn't support In-House profiles")
         end
@@ -172,16 +172,27 @@ module Match
         self.files_to_commmit << profile
       end
 
-      installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       uuid = parsed["UUID"]
 
       if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
         # This profile is invalid, let's remove the local file and generate a new one
-        File.delete(profile)
+        FastlaneCore::ProvisioningProfile.uninstall(profile, keychain_path)
         # This method will be called again, no need to modify `files_to_commmit`
-        return nil
+        if params[:readonly]
+          UI.error("No matching provisioning profiles found and can not create a new one because you enabled `readonly`. Check the output above for more information.")
+          UI.user_error!("To reset the provisioning profiles of your Apple account, you can use the `fastlane match nuke` feature, or set readonly false, more information on https://docs.fastlane.tools/actions/match/")
+          return nil
+        else
+          profile = Generator.generate_provisioning_profile(params: params,
+                                                       prov_type: prov_type,
+                                                  certificate_id: certificate_id,
+                                                  app_identifier: app_identifier)
+          self.files_to_commmit << profile
+        end
       end
+
+      installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
 
       Utils.fill_environment(Utils.environment_variable_name(app_identifier: app_identifier,
                                                                        type: prov_type,
