@@ -231,7 +231,8 @@ module Supply
           current_edit.id,
           apk_version_code,
           "proguard",
-          upload_source: path_to_mapping
+          upload_source: path_to_mapping,
+          content_type: "application/octet-stream"
         )
       end
     end

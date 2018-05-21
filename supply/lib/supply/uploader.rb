@@ -43,6 +43,12 @@ module Supply
       unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths] || Supply.config[:aab] || (Supply.config[:track] && Supply.config[:track_promote_to])
         UI.user_error!("No local metadata, apks, aab, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
       end
+
+      apk_paths = [Supply.config[:apk], Supply.config[:apk_paths]].flatten.compact
+      aab_path = Supply.config[:aab]
+      if !apk_paths.empty? && aab_path
+        UI.user_error!("Cannot provide both apk(s) and aab - please make sure to remove any existing .apk or .aab files that are no longer needed")
+      end
     end
 
     def promote_track
@@ -135,6 +141,7 @@ module Supply
 
     def upload_bundles
       aab_path = Supply.config[:aab]
+      return unless aab_path
 
       apk_version_codes = []
       apk_version_codes.push(client.upload_bundle(aab_path))
