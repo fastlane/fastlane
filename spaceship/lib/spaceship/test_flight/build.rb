@@ -116,7 +116,14 @@ module Spaceship
 
       # Just the builds, as a flat array, that are still processing
       def self.all_processing_builds(app_id: nil, platform: nil, retry_count: 0)
-        all(app_id: app_id, platform: platform, retry_count: retry_count).find_all(&:processing?)
+        require 'pry'
+        binding.pry
+        all_builds = all(app_id: app_id, platform: platform, retry_count: retry_count)
+        all_builds.find_all(&:processing?)
+      end
+
+      def self.all_waiting_for_review(app_id: nil, platform: nil, retry_count: 0)
+        all(app_id: app_id, platform: platform, retry_count: retry_count).select{ |app| app.external_state == 'testflight.build.state.review.waiting' }
       end
 
       def self.latest(app_id: nil, platform: nil)
