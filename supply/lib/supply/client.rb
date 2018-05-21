@@ -236,6 +236,21 @@ module Supply
       end
     end
 
+    def upload_bundle(path_to_aab)
+      ensure_active_edit!
+
+      result_upload = call_google_api do
+        android_publisher.upload_edit_bundle(
+          current_package_name,
+          self.current_edit.id,
+          upload_source: path_to_aab,
+          content_type: "application/octet-stream"
+        )
+      end
+
+      return result_upload.version_code
+    end
+
     # Updates the track for the provided version code(s)
     def update_track(track, rollout, apk_version_code)
       ensure_active_edit!

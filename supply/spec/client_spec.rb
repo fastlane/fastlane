@@ -19,6 +19,7 @@ describe Supply do
         expect(subject.class.method_defined?(:update_listing)).to eq(true)
         expect(subject.class.method_defined?(:update_track)).to eq(true)
         expect(subject.class.method_defined?(:upload_apk)).to eq(true)
+        expect(subject.class.method_defined?(:upload_edit_bundle)).to eq(true)
         expect(subject.class.method_defined?(:upload_edit_deobfuscationfile)).to eq(true)
         expect(subject.class.method_defined?(:upload_expansion_file)).to eq(true)
         expect(subject.class.method_defined?(:upload_image)).to eq(true)

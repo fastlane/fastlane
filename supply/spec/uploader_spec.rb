@@ -9,7 +9,7 @@ describe Supply do
         Supply.config = {}
         expect do
           subject.verify_config!
-        end.to raise_error("No local metadata, apks, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+        end.to raise_error("No local metadata, apks, aab, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
       end
 
       it "raises error if only track" do
@@ -18,7 +18,7 @@ describe Supply do
         }
         expect do
           subject.verify_config!
-        end.to raise_error("No local metadata, apks, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+        end.to raise_error("No local metadata, apks, aab, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
       end
 
       it "raises error if only track_promote_to" do
@@ -27,7 +27,7 @@ describe Supply do
         }
         expect do
           subject.verify_config!
-        end.to raise_error("No local metadata, apks, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+        end.to raise_error("No local metadata, apks, aab, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
       end
 
       it "does not raise error if only metadata" do
@@ -47,6 +47,13 @@ describe Supply do
       it "does not raise error if only apk_paths" do
         Supply.config = {
           apk_paths: ['some/path/app1.apk', 'some/path/app2.apk']
+        }
+        subject.verify_config!
+      end
+
+      it "does not raise error if only aab" do
+        Supply.config = {
+          aab: 'some/path/app1.aab'
         }
         subject.verify_config!
       end
