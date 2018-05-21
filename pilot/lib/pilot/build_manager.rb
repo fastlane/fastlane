@@ -177,9 +177,11 @@ module Pilot
           # the approved state, this is a temporary workaround.
           if ex.to_s.include?("504")
           elsif ex.to_s.include?("another build is already in review") && options[:reject_previously_submitted_build]
-            UI.important("Another build is already in review. Going to expire that build and submit new one.")
-            waiting_for_review_build = Spaceship::TestFlight::Build.all_waiting_for_review(app_id: uploaded_build.app_id, platform: :ios)
-            waiting_for_review_build.first.expire!
+            UI.important("Another build is already in review. Going to expire that build and submit the new one.")
+            waiting_for_review_build = Spaceship::TestFlight::Build.all_waiting_for_review(app_id: uploaded_build.app_id, platform: :ios).first
+            UI.important("Expiring build: #{waiting_for_review_build.train_version} - #{waiting_for_review_build.build_version}")
+            waiting_for_review_build.expire!
+            UI.success("Expired previous build: #{waiting_for_review_build.train_version} - #{waiting_for_review_build.build_version}")
             distribute_build(uploaded_build, options)
             return
           else
