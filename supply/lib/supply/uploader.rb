@@ -44,10 +44,13 @@ module Supply
         UI.user_error!("No local metadata, apks, aab, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
       end
 
+      # Can't upload both at apk and aab at same time
+      # Need to error out users when there both apks and aabs are detected
       apk_paths = [Supply.config[:apk], Supply.config[:apk_paths]].flatten.compact
-      aab_path = Supply.config[:aab]
-      if !apk_paths.empty? && aab_path
-        UI.user_error!("Cannot provide both apk(s) and aab - please make sure to remove any existing .apk or .aab files that are no longer needed")
+      could_upload_apk = !apk_paths.empty? && !Supply.config[:skip_upload_apk]
+      could_upload_aab = Supply.config[:aab] && !Supply.config[:skip_upload_aab]
+      if could_upload_apk && could_upload_aab
+        UI.user_error!("Cannot provide both apk(s) and aab - use `skip_upload_apk`, `skip_upload_aab`, or  make sure to remove any existing .apk or .aab files that are no longer needed")
       end
     end
 
@@ -143,8 +146,8 @@ module Supply
       aab_path = Supply.config[:aab]
       return unless aab_path
 
-      apk_version_codes = []
-      apk_version_codes.push(client.upload_bundle(aab_path))
+      UI.message("Preparing aab at path '#{aab_path}' for upload...")
+      apk_version_codes = [client.upload_bundle(aab_path)]
 
       # Only update tracks if we have version codes
       # Updating a track with empty version codes can completely clear out a track
