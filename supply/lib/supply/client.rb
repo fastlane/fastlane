@@ -214,8 +214,7 @@ module Supply
         android_publisher.upload_apk(
           current_package_name,
           current_edit.id,
-          upload_source: path_to_apk,
-          content_type: 'application/octet-stream'
+          upload_source: path_to_apk
         )
       end
 
