@@ -3,6 +3,7 @@ require 'credentials_manager/appfile_config'
 
 module Supply
   class Options
+    # rubocop:disable Metrics/PerceivedComplexity
     def self.available_options
       default_tracks = %w(production beta alpha internal rollout)
       @options ||= [
@@ -205,5 +206,6 @@ module Supply
 
       ]
     end
+    # rubocop:enable Metrics/PerceivedComplexity
   end
 end
