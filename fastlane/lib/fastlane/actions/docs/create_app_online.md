@@ -247,7 +247,7 @@ end
 To use the newly generated app in _deliver_, you need to add this line to your `Deliverfile`:
 
 ```ruby-skip-tests
-apple_id ENV['PRODUCE_APPLE_ID']
+apple_id(ENV['PRODUCE_APPLE_ID'])
 ```
 
 This will tell _deliver_, which `App ID` to use, since the app is not yet available in the App Store.
