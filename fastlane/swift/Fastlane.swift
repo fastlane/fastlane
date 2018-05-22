@@ -1373,7 +1373,7 @@ func ensureNoDebugCode(text: String,
                                                                                                       RubyCommand.Argument(name: "exclude_dirs", value: excludeDirs)])
   _ = runner.executeCommand(command)
 }
-func ensureXcodeVersion(version: String) {
+func ensureXcodeVersion(version: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "ensure_xcode_version", className: nil, args: [RubyCommand.Argument(name: "version", value: version)])
   _ = runner.executeCommand(command)
 }
@@ -3237,7 +3237,9 @@ func supply(packageName: String,
             jsonKeyData: String? = nil,
             apk: String? = nil,
             apkPaths: [String]? = nil,
+            aab: String? = nil,
             skipUploadApk: Bool = false,
+            skipUploadAab: Bool = false,
             skipUploadMetadata: Bool = false,
             skipUploadImages: Bool = false,
             skipUploadScreenshots: Bool = false,
@@ -3257,7 +3259,9 @@ func supply(packageName: String,
                                                                                         RubyCommand.Argument(name: "json_key_data", value: jsonKeyData),
                                                                                         RubyCommand.Argument(name: "apk", value: apk),
                                                                                         RubyCommand.Argument(name: "apk_paths", value: apkPaths),
+                                                                                        RubyCommand.Argument(name: "aab", value: aab),
                                                                                         RubyCommand.Argument(name: "skip_upload_apk", value: skipUploadApk),
+                                                                                        RubyCommand.Argument(name: "skip_upload_aab", value: skipUploadAab),
                                                                                         RubyCommand.Argument(name: "skip_upload_metadata", value: skipUploadMetadata),
                                                                                         RubyCommand.Argument(name: "skip_upload_images", value: skipUploadImages),
                                                                                         RubyCommand.Argument(name: "skip_upload_screenshots", value: skipUploadScreenshots),
@@ -3510,7 +3514,7 @@ func updatePlist(plistPath: String? = nil,
   _ = runner.executeCommand(command)
 }
 func updateProjectCodeSigning(path: String,
-                              udid: String,
+                              udid: String? = nil,
                               uuid: String) {
   let command = RubyCommand(commandID: "", methodName: "update_project_code_signing", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
                                                                                                              RubyCommand.Argument(name: "udid", value: udid),
@@ -3522,13 +3526,15 @@ func updateProjectProvisioning(xcodeproj: String? = nil,
                                targetFilter: String? = nil,
                                buildConfigurationFilter: String? = nil,
                                buildConfiguration: String? = nil,
-                               certificate: String = "/tmp/AppleIncRootCertificate.cer") {
+                               certificate: String = "/tmp/AppleIncRootCertificate.cer",
+                               codeSigningIdentity: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "update_project_provisioning", className: nil, args: [RubyCommand.Argument(name: "xcodeproj", value: xcodeproj),
                                                                                                              RubyCommand.Argument(name: "profile", value: profile),
                                                                                                              RubyCommand.Argument(name: "target_filter", value: targetFilter),
                                                                                                              RubyCommand.Argument(name: "build_configuration_filter", value: buildConfigurationFilter),
                                                                                                              RubyCommand.Argument(name: "build_configuration", value: buildConfiguration),
-                                                                                                             RubyCommand.Argument(name: "certificate", value: certificate)])
+                                                                                                             RubyCommand.Argument(name: "certificate", value: certificate),
+                                                                                                             RubyCommand.Argument(name: "code_signing_identity", value: codeSigningIdentity)])
   _ = runner.executeCommand(command)
 }
 func updateProjectTeam(path: String,
@@ -3713,7 +3719,9 @@ func uploadToPlayStore(packageName: String,
                        jsonKeyData: String? = nil,
                        apk: String? = nil,
                        apkPaths: [String]? = nil,
+                       aab: String? = nil,
                        skipUploadApk: Bool = false,
+                       skipUploadAab: Bool = false,
                        skipUploadMetadata: Bool = false,
                        skipUploadImages: Bool = false,
                        skipUploadScreenshots: Bool = false,
@@ -3733,7 +3741,9 @@ func uploadToPlayStore(packageName: String,
                                                                                                       RubyCommand.Argument(name: "json_key_data", value: jsonKeyData),
                                                                                                       RubyCommand.Argument(name: "apk", value: apk),
                                                                                                       RubyCommand.Argument(name: "apk_paths", value: apkPaths),
+                                                                                                      RubyCommand.Argument(name: "aab", value: aab),
                                                                                                       RubyCommand.Argument(name: "skip_upload_apk", value: skipUploadApk),
+                                                                                                      RubyCommand.Argument(name: "skip_upload_aab", value: skipUploadAab),
                                                                                                       RubyCommand.Argument(name: "skip_upload_metadata", value: skipUploadMetadata),
                                                                                                       RubyCommand.Argument(name: "skip_upload_images", value: skipUploadImages),
                                                                                                       RubyCommand.Argument(name: "skip_upload_screenshots", value: skipUploadScreenshots),
@@ -4023,4 +4033,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.17]
+// FastlaneRunnerAPIVersion [0.9.18]
