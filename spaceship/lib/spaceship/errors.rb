@@ -22,6 +22,12 @@ module Spaceship
     end
   end
 
+  class AppleIDAndPrivacyAcknowledgementNeeded < BasicPreferredInfoError
+    def show_github_issues
+      false
+    end
+  end
+
   # User doesn't have enough permission for given action
   class InsufficientPermissions < BasicPreferredInfoError
     TITLE = 'Insufficient permissions for your Apple ID:'.freeze

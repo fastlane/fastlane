@@ -17,6 +17,38 @@ describe Spaceship::TunesClient do
     end
   end
 
+  describe 'exception if Apple ID & Privacy not acknowledged' do
+    subject { Spaceship::Tunes.client }
+    let(:username) { 'spaceship@krausefx.com' }
+    let(:password) { 'so_secret' }
+
+    it 'has authType is sa' do
+      response = double
+      allow(response).to receive(:status).and_return(412)
+      allow(response).to receive(:body).and_return({ "authType" => "sa" })
+
+      allow_any_instance_of(Spaceship::Client).to receive(:request)
+        .and_return(response)
+
+      expect do
+        Spaceship::Tunes.login(username, password)
+      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://itunesconnect.apple.com) to acknowledge the statement.")
+    end
+
+    it 'has authType of hsa' do
+      response = double
+      allow(response).to receive(:status).and_return(412)
+      allow(response).to receive(:body).and_return({ "authType" => "hsa" })
+
+      allow_any_instance_of(Spaceship::Client).to receive(:request)
+        .and_return(response)
+
+      expect do
+        Spaceship::Tunes.login(username, password)
+      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://itunesconnect.apple.com) to acknowledge the statement.")
+    end
+  end
+
   describe "Logged in" do
     subject { Spaceship::Tunes.client }
     let(:username) { 'spaceship@krausefx.com' }
