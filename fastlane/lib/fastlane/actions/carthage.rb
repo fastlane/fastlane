@@ -61,7 +61,6 @@ module Fastlane
         %w(all iOS Mac tvOS watchOS)
       end
 
-      # rubocop:disable Metrics/PerceivedComplexity
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :command,
@@ -171,7 +170,6 @@ module Fastlane
                                        optional: true)
         ]
       end
-      # rubocop:enable Metrics/PerceivedComplexity
 
       def self.example_code
         [
