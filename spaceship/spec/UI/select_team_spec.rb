@@ -82,7 +82,7 @@ describe Spaceship::Client do
           expect(Spaceship::Client::UserInterface).to receive(:interactive?).and_return(false)
           expect do
             subject.select_team
-          end.to raise_error("Multiple Teams found; unable to choose, terminal not ineractive!")
+          end.to raise_error("Multiple Teams found; unable to choose, terminal not interactive!")
         end
 
         after do

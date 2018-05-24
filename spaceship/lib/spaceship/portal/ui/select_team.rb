@@ -87,7 +87,7 @@ module Spaceship
           teams.each_with_index do |team, i|
             puts("#{i + 1}) #{team['teamId']} \"#{team['name']}\" (#{team['type']})")
           end
-          raise "Multiple Teams found; unable to choose, terminal not ineractive!"
+          raise "Multiple Teams found; unable to choose, terminal not interactive!"
         end
 
         # User Selection

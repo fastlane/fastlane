@@ -105,7 +105,7 @@ module Spaceship
         unless Spaceship::Client::UserInterface.interactive?
           puts("Multiple teams found on iTunes Connect, Your Terminal is running in non-interactive mode! Cannot continue from here.")
           puts("Please check that you set FASTLANE_ITC_TEAM_ID or FASTLANE_ITC_TEAM_NAME to the right value.")
-          raise "Multiple iTunes Connect Teams found; unable to choose, terminal not ineractive!"
+          raise "Multiple iTunes Connect Teams found; unable to choose, terminal not interactive!"
         end
 
         selected = ($stdin.gets || '').strip.to_i - 1
