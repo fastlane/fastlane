@@ -540,6 +540,52 @@ describe Fastlane do
           end
         end
       end
+
+      context "when specify log_path" do
+        context "when command is archive" do
+          let(:command) { 'archive' }
+          it "--log-path option is not present" do
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: '#{command}', log_path: 'bla.log')
+              end").runner.execute(:test)
+            end.to raise_error("Log path option is available only for 'build', 'bootstrap', and 'update' command.")
+          end
+        end
+
+        context "when command is update" do
+          let(:command) { 'update' }
+
+          it "--log-path option is present" do
+            result = Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: '#{command}', log_path: 'bla.log')
+              end").runner.execute(:test)
+            expect(result).to eq("carthage update --log-path bla.log")
+          end
+        end
+
+        context "when command is build" do
+          let(:command) { 'build' }
+
+          it "--log-path option is present" do
+            result = Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: '#{command}', log_path: 'bla.log')
+              end").runner.execute(:test)
+            expect(result).to eq("carthage build --log-path bla.log")
+          end
+        end
+
+        context "when command is bootstrap" do
+          let(:command) { 'bootstrap' }
+
+          it "--log-path option is present" do
+            result = Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: '#{command}', log_path: 'bla.log')
+              end").runner.execute(:test)
+            expect(result).to eq("carthage bootstrap --log-path bla.log")
+          end
+        end
+      end
     end
   end
 end
