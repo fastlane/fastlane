@@ -71,6 +71,10 @@ module Fastlane
                                        env_name: "FL_SLACK_MESSAGE",
                                        description: "The message that should be displayed on Slack. This supports the standard Slack markup language",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :pretext,
+                                       env_name: "FL_SLACK_PRETEXT",
+                                       description: "This is optional text that appears above the message attachment block. This supports the standard Slack markup language",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :channel,
                                        env_name: "FL_SLACK_CHANNEL",
                                        description: "#channel or @username",
@@ -185,6 +189,7 @@ module Fastlane
         slack_attachment = {
           fallback: options[:message],
           text: options[:message],
+          pretext: options[:pretext],
           color: color,
           mrkdwn_in: ["pretext", "text", "fields", "message"],
           fields: []
