@@ -119,14 +119,9 @@ describe Spaceship::TunesClient do
       end
 
       it "returns team_id from environment variable" do
-        ENV["FASTLANE_ITC_TEAM_NAME"] = "Harry"
+        stub_const('ENV', { 'FASTLANE_ITC_TEAM_NAME' => 'Harry' })
         allow(subject).to receive(:teams).and_return(associated_teams)
         expect(subject.select_team).to eq('5678')
-      end
-
-      after do
-        ENV.delete("FASTLANE_ITC_TEAM_ID")
-        ENV.delete("FASTLANE_ITC_TEAM_NAME")
       end
     end
   end
