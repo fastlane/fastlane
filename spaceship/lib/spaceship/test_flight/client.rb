@@ -202,6 +202,17 @@ module Spaceship
         handle_response(response)
       end
 
+      def remove_testers_from_testflight(app_id: nil, tester_ids: nil)
+        assert_required_params(__method__, binding)
+        url = "providers/#{team_id}/apps/#{app_id}/deleteTesters"
+        response = request(:post) do |req|
+          req.url(url)
+          req.body = tester_ids.map { |i| { "id" => i } }.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_response(response)
+      end
+
       def search_for_tester_in_app(app_id: nil, text: nil)
         assert_required_params(__method__, binding)
         text = CGI.escape(text)
