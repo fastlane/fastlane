@@ -261,6 +261,14 @@ module Spaceship
         handle_response(response)
       end
 
+      def builds_for_group(app_id: nil, group_id: nil)
+        assert_required_params(__method__, binding)
+
+        url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/builds"
+        response = request(:get, url)
+        handle_response(response)
+      end
+
       ##
       # @!group AppTestInfo
       ##

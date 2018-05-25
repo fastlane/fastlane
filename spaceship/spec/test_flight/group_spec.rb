@@ -145,5 +145,27 @@ describe Spaceship::TestFlight::Group do
         expect(group.default_external_group?).to be(true)
       end
     end
+
+    context '#builds' do
+      before do
+        mock_client_response(:builds_for_group, with: { app_id: 1, group_id: 2 }) do
+          [
+            {
+              id: 1,
+              appAdamId: 10,
+              trainVersion: '1.0',
+              uploadDate: '2017-01-01T12:00:00.000+0000',
+              externalState: 'testflight.build.state.export.compliance.missing'
+            }
+          ]
+        end
+      end
+
+      it 'gets the builds for this group via client' do
+        expect(mock_client).to receive(:builds_for_group).with(app_id: 1, group_id: 2)
+        builds = group.builds
+        expect(builds.size).to eq(1)
+      end
+    end
   end
 end
