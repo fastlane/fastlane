@@ -194,6 +194,14 @@ describe Spaceship::TestFlight::Client do
     end
   end
 
+  context '#remove_testers_from_testflight' do
+    it 'executes the request' do
+      MockAPI::TestFlightServer.post('/testflight/v2/providers/fake-team-id/apps/some-app-id/deleteTesters') {}
+      subject.remove_testers_from_testflight(app_id: app_id, tester_ids: [1, 2])
+      expect(WebMock).to have_requested(:post, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/deleteTesters')
+    end
+  end
+
   context '#post_tester_to_group' do
     it 'executes the request' do
       MockAPI::TestFlightServer.post('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers') {}

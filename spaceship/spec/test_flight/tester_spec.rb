@@ -137,6 +137,13 @@ describe Spaceship::TestFlight::Tester do
         tester.remove_from_app!(app_id: 'app-id')
       end
     end
+
+    context '.remove_from_testflight!' do
+      it 'removes a tester from TestFlight' do
+        expect(mock_client).to receive(:remove_testers_from_testflight).with(app_id: 'app-id', tester_ids: [2])
+        tester.remove_from_testflight!(app_id: 'app-id')
+      end
+    end
   end
 
   context 'invites' do

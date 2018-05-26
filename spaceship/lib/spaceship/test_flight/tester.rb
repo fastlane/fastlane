@@ -109,6 +109,10 @@ module Spaceship
         return testers_matching_text
       end
 
+      def self.remove_testers_from_testflight(app_id: nil, tester_ids: nil)
+        client.remove_testers_from_testflight(app_id: app_id, tester_ids: tester_ids)
+      end
+
       def self.create_app_level_tester(app_id: nil, first_name: nil, last_name: nil, email: nil)
         client.create_app_level_tester(app_id: app_id,
                                        first_name: first_name,
@@ -118,6 +122,10 @@ module Spaceship
 
       def remove_from_app!(app_id: nil)
         client.delete_tester_from_app(app_id: app_id, tester_id: self.tester_id)
+      end
+
+      def remove_from_testflight!(app_id: nil)
+        client.remove_testers_from_testflight(app_id: app_id, tester_ids: [self.tester_id])
       end
 
       def resend_invite(app_id: nil)
