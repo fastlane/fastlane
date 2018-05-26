@@ -104,6 +104,26 @@ describe Spaceship::TunesClient do
         end.to raise_error(Spaceship::TunesClient::ITunesConnectTemporaryError, "We're temporarily unable to save your changes. Please try again later.")
       end
     end
+
+    describe "associated to multiple teams" do
+      let(:associated_teams) { [{ 'contentProvider' => { 'name' => 'Tom', 'contentProviderId' => '1234' } }, { 'contentProvider' => { 'name' => 'Harry', 'contentProviderId' => '5678' } }] }
+
+      it "#team_id picks the first team if select_team not called" do
+        allow(subject).to receive(:teams).and_return(associated_teams)
+        expect(subject.team_id).to eq('1234')
+      end
+
+      it "returns team_id from legitimate team_name parameter" do
+        allow(subject).to receive(:teams).and_return(associated_teams)
+        expect(subject.select_team(team_name: 'Harry')).to eq('5678')
+      end
+
+      it "returns team_id from environment variable" do
+        stub_const('ENV', { 'FASTLANE_ITC_TEAM_NAME' => 'Harry' })
+        allow(subject).to receive(:teams).and_return(associated_teams)
+        expect(subject.select_team).to eq('5678')
+      end
+    end
   end
 
   describe "CI" do

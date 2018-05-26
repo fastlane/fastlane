@@ -65,7 +65,7 @@ module Spaceship
         puts("Looking for iTunes Connect Team with name #{t_name}") if Spaceship::Globals.verbose?
 
         teams.each do |t|
-          t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].casecmp(t_name.downcase).zero?
+          t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].casecmp(t_name).zero?
         end
 
         puts("Could not find team with name '#{t_name}', trying to fallback to default team") if t_id.length.zero?
@@ -78,7 +78,7 @@ module Spaceship
 
         # actually set the team id here
         self.team_id = t_id
-        return
+        return self.team_id
       end
 
       # user didn't specify a team... #thisiswhywecanthavenicethings
@@ -113,7 +113,7 @@ module Spaceship
 
         if team_to_use
           self.team_id = team_to_use['contentProvider']['contentProviderId'].to_s # actually set the team id here
-          break
+          return self.team_id
         end
       end
     end
