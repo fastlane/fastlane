@@ -216,6 +216,14 @@ describe Spaceship::TestFlight::Client do
     end
   end
 
+  context '#builds_for_group' do
+    it 'executes the request' do
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/builds') {}
+      subject.builds_for_group(app_id: app_id, group_id: 'fake-group-id')
+      expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/builds')
+    end
+  end
+
   ##
   # @!group AppTestInfo
   ##
