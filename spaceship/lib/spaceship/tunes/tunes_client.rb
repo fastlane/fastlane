@@ -338,26 +338,17 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def get_reviews(app_id, platform, storefront, version_id)
-      index = 0
+    def get_reviews(app_id, platform, storefront, version_id, page = 0, sort = 'REVIEW_SORT_ORDER_MOST_RECENT')
       per_page = 100 # apple default
-      all_reviews = []
-      loop do
-        rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews?"
-        rating_url << "sort=REVIEW_SORT_ORDER_MOST_RECENT"
-        rating_url << "&index=#{index}"
-        rating_url << "&storefront=#{storefront}" unless storefront.empty?
-        rating_url << "&version_id=#{version_id}" unless version_id.empty?
+      index = page * per_page
+      rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews?"
+      rating_url << "sort=#{sort}"
+      rating_url << "&index=#{index}"
+      rating_url << "&storefront=#{storefront}" unless storefront.empty?
+      rating_url << "&version_id=#{version_id}" unless version_id.empty?
 
-        r = request(:get, rating_url)
-        all_reviews.concat(parse_response(r, 'data')['reviews'])
-        if all_reviews.count < parse_response(r, 'data')['reviewCount']
-          index += per_page
-        else
-          break
-        end
-      end
-      all_reviews
+      r = request(:get, rating_url)
+      parse_response(r, 'data')['reviews']
     end
 
     def create_developer_response!(app_id: nil, platform: "ios", review_id: nil, response: nil)
