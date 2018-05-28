@@ -6,7 +6,7 @@ module Fastlane
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # @param env Dot Env Information
-    def self.cruise_lane(lane, parameters = nil, env = nil, disable_runner_upgrades: false)
+    def self.cruise_lane(lane, port, parameters = nil, env = nil, disable_runner_upgrades: false)
       UI.user_error!("lane must be a string") unless lane.kind_of?(String) || lane.nil?
       UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) || parameters.nil?
 
@@ -33,7 +33,7 @@ module Fastlane
         end
 
         self.ensure_runner_built!
-        socket_thread = self.start_socket_thread
+        socket_thread = self.start_socket_thread(port: port)
         sleep(0.250) while socket_thread[:ready].nil?
         # wait on socket_thread to be in ready state, then start the runner thread
         self.cruise_swift_lane_in_thread(lane, parameters)
@@ -194,8 +194,8 @@ module Fastlane
       # Swap in all new user supplied configs into the project
       project_modified = swap_paths_in_target(
         target: runner_target,
-        file_refs_to_swap: target_file_refs,
-        expected_path_to_replacement_path_tuples: new_user_tool_file_paths
+          file_refs_to_swap: target_file_refs,
+          expected_path_to_replacement_path_tuples: new_user_tool_file_paths
       )
 
       # Swap out any configs the user has removed, inserting fastlane defaults
@@ -216,14 +216,14 @@ module Fastlane
       return project_modified
     end
 
-    def self.start_socket_thread
+    def self.start_socket_thread(port: 2000)
       require 'fastlane/server/socket_server'
       require 'fastlane/server/socket_server_action_command_executor'
 
       return Thread.new do
         command_executor = SocketServerActionCommandExecutor.new
         server = Fastlane::SocketServer.new(command_executor: command_executor)
-        server.start
+        server.start(port: port)
       end
     end
 

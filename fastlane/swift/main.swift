@@ -23,7 +23,11 @@ class MainProcess {
     var thread: Thread!
     
     @objc func connectToFastlaneAndRunLane() {
-        runner.startSocketThread()
+        var port: UInt32 = 2000
+        if let portString = argumentProcessor.laneParameters()["port"], let _port = UInt32(portString) {
+            port = _port
+        }
+        runner.startSocketThread(port: port)
         
         let completedRun = Fastfile.runLane(named: argumentProcessor.currentLane, parameters: argumentProcessor.laneParameters())
         if completedRun {
@@ -50,3 +54,4 @@ while (!process.doneRunningLane && (RunLoop.current.run(mode: RunLoopMode.defaul
 // Please don't remove the lines below
 // They are used to detect outdated files
 // FastlaneRunnerAPIVersion [0.9.2]
+
