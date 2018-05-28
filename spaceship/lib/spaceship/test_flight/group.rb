@@ -1,4 +1,5 @@
 require_relative 'base'
+require_relative 'build'
 
 module Spaceship::TestFlight
   class Group < Base
@@ -102,6 +103,11 @@ module Spaceship::TestFlight
 
     def active?
       is_active
+    end
+
+    def builds
+      builds = client.builds_for_group(app_id: self.app_id, group_id: self.id)
+      builds.map { |b| Spaceship::TestFlight::Build.new(b) }
     end
 
     def self.perform_for_groups_in_app(app: nil, groups: nil, &block)
