@@ -7,19 +7,19 @@ require 'json'
 module Fastlane
   class SocketServer
     COMMAND_EXECUTION_STATE = {
-    ready: :ready,
-    already_shutdown: :already_shutdown,
-    error: :error
+      ready: :ready,
+      already_shutdown: :already_shutdown,
+      error: :error
     }
 
     attr_accessor :command_executor
     attr_accessor :return_value_processor
 
     def initialize(
-                   command_executor: nil,
-                   return_value_processor: nil,
-                   connection_timeout: 5,
-                   stay_alive: false
+      command_executor: nil,
+      return_value_processor: nil,
+      connection_timeout: 5,
+      stay_alive: false
     )
       if return_value_processor.nil?
         return_value_processor = JSONReturnValueProcessor.new
@@ -184,7 +184,7 @@ module Fastlane
 
       return_object = return_value_processor.prepare_object(
         return_value: return_object,
-          return_value_type: return_value_type
+        return_value_type: return_value_type
       )
 
       if closure_arg.nil?
@@ -192,19 +192,19 @@ module Fastlane
       else
         closure_arg = return_value_processor.prepare_object(
           return_value: closure_arg,
-                                                            return_value_type: :string # always assume string for closure error_callback
+          return_value_type: :string # always assume string for closure error_callback
         )
       end
 
       Thread.current[:exception] = nil
 
       payload = {
-            payload: {
-                status: "ready_for_next",
-                return_object: return_object,
-                closure_argument_value: closure_arg
-            }
+        payload: {
+          status: "ready_for_next",
+          return_object: return_object,
+          closure_argument_value: closure_arg
         }
+      }
       return JSON.generate(payload)
     rescue StandardError => e
       Thread.current[:exception] = e
@@ -219,10 +219,10 @@ module Fastlane
       end
 
       payload = {
-          payload: {
-              status: "failure",
-              failure_information: exception_array.flatten
-          }
+        payload: {
+          status: "failure",
+          failure_information: exception_array.flatten
+        }
       }
       return JSON.generate(payload)
     end

@@ -194,8 +194,8 @@ module Fastlane
       # Swap in all new user supplied configs into the project
       project_modified = swap_paths_in_target(
         target: runner_target,
-          file_refs_to_swap: target_file_refs,
-          expected_path_to_replacement_path_tuples: new_user_tool_file_paths
+        file_refs_to_swap: target_file_refs,
+        expected_path_to_replacement_path_tuples: new_user_tool_file_paths
       )
 
       # Swap out any configs the user has removed, inserting fastlane defaults
