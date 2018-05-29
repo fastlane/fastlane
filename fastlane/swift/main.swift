@@ -23,11 +23,7 @@ class MainProcess {
     var thread: Thread!
     
     @objc func connectToFastlaneAndRunLane() {
-        var port: UInt32 = 2000
-        if let portString = argumentProcessor.laneParameters()["port"], let _port = UInt32(portString) {
-            port = _port
-        }
-        runner.startSocketThread(port: port)
+        runner.startSocketThread(port: argumentProcessor.port)
         
         let completedRun = Fastfile.runLane(named: argumentProcessor.currentLane, parameters: argumentProcessor.laneParameters())
         if completedRun {

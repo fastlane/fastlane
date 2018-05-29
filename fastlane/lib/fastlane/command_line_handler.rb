@@ -6,7 +6,6 @@ module Fastlane
     def self.handle(args, options)
       lane_parameters = {} # the parameters we'll pass to the lane
       platform_lane_info = [] # the part that's responsible for the lane/platform definition
-      port = 2000
       args.each do |current|
         if current.include?(":") # that's a key/value which we want to pass to the lane
           key, value = current.split(":", 2)
@@ -14,9 +13,6 @@ module Fastlane
           value = convert_value(value)
           UI.verbose("Using #{key}: #{value}")
           lane_parameters[key.to_sym] = value
-          if key.include?("port")
-            port = value
-          end
         else
           platform_lane_info << current
         end
@@ -34,8 +30,8 @@ module Fastlane
 
       if FastlaneCore::FastlaneFolder.swift?
         disable_runner_upgrades = options.disable_runner_upgrades || false
-
-        Fastlane::SwiftLaneManager.cruise_lane(lane, port, lane_parameters, dot_env, disable_runner_upgrades: disable_runner_upgrades)
+        swift_server_port = options.swift_server_port || 2000
+        Fastlane::SwiftLaneManager.cruise_lane(lane, lane_parameters, dot_env, swift_server_port, disable_runner_upgrades: disable_runner_upgrades)
       else
         Fastlane::LaneManager.cruise_lane(platform, lane, lane_parameters, dot_env)
       end
