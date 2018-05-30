@@ -511,6 +511,32 @@ module Spaceship
     end
 
     #####################################################
+    # @!group AppAnalytics
+    #####################################################
+
+    def time_series_analytics(app_ids, measures, start_time, end_time, frequency)
+      data = {
+        adamId: app_ids,
+        dimensionFilters: [],
+        endTime: end_time,
+        frequency: frequency,
+        group: nil,
+        measures: measures,
+        startTime: start_time
+      }
+
+      r = request(:post) do |req|
+        req.url("https://analytics.itunes.apple.com/analytics/api/v1/data/time-series")
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['Referer'] = 'https://analytics.itunes.apple.com/'
+        req.headers['X-Requested-By'] = 'analytics.itunes.apple.com'
+      end
+
+      data = parse_response(r)
+    end
+
+    #####################################################
     # @!group Pricing
     #####################################################
 
