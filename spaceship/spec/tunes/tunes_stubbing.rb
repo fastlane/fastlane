@@ -536,5 +536,11 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file(File.join('member_list.json')),
          headers: { "Content-Type" => "application/json" })
     end
+
+    def itc_stub_analytics
+      stub_request(:post, "https://analytics.itunes.apple.com/analytics/api/v1/data/time-series").
+        to_return(status: 200, body: itc_read_fixture_file("app_analytics.json"),
+                  headers: { "Content-Type" => "application/json" })
+    end
   end
 end
