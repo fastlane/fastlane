@@ -23,7 +23,7 @@ module FastlaneCore
     def self.installed_identies(in_keychain: nil)
       install_wwdr_certificate unless wwdr_certificate_installed?
 
-      available = list_available_identities
+      available = list_available_identities(in_keychain: in_keychain)
       # Match for this text against word boundaries to avoid edge cases around multiples of 10 identities!
       if /\b0 valid identities found\b/ =~ available
         UI.error([
