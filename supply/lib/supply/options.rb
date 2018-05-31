@@ -3,6 +3,7 @@ require 'credentials_manager/appfile_config'
 
 module Supply
   class Options
+    # rubocop:disable Metrics/PerceivedComplexity
     def self.available_options
       default_tracks = %w(production beta alpha internal rollout)
       @options ||= [
@@ -91,7 +92,7 @@ module Supply
                                      env_name: "SUPPLY_APK",
                                      description: "Path to the APK file to upload",
                                      short_option: "-b",
-                                     conflicting_options: [:apk_paths],
+                                     conflicting_options: [:apk_paths, :aab],
                                      code_gen_sensitive: true,
                                      default_value: Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-Release.apk")].last,
                                      default_value_dynamic: true,
@@ -102,7 +103,7 @@ module Supply
                                      end),
         FastlaneCore::ConfigItem.new(key: :apk_paths,
                                      env_name: "SUPPLY_APK_PATHS",
-                                     conflicting_options: [:apk],
+                                     conflicting_options: [:apk, :aab],
                                      optional: true,
                                      type: Array,
                                      description: "An array of paths to APK files to upload",
@@ -114,10 +115,29 @@ module Supply
                                          UI.user_error!("file at path '#{path}' is not an apk") unless path.end_with?('.apk')
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :aab,
+                                     env_name: "SUPPLY_AAB",
+                                     description: "Path to the AAB file to upload",
+                                     short_option: "-f",
+                                     conflicting_options: [:apk_path, :apk_paths],
+                                     code_gen_sensitive: true,
+                                     default_value: Dir["*.aab"].last || Dir[File.join("app", "build", "outputs", "bundle", "release", "bundle.aab")].last,
+                                     default_value_dynamic: true,
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Could not find aab file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("aab file is not an aab") unless value.end_with?('.aab')
+                                     end),
         FastlaneCore::ConfigItem.new(key: :skip_upload_apk,
                                      env_name: "SUPPLY_SKIP_UPLOAD_APK",
                                      optional: true,
                                      description: "Whether to skip uploading APK",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_upload_aab,
+                                     env_name: "SUPPLY_SKIP_UPLOAD_AAB",
+                                     optional: true,
+                                     description: "Whether to skip uploading AAB",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_upload_metadata,
@@ -186,5 +206,6 @@ module Supply
 
       ]
     end
+    # rubocop:enable Metrics/PerceivedComplexity
   end
 end

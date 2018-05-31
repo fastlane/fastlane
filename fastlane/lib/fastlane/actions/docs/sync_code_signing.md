@@ -309,7 +309,7 @@ You'll have to confirm a list of profiles / certificates that will be deleted.
 
 ### Change Password
 
-To change the password of your repo and therefore decrypting and encrypting all files run
+To change the password of your repo and therefore decrypting and encrypting all files run:
 
 ```no-highlight
 fastlane match change_password
@@ -327,20 +327,23 @@ openssl aes-256-cbc -k "<password>" -in "<fileYouWantToDecryptPath>" -out "<decr
 
 #### Export Distribution Certificate and Private Key as Single .p12 File
 
-_match_ stores the certificate (.cer) and the private key (.p12) files separately. The following steps will repackage the separate certificate and private key into a single .p12 file.
+_match_ stores the certificate (`.cer`) and the private key (`.p12`) files separately. The following steps will repackage the separate certificate and private key into a single `.p12` file.
 
-Decrypt your cert found in certs/`<type>`/`<unique-id>`.cer as a pem file
+Decrypt your cert found in `certs/<type>/<unique-id>.cer` as a pem file:
+
 ```no-highlight
 openssl aes-256-cbc -k "<password>" -in "certs/<type>/<unique-id>.cer" -out "cert.dem" -a -d
 openssl x509 -inform der -in cert.der -out cert.pem
 ```
 
-Decrypt your private key found in certs/`<type>`/`<unique-id>`.p12 as a pem file
+Decrypt your private key found in `certs/<type>/<unique-id>.p12` as a pem file:
+
 ```no-highlight
 openssl aes-256-cbc -k "<password>" -in "certs/distribution/<unique-id>.p12" -out "key.pem" -a -d
 ```
 
-Generate an encrypted p12 file with the same or new password
+Generate an encrypted p12 file with the same or new password:
+
 ```no-highlight
 openssl pkcs12 -export -out "cert.p12" -inkey "key.pem' -in "cert.pem" -password pass:<password>
 ```
