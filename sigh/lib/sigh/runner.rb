@@ -179,7 +179,7 @@ module Sigh
         # handles case where the desired certificate type is adhoc but the account is an enterprise account
         # the apple dev portal api has a weird quirk in it where if you query for distribution certificates
         # for enterprise accounts, you get nothing back even if they exist.
-        elsif profile_type == Spaceship.provisioning_profile.AdHoc && Spaceship.client.in_house?
+        elsif profile_type == Spaceship.provisioning_profile.AdHoc && Spaceship.client && Spaceship.client.in_house?
           certificates = Spaceship.certificate.in_house.all
         else
           certificates = Spaceship.certificate.production.all # Ad hoc or App Store
