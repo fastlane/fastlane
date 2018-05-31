@@ -96,6 +96,15 @@ module Pilot
       build.auto_notify_enabled = config[:notify_external_testers]
 
       return if config[:skip_submission]
+      if options[:reject_previously_submitted_build]
+        waiting_for_review_build = Spaceship::TestFlight::Build.all_waiting_for_review(app_id: build.app_id, platform: :ios).first
+        if waiting_for_review_build != nil
+          UI.important("Another build is already in review. Going to expire that build and submit the new one.")  
+          UI.important("Expiring build: #{waiting_for_review_build.train_version} - #{waiting_for_review_build.build_version}")
+          waiting_for_review_build.expire!
+          UI.success("Expired previous build: #{waiting_for_review_build.train_version} - #{waiting_for_review_build.build_version}")
+        end
+      end
       distribute_build(build, options)
       type = options[:distribute_external] ? 'External' : 'Internal'
       UI.success("Successfully distributed build to #{type} testers 🚀")
@@ -175,19 +184,7 @@ module Pilot
         rescue => ex
           # iTunes Connect currently may 504 on this request even though it manages to get the build in
           # the approved state, this is a temporary workaround.
-          if ex.to_s.include?("504")
-          elsif ex.to_s.include?("another build is already in review") && options[:reject_previously_submitted_build]
-            UI.important("Another build is already in review. Going to expire that build and submit the new one.")
-            waiting_for_review_build = Spaceship::TestFlight::Build.all_waiting_for_review(app_id: uploaded_build.app_id, platform: :ios).first
-            UI.important("Expiring build: #{waiting_for_review_build.train_version} - #{waiting_for_review_build.build_version}")
-            waiting_for_review_build.expire!
-            UI.success("Expired previous build: #{waiting_for_review_build.train_version} - #{waiting_for_review_build.build_version}")
-            distribute_build(uploaded_build, options)
-            return
-          else
-            raise ex
-          end
-          # raise ex unless ex.to_s.include?("504")
+          raise ex unless ex.to_s.include?("504")
           UI.message("Submitting the build for review timed out, trying to recover.")
           updated_build = Spaceship::TestFlight::Build.find(app_id: uploaded_build.app_id, build_id: uploaded_build.id)
           raise ex unless updated_build.approved?
