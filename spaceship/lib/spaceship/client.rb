@@ -41,8 +41,6 @@ module Spaceship
 
     attr_accessor :provider
 
-    attr_accessor :available_providers
-
     # legacy support
     BasicPreferredInfoError = Spaceship::BasicPreferredInfoError
     InvalidUserCredentialsError = Spaceship::InvalidUserCredentialsError
@@ -494,12 +492,6 @@ module Spaceship
 
         provider = body["provider"]
         self.provider = Spaceship::Provider.new(provider_hash: provider) unless provider.nil?
-
-        available_providers_list = body["availableProviders"].compact
-
-        self.available_providers = available_providers_list.map do |provider_hash|
-          Spaceship::Provider.new(provider_hash: provider_hash)
-        end
       end
     end
 
