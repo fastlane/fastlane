@@ -19,7 +19,8 @@ module Fastlane
       command_executor: nil,
       return_value_processor: nil,
       connection_timeout: 5,
-      stay_alive: false
+      stay_alive: false,
+      port: 2000
     )
       if return_value_processor.nil?
         return_value_processor = JSONReturnValueProcessor.new
@@ -29,15 +30,16 @@ module Fastlane
       @return_value_processor = return_value_processor
       @connection_timeout = connection_timeout.to_i
       @stay_alive = stay_alive
+      @port = port.to_i
     end
 
     # this is the public API, don't call anything else
-    def start(port: 2000)
-      listen(port: port)
+    def start
+      listen(@port)
 
       while @stay_alive
         UI.important("stay_alive is set to true, restarting server")
-        listen(port: port)
+        listen(@port)
       end
     end
 
@@ -134,7 +136,7 @@ module Fastlane
       return COMMAND_EXECUTION_STATE[:ready]
     end
 
-    def listen(port: 2000)
+    def listen(port)
       @server = TCPServer.open('localhost', port) # Socket to listen on port 2000
       UI.verbose("Waiting for #{@connection_timeout} seconds for a connection from FastlaneRunner")
 

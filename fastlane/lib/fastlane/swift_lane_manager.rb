@@ -6,7 +6,7 @@ module Fastlane
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # @param env Dot Env Information
-    def self.cruise_lane(lane, parameters = nil, env = nil, swift_server_port, disable_runner_upgrades: false)
+    def self.cruise_lane(lane, parameters = nil, env = nil, disable_runner_upgrades: false, swift_server_port: nil)
       UI.user_error!("lane must be a string") unless lane.kind_of?(String) || lane.nil?
       UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) || parameters.nil?
 
@@ -218,14 +218,14 @@ module Fastlane
       return project_modified
     end
 
-    def self.start_socket_thread(port: 2000)
+    def self.start_socket_thread(port: nil)
       require 'fastlane/server/socket_server'
       require 'fastlane/server/socket_server_action_command_executor'
 
       return Thread.new do
         command_executor = SocketServerActionCommandExecutor.new
-        server = Fastlane::SocketServer.new(command_executor: command_executor)
-        server.start(port: port)
+        server = Fastlane::SocketServer.new(command_executor: command_executor, port: port)
+        server.start()
       end
     end
 

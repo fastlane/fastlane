@@ -31,7 +31,7 @@ module Fastlane
       if FastlaneCore::FastlaneFolder.swift?
         disable_runner_upgrades = options.disable_runner_upgrades || false
         swift_server_port = options.swift_server_port || 2000
-        Fastlane::SwiftLaneManager.cruise_lane(lane, lane_parameters, dot_env, swift_server_port, disable_runner_upgrades: disable_runner_upgrades)
+        Fastlane::SwiftLaneManager.cruise_lane(lane, lane_parameters, dot_env, disable_runner_upgrades: disable_runner_upgrades, swift_server_port: swift_server_port)
       else
         Fastlane::LaneManager.cruise_lane(platform, lane, lane_parameters, dot_env)
       end

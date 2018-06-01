@@ -60,7 +60,7 @@ class Runner {
 
 // Handle threading stuff
 extension Runner {
-    func startSocketThread(port: UInt32 = 2000) {
+    func startSocketThread(port: UInt32) {
         let secondsToWait = DispatchTimeInterval.seconds(SocketClient.connectTimeoutSeconds)
         
         self.dispatchGroup.enter()
