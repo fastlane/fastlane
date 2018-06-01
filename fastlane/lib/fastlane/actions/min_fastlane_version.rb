@@ -33,7 +33,9 @@ module Fastlane
       end
 
       def self.example_code
-        ['min_fastlane_version "1.50.0"']
+        [
+          'min_fastlane_version("1.50.0")'
+        ]
       end
 
       def self.details

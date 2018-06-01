@@ -56,7 +56,7 @@ module Fastlane
                                        is_string: true,
                                        conflicting_options: [:path],
                                        optional: true,
-                                       deprecated: "Use --path instead")
+                                       deprecated: "Use `--path` instead")
         ]
       end
 

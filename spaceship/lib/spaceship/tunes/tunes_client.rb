@@ -1,5 +1,4 @@
 require "securerandom"
-
 require_relative '../client'
 require_relative '../du/du_client'
 require_relative '../du/upload_file'
@@ -11,7 +10,6 @@ require_relative 'iap_subscription_pricing_tier'
 require_relative 'pricing_tier'
 require_relative 'territory'
 require_relative 'user_detail'
-
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -67,7 +65,7 @@ module Spaceship
         puts("Looking for iTunes Connect Team with name #{t_name}") if Spaceship::Globals.verbose?
 
         teams.each do |t|
-          t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].casecmp(t_name.downcase).zero?
+          t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].casecmp(t_name).zero?
         end
 
         puts("Could not find team with name '#{t_name}', trying to fallback to default team") if t_id.length.zero?
@@ -80,7 +78,7 @@ module Spaceship
 
         # actually set the team id here
         self.team_id = t_id
-        return
+        return self.team_id
       end
 
       # user didn't specify a team... #thisiswhywecanthavenicethings
@@ -107,7 +105,7 @@ module Spaceship
         unless Spaceship::Client::UserInterface.interactive?
           puts("Multiple teams found on iTunes Connect, Your Terminal is running in non-interactive mode! Cannot continue from here.")
           puts("Please check that you set FASTLANE_ITC_TEAM_ID or FASTLANE_ITC_TEAM_NAME to the right value.")
-          raise "Multiple iTunes Connect Teams found; unable to choose, terminal not ineractive!"
+          raise "Multiple iTunes Connect Teams found; unable to choose, terminal not interactive!"
         end
 
         selected = ($stdin.gets || '').strip.to_i - 1
@@ -115,7 +113,7 @@ module Spaceship
 
         if team_to_use
           self.team_id = team_to_use['contentProvider']['contentProviderId'].to_s # actually set the team id here
-          break
+          return self.team_id
         end
       end
     end
@@ -617,8 +615,11 @@ module Spaceship
       # API will error out if cleared_for_preorder is false and app_available_date has a date
       cleared_for_preorder = availability.cleared_for_preorder
       app_available_date = cleared_for_preorder ? availability.app_available_date : nil
+      data["b2bAppEnabled"] = availability.b2b_app_enabled
+      data["educationalDiscount"] = availability.educational_discount
       data["preOrder"]["clearedForPreOrder"] = { "value" => cleared_for_preorder, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
       data["preOrder"]["appAvailableDate"] = { "value" => app_available_date, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
+      data["b2bUsers"] = availability.b2b_app_enabled ? availability.b2b_users.map { |user| { "value" => { "add" => user.add, "delete" => user.delete, "dsUsername" => user.ds_username } } } : []
 
       # send the changes back to Apple
       r = request(:post) do |req|

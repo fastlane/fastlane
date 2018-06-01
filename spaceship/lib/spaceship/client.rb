@@ -23,6 +23,7 @@ module Spaceship
   class Client
     PROTOCOL_VERSION = "QH65B2"
     USER_AGENT = "Spaceship #{Fastlane::VERSION}"
+    AUTH_TYPES = ["sa", "hsa", "non-sa", "hsa2"]
 
     attr_reader :client
 
@@ -191,6 +192,11 @@ module Spaceship
       teams.find do |t|
         t['teamId'] == team_id
       end
+    end
+
+    # @return (String) Fetches name from currently used team
+    def team_name
+      (team_information || {})['name']
     end
 
     # Instantiates a client but with a cookie derived from another client.
@@ -462,6 +468,10 @@ module Spaceship
         if (response.body || "").include?('invalid="true"')
           # User Credentials are wrong
           raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
+        elsif response.status == 412 && AUTH_TYPES.include?(response.body["authType"])
+          # Need to acknowledge Apple ID and Privacy statement - https://github.com/fastlane/fastlane/issues/12577
+          # Looking for status of 412 might be enough but might be safer to keep looking only at what is being reported
+          raise AppleIDAndPrivacyAcknowledgementNeeded.new, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://itunesconnect.apple.com) to acknowledge the statement."
         elsif (response['Set-Cookie'] || "").include?("itctx")
           raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
         else

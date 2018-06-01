@@ -14,26 +14,26 @@ File.write("#{lib}/fastlane/plugins/template/.rubocop.yml", YAML.dump(config))
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
-  spec.authors       = ["Stefan Natchev",
-                        "Jorge Revuelta H",
+  spec.authors       = ["Kohki Miki",
                         "Andrew McBurney",
-                        "Maksym Grebenets",
-                        "Felix Krause",
-                        "Danielle Tomlinson",
-                        "Jan Piotrowski",
-                        "Josh Holtz",
-                        "Iulian Onofrei",
-                        "Kohki Miki",
-                        "Jérôme Lacoste",
-                        "Olivier Halligon",
-                        "Fumiya Nakamura",
-                        "Helmut Januschka",
-                        "Joshua Liebowitz",
                         "Jimmy Dee",
-                        "Manu Wallner",
-                        "Aaron Brager",
                         "Matthew Ellis",
-                        "Luka Mirosevic"]
+                        "Helmut Januschka",
+                        "Olivier Halligon",
+                        "Luka Mirosevic",
+                        "Aaron Brager",
+                        "Jérôme Lacoste",
+                        "Joshua Liebowitz",
+                        "Fumiya Nakamura",
+                        "Jan Piotrowski",
+                        "Danielle Tomlinson",
+                        "Jorge Revuelta H",
+                        "Maksym Grebenets",
+                        "Manu Wallner",
+                        "Iulian Onofrei",
+                        "Felix Krause",
+                        "Josh Holtz",
+                        "Stefan Natchev"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -82,7 +82,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('mini_magick', '~> 4.5.1') # To open, edit and export PSD files
   spec.add_dependency('multi_json') # Because sometimes it's just not installed
   spec.add_dependency('multi_xml', '~> 0.5')
-  spec.add_dependency('rubyzip', '>= 1.1.0', '< 2.0.0') # fix swift/ipa in gym
+  spec.add_dependency('rubyzip', '>= 1.2.1', '< 2.0.0') # fix swift/ipa in gym
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
   spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3')
   spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
@@ -93,7 +93,7 @@ Gem::Specification.new do |spec|
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.
-  spec.add_dependency('google-api-client', '>= 0.13.1', '< 0.14.0') # Google API Client to access Play Publishing API
+  spec.add_dependency('google-api-client', '>= 0.21.2', '< 0.22.0') # Google API Client to access Play Publishing API
 
   spec.add_dependency('emoji_regex', '~> 0.1') # Used to scan for Emoji in the changelog
 

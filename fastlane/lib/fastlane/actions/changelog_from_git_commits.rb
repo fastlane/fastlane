@@ -10,7 +10,11 @@ module Fastlane
           UI.success("Collecting the last #{params[:commits_count]} Git commits")
         else
           if params[:between]
-            from, to = params[:between]
+            if params[:between].kind_of?(String) && params[:between].include?(",") # :between is string
+              from, to = params[:between].split(",", 2)
+            elsif params[:between].kind_of?(Array)
+              from, to = params[:between]
+            end
           else
             from = Actions.last_git_tag_name(params[:match_lightweight_tag], params[:tag_match_pattern])
             UI.verbose("Found the last Git tag: #{from}")
@@ -28,6 +32,8 @@ module Fastlane
         if params[:include_merges] == false
           merge_commit_filtering = :exclude_merges
         end
+
+        params[:path] = './' unless params[:path]
 
         Dir.chdir(params[:path]) do
           if params[:commits_count]
@@ -72,9 +78,13 @@ module Fastlane
                                        is_string: false,
                                        conflicting_options: [:commits_count],
                                        verify_block: proc do |value|
-                                         UI.user_error!(":between must be of type array") unless value.kind_of?(Array)
-                                         UI.user_error!(":between must not contain nil values") if value.any?(&:nil?)
-                                         UI.user_error!(":between must be an array of size 2") unless (value || []).size == 2
+                                         if value.kind_of?(String)
+                                           UI.user_error!(":between must contain comma") unless value.include?(',')
+                                         else
+                                           UI.user_error!(":between must be of type array") unless value.kind_of?(Array)
+                                           UI.user_error!(":between must not contain nil values") if value.any?(&:nil?)
+                                           UI.user_error!(":between must be an array of size 2") unless (value || []).size == 2
+                                         end
                                        end),
           FastlaneCore::ConfigItem.new(key: :commits_count,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_COUNT',
@@ -119,8 +129,9 @@ module Fastlane
                                        default_value: true,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :include_merges,
+                                       deprecated: "Use `:merge_commit_filtering` instead",
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_INCLUDE_MERGES',
-                                       description: "Whether or not to include any commits that are merges\n" + '(DEPRECATED - use :merge_commit_filtering)'.red,
+                                       description: "Whether or not to include any commits that are merges",
                                        optional: true,
                                        is_string: false,
                                        type: Boolean,
@@ -129,7 +140,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :merge_commit_filtering,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_MERGE_COMMIT_FILTERING',
-                                       description: "Controls inclusion of merge commits when collecting the changelog.\nValid values: #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map { |o| "'#{o}'" }.join(', ')}",
+                                       description: "Controls inclusion of merge commits when collecting the changelog. Valid values: #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map { |o| "`:#{o}`" }.join(', ')}",
                                        optional: true,
                                        default_value: 'include_merges',
                                        verify_block: proc do |value|
