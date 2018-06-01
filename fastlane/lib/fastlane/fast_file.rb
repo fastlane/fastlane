@@ -307,12 +307,9 @@ module Fastlane
     def say(value)
       # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
       value ||= yield
-      Actions.execute_action('say') do
-        action_launched('say')
-        return_value = Fastlane::Actions::SayAction.run([value])
-        action_completed('say', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
-        return return_value
-      end
+
+      value = { text: value } if value.kind_of?(String) || value.kind_of?(Array)
+      self.runner.trigger_action_by_name(:say, nil, false, value)
     end
 
     def puts(value)
