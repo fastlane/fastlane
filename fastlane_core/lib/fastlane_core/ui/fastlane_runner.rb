@@ -90,7 +90,7 @@ module Commander
           raise e
         else
           action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::INTERRUPTED, exception: e)
-          puts("\nCancelled... use --verbose to show the stack trace")
+          abort("\nCancelled... use --verbose to show the stack trace")
         end
       rescue \
         OptionParser::InvalidOption,
