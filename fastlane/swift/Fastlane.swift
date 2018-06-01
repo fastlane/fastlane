@@ -843,7 +843,8 @@ func carthage(command: String = "bootstrap",
               configuration: String? = nil,
               toolchain: String? = nil,
               projectDirectory: String? = nil,
-              newResolver: Bool? = nil) {
+              newResolver: Bool? = nil,
+              logPath: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "carthage", className: nil, args: [RubyCommand.Argument(name: "command", value: command),
                                                                                           RubyCommand.Argument(name: "dependencies", value: dependencies),
                                                                                           RubyCommand.Argument(name: "use_ssh", value: useSsh),
@@ -860,7 +861,8 @@ func carthage(command: String = "bootstrap",
                                                                                           RubyCommand.Argument(name: "configuration", value: configuration),
                                                                                           RubyCommand.Argument(name: "toolchain", value: toolchain),
                                                                                           RubyCommand.Argument(name: "project_directory", value: projectDirectory),
-                                                                                          RubyCommand.Argument(name: "new_resolver", value: newResolver)])
+                                                                                          RubyCommand.Argument(name: "new_resolver", value: newResolver),
+                                                                                          RubyCommand.Argument(name: "log_path", value: logPath)])
   _ = runner.executeCommand(command)
 }
 func cert(development: Bool = false,
@@ -2697,8 +2699,10 @@ func s3(ipa: String? = nil,
                                                                                     RubyCommand.Argument(name: "acl", value: acl)])
   _ = runner.executeCommand(command)
 }
-func say() {
-  let command = RubyCommand(commandID: "", methodName: "say", className: nil, args: [])
+func say(text: String,
+         mute: Bool = false) {
+  let command = RubyCommand(commandID: "", methodName: "say", className: nil, args: [RubyCommand.Argument(name: "text", value: text),
+                                                                                     RubyCommand.Argument(name: "mute", value: mute)])
   _ = runner.executeCommand(command)
 }
 func scan(workspace: String? = scanfile.workspace,
@@ -2992,6 +2996,7 @@ func skipDocs() {
   _ = runner.executeCommand(command)
 }
 func slack(message: String? = nil,
+           pretext: String? = nil,
            channel: String? = nil,
            useWebhookConfiguredUsernameAndIcon: Bool = false,
            slackUrl: String,
@@ -3004,6 +3009,7 @@ func slack(message: String? = nil,
            failOnError: Bool = true,
            linkNames: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "slack", className: nil, args: [RubyCommand.Argument(name: "message", value: message),
+                                                                                       RubyCommand.Argument(name: "pretext", value: pretext),
                                                                                        RubyCommand.Argument(name: "channel", value: channel),
                                                                                        RubyCommand.Argument(name: "use_webhook_configured_username_and_icon", value: useWebhookConfiguredUsernameAndIcon),
                                                                                        RubyCommand.Argument(name: "slack_url", value: slackUrl),
@@ -3350,7 +3356,8 @@ func teamName() {
   _ = runner.executeCommand(command)
 }
 func testfairy(apiKey: String,
-               ipa: String,
+               ipa: String? = nil,
+               apk: String? = nil,
                symbolsFile: String? = nil,
                uploadUrl: String = "https://upload.testfairy.com",
                testersGroups: [String] = [],
@@ -3361,6 +3368,7 @@ func testfairy(apiKey: String,
                options: [String] = []) {
   let command = RubyCommand(commandID: "", methodName: "testfairy", className: nil, args: [RubyCommand.Argument(name: "api_key", value: apiKey),
                                                                                            RubyCommand.Argument(name: "ipa", value: ipa),
+                                                                                           RubyCommand.Argument(name: "apk", value: apk),
                                                                                            RubyCommand.Argument(name: "symbols_file", value: symbolsFile),
                                                                                            RubyCommand.Argument(name: "upload_url", value: uploadUrl),
                                                                                            RubyCommand.Argument(name: "testers_groups", value: testersGroups),
@@ -3927,7 +3935,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode92/Xcode.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -4033,4 +4041,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.19]
+// FastlaneRunnerAPIVersion [0.9.20]
