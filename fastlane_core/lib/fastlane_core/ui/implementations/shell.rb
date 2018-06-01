@@ -31,11 +31,11 @@ module FastlaneCore
 
     def format_string(datetime = Time.now, severity = "")
       if FastlaneCore::Globals.verbose?
-        return "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: "
+        return "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N %z')}]: "
       elsif FastlaneCore::Env.truthy?("FASTLANE_HIDE_TIMESTAMP")
         return ""
       else
-        return "[#{datetime.strftime('%H:%M:%S')}]: "
+        return "[#{datetime.strftime('%H:%M:%S %z')}]: "
       end
     end
 
