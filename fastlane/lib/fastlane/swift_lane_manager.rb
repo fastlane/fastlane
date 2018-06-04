@@ -225,7 +225,7 @@ module Fastlane
       return Thread.new do
         command_executor = SocketServerActionCommandExecutor.new
         server = Fastlane::SocketServer.new(command_executor: command_executor, port: port)
-        server.start()
+        server.start
       end
     end
 
