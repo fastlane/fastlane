@@ -38,7 +38,7 @@ class TunesStubbing
 
       stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/v1/session/webSession").
         with(body: "{\"contentProviderId\":\"5678\",\"dsId\":null}",
-              headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/json'}).
+              headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/json' }).
         to_return(status: 200, body: "", headers: {})
     end
 
