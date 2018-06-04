@@ -83,7 +83,7 @@ module Fastlane
                                        description: "Your Apple ID Username"),
           FastlaneCore::ConfigItem.new(key: :merchant_bundle_id,
                                    env_name: "APPLE_PAY_MERCHANT_BUNDLE_ID",
-                                   description: "You merchant bundle identifier (e.g: merchant.com.example"),
+                                   description: "You merchant bundle identifier (e.g: merchant.com.example)"),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                  short_option: "-b",
                                  env_name: "APPLE_PAY_CERT_TEAM_ID",
