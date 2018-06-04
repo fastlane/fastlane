@@ -44,7 +44,7 @@ Key | Description | Default
 <%- (action.available_options || []).each do |config_item| -%>
   <%- next unless config_item.kind_of?(FastlaneCore::ConfigItem) -%>
   <%- next if config_item.description.to_s.length == 0 -%>
-  `<%= config_item.key %>` | <%= config_item.description %> | <%= config_item.doc_default_value %>
+  `<%= config_item.key %>` | <%= config_item.description.gsub(/(?<!\\)\|/, "\\|") %> | <%= config_item.doc_default_value %>
 <%- end %>
 <em id="parameters-legend-dynamic">* = default value is dependent on the user's system</em>
 <% end %><%# End of action.available_options... %>

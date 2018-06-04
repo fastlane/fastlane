@@ -29,6 +29,7 @@ module Fastlane
         cmd << "--project-directory #{params[:project_directory]}" if params[:project_directory]
         cmd << "--cache-builds" if params[:cache_builds]
         cmd << "--new-resolver" if params[:new_resolver]
+        cmd << "--log-path #{params[:log_path]}" if params[:log_path]
 
         Actions.sh(cmd.join(' '))
       end
@@ -41,6 +42,10 @@ module Fastlane
         end
         if command_name != "archive" && params[:output]
           UI.user_error!("Output option is available only for 'archive' command.")
+        end
+
+        if params[:log_path] && !%w(build bootstrap update).include?(command_name)
+          UI.user_error!("Log path option is available only for 'build', 'bootstrap', and 'update' command.")
         end
       end
 
@@ -158,7 +163,11 @@ module Fastlane
                                        description: "Use new resolver when resolving dependency graph",
                                        is_string: false,
                                        optional: true,
-                                       type: Boolean)
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :log_path,
+                                       env_name: "FL_CARTHAGE_LOG_PATH",
+                                       description: "Path to the xcode build output",
+                                       optional: true)
         ]
       end
 
@@ -180,7 +189,8 @@ module Fastlane
             configuration: "Release",                       # Build configuration to use when building
             cache_builds: true,                             # By default Carthage will rebuild a dependency regardless of whether its the same resolved version as before.
             toolchain: "com.apple.dt.toolchain.Swift_2_3",  # Specify the xcodebuild toolchain
-            new_resolver: false                             # Use the new resolver to resolve depdendency graph
+            new_resolver: false,                            # Use the new resolver to resolve depdendency graph
+            log_path: "carthage.log"                        # Path to the xcode build output
           )'
         ]
       end

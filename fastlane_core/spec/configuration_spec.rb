@@ -440,11 +440,24 @@ describe FastlaneCore do
       end
 
       describe "deprecation", focus: true do
-        it "deprecated changes the description" do
+        it "deprecated message changes the description" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
                                                      description: 'foo',
                                                      deprecated: 'replaced by bar')
-          expect(config_item.description).to eq("[DEPRECATED!] replaced by bar - foo")
+          expect(config_item.description).to eq("**DEPRECATED!** replaced by bar - foo")
+        end
+
+        it "deprecated boolean changes the description" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo. use bar instead',
+                                                     deprecated: true)
+          expect(config_item.description).to eq("**DEPRECATED!** foo. use bar instead")
+        end
+
+        it "deprecated messages replaces empty description" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     deprecated: 'replaced by bar')
+          expect(config_item.description).to eq("**DEPRECATED!** replaced by bar")
         end
 
         it "deprecated makes it optional" do
