@@ -138,6 +138,10 @@ module Spaceship
       end
 
       def analytics
+        if self.latest_version.app_status != AppStatus::READY_FOR_SALE
+          raise 'Analytics are only available for live apps.'
+        end
+
         attrs = {}
         attrs[:apple_id] = self.apple_id
         Spaceship::Tunes::AppAnalytics.factory(attrs)

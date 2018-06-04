@@ -7,7 +7,7 @@ describe Spaceship::Tunes::AppAnalytics do
   let(:app) { Spaceship::Application.all.first }
 
   describe "App Analytics Grabbed Properly" do
-    it "accesses analytics details" do
+    it "accesses live analytics details" do
       TunesStubbing.itc_stub_analytics
 
       analytics = app.analytics
@@ -22,6 +22,14 @@ describe Spaceship::Tunes::AppAnalytics do
       end
 
       expect(val['meetsThreshold']).to eq(true)
+    end
+
+    it "accesses non-live analytics details" do
+      TunesStubbing.itc_stub_analytics
+      TunesStubbing.itc_stub_latest_version_rejected
+      expect do
+        analytics = app.analytics
+      end.to raise_error("Analytics are only available for live apps.")
     end
   end
 end
