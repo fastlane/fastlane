@@ -40,9 +40,12 @@ module Spaceship
         return m
       end
 
+      AccessWiFi = AppService.new_service("AWEQ28MY3E")
       AppGroup = AppService.new_service("APG3427HIY")
       ApplePay = AppService.new_service("OM633U5T5G")
       AssociatedDomains = AppService.new_service("SKC3T5S89Y")
+      ClassKit = AppService.new_service("PKTJAN2017")
+      AutoFillCredential = AppService.new_service("CPEQ28MX4E")
       DataProtection = AppService.new_service("dataProtection", values: { off: "", complete: "complete", unless_open: "unlessopen", until_first_auth: "untilfirstauth" })
       GameCenter = AppService.new_service("gameCenter")
       HealthKit = AppService.new_service("HK421J6T7P")
