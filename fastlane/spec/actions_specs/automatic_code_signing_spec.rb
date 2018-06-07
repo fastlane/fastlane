@@ -100,8 +100,7 @@ describe Fastlane do
     end
 
     it "sets code sign identity", requires_xcodeproj: true do
-
-      temp_dir = Dir.tmpdir()
+      temp_dir = Dir.tmpdir
       FileUtils.copy_entry('./fastlane/spec/fixtures/xcodeproj/automatic_code_signing.xcodeproj', temp_dir)
 
       # G3KGXDXQL9
@@ -116,7 +115,7 @@ describe Fastlane do
       end").runner.execute(:test)
       expect(result).to eq(false)
 
-      project = Xcodeproj::Project.open("#{temp_dir}")
+      project = Xcodeproj::Project.open(temp_dir.to_s)
       root_attrs = project.root_object.attributes["TargetAttributes"]
 
       expect(root_attrs["771D79501D9E69C900D840FA"]["ProvisioningStyle"]).to eq("Manual")
