@@ -91,8 +91,14 @@ module Fastlane
                                       env_name: "MAILGUN_ATTACHMENT",
                                       description: "Mail Attachment filenames, either an array or just one string",
                                       optional: true,
-                                      is_string: false)
-
+                                      is_string: false),
+          FastlaneCore::ConfigItem.new(key: :custom_placeholders,
+                                       short_option: "-p",
+                                       env_name: "MAILGUN_CUSTOM_PLACEHOLDERS",
+                                       description: "Placeholders for template given as a hash",
+                                       default_value: {},
+                                       is_string: false,
+                                       type: Hash)
         ]
       end
 
@@ -139,6 +145,9 @@ module Fastlane
         }
         hash[:success] = options[:success]
         hash[:ci_build_link] = options[:ci_build_link]
+
+        # concatenate with custom placeholders passed by user
+        hash = hash.merge(options[:custom_placeholders])
 
         # grabs module
         eth = Fastlane::ErbTemplateHelper
