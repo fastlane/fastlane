@@ -180,6 +180,10 @@ module Fastlane
             app_link: "http://www.myapplink.com",
             ci_build_link: "http://www.mycibuildlink.com",
             template_path: "HTML_TEMPLATE_PATH",
+            custom_placeholders: {
+              :var1 => 123,
+              :var2 => "string"
+            },
             attachment: "dirname/filename.ext"
           )'
         ]
