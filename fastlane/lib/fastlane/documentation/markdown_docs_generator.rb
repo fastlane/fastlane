@@ -104,6 +104,32 @@ module Fastlane
       return nil
     end
 
+    def get_action_mds
+      action_mds = {}
+
+      ActionsList.all_actions do |action|
+        @action = action
+        @action_filename = filename_for_action(action)
+
+        unless @action_filename
+          next
+        end
+
+        @custom_content = load_custom_action_md(action)
+
+        if action.superclass != Fastlane::Action
+          @custom_content ||= load_custom_action_md(action.superclass)
+        end
+
+        template = File.join(Fastlane::ROOT, "lib/assets/ActionDetails.md.erb")
+        result = ERB.new(File.read(template), 0, '-').result(binding)
+
+        action_mds[action.action_name] = result
+      end
+
+      return action_mds
+    end
+
     def generate!(target_path: nil)
       require 'yaml'
       FileUtils.mkdir_p(target_path)

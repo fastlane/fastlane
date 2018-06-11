@@ -17,6 +17,7 @@ lane :validate_repo do
   validate_docs
   ensure_tool_name_formatting
   ensure_code_samples
+  ensure_code_snippets
   ensure_actions_config_items_formatting
 end
 
@@ -500,6 +501,24 @@ private_lane :ensure_code_samples do
   end
   test_sample_code(content: all_content) # to not have to call the action 200 times
   UI.success("✅  All fastlane code samples work as expected")
+end
+
+private_lane :ensure_code_snippets do
+  UI.message("🕗  Verifying all code snippets are correctly formatted")
+
+  errors = []
+
+  require 'fastlane/documentation/markdown_docs_generator'
+
+  Fastlane::MarkdownDocsGenerator.new.get_action_mds.each do |action_name, content|
+    errors << "Use '```no-highlight ↵ <code snippet> ↵ ```' instead of '```<language> ↵ <code snippet> ↵ ```' for code snippets for action '#{action_name}'" if content =~ /```(?<!no-higlight)\w+\s*(bundle|fastlane)[ ]/
+    errors << "Use '```no-highlight ↵ <code snippet> ↵ ```' instead of '    <code snippet>' for code snippets for action '#{action_name}'" if content =~ /^[ ]{4}((bundle|fastlane)[ ]|[A-Z_]+=)/
+  end
+
+  errors.each { |a| UI.error(a) }
+
+  UI.user_error!("Invalid formatting of one of the code snippets") unless errors.empty?
+  UI.success("✅  All code snippets are formatted as expected")
 end
 
 private_lane :ensure_actions_config_items_formatting do

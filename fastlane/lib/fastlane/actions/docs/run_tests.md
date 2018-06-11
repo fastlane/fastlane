@@ -90,15 +90,21 @@ _scan_ uses a plain `xcodebuild` command, therefore keeping 100% compatible with
 
 # Usage
 
-    fastlane scan
+```no-highlight
+fastlane scan
+```
 
 That's all you need to run your tests. If you want more control, here are some available parameters:
 
-    fastlane scan --workspace "Example.xcworkspace" --scheme "AppName" --device "iPhone 6" --clean
+```no-highlight
+fastlane scan --workspace "Example.xcworkspace" --scheme "AppName" --device "iPhone 6" --clean
+```
 
 If you need to use a different xcode install, use `xcode-select` or define `DEVELOPER_DIR`:
 
-    DEVELOPER_DIR="/Applications/Xcode6.2.app" scan
+```no-highlight
+DEVELOPER_DIR="/Applications/Xcode6.2.app" scan
+```
 
 To run _scan_ on multiple devices via [_fastlane_](https://fastlane.tools), add this to your `Fastfile`:
 

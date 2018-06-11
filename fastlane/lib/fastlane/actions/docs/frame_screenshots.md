@@ -71,15 +71,21 @@ Why should you have to use Photoshop, just to add a frame around your screenshot
 
 Just navigate to your folder of screenshots and use the following command:
 
-    fastlane frameit
+```no-highlight
+fastlane frameit
+```
 
 To use the silver version of the frames:
 
-    fastlane frameit silver
+```no-highlight
+fastlane frameit silver
+```
 
 To download the latest frames
 
-    fastlane frameit download_frames
+```no-highlight
+fastlane frameit download_frames
+```
 
 When using _frameit_ without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store.
 
