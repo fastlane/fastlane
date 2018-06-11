@@ -510,7 +510,7 @@ private_lane :ensure_code_snippets do
 
   require 'fastlane/documentation/markdown_docs_generator'
 
-  Fastlane::MarkdownDocsGenerator.new.get_action_mds.each do |action_name, content|
+  Fastlane::MarkdownDocsGenerator.new.actions_md_contents.each do |action_name, content|
     errors << "Use '```no-highlight ↵ <code snippet> ↵ ```' instead of '```<language> ↵ <code snippet> ↵ ```' for code snippets for action '#{action_name}'" if content =~ /```(?<!no-higlight)\w+\s*(bundle|fastlane)[ ]/
     errors << "Use '```no-highlight ↵ <code snippet> ↵ ```' instead of '    <code snippet>' for code snippets for action '#{action_name}'" if content =~ /^[ ]{4}((bundle|fastlane)[ ]|[A-Z_]+=)/
   end

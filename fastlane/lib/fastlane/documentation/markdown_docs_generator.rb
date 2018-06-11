@@ -104,7 +104,7 @@ module Fastlane
       return nil
     end
 
-    def get_action_mds
+    def actions_md_contents
       action_mds = {}
 
       ActionsList.all_actions do |action|
