@@ -41,6 +41,7 @@ module Fastlane
         return
       end
 
+      require 'terminal-table'
       puts(Terminal::Table.new({
         rows: FastlaneCore::PrintTable.transform_output(rows),
         title: "Plugin updates available".yellow,
