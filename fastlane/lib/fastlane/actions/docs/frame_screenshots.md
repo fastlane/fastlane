@@ -146,6 +146,7 @@ The `keyword` and `title` parameters are both used in `default` and `data`. They
 | `text` | The text that should be used for the `keyword` or `title`. <p> Note: If you want to use localised text, use [`.strings` files](#strings-files). | NA |
 
 ### Example
+
 ```json
 {
   "device_frame_version": "latest",
@@ -275,5 +276,6 @@ brew install imagemagick
 ```
 
 ## Uninstall
-- ```sudo gem uninstall fastlane```
-- ```rm -rf ~/.frameit```
+
+- `sudo gem uninstall fastlane`
+- `rm -rf ~/.frameit`
