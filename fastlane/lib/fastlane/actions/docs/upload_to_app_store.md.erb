@@ -32,8 +32,8 @@ To upload builds to TestFlight check out [_pilot_](/actions/pilot).
 
 The guide will create all the necessary files for you, using the existing app metadata from iTunes Connect.
 
-- ```cd [your_project_folder]```
-- ```fastlane deliver init```
+- `cd [your_project_folder]`
+- `fastlane deliver init`
 - Enter your iTunes Connect credentials
 - Enter your app identifier
 - Enjoy a good drink, while the computer does all the work for you
@@ -684,14 +684,14 @@ Detailed instructions about how to set up _deliver_ and _fastlane_ in `Jenkins` 
 
 _deliver_ uses the iTunes Transporter to upload metadata and binaries. In case you are behind a firewall, you can specify a different transporter protocol using
 
-```bash
+```no-highlight
 DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV" fastlane deliver
 ```
 
 ## HTTP Proxy
 iTunes Transporter is a Java application bundled with Xcode. In addition to utilizing the `DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV"`, you need to configure the transporter application to use the proxy independently from the system proxy or any environment proxy settings. You can find the configuration file within Xcode:
 
-```bash
+```no-highlight
 TOOLS_PATH=$( xcode-select -p )
 REL_PATH='../Applications/Application Loader.app/Contents/itms/java/lib/net.properties'
 echo "$TOOLS_PATH/$REL_PATH"
@@ -701,7 +701,7 @@ Add necessary proxy configuration values to the net.properties according to [Jav
 
 As an alternative to editing the properties files, proxy configuration can be specified on the command line directly:
 
-```bash
+```no-highlight
 DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV -Dhttp.proxyHost=myproxy.com -Dhttp.proxyPort=8080"
 ```
 

@@ -44,15 +44,15 @@ _gym_ uses the latest APIs to build and sign your application which results in m
 
 |          |  Gym Features  |
 |----------|----------------|
-🚀            | _gym_ builds 30% faster than other build tools like [shenzhen](https://github.com/nomad/shenzhen)
+🚀 | _gym_ builds 30% faster than other build tools like [shenzhen](https://github.com/nomad/shenzhen)
 🏁 | Beautiful inline build output
-📖    | Helps you resolve common build errors like code signing issues
+📖 | Helps you resolve common build errors like code signing issues
 🚠 | Sensible defaults: Automatically detect the project, its schemes and more
-🔗  | Works perfectly with [_fastlane_](https://fastlane.tools) and other tools
+🔗 | Works perfectly with [_fastlane_](https://fastlane.tools) and other tools
 📦 | Automatically generates an `ipa` and a compressed `dSYM` file
 🚅 | Don't remember any complicated build commands, just _gym_
-🔧  | Easy and dynamic configuration using parameters and environment variables
-💾   | Store common build settings in a `Gymfile`
+🔧 | Easy and dynamic configuration using parameters and environment variables
+💾 | Store common build settings in a `Gymfile`
 📤 | All archives are stored and accessible in the Xcode Organizer
 💻 | Supports both iOS and Mac applications
 
