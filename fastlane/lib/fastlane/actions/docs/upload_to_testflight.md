@@ -192,7 +192,9 @@ fastlane pilot import -c ~/Desktop/testers.csv
 
 If you run into any issues you can use the `verbose` mode to get a more detailed output:
 
-    fastlane pilot upload --verbose
+```no-highlight
+fastlane pilot upload --verbose
+```
 
 ## Firewall Issues
 

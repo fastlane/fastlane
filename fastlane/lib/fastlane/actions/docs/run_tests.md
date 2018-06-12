@@ -71,15 +71,15 @@ _scan_ uses the latest APIs and tools to make running tests plain simple and off
 🚠 | Sensible defaults: Automatically detect the project, schemes and more
 📊 | Support for HTML, JSON and JUnit reports
 🔎 | Xcode duplicated your simulators again? _scan_ will handle this for you
-🔗  | Works perfectly with [_fastlane_](https://fastlane.tools) and other tools
+🔗 | Works perfectly with [_fastlane_](https://fastlane.tools) and other tools
 🚅 | Don't remember any complicated build commands, just _scan_
-🔧  | Easy and dynamic configuration using parameters and environment variables
+🔧 | Easy and dynamic configuration using parameters and environment variables
 📢 | Beautiful slack notifications of the test results
-💾   | Store common build settings in a `Scanfile`
+💾 | Store common build settings in a `Scanfile`
 📤 | The raw `xcodebuild` outputs are stored in `~/Library/Logs/scan`
 💻 | Supports both iOS and Mac applications
-👱      | Automatically switches to the [travis formatter](https://github.com/kattrali/xcpretty-travis-formatter) when running on Travis
-📖     | Helps you resolve common test errors like simulator not responding
+👱 | Automatically switches to the [travis formatter](https://github.com/kattrali/xcpretty-travis-formatter) when running on Travis
+📖 | Helps you resolve common test errors like simulator not responding
 
 _scan_ uses a plain `xcodebuild` command, therefore keeping 100% compatible with `xcodebuild`. To generate the nice output, _scan_ uses [xcpretty](https://github.com/supermarin/xcpretty). You can alway access the raw output in `~/Library/Logs/scan`.
 
@@ -90,15 +90,21 @@ _scan_ uses a plain `xcodebuild` command, therefore keeping 100% compatible with
 
 # Usage
 
-    fastlane scan
+```no-highlight
+fastlane scan
+```
 
 That's all you need to run your tests. If you want more control, here are some available parameters:
 
-    fastlane scan --workspace "Example.xcworkspace" --scheme "AppName" --device "iPhone 6" --clean
+```no-highlight
+fastlane scan --workspace "Example.xcworkspace" --scheme "AppName" --device "iPhone 6" --clean
+```
 
 If you need to use a different xcode install, use `xcode-select` or define `DEVELOPER_DIR`:
 
-    DEVELOPER_DIR="/Applications/Xcode6.2.app" scan
+```no-highlight
+DEVELOPER_DIR="/Applications/Xcode6.2.app" scan
+```
 
 To run _scan_ on multiple devices via [_fastlane_](https://fastlane.tools), add this to your `Fastfile`:
 

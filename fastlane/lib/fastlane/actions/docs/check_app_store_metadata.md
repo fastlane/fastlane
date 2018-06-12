@@ -25,14 +25,14 @@ Apple rejects builds for many avoidable metadata issues like including swear wor
 
 |          |  precheck Features  |
 |----------|-----------------|
-|🐛|  product bug mentions|
-|🙅|Swear word checker|
-|🤖|Mentioning other platforms|
-|😵|URL reachability checker|
-|📝|Placeholder/test words/mentioning future features|
-|📅|Copyright date checking|
-|🙈|Customizable word list checking|
-|📢|You can decide if you want to warn about potential problems and continue or have _fastlane_ show an error and stop after all scans are done|
+🐛 |  product bug mentions
+🙅 | Swear word checker
+🤖 | Mentioning other platforms
+😵 | URL reachability checker
+📝 | Placeholder/test words/mentioning future features
+📅 | Copyright date checking
+🙈 | Customizable word list checking
+📢 | You can decide if you want to warn about potential problems and continue or have _fastlane_ show an error and stop after all scans are done
 
 # Usage
 Run _fastlane precheck_ to check the app metadata from iTunes Connect

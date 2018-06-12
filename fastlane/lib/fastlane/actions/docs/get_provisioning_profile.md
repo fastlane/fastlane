@@ -56,55 +56,79 @@ _sigh_ will create, repair and download profiles for the App Store by default.
 
 You can pass your bundle identifier and username like this:
 
-    fastlane sigh -a com.krausefx.app -u username
+```no-highlight
+fastlane sigh -a com.krausefx.app -u username
+```
 
 If you want to generate an **Ad Hoc** profile instead of an App Store profile:
 
-    fastlane sigh --adhoc
+```no-highlight
+fastlane sigh --adhoc
+```
 
 If you want to generate a **Development** profile:
 
-    fastlane sigh --development
+```no-highlight
+fastlane sigh --development
+```
 
 To generate the profile in a specific directory:
 
-    fastlane sigh -o "~/Certificates/"
+```no-highlight
+fastlane sigh -o "~/Certificates/"
+```
 
 To download all your provisioning profiles use
 
-    fastlane sigh download_all
+```no-highlight
+fastlane sigh download_all
+```
 
 Optionally, use `fastlane sigh download_all --download_xcode_profiles` to also include the Xcode managed provisioning profiles
 
 For a list of available parameters and commands run
 
-    fastlane action sigh
+```no-highlight
+fastlane action sigh
+```
 
 ### Advanced
 
 By default, _sigh_ will install the downloaded profile on your machine. If you just want to generate the profile and skip the installation, use the following flag:
 
-    fastlane sigh --skip_install
+```no-highlight
+fastlane sigh --skip_install
+```
 
 To save the provisioning profile under a specific name, use the -q option:
 
-    fastlane sigh -a com.krausefx.app -u username -q "myProfile.mobileprovision"
+```no-highlight
+fastlane sigh -a com.krausefx.app -u username -q "myProfile.mobileprovision"
+```
 
 If for some reason you don't want _sigh_ to verify that the code signing identity is installed on your local machine:
 
-    fastlane sigh --skip_certificate_verification
+```no-highlight
+fastlane sigh --skip_certificate_verification
+```
 
 If you need the provisioning profile to be renewed regardless of its state use the `--force` option. This gives you a profile with the maximum lifetime. `--force` will also add all available devices to this profile.
 
-    fastlane sigh --force
+```no-highlight
+fastlane sigh --force
+```
 
 By default, _sigh_ will include all certificates on development profiles, and first certificate on other types. If you need to specify which certificate to use you can either use the environment variable `SIGH_CERTIFICATE`, or pass the name or expiry date of the certificate as argument:
 
-    fastlane sigh -c "SunApps GmbH"
+```no-highlight
+fastlane sigh -c "SunApps GmbH"
+```
 
 For a list of available parameters and commands run
 
-    fastlane action sigh
+```no-highlight
+fastlane action sigh
+```
 
 
 ### Use with [_fastlane_](https://fastlane.tools)
@@ -128,33 +152,45 @@ This will result in _sigh_ always using the correct signing certificate, which i
 
 _sigh_ can automatically repair all your existing provisioning profiles which are expired or just invalid.
 
-    fastlane sigh repair
+```no-highlight
+fastlane sigh repair
+```
 
 # Resign
 
 If you generated your `ipa` file but want to apply a different code signing onto the ipa file, you can use `sigh resign`:
 
-    fastlane sigh resign
+```no-highlight
+fastlane sigh resign
+```
 
 _sigh_ will find the ipa file and the provisioning profile for you if they are located in the current folder.
 
 You can pass more information using the command line:
 
-    fastlane sigh resign ./path/app.ipa --signing_identity "iPhone Distribution: Felix Krause" -p "my.mobileprovision"
+```no-highlight
+fastlane sigh resign ./path/app.ipa --signing_identity "iPhone Distribution: Felix Krause" -p "my.mobileprovision"
+```
 
 # Manage
 
 With `sigh manage` you can list all provisioning profiles installed locally.
 
-    fastlane sigh manage
+```no-highlight
+fastlane sigh manage
+```
 
 Delete all expired provisioning profiles
 
-    fastlane sigh manage -e
+```no-highlight
+fastlane sigh manage -e
+```
 
 Or delete all `iOS Team Provisioning Profile` by using a regular expression
 
-    fastlane sigh manage -p "iOS\ ?Team Provisioning Profile:"
+```no-highlight
+fastlane sigh manage -p "iOS\ ?Team Provisioning Profile:"
+```
 
 ## Environment Variables
 
