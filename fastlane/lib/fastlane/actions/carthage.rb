@@ -11,7 +11,7 @@ module Fastlane
 
         if command_name == "archive" && params[:frameworks].count > 0
           cmd.concat(params[:frameworks])
-        elsif (command_name == "update" || command_name == "build") && params[:dependencies].count > 0
+        elsif ["update", "build", "bootstrap"].include?(command_name) && params[:dependencies].count > 0
           cmd.concat(params[:dependencies])
         end
 
@@ -71,7 +71,7 @@ module Fastlane
                                          UI.user_error!("Please pass a valid command. Use one of the following: #{available_commands.join(', ')}") unless available_commands.include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :dependencies,
-                                       description: "Carthage dependencies to update or build",
+                                       description: "Carthage dependencies to update, build or bootstrap",
                                        default_value: [],
                                        is_string: false,
                                        type: Array),
@@ -178,7 +178,7 @@ module Fastlane
             frameworks: ["MyFramework1", "MyFramework2"],   # Specify which frameworks to archive (only for the archive command)
             output: "MyFrameworkBundle.framework.zip",      # Specify the output archive name (only for the archive command)
             command: "bootstrap",                           # One of: build, bootstrap, update, archive. (default: bootstrap)
-            dependencies: ["Alamofire", "Notice"],          # Specify which dependencies to update or build (only for update and build commands)
+            dependencies: ["Alamofire", "Notice"],          # Specify which dependencies to update or build (only for update, build and bootstrap commands)
             use_ssh: false,                                 # Use SSH for downloading GitHub repositories.
             use_submodules: false,                          # Add dependencies as Git submodules.
             use_binaries: true,                             # Check out dependency repositories even when prebuilt frameworks exist
