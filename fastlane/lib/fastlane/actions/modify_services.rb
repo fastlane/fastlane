@@ -153,7 +153,7 @@ module Fastlane
             username: "test.account@gmail.com",
             app_identifier: "com.someorg.app",
             services: {
-              push_notifications: "on",
+              push_notification: "on",
               associated_domains: "off"
             }
           )'
