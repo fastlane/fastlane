@@ -97,7 +97,7 @@ module Pilot
 
       return if config[:skip_submission]
       if options[:reject_build_waiting_for_review]
-        waiting_for_review_build = Spaceship::TestFlight::Build.all_waiting_for_review(app_id: build.app_id, platform: :ios).first
+        waiting_for_review_build = Spaceship::TestFlight::Build.all_waiting_for_review(app_id: build.app_id, platform: fetch_app_platform).first
         unless waiting_for_review_build.nil?
           UI.important("Another build is already in review. Going to expire that build and submit the new one.")
           UI.important("Expiring build: #{waiting_for_review_build.train_version} - #{waiting_for_review_build.build_version}")
