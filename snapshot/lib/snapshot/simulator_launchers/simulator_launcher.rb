@@ -158,6 +158,9 @@ module Snapshot
       # https://github.com/fastlane/fastlane/issues/10786
       prepare_directories_for_launch(language: language, locale: locale, launch_arguments: launch_args)
 
+      # Clear errors so a successful retry isn't reported as an over failure
+      self.collected_errors = []
+
       execute(retries + 1, command: command, language: language, locale: locale, launch_args: launch_args, devices: devices)
     end
 
