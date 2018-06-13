@@ -152,6 +152,12 @@ module Snapshot
     def retry_tests(retries, command, language, locale, launch_args, devices)
       UI.important("Retrying on devices: #{devices.join(', ')}")
       UI.important("Number of retries remaining: #{launcher_config.number_of_retries - retries - 1}")
+
+      # Make sure all needed directories exist for next retry
+      # `copy_screenshots` in `cleanup_after_failure` can delete some needed directories
+      # https://github.com/fastlane/fastlane/issues/10786
+      prepare_directories_for_launch(language: language, locale: locale, launch_arguments: launch_args)
+
       execute(retries + 1, command: command, language: language, locale: locale, launch_args: launch_args, devices: devices)
     end
 
