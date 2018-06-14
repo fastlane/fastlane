@@ -147,7 +147,7 @@ describe Scan do
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
       result = @test_command_generator.generate
-      expect(result.last).to include("| xcpretty -f `custom-formatter`")
+      expect(result.last).to include("| xcpretty -f 'custom-formatter'")
     end
 
     describe "Standard Example" do
