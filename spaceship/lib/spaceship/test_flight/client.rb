@@ -171,11 +171,7 @@ module Spaceship
         url = "providers/#{team_id}/apps/#{app_id}/internalUsers"
         r = request(:get, url)
 
-        require 'pry'
-        # binding.pry
-        # puts r
         internal_users = parse_response(r, 'data')
-        # puts "a"
       end
 
       ##
