@@ -29,6 +29,7 @@ module Fastlane
         app = Spaceship::Tunes::Application.find(params[:app_identifier])
         if params[:live]
           UI.message("Fetching the latest build number for live-version")
+          UI.user_error!("Could not find a live-version of #{params[:app_identifier]} on iTC") unless app.live_version
           build_nr = app.live_version.current_build_number
         else
           version_number = params[:version]
