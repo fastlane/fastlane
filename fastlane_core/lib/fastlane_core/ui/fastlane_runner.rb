@@ -69,8 +69,8 @@ module Commander
         end
 
         # https://github.com/fastlane/fastlane/issues/11913
-        # action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(@program[:name], args: ARGV)
-        # FastlaneCore.session.action_launched(launch_context: action_launch_context)
+        action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(@program[:name], args: ARGV)
+        FastlaneCore.session.action_launched(launch_context: action_launch_context)
 
         return_value = run_active_command
 
