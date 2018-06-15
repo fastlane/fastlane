@@ -26,7 +26,6 @@ module Frameit
 
     # Device name for a given screen size. Used to use the correct template
     def device_name
-      # rubocop:disable Require/MissingRequireStatement
       sizes = Deliver::AppScreenshot::ScreenSize
       case @screen_size
       when sizes::IOS_58
