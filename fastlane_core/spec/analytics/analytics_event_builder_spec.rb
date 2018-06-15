@@ -7,11 +7,9 @@ describe FastlaneCore::AnalyticsEventBuilder do
 
   let(:builder) do
     FastlaneCore::AnalyticsEventBuilder.new(
-      oauth_app_name: oauth_app_name,
       p_hash: p_hash,
       session_id: session_id,
-      action_name: action_name,
-      timestamp_millis: timestamp_millis
+      action_name: action_name
     )
   end
 
