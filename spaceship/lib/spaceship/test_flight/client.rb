@@ -171,7 +171,7 @@ module Spaceship
         url = "providers/#{team_id}/apps/#{app_id}/internalUsers"
         r = request(:get, url)
 
-        internal_users = parse_response(r, 'data')
+        parse_response(r, 'data')
       end
 
       ##
