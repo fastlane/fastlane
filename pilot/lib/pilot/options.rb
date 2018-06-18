@@ -179,7 +179,7 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :groups,
                                      short_option: "-g",
                                      env_name: "PILOT_GROUPS",
-                                     description: "Associate tester to one group or more by group name / group id. E.g. '-g \"Team 1\",\"Team 2\"'",
+                                     description: "Associate tester to one group or more by group name / group id. E.g. `-g \"Team 1\",\"Team 2\"`",
                                      optional: true,
                                      type: Array,
                                      verify_block: proc do |value|
@@ -188,6 +188,12 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :wait_for_uploaded_build,
                                      env_name: "PILOT_WAIT_FOR_UPLOADED_BUILD",
                                      description: "Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :reject_build_waiting_for_review,
+                                     short_option: "-b",
+                                     env_name: "PILOT_REJECT_PREVIOUS_BUILD",
+                                     description: "Expire previous if it's 'waiting for review'",
                                      is_string: false,
                                      default_value: false)
       ]

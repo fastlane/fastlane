@@ -35,6 +35,11 @@ class TunesStubbing
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin").
         with(body: { "accountName" => "bad-username", "password" => "bad-password", "rememberMe" => true }.to_json).
         to_return(status: 401, body: '{}', headers: { 'Set-Cookie' => 'session=invalid' })
+
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/v1/session/webSession").
+        with(body: "{\"contentProviderId\":\"5678\",\"dsId\":null}",
+              headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/json' }).
+        to_return(status: 200, body: "", headers: {})
     end
 
     def itc_stub_applications
@@ -457,6 +462,18 @@ class TunesStubbing
         with(body: JSON.parse(itc_read_fixture_file(File.join('availability', 'set_preorder_cleared_with_date_request.json'))).to_json).
         to_return(status: 200, body: itc_read_fixture_file(File.join('availability', 'set_preorder_cleared_with_date_response.json')),
                   headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_app_pricing_intervals_vpp
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        to_return(status: 200, body: itc_read_fixture_file(File.join('app_pricing_intervals_b2b_included.json')),
+                    headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_app_pricing_intervals_b2b_disabled
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/pricing/intervals").
+        to_return(status: 200, body: itc_read_fixture_file(File.join('app_pricing_intervals_b2b_flag_disabled.json')),
+                    headers: { 'Content-Type' => 'application/json' })
     end
 
     def itc_stub_members

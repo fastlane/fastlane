@@ -49,14 +49,6 @@ describe Fastlane do
         expect(result).to eq("git log --pretty=\"%B\" v1.8.0\\(30\\)...HEAD")
       end
 
-      it "Does not accept a string value for between" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            changelog_from_git_commits(between: 'abcd...1234')
-          end").runner.execute(:test)
-        end.to raise_error(":between must be of type array")
-      end
-
       it "Does not accept a :between array of size 1" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -162,6 +154,26 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
+      end
+
+      it "Runs between option from command line" do
+        expect(system("fastlane run changelog_from_git_commits between:123456,HEAD")).to be
+      end
+
+      it "Accepts string value for :between" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(between: 'abcd,1234')
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" abcd...1234")
+      end
+
+      it "Does not accept string if it does not contain comma" do
+        expect do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            changelog_from_git_commits(between: 'abcd1234')
+          end").runner.execute(:test)
+        end.to raise_error(":between must contain comma")
       end
     end
   end

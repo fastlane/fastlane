@@ -32,7 +32,7 @@ module Fastlane
       def self.example_code
         [
           'add_extra_platforms(
-            platforms: [:windows,:neogeo]
+            platforms: [:windows, :neogeo]
           )'
         ]
       end
