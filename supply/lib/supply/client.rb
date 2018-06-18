@@ -70,6 +70,7 @@ module Supply
       Google::Apis::ClientOptions.default.application_version = Fastlane::VERSION
       Google::Apis::ClientOptions.default.read_timeout_sec = 300
       Google::Apis::ClientOptions.default.open_timeout_sec = 300
+      Google::Apis::ClientOptions.default.send_timeout_sec = 300
       Google::Apis::RequestOptions.default.retries = 5
 
       self.android_publisher = Androidpublisher::AndroidPublisherService.new
