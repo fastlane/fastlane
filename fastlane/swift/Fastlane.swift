@@ -2033,7 +2033,8 @@ func mailgun(mailgunSandboxDomain: String? = nil,
              ciBuildLink: String? = nil,
              templatePath: String? = nil,
              replyTo: String? = nil,
-             attachment: String? = nil) {
+             attachment: String? = nil,
+             customPlaceholders: [String : Any] = [:]) {
   let command = RubyCommand(commandID: "", methodName: "mailgun", className: nil, args: [RubyCommand.Argument(name: "mailgun_sandbox_domain", value: mailgunSandboxDomain),
                                                                                          RubyCommand.Argument(name: "mailgun_sandbox_postmaster", value: mailgunSandboxPostmaster),
                                                                                          RubyCommand.Argument(name: "mailgun_apikey", value: mailgunApikey),
@@ -2048,7 +2049,8 @@ func mailgun(mailgunSandboxDomain: String? = nil,
                                                                                          RubyCommand.Argument(name: "ci_build_link", value: ciBuildLink),
                                                                                          RubyCommand.Argument(name: "template_path", value: templatePath),
                                                                                          RubyCommand.Argument(name: "reply_to", value: replyTo),
-                                                                                         RubyCommand.Argument(name: "attachment", value: attachment)])
+                                                                                         RubyCommand.Argument(name: "attachment", value: attachment),
+                                                                                         RubyCommand.Argument(name: "custom_placeholders", value: customPlaceholders)])
   _ = runner.executeCommand(command)
 }
 func makeChangelogFromJenkins(fallbackChangelog: String = "",
@@ -2130,6 +2132,7 @@ func nexusUpload(file: String,
                  username: String,
                  password: String,
                  sslVerify: Bool = true,
+                 nexusVersion: Int = 2,
                  verbose: Bool = false,
                  proxyUsername: String? = nil,
                  proxyPassword: String? = nil,
@@ -2146,6 +2149,7 @@ func nexusUpload(file: String,
                                                                                               RubyCommand.Argument(name: "username", value: username),
                                                                                               RubyCommand.Argument(name: "password", value: password),
                                                                                               RubyCommand.Argument(name: "ssl_verify", value: sslVerify),
+                                                                                              RubyCommand.Argument(name: "nexus_version", value: nexusVersion),
                                                                                               RubyCommand.Argument(name: "verbose", value: verbose),
                                                                                               RubyCommand.Argument(name: "proxy_username", value: proxyUsername),
                                                                                               RubyCommand.Argument(name: "proxy_password", value: proxyPassword),
@@ -2295,7 +2299,8 @@ func pilot(username: String,
            devPortalTeamId: String? = nil,
            itcProvider: String? = nil,
            groups: [String]? = nil,
-           waitForUploadedBuild: Bool = false) {
+           waitForUploadedBuild: Bool = false,
+           rejectBuildWaitingForReview: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "pilot", className: nil, args: [RubyCommand.Argument(name: "username", value: username),
                                                                                        RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                        RubyCommand.Argument(name: "app_platform", value: appPlatform),
@@ -2320,7 +2325,8 @@ func pilot(username: String,
                                                                                        RubyCommand.Argument(name: "dev_portal_team_id", value: devPortalTeamId),
                                                                                        RubyCommand.Argument(name: "itc_provider", value: itcProvider),
                                                                                        RubyCommand.Argument(name: "groups", value: groups),
-                                                                                       RubyCommand.Argument(name: "wait_for_uploaded_build", value: waitForUploadedBuild)])
+                                                                                       RubyCommand.Argument(name: "wait_for_uploaded_build", value: waitForUploadedBuild),
+                                                                                       RubyCommand.Argument(name: "reject_build_waiting_for_review", value: rejectBuildWaitingForReview)])
   _ = runner.executeCommand(command)
 }
 func pluginScores(outputPath: String,
@@ -3403,7 +3409,8 @@ func testflight(username: String,
                 devPortalTeamId: String? = nil,
                 itcProvider: String? = nil,
                 groups: [String]? = nil,
-                waitForUploadedBuild: Bool = false) {
+                waitForUploadedBuild: Bool = false,
+                rejectBuildWaitingForReview: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "testflight", className: nil, args: [RubyCommand.Argument(name: "username", value: username),
                                                                                             RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                             RubyCommand.Argument(name: "app_platform", value: appPlatform),
@@ -3428,7 +3435,8 @@ func testflight(username: String,
                                                                                             RubyCommand.Argument(name: "dev_portal_team_id", value: devPortalTeamId),
                                                                                             RubyCommand.Argument(name: "itc_provider", value: itcProvider),
                                                                                             RubyCommand.Argument(name: "groups", value: groups),
-                                                                                            RubyCommand.Argument(name: "wait_for_uploaded_build", value: waitForUploadedBuild)])
+                                                                                            RubyCommand.Argument(name: "wait_for_uploaded_build", value: waitForUploadedBuild),
+                                                                                            RubyCommand.Argument(name: "reject_build_waiting_for_review", value: rejectBuildWaitingForReview)])
   _ = runner.executeCommand(command)
 }
 func tryouts(appId: String,
@@ -3463,7 +3471,7 @@ func typetalk() {
   let command = RubyCommand(commandID: "", methodName: "typetalk", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
-func unlockKeychain(path: String,
+func unlockKeychain(path: String = "login",
                     password: String,
                     addToSearchList: Bool = true,
                     setDefault: Bool = false) {
@@ -3787,7 +3795,8 @@ func uploadToTestflight(username: String,
                         devPortalTeamId: String? = nil,
                         itcProvider: String? = nil,
                         groups: [String]? = nil,
-                        waitForUploadedBuild: Bool = false) {
+                        waitForUploadedBuild: Bool = false,
+                        rejectBuildWaitingForReview: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "upload_to_testflight", className: nil, args: [RubyCommand.Argument(name: "username", value: username),
                                                                                                       RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                       RubyCommand.Argument(name: "app_platform", value: appPlatform),
@@ -3812,7 +3821,8 @@ func uploadToTestflight(username: String,
                                                                                                       RubyCommand.Argument(name: "dev_portal_team_id", value: devPortalTeamId),
                                                                                                       RubyCommand.Argument(name: "itc_provider", value: itcProvider),
                                                                                                       RubyCommand.Argument(name: "groups", value: groups),
-                                                                                                      RubyCommand.Argument(name: "wait_for_uploaded_build", value: waitForUploadedBuild)])
+                                                                                                      RubyCommand.Argument(name: "wait_for_uploaded_build", value: waitForUploadedBuild),
+                                                                                                      RubyCommand.Argument(name: "reject_build_waiting_for_review", value: rejectBuildWaitingForReview)])
   _ = runner.executeCommand(command)
 }
 func verifyBuild(provisioningType: String? = nil,
@@ -4041,4 +4051,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.20]
+// FastlaneRunnerAPIVersion [0.9.21]
