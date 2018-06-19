@@ -103,8 +103,8 @@ module FastlaneCore
       return exit_status.zero?
     end
 
-    def gather_errors
-      @errors_to_show
+    def displayable_errors
+      @errors.map{|error| "[Transporter Error Output]: #{error}"}.join("\n").gsub!(/"/, "")
     end
 
     private
@@ -120,10 +120,6 @@ module FastlaneCore
 
       elsif line =~ ERROR_REGEX
         @errors << $1
-        # It looks like this causes errors to be printed twice
-        # Instead of printing this again maybe just save it to be used later?
-        @errors_to_show << "[Transporter Error Output]: #{$1}"
-        # UI.error("[Transporter Error Output]: #{$1}")
 
         # Check if it's a login error
         if $1.include?("Your Apple ID or password was entered incorrectly") ||
@@ -400,8 +396,8 @@ module FastlaneCore
       return result
     end
 
-    def returned_errors
-      @transporter_executor.gather_errors
+    def displayable_errors
+      @transporter_executor.displayable_errors
     end
 
     private

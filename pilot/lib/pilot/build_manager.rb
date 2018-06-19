@@ -38,8 +38,7 @@ module Pilot
       result = transporter.upload(app.apple_id, package_path)
 
       unless result
-        transporter_errors = transporter.returned_errors.join("\n")
-        transporter_errors.gsub!(/"/, "")
+        transporter_errors = transporter.displayable_errors
         UI.user_error!("Error uploading ipa file: \n #{transporter_errors}")
       end
 
