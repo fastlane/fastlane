@@ -131,7 +131,8 @@ module FastlaneCore
           end
         elsif $1.include?("Redundant Binary Upload. You've already uploaded a build with build")
           UI.error($1)
-          UI.error("You have to change the build number of your app to upload your ipa file")
+          /build number (?<build_number>'.*') for version number (?<version_number>'.*')./ =~ $1
+          UI.error("You need to upload a binary with a build number greater than #{build_number}. Or upload a binary with a version greater than #{version_number}.")
         end
 
         output_done = true
