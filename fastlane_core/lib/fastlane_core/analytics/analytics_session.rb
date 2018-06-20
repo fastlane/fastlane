@@ -18,10 +18,6 @@ module FastlaneCore
       @is_fastfile = false
     end
 
-    def opt_out_metrics?
-      FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
-    end
-
     def backfill_p_hashes(p_hash: nil)
       return if p_hash.nil? || p_hash == ActionLaunchContext::UNKNOWN_P_HASH || @events.count == 0
       @events.reverse_each do |event|
@@ -68,55 +64,50 @@ module FastlaneCore
     end
 
     def finalize_session
-      # If our users want to opt out of usage metrics, don't post the events.
-      # Learn more at https://docs.fastlane.tools/#metrics
-      return if opt_out_metrics?
-
-      client.post_events(@events)
     end
 
-    def fastlane_version
-      return Fastlane::VERSION
-    end
-
-    def ruby_version
-      patch_level = RUBY_PATCHLEVEL == 0 ? nil : "p#{RUBY_PATCHLEVEL}"
-      return "#{RUBY_VERSION}#{patch_level}"
-    end
-
-    def operating_system
-      return Helper.operating_system
-    end
-
-    def install_method
-      if Helper.rubygems?
-        return 'gem'
-      elsif Helper.bundler?
-        return 'bundler'
-      elsif Helper.mac_app?
-        return 'mac_app'
-      elsif Helper.contained_fastlane?
-        return 'standalone'
-      elsif Helper.homebrew?
-        return 'homebrew'
-      else
-        return 'unknown'
-      end
-    end
-
-    def ci?
-      return Helper.ci?
-    end
-
-    def operating_system_version
-      os = self.operating_system
-      case os
-      when "macOS"
-        return system('sw_vers', out: File::NULL) ? `sw_vers -productVersion`.strip : 'unknown'
-      else
-        # Need to test in Windows and Linux... not sure this is enough
-        return Gem::Platform.local.version
-      end
-    end
+    # def fastlane_version
+    #   return Fastlane::VERSION
+    # end
+    #
+    # def ruby_version
+    #   patch_level = RUBY_PATCHLEVEL == 0 ? nil : "p#{RUBY_PATCHLEVEL}"
+    #   return "#{RUBY_VERSION}#{patch_level}"
+    # end
+    #
+    # def operating_system
+    #   return Helper.operating_system
+    # end
+    #
+    # def install_method
+    #   if Helper.rubygems?
+    #     return 'gem'
+    #   elsif Helper.bundler?
+    #     return 'bundler'
+    #   elsif Helper.mac_app?
+    #     return 'mac_app'
+    #   elsif Helper.contained_fastlane?
+    #     return 'standalone'
+    #   elsif Helper.homebrew?
+    #     return 'homebrew'
+    #   else
+    #     return 'unknown'
+    #   end
+    # end
+    #
+    # def ci?
+    #   return Helper.ci?
+    # end
+    #
+    # def operating_system_version
+    #   os = self.operating_system
+    #   case os
+    #   when "macOS"
+    #     return system('sw_vers', out: File::NULL) ? `sw_vers -productVersion`.strip : 'unknown'
+    #   else
+    #     # Need to test in Windows and Linux... not sure this is enough
+    #     return Gem::Platform.local.version
+    #   end
+    # end
   end
 end

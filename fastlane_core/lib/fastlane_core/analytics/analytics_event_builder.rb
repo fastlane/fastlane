@@ -10,7 +10,7 @@ module FastlaneCore
 
     def new_event(action_stage)
       {
-        client_id: @session_id,
+        client_id: @p_hash,
         category: :undefined,
         action: action_stage,
         label: action_name,

@@ -11,7 +11,9 @@ module FastlaneCore
     end
 
     def post_events(events)
-      unless Helper.test?
+      # If our users want to opt out of usage metrics, don't post the events.
+      # Learn more at https://docs.fastlane.tools/#metrics
+    unless Helper.test? or FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
         Thread.new do
           send_request(events)
         end

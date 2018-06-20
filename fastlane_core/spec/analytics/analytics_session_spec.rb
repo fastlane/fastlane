@@ -26,7 +26,7 @@ describe FastlaneCore::AnalyticsSession do
         expect(SecureRandom).to receive(:uuid).and_return(session_id)
 
         # Stub out calls related to the execution environment
-        client = double('AnalyticsIngesterClient')
+        client = double("ingester_client")
         session = FastlaneCore::AnalyticsSession.new(analytics_ingester_client: client)
         expect(client).to receive(:post_events).with(instance_of(Array))
 
