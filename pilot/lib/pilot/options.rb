@@ -189,6 +189,12 @@ module Pilot
                                      env_name: "PILOT_WAIT_FOR_UPLOADED_BUILD",
                                      description: "Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used",
                                      is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :reject_build_waiting_for_review,
+                                     short_option: "-b",
+                                     env_name: "PILOT_REJECT_PREVIOUS_BUILD",
+                                     description: "Expire previous if it's 'waiting for review'",
+                                     is_string: false,
                                      default_value: false)
       ]
     end

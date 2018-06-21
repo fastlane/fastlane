@@ -134,7 +134,7 @@ export_options("./ExportOptions.plist")
 or you can provide hash of values directly in the `Gymfile`:
 
 ```ruby-skip-tests
-export_options: {
+export_options = {
   method: "ad-hoc",
   manifest: {
     appURL: "https://example.com/My App.ipa",

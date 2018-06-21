@@ -48,6 +48,7 @@ Gemfile.lock
 # fastlane specific
 /*.itmsp
 .idea
+.rakeTasks
 spec/fixtures/*.itmsp/*.png
 /integration
 **/report.xml

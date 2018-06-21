@@ -14,26 +14,26 @@ File.write("#{lib}/fastlane/plugins/template/.rubocop.yml", YAML.dump(config))
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
-  spec.authors       = ["Danielle Tomlinson",
+  spec.authors       = ["Stefan Natchev",
+                        "Jimmy Dee",
+                        "Maksym Grebenets",
                         "Joshua Liebowitz",
-                        "Andrew McBurney",
-                        "Manu Wallner",
                         "Jérôme Lacoste",
-                        "Aaron Brager",
+                        "Helmut Januschka",
+                        "Matthew Ellis",
                         "Kohki Miki",
                         "Felix Krause",
-                        "Iulian Onofrei",
-                        "Fumiya Nakamura",
-                        "Maksym Grebenets",
                         "Josh Holtz",
-                        "Jorge Revuelta H",
-                        "Matthew Ellis",
-                        "Jimmy Dee",
-                        "Luka Mirosevic",
                         "Jan Piotrowski",
-                        "Stefan Natchev",
-                        "Helmut Januschka",
-                        "Olivier Halligon"]
+                        "Danielle Tomlinson",
+                        "Aaron Brager",
+                        "Manu Wallner",
+                        "Jorge Revuelta H",
+                        "Olivier Halligon",
+                        "Fumiya Nakamura",
+                        "Iulian Onofrei",
+                        "Luka Mirosevic",
+                        "Andrew McBurney"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -55,7 +55,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency('slack-notifier', '>= 2.0.0', '< 3.0.0') # Slack notifications
   spec.add_dependency('xcodeproj', '>= 1.5.7', '< 2.0.0') # Needed for commit_version_bump action and gym code_signing_mapping
-  spec.add_dependency('xcpretty', '>= 0.2.4', '< 1.0.0') # prettify xcodebuild output
+  spec.add_dependency('xcpretty', '~> 0.2.8') # prettify xcodebuild output
   spec.add_dependency('terminal-notifier', '>= 1.6.2', '< 2.0.0') # macOS notifications
   spec.add_dependency('terminal-table', '>= 1.4.5', '< 2.0.0') # Actions documentation
   spec.add_dependency('plist', '>= 3.1.0', '< 4.0.0') # Needed for set_build_number_repository and get_info_plist_value actions
