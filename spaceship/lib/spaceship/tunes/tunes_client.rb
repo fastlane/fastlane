@@ -1019,11 +1019,14 @@ module Spaceship
       handle_itc_response(r.body)
 
       # iTunes Connect still returns a success status code even the submission
-      # was failed because of Ad ID info. This checks for any section error
-      # keys in returned adIdInfo and prints them out.
+      # was failed because of Ad ID Info / Export Complicance. This checks for any section error
+      # keys in returned adIdInfo / exportCompliance and prints them out.
       ad_id_error_keys = r.body.fetch('data').fetch('adIdInfo').fetch('sectionErrorKeys')
+      export_error_keys = r.body.fetch('data').fetch('exportCompliance').fetch('sectionErrorKeys')
       if ad_id_error_keys.any?
         raise "Something wrong with your Ad ID information: #{ad_id_error_keys}."
+      elsif export_error_keys.any?
+        raise "Something wrong with your Export Complicance: #{export_error_keys}"
       elsif r.body.fetch('messages').fetch('info').last == "Successful POST"
         # success
       else
