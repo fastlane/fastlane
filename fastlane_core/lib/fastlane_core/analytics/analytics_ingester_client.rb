@@ -6,6 +6,10 @@ require_relative '../helper'
 
 module FastlaneCore
   class AnalyticsIngesterClient
+    GA_URL = "https://www.google-analytics.com"
+
+    private_constant :GA_URL
+
     def initialize(ga_tracking)
       @ga_tracking = ga_tracking
     end
@@ -13,12 +17,12 @@ module FastlaneCore
     def post_events(events)
       # If our users want to opt out of usage metrics, don't post the events.
       # Learn more at https://docs.fastlane.tools/#metrics
-    unless Helper.test? or FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
-        Thread.new do
-          send_request(events)
-        end
+      if Helper.test? || FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
+        return
       end
-      return true
+      Thread.new do
+        send_request(events)
+      end
     end
 
     def send_request(events, retries: 2)
@@ -32,9 +36,8 @@ module FastlaneCore
       if ENV['METRICS_DEBUG']
         write_json(events.to_json)
       end
-      url = "https://www.google-analytics.com"
 
-      connection = Faraday.new(url) do |conn|
+      connection = Faraday.new(GA_URL) do |conn|
         conn.request(:url_encoded)
         conn.adapter(Faraday.default_adapter)
         if ENV['METRICS_DEBUG']
@@ -42,7 +45,7 @@ module FastlaneCore
           conn.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
         end
       end
-      connection.headers[:user_agent] = 'Fastlane'
+      connection.headers[:user_agent] = 'fastlane'
       events.each do |event|
         connection.post("/collect", {
           v: "1",                                            # API Version

@@ -224,9 +224,10 @@ module Fastlane
       verify_supported_os(method_sym, class_ref)
 
       begin
-        # https://github.com/fastlane/fastlane/issues/11913
-        # launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(method_sym.to_s, configuration_language: configuration_language, args: ARGV)
-        # FastlaneCore.session.action_launched(launch_context: launch_context)
+        launch_context = FastlaneCore::ActionLaunchContext
+                           .context_for_action_name(method_sym.to_s,configuration_language: configuration_language,
+                                                    args: ARGV)
+        FastlaneCore.session.action_launched(launch_context: launch_context)
 
         Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
           # If another action is calling this action, we shouldn't show it in the summary

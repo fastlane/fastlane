@@ -4,18 +4,18 @@ require_relative 'analytics_event_builder'
 
 module FastlaneCore
   class AnalyticsSession
+    GA_TRACKING = "UA-121171860-1"
+
+    private_constant :GA_TRACKING
     attr_accessor :session_id
     attr_accessor :client
     attr_accessor :events
-    attr_accessor :is_fastfile
-    alias fastfile? is_fastfile
 
-    def initialize(analytics_ingester_client: AnalyticsIngesterClient.new(ENV['GA_TRACKING_ID'] || "UA-120900387-1"))
+    def initialize(analytics_ingester_client: AnalyticsIngesterClient.new(GA_TRACKING))
       require 'securerandom'
       @session_id = SecureRandom.uuid
       @client = analytics_ingester_client
       @events = []
-      @is_fastfile = false
     end
 
     def backfill_p_hashes(p_hash: nil)
@@ -31,20 +31,6 @@ module FastlaneCore
           break
         end
       end
-    end
-
-    def is_fastfile=(value)
-      if value
-        # If true, update all of the events to reflect
-        # that the execution is running within a Fastfile context.
-        # We don't want to update if this is false because once we
-        # detect a true value, that is the one to be trusted
-        @events.reverse_each do |event|
-          # Follow-up: decide whether we need this
-          # event[:primary_target][:name] == 'fastfile' ? event[:primary_target][:detail] = value.to_s : next
-        end
-      end
-      @is_fastfile = value
     end
 
     def action_launched(launch_context: nil)
@@ -65,49 +51,5 @@ module FastlaneCore
 
     def finalize_session
     end
-
-    # def fastlane_version
-    #   return Fastlane::VERSION
-    # end
-    #
-    # def ruby_version
-    #   patch_level = RUBY_PATCHLEVEL == 0 ? nil : "p#{RUBY_PATCHLEVEL}"
-    #   return "#{RUBY_VERSION}#{patch_level}"
-    # end
-    #
-    # def operating_system
-    #   return Helper.operating_system
-    # end
-    #
-    # def install_method
-    #   if Helper.rubygems?
-    #     return 'gem'
-    #   elsif Helper.bundler?
-    #     return 'bundler'
-    #   elsif Helper.mac_app?
-    #     return 'mac_app'
-    #   elsif Helper.contained_fastlane?
-    #     return 'standalone'
-    #   elsif Helper.homebrew?
-    #     return 'homebrew'
-    #   else
-    #     return 'unknown'
-    #   end
-    # end
-    #
-    # def ci?
-    #   return Helper.ci?
-    # end
-    #
-    # def operating_system_version
-    #   os = self.operating_system
-    #   case os
-    #   when "macOS"
-    #     return system('sw_vers', out: File::NULL) ? `sw_vers -productVersion`.strip : 'unknown'
-    #   else
-    #     # Need to test in Windows and Linux... not sure this is enough
-    #     return Gem::Platform.local.version
-    #   end
-    # end
   end
 end
