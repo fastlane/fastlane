@@ -21,8 +21,8 @@ module Fastlane
         changed_targets = []
 
         target_dictionary.each do |props|
-          if !target_attributes.key?(props[:uuid])
-            target_attributes[props[:uuid]] = { }
+          unless target_attributes.key?(props[:uuid])
+            target_attributes[props[:uuid]] = {}
           end
         end
 
