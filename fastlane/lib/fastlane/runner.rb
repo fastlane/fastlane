@@ -224,11 +224,6 @@ module Fastlane
       verify_supported_os(method_sym, class_ref)
 
       begin
-        launch_context = FastlaneCore::ActionLaunchContext
-                           .context_for_action_name(method_sym.to_s,configuration_language: configuration_language,
-                                                    args: ARGV)
-        FastlaneCore.session.action_launched(launch_context: launch_context)
-
         Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
           # If another action is calling this action, we shouldn't show it in the summary
           # (see https://github.com/fastlane/fastlane/issues/4546)
@@ -255,11 +250,7 @@ module Fastlane
               puts("==========================================\n".deprecated)
             end
             class_ref.runner = self # needed to call another action form an action
-            return_value = class_ref.run(arguments)
-
-            action_completed(method_sym.to_s, status: FastlaneCore::ActionCompletionStatus::SUCCESS)
-
-            return return_value
+            return class_ref.run(arguments)
           end
         end
       rescue Interrupt => e

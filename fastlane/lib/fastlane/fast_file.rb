@@ -220,11 +220,7 @@ module Fastlane
       actions_path = File.join(File.expand_path("..", path), 'actions')
       Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
 
-      action_launched('import')
-
       return_value = parse(File.read(path), path)
-
-      action_completed('import', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
 
       return return_value
     end
@@ -238,8 +234,6 @@ module Fastlane
 
       Actions.execute_action('import_from_git') do
         require 'tmpdir'
-
-        action_launched('import_from_git')
 
         # Checkout the repo
         repo_name = url.split("/").last
@@ -273,8 +267,6 @@ module Fastlane
           end
 
           return_value = import(File.join(clone_folder, path))
-
-          action_completed('import_from_git', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
 
           return return_value
         end
@@ -316,28 +308,12 @@ module Fastlane
       # Overwrite this, since there is already a 'puts' method defined in the Ruby standard library
       value ||= yield if block_given?
 
-      action_launched('puts')
-      return_value = Fastlane::Actions::PutsAction.run([value])
-      action_completed('puts', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
-      return return_value
+      return Fastlane::Actions::PutsAction.run([value])
     end
 
     def test(params = {})
       # Overwrite this, since there is already a 'test' method defined in the Ruby standard library
       self.runner.try_switch_to_lane(:test, [params])
-    end
-
-    def action_launched(action_name)
-      action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name,
-                                                                                        configuration_language: "ruby",
-                                                                                        args: ARGV)
-      FastlaneCore.session.action_launched(launch_context: action_launch_context)
-    end
-
-    def action_completed(action_name, status: nil)
-      completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV,
-                                                                                         status: status)
-      FastlaneCore.session.action_completed(completion_context: completion_context)
     end
   end
 end
