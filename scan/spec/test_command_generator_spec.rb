@@ -1,6 +1,6 @@
 describe Scan do
   before(:all) do
-    options = {project: "./scan/examples/standard/app.xcodeproj"}
+    options = { project: "./scan/examples/standard/app.xcodeproj" }
     config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
     @project = FastlaneCore::Project.new(config)
   end
@@ -67,7 +67,7 @@ describe Scan do
     allow(rt_response).to receive(:read).and_return("no\n")
     allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, rt_response, nil, nil)
 
-    allow(FastlaneCore::CommandExecutor).to receive(:execute).with(command: "sw_vers -productVersion", print_all: false, print_command: false).and_return("10.12.1")
+    allow(FastlaneCore::CommandExecutor).to receive(:execute).with(command: "sw_vers -productVersion", print_all: false, print_command: false).and_return('10.12.1')
 
     allow(Scan).to receive(:project).and_return(@project)
   end
@@ -81,7 +81,7 @@ describe Scan do
       tmp_path = Dir.mktmpdir
       path = "#{tmp_path}/notExistent"
       expect do
-        options = {project: path}
+        options = { project: path }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
       end.to raise_error("Project file not found at path '#{path}'")
     end
@@ -101,7 +101,7 @@ describe Scan do
       end
 
       it "passes the toolchain option to xcodebuild", requires_xcodebuild: true do
-        options = {project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", toolchain: "com.apple.dt.toolchain.Swift_2_3"}
+        options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", toolchain: "com.apple.dt.toolchain.Swift_2_3" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
         result = @test_command_generator.generate
@@ -115,7 +115,7 @@ describe Scan do
                                        "-toolchain 'com.apple.dt.toolchain.Swift_2_3'",
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
                                        :build,
-                                       :test,
+                                       :test
                                      ])
       end
     end
@@ -123,8 +123,8 @@ describe Scan do
     it "supports additional parameters", requires_xcodebuild: true do
       log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-      xcargs = {DEBUG: "1", BUNDLE_NAME: "Example App"}
-      options = {project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", xcargs: xcargs}
+      xcargs = { DEBUG: "1", BUNDLE_NAME: "Example App" }
+      options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", xcargs: xcargs }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
       result = @test_command_generator.generate
@@ -138,12 +138,12 @@ describe Scan do
                                      "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
                                      "DEBUG=1 BUNDLE_NAME=Example\\ App",
                                      :build,
-                                     :test,
+                                     :test
                                    ])
     end
 
     it "supports custom xcpretty formatter as a gem name", requires_xcodebuild: true do
-      options = {formatter: "custom-formatter", project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0"}
+      options = { formatter: "custom-formatter", project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0" }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
       result = @test_command_generator.generate
@@ -151,7 +151,7 @@ describe Scan do
     end
 
     it "supports custom xcpretty formatter as a path to a ruby file", requires_xcodebuild: true do
-      options = {formatter: "custom-formatter.rb", project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0"}
+      options = { formatter: "custom-formatter.rb", project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0" }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
       result = @test_command_generator.generate
@@ -160,7 +160,7 @@ describe Scan do
 
     describe "Standard Example" do
       before do
-        options = {project: "./scan/examples/standard/app.xcodeproj"}
+        options = { project: "./scan/examples/standard/app.xcodeproj" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
       end
 
@@ -176,7 +176,7 @@ describe Scan do
                                        "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
                                        :build,
-                                       :test,
+                                       :test
                                      ])
       end
 
@@ -192,7 +192,7 @@ describe Scan do
       end
 
       it "#buildlog_path is used when provided", requires_xcodebuild: true do
-        options = {project: "./scan/examples/standard/app.xcodeproj", buildlog_path: "/tmp/my/path"}
+        options = { project: "./scan/examples/standard/app.xcodeproj", buildlog_path: "/tmp/my/path" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
         result = @test_command_generator.xcodebuild_log_path
         expect(result).to include("/tmp/my/path")
@@ -206,7 +206,7 @@ describe Scan do
 
     describe "Derived Data Example" do
       before do
-        options = {project: "./scan/examples/standard/app.xcodeproj", derived_data_path: "/tmp/my/derived_data"}
+        options = { project: "./scan/examples/standard/app.xcodeproj", derived_data_path: "/tmp/my/derived_data" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
       end
 
@@ -222,14 +222,14 @@ describe Scan do
                                        "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                        "-derivedDataPath '/tmp/my/derived_data'",
                                        :build,
-                                       :test,
+                                       :test
                                      ])
       end
     end
 
     describe "Test Max Concurrent Simulators" do
       before do
-        options = {project: "./scan/examples/standard/app.xcodeproj", max_concurrent_simulators: 3}
+        options = { project: "./scan/examples/standard/app.xcodeproj", max_concurrent_simulators: 3 }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
       end
 
@@ -243,7 +243,7 @@ describe Scan do
 
     describe "Test Disable Concurrent Simulators" do
       before do
-        options = {project: "./scan/examples/standard/app.xcodeproj", disable_concurrent_testing: true}
+        options = { project: "./scan/examples/standard/app.xcodeproj", disable_concurrent_testing: true }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
       end
 
@@ -259,24 +259,24 @@ describe Scan do
       context "extract system.logarchive" do
         it "copies all device logs to the output directory", requires_xcodebuild: true do
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
-            output_directory: "/tmp/scan_results",
+            output_directory: '/tmp/scan_results',
             include_simulator_logs: true,
             devices: ["iPhone 6s", "iPad Air"],
-            project: "./scan/examples/standard/app.xcodeproj",
+            project: './scan/examples/standard/app.xcodeproj'
           })
-          Scan.cache[:temp_junit_report] = "./scan/spec/fixtures/boring.log"
+          Scan.cache[:temp_junit_report] = './scan/spec/fixtures/boring.log'
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
-              with(command: "xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect --output /tmp/scan_results/system_logs-iPhone\\ 6s_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
+            with(command: "xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect --output /tmp/scan_results/system_logs-iPhone\\ 6s_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
-              with(command: "xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect --output /tmp/scan_results/system_logs-iPad\\ Air_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
+            with(command: "xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect --output /tmp/scan_results/system_logs-iPad\\ Air_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
 
           mock_test_result_parser = Object.new
           allow(Scan::TestResultParser).to receive(:new).and_return(mock_test_result_parser)
-          allow(mock_test_result_parser).to receive(:parse_result).and_return({tests: 100, failures: 0})
+          allow(mock_test_result_parser).to receive(:parse_result).and_return({ tests: 100, failures: 0 })
 
           mock_slack_poster = Object.new
           allow(Scan::SlackPoster).to receive(:new).and_return(mock_slack_poster)
@@ -284,7 +284,7 @@ describe Scan do
 
           mock_test_command_generator = Object.new
           allow(Scan::TestCommandGenerator).to receive(:new).and_return(mock_test_command_generator)
-          allow(mock_test_command_generator).to receive(:xcodebuild_log_path).and_return("./scan/spec/fixtures/boring.log")
+          allow(mock_test_command_generator).to receive(:xcodebuild_log_path).and_return('./scan/spec/fixtures/boring.log')
 
           Scan::Runner.new.handle_results(0)
         end
@@ -295,7 +295,7 @@ describe Scan do
       it "uses the correct build command with the example project", requires_xcodebuild: true do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-        options = {project: "./scan/examples/standard/app.xcodeproj", result_bundle: true, scheme: "app"}
+        options = { project: "./scan/examples/standard/app.xcodeproj", result_bundle: true, scheme: 'app' }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
         result = @test_command_generator.generate
@@ -308,7 +308,7 @@ describe Scan do
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
                                        "-resultBundlePath './fastlane/test_output/app.test_result'",
                                        :build,
-                                       :test,
+                                       :test
                                      ])
       end
     end
@@ -317,8 +317,8 @@ describe Scan do
       it "only tests the test bundle/suite/cases specified in only_testing when the input is an array", requires_xcodebuild: true do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-        options = {project: "./scan/examples/standard/app.xcodeproj", scheme: "app",
-                   only_testing: %w(TestBundleA/TestSuiteB TestBundleC)}
+        options = { project: "./scan/examples/standard/app.xcodeproj", scheme: 'app',
+                    only_testing: %w(TestBundleA/TestSuiteB TestBundleC) }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
         result = @test_command_generator.generate
@@ -330,18 +330,18 @@ describe Scan do
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
-                                       "-only-testing:TestBundleA/TestSuiteB",
-                                       "-only-testing:TestBundleC",
+                                       '-only-testing:TestBundleA/TestSuiteB',
+                                       '-only-testing:TestBundleC',
                                        :build,
-                                       :test,
+                                       :test
                                      ])
       end
 
       it "only tests the test bundle/suite/cases specified in only_testing when the input is a string", requires_xcodebuild: true do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-        options = {project: "./scan/examples/standard/app.xcodeproj", scheme: "app",
-                   only_testing: "TestBundleA/TestSuiteB"}
+        options = { project: "./scan/examples/standard/app.xcodeproj", scheme: 'app',
+                    only_testing: 'TestBundleA/TestSuiteB' }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
         result = @test_command_generator.generate
@@ -353,17 +353,17 @@ describe Scan do
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
-                                       "-only-testing:TestBundleA/TestSuiteB",
+                                       '-only-testing:TestBundleA/TestSuiteB',
                                        :build,
-                                       :test,
+                                       :test
                                      ])
       end
 
       it "does not the test bundle/suite/cases specified in skip_testing when the input is an array", requires_xcodebuild: true do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-        options = {project: "./scan/examples/standard/app.xcodeproj", scheme: "app",
-                   skip_testing: %w(TestBundleA/TestSuiteB TestBundleC)}
+        options = { project: "./scan/examples/standard/app.xcodeproj", scheme: 'app',
+                    skip_testing: %w(TestBundleA/TestSuiteB TestBundleC) }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
         result = @test_command_generator.generate
@@ -375,18 +375,18 @@ describe Scan do
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
-                                       "-skip-testing:TestBundleA/TestSuiteB",
-                                       "-skip-testing:TestBundleC",
+                                       '-skip-testing:TestBundleA/TestSuiteB',
+                                       '-skip-testing:TestBundleC',
                                        :build,
-                                       :test,
+                                       :test
                                      ])
       end
 
       it "does not the test bundle/suite/cases specified in skip_testing when the input is a string", requires_xcodebuild: true do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-        options = {project: "./scan/examples/standard/app.xcodeproj", scheme: "app",
-                   skip_testing: "TestBundleA/TestSuiteB"}
+        options = { project: "./scan/examples/standard/app.xcodeproj", scheme: 'app',
+                    skip_testing: 'TestBundleA/TestSuiteB' }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
         result = @test_command_generator.generate
@@ -398,15 +398,15 @@ describe Scan do
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
-                                       "-skip-testing:TestBundleA/TestSuiteB",
+                                       '-skip-testing:TestBundleA/TestSuiteB',
                                        :build,
-                                       :test,
+                                       :test
                                      ])
       end
     end
 
     it "uses a device without version specifier", requires_xcodebuild: true do
-      options = {project: "./scan/examples/standard/app.xcodeproj", device: "iPhone 6s"}
+      options = { project: "./scan/examples/standard/app.xcodeproj", device: "iPhone 6s" }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
       result = @test_command_generator.generate
@@ -419,12 +419,12 @@ describe Scan do
                                      "-destination 'platform=iOS Simulator,id=021A465B-A294-4D9E-AD07-6BDC8E186343'",
                                      "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
                                      :build,
-                                     :test,
+                                     :test
                                    ])
     end
 
     it "rejects devices with versions below deployment target", requires_xcodebuild: true do
-      options = {project: "./scan/examples/standard/app.xcodeproj", device: "iPhone 5 (8.4)"}
+      options = { project: "./scan/examples/standard/app.xcodeproj", device: "iPhone 5 (8.4)" }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
       result = @test_command_generator.generate
@@ -433,10 +433,10 @@ describe Scan do
 
     describe "test-without-building and build-for-testing" do
       before do
-        options = {project: "./scan/examples/standard/app.xcodeproj", destination: [
+        options = { project: "./scan/examples/standard/app.xcodeproj", destination: [
           "platform=iOS Simulator,name=iPhone 6s,OS=9.3",
-          "platform=iOS Simulator,name=iPad Air 2,OS=9.2",
-        ]}
+          "platform=iOS Simulator,name=iPad Air 2,OS=9.2"
+        ] }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
       end
 
@@ -451,7 +451,7 @@ describe Scan do
                                        "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
                                        "-destination 'platform=iOS Simulator,name=iPad Air 2,OS=9.2'",
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
-                                       "build-for-testing",
+                                       "build-for-testing"
                                      ])
       end
       it "should test-without-building", requires_xcodebuild: true do
@@ -465,7 +465,7 @@ describe Scan do
                                        "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
                                        "-destination 'platform=iOS Simulator,name=iPad Air 2,OS=9.2'",
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
-                                       "test-without-building",
+                                       "test-without-building"
                                      ])
       end
       it "should raise an exception if two build_modes are set", requires_xcodebuild: true do
@@ -491,17 +491,17 @@ describe Scan do
                                        "-destination 'platform=iOS Simulator,name=iPad Air 2,OS=9.2'",
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
                                        "-xctestrun '/folder/mytests.xctestrun'",
-                                       "test-without-building",
+                                       "test-without-building"
                                      ])
       end
     end
 
     describe "Multiple devices example" do
       it "uses multiple destinations", requires_xcodebuild: true do
-        options = {project: "./scan/examples/standard/app.xcodeproj", destination: [
+        options = { project: "./scan/examples/standard/app.xcodeproj", destination: [
           "platform=iOS Simulator,name=iPhone 6s,OS=9.3",
-          "platform=iOS Simulator,name=iPad Air 2,OS=9.2",
-        ]}
+          "platform=iOS Simulator,name=iPad Air 2,OS=9.2"
+        ] }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
         result = @test_command_generator.generate
@@ -514,15 +514,15 @@ describe Scan do
                                        "-destination 'platform=iOS Simulator,name=iPad Air 2,OS=9.2'",
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
                                        :build,
-                                       :test,
+                                       :test
                                      ])
       end
 
       it "uses multiple devices", requires_xcodebuild: true do
-        options = {project: "./scan/examples/standard/app.xcodeproj", devices: [
+        options = { project: "./scan/examples/standard/app.xcodeproj", devices: [
           "iPhone 6s (9.3)",
-          "iPad Air (9.3)",
-        ]}
+          "iPad Air (9.3)"
+        ] }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
         result = @test_command_generator.generate
@@ -535,15 +535,15 @@ describe Scan do
                                        "-destination 'platform=iOS Simulator,id=DD134998-177F-47DA-99FA-D549D9305476'",
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
                                        :build,
-                                       :test,
+                                       :test
                                      ])
       end
 
       it "de-duplicates devices matching same simulator", requires_xcodebuild: true do
-        options = {project: "./scan/examples/standard/app.xcodeproj", devices: [
+        options = { project: "./scan/examples/standard/app.xcodeproj", devices: [
           "iPhone 5 (9.0)",
-          "iPhone 5 (9.0.0)",
-        ]}
+          "iPhone 5 (9.0.0)"
+        ] }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
         result = @test_command_generator.generate
@@ -555,16 +555,16 @@ describe Scan do
                                        "-destination 'platform=iOS Simulator,id=9905A018-9DC9-4DD8-BA14-B0B000CC8622'",
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
                                        :build,
-                                       :test,
+                                       :test
                                      ])
       end
 
       it "raises an error if multiple devices are specified for `device`" do
         expect do
-          options = {project: "./scan/examples/standard/app.xcodeproj", device: [
+          options = { project: "./scan/examples/standard/app.xcodeproj", device: [
             "iPhone 6s (9.3)",
-            "iPad Air (9.3)",
-          ]}
+            "iPad Air (9.3)"
+          ] }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
         end.to raise_error("'device' value must be a String! Found Array instead.")
       end
@@ -574,7 +574,7 @@ describe Scan do
           options = {
             project: "./scan/examples/standard/app.xcodeproj",
             device: ["iPhone 6s (9.3)"],
-            devices: ["iPhone 6"],
+            devices: ["iPhone 6"]
           }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
         end.to raise_error("'device' value must be a String! Found Array instead.")

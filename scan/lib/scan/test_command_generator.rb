@@ -1,4 +1,4 @@
-require_relative "xcpretty_reporter_options_generator"
+require_relative 'xcpretty_reporter_options_generator'
 
 module Scan
   # Responsible for building the fully working xcodebuild command
@@ -39,9 +39,9 @@ module Scan
       options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
       options << "-maximum-concurrent-test-simulator-destinations #{config[:max_concurrent_simulators]}" if config[:max_concurrent_simulators]
       options << "-disable-concurrent-testing" if config[:disable_concurrent_testing]
-      options << "-enableCodeCoverage #{config[:code_coverage] ? "YES" : "NO"}" unless config[:code_coverage].nil?
-      options << "-enableAddressSanitizer #{config[:address_sanitizer] ? "YES" : "NO"}" unless config[:address_sanitizer].nil?
-      options << "-enableThreadSanitizer #{config[:thread_sanitizer] ? "YES" : "NO"}" unless config[:thread_sanitizer].nil?
+      options << "-enableCodeCoverage #{config[:code_coverage] ? 'YES' : 'NO'}" unless config[:code_coverage].nil?
+      options << "-enableAddressSanitizer #{config[:address_sanitizer] ? 'YES' : 'NO'}" unless config[:address_sanitizer].nil?
+      options << "-enableThreadSanitizer #{config[:thread_sanitizer] ? 'YES' : 'NO'}" unless config[:thread_sanitizer].nil?
       options << "-xctestrun '#{config[:xctestrun]}'" if config[:xctestrun]
       options << config[:xcargs] if config[:xcargs]
 
@@ -79,7 +79,7 @@ module Scan
     def pipe
       pipe = ["| tee '#{xcodebuild_log_path}'"]
 
-      if Scan.config[:output_style] == "raw"
+      if Scan.config[:output_style] == 'raw'
         return pipe
       end
 
@@ -99,11 +99,11 @@ module Scan
         formatter << "--no-color"
       end
 
-      if Scan.config[:output_style] == "basic"
+      if Scan.config[:output_style] == 'basic'
         formatter << "--no-utf"
       end
 
-      if Scan.config[:output_style] == "rspec"
+      if Scan.config[:output_style] == 'rspec'
         formatter << "--test"
       end
 
@@ -113,7 +113,7 @@ module Scan
                                                                          Scan.config[:output_directory],
                                                                          Scan.config[:use_clang_report_name])
       reporter_options = @reporter_options_generator.generate_reporter_options
-      return pipe << "| xcpretty #{formatter.join(" ")} #{reporter_options.join(" ")}"
+      return pipe << "| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')}"
     end
 
     # Store the raw file
@@ -128,7 +128,7 @@ module Scan
     # Generate destination parameters
     def destination
       unless Scan.cache[:destination]
-        Scan.cache[:destination] = [*Scan.config[:destination]].map { |dst| "-destination '#{dst}'" }.join(" ")
+        Scan.cache[:destination] = [*Scan.config[:destination]].map { |dst| "-destination '#{dst}'" }.join(' ')
       end
       Scan.cache[:destination]
     end
