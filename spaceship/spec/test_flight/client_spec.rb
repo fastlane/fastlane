@@ -158,6 +158,18 @@ describe Spaceship::TestFlight::Client do
   end
 
   ##
+  # @!Internal Testers
+  ##
+
+  context '#internal_users_for_app' do
+    it 'executes the request' do
+      MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/internalUsers') {}
+      subject.internal_users(app_id: app_id)
+      expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/internalUsers')
+    end
+  end
+
+  ##
   # @!group Testers API
   ##
 
