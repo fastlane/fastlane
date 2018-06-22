@@ -40,6 +40,20 @@ class B2bUserSpec
         !expect(b2b_user_created.delete)
         expect(b2b_user_created.ds_username).to eq('b2b2@def.com')
       end
+
+      it 'creates correct object to add with explicit input' do
+        b2b_user_created = Spaceship::Tunes::B2bUser.from_username("b2b2@def.com", is_add_type: true)
+        expect(b2b_user_created.add)
+        !expect(b2b_user_created.delete)
+        expect(b2b_user_created.ds_username).to eq('b2b2@def.com')
+      end
+
+      it 'creates correct object to remove' do
+        b2b_user_created = Spaceship::Tunes::B2bUser.from_username("b2b2@def.com", is_add_type: false)
+        !expect(b2b_user_created.add)
+        expect(b2b_user_created.delete)
+        expect(b2b_user_created.ds_username).to eq('b2b2@def.com')
+      end
     end
   end
 end
