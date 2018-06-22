@@ -28,7 +28,13 @@ describe FastlaneCore::AnalyticsSession do
         # Stub out calls related to the execution environment
         client = double("ingester_client")
         session = FastlaneCore::AnalyticsSession.new(analytics_ingester_client: client)
-        expect(client).to receive(:post_events).with(instance_of(Array))
+        expect(client).to receive(:post_event).with({
+            client_id: p_hash,
+            category: :undefined,
+            action: :launch,
+            label: nil,
+            value: nil
+        })
 
         session.action_launched(launch_context: launch_context)
       end

@@ -127,8 +127,8 @@ module Commander
         rescue_connection_failed_error(e)
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         rescue_unknown_error(e)
-        ensure
-          FastlaneCore.session.finalize_session
+      ensure
+        FastlaneCore.session.finalize_session
       end
     end
 

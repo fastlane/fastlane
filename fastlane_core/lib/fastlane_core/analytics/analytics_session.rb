@@ -35,9 +35,7 @@ module FastlaneCore
     end
 
     def finalize_session
-      @threads.each do |thread|
-        thread.join
-      end
+      @threads.map(&:join)
     end
   end
 end
