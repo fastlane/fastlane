@@ -497,7 +497,7 @@ module Spaceship
         end
       end
 
-      false
+      return false
     end
 
     def itc_service_key
