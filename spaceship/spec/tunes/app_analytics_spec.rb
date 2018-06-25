@@ -26,7 +26,7 @@ describe Spaceship::Tunes::AppAnalytics do
 
     it "accesses non-live analytics details" do
       TunesStubbing.itc_stub_analytics
-      TunesStubbing.itc_stub_latest_version_rejected
+      TunesStubbing.itc_stub_no_live_version
       expect do
         analytics = app.analytics
       end.to raise_error("Analytics are only available for live apps.")

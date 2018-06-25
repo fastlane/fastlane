@@ -543,9 +543,9 @@ class TunesStubbing
                   headers: { "Content-Type" => "application/json" })
     end
 
-    def itc_stub_latest_version_rejected
-      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/versions/813314674").
-        to_return(status: 200, body: itc_read_fixture_file('app_version.json').sub('readyForSale', 'devRejected'), headers: { 'Content-Type' => 'application/json' })
+    def itc_stub_no_live_version
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/overview").
+        to_return(status: 200, body: itc_read_fixture_file('app_overview_stuckinprepare.json'), headers: { 'Content-Type' => 'application/json' })
     end
   end
 end

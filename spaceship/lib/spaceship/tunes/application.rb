@@ -138,7 +138,7 @@ module Spaceship
       end
 
       def analytics
-        if self.latest_version.app_status != AppStatus::READY_FOR_SALE
+        if self.live_version.nil?
           raise 'Analytics are only available for live apps.'
         end
 
