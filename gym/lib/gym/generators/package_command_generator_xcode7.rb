@@ -124,30 +124,10 @@ module Gym
         hash
       end
 
-      def keys_to_symbols(hash)
-        # Convert keys to symbols
-        hash = hash.each_with_object({}) do |(k, v), memo|
-          memo[k.b.to_s.to_sym] = v
-          memo
-        end
-        hash
-      end
-
       def read_export_options
         # Reads export options
         if Gym.config[:export_options]
-          if Gym.config[:export_options].kind_of?(Hash)
-            # Reads options from hash
-            hash = normalize_export_options(Gym.config[:export_options])
-          else
-            # Reads options from file
-            plist_file_path = Gym.config[:export_options]
-            UI.user_error!("Couldn't find plist file at path #{File.expand_path(plist_file_path)}") unless File.exist?(plist_file_path)
-            hash = Plist.parse_xml(plist_file_path)
-            UI.user_error!("Couldn't read provided plist at path #{File.expand_path(plist_file_path)}") if hash.nil?
-            # Convert keys to symbols
-            hash = keys_to_symbols(hash)
-          end
+          hash = normalize_export_options(Gym.config[:export_options])
 
           # Saves configuration for later use
           Gym.config[:export_method] ||= hash[:method] || DEFAULT_EXPORT_METHOD
