@@ -84,8 +84,12 @@ module Scan
       end
 
       formatter = []
-      if Scan.config[:formatter]
-        formatter << "-f `#{Scan.config[:formatter]}`"
+      if (custom_formatter = Scan.config[:formatter])
+        if custom_formatter.end_with? ".rb"
+          formatter << "-f '#{custom_formatter}'"
+        else
+          formatter << "-f `#{custom_formatter}`"
+        end
       elsif FastlaneCore::Env.truthy?("TRAVIS")
         formatter << "-f `xcpretty-travis-formatter`"
         UI.success("Automatically switched to Travis formatter")
