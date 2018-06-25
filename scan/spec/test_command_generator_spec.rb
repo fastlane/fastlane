@@ -142,12 +142,20 @@ describe Scan do
                                    ])
     end
 
-    it "supports custom xcpretty formatter", requires_xcodebuild: true do
+    it "supports custom xcpretty formatter as a gem name", requires_xcodebuild: true do
       options = { formatter: "custom-formatter", project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0" }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
       result = @test_command_generator.generate
       expect(result.last).to include("| xcpretty -f `custom-formatter`")
+    end
+
+    it "supports custom xcpretty formatter as a path to a ruby file", requires_xcodebuild: true do
+      options = { formatter: "custom-formatter.rb", project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0" }
+      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+      result = @test_command_generator.generate
+      expect(result.last).to include("| xcpretty -f 'custom-formatter.rb'")
     end
 
     describe "Standard Example" do
