@@ -164,6 +164,17 @@ module Spaceship
         testers
       end
 
+      #####################################################
+      # @!Internal Testers
+      #####################################################
+      def internal_users(app_id: nil)
+        assert_required_params(__method__, binding)
+        url = "providers/#{team_id}/apps/#{app_id}/internalUsers"
+        r = request(:get, url)
+
+        parse_response(r, 'data')
+      end
+
       ##
       # @!group Testers API
       ##
