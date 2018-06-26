@@ -3,7 +3,6 @@
 //  FastlaneRunner
 //
 //  Created by Joshua Liebowitz on 9/28/17.
-//  Copyright © 2017 Joshua Liebowitz. All rights reserved.
 //
 
 //

@@ -85,7 +85,7 @@ module Scan
 
       formatter = []
       if (custom_formatter = Scan.config[:formatter])
-        if custom_formatter.end_with? ".rb"
+        if custom_formatter.end_with?(".rb")
           formatter << "-f '#{custom_formatter}'"
         else
           formatter << "-f `#{custom_formatter}`"
