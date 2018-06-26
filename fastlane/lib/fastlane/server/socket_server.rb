@@ -35,11 +35,11 @@ module Fastlane
 
     # this is the public API, don't call anything else
     def start
-      listen(@port)
+      listen
 
       while @stay_alive
         UI.important("stay_alive is set to true, restarting server")
-        listen(@port)
+        listen
       end
     end
 
@@ -136,8 +136,8 @@ module Fastlane
       return COMMAND_EXECUTION_STATE[:ready]
     end
 
-    def listen(port)
-      @server = TCPServer.open('localhost', port) # Socket to listen on port 2000
+    def listen
+      @server = TCPServer.open('localhost', @port) # Socket to listen on port 2000
       UI.verbose("Waiting for #{@connection_timeout} seconds for a connection from FastlaneRunner")
 
       # set thread local to ready so we can check it

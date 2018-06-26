@@ -6,7 +6,7 @@ module Fastlane
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # @param env Dot Env Information
-    def self.cruise_lane(lane, parameters = nil, env = nil, disable_runner_upgrades: false, swift_server_port: nil)
+    def self.cruise_lane(lane, parameters = nil, env = nil, disable_runner_upgrades: false, swift_server_port: 2000)
       UI.user_error!("lane must be a string") unless lane.kind_of?(String) || lane.nil?
       UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) || parameters.nil?
 
