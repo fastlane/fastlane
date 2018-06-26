@@ -21,7 +21,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Upload a new binary to App Store Connect for TestFlight beta testing (via _pilot_)"
+        "Upload new binary to App Store Connect for TestFlight beta testing (via _pilot_)"
       end
 
       def self.details
