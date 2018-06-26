@@ -169,4 +169,4 @@ extension XCUIElement {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperXcode8Version [1.4]
+// SnapshotHelperXcode8Version [1.5]
