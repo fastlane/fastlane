@@ -2,7 +2,7 @@ require_relative 'tunes_base'
 
 module Spaceship
   module Tunes
-    # Represents a submission for review of an iTunes Connect Application
+    # Represents a submission for review of an App Store Connect Application
     # This class handles the submission of all review information and documents
     class AppSubmission < TunesBase
       # @return (Spaceship::Tunes::Application) A reference to the application

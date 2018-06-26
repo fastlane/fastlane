@@ -62,7 +62,7 @@ module Produce
         if app.name != Produce.config[:app_name]
           UI.important("Your app name includes non-ASCII characters, which are not supported by the Apple Developer Portal.")
           UI.important("To fix this a unique (internal) name '#{app.name}' has been created for you. Your app's real name '#{Produce.config[:app_name]}'")
-          UI.important("will still show up correctly on iTunes Connect and the App Store.")
+          UI.important("will still show up correctly on App Store Connect and the App Store.")
         end
 
         UI.message("Created app #{app.app_id}")

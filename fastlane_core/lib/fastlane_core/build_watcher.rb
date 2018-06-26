@@ -47,7 +47,7 @@ module FastlaneCore
       end
 
       def report_status(build: nil)
-        # Due to iTunes Connect, builds disappear from the build list altogether
+        # Due to App Store Connect, builds disappear from the build list altogether
         # after they finished processing. Before returning this build, we have to
         # wait for the build to appear in the build list again
         # As this method is very often used to wait for a build, and then do something
@@ -59,7 +59,7 @@ module FastlaneCore
         elsif build.ready_to_submit? || build.export_compliance_missing? || build.review_rejected?
           UI.success("Successfully finished processing the build #{build.train_version} - #{build.build_version}")
         else
-          UI.message("Waiting for iTunes Connect to finish processing the new build (#{build.train_version} - #{build.build_version})")
+          UI.message("Waiting for App Store Connect to finish processing the new build (#{build.train_version} - #{build.build_version})")
         end
       end
     end

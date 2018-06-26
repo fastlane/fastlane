@@ -10,7 +10,7 @@ module Fastlane
         require 'spaceship'
         require 'net/http'
 
-        UI.message("Login to iTunes Connect (#{params[:username]})")
+        UI.message("Login to App Store Connect (#{params[:username]})")
         Spaceship::Tunes.login(params[:username])
         Spaceship::Tunes.select_team
         UI.message("Login successful")
@@ -84,7 +84,7 @@ module Fastlane
         end
 
         if (Actions.lane_context[SharedValues::DSYM_PATHS] || []).count == 0
-          UI.error("No dSYM files found on iTunes Connect - this usually happens when no recompiling has happened yet")
+          UI.error("No dSYM files found on App Store Connect - this usually happens when no recompiling has happened yet")
         end
       end
       # rubocop:enable Metrics/PerceivedComplexity
@@ -120,7 +120,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Download dSYM files from Apple iTunes Connect for Bitcode apps"
+        "Download dSYM files from Apple App Store Connect for Bitcode apps"
       end
 
       def self.details
@@ -135,7 +135,7 @@ module Fastlane
         SAMPLE
 
         [
-          "This action downloads dSYM files from Apple iTunes Connect after the ipa gets re-compiled by Apple. Useful if you have Bitcode enabled.".markdown_preserve_newlines,
+          "This action downloads dSYM files from Apple App Store Connect after the ipa gets re-compiled by Apple. Useful if you have Bitcode enabled.".markdown_preserve_newlines,
           sample
         ].join("\n")
       end
@@ -148,7 +148,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :username,
                                        short_option: "-u",
                                        env_name: "DOWNLOAD_DSYMS_USERNAME",
-                                       description: "Your Apple ID Username for iTunes Connect",
+                                       description: "Your Apple ID Username for App Store Connect",
                                        default_value: user,
                                        default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
@@ -162,7 +162,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        short_option: "-k",
                                        env_name: "DOWNLOAD_DSYMS_TEAM_ID",
-                                       description: "The ID of your iTunes Connect team if you're in multiple teams",
+                                       description: "The ID of your App Store Connect team if you're in multiple teams",
                                        optional: true,
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
@@ -174,7 +174,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :team_name,
                                        short_option: "-e",
                                        env_name: "DOWNLOAD_DSYMS_TEAM_NAME",
-                                       description: "The name of your iTunes Connect team if you're in multiple teams",
+                                       description: "The name of your App Store Connect team if you're in multiple teams",
                                        optional: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),

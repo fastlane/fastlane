@@ -27,9 +27,9 @@ Each _fastlane_ tool has a specific purpose and should be kept focused on the fu
 * [_frameit_](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
 * [_pem_](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification certificates
 * [_sigh_](https://github.com/fastlane/fastlane/tree/master/sigh): Because you would rather spend your time building stuff than fighting provisioning
-* [_produce_](https://github.com/fastlane/fastlane/tree/master/produce): Create new iOS apps on iTunes Connect and Apple Developer Portal using the command line
+* [_produce_](https://github.com/fastlane/fastlane/tree/master/produce): Create new iOS apps on App Store Connect and Apple Developer Portal using the command line
 * [_cert_](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
-* [_spaceship_](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Developer Portal and iTunes Connect
+* [_spaceship_](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Developer Portal and App Store Connect
 * [_pilot_](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
 * [boarding](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 * [_gym_](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
