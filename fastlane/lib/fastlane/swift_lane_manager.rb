@@ -6,7 +6,7 @@ module Fastlane
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # @param env Dot Env Information
-    def self.cruise_lane(lane, parameters = nil, env = nil, disable_runner_upgrades: false, swift_server_port: 2000)
+    def self.cruise_lane(lane, parameters = nil, env = nil, disable_runner_upgrades: false, swift_server_port: nil)
       UI.user_error!("lane must be a string") unless lane.kind_of?(String) || lane.nil?
       UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) || parameters.nil?
 
@@ -33,6 +33,7 @@ module Fastlane
         end
 
         self.ensure_runner_built!
+        swift_server_port ||= 2000
         socket_thread = self.start_socket_thread(port: swift_server_port)
         sleep(0.250) while socket_thread[:ready].nil?
         # wait on socket_thread to be in ready state, then start the runner thread
