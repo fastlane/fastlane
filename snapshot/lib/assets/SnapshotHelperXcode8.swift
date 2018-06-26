@@ -3,7 +3,6 @@
 //  Example
 //
 //  Created by Felix Krause on 10/8/15.
-//  Copyright © 2015 Felix Krause. All rights reserved.
 //
 
 // -----------------------------------------------------
