@@ -41,8 +41,6 @@ module Spaceship
 
     attr_accessor :provider
 
-    attr_accessor :available_providers
-
     # legacy support
     BasicPreferredInfoError = Spaceship::BasicPreferredInfoError
     InvalidUserCredentialsError = Spaceship::InvalidUserCredentialsError
@@ -396,7 +394,7 @@ module Spaceship
           # As this will raise an exception if the old session has expired
           # If the old session is still valid, we don't have to do anything else in this method
           # that's why we return true
-          return true if fetch_olympus_session.count > 0
+          return true if fetch_olympus_session
         rescue
           # If the `fetch_olympus_session` method raises an exception
           # we'll land here, and therefore continue doing a full login process
@@ -493,14 +491,13 @@ module Spaceship
         end
 
         provider = body["provider"]
-        self.provider = Spaceship::Provider.new(provider_hash: provider) unless provider.nil?
-
-        available_providers_list = body["availableProviders"].compact
-
-        self.available_providers = available_providers_list.map do |provider_hash|
-          Spaceship::Provider.new(provider_hash: provider_hash)
+        if provider
+          self.provider = Spaceship::Provider.new(provider_hash: provider)
+          return true
         end
       end
+
+      return false
     end
 
     def itc_service_key

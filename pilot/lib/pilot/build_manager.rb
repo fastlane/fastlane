@@ -96,6 +96,15 @@ module Pilot
       build.auto_notify_enabled = config[:notify_external_testers]
 
       return if config[:skip_submission]
+      if options[:reject_build_waiting_for_review]
+        waiting_for_review_build = Spaceship::TestFlight::Build.all_waiting_for_review(app_id: build.app_id, platform: fetch_app_platform).first
+        unless waiting_for_review_build.nil?
+          UI.important("Another build is already in review. Going to expire that build and submit the new one.")
+          UI.important("Expiring build: #{waiting_for_review_build.train_version} - #{waiting_for_review_build.build_version}")
+          waiting_for_review_build.expire!
+          UI.success("Expired previous build: #{waiting_for_review_build.train_version} - #{waiting_for_review_build.build_version}")
+        end
+      end
       distribute_build(build, options)
       type = options[:distribute_external] ? 'External' : 'Internal'
       UI.success("Successfully distributed build to #{type} testers 🚀")

@@ -35,7 +35,9 @@ Check out this gif:
 
 # Usage
 
-    fastlane pem
+```no-highlight
+fastlane pem
+```
 
 Yes, that's the whole command!
 
@@ -50,27 +52,39 @@ Note that ``_pem_`` will never revoke your existing certificates. _pem_ can't do
 
 If you already have a push certificate enabled, which is active for at least 30 more days, _pem_ will not create a new certificate. If you still want to create one, use the `force`:
 
-    fastlane pem --force
+```no-highlight
+fastlane pem --force
+```
 
 You can pass parameters like this:
 
-    fastlane pem -a com.krausefx.app -u username
+```no-highlight
+fastlane pem -a com.krausefx.app -u username
+```
 
 If you want to generate a development certificate instead:
 
-    fastlane pem --development
+```no-highlight
+fastlane pem --development
+```
 
 Set a password for your `p12` file:
 
-    fastlane pem -p "MyPass"
+```no-highlight
+fastlane pem -p "MyPass"
+```
 
 You can specify a name for the output file:
 
-    fastlane pem -o my.pem
+```no-highlight
+fastlane pem -o my.pem
+```
 
 To get a list of available options run:
 
-    fastlane action pem
+```no-highlight
+fastlane action pem
+```
 
 
 ### Note about empty `p12` passwords and Keychain Access.app
@@ -80,23 +94,27 @@ While the file is valid, the Mac's Keychain Access will not allow you to open th
 
 Instead, you may verify the file is valid using OpenSSL:
 
-    openssl pkcs12 -info -in my.p12
+```no-highlight
+openssl pkcs12 -info -in my.p12
+```
 
 If you need the `p12` in your keychain, perhaps to test push with an app like [Knuff](https://github.com/KnuffApp/Knuff) or [Pusher](https://github.com/noodlewerk/NWPusher), you can use `openssl` to export the `p12` to _pem_ and back to `p12`:
 
-    % openssl pkcs12 -in my.p12 -out my.pem
-    Enter Import Password:
-      <hit enter: the p12 has no password>
-    MAC verified OK
-    Enter PEM pass phrase:
-      <enter a temporary password to encrypt the pem file>
-      
-    % openssl pkcs12 -export -in my.pem -out my-with-passphrase.p12
-    Enter pass phrase for temp.pem:
-      <enter the temporary password to decrypt the pem file>
+```no-highlight
+% openssl pkcs12 -in my.p12 -out my.pem
+Enter Import Password:
+  <hit enter: the p12 has no password>
+MAC verified OK
+Enter PEM pass phrase:
+  <enter a temporary password to encrypt the pem file>
 
-    Enter Export Password:
-      <enter a password for encrypting the new p12 file>
+% openssl pkcs12 -export -in my.pem -out my-with-passphrase.p12
+Enter pass phrase for temp.pem:
+  <enter the temporary password to decrypt the pem file>
+
+Enter Export Password:
+  <enter a password for encrypting the new p12 file>
+```
 
 ## Environment Variables
 
