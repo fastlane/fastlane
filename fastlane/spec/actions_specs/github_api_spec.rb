@@ -42,6 +42,25 @@ describe Fastlane do
           end
         end
 
+        context 'with an array body' do
+          it 'correctly submits to github api' do
+            result = Fastlane::FastFile.new.parse("
+              lane :test do
+                github_api(
+                  api_token: '123456789',
+                  http_method: 'PUT',
+                  path: 'repos/fastlane/fastlane/contents/TEST_FILE.md',
+                  body: %w(foo bar),
+                )
+              end
+            ").runner.execute(:test)
+
+            expect(result[:status]).to eq(200)
+            expect(result[:body]).to eq(response_body)
+            expect(result[:json]).to eq(JSON.parse(response_body))
+          end
+        end
+
         context 'with raw JSON body' do
           it 'correctly submits to github api' do
             result = Fastlane::FastFile.new.parse(%{
