@@ -24,8 +24,7 @@ module Spaceship
       # @return (Bool) b2b available for distribution
       attr_accessor :b2b_unavailable
 
-      # @return (Array of Spaceship::Tunes::B2bUser objects) A list of users set by user - if not
-      # then the b2b user list that is currently set
+      # @return (Array of Spaceship::Tunes::B2bUser objects) A list of users
       attr_accessor :b2b_users
 
       attr_mapping(
@@ -78,7 +77,7 @@ module Spaceship
       end
 
       def b2b_users
-        @b2b_users ||= raw_data['b2bUsers'].map { |user| B2bUser.new(user) }
+        @b2b_users || raw_data['b2bUsers'].map { |user| B2bUser.new(user) }
       end
 
       def b2b_app_enabled
@@ -100,16 +99,33 @@ module Spaceship
         @b2b_app_enabled = true
         # need to set the educational discount to false
         @educational_discount = false
-        self
+        return self
       end
 
       # Adds users for b2b enabled apps
       def add_b2b_users(user_list = [])
         raise "Cannot add b2b users if b2b is not enabled" unless b2b_app_enabled
-        @b2b_users = user_list.map do |user|
-          B2bUser.from_username(user)
-        end
-        self
+        @b2b_users = user_list.map { |user| B2bUser.from_username(user) }
+        return self
+      end
+
+      # Updates users for b2b enabled apps
+      def update_b2b_users(user_list = [])
+        raise "Cannot add b2b users if b2b is not enabled" unless b2b_app_enabled
+
+        added_users = b2b_users.map(&:ds_username)
+
+        # Returns if list is unchanged
+        return self if (added_users - user_list) == (user_list - added_users)
+
+        users_to_add = user_list.reject { |user| added_users.include?(user) }
+        users_to_remove = added_users.reject { |user| user_list.include?(user) }
+
+        @b2b_users = b2b_users.reject { |user| users_to_remove.include?(user.ds_username) }
+        @b2b_users.concat(users_to_add.map { |user| B2bUser.from_username(user) })
+        @b2b_users.concat(users_to_remove.map { |user| B2bUser.from_username(user, is_add_type: false) })
+
+        return self
       end
     end
   end

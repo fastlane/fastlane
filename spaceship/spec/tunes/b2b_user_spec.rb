@@ -27,8 +27,8 @@ class B2bUserSpec
     describe 'b2b_user' do
       it 'parses the data correctly' do
         expect(b2b_user).to be_instance_of(Spaceship::Tunes::B2bUser)
-        !expect(b2b_user.add)
-        !expect(b2b_user.delete)
+        expect(b2b_user.add).to eq(false)
+        expect(b2b_user.delete).to eq(false)
         expect(b2b_user.ds_username).to eq('b2b1@abc.com')
       end
     end
@@ -36,8 +36,22 @@ class B2bUserSpec
     describe 'from_username' do
       it 'creates correct object to add' do
         b2b_user_created = Spaceship::Tunes::B2bUser.from_username("b2b2@def.com")
-        expect(b2b_user_created.add)
-        !expect(b2b_user_created.delete)
+        expect(b2b_user_created.add).to eq(true)
+        expect(b2b_user_created.delete).to eq(false)
+        expect(b2b_user_created.ds_username).to eq('b2b2@def.com')
+      end
+
+      it 'creates correct object to add with explicit input' do
+        b2b_user_created = Spaceship::Tunes::B2bUser.from_username("b2b2@def.com", is_add_type: true)
+        expect(b2b_user_created.add).to eq(true)
+        expect(b2b_user_created.delete).to eq(false)
+        expect(b2b_user_created.ds_username).to eq('b2b2@def.com')
+      end
+
+      it 'creates correct object to remove' do
+        b2b_user_created = Spaceship::Tunes::B2bUser.from_username("b2b2@def.com", is_add_type: false)
+        expect(b2b_user_created.add).to eq(false)
+        expect(b2b_user_created.delete).to eq(true)
         expect(b2b_user_created.ds_username).to eq('b2b2@def.com')
       end
     end

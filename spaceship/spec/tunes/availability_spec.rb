@@ -184,7 +184,72 @@ describe Spaceship::Tunes::Availability do
         new_availability = availability.add_b2b_users(["abc@def.com"])
         expect(new_availability).to be_an_instance_of(Spaceship::Tunes::Availability)
         expect(new_availability.b2b_users.length).to eq(1)
-        expect(new_availability.b2b_users.first.ds_username).to eq("abc@def.com")
+        expect(new_availability.b2b_users[0].ds_username).to eq("abc@def.com")
+      end
+    end
+
+    describe "update_b2b_users" do
+      it "throws exception if b2b app not enabled" do
+        availability = client.availability(app.apple_id)
+        expect { availability.add_b2b_users(["abc@def.com"]) }.to raise_error("Cannot add b2b users if b2b is not enabled")
+      end
+
+      it "does not do anything for same b2b_user_list" do
+        TunesStubbing.itc_stub_app_pricing_intervals_vpp
+        availability = client.availability(app.apple_id)
+        old_b2b_users = availability.b2b_users
+        new_availability = availability.update_b2b_users(%w(b2b1@abc.com b2b2@def.com))
+        expect(new_availability).to be_an_instance_of(Spaceship::Tunes::Availability)
+        new_b2b_users = new_availability.b2b_users
+        expect(new_b2b_users).to eq(old_b2b_users)
+      end
+
+      it "removes existing user" do
+        TunesStubbing.itc_stub_app_pricing_intervals_vpp
+        availability = client.availability(app.apple_id)
+        new_availability = availability.update_b2b_users(%w(b2b1@abc.com))
+        expect(new_availability).to be_an_instance_of(Spaceship::Tunes::Availability)
+        expect(new_availability.b2b_users.length).to eq(2)
+        expect(new_availability.b2b_users[0].ds_username).to eq("b2b1@abc.com")
+        expect(new_availability.b2b_users[0].add).to eq(false)
+        expect(new_availability.b2b_users[0].delete).to eq(false)
+        expect(new_availability.b2b_users[1].ds_username).to eq("b2b2@def.com")
+        expect(new_availability.b2b_users[1].add).to eq(false)
+        expect(new_availability.b2b_users[1].delete).to eq(true)
+      end
+
+      it "adds new user" do
+        TunesStubbing.itc_stub_app_pricing_intervals_vpp
+        availability = client.availability(app.apple_id)
+        new_availability = availability.update_b2b_users(%w(b2b1@abc.com b2b2@def.com jkl@mno.com))
+        expect(new_availability).to be_an_instance_of(Spaceship::Tunes::Availability)
+        expect(new_availability.b2b_users.length).to eq(3)
+        expect(new_availability.b2b_users[0].ds_username).to eq("b2b1@abc.com")
+        expect(new_availability.b2b_users[0].add).to eq(false)
+        expect(new_availability.b2b_users[0].delete).to eq(false)
+        expect(new_availability.b2b_users[1].ds_username).to eq("b2b2@def.com")
+        expect(new_availability.b2b_users[1].add).to eq(false)
+        expect(new_availability.b2b_users[1].delete).to eq(false)
+        expect(new_availability.b2b_users[2].ds_username).to eq("jkl@mno.com")
+        expect(new_availability.b2b_users[2].add).to eq(true)
+        expect(new_availability.b2b_users[2].delete).to eq(false)
+      end
+
+      it "adds and removes appropriate users" do
+        TunesStubbing.itc_stub_app_pricing_intervals_vpp
+        availability = client.availability(app.apple_id)
+        new_availability = availability.update_b2b_users(%w(b2b1@abc.com jkl@mno.com))
+        expect(new_availability).to be_an_instance_of(Spaceship::Tunes::Availability)
+        expect(new_availability.b2b_users.length).to eq(3)
+        expect(new_availability.b2b_users[0].ds_username).to eq("b2b1@abc.com")
+        expect(new_availability.b2b_users[0].add).to eq(false)
+        expect(new_availability.b2b_users[0].delete).to eq(false)
+        expect(new_availability.b2b_users[1].ds_username).to eq("jkl@mno.com")
+        expect(new_availability.b2b_users[1].add).to eq(true)
+        expect(new_availability.b2b_users[1].delete).to eq(false)
+        expect(new_availability.b2b_users[2].ds_username).to eq("b2b2@def.com")
+        expect(new_availability.b2b_users[2].add).to eq(false)
+        expect(new_availability.b2b_users[2].delete).to eq(true)
       end
     end
   end
