@@ -18,7 +18,7 @@ module Fastlane
       end
 
       def self.description
-        "Upload metadata and binary to iTunes Connect (via _deliver_)"
+        "Upload metadata and binary to App Store Connect (via _deliver_)"
       end
 
       def self.details

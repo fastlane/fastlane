@@ -493,19 +493,19 @@ describe Spaceship::AppVersion, all: true do
         it "prevent from using invalid language" do
           expect do
             version.upload_screenshot!(screenshot_path, 1, "NotALanguage", 'iphone4', false)
-          end.to raise_error("iTunes Connect error: NotALanguage isn't an activated language")
+          end.to raise_error("App Store Connect error: NotALanguage isn't an activated language")
         end
 
         it "prevent from using invalid language" do
           expect do
             version.upload_screenshot!(screenshot_path, 1, "English_CA", 'iphone4', false)
-          end.to raise_error("iTunes Connect error: English_CA isn't an activated language")
+          end.to raise_error("App Store Connect error: English_CA isn't an activated language")
         end
 
         it "prevent from using invalid device" do
           expect do
             version.upload_screenshot!(screenshot_path, 1, "English", :android, false)
-          end.to raise_error("iTunes Connect error: android isn't a valid device name")
+          end.to raise_error("App Store Connect error: android isn't a valid device name")
         end
       end
 

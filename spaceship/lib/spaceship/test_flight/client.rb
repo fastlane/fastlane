@@ -328,7 +328,7 @@ module Spaceship
 
         raise UnexpectedResponse, response.body['error'] if response.body['error']
 
-        raise UnexpectedResponse, "Temporary iTunes Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
+        raise UnexpectedResponse, "Temporary App Store Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
 
         return response.body['data'] if response.body['data']
 

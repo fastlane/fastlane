@@ -47,7 +47,7 @@ module FastlaneCore
 
       if hide_output
         # Show a one time message instead
-        UI.success("Waiting for iTunes Connect transporter to be finished.")
+        UI.success("Waiting for App Store Connect transporter to be finished.")
         UI.success("iTunes Transporter progress... this might take a few minutes...")
       end
 
@@ -190,11 +190,11 @@ module FastlaneCore
       unless password === /^[0-9a-zA-Z\.\$\_]*$/
         UI.error([
           "Password contains special characters, which may not be handled properly by iTMSTransporter.",
-          "If you experience problems uploading to iTunes Connect, please consider changing your password to something with only alphanumeric characters."
+          "If you experience problems uploading to App Store Connect, please consider changing your password to something with only alphanumeric characters."
         ].join(' '))
       end
       # rubocop:enable Style/CaseEquality
-      UI.error("Could not download/upload from iTunes Connect! It's probably related to your password or your internet connection.")
+      UI.error("Could not download/upload from App Store Connect! It's probably related to your password or your internet connection.")
     end
 
     private
@@ -334,7 +334,7 @@ module FastlaneCore
     def download(app_id, dir = nil)
       dir ||= "/tmp"
 
-      UI.message("Going to download app metadata from iTunes Connect")
+      UI.message("Going to download app metadata from App Store Connect")
       command = @transporter_executor.build_download_command(@user, @password, app_id, dir, @provider_short_name)
       UI.verbose(@transporter_executor.build_download_command(@user, 'YourPassword', app_id, dir, @provider_short_name))
 
@@ -351,7 +351,7 @@ module FastlaneCore
       successful = result && File.directory?(itmsp_path)
 
       if successful
-        UI.success("✅ Successfully downloaded the latest package from iTunes Connect to #{itmsp_path}")
+        UI.success("✅ Successfully downloaded the latest package from App Store Connect to #{itmsp_path}")
       else
         handle_error(@password)
       end
@@ -359,7 +359,7 @@ module FastlaneCore
       successful
     end
 
-    # Uploads the modified package back to iTunes Connect
+    # Uploads the modified package back to App Store Connect
     # @param app_id [Integer] The unique App ID
     # @param dir [String] the path in which the package file is located
     # @return (Bool) True if everything worked fine
@@ -368,7 +368,7 @@ module FastlaneCore
     def upload(app_id, dir)
       actual_dir = File.join(dir, "#{app_id}.itmsp")
 
-      UI.message("Going to upload updated app to iTunes Connect")
+      UI.message("Going to upload updated app to App Store Connect")
       UI.success("This might take a few minutes. Please don't interrupt the script.")
 
       command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name)
@@ -382,7 +382,7 @@ module FastlaneCore
       end
 
       if result
-        UI.header("Successfully uploaded package to iTunes Connect. It might take a few minutes until it's visible online.")
+        UI.header("Successfully uploaded package to App Store Connect. It might take a few minutes until it's visible online.")
 
         FileUtils.rm_rf(actual_dir) unless Helper.test? # we don't need the package any more, since the upload was successful
       else

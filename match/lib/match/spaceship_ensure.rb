@@ -2,7 +2,7 @@ require 'spaceship'
 require_relative 'module'
 
 module Match
-  # Ensures the certificate and profiles are also available on iTunes Connect
+  # Ensures the certificate and profiles are also available on App Store Connect
   class SpaceshipEnsure
     def initialize(user, team_id, team_name)
       # We'll try to manually fetch the password
