@@ -181,7 +181,7 @@ module Spaceship
     def store_session
       # If the request was successful, r.body is actually nil
       # The previous request will fail if the user isn't on a team
-      # on iTunes Connect, but it still works, so we're good
+      # on App Store Connect, but it still works, so we're good
 
       # Tell iTC that we are trustworthy (obviously)
       # This will update our local cookies to something new

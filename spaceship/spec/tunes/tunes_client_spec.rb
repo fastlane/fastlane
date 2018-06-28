@@ -131,7 +131,7 @@ describe Spaceship::TunesClient do
       expect(FastlaneCore::Helper).to receive(:ci?).and_return(true)
       provider = { 'contentProvider' => { 'name' => 'Tom', 'contentProviderId' => 1234 } }
       allow(subject).to receive(:teams).and_return([provider, provider]) # pass it twice, to call the team selection
-      expect { subject.select_team }.to raise_error("Multiple iTunes Connect Teams found; unable to choose, terminal not interactive!")
+      expect { subject.select_team }.to raise_error("Multiple App Store Connect Teams found; unable to choose, terminal not interactive!")
     end
   end
 end

@@ -4,7 +4,7 @@ module Spaceship
   module Tunes
     # Represents the details of a build
     class BuildDetails < TunesBase
-      # @return (String) The App identifier of this app, provided by iTunes Connect
+      # @return (String) The App identifier of this app, provided by App Store Connect
       # @example
       #   "1013943394"
       attr_accessor :apple_id

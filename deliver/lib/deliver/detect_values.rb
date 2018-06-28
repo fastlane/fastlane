@@ -42,7 +42,7 @@ module Deliver
       if app
         options[:app] = app
       else
-        UI.user_error!("Could not find app with app identifier '#{options[:app_identifier]}' in your iTunes Connect account (#{options[:username]} - Team: #{Spaceship::Tunes.client.team_id})")
+        UI.user_error!("Could not find app with app identifier '#{options[:app_identifier]}' in your App Store Connect account (#{options[:username]} - Team: #{Spaceship::Tunes.client.team_id})")
       end
     end
 

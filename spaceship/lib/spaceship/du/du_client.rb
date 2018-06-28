@@ -96,7 +96,7 @@ module Spaceship
       parse_upload_response(r)
     end
 
-    # You can find this by uploading an image in iTunes connect
+    # You can find this by uploading an image in App Store Connect
     # then look for the X-Apple-Upload-Validation-RuleSets value
     def picture_type_map
       # rubocop:enable Layout/ExtraSpacing

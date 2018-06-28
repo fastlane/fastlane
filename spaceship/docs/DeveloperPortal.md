@@ -7,7 +7,7 @@ To quickly play around with _spaceship_ launch `irb` in your terminal and execut
 
 ## Login
 
-*Note*: If you use both the Developer Portal and iTunes Connect API, you'll have to login on both, as the user might have different user credentials.
+*Note*: If you use both the Developer Portal and App Store Connect API, you'll have to login on both, as the user might have different user credentials.
 
 ```ruby
 Spaceship::Portal.login("felix@krausefx.com", "password")

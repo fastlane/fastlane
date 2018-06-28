@@ -56,8 +56,8 @@ _spaceship_ uses [Faraday](https://github.com/lostisland/faraday) to interact wi
 
 _spaceship_ is split into 3 layers:
 
-- `client.rb` which is the client superclass that contains all shared code between iTunes Connect the Developer Portal
-- `tunes_client.rb` and `portal_client.rb` which are the implementations for both iTunes Connect and Developer Portal. Those classes include the actual HTTP requests that are being sent:
+- `client.rb` which is the client superclass that contains all shared code between App Store Connect the Developer Portal
+- `tunes_client.rb` and `portal_client.rb` which are the implementations for both App Store Connect and Developer Portal. Those classes include the actual HTTP requests that are being sent:
 ```ruby
 def app_version_data(app_id, version_platform: nil, version_id: nil)
   r = request(:get, "ra/apps/#{app_id}/platforms/#{version_platform}/versions/#{version_id}")
@@ -70,8 +70,8 @@ Don’t use any custom HTML parsing in _spaceship_, instead try to only use JSON
 
 ### Verify the website works
 
-If _spaceship_ doesn’t work, it’s best to first find out if the actual website (Developer Portal or iTunes Connect) is currently working. Sometimes this might be a temporary server issue that gets resolved quickly. To gather information, make sure to check if other people are having the same issue on [GitHub](https://github.com/fastlane/fastlane/issues).
-If it is a server issue, it’s best to [file a radar](https://bugreport.apple.com/) or call the [iTunes Connect hotline](https://developer.apple.com/contact/phone/).
+If _spaceship_ doesn’t work, it’s best to first find out if the actual website (Developer Portal or App Store Connect) is currently working. Sometimes this might be a temporary server issue that gets resolved quickly. To gather information, make sure to check if other people are having the same issue on [GitHub](https://github.com/fastlane/fastlane/issues).
+If it is a server issue, it’s best to [file a radar](https://bugreport.apple.com/) or call the [App Store Connect hotline](https://developer.apple.com/contact/phone/).
 
 ### Setting up [Charles Web Proxy](https://www.charlesproxy.com/)
 
@@ -83,10 +83,10 @@ First, download and install the latest version of [Charles Proxy](https://www.ch
 
 > In Charles go to the Help menu and choose "SSL Proxying > Install Charles Root Certificate". Keychain Access will open, and prompt you about the certificate. Click the "Always Trust" button. You will then be prompted for your Administrator password to update the system trust settings.
 
-You might have to restart your Mac for the changes to be applied. To see if it works, relaunch Charles and Chrome/Safari and try opening [iTunes Connect](https://itunesconnect.apple.com).
+You might have to restart your Mac for the changes to be applied. To see if it works, relaunch Charles and Chrome/Safari and try opening [App Store Connect](https://itunesconnect.apple.com).
 
 If everything worked, you’ll already see a list of requests in the sidebar of Charles. Take a look at the above list of used API endpoints, and enable `SSL Proxying` and `Focus` on all endpoints you are interested in.
-After doing so, refresh the iTunes Connect page. You should be able to see all web requests with their responses.
+After doing so, refresh the App Store Connect page. You should be able to see all web requests with their responses.
 
 We’re not using the built-in network tracker of your browser, since we also need a proxy for our local _fastlane_ install, which will be covered in the next section of this document.
 

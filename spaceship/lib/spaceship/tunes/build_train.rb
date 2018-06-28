@@ -4,7 +4,7 @@ require_relative 'build'
 
 module Spaceship
   module Tunes
-    # Represents a build train of builds from iTunes Connect
+    # Represents a build train of builds from App Store Connect
     # A build train is all builds for a given version number with different build numbers
     class BuildTrain < TunesBase
       # @return (Spaceship::Tunes::Application) A reference to the application this train is for
@@ -165,7 +165,7 @@ module Spaceship
             error_message << "<key>ITSAppUsesNonExemptEncryption</key><false/>"
             error_message << ""
             error_message << "Afterwards re-build your app and try again"
-            error_message << "iTunes Connect reported: '#{ex}'"
+            error_message << "App Store Connect reported: '#{ex}'"
             raise error_message.join("\n")
           else
             raise ex

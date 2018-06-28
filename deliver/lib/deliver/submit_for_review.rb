@@ -60,10 +60,10 @@ module Deliver
         build = find_build(app.latest_version.candidate_builds)
         return build if build.processing == false
 
-        UI.message("Waiting iTunes Connect processing for build #{build.train_version} (#{build.build_version})... this might take a while...")
+        UI.message("Waiting App Store Connect processing for build #{build.train_version} (#{build.build_version})... this might take a while...")
         if (Time.now - start) > (60 * 5)
           UI.message("")
-          UI.message("You can tweet: \"iTunes Connect #iosprocessingtime #{((Time.now - start) / 60).round} minutes\"")
+          UI.message("You can tweet: \"App Store Connect #iosprocessingtime #{((Time.now - start) / 60).round} minutes\"")
         end
         sleep(30)
       end
@@ -72,7 +72,7 @@ module Deliver
 
     def find_build(candidate_builds)
       if (candidate_builds || []).count == 0
-        UI.user_error!("Could not find any available candidate builds on iTunes Connect to submit")
+        UI.user_error!("Could not find any available candidate builds on App Store Connect to submit")
       end
 
       build = candidate_builds.first

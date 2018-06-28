@@ -288,7 +288,7 @@ module Sigh
       UI.message("fastlane produce -u #{config[:username]} -a #{config[:app_identifier]} --skip_itc".yellow)
       UI.message("")
       UI.message("You will be asked for any missing information, like the full name of your app")
-      UI.message("If the app should also be created on iTunes Connect, remove the " + "--skip_itc".yellow + " from the command above")
+      UI.message("If the app should also be created on App Store Connect, remove the " + "--skip_itc".yellow + " from the command above")
       UI.message("==========================================".yellow)
       UI.message("")
     end

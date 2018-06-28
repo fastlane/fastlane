@@ -173,7 +173,7 @@ module Commander
     end
 
     def handle_tls_error!(e)
-      # Apple has upgraded its iTunes Connect servers to require TLS 1.2, but
+      # Apple has upgraded its App Store Connect servers to require TLS 1.2, but
       # system Ruby 2.0 does not support it. We want to suggest that users upgrade
       # their Ruby version
       suggest_ruby_reinstall(e)

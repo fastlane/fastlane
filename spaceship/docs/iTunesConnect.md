@@ -1,4 +1,4 @@
-iTunes Connect API
+App Store Connect API
 ====================
 
 # Usage
@@ -9,7 +9,7 @@ In general the classes are pre-fixed with the `Tunes` module.
 
 ## Login
 
-*Note*: If you use both the Developer Portal and iTunes Connect API, you'll have to login on both, as the user might have different user credentials.
+*Note*: If you use both the Developer Portal and App Store Connect API, you'll have to login on both, as the user might have different user credentials.
 
 ```ruby
 Spaceship::Tunes.login("felix@krausefx.com", "password")
@@ -259,7 +259,7 @@ build.submit_for_beta_review!(parameters)
 
 ## Processing builds
 
-To also access those builds that are "stuck" at `Processing` at iTunes Connect for a while:
+To also access those builds that are "stuck" at `Processing` at App Store Connect for a while:
 
 ```ruby
 app.all_processing_builds       # => Array of processing builds for this application
@@ -286,7 +286,7 @@ For a full list of available options, check out [app_submission.rb](https://gith
 There are 3 types of testers:
 
 - **External testers**: usually not part of your team. You can invite up to 10000 external testers. Before distributing a build to those testers you need to submit your app to beta review.
-- **Internal testers**: Employees that are registered in your iTunes Connect team. They get access to all builds without having to wait for review.
+- **Internal testers**: Employees that are registered in your App Store Connect team. They get access to all builds without having to wait for review.
 - **Sandbox testers**: Dummy accounts to test development-mode apps with in-app purchase or Apple Pay.
 
 ```ruby

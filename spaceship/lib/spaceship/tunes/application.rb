@@ -14,7 +14,7 @@ require_relative 'version_set'
 module Spaceship
   module Tunes
     class Application < TunesBase
-      # @return (String) The App identifier of this app, provided by iTunes Connect
+      # @return (String) The App identifier of this app, provided by App Store Connect
       # @example
       #   "1013943394"
       attr_accessor :apple_id
@@ -24,7 +24,7 @@ module Spaceship
       #   "Spaceship App"
       attr_accessor :name
 
-      # @return (String) The Vendor ID provided by iTunes Connect
+      # @return (String) The Vendor ID provided by App Store Connect
       # @example
       #   "1435592086"
       attr_accessor :vendor_id
@@ -37,7 +37,7 @@ module Spaceship
       # @return (String) Last modified
       attr_accessor :last_modified
 
-      # @return (Integer) The number of issues provided by iTunes Connect
+      # @return (Integer) The number of issues provided by App Store Connect
       attr_accessor :issues_count
 
       # @return (String) The URL to a low resolution app icon of this app (340x340px). Might be nil
@@ -75,7 +75,7 @@ module Spaceship
           end
         end
 
-        # Creates a new application on iTunes Connect
+        # Creates a new application on App Store Connect
         # @param name (String): The name of your app as it will appear on the App Store.
         #   This can't be longer than 255 characters.
         # @param primary_language (String): If localized app information isn't available in an

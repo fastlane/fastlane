@@ -29,7 +29,7 @@ module Produce
 
       command :create do |c|
         c.syntax = 'fastlane produce create'
-        c.description = 'Creates a new app on iTunes Connect and the Apple Developer Portal'
+        c.description = 'Creates a new app on App Store Connect and the Apple Developer Portal'
 
         FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
 

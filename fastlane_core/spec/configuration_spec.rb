@@ -600,7 +600,7 @@ describe FastlaneCore do
             FastlaneCore::ConfigItem.new(key: :wait_processing_interval,
                                 short_option: "-k",
                                     env_name: "PILOT_WAIT_PROCESSING_INTERVAL",
-                                 description: "Interval in seconds to wait for iTunes Connect processing",
+                                 description: "Interval in seconds to wait for App Store Connect processing",
                                default_value: 30,
                                         type: Integer,
                                 verify_block: proc do |value|

@@ -19,7 +19,7 @@ module Pilot
     def login
       config[:username] ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
-      UI.message("Login to iTunes Connect (#{config[:username]})")
+      UI.message("Login to App Store Connect (#{config[:username]})")
       Spaceship::Tunes.login(config[:username])
       Spaceship::Tunes.select_team
       UI.message("Login successful")
@@ -48,7 +48,7 @@ module Pilot
 
       if config[:app_identifier]
         @app ||= Spaceship::Tunes::Application.find(config[:app_identifier])
-        UI.user_error!("Couldn't find app '#{config[:app_identifier]}' on the account of '#{config[:username]}' on iTunes Connect") unless @app
+        UI.user_error!("Couldn't find app '#{config[:app_identifier]}' on the account of '#{config[:username]}' on App Store Connect") unless @app
         app_id ||= @app.apple_id
       end
 

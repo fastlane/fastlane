@@ -7,7 +7,7 @@ Precheck
 
 ###### Check your app using a community driven set of App Store review rules to avoid being rejected
 
-Apple rejects builds for many avoidable metadata issues like including swear words 😮, other companies’ trademarks, or even mentioning an iOS bug 🐛. _fastlane precheck_ takes a lot of the guess work out by scanning your app’s details in iTunes Connect for avoidable problems. fastlane precheck helps you get your app through app review without rejections so you can ship faster 🚀
+Apple rejects builds for many avoidable metadata issues like including swear words 😮, other companies’ trademarks, or even mentioning an iOS bug 🐛. _fastlane precheck_ takes a lot of the guess work out by scanning your app’s details in App Store Connect for avoidable problems. fastlane precheck helps you get your app through app review without rejections so you can ship faster 🚀
 
 -------
 
@@ -35,7 +35,7 @@ Apple rejects builds for many avoidable metadata issues like including swear wor
 📢 | You can decide if you want to warn about potential problems and continue or have _fastlane_ show an error and stop after all scans are done
 
 # Usage
-Run _fastlane precheck_ to check the app metadata from iTunes Connect
+Run _fastlane precheck_ to check the app metadata from App Store Connect
 
 ```no-highlight
 fastlane precheck
@@ -97,7 +97,7 @@ end
 
 # How does it work?
 
-_precheck_ will access `iTunes Connect` to download your app's metadata. It uses [_spaceship_](https://spaceship.airforce) to communicate with Apple's web services.
+_precheck_ will access `App Store Connect` to download your app's metadata. It uses [_spaceship_](https://spaceship.airforce) to communicate with Apple's web services.
 
 # Want to improve precheck's rules?
 Please submit an issue on GitHub and provide information about your App Store rejection! Make sure you scrub out any personally identifiable information since this will be public.

@@ -258,7 +258,7 @@ Check out [_snapshot_](https://docs.fastlane.tools/actions/snapshot/) to automat
 
 ## Upload screenshots
 
-Use [_deliver_](https://docs.fastlane.tools/actions/deliver/) to upload iOS screenshots to iTunes Connect, or [_supply_](https://docs.fastlane.tools/actions/supply/) to upload Android screenshots to Play Store completely automatically 🚀
+Use [_deliver_](https://docs.fastlane.tools/actions/deliver/) to upload iOS screenshots to App Store Connect, or [_supply_](https://docs.fastlane.tools/actions/supply/) to upload Android screenshots to Play Store completely automatically 🚀
 
 ## Alternative location to store device_frames
 
