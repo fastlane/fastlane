@@ -27,7 +27,7 @@ module Deliver
     end
 
     def login
-      UI.message("Login to iTunes Connect (#{options[:username]})")
+      UI.message("Login to App Store Connect (#{options[:username]})")
       Spaceship::Tunes.login(options[:username])
       Spaceship::Tunes.select_team
       UI.message("Login successful")
@@ -42,7 +42,7 @@ module Deliver
         upload_binary
       end
 
-      UI.success("Finished the upload to iTunes Connect") unless options[:skip_binary_upload]
+      UI.success("Finished the upload to App Store Connect") unless options[:skip_binary_upload]
 
       reject_version_if_possible if options[:reject_if_possible]
 
@@ -83,22 +83,22 @@ module Deliver
       return precheck_success
     end
 
-    # Make sure the version on iTunes Connect matches the one in the ipa
+    # Make sure the version on App Store Connect matches the one in the ipa
     # If not, the new version will automatically be created
     def verify_version
       app_version = options[:app_version]
-      UI.message("Making sure the latest version on iTunes Connect matches '#{app_version}' from the ipa file...")
+      UI.message("Making sure the latest version on App Store Connect matches '#{app_version}' from the ipa file...")
 
       changed = options[:app].ensure_version!(app_version, platform: options[:platform])
 
       if changed
         UI.success("Successfully set the version to '#{app_version}'")
       else
-        UI.success("'#{app_version}' is the latest version on iTunes Connect")
+        UI.success("'#{app_version}' is the latest version on App Store Connect")
       end
     end
 
-    # Upload all metadata, screenshots, pricing information, etc. to iTunes Connect
+    # Upload all metadata, screenshots, pricing information, etc. to App Store Connect
     def upload_metadata
       upload_metadata = UploadMetadata.new
       upload_screenshots = UploadScreenshots.new
@@ -137,9 +137,9 @@ module Deliver
       options[:apple_watch_app_icon] ||= default_watch_icon_path if default_watch_icon_path && File.exist?(default_watch_icon_path)
     end
 
-    # Upload the binary to iTunes Connect
+    # Upload the binary to App Store Connect
     def upload_binary
-      UI.message("Uploading binary to iTunes Connect")
+      UI.message("Uploading binary to App Store Connect")
       if options[:ipa]
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: options[:app].apple_id,
@@ -158,7 +158,7 @@ module Deliver
 
       transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
       result = transporter.upload(options[:app].apple_id, package_path)
-      UI.user_error!("Could not upload binary to iTunes Connect. Check out the error above", show_github_issues: true) unless result
+      UI.user_error!("Could not upload binary to App Store Connect. Check out the error above", show_github_issues: true) unless result
     end
 
     def reject_version_if_possible
