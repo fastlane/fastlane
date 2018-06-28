@@ -6,7 +6,7 @@ module Fastlane
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # @param env Dot Env Information
-    def self.cruise_lane(lane, parameters = nil, env = nil, disable_runner_upgrades: false)
+    def self.cruise_lane(lane, parameters = nil, env = nil, disable_runner_upgrades: false, swift_server_port: nil)
       UI.user_error!("lane must be a string") unless lane.kind_of?(String) || lane.nil?
       UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) || parameters.nil?
 
@@ -33,10 +33,11 @@ module Fastlane
         end
 
         self.ensure_runner_built!
-        socket_thread = self.start_socket_thread
+        swift_server_port ||= 2000
+        socket_thread = self.start_socket_thread(port: swift_server_port)
         sleep(0.250) while socket_thread[:ready].nil?
         # wait on socket_thread to be in ready state, then start the runner thread
-        self.cruise_swift_lane_in_thread(lane, parameters)
+        self.cruise_swift_lane_in_thread(lane, parameters, swift_server_port)
 
         socket_thread.join
       rescue Exception => ex # rubocop:disable Lint/RescueException
@@ -82,7 +83,7 @@ module Fastlane
       Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lanes))
     end
 
-    def self.cruise_swift_lane_in_thread(lane, parameters = nil)
+    def self.cruise_swift_lane_in_thread(lane, parameters = nil, swift_server_port)
       if parameters.nil?
         parameters = {}
       end
@@ -95,6 +96,8 @@ module Fastlane
       if FastlaneCore::Globals.verbose?
         parameter_string += " logMode verbose"
       end
+
+      parameter_string += " swiftServerPort #{swift_server_port}"
 
       return Thread.new do
         Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lane #{lane}#{parameter_string} > /dev/null))
@@ -216,13 +219,13 @@ module Fastlane
       return project_modified
     end
 
-    def self.start_socket_thread
+    def self.start_socket_thread(port: nil)
       require 'fastlane/server/socket_server'
       require 'fastlane/server/socket_server_action_command_executor'
 
       return Thread.new do
         command_executor = SocketServerActionCommandExecutor.new
-        server = Fastlane::SocketServer.new(command_executor: command_executor)
+        server = Fastlane::SocketServer.new(command_executor: command_executor, port: port)
         server.start
       end
     end
