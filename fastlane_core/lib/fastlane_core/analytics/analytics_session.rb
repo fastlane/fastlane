@@ -15,9 +15,15 @@ module FastlaneCore
       @session_id = SecureRandom.uuid
       @client = analytics_ingester_client
       @threads = []
+      @launch_event_sent = false
     end
 
     def action_launched(launch_context: nil)
+      if @launch_event_sent || launch_context.p_hash.nil?
+        return
+      end
+
+      @launch_event_sent = true
       builder = AnalyticsEventBuilder.new(
         p_hash: launch_context.p_hash,
         session_id: session_id,
