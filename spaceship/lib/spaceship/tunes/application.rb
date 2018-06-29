@@ -1,5 +1,6 @@
 require_relative '../test_flight/group'
 require_relative '../test_flight/build'
+require_relative 'app_analytics'
 require_relative 'app_details'
 require_relative 'app_ratings'
 require_relative 'app_submission'
@@ -134,6 +135,16 @@ module Spaceship
       # @return (String) An URL to this specific resource. You can enter this URL into your browser
       def url
         "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.apple_id}"
+      end
+
+      def analytics
+        if self.live_version.nil?
+          raise 'Analytics are only available for live apps.'
+        end
+
+        attrs = {}
+        attrs[:apple_id] = self.apple_id
+        Spaceship::Tunes::AppAnalytics.factory(attrs)
       end
 
       # @return (Hash) Contains the reason for rejection.
