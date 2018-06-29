@@ -529,6 +529,7 @@ module Spaceship
         req.url("https://analytics.itunes.apple.com/analytics/api/v1/data/time-series")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['X-Requested-By'] = 'analytics.itunes.apple.com'
       end
 
       data = parse_response(r)
