@@ -42,9 +42,6 @@ module Fastlane
 
       platform, lane = choose_lane(ff, platform) unless lane
 
-      # https://github.com/fastlane/fastlane/issues/11913
-      # FastlaneCore.session.is_fastfile = true
-
       # xcodeproj has a bug in certain versions that causes it to change directories
       # and not return to the original working directory
       # https://github.com/CocoaPods/Xcodeproj/issues/426

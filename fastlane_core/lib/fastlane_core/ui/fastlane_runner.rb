@@ -68,9 +68,8 @@ module Commander
           FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_RELEASE}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
         end
 
-        # https://github.com/fastlane/fastlane/issues/11913
-        # action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(@program[:name], args: ARGV)
-        # FastlaneCore.session.action_launched(launch_context: action_launch_context)
+        action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(@program[:name], args: ARGV)
+        FastlaneCore.session.action_launched(launch_context: action_launch_context)
 
         return_value = run_active_command
 
@@ -128,9 +127,8 @@ module Commander
         rescue_connection_failed_error(e)
       rescue => e # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         rescue_unknown_error(e)
-        # https://github.com/fastlane/fastlane/issues/11913
-        # ensure
-        #   FastlaneCore.session.finalize_session
+      ensure
+        FastlaneCore.session.finalize_session
       end
     end
 
