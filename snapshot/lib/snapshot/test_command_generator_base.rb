@@ -23,6 +23,7 @@ module Snapshot
         options += project_path_array
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-derivedDataPath '#{derived_data_path}'"
+        options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
         options << config[:xcargs] if config[:xcargs]
         return options
       end
@@ -78,6 +79,17 @@ module Snapshot
 
       def derived_data_path
         Snapshot.cache[:derived_data_path] ||= (Snapshot.config[:derived_data_path] || Dir.mktmpdir("snapshot_derived"))
+      end
+
+      def result_bundle_path
+        unless Snapshot.cache[:result_bundle_path]
+          path = File.join(Snapshot.config[:output_directory], Snapshot.config[:scheme]) + ".test_result"
+          if File.directory?(path)
+            FileUtils.remove_dir(path)
+          end
+          Snapshot.cache[:result_bundle_path] = path
+        end
+        return Snapshot.cache[:result_bundle_path]
       end
 
       def initialize
