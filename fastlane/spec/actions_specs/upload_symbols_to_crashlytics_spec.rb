@@ -146,10 +146,8 @@ describe Fastlane do
                 binary_path: 'fastlane/#{binary_path}')
             end").runner.execute(:test)
           end.to raise_error(FastlaneCore::Interface::FastlaneError)
-
         end
       end
-
     end
   end
 end
