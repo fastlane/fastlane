@@ -994,7 +994,7 @@ func cocoapods(clean: Bool = true,
                useBundleExec: Bool = true,
                podfile: String? = nil,
                errorCallback: String? = nil,
-               tryRepoUpdateOnError: Bool? = nil) {
+               tryRepoUpdateOnError: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "cocoapods", className: nil, args: [RubyCommand.Argument(name: "clean", value: clean),
                                                                                            RubyCommand.Argument(name: "integrate", value: integrate),
                                                                                            RubyCommand.Argument(name: "repo_update", value: repoUpdate),
@@ -3945,7 +3945,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode92/Xcode.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -4051,4 +4051,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.21]
+// FastlaneRunnerAPIVersion [0.9.22]
