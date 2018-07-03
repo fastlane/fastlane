@@ -180,7 +180,7 @@ module Fastlane
       end
 
       def self.authors
-        ["rishabhtayal"]
+        ["hjanuschka"]
       end
 
       def self.category
