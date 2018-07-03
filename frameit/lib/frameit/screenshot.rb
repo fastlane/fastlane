@@ -41,7 +41,7 @@ module Frameit
         return 'iPhone 4'
       when sizes::IOS_IPAD
         return 'iPad Air 2'
-      when sizes::IOS_IPAD_PRO
+      when sizes::IOS_IPAD_PRO, sizes::IOS_IPAD_10_5
         return 'iPad Pro'
       when sizes::MAC
         return 'MacBook'
