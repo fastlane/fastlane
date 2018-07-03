@@ -16,7 +16,8 @@ module Fastlane
           headers = construct_headers(params[:api_token], params[:headers])
           payload = construct_body(params[:body], params[:raw_body])
           error_handlers = params[:error_handlers] || {}
-          secure = params[:secure] || true
+          secure = params[:secure]
+          secure = true if secure.nil?
 
           response = call_endpoint(
             url,
