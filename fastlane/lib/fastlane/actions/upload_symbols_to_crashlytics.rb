@@ -191,9 +191,7 @@ module Fastlane
                                        description: "The number of threads to use for simultaneous dSYM upload",
                                        verify_block: proc do |value|
                                          min_threads = 1
-                                         max_threads = 15
                                          UI.user_error!("Too few threads (#{value}) minimum number of threads: #{min_threads}") unless value >= min_threads
-                                         UI.user_error!("Too many threads (#{value}) maximum number of threads: #{max_threads}") unless value <= max_threads
                                        end)
         ]
       end
