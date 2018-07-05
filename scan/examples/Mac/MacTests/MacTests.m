@@ -3,7 +3,6 @@
 //  MacTests
 //
 //  Created by Felix Krause on 10/14/15.
-//  Copyright © 2015 Felix Krause. All rights reserved.
 //
 
 #import <XCTest/XCTest.h>

@@ -224,6 +224,8 @@ module Fastlane
             raw_body
           elsif body.kind_of?(Hash)
             body.to_json
+          elsif body.kind_of?(Array)
+            body.to_json
           else
             UI.user_error!("Please provide valid JSON, or a hash as request body") unless parse_json(body)
             body
