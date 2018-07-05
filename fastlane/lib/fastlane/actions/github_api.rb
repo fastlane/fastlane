@@ -17,7 +17,6 @@ module Fastlane
           payload = construct_body(params[:body], params[:raw_body])
           error_handlers = params[:error_handlers] || {}
           secure = params[:secure]
-          secure = true if secure.nil?
 
           response = call_endpoint(
             url,
@@ -141,7 +140,7 @@ module Fastlane
             FastlaneCore::ConfigItem.new(key: :secure,
                                          env_name: "FL_GITHUB_API_SECURE",
                                          description: "Optionally disable secure requests (ssl_verify_peer)",
-                                         is_string: false,
+                                         type: Boolean,
                                          default_value: true,
                                          optional: true)
           ]
