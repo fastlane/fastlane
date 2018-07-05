@@ -78,7 +78,7 @@ module Spaceship
         end
       end
 
-      # Push all changes that were made back to iTunes Connect
+      # Push all changes that were made back to App Store Connect
       def save!
         client.update_app_details!(application.apple_id, raw_data)
       rescue Spaceship::Tunes::Error => ex

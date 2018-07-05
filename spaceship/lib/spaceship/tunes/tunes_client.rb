@@ -35,6 +35,7 @@ module Spaceship
             'iphone6Plus' => [2208, 1242],
             'iphone58' => [2436, 1125],
             'ipad' => [1024, 768],
+            'ipad105' => [2224, 1668],
             'ipadPro' => [2732, 2048]
         }
 
@@ -62,7 +63,7 @@ module Spaceship
       t_name = (team_name || ENV['FASTLANE_ITC_TEAM_NAME'] || '').strip
 
       if t_name.length > 0 && t_id.length.zero? # we prefer IDs over names, they are unique
-        puts("Looking for iTunes Connect Team with name #{t_name}") if Spaceship::Globals.verbose?
+        puts("Looking for App Store Connect Team with name #{t_name}") if Spaceship::Globals.verbose?
 
         teams.each do |t|
           t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].casecmp(t_name).zero?
@@ -74,7 +75,7 @@ module Spaceship
       t_id = teams.first['contentProvider']['contentProviderId'].to_s if teams.count == 1
 
       if t_id.length > 0
-        puts("Looking for iTunes Connect Team with ID #{t_id}") if Spaceship::Globals.verbose?
+        puts("Looking for App Store Connect Team with ID #{t_id}") if Spaceship::Globals.verbose?
 
         # actually set the team id here
         self.team_id = t_id
@@ -83,9 +84,9 @@ module Spaceship
 
       # user didn't specify a team... #thisiswhywecanthavenicethings
       loop do
-        puts("Multiple #{'iTunes Connect teams'.yellow} found, please enter the number of the team you want to use: ")
+        puts("Multiple #{'App Store Connect teams'.yellow} found, please enter the number of the team you want to use: ")
         if ENV["FASTLANE_HIDE_TEAM_INFORMATION"].to_s.length == 0
-          puts("Note: to automatically choose the team, provide either the iTunes Connect Team ID, or the Team Name in your fastlane/Appfile:")
+          puts("Note: to automatically choose the team, provide either the App Store Connect Team ID, or the Team Name in your fastlane/Appfile:")
           puts("Alternatively you can pass the team name or team ID using the `FASTLANE_ITC_TEAM_ID` or `FASTLANE_ITC_TEAM_NAME` environment variable")
           first_team = teams.first["contentProvider"]
           puts("")
@@ -103,9 +104,9 @@ module Spaceship
         end
 
         unless Spaceship::Client::UserInterface.interactive?
-          puts("Multiple teams found on iTunes Connect, Your Terminal is running in non-interactive mode! Cannot continue from here.")
+          puts("Multiple teams found on App Store Connect, Your Terminal is running in non-interactive mode! Cannot continue from here.")
           puts("Please check that you set FASTLANE_ITC_TEAM_ID or FASTLANE_ITC_TEAM_NAME to the right value.")
-          raise "Multiple iTunes Connect Teams found; unable to choose, terminal not interactive!"
+          raise "Multiple App Store Connect Teams found; unable to choose, terminal not interactive!"
         end
 
         selected = ($stdin.gets || '').strip.to_i - 1
@@ -270,7 +271,7 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    # Creates a new application on iTunes Connect
+    # Creates a new application on App Store Connect
     # @param name (String): The name of your app as it will appear on the App Store.
     #   This can't be longer than 255 characters.
     # @param primary_language (String): If localized app information isn't available in an
@@ -508,6 +509,31 @@ module Spaceship
         req.headers['Content-Type'] = 'application/json'
       end
       handle_itc_response(r.body)
+    end
+
+    #####################################################
+    # @!group AppAnalytics
+    #####################################################
+
+    def time_series_analytics(app_ids, measures, start_time, end_time, frequency)
+      data = {
+        adamId: app_ids,
+        dimensionFilters: [],
+        endTime: end_time,
+        frequency: frequency,
+        group: nil,
+        measures: measures,
+        startTime: start_time
+      }
+
+      r = request(:post) do |req|
+        req.url("https://analytics.itunes.apple.com/analytics/api/v1/data/time-series")
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['X-Requested-By'] = 'analytics.itunes.apple.com'
+      end
+
+      data = parse_response(r)
     end
 
     #####################################################
@@ -824,13 +850,13 @@ module Spaceship
       if retry_error_messages.any? { |message| ex.to_s.include?(message) }
         tries -= 1
         if tries > 0
-          logger.warn("Received temporary server error from iTunes Connect. Retrying the request...")
+          logger.warn("Received temporary server error from App Store Connect. Retrying the request...")
           sleep(3) unless Object.const_defined?("SpecHelper")
           retry
         end
       end
 
-      raise Spaceship::Client::UnexpectedResponse, "Temporary iTunes Connect error: #{ex}"
+      raise Spaceship::Client::UnexpectedResponse, "Temporary App Store Connect error: #{ex}"
     end
     # rubocop:enable Metrics/BlockNesting
 
@@ -1018,7 +1044,7 @@ module Spaceship
 
       handle_itc_response(r.body)
 
-      # iTunes Connect still returns a success status code even the submission
+      # App Store Connect still returns a success status code even the submission
       # was failed because of Ad ID Info / Export Complicance. This checks for any section error
       # keys in returned adIdInfo / exportCompliance and prints them out.
       ad_id_error_keys = r.body.fetch('data').fetch('adIdInfo').fetch('sectionErrorKeys')
@@ -1344,7 +1370,7 @@ module Spaceship
       return yield
     rescue Spaceship::TunesClient::ITunesConnectTemporaryError => ex
       unless (tries -= 1).zero?
-        msg = "iTunes Connect temporary error received: '#{ex.message}'. Retrying after 60 seconds (remaining: #{tries})..."
+        msg = "App Store Connect temporary error received: '#{ex.message}'. Retrying after 60 seconds (remaining: #{tries})..."
         puts(msg)
         logger.warn(msg)
         sleep(60) unless Object.const_defined?("SpecHelper")

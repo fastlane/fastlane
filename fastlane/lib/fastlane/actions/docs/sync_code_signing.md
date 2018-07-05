@@ -362,7 +362,7 @@ What's the worst that could happen for each of the profile types?
 
 ##### App Store Profiles
 
-An App Store profile can't be used for anything as long as it's not re-signed by Apple. The only way to get an app resigned is to submit an app for review which could take anywhere from 24 hours to a few days (checkout [appreviewtimes.com](http://appreviewtimes.com) for up-to-date expectations). Attackers could only submit an app for review, if they also got access to your iTunes Connect credentials (which are not stored in git, but in your local keychain). Additionally you get an email notification every time a build gets uploaded to cancel the submission even before your app gets into the review stage.
+An App Store profile can't be used for anything as long as it's not re-signed by Apple. The only way to get an app resigned is to submit an app for review which could take anywhere from 24 hours to a few days (checkout [appreviewtimes.com](http://appreviewtimes.com) for up-to-date expectations). Attackers could only submit an app for review, if they also got access to your App Store Connect credentials (which are not stored in git, but in your local keychain). Additionally you get an email notification every time a build gets uploaded to cancel the submission even before your app gets into the review stage.
 
 ##### Development and Ad Hoc Profiles
 
@@ -377,7 +377,7 @@ Because of the potentially dangerous nature of In-House profiles please use _mat
 ##### To sum up
 
 - You have full control over the access list of your Git repo, no third party service involved
-- Even if your certificates are leaked, they can't be used to cause any harm without your iTunes Connect login credentials
+- Even if your certificates are leaked, they can't be used to cause any harm without your App Store Connect login credentials
 - Use In-House enterprise profile with _match_ with caution
 - If you use GitHub or Bitbucket we encourage enabling 2 factor authentication for all accounts that have access to the certificates repo
 - The complete source code of _match_ is fully open source on [GitHub](https://docs.fastlane.tools/actions/match/)

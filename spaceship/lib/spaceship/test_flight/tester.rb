@@ -3,7 +3,7 @@ require_relative 'base'
 module Spaceship
   module TestFlight
     class Tester < Base
-      # @return (String) The identifier of this tester, provided by iTunes Connect
+      # @return (String) The identifier of this tester, provided by App Store Connect
       # @example
       #   "60f858b4-60a8-428a-963a-f943a3d68d17"
       attr_accessor :tester_id

@@ -42,7 +42,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        short_option: "-k",
                                        env_name: "APPSTORE_BUILD_NUMBER_LIVE_TEAM_ID",
-                                       description: "The ID of your iTunes Connect team if you're in multiple teams",
+                                       description: "The ID of your App Store Connect team if you're in multiple teams",
                                        optional: true,
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
@@ -75,7 +75,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :team_name,
                                        short_option: "-e",
                                        env_name: "LATEST_TESTFLIGHT_BUILD_NUMBER_TEAM_NAME",
-                                       description: "The name of your iTunes Connect team if you're in multiple teams",
+                                       description: "The name of your App Store Connect team if you're in multiple teams",
                                        optional: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
