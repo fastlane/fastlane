@@ -23,8 +23,10 @@ module Supply
         end
       end
 
-      upload_binaries unless Supply.config[:skip_upload_apk]
-      upload_bundles unless Supply.config[:skip_upload_aab]
+      apk_version_codes = []
+      apk_version_codes.concat(upload_apks) unless Supply.config[:skip_upload_apk]
+      apk_version_codes.concat(upload_bundles) unless Supply.config[:skip_upload_aab]
+      upload_binaries(apk_version_codes)
 
       promote_track if Supply.config[:track_promote_to]
 
@@ -120,7 +122,7 @@ module Supply
       end
     end
 
-    def upload_binaries
+    def upload_apks
       apk_paths = [Supply.config[:apk]] unless (apk_paths = Supply.config[:apk_paths])
       apk_paths.compact!
 
@@ -130,6 +132,10 @@ module Supply
         apk_version_codes.push(upload_binary_data(apk_path))
       end
 
+      return apk_version_codes
+    end
+
+    def upload_binaries(apk_version_codes)
       mapping_paths = [Supply.config[:mapping]] unless (mapping_paths = Supply.config[:mapping_paths])
       mapping_paths.zip(apk_version_codes).each do |mapping_path, version_code|
         if mapping_path
@@ -147,11 +153,7 @@ module Supply
       return unless aab_path
 
       UI.message("Preparing aab at path '#{aab_path}' for upload...")
-      apk_version_codes = [client.upload_bundle(aab_path)]
-
-      # Only update tracks if we have version codes
-      # Updating a track with empty version codes can completely clear out a track
-      update_track(apk_version_codes) unless apk_version_codes.empty?
+      return [client.upload_bundle(aab_path)]
     end
 
     private
