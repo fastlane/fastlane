@@ -39,7 +39,8 @@
     },
     "enabledFeatures": [
       "gameCenter",
-      "inAppPurchase"
+      "inAppPurchase",
+      "push"
     ],
     "isDevPushEnabled": false,
     "isProdPushEnabled": false,
