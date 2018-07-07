@@ -17,13 +17,13 @@ module Snapshot
         UI.user_error!("No project/workspace found")
       end
 
-      def options
+      def options(language, locale)
         config = Snapshot.config
         options = []
         options += project_path_array
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-derivedDataPath '#{derived_data_path}'"
-        options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
+        options << "-resultBundlePath '#{result_bundle_path(language, locale)}'" if config[:result_bundle]
         options << config[:xcargs] if config[:xcargs]
         return options
       end
@@ -81,9 +81,9 @@ module Snapshot
         Snapshot.cache[:derived_data_path] ||= (Snapshot.config[:derived_data_path] || Dir.mktmpdir("snapshot_derived"))
       end
 
-      def result_bundle_path
+      def result_bundle_path(language, locale)
         unless Snapshot.cache[:result_bundle_path]
-          path = File.join(Snapshot.config[:output_directory], Snapshot.config[:scheme]) + ".test_result"
+          path = File.join(Snapshot.config[:output_directory], "test_output", locale || language, Snapshot.config[:scheme]) + ".test_result"
           if File.directory?(path)
             FileUtils.remove_dir(path)
           end
