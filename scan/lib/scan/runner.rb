@@ -44,6 +44,7 @@ module Scan
                                       print_command: true,
                                              prefix: prefix_hash,
                                             loading: "Loading...",
+                                    suppress_output: Scan.config[:suppress_xcode_output],
                                               error: proc do |error_output|
                                                 begin
                                                   exit_status = $?.exitstatus
