@@ -82,14 +82,17 @@ module Snapshot
       end
 
       def result_bundle_path(language, locale)
-        unless Snapshot.cache[:result_bundle_path]
-          path = File.join(Snapshot.config[:output_directory], "test_output", locale || language, Snapshot.config[:scheme]) + ".test_result"
+        Snapshot.cache[:result_bundle_path] = {}
+        language_key = locale || language
+
+        unless Snapshot.cache[:result_bundle_path][language_key]
+          path = File.join(Snapshot.config[:output_directory], "test_output", language_key, Snapshot.config[:scheme]) + ".test_result"
           if File.directory?(path)
             FileUtils.remove_dir(path)
           end
-          Snapshot.cache[:result_bundle_path] = path
+          Snapshot.cache[:result_bundle_path][language_key] = path
         end
-        return Snapshot.cache[:result_bundle_path]
+        return Snapshot.cache[:result_bundle_path][language_key]
       end
 
       def initialize
