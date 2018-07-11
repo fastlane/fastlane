@@ -31,7 +31,7 @@ module Spaceship
       #
       # @param team_id (String) (optional): The ID of a iTunesConnect team
       # @param team_name (String) (optional): The name of a iTunesConnect team
-      def select_team(team_id = nil, team_name = nil)
+      def select_team(team_id: nil, team_name: nil)
         @client.select_team(team_id: team_id, team_name: team_name)
       end
     end
