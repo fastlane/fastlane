@@ -46,7 +46,8 @@ module FastlaneCore
         ec: event[:category],                              # Event category
         ea: event[:action],                                # Event action
         el: event[:label] || "na",                         # Event label
-        ev: event[:value] || "0"                           # Event value
+        ev: event[:value] || "0",                          # Event value
+        aip: "1"                                           # IP anonymization
       })
     end
   end
