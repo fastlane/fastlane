@@ -4,21 +4,34 @@ module Fastlane
   module Helper
     class CrashlyticsHelper
       class << self
-        def discover_default_crashlytics_path
-          path = Dir["./Pods/iOS/Crashlytics/Crashlytics.framework"].last || Dir["./**/Crashlytics.framework"].last
-          unless path
-            UI.user_error!("Couldn't find Crashlytics.framework in current directory. Make sure to add the 'Crashlytics' pod to your 'Podfile' and run `pod update`")
+        def discover_crashlytics_path(params)
+          path = params[:crashlytics_path]
+
+          # Finding submit binary inside of given Crashlytics path (for backwards compatability)
+          if path && File.basename(path) == "Crashlytics.framework"
+            path = Dir[File.join(path, '**', 'submit')].last
           end
+
+          # Check for submit binary outside of Crashlytics.framework (for Crashlytics 3.4.1 and over)
+          path ||= Dir["./Pods/Crashlytics/submit"].first
+
+          # Check for submit binary in Crashlytics.framework (for Crashlytics 3.4.1 and under)
+          path ||= Dir["./Pods/iOS/Crashlytics/Crashlytics.framework/submit"].last
+          path ||= Dir["./**/Crashlytics.framework/submit"].last
+
+          if path && path.downcase.include?("crashlytics.framework")
+            UI.deprecated("Crashlytics has removed support for the submit binary in Crashlytics.framework as of 3.4.1. Please change :crashlytics_path to `<PODS_ROOT>/Crashlytics/submit`")
+          end
+
           return path
         end
 
         def generate_ios_command(params)
-          params[:crashlytics_path] ||= discover_default_crashlytics_path
-
-          UI.user_error!("No value found for 'crashlytics_path'") unless params[:crashlytics_path]
-          submit_binary = Dir[File.join(params[:crashlytics_path], '**', 'submit')].last
-          submit_binary ||= "Crashlytics.framework/submit" if Helper.test?
-          UI.user_error!("Could not find submit binary in crashlytics bundle at path '#{params[:crashlytics_path]}'") unless submit_binary
+          submit_binary = discover_crashlytics_path(params)
+          unless submit_binary
+            UI.user_error!("Couldn't find Crashlytics' submit binary in current directory. Make sure to add the 'Crashlytics' pod to your 'Podfile' and run `pod update`")
+          end
+          submit_binary = "Crashlytics.framework/submit" if Helper.test?
 
           command = []
           command << submit_binary.shellescape

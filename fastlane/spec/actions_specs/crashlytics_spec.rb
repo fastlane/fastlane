@@ -273,7 +273,7 @@ describe Fastlane do
 
         describe "Invalid Parameters" do
           it "raises an error if no crashlytics path was given" do
-            expect(Fastlane::Helper::CrashlyticsHelper).to receive(:discover_default_crashlytics_path).and_return(nil)
+            expect(Fastlane::Helper::CrashlyticsHelper).to receive(:discover_crashlytics_path).and_return(nil)
             expect do
               Fastlane::FastFile.new.parse("lane :test do
                 crashlytics({
@@ -282,7 +282,7 @@ describe Fastlane do
                   ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
                 })
               end").runner.execute(:test)
-            end.to raise_error("No value found for 'crashlytics_path'")
+            end.to raise_error("Couldn't find Crashlytics' submit binary in current directory. Make sure to add the 'Crashlytics' pod to your 'Podfile' and run `pod update`")
           end
 
           it "raises an error if the given crashlytics path was not found" do
