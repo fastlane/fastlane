@@ -257,7 +257,7 @@ private extension XCUIElementQuery {
     }
 
     var deviceStatusBars: XCUIElementQuery {
-        let deviceWidth = XCUIApplication().frame.width
+        let deviceWidth = XCUIApplication().windows.firstMatch.frame.width
 
         let isStatusBar = NSPredicate { (evaluatedObject, _) in
             guard let element = evaluatedObject as? XCUIElementAttributes else { return false }
