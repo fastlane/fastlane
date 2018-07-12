@@ -80,6 +80,7 @@ module Fastlane
                                        description: "The sources of repos you want the pod spec to lint with, separated by commas",
                                        optional: true,
                                        is_string: false,
+                                       type: Array,
                                        verify_block: proc do |value|
                                          UI.user_error!("Sources must be an array.") unless value.kind_of?(Array)
                                        end),
