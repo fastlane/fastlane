@@ -1,5 +1,5 @@
 require 'fileutils'
-fastlane_require('xcodeproj')
+fastlane_require 'xcodeproj'
 
 skip_docs # Do not create fastlane/README.txt
 

@@ -294,6 +294,7 @@ Style/MethodCallWithArgsParentheses:
   IgnoredMethods:
     - 'require'
     - 'require_relative'
+    - 'fastlane_require'
     - 'gem'
     - 'program'
     - 'command'
