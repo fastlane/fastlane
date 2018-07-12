@@ -63,7 +63,7 @@ module Spaceship
       PushNotification = AppService.new_service("push")
       SiriKit = AppService.new_service("SI015DKUHP")
       VPNConfiguration = AppService.new_service("V66P55NK2I")
-      Wallet = AppService.new_service("passbook")
+      Wallet = AppService.new_service("pass")
       WirelessAccessory = AppService.new_service("WC421J6T7P")
 
       constants.each do |c|
