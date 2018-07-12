@@ -521,6 +521,16 @@ module Spaceship
       raise AppleTimeoutError.new, "Could not receive latest API key from App Store Connect, this might be a server issue."
     end
 
+    def contract_messages
+      response = request(:get, "https://olympus.itunes.apple.com/v1/contractMessages")
+      body = response.body
+      if body
+        body = JSON.parse(body) if body.kind_of?(String)
+      end
+
+      return body
+    end
+
     #####################################################
     # @!group Helpers
     #####################################################
