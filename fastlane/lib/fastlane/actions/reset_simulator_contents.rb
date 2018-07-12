@@ -12,7 +12,7 @@ module Fastlane
       end
 
       def self.reset_at_least_xcode9(ios_versions)
-        UI.verbose("Resetting simulator contents forXcode9 and later")
+        UI.verbose("Resetting simulator contents for Xcode 9 and later")
         simulators = FastlaneCore::DeviceManager.simulators('iOS')
         if ios_versions
           simulators.select! { |s| ios_versions.include?(s.os_version) }
@@ -24,7 +24,7 @@ module Fastlane
       end
 
       def self.reset_up_to_xcode8(ios_versions)
-        UI.verbose("Resetting simulator contents for Xcode8 and earlier")
+        UI.verbose("Resetting simulator contents for Xcode 8 and earlier")
         if ios_versions
           ios_versions.each do |os_version|
             FastlaneCore::Simulator.reset_all_by_version(os_version: os_version)
