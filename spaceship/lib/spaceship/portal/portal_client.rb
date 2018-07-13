@@ -184,7 +184,6 @@ module Spaceship
                        {
                          type: 'explicit',
                          identifier: bundle_id,
-                         push: 'on',
                          inAppPurchase: 'on',
                          gameCenter: 'on'
                        }
