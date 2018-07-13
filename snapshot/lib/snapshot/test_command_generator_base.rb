@@ -19,11 +19,13 @@ module Snapshot
 
       def options(language, locale)
         config = Snapshot.config
+        result_bundle_path = resolve_result_bundle_path(language, locale) if config[:result_bundle]
+
         options = []
         options += project_path_array
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-derivedDataPath '#{derived_data_path}'"
-        options << "-resultBundlePath '#{result_bundle_path(language, locale)}'" if config[:result_bundle]
+        options << "-resultBundlePath '#{result_bundle_path}'" if result_bundle_path
         options << config[:xcargs] if config[:xcargs]
         return options
       end
@@ -81,7 +83,7 @@ module Snapshot
         Snapshot.cache[:derived_data_path] ||= (Snapshot.config[:derived_data_path] || Dir.mktmpdir("snapshot_derived"))
       end
 
-      def result_bundle_path(language, locale)
+      def resolve_result_bundle_path(language, locale)
         Snapshot.cache[:result_bundle_path] = {}
         language_key = locale || language
 
