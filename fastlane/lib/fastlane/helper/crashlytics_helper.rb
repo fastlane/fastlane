@@ -8,8 +8,13 @@ module Fastlane
           path = params[:crashlytics_path]
 
           # Finding submit binary inside of given Crashlytics path (for backwards compatability)
-          if path && File.basename(path) == "Crashlytics.framework"
-            path = Dir[File.join(path, '**', 'submit')].last
+          if path
+            if File.basename(path) != "submit"
+              path = Dir[File.join(path, '**', 'submit')].last
+              UI.verbose(":crashlytics_path passed through parameters did not point to a submit binary. Using this submit binary on that path instead: '#{path}'")
+            else
+              UI.verbose("Using :crashlytics_path passed in through parameters: '#{path}'")
+            end
           end
 
           # Check for submit binary outside of Crashlytics.framework (for Crashlytics 3.4.1 and over)
@@ -20,7 +25,7 @@ module Fastlane
           path ||= Dir["./**/Crashlytics.framework/submit"].last
 
           if path && path.downcase.include?("crashlytics.framework")
-            UI.deprecated("Crashlytics has removed support for the submit binary in Crashlytics.framework as of 3.4.1. Please change :crashlytics_path to `<PODS_ROOT>/Crashlytics/submit`")
+            UI.deprecated("Crashlytics has moved the submit binary outside of Crashlytics.framework directory as of 3.4.1. Please change :crashlytics_path to `<PODS_ROOT>/Crashlytics/submit`")
           end
 
           return path
@@ -30,6 +35,9 @@ module Fastlane
           submit_binary = discover_crashlytics_path(params)
           unless submit_binary
             UI.user_error!("Couldn't find Crashlytics' submit binary in current directory. Make sure to add the 'Crashlytics' pod to your 'Podfile' and run `pod update`")
+          end
+          if File.basename(submit_binary) != "submit"
+            UI.user_error!("Invalid crashlytics path was detected with '#{submit_binary}'. Path must point to the `submit` binary (example: './Pods/Crashlytics/submit')")
           end
           submit_binary = "Crashlytics.framework/submit" if Helper.test?
 
