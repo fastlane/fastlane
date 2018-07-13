@@ -153,7 +153,7 @@ module Fastlane
                                          UI.user_error!("Symbolication file needs to be dSYM or zip") unless value.end_with?(".zip", ".dSYM")
                                        end),
           FastlaneCore::ConfigItem.new(key: :dsym_paths,
-                                       env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DSYM_PATHs",
+                                       env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DSYM_PATHS",
                                        description: "Paths to the DSYM files or zips to upload",
                                        optional: true,
                                        type: Array,
