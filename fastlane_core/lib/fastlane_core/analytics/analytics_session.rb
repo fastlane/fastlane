@@ -19,6 +19,10 @@ module FastlaneCore
     end
 
     def action_launched(launch_context: nil)
+      unless did_show_message?
+        show_message
+      end
+
       if @launch_event_sent || launch_context.p_hash.nil?
         return
       end
@@ -38,6 +42,25 @@ module FastlaneCore
     end
 
     def action_completed(completion_context: nil)
+    end
+
+    def show_message
+      UI.message("Sending anonymous analytics information")
+      UI.message("Learn more at https://docs.fastlane.tools/#metrics")
+      UI.message("No personal or sensitive data is sent.")
+      UI.message("You can disable this by adding `opt_out_usage` at the top of your Fastfile")
+    end
+
+    def did_show_message?
+      file_name = ".did_show_opt_info"
+
+      new_path = File.join(FastlaneCore.fastlane_user_dir, file_name)
+      did_show = File.exist?(new_path)
+
+      return did_show if did_show
+
+      File.write(new_path, '1')
+      false
     end
 
     def finalize_session
