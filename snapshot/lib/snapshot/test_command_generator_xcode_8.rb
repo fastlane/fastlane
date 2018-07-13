@@ -12,7 +12,7 @@ module Snapshot
       def generate(device_type: nil, language: nil, locale: nil)
         parts = prefix
         parts << "xcodebuild"
-        parts += options
+        parts += options(language, locale)
         parts += destination(device_type)
         parts += build_settings
         parts += actions
