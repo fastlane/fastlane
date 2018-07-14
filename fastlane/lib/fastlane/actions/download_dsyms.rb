@@ -120,7 +120,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Download dSYM files from Apple App Store Connect for Bitcode apps"
+        "Download dSYM files from App Store Connect for Bitcode apps"
       end
 
       def self.details
@@ -135,7 +135,7 @@ module Fastlane
         SAMPLE
 
         [
-          "This action downloads dSYM files from Apple App Store Connect after the ipa gets re-compiled by Apple. Useful if you have Bitcode enabled.".markdown_preserve_newlines,
+          "This action downloads dSYM files from App Store Connect after the ipa gets re-compiled by Apple. Useful if you have Bitcode enabled.".markdown_preserve_newlines,
           sample
         ].join("\n")
       end
