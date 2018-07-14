@@ -262,7 +262,7 @@ describe Fastlane do
               end
             end
           end
-          
+
           context 'secure is set' do
             it 'correctly submits without ssl verification' do
               Excon.defaults[:ssl_verify_peer] = true
