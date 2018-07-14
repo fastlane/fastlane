@@ -56,8 +56,8 @@ module Spaceship
     # Shows a team selection for the user in the terminal. This should not be
     # called on CI systems
     #
-    # @param team_id (String) (optional): The ID of a iTunesConnect team
-    # @param team_name (String) (optional): The name of a iTunesConnect team
+    # @param team_id (String) (optional): The ID of an App Store Connect team
+    # @param team_name (String) (optional): The name of an App Store Connect team
     def select_team(team_id: nil, team_name: nil)
       t_id = (team_id || ENV['FASTLANE_ITC_TEAM_ID'] || '').strip
       t_name = (team_name || ENV['FASTLANE_ITC_TEAM_NAME'] || '').strip
