@@ -66,13 +66,16 @@ module Supply
       client.apks_version_codes.each do |apk_version_code|
         upload_changelog(language, apk_version_code)
       end
+      client.aab_version_codes.each do |aab_version_code|
+        upload_changelog(language, aab_version_code)
+      end
     end
 
-    def upload_changelog(language, apk_version_code)
-      path = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME, "#{apk_version_code}.txt")
+    def upload_changelog(language, version_code)
+      path = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME, "#{version_code}.txt")
       if File.exist?(path)
-        UI.message("Updating changelog for code version '#{apk_version_code}' and language '#{language}'...")
-        apk_listing = ApkListing.new(File.read(path, encoding: 'UTF-8'), language, apk_version_code)
+        UI.message("Updating changelog for code version '#{version_code}' and language '#{language}'...")
+        apk_listing = ApkListing.new(File.read(path, encoding: 'UTF-8'), language, version_code)
         client.update_apk_listing_for_language(apk_listing)
       end
     end
