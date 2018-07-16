@@ -77,7 +77,7 @@ module Pilot
                                      deprecated: true,
                                      short_option: "-x",
                                      env_name: "PILOT_UPDATE_BUILD_INFO_ON_UPLOAD",
-                                     description: "Update build info immediately after validation. This is deprecated and will be removed in a future release. iTunesConnect no longer supports setting build info until after build processing has completed, which is when build info is updated by default",
+                                     description: "Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :apple_id,
