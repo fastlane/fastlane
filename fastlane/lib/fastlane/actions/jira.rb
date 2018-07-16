@@ -6,12 +6,17 @@ module Fastlane
         require 'jira-ruby'
 
         site         = params[:url]
-        context_path = ""
         auth_type    = :basic
         username     = params[:username]
         password     = params[:password]
         ticket_id    = params[:ticket_id]
         comment_text = params[:comment_text]
+
+        if params[:self_hosted_server]
+          context_path = "/jira"
+        else
+          context_path = ""
+        end
 
         options = {
                     site: site,
@@ -43,6 +48,12 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("No url for Jira given, pass using `url: 'url'`") if value.to_s.length == 0
                                        end),
+          FastlaneCore::ConfigItem.new(key: :self_hosted_server,
+                                      env_name: "FL_JIRA_SELF_HOSTED_SERVER",
+                                      description: "Is JIRA self hosted server with context path",
+                                      optional: true,
+                                      default_value: false,
+                                      is_string: false),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "FL_JIRA_USERNAME",
                                        description: "Username for JIRA instance",
@@ -86,6 +97,14 @@ module Fastlane
         [
           'jira(
             url: "https://bugs.yourdomain.com",
+            username: "Your username",
+            password: "Your password",
+            ticket_id: "Ticket ID, i.e. IOS-123",
+            comment_text: "Text to post as a comment"
+          )',
+          'jira(
+            url: "https://yourserverdomain.com",
+            self_hosted_server: true, # append \'/jira\' path to your url
             username: "Your username",
             password: "Your password",
             ticket_id: "Ticket ID, i.e. IOS-123",
