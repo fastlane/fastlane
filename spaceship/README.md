@@ -109,7 +109,7 @@ This requires you to install `pry` using `sudo gem install pry`. `pry` is not in
 
 ## App Store Connect API
 
-##### Open [iTunesConnect.md](docs/iTunesConnect.md) for code samples
+##### Open [AppStoreConnect.md](docs/AppStoreConnect.md) for code samples
 
 ## 2 Step Verification
 

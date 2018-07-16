@@ -2,7 +2,7 @@ require_relative 'app_review'
 
 module Spaceship
   module Tunes
-    # Represents app ratings from iTunesConnect
+    # Represents app ratings from App Store Connect
     class AppRatings < TunesBase
       # @return (Spaceship::Tunes::Application) A reference to the application
       #   this version is for
