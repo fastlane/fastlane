@@ -106,6 +106,48 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_error(FastlaneCore::Interface::FastlaneError)
       end
+
+      context "with dsym_paths" do
+        it "uploads dSYM files with gsp_path" do
+          binary_path = './spec/fixtures/screenshots/screenshot1.png'
+          dsym_1_path = './spec/fixtures/dSYM/Themoji.dSYM'
+          dsym_2_path = './spec/fixtures/dSYM/Themoji2.dSYM'
+          gsp_path = './spec/fixtures/plist/With Space.plist'
+
+          command = []
+          command << File.expand_path(File.join("fastlane", binary_path)).shellescape
+          command << "-gsp #{File.expand_path(File.join('fastlane', gsp_path)).shellescape}"
+          command << "-p ios"
+          command_1 = command + [File.expand_path(File.join("fastlane", dsym_1_path)).shellescape]
+          command_2 = command + [File.expand_path(File.join("fastlane", dsym_2_path)).shellescape]
+
+          expect(Fastlane::Actions).to receive(:sh).with(command_1.join(" "), log: false)
+          expect(Fastlane::Actions).to receive(:sh).with(command_2.join(" "), log: false)
+
+          Fastlane::FastFile.new.parse("lane :test do
+            upload_symbols_to_crashlytics(
+              dsym_paths: ['fastlane/#{dsym_1_path}', 'fastlane/#{dsym_2_path}'],
+              gsp_path: 'fastlane/#{gsp_path}',
+              binary_path: 'fastlane/#{binary_path}')
+          end").runner.execute(:test)
+        end
+
+        it "raises exception if a dsym_paths not found" do
+          binary_path = './spec/fixtures/screenshots/screenshot1.png'
+          dsym_1_path = './spec/fixtures/dSYM/Themoji.dSYM'
+          dsym_not_here_path = './spec/fixtures/dSYM/Themoji_not_here.dSYM'
+          gsp_path = './spec/fixtures/plist/With Space.plist'
+
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              upload_symbols_to_crashlytics(
+                dsym_paths: ['fastlane/#{dsym_1_path}', 'fastlane/#{dsym_not_here_path}'],
+                gsp_path: 'fastlane/#{gsp_path}',
+                binary_path: 'fastlane/#{binary_path}')
+            end").runner.execute(:test)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError)
+        end
+      end
     end
   end
 end
