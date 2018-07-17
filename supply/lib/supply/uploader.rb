@@ -26,7 +26,7 @@ module Supply
       apk_version_codes = []
       apk_version_codes.concat(upload_apks) unless Supply.config[:skip_upload_apk]
       apk_version_codes.concat(upload_bundles) unless Supply.config[:skip_upload_aab]
-      upload_binaries(apk_version_codes)
+      upload_mapping(apk_version_codes)
 
       promote_track if Supply.config[:track_promote_to]
 
@@ -135,7 +135,7 @@ module Supply
       return apk_version_codes
     end
 
-    def upload_binaries(apk_version_codes)
+    def upload_mapping(apk_version_codes)
       mapping_paths = [Supply.config[:mapping]] unless (mapping_paths = Supply.config[:mapping_paths])
       mapping_paths.zip(apk_version_codes).each do |mapping_path, version_code|
         if mapping_path
