@@ -43,11 +43,11 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("No url for Jira given, pass using `url: 'url'`") if value.to_s.length == 0
                                        end),
-          FastlaneCore::ConfigItem.new(key: :self_hosted_server,
+          FastlaneCore::ConfigItem.new(key: :context_path,
                                       env_name: "FL_JIRA_CONTEXT_PATH",
-                                      description: "Is JIRA self hosted server and need custom context path",
+                                      description: "Appends to the url (ex: \"/jira\")",
                                       optional: true,
-                                      default_value: "",
+                                      default_value: ""),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "FL_JIRA_USERNAME",
                                        description: "Username for JIRA instance",
@@ -98,7 +98,7 @@ module Fastlane
           )',
           'jira(
             url: "https://yourserverdomain.com",
-            context_path: "/jira", # append \'/jira\' path to your url
+            context_path: "/jira",
             username: "Your username",
             password: "Your password",
             ticket_id: "Ticket ID, i.e. IOS-123",
