@@ -7,16 +7,11 @@ module Fastlane
 
         site         = params[:url]
         auth_type    = :basic
+        context_path = params[:context_path]
         username     = params[:username]
         password     = params[:password]
         ticket_id    = params[:ticket_id]
         comment_text = params[:comment_text]
-
-        if params[:self_hosted_server]
-          context_path = "/jira"
-        else
-          context_path = ""
-        end
 
         options = {
                     site: site,
@@ -49,11 +44,10 @@ module Fastlane
                                          UI.user_error!("No url for Jira given, pass using `url: 'url'`") if value.to_s.length == 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :self_hosted_server,
-                                      env_name: "FL_JIRA_SELF_HOSTED_SERVER",
-                                      description: "Is JIRA self hosted server with context path",
+                                      env_name: "FL_JIRA_CONTEXT_PATH",
+                                      description: "Is JIRA self hosted server and need custom context path",
                                       optional: true,
-                                      default_value: false,
-                                      is_string: false),
+                                      default_value: "",
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "FL_JIRA_USERNAME",
                                        description: "Username for JIRA instance",
@@ -104,7 +98,7 @@ module Fastlane
           )',
           'jira(
             url: "https://yourserverdomain.com",
-            self_hosted_server: true, # append \'/jira\' path to your url
+            context_path: "/jira", # append \'/jira\' path to your url
             username: "Your username",
             password: "Your password",
             ticket_id: "Ticket ID, i.e. IOS-123",
