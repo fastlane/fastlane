@@ -13,6 +13,7 @@ describe Supply do
         expect(subject.class.method_defined?(:insert_edit)).to eq(true)
         expect(subject.class.method_defined?(:list_apk_listings)).to eq(true)
         expect(subject.class.method_defined?(:list_apks)).to eq(true)
+        expect(subject.class.method_defined?(:list_edit_bundles)).to eq(true)
         expect(subject.class.method_defined?(:list_images)).to eq(true)
         expect(subject.class.method_defined?(:list_listings)).to eq(true)
         expect(subject.class.method_defined?(:update_apk_listing)).to eq(true)
