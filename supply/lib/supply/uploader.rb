@@ -28,6 +28,10 @@ module Supply
       apk_version_codes.concat(upload_bundles) unless Supply.config[:skip_upload_aab]
       upload_mapping(apk_version_codes)
 
+      # Only update tracks if we have version codes
+      # Updating a track with empty version codes can completely clear out a track
+      update_track(apk_version_codes) unless apk_version_codes.empty?
+
       promote_track if Supply.config[:track_promote_to]
 
       if Supply.config[:validate_only]
@@ -142,10 +146,6 @@ module Supply
           client.upload_mapping(mapping_path, version_code)
         end
       end
-
-      # Only update tracks if we have version codes
-      # Updating a track with empty version codes can completely clear out a track
-      update_track(apk_version_codes) unless apk_version_codes.empty?
     end
 
     def upload_bundles
