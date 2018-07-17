@@ -18,6 +18,9 @@ module Fastlane
         dsym_paths << params[:dsym_path] if params[:dsym_path]
         dsym_paths += Actions.lane_context[SharedValues::DSYM_PATHS] if Actions.lane_context[SharedValues::DSYM_PATHS]
 
+        # Allows adding of additional multiple dsym_paths since :dsym_path can be autoset by other actions
+        dsym_paths += params[:dsym_paths] if params[:dsym_paths]
+
         if dsym_paths.count == 0
           UI.error("Couldn't find any dSYMs, please pass them using the dsym_path option")
           return nil
@@ -150,6 +153,17 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                          UI.user_error!("Symbolication file needs to be dSYM or zip") unless value.end_with?(".zip", ".dSYM")
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :dsym_paths,
+                                       env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DSYM_PATHS",
+                                       description: "Paths to the DSYM files or zips to upload",
+                                       optional: true,
+                                       type: Array,
+                                       verify_block: proc do |values|
+                                         values.each do |value|
+                                           UI.user_error!("Couldn't find file at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                           UI.user_error!("Symbolication file needs to be dSYM or zip") unless value.end_with?(".zip", ".dSYM")
+                                         end
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "CRASHLYTICS_API_TOKEN",
