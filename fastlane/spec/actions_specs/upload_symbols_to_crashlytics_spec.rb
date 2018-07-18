@@ -128,16 +128,6 @@ describe Fastlane do
           command_1 = command + [File.expand_path(File.join("fastlane", dsym_1_path)).shellescape]
           command_2 = command + [File.expand_path(File.join("fastlane", dsym_2_path)).shellescape]
 
-          # Sometimes CI systems will pull dsym from other places so need to make sure its nil
-          # Need to make sure that :dsym_path is nil because we are only tesing :dsym_paths
-          allow_any_instance_of(FastlaneCore::Configuration).to receive(:[]).and_wrap_original do |m, *args|
-            if args[0] == :dsym_path
-              nil
-            else
-              m.call(*args)
-            end
-          end
-
           expect(Fastlane::Actions).to receive(:sh).with(command_1.join(" "), log: false).at_least(:once)
           expect(Fastlane::Actions).to receive(:sh).with(command_2.join(" "), log: false).at_least(:once)
 
