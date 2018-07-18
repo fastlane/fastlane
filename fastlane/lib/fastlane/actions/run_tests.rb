@@ -22,6 +22,11 @@ module Fastlane
           Scan::Manager.new.work(values)
 
           return true
+        rescue FastlaneCore::Interface::FastlaneBuildFailure => ex
+          # Specifically catching FastlaneBuildFailure to prevent build/compile errors from being
+          # silenced when :fail_build is set to false
+          # :fail_build should only suppress testing failures
+          raise ex
         rescue => ex
           if values[:fail_build]
             raise ex
