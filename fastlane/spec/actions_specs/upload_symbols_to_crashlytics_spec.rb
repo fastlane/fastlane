@@ -128,8 +128,8 @@ describe Fastlane do
           command_1 = command + [File.expand_path(File.join("fastlane", dsym_1_path)).shellescape]
           command_2 = command + [File.expand_path(File.join("fastlane", dsym_2_path)).shellescape]
 
-          expect(Fastlane::Actions).to receive(:sh).with(command_1.join(" "), log: false).at_least(:once)
-          expect(Fastlane::Actions).to receive(:sh).with(command_2.join(" "), log: false).at_least(:once)
+          expect(Fastlane::Actions).to receive(:sh).with(command_1.join(" "), log: false)
+          expect(Fastlane::Actions).to receive(:sh).with(command_2.join(" "), log: false)
 
           Fastlane::FastFile.new.parse("lane :test do
             upload_symbols_to_crashlytics(
