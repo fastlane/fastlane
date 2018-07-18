@@ -108,6 +108,13 @@ describe Fastlane do
       end
 
       context "with dsym_paths" do
+        before :each do
+          # dsym_path option to be nil
+          ENV[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH.to_s] = nil
+          Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_PATHS] = nil
+          allow(Dir).to receive(:[]).and_return([])
+        end
+
         it "uploads dSYM files with gsp_path" do
           binary_path = './spec/fixtures/screenshots/screenshot1.png'
           dsym_1_path = './spec/fixtures/dSYM/Themoji.dSYM'
