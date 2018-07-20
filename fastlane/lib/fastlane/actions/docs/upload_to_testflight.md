@@ -173,7 +173,7 @@ fastlane pilot export
 
 ### Import testers
 
-Add external testers from a CSV file. Create an empty `tester_import.csv` file with the following format:
+Add external testers from a CSV file. Create a file called `tester_import.csv` and fill it with the following format:
 
 ```no-highlight
 John,Appleseed,appleseed_john@mac.com,group-1;group-2
