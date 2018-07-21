@@ -302,7 +302,19 @@ module Scan
                                      deprecated: "Use `--output_files` instead",
                                      conflicting_options: [:output_files],
                                      optional: true,
-                                     is_string: true)
+                                     is_string: true),
+        FastlaneCore::ConfigItem.new(key: :app_identifier,
+                                     env_name: 'SCAN_APP_IDENTIFIER',
+                                     optional: true,
+                                     description: "The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)",
+                                     code_gen_sensitive: true,
+                                     default_value: ENV["SCAN_APP_IDENTITIFER"] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                     default_value_dynamic: true),
+        FastlaneCore::ConfigItem.new(key: :reinstall_app,
+                                     env_name: 'SCAN_REINSTALL_APP',
+                                     description: "Enabling this option will automatically uninstall the application before running it",
+                                     default_value: false,
+                                     is_string: false)
       ]
     end
   end

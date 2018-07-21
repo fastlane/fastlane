@@ -39,6 +39,14 @@ module Scan
         }
       ]
       exit_status = 0
+
+      Scan.devices.each do |device|
+        app_identifier = Scan.config[:app_identifier]
+        app_identifier ||= UI.input("App Identifier: ")
+
+        FastlaneCore::Simulator.uninstall_app(app_identifier, device.name, device.udid) if Scan.config[:reinstall_app]
+      end
+
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: true,
                                       print_command: true,
