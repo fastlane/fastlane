@@ -478,6 +478,7 @@ private_lane :ensure_tool_name_formatting do
       content = File.read(path)
       Fastlane::TOOLS.each do |tool|
         errors << "Use _#{tool}_ instead of `#{tool}` to mention a tool in the docs in '#{path}'" if content.include?("`#{tool}`")
+        errors << "Use _#{tool}_ instead of `_#{tool}_` to mention a tool in the docs in '#{path}'" if content.include?("`_#{tool}_`")
         errors << "Use [_#{tool}_] instead of [#{tool}] to mention a tool in the docs in '#{path}'" if content.include?("[#{tool}]")
         if content.include?("_#{tool.to_s.capitalize}_") || content.include?("`#{tool.to_s.capitalize}`")
           errors << "fastlane tools have to be formatted in lower case: #{tool} in '#{path}'"
