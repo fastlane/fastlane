@@ -12,21 +12,43 @@ module Snapshot
 
       @data = {}
 
+      @screenshots = {}
+      @devices = {}
+      @languages = []
+      @screenshot_names = []
+
+      @html_summary_format = Snapshot.config[:html_summary_format]
+
       Dir[File.join(screens_path, "*")].sort.each do |language_folder|
         language = File.basename(language_folder)
         Dir[File.join(language_folder, '*.png')].sort.each do |screenshot|
           available_devices.each do |key_name, output_name|
             next unless File.basename(screenshot).include?(key_name)
+
+            screenshot_name = File.basename(screenshot).split("-").drop(1).join("-")
+            @screenshot_names << screenshot_name
+
+            @languages << language
+            @devices[output_name] = key_name
+
             # This screenshot is from this device
             @data[language] ||= {}
             @data[language][output_name] ||= []
 
             resulting_path = File.join('.', language, File.basename(screenshot))
             @data[language][output_name] << resulting_path
+
+            @screenshots[language] ||= {}
+            @screenshots[language][screenshot_name] ||= {}
+            @screenshots[language][screenshot_name][key_name] = resulting_path
+
             break # to not include iPhone 6 and 6 Plus (name is contained in the other name)
           end
         end
       end
+
+      @languages.uniq!
+      @screenshot_names.uniq!
 
       html_path = File.join(Snapshot::ROOT, "lib", "snapshot/page.html.erb")
       html = ERB.new(File.read(html_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system

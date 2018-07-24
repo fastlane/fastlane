@@ -86,6 +86,14 @@ module Snapshot
                                      description: "By default, the latest version should be used automatically. If you want to change it, do it here",
                                      short_option: "-i",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :html_summary_format,
+                                     env_name: 'SNAPSHOT_HTML_SUMMARY_FORMAT',
+                                     description: "The format of how the HTML summary should be generated",
+                                     default_value: "group_by_device",
+                                     verify_block: proc do |value|
+                                       valid_values = %w(group_by_device group_by_screenshot)
+                                       UI.user_error!("Unsupported export_method '#{value}', must be: #{valid_values}") unless valid_values.include?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :skip_open_summary,
                                      env_name: 'SNAPSHOT_SKIP_OPEN_SUMMARY',
                                      description: "Don't open the HTML summary after running _snapshot_",

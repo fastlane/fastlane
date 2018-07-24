@@ -11,11 +11,14 @@
       .language {
 
       }
-      .deviceName {
+      .deviceName, .languageName, .screenshotTitle  {
         display: block;
         font-size: 30px;
         padding-bottom: 24px;
         padding-top: 45px;
+      }
+      .screenshotName  {
+        font-size: 30px;
       }
       .screenshot {
         cursor: pointer;
@@ -64,23 +67,57 @@
       }
     </style>
   </head>
-  <body><% image_counter = 0 %><% @data.each do |language, content| %>
-    <h1 id="<%= language %>" class="language"><%= language %></h1>
-    <hr>
-    <table><% content.each do |device_name, screens| %>
-      <tr>
-        <th colspan="<%= screens.count %>">
-          <a id="<%= language %>-<%= device_name %>" class="deviceName" href="#<%= language %>-<%= device_name %>"><%= device_name %></a>
-        </th>
-      </tr>
-      <tr><% screens.each do |screen_path| %><% next if screen_path.include?"_framed.png" %>
-        <td><% image_counter += 1 %>
-          <a href="<%= screen_path %>" target="_blank" class="screenshotLink">
-            <img class="screenshot" src="<%= screen_path %>" style="width: 100%;" alt="<%= language %> <%= device_name %>" data-counter="<%= image_counter %>">
-          </a>
-        </td><% end %>
-      </tr><% end %>
-    </table><% end %>
+  <body>
+    <% image_counter = 0 %>
+
+    <% if @html_summary_format == "group_by_screenshot" %>
+      <% @devices.each do |device_name, output_name| %>
+      <h1 id="<%= device_name %>" class="language"><%= device_name %></h1>
+      <hr>
+      <table>
+        <tr>
+          <th class="screenshotTitle">Name</th>
+          <% @languages.each do |language| %>
+          <th>
+            <a id="<%= device_name %>-<%= language %>" class="languageName" href="#<%= device_name %>-<%= language %>"><%= language %></a>
+          </th>
+          <% end %>
+        </tr>
+        <% @screenshot_names.each do |screenshot_name| %>
+          <tr>
+            <td class="screenshotName"><%= screenshot_name %></td>
+            <% @languages.each do |language| %>
+              <% image_counter += 1 %>
+              <td>
+                <% screen_path = @screenshots[language][screenshot_name][output_name] %>
+                <img class="screenshot" src="<%= screen_path %>" style="width: 100%;" alt="<%= device_name %> <%= language %>" data-counter="<%= image_counter %>">
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </table>
+      <% end %>
+    <% else %>
+      <% @data.each do |language, content| %>
+      <h1 id="<%= language %>" class="language"><%= language %></h1>
+      <hr>
+      <table><% content.each do |device_name, screens| %>
+        <tr>
+          <th colspan="<%= screens.count %>">
+            <a id="<%= language %>-<%= device_name %>" class="deviceName" href="#<%= language %>-<%= device_name %>"><%= device_name %></a>
+          </th>
+        </tr>
+        <tr><% screens.each do |screen_path| %><% next if screen_path.include?"_framed.png" %>
+          <td><% image_counter += 1 %>
+            <a href="<%= screen_path %>" target="_blank" class="screenshotLink">
+              <img class="screenshot" src="<%= screen_path %>" style="width: 100%;" alt="<%= language %> <%= device_name %>" data-counter="<%= image_counter %>">
+            </a>
+          </td><% end %>
+        </tr><% end %>
+      </table>
+      <% end %>
+    <% end %>
+
     <div id="overlay">
       <img id="imageDisplay" src="" alt="" />
       <div id="imageInfo"></div>
