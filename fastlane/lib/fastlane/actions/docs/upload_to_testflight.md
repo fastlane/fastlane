@@ -179,8 +179,6 @@ Add external testers from a CSV file. Create a file (ex: `testers.csv`) and fill
 John,Appleseed,appleseed_john@mac.com,group-1;group-2
 ```
 
-Importing the CSV is as simple as:
-
 ```no-highlight
 fastlane pilot import
 ```
