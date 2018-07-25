@@ -14,26 +14,26 @@ File.write("#{lib}/fastlane/plugins/template/.rubocop.yml", YAML.dump(config))
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
-  spec.authors       = ["Jimmy Dee",
-                        "Josh Holtz",
-                        "Stefan Natchev",
-                        "Felix Krause",
-                        "Manu Wallner",
-                        "Joshua Liebowitz",
-                        "Jan Piotrowski",
-                        "Aaron Brager",
-                        "Iulian Onofrei",
-                        "Danielle Tomlinson",
-                        "Fumiya Nakamura",
-                        "Olivier Halligon",
-                        "Helmut Januschka",
-                        "Luka Mirosevic",
-                        "Maksym Grebenets",
+  spec.authors       = ["Manu Wallner",
                         "Jorge Revuelta H",
                         "Matthew Ellis",
+                        "Danielle Tomlinson",
+                        "Iulian Onofrei",
+                        "Fumiya Nakamura",
+                        "Helmut Januschka",
+                        "Maksym Grebenets",
+                        "Jimmy Dee",
+                        "Felix Krause",
                         "Jérôme Lacoste",
+                        "Olivier Halligon",
+                        "Stefan Natchev",
+                        "Joshua Liebowitz",
+                        "Luka Mirosevic",
+                        "Kohki Miki",
                         "Andrew McBurney",
-                        "Kohki Miki"]
+                        "Aaron Brager",
+                        "Josh Holtz",
+                        "Jan Piotrowski"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -93,7 +93,7 @@ Gem::Specification.new do |spec|
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.
-  spec.add_dependency('google-api-client', '>= 0.21.2', '< 0.22.0') # Google API Client to access Play Publishing API
+  spec.add_dependency('google-api-client', '>= 0.21.2', '< 0.24.0') # Google API Client to access Play Publishing API
 
   spec.add_dependency('emoji_regex', '~> 0.1') # Used to scan for Emoji in the changelog
 

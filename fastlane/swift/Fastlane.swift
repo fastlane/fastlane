@@ -724,6 +724,7 @@ func captureIosScreenshots(workspace: String? = nil,
                            numberOfRetries: Int = 1,
                            stopAfterFirstError: Bool = false,
                            derivedDataPath: String? = nil,
+                           resultBundle: Bool = false,
                            testTargetName: String? = nil,
                            namespaceLogFiles: String? = nil,
                            concurrentSimulators: Bool = true) {
@@ -756,6 +757,7 @@ func captureIosScreenshots(workspace: String? = nil,
                                                                                                          RubyCommand.Argument(name: "number_of_retries", value: numberOfRetries),
                                                                                                          RubyCommand.Argument(name: "stop_after_first_error", value: stopAfterFirstError),
                                                                                                          RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath),
+                                                                                                         RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                                          RubyCommand.Argument(name: "test_target_name", value: testTargetName),
                                                                                                          RubyCommand.Argument(name: "namespace_log_files", value: namespaceLogFiles),
                                                                                                          RubyCommand.Argument(name: "concurrent_simulators", value: concurrentSimulators)])
@@ -790,6 +792,7 @@ func captureScreenshots(workspace: String? = nil,
                         numberOfRetries: Int = 1,
                         stopAfterFirstError: Bool = false,
                         derivedDataPath: String? = nil,
+                        resultBundle: Bool = false,
                         testTargetName: String? = nil,
                         namespaceLogFiles: String? = nil,
                         concurrentSimulators: Bool = true) {
@@ -822,6 +825,7 @@ func captureScreenshots(workspace: String? = nil,
                                                                                                      RubyCommand.Argument(name: "number_of_retries", value: numberOfRetries),
                                                                                                      RubyCommand.Argument(name: "stop_after_first_error", value: stopAfterFirstError),
                                                                                                      RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath),
+                                                                                                     RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                                      RubyCommand.Argument(name: "test_target_name", value: testTargetName),
                                                                                                      RubyCommand.Argument(name: "namespace_log_files", value: namespaceLogFiles),
                                                                                                      RubyCommand.Argument(name: "concurrent_simulators", value: concurrentSimulators)])
@@ -1968,11 +1972,13 @@ func jazzy(config: String? = nil) {
   _ = runner.executeCommand(command)
 }
 func jira(url: String,
+          contextPath: String = "",
           username: String,
           password: String,
           ticketId: String,
           commentText: String) {
   let command = RubyCommand(commandID: "", methodName: "jira", className: nil, args: [RubyCommand.Argument(name: "url", value: url),
+                                                                                      RubyCommand.Argument(name: "context_path", value: contextPath),
                                                                                       RubyCommand.Argument(name: "username", value: username),
                                                                                       RubyCommand.Argument(name: "password", value: password),
                                                                                       RubyCommand.Argument(name: "ticket_id", value: ticketId),
@@ -2340,7 +2346,7 @@ func pluginScores(outputPath: String,
 func podLibLint(useBundleExec: Bool = true,
                 verbose: String? = nil,
                 allowWarnings: String? = nil,
-                sources: String? = nil,
+                sources: [String]? = nil,
                 useLibraries: Bool = false,
                 failFast: Bool = false,
                 `private`: Bool = false,
@@ -2360,7 +2366,7 @@ func podPush(useBundleExec: Bool = false,
              repo: String? = nil,
              allowWarnings: String? = nil,
              useLibraries: String? = nil,
-             sources: String? = nil,
+             sources: [String]? = nil,
              swiftVersion: String? = nil,
              verbose: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "pod_push", className: nil, args: [RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec),
@@ -3134,6 +3140,7 @@ func snapshot(workspace: String? = snapshotfile.workspace,
               numberOfRetries: Int = snapshotfile.numberOfRetries,
               stopAfterFirstError: Bool = snapshotfile.stopAfterFirstError,
               derivedDataPath: String? = snapshotfile.derivedDataPath,
+              resultBundle: Bool = snapshotfile.resultBundle,
               testTargetName: String? = snapshotfile.testTargetName,
               namespaceLogFiles: String? = snapshotfile.namespaceLogFiles,
               concurrentSimulators: Bool = snapshotfile.concurrentSimulators) {
@@ -3166,6 +3173,7 @@ func snapshot(workspace: String? = snapshotfile.workspace,
                                                                                           RubyCommand.Argument(name: "number_of_retries", value: numberOfRetries),
                                                                                           RubyCommand.Argument(name: "stop_after_first_error", value: stopAfterFirstError),
                                                                                           RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath),
+                                                                                          RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                           RubyCommand.Argument(name: "test_target_name", value: testTargetName),
                                                                                           RubyCommand.Argument(name: "namespace_log_files", value: namespaceLogFiles),
                                                                                           RubyCommand.Argument(name: "concurrent_simulators", value: concurrentSimulators)])
@@ -3179,7 +3187,8 @@ func sonar(projectConfigurationPath: String? = nil,
            projectLanguage: String? = nil,
            sourceEncoding: String? = nil,
            sonarRunnerArgs: String? = nil,
-           sonarLogin: String? = nil) {
+           sonarLogin: String? = nil,
+           sonarUrl: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "sonar", className: nil, args: [RubyCommand.Argument(name: "project_configuration_path", value: projectConfigurationPath),
                                                                                        RubyCommand.Argument(name: "project_key", value: projectKey),
                                                                                        RubyCommand.Argument(name: "project_name", value: projectName),
@@ -3188,7 +3197,8 @@ func sonar(projectConfigurationPath: String? = nil,
                                                                                        RubyCommand.Argument(name: "project_language", value: projectLanguage),
                                                                                        RubyCommand.Argument(name: "source_encoding", value: sourceEncoding),
                                                                                        RubyCommand.Argument(name: "sonar_runner_args", value: sonarRunnerArgs),
-                                                                                       RubyCommand.Argument(name: "sonar_login", value: sonarLogin)])
+                                                                                       RubyCommand.Argument(name: "sonar_login", value: sonarLogin),
+                                                                                       RubyCommand.Argument(name: "sonar_url", value: sonarUrl)])
   _ = runner.executeCommand(command)
 }
 func splunkmint(dsym: String? = nil,
@@ -3581,13 +3591,15 @@ func updateUrlSchemes(path: String,
                                                                                                     RubyCommand.Argument(name: "update_url_schemes", value: updateUrlSchemes)])
   _ = runner.executeCommand(command)
 }
-func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/Themoji.dSYM.zip",
+func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/Themoji2.dSYM",
+                                dsymPaths: [String]? = nil,
                                 apiToken: String? = nil,
                                 gspPath: String? = nil,
                                 binaryPath: String? = nil,
                                 platform: String = "ios",
                                 dsymWorkerThreads: Int = 1) {
   let command = RubyCommand(commandID: "", methodName: "upload_symbols_to_crashlytics", className: nil, args: [RubyCommand.Argument(name: "dsym_path", value: dsymPath),
+                                                                                                               RubyCommand.Argument(name: "dsym_paths", value: dsymPaths),
                                                                                                                RubyCommand.Argument(name: "api_token", value: apiToken),
                                                                                                                RubyCommand.Argument(name: "gsp_path", value: gspPath),
                                                                                                                RubyCommand.Argument(name: "binary_path", value: binaryPath),
@@ -3945,7 +3957,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-9.2.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -4051,4 +4063,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.22]
+// FastlaneRunnerAPIVersion [0.9.24]
