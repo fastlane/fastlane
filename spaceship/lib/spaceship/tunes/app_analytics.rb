@@ -72,48 +72,48 @@ module Spaceship
         app_crashes_interval(start_t, end_t)
       end
 
-      def dimension_interval(start_t, end_t, dimension, filter = nil)
-        client.time_series_analytics([apple_id], [dimension], start_t, end_t, "DAY", filter)
+      def dimension_interval(start_t, end_t, dimension, view_by = nil)
+        client.time_series_analytics([apple_id], [dimension], start_t, end_t, "DAY", view_by)
       end
 
-      def app_units_interval(start_t, end_t, filter = nil)
-        client.time_series_analytics([apple_id], ['units'], start_t, end_t, "DAY", filter)
+      def app_units_interval(start_t, end_t, view_by = nil)
+        client.time_series_analytics([apple_id], ['units'], start_t, end_t, "DAY", view_by)
       end
 
-      def app_views_interval(start_t, end_t, filter = nil)
-        client.time_series_analytics([apple_id], ['pageViewCount'], start_t, end_t, "DAY", filter)
+      def app_views_interval(start_t, end_t, view_by = nil)
+        client.time_series_analytics([apple_id], ['pageViewCount'], start_t, end_t, "DAY", view_by)
       end
 
-      def app_in_app_purchases_interval(start_t, end_t, filter = nil)
-        client.time_series_analytics([apple_id], ['iap'], start_t, end_t, "DAY", filter)
+      def app_in_app_purchases_interval(start_t, end_t, view_by = nil)
+        client.time_series_analytics([apple_id], ['iap'], start_t, end_t, "DAY", view_by)
       end
 
-      def app_sales_interval(start_t, end_t, filter = nil)
-        client.time_series_analytics([apple_id], ['sales'], start_t, end_t, "DAY", filter)
+      def app_sales_interval(start_t, end_t, view_by = nil)
+        client.time_series_analytics([apple_id], ['sales'], start_t, end_t, "DAY", view_by)
       end
 
-      def app_paying_users_interval(start_t, end_t, filter = nil)
-        client.time_series_analytics([apple_id], ['payingUsers'], start_t, end_t, "DAY", filter)
+      def app_paying_users_interval(start_t, end_t, view_by = nil)
+        client.time_series_analytics([apple_id], ['payingUsers'], start_t, end_t, "DAY", view_by)
       end
 
-      def app_installs_interval(start_t, end_t, filter = nil)
-        client.time_series_analytics([apple_id], ['installs'], start_t, end_t, "DAY", filter)
+      def app_installs_interval(start_t, end_t, view_by = nil)
+        client.time_series_analytics([apple_id], ['installs'], start_t, end_t, "DAY", view_by)
       end
 
-      def app_sessions_interval(start_t, end_t, filter = nil)
-        client.time_series_analytics([apple_id], ['sessions'], start_t, end_t, "DAY", filter)
+      def app_sessions_interval(start_t, end_t, view_by = nil)
+        client.time_series_analytics([apple_id], ['sessions'], start_t, end_t, "DAY", view_by)
       end
 
-      def app_active_devices_interval(start_t, end_t, filter = nil)
-        client.time_series_analytics([apple_id], ['activeDevices'], start_t, end_t, "DAY", filter)
+      def app_active_devices_interval(start_t, end_t, view_by = nil)
+        client.time_series_analytics([apple_id], ['activeDevices'], start_t, end_t, "DAY", view_by)
       end
 
-      def app_active_last_30_days_interval(start_t, end_t, filter = nil)
-        client.time_series_analytics([apple_id], ['rollingActiveDevices'], start_t, end_t, "DAY", filter)
+      def app_active_last_30_days_interval(start_t, end_t, view_by = nil)
+        client.time_series_analytics([apple_id], ['rollingActiveDevices'], start_t, end_t, "DAY", view_by)
       end
 
-      def app_crashes_interval(start_t, end_t, filter = nil)
-        client.time_series_analytics([apple_id], ['crashes'], start_t, end_t, "DAY", filter)
+      def app_crashes_interval(start_t, end_t, view_by = nil)
+        client.time_series_analytics([apple_id], ['crashes'], start_t, end_t, "DAY", view_by)
       end
 
       def time_last_7_days
