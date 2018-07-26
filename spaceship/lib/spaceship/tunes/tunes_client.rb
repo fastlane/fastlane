@@ -515,13 +515,13 @@ module Spaceship
     # @!group AppAnalytics
     #####################################################
 
-    def time_series_analytics(app_ids, measures, start_time, end_time, frequency)
+    def time_series_analytics(app_ids, measures, start_time, end_time, frequency, filter)
       data = {
         adamId: app_ids,
         dimensionFilters: [],
         endTime: end_time,
         frequency: frequency,
-        group: nil,
+        group: {metric: measures.first, dimension: filter, rank: "DESCENDING", limit: 3},
         measures: measures,
         startTime: start_time
       }
