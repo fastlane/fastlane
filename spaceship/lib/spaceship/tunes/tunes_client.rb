@@ -1416,7 +1416,7 @@ module Spaceship
       else
         return {
           metric: measures.first,
-          dimension: filter,
+          dimension: view_by,
           rank: "DESCENDING",
           limit: 3
         }
