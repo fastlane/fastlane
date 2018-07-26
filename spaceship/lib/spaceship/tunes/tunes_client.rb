@@ -1414,12 +1414,12 @@ module Spaceship
       if view_by.nil? || measures.nil?
         return nil
       else
-        return { 
-          metric: measures.first, 
-          dimension: filter, 
-          rank: "DESCENDING", 
-          limit: 3 
-        }  
+        return {
+          metric: measures.first,
+          dimension: filter,
+          rank: "DESCENDING",
+          limit: 3
+        }
       end
     end
 

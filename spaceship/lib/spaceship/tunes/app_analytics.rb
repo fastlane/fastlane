@@ -72,8 +72,8 @@ module Spaceship
         app_crashes_interval(start_t, end_t)
       end
 
-      def dimension_interval(start_t, end_t, dimension, view_by = nil)
-        client.time_series_analytics([apple_id], [dimension], start_t, end_t, "DAY", view_by)
+      def measure_interval(start_t, end_t, measure, view_by = nil)
+        client.time_series_analytics([apple_id], [measure], start_t, end_t, "DAY", view_by)
       end
 
       def app_units_interval(start_t, end_t, view_by = nil)
