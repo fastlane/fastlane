@@ -173,7 +173,11 @@ fastlane pilot export
 
 ### Import testers
 
-Add external testers from a CSV file. Sample CSV file available [here](https://itunesconnect.apple.com/itc/docs/tester_import.csv).
+Add external testers from a CSV file. Create a file (ex: `testers.csv`) and fill it with the following format:
+
+```no-highlight
+John,Appleseed,appleseed_john@mac.com,group-1;group-2
+```
 
 ```no-highlight
 fastlane pilot import
