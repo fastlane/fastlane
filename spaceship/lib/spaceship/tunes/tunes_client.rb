@@ -1409,7 +1409,8 @@ module Spaceship
       @sso_token_for_video ||= ref_data.sso_token_for_video
     end
 
-    # generates group hash used in the analytics time_series API
+    # generates group hash used in the analytics time_series API.
+    # Using rank=DESCENDING and limit=3 as this is what the App Store Connect analytics dashboard uses.
     def group_for_view_by(view_by, measures)
       if view_by.nil? || measures.nil?
         return nil

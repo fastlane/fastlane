@@ -74,6 +74,20 @@ describe Spaceship::Tunes::AppAnalytics do
         a['adamId'].include?('898536088')
       end
       expect(val['meetsThreshold']).to eq(true)
+
+      measure_installs = app_measure_interval(start_t, end_t, 'installs')
+      expect(measure_installs['size']).to eq(1)
+      val = measure_installs['results'].find do |a|
+        a['adamId'].include?('898536088')
+      end
+      expect(val['meetsThreshold']).to eq(true)
+
+      measure_installs_by_source = app_measure_interval(start_t, end_t, 'installs', 'source')
+      expect(measure_installs_by_source['size']).to eq(5)
+      val = measure_installs_by_source['results'].find do |a|
+        a['adamId'].include?('898536088')
+      end
+      expect(val['meetsThreshold']).to eq(true)
     end
 
     it "accesses non-live analytics details" do
