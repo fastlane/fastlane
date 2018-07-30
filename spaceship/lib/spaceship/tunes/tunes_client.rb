@@ -515,13 +515,13 @@ module Spaceship
     # @!group AppAnalytics
     #####################################################
 
-    def time_series_analytics(app_ids, measures, start_time, end_time, frequency)
+    def time_series_analytics(app_ids, measures, start_time, end_time, frequency, view_by)
       data = {
         adamId: app_ids,
         dimensionFilters: [],
         endTime: end_time,
         frequency: frequency,
-        group: nil,
+        group: group_for_view_by(view_by, measures),
         measures: measures,
         startTime: start_time
       }
@@ -1407,6 +1407,21 @@ module Spaceship
     # the ssoTokenForVideo found in the AppVersionRef instance
     def sso_token_for_video
       @sso_token_for_video ||= ref_data.sso_token_for_video
+    end
+
+    # generates group hash used in the analytics time_series API.
+    # Using rank=DESCENDING and limit=3 as this is what the App Store Connect analytics dashboard uses.
+    def group_for_view_by(view_by, measures)
+      if view_by.nil? || measures.nil?
+        return nil
+      else
+        return {
+          metric: measures.first,
+          dimension: view_by,
+          rank: "DESCENDING",
+          limit: 3
+        }
+      end
     end
 
     def update_tester_from_app!(tester, app_id, testing)
