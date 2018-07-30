@@ -456,10 +456,10 @@ module FastlaneCore
         @_project_paths = workspace_data.scan(/\"group:(.*)\"/).collect do |current_match|
           # It's a relative path from the workspace file
           File.join(File.expand_path("..", path), current_match.first)
-        end.find_all do |current_match|
+        end.reject do |current_match|
           # We're not interested in a `Pods` project, as it doesn't contain any relevant
           # information about code signing
-          !current_match.end_with?("Pods/Pods.xcodeproj")
+          current_match.end_with?("Pods/Pods.xcodeproj")
         end
 
         return @_project_paths
