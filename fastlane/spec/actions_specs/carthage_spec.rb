@@ -338,6 +338,17 @@ describe Fastlane do
           eq("carthage bootstrap --derived-data ../derived\\ data")
       end
 
+      it "use custom executable" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              executable: 'custom_carthage'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to \
+          eq("custom_carthage bootstrap")
+      end
+
       it "updates with a single dependency" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
