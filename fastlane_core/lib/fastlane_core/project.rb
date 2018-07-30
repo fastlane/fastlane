@@ -456,6 +456,9 @@ module FastlaneCore
         @_project_paths = workspace_data.scan(/\"group:(.*)\"/).collect do |current_match|
           # It's a relative path from the workspace file
           File.join(File.expand_path("..", path), current_match.first)
+        end.select do |current_match|
+          # Xcode workspaces can contain loose files now, so let's filter non-xcodeproj files.
+          current_match.end_with?(".xcodeproj")
         end.reject do |current_match|
           # We're not interested in a `Pods` project, as it doesn't contain any relevant
           # information about code signing
