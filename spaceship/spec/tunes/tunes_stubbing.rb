@@ -316,6 +316,10 @@ class TunesStubbing
       stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1195137656/pricing/equalize/EUR/1").
         to_return(status: 200, body: itc_read_fixture_file("iap_price_goal_calc.json"),
                  headers: { "Content-Type" => "application/json" })
+      stub_request(:get, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1195137657/pricing/equalize/EUR/1").
+        to_return(status: 200, body: itc_read_fixture_file("iap_price_goal_calc.json"),
+                 headers: { "Content-Type" => "application/json" })
+
       # delete iap
       stub_request(:delete, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1194457865").
         to_return(status: 200, body: "", headers: {})
@@ -327,6 +331,11 @@ class TunesStubbing
       # create recurring iap
       stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps").
         with(body: itc_read_fixture_file("iap_create_recurring.json")).
+        to_return(status: 200, body: itc_read_fixture_file("iap_detail_recurring.json"),
+                  headers: { "Content-Type" => "application/json" })
+      # create recurring iap witout pricing
+      stub_request(:post, "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps").
+        with(body: itc_read_fixture_file("iap_create_recurring_without_pricing.json")).
         to_return(status: 200, body: itc_read_fixture_file("iap_detail_recurring.json"),
                   headers: { "Content-Type" => "application/json" })
       # iap consumable template
@@ -581,6 +590,11 @@ class TunesStubbing
       stub_request(:post, "https://analytics.itunes.apple.com/analytics/api/v1/data/time-series").
         with(body: { "adamId" => ["898536088"], "dimensionFilters" => [], "endTime" => end_time, "frequency" => "DAY", "group" => nil, "measures" => ["crashes"], "startTime" => start_time }.to_json).
         to_return(status: 200, body: itc_read_fixture_file("app_analytics_crashes.json"),
+                  headers: { "Content-Type" => "application/json" })
+
+      stub_request(:post, "https://analytics.itunes.apple.com/analytics/api/v1/data/time-series").
+        with(body: { "adamId" => ["898536088"], "dimensionFilters" => [], "endTime" => end_time, "frequency" => "DAY", "group" => { metric: "installs", dimension: "source", rank: "DESCENDING", limit: 3 }, "measures" => ["installs"], "startTime" => start_time }.to_json).
+        to_return(status: 200, body: itc_read_fixture_file("app_analytics_installs_by_source.json"),
                   headers: { "Content-Type" => "application/json" })
     end
 

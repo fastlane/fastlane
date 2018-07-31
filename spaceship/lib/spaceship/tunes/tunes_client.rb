@@ -515,13 +515,13 @@ module Spaceship
     # @!group AppAnalytics
     #####################################################
 
-    def time_series_analytics(app_ids, measures, start_time, end_time, frequency)
+    def time_series_analytics(app_ids, measures, start_time, end_time, frequency, view_by)
       data = {
         adamId: app_ids,
         dimensionFilters: [],
         endTime: end_time,
         frequency: frequency,
-        group: nil,
+        group: group_for_view_by(view_by, measures),
         measures: measures,
         startTime: start_time
       }
@@ -573,6 +573,51 @@ module Spaceship
         req.headers['Content-Type'] = 'application/json'
       end
       handle_itc_response(r.body)
+    end
+
+    def transform_to_raw_pricing_intervals(app_id = nil, purchase_id = nil, pricing_intervals = nil, subscription_price_target = nil)
+      intervals_array = []
+      if pricing_intervals
+        intervals_array = pricing_intervals.map do |interval|
+          {
+            "value" =>  {
+              "tierStem" =>  interval[:tier],
+              "priceTierEffectiveDate" =>  interval[:begin_date],
+              "priceTierEndDate" =>  interval[:end_date],
+              "country" =>  interval[:country] || "WW",
+              "grandfathered" =>  interval[:grandfathered]
+            }
+          }
+        end
+      end
+
+      if subscription_price_target
+        pricing_calculator = iap_subscription_pricing_target(app_id: app_id, purchase_id: purchase_id, currency: subscription_price_target[:currency], tier: subscription_price_target[:tier])
+        intervals_array = pricing_calculator.map do |language_code, value|
+          existing_interval =
+            if pricing_intervals
+              pricing_intervals.find { |interval| interval[:country] == language_code }
+            end
+          grandfathered =
+            if existing_interval
+              existing_interval[:grandfathered].clone
+            else
+              { "value" => "FUTURE_NONE" }
+            end
+
+          {
+            "value" => {
+              "tierStem" => value["tierStem"],
+              "priceTierEffectiveDate" => value["priceTierEffectiveDate"],
+              "priceTierEndDate" => value["priceTierEndDate"],
+              "country" => language_code,
+              "grandfathered" => grandfathered
+            }
+          }
+        end
+      end
+
+      intervals_array
     end
 
     def price_tier(app_id)
@@ -1407,6 +1452,21 @@ module Spaceship
     # the ssoTokenForVideo found in the AppVersionRef instance
     def sso_token_for_video
       @sso_token_for_video ||= ref_data.sso_token_for_video
+    end
+
+    # generates group hash used in the analytics time_series API.
+    # Using rank=DESCENDING and limit=3 as this is what the App Store Connect analytics dashboard uses.
+    def group_for_view_by(view_by, measures)
+      if view_by.nil? || measures.nil?
+        return nil
+      else
+        return {
+          metric: measures.first,
+          dimension: view_by,
+          rank: "DESCENDING",
+          limit: 3
+        }
+      end
     end
 
     def update_tester_from_app!(tester, app_id, testing)

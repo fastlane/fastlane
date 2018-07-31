@@ -52,6 +52,14 @@ module Spaceship
       # @param family_id (String) Only used on RECURRING purchases, assigns the In-App-Purchase to a specific familie
       # @param subscription_free_trial (String) Free Trial duration (1w,1m,3m....)
       # @param subscription_duration (String) 1w,1m.....
+      # @param subscription_price_target (Hash) Only used on RECURRING purchases, used to set the
+      # price of all the countries to be roughly the same as the price calculated from the price
+      # tier and currency given as input.
+      # @example:
+      #  {
+      #    currency: "EUR",
+      #    tier: 2
+      #  }
       def create!(type: "consumable",
                   versions: nil,
                   reference_name: nil,
@@ -62,8 +70,8 @@ module Spaceship
                   pricing_intervals: nil,
                   family_id: nil,
                   subscription_free_trial: nil,
-                  subscription_duration: nil)
-
+                  subscription_duration: nil,
+                  subscription_price_target: nil)
         client.create_iap!(app_id: self.application.apple_id,
                            type: type,
                            versions: versions,
@@ -78,30 +86,20 @@ module Spaceship
                            subscription_free_trial: subscription_free_trial)
 
         # Update pricing for a recurring subscription.
-        if type == Spaceship::Tunes::IAPType::RECURRING && pricing_intervals
+        if type == Spaceship::Tunes::IAPType::RECURRING &&
+           (pricing_intervals || subscription_price_target)
           # There are cases where the product that was just created is not immediately found,
           # and in order to update its pricing the purchase_id is needed. Therefore polling is done
-          # for 4 times until it is found. If it's not found after 4 tries, a PotentialServerError
+          # for 4 times until it is found. If it's not found after 6 tries, a PotentialServerError
           # exception is raised.
-          product = find_product_with_retries(product_id, 4)
-          transformed_pricing_intervals = transform_pricing_intervals(pricing_intervals)
+          product = find_product_with_retries(product_id, 6)
+          raw_pricing_intervals =
+            client.transform_to_raw_pricing_intervals(application.apple_id,
+                                                      product.purchase_id, pricing_intervals,
+                                                      subscription_price_target)
           client.update_recurring_iap_pricing!(app_id: self.application.apple_id,
                                                purchase_id: product.purchase_id,
-                                               pricing_intervals: transformed_pricing_intervals)
-        end
-      end
-
-      def transform_pricing_intervals(pricing_intervals)
-        pricing_intervals.map do |interval|
-          {
-            "value" =>  {
-              "tierStem" =>  interval[:tier],
-              "priceTierEffectiveDate" =>  interval[:begin_date],
-              "priceTierEndDate" =>  interval[:end_date],
-              "country" =>  interval[:country] || "WW",
-              "grandfathered" =>  interval[:grandfathered]
-            }
-          }
+                                               pricing_intervals: raw_pricing_intervals)
         end
       end
 

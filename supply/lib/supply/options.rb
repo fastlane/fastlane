@@ -202,7 +202,13 @@ module Supply
                                      optional: true,
                                      description: "Check the other tracks for superseded versions and disable them",
                                      is_string: false,
-                                     default_value: false)
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :timeout,
+                                     env_name: "SUPPLY_TIMEOUT",
+                                     optional: true,
+                                     description: "Timeout for read, open, and send (in seconds)",
+                                     type: Integer,
+                                     default_value: 300)
 
       ]
     end
