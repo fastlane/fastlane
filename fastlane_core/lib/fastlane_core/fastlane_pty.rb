@@ -1,3 +1,4 @@
+# PTY that also works on platforms that don't have PTY (e.g. Windows) by falling back on Open3.popen2e
 # Source: Mix of https://github.com/fastlane/fastlane/pull/7202/files,
 # https://github.com/fastlane/fastlane/pull/11384#issuecomment-356084518 and
 # https://github.com/DragonBox/u3d/blob/59e471ad78ac00cb629f479dbe386c5ad2dc5075/lib/u3d_core/command_runner.rb#L88-L96
@@ -6,7 +7,15 @@ module FastlaneCore
     def self.spawn(command, &block)
       require 'pty'
       PTY.spawn(command) do |command_stdout, command_stdin, pid|
-        block.call(command_stdout, command_stdin, pid)
+        begin
+          block.call(command_stdout, command_stdin, pid)
+        rescue Errno::EIO
+          # This is expected on some linux systems, that indicates that the subcommand finished
+          # and we kept trying to read, ignore it
+        ensure
+          Process.wait(pid)
+        end
+        $CHILD_STATUS.exitstatus
       end
     rescue LoadError
       require 'open3'
