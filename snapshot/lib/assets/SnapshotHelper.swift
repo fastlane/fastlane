@@ -160,7 +160,7 @@ open class Snapshot: NSObject {
                 return
             }
             
-            let window = window.firstMatch
+            let window = app.windows.firstMatch
             let screenshot = window.screenshot()
             guard let simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
             let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
