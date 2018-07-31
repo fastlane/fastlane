@@ -9,9 +9,6 @@ module FastlaneCore
       PTY.spawn(command) do |command_stdout, command_stdin, pid|
         begin
           block.call(command_stdout, command_stdin, pid)
-        rescue Errno::EIO
-          # This is expected on some linux systems, that indicates that the subcommand finished
-          # and we kept trying to read, ignore it
         ensure
           Process.wait(pid)
         end

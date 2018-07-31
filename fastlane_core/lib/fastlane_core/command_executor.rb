@@ -49,18 +49,23 @@ module FastlaneCore
 
         begin
           status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
-            command_stdout.each do |l|
-              line = l.strip # strip so that \n gets removed
-              output << line
+            begin
+              command_stdout.each do |l|
+                line = l.strip # strip so that \n gets removed
+                output << line
 
-              next unless print_all
+                next unless print_all
 
-              # Prefix the current line with a string
-              prefix.each do |element|
-                line = element[:prefix] + line if element[:block] && element[:block].call(line)
+                # Prefix the current line with a string
+                prefix.each do |element|
+                  line = element[:prefix] + line if element[:block] && element[:block].call(line)
+                end
+
+                UI.command_output(line)
               end
-
-              UI.command_output(line)
+            rescue Errno::EIO
+              # This is expected on some linux systems, that indicates that the subcommand finished
+              # and we kept trying to read, ignore it
             end
           end
         rescue => ex
@@ -84,7 +89,7 @@ module FastlaneCore
           if error
             error.call(o, status)
           else
-            UI.user_error!("Exit status: #{status}")
+            #UI.user_error!("Exit status: #{status}")
           end
         end
 
