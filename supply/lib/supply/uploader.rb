@@ -153,7 +153,7 @@ module Supply
 
     def upload_bundles
       aab_path = Supply.config[:aab]
-      return unless aab_path
+      return [] unless aab_path
 
       UI.message("Preparing aab at path '#{aab_path}' for upload...")
       return [client.upload_bundle(aab_path)]
