@@ -101,6 +101,10 @@ module Spaceship
                                     platform: platform,
                                     itunes_connect_users: itunes_connect_users)
         end
+
+        def available_bundle_ids(platform: nil)
+          client.get_available_bundle_ids(platform: platform)
+        end
       end
 
       #####################################################
