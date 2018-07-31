@@ -290,6 +290,10 @@ module Spaceship
       r = request(:get, "ra/apps/create/v2/?platformString=#{platform}")
       data = parse_response(r, 'data')
 
+      # check if the bundle id exists in the list of bundle ids
+      available_bundle_ids = data['bundleIds']
+      raise 'requested bundle id not available' unless available_bundle_ids.keys.include?(bundle_id)
+
       # Now fill in the values we have
       # some values are nil, that's why there is a hash
       data['name'] = { value: name }
