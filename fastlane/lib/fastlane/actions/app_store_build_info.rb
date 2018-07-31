@@ -12,7 +12,7 @@ module Fastlane
         build_info = get_build_info(params)
 
         build_nr = build_info[:latest_build_number]
-        
+
         # Convert build_nr to int (for legacy use) if no "." in string
         if build_nr.kind_of?(String) && !build_nr.include?(".")
           build_nr = build_nr.to_i
