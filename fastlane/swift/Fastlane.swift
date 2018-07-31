@@ -848,7 +848,8 @@ func carthage(command: String = "bootstrap",
               toolchain: String? = nil,
               projectDirectory: String? = nil,
               newResolver: Bool? = nil,
-              logPath: String? = nil) {
+              logPath: String? = nil,
+              executable: String = "carthage") {
   let command = RubyCommand(commandID: "", methodName: "carthage", className: nil, args: [RubyCommand.Argument(name: "command", value: command),
                                                                                           RubyCommand.Argument(name: "dependencies", value: dependencies),
                                                                                           RubyCommand.Argument(name: "use_ssh", value: useSsh),
@@ -866,7 +867,8 @@ func carthage(command: String = "bootstrap",
                                                                                           RubyCommand.Argument(name: "toolchain", value: toolchain),
                                                                                           RubyCommand.Argument(name: "project_directory", value: projectDirectory),
                                                                                           RubyCommand.Argument(name: "new_resolver", value: newResolver),
-                                                                                          RubyCommand.Argument(name: "log_path", value: logPath)])
+                                                                                          RubyCommand.Argument(name: "log_path", value: logPath),
+                                                                                          RubyCommand.Argument(name: "executable", value: executable)])
   _ = runner.executeCommand(command)
 }
 func cert(development: Bool = false,
@@ -3270,7 +3272,8 @@ func supply(packageName: String,
             mapping: String? = nil,
             mappingPaths: [String]? = nil,
             rootUrl: String? = nil,
-            checkSupersededTracks: Bool = false) {
+            checkSupersededTracks: Bool = false,
+            timeout: Int = 300) {
   let command = RubyCommand(commandID: "", methodName: "supply", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
                                                                                         RubyCommand.Argument(name: "track", value: track),
                                                                                         RubyCommand.Argument(name: "rollout", value: rollout),
@@ -3292,7 +3295,8 @@ func supply(packageName: String,
                                                                                         RubyCommand.Argument(name: "mapping", value: mapping),
                                                                                         RubyCommand.Argument(name: "mapping_paths", value: mappingPaths),
                                                                                         RubyCommand.Argument(name: "root_url", value: rootUrl),
-                                                                                        RubyCommand.Argument(name: "check_superseded_tracks", value: checkSupersededTracks)])
+                                                                                        RubyCommand.Argument(name: "check_superseded_tracks", value: checkSupersededTracks),
+                                                                                        RubyCommand.Argument(name: "timeout", value: timeout)])
   _ = runner.executeCommand(command)
 }
 func swiftlint(mode: String = "lint",
@@ -3758,7 +3762,8 @@ func uploadToPlayStore(packageName: String,
                        mapping: String? = nil,
                        mappingPaths: [String]? = nil,
                        rootUrl: String? = nil,
-                       checkSupersededTracks: Bool = false) {
+                       checkSupersededTracks: Bool = false,
+                       timeout: Int = 300) {
   let command = RubyCommand(commandID: "", methodName: "upload_to_play_store", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
                                                                                                       RubyCommand.Argument(name: "track", value: track),
                                                                                                       RubyCommand.Argument(name: "rollout", value: rollout),
@@ -3780,7 +3785,8 @@ func uploadToPlayStore(packageName: String,
                                                                                                       RubyCommand.Argument(name: "mapping", value: mapping),
                                                                                                       RubyCommand.Argument(name: "mapping_paths", value: mappingPaths),
                                                                                                       RubyCommand.Argument(name: "root_url", value: rootUrl),
-                                                                                                      RubyCommand.Argument(name: "check_superseded_tracks", value: checkSupersededTracks)])
+                                                                                                      RubyCommand.Argument(name: "check_superseded_tracks", value: checkSupersededTracks),
+                                                                                                      RubyCommand.Argument(name: "timeout", value: timeout)])
   _ = runner.executeCommand(command)
 }
 func uploadToTestflight(username: String,
@@ -3957,7 +3963,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode-9.2.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -4063,4 +4069,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.24]
+// FastlaneRunnerAPIVersion [0.9.25]
