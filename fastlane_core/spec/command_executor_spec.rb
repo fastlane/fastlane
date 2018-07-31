@@ -1,6 +1,11 @@
 describe FastlaneCore do
   describe FastlaneCore::CommandExecutor do
     describe "execute" do
+      it 'executes a simple command successfully' do
+        result = FastlaneCore::CommandExecutor.execute(command: 'echo foo')
+        expect(result).to eq('foo')
+      end
+
       it 'handles reading which throws a EIO exception' do
         explodes_on_strip = 'danger! lasers!'
         fake_std_in = ['a_filename', explodes_on_strip]
