@@ -62,7 +62,7 @@ module Fastlane
       end
 
       def self.description
-        "Send a success/error message to your Slack group"
+        "Send a success/error message to your [Slack](https://slack.com) group"
       end
 
       def self.available_options
