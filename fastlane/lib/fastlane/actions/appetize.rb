@@ -87,7 +87,7 @@ module Fastlane
       private_class_method :parse_response
 
       def self.description
-        "Upload your app to Appetize.io to stream it in the browser"
+        "Upload your app to [Appetize.io](https://appetize.io/) to stream it in the browser"
       end
 
       def self.details
