@@ -59,7 +59,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Upload dSYM file to Apteligent (Crittercism)"
+        "Upload dSYM file to [Apteligent (Crittercism)](http://www.apteligent.com/)"
       end
 
       def self.available_options
