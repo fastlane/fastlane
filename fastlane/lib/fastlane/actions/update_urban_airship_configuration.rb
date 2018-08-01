@@ -21,7 +21,7 @@ module Fastlane
       end
 
       def self.description
-        "Set the [Urban Airship](https://www.urbanairship.com/) plist configuration values"
+        "Set [Urban Airship](https://www.urbanairship.com/) plist configuration values"
       end
 
       def self.details
