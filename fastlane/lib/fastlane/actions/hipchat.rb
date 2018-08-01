@@ -91,7 +91,7 @@ module Fastlane
       end
 
       def self.description
-        "Send a error/success message to HipChat"
+        "Send a error/success message to [HipChat](https://www.hipchat.com/)"
       end
 
       def self.available_options
