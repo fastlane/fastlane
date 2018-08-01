@@ -110,6 +110,19 @@ describe Spaceship::Application do
       end
     end
 
+    describe '#available_bundle_ids' do
+      it "returns the list of bundle ids" do
+        TunesStubbing.itc_stub_applications_first_create
+        bundle_ids = Spaceship::Tunes::Application.available_bundle_ids
+        expect(bundle_ids.length).to eq(5)
+        expect(bundle_ids[0]).to eq("com.krausefx.app_name")
+        expect(bundle_ids[1]).to eq("net.sunapps.*")
+        expect(bundle_ids[2]).to eq("net.sunapps.947474")
+        expect(bundle_ids[3]).to eq("*")
+        expect(bundle_ids[4]).to eq("net.sunapps.100")
+      end
+    end
+
     describe "#resolution_center" do
       it "when the app was rejected" do
         TunesStubbing.itc_stub_resolution_center
