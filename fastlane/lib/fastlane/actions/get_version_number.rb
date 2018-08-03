@@ -85,7 +85,7 @@ module Fastlane
       end
 
       def self.get_plist!(folder, target, configuration = nil)
-        plist_files = target.resolved_build_setting("INFOPLIST_FILE")
+        plist_files = target.resolved_build_setting("INFOPLIST_FILE", true)
         plist_files_count = plist_files.values.compact.uniq.count
 
         # Get plist file for specified configuration
@@ -100,6 +100,8 @@ module Fastlane
         else
           plist_file = plist_files.values.first
         end
+
+        UI.user_error!("Cannot find value for INFOPLIST_FILE build setting") if plist_file.nil?
 
         # $(SRCROOT) is the path of where the XcodeProject is
         # We can just set this as empty string since we join with `folder` below
