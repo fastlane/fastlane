@@ -79,7 +79,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Upload dSYM file to Splunk MINT"
+        "Upload dSYM file to [Splunk MINT](https://mint.splunk.com/)"
       end
 
       def self.available_options
