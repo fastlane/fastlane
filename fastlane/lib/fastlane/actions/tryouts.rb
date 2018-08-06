@@ -58,7 +58,7 @@ module Fastlane
       end
 
       def self.description
-        "Upload a new build to Tryouts"
+        "Upload a new build to [Tryouts](https://tryouts.io/)"
       end
 
       def self.details

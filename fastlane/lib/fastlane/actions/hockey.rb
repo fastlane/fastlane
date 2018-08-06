@@ -183,7 +183,7 @@ module Fastlane
       end
 
       def self.description
-        "Upload a new build to HockeyApp"
+        "Upload a new build to [HockeyApp](https://hockeyapp.net/)"
       end
 
       def self.available_options
