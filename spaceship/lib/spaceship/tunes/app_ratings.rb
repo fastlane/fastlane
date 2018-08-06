@@ -46,8 +46,8 @@ module Spaceship
       end
 
       # @return (Array) of Review Objects
-      def reviews(store_front = '', version_id = '')
-        raw_reviews = client.get_reviews(application.apple_id, application.platform, store_front, version_id)
+      def reviews(store_front = '', version_id = '', upto_date = '')
+        raw_reviews = client.get_reviews(application.apple_id, application.platform, store_front, version_id, upto_date)
         raw_reviews.map do |review|
           review["value"]["application"] = self.application
           AppReview.factory(review["value"])

@@ -358,7 +358,7 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def get_reviews(app_id, platform, storefront, version_id)
+    def get_reviews(app_id, platform, storefront, version_id, upto_date)
       index = 0
       per_page = 100 # apple default
       all_reviews = []
@@ -371,6 +371,12 @@ module Spaceship
 
         r = request(:get, rating_url)
         all_reviews.concat(parse_response(r, 'data')['reviews'])
+
+        last_review_date = Date.parse(Time.at(all_reviews[-1]['value']['lastModified']/1000).to_s).to_date
+        if last_review_date < DateTime.parse(upto_date).to_date
+          break
+        end
+
         if all_reviews.count < parse_response(r, 'data')['reviewCount']
           index += per_page
         else
