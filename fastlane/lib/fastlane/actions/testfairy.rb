@@ -130,7 +130,7 @@ module Fastlane
       private_class_method :parse_response
 
       def self.description
-        'Upload a new build to TestFairy'
+        'Upload a new build to [TestFairy](https://www.testfairy.com/)'
       end
 
       def self.details

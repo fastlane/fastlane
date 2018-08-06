@@ -58,7 +58,7 @@ module Fastlane
       end
 
       def self.description
-        "Upload a new build to Crashlytics Beta"
+        "Upload a new build to [Crashlytics Beta](http://try.crashlytics.com/beta/)"
       end
 
       def self.available_options

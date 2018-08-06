@@ -60,7 +60,7 @@ module Fastlane
       end
 
       def self.description
-        "Upload a new build to Installr"
+        "Upload a new build to [Installr](http://installrapp.com/)"
       end
 
       def self.available_options
