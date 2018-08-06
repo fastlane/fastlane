@@ -19,6 +19,11 @@ module Fastlane
         end
 
         Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER] = build_nr
+
+        unless build_nr.nil?
+          build_info[:latest_build_number] = build_nr
+        end
+        build_info
       end
 
       def self.get_build_info(params)
