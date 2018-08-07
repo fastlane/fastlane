@@ -146,6 +146,18 @@ end
 
 Then all your team has to do is `fastlane certificates` and keys, certs and profiles for all targets will be synced.
 
+#### Handle multiple apps per developer/distribution certificate
+If you want to use a single developer and/or distribution certificate for multiple apps belonging to the same development team, you may use the same signing identities repository and branch to store the signing identities for your apps:
+
+Matchfile for both App #1 and #2:
+
+```ruby
+git_url("https://github.com/example/example-repo.git")
+git_branch("master")
+```
+
+_match_ will reuse certificates and will create separate provisioning profiles for each app.
+
 #### Passphrase
 
 When running _match_ for the first time on a new machine, it will ask you for the passphrase for the Git repository. This is an additional layer of security: each of the files will be encrypted using `openssl`. Make sure to remember the password, as you'll need it when you run match on a different machine.
