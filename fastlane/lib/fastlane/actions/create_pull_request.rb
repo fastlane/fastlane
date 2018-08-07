@@ -111,7 +111,7 @@ module Fastlane
       def self.example_code
         [
           'create_pull_request(
-            api_token: ENV["GITHUB_TOKEN"],
+            api_token: "secret",                # optional, defaults to ENV["GITHUB_API_TOKEN"]
             repo: "fastlane/fastlane",
             title: "Amazing new feature",
             head: "my-feature",                 # optional, defaults to current branch name
