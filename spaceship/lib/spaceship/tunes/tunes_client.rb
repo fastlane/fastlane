@@ -358,10 +358,13 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def get_reviews(app_id, platform, storefront, version_id, upto_date)
+    def get_reviews(app_id, platform, storefront, version_id, upto_date = nil)
       index = 0
       per_page = 100 # apple default
       all_reviews = []
+
+      upto_date = Time.parse(upto_date) unless upto_date.nil?
+
       loop do
         rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews?"
         rating_url << "sort=REVIEW_SORT_ORDER_MOST_RECENT"
@@ -371,19 +374,20 @@ module Spaceship
 
         r = request(:get, rating_url)
         all_reviews.concat(parse_response(r, 'data')['reviews'])
-
-        last_review_date = Date.parse(Time.at(all_reviews[-1]['value']['lastModified']/1000).to_s).to_date
-        if last_review_date < DateTime.parse(upto_date).to_date
-          break
-        end
-
+        last_review_date = Time.at(all_reviews[-1]['value']['lastModified']/1000)
+        
+        break if last_review_date < upto_date && !upto_date.nil?
+        
         if all_reviews.count < parse_response(r, 'data')['reviewCount']
           index += per_page
         else
           break
         end
       end
-      all_reviews
+
+      return all_reviews if upto_date.nil?
+
+      return all_reviews.select { |review| Time.at(review['value']['lastModified']/1000) > upto_date  }
     end
 
     #####################################################
