@@ -1,4 +1,3 @@
-require 'pry'
 require_relative 'app_review'
 
 module Spaceship
