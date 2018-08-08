@@ -78,10 +78,10 @@ module Fastlane
         end
         UI.message("Latest upload for version #{version_number} is build: #{build_nr}")
 
-        [
+        {
           latest_build_number: build_nr,
           latest_version_number: version_number
-        ]
+        }
       end
 
       def self.order_versions(versions)
