@@ -344,7 +344,7 @@ _match_ stores the certificate (`.cer`) and the private key (`.p12`) files separ
 Decrypt your cert found in `certs/<type>/<unique-id>.cer` as a pem file:
 
 ```no-highlight
-openssl aes-256-cbc -k "<password>" -in "certs/<type>/<unique-id>.cer" -out "cert.dem" -a -d
+openssl aes-256-cbc -k "<password>" -in "certs/<type>/<unique-id>.cer" -out "cert.der" -a -d
 openssl x509 -inform der -in cert.der -out cert.pem
 ```
 
@@ -357,7 +357,7 @@ openssl aes-256-cbc -k "<password>" -in "certs/distribution/<unique-id>.p12" -ou
 Generate an encrypted p12 file with the same or new password:
 
 ```no-highlight
-openssl pkcs12 -export -out "cert.p12" -inkey "key.pem' -in "cert.pem" -password pass:<password>
+openssl pkcs12 -export -out "cert.p12" -inkey "key.pem" -in "cert.pem" -password pass:<password>
 ```
 
 ## Is this secure?
