@@ -375,8 +375,11 @@ module Spaceship
         r = request(:get, rating_url)
         all_reviews.concat(parse_response(r, 'data')['reviews'])
         last_review_date = Time.at(all_reviews[-1]['value']['lastModified']/1000)
-        
-        break if last_review_date < upto_date && !upto_date.nil?
+
+        if upto_date && last_review_date < upto_date
+          all_reviews = all_reviews.select { |review| Time.at(review['value']['lastModified']/1000) > upto_date  }
+          break
+        end
         
         if all_reviews.count < parse_response(r, 'data')['reviewCount']
           index += per_page
@@ -384,10 +387,8 @@ module Spaceship
           break
         end
       end
-
-      return all_reviews if upto_date.nil?
-
-      return all_reviews.select { |review| Time.at(review['value']['lastModified']/1000) > upto_date  }
+      
+      all_reviews
     end
 
     #####################################################
