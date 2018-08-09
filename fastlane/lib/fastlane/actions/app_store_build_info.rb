@@ -38,9 +38,11 @@ module Fastlane
         if params[:live]
           UI.message("Fetching the latest build number for live-version")
           live_version = app.live_version
-          build_nr = live_version.current_build_number
-          Actions.lane_context[SharedValues::LATEST_VERSION_NUMBER] = live_version.version
-          version_number = live_version.version
+          unless live_version.nil?
+            build_nr = live_version.current_build_number
+            Actions.lane_context[SharedValues::LATEST_VERSION_NUMBER] = live_version.version
+            version_number = live_version.version
+          end
         else
           version_number = params[:version]
           unless version_number
