@@ -2,6 +2,7 @@ require_relative '../client'
 
 require_relative 'app'
 require_relative 'app_group'
+require_relative 'cloud_container'
 require_relative 'device'
 require_relative 'merchant'
 require_relative 'passbook'
@@ -144,6 +145,18 @@ module Spaceship
         appIdId: app.app_id,
         displayId: app.app_id,
         applicationGroups: groups.map(&:app_group_id)
+      })
+
+      details_for_app(app)
+    end
+
+    def associate_cloud_containers_with_app(app, containers)
+      ensure_csrf(Spaceship::Portal::CloudContainer)
+
+      request(:post, 'account/ios/identifiers/assignCloudContainerToAppId.action', {
+          teamId: team_id,
+          appIdId: app.app_id,
+          cloudContainers: containers.map(&:cloud_container)
       })
 
       details_for_app(app)
@@ -373,6 +386,44 @@ module Spaceship
         applicationGroup: app_group_id
       })
       parse_response(r)
+    end
+
+    #####################################################
+    # @!group Cloud Containers
+    #####################################################
+
+    def cloud_containers
+      paging do |page_number|
+        r = request(:post, 'account/cloudContainer/listCloudContainers.action', {
+            teamId: team_id,
+            pageNumber: page_number,
+            pageSize: page_size,
+            sort: 'name=asc'
+        })
+        result = parse_response(r, 'cloudContainerList')
+
+        csrf_cache[Spaceship::Portal::CloudContainer] = self.csrf_tokens
+
+        result
+      end
+    end
+
+    def create_cloud_container!(name, identifier)
+      ensure_csrf(Spaceship::Portal::CloudContainer)
+
+      r = request(:post, 'account/cloudContainer/addCloudContainer.action', {
+          name: valid_name_for(name),
+          identifier: identifier,
+          teamId: team_id
+      })
+      a = parse_response(r)
+
+      # If request fails, try to fetch container with identifier if it already exists
+      return a['cloudContainer'] unless a['cloudContainer'].nil?
+
+      cloud_containers.find do |container|
+        container['identifier'] == identifier
+      end
     end
 
     #####################################################
