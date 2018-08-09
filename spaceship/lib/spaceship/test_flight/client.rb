@@ -112,6 +112,10 @@ module Spaceship
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
+
+        # This is invalid now.
+        @cached_groups.delete(app_id)
+
         handle_response(response)
       end
 
