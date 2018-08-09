@@ -114,7 +114,7 @@ module Spaceship
         end
 
         # This is invalid now.
-        @cached_groups.delete(app_id)
+        @cached_groups.delete(app_id) if @cached_groups
 
         handle_response(response)
       end
