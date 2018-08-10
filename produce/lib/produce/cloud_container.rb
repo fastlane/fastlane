@@ -6,7 +6,7 @@ module Produce
     def create(options, _args)
       login
 
-      ENV["CREATED_NEW_GROUP_ID"] = Time.now.to_i.to_s
+      ENV["CREATED_NEW_CLOUD_CONTAINER_ID"] = Time.now.to_i.to_s
 
       container_identifier = options.container_identifier || UI.input("iCloud Container identifier: ")
 
@@ -42,7 +42,7 @@ module Produce
       login
 
       if !app_exists?
-        UI.message("[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist, nothing to associate with the groups")
+        UI.message("[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist, nothing to associate with the containers")
       else
         app = Spaceship.app.find(app_identifier)
         UI.user_error!("Something went wrong when fetching the app - it's not listed in the apps list") if app.nil?
