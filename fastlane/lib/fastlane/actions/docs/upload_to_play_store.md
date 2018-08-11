@@ -65,7 +65,7 @@ The previous p12 configuration is still currently supported.
 - `cd [your_project_folder]`
 - `fastlane supply init`
 - Make changes to the downloaded metadata, add images, screenshots and/or an APK
-- `fastlane supply run`
+- `fastlane supply`
 
 ## Available Commands
 

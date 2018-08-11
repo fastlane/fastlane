@@ -335,6 +335,13 @@ module Spaceship
       handle_itc_response(data)
     end
 
+    def get_available_bundle_ids(platform: nil)
+      platform ||= "ios"
+      r = request(:get, "ra/apps/create/v2/?platformString=#{platform}")
+      data = parse_response(r, 'data')
+      return data['bundleIds'].keys
+    end
+
     def get_resolution_center(app_id, platform)
       r = request(:get, "ra/apps/#{app_id}/platforms/#{platform}/resolutionCenter?v=latest")
       parse_response(r, 'data')

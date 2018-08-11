@@ -9,7 +9,8 @@ module Fastlane
         :issuer,
         :json_key,
         :json_key_data,
-        :root_url
+        :root_url,
+        :timeout
       ]
 
       def self.run(params)

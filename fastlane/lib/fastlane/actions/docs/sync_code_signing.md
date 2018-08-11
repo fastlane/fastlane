@@ -146,6 +146,18 @@ end
 
 Then all your team has to do is `fastlane certificates` and keys, certs and profiles for all targets will be synced.
 
+#### Handle multiple apps per developer/distribution certificate
+If you want to use a single developer and/or distribution certificate for multiple apps belonging to the same development team, you may use the same signing identities repository and branch to store the signing identities for your apps:
+
+Matchfile for both App #1 and #2:
+
+```ruby
+git_url("https://github.com/example/example-repo.git")
+git_branch("master")
+```
+
+_match_ will reuse certificates and will create separate provisioning profiles for each app.
+
 #### Passphrase
 
 When running _match_ for the first time on a new machine, it will ask you for the passphrase for the Git repository. This is an additional layer of security: each of the files will be encrypted using `openssl`. Make sure to remember the password, as you'll need it when you run match on a different machine.
@@ -332,7 +344,7 @@ _match_ stores the certificate (`.cer`) and the private key (`.p12`) files separ
 Decrypt your cert found in `certs/<type>/<unique-id>.cer` as a pem file:
 
 ```no-highlight
-openssl aes-256-cbc -k "<password>" -in "certs/<type>/<unique-id>.cer" -out "cert.dem" -a -d
+openssl aes-256-cbc -k "<password>" -in "certs/<type>/<unique-id>.cer" -out "cert.der" -a -d
 openssl x509 -inform der -in cert.der -out cert.pem
 ```
 
@@ -345,7 +357,7 @@ openssl aes-256-cbc -k "<password>" -in "certs/distribution/<unique-id>.p12" -ou
 Generate an encrypted p12 file with the same or new password:
 
 ```no-highlight
-openssl pkcs12 -export -out "cert.p12" -inkey "key.pem' -in "cert.pem" -password pass:<password>
+openssl pkcs12 -export -out "cert.p12" -inkey "key.pem" -in "cert.pem" -password pass:<password>
 ```
 
 ## Is this secure?

@@ -168,7 +168,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Upload your app to Appaloosa Store'
+        'Upload your app to [Appaloosa Store](https://www.appaloosa-store.com/)'
       end
 
       def self.details
