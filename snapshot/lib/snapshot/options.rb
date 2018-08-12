@@ -122,6 +122,7 @@ module Snapshot
                                      optional: true,
                                      description: "The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)",
                                      code_gen_sensitive: true,
+                                     # This incorrect env name is here for backwards compatibility
                                      default_value: ENV["SNAPSHOT_APP_IDENTITIFER"] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :add_photos,
