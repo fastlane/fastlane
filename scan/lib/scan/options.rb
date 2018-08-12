@@ -308,7 +308,7 @@ module Scan
                                      optional: true,
                                      description: "The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)",
                                      code_gen_sensitive: true,
-                                     default_value: ENV["SCAN_APP_IDENTITIFER"] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                     default_value: ENV["SCAN_APP_IDENTIFIER"] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :reinstall_app,
                                      env_name: 'SCAN_REINSTALL_APP',
