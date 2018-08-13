@@ -1,6 +1,16 @@
 describe FastlaneCore do
   describe FastlaneCore::CommandExecutor do
     describe "execute" do
+      it 'executes a simple command successfully' do
+        unless FastlaneCore::Helper.windows?
+          expect(Process).to receive(:wait)
+        end
+
+        result = FastlaneCore::CommandExecutor.execute(command: 'echo foo')
+
+        expect(result).to eq('foo')
+      end
+
       it 'handles reading which throws a EIO exception' do
         explodes_on_strip = 'danger! lasers!'
         fake_std_in = ['a_filename', explodes_on_strip]
@@ -9,17 +19,12 @@ describe FastlaneCore do
         # we raise when the line is cleaned up with `strip` afterward
         expect(explodes_on_strip).to receive(:strip).and_raise(Errno::EIO)
 
-        child_process_id = 1
-        expect(Process).to receive(:wait).with(child_process_id)
-
-        # Hacky approach because $? is not be defined since we skip the actual spawn
-        allow_message_expectations_on_nil
-        expect($?).to receive(:exitstatus).and_return(0)
-
         # Make a fake child process so we have a valid PID and $? is set correctly
+        child_process_id = 1
         expect(FastlaneCore::FastlanePty).to receive(:spawn) do |command, &block|
           expect(command).to eq('ls')
           block.yield(fake_std_in, 'not_really_std_out', child_process_id)
+          $?.exitstatus
         end
 
         result = FastlaneCore::CommandExecutor.execute(command: 'ls')
