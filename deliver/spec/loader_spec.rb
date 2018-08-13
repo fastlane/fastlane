@@ -50,6 +50,7 @@ describe Deliver::Loader do
     FileUtils.mkdir(File.join(@root, 'fonts'))
 
     @folders = Deliver::Loader.language_folders(@root, false)
+    
     basenames = @folders.map { |f| File.basename(f) }
     expect(basenames.include?('fonts')).to eq(false)
   end
