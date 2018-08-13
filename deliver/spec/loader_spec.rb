@@ -51,6 +51,6 @@ describe Deliver::Loader do
 
     @folders = Deliver::Loader.language_folders(@root, false)
     basenames = @folders.map { |f| File.basename(f) }
-    expect(basenames.include? 'fonts').to eq(false)
+    expect(basenames.include?('fonts')).to eq(false)
   end
 end
