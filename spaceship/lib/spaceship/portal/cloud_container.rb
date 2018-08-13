@@ -48,7 +48,7 @@ module Spaceship
       class << self
         # @return (Array) Returns all iCloud containers available for this account
         def all
-          client.cloud_containers.map { |container| self.factory(container) }
+          client.associated_cloud_containers.map { |container| self.factory(container) }
         end
 
         # Creates a new iCloud Container on the Apple Dev Portal

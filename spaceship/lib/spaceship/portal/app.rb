@@ -122,10 +122,10 @@ module Spaceship
         end
       end
 
-      def cloud_containers
+      def associated_cloud_containers
         return unless raw_data['associatedCloudContainers']
 
-        @cloud_containers ||= raw_data['associatedCloudContainers'].map do |info|
+        @associated_cloud_containers ||= raw_data['associatedCloudContainers'].map do |info|
           Spaceship::Portal::CloudContainer.new(info)
         end
       end
