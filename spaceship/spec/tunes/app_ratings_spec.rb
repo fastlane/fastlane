@@ -33,7 +33,7 @@ describe Spaceship::Tunes::AppRatings do
       ratings = app.ratings
       reviews = ratings.reviews("US")
 
-      expect(reviews.count).to eq(4)
+      expect(reviews.count).to eq(5)
       expect(reviews.first.store_front).to eq("NZ")
       expect(reviews.first.id).to eq(1_000_000_000)
       expect(reviews.first.rating).to eq(2)
@@ -41,6 +41,23 @@ describe Spaceship::Tunes::AppRatings do
       expect(reviews.first.review).to eq("Review 1")
       expect(reviews.first.last_modified).to eq(1_463_887_020_000)
       expect(reviews.first.nickname).to eq("Reviewer1")
+    end
+  end
+
+  describe "successfully loads reviews upto date ('2018-08-13')" do
+    it "contains the right information" do
+      TunesStubbing.itc_stub_ratings
+      ratings = app.ratings
+      reviews = ratings.reviews("US", "", upto_date = "2018-08-13")
+
+      expect(reviews.count).to eq(5)
+      expect(reviews.last.store_front).to eq("US")
+      expect(reviews.last.id).to eq(1_000_000_004)
+      expect(reviews.first.rating).to eq(4)
+      expect(reviews.first.title).to eq("Title 5")
+      expect(reviews.first.review).to eq("Review 5")
+      expect(reviews.first.nickname).to eq("Reviewer5")
+      expect(reviews.first.last_modified).to be < 1_534_171_273_000
     end
   end
 

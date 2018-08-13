@@ -1,6 +1,6 @@
 {
     "data": {
-        "reviewCount": 4,
+        "reviewCount": 5,
         "reviews": [{
             "value": {
                 "id": 1000000000,
@@ -49,7 +49,17 @@
                 "nickname": "Reviewer4",
                 "storeFront": "NZ"
             }
-        }]
+        }, {
+          "value": {
+              "id": 1000000004,
+              "rating": 4,
+              "title": "Title 5",
+              "review": "Review 5",
+              "lastModified": 1534086069000,
+              "nickname": "Reviewer5",
+              "storeFront": "US"
+          }
+      }]
     },
     "messages": {
         "warn": null,
