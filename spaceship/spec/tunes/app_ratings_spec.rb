@@ -48,16 +48,16 @@ describe Spaceship::Tunes::AppRatings do
     it "contains the right information" do
       TunesStubbing.itc_stub_ratings
       ratings = app.ratings
-      reviews = ratings.reviews("US", "", upto_date = "2018-08-13")
+      reviews = ratings.reviews("US", "", "2018-08-13")
 
       expect(reviews.count).to eq(5)
       expect(reviews.last.store_front).to eq("US")
       expect(reviews.last.id).to eq(1_000_000_004)
-      expect(reviews.first.rating).to eq(4)
-      expect(reviews.first.title).to eq("Title 5")
-      expect(reviews.first.review).to eq("Review 5")
-      expect(reviews.first.nickname).to eq("Reviewer5")
-      expect(reviews.first.last_modified).to be < 1_534_171_273_000
+      expect(reviews.last.rating).to eq(4)
+      expect(reviews.last.title).to eq("Title 5")
+      expect(reviews.last.review).to eq("Review 5")
+      expect(reviews.last.nickname).to eq("Reviewer5")
+      expect(reviews.last.last_modified).to be < 1_534_171_273_000
     end
   end
 
