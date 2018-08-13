@@ -136,7 +136,10 @@ module Screengrab
     end
 
     def determine_external_screenshots_path(device_serial)
-      device_ext_storage = run_adb_command("adb -s #{device_serial} shell echo \$EXTERNAL_STORAGE",
+      # macOS evaluates $foo in `echo $foo` before executing the command,
+      # Windows doesn't - hence the double backslash vs. single backslash
+      command = Helper.windows? ? "shell echo \$EXTERNAL_STORAGE " : "shell echo \\$EXTERNAL_STORAGE"
+      device_ext_storage = run_adb_command("adb -s #{device_serial} #{command}",
                                            print_all: true,
                                            print_command: true)
       File.join(device_ext_storage, @config[:app_package_name], 'screengrab')
