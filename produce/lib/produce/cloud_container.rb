@@ -6,13 +6,10 @@ module Produce
     def create(options, _args)
       login
 
-      ENV["CREATED_NEW_CLOUD_CONTAINER_ID"] = Time.now.to_i.to_s
-
       container_identifier = options.container_identifier || UI.input("iCloud Container identifier: ")
 
       if container_exists?(container_identifier)
         UI.success("[DevCenter] iCloud Container '#{options.container_name} (#{options.container_identifier})' already exists, nothing to do on the Dev Center")
-        ENV["CREATED_NEW_CLOUD_CONTAINER_ID"] = nil
         # Nothing to do here
       else
         container_name = options.container_name || container_identifier.gsub('.', ' ')
@@ -27,11 +24,7 @@ module Produce
         end
 
         UI.message("Created iCloud Container #{container.cloud_container}")
-
         UI.user_error!("Something went wrong when creating the new iCloud Container - it's not listed in the iCloud Container list") unless container_exists?(container_identifier)
-
-        ENV["CREATED_NEW_CLOUD_CONTAINER_ID"] = Time.now.to_i.to_s
-
         UI.success("Finished creating new iCloud Container '#{container_name}' on the Dev Center")
       end
 
