@@ -32,11 +32,11 @@ For _fastlane_ plugins, check out the [available plugins](https://docs.fastlane.
 <%- @categories.each do |category, actions| %>
 # <%= category %>
 
-Action | Description
----|---
+Action | Description | Supported Platforms
+---|---|---
 <%- actions.sort.to_h.each do |_number_of_launches, action| -%>
 <%- link = "/actions/#{action.action_name}/" -%>
-<a href="<%= link %>"><%= action.action_name %></a> | <%= action.description %>
+<a href="<%= link %>"><%= action.action_name %></a> | <%= action.description %> | <%= [:ios, :android, :mac].find_all { |a| action.is_supported?(a) }.join(", ") %>
 <%- end %><%# End of actions.sort... %>
 
 <%- end %><%# End of categories.each %>
