@@ -14,7 +14,7 @@ module Deliver
 
     SPECIAL_DIR_NAMES = [APPLE_TV_DIR_NAME, IMESSAGE_DIR_NAME, DEFAULT_DIR_NAME].freeze
 
-    # Some exception directories may exist from other projects that should not be iterated through
+    # Some exception directories may exist from other actions that should not be iterated through
     SUPPLY_DIR_NAME = "android".freeze
     FRAMEIT_FONTS_DIR_NAME = "fonts".freeze
     META_DIR_NAMES = UploadMetadata::ALL_META_SUB_DIRS.map(&:downcase)
