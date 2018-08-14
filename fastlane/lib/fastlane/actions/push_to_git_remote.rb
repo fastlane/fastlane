@@ -23,6 +23,9 @@ module Fastlane
         # optionally add the force component
         command << '--force' if params[:force]
 
+        # optionally add the force component
+        command << '--force-with-lease' if params[:force_with_lease]
+
         # execute our command
         Actions.sh('pwd')
         return command.join(' ') if Helper.test?
@@ -52,6 +55,10 @@ module Fastlane
                                        description: "Force push to remote",
                                        is_string: false,
                                        default_value: false),
+          FastlaneCore::ConfigItem.new(key: :force_with_lease,
+                                       env_name: "FL_PUSH_GIT_FORCE_WITH_LEASE",
+                                       description: "Force push with lease to remote",
+                                       default_value: false),          
           FastlaneCore::ConfigItem.new(key: :tags,
                                        env_name: "FL_PUSH_GIT_TAGS",
                                        description: "Whether tags are pushed to remote",
@@ -60,7 +67,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :remote,
                                        env_name: "FL_GIT_PUSH_REMOTE",
                                        description: "The remote to push to",
-                                       default_value: 'origin')
+                                       default_value: 'origin')          
         ]
       end
 
@@ -84,6 +91,7 @@ module Fastlane
             local_branch: "develop",  # optional, aliased by "branch", default: "master"
             remote_branch: "develop", # optional, default is set to local_branch
             force: true,              # optional, default: false
+            force_with_lease: true,   # optional, default: false
             tags: false               # optional, default: true
           )'
         ]
