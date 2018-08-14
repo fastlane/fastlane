@@ -22,6 +22,7 @@ module Pilot
                                      description: "The bundle identifier of the app to upload or manage testers (optional)",
                                      optional: true,
                                      code_gen_sensitive: true,
+                                     # This incorrect env name is here for backwards compatibility
                                      default_value: ENV["TESTFLIGHT_APP_IDENTITIFER"] || CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :app_platform,
