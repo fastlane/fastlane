@@ -142,6 +142,7 @@ module Screengrab
       device_ext_storage = run_adb_command("adb -s #{device_serial} #{command}",
                                            print_all: true,
                                            print_command: true)
+      device_ext_storage = device_ext_storage.strip
       File.join(device_ext_storage, @config[:app_package_name], 'screengrab')
     end
 
