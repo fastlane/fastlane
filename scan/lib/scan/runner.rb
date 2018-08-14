@@ -104,11 +104,12 @@ module Scan
       # Gets absolute path of output directory
       output_directory = File.absolute_path(Scan.config[:output_directory])
       output_path = File.join(output_directory, "build_products.zip")
+      Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SCAN_ZIP_BUILD_OUTPUT_PATH] = output_path
 
       # Zips build products and moves it to output directory
       UI.message("Zipping build products")
       FastlaneCore::Helper.zip_directory(path, output_path, contents_only: true, print: false)
-      UI.message("Succesfully zipped build products: #{output_path}")
+      UI.message("Successfully zipped build products: #{output_path}")
     end
 
     def test_results
