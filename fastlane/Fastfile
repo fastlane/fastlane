@@ -322,6 +322,13 @@ lane :validate_docs do
 
   # Verify docs are still working
   verify_docs
+
+  # Validate docs content
+  ensure_tool_name_formatting
+  ensure_code_samples
+  ensure_code_snippets
+  # (Validate action documentation)
+  ensure_actions_config_items_formatting
 end
 
 desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
