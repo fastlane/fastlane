@@ -20,7 +20,7 @@ _match_ is the implementation of the https://codesigning.guide concept. _match_ 
 
 -------
 
-<h5 align="center"><code>match</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
+<h5 align="center"><em>match</em> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 ## Why match?
 

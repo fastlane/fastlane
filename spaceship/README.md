@@ -49,7 +49,7 @@ Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.co
 
 -------
 
-<h5 align="center"><code>spaceship</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
+<h5 align="center"><em>spaceship</em> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # What's spaceship?
 
