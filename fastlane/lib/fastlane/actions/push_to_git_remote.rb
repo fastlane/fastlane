@@ -58,7 +58,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :force_with_lease,
                                        env_name: "FL_PUSH_GIT_FORCE_WITH_LEASE",
                                        description: "Force push with lease to remote",
-                                       default_value: false),          
+                                       is_string: false,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :tags,
                                        env_name: "FL_PUSH_GIT_TAGS",
                                        description: "Whether tags are pushed to remote",
@@ -67,7 +68,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :remote,
                                        env_name: "FL_GIT_PUSH_REMOTE",
                                        description: "The remote to push to",
-                                       default_value: 'origin')          
+                                       default_value: 'origin')
         ]
       end
 
