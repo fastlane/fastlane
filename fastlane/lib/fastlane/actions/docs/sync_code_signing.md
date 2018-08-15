@@ -91,7 +91,7 @@ username("user@fastlane.tools")
 
 _match_ also supports storing certificates of multiple teams in one repo, by using separate git branches. If you work in multiple teams, make sure to set the `git_branch` parameter to a unique value per team. From there, _match_ will automatically create and use the specified branch for you.
 
-```ruby-skip-tests
+```ruby
 match(git_branch: "team1", username: "user@team1.com")
 match(git_branch: "team2", username: "user@team2.com")
 ```
@@ -151,7 +151,7 @@ If you want to use a single developer and/or distribution certificate for multip
 
 Matchfile for both App #1 and #2:
 
-```ruby
+```ruby-skip-tests
 git_url("https://github.com/example/example-repo.git")
 git_branch("master")
 ```
