@@ -416,14 +416,7 @@ module Spaceship
           identifier: identifier,
           teamId: team_id
       })
-      a = parse_response(r)
-
-      # If request fails, try to fetch container with identifier if it already exists
-      return a['cloudContainer'] unless a['cloudContainer'].nil?
-
-      cloud_containers.find do |container|
-        container['identifier'] == identifier
-      end
+      parse_response(r, 'cloudContainer')
     end
 
     #####################################################
