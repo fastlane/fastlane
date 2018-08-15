@@ -29,7 +29,7 @@ module Precheck
         begin
           uri = Addressable::URI.parse(url)
           uri.fragment = nil
-          request = Faraday.new(URI.encode(uri.to_s)) do |connection|
+          request = Faraday.new(URI.encode(uri.normalize.to_s)) do |connection|
             connection.use(FaradayMiddleware::FollowRedirects)
             connection.adapter(:net_http)
           end
