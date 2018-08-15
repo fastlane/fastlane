@@ -59,6 +59,9 @@ jobs:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
+
+      - run: bundle exec coveralls push
+
   "Execute tests on Ubuntu":
     environment:
       CIRCLE_TEST_REPORTS: ~/test-reports
