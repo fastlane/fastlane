@@ -78,6 +78,24 @@ jobs:
             - .bundle
       - run: bundle exec coveralls push
 
+  "rspec only":
+    environment:
+      COVERALLS_NOISY: true
+    docker:
+      - image: fastlanetools/fastlane:2.3.4
+    steps:
+      - checkout
+      - run:
+          name: Setup Build
+          command: |
+            mkdir -p ~/test-reports
+            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+      - save_cache:
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+          paths:
+            - .bundle
+      - run: bundle exec rspec
+
   "Execute tests on Ubuntu":
     environment:
       CIRCLE_TEST_REPORTS: ~/test-reports
@@ -172,3 +190,4 @@ workflows:
       - "Validate Documentation"
       - "Lint Source Code"
       - "Coveralls"
+      - "rspec only"
