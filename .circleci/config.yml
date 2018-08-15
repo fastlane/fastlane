@@ -59,7 +59,23 @@ jobs:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
-
+    
+  "Coveralls"
+    environment:
+      COVERALLS_NOISY: true
+    docker:
+      - image: fastlanetools/fastlane:2.3.4
+    steps:
+      - checkout
+      - run:
+          name: Setup Build
+          command: |
+            mkdir -p ~/test-reports
+            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+      - save_cache:
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+          paths:
+            - .bundle
       - run: bundle exec coveralls push
 
   "Execute tests on Ubuntu":
@@ -155,3 +171,4 @@ workflows:
       - "Execute tests on Ubuntu"
       - "Validate Documentation"
       - "Lint Source Code"
+      - "Coveralls"
