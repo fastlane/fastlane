@@ -175,5 +175,4 @@ workflows:
       - "Execute tests on Ubuntu"
       - "Validate Documentation"
       - "Lint Source Code"
-      - "Coveralls"
       - "rspec only"

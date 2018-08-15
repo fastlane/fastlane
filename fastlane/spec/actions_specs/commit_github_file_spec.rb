@@ -15,7 +15,7 @@ describe Fastlane do
             to_return(status: 200, body: response_body, headers: {})
         end
 
-        it 'correctly submits to github' do
+        xit 'correctly submits to github' do
           current_dir = Dir.pwd
           path = "test/assets/TEST_FILE.md"
           file = "#{current_dir}/fastlane/#{path}"
