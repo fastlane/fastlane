@@ -79,10 +79,10 @@ jobs:
       - run: bundle exec coveralls push
 
   "rspec only":
+    macos:
+      xcode: "9.0.0"
     environment:
       COVERALLS_NOISY: true
-    docker:
-      - image: fastlanetools/fastlane:2.3.4
     steps:
       - checkout
       - run:
