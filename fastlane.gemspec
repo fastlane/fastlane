@@ -107,7 +107,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('pry-stack_explorer')
   spec.add_development_dependency('yard', '~> 0.9.11')
   spec.add_development_dependency('webmock', '~> 2.3.2')
-  spec.add_development_dependency('coveralls', '~> 0.8.13')
+  spec.add_development_dependency('coveralls_reborn', '~> 0.12.0')
   spec.add_development_dependency('rubocop', Fastlane::RUBOCOP_REQUIREMENT)
   spec.add_development_dependency('rubocop-require_tools', '>= 0.1.2')
   spec.add_development_dependency('rb-readline') # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
