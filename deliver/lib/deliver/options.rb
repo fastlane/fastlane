@@ -27,8 +27,13 @@ module Deliver
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
                                      default_value_dynamic: true),
-
-        # binary
+        # version
+        FastlaneCore::ConfigItem.new(key: :app_version,
+                                     short_option: '-z',
+                                     description: "The version that should be edited or created",
+                                     optional: true),        
+        
+        # binary / build
         FastlaneCore::ConfigItem.new(key: :ipa,
                                      short_option: "-i",
                                      optional: true,
@@ -60,6 +65,14 @@ module Deliver
                                      conflicting_options: [:ipa],
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'pkg' and '#{value.key}' options in one run.")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :build_number,
+                                     short_option: "-n",
+                                     description: "If set the given build number (already uploaded to iTC) will be used instead of the current built one",
+                                     optional: true,
+                                     conflicting_options: [:ipa, :pkg],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'build_number' and '#{value.key}' options in one run.")
                                      end),
         FastlaneCore::ConfigItem.new(key: :platform,
                                      short_option: "-j",
@@ -111,20 +124,6 @@ module Deliver
                                      description: "Don't update app version for submission",
                                      is_string: false,
                                      default_value: false),
-
-        # version and build number
-        FastlaneCore::ConfigItem.new(key: :app_version,
-                                     short_option: '-z',
-                                     description: "The version that should be edited or created",
-                                     optional: true),
-        FastlaneCore::ConfigItem.new(key: :build_number,
-                                     short_option: "-n",
-                                     description: "If set the given build number (already uploaded to iTC) will be used instead of the current built one",
-                                     optional: true,
-                                     conflicting_options: [:ipa, :pkg],
-                                     conflict_block: proc do |value|
-                                       UI.user_error!("You can't use 'build_number' and '#{value.key}' options in one run.")
-                                     end),
 
         # how to operate
         FastlaneCore::ConfigItem.new(key: :force,
