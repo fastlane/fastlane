@@ -85,13 +85,27 @@ jobs:
       COVERALLS_NOISY: true
     steps:
       - checkout
+      - restore_cache:
+          key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+      - restore_cache:
+          keys:
+            - v3-homebrew-{{ epoch }}
+            - v3-homebrew
       - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
+            echo "2.3" > .ruby-version
+            gem update --system
+            brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+
       - save_cache:
-          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+          key: v3-homebrew-{{ epoch }}
+          paths:
+            - /usr/local/Homebrew
+      - save_cache:
+          key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
           paths:
             - .bundle
       - run: bundle exec rspec
