@@ -60,7 +60,7 @@ jobs:
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
     
-  "Coveralls"
+  "Coveralls":
     environment:
       COVERALLS_NOISY: true
     docker:
