@@ -34,8 +34,8 @@ module Precheck
             connection.adapter(:net_http)
           end
           return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: url) unless request.head.status == 200
-        rescue
-          UI.verbose("URL #{url} not reachable 😵")
+        rescue StandardError => e  
+          UI.verbose("URL #{url} not reachable 😵: #{e.message}")
           # I can only return :fail here, but I also want to return #{url}
           return RuleReturn.new(validation_state: VALIDATION_STATES[:failed], failure_data: "unreachable: #{url}")
         end
