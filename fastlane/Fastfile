@@ -505,13 +505,15 @@ end
 private_lane :ensure_code_samples do
   UI.message("🕗  Verifying all action code samples work with the current fastlane release")
   all_content = ""
+  count_actions = 0
   ActionsList.all_actions do |action|
     all_content += "```ruby\n"
     all_content += action.example_code.map { |code| code.gsub(/^\s+/, '') }.join("\n") if action.example_code
     all_content += "\n```"
+    count_actions += 1
   end
   test_sample_code(content: all_content) # to not have to call the action 200 times
-  UI.success("✅  All fastlane action code samples (from #{ActionsList.all_actions.length} actions) work as expected")
+  UI.success("✅  All fastlane action code samples (from #{count_actions} actions) work as expected")
 end
 
 # Run the other code samples, yo
