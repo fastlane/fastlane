@@ -22,7 +22,8 @@ module Fastlane
           values[:destination] = destination # restore destination value
           Scan::Manager.new.work(values)
 
-          Actions.lane_context[SharedValues::SCAN_ZIP_BUILD_PRODUCTS_PATH] = Scan::Runner.zip_build_products_path if Scan::Runner.zip_build_products_path
+          zip_build_products_path = Scan.cache[:zip_build_products_path]
+          Actions.lane_context[SharedValues::SCAN_ZIP_BUILD_PRODUCTS_PATH] = zip_build_products_path if zip_build_products_path
 
           return true
         rescue FastlaneCore::Interface::FastlaneBuildFailure => ex

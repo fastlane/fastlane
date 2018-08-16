@@ -94,23 +94,19 @@ module Scan
       end
     end
 
-    def self.zip_build_products_path
+    def zip_build_products
       return unless Scan.config[:should_zip_build_products]
+
+      # Gets :derived_data_path/Build/Products directory for zipping zip
+      derived_data_path = Scan.config[:derived_data_path]
+      path = File.join(derived_data_path, "Build/Products")
 
       # Gets absolute path of output directory
       output_directory = File.absolute_path(Scan.config[:output_directory])
       output_path = File.join(output_directory, "build_products.zip")
 
-      return output_path
-    end
-
-    def zip_build_products
-      output_path = Scan::Runner.zip_build_products_path
-      return unless output_path
-
-      # Gets :derived_data_path/Build/Products directory for zipping zip
-      derived_data_path = Scan.config[:derived_data_path]
-      path = File.join(derived_data_path, "Build/Products")
+      # Caching path for action to put into lane_context
+      Scan.cache[:zip_build_products_path] = output_path
 
       # Zips build products and moves it to output directory
       UI.message("Zipping build products")
