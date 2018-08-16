@@ -228,6 +228,8 @@ module FastlaneCore
         # (not on Windows)
         "'" + password + "'"
       end
+
+      password
     end
   end
 
