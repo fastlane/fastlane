@@ -991,26 +991,26 @@ func clubmate() {
   let command = RubyCommand(commandID: "", methodName: "clubmate", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
-func cocoapods(clean: Bool = true,
-               integrate: Bool = true,
-               repoUpdate: Bool = false,
+func cocoapods(repoUpdate: Bool = false,
                silent: Bool = false,
                verbose: Bool = false,
                ansi: Bool = true,
                useBundleExec: Bool = true,
                podfile: String? = nil,
                errorCallback: String? = nil,
-               tryRepoUpdateOnError: Bool = false) {
-  let command = RubyCommand(commandID: "", methodName: "cocoapods", className: nil, args: [RubyCommand.Argument(name: "clean", value: clean),
-                                                                                           RubyCommand.Argument(name: "integrate", value: integrate),
-                                                                                           RubyCommand.Argument(name: "repo_update", value: repoUpdate),
+               tryRepoUpdateOnError: Bool = false,
+               clean: Bool = true,
+               integrate: Bool = true) {
+  let command = RubyCommand(commandID: "", methodName: "cocoapods", className: nil, args: [RubyCommand.Argument(name: "repo_update", value: repoUpdate),
                                                                                            RubyCommand.Argument(name: "silent", value: silent),
                                                                                            RubyCommand.Argument(name: "verbose", value: verbose),
                                                                                            RubyCommand.Argument(name: "ansi", value: ansi),
                                                                                            RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec),
                                                                                            RubyCommand.Argument(name: "podfile", value: podfile),
                                                                                            RubyCommand.Argument(name: "error_callback", value: errorCallback),
-                                                                                           RubyCommand.Argument(name: "try_repo_update_on_error", value: tryRepoUpdateOnError)])
+                                                                                           RubyCommand.Argument(name: "try_repo_update_on_error", value: tryRepoUpdateOnError),
+                                                                                           RubyCommand.Argument(name: "clean", value: clean),
+                                                                                           RubyCommand.Argument(name: "integrate", value: integrate)])
   _ = runner.executeCommand(command)
 }
 @discardableResult func commitGithubFile(repositoryName: String,
@@ -1651,14 +1651,16 @@ func googlePlayTrackVersionCodes(packageName: String,
                                  issuer: String? = nil,
                                  jsonKey: String? = nil,
                                  jsonKeyData: String? = nil,
-                                 rootUrl: String? = nil) {
+                                 rootUrl: String? = nil,
+                                 timeout: Int = 300) {
   let command = RubyCommand(commandID: "", methodName: "google_play_track_version_codes", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
                                                                                                                  RubyCommand.Argument(name: "track", value: track),
                                                                                                                  RubyCommand.Argument(name: "key", value: key),
                                                                                                                  RubyCommand.Argument(name: "issuer", value: issuer),
                                                                                                                  RubyCommand.Argument(name: "json_key", value: jsonKey),
                                                                                                                  RubyCommand.Argument(name: "json_key_data", value: jsonKeyData),
-                                                                                                                 RubyCommand.Argument(name: "root_url", value: rootUrl)])
+                                                                                                                 RubyCommand.Argument(name: "root_url", value: rootUrl),
+                                                                                                                 RubyCommand.Argument(name: "timeout", value: timeout)])
   _ = runner.executeCommand(command)
 }
 func gradle(task: String,
@@ -4069,4 +4071,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.25]
+// FastlaneRunnerAPIVersion [0.9.26]
