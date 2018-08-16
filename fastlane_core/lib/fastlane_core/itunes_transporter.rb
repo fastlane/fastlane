@@ -325,7 +325,6 @@ module FastlaneCore
         use_shell_script ||= Helper.xcode_version.start_with?('6.')
       end
       use_shell_script ||= Feature.enabled?('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT')
-      puts("use_shell_script = " + use_shell_script.to_s)
 
       @user = user
       @password = password || load_password_for_transporter
