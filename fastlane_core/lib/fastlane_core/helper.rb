@@ -193,7 +193,8 @@ module FastlaneCore
 
     # @return the full path to the iTMSTransporter executable
     def self.transporter_path
-      return File.join(self.itms_path, 'bin', 'iTMSTransporter')
+      return File.join(self.itms_path, 'bin', 'iTMSTransporter') unless Helper.windows?
+      return File.join(self.itms_path, 'iTMSTransporter') 
     end
 
     # @return the full path to the iTMSTransporter executable
