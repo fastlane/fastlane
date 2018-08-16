@@ -165,9 +165,9 @@ module FastlaneCore
         "-m upload",
         "-u \"#{username}\"",
         "-p #{shell_escaped_password(password)}",
-        "-f '#{source}'",
+        "-f #{source}",
         ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
-        "-t 'Signiant'",
+        #"-t 'Signiant'",
         "-k 100000",
         ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?)
       ].compact.join(' ')
@@ -210,8 +210,11 @@ module FastlaneCore
         "'\"\\'\"'"
       end
 
-      # wrap the fully-escaped password in single quotes, since the transporter expects a escaped password string (which must be single-quoted for the shell's benefit)
-      "'" + password + "'"
+      unless Helper.windows?
+        # wrap the fully-escaped password in single quotes, since the transporter expects a escaped password string (which must be single-quoted for the shell's benefit)
+        # (not on Windows)
+        "'" + password + "'"
+      end
     end
   end
 
