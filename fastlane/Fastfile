@@ -504,7 +504,7 @@ private_lane :ensure_code_samples do
     action_count += 1
   end
   test_sample_code(content: all_content) # to not have to call the action 200 times
-  UI.success("✅  All fastlane code samples (from #{action_count}) work as expected")
+  UI.success("✅  All fastlane code samples (from #{action_count} actions) work as expected")
 end
 
 private_lane :ensure_code_snippets do
