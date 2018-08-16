@@ -105,6 +105,9 @@ module Scan
       output_directory = File.absolute_path(Scan.config[:output_directory])
       output_path = File.join(output_directory, "build_products.zip")
 
+      # Caching path for action to put into lane_context
+      Scan.cache[:zip_build_products_path] = output_path
+
       # Zips build products and moves it to output directory
       UI.message("Zipping build products")
       FastlaneCore::Helper.zip_directory(path, output_path, contents_only: true, print: false)
