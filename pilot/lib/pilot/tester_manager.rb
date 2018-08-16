@@ -205,7 +205,7 @@ module Pilot
       end
 
       if tester.latest_installed_date
-        rows << ["Latest Version", tester.latest_build]
+        rows << ["Latest Version", "#{tester.latest_install_info['latestInstalledShortVersion']} (#{tester.latest_install_info['latestInstalledVersion']})"]
         rows << ["Latest Install Date", tester.pretty_install_date]
       end
 
