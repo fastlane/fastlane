@@ -162,9 +162,9 @@ module FastlaneCore
         "-m upload",
         "-u \"#{username}\"",
         "-p #{shell_escaped_password(password)}",
-        "-f #{single_quotify(source)}",
+        "-f '#{source}'",
         ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
-        "-t #{single_quotify('Signiant')}",
+        "-t Signiant",
         "-k 100000",
         ("-WONoPause true" if Helper.windows?), # Windows only: process returns instead of waiting for key press
         ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?)
