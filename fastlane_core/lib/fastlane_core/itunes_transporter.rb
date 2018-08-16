@@ -210,7 +210,7 @@ module FastlaneCore
         "'\"\\'\"'"
       end
       # wrap the fully-escaped password in single quotes, since the transporter expects a escaped password string (which must be single-quoted for the shell's benefit)
-      self.single_quotify(password)
+      single_quotify(password)
     end
 
     def single_quotify(string)
