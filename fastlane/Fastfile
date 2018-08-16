@@ -17,6 +17,7 @@ lane :validate_repo do
   validate_docs
   ensure_tool_name_formatting
   ensure_code_samples
+  ensure_special_docs_code_samples
   ensure_code_snippets
   ensure_actions_config_items_formatting
 end
@@ -326,6 +327,7 @@ lane :validate_docs do
   # Validate docs content
   ensure_tool_name_formatting
   ensure_code_samples
+  ensure_special_docs_code_samples
   ensure_code_snippets
   # (Validate action documentation)
   ensure_actions_config_items_formatting
@@ -501,7 +503,7 @@ end
 
 # Run the code samples, yo
 private_lane :ensure_code_samples do
-  UI.message("🕗  Verifying all code samples work with the current fastlane release")
+  UI.message("🕗  Verifying all action code samples work with the current fastlane release")
   all_content = ""
   ActionsList.all_actions do |action|
     all_content += "```ruby\n"
@@ -509,7 +511,19 @@ private_lane :ensure_code_samples do
     all_content += "\n```"
   end
   test_sample_code(content: all_content) # to not have to call the action 200 times
-  UI.success("✅  All fastlane code samples (from #{ActionsList.all_actions.length} actions) work as expected")
+  UI.success("✅  All fastlane action code samples (from #{ActionsList.all_actions.length} actions) work as expected")
+end
+
+# Run the other code samples, yo
+private_lane :ensure_special_docs_code_samples do
+  UI.message("🕗  Verifying all action special docs (`fastlane/lib/fastlane/actions/docs`) code samples work with the latest fastlane release")
+  all_content = ""
+  files = Dir["../fastlane/lib/fastlane/actions/docs/*.md"]
+  files.each do |special_docs_page_path|
+    all_content += File.read(special_docs_page_path)
+  end
+  test_sample_code(content: all_content) # to not have to call the action 200 times
+  UI.success("✅  All fastlane action special docs code samples (from #{files.length} files) work as expected")
 end
 
 private_lane :ensure_code_snippets do
