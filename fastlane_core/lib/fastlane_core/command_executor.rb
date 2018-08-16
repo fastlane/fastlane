@@ -63,9 +63,6 @@ module FastlaneCore
 
                 UI.command_output(line)
               end
-            rescue Errno::EIO
-              # This is expected on some linux systems, that indicates that the subcommand finished
-              # and we kept trying to read, ignore it
             end
           end
         rescue => ex
