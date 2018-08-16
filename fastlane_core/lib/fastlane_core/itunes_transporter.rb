@@ -213,7 +213,7 @@ module FastlaneCore
       unless Helper.windows?
         # wrap the fully-escaped password in single quotes, since the transporter expects a escaped password string (which must be single-quoted for the shell's benefit)
         # (not on Windows)
-        "'" + password + "'"
+        password = "'" + password + "'"
       end
 
       password
