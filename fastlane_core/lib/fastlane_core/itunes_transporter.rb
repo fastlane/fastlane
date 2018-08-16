@@ -322,6 +322,8 @@ module FastlaneCore
         use_shell_script ||= Helper.xcode_version.start_with?('6.')
       end
       use_shell_script ||= Feature.enabled?('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT')
+      use_shell_script = true
+      puts "use_shell_script = " + use_shell_script.to_s
 
       @user = user
       @password = password || load_password_for_transporter
@@ -377,6 +379,7 @@ module FastlaneCore
       UI.success("This might take a few minutes. Please don't interrupt the script.")
 
       command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name)
+      puts command
       UI.verbose(@transporter_executor.build_upload_command(@user, 'YourPassword', actual_dir, @provider_short_name))
 
       begin
