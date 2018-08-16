@@ -162,9 +162,9 @@ module FastlaneCore
         "-m upload",
         "-u \"#{username}\"",
         "-p #{shell_escaped_password(password)}",
-        "-f #{source}",
+        "-f #{single_quotify(source)}",
         ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
-        "-t Signiant",
+        "-t #{single_quotify('Signiant')}",
         "-k 100000",
         "-WONoPause true", # Add only on Windows so the process return instead of waiting for key press
         "-throughput", # total transmission time for successfully uploaded packages
@@ -209,14 +209,13 @@ module FastlaneCore
       password = Shellwords.escape(password).gsub("\\'") do
         "'\"\\'\"'"
       end
+      # wrap the fully-escaped password in single quotes, since the transporter expects a escaped password string (which must be single-quoted for the shell's benefit)
+      self.single_quotify(password)
+    end
 
-      unless Helper.windows?
-        # wrap the fully-escaped password in single quotes, since the transporter expects a escaped password string (which must be single-quoted for the shell's benefit)
-        # (not on Windows)
-        password = "'" + password + "'"
-      end
-
-      password
+    def single_quotify(string)
+      string = "'" + string + "'" unless Helper.windows?
+      string
     end
   end
 
@@ -448,7 +447,7 @@ module FastlaneCore
       UI.error("To set the application specific password on a CI machine using")
       UI.error("an environment variable, you can set the")
       UI.error("#{TWO_FACTOR_ENV_VARIABLE} variable")
-      @password = a.password(ask_if_missing: true) # to ask the user for the missing value # TODO not on Windows
+      @password = a.password(ask_if_missing: true) # to ask the user for the missing value 
 
       return true
     end
