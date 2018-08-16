@@ -67,12 +67,9 @@ module FastlaneCore
         @errors << ex.to_s
       end
 
-      #exit_status = $?.exitstatus
       unless exit_status.zero?
         @errors << "The call to the iTMSTransporter completed with a non-zero exit status: #{exit_status}. This indicates a failure."
       end
-
-
 
       if @warnings.count > 0
         UI.important(@warnings.join("\n"))
@@ -202,7 +199,6 @@ module FastlaneCore
 
     def execute(command, hide_output)
       if Helper.windows?
-        puts "switch over to #{Helper.itms_path}"
         FileUtils.cd(Helper.itms_path) do
           return super(command, hide_output)
         end
@@ -338,7 +334,7 @@ module FastlaneCore
       end
       use_shell_script ||= Feature.enabled?('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT')
       use_shell_script = true
-      puts "use_shell_script = " + use_shell_script.to_s
+      puts("use_shell_script = " + use_shell_script.to_s)
 
       @user = user
       @password = password || load_password_for_transporter
@@ -394,7 +390,6 @@ module FastlaneCore
       UI.success("This might take a few minutes. Please don't interrupt the script.")
 
       command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name)
-      puts command
       UI.verbose(@transporter_executor.build_upload_command(@user, 'YourPassword', actual_dir, @provider_short_name))
 
       begin
