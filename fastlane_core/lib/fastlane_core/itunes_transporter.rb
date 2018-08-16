@@ -463,7 +463,7 @@ module FastlaneCore
       UI.error("To set the application specific password on a CI machine using")
       UI.error("an environment variable, you can set the")
       UI.error("#{TWO_FACTOR_ENV_VARIABLE} variable")
-      @password = a.password(ask_if_missing: true) # to ask the user for the missing value
+      @password = a.password(ask_if_missing: true) # to ask the user for the missing value # TODO not on Windows
 
       return true
     end
