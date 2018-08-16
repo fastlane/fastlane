@@ -74,7 +74,7 @@ module Spaceship
       def pretty_install_date
         return nil unless latest_installed_date
 
-        Time.at((latest_installed_date / 1000)).strftime("%m/%d/%y %H:%M")
+        Time.at((latest_installed_date / 1000)).strftime("%Y-%m-%d %H:%M")
       end
 
       # @return (Array) Returns all beta testers available for this account
