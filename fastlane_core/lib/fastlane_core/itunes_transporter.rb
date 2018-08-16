@@ -161,14 +161,16 @@ module FastlaneCore
   class ShellScriptTransporterExecutor < TransporterExecutor
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "")
       [
-        '"' + Helper.transporter_path + '"',
+        'iTMSTransporter',
         "-m upload",
         "-u \"#{username}\"",
         "-p #{shell_escaped_password(password)}",
         "-f #{source}",
         ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
-        #"-t 'Signiant'",
+        "-t Signiant",
         "-k 100000",
+        "-WONoPause true", # Add only on Windows so the process return instead of waiting for key press
+        "-throughput", # total transmission time for successfully uploaded packages
         ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?)
       ].compact.join(' ')
     end
@@ -194,7 +196,18 @@ module FastlaneCore
         ].join(' '))
       end
       # rubocop:enable Style/CaseEquality
+
       UI.error("Could not download/upload from App Store Connect! It's probably related to your password or your internet connection.")
+    end
+
+    def execute(command, hide_output)
+      if Helper.windows?
+        puts "switch over to #{Helper.itms_path}"
+        FileUtils.cd(Helper.itms_path) do
+          return super(command, hide_output)
+        end
+      end
+      return super(command, hide_output)
     end
 
     private
