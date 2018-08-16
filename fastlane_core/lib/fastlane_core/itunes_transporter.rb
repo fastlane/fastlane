@@ -158,7 +158,7 @@ module FastlaneCore
   class ShellScriptTransporterExecutor < TransporterExecutor
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "")
       [
-        'iTMSTransporter',
+        '"' + Helper.transporter_path + '"',
         "-m upload",
         "-u \"#{username}\"",
         "-p #{shell_escaped_password(password)}",
