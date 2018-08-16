@@ -197,15 +197,6 @@ module FastlaneCore
       UI.error("Could not download/upload from App Store Connect! It's probably related to your password or your internet connection.")
     end
 
-    def execute(command, hide_output)
-      if Helper.windows?
-        FileUtils.cd(Helper.itms_path) do
-          return super(command, hide_output)
-        end
-      end
-      return super(command, hide_output)
-    end
-
     private
 
     def shell_escaped_password(password)
