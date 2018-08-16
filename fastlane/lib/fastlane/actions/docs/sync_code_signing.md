@@ -151,7 +151,7 @@ If you want to use a single developer and/or distribution certificate for multip
 
 Matchfile for both App #1 and #2:
 
-```ruby
+```ruby-skip-tests
 git_url("https://github.com/example/example-repo.git")
 git_branch("master")
 ```
