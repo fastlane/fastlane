@@ -76,7 +76,7 @@ describe FastlaneCore do
       ].compact.join(' ')
     end
 
-    describe "with Xcode 7.x installed" do
+    describe "with Xcode 7.x installed", requires_xcode: true do
       before(:each) { allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('7.3') }
 
       describe "by default" do
@@ -180,7 +180,7 @@ describe FastlaneCore do
       end
     end
 
-    describe "with Xcode 6.x installed" do
+    describe "with Xcode 6.x installed", requires_xcode: true do
       before(:each) { allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('6.4') }
 
       describe "upload command generation" do
