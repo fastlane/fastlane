@@ -197,5 +197,25 @@ describe FastlaneCore do
         end
       end
     end
+
+    describe "with `FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT` set" do
+      before(:each) { ENV["FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT"] = "1" }
+
+      describe "upload command generation" do
+        it 'generates a call to the shell script' do
+          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+          expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
+        end
+      end
+
+      describe "download command generation" do
+        it 'generates a call to the shell script' do
+          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+          expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command)
+        end
+      end
+
+      after(:each) { ENV.delete("FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT") }
+    end
   end
 end
