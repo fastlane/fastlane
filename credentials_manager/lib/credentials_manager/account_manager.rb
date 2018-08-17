@@ -154,7 +154,7 @@ module CredentialsManager
     end
 
     # Helper.mac? - but we don't have access to the helper here
-    def self.mac?
+    def mac?
       (/darwin/ =~ RUBY_PLATFORM) != nil
     end
   end
