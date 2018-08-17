@@ -8,10 +8,12 @@ describe FastlaneCore do
         '"' + FastlaneCore::Helper.transporter_path + '"',
         "-m upload",
         '-u "fabric.devtools@gmail.com"',
-        "-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'",
-        "-f '/tmp/my.app.id.itmsp'",
-        "-t 'Signiant'",
+        ("-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'" unless FastlaneCore::Helper.windows?),
+        ("-p \\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<" if FastlaneCore::Helper.windows?),
+        "-f \"/tmp/my.app.id.itmsp\"",
+        "-t Signiant",
         "-k 100000",
+        ("-WONoPause true" if FastlaneCore::Helper.windows?),
         ("-itc_provider #{provider_short_name}" if provider_short_name)
       ].compact.join(' ')
     end
@@ -21,7 +23,8 @@ describe FastlaneCore do
         '"' + FastlaneCore::Helper.transporter_path + '"',
         '-m lookupMetadata',
         '-u "fabric.devtools@gmail.com"',
-        "-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'",
+        ("-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'" unless FastlaneCore::Helper.windows?),
+        ("-p \\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<" if FastlaneCore::Helper.windows?),
         "-apple_id my.app.id",
         "-destination '/tmp'",
         ("-itc_provider #{provider_short_name}" if provider_short_name)
@@ -73,7 +76,7 @@ describe FastlaneCore do
       ].compact.join(' ')
     end
 
-    describe "with Xcode 7.x installed" do
+    describe "with Xcode 7.x installed", requires_xcode: true do
       before(:each) { allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('7.3') }
 
       describe "by default" do
@@ -177,7 +180,7 @@ describe FastlaneCore do
       end
     end
 
-    describe "with Xcode 6.x installed" do
+    describe "with Xcode 6.x installed", requires_xcode: true do
       before(:each) { allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('6.4') }
 
       describe "upload command generation" do
@@ -189,6 +192,47 @@ describe FastlaneCore do
 
       describe "download command generation" do
         it 'generates a call to the shell script' do
+          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+          expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command)
+        end
+      end
+    end
+
+    describe "with `FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT` set" do
+      before(:each) { ENV["FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT"] = "1" }
+
+      describe "upload command generation" do
+        it 'generates a call to the shell script' do
+          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+          expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
+        end
+      end
+
+      describe "download command generation" do
+        it 'generates a call to the shell script' do
+          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+          expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command)
+        end
+      end
+
+      after(:each) { ENV.delete("FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT") }
+    end
+
+    describe "with the code running on Windows" do
+      before(:each) do
+        allow(FastlaneCore::Helper).to receive(:windows?).and_return(true)
+        ENV.delete("FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT")
+      end
+
+      describe "upload command generation" do
+        it 'generates a call to the shell script even without `FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT` being set' do
+          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+          expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
+        end
+      end
+
+      describe "download command generation" do
+        it 'generates a call to the shell scripteven without `FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT` being set' do
           transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
           expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command)
         end
