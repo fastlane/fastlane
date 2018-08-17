@@ -7,7 +7,7 @@ module FastlaneCore
       require 'pty'
       PTY.spawn(command) do |command_stdout, command_stdin, pid|
         begin
-          block.call(command_stdout, command_stdin, pid)
+          yield(command_stdout, command_stdin, pid)
         rescue Errno::EIO
           # Exception ignored intentionally.
           # https://stackoverflow.com/questions/10238298/ruby-on-linux-pty-goes-away-without-eof-raises-errnoeio
