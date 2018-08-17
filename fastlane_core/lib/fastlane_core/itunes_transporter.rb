@@ -67,7 +67,7 @@ module FastlaneCore
         @errors << ex.to_s
       end
 
-      unless exit_status.zero?
+      if exit_status != 0
         @errors << "The call to the iTMSTransporter completed with a non-zero exit status: #{exit_status}. This indicates a failure."
       end
 
