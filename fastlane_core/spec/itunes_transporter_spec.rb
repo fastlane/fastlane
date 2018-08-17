@@ -76,6 +76,49 @@ describe FastlaneCore do
       ].compact.join(' ')
     end
 
+    def java_upload_command_9(provider_short_name = nil)
+      [
+        FastlaneCore::Helper.transporter_java_executable_path.shellescape,
+        "-Djava.ext.dirs=#{FastlaneCore::Helper.transporter_java_ext_dir.shellescape}",
+        '-XX:NewSize=2m',
+        '-Xms32m',
+        '-Xmx1024m',
+        '-Xms1024m',
+        '-Djava.awt.headless=true',
+        '-Dsun.net.http.retryPost=false',
+        "-jar #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}",
+        "-m upload",
+        "-u fabric.devtools@gmail.com",
+        "-p \\!\\>\\ p@\\$s_-\\+\\=w\\'o\\%rd\\\"\\&\\#\\*\\<",
+        "-f /tmp/my.app.id.itmsp",
+        "-t Signiant",
+        "-k 100000",
+        ("-itc_provider #{provider_short_name}" if provider_short_name),
+        '2>&1'
+      ].compact.join(' ')
+    end
+
+    def java_download_command_9(provider_short_name = nil)
+      [
+        FastlaneCore::Helper.transporter_java_executable_path.shellescape,
+        "-Djava.ext.dirs=#{FastlaneCore::Helper.transporter_java_ext_dir.shellescape}",
+        '-XX:NewSize=2m',
+        '-Xms32m',
+        '-Xmx1024m',
+        '-Xms1024m',
+        '-Djava.awt.headless=true',
+        '-Dsun.net.http.retryPost=false',
+        "-jar #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}",
+        '-m lookupMetadata',
+        '-u fabric.devtools@gmail.com',
+        "-p \\!\\>\\ p@\\$s_-\\+\\=w\\'o\\%rd\\\"\\&\\#\\*\\<",
+        '-apple_id my.app.id',
+        '-destination /tmp',
+        ("-itc_provider #{provider_short_name}" if provider_short_name),
+        '2>&1'
+      ].compact.join(' ')
+    end
+
     describe "with Xcode 7.x installed", requires_xcode: true do
       before(:each) { allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('7.3') }
 
@@ -198,8 +241,29 @@ describe FastlaneCore do
       end
     end
 
+    describe "with Xcode 9.x installed", requires_xcode: true do
+      before(:each) { allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('9.1') }
+
+      describe "upload command generation" do
+        it 'generates a call to the shell script' do
+          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+          expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command_9)
+        end
+      end
+
+      describe "download command generation" do
+        it 'generates a call to the shell script' do
+          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+          expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command_9)
+        end
+      end
+    end
+
     describe "with `FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT` set" do
-      before(:each) { ENV["FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT"] = "1" }
+      before(:each) do
+        ENV["FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT"] = "1"
+        allow(File).to receive(:exist?).with("C:/Program Files (x86)/itms").and_return(true) if FastlaneCore::Helper.windows?
+      end
 
       describe "upload command generation" do
         it 'generates a call to the shell script' do
@@ -218,23 +282,37 @@ describe FastlaneCore do
       after(:each) { ENV.delete("FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT") }
     end
 
-    describe "with the code running on Windows" do
+    describe "with no special configuration" do
       before(:each) do
-        allow(FastlaneCore::Helper).to receive(:windows?).and_return(true)
+        allow(File).to receive(:exist?).and_return(true) unless FastlaneCore::Helper.mac?
         ENV.delete("FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT")
       end
 
       describe "upload command generation" do
-        it 'generates a call to the shell script even without `FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT` being set' do
+        it 'generates the correct command' do
           transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
-          expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
+          command = java_upload_command
+          # If we are on Windows, switch to shell script command
+          command = shell_upload_command if FastlaneCore::Helper.windows?
+          # If we are on Mac with Xcode 6.x, switch to shell script command
+          command = shell_upload_command if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_version.start_with?('6.')
+          # If we are on Mac with Xcode >= 9, switch to newer java command
+          command = java_upload_command_9 if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_at_least?(9)
+          expect(transporter.upload('my.app.id', '/tmp')).to eq(command)
         end
       end
 
       describe "download command generation" do
-        it 'generates a call to the shell scripteven without `FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT` being set' do
+        it 'generates the correct command' do
           transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
-          expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command)
+          command = java_download_command
+          # If we are on Windows, switch to shell script command
+          command = shell_download_command if FastlaneCore::Helper.windows?
+          # If we are on Mac with Xcode 6.x, switch to shell script command
+          command = shell_download_command if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_version.start_with?('6.')
+          # If we are on Mac with Xcode >= 9, switch to newer java command
+          command = java_download_command_9 if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_at_least?(9)
+          expect(transporter.download('my.app.id', '/tmp')).to eq(command)
         end
       end
     end
