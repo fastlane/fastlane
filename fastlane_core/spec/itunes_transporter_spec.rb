@@ -8,9 +8,10 @@ describe FastlaneCore do
         '"' + FastlaneCore::Helper.transporter_path + '"',
         "-m upload",
         '-u "fabric.devtools@gmail.com"',
-        "-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'",
-        "-f '/tmp/my.app.id.itmsp'",
-        "-t 'Signiant'",
+        ("-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'" unless FastlaneCore::Helper.windows?),
+        ("-p \\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<" if FastlaneCore::Helper.windows?),
+        "-f \"/tmp/my.app.id.itmsp\"",
+        "-t Signiant",
         "-k 100000",
         ("-itc_provider #{provider_short_name}" if provider_short_name)
       ].compact.join(' ')
@@ -21,7 +22,8 @@ describe FastlaneCore do
         '"' + FastlaneCore::Helper.transporter_path + '"',
         '-m lookupMetadata',
         '-u "fabric.devtools@gmail.com"',
-        "-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'",
+        ("-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'" unless FastlaneCore::Helper.windows?),
+        ("-p \\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<" if FastlaneCore::Helper.windows?),
         "-apple_id my.app.id",
         "-destination '/tmp'",
         ("-itc_provider #{provider_short_name}" if provider_short_name)
