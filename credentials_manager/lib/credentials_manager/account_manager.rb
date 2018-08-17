@@ -50,10 +50,8 @@ module CredentialsManager
       end
 
       unless @password
-        if mac?
-          item = Security::InternetPassword.find(server: server_name)
-          @password ||= item.password if item
-        end
+        item = Security::InternetPassword.find(server: server_name)
+        @password ||= item.password if item
       end
       ask_for_login while ask_if_missing && @password.to_s.length == 0
       return @password
@@ -72,10 +70,8 @@ module CredentialsManager
       end
 
       if force || agree("Do you want to re-enter your password? (y/n)", true)
-        if mac?
-          puts("Removing Keychain entry for user '#{user}'...".yellow)
-          remove_from_keychain
-        end
+        puts("Removing Keychain entry for user '#{user}'...".yellow) if mac?
+        remove_from_keychain
         ask_for_login
         return true
       end
