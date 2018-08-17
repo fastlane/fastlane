@@ -162,7 +162,7 @@ module FastlaneCore
         "-m upload",
         "-u \"#{username}\"",
         "-p #{shell_escaped_password(password)}",
-        "-f '#{source}'",
+        "-f \"#{source}\"",
         ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
         "-t Signiant",
         "-k 100000",
