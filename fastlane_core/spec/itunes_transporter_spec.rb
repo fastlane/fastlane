@@ -10,7 +10,7 @@ describe FastlaneCore do
         '-u "fabric.devtools@gmail.com"',
         ("-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'" unless FastlaneCore::Helper.windows?),
         ("-p \\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<" if FastlaneCore::Helper.windows?),
-        "-f \"/tmp/my.app.id.itmsp\"'",
+        "-f \"/tmp/my.app.id.itmsp\"",
         "-t Signiant",
         "-k 100000",
         ("-WONoPause true" if FastlaneCore::Helper.windows?),
