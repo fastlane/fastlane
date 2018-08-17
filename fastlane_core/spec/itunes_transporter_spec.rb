@@ -217,5 +217,26 @@ describe FastlaneCore do
 
       after(:each) { ENV.delete("FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT") }
     end
+
+    describe "with the code running on Windows" do
+      before(:each) do
+        allow(FastlaneCore::Helper).to receive(:windows?).and_return(true)
+        ENV.delete("FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT")
+      end
+
+      describe "upload command generation" do
+        it 'generates a call to the shell script even without `FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT` being set' do
+          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+          expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
+        end
+      end
+
+      describe "download command generation" do
+        it 'generates a call to the shell scripteven without `FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT` being set' do
+          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+          expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command)
+        end
+      end
+    end
   end
 end
