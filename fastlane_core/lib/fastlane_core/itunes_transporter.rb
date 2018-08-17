@@ -318,7 +318,7 @@ module FastlaneCore
     def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil)
       # Xcode 6.x doesn't have the same iTMSTransporter Java setup as later Xcode versions, so
       # we can't default to using the newer direct Java invocation strategy for those versions.
-      use_shell_script ||= Helper.is_mac? && Helper.xcode_version.start_with?('6.') 
+      use_shell_script ||= Helper.is_mac? && Helper.xcode_version.start_with?('6.')
       use_shell_script ||= Helper.windows?
       use_shell_script ||= Feature.enabled?('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT')
 
