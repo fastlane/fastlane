@@ -1,3 +1,4 @@
+# coding: utf-8
 require 'shellwords'
 require 'fileutils'
 require 'credentials_manager/account_manager'
@@ -99,7 +100,10 @@ module FastlaneCore
         UI.important("Although errors occurred during execution of iTMSTransporter, it returned success status.")
       end
 
-      exit_status.zero?
+      {
+        successful: exit_status.zero?,
+        output: @all_lines
+      }
     end
 
     private
@@ -185,6 +189,15 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
+    def build_get_provider_ids_command(username, password)
+      [
+        '"' + Helper.transporter_path + '"',
+        '-m provider',
+        "-u \"#{username}\"",
+        "-p #{shell_escaped_password(password)}"
+      ].compact.join(' ')
+    end
+
     def handle_error(password)
       # rubocop:disable Style/CaseEquality
       unless password === /^[0-9a-zA-Z\.\$\_]*$/
@@ -258,6 +271,24 @@ module FastlaneCore
         "-apple_id #{apple_id.shellescape}",
         "-destination #{destination.shellescape}",
         ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
+        '2>&1' # cause stderr to be written to stdout
+      ].compact.join(' ')
+    end
+
+    def build_get_provider_ids_command(username, password)
+      [
+        Helper.transporter_java_executable_path.shellescape,
+        "-Djava.ext.dirs=#{Helper.transporter_java_ext_dir.shellescape}",
+        '-XX:NewSize=2m',
+        '-Xms32m',
+        '-Xmx1024m',
+        '-Xms1024m',
+        '-Djava.awt.headless=true',
+        '-Dsun.net.http.retryPost=false',
+        java_code_option,
+        '-m provider',
+        "-u #{username.shellescape}",
+        "-p #{password.shellescape}",
         '2>&1' # cause stderr to be written to stdout
       ].compact.join(' ')
     end
@@ -339,7 +370,7 @@ module FastlaneCore
       UI.verbose(@transporter_executor.build_download_command(@user, 'YourPassword', app_id, dir, @provider_short_name))
 
       begin
-        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)[:successful]
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return download(app_id, dir)
@@ -375,7 +406,7 @@ module FastlaneCore
       UI.verbose(@transporter_executor.build_upload_command(@user, 'YourPassword', actual_dir, @provider_short_name))
 
       begin
-        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)[:successful]
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return upload(app_id, dir)
@@ -387,6 +418,19 @@ module FastlaneCore
         FileUtils.rm_rf(actual_dir) unless Helper.test? # we don't need the package any more, since the upload was successful
       else
         handle_error(@password)
+      end
+
+      result
+    end
+
+    def provider_ids
+      command = @transporter_executor.build_get_provider_ids_command(@user, @password)
+      UI.verbose(@transporter_executor.build_get_provider_ids_command(@user, 'YourPassword'))
+      begin
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)[:output]
+      rescue TransporterRequiresApplicationSpecificPasswordError => ex
+        handle_two_step_failure(ex)
+        return get_provider_ids
       end
 
       result
