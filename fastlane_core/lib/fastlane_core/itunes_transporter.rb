@@ -317,7 +317,7 @@ module FastlaneCore
     #                            short names
     def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil)
       use_shell_script ||= Helper.windows?
-      unless Helper.windows?
+      if Helper.mac?
         # Xcode 6.x doesn't have the same iTMSTransporter Java setup as later Xcode versions, so
         # we can't default to using the better direct Java invocation strategy for those versions.
         use_shell_script ||= Helper.xcode_version.start_with?('6.')
