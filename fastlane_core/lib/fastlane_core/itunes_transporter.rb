@@ -52,7 +52,7 @@ module FastlaneCore
       end
 
       begin
-        FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
+        exit_status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
           begin
             command_stdout.each do |line|
               @all_lines << line
@@ -61,16 +61,13 @@ module FastlaneCore
           rescue Errno::EIO
             # Exception ignored intentionally.
             # https://stackoverflow.com/questions/10238298/ruby-on-linux-pty-goes-away-without-eof-raises-errnoeio
-          ensure
-            Process.wait(pid)
           end
         end
       rescue => ex
         @errors << ex.to_s
       end
 
-      exit_status = $?.exitstatus
-      unless exit_status.zero?
+      if exit_status != 0
         @errors << "The call to the iTMSTransporter completed with a non-zero exit status: #{exit_status}. This indicates a failure."
       end
 
