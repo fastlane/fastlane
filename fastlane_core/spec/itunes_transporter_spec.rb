@@ -13,6 +13,7 @@ describe FastlaneCore do
         "-f \"/tmp/my.app.id.itmsp\"",
         "-t Signiant",
         "-k 100000",
+        ("-WONoPause true" if FastlaneCore::Helper.windows?),
         ("-itc_provider #{provider_short_name}" if provider_short_name)
       ].compact.join(' ')
     end

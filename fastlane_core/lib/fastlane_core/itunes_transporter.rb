@@ -166,6 +166,7 @@ module FastlaneCore
         ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
         "-t Signiant",
         "-k 100000",
+        ("-WONoPause true" if Helper.windows?), # Windows only: process instantly returns instead of waiting for key press
         ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?)
       ].compact.join(' ')
     end
