@@ -209,7 +209,7 @@ module FastlaneCore
         "'\"\\'\"'"
       end
 
-      # wrap the fully-escaped password in single quotes, since the transporter expects a escaped password string 
+      # wrap the fully-escaped password in single quotes, since the transporter expects a escaped password string
       # (which must be single-quoted for the shell's benefit [on non-Windows platforms])
       password = "'" + password + "'" unless Helper.windows?
 
