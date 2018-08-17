@@ -189,7 +189,7 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
-    def build_get_provider_ids_command(username, password)
+    def build_provider_ids_command(username, password)
       [
         '"' + Helper.transporter_path + '"',
         '-m provider',
@@ -275,7 +275,7 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
-    def build_get_provider_ids_command(username, password)
+    def build_provider_ids_command(username, password)
       [
         Helper.transporter_java_executable_path.shellescape,
         "-Djava.ext.dirs=#{Helper.transporter_java_ext_dir.shellescape}",
@@ -424,13 +424,13 @@ module FastlaneCore
     end
 
     def provider_ids
-      command = @transporter_executor.build_get_provider_ids_command(@user, @password)
-      UI.verbose(@transporter_executor.build_get_provider_ids_command(@user, 'YourPassword'))
+      command = @transporter_executor.build_provider_ids_command(@user, @password)
+      UI.verbose(@transporter_executor.build_provider_ids_command(@user, 'YourPassword'))
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)[:output]
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
-        return get_provider_ids
+        return provider_ids
       end
 
       result
