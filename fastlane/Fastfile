@@ -359,7 +359,6 @@ lane :validate_docs do
     # Test if generating the docs is successful
     generate_markdown_docs(target_path: ".")
     # Verify docs tests are still passing
-    sh("pwd")
     run_docs_tests
   end
 end
@@ -374,7 +373,6 @@ end
 desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
 private_lane :run_docs_tests do
   Bundler.with_clean_env do
-    sh("pwd")
     puts(`sed -i -e "s/activate_bin_path/bin_path/g" $(which bundle)`) # workaround for bundler https://github.com/bundler/bundler/issues/4602#issuecomment-233619696
     sh("bundle install")
     sh("bundle exec fastlane test skip_building:true --verbose") # skip_building since we don't have a proper python environment set up
