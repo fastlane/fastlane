@@ -14,7 +14,11 @@ module FastlaneCore
           # This is expected on some linux systems, that indicates that the subcommand finished
           # and we kept trying to read, ignore it
         ensure
-          Process.wait(pid)
+          begin
+            Process.wait(pid)
+          rescue Errno::ECHILD, PTY::ChildExited
+            # The process might have exited.
+          end
         end
       end
       $?.exitstatus
