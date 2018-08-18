@@ -433,13 +433,14 @@ module FastlaneCore
       command = @transporter_executor.build_provider_ids_command(@user, @password)
       UI.verbose(@transporter_executor.build_provider_ids_command(@user, 'YourPassword'))
       begin
-        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)[:output]
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
+        return result[:successful] if Helper.test?
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return provider_ids
       end
 
-      result.map { |line| provider_pair(line) }.compact.to_h
+      result[:output].map { |line| provider_pair(line) }.compact.to_h
     end
 
     private
