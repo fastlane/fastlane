@@ -320,6 +320,7 @@ module FastlaneCore
   end
 
   class ItunesTransporter
+    PROVIDER_REGEX = /^\d+\s{2,}.+\s{2,}[^\s]+$/
     TWO_STEP_HOST_PREFIX = "deliver.appspecific"
 
     # This will be called from the Deliverfile, and disables the logging of the transporter output
@@ -433,7 +434,7 @@ module FastlaneCore
         return provider_ids
       end
 
-      result
+      result.map { |line| provider_pair(line) }.compact.to_h
     end
 
     private
@@ -491,6 +492,12 @@ module FastlaneCore
 
     def handle_error(password)
       @transporter_executor.handle_error(password)
+    end
+
+    def provider_pair(line)
+      line = line.strip
+      return nil unless line =~ PROVIDER_REGEX
+      line.split(/\s{2,}/).drop(1)
     end
   end
 end
