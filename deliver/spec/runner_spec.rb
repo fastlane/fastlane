@@ -1,9 +1,18 @@
 require 'deliver/runner'
 
+class MockSession
+  def teams
+    [
+      { 'contentProvider' => { 'contentProviderId' => 'abc', 'name' => 'A B C' } },
+      { 'contentProvider' => { 'contentProviderId' => 'def', 'name' => 'D E F' } }
+    ]
+  end
+end
+
 describe Deliver::Runner do
   let(:runner) do
-    allow(Spaceship::Tunes).to receive(:login).and_return(true)
-    allow(Spaceship::Tunes).to receive(:select_team).and_return(true)
+    allow(Spaceship::Tunes).to receive(:login).and_return(MockSession.new)
+    allow(Spaceship::Tunes).to receive(:select_team).and_return('abc')
     allow_any_instance_of(Deliver::DetectValues).to receive(:run!) { |opt| opt }
     Deliver::Runner.new(options)
   end
