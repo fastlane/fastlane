@@ -17,6 +17,7 @@ lane :validate_repo do
   validate_docs
   ensure_tool_name_formatting
   ensure_code_samples
+  ensure_special_docs_code_samples
   ensure_code_snippets
   ensure_actions_config_items_formatting
 end
@@ -315,6 +316,14 @@ end
 
 desc "Validates the docs still are good"
 lane :validate_docs do
+  # Validate docs content
+  ensure_tool_name_formatting
+  ensure_code_samples
+  ensure_special_docs_code_samples
+  ensure_code_snippets
+  # (Validate action documentation)
+  ensure_actions_config_items_formatting
+
   # Test if generating the docs is successful
   clone_docs do
     generate_markdown_docs(target_path: ".")
@@ -480,6 +489,7 @@ private_lane :ensure_tool_name_formatting do
         errors << "Use _#{tool}_ instead of `#{tool}` to mention a tool in the docs in '#{path}'" if content.include?("`#{tool}`")
         errors << "Use _#{tool}_ instead of `_#{tool}_` to mention a tool in the docs in '#{path}'" if content.include?("`_#{tool}_`")
         errors << "Use [_#{tool}_] instead of [#{tool}] to mention a tool in the docs in '#{path}'" if content.include?("[#{tool}]")
+        errors << "Use <em>#{tool}<em> instead of <code>#{tool}</code> to mention a tool in the docs in '#{path}'" if content.include?("<code>#{tool}</code>")
         if content.include?("_#{tool.to_s.capitalize}_") || content.include?("`#{tool.to_s.capitalize}`")
           errors << "fastlane tools have to be formatted in lower case: #{tool} in '#{path}'"
         end
@@ -493,15 +503,29 @@ end
 
 # Run the code samples, yo
 private_lane :ensure_code_samples do
-  UI.message("🕗  Verifying all code samples work with the current fastlane release")
+  UI.message("🕗  Verifying all action code samples work with the current fastlane release")
   all_content = ""
+  count_actions = 0
   ActionsList.all_actions do |action|
     all_content += "```ruby\n"
     all_content += action.example_code.map { |code| code.gsub(/^\s+/, '') }.join("\n") if action.example_code
     all_content += "\n```"
+    count_actions += 1
   end
   test_sample_code(content: all_content) # to not have to call the action 200 times
-  UI.success("✅  All fastlane code samples work as expected")
+  UI.success("✅  All fastlane action code samples (from #{count_actions} actions) work as expected")
+end
+
+# Run the other code samples, yo
+private_lane :ensure_special_docs_code_samples do
+  UI.message("🕗  Verifying all action special docs (`fastlane/lib/fastlane/actions/docs`) code samples work with the latest fastlane release")
+  all_content = ""
+  files = Dir["../fastlane/lib/fastlane/actions/docs/*.md"]
+  files.each do |special_docs_page_path|
+    all_content += File.read(special_docs_page_path)
+  end
+  test_sample_code(content: all_content) # to not have to call the action 200 times
+  UI.success("✅  All fastlane action special docs code samples (from #{files.length} files) work as expected")
 end
 
 private_lane :ensure_code_snippets do

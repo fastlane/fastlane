@@ -20,7 +20,7 @@ _match_ is the implementation of the https://codesigning.guide concept. _match_ 
 
 -------
 
-<h5 align="center"><code>match</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
+<h5 align="center"><em>match</em> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 ## Why match?
 
@@ -151,7 +151,7 @@ If you want to use a single developer and/or distribution certificate for multip
 
 Matchfile for both App #1 and #2:
 
-```ruby
+```ruby-skip-tests
 git_url("https://github.com/example/example-repo.git")
 git_branch("master")
 ```

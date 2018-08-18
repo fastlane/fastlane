@@ -22,7 +22,7 @@ _pilot_ uses [spaceship.airforce](https://spaceship.airforce) to interact with A
 
 -------
 
-<h5 align="center"><code>pilot</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
+<h5 align="center"><em>pilot</em> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # Usage
 
