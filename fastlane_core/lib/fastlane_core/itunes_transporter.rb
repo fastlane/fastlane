@@ -32,7 +32,12 @@ module FastlaneCore
     private_constant :ERROR_REGEX, :WARNING_REGEX, :OUTPUT_REGEX, :RETURN_VALUE_REGEX, :SKIP_ERRORS
 
     def execute(command, hide_output)
-      return command if Helper.test?
+      if Helper.test?
+        return {
+          successful: command,
+          output: nil
+        }
+      end
 
       # Workaround because the traditional transporter broke on 1st March 2018
       # More information https://github.com/fastlane/fastlane/issues/11958
