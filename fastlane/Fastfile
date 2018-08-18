@@ -356,21 +356,28 @@ lane :validate_docs do
 
   # Test if generating the docs is successful
   clone_docs do
+    # Test if generating the docs is successful
     generate_markdown_docs(target_path: ".")
+    # Verify docs tests are still passing
+    sh("pwd")
+    run_docs_tests
   end
-
-  # Verify docs are still working
-  verify_docs
 end
 
 desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
 lane :verify_docs do
   clone_docs do
-    Bundler.with_clean_env do
-      puts(`sed -i -e "s/activate_bin_path/bin_path/g" $(which bundle)`) # workaround for bundler https://github.com/bundler/bundler/issues/4602#issuecomment-233619696
-      sh("bundle install")
-      sh("bundle exec fastlane test skip_building:true") # skip_building since we don't have a proper python environment set up
-    end
+    run_docs_tests
+  end
+end
+
+desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
+private_lane :run_docs_tests do
+  Bundler.with_clean_env do
+    sh("pwd")
+    puts(`sed -i -e "s/activate_bin_path/bin_path/g" $(which bundle)`) # workaround for bundler https://github.com/bundler/bundler/issues/4602#issuecomment-233619696
+    sh("bundle install")
+    sh("bundle exec fastlane test skip_building:true --verbose") # skip_building since we don't have a proper python environment set up
   end
 end
 
@@ -453,15 +460,20 @@ def clone_docs(debug: false)
       yield
     end
   else
-    require 'tmpdir'
     git_url = ENV['FASTLANE_DOCS_GIT_URL'] || "https://github.com/fastlane/docs"
 
-    Dir.mktmpdir("fl_clone") do |tmp_dir|
-      Dir.chdir(tmp_dir) do
-        sh("git clone #{git_url} --depth=1")
-        Dir.chdir("docs") do
-          yield
-        end
+    target_dir = ENV['FASTLANE_DOCS_CLONE_PATH']
+    if target_dir.nil?
+      require 'tmpdir'
+      target_dir = Dir.mktmpdir("fl_clone")
+    else
+      FileUtils.mkdir_p(target_dir)
+    end
+
+    Dir.chdir(target_dir) do
+      sh("git clone #{git_url} --depth=1")
+      Dir.chdir("docs") do
+        yield
       end
     end
   end
