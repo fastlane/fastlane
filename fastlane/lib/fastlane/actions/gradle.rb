@@ -231,6 +231,10 @@ module Fastlane
             # ...
 
             flags: "--exitcode --xml file.xml"
+          )',
+          '# Delete the build directory and generated APKs
+          gradle(
+            task: "clean"
           )'
         ]
       end
