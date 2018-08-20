@@ -20,8 +20,8 @@ module Pilot
       config[:username] ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
       UI.message("Login to App Store Connect (#{config[:username]})")
-      Spaceship::Tunes.login(config[:username])
-      Spaceship::Tunes.select_team
+      @session = Spaceship::Tunes.login(config[:username])
+      @selected_team_id = Spaceship::Tunes.select_team
       UI.message("Login successful")
     end
 

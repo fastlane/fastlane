@@ -1,3 +1,4 @@
+# coding: utf-8
 require 'tmpdir'
 require 'terminal-table'
 require 'emoji_regex'
@@ -34,7 +35,7 @@ module Pilot
                                                                   package_path: dir,
                                                                       platform: platform)
 
-      transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
+      transporter = transporter_for_selected_team
       result = transporter.upload(app.apple_id, package_path)
 
       unless result
@@ -169,6 +170,25 @@ module Pilot
 
     def should_update_app_test_information?(options)
       options[:beta_app_description].to_s.length > 0 || options[:beta_app_feedback_email].to_s.length > 0
+    end
+
+    # If itc_provider was explicitly specified, use it.
+    # If there are multiple teams, infer the provider from the selected team name.
+    # If there are fewer than two teams, don't infer the provider.
+    def transporter_for_selected_team
+      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
+      return generic_transporter unless options[:itc_provider].nil? && @session.teams.count < 2
+
+      begin
+        team = @session.teams.find { |t| t['contentProvider']['contentProviderId'] == @selected_team_id }
+        name = team['contentProvider']['name']
+        provider_id = generic_transporter.provider_ids[name]
+        UI.verbose("Inferred provider id #{provider_id} for team #{name}.")
+        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id)
+      rescue => ex
+        UI.verbose("Couldn't infer a provider short name for team with id #{@selected_team_id} automatically: #{ex}. Proceeding without provider short name.")
+        return generic_transporter
+      end
     end
 
     def distribute_build(uploaded_build, options)
