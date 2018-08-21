@@ -25,7 +25,8 @@ init:
 install:
   - set PATH=C:\Ruby24-x64\bin;%PATH%
   - bundle install
-  - cinst gtk-runtime # includes iconv
+  # - cinst gtk-runtime # includes iconv
+  - ps: Install-ChocolateyPackage "gtk-runtime" "exe" "/S" "http://downloads.sourceforge.net/gtk-win/gtk2-runtime-2.24.10-2012-10-10-ash.exe?download" -validExitCodes @(0) -checksum "afd74fbc35743a5528f07f21837978e10c078965" -checksumType "sha1"
 
 environment:
   LC_ALL: en_US.UTF-8
