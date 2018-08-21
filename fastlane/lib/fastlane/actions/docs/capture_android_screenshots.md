@@ -59,7 +59,7 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
   - You can also create a lane and use `build_android_app`:
     ```ruby
     desc "Build debug and test APK for screenshots"
-    lane :buildForScreengrab do
+    lane :build_for_screengrab do
       build_android_app(
         task: 'assemble',
         build_type: 'Debug'
