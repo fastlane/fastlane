@@ -119,7 +119,7 @@ fastlane produce associate_cloud_container -a com.krausefx.app iCloud.com.krause
 If you want to associate an app with multiple iCloud Containers:
 
 ```no-highlight
-fastlane produce associate_merchant -a com.krausefx.app iCloud.com.krausefx.app1 iCloud.com.krausefx.app2
+fastlane produce associate_cloud_container -a com.krausefx.app iCloud.com.krausefx.app1 iCloud.com.krausefx.app2
 ```
 
 # Parameters

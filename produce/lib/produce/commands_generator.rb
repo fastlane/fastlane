@@ -174,7 +174,7 @@ module Produce
       command :associate_cloud_container do |c|
         c.syntax = 'fastlane produce associate_cloud_container -a APP_IDENTIFIER CONTAINER_IDENTIFIER1, CONTAINER_IDENTIFIER2, ...'
         c.description = 'Associate with a iCloud Container, which is created if needed or simply located otherwise'
-        c.example('Associate with iCloud Container', 'fastlane produce associate-cloud-container -a com.example.app iCloud.com.example.com')
+        c.example('Associate with iCloud Container', 'fastlane produce associate_cloud_container -a com.example.app iCloud.com.example.com')
 
         FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
 
