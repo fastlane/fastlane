@@ -9,6 +9,15 @@ class MockSession
   end
 end
 
+class MockTransporter
+  def provider_ids
+    {
+      'A B C' => 'abc',
+      'D E F' => 'somelegacything'
+    }
+  end
+end
+
 describe Deliver::Runner do
   let(:runner) do
     allow(Spaceship::Tunes).to receive(:login).and_return(MockSession.new)
@@ -30,7 +39,7 @@ describe Deliver::Runner do
   end
 
   describe :upload_binary do
-    let(:transporter) { double }
+    let(:transporter) { MockTransporter.new }
     before do
       allow(FastlaneCore::ItunesTransporter).to receive(:new).and_return(transporter)
     end
