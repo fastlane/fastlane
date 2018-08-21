@@ -70,7 +70,7 @@ If you want to run code style verification only for one tool, use `bundle exec r
 
 After introducing some changes to the _fastlane_ source code, you probably want to test the changes for your application. The easiest way to do so it use [bundler](https://bundler.io/).
 
-Adapt your `Gemfile` in your project's root folder and replace the `gem 'fastlane'` line with:
+Edit your `Gemfile` in your project's root folder and replace the `gem 'fastlane'` line with:
 ```
 gemspec path: File.expand_path("<PATH_TO_YOUR_LOCAL_FASTLANE_CLONE>")
 ```
