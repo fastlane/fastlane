@@ -1,5 +1,3 @@
-# coding: utf-8
-
 require 'tmpdir'
 require 'terminal-table'
 require 'emoji_regex'

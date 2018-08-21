@@ -1,5 +1,3 @@
-# coding: utf-8
-
 require 'shellwords'
 require 'fileutils'
 require 'credentials_manager/account_manager'
@@ -326,6 +324,7 @@ module FastlaneCore
   end
 
   class ItunesTransporter
+    # Matches a line in the provider table: "12  Initech Systems Inc     LG89CQY559"
     PROVIDER_REGEX = /^\d+\s{2,}.+\s{2,}[^\s]+$/
     TWO_STEP_HOST_PREFIX = "deliver.appspecific"
 

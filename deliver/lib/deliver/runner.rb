@@ -1,5 +1,3 @@
-# coding: utf-8
-
 require 'precheck/options'
 require 'precheck/runner'
 require 'fastlane_core/configuration/configuration'
