@@ -15,6 +15,7 @@ module Fastlane
       :production,
       :source_control,
       :notifications,
+      :app_store_connect,
       :misc,
       :deprecated # This should be the last item
     ]
