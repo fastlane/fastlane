@@ -710,3 +710,6 @@ App Store Connect has a limit of 150 binary uploads per day.
 
 ## Editing the `Deliverfile`
 Change syntax highlighting to *Ruby*.
+
+## Provider Short Name
+If you are on multiple App Store Connect teams, iTunes Transporter may need a provider short name to know where to upload your binary. _deliver_ will try to use the long name of the selected team to detect the provider short name. To override the detected value with an explicit one, use the `itc_provider` option.
