@@ -219,7 +219,7 @@ module FastlaneCore
         UI.user_error!("Could not find transporter at usual locations. Please use environment variable `FASTLANE_ITUNES_TRANSPORTER_PATH` to specify your installation path.")
       else
         # not Mac or Windows
-        return '' 
+        return ''
       end
     end
 
