@@ -3,7 +3,7 @@
 # https://github.com/DragonBox/u3d/blob/59e471ad78ac00cb629f479dbe386c5ad2dc5075/lib/u3d_core/command_runner.rb#L88-L96
 module FastlaneCore
   class FastlanePty
-    def self.spawn(command, &block)
+    def self.spawn(command)
       require 'pty'
       PTY.spawn(command) do |command_stdout, command_stdin, pid|
         begin
