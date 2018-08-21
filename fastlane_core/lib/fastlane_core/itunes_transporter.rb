@@ -1,4 +1,5 @@
 # coding: utf-8
+
 require 'shellwords'
 require 'fileutils'
 require 'credentials_manager/account_manager'
