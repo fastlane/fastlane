@@ -25,9 +25,10 @@ init:
 install:
   - set PATH=C:\Ruby24-x64\bin;%PATH%
   - bundle install
-  # - cinst gtk-runtime # includes iconv
+  # gtk-runtime includes `iconv`
+  # - cinst gtk-runtime 
   - ps: Start-FileDownload 'http://downloads.sourceforge.net/gtk-win/gtk2-runtime-2.24.10-2012-10-10-ash.exe?download'
-  - gtk2-runtime-2.24.10-2012-10-10-ash.exe
+  - gtk2-runtime-2.24.10-2012-10-10-ash.exe /S
 
 environment:
   LC_ALL: en_US.UTF-8
