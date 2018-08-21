@@ -28,7 +28,7 @@ module Precheck
       end
 
       it "passes for valid non encoded URL" do
-        setup_url_rule_mock(url: "http://fastlane.tools/%25E3%2583%2586%25E3%2582%25B9%25E3%2583%2588")
+        setup_url_rule_mock(url: "http://fastlane.tools/%E3%83%86%E3%82%B9%E3%83%88")
 
         item = URLItemToCheck.new("http://fastlane.tools/テスト", "some_url", "test URL")
         result = rule.check_item(item)
