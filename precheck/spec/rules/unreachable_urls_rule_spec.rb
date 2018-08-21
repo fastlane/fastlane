@@ -15,7 +15,8 @@ module Precheck
         allow(request).to receive(:adapter).and_return(nil)
         allow(request).to receive(:head).and_return(head_object)
 
-        allow(Faraday).to receive(:new).with(url).and_return(request)
+        uri = Addressable::URI.parse(url)
+        allow(Faraday).to receive(:new).with(uri.normalize.to_s).and_return(request)
       end
 
       it "passes for 200 status URL" do
