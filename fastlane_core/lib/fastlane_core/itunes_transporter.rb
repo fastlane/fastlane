@@ -67,7 +67,7 @@ module FastlaneCore
         @errors << ex.to_s
       end
 
-      if exit_status != 0
+      unless exit_status.zero?
         @errors << "The call to the iTMSTransporter completed with a non-zero exit status: #{exit_status}. This indicates a failure."
       end
 
@@ -92,11 +92,11 @@ module FastlaneCore
       #  iTMSTransporter file transfer fails; iTMSTransporter will log an error
       #  but will then retry; if that retry is successful, we will see the error
       #  logged, but since the status code is zero, we want to return success
-      if @errors.count > 0 && exit_status == 0
+      if @errors.count > 0 && exit_status.zero?
         UI.important("Although errors occurred during execution of iTMSTransporter, it returned success status.")
       end
 
-      exit_status == 0
+      exit_status.zero?
     end
 
     private
