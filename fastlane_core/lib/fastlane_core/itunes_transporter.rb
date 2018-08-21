@@ -427,7 +427,7 @@ module FastlaneCore
         UI.error("")
         UI.error("Application specific password you provided using")
         UI.error("environment variable #{TWO_FACTOR_ENV_VARIABLE}")
-        UI.error("is invalid, please make sure it's correct.")
+        UI.error("is invalid, please make sure it's correct")
         UI.error("")
         UI.user_error!("Invalid application specific password provided")
       end
@@ -445,11 +445,11 @@ module FastlaneCore
       UI.error("Your account has 2 step verification enabled")
       UI.error("Please go to https://appleid.apple.com/account/manage")
       UI.error("and generate an application specific password for")
-      UI.error("the iTunes Transporter, which is used to upload builds.")
+      UI.error("the iTunes Transporter, which is used to upload builds")
       UI.error("")
       UI.error("To set the application specific password on a CI machine using")
       UI.error("an environment variable, you can set the")
-      UI.error("#{TWO_FACTOR_ENV_VARIABLE} variable.")
+      UI.error("#{TWO_FACTOR_ENV_VARIABLE} variable")
       @password = a.password(ask_if_missing: true) # to ask the user for the missing value
 
       return true
