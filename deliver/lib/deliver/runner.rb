@@ -180,10 +180,10 @@ module Deliver
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team
       generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
-      return generic_transporter unless options[:itc_provider].nil? && @session.teams.count < 2
+      return generic_transporter unless options[:itc_provider].nil? && @session.teams.count > 1
 
       begin
-        team = @session.teams.find { |t| t['contentProvider']['contentProviderId'] == @selected_team_id }
+        team = @session.teams.find { |t| t['contentProvider']['contentProviderId'].to_s == @selected_team_id }
         name = team['contentProvider']['name']
         provider_id = generic_transporter.provider_ids[name]
         UI.verbose("Inferred provider id #{provider_id} for team #{name}.")
