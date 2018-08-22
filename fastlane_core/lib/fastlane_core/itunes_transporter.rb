@@ -32,10 +32,8 @@ module FastlaneCore
 
     def execute(command, hide_output)
       if Helper.test?
-        return {
-          successful: command,
-          output: nil
-        }
+        yield(nil) if block_given?
+        return command
       end
 
       # Workaround because the traditional transporter broke on 1st March 2018
@@ -104,10 +102,8 @@ module FastlaneCore
         UI.important("Although errors occurred during execution of iTMSTransporter, it returned success status.")
       end
 
-      {
-        successful: exit_status.zero?,
-        output: @all_lines
-      }
+      yield(@all_lines) if block_given?
+      return exit_status.zero?
     end
 
     private
@@ -376,7 +372,7 @@ module FastlaneCore
       UI.verbose(@transporter_executor.build_download_command(@user, 'YourPassword', app_id, dir, @provider_short_name))
 
       begin
-        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)[:successful]
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return download(app_id, dir)
@@ -412,7 +408,7 @@ module FastlaneCore
       UI.verbose(@transporter_executor.build_upload_command(@user, 'YourPassword', actual_dir, @provider_short_name))
 
       begin
-        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)[:successful]
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return upload(app_id, dir)
@@ -432,15 +428,16 @@ module FastlaneCore
     def provider_ids
       command = @transporter_executor.build_provider_ids_command(@user, @password)
       UI.verbose(@transporter_executor.build_provider_ids_command(@user, 'YourPassword'))
+      lines = []
       begin
-        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
-        return result[:successful] if Helper.test?
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?) { |xs| lines = xs }
+        return result if Helper.test?
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return provider_ids
       end
 
-      result[:output].map { |line| provider_pair(line) }.compact.to_h
+      lines.map { |line| provider_pair(line) }.compact.to_h
     end
 
     private

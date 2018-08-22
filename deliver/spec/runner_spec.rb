@@ -7,6 +7,10 @@ class MockSession
       { 'contentProvider' => { 'contentProviderId' => 'def', 'name' => 'D E F' } }
     ]
   end
+
+  def team_id
+    'abc'
+  end
 end
 
 class MockTransporter
@@ -20,8 +24,9 @@ end
 
 describe Deliver::Runner do
   let(:runner) do
-    allow(Spaceship::Tunes).to receive(:login).and_return(MockSession.new)
-    allow(Spaceship::Tunes).to receive(:select_team).and_return('abc')
+    allow(Spaceship::Tunes).to receive(:login).and_return(true)
+    allow(Spaceship::Tunes).to receive(:select_team).and_return(true)
+    allow(Spaceship::Tunes).to receive(:client).and_return(MockSession.new)
     allow_any_instance_of(Deliver::DetectValues).to receive(:run!) { |opt| opt }
     Deliver::Runner.new(options)
   end
