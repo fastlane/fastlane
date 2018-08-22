@@ -144,13 +144,13 @@
         <% if @options[:app_icon] %>
         <div class="app-icon">
           Large App Icon:<br>
-          <img src="<%= @options[:app_icon] %>">
+          <img src="<%= File.expand_path(@options[:app_icon]) %>">
         </div>
         <% end %>
         <% if @options[:apple_watch_app_icon] %>
         <div class="watch-icon">
           Watch App Icon:<br>
-          <img src="<%= @options[:apple_watch_app_icon] %>">
+          <img src="<%= File.expand_path(@options[:apple_watch_app_icon]) %>">
         </div>
         <% end %>
       </div>
