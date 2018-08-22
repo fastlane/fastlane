@@ -26,7 +26,7 @@ install:
   - set PATH=C:\Ruby24-x64\bin;%PATH%
   - bundle install
   # iconv
-  - appveyor DownloadFile 'https://downloads.sourceforge.net/project/gnuwin32/libiconv/1.9.2-1/libiconv-1.9.2-1.exe?download'
+  - appveyor DownloadFile https://downloads.sourceforge.net/project/gnuwin32/libiconv/1.9.2-1/libiconv-1.9.2-1.exe?download
   - libiconv-1.9.2-1.exe /SILENT /SUPPRESSMSGBOXES
 
 environment:
