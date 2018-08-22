@@ -147,9 +147,7 @@ module Fastlane
         @action = action # to provide a reference in the .html.erb template
         @action_filename = filename_for_action(action)
 
-        unless @action_filename
-          next
-        end
+        next if @action_filename.nil?
 
         # Make sure to always assign `@custom_content`, as we're in a loop and `@` is needed for the `erb`
         @custom_content = load_custom_action_md(action)

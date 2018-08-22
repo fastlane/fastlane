@@ -56,10 +56,6 @@ module Fastlane
         true
       end
 
-      def self.category
-        :misc
-      end
-
       # Those are plugins that are now part of fastlane core actions, so we don't want to show them in the directory
       def self.hidden_plugins
         [
