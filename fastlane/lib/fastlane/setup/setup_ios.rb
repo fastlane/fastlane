@@ -470,14 +470,16 @@ module Fastlane
         produce_options[:skip_devcenter] = true
       end
 
-      Produce.config = FastlaneCore::Configuration.create(
-        Produce::Options.available_options,
-        produce_options
-      )
-
       # The retrying system allows people to correct invalid inputs
       # e.g. the app's name is already taken
       loop do
+        # Creating config in the loop so user will be reprompted
+        # for app name if app name is taken or too long
+        Produce.config = FastlaneCore::Configuration.create(
+          Produce::Options.available_options,
+          produce_options
+        )
+
         begin
           Produce::Manager.start_producing
           UI.success("✅  Successfully created app")
