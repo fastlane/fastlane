@@ -226,7 +226,7 @@ module Deliver
       # Collect all languages we need
       # We only care about languages from user provided values
       # as the other languages are on iTC already anyway
-      v = options[:app].edit_version
+      v = options[:app].edit_version(platform: options[:platform])
       UI.user_error!("Could not find a version to edit for app '#{options[:app].name}', the app metadata is read-only currently") unless v
 
       enabled_languages = options[:languages] || []
