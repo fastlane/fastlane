@@ -206,7 +206,7 @@ module FastlaneCore
       #    '"\'"'
       # this allows us to properly handle passwords with single-quotes in them
       # we use the 'do' version of gsub, because two-param version interprets the replace text as a pattern and does the wrong thing
-      password = Shellwords.escape(password).gsub("\\'") do
+      password = password.shellescape.gsub("\\'") do
         "'\"\\'\"'"
       end
 
