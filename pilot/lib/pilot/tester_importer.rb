@@ -42,7 +42,7 @@ module Pilot
         begin
           tester_manager.add_tester(config)
           imported_tester_count += 1
-        rescue  => exception
+        rescue => exception
           UI.error("Error adding tester #{email}: #{exception}")
         end
       end
