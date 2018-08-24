@@ -187,4 +187,20 @@ class String
 
     self.gsub!(/^#{first_line_indent}/, "")
   end
+
+  def shellescape
+    if FastlaneCore::Helper.windows?
+      # double quotes have to be doubled
+      self.gsub!('"', '""')
+      # wrap in double quotes if contains space
+      # then return (and skip Shellwords.escape)
+      if self =~ /\s/
+        return '"' + self + '"'
+      else
+        return self
+      end
+    else
+      return Shellwords.escape(self)
+    end
+  end
 end
