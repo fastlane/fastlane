@@ -122,6 +122,13 @@ module Snapshot
       UI.verbose("Checking that helper files contain #{current_version}")
 
       helper_files = Update.find_helper
+      if helper_files.empty?
+        UI.error("Your Snapshot Helper file is missing, please place a copy")
+        UI.error("in your project directory.")
+        UI.user_error!("Please add a Snapshot Helper file to your project.")
+        return
+      end
+
       helper_files.each do |path|
         content = File.read(path)
 
