@@ -190,15 +190,22 @@ class String
 
   def shellescape
     if FastlaneCore::Helper.windows?
-      string = self.dup
-      # double quotes have to be doubled
-      string.gsub!('"', '""')
+      str = self.to_s
+
+      # An empty argument will be skipped, so return empty quotes.
+      # https://github.com/ruby/ruby/blob/a6413848153e6c37f6b0fea64e3e871460732e34/lib/shellwords.rb#L142-L143
+      return '""'.dup if str.empty?
+
+      str = self.dup
+
       # wrap in double quotes if contains space
       # then return (and skip Shellwords.escape)
-      if string =~ /\s/
-        return '"' + string + '"'
+      if str =~ /\s/
+        # double quotes have to be doubled
+        str.gsub!('"', '""')
+        return '"' + str + '"'
       else
-        return string
+        return str
       end
     else
       return Shellwords.escape(self)
