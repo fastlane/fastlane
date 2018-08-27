@@ -33,8 +33,8 @@ describe FastlaneCore do
       it 'uses the correct command to import it' do
         # We have to execute *something* using ` since otherwise we set expectations to `nil`, which is not healthy
         `ls`
-
-        cmd = %r{curl -f -o (([A-Z]\:)?\/.+) https://developer\.apple\.com/certificationauthority/AppleWWDRCA.cer && security import \1 -k keychain\\ with\\ spaces\.keychain}
+        keychain = "keychain with spaces.keychain"
+        cmd = %r{curl -f -o (([A-Z]\:)?\/.+) https://developer\.apple\.com/certificationauthority/AppleWWDRCA.cer && security import \1 -k #{keychain.shellescape}}
         require "open3"
 
         expect(Open3).to receive(:capture3).with(cmd).and_return("")
