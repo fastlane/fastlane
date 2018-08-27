@@ -2,7 +2,7 @@ require 'shellwords'
 require 'credentials_manager'
 
 describe FastlaneCore do
-  before(:all) do
+  before(:each) do
     @password = "p@$s_-+=w'o%rd\"&#*<"
   end
 
