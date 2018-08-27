@@ -211,8 +211,8 @@ module FastlaneCore
       end
 
       # wrap the fully-escaped password in single quotes, since the transporter expects a escaped password string (which must be single-quoted for the shell's benefit)
-      password = "'" + password + "'" unless Helper.windows?
-      
+      password = "'" + password + "'" if Helper.mac?
+
       password
     end
   end
