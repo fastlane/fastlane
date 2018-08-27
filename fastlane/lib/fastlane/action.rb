@@ -188,7 +188,7 @@ class String
     self.gsub!(/^#{first_line_indent}/, "")
   end
 
-  # FastlaneShellwords
+  # CrossplatformShellwords
   def shellescape
     CrossplatformShellwords.shellescape(self)
   end
@@ -203,7 +203,7 @@ end
 module CrossplatformShellwords
   def shellescape(str)
     if FastlaneCore::Helper.windows?
-      CrossplatformShellwords.shellescape(str)
+      WindowsShellwords.shellescape(str)
     else
       return Shellwords.escape(str)
     end
