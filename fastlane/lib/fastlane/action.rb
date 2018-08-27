@@ -205,6 +205,27 @@ class Array
   end
 end
 
+module Shellwords
+  def shellescape(string)
+    FastlaneShellwords.shellescape(string)
+  end
+  module_function :shellescape
+
+  class << self
+    alias escape shellescape
+  end
+
+  def shelljoin(array)
+    FastlaneShellwords.shelljoin(array)
+  end
+
+  module_function :shelljoin
+
+  class << self
+    alias join shelljoin
+  end
+end
+
 module FastlaneShellwords
   def shellescape(str)
     if FastlaneCore::Helper.windows?
