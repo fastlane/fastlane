@@ -37,7 +37,7 @@ describe FastlaneCore do
         RSpec::Support::ObjectFormatter.default_instance.max_formatted_output_length = 1024
 
         keychain = "keychain with spaces.keychain"
-        cmd = %r{curl -f -o (([A-Z]\:)?\/.+) https://developer\.apple\.com/certificationauthority/AppleWWDRCA.cer && security import \1 -k #{keychain.shellescape.gsub('.', '\.')}}
+        cmd = %r{curl -f -o (([A-Z]\:)?\/.+) https://developer\.apple\.com/certificationauthority/AppleWWDRCA.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
         require "open3"
 
         expect(Open3).to receive(:capture3).with(cmd).and_return("")
