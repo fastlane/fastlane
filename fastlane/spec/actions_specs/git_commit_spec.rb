@@ -26,7 +26,7 @@ describe Fastlane do
           git_commit(path: ['./fastlane/*.md', './LICENSE'], message: 'message')
         end").runner.execute(:test)
 
-        expect(result).to eq("git commit -m message ./fastlane/\\*.md ./LICENSE")
+        expect(result).to eq("git commit -m message #{"./fastlane/*.md".shellescape} ./LICENSE")
       end
 
       it "generates the correct git command with shell-escaped-paths" do
@@ -38,10 +38,11 @@ describe Fastlane do
       end
 
       it "generates the correct git command with a shell-escaped message" do
+        message = "message with 'quotes' (and parens)"
         result = Fastlane::FastFile.new.parse("lane :test do
-          git_commit(path: './fastlane/README.md', message: \"message with 'quotes' (and parens)\")
+          git_commit(path: './fastlane/README.md', message: \"#{message}\")
         end").runner.execute(:test)
-        expect(result).to eq("git commit -m message\\ with\\ \\'quotes\\'\\ \\(and\\ parens\\) ./fastlane/README.md")
+        expect(result).to eq("git commit -m #{message.shellescape} ./fastlane/README.md")
       end
     end
   end
