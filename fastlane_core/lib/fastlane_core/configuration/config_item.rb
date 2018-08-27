@@ -238,7 +238,7 @@ module FastlaneCore
       elsif data_type == Float
         return value.to_f if value.to_f.to_s == value.to_s
       elsif allow_shell_conversion
-        return Shellwords.join(value) if value.kind_of?(Array)
+        return value.shelljoin if value.kind_of?(Array)
         return value.map { |k, v| "#{k.to_s.shellescape}=#{v.shellescape}" }.join(' ') if value.kind_of?(Hash)
       elsif data_type != String
         # Special treatment if the user specified true, false or YES, NO
