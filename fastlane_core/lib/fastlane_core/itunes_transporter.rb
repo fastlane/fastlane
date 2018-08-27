@@ -200,20 +200,22 @@ module FastlaneCore
     private
 
     def shell_escaped_password(password)
-      # because the shell handles passwords with single-quotes incorrectly, use gsub to replace ShellEscape'd single-quotes of this form:
-      #    \'
-      # with a sequence that wraps the escaped single-quote in double-quotes:
-      #    '"\'"'
-      # this allows us to properly handle passwords with single-quotes in them
-      # we use the 'do' version of gsub, because two-param version interprets the replace text as a pattern and does the wrong thing
-      password = password.shellescape.gsub("\\'") do
-        "'\"\\'\"'"
+      if Helper.mac?
+        # because the shell handles passwords with single-quotes incorrectly, use gsub to replace ShellEscape'd single-quotes of this form:
+        #    \'
+        # with a sequence that wraps the escaped single-quote in double-quotes:
+        #    '"\'"'
+        # this allows us to properly handle passwords with single-quotes in them
+        # we use the 'do' version of gsub, because two-param version interprets the replace text as a pattern and does the wrong thing
+        password = password.shellescape.gsub("\\'") do
+          "'\"\\'\"'"
+        end
+
+        # wrap the fully-escaped password in single quotes, since the transporter expects a escaped password string (which must be single-quoted for the shell's benefit)
+        password = "'" + password + "'"
       end
 
-      # wrap the fully-escaped password in single quotes, since the transporter expects a escaped password string (which must be single-quoted for the shell's benefit)
-      password = "'" + password + "'" if Helper.mac?
-
-      password
+      password.shellescape
     end
   end
 
@@ -315,6 +317,8 @@ module FastlaneCore
     #                            for more information about how to use the iTMSTransporter to list your provider
     #                            short names
     def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil)
+puts "initialize: " + password
+
       # Xcode 6.x doesn't have the same iTMSTransporter Java setup as later Xcode versions, so
       # we can't default to using the better direct Java invocation strategy for those versions.
       use_shell_script ||= Helper.xcode_version.start_with?('6.')
