@@ -116,6 +116,7 @@ describe FastlaneCore do
         describe "upload command generation" do
           it 'generates a call to java directly' do
             transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password, true, 'abcd1234')
+            RSpec::Support::ObjectFormatter.default_instance.max_formatted_output_length = 1024
             expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command('abcd1234'))
           end
         end
@@ -123,6 +124,7 @@ describe FastlaneCore do
         describe "download command generation" do
           it 'generates a call to java directly' do
             transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password, true, 'abcd1234')
+            RSpec::Support::ObjectFormatter.default_instance.max_formatted_output_length = 1024
             expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command('abcd1234'))
           end
         end
@@ -152,6 +154,7 @@ describe FastlaneCore do
         describe "upload command generation" do
           it 'generates a call to the shell script' do
             transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password, true)
+            RSpec::Support::ObjectFormatter.default_instance.max_formatted_output_length = 1024
             expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
           end
         end
@@ -159,6 +162,7 @@ describe FastlaneCore do
         describe "download command generation" do
           it 'generates a call to the shell script' do
             transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password, true)
+            RSpec::Support::ObjectFormatter.default_instance.max_formatted_output_length = 1024
             expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command)
           end
         end
@@ -187,6 +191,7 @@ describe FastlaneCore do
       describe "upload command generation" do
         it 'generates a call to the shell script' do
           transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password, false)
+          RSpec::Support::ObjectFormatter.default_instance.max_formatted_output_length = 1024
           expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
         end
       end
@@ -194,6 +199,7 @@ describe FastlaneCore do
       describe "download command generation" do
         it 'generates a call to the shell script' do
           transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password, false)
+          RSpec::Support::ObjectFormatter.default_instance.max_formatted_output_length = 1024
           expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command)
         end
       end
