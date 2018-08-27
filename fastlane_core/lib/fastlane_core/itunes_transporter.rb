@@ -213,9 +213,11 @@ module FastlaneCore
 
         # wrap the fully-escaped password in single quotes, since the transporter expects a escaped password string (which must be single-quoted for the shell's benefit)
         password = "'" + password + "'"
-      end
 
-      password.shellescape
+        return password
+      else
+        password.shellescape
+      end
     end
   end
 
