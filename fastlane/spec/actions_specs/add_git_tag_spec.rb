@@ -117,7 +117,6 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        tag = "#{tag}"
         expect(result).to eq("git tag -am #{message.shellescape} #{tag.shellescape}")
       end
 

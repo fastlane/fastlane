@@ -14,7 +14,7 @@ module Fastlane
         cmd << ["-am #{message.shellescape}"]
         cmd << '--force' if options[:force]
         cmd << '-s' if options[:sign]
-        cmd << "#{tag.shellescape}"
+        cmd << tag.shellescape
         cmd << options[:commit].to_s if options[:commit]
 
         UI.message("Adding git tag '#{tag}' 🎯.")
