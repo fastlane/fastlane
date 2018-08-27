@@ -183,9 +183,8 @@ describe Fastlane do
                     --ignore #{ignore.shellescape}
                     --input-format bah
                     --scheme #{scheme.shellescape}
-                    #{proj.shellescape}".gsub(/\s+/, ' ')#
-
-        expect(result).to eq(expected)#
+                    #{proj.shellescape}".gsub(/\s+/, ' ')
+        expect(result).to eq(expected)
       end
 
       it "works with multiple ignore patterns" do

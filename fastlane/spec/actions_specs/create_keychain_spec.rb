@@ -31,7 +31,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result.size).to eq(3)
-        expect(result[0]).to eq(%(security create-keychain -p #{password.shellescape} ~/Library/Keychains/test.keychain))#
+        expect(result[0]).to eq(%(security create-keychain -p #{password.shellescape} ~/Library/Keychains/test.keychain))
       end
 
       it "works with keychain-settings and name and password" do

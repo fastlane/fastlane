@@ -26,7 +26,7 @@ describe Fastlane do
           git_commit(path: ['./fastlane/*.md', './LICENSE'], message: 'message')
         end").runner.execute(:test)
 
-        expect(result).to eq("git commit -m message #{"./fastlane/*.md".shellescape} ./LICENSE")
+        expect(result).to eq("git commit -m message #{'./fastlane/*.md'.shellescape} ./LICENSE")
       end
 
       it "generates the correct git command with shell-escaped-paths" do

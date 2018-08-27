@@ -77,7 +77,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to include(" -rule #{rule.shellescape} ")#
+        expect(result).to include(" -rule #{rule.shellescape} ")
         expect(result).to include(" -disable-rule #{rule.shellescape} ")
       end
 

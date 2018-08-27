@@ -66,7 +66,7 @@ describe Fastlane do
         result = Fastlane::FastFile.new.parse("lane :test do
           ensure_no_debug_code(text: 'pry', path: '.', exclude_dirs: ['#{directory}'])
         end").runner.execute(:test)
-        expect(result).to eq("grep -RE 'pry' '#{File.absolute_path('./')}' --exclude-dir #{directory.shellescape}")#
+        expect(result).to eq("grep -RE 'pry' '#{File.absolute_path('./')}' --exclude-dir #{directory.shellescape}")
       end
 
       it "handles the exclude_dirs parameter with multiple  elements correctly" do

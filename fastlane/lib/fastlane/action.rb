@@ -189,19 +189,6 @@ class String
   end
 end
 
-#module Shellwords
-#  original_shellescape = instance_method(:shellescape)
-#
-#  define_method(:shellescape) do
-#    if FastlaneCore::Helper.windows?
-#      WindowsShellwords.shellescape(string)
-#    else
-#      original_shellescape.bind(self).()
-#    end
-#  end
-#
-#end
-
 # Monkey Patch Windows support into Shellwords
 # Module#prepend: https://stackoverflow.com/a/4471202/252627
 module ShellwordsWithCrossPlatformSupport
@@ -218,13 +205,11 @@ class Shellwords::Shellwords
   prepend ShellwordsWithCrossPlatformSupport
 end
 
-
 module WindowsShellwords
   def shellescape(str)
     str = str.to_s
 
     # An empty argument will be skipped, so return empty quotes.
-    # https://github.com/ruby/ruby/blob/a6413848153e6c37f6b0fea64e3e871460732e34/lib/shellwords.rb#L142-L143
     return '""'.dup if str.empty?
 
     str = str.dup
