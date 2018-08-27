@@ -187,22 +187,33 @@ class String
 
     self.gsub!(/^#{first_line_indent}/, "")
   end
-end
 
-# Monkey Patch Windows support into Shellwords
-# Module#prepend: https://stackoverflow.com/a/4471202/252627
-module ShellwordsWithCrossPlatformSupport
+  # FastlaneShellwords
   def shellescape
-    if FastlaneCore::Helper.windows?
-      WindowsShellwords.shellescape(string)
-    else
-      super
-    end
+    CrossplatformShellwords.shellescape(self)
   end
 end
 
-class Shellwords::Shellwords
-  prepend ShellwordsWithCrossPlatformSupport
+class Array
+  def shelljoin
+    CrossplatformShellwords.shelljoin(self)
+  end
+end
+
+module CrossplatformShellwords
+  def shellescape(str)
+    if FastlaneCore::Helper.windows?
+      CrossplatformShellwords.shellescape(str)
+    else
+      return Shellwords.escape(str)
+    end
+  end
+  module_function :shellescape
+
+  def shelljoin(array)
+    array.map { |arg| shellescape(arg) }.join(' ')
+  end
+  module_function :shelljoin
 end
 
 module WindowsShellwords
@@ -210,6 +221,7 @@ module WindowsShellwords
     str = str.to_s
 
     # An empty argument will be skipped, so return empty quotes.
+    # https://github.com/ruby/ruby/blob/a6413848153e6c37f6b0fea64e3e871460732e34/lib/shellwords.rb#L142-L143
     return '""'.dup if str.empty?
 
     str = str.dup
@@ -224,4 +236,5 @@ module WindowsShellwords
       return str
     end
   end
+  module_function :shellescape
 end
