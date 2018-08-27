@@ -187,83 +187,56 @@ class String
 
     self.gsub!(/^#{first_line_indent}/, "")
   end
+end
 
-  # FastlaneShellwords
+#module Shellwords
+#  original_shellescape = instance_method(:shellescape)
+#
+#  define_method(:shellescape) do
+#    if FastlaneCore::Helper.windows?
+#      WindowsShellwords.shellescape(string)
+#    else
+#      original_shellescape.bind(self).()
+#    end
+#  end
+#
+#end
 
-  #def shellsplit
-  #  FastlaneShellwords.split(self)
-  #end
-
+# Monkey Patch Windows support into Shellwords
+# Module#prepend: https://stackoverflow.com/a/4471202/252627
+module ShellwordsWithCrossPlatformSupport
   def shellescape
-    FastlaneShellwords.shellescape(self)
-  end
-end
-
-class Array
-  def shelljoin
-    FastlaneShellwords.shelljoin(self)
-  end
-end
-
-module Shellwords
-  def shellescape(string)
-    FastlaneShellwords.shellescape(string)
-  end
-  module_function :shellescape
-
-  class << self
-    alias escape shellescape
-  end
-
-  def shelljoin(array)
-    FastlaneShellwords.shelljoin(array)
-  end
-
-  module_function :shelljoin
-
-  class << self
-    alias join shelljoin
-  end
-end
-
-module FastlaneShellwords
-  def shellescape(str)
     if FastlaneCore::Helper.windows?
-      str = str.to_s
-
-      # An empty argument will be skipped, so return empty quotes.
-      # https://github.com/ruby/ruby/blob/a6413848153e6c37f6b0fea64e3e871460732e34/lib/shellwords.rb#L142-L143
-      return '""'.dup if str.empty?
-
-      str = str.dup
-
-      # wrap in double quotes if contains space
-      # then return (and skip Shellwords.escape)
-      if str =~ /\s/
-        # double quotes have to be doubled
-        str.gsub!('"', '""')
-        return '"' + str + '"'
-      else
-        return str
-      end
+      WindowsShellwords.shellescape(string)
     else
-      return Shellwords.escape(str)
+      super
     end
   end
+end
 
-  module_function :shellescape
+class Shellwords::Shellwords
+  prepend ShellwordsWithCrossPlatformSupport
+end
 
-  class << self
-    alias escape shellescape
-  end
 
-  def shelljoin(array)
-    array.map { |arg| shellescape(arg) }.join(' ')
-  end
+module WindowsShellwords
+  def shellescape(str)
+    str = str.to_s
 
-  module_function :shelljoin
+    # An empty argument will be skipped, so return empty quotes.
+    # https://github.com/ruby/ruby/blob/a6413848153e6c37f6b0fea64e3e871460732e34/lib/shellwords.rb#L142-L143
+    return '""'.dup if str.empty?
 
-  class << self
-    alias join shelljoin
+    str = str.dup
+
+    # wrap in double quotes if contains space
+    # then return (and skip Shellwords.escape)
+    if str =~ /\s/
+      # double quotes have to be doubled
+      str.gsub!('"', '""')
+      return '"' + str + '"'
+    else
+      return str
+    end
   end
 end
