@@ -190,14 +190,15 @@ class String
 
   def shellescape
     if FastlaneCore::Helper.windows?
+      string = self.dup
       # double quotes have to be doubled
-      self.gsub!('"', '""')
+      string.gsub!('"', '""')
       # wrap in double quotes if contains space
       # then return (and skip Shellwords.escape)
-      if self =~ /\s/
-        return '"' + self + '"'
+      if string =~ /\s/
+        return '"' + string + '"'
       else
-        return self
+        return string
       end
     else
       return Shellwords.escape(self)
