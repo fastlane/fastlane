@@ -80,36 +80,36 @@ testcases = [
     'it' => '(#4) on simple string that is already wrapped in double quotes',
     'it_result' => {
       'windows' => "doesn't touch it", 
-      'other'   => 'escapes the double quotes with <backslash>'
+      'other'   => 'removes double quotes' #'escapes the double quotes with <backslash>'
     },
     'str' => '"normal_string_without_spaces"',
     'expect' => {
       'windows' => '"normal_string_without_spaces"',
-      'other'   => '\"normal_string_without_spaces\"'
+      'other'   => 'normal_string_without_spaces' # '\"normal_string_without_spaces\"'
     }
   },
   { 
     'it' => '(#5) on string with spaces that is already wrapped in double quotes',
     'it_result' => {
       'windows' => "wraps in double quotes and duplicates existing double quotes", 
-      'other'   => 'escapes the double quotes and spaces with <backslash>'
+      'other'   => 'removes the double quotes and escapes the spaces with <backslash>' # 'escapes the double quotes and spaces with <backslash>'
     },
     'str' => '"string with spaces already wrapped in double quotes"',
     'expect' => {
       'windows' => '"""string with spaces already wrapped in double quotes"""',
-      'other'   => '\"string\ with\ spaces\ already\ wrapped\ in\ double\ quotes\"'
+      'other'   => 'string\ with\ spaces\ already\ wrapped\ in\ double\ quotes' # '\"string\ with\ spaces\ already\ wrapped\ in\ double\ quotes\"'
     }
   },
   { 
     'it' => '(#6) on string with spaces and double quotes',
     'it_result' => {
       'windows' => "wraps in double quotes and duplicates existing double quotes", 
-      'other'   => 'escapes the double quotes and spaces with <backslash>'
+      'other'   => 'removes the double quotes and escapes the spaces with <backslash>' # 'escapes the double quotes and spaces with <backslash>'
     },
     'str' => 'string with spaces and "double" quotes',
     'expect' => {
       'windows' => '"string with spaces and ""double"" quotes"',
-      'other'   => 'string\ with\ spaces\ and\ \"double\"\ quotes'
+      'other'   => 'string\ with\ spaces\ and\ double\ quotes' # 'string\ with\ spaces\ and\ \"double\"\ quotes'
     }
   },
 ]
