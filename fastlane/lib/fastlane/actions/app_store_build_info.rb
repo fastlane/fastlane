@@ -1,13 +1,93 @@
 module Fastlane
   module Actions
     module SharedValues
-      APP_STORE_LATEST_BUILD_NUMBER = :APP_STORE_LATEST_BUILD_NUMBER
+      LATEST_BUILD_NUMBER = :LATEST_BUILD_NUMBER
+      LATEST_VERSION_NUMBER = :LATEST_VERSION_NUMBER
     end
 
-    class AppStoreBuildNumberAction < Action
+    class AppStoreBuildInfoAction < Action
       def self.run(params)
-        build_number = AppStoreBuildInfoAction.run(params)[:latest_build_number]
-        Actions.lane_context[SharedValues::APP_STORE_LATEST_BUILD_NUMBER] = build_number
+        require 'spaceship'
+
+        build_info = get_build_info(params)
+
+        build_nr = build_info[:latest_build_number]
+
+        # Convert build_nr to int (for legacy use) if no "." in string
+        if build_nr.kind_of?(String) && !build_nr.include?(".")
+          build_nr = build_nr.to_i
+        end
+
+        Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER] = build_nr
+
+        unless build_nr.nil?
+          build_info[:latest_build_number] = build_nr
+        end
+        build_info
+      end
+
+      def self.get_build_info(params)
+        UI.message("Login to iTunes Connect (#{params[:username]})")
+        Spaceship::Tunes.login(params[:username])
+        Spaceship::Tunes.select_team(team_id: params[:team_id], team_name: params[:team_name])
+        UI.message("Login successful")
+
+        platform = params[:platform]
+
+        app = Spaceship::Tunes::Application.find(params[:app_identifier])
+        if params[:live]
+          UI.message("Fetching the latest build number for live-version")
+          live_version = app.live_version
+          unless live_version.nil?
+            build_nr = live_version.current_build_number
+            Actions.lane_context[SharedValues::LATEST_VERSION_NUMBER] = live_version.version
+            version_number = live_version.version
+          end
+        else
+          version_number = params[:version]
+          unless version_number
+            # Automatically fetch the latest version in testflight
+            begin
+              train_numbers = app.all_build_train_numbers(platform: platform)
+              testflight_version = self.order_versions(train_numbers).last
+            rescue
+              testflight_version = params[:version]
+            end
+
+            if testflight_version
+              version_number = testflight_version
+            else
+              version_number = UI.input("You have to specify a new version number, as there are multiple to choose from")
+            end
+
+          end
+
+          Actions.lane_context[SharedValues::LATEST_VERSION_NUMBER] = version_number
+
+          UI.message("Fetching the latest build number for version #{version_number}")
+
+          begin
+            build_numbers = app.all_builds_for_train(train: version_number, platform: platform).map(&:build_version)
+            build_nr = self.order_versions(build_numbers).last
+            if build_nr.nil? && params[:initial_build_number]
+              UI.message("Could not find a build on iTC. Using supplied 'initial_build_number' option")
+              build_nr = params[:initial_build_number]
+            end
+          rescue
+            UI.user_error!("Could not find a build on iTC - and 'initial_build_number' option is not set") unless params[:initial_build_number]
+            build_nr = params[:initial_build_number]
+          end
+        end
+        UI.message("Latest upload for version #{version_number} is build: #{build_nr}")
+
+        {
+          latest_build_number: build_nr,
+          latest_version_number: version_number
+        }
+      end
+
+      def self.order_versions(versions)
+        versions.map(&:to_s).sort_by { |v| Gem::Version.new(v) }
       end
 
       #####################################################
@@ -41,8 +121,8 @@ module Fastlane
                                        default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        short_option: "-k",
-                                       env_name: "APPSTORE_BUILD_NUMBER_LIVE_TEAM_ID",
-                                       description: "The ID of your App Store Connect team if you're in multiple teams",
+                                       env_name: "APPSTORE_BUILD_INFO_LIVE_TEAM_ID",
+                                       description: "The ID of your iTunes Connect team if you're in multiple teams",
                                        optional: true,
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
@@ -53,7 +133,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :live,
                                        short_option: "-l",
-                                       env_name: "APPSTORE_BUILD_NUMBER_LIVE",
+                                       env_name: "APPSTORE_BUILD_INFO_LIVE",
                                        description: "Query the live version (ready-for-sale)",
                                        optional: true,
                                        is_string: false,
@@ -75,7 +155,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :team_name,
                                        short_option: "-e",
                                        env_name: "LATEST_TESTFLIGHT_BUILD_NUMBER_TEAM_NAME",
-                                       description: "The name of your App Store Connect team if you're in multiple teams",
+                                       description: "The name of your iTunes Connect team if you're in multiple teams",
                                        optional: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
@@ -88,25 +168,23 @@ module Fastlane
 
       def self.output
         [
-          ['APP_STORE_LATEST_BUILD_NUMBER', 'The latest build number of either live or testflight version']
+          ['LATEST_BUILD_NUMBER', 'The latest build number of either live or testflight version'],
+          ['LATEST_VERSION_NUMBER', 'The latest version number of either live or testflight version']
         ]
       end
 
       def self.details
-        [
-          "Returns the current build number of either the live or testflight version - it is useful for getting the build_number of the current or ready-for-sale app version, and it also works on non-live testflight version.",
-          "If you need to handle more build-trains please see `latest_testflight_build_number`."
-        ].join("\n")
+        "Returns the current build number and version number of either the live or testflight version - it is useful for getting the build_number of the current or ready-for-sale app version, and it also works on non-live testflight version. If you need to handle more build-trains please see `latest_testflight_build_number`"
       end
 
       def self.example_code
         [
-          'app_store_build_number',
-          'app_store_build_number(
+          'app_store_build_info',
+          'app_store_build_info(
             app_identifier: "app.identifier",
             username: "user@host.com"
           )',
-          'app_store_build_number(
+          'app_store_build_info(
             live: false,
             app_identifier: "app.identifier",
             version: "1.2.9"
@@ -115,11 +193,11 @@ module Fastlane
       end
 
       def self.authors
-        ["hjanuschka"]
+        ["hjanuschka", "rishabhtayal"]
       end
 
       def self.category
-        :app_store_connect
+        :misc
       end
 
       def self.is_supported?(platform)
