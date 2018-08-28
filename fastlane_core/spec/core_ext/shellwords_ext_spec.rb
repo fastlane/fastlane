@@ -41,7 +41,7 @@ end
 
 testcases = [
   { 
-    'it' => 'on simple string',
+    'it' => '(#1) on simple string',
     'it_result' => {
       'windows' => "doesn't change it", 
       'other'   => "doesn't change it"
@@ -53,7 +53,7 @@ testcases = [
     }
   },
   { 
-    'it' => 'on empty string',
+    'it' => '(#2) on empty string',
     'it_result' => {
       'windows' => "wraps it in double quotes", 
       'other'   => 'wraps it in single quotes'
@@ -65,7 +65,7 @@ testcases = [
     }
   },
   { 
-    'it' => 'on string with spaces',
+    'it' => '(#3) on string with spaces',
     'it_result' => {
       'windows' => "wraps it in double quotes", 
       'other'   => 'escapes spaces with <backslash>'
@@ -77,7 +77,7 @@ testcases = [
     }
   },
   { 
-    'it' => 'on simple string that is already wrapped in double quotes',
+    'it' => '(#4) on simple string that is already wrapped in double quotes',
     'it_result' => {
       'windows' => "doesn't touch it", 
       'other'   => 'escapes the double quotes with <backslash>'
@@ -89,7 +89,7 @@ testcases = [
     }
   },
   { 
-    'it' => 'on string with spaces that is already wrapped in double quotes',
+    'it' => '(#5) on string with spaces that is already wrapped in double quotes',
     'it_result' => {
       'windows' => "wraps in double quotes and duplicates existing double quotes", 
       'other'   => 'escapes the double quotes and spaces with <backslash>'
@@ -101,7 +101,7 @@ testcases = [
     }
   },
   { 
-    'it' => 'on string with spaces and double quotes',
+    'it' => '(#6) on string with spaces and double quotes',
     'it_result' => {
       'windows' => "wraps in double quotes and duplicates existing double quotes", 
       'other'   => 'escapes the double quotes and spaces with <backslash>'
