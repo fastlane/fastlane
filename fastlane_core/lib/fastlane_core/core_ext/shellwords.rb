@@ -18,7 +18,7 @@ module CrossplatformShellwords
     if FastlaneCore::Helper.windows?
       WindowsShellwords.shellescape(str)
     else
-      return Shellwords.escape(str)
+      Shellwords.escape(str)
     end
   end
   module_function :shellescape
