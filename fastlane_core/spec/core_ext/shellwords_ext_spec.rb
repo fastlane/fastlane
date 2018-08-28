@@ -9,6 +9,7 @@
 # abuses a `grep` error message because that should be cross platform
 # (I'm so sorry, but this actually works)
 def confirm_shell_unescapes_string_correctly(string, escaped)
+  string = string.dup
   string = simulate_normal_shell_unwrapping(string) unless FastlaneCore::Helper.windows?
   string = simulate_windows_shell_unwrapping(string) if FastlaneCore::Helper.windows?
   compare_command = "grep 'foo' #{escaped}"
