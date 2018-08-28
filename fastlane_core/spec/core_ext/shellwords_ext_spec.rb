@@ -4,15 +4,15 @@
 # https://github.com/ruby/ruby/blob/trunk/test/test_shellwords.rb
 # https://github.com/ruby/ruby/blob/trunk/spec/ruby/library/shellwords/shellwords_spec.rb
 
-# used to confirm that the escaped command that is generated actually 
+# used to confirm that the escaped command that is generated actually
 # gets turned back into the source string by the actual shell.
 # abuses a `grep` error message because that should be cross platform
 def confirm_shell_unescapes_string_correctly(string, escaped)
   string = simulate_windows_shell_unwrapping(string)
-  
+
   compare_command = "grep 'foo' #{escaped}"
   puts 'execute command: ' + compare_command
-  
+
   # https://stackoverflow.com/a/18623297/252627, last variant
   require 'open3'
   Open3.popen3(compare_command) do |stdin, stdout, stderr, thread|
@@ -25,9 +25,9 @@ end
 def simulate_windows_shell_unwrapping(string)
   regex = /^"(([^"])(\S*)([^"]))"$/
   unless string.match(regex).nil?
-    puts 'string before mod: ' + string
+    puts('string before mod: ' + string)
     string = string.match(regex)[1]
-    puts 'string after mod: ' + string
+    puts('string after mod: ' + string)
   end
   return string
 end
@@ -97,15 +97,11 @@ describe "monkey patch of Shellwords.shelljoin" do
   # not implemented yet
 end
 
-
-
-
-
 #"builds/test/1337 (fastlane)" => builds/test/1337\\ \\(fastlane\\)
 #\'builds/test/1337\'
 
-#message = "message with 'quotes' (and parens)"
-#escaped_message = "message\\ with\\ \\'quotes\\'\\ \\(and\\ parens\\)"
+# message = "message with 'quotes' (and parens)"
+# escaped_message = "message\\ with\\ \\'quotes\\'\\ \\(and\\ parens\\)"
 
-#password: '\"test password\"',
-#expect(result[0]).to eq(%(security create-keychain -p \\\"test\\ password\\\" ~/Library/Keychains/test.keychain))
+# password: '\"test password\"',
+# expect(result[0]).to eq(%(security create-keychain -p \\\"test\\ password\\\" ~/Library/Keychains/test.keychain))
