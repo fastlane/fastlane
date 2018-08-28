@@ -1,45 +1,3 @@
-
-# https://ruby-doc.org/stdlib-2.3.0/libdoc/shellwords/rdoc/Shellwords.html
-# https://github.com/ruby/ruby/blob/trunk/lib/shellwords.rb
-# https://github.com/ruby/ruby/blob/trunk/test/test_shellwords.rb
-# https://github.com/ruby/ruby/blob/trunk/spec/ruby/library/shellwords/shellwords_spec.rb
-
-# confirms that the escaped string that is generated actually
-# gets turned back into the source string by the actual shell.
-# abuses a `grep` error message because that should be cross platform
-# (I'm so sorry, but this actually works)
-def confirm_shell_unescapes_string_correctly(string, escaped)
-  string = string.dup
-  string = simulate_normal_shell_unwrapping(string) unless FastlaneCore::Helper.windows?
-  string = simulate_windows_shell_unwrapping(string) if FastlaneCore::Helper.windows?
-  compare_command = "grep 'foo' #{escaped}"
-
-  # https://stackoverflow.com/a/18623297/252627, last variant
-  require 'open3'
-  Open3.popen3(compare_command) do |stdin, stdout, stderr, thread|
-    error = stderr.read.chomp
-    compare_error = "grep: " + string + ": No such file or directory"
-    expect(error).to eq(compare_error)
-  end
-end
-
-# remove double quote pair
-# un-double-double quote resulting string
-def simulate_windows_shell_unwrapping(string)
-  regex = /^"(([^"])(\S*)([^"]))"$/
-  unless string.match(regex).nil?
-    string = string.match(regex)[1] # get only part in quotes
-    string.gsub!('""', '"') # remove double double quotes
-  end
-  return string
-end
-
-# remove all double quotes
-def simulate_normal_shell_unwrapping(string)
-  string.gsub!('"', '')
-  return string
-end
-
 testcases = [
   { 
     'it' => '(#1) on simple string',
@@ -169,6 +127,11 @@ end
 # special characters in string
 # multi byte characters in string
 
+# https://ruby-doc.org/stdlib-2.3.0/libdoc/shellwords/rdoc/Shellwords.html
+# https://github.com/ruby/ruby/blob/trunk/lib/shellwords.rb
+# https://github.com/ruby/ruby/blob/trunk/test/test_shellwords.rb
+# https://github.com/ruby/ruby/blob/trunk/spec/ruby/library/shellwords/shellwords_spec.rb
+
 describe "monkey patch of Array.shelljoin (via CrossplatformShellwords)" do
   # TODO
 end
@@ -189,3 +152,40 @@ end
 
 # password: '\"test password\"',
 # expect(result[0]).to eq(%(security create-keychain -p \\\"test\\ password\\\" ~/Library/Keychains/test.keychain))
+
+
+# confirms that the escaped string that is generated actually
+# gets turned back into the source string by the actual shell.
+# abuses a `grep` error message because that should be cross platform
+# (I'm so sorry, but this actually works)
+def confirm_shell_unescapes_string_correctly(string, escaped)
+  string = string.dup
+  string = simulate_normal_shell_unwrapping(string) unless FastlaneCore::Helper.windows?
+  string = simulate_windows_shell_unwrapping(string) if FastlaneCore::Helper.windows?
+  compare_command = "grep 'foo' #{escaped}"
+
+  # https://stackoverflow.com/a/18623297/252627, last variant
+  require 'open3'
+  Open3.popen3(compare_command) do |stdin, stdout, stderr, thread|
+    error = stderr.read.chomp
+    compare_error = "grep: " + string + ": No such file or directory"
+    expect(error).to eq(compare_error)
+  end
+end
+
+# remove double quote pair
+# un-double-double quote resulting string
+def simulate_windows_shell_unwrapping(string)
+  regex = /^"(([^"])(\S*)([^"]))"$/
+  unless string.match(regex).nil?
+    string = string.match(regex)[1] # get only part in quotes
+    string.gsub!('""', '"') # remove double double quotes
+  end
+  return string
+end
+
+# remove all double quotes
+def simulate_normal_shell_unwrapping(string)
+  string.gsub!('"', '')
+  return string
+end
