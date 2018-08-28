@@ -1,3 +1,5 @@
+require_relative '../helper'
+
 class String
   # CrossplatformShellwords
   def shellescape
