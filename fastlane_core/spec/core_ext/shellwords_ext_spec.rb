@@ -8,7 +8,8 @@
 # gets turned back into the source string by the actual shell.
 # abuses a `grep` error message because that should be cross platform
 def confirm_shell_unescapes_string_correctly(string, escaped)
-  string = simulate_windows_shell_unwrapping(string)
+  string = simulate_windows_shell_unwrapping(string) if FastlaneCore::Helper.windows?
+  string = simulate_other_shell_unwrapping(string) unless FastlaneCore::Helper.windows?
 
   compare_command = "grep 'foo' #{escaped}"
   puts 'execute command: ' + compare_command
@@ -26,10 +27,15 @@ def simulate_windows_shell_unwrapping(string)
   regex = /^"(([^"])(\S*)([^"]))"$/
   unless string.match(regex).nil?
     puts('string before mod: ' + string)
-    string = string.match(regex)[1]
+    string = string.match(regex)[1] # get only part in quotes
+    string.gsub!('""', '"') # remove double double quotes
     puts('string after mod: ' + string)
   end
   return string
+end
+
+def simulate_other_shell_unwrapping(string)
+  string.gsub!('"', '')
 end
 
 # test Windows implementation directly
@@ -74,7 +80,7 @@ describe "WindowsShellwords#shellescape" do
     confirm_shell_unescapes_string_correctly(str, escaped)
   end
 
-  it "???" do
+  it "wraps in double quotes and double-double quotes a string with spaces that is already wrapped in quotes" do
     str = '"string with spaces already wrapped in double quotes"'
     escaped = WindowsShellwords.shellescape(str)
 
