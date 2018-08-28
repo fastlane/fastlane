@@ -216,6 +216,8 @@ module Fastlane
         "Beta"
       when :production
         "Releasing your app"
+      when :app_store_connect
+        "App Store Connect"
       when :deprecated
         "Deprecated"
       else
