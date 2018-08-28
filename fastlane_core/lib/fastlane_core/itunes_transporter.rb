@@ -195,18 +195,23 @@ module FastlaneCore
     private
 
     def shell_escaped_password(password)
-      # because the shell handles passwords with single-quotes incorrectly, use gsub to replace ShellEscape'd single-quotes of this form:
-      #    \'
-      # with a sequence that wraps the escaped single-quote in double-quotes:
-      #    '"\'"'
-      # this allows us to properly handle passwords with single-quotes in them
-      # we use the 'do' version of gsub, because two-param version interprets the replace text as a pattern and does the wrong thing
-      password = Shellwords.escape(password).gsub("\\'") do
-        "'\"\\'\"'"
-      end
+      password = password.shellescape
+      if Helper.mac?
+        # because the shell handles passwords with single-quotes incorrectly, use `gsub` to replace `shellescape`'d single-quotes of this form:
+        #    \'
+        # with a sequence that wraps the escaped single-quote in double-quotes:
+        #    '"\'"'
+        # this allows us to properly handle passwords with single-quotes in them
+        # background: https://stackoverflow.com/questions/1250079/how-to-escape-single-quotes-within-single-quoted-strings/1250098#1250098
+        password = password.gsub("\\'") do
+          # we use the 'do' version of gsub, because two-param version interprets the replace text as a pattern and does the wrong thing
+          "'\"\\'\"'"
+        end
 
-      # wrap the fully-escaped password in single quotes, since the transporter expects a escaped password string (which must be single-quoted for the shell's benefit)
-      "'" + password + "'"
+        # wrap the fully-escaped password in single quotes, since the transporter expects a escaped password string (which must be single-quoted for the shell's benefit)
+        password = "'" + password + "'"
+      end
+      return password
     end
   end
 
