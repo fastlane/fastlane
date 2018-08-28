@@ -36,6 +36,7 @@ end
 
 def simulate_other_shell_unwrapping(string)
   string.gsub!('"', '')
+  return string
 end
 
 # test Windows implementation directly
