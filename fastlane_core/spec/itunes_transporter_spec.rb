@@ -8,11 +8,20 @@ describe FastlaneCore do
 
   describe FastlaneCore::ItunesTransporter do
     def shell_upload_command(provider_short_name = nil)
+      password = @password.dup
+      if Helper.mac?
+        password = password.shellescape.gsub("\\'") do
+          "'\"\\'\"'"
+        end
+        password = "'" + password + "'"
+      begin
+        password = password.shellescape
+      end
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         "-m upload",
         '-u "fabric.devtools@gmail.com"',
-        "-p #{@password.shellescape}",
+        "-p #{password}",
         "-f '/tmp/my.app.id.itmsp'",
         "-t 'Signiant'",
         "-k 100000",
@@ -21,11 +30,20 @@ describe FastlaneCore do
     end
 
     def shell_download_command(provider_short_name = nil)
+      password = @password.dup
+      if Helper.mac?
+        password = password.shellescape.gsub("\\'") do
+          "'\"\\'\"'"
+        end
+        password = "'" + password + "'"
+      begin
+        password = password.shellescape
+      end
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         '-m lookupMetadata',
         '-u "fabric.devtools@gmail.com"',
-        "-p #{@password.shellescape}",
+        "-p #{password}",
         "-apple_id my.app.id",
         "-destination '/tmp'",
         ("-itc_provider #{provider_short_name}" if provider_short_name)
