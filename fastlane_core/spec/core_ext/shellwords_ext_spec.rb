@@ -12,7 +12,7 @@ def confirm_shell_unescapes_string_correctly(string, escaped)
   string = simulate_other_shell_unwrapping(string) unless FastlaneCore::Helper.windows?
 
   compare_command = "grep 'foo' #{escaped}"
-  puts 'execute command: ' + compare_command
+  puts('execute command: ' + compare_command)
 
   # https://stackoverflow.com/a/18623297/252627, last variant
   require 'open3'
@@ -103,8 +103,8 @@ describe "monkey patch of Shellwords.shelljoin" do
   # not implemented yet
 end
 
-#"builds/test/1337 (fastlane)" => builds/test/1337\\ \\(fastlane\\)
-#\'builds/test/1337\'
+# "builds/test/1337 (fastlane)" => builds/test/1337\\ \\(fastlane\\)
+# \'builds/test/1337\'
 
 # message = "message with 'quotes' (and parens)"
 # escaped_message = "message\\ with\\ \\'quotes\\'\\ \\(and\\ parens\\)"
