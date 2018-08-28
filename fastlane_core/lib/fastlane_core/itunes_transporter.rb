@@ -58,11 +58,6 @@ module FastlaneCore
               @all_lines << line
               parse_line(line, hide_output) # this is where the parsing happens
             end
-          rescue Errno::EIO
-            # Exception ignored intentionally.
-            # https://stackoverflow.com/questions/10238298/ruby-on-linux-pty-goes-away-without-eof-raises-errnoeio
-          ensure
-            Process.wait(pid)
           end
         end
       rescue => ex
