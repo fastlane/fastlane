@@ -39,97 +39,109 @@ def simulate_normal_shell_unwrapping(string)
   return string
 end
 
+testcases = [
+  { 
+    'it' => 'on simple string',
+    'it_result' => {
+      'windows' => "doesn't change it", 
+      'other'   => "doesn't change it"
+    },
+    'str' => 'normal_string_without_spaces',
+    'expect' => {
+      'windows' => 'normal_string_without_spaces',
+      'other'   => 'normal_string_without_spaces'
+    }
+  },
+  { 
+    'it' => 'on empty string',
+    'it_result' => {
+      'windows' => "wraps it in double quotes", 
+      'other'   => 'wraps it in single quotes'
+    },
+    'str' => '',
+    'expect' => {
+      'windows' => '""',
+      'other'   => '\'\''
+    }
+  },
+  { 
+    'it' => 'on string with spaces',
+    'it_result' => {
+      'windows' => "wraps it in double quotes", 
+      'other'   => 'escapes spaces with <backslash>'
+    },
+    'str' => 'string with spaces',
+    'expect' => {
+      'windows' => '"string with spaces"',
+      'other'   => 'string\ with\ spaces'
+    }
+  },
+  { 
+    'it' => 'on simple string that is already wrapped in double quotes',
+    'it_result' => {
+      'windows' => "doesn't touch it", 
+      'other'   => 'escapes the double quotes with <backslash>'
+    },
+    'str' => '"normal_string_without_spaces"',
+    'expect' => {
+      'windows' => '"normal_string_without_spaces"',
+      'other'   => '\"normal_string_without_spaces\"'
+    }
+  },
+  { 
+    'it' => 'on string with spaces that is already wrapped in double quotes',
+    'it_result' => {
+      'windows' => "wraps in double quotes and duplicates existing double quotes", 
+      'other'   => 'escapes the double quotes and spaces with <backslash>'
+    },
+    'str' => '"string with spaces already wrapped in double quotes"',
+    'expect' => {
+      'windows' => '"""string with spaces already wrapped in double quotes"""',
+      'other'   => '\"string\ with\ spaces\ already\ wrapped\ in\ double\ quotes\"'
+    }
+  },
+  { 
+    'it' => 'on string with spaces and double quotes',
+    'it_result' => {
+      'windows' => "wraps in double quotes and duplicates existing double quotes", 
+      'other'   => 'escapes the double quotes and spaces with <backslash>'
+    },
+    'str' => 'string with spaces and "double" quotes',
+    'expect' => {
+      'windows' => '"string with spaces and ""double"" quotes"',
+      'other'   => 'string\ with\ spaces\ and\ \"double\"\ quotes'
+    }
+  },
+]
+
 # test Windows implementation directly
 describe "WindowsShellwords#shellescape" do
-  it "on simple string: doesn't change it" do
-    str = 'normal_string_without_spaces'
-    escaped = WindowsShellwords.shellescape(str)
-
-    expect(escaped).to eq(str)
-    confirm_shell_unescapes_string_correctly(str, escaped)
-  end
-
-  it "on empty string: wraps it in double quotes" do
-    str = ''
-    escaped = WindowsShellwords.shellescape(str)
-
-    expect(escaped).to eq('""')
-    confirm_shell_unescapes_string_correctly(str, escaped)
-  end
-
-  it "on string with spaces: wraps it in double quotes" do
-    str = 'string with spaces'
-    escaped = WindowsShellwords.shellescape(str)
-
-    expect(escaped).to eq('"string with spaces"')
-    confirm_shell_unescapes_string_correctly(str, escaped)
-  end
-
-  it "on simple string that is already wrapped in double quotes: doesn't touch it" do
-    str = '"normal_string_without_spaces"'
-    escaped = WindowsShellwords.shellescape(str)
-
-    expect(escaped).to eq('"normal_string_without_spaces"')
-    confirm_shell_unescapes_string_correctly(str, escaped)
-  end
-
-  it "on string with spaces that is already wrapped in double quotes: wraps in double quotes and duplicates existing double quotes" do
-    str = '"string with spaces already wrapped in double quotes"'
-    escaped = WindowsShellwords.shellescape(str)
-
-    expect(escaped).to eq('"""string with spaces already wrapped in double quotes"""')
-    confirm_shell_unescapes_string_correctly(str, escaped)
-  end
-
-  it "on string with spaces and double quotes: wraps in double quotes and duplicates existing double quotes" do
-    str = 'string with spaces and "double" quotes'
-    escaped = WindowsShellwords.shellescape(str)
-
-    expect(escaped).to eq('"string with spaces and ""double"" quotes"')
-    confirm_shell_unescapes_string_correctly(str, escaped)
+  os = 'windows'
+  testcases.each do |testcase|
+    it testcase['it'] + ': ' + testcase['it_result'][os] do
+      str = testcase['str']
+      escaped = WindowsShellwords.shellescape(str)
+  
+      expect(escaped).to eq(testcase['expect'][os])
+      confirm_shell_unescapes_string_correctly(str, escaped)
+    end
   end
 end
 
+# test monkey patched method on both (simulated) OSes
 describe "monkey patch of String.shellescape (via CrossplatformShellwords)" do
   describe "on Windows" do
     before(:each) do
       allow(FastlaneCore::Helper).to receive(:windows?).and_return(true)
     end
 
-    it "on simple string: doesn't change it" do
-      str = 'normal_string_without_spaces'
-      escaped = str.shellescape
-      expect(escaped).to eq(str)
-    end
-
-    it "on empty string: wraps it in double quotes" do
-      str = ''
-      escaped = str.shellescape
-      expect(escaped).to eq('""')
-    end
-
-    it "on string with spaces: wraps it in double quotes" do
-      str = 'string with spaces'
-      escaped = str.shellescape
-      expect(escaped).to eq('"string with spaces"')
-    end
-
-    it "on simple string that is already wrapped in double quotes: doesn't touch it" do
-      str = '"normal_string_without_spaces"'
-      escaped = str.shellescape
-      expect(escaped).to eq('"normal_string_without_spaces"')
-    end
-
-    it "on string with spaces that is already wrapped in double quotes: wraps in double quotes and duplicates existing double quotes" do
-      str = '"string with spaces already wrapped in double quotes"'
-      escaped = str.shellescape
-      expect(escaped).to eq('"""string with spaces already wrapped in double quotes"""')
-    end
-
-    it "on string with spaces and double quotes: wraps in double quotes and duplicates existing double quotes" do
-      str = 'string with spaces and "double" quotes'
-      escaped = str.shellescape
-      expect(escaped).to eq('"string with spaces and ""double"" quotes"')
+    os = 'windows'
+    testcases.each do |testcase|
+      it testcase['it'] + ': ' + testcase['it_result'][os] do
+        str = testcase['str']
+        escaped = str.shellescape
+        expect(escaped).to eq(testcase['expect'][os])
+      end
     end
   end
 
@@ -138,40 +150,13 @@ describe "monkey patch of String.shellescape (via CrossplatformShellwords)" do
       allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
     end
 
-    it "on simple string: doesn't change it" do
-      str = 'normal_string_without_spaces'
-      escaped = str.shellescape
-      expect(escaped).to eq(str)
-    end
-
-    it "on empty string: wraps it in single quotes" do
-      str = ''
-      escaped = str.shellescape 
-      expect(escaped).to eq('\'\'')
-    end
-
-    it "on string with spaces: escapes spaces with <backslash>" do
-      str = 'string with spaces'
-      escaped = str.shellescape
-      expect(escaped).to eq('string\ with\ spaces')
-    end
-
-    it "on simple string that is already wrapped in double quotes: escapes the double quotes with <backslash>" do
-      str = '"normal_string_without_spaces"'
-      escaped = str.shellescape
-      expect(escaped).to eq('\"normal_string_without_spaces\"')
-    end
-
-    it "on string with spaces that is already wrapped in double quotes: escapes the double quotes and spaces with <backslash>" do
-      str = '"string with spaces already wrapped in double quotes"'
-      escaped = str.shellescape
-      expect(escaped).to eq('\"string\ with\ spaces\ already\ wrapped\ in\ double\ quotes\"')
-    end
-
-    it "on string with spaces and double quotes: escapes the double quotes and spaces with <backslash>" do
-      str = 'string with spaces and "double" quotes'
-      escaped = str.shellescape
-      expect(escaped).to eq('string\ with\ spaces\ and\ \"double\"\ quotes')
+    os = 'other'
+    testcases.each do |testcase|
+      it testcase['it'] + ': ' + testcase['it_result'][os] do
+        str = testcase['str']
+        escaped = str.shellescape
+        expect(escaped).to eq(testcase['expect'][os])
+      end
     end
   end
 end
