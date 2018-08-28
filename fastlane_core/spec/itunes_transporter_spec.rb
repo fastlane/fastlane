@@ -10,6 +10,12 @@ describe FastlaneCore do
     def shell_upload_command(provider_short_name = nil)
       password = @password.dup
       password = password.shellescape
+      if FastlaneCore::Helper.mac?
+        password = password.gsub("\\'") do
+          "'\"\\'\"'"
+        end
+        password = "'" + password + "'"
+      end
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         "-m upload",
@@ -25,6 +31,12 @@ describe FastlaneCore do
     def shell_download_command(provider_short_name = nil)
       password = @password.dup
       password = password.shellescape
+      if FastlaneCore::Helper.mac?
+        password = password.gsub("\\'") do
+          "'\"\\'\"'"
+        end
+        password = "'" + password + "'"
+      end
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         '-m lookupMetadata',
