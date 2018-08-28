@@ -3,13 +3,22 @@
 # https://github.com/DragonBox/u3d/blob/59e471ad78ac00cb629f479dbe386c5ad2dc5075/lib/u3d_core/command_runner.rb#L88-L96
 module FastlaneCore
   class FastlanePty
-    def self.spawn(command, &block)
+    def self.spawn(command)
       require 'pty'
       PTY.spawn(command) do |command_stdout, command_stdin, pid|
         begin
-          block.call(command_stdout, command_stdin, pid)
+          yield(command_stdout, command_stdin, pid)
+        rescue Errno::EIO
+          # Exception ignored intentionally.
+          # https://stackoverflow.com/questions/10238298/ruby-on-linux-pty-goes-away-without-eof-raises-errnoeio
+          # This is expected on some linux systems, that indicates that the subcommand finished
+          # and we kept trying to read, ignore it
         ensure
-          Process.wait(pid)
+          begin
+            Process.wait(pid)
+          rescue Errno::ECHILD, PTY::ChildExited
+            # The process might have exited.
+          end
         end
       end
       $?.exitstatus
