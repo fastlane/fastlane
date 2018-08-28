@@ -111,6 +111,9 @@ RSpec.configure do |config|
     config.define_derived_metadata(:requires_xar) do |meta|
       meta[:skip] = "Skipped: Requires `xar` to be installed (which is not possible on Windows and no workaround has been implemented)"
     end
+    config.define_derived_metadata(:requires_pty) do |meta|
+      meta[:skip] = "Skipped: Requires `pty` to be available (which is not possible on Windows and no workaround has been implemented)"
+    end
   end
 end
 
