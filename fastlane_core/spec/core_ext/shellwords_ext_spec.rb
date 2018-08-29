@@ -1,3 +1,11 @@
+# references
+# https://ruby-doc.org/stdlib-2.3.0/libdoc/shellwords/rdoc/Shellwords.html
+# https://github.com/ruby/ruby/blob/trunk/lib/shellwords.rb
+# https://github.com/ruby/ruby/blob/trunk/test/test_shellwords.rb
+# https://github.com/ruby/ruby/blob/trunk/spec/ruby/library/shellwords/shellwords_spec.rb
+# https://github.com/larskanis/shellwords/tree/master/test
+
+
 # shellescape
 
 shellescape_testcases = [
@@ -99,6 +107,21 @@ shellescape_testcases = [
       'other'   => '3'
     }
   },
+# TODO: 
+# single quotes in string
+# \ in string
+# / in string
+# special characters in string
+
+# "builds/test/1337 (fastlane)" => builds/test/1337\\ \\(fastlane\\)
+# \'builds/test/1337\'
+
+# message = "message with 'quotes' (and parens)"
+# escaped_message = "message\\ with\\ \\'quotes\\'\\ \\(and\\ parens\\)"
+
+# password: '\"test password\"',
+# expect(result[0]).to eq(%(security create-keychain -p \\\"test\\ password\\\" ~/Library/Keychains/test.keychain))
+
 ]
 
 # test shellescape Windows implementation directly
@@ -147,10 +170,6 @@ describe "monkey patch of String.shellescape (via CrossplatformShellwords)" do
     end
   end
 end
-
-
-# TODO move up to shellescape_testcases
-
 
 
 # shelljoin
@@ -241,20 +260,6 @@ describe "monkey patch of String.shelljoin (via CrossplatformShellwords)" do
 end
 
 
-# TODO: 
-# single quotes in string
-# \ in string
-# / in string
-# special characters in string
-# multi byte characters in string
-
-# https://ruby-doc.org/stdlib-2.3.0/libdoc/shellwords/rdoc/Shellwords.html
-# https://github.com/ruby/ruby/blob/trunk/lib/shellwords.rb
-# https://github.com/ruby/ruby/blob/trunk/test/test_shellwords.rb
-# https://github.com/ruby/ruby/blob/trunk/spec/ruby/library/shellwords/shellwords_spec.rb
-# https://github.com/larskanis/shellwords/tree/master/test
-
-
 # other tests
 
 # https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L98-L118
@@ -318,9 +323,6 @@ end
 # TODO also run for our implementation on Windows to confirm it does what it should do
 
 
-
-
-
 describe "monkey patch of Array.shelljoin (via CrossplatformShellwords)" do
   # TODO
 end
@@ -333,24 +335,15 @@ describe "monkey patch of Shellwords.shelljoin" do
   # not implemented yet
 end
 
-# "builds/test/1337 (fastlane)" => builds/test/1337\\ \\(fastlane\\)
-# \'builds/test/1337\'
-
-# message = "message with 'quotes' (and parens)"
-# escaped_message = "message\\ with\\ \\'quotes\\'\\ \\(and\\ parens\\)"
-
-# password: '\"test password\"',
-# expect(result[0]).to eq(%(security create-keychain -p \\\"test\\ password\\\" ~/Library/Keychains/test.keychain))
-
 
 # confirms that the escaped string that is generated actually
 # gets turned back into the source string by the actual shell.
 # abuses a `grep` error message because that should be cross platform
-# (I'm so sorry, but this actually works)
 def confirm_shell_unescapes_string_correctly(string, escaped)
   compare_string = string.to_s.dup
   compare_string = simulate_normal_shell_unwrapping(compare_string) unless FastlaneCore::Helper.windows?
   compare_string = simulate_windows_shell_unwrapping(compare_string) if FastlaneCore::Helper.windows?
+  # (I'm so sorry, but this actually works)
   compare_command = "grep 'foo' #{escaped}"
 
   # https://stackoverflow.com/a/18623297/252627, last variant
