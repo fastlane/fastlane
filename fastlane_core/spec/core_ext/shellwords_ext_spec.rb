@@ -73,6 +73,11 @@ shellescape_testcases = [
       'other'   => 'string\ with\ spaces\ and\ \"double\"\ quotes'
     }
   },
+  # https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L64-L65
+  #3 => '3'
+  # https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L67-L68
+  #joined = ['ps', '-p', $$].shelljoin
+  #assert_equal "ps -p #{$$}", joined
 ]
 
 # test shellescape Windows implementation directly
@@ -121,6 +126,16 @@ describe "monkey patch of String.shellescape (via CrossplatformShellwords)" do
     end
   end
 end
+
+# https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L120-L125
+describe("test_multibyte_characters") do
+  it 'multi byte character is not changed' do
+    expect("あい".shellescape).to eq("あい")
+  end
+end
+# TODO move up to shellescape_testcases
+
+
 
 # shelljoin
 # based on (reversal of) https://github.com/ruby/ruby/blob/trunk/spec/ruby/library/shellwords/shellwords_spec.rb
@@ -207,6 +222,98 @@ end
 # https://ruby-doc.org/stdlib-2.3.0/libdoc/shellwords/rdoc/Shellwords.html
 # https://github.com/ruby/ruby/blob/trunk/lib/shellwords.rb
 # https://github.com/ruby/ruby/blob/trunk/test/test_shellwords.rb
+
+
+
+# other tests
+
+# https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L42-L61
+describe "test_backslashes: slash + shellwords" do
+  [
+    [
+      %q{/a//b///c////d/////e/ "/a//b///c////d/////e/ "'/a//b///c////d/////e/ '/a//b///c////d/////e/ },
+      'a/b/c//d//e /a/b//c//d///e/ /a//b///c////d/////e/ a/b/c//d//e '
+    ],
+    [
+      %q{printf %s /"/$/`///"/r/n},
+      'printf', '%s', '"$`/"rn'
+    ],
+    [
+      %q{printf %s "/"/$/`///"/r/n"},
+      'printf', '%s', '"$`/"/r/n'
+    ]
+  ].map { |strs|
+    it 'foo' do
+      cmdline, *expected = strs.map { |str| str.tr("/", "\\\\") }
+      expect(Shellwords.shellwords(cmdline)).to eq(expected)
+    end
+  }
+end
+# TODO also run for our implementation on Windows to confirm it does what it should do
+
+# https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L98-L118
+describe "test_frozenness: result not frozen" do
+  [
+    Shellwords.shellescape(String.new),
+    Shellwords.shellescape(String.new('foo')),
+    Shellwords.shellescape(''.freeze),
+    Shellwords.shellescape("\n".freeze),
+    Shellwords.shellescape('foo'.freeze),
+    Shellwords.shelljoin(['ps'.freeze, 'ax'.freeze]),
+  ].each { |object|
+    it 'foo' do # TODO
+      expect(object.frozen?).to eq(false)
+    end
+  }
+
+  [
+    Shellwords.shellsplit('ps'),
+    Shellwords.shellsplit('ps ax'),
+  ].each { |array|
+    array.each { |arg|
+      it 'foo' do # TODO
+        expect(arg.frozen?).to eq(false), "expected arg.frozen? to return false, got #{array.inspect}"
+      end
+    }
+  }
+end
+# TODO also run for our implementation on Windows to confirm it does what it should do
+
+# https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L72-L88
+describe "test_whitespace" do
+  empty = ''
+  space = " "
+  newline = "\n"
+  tab = "\t"
+
+  tokens = [
+    empty,
+    space,
+    space * 2,
+    newline,
+    newline * 2,
+    tab,
+    tab * 2,
+    empty,
+    space + newline + tab,
+    empty
+  ]
+
+  tokens.each { |token|
+    it "test shellescape->shellsplit individual tokens: '#{token}'"  do
+      expect([token]).to eq(Shellwords.shellescape(token).shellsplit) # TODO
+    end
+  }
+
+  it "test reverse shelljoin->shellsplit" do
+    expect(tokens).to eq(Shellwords.shelljoin(tokens).shellsplit) # TODO
+  end
+end
+# TODO also run for our implementation on Windows to confirm it does what it should do
+
+
+
+
 
 describe "monkey patch of Array.shelljoin (via CrossplatformShellwords)" do
   # TODO
