@@ -31,11 +31,20 @@ module Deliver
       end
     end
 
+    # Returns a path relative to FastlaneFolder.path
+    # This is needed as the Preview.html file is located inside FastlaneFolder.path
+    def render_relative_path(export_path, path)
+      export_path = Pathname.new(export_path)
+      path = Pathname.new(path).relative_path_from(export_path)
+      return path.to_path
+    end
+
     # Renders all data available to quickly see if everything was correctly generated.
     # @param export_path (String) The path to a folder where the resulting HTML file should be stored.
     def render(options, screenshots, export_path = nil)
       @screenshots = screenshots || []
       @options = options
+      @export_path = export_path
 
       @app_name = (options[:name]['en-US'] || options[:name].values.first) if options[:name]
       @app_name ||= options[:app].name
