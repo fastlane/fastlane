@@ -199,7 +199,7 @@ module FastlaneCore
     # @return the full path to the iTMSTransporter executable
     def self.itms_path
       return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
-      return '' unless self.mac? # so tests work on Linux and Windows too
+      return '.' unless self.mac? # so tests work on Linux and Windows too
 
       [
         "../Applications/Application Loader.app/Contents/MacOS/itms",
