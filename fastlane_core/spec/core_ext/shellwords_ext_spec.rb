@@ -1,4 +1,6 @@
-testcases = [
+# shellescape
+
+shellescape_testcases = [
   { 
     'it' => '(#1) on simple string',
     'it_result' => {
@@ -73,10 +75,10 @@ testcases = [
   },
 ]
 
-# test Windows implementation directly
+# test shellescape Windows implementation directly
 describe "WindowsShellwords#shellescape" do
   os = 'windows'
-  testcases.each do |testcase|
+  shellescape_testcases.each do |testcase|
     it testcase['it'] + ': ' + testcase['it_result'][os] do
       str = testcase['str']
       escaped = WindowsShellwords.shellescape(str)
@@ -95,7 +97,7 @@ describe "monkey patch of String.shellescape (via CrossplatformShellwords)" do
     end
 
     os = 'windows'
-    testcases.each do |testcase|
+    shellescape_testcases.each do |testcase|
       it testcase['it'] + ': ' + testcase['it_result'][os] do
         str = testcase['str']
         escaped = str.shellescape
@@ -110,7 +112,7 @@ describe "monkey patch of String.shellescape (via CrossplatformShellwords)" do
     end
 
     os = 'other'
-    testcases.each do |testcase|
+    shellescape_testcases.each do |testcase|
       it testcase['it'] + ': ' + testcase['it_result'][os] do
         str = testcase['str']
         escaped = str.shellescape
@@ -119,6 +121,81 @@ describe "monkey patch of String.shellescape (via CrossplatformShellwords)" do
     end
   end
 end
+
+# shelljoin
+# based on (reversal of) https://github.com/ruby/ruby/blob/trunk/spec/ruby/library/shellwords/shellwords_spec.rb
+
+shelljoin_testcases = [
+  { 
+    'it' => '(#1) on array with entry with space',
+    'it_result' => {
+      'windows' => 'wraps this entry in double quotes', 
+      'other'   => 'escapes the space in this entry'
+    },
+    'input' => ['a', 'b c', 'd'],
+    'expect' => {
+      'windows' => 'a "b c" d',
+      'other'   => 'a b\ c d'
+    }
+  },
+  { 
+    'it' => '(#2) on array with entry with string wrapped in double quotes and space',
+    'it_result' => {
+      'windows' => 'wraps the entry with space in quote, and doubles the double quotes', 
+      'other'   => 'escapes the double quotes and escapes the space'
+    },
+    'input' => ['a', '"b" c', 'd'],
+    'expect' => {
+      'windows' => 'a """b"" c" d',
+      'other'   => 'a \"b\"\ c d'
+    }
+  },
+  { 
+    'it' => '(#3) on array with entry with string wrapped in single quotes and space',
+    'it_result' => {
+      'windows' => 'no changes', 
+      'other'   => 'escapes the single quotes and space'
+    },
+    'input' => ['a', "'b' c", 'd'],
+    'expect' => {
+      'windows' => "a \"'b' c\" d",
+      'other'   => "a \\'b\\'\\ c d"
+    }
+  },
+]
+
+describe "monkey patch of String.shelljoin (via CrossplatformShellwords)" do
+  describe "on Windows" do
+    before(:each) do
+      allow(FastlaneCore::Helper).to receive(:windows?).and_return(true)
+    end
+
+    os = 'windows'
+    shelljoin_testcases.each do |testcase|
+      it testcase['it'] + ': ' + testcase['it_result'][os] do
+        array = testcase['input']
+        joined = array.shelljoin
+        expect(joined).to eq(testcase['expect'][os])
+      end
+    end
+  end
+
+  describe "on other OSs (macOS, Linux)" do
+    before(:each) do
+      allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+    end
+    
+    os = 'other'
+    shelljoin_testcases.each do |testcase|
+      it testcase['it'] + ': ' + testcase['it_result'][os] do
+        array = testcase['input']
+        joined = array.shelljoin
+        expect(joined).to eq(testcase['expect'][os])
+      end
+    end
+  end
+end
+
 
 # TODO: 
 # single quotes in string
@@ -130,7 +207,6 @@ end
 # https://ruby-doc.org/stdlib-2.3.0/libdoc/shellwords/rdoc/Shellwords.html
 # https://github.com/ruby/ruby/blob/trunk/lib/shellwords.rb
 # https://github.com/ruby/ruby/blob/trunk/test/test_shellwords.rb
-# https://github.com/ruby/ruby/blob/trunk/spec/ruby/library/shellwords/shellwords_spec.rb
 
 describe "monkey patch of Array.shelljoin (via CrossplatformShellwords)" do
   # TODO
@@ -173,7 +249,7 @@ def confirm_shell_unescapes_string_correctly(string, escaped)
   end
 end
 
-# remove double quote pair
+# remove double quote pairs
 # un-double-double quote resulting string
 def simulate_windows_shell_unwrapping(string)
   regex = /^"(([^"])(\S*)([^"]))"$/
