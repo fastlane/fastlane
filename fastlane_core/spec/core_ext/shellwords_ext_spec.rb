@@ -82,7 +82,7 @@ describe "WindowsShellwords#shellescape" do
       escaped = WindowsShellwords.shellescape(str)
   
       expect(escaped).to eq(testcase['expect'][os])
-      # confirm_shell_unescapes_string_correctly(str, escaped) TODO activate again!
+      confirm_shell_unescapes_string_correctly(str, escaped)
     end
   end
 end
@@ -159,16 +159,16 @@ end
 # abuses a `grep` error message because that should be cross platform
 # (I'm so sorry, but this actually works)
 def confirm_shell_unescapes_string_correctly(string, escaped)
-  string = string.dup
-  string = simulate_normal_shell_unwrapping(string) unless FastlaneCore::Helper.windows?
-  string = simulate_windows_shell_unwrapping(string) if FastlaneCore::Helper.windows?
+  compare_string = string.dup
+  compare_string = simulate_normal_shell_unwrapping(compare_string) unless FastlaneCore::Helper.windows?
+  compare_string = simulate_windows_shell_unwrapping(compare_string) if FastlaneCore::Helper.windows?
   compare_command = "grep 'foo' #{escaped}"
 
   # https://stackoverflow.com/a/18623297/252627, last variant
   require 'open3'
   Open3.popen3(compare_command) do |stdin, stdout, stderr, thread|
     error = stderr.read.chomp
-    compare_error = "grep: " + string + ": No such file or directory"
+    compare_error = "grep: " + compare_string + ": No such file or directory"
     expect(error).to eq(compare_error)
   end
 end
@@ -184,7 +184,7 @@ def simulate_windows_shell_unwrapping(string)
   return string
 end
 
-# remove all double quotes
+# remove all double quotes completely
 def simulate_normal_shell_unwrapping(string)
   string.gsub!('"', '')
   return string
