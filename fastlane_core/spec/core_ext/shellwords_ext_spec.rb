@@ -288,7 +288,32 @@ describe "test_frozenness: result not frozen" do
     }
   }
 end
-# TODO also run for our implementation on Windows to confirm it does what it should do
+
+describe "test_frozenness 2: result not frozen" do
+  [
+    String.new.shellescape,
+    String.new('foo').shellescape,
+    ''.freeze.shellescape,
+    "\n".freeze.shellescape,
+    'foo'.freeze.shellescape,
+    ['ps'.freeze, 'ax'.freeze].shelljoin,
+  ].each { |object|
+    it 'foo' do # TODO
+      expect(object.frozen?).to eq(false)
+    end
+  }
+
+  [
+    'ps'.shellsplit,
+    'ps ax'.shellsplit,
+  ].each { |array|
+    array.each { |arg|
+      it 'foo' do # TODO
+        expect(arg.frozen?).to eq(false), "expected arg.frozen? to return false, got #{array.inspect}"
+      end
+    }
+  }
+end
 
 # https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L72-L88
 describe "test_whitespace" do
@@ -312,15 +337,44 @@ describe "test_whitespace" do
 
   tokens.each { |token|
     it "test shellescape->shellsplit individual tokens: '#{token}'"  do
-      expect([token]).to eq(Shellwords.shellescape(token).shellsplit) # TODO
+      expect([token]).to eq(Shellwords.shellescape(token).shellsplit)
     end
   }
 
   it "test reverse shelljoin->shellsplit" do
-    expect(tokens).to eq(Shellwords.shelljoin(tokens).shellsplit) # TODO
+    expect(tokens).to eq(Shellwords.shelljoin(tokens).shellsplit)
   end
 end
-# TODO also run for our implementation on Windows to confirm it does what it should do
+
+describe "test_whitespace 2" do
+  empty = ''
+  space = " "
+  newline = "\n"
+  tab = "\t"
+
+  tokens = [
+    empty,
+    space,
+    space * 2,
+    newline,
+    newline * 2,
+    tab,
+    tab * 2,
+    empty,
+    space + newline + tab,
+    empty
+  ]
+
+  tokens.each { |token|
+    it "test shellescape->shellsplit individual tokens: '#{token}'"  do
+      expect([token]).to eq(token.shellescape.shellsplit)
+    end
+  }
+
+  it "test reverse shelljoin->shellsplit" do
+    expect(tokens).to eq(tokens.shelljoin.shellsplit)
+  end
+end
 
 
 describe "monkey patch of Array.shelljoin (via CrossplatformShellwords)" do
