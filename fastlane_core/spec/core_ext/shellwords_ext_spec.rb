@@ -73,6 +73,19 @@ shellescape_testcases = [
       'other'   => 'string\ with\ spaces\ and\ \"double\"\ quotes'
     }
   },
+  # https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L120-L125
+  { 
+    'it' => '(#7) on string with multibyte characters',
+    'it_result' => {
+      'windows' => "doesn't change it", 
+      'other'   => 'escapes the characters'
+    },
+    'str' => "あい",
+    'expect' => {
+      'windows' => "あい",
+      'other'   => "\\あ\\い"
+    }
+  },
   # https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L64-L65
   #3 => '3'
   # https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L67-L68
@@ -127,12 +140,7 @@ describe "monkey patch of String.shellescape (via CrossplatformShellwords)" do
   end
 end
 
-# https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L120-L125
-describe("test_multibyte_characters") do
-  it 'multi byte character is not changed' do
-    expect("あい".shellescape).to eq("あい")
-  end
-end
+
 # TODO move up to shellescape_testcases
 
 
@@ -222,34 +230,11 @@ end
 # https://ruby-doc.org/stdlib-2.3.0/libdoc/shellwords/rdoc/Shellwords.html
 # https://github.com/ruby/ruby/blob/trunk/lib/shellwords.rb
 # https://github.com/ruby/ruby/blob/trunk/test/test_shellwords.rb
-
+# https://github.com/ruby/ruby/blob/trunk/spec/ruby/library/shellwords/shellwords_spec.rb
+# https://github.com/larskanis/shellwords/tree/master/test
 
 
 # other tests
-
-# https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L42-L61
-describe "test_backslashes: slash + shellwords" do
-  [
-    [
-      %q{/a//b///c////d/////e/ "/a//b///c////d/////e/ "'/a//b///c////d/////e/ '/a//b///c////d/////e/ },
-      'a/b/c//d//e /a/b//c//d///e/ /a//b///c////d/////e/ a/b/c//d//e '
-    ],
-    [
-      %q{printf %s /"/$/`///"/r/n},
-      'printf', '%s', '"$`/"rn'
-    ],
-    [
-      %q{printf %s "/"/$/`///"/r/n"},
-      'printf', '%s', '"$`/"/r/n'
-    ]
-  ].map { |strs|
-    it 'foo' do
-      cmdline, *expected = strs.map { |str| str.tr("/", "\\\\") }
-      expect(Shellwords.shellwords(cmdline)).to eq(expected)
-    end
-  }
-end
-# TODO also run for our implementation on Windows to confirm it does what it should do
 
 # https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L98-L118
 describe "test_frozenness: result not frozen" do
