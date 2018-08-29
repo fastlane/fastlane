@@ -87,10 +87,18 @@ shellescape_testcases = [
     }
   },
   # https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L64-L65
-  #3 => '3'
-  # https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L67-L68
-  #joined = ['ps', '-p', $$].shelljoin
-  #assert_equal "ps -p #{$$}", joined
+  { 
+    'it' => '(#8) on simple int',
+    'it_result' => {
+      'windows' => "doesn't change it", 
+      'other'   => "doesn't change it"
+    },
+    'str' => 3,
+    'expect' => {
+      'windows' => '3',
+      'other'   => '3'
+    }
+  },
 ]
 
 # test shellescape Windows implementation directly
@@ -117,7 +125,7 @@ describe "monkey patch of String.shellescape (via CrossplatformShellwords)" do
     os = 'windows'
     shellescape_testcases.each do |testcase|
       it testcase['it'] + ': ' + testcase['it_result'][os] do
-        str = testcase['str']
+        str = testcase['str'].to_s
         escaped = str.shellescape
         expect(escaped).to eq(testcase['expect'][os])
       end
@@ -132,7 +140,7 @@ describe "monkey patch of String.shellescape (via CrossplatformShellwords)" do
     os = 'other'
     shellescape_testcases.each do |testcase|
       it testcase['it'] + ': ' + testcase['it_result'][os] do
-        str = testcase['str']
+        str = testcase['str'].to_s
         escaped = str.shellescape
         expect(escaped).to eq(testcase['expect'][os])
       end
@@ -183,6 +191,19 @@ shelljoin_testcases = [
     'expect' => {
       'windows' => "a \"'b' c\" d",
       'other'   => "a \\'b\\'\\ c d"
+    }
+  },
+  # https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L67-L68
+  { 
+    'it' => '(#4) on array with entry that is funny $$',
+    'it_result' => {
+      'windows' => 'no idea', 
+      'other'   => 'no idea'
+    },
+    'input' => ['ps', '-p', $$],
+    'expect' => {
+      'windows' => "ps -p #{$$}",
+      'other'   => "ps -p #{$$}"
     }
   },
 ]
@@ -327,7 +348,7 @@ end
 # abuses a `grep` error message because that should be cross platform
 # (I'm so sorry, but this actually works)
 def confirm_shell_unescapes_string_correctly(string, escaped)
-  compare_string = string.dup
+  compare_string = string.to_s.dup
   compare_string = simulate_normal_shell_unwrapping(compare_string) unless FastlaneCore::Helper.windows?
   compare_string = simulate_windows_shell_unwrapping(compare_string) if FastlaneCore::Helper.windows?
   compare_command = "grep 'foo' #{escaped}"
@@ -345,9 +366,9 @@ end
 # un-double-double quote resulting string
 def simulate_windows_shell_unwrapping(string)
   regex = /^"(([^"])(\S*)([^"]))"$/
-  unless string.match(regex).nil?
-    string = string.match(regex)[1] # get only part in quotes
-    string.gsub!('""', '"') # remove double double quotes
+  unless string.to_s.match(regex).nil?
+    string = string.to_s.match(regex)[1] # get only part in quotes
+    string.to_s.gsub!('""', '"') # remove double double quotes
   end
   return string
 end
