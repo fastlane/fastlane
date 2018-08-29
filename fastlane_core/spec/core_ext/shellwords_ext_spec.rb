@@ -288,6 +288,7 @@ describe "test_frozenness: result not frozen" do
     }
   }
 end
+# TODO: Test for WindowsShellwords
 
 describe "test_frozenness 2: result not frozen" do
   [
@@ -314,6 +315,7 @@ describe "test_frozenness 2: result not frozen" do
     }
   }
 end
+# TODO: Run twice, testing for both OS
 
 # https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L72-L88
 describe "test_whitespace" do
@@ -345,6 +347,7 @@ describe "test_whitespace" do
     expect(tokens).to eq(Shellwords.shelljoin(tokens).shellsplit)
   end
 end
+# TODO: Test for WindowsShellwords
 
 describe "test_whitespace 2" do
   empty = ''
@@ -392,20 +395,31 @@ end
 
 # confirms that the escaped string that is generated actually
 # gets turned back into the source string by the actual shell.
-# abuses a `grep` error message because that should be cross platform
+# abuses a `grep` (or `find`) error message because that should be cross platform
 def confirm_shell_unescapes_string_correctly(string, escaped)
   compare_string = string.to_s.dup
-  compare_string = simulate_normal_shell_unwrapping(compare_string) unless FastlaneCore::Helper.windows?
-  compare_string = simulate_windows_shell_unwrapping(compare_string) if FastlaneCore::Helper.windows?
-  # (I'm so sorry, but this actually works)
-  compare_command = "grep 'foo' #{escaped}"
+  
+  if FastlaneCore::CommandExecutor.which('grep')
+    if FastlaneCore::Helper.windows?
+      compare_string = simulate_windows_shell_unwrapping(compare_string)
+    elsif
+      compare_string = simulate_normal_shell_unwrapping(compare_string)
+    end
+    compare_command = "grep 'foo' #{escaped}"
+    expected_compare_error = "grep: " + compare_string + ": No such file or directory"
+  elsif FastlaneCore::CommandExecutor.which('find')
+    compare_string = simulate_normal_shell_unwrapping(compare_string)
+    compare_string = compare_string.upcase
+    compare_command = "find \"foo\" #{escaped}"
+    expected_compare_error = "File not found - " + compare_string
+  end
 
   # https://stackoverflow.com/a/18623297/252627, last variant
   require 'open3'
   Open3.popen3(compare_command) do |stdin, stdout, stderr, thread|
     error = stderr.read.chomp
-    compare_error = "grep: " + compare_string + ": No such file or directory"
-    expect(error).to eq(compare_error)
+    #expect(error).to eq(expected_compare_error)
+    expect(error).to eq(expected_compare_error) # match(/#{expected_compare_error}/)
   end
 end
 
