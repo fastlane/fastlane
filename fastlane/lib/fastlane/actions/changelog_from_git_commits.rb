@@ -45,9 +45,11 @@ module Fastlane
           changelog = changelog.gsub("\n\n", "\n") if changelog # as there are duplicate newlines
           Actions.lane_context[SharedValues::FL_CHANGELOG] = changelog
 
-          puts("")
-          puts(changelog)
-          puts("")
+          if params[:quiet] == false
+            puts("")
+            puts(changelog)
+            puts("")
+          end
 
           changelog
         end
@@ -127,6 +129,12 @@ module Fastlane
                                        description: 'Whether or not to match a lightweight tag when searching for the last one',
                                        optional: true,
                                        default_value: true,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :quiet,
+                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_TAG_QUIET',
+                                       description: 'Whether or not to disbale changelog output',
+                                       optional: true,
+                                       default_value: false,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :include_merges,
                                        deprecated: "Use `:merge_commit_filtering` instead",
