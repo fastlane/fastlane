@@ -626,7 +626,7 @@ module Spaceship
         # Passing a specific `caller_location` here to make sure we return the correct method
         # With the default location the error would say that `parse_response` is the caller
         raise_insuffient_permission_error!(caller_location: 3)
-      elsif body.to_s.include?("Internal Server Error - Read")
+      elsif body.to_s =~ /Internal Server Error - Read|Gateway Timeout - In read/
         raise InternalServerError, "Received an internal server error from App Store Connect / Developer Portal, please try again later"
       elsif (body["resultString"] || "").include?("Program License Agreement")
         raise ProgramLicenseAgreementUpdated, "#{body['userString']} Please manually log into your Apple Developer account to review and accept the updated agreement."
