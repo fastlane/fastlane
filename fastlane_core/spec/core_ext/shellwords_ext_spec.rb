@@ -83,16 +83,17 @@ shellescape_testcases = [
       'other'   => 'string\ with\ spaces\ and\ \"double\"\ quotes'
     }
   },
+  # https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L64-L65
   {
-    'it' => '(#7) on simple string with double quotes',
+    'it' => '(#7) on simple int',
     'it_result' => {
-      'windows' => "wraps in double quotes and duplicates existing double quotes",
-      'other'   => 'escapes the double quotes and spaces with <backslash>'
+      'windows' => "doesn't change it",
+      'other'   => "doesn't change it"
     },
-    'str' => 'normal_string_with_"_but_without_spaces',
+    'str' => 3,
     'expect' => {
-      'windows' => 'normal_string_with_"_but_without_spaces',
-      'other'   => 'normal_string_with_\"_but_without_spaces'
+      'windows' => '3',
+      'other'   => '3'
     }
   },
   # https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L120-L125
@@ -104,21 +105,8 @@ shellescape_testcases = [
     },
     'str' => "あい",
     'expect' => {
-      'windows' => "あい",
+      'windows' => "\xE3\x81\x82\xE3\x81\x84", # which is actually あい but... encoding *shrug
       'other'   => "\\あ\\い"
-    }
-  },
-  # https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L64-L65
-  {
-    'it' => '(#9) on simple int',
-    'it_result' => {
-      'windows' => "doesn't change it",
-      'other'   => "doesn't change it"
-    },
-    'str' => 3,
-    'expect' => {
-      'windows' => '3',
-      'other'   => '3'
     }
   },
   # TODO:
