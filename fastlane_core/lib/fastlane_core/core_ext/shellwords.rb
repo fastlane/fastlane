@@ -19,11 +19,10 @@ end
 # https://stackoverflow.com/a/3833720/252627
 # https://stackoverflow.com/a/7895500/252627
 
-
 # Here be helper
 
-# handle switching between implementations
 module CrossplatformShellwords
+  # handle switching between implementations of shellescape
   def shellescape(str)
     if FastlaneCore::Helper.windows?
       WindowsShellwords.shellescape(str)
@@ -33,6 +32,7 @@ module CrossplatformShellwords
   end
   module_function :shellescape
 
+  # make sure local implementation is also used in shelljoin
   def shelljoin(array)
     array.map { |arg| shellescape(arg) }.join(' ')
   end
