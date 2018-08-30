@@ -701,7 +701,6 @@ module Spaceship
 
     def delete_provisioning_profile!(profile_id, mac: false)
       fetch_csrf_token_for_provisioning
-      
       r = request(:post, "account/#{platform_slug(mac)}/profile/deleteProvisioningProfile.action", {
         teamId: team_id,
         provisioningProfileId: profile_id
