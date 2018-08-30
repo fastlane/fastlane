@@ -6,9 +6,9 @@ describe Fastlane do
           changelog_from_git_commits
         end").runner.execute(:test)
 
-        inner_command =  "git describe --tags `git rev-list --tags --max-count=1`"
+        inner_command = "git describe --tags `git rev-list --tags --max-count=1`"
         # this is not really the command that would have been executed, but a "fabricated" representation for tests (by Actions.sh) that includes both command that would have been run
-        pseudocommand = "git log --pretty=\"%B\" #{inner_command.shellescape}...HEAD" 
+        pseudocommand = "git log --pretty=\"%B\" #{inner_command.shellescape}...HEAD"
         expect(result).to eq(pseudocommand)
       end
 
