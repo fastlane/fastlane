@@ -7,7 +7,7 @@ describe Fastlane do
       allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
     end
 
-    it "enable_automatic_code_signing", requires_xcodeproj: true do
+    it "enable_automatic_code_signing" do
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Automatic'")
       result = Fastlane::FastFile.new.parse("lane :test do
@@ -30,7 +30,7 @@ describe Fastlane do
       end
     end
 
-    it "disable_automatic_code_signing for specific target", requires_xcodeproj: true do
+    it "disable_automatic_code_signing for specific target" do
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
       expect(UI).to receive(:success).with("\t * today")
@@ -52,7 +52,7 @@ describe Fastlane do
       end
     end
 
-    it "disable_automatic_code_signing", requires_xcodeproj: true do
+    it "disable_automatic_code_signing" do
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
       result = Fastlane::FastFile.new.parse("lane :test do
@@ -72,7 +72,7 @@ describe Fastlane do
       end
     end
 
-    it "sets team id", requires_xcodeproj: true do
+    it "sets team id" do
       # G3KGXDXQL9
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
@@ -99,7 +99,7 @@ describe Fastlane do
       end
     end
 
-    it "sets code sign identity", requires_xcodeproj: true do
+    it "sets code sign identity" do
       temp_dir = Dir.tmpdir
       FileUtils.copy_entry('./fastlane/spec/fixtures/xcodeproj/automatic_code_signing.xcodeproj', temp_dir)
 
@@ -138,7 +138,7 @@ describe Fastlane do
       end
     end
 
-    it "sets profile name", requires_xcodeproj: true do
+    it "sets profile name" do
       # G3KGXDXQL9
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
@@ -170,7 +170,7 @@ describe Fastlane do
       end
     end
 
-    it "sets profile uuid", requires_xcodeproj: true do
+    it "sets profile uuid" do
       # G3KGXDXQL9
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
@@ -202,7 +202,7 @@ describe Fastlane do
       end
     end
 
-    it "sets bundle identifier", requires_xcodeproj: true do
+    it "sets bundle identifier" do
       # G3KGXDXQL9
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
@@ -234,7 +234,7 @@ describe Fastlane do
       end
     end
 
-    it "targets not found notice", requires_xcodeproj: true do
+    it "targets not found notice" do
       allow(UI).to receive(:important)
       expect(UI).to receive(:important).with("None of the specified targets has been modified")
       result = Fastlane::FastFile.new.parse("lane :test do
@@ -243,7 +243,7 @@ describe Fastlane do
       expect(result).to eq(false)
     end
 
-    it "raises exception on old projects", requires_xcodeproj: true do
+    it "raises exception on old projects" do
       expect(UI).to receive(:user_error!).with("Seems to be a very old project file format - please open your project file in a more recent version of Xcode")
       result = Fastlane::FastFile.new.parse("lane :test do
         disable_automatic_code_signing(path: './fastlane/spec/fixtures/xcodeproj/automatic-code-signing-old.xcodeproj')
