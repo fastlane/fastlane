@@ -2,14 +2,25 @@ require 'shellwords'
 require 'credentials_manager'
 
 describe FastlaneCore do
+  before(:each) do
+    @password = "!> p@$s_-+=w'o%rd\"&#*<"
+  end
+
   describe FastlaneCore::ItunesTransporter do
     def shell_upload_command(provider_short_name = nil)
+      password = @password.dup
+      password = password.shellescape
+      if FastlaneCore::Helper.mac?
+        password = password.gsub("\\'") do
+          "'\"\\'\"'"
+        end
+        password = "'" + password + "'"
+      end
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         "-m upload",
         '-u "fabric.devtools@gmail.com"',
-        ("-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'" unless FastlaneCore::Helper.windows?),
-        ("-p \\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<" if FastlaneCore::Helper.windows?),
+        "-p #{password}",
         "-f \"/tmp/my.app.id.itmsp\"",
         "-t DAV",
         "-t Signiant",
@@ -20,12 +31,19 @@ describe FastlaneCore do
     end
 
     def shell_download_command(provider_short_name = nil)
+      password = @password.dup
+      password = password.shellescape
+      if FastlaneCore::Helper.mac?
+        password = password.gsub("\\'") do
+          "'\"\\'\"'"
+        end
+        password = "'" + password + "'"
+      end
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         '-m lookupMetadata',
         '-u "fabric.devtools@gmail.com"',
-        ("-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'" unless FastlaneCore::Helper.windows?),
-        ("-p \\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<" if FastlaneCore::Helper.windows?),
+        "-p #{password}",
         "-apple_id my.app.id",
         "-destination '/tmp'",
         ("-itc_provider #{provider_short_name}" if provider_short_name)
@@ -46,7 +64,7 @@ describe FastlaneCore do
         'com.apple.transporter.Application',
         "-m upload",
         "-u fabric.devtools@gmail.com",
-        "-p \\!\\>\\ p@\\$s_-\\+\\=w\\'o\\%rd\\\"\\&\\#\\*\\<",
+        "-p #{@password.shellescape}",
         "-f /tmp/my.app.id.itmsp",
         "-t DAV",
         "-t Signiant",
@@ -70,7 +88,7 @@ describe FastlaneCore do
         'com.apple.transporter.Application',
         '-m lookupMetadata',
         '-u fabric.devtools@gmail.com',
-        "-p \\!\\>\\ p@\\$s_-\\+\\=w\\'o\\%rd\\\"\\&\\#\\*\\<",
+        "-p #{@password.shellescape}",
         '-apple_id my.app.id',
         '-destination /tmp',
         ("-itc_provider #{provider_short_name}" if provider_short_name),
@@ -91,8 +109,7 @@ describe FastlaneCore do
         "-jar #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}",
         "-m upload",
         "-u fabric.devtools@gmail.com",
-        ("-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'" unless FastlaneCore::Helper.windows?),
-        ("-p \\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<" if FastlaneCore::Helper.windows?),
+        "-p #{@password.shellescape}",
         "-f /tmp/my.app.id.itmsp",
         "-t DAV",
         "-t Signiant",
@@ -115,8 +132,7 @@ describe FastlaneCore do
         "-jar #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}",
         '-m lookupMetadata',
         '-u fabric.devtools@gmail.com',
-        ("-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'" unless FastlaneCore::Helper.windows?),
-        ("-p \\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<" if FastlaneCore::Helper.windows?),
+        "-p #{@password.shellescape}",
         '-apple_id my.app.id',
         '-destination /tmp',
         ("-itc_provider #{provider_short_name}" if provider_short_name),
@@ -130,14 +146,14 @@ describe FastlaneCore do
       describe "by default" do
         describe "upload command generation" do
           it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<")
+            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password)
             expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command)
           end
         end
 
         describe "download command generation" do
           it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<")
+            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password)
             expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command)
           end
         end
@@ -146,14 +162,14 @@ describe FastlaneCore do
       describe "use_shell_script is false with a itc_provider short name set" do
         describe "upload command generation" do
           it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false, 'abcd1234')
+            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password, false, 'abcd1234')
             expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command('abcd1234'))
           end
         end
 
         describe "download command generation" do
           it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false, 'abcd1234')
+            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password, false, 'abcd1234')
             expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command('abcd1234'))
           end
         end
@@ -162,14 +178,14 @@ describe FastlaneCore do
       describe "use_shell_script is true with a itc_provider short name set" do
         describe "upload command generation" do
           it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", true, 'abcd1234')
+            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password, true, 'abcd1234')
             expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command('abcd1234'))
           end
         end
 
         describe "download command generation" do
           it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", true, 'abcd1234')
+            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password, true, 'abcd1234')
             expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command('abcd1234'))
           end
         end
@@ -179,7 +195,7 @@ describe FastlaneCore do
         describe "upload command generation" do
           it 'generates a call to the shell script' do
             with_env_values('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT' => 'true') do
-              transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<")
+              transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password)
               expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
             end
           end
@@ -188,7 +204,7 @@ describe FastlaneCore do
         describe "download command generation" do
           it 'generates a call to the shell script' do
             with_env_values('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT' => 'true') do
-              transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<")
+              transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password)
               expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command)
             end
           end
@@ -198,14 +214,14 @@ describe FastlaneCore do
       describe "use_shell_script is true" do
         describe "upload command generation" do
           it 'generates a call to the shell script' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", true)
+            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password, true)
             expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
           end
         end
 
         describe "download command generation" do
           it 'generates a call to the shell script' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", true)
+            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password, true)
             expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command)
           end
         end
@@ -214,14 +230,14 @@ describe FastlaneCore do
       describe "use_shell_script is false" do
         describe "upload command generation" do
           it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password, false)
             expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command)
           end
         end
 
         describe "download command generation" do
           it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password, false)
             expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command)
           end
         end
@@ -233,14 +249,14 @@ describe FastlaneCore do
 
       describe "upload command generation" do
         it 'generates a call to the shell script' do
-          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password, false)
           expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
         end
       end
 
       describe "download command generation" do
         it 'generates a call to the shell script' do
-          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', @password, false)
           expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command)
         end
       end
