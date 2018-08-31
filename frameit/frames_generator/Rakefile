@@ -28,6 +28,8 @@ task(:generate_device_frames) do
   sh("rm -rf output")
   mkdir_p(output) unless File.directory?(output)
 
+  resize_missing_frames
+
   image_assets = []
   (Dir["raw/Phones/Apple*/Device/*.png"] + Dir["raw/Computers/Apple*/Device/*.png"] + Dir["raw/Tablets/Apple*/Device/*.png"]).each do |current_raw|
     basename = File.basename(current_raw)
@@ -60,6 +62,27 @@ task(:generate_device_frames) do
   puts("To do so, clone https://github.com/fastlane/frameit-frames, make sure to check out the `gh-pages` branch".green)
   puts("and overwrite the 'latest' folder, and copy the time stamp folder into the root.".green)
   puts("Push the changes, and run `fastlane frameit update_frames` to ensure everything worked as expected".green)
+end
+
+def resize_missing_frames
+  file = File.read('resizes.json')
+  data = JSON.parse(file)
+
+  (Dir["raw/Phones/Apple*/Device/*.png"] + Dir["raw/Computers/Apple*/Device/*.png"] + Dir["raw/Tablets/Apple*/Device/*.png"]).each do |current_raw|
+    basename = File.basename(current_raw)
+
+    output_dir = File.dirname(current_raw)
+    FileUtils.mkdir_p(File.dirname(output_dir))
+
+    resize_config = data[basename]
+    next unless resize_config
+    height = resize_config["height"]
+    width = resize_config["width"]
+    output_path = resize_config["output_path"]
+
+
+    system("sips --resampleHeightWidth #{height} #{width} '#{current_raw}' --out '#{output_path}'")
+  end
 end
 
 def confirm

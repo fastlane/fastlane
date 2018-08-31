@@ -35,6 +35,10 @@
     "iPad Pro": {
       "offset": "+118+215",
       "width": 2050
+    },
+    "iPad Pro 10-5": {
+      "offset": "+100+175",
+      "width": 1668
     }
   }
 }
