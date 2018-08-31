@@ -96,6 +96,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('google-api-client', '>= 0.21.2', '< 0.24.0') # Google API Client to access Play Publishing API
 
   spec.add_dependency('emoji_regex', '~> 0.1') # Used to scan for Emoji in the changelog
+  spec.add_dependency('bootsnap', '>= 1.3.1', '< 1.4.0') # Optimize ruby startup time
 
   # Development only
   spec.add_development_dependency('rake', '< 12')
