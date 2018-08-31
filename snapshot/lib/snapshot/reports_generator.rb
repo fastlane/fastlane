@@ -87,9 +87,12 @@ module Snapshot
         'iPad Air' => 'iPad Air',
         'iPad (5th generation)' => 'iPad (5th generation)',
         'iPad Pro (9.7-inch)' => 'iPad Pro (9.7-inch)',
+        'iPad Pro (9.7 inch)' => 'iPad Pro (9.7-inch)', # iOS 10.3.1 simulator
         'iPad Pro (10.5-inch)' => 'iPad Pro (10.5-inch)',
         'iPad Pro (12.9-inch) (2nd generation)' => 'iPad Pro (12.9-inch) (2nd generation)',
         'iPad Pro (12.9-inch)' => 'iPad Pro (12.9-inch)',
+        'iPad Pro (12.9 inch)' => 'iPad Pro (12.9-inch)', # iOS 10.3.1 simulator
+        'iPad Pro' => 'iPad Pro (12.9-inch)', # iOS 9.3 simulator
         'Apple TV 1080p' => 'Apple TV',
         'Apple TV 4K (at 1080p)' => 'Apple TV 4K (at 1080p)',
         'Apple TV 4K' => 'Apple TV 4K',
