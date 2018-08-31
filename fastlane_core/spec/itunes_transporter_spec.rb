@@ -140,8 +140,13 @@ describe FastlaneCore do
       ].compact.join(' ')
     end
 
-    describe "with Xcode 7.x installed", requires_xcode: true do
-      before(:each) { allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('7.3') }
+    describe "with Xcode 7.x installed" do
+      before(:each) do
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('7.3')
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+        allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
+      end
 
       describe "by default" do
         describe "upload command generation" do
@@ -244,8 +249,13 @@ describe FastlaneCore do
       end
     end
 
-    describe "with Xcode 6.x installed", requires_xcode: true do
-      before(:each) { allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('6.4') }
+    describe "with Xcode 6.x installed" do
+      before(:each) do
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('6.4')
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+        allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
+      end
 
       describe "upload command generation" do
         it 'generates a call to the shell script' do
@@ -262,8 +272,13 @@ describe FastlaneCore do
       end
     end
 
-    describe "with Xcode 9.x installed", requires_xcode: true do
-      before(:each) { allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('9.1') }
+    describe "with Xcode 9.x installed" do
+      before(:each) do
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('9.1')
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+        allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
+      end
 
       describe "upload command generation" do
         it 'generates a call to java directly' do
