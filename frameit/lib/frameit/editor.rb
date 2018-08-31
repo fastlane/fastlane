@@ -18,6 +18,8 @@ module Frameit
 
     def frame!(screenshot)
       self.screenshot = screenshot
+      require 'pry-byebug'; binding.pry
+      t1 = Time.now()
       prepare_image
 
       frame = load_frame
@@ -33,7 +35,10 @@ module Frameit
 
       if should_add_title?
         @image = complex_framing
+        t2 = Time.now()
+        UI.success(t2-t1)
       else
+
         # easy mode from 1.0 - no title or background
         put_into_frame # put it in the frame
       end
