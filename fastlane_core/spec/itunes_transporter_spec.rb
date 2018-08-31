@@ -250,14 +250,14 @@ describe FastlaneCore do
       before(:each) { allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('9.1') }
 
       describe "upload command generation" do
-        it 'generates a call to the shell script' do
+        it 'generates a call to java directly' do
           transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
           expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command_9)
         end
       end
 
       describe "download command generation" do
-        it 'generates a call to the shell script' do
+        it 'generates a call to java directly' do
           transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
           expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command_9)
         end
