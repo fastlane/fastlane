@@ -40,7 +40,7 @@ module Match
 
       begin
         # GIT_TERMINAL_PROMPT will fail the `git clone` command if user credentials are missing
-        FastlaneCore::CommandExecutor.execute(command: "GIT_TERMINAL_PROMPT=0 #{command}",
+        FastlaneCore::CommandExecutor.execute(command: "set GIT_TERMINAL_PROMPT=0&& #{command}",
                                             print_all: FastlaneCore::Globals.verbose?,
                                         print_command: FastlaneCore::Globals.verbose?)
       rescue
