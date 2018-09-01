@@ -95,6 +95,8 @@ module Match
     def self.commit_changes(path, message, git_url, branch = "master", files_to_commmit = nil)
       files_to_commmit ||= []
       Dir.chdir(path) do
+        puts "Match::GitHelper.commit_changes loop path: " + path.to_s
+
         return if `git status`.include?("nothing to commit")
 
         Encrypt.new.encrypt_repo(path: path, git_url: git_url)

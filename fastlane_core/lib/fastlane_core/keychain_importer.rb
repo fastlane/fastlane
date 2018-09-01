@@ -6,6 +6,7 @@ module FastlaneCore
       UI.important('## import to keychain ##')
       UI.important('path: ' + path)
       UI.important('keychain_path: ' + keychain_path)
+      UI.important('just return')
       return if FastlaneCore::Helper.windows?
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 

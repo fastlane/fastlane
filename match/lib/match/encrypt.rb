@@ -60,7 +60,9 @@ module Match
         begin
           decrypt(path: current,
             password: manual_password || password(git_url))
-        rescue
+        rescue => error
+          UI.error(error.to_s)
+          puts error.inspect
           UI.error("Couldn't decrypt the repo, please make sure you enter the right password!")
           UI.user_error!("Invalid password passed via 'MATCH_PASSWORD'") if ENV["MATCH_PASSWORD"]
           clear_password(git_url)
@@ -91,12 +93,19 @@ module Match
       UI.user_error!("No password supplied") if password.to_s.strip.length == 0
 
       data_to_encrypt = File.binread(path)
+      puts "##########################################"
+      puts "path: "+path
+      puts "data_to_encrypt: " + data_to_encrypt
       salt = SecureRandom.random_bytes(8)
 
       cipher = OpenSSL::Cipher.new('AES-256-CBC')
       cipher.encrypt
       cipher.pkcs5_keyivgen(password, salt, 1, "MD5")
       encrypted_data = "Salted__" + salt + cipher.update(data_to_encrypt) + cipher.final
+
+      puts "encrypted_data: " + encrypted_data
+      puts "encrypted_data base64: " + Base64.encode64(encrypted_data)
+      puts "##########################################"
 
       File.binwrite(path, Base64.encode64(encrypted_data))
     rescue FastlaneCore::Interface::FastlaneError
@@ -109,16 +118,22 @@ module Match
     # The encryption parameters in this implementations reflect the old behaviour which depended on the users' local OpenSSL version
     # 1.0.x OpenSSL and earlier versions use MD5, 1.1.0c and newer uses SHA256, we try both before giving an error
     def decrypt(path: nil, password: nil, hash_algorithm: "MD5")
+      puts 'decrypt'
       stored_data = Base64.decode64(File.binread(path))
       salt = stored_data[8..15]
       data_to_decrypt = stored_data[16..-1]
 
       decipher = OpenSSL::Cipher.new('AES-256-CBC')
+      puts 'decrypt: after new'
       decipher.decrypt
+      puts 'decrypt: after decrypt'
       decipher.pkcs5_keyivgen(password, salt, 1, hash_algorithm)
+      puts 'decrypt: after pkcs5_keyivgen'
 
       decrypted_data = decipher.update(data_to_decrypt) + decipher.final
+      puts 'decrypt: after update'
 
+      puts 'end decrypt'
       File.binwrite(path, decrypted_data)
     rescue => error
       fallback_hash_algorithm = "SHA256"

@@ -40,11 +40,15 @@ puts "FastlaneCore::ProvisioningProfile.parse plist: " + plist.inspect
 
       # @return [String] The UUID of the given provisioning profile
       def uuid(path, keychain_path = nil)
+  puts "FastlaneCore::ProvisioningProfile.uuid path: " + path.to_s
+puts "FastlaneCore::ProvisioningProfile.uuid keychain_path: " + keychain_path.to_s
         parse(path, keychain_path).fetch("UUID")
       end
 
       # @return [String] The Name of the given provisioning profile
       def name(path, keychain_path = nil)
+puts "FastlaneCore::ProvisioningProfile.name path: " + path.to_s
+puts "FastlaneCore::ProvisioningProfile.name keychain_path: " + keychain_path.to_s
         parse(path, keychain_path).fetch("Name")
       end
 
@@ -81,6 +85,8 @@ puts "FastlaneCore::ProvisioningProfile.parse plist: " + plist.inspect
         puts "FastlaneCore::ProvisioningProfile.decode path: " + path.to_s
         puts "FastlaneCore::ProvisioningProfile.decode keychain_path: " + keychain_path.to_s
         if Helper.windows?
+          puts "FastlaneCore::ProvisioningProfile.decode xmlcommand: " + "openssl smime -inform der -verify -noverify -in #{path}".to_s
+         
           xml = `openssl smime -inform der -verify -noverify -in #{path}`
           return xml
         end

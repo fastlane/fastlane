@@ -74,6 +74,7 @@ puts "Match:Generator.generate_certificate ######################"
 
       Sigh.config = arguments
       path = Sigh::Manager.start
+puts "Match::Generator.generate_provisioning_profile returned path: " + path.to_s
       return path
     end
 
