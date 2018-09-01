@@ -90,7 +90,7 @@ module Match
     def encrypt(path: nil, password: nil)
       UI.user_error!("No password supplied") if password.to_s.strip.length == 0
 
-      data_to_encrypt = File.read(path)
+      data_to_encrypt = File.binread(path)
       salt = SecureRandom.random_bytes(8)
 
       cipher = OpenSSL::Cipher.new('AES-256-CBC')
@@ -98,7 +98,7 @@ module Match
       cipher.pkcs5_keyivgen(password, salt, 1, "MD5")
       encrypted_data = "Salted__" + salt + cipher.update(data_to_encrypt) + cipher.final
 
-      File.write(path, Base64.encode64(encrypted_data))
+      File.binwrite(path, Base64.encode64(encrypted_data))
     rescue FastlaneCore::Interface::FastlaneError
       raise
     rescue => error
@@ -109,7 +109,7 @@ module Match
     # The encryption parameters in this implementations reflect the old behaviour which depended on the users' local OpenSSL version
     # 1.0.x OpenSSL and earlier versions use MD5, 1.1.0c and newer uses SHA256, we try both before giving an error
     def decrypt(path: nil, password: nil, hash_algorithm: "MD5")
-      stored_data = Base64.decode64(File.read(path))
+      stored_data = Base64.decode64(File.binread(path))
       salt = stored_data[8..15]
       data_to_decrypt = stored_data[16..-1]
 
