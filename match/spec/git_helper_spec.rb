@@ -12,13 +12,30 @@ describe Match do
       end
     end
 
+    def expect_set_env_var(varstring)
+      command = (FastlaneCore::Helper.windows?) ? "set #{varstring}" : "#{varstring}"
+      to_params = {
+        command: command,
+        print_all: nil,
+        print_command: nil
+      }
+
+      expect(FastlaneCore::CommandExecutor).
+        to receive(:execute).
+        with(to_params).
+        and_return(nil)
+    end
+
     describe "#clone" do
       it "skips README file generation if so requested" do
         path = Dir.mktmpdir # to have access to the actual path
         expect(Dir).to receive(:mktmpdir).and_return(path)
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         shallow_clone = false
-        command = "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}'"
+
+        expect_set_env_var("GIT_TERMINAL_PROMPT=0")
+
+        command = "git clone #{git_url.shellescape} #{path.shellescape}"
         to_params = {
           command: command,
           print_all: nil,
@@ -30,6 +47,8 @@ describe Match do
           with(to_params).
           and_return(nil)
 
+        expect_set_env_var("GIT_TERMINAL_PROMPT=")
+          
         result = Match::GitHelper.clone(git_url, shallow_clone, skip_docs: true)
         expect(File.directory?(result)).to eq(true)
         expect(File.exist?(File.join(result, 'README.md'))).to eq(false)
@@ -40,7 +59,10 @@ describe Match do
         expect(Dir).to receive(:mktmpdir).and_return(path)
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         shallow_clone = true
-        command = "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}' --depth 1 --no-single-branch"
+
+        expect_set_env_var("GIT_TERMINAL_PROMPT=0")
+
+        command = "git clone #{git_url.shellescape} #{path.shellescape} --depth 1 --no-single-branch"
         to_params = {
           command: command,
           print_all: nil,
@@ -51,6 +73,8 @@ describe Match do
           to receive(:execute).
           with(to_params).
           and_return(nil)
+
+        expect_set_env_var("GIT_TERMINAL_PROMPT=")
 
         result = Match::GitHelper.clone(git_url, shallow_clone)
         expect(File.directory?(result)).to eq(true)
@@ -62,7 +86,10 @@ describe Match do
         expect(Dir).to receive(:mktmpdir).and_return(path)
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         shallow_clone = false
-        command = "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}'"
+
+        expect_set_env_var("GIT_TERMINAL_PROMPT=0")
+
+        command = "git clone #{git_url.shellescape} #{path.shellescape}"
         to_params = {
           command: command,
           print_all: nil,
@@ -73,6 +100,8 @@ describe Match do
           to receive(:execute).
           with(to_params).
           and_return(nil)
+
+        expect_set_env_var("GIT_TERMINAL_PROMPT=")
 
         result = Match::GitHelper.clone(git_url, shallow_clone)
         expect(File.directory?(result)).to eq(true)
@@ -85,7 +114,10 @@ describe Match do
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         git_branch = "test"
         shallow_clone = false
-        command = "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}'"
+
+        expect_set_env_var("GIT_TERMINAL_PROMPT=0")
+
+        command = "git clone #{git_url.shellescape} #{path.shellescape}"
         to_params = {
           command: command,
           print_all: nil,
@@ -96,6 +128,8 @@ describe Match do
           to receive(:execute).
           with(to_params).
           and_return(nil)
+
+        expect_set_env_var("GIT_TERMINAL_PROMPT=")
 
         command = "git --no-pager branch --list origin/#{git_branch} --no-color -r"
         to_params = {

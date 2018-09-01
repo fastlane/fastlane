@@ -38,11 +38,20 @@ module Match
         UI.message("If cloning the repo takes too long, you can use the `clone_branch_directly` option in match.")
       end
 
+      commands = []
+      commands << "set GIT_TERMINAL_PROMPT=0" if Helper.windows?
+      commands << "GIT_TERMINAL_PROMPT=0" unless Helper.windows?
+      commands << command
+      commands << "set GIT_TERMINAL_PROMPT=" if Helper.windows?
+      commands << "GIT_TERMINAL_PROMPT=" unless Helper.windows?
+
       begin
-        # GIT_TERMINAL_PROMPT will fail the `git clone` command if user credentials are missing
-        FastlaneCore::CommandExecutor.execute(command: "set GIT_TERMINAL_PROMPT=0&& #{command}",
-                                            print_all: FastlaneCore::Globals.verbose?,
-                                        print_command: FastlaneCore::Globals.verbose?)
+        commands.each do |inner_command|
+          # GIT_TERMINAL_PROMPT will fail the `git clone` command if user credentials are missing
+          FastlaneCore::CommandExecutor.execute(command: "#{inner_command}",
+                                              print_all: FastlaneCore::Globals.verbose?,
+                                          print_command: FastlaneCore::Globals.verbose?)
+        end
       rescue
         UI.error("Error cloning certificates repo, please make sure you have read access to the repository you want to use")
         if branch && clone_branch_directly
@@ -128,7 +137,12 @@ module Match
           commands << "git add -A"
         end
         commands << "git commit -m #{message.shellescape}"
-        commands << "set GIT_TERMINAL_PROMPT=0&& git push origin #{branch.shellescape}"
+
+        commands << "set GIT_TERMINAL_PROMPT=0" if Helper.windows?
+        commands << "GIT_TERMINAL_PROMPT=0" unless Helper.windows?
+        commands << "git push origin #{branch.shellescape}"
+        commands << "set GIT_TERMINAL_PROMPT=" if Helper.windows?
+        commands << "GIT_TERMINAL_PROMPT=" unless Helper.windows?
 
         UI.message("Pushing changes to remote git repo...")
 
