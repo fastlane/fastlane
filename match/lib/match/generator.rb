@@ -8,14 +8,14 @@ module Match
       require 'cert/options'
 
       output_path = File.join(params[:workspace], "certs", cert_type.to_s)
-
+puts "Match:Generator.generate_certificate ######################"
       arguments = FastlaneCore::Configuration.create(Cert::Options.available_options, {
         development: params[:type] == "development",
         output_path: output_path,
         force: true, # we don't need a certificate without its private key, we only care about a new certificate
         username: params[:username],
         team_id: params[:team_id],
-        keychain_path: FastlaneCore::Helper.keychain_path(params[:keychain_name]),
+        #keychain_path: FastlaneCore::Helper.keychain_path(params[:keychain_name]),
         keychain_password: params[:keychain_password]
       })
 

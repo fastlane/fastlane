@@ -25,8 +25,12 @@ module FastlaneCore
       #   "Version"=>1}
       def parse(path, keychain_path = nil)
         require 'plist'
-
-        plist = Plist.parse_xml(decode(path, keychain_path))
+puts "FastlaneCore::ProvisioningProfile.parse path: " + path.to_s
+puts "FastlaneCore::ProvisioningProfile.parse keychain_path: " + keychain_path.to_s
+xml = decode(path, keychain_path)
+puts "FastlaneCore::ProvisioningProfile.parse xml: " + xml.to_s
+        plist = Plist.parse_xml(xml)
+puts "FastlaneCore::ProvisioningProfile.parse plist: " + plist.inspect
         if (plist || []).count > 5
           plist
         else
@@ -74,6 +78,12 @@ module FastlaneCore
       private
 
       def decode(path, keychain_path = nil)
+        puts "FastlaneCore::ProvisioningProfile.decode path: " + path.to_s
+        puts "FastlaneCore::ProvisioningProfile.decode keychain_path: " + keychain_path.to_s
+        if Helper.windows?
+          xml = `openssl smime -inform der -verify -noverify -in #{path}`
+          return xml
+        end
         require 'tmpdir'
         Dir.mktmpdir('fastlane') do |dir|
           err = "#{dir}/cms.err"

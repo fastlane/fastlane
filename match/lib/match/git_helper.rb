@@ -126,7 +126,7 @@ module Match
           commands << "git add -A"
         end
         commands << "git commit -m #{message.shellescape}"
-        commands << "GIT_TERMINAL_PROMPT=0 git push origin #{branch.shellescape}"
+        commands << "set GIT_TERMINAL_PROMPT=0&& git push origin #{branch.shellescape}"
 
         UI.message("Pushing changes to remote git repo...")
 

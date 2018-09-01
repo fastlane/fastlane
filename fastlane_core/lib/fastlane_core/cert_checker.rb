@@ -7,6 +7,7 @@ module FastlaneCore
   # This class checks if a specific certificate is installed on the current mac
   class CertChecker
     def self.installed?(path, in_keychain: nil)
+      return true if Helper.windows?
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
       ids = installed_identies(in_keychain: in_keychain)
@@ -54,6 +55,7 @@ module FastlaneCore
     end
 
     def self.wwdr_certificate_installed?
+      return true if Helper.windows?
       certificate_name = "Apple Worldwide Developer Relations Certification Authority"
       keychain = wwdr_keychain
       response = Helper.backticks("security find-certificate -c '#{certificate_name}' #{keychain.shellescape}", print: FastlaneCore::Globals.verbose?)
@@ -90,6 +92,7 @@ module FastlaneCore
     end
 
     def self.wwdr_keychain
+      return "" if Helper.windows?
       priority = [
         "security list-keychains -d user",
         "security default-keychain -d user"
