@@ -60,7 +60,7 @@ module Match
         # No existing working directory, creating a new one now
         self.working_directory = Dir.mktmpdir
 
-        command = "git clone '#{self.git_url}' '#{self.working_directory}'"
+        command = "git clone #{self.git_url.shellescape} #{self.working_directory.shellescape}"
         if self.shallow_clone
           command << " --depth 1 --no-single-branch"
         elsif self.clone_branch_directly
