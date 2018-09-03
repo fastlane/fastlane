@@ -7,7 +7,7 @@ module Deliver
       select_build(options)
 
       UI.message("Submitting the app for review...")
-      submission = app.create_submission
+      submission = app.create_submission(platform: options[:platform])
 
       # Set app submission information
       # Default Values
@@ -31,7 +31,7 @@ module Deliver
 
     def select_build(options)
       app = options[:app]
-      v = app.edit_version
+      v = app.edit_version(platform: options[:platform])
 
       if options[:build_number] && options[:build_number] != "latest"
         UI.message("Selecting existing build-number: #{options[:build_number]}")
