@@ -50,6 +50,7 @@ module Spaceship
     UnexpectedResponse = Spaceship::UnexpectedResponse
     AppleTimeoutError = Spaceship::AppleTimeoutError
     UnauthorizedAccessError = Spaceship::UnauthorizedAccessError
+    GatewayTimeoutError = Spaceship::GatewayTimeoutError
     InternalServerError = Spaceship::InternalServerError
 
     # Authenticates with Apple's web services. This method has to be called once
@@ -532,6 +533,7 @@ module Spaceship
         Faraday::Error::TimeoutError,
         Faraday::ParsingError, # <h2>Internal Server Error</h2> with content type json
         AppleTimeoutError,
+        GatewayTimeoutError,
         InternalServerError => ex # New Faraday version: Faraday::TimeoutError => ex
       tries -= 1
       unless tries.zero?
@@ -628,6 +630,8 @@ module Spaceship
         raise_insuffient_permission_error!(caller_location: 3)
       elsif body.to_s.include?("Internal Server Error - Read")
         raise InternalServerError, "Received an internal server error from App Store Connect / Developer Portal, please try again later"
+      elsif body.to_s.include?("Gateway Timeout - In read")
+        raise GatewayTimeoutError, "Received a gateway timeout error from App Store Connect / Developer Portal, please try again later"
       elsif (body["resultString"] || "").include?("Program License Agreement")
         raise ProgramLicenseAgreementUpdated, "#{body['userString']} Please manually log into your Apple Developer account to review and accept the updated agreement."
       end

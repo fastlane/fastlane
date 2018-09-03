@@ -70,4 +70,7 @@ module Spaceship
 
   # Raised when 500 is received from App Store Connect
   class InternalServerError < BasicPreferredInfoError; end
+
+  # Raised when 504 is received from App Store Connect
+  class GatewayTimeoutError < BasicPreferredInfoError; end
 end
