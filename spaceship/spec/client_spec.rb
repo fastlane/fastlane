@@ -39,11 +39,57 @@ describe Spaceship::Client do
       then.to_return(status: status_ok, body: body)
   end
 
+  describe 'detect_most_common_errors_and_raise_exceptions' do
+    it "raises Spaceship::InsufficientPermissions for Forbidden" do
+      body = JSON.generate({ messages: { error: "InsufficentPermissions" } })
+      stub_client_request(Spaceship::InsufficientPermissions, 6, 200, body)
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::InsufficientPermissions)
+    end
+
+    it "raises Spaceship::InsufficientPermissions for insufficient privileges" do
+      body = JSON.generate({ messages: { error: "insufficient privileges" } })
+      stub_client_request(Spaceship::InsufficientPermissions, 6, 200, body)
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::InsufficientPermissions)
+    end
+
+    it "raises Spaceship::InternalServerError" do
+      stub_client_request(Spaceship::GatewayTimeoutError, 6, 504, "<html>Internal Server - Read</html>")
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::GatewayTimeoutError)
+    end
+
+    it "raises Spaceship::GatewayTimeoutError" do
+      stub_client_request(Spaceship::GatewayTimeoutError, 6, 504, "<html>Gateway Timeout - In Read</html>")
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::GatewayTimeoutError)
+    end
+
+    it "raises Spaceship::ProgramLicenseAgreementUpdated" do
+      stub_client_request(Spaceship::ProgramLicenseAgreementUpdated, 6, 200, "Program License Agreement")
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::ProgramLicenseAgreementUpdated)
+    end
+  end
+
   describe 'retry' do
     [
       Faraday::Error::TimeoutError,
       Faraday::Error::ConnectionFailed,
-      Faraday::ParsingError
+      Faraday::ParsingError,
+      Spaceship::InternalServerError,
+      Spaceship::GatewayTimeoutError
     ].each do |thrown|
       it "re-raises when retry limit reached throwing #{thrown}" do
         stub_client_request(thrown, 6, 200, nil)
