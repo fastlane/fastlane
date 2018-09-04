@@ -262,6 +262,7 @@ describe "monkey patch of String.shellescape (via CrossplatformShellwords)" do
     shellescape_testcases.each do |testcase|
       it testcase['it'] + ': ' + testcase['it_result'][os] do
         str = testcase['str'].to_s
+        expect_correct_implementation_to_be_called(str, :shellescape, os)
         escaped = str.shellescape
         expect(escaped).to eq(testcase['expect'][os])
       end
@@ -277,6 +278,7 @@ describe "monkey patch of String.shellescape (via CrossplatformShellwords)" do
     shellescape_testcases.each do |testcase|
       it testcase['it'] + ': ' + testcase['it_result'][os] do
         str = testcase['str'].to_s
+        expect_correct_implementation_to_be_called(str, :shellescape, os)
         escaped = str.shellescape
         expect(escaped).to eq(testcase['expect'][os])
       end
@@ -349,6 +351,7 @@ describe "monkey patch of Array.shelljoin (via CrossplatformShellwords)" do
     shelljoin_testcases.each do |testcase|
       it testcase['it'] + ': ' + testcase['it_result'][os] do
         array = testcase['input']
+        expect_correct_implementation_to_be_called(array, :shelljoin, os)
         joined = array.shelljoin
         expect(joined).to eq(testcase['expect'][os])
       end
@@ -364,9 +367,33 @@ describe "monkey patch of Array.shelljoin (via CrossplatformShellwords)" do
     shelljoin_testcases.each do |testcase|
       it testcase['it'] + ': ' + testcase['it_result'][os] do
         array = testcase['input']
+        expect_correct_implementation_to_be_called(array, :shelljoin, os)
         joined = array.shelljoin
         expect(joined).to eq(testcase['expect'][os])
       end
     end
+  end
+end
+
+def expect_correct_implementation_to_be_called(obj, method, os)
+  if method == :shellescape
+    # String.shellescape => ...
+    expect(obj).to receive(:shellescape).and_call_original
+    if os == 'windows'
+      # ... CrossplatformShellwords.shellescape => WindowsShellwords.shellescape
+      expect(CrossplatformShellwords).to receive(:shellescape).with(obj).and_call_original
+      expect(WindowsShellwords).to receive(:shellescape).with(obj).and_call_original
+      expect(Shellwords).not_to(receive(:escape))
+    else
+      # ... CrossplatformShellwords.shellescape => Shellswords.escape
+      expect(CrossplatformShellwords).to receive(:shellescape).with(obj).and_call_original
+      expect(Shellwords).to receive(:escape).with(obj).and_call_original
+      expect(WindowsShellwords).not_to(receive(:shellescape))
+    end
+  elsif method == :shelljoin
+    # Array.shelljoin => CrossplatformShellwords.shelljoin => CrossplatformShellwords.shellescape ...
+    expect(obj).to receive(:shelljoin).and_call_original
+    expect(CrossplatformShellwords).to receive(:shelljoin).with(obj).and_call_original
+    expect(CrossplatformShellwords).to receive(:shellescape).at_least(:once).and_call_original
   end
 end
