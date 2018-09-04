@@ -177,12 +177,12 @@ Overview of the used API endpoints
   - Repair provisioning profiles
   - Download provisioning profiles
   - Team selection
-- `https://itunesconnect.apple.com`:
+- `https://appstoreconnect.apple.com`:
   - Managing apps
   - Managing beta testers
   - Submitting updates to review
   - Managing app metadata
-- `https://du-itc.itunesconnect.apple.com`:
+- `https://du-itc.appstoreconnect.apple.com`:
   - Upload icons, screenshots, trailers ...
 
 _spaceship_ uses all those API points to offer this seamless experience.

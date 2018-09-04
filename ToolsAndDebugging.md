@@ -46,12 +46,12 @@ _spaceship_ uses [Faraday](https://github.com/lostisland/faraday) to interact wi
   - Repair provisioning profiles
   - Download provisioning profiles
   - Team selection
-- `https://itunesconnect.apple.com`:
+- `https://appstoreconnect.apple.com`:
   - Managing apps
   - Managing beta testers
   - Submitting updates to review
   - Managing app metadata
-- `https://du-itc.itunesconnect.apple.com`:
+- `https://du-itc.appstoreconnect.apple.com`:
   - Upload icons, screenshots, trailers ...
 
 _spaceship_ is split into 3 layers:
@@ -83,7 +83,7 @@ First, download and install the latest version of [Charles Proxy](https://www.ch
 
 > In Charles go to the Help menu and choose "SSL Proxying > Install Charles Root Certificate". Keychain Access will open, and prompt you about the certificate. Click the "Always Trust" button. You will then be prompted for your Administrator password to update the system trust settings.
 
-You might have to restart your Mac for the changes to be applied. To see if it works, relaunch Charles and Chrome/Safari and try opening [App Store Connect](https://itunesconnect.apple.com).
+You might have to restart your Mac for the changes to be applied. To see if it works, relaunch Charles and Chrome/Safari and try opening [App Store Connect](https://appstoreconnect.apple.com).
 
 If everything worked, you’ll already see a list of requests in the sidebar of Charles. Take a look at the above list of used API endpoints, and enable `SSL Proxying` and `Focus` on all endpoints you are interested in.
 After doing so, refresh the App Store Connect page. You should be able to see all web requests with their responses.

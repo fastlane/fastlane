@@ -15,7 +15,7 @@ module Spaceship
       # Each request method should make only one request. For more high-level logic, put code in the data models.
 
       def self.hostname
-        'https://itunesconnect.apple.com/testflight/v2/'
+        'https://appstoreconnect.apple.com/testflight/v2/'
       end
 
       ##
