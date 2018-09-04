@@ -377,16 +377,15 @@ end
 
 def expect_correct_implementation_to_be_called(obj, method, os)
   if method == :shellescape
-    # String.shellescape => ...
+    # String.shellescape => CrossplatformShellwords.shellescape => ...
     expect(obj).to receive(:shellescape).and_call_original
+    expect(CrossplatformShellwords).to receive(:shellescape).with(obj).and_call_original
     if os == 'windows'
-      # ... CrossplatformShellwords.shellescape => WindowsShellwords.shellescape
-      expect(CrossplatformShellwords).to receive(:shellescape).with(obj).and_call_original
+      # WindowsShellwords.shellescape
       expect(WindowsShellwords).to receive(:shellescape).with(obj).and_call_original
       expect(Shellwords).not_to(receive(:escape))
     else
-      # ... CrossplatformShellwords.shellescape => Shellswords.escape
-      expect(CrossplatformShellwords).to receive(:shellescape).with(obj).and_call_original
+      # Shellswords.escape
       expect(Shellwords).to receive(:escape).with(obj).and_call_original
       expect(WindowsShellwords).not_to(receive(:shellescape))
     end
