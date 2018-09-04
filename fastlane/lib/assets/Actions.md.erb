@@ -3,7 +3,7 @@ This file is auto-generated and will be re-generated every time the docs are upd
 To modify it, go to its source at https://github.com/fastlane/fastlane/blob/master/fastlane/lib/assets/Actions.md.erb
 -->
 
-{!docs/setup-fastlane-header.md!}
+{!docs/includes/setup-fastlane-header.md!}
 
 # fastlane actions
 
