@@ -326,10 +326,10 @@ shelljoin_testcases = [
   },
   # https://github.com/ruby/ruby/blob/ac543abe91d7325ace7254f635f34e71e1faaf2e/test/test_shellwords.rb#L67-L68
   {
-    'it' => '(#4) on array with entry that is funny $$',
+    'it' => '(#4) on array with entry that is `$$`',
     'it_result' => {
-      'windows' => 'no idea',
-      'other'   => 'no idea'
+      'windows' => 'the result includes the process id',
+      'other'   => 'the result includes the process id'
     },
     'input' => ['ps', '-p', $$],
     'expect' => {
