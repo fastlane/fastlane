@@ -202,6 +202,11 @@ module Scan
         return
       end
 
+      # Do not set destination by default for build_for_testing
+      if Scan.config[:build_for_testing]
+        return
+      end
+
       # building up the destination now
       if Scan.devices && Scan.devices.count > 0
         Scan.config[:destination] = Scan.devices.map { |d| "platform=#{d.os_type} Simulator,id=#{d.udid}" }
