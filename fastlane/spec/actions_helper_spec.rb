@@ -42,9 +42,17 @@ describe Fastlane do
         Fastlane::Actions::ArchiveAction.run(nil)
       end
 
-      it "can throws an error if plugin is damaged" do
+      it "throws an error if plugin is damaged" do
         expect(UI).to receive(:user_error!).with("Action 'broken_action' is damaged!", { show_github_issues: true })
         Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/broken_actions")
+      end
+
+      it "throws errors when syntax is incorrect" do
+        content = File.read('./fastlane/spec/fixtures/broken_files/broken_file.rb', encoding: 'utf-8')
+        expect(UI).to receive(:content_error).with(content, '7')
+        expect(UI).to receive(:content_error).with(content, '8')
+        expect(UI).to receive(:user_error!).with("Syntax error in broken_file.rb")
+        Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/broken_files")
       end
     end
 
