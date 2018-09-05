@@ -50,7 +50,7 @@ module Spaceship
     #####################################################
 
     def self.hostname
-      "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/"
+      "https://#{Spaceship::Client.base_url}/WebObjects/iTunesConnect.woa/"
     end
 
     # Shows a team selection for the user in the terminal. This should not be

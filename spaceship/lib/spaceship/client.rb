@@ -89,6 +89,10 @@ module Spaceship
       end
     end
 
+    def self.base_url
+      ENV["ITC_ITUNES_ENDPOINT"] ? "itunesconnect.apple.com" : "appstoreconnect.apple.com"
+    end
+
     # Fetch the general information of the user, is used by various methods across spaceship
     # Sample return value
     # => {"associatedAccounts"=>
