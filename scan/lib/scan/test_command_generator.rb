@@ -127,7 +127,7 @@ module Scan
 
     # Generate destination parameters
     def destination
-      unless Scan.cache[:destination]
+      if !Scan.cache[:destination] && Scan.config[:destination]
         Scan.cache[:destination] = [*Scan.config[:destination]].map { |dst| "-destination '#{dst}'" }.join(' ')
       end
       Scan.cache[:destination]
