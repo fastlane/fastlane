@@ -405,7 +405,7 @@ module Spaceship
 
       # @return (String) An URL to this specific resource. You can enter this URL into your browser
       def url
-        url = "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{application.apple_id}/#{self.platform}/versioninfo/"
+        url = "https://#{Spaceship::Client.base_url}/WebObjects/iTunesConnect.woa/ra/ng/app/#{application.apple_id}/#{self.platform}/versioninfo/"
         url += "deliverable" if self.is_live?
         return url
       end

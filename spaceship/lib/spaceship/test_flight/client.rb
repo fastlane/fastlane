@@ -7,7 +7,7 @@ module Spaceship
       # Spaceship HTTP client for the testflight API.
       #
       # This client is solely responsible for the making HTTP requests and
-      # parsing their responses. Parameters should be either named parameters, or
+      # parsing their responses. Parameters should
       # for large request data bodies, pass in anything that can resond to
       # `to_json`.
       #
@@ -15,7 +15,7 @@ module Spaceship
       # Each request method should make only one request. For more high-level logic, put code in the data models.
 
       def self.hostname
-        'https://appstoreconnect.apple.com/testflight/v2/'
+        "https://#{Spaceship::Client.base_url}/testflight/v2/"
       end
 
       ##
