@@ -508,7 +508,10 @@ module Spaceship
       itc_service_key_path = "/tmp/spaceship_itc_service_key.txt"
       return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
 
-      response = request(:get, "https://olympus.itunes.apple.com/v1/app/config?hostname=appstoreconnect.apple.com")
+      # Fixes issue https://github.com/fastlane/fastlane/issues/13281
+      # Even though we are using https://appstoreconnect.apple.com, the service key needs to still use a
+      # hostname through itunesconnect.apple.com
+      response = request(:get, "https://olympus.itunes.apple.com/v1/app/config?hostname=itunesconnect.apple.com")
       @service_key = response.body["authServiceKey"].to_s
 
       raise "Service key is empty" if @service_key.length == 0
