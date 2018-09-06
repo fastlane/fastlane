@@ -77,7 +77,15 @@ module Fastlane
       private_class_method
 
       def self.test_summary_filenames(derived_data_path)
-        Dir["#{derived_data_path}/**/Logs/Test/*TestSummaries.plist"]
+        files = []
+
+        # Xcode < 10
+        files += Dir["#{derived_data_path}/**/Logs/Test/*TestSummaries.plist"]
+
+        # Xcode 10
+        files += Dir["#{derived_data_path}/**/Logs/Test/*.xcresult/TestSummaries.plist"]
+
+        return files
       end
 
       def self.example_code
