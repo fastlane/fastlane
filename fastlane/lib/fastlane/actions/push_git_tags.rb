@@ -9,7 +9,7 @@ module Fastlane
         ]
 
         if params[:tag]
-          command << "refs/tags/#{params[:tag].shellescape}"
+          command << "refs/tags/#{params[:tag]}"
         else
           command << '--tags'
         end
