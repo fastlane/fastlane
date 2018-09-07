@@ -8,7 +8,7 @@ describe Scan do
 
     describe "xcpretty reporter options generation" do
       it "generates options for the junit tempfile report required by scan" do
-        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "report.html", "/test_output", false)
+        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "report.html", "/test_output", false, nil)
         reporter_options = generator.generate_reporter_options
         temp_junit_report = Scan.cache[:temp_junit_report]
 
@@ -20,7 +20,7 @@ describe Scan do
       end
 
       it "generates options for a custom junit report with default file name" do
-        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "junit", nil, "/test_output", false)
+        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "junit", nil, "/test_output", false, nil)
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
@@ -30,7 +30,7 @@ describe Scan do
       end
 
       it "generates options for a custom junit report with custom file name" do
-        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "junit", "junit.xml", "/test_output", false)
+        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "junit", "junit.xml", "/test_output", false, nil)
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
@@ -40,7 +40,7 @@ describe Scan do
       end
 
       it "generates options for a custom html report with default file name" do
-        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", nil, "/test_output", false)
+        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", nil, "/test_output", false, nil)
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
@@ -50,7 +50,7 @@ describe Scan do
       end
 
       it "generates options for a custom html report with custom file name" do
-        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "custom_report.html", "/test_output", false)
+        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "custom_report.html", "/test_output", false, nil)
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
@@ -60,7 +60,7 @@ describe Scan do
       end
 
       it "generates options for a custom json-compilation-database file with default file name" do
-        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "json-compilation-database", nil, "/test_output", false)
+        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "json-compilation-database", nil, "/test_output", false, nil)
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
@@ -70,7 +70,7 @@ describe Scan do
       end
 
       it "generates options for a custom json-compilation-database file with a custom file name" do
-        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "json-compilation-database", "custom_report.json", "/test_output", false)
+        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "json-compilation-database", "custom_report.json", "/test_output", false, nil)
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
@@ -80,7 +80,7 @@ describe Scan do
       end
 
       it "generates options for a custom json-compilation-database file with a clang naming convention" do
-        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "json-compilation-database", "ignore_custom_name_here.json", "/test_output", true)
+        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "json-compilation-database", "ignore_custom_name_here.json", "/test_output", true, nil)
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
@@ -90,7 +90,7 @@ describe Scan do
       end
 
       it "generates options for a multiple reports with default file names" do
-        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html,junit", nil, "/test_output", true)
+        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html,junit", nil, "/test_output", true, nil)
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
@@ -102,7 +102,7 @@ describe Scan do
       end
 
       it "generates options for a multiple reports with default file names" do
-        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html,junit", "custom_report.html,junit.xml", "/test_output", true)
+        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html,junit", "custom_report.html,junit.xml", "/test_output", true, nil)
         reporter_options = generator.generate_reporter_options
 
         expect(reporter_options).to start_with([
@@ -115,7 +115,7 @@ describe Scan do
 
       context "options passed as arrays" do
         it "generates options for the junit tempfile report required by scan" do
-          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["html"], ["report.html"], "test_output", false)
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["html"], ["report.html"], "test_output", false, nil)
           reporter_options = generator.generate_reporter_options
           temp_junit_report = Scan.cache[:temp_junit_report]
 
@@ -127,7 +127,7 @@ describe Scan do
         end
 
         it "generates options for a custom junit report with default file name" do
-          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["junit"], nil, "/test_output", false)
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["junit"], nil, "/test_output", false, nil)
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
@@ -137,7 +137,7 @@ describe Scan do
         end
 
         it "generates options for a custom junit report with custom file name" do
-          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["junit"], ["junit.xml"], "/test_output", false)
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["junit"], ["junit.xml"], "/test_output", false, nil)
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
@@ -147,7 +147,7 @@ describe Scan do
         end
 
         it "generates options for a custom html report with default file name" do
-          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["html"], nil, "/test_output", false)
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["html"], nil, "/test_output", false, nil)
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
@@ -157,7 +157,7 @@ describe Scan do
         end
 
         it "generates options for a custom html report with custom file name" do
-          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["html"], ["custom_report.html"], "/test_output", false)
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["html"], ["custom_report.html"], "/test_output", false, nil)
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
@@ -167,7 +167,7 @@ describe Scan do
         end
 
         it "generates options for a custom json-compilation-database file with default file name" do
-          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["json-compilation-database"], nil, "/test_output", false)
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["json-compilation-database"], nil, "/test_output", false, nil)
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
@@ -177,7 +177,7 @@ describe Scan do
         end
 
         it "generates options for a custom json-compilation-database file with a custom file name" do
-          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["json-compilation-database"], ["custom_report.json"], "/test_output", false)
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["json-compilation-database"], ["custom_report.json"], "/test_output", false, nil)
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
@@ -187,7 +187,7 @@ describe Scan do
         end
 
         it "generates options for a custom json-compilation-database file with a clang naming convention" do
-          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["json-compilation-database"], ["ignore_custom_name_here.json"], "/test_output", true)
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["json-compilation-database"], ["ignore_custom_name_here.json"], "/test_output", true, nil)
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to include("--report json-compilation-database")
@@ -200,7 +200,7 @@ describe Scan do
         end
 
         it "generates options for a multiple reports with default file names" do
-          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["html", "junit"], nil, "/test_output", true)
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["html", "junit"], nil, "/test_output", true, nil)
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
@@ -212,7 +212,7 @@ describe Scan do
         end
 
         it "generates options for a multiple reports with custom file names" do
-          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["html", "junit"], ["custom_report.html", "junit.xml"], "/test_output", true)
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["html", "junit"], ["custom_report.html", "junit.xml"], "/test_output", true, nil)
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
