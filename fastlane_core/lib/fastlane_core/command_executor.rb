@@ -63,7 +63,8 @@ module FastlaneCore
               UI.command_output(line)
             end
           end
-        rescue => ex
+        rescue FastlaneCore::FastlanePtyError => ex
+          status = ex.exit_status
           # This could happen when the environment is wrong:
           # > invalid byte sequence in US-ASCII (ArgumentError)
           output << ex.to_s
