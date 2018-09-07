@@ -3,6 +3,7 @@ require_relative 'module'
 module Scan
   class XCPrettyReporterOptionsGenerator
     SUPPORTED_REPORT_TYPES = %w(html junit json-compilation-database)
+    SUPPORTED_XCARGS_TYPES = %w(simple test tap knock)
 
     def self.generate_from_scan_config
       self.new(Scan.config[:open_report],
@@ -62,6 +63,17 @@ module Scan
       reporter << "--report junit"
       reporter << "--output '#{Scan.cache[:temp_junit_report]}'"
       return reporter
+    end
+
+    def generate_xcpretty_args
+      xcargs = []
+
+      valid_types = @output_types & SUPPORTED_XCARGS_TYPES
+      valid_types.each do |raw_type|
+        type = raw_type.strip
+        xcargs << "#{type}"
+      end
+      return xcargs
     end
 
     private
