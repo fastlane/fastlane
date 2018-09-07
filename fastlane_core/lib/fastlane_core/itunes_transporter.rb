@@ -60,7 +60,8 @@ module FastlaneCore
             end
           end
         end
-      rescue => ex
+      rescue FastlaneCore::FastlanePtyError => ex
+        exit_status = ex.exit_status
         @errors << ex.to_s
       end
 

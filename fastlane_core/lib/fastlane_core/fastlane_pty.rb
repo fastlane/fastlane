@@ -2,6 +2,15 @@
 # https://github.com/fastlane/fastlane/pull/11384#issuecomment-356084518 and
 # https://github.com/DragonBox/u3d/blob/59e471ad78ac00cb629f479dbe386c5ad2dc5075/lib/u3d_core/command_runner.rb#L88-L96
 module FastlaneCore
+  class FastlanePtyError < StandardError
+    attr_reader :exit_status
+    def initialize(e, exit_status)
+      super(e)
+      set_backtrace(e.backtrace) if e
+      @exit_status = exit_status
+    end
+  end
+
   class FastlanePty
     def self.spawn(command)
       require 'pty'
@@ -31,6 +40,11 @@ module FastlaneCore
         command_stdout.close
         p.value.exitstatus
       end
+    rescue StandardError => e
+      # Wrapping any error in FastlanePtyError to allow
+      # callers to see and use $?.exitstatus that
+      # would usually get returned
+      raise FastlanePtyError.new(e, $?.exitstatus)
     end
   end
 end
