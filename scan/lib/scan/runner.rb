@@ -122,7 +122,7 @@ module Scan
       # We'll have to regenerate from the xcodebuild log, like we did before version 2.34.0.
       UI.message("Generating test results. This may take a while for large projects.")
 
-      reporter_options_generator = XCPrettyReporterOptionsGenerator.new(false, [], [], "", false, [])
+      reporter_options_generator = XCPrettyReporterOptionsGenerator.new(false, [], [], "", false, "")
       reporter_options = reporter_options_generator.generate_reporter_options
       xcpretty_format_options = reporter_options_generator.generate_xcpretty_format_options
       cmd = "cat #{@test_command_generator.xcodebuild_log_path.shellescape} | xcpretty #{reporter_options.join(' ')} #{xcpretty_format_options.join(' ')} &> /dev/null"
