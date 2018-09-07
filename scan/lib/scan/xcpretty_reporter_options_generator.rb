@@ -11,21 +11,21 @@ module Scan
                Scan.config[:output_files] || Scan.config[:custom_report_file_name],
                Scan.config[:output_directory],
                Scan.config[:use_clang_report_name],
-               Scan.config[:xcpretty_args])
+               Scan.config[:xcpretty_format])
     end
 
     # Intialize with values from Scan.config matching these param names
-    def initialize(open_report, output_types, output_files, output_directory, use_clang_report_name, xcpretty_args)
+    def initialize(open_report, output_types, output_files, output_directory, use_clang_report_name, xcpretty_format)
       @open_report = open_report
       @output_types = output_types
       @output_files = output_files
       @output_directory = output_directory
       @use_clang_report_name = use_clang_report_name
-      @xcpretty_args = xcpretty_args
+      @xcpretty_format = xcpretty_format
 
       # might already be an array when passed via fastlane
       @output_types = @output_types.split(',') if @output_types.kind_of?(String)
-      @xcpretty_args = @xcpretty_args.split(',') if @xcpretty_args.kind_of?(String)
+      @xcpretty_format = @xcpretty_format.split(',') if @xcpretty_format.kind_of?(String)
 
       if @output_files.nil?
         @output_files = @output_types.map { |type| "report.#{type}" }
@@ -42,8 +42,8 @@ module Scan
         UI.error("Couldn't find reporter '#{type}', available #{SUPPORTED_REPORT_TYPES.join(', ')}")
       end
 
-      unless @xcpretty_args.nil?
-        (@xcpretty_args - SUPPORTED_XCARGS_TYPES).each do |type|
+      unless @xcpretty_format.nil?
+        (@xcpretty_format - SUPPORTED_XCARGS_TYPES).each do |type|
           UI.error("Couldn't find reporter '#{type}', available #{SUPPORTED_XCARGS_TYPES.join(', ')}")
         end
       end
@@ -74,10 +74,10 @@ module Scan
       return reporter
     end
 
-    def generate_xcpretty_args
+    def generate_xcpretty_format_options
       xcargs = []
-      unless @xcpretty_args.nil?
-        valid_args = @xcpretty_args & SUPPORTED_XCARGS_TYPES
+      unless @xcpretty_format.nil?
+        valid_args = @xcpretty_format & SUPPORTED_XCARGS_TYPES
         valid_args.each do |raw_arg|
           arg = raw_arg.strip
           xcargs << "--#{arg}"

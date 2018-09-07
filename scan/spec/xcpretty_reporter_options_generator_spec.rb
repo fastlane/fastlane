@@ -224,6 +224,44 @@ describe Scan do
         end
       end
 
+      describe "xcpretty format options generation" do
+        it "generates options to use xcpretty's `test` format option" do
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "report.html", "/test_output", false, "test")
+          reporter_options = generator.generate_xcpretty_format_options
+
+          puts(reporter_options)
+          expect(reporter_options).to end_with("--test")
+        end
+
+        it "generates options to use xcpretty's `simple` format option" do
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "report.html", "/test_output", false, "simple")
+          reporter_options = generator.generate_xcpretty_format_options
+
+          expect(reporter_options).to end_with("--simple")
+        end
+
+        it "generates options to use xcpretty's `tap` format option" do
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "report.html", "/test_output", false, "tap")
+          reporter_options = generator.generate_xcpretty_format_options
+
+          expect(reporter_options).to end_with("--tap")
+        end
+
+        it "generates options to use xcpretty's `knock` format option" do
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "report.html", "/test_output", false, "knock")
+          reporter_options = generator.generate_xcpretty_format_options
+
+          expect(reporter_options).to end_with("--knock")
+        end
+
+        it "does not accept an invalid format option" do
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "report.html", "/test_output", false, "invalid")
+          reporter_options = generator.generate_xcpretty_format_options
+
+          expect(reporter_options).to be_empty
+        end
+      end
+
       context "generator created from Scan.config" do
         it "generates options for a single reports while using custom_report_file_name" do
           options = {
