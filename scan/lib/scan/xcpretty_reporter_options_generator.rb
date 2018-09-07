@@ -10,19 +10,23 @@ module Scan
                Scan.config[:output_types],
                Scan.config[:output_files] || Scan.config[:custom_report_file_name],
                Scan.config[:output_directory],
-               Scan.config[:use_clang_report_name])
+               Scan.config[:use_clang_report_name],
+               Scan.config[:xcpretty_args]
+             )
     end
 
     # Intialize with values from Scan.config matching these param names
-    def initialize(open_report, output_types, output_files, output_directory, use_clang_report_name)
+    def initialize(open_report, output_types, output_files, output_directory, use_clang_report_name, xcpretty_args)
       @open_report = open_report
       @output_types = output_types
       @output_files = output_files
       @output_directory = output_directory
       @use_clang_report_name = use_clang_report_name
+      @xcpretty_args = xcpretty_args
 
       # might already be an array when passed via fastlane
       @output_types = @output_types.split(',') if @output_types.kind_of?(String)
+      @xcpretty_args = @xcpretty_args.split(',') if @xcpretty_args.kind_of?(String)
 
       if @output_files.nil?
         @output_files = @output_types.map { |type| "report.#{type}" }
@@ -37,6 +41,10 @@ module Scan
 
       (@output_types - SUPPORTED_REPORT_TYPES).each do |type|
         UI.error("Couldn't find reporter '#{type}', available #{SUPPORTED_REPORT_TYPES.join(', ')}")
+      end
+
+      (@xcpretty_args - SUPPORTED_XCARGS_TYPES).each do |type|
+        UI.error("Couldn't find reporter '#{type}', available #{SUPPORTED_XCARGS_TYPES.join(', ')}")
       end
     end
 
@@ -68,10 +76,10 @@ module Scan
     def generate_xcpretty_args
       xcargs = []
 
-      valid_types = @output_types & SUPPORTED_XCARGS_TYPES
-      valid_types.each do |raw_type|
-        type = raw_type.strip
-        xcargs << "#{type}"
+      valid_args = @xcpretty_args & SUPPORTED_XCARGS_TYPES
+      valid_args.each do |raw_arg|
+        arg = raw_arg.strip
+        xcargs << "--#{arg}"
       end
       return xcargs
     end
