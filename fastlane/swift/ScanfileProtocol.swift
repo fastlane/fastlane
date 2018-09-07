@@ -4,6 +4,7 @@ protocol ScanfileProtocol: class {
   var device: String? { get }
   var toolchain: String? { get }
   var devices: [String]? { get }
+  var skipDetectDevices: Bool { get }
   var scheme: String? { get }
   var clean: Bool { get }
   var codeCoverage: Bool? { get }
@@ -49,6 +50,7 @@ extension ScanfileProtocol {
   var device: String? { return nil }
   var toolchain: String? { return nil }
   var devices: [String]? { return nil }
+  var skipDetectDevices: Bool { return false }
   var scheme: String? { return nil }
   var clean: Bool { return false }
   var codeCoverage: Bool? { return nil }
@@ -90,4 +92,4 @@ extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.3]
+// FastlaneRunnerAPIVersion [0.9.4]
