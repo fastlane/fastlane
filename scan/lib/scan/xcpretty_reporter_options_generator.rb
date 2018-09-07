@@ -11,8 +11,7 @@ module Scan
                Scan.config[:output_files] || Scan.config[:custom_report_file_name],
                Scan.config[:output_directory],
                Scan.config[:use_clang_report_name],
-               Scan.config[:xcpretty_args]
-             )
+               Scan.config[:xcpretty_args])
     end
 
     # Intialize with values from Scan.config matching these param names
