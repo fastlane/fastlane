@@ -279,14 +279,20 @@ module FastlaneCore
     end
 
     # Zips directory
-    def self.zip_directory(path, output_path, contents_only: false, print: true)
+    def self.zip_directory(path, output_path, contents_only: false, overwrite: false, print: true)
+      if overwrite
+        overwrite_command = " && rm -f '#{output_path}'"
+      else
+        overwrite_command = ""
+      end
+
       if contents_only
-        command = "cd '#{path}' && zip -r '#{output_path}' *"
+        command = "cd '#{path}'#{overwrite_command} && zip -r '#{output_path}' *"
       else
         containing_path = File.expand_path("..", path)
         contents_path = File.basename(path)
 
-        command = "cd '#{containing_path}' && zip -r '#{output_path}' '#{contents_path}'"
+        command = "cd '#{containing_path}'#{overwrite_command} && zip -r '#{output_path}' '#{contents_path}'"
       end
 
       UI.command(command) unless print
