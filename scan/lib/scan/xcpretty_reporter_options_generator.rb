@@ -43,8 +43,10 @@ module Scan
         UI.error("Couldn't find reporter '#{type}', available #{SUPPORTED_REPORT_TYPES.join(', ')}")
       end
 
-      (@xcpretty_args - SUPPORTED_XCARGS_TYPES).each do |type|
-        UI.error("Couldn't find reporter '#{type}', available #{SUPPORTED_XCARGS_TYPES.join(', ')}")
+      unless @xcpretty_args.nil?
+        (@xcpretty_args - SUPPORTED_XCARGS_TYPES).each do |type|
+          UI.error("Couldn't find reporter '#{type}', available #{SUPPORTED_XCARGS_TYPES.join(', ')}")
+        end
       end
     end
 
@@ -75,11 +77,12 @@ module Scan
 
     def generate_xcpretty_args
       xcargs = []
-
-      valid_args = @xcpretty_args & SUPPORTED_XCARGS_TYPES
-      valid_args.each do |raw_arg|
-        arg = raw_arg.strip
-        xcargs << "--#{arg}"
+      unless @xcpretty_args.nil?
+        valid_args = @xcpretty_args & SUPPORTED_XCARGS_TYPES
+        valid_args.each do |raw_arg|
+          arg = raw_arg.strip
+          xcargs << "--#{arg}"
+        end
       end
       return xcargs
     end
