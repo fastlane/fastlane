@@ -316,5 +316,24 @@ describe FastlaneCore do
         end
       end
     end
+
+    describe "with simulated no-test environment" do
+      before(:each) do
+        allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
+        @transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+      end
+
+      describe "and faked command execution" do
+        it 'handles successful execution with no errors' do
+          expect(FastlaneCore::FastlanePty).to receive(:spawn).and_return(0)
+          expect(@transporter.upload('my.app.id', '/tmp')).to eq(true)
+        end
+
+        it 'handles exceptions' do
+          expect(FastlaneCore::FastlanePty).to receive(:spawn).and_raise(StandardError, "It's all broken now.")
+          expect(@transporter.upload('my.app.id', '/tmp')).to eq(false)
+        end
+      end
+    end
   end
 end
