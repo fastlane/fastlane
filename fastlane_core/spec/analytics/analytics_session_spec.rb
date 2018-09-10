@@ -1,5 +1,5 @@
 describe FastlaneCore::AnalyticsSession do
-  let(:configuration_language) { 'ruby' }
+  let(:fastlane_client_language) { :ruby }
   let(:p_hash) { 'some.phash.value' }
   let(:session_id) { 's0m3s3ss10n1D' }
 
@@ -18,7 +18,7 @@ describe FastlaneCore::AnalyticsSession do
           action_name: action_name,
           p_hash: p_hash,
           platform: 'ios',
-          configuration_language: configuration_language
+          fastlane_client_language: fastlane_client_language
         )
       end
 
@@ -30,7 +30,7 @@ describe FastlaneCore::AnalyticsSession do
         session = FastlaneCore::AnalyticsSession.new(analytics_ingester_client: client)
         expect(client).to receive(:post_event).with({
             client_id: p_hash,
-            category: :undefined,
+            category: :ruby,
             action: :launch,
             label: nil,
             value: nil
