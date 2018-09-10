@@ -26,7 +26,7 @@ describe FastlaneCore::AnalyticsEventBuilder do
       expect(event).to eq(
         {
           client_id: p_hash,
-          category: :ruby,
+          category: 'fastlane Client Langauge - ruby',
           action: :launch,
           label: action_name,
           value: nil
@@ -39,7 +39,7 @@ describe FastlaneCore::AnalyticsEventBuilder do
       expect(event).to eq(
         {
           client_id: p_hash,
-          category: :ruby,
+          category: 'fastlane Client Langauge - ruby',
           action: :launch,
           label: action_name,
           value: nil
@@ -52,7 +52,7 @@ describe FastlaneCore::AnalyticsEventBuilder do
       expect(event).to eq(
         {
           client_id: p_hash,
-          category: :swift,
+          category: 'fastlane Client Langauge - swift',
           action: :launch,
           label: action_name,
           value: nil
