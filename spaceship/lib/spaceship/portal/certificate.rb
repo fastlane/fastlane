@@ -137,7 +137,7 @@ module Spaceship
 
       # ApplePay certificate
       class ApplePay < Certificate; end
-      
+
       # ApplePayMerchantIdentity certificate
       class ApplePayMerchantIdentity < Certificate; end
 
