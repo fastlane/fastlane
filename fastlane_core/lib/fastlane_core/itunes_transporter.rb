@@ -61,6 +61,8 @@ module FastlaneCore
           end
         end
       rescue => ex
+        # FastlanePty adds exit_status on to StandardError so every error will have a status code
+        exit_status = ex.exit_status
         @errors << ex.to_s
       end
 

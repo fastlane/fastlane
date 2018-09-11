@@ -61,6 +61,11 @@ module Scan
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'device' and 'devices' options in one run")
                                      end),
+        FastlaneCore::ConfigItem.new(key: :skip_detect_devices,
+                                     description: "Should skip auto detecting of devices if none were specified",
+                                     default_value: false,
+                                     type: Boolean,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",
                                      optional: true,

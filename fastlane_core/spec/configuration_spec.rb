@@ -235,9 +235,10 @@ describe FastlaneCore do
                                                      description: 'xcargs',
                                                      type: :shell_string)
 
-          value = config_item.auto_convert_value(['a b', 'c d', :e])
+          array = ['a b', 'c d', :e]
+          value = config_item.auto_convert_value(array)
 
-          expect(value).to eq('a\\ b c\\ d e')
+          expect(value).to eq(array.shelljoin)
         end
 
         it "auto converts Hash values to Strings if allowed" do
@@ -245,9 +246,12 @@ describe FastlaneCore do
                                                      description: 'xcargs',
                                                      type: :shell_string)
 
-          value = config_item.auto_convert_value({ 'FOO BAR' => 'I\'m foo bar', :BAZ => 'And I\'m baz' })
+          hash = { 'FOO BAR' => 'I\'m foo bar', :BAZ => 'And I\'m baz' }
+          value = config_item.auto_convert_value(hash)
 
-          expect(value).to eq('FOO\\ BAR=I\\\'m\\ foo\\ bar BAZ=And\\ I\\\'m\\ baz')
+          expected = 'FOO\\ BAR=I\\\'m\\ foo\\ bar BAZ=And\\ I\\\'m\\ baz'
+          expected = "\"FOO BAR\"=\"I'm foo bar\" BAZ=\"And I'm baz\"" if FastlaneCore::Helper.windows?
+          expect(value).to eq(expected)
         end
 
         it "does not auto convert Array values to Strings if not allowed" do
