@@ -68,7 +68,9 @@ module Commander
           FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_RELEASE}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
         end
 
-        action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(@program[:name], args: ARGV)
+        is_swift = FastlaneCore::FastlaneFolder.swift?
+        fastlane_client_language = is_swift ? :swift : :ruby
+        action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(@program[:name], fastlane_client_language: fastlane_client_language, args: ARGV)
         FastlaneCore.session.action_launched(launch_context: action_launch_context)
 
         return_value = run_active_command

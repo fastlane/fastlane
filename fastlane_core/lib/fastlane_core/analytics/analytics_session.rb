@@ -31,7 +31,8 @@ module FastlaneCore
       builder = AnalyticsEventBuilder.new(
         p_hash: launch_context.p_hash,
         session_id: session_id,
-        action_name: nil
+        action_name: nil,
+        fastlane_client_language: launch_context.fastlane_client_language
       )
 
       launch_event = builder.new_event(:launch)
