@@ -52,12 +52,34 @@ module Fastlane
         UI.message(message.join(" "))
 
         app.tunes_all_build_trains(platform: platform).each do |train|
+          # We try to check first with version_string, but also we try to check with display_version_string since
+          # this value could be different.
+          #
+          # Example:
+          # - App Store version set as 1.0 and app version set as 1.0.0;
+          #
+          # In that case, the response from API will be "versionString = 1.0" and "displayVersionString = 1.0.0"
           UI.verbose("Found train: #{train.version_string}, comparing to supplied version: #{version}")
-          if version && version != train.version_string
+          if version && train.version_string == train.display_version_string && version != train.version_string
             UI.verbose("Version #{version} doesn't match: #{train.version_string}")
             next
+          else
+            UI.verbose("Version #{version} doesn't match: #{train.version_string}")
+            UI.verbose("Found train: #{train.display_version_string}, comparing to supplied version: #{train.display_version_string}")
+            if version && version != train.display_version_string
+              UI.verbose("Version #{version} doesn't match: #{train.display_version_string}")
+              next
+            end
           end
+
           app.tunes_all_builds_for_train(train: train.version_string, platform: platform).each do |build|
+            # This probably is not necessary, but as we have that situation mentioned above, better check for safety.
+            UI.verbose("Comparing train version #{build.train_version} to supplied version #{version}")
+            if version && version != build.train_version
+              UI.verbose("Train version #{build.train_version} doesn't match with supplied version: #{version}")
+              next
+            end
+
             UI.verbose("Found build version: #{build.build_version}, comparing to supplied build_number: #{build_number}")
             if build_number && build.build_version != build_number
               UI.verbose("build_version: #{build.build_version} doesn't match: #{build_number}")

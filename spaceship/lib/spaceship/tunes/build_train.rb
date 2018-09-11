@@ -20,6 +20,9 @@ module Spaceship
       # @return (String) The version number of this train
       attr_reader :version_string
 
+      # @return (String) The display version number of this train
+      attr_reader :display_version_string
+
       # @return (String) Platform (e.g. "ios")
       attr_reader :platform
 
@@ -40,6 +43,7 @@ module Spaceship
       attr_mapping(
         'application' => 'application',
         'versionString' => :version_string,
+        'displayVersionString' => :display_version_string,
         'platform' => :platform,
         'externalTesting.value' => :external_testing_enabled,
         'internalTesting.value' => :internal_testing_enabled
