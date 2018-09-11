@@ -64,8 +64,7 @@ module Fastlane
             UI.verbose("Version #{version} doesn't match: #{train.version_string}")
             next
           else
-            UI.verbose("Version #{version} doesn't match: #{train.version_string}")
-            UI.verbose("Found train: #{train.display_version_string}, comparing to supplied version: #{train.display_version_string}")
+            UI.verbose("Failed. Comparing to display_version_string: #{train.display_version_string}")
             if version && version != train.display_version_string
               UI.verbose("Version #{version} doesn't match: #{train.display_version_string}")
               next
@@ -73,7 +72,7 @@ module Fastlane
           end
 
           app.tunes_all_builds_for_train(train: train.version_string, platform: platform).each do |build|
-            # This probably is not necessary, but as we have that situation mentioned above, better check for safety.
+            # This is probably not necessary, but as we have the situation mentioned above, better check for safety.
             UI.verbose("Comparing train version #{build.train_version} to supplied version #{version}")
             if version && version != build.train_version
               UI.verbose("Train version #{build.train_version} doesn't match with supplied version: #{version}")
