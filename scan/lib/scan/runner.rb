@@ -124,8 +124,8 @@ module Scan
 
       reporter_options_generator = XCPrettyReporterOptionsGenerator.new(false, [], [], "", false, "")
       reporter_options = reporter_options_generator.generate_reporter_options
-      xcpretty_format_options = reporter_options_generator.generate_xcpretty_format_options
-      cmd = "cat #{@test_command_generator.xcodebuild_log_path.shellescape} | xcpretty #{reporter_options.join(' ')} #{xcpretty_format_options.join(' ')} &> /dev/null"
+      xcpretty_args_options = reporter_options_generator.generate_xcpretty_args_options
+      cmd = "cat #{@test_command_generator.xcodebuild_log_path.shellescape} | xcpretty #{reporter_options.join(' ')} #{xcpretty_args_options.join(' ')} &> /dev/null"
       system(cmd)
       File.read(Scan.cache[:temp_junit_report])
     end

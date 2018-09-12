@@ -227,7 +227,7 @@ describe Scan do
       describe "xcpretty format options generation" do
         it "generates options to use xcpretty's `test` format option" do
           generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "report.html", "/test_output", false, "test")
-          reporter_options = generator.generate_xcpretty_format_options
+          reporter_options = generator.generate_xcpretty_args_options
 
           puts(reporter_options)
           expect(reporter_options).to end_with("--test")
@@ -235,28 +235,28 @@ describe Scan do
 
         it "generates options to use xcpretty's `simple` format option" do
           generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "report.html", "/test_output", false, "simple")
-          reporter_options = generator.generate_xcpretty_format_options
+          reporter_options = generator.generate_xcpretty_args_options
 
           expect(reporter_options).to end_with("--simple")
         end
 
         it "generates options to use xcpretty's `tap` format option" do
           generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "report.html", "/test_output", false, "tap")
-          reporter_options = generator.generate_xcpretty_format_options
+          reporter_options = generator.generate_xcpretty_args_options
 
           expect(reporter_options).to end_with("--tap")
         end
 
         it "generates options to use xcpretty's `knock` format option" do
           generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "report.html", "/test_output", false, "knock")
-          reporter_options = generator.generate_xcpretty_format_options
+          reporter_options = generator.generate_xcpretty_args_options
 
           expect(reporter_options).to end_with("--knock")
         end
 
         it "does not accept an invalid format option" do
           generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "report.html", "/test_output", false, "invalid")
-          reporter_options = generator.generate_xcpretty_format_options
+          reporter_options = generator.generate_xcpretty_args_options
 
           expect(reporter_options).to be_empty
         end
