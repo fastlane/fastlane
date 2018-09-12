@@ -229,7 +229,6 @@ describe Scan do
           generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "report.html", "/test_output", false, "test")
           reporter_options = generator.generate_xcpretty_args_options
 
-          puts(reporter_options)
           expect(reporter_options).to end_with("--test")
         end
 
