@@ -164,7 +164,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :distribution_name,
                                        optional: true,
                                        is_string: true,
-                                       default_value: false,
                                        env_name: "DEPLOYGATE_DISTRIBUTION_NAME",
                                        description: "Target Distribution Name")
         ]
