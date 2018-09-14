@@ -102,6 +102,7 @@ module Spaceship
       # rubocop:enable Layout/ExtraSpacing
       {
         watch:        "MZPFT.SortedN27ScreenShot",
+        watchSeries4: "MZPFT.SortedN131ScreenShot",
         ipad:         "MZPFT.SortedTabletScreenShot",
         ipadPro:      "MZPFT.SortedJ99ScreenShot",
         ipad105:      "MZPFT.SortedJ207ScreenShot",
@@ -134,6 +135,7 @@ module Spaceship
       # rubocop:enable Layout/ExtraSpacing
       {
         watch:        [[312, 390]],
+        watchSeries4: [[368, 448]],
         ipad:         [[1024, 748], [1024, 768], [2048, 1496], [2048, 1536], [768, 1004], [768, 1024], [1536, 2008], [1536, 2048]],
         ipadPro:      [[2048, 2732], [2732, 2048]],
         ipad105:      [[1668, 2224], [2224, 1668]],
