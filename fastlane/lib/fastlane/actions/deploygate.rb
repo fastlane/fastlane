@@ -45,7 +45,7 @@ module Fastlane
         user_name = options[:user]
         binary = options[:ipa] || options[:apk]
         upload_options = options.values.select do |key, _|
-          [:message, :distribution_key, :release_note, :disable_notify].include?(key)
+          [:message, :distribution_key, :release_note, :disable_notify, :distribution_name].include?(key)
         end
 
         UI.user_error!('missing `ipa` and `apk`. deploygate action needs least one.') unless binary
@@ -160,7 +160,13 @@ module Fastlane
                                        is_string: false,
                                        default_value: false,
                                        env_name: "DEPLOYGATE_DISABLE_NOTIFY",
-                                       description: "Disables Push notification emails")
+                                       description: "Disables Push notification emails"),
+          FastlaneCore::ConfigItem.new(key: :distribution_name,
+                                       optional: true,
+                                       is_string: true,
+                                       default_value: false,
+                                       env_name: "DEPLOYGATE_DISTRIBUTION_NAME",
+                                       description: "Target Distribution Name")
         ]
       end
 
@@ -179,14 +185,16 @@ module Fastlane
             user: "target username or organization name",
             ipa: "./ipa_file.ipa",
             message: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
-            distribution_key: "(Optional) Target Distribution Key"
+            distribution_key: "(Optional) Target Distribution Key",
+            distribution_name: "(Optional) Target Distribution Name"
           )',
           'deploygate(
             api_token: "...",
             user: "target username or organization name",
             apk: "./apk_file.apk",
             message: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
-            distribution_key: "(Optional) Target Distribution Key"
+            distribution_key: "(Optional) Target Distribution Key",
+            distribution_name: "(Optional) Target Distribution Name"
           )'
         ]
       end
