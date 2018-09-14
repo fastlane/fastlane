@@ -193,22 +193,34 @@ module FastlaneCore
 
     # @return the full path to the iTMSTransporter executable
     def self.transporter_path
-      return File.join(self.itms_path, 'bin', 'iTMSTransporter')
+      return File.join(self.itms_path, 'bin', 'iTMSTransporter') unless Helper.windows?
+      return File.join(self.itms_path, 'iTMSTransporter')
     end
 
     # @return the full path to the iTMSTransporter executable
     def self.itms_path
       return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
-      return '' unless self.mac? # so tests work on Linux and Windows too
 
-      [
-        "../Applications/Application Loader.app/Contents/MacOS/itms",
-        "../Applications/Application Loader.app/Contents/itms"
-      ].each do |path|
-        result = File.expand_path(File.join(self.xcode_path, path))
-        return result if File.exist?(result)
+      if self.mac?
+        [
+          "../Applications/Application Loader.app/Contents/MacOS/itms",
+          "../Applications/Application Loader.app/Contents/itms"
+        ].each do |path|
+          result = File.expand_path(File.join(self.xcode_path, path))
+          return result if File.exist?(result)
+        end
+        UI.user_error!("Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.")
+      elsif self.windows?
+        [
+          "C:/Program Files (x86)/itms"
+        ].each do |path|
+          return path if File.exist?(path)
+        end
+        UI.user_error!("Could not find transporter at usual locations. Please use environment variable `FASTLANE_ITUNES_TRANSPORTER_PATH` to specify your installation path.")
+      else
+        # not Mac or Windows
+        return ''
       end
-      UI.user_error!("Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.")
     end
 
     # keychain
@@ -267,14 +279,20 @@ module FastlaneCore
     end
 
     # Zips directory
-    def self.zip_directory(path, output_path, contents_only: false, print: true)
+    def self.zip_directory(path, output_path, contents_only: false, overwrite: false, print: true)
+      if overwrite
+        overwrite_command = " && rm -f '#{output_path}'"
+      else
+        overwrite_command = ""
+      end
+
       if contents_only
-        command = "cd '#{path}' && zip -r '#{output_path}' *"
+        command = "cd '#{path}'#{overwrite_command} && zip -r '#{output_path}' *"
       else
         containing_path = File.expand_path("..", path)
         contents_path = File.basename(path)
 
-        command = "cd '#{containing_path}' && zip -r '#{output_path}' '#{contents_path}'"
+        command = "cd '#{containing_path}'#{overwrite_command} && zip -r '#{output_path}' '#{contents_path}'"
       end
 
       UI.command(command) unless print

@@ -55,24 +55,20 @@ module FastlaneCore
       end
 
       begin
-        FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
+        exit_status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
           begin
             command_stdout.each do |line|
               @all_lines << line
               parse_line(line, hide_output) # this is where the parsing happens
             end
-          rescue Errno::EIO
-            # Exception ignored intentionally.
-            # https://stackoverflow.com/questions/10238298/ruby-on-linux-pty-goes-away-without-eof-raises-errnoeio
-          ensure
-            Process.wait(pid)
           end
         end
       rescue => ex
+        # FastlanePty adds exit_status on to StandardError so every error will have a status code
+        exit_status = ex.exit_status
         @errors << ex.to_s
       end
 
-      exit_status = $?.exitstatus
       unless exit_status.zero?
         @errors << "The call to the iTMSTransporter completed with a non-zero exit status: #{exit_status}. This indicates a failure."
       end
@@ -169,10 +165,11 @@ module FastlaneCore
         "-m upload",
         "-u \"#{username}\"",
         "-p #{shell_escaped_password(password)}",
-        "-f '#{source}'",
+        "-f \"#{source}\"",
         ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
-        "-t 'Signiant'",
+        "-t Signiant",
         "-k 100000",
+        ("-WONoPause true" if Helper.windows?), # Windows only: process instantly returns instead of waiting for key press
         ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?)
       ].compact.join(' ')
     end
@@ -200,13 +197,16 @@ module FastlaneCore
 
     def handle_error(password)
       # rubocop:disable Style/CaseEquality
-      unless password === /^[0-9a-zA-Z\.\$\_]*$/
+      # rubocop:disable Style/YodaCondition
+      unless /^[0-9a-zA-Z\.\$\_\-]*$/ === password
         UI.error([
           "Password contains special characters, which may not be handled properly by iTMSTransporter.",
           "If you experience problems uploading to App Store Connect, please consider changing your password to something with only alphanumeric characters."
         ].join(' '))
       end
       # rubocop:enable Style/CaseEquality
+      # rubocop:enable Style/YodaCondition
+
       UI.error("Could not download/upload from App Store Connect! It's probably related to your password or your internet connection.")
     end
 
@@ -223,8 +223,11 @@ module FastlaneCore
         "'\"\\'\"'"
       end
 
-      # wrap the fully-escaped password in single quotes, since the transporter expects a escaped password string (which must be single-quoted for the shell's benefit)
-      "'" + password + "'"
+      # wrap the fully-escaped password in single quotes, since the transporter expects a escaped password string
+      # (which must be single-quoted for the shell's benefit [on non-Windows platforms])
+      password = "'" + password + "'" unless Helper.windows?
+
+      password
     end
   end
 
@@ -347,8 +350,9 @@ module FastlaneCore
     #                            short names
     def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil)
       # Xcode 6.x doesn't have the same iTMSTransporter Java setup as later Xcode versions, so
-      # we can't default to using the better direct Java invocation strategy for those versions.
-      use_shell_script ||= Helper.xcode_version.start_with?('6.')
+      # we can't default to using the newer direct Java invocation strategy for those versions.
+      use_shell_script ||= Helper.is_mac? && Helper.xcode_version.start_with?('6.')
+      use_shell_script ||= Helper.windows?
       use_shell_script ||= Feature.enabled?('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT')
 
       @user = user
@@ -467,8 +471,11 @@ module FastlaneCore
     def handle_two_step_failure(ex)
       if ENV[TWO_FACTOR_ENV_VARIABLE].to_s.length > 0
         # Password provided, however we already used it
-        UI.error("Application specific password you provided using #{TWO_FACTOR_ENV_VARIABLE}")
+        UI.error("")
+        UI.error("Application specific password you provided using")
+        UI.error("environment variable #{TWO_FACTOR_ENV_VARIABLE}")
         UI.error("is invalid, please make sure it's correct")
+        UI.error("")
         UI.user_error!("Invalid application specific password provided")
       end
 
@@ -481,10 +488,12 @@ module FastlaneCore
         UI.error("Please make sure to follow the instructions")
         a.remove_from_keychain
       end
+      UI.error("")
       UI.error("Your account has 2 step verification enabled")
       UI.error("Please go to https://appleid.apple.com/account/manage")
       UI.error("and generate an application specific password for")
       UI.error("the iTunes Transporter, which is used to upload builds")
+      UI.error("")
       UI.error("To set the application specific password on a CI machine using")
       UI.error("an environment variable, you can set the")
       UI.error("#{TWO_FACTOR_ENV_VARIABLE} variable")

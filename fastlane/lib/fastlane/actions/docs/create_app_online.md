@@ -22,6 +22,8 @@ _produce_ creates new iOS apps on both the Apple Developer Portal and App Store 
 - **Modify** Application Services on the Apple Developer Portal
 - **Create** App Groups on the Apple Developer Portal
 - **Associate** apps with App Groups on the Apple Developer Portal
+- **Create** iCloud Containers on the Apple Developer Portal
+- **Associate** apps with iCloud Containers on the Apple Developer Portal
 - **Create** Merchant Identifiers on the Apple Developer Portal
 - **Associate** apps with Merchant Identifiers on the Apple Developer Portal
 - Support for **multiple Apple accounts**, storing your credentials securely in the Keychain
@@ -48,6 +50,7 @@ Commands: (* default)
   disable_services     Disable specific Application Services for a specific app on the Apple Developer Portal
   enable_services      Enable specific Application Services for a specific app on the Apple Developer Portal
   group                Ensure that a specific App Group exists
+  cloud_container      Ensure that a specific iCloud Container exists
   help                 Display global or [command] help documentation
   merchant             Ensure that a specific Merchant exists
 
@@ -99,6 +102,24 @@ If you want to associate an app with an App Group:
 
 ```no-highlight
 fastlane produce associate_group -a com.krausefx.app group.krausefx
+```
+
+If you want to create a new iCloud Container:
+
+```no-highlight
+fastlane produce cloud_container -ci iCloud.com.krausefx.app -n "Example iCloud Container"
+```
+
+If you want to associate an app with an iCloud Container:
+
+```no-highlight
+fastlane produce associate_cloud_container -a com.krausefx.app iCloud.com.krausefx.app
+```
+
+If you want to associate an app with multiple iCloud Containers:
+
+```no-highlight
+fastlane produce associate_cloud_container -a com.krausefx.app iCloud.com.krausefx.app1 iCloud.com.krausefx.app2
 ```
 
 # Parameters

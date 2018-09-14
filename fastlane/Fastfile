@@ -47,6 +47,32 @@ lane :lint_source do
   end
 end
 
+desc "Measure the execution time of the --help command"
+lane :benchmark_help_command do
+  Dir.chdir("..") do
+    # install gnomon if not installed yet
+    Actions.sh("echo foo | gnomon", log: true, error_callback: lambda { |result|
+      if Helper.windows? || Helper.mac?
+        sh('npm install -g gnomon')
+      else
+        # install npm if not installed yet
+        Actions.sh("echo foo | npm", log: true, error_callback: lambda { |result2|
+          sh('curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -')
+          sh('sudo apt-get install -y nodejs')
+        })
+        sh('sudo npm install -g gnomon')
+      end
+    })
+    cmd = Helper.windows? ? "cd bin && fastlane --help | gnomon" : "bin/fastlane --help | gnomon"
+    3.times do
+      content = sh(cmd, log: false)
+      content.each_line do |line|
+        UI.message("🏎️ '#{line.strip}'") if ["Total", "real", "user", "sys"].any? { |word| line.include?(word) }
+      end
+    end
+  end
+end
+
 desc "Runs the tests"
 lane :execute_tests do
   version = local_version # has to be outside of the `Dir.chdir`
@@ -59,6 +85,8 @@ lane :execute_tests do
       UI.user_error!("--help missing information: '#{current}'") unless content.include?(current)
     end
   end
+
+  benchmark_help_command
 
   Dir.chdir("..") do
     # Install the bundle and the actual gem

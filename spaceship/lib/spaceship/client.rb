@@ -50,6 +50,7 @@ module Spaceship
     UnexpectedResponse = Spaceship::UnexpectedResponse
     AppleTimeoutError = Spaceship::AppleTimeoutError
     UnauthorizedAccessError = Spaceship::UnauthorizedAccessError
+    GatewayTimeoutError = Spaceship::GatewayTimeoutError
     InternalServerError = Spaceship::InternalServerError
 
     # Authenticates with Apple's web services. This method has to be called once
@@ -469,7 +470,7 @@ module Spaceship
         elsif response.status == 412 && AUTH_TYPES.include?(response.body["authType"])
           # Need to acknowledge Apple ID and Privacy statement - https://github.com/fastlane/fastlane/issues/12577
           # Looking for status of 412 might be enough but might be safer to keep looking only at what is being reported
-          raise AppleIDAndPrivacyAcknowledgementNeeded.new, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://itunesconnect.apple.com) to acknowledge the statement."
+          raise AppleIDAndPrivacyAcknowledgementNeeded.new, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement."
         elsif (response['Set-Cookie'] || "").include?("itctx")
           raise "Looks like your Apple ID is not enabled for App Store Connect, make sure to be able to login online"
         else
@@ -507,6 +508,9 @@ module Spaceship
       itc_service_key_path = "/tmp/spaceship_itc_service_key.txt"
       return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
 
+      # Fixes issue https://github.com/fastlane/fastlane/issues/13281
+      # Even though we are using https://appstoreconnect.apple.com, the service key needs to still use a
+      # hostname through itunesconnect.apple.com
       response = request(:get, "https://olympus.itunes.apple.com/v1/app/config?hostname=itunesconnect.apple.com")
       @service_key = response.body["authServiceKey"].to_s
 
@@ -532,6 +536,7 @@ module Spaceship
         Faraday::Error::TimeoutError,
         Faraday::ParsingError, # <h2>Internal Server Error</h2> with content type json
         AppleTimeoutError,
+        GatewayTimeoutError,
         InternalServerError => ex # New Faraday version: Faraday::TimeoutError => ex
       tries -= 1
       unless tries.zero?
@@ -628,6 +633,8 @@ module Spaceship
         raise_insuffient_permission_error!(caller_location: 3)
       elsif body.to_s.include?("Internal Server Error - Read")
         raise InternalServerError, "Received an internal server error from App Store Connect / Developer Portal, please try again later"
+      elsif body.to_s.include?("Gateway Timeout - In read")
+        raise GatewayTimeoutError, "Received a gateway timeout error from App Store Connect / Developer Portal, please try again later"
       elsif (body["resultString"] || "").include?("Program License Agreement")
         raise ProgramLicenseAgreementUpdated, "#{body['userString']} Please manually log into your Apple Developer account to review and accept the updated agreement."
       end

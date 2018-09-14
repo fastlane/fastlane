@@ -70,6 +70,11 @@ module Spaceship
         Spaceship::Portal::AppService
       end
 
+      # @return (Class) Access the iCloud Containers for the spaceship
+      def cloud_container
+        Spaceship::Portal::CloudContainer.set_client(@client)
+      end
+
       # @return (Class) Access the devices for the spaceship
       def device
         Spaceship::Portal::Device.set_client(@client)
@@ -120,6 +125,10 @@ module Spaceship
 
     def app_service
       Spaceship::Portal.app_service
+    end
+
+    def cloud_container
+      Spaceship::Portal.cloud_container
     end
 
     def device
