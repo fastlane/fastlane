@@ -59,6 +59,8 @@ module Frameit
       if !Frameit.config[:use_legacy_iphone6s] && @color == Frameit::Color::BLACK
         if @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_47
           return "Matte Black" # RIP space gray
+        elsif @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_61
+          return "Black"
         end
       end
       return @color
