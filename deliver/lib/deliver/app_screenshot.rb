@@ -15,8 +15,12 @@ module Deliver
       IOS_47 = "iOS-4.7-in"
       # iPhone 6 Plus
       IOS_55 = "iOS-5.5-in"
-      # iPhone X
+      # iPhone XS
       IOS_58 = "iOS-5.8-in"
+      # iPhone XR
+      IOS_61 = "iOS-6.1-in"
+      # iPhone XS Max
+      IOS_65 = "iOS-6.5-in"
       # iPad
       IOS_IPAD = "iOS-iPad"
       # iPad 10.5
@@ -29,8 +33,12 @@ module Deliver
       IOS_47_MESSAGES = "iOS-4.7-in-messages"
       # iPhone 6 Plus iMessage
       IOS_55_MESSAGES = "iOS-5.5-in-messages"
-      # iPhone X iMessage
+      # iPhone XS iMessage
       IOS_58_MESSAGES = "iOS-5.8-in-messages"
+      # iPhone XR iMessage
+      IOS_61_MESSAGES = "iOS-6.1-in-messages"
+      # iPhone XS Max iMessage
+      IOS_65_MESSAGES = "iOS-6.5-in-messages"
       # iPad iMessage
       IOS_IPAD_MESSAGES = "iOS-iPad-messages"
       # iPad 10.5 iMessage
@@ -75,6 +83,8 @@ module Deliver
         ScreenSize::IOS_47 => "iphone6",
         ScreenSize::IOS_55 => "iphone6Plus",
         ScreenSize::IOS_58 => "iphone58",
+        ScreenSize::IOS_61 => "iphone61",
+        ScreenSize::IOS_65 => "iphone65",
         ScreenSize::IOS_IPAD => "ipad",
         ScreenSize::IOS_IPAD_10_5 => "ipad105",
         ScreenSize::IOS_IPAD_PRO => "ipadPro",
@@ -82,6 +92,7 @@ module Deliver
         ScreenSize::IOS_47_MESSAGES => "iphone6",
         ScreenSize::IOS_55_MESSAGES => "iphone6Plus",
         ScreenSize::IOS_58_MESSAGES => "iphone58",
+        ScreenSize::IOS_65_MESSAGES => "iphone65",
         ScreenSize::IOS_IPAD_MESSAGES => "ipad",
         ScreenSize::IOS_IPAD_PRO_MESSAGES => "ipadPro",
         ScreenSize::IOS_IPAD_10_5_MESSAGES => "ipad105",
@@ -99,14 +110,18 @@ module Deliver
         ScreenSize::IOS_40 => "iPhone 5",
         ScreenSize::IOS_47 => "iPhone 6",
         ScreenSize::IOS_55 => "iPhone 6 Plus",
-        ScreenSize::IOS_58 => "iPhone X",
+        ScreenSize::IOS_58 => "iPhone XS",
+        ScreenSize::IOS_61 => "iPhone XR",
+        ScreenSize::IOS_65 => "iPhone XS Max",
         ScreenSize::IOS_IPAD => "iPad",
         ScreenSize::IOS_IPAD_10_5 => "iPad 10.5",
         ScreenSize::IOS_IPAD_PRO => "iPad Pro",
         ScreenSize::IOS_40_MESSAGES => "iPhone 5 (iMessage)",
         ScreenSize::IOS_47_MESSAGES => "iPhone 6 (iMessage)",
         ScreenSize::IOS_55_MESSAGES => "iPhone 6 Plus (iMessage)",
-        ScreenSize::IOS_58_MESSAGES => "iPhone X (iMessage)",
+        ScreenSize::IOS_58_MESSAGES => "iPhone XS (iMessage)",
+        ScreenSize::IOS_61_MESSAGES => "iPhone XR (iMessage)",
+        ScreenSize::IOS_65_MESSAGES => "iPhone XS Max (iMessage)",
         ScreenSize::IOS_IPAD_MESSAGES => "iPad (iMessage)",
         ScreenSize::IOS_IPAD_PRO_MESSAGES => "iPad Pro (iMessage)",
         ScreenSize::IOS_IPAD_10_5_MESSAGES => "iPad 10.5 (iMessage)",
@@ -130,6 +145,8 @@ module Deliver
         ScreenSize::IOS_47_MESSAGES,
         ScreenSize::IOS_55_MESSAGES,
         ScreenSize::IOS_58_MESSAGES,
+        ScreenSize::IOS_61_MESSAGES,
+        ScreenSize::IOS_65_MESSAGES,
         ScreenSize::IOS_IPAD_MESSAGES,
         ScreenSize::IOS_IPAD_PRO_MESSAGES,
         ScreenSize::IOS_IPAD_10_5_MESSAGES
@@ -138,6 +155,12 @@ module Deliver
 
     def self.device_messages
       return {
+        ScreenSize::IOS_65_MESSAGES => [
+          [1242, 2688]
+        ],
+        ScreenSize::IOS_61_MESSAGES => [
+          [828, 1792]
+        ],
         ScreenSize::IOS_58_MESSAGES => [
           [1125, 2436]
         ],
@@ -176,6 +199,12 @@ module Deliver
 
     def self.devices
       return {
+        ScreenSize::IOS_65 => [
+          [1242, 2688]
+        ],
+        ScreenSize::IOS_61 => [
+          [828, 1792]
+        ],
         ScreenSize::IOS_58 => [
           [1125, 2436]
         ],
