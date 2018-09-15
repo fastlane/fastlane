@@ -38,7 +38,7 @@ describe Fastlane do
           push_git_tags(remote: 'foo', tag: 'v1.0')
         end").runner.execute(:test)
 
-        expect(result).to eq("git push foo v1.0")
+        expect(result).to eq("git push foo refs/tags/v1.0")
       end
     end
   end
