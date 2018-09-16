@@ -239,14 +239,14 @@ describe Scan do
           expect(reporter_options).to end_with("--simple")
         end
 
-        it "generates options to use xcpretty's `tap` format option" do
+        it "generates options to use xcpretty's `tap` format option and ASCII format" do
           generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "report.html", "/test_output", false, "--tap --no-utf")
           reporter_options = generator.generate_xcpretty_args_options
 
           expect(reporter_options).to end_with("--tap --no-utf")
         end
 
-        it "generates options to use xcpretty's `knock` format option" do
+        it "generates options to use xcpretty's `knock` format option and color format" do
           generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "report.html", "/test_output", false, "--knock --color")
           reporter_options = generator.generate_xcpretty_args_options
 

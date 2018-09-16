@@ -153,7 +153,7 @@ module Scan
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :xcpretty_args,
                                      env_name: "XCPRETTY_ARGS",
-                                     description: "Pass in xcpretty format option",
+                                     description: "Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')",
                                      type: String,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :max_concurrent_simulators,
