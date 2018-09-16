@@ -115,7 +115,7 @@ module Scan
                                                                          Scan.config[:xcpretty_args])
       reporter_options = @reporter_options_generator.generate_reporter_options
       reporter_xcpretty_args = @reporter_options_generator.generate_xcpretty_args_options
-      return pipe << "| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')} #{reporter_xcpretty_args.join(' ')}"
+      return pipe << "| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')} #{reporter_xcpretty_args}"
     end
 
     # Store the raw file

@@ -3,7 +3,6 @@ require_relative 'module'
 module Scan
   class XCPrettyReporterOptionsGenerator
     SUPPORTED_REPORT_TYPES = %w(html junit json-compilation-database)
-    SUPPORTED_XCARGS_TYPES = %w(simple test tap knock)
 
     def self.generate_from_scan_config
       self.new(Scan.config[:open_report],
@@ -25,7 +24,6 @@ module Scan
 
       # might already be an array when passed via fastlane
       @output_types = @output_types.split(',') if @output_types.kind_of?(String)
-      @xcpretty_args = @xcpretty_args.split(',') if @xcpretty_args.kind_of?(String)
 
       if @output_files.nil?
         @output_files = @output_types.map { |type| "report.#{type}" }
@@ -40,12 +38,6 @@ module Scan
 
       (@output_types - SUPPORTED_REPORT_TYPES).each do |type|
         UI.error("Couldn't find reporter '#{type}', available #{SUPPORTED_REPORT_TYPES.join(', ')}")
-      end
-
-      unless @xcpretty_args.nil?
-        (@xcpretty_args - SUPPORTED_XCARGS_TYPES).each do |type|
-          UI.error("Couldn't find reporter '#{type}', available #{SUPPORTED_XCARGS_TYPES.join(', ')}")
-        end
       end
     end
 
@@ -75,15 +67,7 @@ module Scan
     end
 
     def generate_xcpretty_args_options
-      xcargs = []
-      unless @xcpretty_args.nil?
-        valid_args = @xcpretty_args & SUPPORTED_XCARGS_TYPES
-        valid_args.each do |raw_arg|
-          arg = raw_arg.strip
-          xcargs << "--#{arg}"
-        end
-      end
-      return xcargs
+      return @xcpretty_args
     end
 
     private
