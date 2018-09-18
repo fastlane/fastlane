@@ -108,6 +108,7 @@ module Spaceship
         iphone6:      "MZPFT.SortedN61ScreenShot",
         iphone6Plus:  "MZPFT.SortedN56ScreenShot",
         iphone58:     "MZPFT.SortedD22ScreenShot",
+        iphone65:     "MZPFT.SortedD33ScreenShot",
         iphone4:      "MZPFT.SortedN41ScreenShot",
         iphone35:     "MZPFT.SortedScreenShot",
         appleTV:      "MZPFT.SortedATVScreenShot",
@@ -124,6 +125,7 @@ module Spaceship
         iphone6:      "MZPFT.SortedN61MessagesScreenShot",
         iphone6Plus:  "MZPFT.SortedN56MessagesScreenShot",
         iphone58:     "MZPFT.SortedD22MessagesScreenShot",
+        iphone65:     "MZPFT.SortedD33MessagesScreenShot",
         iphone4:      "MZPFT.SortedN41MessagesScreenShot"
       }
     end
@@ -137,6 +139,8 @@ module Spaceship
         ipad105:      [[1668, 2224], [2224, 1668]],
         iphone6:      [[750, 1334], [1334, 750]],
         iphone6Plus:  [[1242, 2208], [2208, 1242]],
+        iphone58:     [[1125, 2436], [2436, 1125]],
+        iphone65:     [[1242, 2688], [2688, 1242]],
         iphone4:      [[640, 1096], [640, 1136], [1136, 600], [1136, 640]],
         iphone35:     [[640, 960], [640, 920], [960, 600], [960, 640]],
         appleTV:      [[1920, 1080]],
