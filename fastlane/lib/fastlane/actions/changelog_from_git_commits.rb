@@ -132,7 +132,7 @@ module Fastlane
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :quiet,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_TAG_QUIET',
-                                       description: 'Whether or not to disbale changelog output',
+                                       description: 'Whether or not to disable changelog output',
                                        optional: true,
                                        default_value: false,
                                        is_string: false),
