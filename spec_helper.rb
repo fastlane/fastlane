@@ -2,8 +2,10 @@
 module SpecHelper
 end
 
-require "coveralls"
-Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+require 'simplecov'
+SimpleCov.start
+require 'codecov'
+SimpleCov.formatter = SimpleCov::Formatter::Codecov
 
 require "webmock/rspec"
 WebMock.disable_net_connect!(allow: 'coveralls.io')
