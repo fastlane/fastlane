@@ -152,7 +152,7 @@ module Scan
                                      description: "A custom xcpretty formatter to use",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :xcpretty_args,
-                                     env_name: "XCPRETTY_ARGS",
+                                     env_name: "SCAN_XCPRETTY_ARGS",
                                      description: "Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')",
                                      type: String,
                                      optional: true),

@@ -177,7 +177,7 @@ describe Scan do
         end
 
         it "generates options for a custom json-compilation-database file with a custom file name" do
-          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["json-compilation-database"], ["custom_report.json"], "/test_output", false, nil)
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["json-compilation-database"], ["custom_report.json"], "/test_output", false, "")
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
@@ -187,7 +187,7 @@ describe Scan do
         end
 
         it "generates options for a custom json-compilation-database file with a clang naming convention" do
-          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["json-compilation-database"], ["ignore_custom_name_here.json"], "/test_output", true, nil)
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["json-compilation-database"], ["ignore_custom_name_here.json"], "/test_output", true, "")
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to include("--report json-compilation-database")
@@ -200,7 +200,7 @@ describe Scan do
         end
 
         it "generates options for a multiple reports with default file names" do
-          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["html", "junit"], nil, "/test_output", true, nil)
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["html", "junit"], nil, "/test_output", true, "")
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
@@ -212,7 +212,7 @@ describe Scan do
         end
 
         it "generates options for a multiple reports with custom file names" do
-          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["html", "junit"], ["custom_report.html", "junit.xml"], "/test_output", true, nil)
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, ["html", "junit"], ["custom_report.html", "junit.xml"], "/test_output", true, "")
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to start_with([
@@ -251,6 +251,13 @@ describe Scan do
           reporter_options = generator.generate_xcpretty_args_options
 
           expect(reporter_options).to end_with("--knock --color")
+        end
+
+        it "generates valid options when no xcpretty arguments specified" do
+          generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", "report.html", "/test_output", false, nil)
+          reporter_options = generator.generate_xcpretty_args_options
+
+          expect(reporter_options).to be_nil
         end
       end
 
