@@ -59,15 +59,16 @@ module Fastlane
           # - App Store version set as 1.0 and app version set as 1.0.0;
           #
           # In that case, the response from API will be "versionString = 1.0" and "displayVersionString = 1.0.0"
-          UI.verbose("Found train: #{train.version_string}, comparing to supplied version: #{version}")
-          if version && train.version_string == train.display_version_string && version != train.version_string
-            UI.verbose("Version #{version} doesn't match: #{train.version_string}")
-            next
-          else
-            UI.verbose("Failed. Comparing to display_version_string: #{train.display_version_string}")
-            if version && version != train.display_version_string
-              UI.verbose("Version #{version} doesn't match: #{train.display_version_string}")
+          if version
+            if train.version_string == train.display_version_string && version != train.version_string
+              UI.verbose("Version #{version} doesn't match: #{train.version_string}")
               next
+            else
+              UI.verbose("Failed. Comparing to display_version_string: #{train.display_version_string}")
+              if version != train.display_version_string
+                UI.verbose("Version #{version} doesn't match: #{train.display_version_string}")
+                next
+              end
             end
           end
 
