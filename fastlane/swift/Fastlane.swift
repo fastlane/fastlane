@@ -1310,7 +1310,8 @@ func deploygate(apiToken: String,
                 message: String = "No changelog provided",
                 distributionKey: String? = nil,
                 releaseNote: String? = nil,
-                disableNotify: Bool = false) {
+                disableNotify: Bool = false,
+                distributionName: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "deploygate", className: nil, args: [RubyCommand.Argument(name: "api_token", value: apiToken),
                                                                                             RubyCommand.Argument(name: "user", value: user),
                                                                                             RubyCommand.Argument(name: "ipa", value: ipa),
@@ -1318,7 +1319,8 @@ func deploygate(apiToken: String,
                                                                                             RubyCommand.Argument(name: "message", value: message),
                                                                                             RubyCommand.Argument(name: "distribution_key", value: distributionKey),
                                                                                             RubyCommand.Argument(name: "release_note", value: releaseNote),
-                                                                                            RubyCommand.Argument(name: "disable_notify", value: disableNotify)])
+                                                                                            RubyCommand.Argument(name: "disable_notify", value: disableNotify),
+                                                                                            RubyCommand.Argument(name: "distribution_name", value: distributionName)])
   _ = runner.executeCommand(command)
 }
 func dotgpgEnvironment(dotgpgFile: String) {
@@ -1841,7 +1843,7 @@ func hockey(apk: String? = nil,
             uploadDsymOnly: Bool = false,
             ownerId: String? = nil,
             strategy: String = "add",
-            timeout: String? = nil,
+            timeout: Int? = nil,
             bypassCdn: Bool = false,
             dsaSignature: String = "") {
   let command = RubyCommand(commandID: "", methodName: "hockey", className: nil, args: [RubyCommand.Argument(name: "apk", value: apk),
@@ -2482,11 +2484,13 @@ func pushGitTags(force: Bool = false,
 func pushToGitRemote(localBranch: String? = nil,
                      remoteBranch: String? = nil,
                      force: Bool = false,
+                     forceWithLease: Bool = false,
                      tags: Bool = true,
                      remote: String = "origin") {
   let command = RubyCommand(commandID: "", methodName: "push_to_git_remote", className: nil, args: [RubyCommand.Argument(name: "local_branch", value: localBranch),
                                                                                                     RubyCommand.Argument(name: "remote_branch", value: remoteBranch),
                                                                                                     RubyCommand.Argument(name: "force", value: force),
+                                                                                                    RubyCommand.Argument(name: "force_with_lease", value: forceWithLease),
                                                                                                     RubyCommand.Argument(name: "tags", value: tags),
                                                                                                     RubyCommand.Argument(name: "remote", value: remote)])
   _ = runner.executeCommand(command)
@@ -2616,6 +2620,7 @@ func runTests(workspace: String? = nil,
               buildlogPath: String = "~/Library/Logs/scan",
               includeSimulatorLogs: Bool = false,
               formatter: String? = nil,
+              xcprettyArgs: String? = nil,
               maxConcurrentSimulators: Int? = nil,
               disableConcurrentTesting: Bool = false,
               testWithoutBuilding: Bool? = nil,
@@ -2659,6 +2664,7 @@ func runTests(workspace: String? = nil,
                                                                                            RubyCommand.Argument(name: "buildlog_path", value: buildlogPath),
                                                                                            RubyCommand.Argument(name: "include_simulator_logs", value: includeSimulatorLogs),
                                                                                            RubyCommand.Argument(name: "formatter", value: formatter),
+                                                                                           RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                            RubyCommand.Argument(name: "max_concurrent_simulators", value: maxConcurrentSimulators),
                                                                                            RubyCommand.Argument(name: "disable_concurrent_testing", value: disableConcurrentTesting),
                                                                                            RubyCommand.Argument(name: "test_without_building", value: testWithoutBuilding),
@@ -2744,6 +2750,7 @@ func scan(workspace: String? = scanfile.workspace,
           buildlogPath: String = scanfile.buildlogPath,
           includeSimulatorLogs: Bool = scanfile.includeSimulatorLogs,
           formatter: String? = scanfile.formatter,
+          xcprettyArgs: String? = scanfile.xcprettyArgs,
           maxConcurrentSimulators: Int? = scanfile.maxConcurrentSimulators,
           disableConcurrentTesting: Bool = scanfile.disableConcurrentTesting,
           testWithoutBuilding: Bool? = scanfile.testWithoutBuilding,
@@ -2787,6 +2794,7 @@ func scan(workspace: String? = scanfile.workspace,
                                                                                       RubyCommand.Argument(name: "buildlog_path", value: buildlogPath),
                                                                                       RubyCommand.Argument(name: "include_simulator_logs", value: includeSimulatorLogs),
                                                                                       RubyCommand.Argument(name: "formatter", value: formatter),
+                                                                                      RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                       RubyCommand.Argument(name: "max_concurrent_simulators", value: maxConcurrentSimulators),
                                                                                       RubyCommand.Argument(name: "disable_concurrent_testing", value: disableConcurrentTesting),
                                                                                       RubyCommand.Argument(name: "test_without_building", value: testWithoutBuilding),
@@ -3281,7 +3289,8 @@ func supply(packageName: String,
             mappingPaths: [String]? = nil,
             rootUrl: String? = nil,
             checkSupersededTracks: Bool = false,
-            timeout: Int = 300) {
+            timeout: Int = 300,
+            deactivateOnPromote: Bool = true) {
   let command = RubyCommand(commandID: "", methodName: "supply", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
                                                                                         RubyCommand.Argument(name: "track", value: track),
                                                                                         RubyCommand.Argument(name: "rollout", value: rollout),
@@ -3304,7 +3313,8 @@ func supply(packageName: String,
                                                                                         RubyCommand.Argument(name: "mapping_paths", value: mappingPaths),
                                                                                         RubyCommand.Argument(name: "root_url", value: rootUrl),
                                                                                         RubyCommand.Argument(name: "check_superseded_tracks", value: checkSupersededTracks),
-                                                                                        RubyCommand.Argument(name: "timeout", value: timeout)])
+                                                                                        RubyCommand.Argument(name: "timeout", value: timeout),
+                                                                                        RubyCommand.Argument(name: "deactivate_on_promote", value: deactivateOnPromote)])
   _ = runner.executeCommand(command)
 }
 func swiftlint(mode: String = "lint",
@@ -3771,7 +3781,8 @@ func uploadToPlayStore(packageName: String,
                        mappingPaths: [String]? = nil,
                        rootUrl: String? = nil,
                        checkSupersededTracks: Bool = false,
-                       timeout: Int = 300) {
+                       timeout: Int = 300,
+                       deactivateOnPromote: Bool = true) {
   let command = RubyCommand(commandID: "", methodName: "upload_to_play_store", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
                                                                                                       RubyCommand.Argument(name: "track", value: track),
                                                                                                       RubyCommand.Argument(name: "rollout", value: rollout),
@@ -3794,7 +3805,8 @@ func uploadToPlayStore(packageName: String,
                                                                                                       RubyCommand.Argument(name: "mapping_paths", value: mappingPaths),
                                                                                                       RubyCommand.Argument(name: "root_url", value: rootUrl),
                                                                                                       RubyCommand.Argument(name: "check_superseded_tracks", value: checkSupersededTracks),
-                                                                                                      RubyCommand.Argument(name: "timeout", value: timeout)])
+                                                                                                      RubyCommand.Argument(name: "timeout", value: timeout),
+                                                                                                      RubyCommand.Argument(name: "deactivate_on_promote", value: deactivateOnPromote)])
   _ = runner.executeCommand(command)
 }
 func uploadToTestflight(username: String,
@@ -3971,7 +3983,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-10.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -4017,10 +4029,12 @@ func xcversion(version: String) {
 }
 @discardableResult func zip(path: String,
                             outputPath: String? = nil,
-                            verbose: Bool = true) -> String {
+                            verbose: Bool = true,
+                            password: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "zip", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
                                                                                      RubyCommand.Argument(name: "output_path", value: outputPath),
-                                                                                     RubyCommand.Argument(name: "verbose", value: verbose)])
+                                                                                     RubyCommand.Argument(name: "verbose", value: verbose),
+                                                                                     RubyCommand.Argument(name: "password", value: password)])
   return runner.executeCommand(command)
 }
 
@@ -4077,4 +4091,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.28]
+// FastlaneRunnerAPIVersion [0.9.29]
