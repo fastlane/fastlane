@@ -208,8 +208,13 @@ module Supply
                                      optional: true,
                                      description: "Timeout for read, open, and send (in seconds)",
                                      type: Integer,
-                                     default_value: 300)
-
+                                     default_value: 300),
+        FastlaneCore::ConfigItem.new(key: :deactivate_on_promote,
+                                     env_name: "SUPPLY_DEACTIVATE_ON_PROMOTE",
+                                     optional: true,
+                                     description: "When promoting to a new track, deactivate the binary in the origin track",
+                                     is_string: false,
+                                     default_value: true)
       ]
     end
     # rubocop:enable Metrics/PerceivedComplexity
