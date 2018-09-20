@@ -47,6 +47,7 @@ module Fastlane
             app_group: 'app_group',
             apple_pay: 'apple_pay',
             associated_domains: 'associated_domains',
+            auto_fill_credential: 'auto_fill_credential',
             data_protection: 'data_protection',
             game_center: 'game_center',
             health_kit: 'healthkit',
