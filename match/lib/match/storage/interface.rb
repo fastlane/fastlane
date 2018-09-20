@@ -14,6 +14,8 @@ module Match
 
       # Call this method for the initial clone/download of the
       # user's certificates & profiles
+      # As part of this method, the `self.working_directory` attribute
+      # will be set
       def download
         not_implemented(__method__)
       end
