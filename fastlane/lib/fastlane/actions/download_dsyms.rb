@@ -52,6 +52,7 @@ module Fastlane
         UI.message(message.join(" "))
 
         app.tunes_all_build_trains(platform: platform).each do |train|
+          UI.verbose("Found train: version_string=#{train.version_string} / display_version_string=#{train.display_version_string}, comparing to supplied version: #{version}")
           # We try to check first with version_string, but also we try to check with display_version_string since
           # this value could be different.
           #
@@ -60,7 +61,7 @@ module Fastlane
           #
           # In that case, the response from API will be "versionString = 1.0" and "displayVersionString = 1.0.0"
           if version && version != train.version_string && version != train.display_version_string
-            UI.verbose("Version #{version} doesn't match: #{train.version_string} or #{trains.display_version_string}")
+            UI.verbose("Version #{version} doesn't match: version_string=#{train.version_string} or display_version_string=#{trains.display_version_string}")
             next
           end
 
