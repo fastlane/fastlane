@@ -1,8 +1,13 @@
 module Match
   module Storage
     class Interface
-      def initialize
-        not_implemented(__method__)
+      attr_accessor :type
+      attr_accessor :platform
+
+      def initialize(type: nil,
+                     platform: nil)
+        self.type = type
+        self.platform = platform
       end
 
       # Call this method after creating a new object to configure
@@ -25,7 +30,9 @@ module Match
       # given remote server
       # This method is blocking, meaning it might take multiple
       # seconds or longer to run
-      def save_changes!
+      # @parameter files_to_commit [Array] Array to paths to files
+      #   that should be committed to the storage provider
+      def save_changes!(files_to_commmit: [])
         not_implemented(__method__)
       end
 

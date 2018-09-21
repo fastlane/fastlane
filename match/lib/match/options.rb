@@ -115,18 +115,6 @@ module Match
                                      description: "Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail",
                                      is_string: false,
                                      default_value: false),
-        FastlaneCore::ConfigItem.new(key: :workspace,
-                                     description: nil,
-                                     verify_block: proc do |value|
-                                       unless Helper.test?
-                                         if value.start_with?("/var/folders") || value.include?("tmp/") || value.include?("temp/")
-                                           # that's fine
-                                         else
-                                           UI.user_error!("Specify the `git_url` instead of the `path`")
-                                         end
-                                       end
-                                     end,
-                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :force_for_new_devices,
                                      env_name: "MATCH_FORCE_FOR_NEW_DEVICES",
                                      description: "Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile type 'appstore'",

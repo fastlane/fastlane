@@ -1,6 +1,5 @@
 require_relative 'module'
 require_relative 'encrypt'
-require_relative 'git_helper'
 
 module Match
   # These functions should only be used while in (UI.) interactive mode
