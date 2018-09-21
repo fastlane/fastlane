@@ -36,7 +36,6 @@ module Match
         self.git_full_name = git_full_name
         self.git_user_email = git_user_email
         self.clone_branch_directly = clone_branch_directly
-        self.type = type # TODO: ensure we're always passing a string here
 
         # Note: if you modify the parameters above, don't forget to also update the method call in
         # TODO
