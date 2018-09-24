@@ -20,7 +20,7 @@ module Fastlane
         # puts 'credentials: '+credentials.inspect
         # puts 'email: ' + credentials['client_email']
 
-        callback_uri = 'https://janpio.github.io/fastlane-plugin-managed_google_play/callback.html TODO'
+        callback_uri = 'https://fastlane.github.io/managed_google_play-callback/callback.html'
         uri = "https://play.google.com/apps/publish/delegatePrivateApp?service_account=#{credentials['client_email']}&continueUrl=#{URI.escape(callback_uri)}"
 
         UI.message("To obtain publishing rights for custom apps on Managed Play Store, open the following URL and log in:")
