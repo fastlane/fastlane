@@ -30,6 +30,7 @@ If the above doesn't help, please [submit an issue](https://github.com/fastlane/
 
 ## _fastlane_ team
 
+<!-- This table is regenerated and resorted on each release -->
 <table id='team'>
 <tr>
 <td id='luka-mirosevic'>
