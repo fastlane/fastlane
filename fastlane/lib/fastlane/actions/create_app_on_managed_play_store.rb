@@ -77,7 +77,19 @@ module Fastlane
       end
 
       def self.details
-        "TODO"
+        "Create new apps on Managed Google Play."
+      end
+
+      def self.example_code
+        [
+          "create_app_on_managed_play_store(
+            json_key: 'path/to/you/json/key/file',
+            developer_account_id: 'developer_account_id', # obtained using the get_managed_play_store_publishing_rights action (or looking at the Play Console url),
+            app_title: 'Your app title',
+            language: 'en_US',
+            apk: '/files/app-release.apk'
+          )"
+        ]
       end
 
       def self.available_options
