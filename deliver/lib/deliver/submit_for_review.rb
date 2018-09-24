@@ -58,8 +58,21 @@ module Deliver
       build = nil
 
       loop do
-        latest_build = find_build(app.latest_version)
+        # Sometimes candidate_builds don't appear immediately after submittion
+        # Wait for candidate_builds to appear on iTunes
+        # Issue https://github.com/fastlane/fastlane/issues/10411
+        candidate_builds = app.latest_version.candidate_builds
+        if (candidate_builds || []).count == 0
+          UI.message("Waiting for candidate builds to appear...")
+          if (Time.now - start) > (60 * 5)
+            UI.user_error!("Could not find any available candidate builds on App Store Connect to submit")
+          else
+            sleep(30)
+            next
+          end
+        end
 
+        latest_build = find_build(candidate_builds)
         # Sometimes latest build will disappear and a different build would get selected
         # Only set build if no latest build found or if same build versions as previously fetched build
         # Issue: https://github.com/fastlane/fastlane/issues/10945
@@ -84,8 +97,10 @@ module Deliver
       nil
     end
 
-    def find_build(latest_version)
-      candidate_builds = wait_for_candidate(latest_version)
+    def find_build(candidate_builds)
+      if (candidate_builds || []).count == 0
+        UI.user_error!("Could not find any available candidate builds on App Store Connect to submit")
+      end
 
       build = candidate_builds.first
       candidate_builds.each do |b|
@@ -95,23 +110,6 @@ module Deliver
       end
 
       return build
-    end
-
-    def wait_for_candidate(latest_version)
-      wait_for_candidate_start = Time.now
-
-      loop do
-        candidate_builds = latest_version.candidate_builds
-        return candidate_builds if (candidate_builds || []).count > 0
-
-        UI.message("Waiting for candidate builds to appear...")
-
-        if (Time.now - wait_for_candidate_start) > (60 * 5)
-          UI.user_error!("Could not find any available candidate builds on App Store Connect to submit")
-        end
-
-        sleep(30)
-      end
     end
   end
 end
