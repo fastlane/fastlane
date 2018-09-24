@@ -3,7 +3,7 @@ require 'credentials_manager'
 module Fastlane
   module Actions
     class RegisterDeviceAction < Action
-      UDID_REGEXP = /^\h{40}$/
+      UDID_REGEXP = /^(\h{40}|\h{8}-\h{16})$/
 
       def self.is_supported?(platform)
         platform == :ios

@@ -156,6 +156,42 @@ describe Supply do
       end
     end
 
+    describe 'promote_track' do
+      subject { Supply::Uploader.new.promote_track }
+
+      let(:client) { double('client') }
+      let(:version_codes) { [1, 2, 3] }
+      let(:config) { { track: 'alpha', track_promote_to: 'beta' } }
+
+      before do
+        Supply.config = config
+        allow(Supply::Client).to receive(:make_from_config).and_return(client)
+        allow(client).to receive(:track_version_codes).and_return(version_codes)
+        allow(client).to receive(:update_track).with(config[:track], 0.1, nil)
+        allow(client).to receive(:update_track).with(config[:track_promote_to], 0.1, version_codes)
+      end
+
+      context 'when deactivate_on_promote is true' do
+        it 'should update track multiple times' do
+          Supply.config[:deactivate_on_promote] = true
+
+          expect(client).to receive(:update_track).with(config[:track], 0.1, nil).once
+          expect(client).to receive(:update_track).with(config[:track_promote_to], 0.1, version_codes).once
+          subject
+        end
+      end
+
+      context 'when deactivate_on_promote is false' do
+        it 'should only update track once' do
+          Supply.config[:deactivate_on_promote] = false
+
+          expect(client).not_to(receive(:update_track).with(config[:track], 0.1, nil))
+          expect(client).to receive(:update_track).with(config[:track_promote_to], 0.1, version_codes).once
+          subject
+        end
+      end
+    end
+
     describe 'check superseded tracks' do
       let(:client) { double('client') }
 

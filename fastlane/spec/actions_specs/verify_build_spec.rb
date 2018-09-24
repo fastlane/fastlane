@@ -21,7 +21,8 @@ describe Fastlane do
           "team_identifier" => "TestFixture",
           "app_name" => "very-capable-app",
           "provisioning_uuid" => "12345678-1234-1234-1234-123456789012",
-          "team_name" => "TestFixture"
+          "team_name" => "TestFixture",
+          "authority" => ["TestFixture"]
         }
       end
 

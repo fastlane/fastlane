@@ -76,7 +76,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                      env_name: "TRYOUTS_API_TOKEN",
                                      sensitive: true,
-                                     description: "API Token for Tryouts Access",
+                                     description: "API Token (api_key:api_secret) for Tryouts Access",
                                      verify_block: proc do |value|
                                        UI.user_error!("No API token for Tryouts given, pass using `api_token: 'token'`") unless value && !value.empty?
                                      end),
