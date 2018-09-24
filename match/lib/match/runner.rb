@@ -19,6 +19,7 @@ module Match
       FastlaneCore::PrintTable.print_values(config: params,
                                              title: "Summary for match #{Fastlane::VERSION}")
 
+      # Choose the right storage and encryption implementations
       storage = Storage::GitStorage.new(type: params[:type].to_s,
                                     platform: params[:platform].to_s)
 
@@ -30,6 +31,11 @@ module Match
                     git_user_email: params[:git_user_email],
                     clone_branch_directly: params[:clone_branch_directly])
       storage.download
+
+      # Init the encryption only after the `storage.download` was called to have the right working directory
+      encryption = Encryption::OpenSSL.new(git_url: storage.git_url, working_directory: storage.working_directory)
+
+      encryption.decrypt_files # TODO: pass manual password somewhere
 
       unless params[:readonly]
         self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name])
@@ -71,7 +77,13 @@ module Match
 
       # Done
       if self.files_to_commmit.count > 0 && !params[:readonly]
-        storage.save_changes!(files_to_commmit: self.files_to_commmit)
+        Dir.chdir(storage.working_directory) do
+          return if `git status`.include?("nothing to commit")
+
+          encryption.encrypt_files
+
+          storage.save_changes!(files_to_commmit: self.files_to_commmit)
+        end
       end
 
       # Print a summary table for each app_identifier

@@ -1,4 +1,3 @@
-require_relative './interface'
 require 'fastlane_core/command_executor'
 
 module Match
@@ -22,7 +21,7 @@ module Match
 
       def configure(git_url: nil,
                     shallow_clone: nil,
-                    manual_password: nil, # TODO: do we need this?
+                    manual_password: nil, # TODO: do we need this? I think just for changing password right? 
                     skip_docs: false,
                     branch: "master",
                     git_full_name: nil,
@@ -86,54 +85,48 @@ module Match
         end
 
         self.checkout_branch unless self.branch == "master"
-
-        Encrypt.new.decrypt_repo(path: self.working_directory, git_url: self.git_url, manual_password: self.manual_password)
       end
 
       def save_changes!(files_to_commmit: [])
-        Dir.chdir(self.working_directory) do
-          return if `git status`.include?("nothing to commit")
+        commands = []
 
-          Encrypt.new.encrypt_repo(path: self.working_directory, git_url: self.git_url)
-          commands = []
-
-          if files_to_commmit.count > 0 # e.g. for nuke this is treated differently
-            if !File.exist?(MATCH_VERSION_FILE_NAME) || File.read(MATCH_VERSION_FILE_NAME) != Fastlane::VERSION.to_s
-              files_to_commmit << MATCH_VERSION_FILE_NAME
-              File.write(MATCH_VERSION_FILE_NAME, Fastlane::VERSION) # stored unencrypted
-            end
-
-            template = File.read("#{Match::ROOT}/lib/assets/READMETemplate.md")
-            readme_path = "README.md"
-            if !File.exist?(readme_path) || File.read(readme_path) != template
-              files_to_commmit << readme_path
-              File.write(readme_path, template)
-            end
-
-            # `git add` each file we want to commit
-            #   - Fixes https://github.com/fastlane/fastlane/issues/8917
-            #   - Fixes https://github.com/fastlane/fastlane/issues/8793
-            #   - Replaces, closes and fixes https://github.com/fastlane/fastlane/pull/8919
-            commands += files_to_commmit.map do |current_file|
-              "git add #{current_file.shellescape}"
-            end
-          else
-            # No specific list given, e.g. this happens on `fastlane match nuke`
-            # We just want to run `git add -A` to commit everything
-            commands << "git add -A"
+        if files_to_commmit.count > 0 # e.g. for nuke this is treated differently
+          if !File.exist?(MATCH_VERSION_FILE_NAME) || File.read(MATCH_VERSION_FILE_NAME) != Fastlane::VERSION.to_s
+            files_to_commmit << MATCH_VERSION_FILE_NAME
+            File.write(MATCH_VERSION_FILE_NAME, Fastlane::VERSION) # stored unencrypted
           end
-          commit_message = generate_commit_message
-          commands << "git commit -m #{commit_message.shellescape}"
-          commands << "GIT_TERMINAL_PROMPT=0 git push origin #{self.branch.shellescape}"
 
-          UI.message("Pushing changes to remote git repo...")
-
-          commands.each do |command|
-            FastlaneCore::CommandExecutor.execute(command: command,
-                                                print_all: FastlaneCore::Globals.verbose?,
-                                            print_command: FastlaneCore::Globals.verbose?)
+          template = File.read("#{Match::ROOT}/lib/assets/READMETemplate.md")
+          readme_path = "README.md"
+          if !File.exist?(readme_path) || File.read(readme_path) != template
+            files_to_commmit << readme_path
+            File.write(readme_path, template)
           end
+
+          # `git add` each file we want to commit
+          #   - Fixes https://github.com/fastlane/fastlane/issues/8917
+          #   - Fixes https://github.com/fastlane/fastlane/issues/8793
+          #   - Replaces, closes and fixes https://github.com/fastlane/fastlane/pull/8919
+          commands += files_to_commmit.map do |current_file|
+            "git add #{current_file.shellescape}"
+          end
+        else
+          # No specific list given, e.g. this happens on `fastlane match nuke`
+          # We just want to run `git add -A` to commit everything
+          commands << "git add -A"
         end
+        commit_message = generate_commit_message
+        commands << "git commit -m #{commit_message.shellescape}"
+        commands << "GIT_TERMINAL_PROMPT=0 git push origin #{self.branch.shellescape}"
+
+        UI.message("Pushing changes to remote git repo...")
+
+        commands.each do |command|
+          FastlaneCore::CommandExecutor.execute(command: command,
+                                              print_all: FastlaneCore::Globals.verbose?,
+                                          print_command: FastlaneCore::Globals.verbose?)
+        end
+
         self.clear_changes
       rescue => ex
         UI.error("Couldn't commit or push changes back to git...")

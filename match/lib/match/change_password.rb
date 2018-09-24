@@ -1,5 +1,4 @@
 require_relative 'module'
-require_relative 'encrypt'
 
 module Match
   # These functions should only be used while in (UI.) interactive mode
