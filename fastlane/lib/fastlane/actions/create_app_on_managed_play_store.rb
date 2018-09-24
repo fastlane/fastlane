@@ -190,7 +190,7 @@ module Fastlane
   end
 end
 
-# https://support.google.com/googleplay/android-developer/answer/3125566?hl=en 
+# https://support.google.com/googleplay/android-developer/answer/3125566?hl=en
 # => Add your own text translations & localized graphic assets => See available languages => replace `-` with `_`
 # %w => https://stackoverflow.com/a/1274703/252627
 class AvailablePlayStoreLanguages
