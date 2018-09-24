@@ -27,13 +27,14 @@ describe Match do
       fake_storage = "fake_storage"
       expect(Match::Storage::GitStorage).to receive(:new).with(type: config[:type], platform: config[:platform]).and_return(fake_storage)
       expect(fake_storage).to receive(:configure).with(
-        git_url: git_url, 
-        shallow_clone: true, 
-        skip_docs: false, 
-        branch: "master", 
-        git_full_name: nil, 
-        git_user_email: nil, 
-        clone_branch_directly: false).and_return(repo_dir)
+        git_url: git_url,
+        shallow_clone: true,
+        skip_docs: false,
+        branch: "master",
+        git_full_name: nil,
+        git_user_email: nil,
+        clone_branch_directly: false
+      ).and_return(repo_dir)
 
       expect(fake_storage).to receive(:download).and_return(nil)
       expect(fake_storage).to receive(:clear_changes).and_return(nil)
@@ -44,8 +45,7 @@ describe Match do
                                                                             prov_type: :appstore,
                                                                        certificate_id: "something",
                                                                        app_identifier: values[:app_identifier],
-                                                                   working_directory: fake_storage.working_directory
-                                                                       ).and_return(profile_path)
+                                                                   working_directory: fake_storage.working_directory).and_return(profile_path)
       expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path, keychain_path).and_return(destination)
       expect(fake_storage).to receive(:save_changes!).with(
         files_to_commit: [
@@ -90,13 +90,14 @@ describe Match do
       fake_storage = "fake_storage"
       expect(Match::Storage::GitStorage).to receive(:new).with(type: config[:type], platform: config[:platform]).and_return(fake_storage)
       expect(fake_storage).to receive(:configure).with(
-        git_url: git_url, 
-        shallow_clone: false, 
-        skip_docs: false, 
-        branch: "master", 
-        git_full_name: nil, 
-        git_user_email: nil, 
-        clone_branch_directly: false).and_return(repo_dir)
+        git_url: git_url,
+        shallow_clone: false,
+        skip_docs: false,
+        branch: "master",
+        git_full_name: nil,
+        git_user_email: nil,
+        clone_branch_directly: false
+      ).and_return(repo_dir)
 
       expect(fake_storage).to receive(:download).and_return(nil)
       expect(fake_storage).to receive(:clear_changes).and_return(nil)
