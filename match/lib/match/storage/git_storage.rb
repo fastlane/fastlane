@@ -21,7 +21,7 @@ module Match
 
       def configure(git_url: nil,
                     shallow_clone: nil,
-                    manual_password: nil, # TODO: do we need this? I think just for changing password right? 
+                    manual_password: nil, # TODO: do we need this? I think just for changing password right?
                     skip_docs: false,
                     branch: "master",
                     git_full_name: nil,
