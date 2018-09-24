@@ -175,22 +175,8 @@ module Fastlane
               unless AvailablePlayStoreLanguages.all_languages.include?(language)
                 UI.user_error!("Please enter one of available languages: #{AvailablePlayStoreLanguages.all_languages}")
               end
-            end),
-          # copied from https://github.com/fastlane/fastlane/blob/2fec459d6f44a41eac1b086e8c181bd1669f7f5c/supply/lib/supply/options.rb#L193-L199
-          FastlaneCore::ConfigItem.new(key: :root_url,
-            env_name: "SUPPLY_ROOT_URL", # TODO
-            description: "Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/", # TODO check if default is true
-            optional: true,
-            verify_block: proc do |value|
-              UI.user_error!("Could not parse URL '#{value}'") unless value =~ URI.regexp
-            end),
-          # copied from https://github.com/fastlane/fastlane/blob/2fec459d6f44a41eac1b086e8c181bd1669f7f5c/supply/lib/supply/options.rb#L206-L211
-          FastlaneCore::ConfigItem.new(key: :timeout,
-            env_name: "SUPPLY_TIMEOUT", # TODO
-            optional: true,
-            description: "Timeout for read, open, and send (in seconds)",
-            type: Integer,
-            default_value: 300)
+            end)
+          # TODO readd root_url and timeout when supply is used
         ]
       end
 
