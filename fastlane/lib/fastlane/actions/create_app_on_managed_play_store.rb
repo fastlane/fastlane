@@ -84,9 +84,9 @@ module Fastlane
         [
           "create_app_on_managed_play_store(
             json_key: 'path/to/you/json/key/file',
-            developer_account_id: 'developer_account_id', # obtained using the get_managed_play_store_publishing_rights action (or looking at the Play Console url),
-            app_title: 'Your app title',
-            language: 'en_US',
+            developer_account_id: 'developer_account_id', # obtained using the get_managed_play_store_publishing_rights action (or looking at the Play Console url)
+            app_title: 'Your new app\'s title',
+            language: 'en_US', # primary app language in BCP 47 format
             apk: '/files/app-release.apk'
           )"
         ]
