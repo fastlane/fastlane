@@ -30,7 +30,7 @@ module Match
         self.git_url = git_url
         self.shallow_clone = shallow_clone
         self.manual_password = manual_password
-        self.skip_docs = skip_docs
+        self.skip_docs = skip_docs # TODO: We don't use this yet
         self.branch = branch
         self.git_full_name = git_full_name
         self.git_user_email = git_user_email
@@ -84,22 +84,22 @@ module Match
           UI.user_error!("Error cloning repo, make sure you have access to it '#{self.git_url}'")
         end
 
-        self.checkout_branch unless self.branch == "master"
+        checkout_branch unless self.branch == "master"
       end
 
-      def save_changes!(files_to_commmit: [])
+      def save_changes!(files_to_commit: [])
         commands = []
 
-        if files_to_commmit.count > 0 # e.g. for nuke this is treated differently
+        if files_to_commit.count > 0 # e.g. for nuke this is treated differently
           if !File.exist?(MATCH_VERSION_FILE_NAME) || File.read(MATCH_VERSION_FILE_NAME) != Fastlane::VERSION.to_s
-            files_to_commmit << MATCH_VERSION_FILE_NAME
+            files_to_commit << MATCH_VERSION_FILE_NAME
             File.write(MATCH_VERSION_FILE_NAME, Fastlane::VERSION) # stored unencrypted
           end
 
           template = File.read("#{Match::ROOT}/lib/assets/READMETemplate.md")
           readme_path = "README.md"
-          if !File.exist?(readme_path) || File.read(readme_path) != template
-            files_to_commmit << readme_path
+          if (!File.exist?(readme_path) || File.read(readme_path) != template) && !self.skip_docs
+            files_to_commit << readme_path
             File.write(readme_path, template)
           end
 
@@ -107,7 +107,7 @@ module Match
           #   - Fixes https://github.com/fastlane/fastlane/issues/8917
           #   - Fixes https://github.com/fastlane/fastlane/issues/8793
           #   - Replaces, closes and fixes https://github.com/fastlane/fastlane/pull/8919
-          commands += files_to_commmit.map do |current_file|
+          commands += files_to_commit.map do |current_file|
             "git add #{current_file.shellescape}"
           end
         else
