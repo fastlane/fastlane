@@ -46,8 +46,7 @@ module Fastlane
       end
 
       def self.details
-        # Optional:
-        "none yet"
+        "TODO"
       end
 
       def self.available_options
