@@ -91,6 +91,10 @@ module Fastlane
       def self.is_supported?(platform)
         [:android].include?(platform)
       end
+
+      def self.category
+        :misc
+      end
     end
   end
 end
