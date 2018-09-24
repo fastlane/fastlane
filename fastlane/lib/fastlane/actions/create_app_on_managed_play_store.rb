@@ -10,13 +10,13 @@ module Fastlane
         FastlaneCore::PrintTable.print_values(
           config: params,
           mask_keys: [:json_key_data],
-          title: "Summary for CreateAppOnManagedPlayStoreAction" # TODO
+          title: "Summary for create_app_on_managed_play_store"
         )
 
         require "google/apis/playcustomapp_v1"
 
         # Auth Info
-        @keyfile = params[:json_key] # TODO json_key_data as alternative
+        @keyfile = params[:json_key]
         @developer_account = params[:developer_account_id]
 
         # App Info
@@ -96,7 +96,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(
             key: :json_key,
-            env_name: "SUPPLY_JSON_KEY", # TODO
+            env_name: "SUPPLY_JSON_KEY",
             short_option: "-j",
             conflicting_options: [:json_key_data],
             optional: true, # this shouldn't be optional but is until I find out how json_key OR json_key_data can be required
@@ -111,7 +111,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :json_key_data,
-            env_name: "SUPPLY_JSON_KEY_DATA", # TODO
+            env_name: "SUPPLY_JSON_KEY_DATA",
             short_option: "-c",
             conflicting_options: [:json_key],
             optional: true,
@@ -130,7 +130,7 @@ module Fastlane
           # developer_account
           FastlaneCore::ConfigItem.new(key: :developer_account_id,
             short_option: "-k",
-            env_name: "PRODUCE_ITC_TEAM_ID", # TODO
+            env_name: "PRODUCE_ITC_TEAM_ID",
             description: "The ID of your Google Play Console account. Can be obtained from the URL when you log in (`https://play.google.com/apps/publish/?account=...` or when you 'Obtain private app publishing rights' (https://developers.google.com/android/work/play/custom-app-api/get-started#retrieve_the_developer_account_id)",
             optional: false,
             is_string: false, # as we also allow integers, which we convert to strings anyway
@@ -142,7 +142,7 @@ module Fastlane
             end),
           FastlaneCore::ConfigItem.new(
             key: :apk,
-            env_name: "SUPPLY_APK", # TODO
+            env_name: "SUPPLY_APK",
             description: "Path to the APK file to upload",
             short_option: "-b",
             conflicting_options: [:apk_paths, :aab],
@@ -157,7 +157,7 @@ module Fastlane
           ),
           # title
           FastlaneCore::ConfigItem.new(key: :app_title,
-            env_name: "PRODUCE_APP_NAME", # TODO
+            env_name: "PRODUCE_APP_NAME",
             short_option: "-q",
             description: "App Title",
             optional: false,
@@ -167,7 +167,7 @@ module Fastlane
           # language
           FastlaneCore::ConfigItem.new(key: :language,
             short_option: "-m",
-            env_name: "PRODUCE_LANGUAGE", # TODO
+            env_name: "PRODUCE_LANGUAGE",
             description: "Default app language (e.g. 'en_US')",
             default_value: "en_US",
             optional: false,
@@ -176,7 +176,6 @@ module Fastlane
                 UI.user_error!("Please enter one of available languages: #{AvailablePlayStoreLanguages.all_languages}")
               end
             end)
-          # TODO readd root_url and timeout when supply is used
         ]
       end
 
