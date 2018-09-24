@@ -69,7 +69,7 @@ module Fastlane
       end
 
       def self.authors
-        ["Jan Piotrowski"]
+        ["janpio"]
       end
 
       def self.return_value
