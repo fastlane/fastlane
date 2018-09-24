@@ -366,6 +366,13 @@ describe FastlaneCore do
           expect(FastlaneCore::FastlanePty).to receive(:spawn).and_raise(StandardError, "It's all broken now.")
           expect(@transporter.upload('my.app.id', '/tmp')).to eq(false)
         end
+
+        # TODO test TransporterRequiresApplicationSpecificPasswordError
+          # first run returns error and output line with specific code,
+          # code then runs same method again with prompted input and succeeds
+        # TODO test handle_error(password)
+        # TODO duplicate upload of same binary with iTMS which it responds to with and error
+        # TODO test "Although errors occurred during execution of iTMSTransporter, it returned success status."
       end
     end
   end
