@@ -29,6 +29,8 @@ module Fastlane
         UI.message("([Cmd/Ctrl] + [Left click] lets you open this URL in many consoles/terminals/shells)")
         UI.message("")
         UI.message("After successful login you will be redirected to a page which outputs some information that is required for usage of the `create_app_on_managed_play_store` action.")
+
+        return uri
       end
 
       def self.description
@@ -40,7 +42,7 @@ module Fastlane
       end
 
       def self.return_value
-        # If your method provides a return value, you can describe here what it does
+        "An URI to obtain publishing rights for custom apps on Managed Play Store"
       end
 
       def self.details
