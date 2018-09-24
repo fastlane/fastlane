@@ -10,10 +10,10 @@ module Fastlane
         FastlaneCore::PrintTable.print_values(
           config: params,
           mask_keys: [:json_key_data],
-          title: "Summary for GetManagedPlayStorePublishingRights" # TODO
+          title: "Summary for get_managed_play_store_publishing_rights"
         )
 
-        @keyfile = params[:json_key] # TODO: json_key_data as alternative
+        @keyfile = params[:json_key]
 
         # login
         credentials = JSON.parse(File.open(@keyfile, 'rb').read)
@@ -66,7 +66,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(
             key: :json_key,
-            env_name: "SUPPLY_JSON_KEY", # TODO
+            env_name: "SUPPLY_JSON_KEY",
             short_option: "-j",
             conflicting_options: [:json_key_data],
             optional: true, # this shouldn't be optional but is until I find out how json_key OR json_key_data can be required
@@ -81,7 +81,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :json_key_data,
-            env_name: "SUPPLY_JSON_KEY_DATA", # TODO
+            env_name: "SUPPLY_JSON_KEY_DATA",
             short_option: "-c",
             conflicting_options: [:json_key],
             optional: true,
