@@ -141,8 +141,6 @@ module Match
         self.working_directory = nil
       end
 
-      private
-
       # Generate the commit message based on the user's parameters
       def generate_commit_message
         [
@@ -153,6 +151,8 @@ module Match
           self.platform
         ].join(" ")
       end
+
+      private
 
       # Create and checkout an specific branch in the git repo
       def checkout_branch

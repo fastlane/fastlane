@@ -10,11 +10,11 @@ require_relative 'utils'
 
 module Match
   class Runner
-    attr_accessor :files_to_commmit
+    attr_accessor :files_to_commit
     attr_accessor :spaceship
 
     def run(params)
-      self.files_to_commmit = []
+      self.files_to_commit = []
 
       FastlaneCore::PrintTable.print_values(config: params,
                                              title: "Summary for match #{Fastlane::VERSION}")
@@ -76,13 +76,13 @@ module Match
       end
 
       # Done
-      if self.files_to_commmit.count > 0 && !params[:readonly]
+      if self.files_to_commit.count > 0 && !params[:readonly]
         Dir.chdir(storage.working_directory) do
           return if `git status`.include?("nothing to commit")
 
           encryption.encrypt_files
 
-          storage.save_changes!(files_to_commmit: self.files_to_commmit)
+          storage.save_changes!(files_to_commit: self.files_to_commit)
         end
       end
 
@@ -114,8 +114,8 @@ module Match
         cert_path = Generator.generate_certificate(params, cert_type, working_directory)
         private_key_path = cert_path.gsub(".cer", ".p12")
 
-        self.files_to_commmit << cert_path
-        self.files_to_commmit << private_key_path
+        self.files_to_commit << cert_path
+        self.files_to_commit << private_key_path
       else
         cert_path = certs.last
         UI.message("Installing certificate...")
@@ -185,7 +185,7 @@ module Match
                                                   certificate_id: certificate_id,
                                                   app_identifier: app_identifier,
                                                working_directory: working_directory)
-        self.files_to_commmit << profile
+        self.files_to_commit << profile
       end
 
       installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
@@ -195,7 +195,7 @@ module Match
       if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
         # This profile is invalid, let's remove the local file and generate a new one
         File.delete(profile)
-        # This method will be called again, no need to modify `files_to_commmit`
+        # This method will be called again, no need to modify `files_to_commit`
         return nil
       end
 

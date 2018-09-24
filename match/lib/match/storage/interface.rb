@@ -32,7 +32,7 @@ module Match
       # seconds or longer to run
       # @parameter files_to_commit [Array] Array to paths to files
       #   that should be committed to the storage provider
-      def save_changes!(files_to_commmit: [])
+      def save_changes!(files_to_commit: [])
         not_implemented(__method__)
       end
 
