@@ -1,6 +1,3 @@
-require 'fastlane/action'
-require_relative '../helper/managed_google_play_helper'
-
 module Fastlane
   module Actions
     class CreateAppOnManagedPlayStoreAction < Action
