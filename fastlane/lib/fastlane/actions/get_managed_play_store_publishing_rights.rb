@@ -49,6 +49,16 @@ module Fastlane
         "TODO"
       end
 
+      def self.example_code
+        [
+          'get_managed_play_store_publishing_rights(
+            json_key: "path/to/your/json/key/file"
+          )
+          # it is probably more useful to execute this action directly in the command line:
+          # $ fastlane run get_managed_play_store_publishing_rights'
+        ]
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(
