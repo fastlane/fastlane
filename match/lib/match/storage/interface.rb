@@ -23,7 +23,9 @@ module Match
       # seconds or longer to run
       # @parameter files_to_commit [Array] Array to paths to files
       #   that should be committed to the storage provider
-      def save_changes!(files_to_commit: [])
+      # @parameter custom_message: [String] Custom change message
+      #           that's optional, is used for commit title
+      def save_changes!(files_to_commit: [], custom_message: nil)
         not_implemented(__method__)
       end
 

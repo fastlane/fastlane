@@ -51,9 +51,15 @@ module Match
         # - commands_generator.rb
       end
 
+      # To make debugging easier, we have a custom exception here
+      def working_directory
+        raise "`working_directory` for `GitStorage` is `nil` as the `#download` method was never called" if @working_directory.nil?
+        return @working_directory
+      end
+
       def download
         # Check if we already have a functional working_directory
-        return self.working_directory if self.working_directory
+        return self.working_directory if @working_directory
 
         # No existing working directory, creating a new one now
         self.working_directory = Dir.mktmpdir
@@ -94,50 +100,54 @@ module Match
         checkout_branch unless self.branch == "master"
       end
 
-      def save_changes!(files_to_commit: [])
-        commands = []
+      def save_changes!(files_to_commit: [], custom_message: nil)
+        Dir.chdir(File.expand_path(self.working_directory)) do
+          commands = []
 
-        if files_to_commit.count > 0 # e.g. for nuke this is treated differently
-          if !File.exist?(MATCH_VERSION_FILE_NAME) || File.read(MATCH_VERSION_FILE_NAME) != Fastlane::VERSION.to_s
-            files_to_commit << MATCH_VERSION_FILE_NAME
-            File.write(MATCH_VERSION_FILE_NAME, Fastlane::VERSION) # stored unencrypted
-          end
+          if files_to_commit.count > 0 # e.g. for nuke this is treated differently
+            if !File.exist?(MATCH_VERSION_FILE_NAME) || File.read(MATCH_VERSION_FILE_NAME) != Fastlane::VERSION.to_s
+              files_to_commit << MATCH_VERSION_FILE_NAME
+              File.write(MATCH_VERSION_FILE_NAME, Fastlane::VERSION) # stored unencrypted
+            end
 
-          template = File.read("#{Match::ROOT}/lib/assets/READMETemplate.md")
-          readme_path = "README.md"
-          if (!File.exist?(readme_path) || File.read(readme_path) != template) && !self.skip_docs
-            files_to_commit << readme_path
-            File.write(readme_path, template)
-          end
+            template = File.read("#{Match::ROOT}/lib/assets/READMETemplate.md")
+            readme_path = "README.md"
+            if (!File.exist?(readme_path) || File.read(readme_path) != template) && !self.skip_docs
+              files_to_commit << readme_path
+              File.write(readme_path, template)
+            end
 
-          # `git add` each file we want to commit
-          #   - Fixes https://github.com/fastlane/fastlane/issues/8917
-          #   - Fixes https://github.com/fastlane/fastlane/issues/8793
-          #   - Replaces, closes and fixes https://github.com/fastlane/fastlane/pull/8919
-          commands += files_to_commit.map do |current_file|
-            "git add #{current_file.shellescape}"
+            # `git add` each file we want to commit
+            #   - Fixes https://github.com/fastlane/fastlane/issues/8917
+            #   - Fixes https://github.com/fastlane/fastlane/issues/8793
+            #   - Replaces, closes and fixes https://github.com/fastlane/fastlane/pull/8919
+            commands += files_to_commit.map do |current_file|
+              "git add #{current_file.shellescape}"
+            end
+          else
+            # No specific list given, e.g. this happens on `fastlane match nuke`
+            # We just want to run `git add -A` to commit everything
+            commands << "git add -A"
           end
-        else
-          # No specific list given, e.g. this happens on `fastlane match nuke`
-          # We just want to run `git add -A` to commit everything
-          commands << "git add -A"
+          commit_message = custom_message || generate_commit_message
+          commands << "git commit -m #{commit_message.shellescape}"
+          commands << "GIT_TERMINAL_PROMPT=0 git push origin #{self.branch.shellescape}"
+
+          UI.message("Pushing changes to remote git repo...")
+
+          begin
+            commands.each do |command|
+              FastlaneCore::CommandExecutor.execute(command: command,
+                                                  print_all: FastlaneCore::Globals.verbose?,
+                                              print_command: FastlaneCore::Globals.verbose?)
+            end
+
+            self.clear_changes
+          rescue => ex
+            UI.error("Couldn't commit or push changes back to git...")
+            UI.error(ex)
+          end
         end
-        commit_message = generate_commit_message
-        commands << "git commit -m #{commit_message.shellescape}"
-        commands << "GIT_TERMINAL_PROMPT=0 git push origin #{self.branch.shellescape}"
-
-        UI.message("Pushing changes to remote git repo...")
-
-        commands.each do |command|
-          FastlaneCore::CommandExecutor.execute(command: command,
-                                              print_all: FastlaneCore::Globals.verbose?,
-                                          print_command: FastlaneCore::Globals.verbose?)
-        end
-
-        self.clear_changes
-      rescue => ex
-        UI.error("Couldn't commit or push changes back to git...")
-        UI.error(ex)
       end
 
       def clear_changes

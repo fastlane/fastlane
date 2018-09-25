@@ -135,9 +135,8 @@ describe Match do
         )
 
         @storage.download
-        Dir.chdir(@storage.working_directory) do
-          @storage.save_changes!(files_to_commit: [random_file])
-        end
+        @storage.save_changes!(files_to_commit: [random_file])
+
         expect(File.directory?(@storage.working_directory)).to eq(true)
         expect(File.exist?(File.join(@storage.working_directory, 'README.md'))).to eq(false)
         expect(File.read(File.join(@storage.working_directory, 'match_version.txt'))).to eq(Fastlane::VERSION)

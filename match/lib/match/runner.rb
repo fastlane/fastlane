@@ -35,7 +35,6 @@ module Match
 
       # Init the encryption only after the `storage.download` was called to have the right working directory
       encryption = Encryption::OpenSSL.new(git_url: storage.git_url, working_directory: storage.working_directory)
-
       encryption.decrypt_files # TODO: pass manual password somewhere
 
       unless params[:readonly]
