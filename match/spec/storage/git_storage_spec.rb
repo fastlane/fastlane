@@ -1,13 +1,11 @@
 describe Match do
   describe Match::Storage::GitStorage do
     before do
-      params = {
-        app_identifier: "tools.fastlane.app",
+      @storage = Match::Storage::GitStorage.new
+      @storage.configure(
         type: "appstore",
         platform: "ios"
-      }
-      @storage = Match::Storage::GitStorage.new(type: params[:type],
-                                            platform: params[:platform])
+      )
     end
 
     describe "#generate_commit_message" do
