@@ -30,12 +30,13 @@ module FastlaneCore
     end
 
     def format_string(datetime = Time.now, severity = "")
+      timezone_string = !ENV.key?('FASTLANE_SHOW_TIMEZONE') ? '' : ' %z'
       if FastlaneCore::Globals.verbose?
-        return "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N %z')}]: "
+        return "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N' + timezone_string)}]: "
       elsif FastlaneCore::Env.truthy?("FASTLANE_HIDE_TIMESTAMP")
         return ""
       else
-        return "[#{datetime.strftime('%H:%M:%S %z')}]: "
+        return "[#{datetime.strftime('%H:%M:%S' + timezone_string)}]: "
       end
     end
 
