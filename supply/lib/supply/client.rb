@@ -5,7 +5,67 @@ Androidpublisher = Google::Apis::AndroidpublisherV2
 require 'net/http'
 
 module Supply
-  class Client
+  UI = FastlaneCore::UI
+
+  class GoogleServiceClient
+    def self.make_from_config(params: nil)
+      unless params[:json_key] || params[:json_key_data]
+        UI.important("To not be asked about this value, you can specify it using 'json_key'")
+        params[:json_key] = UI.input("The service account json file used to authenticate with Google: ")
+      end
+
+      if params[:json_key]
+        service_account_json = File.open(File.expand_path(params[:json_key]))
+      elsif params[:json_key_data]
+        service_account_json = StringIO.new(params[:json_key_data])
+      end
+
+      return self.new(service_account_json: service_account_json, params: params)
+    end
+
+    # Initializes the service and its auth_client using the specified information
+    # @param service_account_json: The raw service account Json data
+    def initialize(service_account_json: nil, params: nil)
+      scope = @scope
+      auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: service_account_json, scope: scope)
+
+      UI.verbose("Fetching a new access token from Google...")
+
+      auth_client.fetch_access_token!
+
+      if FastlaneCore::Env.truthy?("DEBUG")
+        Google::Apis.logger.level = Logger::DEBUG
+      end
+
+      Google::Apis::ClientOptions.default.application_name = "fastlane (supply client)"
+      Google::Apis::ClientOptions.default.application_version = Fastlane::VERSION
+      Google::Apis::ClientOptions.default.read_timeout_sec = params[:timeout]
+      Google::Apis::ClientOptions.default.open_timeout_sec = params[:timeout]
+      Google::Apis::ClientOptions.default.send_timeout_sec = params[:timeout]
+      Google::Apis::RequestOptions.default.retries = 5
+
+      service = @service
+      service.authorization = auth_client
+
+      if params[:root_url]
+        # Google's client expects the root_url string to end with "/".
+        params[:root_url] << '/' unless params[:root_url].end_with?('/')
+        service.root_url = params[:root_url]
+      end
+
+      return service
+    end
+
+    private
+
+    def call_google_api
+      yield if block_given?
+    rescue Google::Apis::ClientError => e
+      UI.user_error!("Google Api Error: #{e.message}")
+    end
+  end
+
+  class Client < GoogleServiceClient
     # Connecting with Google
     attr_accessor :android_publisher
 
@@ -20,32 +80,29 @@ module Supply
     #####################################################
 
     # instantiate a client given the supplied configuration
-    def self.make_from_config
-      unless Supply.config[:json_key] || Supply.config[:json_key_data] || (Supply.config[:key] && Supply.config[:issuer])
+    def self.make_from_config(params: nil)
+      if(params.nil?)
+        params = Supply.config
+      end
+
+      # first consider deprecated params
+      unless params[:json_key] || params[:json_key_data] || (params[:key] && params[:issuer])
         UI.important("To not be asked about this value, you can specify it using 'json_key'")
-        Supply.config[:json_key] = UI.input("The service account json file used to authenticate with Google: ")
+        params[:json_key] = UI.input("The service account json file used to authenticate with Google: ")
       end
 
-      if Supply.config[:json_key]
-        service_account_json = File.open(File.expand_path(Supply.config[:json_key]))
-      elsif Supply.config[:json_key_data]
-        service_account_json = StringIO.new(Supply.config[:json_key_data])
-      end
-
-      return Client.new(path_to_key: Supply.config[:key],
-                        issuer: Supply.config[:issuer], service_account_json: service_account_json)
+      super(params: params)
     end
 
     # Initializes the android_publisher and its auth_client using the specified information
     # @param service_account_json: The raw service account Json data
     # @param path_to_key: The path to your p12 file (@deprecated)
     # @param issuer: Email address for oauth (@deprecated)
-    def initialize(path_to_key: nil, issuer: nil, service_account_json: nil)
-      scope = Androidpublisher::AUTH_ANDROIDPUBLISHER
-
+    def initialize(path_to_key: nil, issuer: nil, service_account_json: nil, params: nil)
       if service_account_json
         key_io = service_account_json
       else
+        # deprecated
         require 'google/api_client/auth/key_utils'
         key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(path_to_key), 'notasecret')
         cred_json = {
@@ -55,30 +112,10 @@ module Supply
         key_io = StringIO.new(MultiJson.dump(cred_json))
       end
 
-      auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: key_io, scope: scope)
+      @service = Androidpublisher::AndroidPublisherService.new
+      @scope = Androidpublisher::AUTH_ANDROIDPUBLISHER
 
-      UI.verbose("Fetching a new access token from Google...")
-
-      auth_client.fetch_access_token!
-
-      if FastlaneCore::Env.truthy?("DEBUG")
-        Google::Apis.logger.level = Logger::DEBUG
-      end
-
-      Google::Apis::ClientOptions.default.application_name = "fastlane - supply"
-      Google::Apis::ClientOptions.default.application_version = Fastlane::VERSION
-      Google::Apis::ClientOptions.default.read_timeout_sec = Supply.config[:timeout]
-      Google::Apis::ClientOptions.default.open_timeout_sec = Supply.config[:timeout]
-      Google::Apis::ClientOptions.default.send_timeout_sec = Supply.config[:timeout]
-      Google::Apis::RequestOptions.default.retries = 5
-
-      self.android_publisher = Androidpublisher::AndroidPublisherService.new
-      self.android_publisher.authorization = auth_client
-      if Supply.config[:root_url]
-        # Google's client expects the root_url string to end with "/".
-        Supply.config[:root_url] << '/' unless Supply.config[:root_url].end_with?('/')
-        self.android_publisher.root_url = Supply.config[:root_url]
-      end
+      self.android_publisher = super(service_account_json: key_io, params: params)
     end
 
     #####################################################
@@ -392,10 +429,5 @@ module Supply
       UI.user_error!("You need to have an active edit, make sure to call `begin_edit`") unless @current_edit
     end
 
-    def call_google_api
-      yield if block_given?
-    rescue Google::Apis::ClientError => e
-      UI.user_error!("Google Api Error: #{e.message}")
-    end
   end
 end
