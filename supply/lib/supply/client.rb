@@ -81,7 +81,7 @@ module Supply
 
     # instantiate a client given the supplied configuration
     def self.make_from_config(params: nil)
-      if(params.nil?)
+      if params.nil?
         params = Supply.config
       end
 
@@ -428,6 +428,5 @@ module Supply
     def ensure_active_edit!
       UI.user_error!("You need to have an active edit, make sure to call `begin_edit`") unless @current_edit
     end
-
   end
 end
