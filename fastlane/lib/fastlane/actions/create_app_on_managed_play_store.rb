@@ -1,11 +1,9 @@
+require "google/apis/playcustomapp_v1"
 module Fastlane
   module Actions
     class CreateAppOnManagedPlayStoreAction < Action
       def self.run(params)
-        unless params[:json_key] || params[:json_key_data]
-          UI.important("To not be asked about this value, you can specify it using 'json_key'")
-          params[:json_key] = UI.input("The service account json file used to authenticate with Google: ")
-        end
+        client = PlaycustomappClient.make_from_config(params: params)
 
         FastlaneCore::PrintTable.print_values(
           config: params,
@@ -13,55 +11,7 @@ module Fastlane
           title: "Summary for create_app_on_managed_play_store"
         )
 
-        require "google/apis/playcustomapp_v1"
-
-        # Auth Info
-        @keyfile = params[:json_key]
-        @developer_account = params[:developer_account_id]
-
-        # App Info
-        @apk_path = params[:apk]
-        @app_title = params[:app_title]
-        @language_code = params[:language]
-
-        # login
-        scope = 'https://www.googleapis.com/auth/androidpublisher'
-        credentials = JSON.parse(File.open(@keyfile, 'rb').read)
-        auth_client = Signet::OAuth2::Client.new(
-          token_credential_uri: 'https://oauth2.googleapis.com/token',
-          audience: 'https://oauth2.googleapis.com/token',
-          scope: scope,
-          issuer: credentials['client_id'],
-          signing_key: OpenSSL::PKey::RSA.new(credentials['private_key'], nil)
-        )
-        UI.message('auth_client: ' + auth_client.inspect)
-        auth_client.fetch_access_token!
-
-        # service
-        play_custom_apps = Google::Apis::PlaycustomappV1::PlaycustomappService.new
-        play_custom_apps.authorization = auth_client
-        UI.message('play_custom_apps with auth: ' + play_custom_apps.inspect)
-
-        # app
-        custom_app = Google::Apis::PlaycustomappV1::CustomApp.new(title: @app_title, language_code: @language_code)
-        UI.message('custom_app: ' + custom_app.inspect)
-
-        # create app
-        returned = play_custom_apps.create_account_custom_app(
-          @developer_account,
-          custom_app,
-          upload_source: @apk_path
-        ) do |created_app, error|
-          if error.nil?
-            puts("Success: #{created_app}.")
-            UI.success(created_app)
-            UI.success(created_app.inspect)
-          else
-            puts("Error: #{error}")
-            UI.error(error.inspect)
-          end
-        end
-        UI.message('returned: ' + returned.inspect)
+        client.create_app(app_title: params[:app_title], language_code: params[:language], developer_account: params[:developer_account_id], apk_path: params[:apk])
       end
 
       def self.description
@@ -84,7 +34,7 @@ module Fastlane
         [
           "create_app_on_managed_play_store(
             json_key: 'path/to/you/json/key/file',
-            developer_account_id: 'developer_account_id', # obtained using the get_managed_play_store_publishing_rights action (or looking at the Play Console url)
+            developer_account_id: 'developer_account_id', # obtained using the `get_managed_play_store_publishing_rights` action (or looking at the Play Console url)
             app_title: 'Your app title',
             language: 'en_US', # primary app language in BCP 47 format
             apk: '/files/app-release.apk'
@@ -175,7 +125,21 @@ module Fastlane
               unless AvailablePlayStoreLanguages.all_languages.include?(language)
                 UI.user_error!("Please enter one of available languages: #{AvailablePlayStoreLanguages.all_languages}")
               end
-            end)
+            end),
+          # stuff
+          FastlaneCore::ConfigItem.new(key: :root_url,
+            env_name: "SUPPLY_ROOT_URL",
+            description: "Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/",
+            optional: true,
+            verify_block: proc do |value|
+              UI.user_error!("Could not parse URL '#{value}'") unless value =~ URI.regexp
+            end),
+          FastlaneCore::ConfigItem.new(key: :timeout,
+            env_name: "SUPPLY_TIMEOUT",
+            optional: true,
+            description: "Timeout for read, open, and send (in seconds)",
+            type: Integer,
+            default_value: 300)
         ]
       end
 
@@ -186,6 +150,45 @@ module Fastlane
       def self.category
         :misc
       end
+    end
+  end
+end
+
+require 'supply/client'
+GoogleServiceClient = Supply::GoogleServiceClient
+class PlaycustomappClient < GoogleServiceClient
+  # Connecting with Google
+  attr_accessor :client
+
+  # instantiate a client given the supplied configuration
+  def self.make_from_config(params: nil)
+    @param = params
+    super(params: params)
+  end
+
+  # Initializes the service and its auth_client using the specified information
+  # @param service_account_json: The raw service account Json data
+  def initialize(service_account_json: nil, params: nil)
+    # TODO Can these be defined as a proper class variable somehow and not in `initialize`?
+    @scope = Google::Apis::PlaycustomappV1::AUTH_ANDROIDPUBLISHER
+    @service = Google::Apis::PlaycustomappV1::PlaycustomappService.new
+
+    self.client = super(service_account_json: service_account_json, params: params)
+  end
+
+  #####################################################
+  # @!group Create
+  #####################################################
+
+  def create_app(app_title: nil, language_code: nil, developer_account: nil, apk_path: nil)
+    custom_app = Google::Apis::PlaycustomappV1::CustomApp.new(title: app_title, language_code: language_code)
+
+    call_google_api do
+      client.create_account_custom_app(
+        developer_account,
+        custom_app,
+        upload_source: apk_path
+      )
     end
   end
 end
