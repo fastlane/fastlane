@@ -168,7 +168,6 @@ class PlaycustomappClient < GoogleServiceClient
   # Initializes the service and its auth_client using the specified information
   # @param service_account_json: The raw service account Json data
   def initialize(service_account_json: nil, params: nil)
-    # TODO: Can these be defined as a proper class variable somehow and not in `initialize`?
     @scope = Google::Apis::PlaycustomappV1::AUTH_ANDROIDPUBLISHER
     @service = Google::Apis::PlaycustomappV1::PlaycustomappService.new
 
