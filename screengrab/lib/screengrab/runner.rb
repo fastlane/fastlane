@@ -244,6 +244,13 @@ module Screengrab
     end
 
     def run_tests_for_locale(locale, device_serial, test_classes_to_use, test_packages_to_use, launch_arguments)
+      if @config[:clear_app_data]
+        UI.message("Clearing application data")
+        run_adb_command("adb -s #{device_serial} shell pm clear #{@config[:app_package_name]}",
+                        print_all: true,
+                        print_command: true)
+      end
+
       UI.message("Running tests for locale: #{locale}")
 
       instrument_command = ["adb -s #{device_serial} shell am instrument --no-window-animation -w",
