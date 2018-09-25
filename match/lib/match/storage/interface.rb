@@ -1,15 +1,6 @@
 module Match
   module Storage
     class Interface
-      attr_accessor :type
-      attr_accessor :platform
-
-      def initialize(type: nil,
-                     platform: nil)
-        self.type = type
-        self.platform = platform
-      end
-
       # Call this method after creating a new object to configure
       # the given Storage object. This method will take
       # different paramters depending on specific class being used

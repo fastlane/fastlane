@@ -15,11 +15,15 @@ module Match
       attr_accessor :git_full_name
       attr_accessor :git_user_email
       attr_accessor :clone_branch_directly
+      attr_accessor :type
+      attr_accessor :platform
 
       # TODO: Maybe this should be moved to the interface?
       attr_accessor :working_directory
 
-      def configure(git_url: nil,
+      def configure(type: nil,
+                    platform: nil,
+                    git_url: nil,
                     shallow_clone: nil,
                     manual_password: nil, # TODO: do we need this? I think just for changing password right?
                     skip_docs: false,
@@ -35,6 +39,9 @@ module Match
         self.git_full_name = git_full_name
         self.git_user_email = git_user_email
         self.clone_branch_directly = clone_branch_directly
+
+        self.type = type if type
+        self.platform = platform if platform
 
         # Note: if you modify the parameters above, don't forget to also update the method call in
         # TODO
