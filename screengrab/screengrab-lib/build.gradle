@@ -38,7 +38,7 @@ publish {
 }
 
 dependencies {
-    api "com.android.support:support-annotations:28.0.0-rc02"
+    api "com.android.support:support-annotations:28.0.0"
     api 'com.android.support.test:runner:1.0.2'
     api 'com.android.support.test:rules:1.0.2'
     api 'com.android.support.test.espresso:espresso-core:3.0.2'
