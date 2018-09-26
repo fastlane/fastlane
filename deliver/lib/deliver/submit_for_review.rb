@@ -58,8 +58,21 @@ module Deliver
       build = nil
 
       loop do
-        latest_build = find_build(app.latest_version.candidate_builds)
+        # Sometimes candidate_builds don't appear immediately after submittion
+        # Wait for candidate_builds to appear on App Store Connect
+        # Issue https://github.com/fastlane/fastlane/issues/10411
+        candidate_builds = app.latest_version.candidate_builds
+        if (candidate_builds || []).count == 0
+          UI.message("Waiting for candidate builds to appear...")
+          if (Time.now - start) > (60 * 5)
+            UI.user_error!("Could not find any available candidate builds on App Store Connect to submit")
+          else
+            sleep(30)
+            next
+          end
+        end
 
+        latest_build = find_build(candidate_builds)
         # Sometimes latest build will disappear and a different build would get selected
         # Only set build if no latest build found or if same build versions as previously fetched build
         # Issue: https://github.com/fastlane/fastlane/issues/10945
