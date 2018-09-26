@@ -45,7 +45,7 @@ module Fastlane
           print_bundle_exec_warning(is_slow: (Time.now - before_import_time > 3))
         end
 
-        unless `locale chapmap` == "UTF-8"
+        unless `locale charmap` == "UTF-8"
           warn = "WARNING: fastlane requires your locale to be set to UTF-8. To learn more go to https://docs.fastlane.tools/getting-started/ios/setup/#set-up-environment-variables"
           UI.error(warn)
           at_exit do
