@@ -21,7 +21,7 @@ describe Fastlane do
           )
         end").runner.execute(:test)
 
-        expect(result).to eq("git push origin 'develop':'remote_branch' --force")
+        expect(result).to eq("git push origin develop:remote_branch --force")
       end
     end
   end
