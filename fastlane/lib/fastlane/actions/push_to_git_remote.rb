@@ -14,7 +14,7 @@ module Fastlane
           'git',
           'push',
           params[:remote],
-          "#{local_branch}:#{remote_branch}"
+          "'#{local_branch}':'#{remote_branch}'"
         ]
 
         # optionally add the tags component
