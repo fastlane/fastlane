@@ -59,7 +59,7 @@ module Deliver
 
       loop do
         # Sometimes candidate_builds don't appear immediately after submittion
-        # Wait for candidate_builds to appear on iTunes
+        # Wait for candidate_builds to appear on App Store Connect
         # Issue https://github.com/fastlane/fastlane/issues/10411
         candidate_builds = app.latest_version.candidate_builds
         if (candidate_builds || []).count == 0
