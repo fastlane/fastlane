@@ -10,7 +10,7 @@ describe Fastlane do
             push_to_git_remote
           end").runner.execute(:test)
 
-        expect(result).to eq("git push origin master:master --tags")
+        expect(result).to eq("git push origin 'master':'master' --tags")
       end
 
       it "run git push with local_branch" do
@@ -20,7 +20,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to eq("git push origin staging:staging --tags")
+        expect(result).to eq("git push origin 'staging':'staging' --tags")
       end
 
       it "run git push with local_branch and remote_branch" do
@@ -31,7 +31,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to eq("git push origin staging:production --tags")
+        expect(result).to eq("git push origin 'staging':'production' --tags")
       end
 
       it "runs git push with tags:false" do
@@ -41,7 +41,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to eq("git push origin master:master")
+        expect(result).to eq("git push origin 'master':'master'")
       end
 
       it "runs git push with force:true" do
@@ -51,7 +51,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to eq("git push origin master:master --tags --force")
+        expect(result).to eq("git push origin 'master':'master' --tags --force")
       end
 
       it "runs git push with force_with_lease:true" do
@@ -61,7 +61,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to eq("git push origin master:master --tags --force-with-lease")
+        expect(result).to eq("git push origin 'master':'master' --tags --force-with-lease")
       end
 
       it "runs git push with remote" do
@@ -71,7 +71,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to eq("git push not_github master:master --tags")
+        expect(result).to eq("git push not_github 'master':'master' --tags")
       end
     end
   end
