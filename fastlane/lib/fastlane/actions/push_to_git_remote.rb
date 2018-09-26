@@ -14,7 +14,7 @@ module Fastlane
           'git',
           'push',
           params[:remote],
-          "#{local_branch}:#{remote_branch.shellescape}"
+          "#{local_branch.shellescape}:#{remote_branch.shellescape}"
         ]
 
         # optionally add the tags component
