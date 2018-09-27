@@ -12,7 +12,6 @@ require_relative 'fastlane_core/core_ext/shellwords'
 # Core functionality
 require_relative 'fastlane_core/update_checker/update_checker'
 
-
 # Third Party code
 require 'colored'
 require 'commander'
