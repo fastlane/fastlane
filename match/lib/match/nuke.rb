@@ -36,7 +36,7 @@ module Match
         git_url: storage.git_url,
         working_directory: storage.working_directory
       )
-      self.encryption.decrypt_files # TODO: pass manual password somewhere
+      self.encryption.decrypt_files
 
       had_app_identifier = self.params.fetch(:app_identifier, ask: false)
       self.params[:app_identifier] = '' # we don't really need a value here

@@ -38,7 +38,7 @@ module Match
         git_url: storage.git_url,
         working_directory: storage.working_directory
       )
-      encryption.decrypt_files # TODO: pass manual password somewhere
+      encryption.decrypt_files
 
       unless params[:readonly]
         self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name])

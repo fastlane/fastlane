@@ -24,7 +24,7 @@ module Match
         git_url: storage.git_url,
         working_directory: storage.working_directory
       )
-      encryption.decrypt_files # TODO: pass manual password somewhere
+      encryption.decrypt_files
 
       encryption.clear_password
       encryption.store_password(to)
