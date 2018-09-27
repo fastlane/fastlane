@@ -1,4 +1,5 @@
 require "rubygems/requirement"
+require "fastlane_core/tag_version"
 
 module Fastlane
   class FastFile
