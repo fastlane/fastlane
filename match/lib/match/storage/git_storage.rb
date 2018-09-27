@@ -152,7 +152,7 @@ module Match
 
       def clear_changes
         # TODO: what does this method actually do
-        return unless self.working_directory
+        return unless @working_directory
 
         FileUtils.rm_rf(self.working_directory)
         self.working_directory = nil
