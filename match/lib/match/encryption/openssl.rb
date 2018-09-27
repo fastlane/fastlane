@@ -11,21 +11,12 @@ module Match
 
       attr_accessor :working_directory
 
-      attr_accessor :manual_encryption_password
-
       # @param git_url: The Git URL is used for identifiying a specific repo
       #                 which is used to store the passphrase in the Keychain
       # @param working_directory: The path to where the certificates are stored
-      # @param manual_encryption_password: did the user pass a passphrase
-      #                 this is used for changing the password of the repo
-      def initialize(
-        git_url: nil,
-        working_directory: nil,
-        manual_encryption_password: nil
-      )
+      def initialize(git_url: nil, working_directory: nil)
         self.git_url = git_url
         self.working_directory = working_directory
-        self.manual_encryption_password = manual_encryption_password
       end
 
       def encrypt_files
@@ -39,7 +30,7 @@ module Match
       def decrypt_files
         iterate(self.working_directory) do |current|
           begin
-            decrypt_specific_file(path: current, password: self.manual_encryption_password || password)
+            decrypt_specific_file(path: current, password: password)
           rescue => ex
             UI.verbose(ex.to_s)
             UI.error("Couldn't decrypt the repo, please make sure you enter the right password!")
@@ -51,6 +42,15 @@ module Match
           UI.success("🔓  Decrypted '#{File.basename(current)}'") if FastlaneCore::Globals.verbose?
         end
         UI.success("🔓  Successfully decrypted certificates repo")
+      end
+
+      def store_password(password)
+        Security::InternetPassword.add(server_name(self.git_url), "", password)
+      end
+
+      # removes the password from the keychain again
+      def clear_password
+        Security::InternetPassword.delete(server: server_name(self.git_url))
       end
 
       private
@@ -90,15 +90,6 @@ module Match
         end
 
         return password
-      end
-
-      def store_password(password)
-        Security::InternetPassword.add(server_name(self.git_url), "", password)
-      end
-
-      # removes the password from the keychain again
-      def clear_password
-        Security::InternetPassword.delete(server: server_name(self.git_url))
       end
 
       # We encrypt with MD5 because that was the most common default value in older fastlane versions which used the local OpenSSL installation

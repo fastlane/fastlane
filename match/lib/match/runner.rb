@@ -79,10 +79,9 @@ module Match
       if self.files_to_commit.count > 0 && !params[:readonly]
         Dir.chdir(storage.working_directory) do
           return if `git status`.include?("nothing to commit")
-
-          encryption.encrypt_files
         end
 
+        encryption.encrypt_files
         storage.save_changes!(files_to_commit: self.files_to_commit)
       end
 

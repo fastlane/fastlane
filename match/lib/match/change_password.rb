@@ -3,27 +3,36 @@ require_relative 'module'
 module Match
   # These functions should only be used while in (UI.) interactive mode
   class ChangePassword
-    def self.update(params: nil, from: nil, to: nil)
+    def self.update(params: nil)
       ensure_ui_interactive
-      to ||= ChangePassword.ask_password(message: "New passphrase for Git Repo: ", confirm: false)
-      from ||= ChangePassword.ask_password(message: "Old passphrase for Git Repo: ", confirm: true)
-      GitHelper.clear_changes
-      workspace = GitHelper.clone(params[:git_url],
-                                  params[:shallow_clone],
-                                  manual_password: from,
-                                  skip_docs: params[:skip_docs],
-                                  branch: params[:git_branch],
-                                  git_full_name: params[:git_full_name],
-                                  git_user_email: params[:git_user_email],
-                                  clone_branch_directly: params[:clone_branch_directly])
-      Encrypt.new.clear_password(params[:git_url])
-      Encrypt.new.store_password(params[:git_url], to)
+
+      to ||= ChangePassword.ask_password(message: "New passphrase for Git Repo: ", confirm: true)
+
+      # Choose the right storage and encryption implementations
+      # TODO: 
+      storage = Storage::GitStorage.new
+      storage.configure(git_url: params[:git_url],
+                    shallow_clone: params[:shallow_clone],
+                    skip_docs: params[:skip_docs],
+                    branch: params[:git_branch],
+                    git_full_name: params[:git_full_name],
+                    git_user_email: params[:git_user_email],
+                    clone_branch_directly: params[:clone_branch_directly])
+      storage.download
+
+      encryption = Encryption::OpenSSL.new(git_url: storage.git_url, working_directory: storage.working_directory)
+      encryption.decrypt_files # TODO: pass manual password somewhere
+
+      encryption.clear_password
+      encryption.store_password(to)
 
       message = "[fastlane] Changed passphrase"
-      GitHelper.commit_changes(workspace, message, params[:git_url], params[:git_branch])
+      encryption.encrypt_files
+      storage.save_changes!(custom_message: message)
     end
 
-    def self.ask_password(message: "Passphrase for Git Repo: ", confirm: true)
+    # This method is called from both here, and from `openssl.rb`
+    def self.ask_password(message: "Passphrase for Git Repo: ", confirm: nil)
       ensure_ui_interactive
       loop do
         password = UI.password(message)

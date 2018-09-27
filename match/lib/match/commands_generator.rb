@@ -95,7 +95,7 @@ module Match
           params.load_configuration_file("Matchfile")
 
           Match::ChangePassword.update(params: params)
-          UI.success("Successfully changed the password. Make sure to update the password on all your clients and servers")
+          UI.success("Successfully changed the password. Make sure to update the password on all your clients and servers by running `fastlane match [environment]`")
         end
       end
 
