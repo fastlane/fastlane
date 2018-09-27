@@ -1,5 +1,6 @@
 require 'commander'
 require 'fastlane/new_action'
+require 'fastlane_core/swag'
 
 HighLine.track_eof = false
 
