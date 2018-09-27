@@ -240,10 +240,10 @@ module Deliver
           [2560, 1600]
         ],
         ScreenSize::IOS_APPLE_WATCH => [
-          [312, 390],
+          [312, 390]
         ],
         ScreenSize::IOS_APPLE_WATCH_SERIES4 => [
-          [368, 448],
+          [368, 448]
         ],
         ScreenSize::APPLE_TV => [
           [1920, 1080]
