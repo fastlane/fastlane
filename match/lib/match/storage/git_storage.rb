@@ -4,7 +4,7 @@ module Match
   module Storage
     # Store the code signing identities in a git repo
     class GitStorage < Interface
-      MATCH_VERSION_FILE_NAME = "match_version.txt" # TODO: do we want to keep this here?
+      MATCH_VERSION_FILE_NAME = "match_version.txt"
 
       # User provided values
       attr_accessor :git_url
@@ -17,9 +17,6 @@ module Match
       attr_accessor :clone_branch_directly
       attr_accessor :type
       attr_accessor :platform
-
-      # TODO: Maybe this should be moved to the interface?
-      attr_accessor :working_directory
 
       def configure(type: nil,
                     platform: nil,
@@ -49,12 +46,6 @@ module Match
         # - nuke.rb
         # - change_password.rb
         # - commands_generator.rb
-      end
-
-      # To make debugging easier, we have a custom exception here
-      def working_directory
-        raise "`working_directory` for `GitStorage` is `nil` as the `#download` method was never called" if @working_directory.nil?
-        return @working_directory
       end
 
       def download
