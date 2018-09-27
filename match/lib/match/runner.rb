@@ -81,9 +81,9 @@ module Match
           return if `git status`.include?("nothing to commit")
 
           encryption.encrypt_files
-
-          storage.save_changes!(files_to_commit: self.files_to_commit)
         end
+
+        storage.save_changes!(files_to_commit: self.files_to_commit)
       end
 
       # Print a summary table for each app_identifier
