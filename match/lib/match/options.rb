@@ -29,6 +29,17 @@ module Match
                                          UI.user_error!("Unsupported environment #{value}, must be in #{Match.environments.join(', ')}")
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :storage_mode,
+                                     env_name: "MATCH_STORAGE_MODE",
+                                     description: "Define where you want to store your certificates",
+                                     is_string: true,
+                                     short_option: "-q",
+                                     default_value: 'git',
+                                     verify_block: proc do |value|
+                                       unless Match.storage_modes.include?(value)
+                                         UI.user_error!("Unsupported storage_mode #{value}, must be in #{Match.storage_modes.join(', ')}")
+                                       end
+                                     end),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "MATCH_APP_IDENTIFIER",

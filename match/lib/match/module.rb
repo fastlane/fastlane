@@ -10,6 +10,10 @@ module Match
     return %w(appstore adhoc development enterprise)
   end
 
+  def self.storage_modes
+    return %w(git google_cloud)
+  end
+
   def self.profile_type_sym(type)
     return type.to_sym
   end

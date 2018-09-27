@@ -9,7 +9,7 @@ module Match
       to ||= ChangePassword.ask_password(message: "New passphrase for Git Repo: ", confirm: true)
 
       # Choose the right storage and encryption implementations
-      # TODO: 
+      # TODO:
       storage = Storage::GitStorage.new
       storage.configure(git_url: params[:git_url],
                     shallow_clone: params[:shallow_clone],

@@ -20,7 +20,7 @@ module Match
                                              title: "Summary for match #{Fastlane::VERSION}")
 
       # Choose the right storage and encryption implementations
-      storage = Storage::GitStorage.new
+      storage = Storage::Interface.storage_class_for_storage_mode(params[:storage_mode]).new
 
       storage.configure(git_url: params[:git_url],
                     shallow_clone: params[:shallow_clone],
@@ -34,7 +34,10 @@ module Match
       storage.download
 
       # Init the encryption only after the `storage.download` was called to have the right working directory
-      encryption = Encryption::OpenSSL.new(git_url: storage.git_url, working_directory: storage.working_directory)
+      encryption = Encryption::Interface.encryption_class_for_storage_mode(params[:storage_mode]).new(
+        git_url: storage.git_url,
+        working_directory: storage.working_directory
+      )
       encryption.decrypt_files # TODO: pass manual password somewhere
 
       unless params[:readonly]
