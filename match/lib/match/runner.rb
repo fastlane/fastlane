@@ -227,16 +227,16 @@ module Match
     end
 
     def device_count_different?(profile: nil, keychain_path: nil)
-      if profile
-        parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
-        uuid = parsed["UUID"]
-        portal_profile = Spaceship.provisioning_profile.all.detect { |i| i.uuid == uuid }
+      return false unless profile
 
-        if portal_profile
-          profile_device_count = portal_profile.devices.count
-          portal_device_count = Spaceship.device.all.count
-          return portal_device_count != profile_device_count
-        end
+      parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
+      uuid = parsed["UUID"]
+      portal_profile = Spaceship.provisioning_profile.all.detect { |i| i.uuid == uuid }
+
+      if portal_profile
+        profile_device_count = portal_profile.devices.count
+        portal_device_count = Spaceship.device.all.count
+        return portal_device_count != profile_device_count
       end
       return false
     end
