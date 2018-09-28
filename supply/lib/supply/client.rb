@@ -7,7 +7,7 @@ require 'net/http'
 module Supply
   UI = FastlaneCore::UI
 
-  class GoogleServiceClient
+  class AbstractGoogleServiceClient
     def self.make_from_config(params: nil)
       unless params[:json_key] || params[:json_key_data]
         UI.important("To not be asked about this value, you can specify it using 'json_key'")
@@ -65,7 +65,7 @@ module Supply
     end
   end
 
-  class Client < GoogleServiceClient
+  class Client < AbstractGoogleServiceClient
     # Connecting with Google
     attr_accessor :android_publisher
 

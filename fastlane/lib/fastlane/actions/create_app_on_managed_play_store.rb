@@ -155,8 +155,7 @@ module Fastlane
 end
 
 require 'supply/client'
-GoogleServiceClient = Supply::GoogleServiceClient
-class PlaycustomappClient < GoogleServiceClient
+class PlaycustomappClient < Supply::AbstractGoogleServiceClient
   # Connecting with Google
   attr_accessor :client
 
