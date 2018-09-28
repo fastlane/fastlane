@@ -19,8 +19,9 @@ module Frameit
       self.screenshot = screenshot
       prepare_image
 
-      if load_frame # Mac doesn't need a frame
-        self.frame = MiniMagick::Image.open(load_frame)
+      frame = load_frame
+      if frame # Mac doesn't need a frame
+        self.frame = MiniMagick::Image.open(frame)
         # Rotate the frame according to the device orientation
         self.frame.rotate(self.rotation_for_device_orientation)
       elsif self.class == Editor
