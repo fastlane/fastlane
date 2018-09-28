@@ -69,7 +69,7 @@ module Fastlane
           if ENV['JAVA_HOME'].nil?
             command = ["java"]
           else
-            command = [Shellwords.escape(File.join(ENV['JAVA_HOME'], "/bin/java"))]
+            command = [File.join(ENV['JAVA_HOME'], "/bin/java").shellescape]
           end
           command << "-jar #{File.expand_path(params[:crashlytics_path])}"
           command << "-androidRes ."
