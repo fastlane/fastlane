@@ -3,9 +3,6 @@ require 'credentials_manager'
 module Fastlane
   module Actions
     class RegisterDevicesAction < Action
-      UDID_REGEXP_IOS = /^(\h{40}|\h{8}-\h{16})$/
-      UDID_REGEXP_MAC = /^[\h\-]{36}$/
-
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
       end
@@ -17,7 +14,6 @@ module Fastlane
         devices_file = params[:devices_file]
 
         mac = params[:platform] == "mac"
-        udid_regexp = mac ? UDID_REGEXP_MAC : UDID_REGEXP_IOS
 
         credentials = CredentialsManager::AccountManager.new(user: params[:username])
         Spaceship.login(credentials.user, credentials.password)
@@ -28,7 +24,6 @@ module Fastlane
 
         if devices
           device_objs = devices.map do |k, v|
-            UI.user_error!("Passed invalid UDID: #{v} for device: #{k}") unless udid_regexp =~ v
             next if existing_devices.map(&:udid).include?(v)
             Spaceship::Device.create!(name: k, udid: v, mac: mac)
           end
@@ -40,9 +35,6 @@ module Fastlane
 
           device_objs = devices_file.drop(1).map do |device|
             next if existing_devices.map(&:udid).include?(device[0])
-
-            UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (http://devimages.apple.com/downloads/devices/Multiple-Upload-Samples.zip)") unless device.count == 2
-            UI.user_error!("Passed invalid UDID: #{device[0]} for device: #{device[1]}") unless udid_regexp =~ device[0]
 
             Spaceship::Device.create!(name: device[1], udid: device[0], mac: mac)
           end
