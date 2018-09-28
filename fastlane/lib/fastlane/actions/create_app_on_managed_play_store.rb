@@ -159,20 +159,6 @@ class PlaycustomappClient < Supply::AbstractGoogleServiceClient
   SERVICE = Google::Apis::PlaycustomappV1::PlaycustomappService.new
   SCOPE = Google::Apis::PlaycustomappV1::AUTH_ANDROIDPUBLISHER
 
-  # Connecting with Google
-  attr_accessor :client
-
-  # instantiate a client given the supplied configuration
-  def self.make_from_config(params: nil)
-    super(params: params)
-  end
-
-  # Initializes the service and its auth_client using the specified information
-  # @param service_account_json: The raw service account Json data
-  def initialize(service_account_json: nil, params: nil)
-    self.client = super(service_account_json: service_account_json, params: params)
-  end
-
   #####################################################
   # @!group Create
   #####################################################
