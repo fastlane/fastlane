@@ -27,7 +27,7 @@ describe Spaceship::Application do
     end
 
     it "#url" do
-      expect(Spaceship::Application.all.first.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088')
+      expect(Spaceship::Application.all.first.url).to eq('https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088')
     end
 
     describe "#find" do

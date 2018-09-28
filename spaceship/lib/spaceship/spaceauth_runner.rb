@@ -44,7 +44,7 @@ module Spaceship
 
       # We remove all the un-needed cookies
       cookies.select! do |cookie|
-        cookie.name.start_with?("DES5") || cookie.name == 'dqsid'
+        cookie.name.start_with?("myacinfo") || cookie.name == 'dqsid'
       end
 
       yaml = cookies.to_yaml.gsub("\n", "\\n")

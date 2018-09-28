@@ -106,7 +106,17 @@ module Fastlane
       UI.user_error!("You need to pass a valid path") unless File.exist?(path)
 
       Dir[File.expand_path('*.rb', path)].each do |file|
-        require file
+        begin
+          require file
+        rescue SyntaxError => ex
+          content = File.read(file, encoding: "utf-8")
+          ex.to_s.lines
+            .collect { |error| error.match(/#{file}:(\d+):(.*)/) }
+            .reject(&:nil?)
+            .each { |error| UI.content_error(content, error[1]) }
+          UI.user_error!("Syntax error in #{File.basename(file)}")
+          next
+        end
 
         file_name = File.basename(file).gsub('.rb', '')
 

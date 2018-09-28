@@ -61,6 +61,11 @@ module Scan
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'device' and 'devices' options in one run")
                                      end),
+        FastlaneCore::ConfigItem.new(key: :skip_detect_devices,
+                                     description: "Should skip auto detecting of devices if none were specified",
+                                     default_value: false,
+                                     type: Boolean,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",
                                      optional: true,
@@ -113,7 +118,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :output_style,
                                      short_option: "-b",
                                      env_name: "SCAN_OUTPUT_STYLE",
-                                     description: "Define how the output should look like (standard, basic, rspec or raw)",
+                                     description: "Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty)",
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Invalid output_style #{value}") unless ['standard', 'basic', 'rspec', 'raw'].include?(value)
@@ -145,6 +150,11 @@ module Scan
                                      short_option: "-n",
                                      env_name: "SCAN_FORMATTER",
                                      description: "A custom xcpretty formatter to use",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_args,
+                                     env_name: "SCAN_XCPRETTY_ARGS",
+                                     description: "Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')",
+                                     type: String,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :max_concurrent_simulators,
                                      type: Integer,

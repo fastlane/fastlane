@@ -138,7 +138,7 @@ module Spaceship
 
       # @return (String) An URL to this specific resource. You can enter this URL into your browser
       def url
-        "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.apple_id}"
+        "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.apple_id}"
       end
 
       def analytics
@@ -357,13 +357,13 @@ module Spaceship
       # @!group Submit for Review
       #####################################################
 
-      def create_submission
-        version = self.latest_version
+      def create_submission(platform: nil)
+        version = self.latest_version(platform: platform)
         if version.nil?
           raise "Could not find a valid version to submit for review"
         end
 
-        Spaceship::Tunes::AppSubmission.create(self, version)
+        Spaceship::Tunes::AppSubmission.create(self, version, platform: platform)
       end
 
       # Cancels all ongoing TestFlight beta submission for this application

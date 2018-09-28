@@ -110,7 +110,7 @@ module Scan
 
       # Zips build products and moves it to output directory
       UI.message("Zipping build products")
-      FastlaneCore::Helper.zip_directory(path, output_path, contents_only: true, print: false)
+      FastlaneCore::Helper.zip_directory(path, output_path, contents_only: true, overwrite: true, print: false)
       UI.message("Succesfully zipped build products: #{output_path}")
     end
 
@@ -122,9 +122,10 @@ module Scan
       # We'll have to regenerate from the xcodebuild log, like we did before version 2.34.0.
       UI.message("Generating test results. This may take a while for large projects.")
 
-      reporter_options_generator = XCPrettyReporterOptionsGenerator.new(false, [], [], "", false)
+      reporter_options_generator = XCPrettyReporterOptionsGenerator.new(false, [], [], "", false, nil)
       reporter_options = reporter_options_generator.generate_reporter_options
-      cmd = "cat #{@test_command_generator.xcodebuild_log_path.shellescape} | xcpretty #{reporter_options.join(' ')} &> /dev/null"
+      xcpretty_args_options = reporter_options_generator.generate_xcpretty_args_options
+      cmd = "cat #{@test_command_generator.xcodebuild_log_path.shellescape} | xcpretty #{reporter_options.join(' ')} #{xcpretty_args_options} &> /dev/null"
       system(cmd)
       File.read(Scan.cache[:temp_junit_report])
     end

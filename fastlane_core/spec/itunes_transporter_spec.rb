@@ -11,6 +11,7 @@ describe FastlaneCore do
         ("-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'" unless FastlaneCore::Helper.windows?),
         ("-p \\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<" if FastlaneCore::Helper.windows?),
         "-f \"/tmp/my.app.id.itmsp\"",
+        "-t DAV",
         "-t Signiant",
         "-k 100000",
         ("-WONoPause true" if FastlaneCore::Helper.windows?),
@@ -47,6 +48,7 @@ describe FastlaneCore do
         "-u fabric.devtools@gmail.com",
         "-p \\!\\>\\ p@\\$s_-\\+\\=w\\'o\\%rd\\\"\\&\\#\\*\\<",
         "-f /tmp/my.app.id.itmsp",
+        "-t DAV",
         "-t Signiant",
         "-k 100000",
         ("-itc_provider #{provider_short_name}" if provider_short_name),
@@ -91,6 +93,7 @@ describe FastlaneCore do
         "-u fabric.devtools@gmail.com",
         "-p \\!\\>\\ p@\\$s_-\\+\\=w\\'o\\%rd\\\"\\&\\#\\*\\<",
         "-f /tmp/my.app.id.itmsp",
+        "-t DAV",
         "-t Signiant",
         "-k 100000",
         ("-itc_provider #{provider_short_name}" if provider_short_name),
@@ -313,6 +316,25 @@ describe FastlaneCore do
           # If we are on Mac with Xcode >= 9, switch to newer java command
           command = java_download_command_9 if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_at_least?(9)
           expect(transporter.download('my.app.id', '/tmp')).to eq(command)
+        end
+      end
+    end
+
+    describe "with simulated no-test environment" do
+      before(:each) do
+        allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
+        @transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+      end
+
+      describe "and faked command execution" do
+        it 'handles successful execution with no errors' do
+          expect(FastlaneCore::FastlanePty).to receive(:spawn).and_return(0)
+          expect(@transporter.upload('my.app.id', '/tmp')).to eq(true)
+        end
+
+        it 'handles exceptions' do
+          expect(FastlaneCore::FastlanePty).to receive(:spawn).and_raise(StandardError, "It's all broken now.")
+          expect(@transporter.upload('my.app.id', '/tmp')).to eq(false)
         end
       end
     end

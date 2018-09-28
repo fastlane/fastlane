@@ -29,8 +29,6 @@ if ENV["FASTLANE_OPTIMIZE_BOOT"]
   )
 end
 
-$LOAD_PATH.push(File.expand_path("../../lib", __FILE__))
-
 require "fastlane/cli_tools_distributor"
 
 if Fastlane::CLIToolsDistributor.running_version_command?

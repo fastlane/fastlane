@@ -4,6 +4,7 @@ protocol ScanfileProtocol: class {
   var device: String? { get }
   var toolchain: String? { get }
   var devices: [String]? { get }
+  var skipDetectDevices: Bool { get }
   var scheme: String? { get }
   var clean: Bool { get }
   var codeCoverage: Bool? { get }
@@ -17,6 +18,7 @@ protocol ScanfileProtocol: class {
   var buildlogPath: String { get }
   var includeSimulatorLogs: Bool { get }
   var formatter: String? { get }
+  var xcprettyArgs: String? { get }
   var maxConcurrentSimulators: Int? { get }
   var disableConcurrentTesting: Bool { get }
   var testWithoutBuilding: Bool? { get }
@@ -49,6 +51,7 @@ extension ScanfileProtocol {
   var device: String? { return nil }
   var toolchain: String? { return nil }
   var devices: [String]? { return nil }
+  var skipDetectDevices: Bool { return false }
   var scheme: String? { return nil }
   var clean: Bool { return false }
   var codeCoverage: Bool? { return nil }
@@ -62,6 +65,7 @@ extension ScanfileProtocol {
   var buildlogPath: String { return "~/Library/Logs/scan" }
   var includeSimulatorLogs: Bool { return false }
   var formatter: String? { return nil }
+  var xcprettyArgs: String? { return nil }
   var maxConcurrentSimulators: Int? { return nil }
   var disableConcurrentTesting: Bool { return false }
   var testWithoutBuilding: Bool? { return nil }
@@ -90,4 +94,4 @@ extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.3]
+// FastlaneRunnerAPIVersion [0.9.5]

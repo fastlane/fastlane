@@ -47,22 +47,25 @@ module Fastlane
             app_group: 'app_group',
             apple_pay: 'apple_pay',
             associated_domains: 'associated_domains',
+            auto_fill_credential: 'auto_fill_credential',
             data_protection: 'data_protection',
             game_center: 'game_center',
             health_kit: 'healthkit',
             home_kit: 'homekit',
-            wireless_accessory: 'wireless_conf',
+            hotspot: 'hotspot',
             icloud: 'icloud',
             in_app_purchase: 'in_app_purchase',
             inter_app_audio: 'inter_app_audio',
+            multipath: 'multipath',
+            network_extension: 'network_extension',
+            nfc_tag_reading: 'nfc_tag_reading',
+            personal_vpn: 'personal_vpn',
             passbook: 'passbook',
             push_notification: 'push_notification',
             siri_kit: 'sirikit',
             vpn_configuration: 'vpn_conf',
-            network_extension: 'network_extension',
-            hotspot: 'hotspot',
-            multipath: 'multipath',
-            nfc_tag_reading: 'nfc_tag_reading'
+            wallet: 'wallet',
+            wireless_accessory: 'wireless_conf'
         }
       end
 

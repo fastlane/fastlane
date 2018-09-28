@@ -64,6 +64,9 @@ module FastlaneCore
             end
           end
         rescue => ex
+          # FastlanePty adds exit_status on to StandardError so every error will have a status code
+          status = ex.exit_status
+
           # This could happen when the environment is wrong:
           # > invalid byte sequence in US-ASCII (ArgumentError)
           output << ex.to_s

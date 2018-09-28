@@ -72,7 +72,7 @@ module FastlaneCore
     # @return [boolean] true if building in a known CI environment
     def self.ci?
       # Check for Jenkins, Travis CI, ... environment variables
-      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS'].each do |current|
+      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD'].each do |current|
         return true if ENV.key?(current)
       end
       return false
@@ -279,14 +279,20 @@ module FastlaneCore
     end
 
     # Zips directory
-    def self.zip_directory(path, output_path, contents_only: false, print: true)
+    def self.zip_directory(path, output_path, contents_only: false, overwrite: false, print: true)
+      if overwrite
+        overwrite_command = " && rm -f '#{output_path}'"
+      else
+        overwrite_command = ""
+      end
+
       if contents_only
-        command = "cd '#{path}' && zip -r '#{output_path}' *"
+        command = "cd '#{path}'#{overwrite_command} && zip -r '#{output_path}' *"
       else
         containing_path = File.expand_path("..", path)
         contents_path = File.basename(path)
 
-        command = "cd '#{containing_path}' && zip -r '#{output_path}' '#{contents_path}'"
+        command = "cd '#{containing_path}'#{overwrite_command} && zip -r '#{output_path}' '#{contents_path}'"
       end
 
       UI.command(command) unless print
