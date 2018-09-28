@@ -1,4 +1,4 @@
-require "fastlane/cli_tools_distributor"
+require_relative internal('fastlane/cli_tools_distributor')
 
 module Fastlane
   class PluginManager

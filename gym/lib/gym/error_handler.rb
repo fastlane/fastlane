@@ -1,6 +1,6 @@
 # coding: utf-8
 
-require 'fastlane_core/print_table'
+require_relative internal('fastlane_core/print_table')
 require_relative 'module'
 
 module Gym

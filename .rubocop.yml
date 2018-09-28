@@ -1,6 +1,7 @@
 require:
   - rubocop/require_tools
   - ./rubocop/fork_usage.rb
+  - ./rubocop/require_relative.rb
 
 Style/MultipleComparison:
   Enabled: false
@@ -89,6 +90,7 @@ Lint/UselessAssignment:
 
 # In specs requires are done automatically
 Require/MissingRequireStatement:
+  Enabled: false # TODO: remove
   Exclude:
     - '**/spec/**/*.rb'
     - '**/spec_helper.rb'
@@ -99,7 +101,16 @@ Require/MissingRequireStatement:
     - '**/*.rake'
     - '**/Rakefile'
     - 'fastlane/**/*' # TODO: remove
-    - 'supply/**/*' # TODO: remove
+
+Require/PreferRelative:
+  Exclude:
+    - '**/spec/**/*.rb'
+    - '**/spec_helper.rb'
+    - '**/Fastfile'
+    - '**/*.gemspec'
+    - 'rakelib/**/*'
+    - '**/*.rake'
+    - '**/Rakefile'
 
 # We could potentially enable the 2 below:
 Layout/IndentHash:
@@ -237,6 +248,7 @@ Style/PerlBackrefs:
 
 # Disable '+ should be surrounded with a single space' for xcodebuild_spec.rb
 Layout/SpaceAroundOperators:
+  Enabled: false # TODO: remove
   Exclude:
     - '**/spec/actions_specs/xcodebuild_spec.rb'
 
@@ -314,3 +326,4 @@ Style/MethodCallWithArgsParentheses:
     - 'context'
     - 'before'
     - 'after'
+

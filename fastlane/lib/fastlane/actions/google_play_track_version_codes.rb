@@ -14,9 +14,9 @@ module Fastlane
       ]
 
       def self.run(params)
-        require 'supply'
-        require 'supply/options'
-        require 'supply/reader'
+        require_relative internal('supply')
+        require_relative internal('supply/options')
+        require_relative internal('supply/reader')
 
         Supply.config = params
 
@@ -36,8 +36,8 @@ module Fastlane
       end
 
       def self.available_options
-        require 'supply'
-        require 'supply/options'
+        require_relative internal('supply')
+        require_relative internal('supply/options')
 
         Supply::Options.available_options.select do |option|
           OPTIONS.include?(option.key)

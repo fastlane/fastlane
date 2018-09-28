@@ -1,4 +1,4 @@
-require 'fastlane/boolean'
+require_relative internal('fastlane/boolean')
 
 require_relative 'analytics/analytics_session'
 

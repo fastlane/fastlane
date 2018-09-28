@@ -1,4 +1,4 @@
-require 'spaceship/test_flight/build'
+require_relative internal('spaceship/test_flight/build')
 
 require_relative 'ui/ui'
 

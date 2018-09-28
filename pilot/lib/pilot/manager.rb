@@ -1,11 +1,11 @@
-require 'credentials_manager/appfile_config'
+require_relative internal('credentials_manager/appfile_config')
 
-require 'fastlane_core/print_table'
-require 'spaceship'
-require 'spaceship/tunes/tunes'
-require 'spaceship/tunes/members'
-require 'spaceship/test_flight'
-require 'fastlane_core/ipa_file_analyser'
+require_relative internal('fastlane_core/print_table')
+require_relative internal('spaceship')
+require_relative internal('spaceship/tunes/tunes')
+require_relative internal('spaceship/tunes/members')
+require_relative internal('spaceship/test_flight')
+require_relative internal('fastlane_core/ipa_file_analyser')
 require_relative 'module'
 
 module Pilot

@@ -2,8 +2,8 @@ module Fastlane
   module Actions
     class UploadToTestflightAction < Action
       def self.run(values)
-        require 'pilot'
-        require 'pilot/options'
+        require_relative internal('pilot')
+        require_relative internal('pilot/options')
 
         changelog = Actions.lane_context[SharedValues::FL_CHANGELOG]
         values[:changelog] ||= changelog if changelog
@@ -32,8 +32,8 @@ module Fastlane
       end
 
       def self.available_options
-        require "pilot"
-        require "pilot/options"
+        require_relative internal('pilot')
+        require_relative internal('pilot/options')
         FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options)
       end
 

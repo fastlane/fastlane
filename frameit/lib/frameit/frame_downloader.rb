@@ -1,4 +1,4 @@
-require 'fastlane_core/module'
+require_relative internal('fastlane_core/module')
 
 require_relative 'module'
 

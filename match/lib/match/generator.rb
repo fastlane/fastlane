@@ -4,8 +4,8 @@ module Match
   # Generate missing resources
   class Generator
     def self.generate_certificate(params, cert_type)
-      require 'cert/runner'
-      require 'cert/options'
+      require_relative internal('cert/runner')
+      require_relative internal('cert/options')
 
       output_path = File.join(params[:workspace], "certs", cert_type.to_s)
 
@@ -41,8 +41,8 @@ module Match
 
     # @return (String) The UUID of the newly generated profile
     def self.generate_provisioning_profile(params: nil, prov_type: nil, certificate_id: nil, app_identifier: nil)
-      require 'sigh/manager'
-      require 'sigh/options'
+      require_relative internal('sigh/manager')
+      require_relative internal('sigh/options')
 
       prov_type = Match.profile_type_sym(params[:type])
 

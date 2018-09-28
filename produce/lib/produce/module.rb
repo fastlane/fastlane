@@ -1,4 +1,4 @@
-require 'fastlane_core/helper'
+require_relative internal('fastlane_core/helper')
 
 module Produce
   class << self

@@ -3,7 +3,7 @@ module Fastlane
     # Resigns the ipa
     class ResignAction < Action
       def self.run(params)
-        require 'sigh'
+        require_relative internal('sigh')
 
         # try to resign the ipa
         if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile], params[:entitlements], params[:version], params[:display_name], params[:short_version], params[:bundle_version], params[:bundle_id], params[:use_app_entitlements], params[:keychain_path])

@@ -1,6 +1,6 @@
 require 'commander'
 
-require 'fastlane_core/configuration/configuration'
+require_relative internal('fastlane_core/configuration/configuration')
 require_relative 'module'
 require_relative 'manager'
 require_relative 'options'

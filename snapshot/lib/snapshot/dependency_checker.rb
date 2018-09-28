@@ -1,5 +1,5 @@
-require 'fastlane_core/device_manager'
-require 'fastlane_core/helper'
+require_relative internal('fastlane_core/device_manager')
+require_relative internal('fastlane_core/helper')
 require_relative 'latest_os_version'
 
 module Snapshot

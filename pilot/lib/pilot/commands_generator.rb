@@ -1,6 +1,6 @@
 require "commander"
 
-require 'fastlane_core/configuration/configuration'
+require_relative internal('fastlane_core/configuration/configuration')
 require_relative 'module'
 require_relative 'tester_importer'
 require_relative 'tester_exporter'

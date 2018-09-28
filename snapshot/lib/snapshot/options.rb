@@ -1,6 +1,6 @@
-require 'fastlane_core/configuration/config_item'
-require 'fastlane_core/device_manager'
-require 'credentials_manager/appfile_config'
+require_relative internal('fastlane_core/configuration/config_item')
+require_relative internal('fastlane_core/device_manager')
+require_relative internal('credentials_manager/appfile_config')
 require_relative 'module'
 
 module Snapshot

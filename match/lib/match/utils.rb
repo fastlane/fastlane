@@ -1,4 +1,4 @@
-require 'fastlane_core/keychain_importer'
+require_relative internal('fastlane_core/keychain_importer')
 require 'openssl'
 require_relative 'module'
 

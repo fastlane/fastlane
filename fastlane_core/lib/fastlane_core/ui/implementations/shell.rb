@@ -26,6 +26,8 @@ module FastlaneCore
         "#{format_string(datetime, severity)}#{msg}\n"
       end
 
+      require_relative internal('fastlane_core/ui/disable_colors') if FastlaneCore::Helper.colors_disabled?
+
       @log
     end
 
