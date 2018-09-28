@@ -83,7 +83,10 @@ describe Match::CommandsGenerator do
       })
 
       expect(fake_storage).to receive(:download)
-      expect(fake_storage).to receive(:working_directory).and_return("yolo_path")
+      allow(fake_storage).to receive(:working_directory).and_return("yolo_path")
+      allow(fake_storage).to receive(:git_url).and_return("https://github.com/fastlane/certs")
+
+      expect(FastlaneCore::UI).to receive(:success).with(/Successfully decrypted certificates/)
       expect(FastlaneCore::UI).to receive(:success).with(/Repo is at/)
     end
 
