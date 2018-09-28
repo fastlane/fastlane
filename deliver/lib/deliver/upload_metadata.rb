@@ -94,6 +94,7 @@ module Deliver
         non_localised_options = (NON_LOCALISED_VERSION_VALUES + NON_LOCALISED_APP_VALUES)
       end
 
+      individual = options[:individual_metadata_items]
       localised_options.each do |key|
         current = options[key]
         next unless current
@@ -106,8 +107,12 @@ module Deliver
         current.each do |language, value|
           next unless value.to_s.length > 0
           strip_value = value.to_s.strip
-          v.send(key)[language] = strip_value if LOCALISED_VERSION_VALUES.include?(key)
-          details.send(key)[language] = strip_value if LOCALISED_APP_VALUES.include?(key)
+          if individual.include?(key.to_s)
+            upload_individual_item(app, v, language, key, strip_value)
+          else
+            v.send(key)[language] = strip_value if LOCALISED_VERSION_VALUES.include?(key)
+            details.send(key)[language] = strip_value if LOCALISED_APP_VALUES.include?(key)
+          end
         end
       end
 
@@ -137,10 +142,28 @@ module Deliver
         # If another string needs to be checked here we should
         # figure out a more generic way to handle these cases.
         if e.message.include?('App Name cannot be longer than 50 characters') || e.message.include?('The app name you entered is already being used')
+          UI.error("Error in app name.  Try using 'individual_metadata_items' to identify the problem language.")
           UI.user_error!(e.message)
         else
           raise e
         end
+      end
+    end
+
+    # Uploads metadata individually by language to help identify exactly which items have issues
+    def upload_individual_item(app, version, language, key, value)
+      details = app.details
+      version.send(key)[language] = value if LOCALISED_VERSION_VALUES.include?(key)
+      details.send(key)[language] = value if LOCALISED_APP_VALUES.include?(key)
+      Helper.show_loading_indicator("Uploading #{language} #{key} to App Store Connect")
+      version.save!
+      Helper.hide_loading_indicator
+      begin
+        details.save!
+        UI.success("Successfully uploaded #{language} #{key} to App Store Connect")
+      rescue Spaceship::TunesClient::ITunesConnectError => e
+        UI.error("Error in #{language} #{key}: \n#{value}")
+        UI.error(e.message) # Don't use user_error to allow all values to get checked
       end
     end
 
