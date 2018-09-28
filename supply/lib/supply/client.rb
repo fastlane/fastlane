@@ -8,6 +8,9 @@ module Supply
   UI = FastlaneCore::UI
 
   class AbstractGoogleServiceClient
+    SCOPE = nil
+    SERVICE = nil
+
     def self.make_from_config(params: nil)
       unless params[:json_key] || params[:json_key_data]
         UI.important("To not be asked about this value, you can specify it using 'json_key'")
@@ -26,8 +29,7 @@ module Supply
     # Initializes the service and its auth_client using the specified information
     # @param service_account_json: The raw service account Json data
     def initialize(service_account_json: nil, params: nil)
-      scope = @scope
-      auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: service_account_json, scope: scope)
+      auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
 
       UI.verbose("Fetching a new access token from Google...")
 
@@ -44,7 +46,7 @@ module Supply
       Google::Apis::ClientOptions.default.send_timeout_sec = params[:timeout]
       Google::Apis::RequestOptions.default.retries = 5
 
-      service = @service
+      service = self.class::SERVICE
       service.authorization = auth_client
 
       if params[:root_url]
@@ -66,6 +68,9 @@ module Supply
   end
 
   class Client < AbstractGoogleServiceClient
+    SERVICE = Androidpublisher::AndroidPublisherService.new
+    SCOPE = Androidpublisher::AUTH_ANDROIDPUBLISHER
+
     # Connecting with Google
     attr_accessor :android_publisher
 
@@ -111,9 +116,6 @@ module Supply
         }
         key_io = StringIO.new(MultiJson.dump(cred_json))
       end
-
-      @service = Androidpublisher::AndroidPublisherService.new
-      @scope = Androidpublisher::AUTH_ANDROIDPUBLISHER
 
       self.android_publisher = super(service_account_json: key_io, params: params)
     end

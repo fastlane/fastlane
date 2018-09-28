@@ -156,6 +156,9 @@ end
 
 require 'supply/client'
 class PlaycustomappClient < Supply::AbstractGoogleServiceClient
+  SERVICE = Google::Apis::PlaycustomappV1::PlaycustomappService.new
+  SCOPE = Google::Apis::PlaycustomappV1::AUTH_ANDROIDPUBLISHER
+
   # Connecting with Google
   attr_accessor :client
 
@@ -167,9 +170,6 @@ class PlaycustomappClient < Supply::AbstractGoogleServiceClient
   # Initializes the service and its auth_client using the specified information
   # @param service_account_json: The raw service account Json data
   def initialize(service_account_json: nil, params: nil)
-    @scope = Google::Apis::PlaycustomappV1::AUTH_ANDROIDPUBLISHER
-    @service = Google::Apis::PlaycustomappV1::PlaycustomappService.new
-
     self.client = super(service_account_json: service_account_json, params: params)
   end
 
