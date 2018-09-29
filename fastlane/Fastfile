@@ -70,6 +70,16 @@ lane :benchmark_help_command do
         UI.message("🏎️ '#{line.strip}'") if ["Total", "real", "user", "sys"].any? { |word| line.include?(word) }
       end
     end
+    ENV["FASTLANE_OPTIMIZE_BOOT"] = '1'
+    UI.important("Turning on FASTLANE_OPTIMIZE_BOOT:")
+    3.times do
+      content = sh(cmd, log: false)
+      content.each_line do |line|
+        UI.message("🏎️ '#{line.strip}'") if ["Total", "real", "user", "sys"].any? { |word| line.include?(word) }
+      end
+    end
+    ENV.delete("FASTLANE_OPTIMIZE_BOOT")
+    UI.important("Turning off FASTLANE_OPTIMIZE_BOOT again.")
   end
 end
 
@@ -494,7 +504,7 @@ end
 
 desc "Get the local version number per version.rb"
 private_lane :local_version do
-  require "../fastlane/lib/fastlane/version.rb"
+  require_relative "../fastlane/lib/fastlane/version.rb"
 
   Fastlane::VERSION
 end
