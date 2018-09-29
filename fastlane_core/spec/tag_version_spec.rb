@@ -1,4 +1,4 @@
-require "fastlane_core/tag_version"
+require_relative "../lib/fastlane_core/tag_version"
 
 describe FastlaneCore::TagVersion do
   describe "version_number_from_tag" do
