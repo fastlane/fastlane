@@ -25,7 +25,7 @@ module Fastlane
         if devices
           device_objs = devices.map do |k, v|
             next if existing_devices.map(&:udid).include?(v)
-            Spaceship::Device.create!(name: k, udid: v, mac: mac)
+            try_create_device(name: k, udid: v, mac: mac)
           end
         elsif devices_file
           require 'csv'
@@ -38,12 +38,7 @@ module Fastlane
 
             UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (http://devimages.apple.com/downloads/devices/Multiple-Upload-Samples.zip)") unless device.count == 2
 
-            begin
-              Spaceship::Device.create!(name: device[1], udid: device[0], mac: mac)
-            rescue => ex
-              UI.error("Failed to register new device (name #{device[1]}, UDID: #{device[0]})")
-              UI.error(ex.to_s)
-            end
+            try_create_device(name: device[1], udid: device[0], mac: mac)
           end
         else
           UI.user_error!("You must pass either a valid `devices` or `devices_file`. Please check the readme.")
@@ -51,6 +46,13 @@ module Fastlane
 
         UI.success("Successfully registered new devices.")
         return device_objs
+      end
+
+      def try_create_device(name, udid, mac)
+        Spaceship::Device.create!(name: name, udid: udid, mac: mac)
+      rescue => ex
+        UI.error("Failed to register new device (name #{name}, UDID: #{udid})")
+        UI.error(ex.to_s)
       end
 
       def self.description
