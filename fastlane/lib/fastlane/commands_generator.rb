@@ -1,6 +1,6 @@
 require 'commander'
-require 'fastlane/new_action'
-require 'fastlane_core/swag'
+require_relative 'new_action'
+require_relative '../../../fastlane_core/lib/fastlane_core/swag'
 
 HighLine.track_eof = false
 
