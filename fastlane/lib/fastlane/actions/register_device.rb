@@ -17,7 +17,13 @@ module Fastlane
         Spaceship.login(credentials.user, credentials.password)
         Spaceship.select_team
 
-        Spaceship::Device.create!(name: name, udid: udid)
+        begin
+          Spaceship::Device.create!(name: name, udid: udid)
+        rescue => ex
+          UI.error("Failed to register new device")
+          UI.error(ex.to_s)
+          return nil
+        end
 
         UI.success("Successfully registered new device")
         return udid

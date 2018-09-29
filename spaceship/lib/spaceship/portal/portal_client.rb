@@ -532,7 +532,12 @@ module Spaceship
         register: 'single'
       })
 
-      parse_response(req, 'devices').first
+      devices = parse_response(req, 'devices')
+      return devices.first unless devices.empty?
+
+      raise parse_response(req, 'validationMessages').map { |message|
+        message["validationUserMessage"]
+      }.compact.uniq.join('\n')
     end
 
     def disable_device!(device_id, device_udid, mac: false)

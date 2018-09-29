@@ -166,6 +166,11 @@ class PortalStubbing
         with(body: { "deviceClasses" => "iphone", "deviceNames" => "Demo Device", "deviceNumbers" => "7f6c8dc83d77134b5a3a1c53f1202b395b04482b", "register" => "single", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('addDeviceResponse.action.json'), headers: { 'Content-Type' => 'application/json' })
 
+      # Fail to register a new device with an invalid UDID
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/device/addDevices.action").
+        with(body: { "deviceClasses" => "iphone", "deviceNames" => "Demo Device", "deviceNumbers" => "1234", "register" => "single", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('addDeviceFailureResponse.json'), headers: { 'Content-Type' => 'application/json' })
+
       # Custom paging
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action").
         with(body: { "pageNumber" => "1", "pageSize" => "8", "sort" => "name=asc", "teamId" => "XXXXXXXXXX", includeRemovedDevices: "false" }).
