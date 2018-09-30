@@ -156,7 +156,7 @@ end
 
 require 'supply/client'
 class PlaycustomappClient < Supply::AbstractGoogleServiceClient
-  SERVICE = Google::Apis::PlaycustomappV1::PlaycustomappService.new
+  SERVICE = Google::Apis::PlaycustomappV1::PlaycustomappService
   SCOPE = Google::Apis::PlaycustomappV1::AUTH_ANDROIDPUBLISHER
 
   #####################################################

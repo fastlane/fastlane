@@ -49,7 +49,7 @@ module Supply
       Google::Apis::ClientOptions.default.send_timeout_sec = params[:timeout]
       Google::Apis::RequestOptions.default.retries = 5
 
-      service = self.class::SERVICE
+      service = self.class::SERVICE.new
       service.authorization = auth_client
 
       if params[:root_url]
@@ -71,7 +71,7 @@ module Supply
   end
 
   class Client < AbstractGoogleServiceClient
-    SERVICE = Androidpublisher::AndroidPublisherService.new
+    SERVICE = Androidpublisher::AndroidPublisherService
     SCOPE = Androidpublisher::AUTH_ANDROIDPUBLISHER
 
     # Editing something
