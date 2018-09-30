@@ -2,24 +2,22 @@ require 'shellwords'
 require 'credentials_manager'
 
 describe FastlaneCore do
-  before(:each) do 
-    let(:password) { "!> p@$s_-+=w'o%rd\"&#*<" }
-  end
+  let(:password) { "!> p@$s_-+=w'o%rd\"&#*<" }
 
   describe FastlaneCore::ItunesTransporter do
     def shell_upload_command(provider_short_name = nil)
-      password = password.shellescape
+      escaped_password = password.shellescape
       if FastlaneCore::Helper.mac?
-        password = password.gsub("\\'") do
+        escaped_password = escaped_password.gsub("\\'") do
           "'\"\\'\"'"
         end
-        password = "'" + password + "'"
+        escaped_password = "'" + escaped_password + "'"
       end
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         "-m upload",
-        '-u "fabric.devtools@gmail.com"',
-        "-p #{password}",
+        "-u #{email.shellescape}",
+        "-p #{escaped_password}",
         "-f \"/tmp/my.app.id.itmsp\"",
         "-t DAV",
         "-t Signiant",
@@ -30,18 +28,18 @@ describe FastlaneCore do
     end
 
     def shell_download_command(provider_short_name = nil)
-      password = password.shellescape
+      escaped_password = password.shellescape
       if FastlaneCore::Helper.mac?
-        password = password.gsub("\\'") do
+        escaped_password = escaped_password.gsub("\\'") do
           "'\"\\'\"'"
         end
-        password = "'" + password + "'"
+        escaped_password = "'" + escaped_password + "'"
       end
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         '-m lookupMetadata',
-        '-u "fabric.devtools@gmail.com"',
-        "-p #{password}",
+        "-u #{email.shellescape}",
+        "-p #{escaped_password}",
         "-apple_id my.app.id",
         "-destination '/tmp'",
         ("-itc_provider #{provider_short_name}" if provider_short_name)
