@@ -51,8 +51,8 @@ module Fastlane
       def try_create_device(name, udid, mac)
         Spaceship::Device.create!(name: name, udid: udid, mac: mac)
       rescue => ex
-        UI.error("Failed to register new device (name #{name}, UDID: #{udid})")
         UI.error(ex.to_s)
+        UI.crash!("Failed to register new device (name: #{name}, UDID: #{udid})")
       end
 
       def self.description
