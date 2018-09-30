@@ -43,6 +43,8 @@ module Deliver
       IOS_IPAD_PRO_MESSAGES = "iOS-iPad-Pro-messages"
       # Apple Watch
       IOS_APPLE_WATCH = "iOS-Apple-Watch"
+      # Apple Watch Series 4
+      IOS_APPLE_WATCH_SERIES4 = "iOS-Apple-Watch-Series4"
       # Mac
       MAC = "Mac"
       # Apple TV
@@ -93,6 +95,7 @@ module Deliver
         ScreenSize::IOS_IPAD_10_5_MESSAGES => "ipad105",
         ScreenSize::MAC => "desktop",
         ScreenSize::IOS_APPLE_WATCH => "watch",
+        ScreenSize::IOS_APPLE_WATCH_SERIES4 => "watchSeries4",
         ScreenSize::APPLE_TV => "appleTV"
       }
       return matching[self.screen_size]
@@ -120,6 +123,7 @@ module Deliver
         ScreenSize::IOS_IPAD_10_5_MESSAGES => "iPad 10.5 (iMessage)",
         ScreenSize::MAC => "Mac",
         ScreenSize::IOS_APPLE_WATCH => "Watch",
+        ScreenSize::IOS_APPLE_WATCH_SERIES4 => "Watch Series4",
         ScreenSize::APPLE_TV => "Apple TV"
       }
       return matching[self.screen_size]
@@ -237,6 +241,9 @@ module Deliver
         ],
         ScreenSize::IOS_APPLE_WATCH => [
           [312, 390]
+        ],
+        ScreenSize::IOS_APPLE_WATCH_SERIES4 => [
+          [368, 448]
         ],
         ScreenSize::APPLE_TV => [
           [1920, 1080]
