@@ -162,7 +162,7 @@ module FastlaneCore
       [
         '"' + Helper.transporter_path + '"',
         "-m upload",
-        "-u \"#{username}\"",
+        "-u #{username.shellescape}",
         "-p #{shell_escaped_password(password)}",
         "-f \"#{source}\"",
         additional_upload_parameters, # that's here, because the user might overwrite the -t option
@@ -177,7 +177,7 @@ module FastlaneCore
       [
         '"' + Helper.transporter_path + '"',
         "-m lookupMetadata",
-        "-u \"#{username}\"",
+        "-u #{username.shellescape}",
         "-p #{shell_escaped_password(password)}",
         "-apple_id #{apple_id}",
         "-destination '#{destination}'",
