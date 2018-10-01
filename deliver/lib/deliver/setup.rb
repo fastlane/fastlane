@@ -1,4 +1,4 @@
-require 'spaceship/tunes/tunes'
+require_relative internal('spaceship/tunes/tunes')
 
 require_relative 'module'
 require_relative 'download_screenshots'

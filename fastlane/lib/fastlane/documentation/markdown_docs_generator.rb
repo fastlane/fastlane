@@ -3,8 +3,8 @@ module Fastlane
     attr_accessor :categories
 
     def initialize
-      require 'fastlane'
-      require 'fastlane/documentation/actions_list'
+      require_relative internal('fastlane')
+      require_relative internal('fastlane/documentation/actions_list')
       Fastlane.load_actions
 
       self.work

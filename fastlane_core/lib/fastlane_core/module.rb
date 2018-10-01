@@ -1,5 +1,6 @@
-require 'fastlane/boolean'
+require_relative '../../../fastlane_core/lib/fastlane_core/require_relative_helper'
 
+require_relative internal('fastlane/boolean')
 require_relative 'analytics/analytics_session'
 
 module FastlaneCore

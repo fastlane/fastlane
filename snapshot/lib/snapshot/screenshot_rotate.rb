@@ -1,5 +1,5 @@
 require_relative 'module'
-require 'fastlane_core/fastlane_pty'
+require_relative internal('fastlane_core/fastlane_pty')
 
 module Snapshot
   # This class takes care of rotating images

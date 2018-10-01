@@ -1,5 +1,5 @@
-require 'fastlane/server/action_command.rb'
-require 'fastlane/server/control_command.rb'
+require_relative internal('fastlane/server/action_command.rb')
+require_relative internal('fastlane/server/control_command.rb')
 require 'json'
 
 module Fastlane

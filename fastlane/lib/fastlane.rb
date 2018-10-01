@@ -1,4 +1,6 @@
-require 'fastlane_core'
+require_relative 'fastlane/module'
+
+require_relative internal('fastlane_core')
 
 require_relative 'fastlane/version'
 require_relative 'fastlane/features'
@@ -26,4 +28,3 @@ require_relative 'fastlane/documentation/docs_generator'
 require_relative 'fastlane/other_action'
 require_relative 'fastlane/plugins/plugins'
 require_relative 'fastlane/fastlane_require'
-require_relative 'fastlane/module'

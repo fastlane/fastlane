@@ -1,9 +1,9 @@
 require "commander"
-require "fastlane_core/globals"
-require "fastlane_core/configuration/commander_generator"
-require "fastlane_core/configuration/configuration"
-require "fastlane_core/helper"
-require "fastlane/version"
+require_relative internal('fastlane_core/globals')
+require_relative internal('fastlane_core/configuration/commander_generator')
+require_relative internal('fastlane_core/configuration/configuration')
+require_relative internal('fastlane_core/helper')
+require_relative internal('fastlane/version')
 
 require_relative 'module'
 require_relative 'options'

@@ -29,7 +29,7 @@ if ENV["FASTLANE_OPTIMIZE_BOOT"]
   )
 end
 
-require "fastlane/cli_tools_distributor"
+require_relative internal('fastlane/cli_tools_distributor')
 
 if Fastlane::CLIToolsDistributor.running_version_command?
   # This will print out the fastlane binary path right above the

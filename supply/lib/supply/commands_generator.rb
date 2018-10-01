@@ -1,6 +1,6 @@
 require "commander"
-require "fastlane_core"
-require "supply"
+require_relative internal('fastlane_core')
+require_relative internal('supply')
 
 HighLine.track_eof = false
 
@@ -46,7 +46,7 @@ module Supply
         FastlaneCore::CommanderGenerator.new.generate(Supply::Options.available_options, command: c)
 
         c.action do |args, options|
-          require 'supply/setup'
+          require_relative internal('supply/setup')
           Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, options.__hash__)
           load_supplyfile
 

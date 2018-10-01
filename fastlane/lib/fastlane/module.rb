@@ -1,7 +1,8 @@
 require_relative '../../../fastlane_core/lib/fastlane_core/require_relative_helper'
-require 'fastlane_core/ui/ui'
-require 'fastlane_core/helper'
-require 'fastlane_core/fastlane_folder'
+
+require_relative internal('fastlane_core/ui/ui')
+require_relative internal('fastlane_core/helper')
+require_relative internal('fastlane_core/fastlane_folder')
 
 module Fastlane
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore

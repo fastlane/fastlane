@@ -1,5 +1,5 @@
 require_relative 'module'
-require 'fastlane_core/command_executor'
+require_relative internal('fastlane_core/command_executor')
 
 module Screengrab
   class AndroidEnvironment
