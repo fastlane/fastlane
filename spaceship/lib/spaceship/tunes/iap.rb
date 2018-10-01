@@ -1,13 +1,13 @@
-require_relative internal('spaceship/tunes/errors')
-require_relative internal('spaceship/tunes/iap_list')
-require_relative internal('spaceship/tunes/iap_detail')
-require_relative internal('spaceship/tunes/iap_status')
-require_relative internal('spaceship/tunes/iap_type')
-require_relative internal('spaceship/tunes/iap_family_list')
-require_relative internal('spaceship/tunes/iap_families')
-require_relative internal('spaceship/tunes/iap_family_details')
-require_relative internal('spaceship/tunes/iap_families')
-require_relative internal('spaceship/tunes/iap_subscription_pricing_tier')
+require_relative 'errors'
+require_relative 'iap_list'
+require_relative 'iap_detail'
+require_relative 'iap_status'
+require_relative 'iap_type'
+require_relative 'iap_family_list'
+require_relative 'iap_families'
+require_relative 'iap_family_details'
+require_relative 'iap_families'
+require_relative 'iap_subscription_pricing_tier'
 
 module Spaceship
   module Tunes

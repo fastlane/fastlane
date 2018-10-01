@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require_relative internal('fastlane/actions/upload_to_app_store')
+    require_relative 'upload_to_app_store'
     class DeliverAction < UploadToAppStoreAction
       #####################################################
       # @!group Documentation

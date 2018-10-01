@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require_relative internal('fastlane/actions/capture_ios_screenshots')
+    require_relative 'capture_ios_screenshots'
     class CaptureScreenshotsAction < CaptureIosScreenshotsAction
       #####################################################
       # @!group Documentation

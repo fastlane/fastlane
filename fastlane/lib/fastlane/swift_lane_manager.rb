@@ -222,8 +222,8 @@ module Fastlane
     end
 
     def self.start_socket_thread(port: nil)
-      require_relative internal('fastlane/server/socket_server')
-      require_relative internal('fastlane/server/socket_server_action_command_executor')
+      require_relative 'server/socket_server'
+      require_relative 'server/socket_server_action_command_executor'
 
       return Thread.new do
         command_executor = SocketServerActionCommandExecutor.new

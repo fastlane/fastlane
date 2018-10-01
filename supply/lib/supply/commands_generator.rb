@@ -1,6 +1,7 @@
 require "commander"
+
+require_relative '../supply'
 require_relative internal('fastlane_core')
-require_relative internal('supply')
 
 HighLine.track_eof = false
 

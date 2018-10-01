@@ -1,6 +1,6 @@
-require_relative internal('fastlane/server/command_executor.rb')
-require_relative internal('fastlane/server/command_parser.rb')
-require_relative internal('fastlane/server/json_return_value_processor.rb')
+require_relative 'command_executor'
+require_relative 'command_parser'
+require_relative 'json_return_value_processor'
 require 'socket'
 require 'json'
 

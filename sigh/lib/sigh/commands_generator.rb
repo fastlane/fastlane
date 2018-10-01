@@ -91,7 +91,7 @@ module Sigh
 
         c.action do |args, options|
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options.__hash__)
-          require_relative internal('sigh/repair')
+          require_relative 'repair'
           Sigh::Repair.new.repair_all
         end
       end

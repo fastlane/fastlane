@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require_relative internal('fastlane/actions/get_certificates')
+    require_relative 'get_certificates'
     class CertAction < GetCertificatesAction
       #####################################################
       # @!group Documentation

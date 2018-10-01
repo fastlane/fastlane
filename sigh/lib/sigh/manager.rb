@@ -31,7 +31,7 @@ module Sigh
     end
 
     def self.download_all(download_xcode_profiles: false)
-      require_relative internal('sigh/download_all')
+      require_relative 'download_all'
       DownloadAll.new.download_all(download_xcode_profiles: download_xcode_profiles)
     end
 

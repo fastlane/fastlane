@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require_relative internal('fastlane/actions/build_ios_app')
+    require_relative 'build_ios_app'
     class BuildAppAction < BuildIosAppAction
       #####################################################
       # @!group Documentation

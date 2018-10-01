@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require_relative internal('fastlane/actions/run_tests')
+    require_relative 'run_tests'
     class ScanAction < RunTestsAction
       #####################################################
       # @!group Documentation

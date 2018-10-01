@@ -24,7 +24,7 @@ module Gym
 
     def init_libs
       # Import all the fixes
-      require_relative internal('gym/xcodebuild_fixes/generic_archive_fix')
+      require_relative 'xcodebuild_fixes/generic_archive_fix'
     end
   end
 

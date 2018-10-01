@@ -738,4 +738,4 @@ module Spaceship
   # rubocop:enable Metrics/ClassLength
 end
 
-require_relative internal('spaceship/two_step_client')
+require_relative 'two_step_client'

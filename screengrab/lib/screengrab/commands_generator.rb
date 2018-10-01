@@ -55,7 +55,7 @@ module Screengrab
         c.description = "Creates a new Screengrabfile in the current directory"
 
         c.action do |args, options|
-          require_relative internal('screengrab/setup')
+          require_relative 'setup'
           path = Screengrab::Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
           is_swift_fastfile = args.include?("swift")
           Screengrab::Setup.create(path, is_swift_fastfile: is_swift_fastfile)

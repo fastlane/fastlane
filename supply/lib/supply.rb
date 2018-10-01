@@ -1,10 +1,11 @@
 require 'json'
-require_relative internal('supply/options')
-require_relative internal('supply/client')
-require_relative internal('supply/listing')
-require_relative internal('supply/apk_listing')
-require_relative internal('supply/uploader')
 
+require_relative '../../fastlane_core/lib/fastlane_core/require_relative_helper'
+require_relative 'supply/options'
+require_relative 'supply/client'
+require_relative 'supply/listing'
+require_relative 'supply/apk_listing'
+require_relative 'supply/uploader'
 require_relative internal('fastlane_core')
 
 module Supply

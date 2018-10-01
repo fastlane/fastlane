@@ -75,7 +75,7 @@ module Produce
           allowed_keys = Produce::Options.available_options.collect(&:key)
           Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include?(key) })
 
-          require_relative internal('produce/service')
+          require_relative 'service'
           Produce::Service.enable(options, args)
         end
       end
