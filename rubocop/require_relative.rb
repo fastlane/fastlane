@@ -26,7 +26,6 @@ module RuboCop
         return unless (required = extract_required_file(node))
         parts = required.split("/")
         head = parts.shift
-        tail = parts.join("/")
         return unless self.tool_dirs.include?(head)
 
         require_statement = "internal('#{required}')"

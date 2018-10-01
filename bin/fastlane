@@ -13,7 +13,7 @@ if ENV["FASTLANE_OPTIMIZE_BOOT"]
   require 'bootsnap'
   require 'tmpdir'
   require 'fileutils'
-  require_relative "../fastlane/lib/fastlane/version.rb"
+  require_relative "../fastlane/lib/fastlane/version"
   cache_dir = "#{Dir.tmpdir}/fastlane/bootsnap-cache/" + Fastlane::VERSION
   unless File.directory?(cache_dir)
     FileUtils.mkdir_p(cache_dir)
@@ -29,6 +29,7 @@ if ENV["FASTLANE_OPTIMIZE_BOOT"]
   )
 end
 
+require_relative '../fastlane_core/lib/fastlane_core/require_relative_helper'
 require_relative internal('fastlane/cli_tools_distributor')
 
 if Fastlane::CLIToolsDistributor.running_version_command?

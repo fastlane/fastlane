@@ -1,6 +1,8 @@
+require 'pathname'
+
 def calling_file(depth: 2)
   # The right file is either 2 when called in from_base or 3 when called in internal
-  caller_locations(depth, depth + 1).find{ |c| !c.absolute_path.end_with?('require_relative_helper.rb') }.absolute_path
+  caller_locations(depth, depth + 1).find { |c| !c.absolute_path.end_with?('require_relative_helper.rb') }.absolute_path
 end
 
 FASTLANE_BASE_DIR = File.expand_path("../../../", File.dirname(__FILE__))

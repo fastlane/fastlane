@@ -2,7 +2,7 @@ module Fastlane
   # Use the RubyGems API to get all fastlane plugins
   class PluginFetcher
     require_relative internal('fastlane_core')
-    require_relative plugin_manager
+    require_relative 'plugin_manager'
 
     # Returns an array of FastlanePlugin objects
     def self.fetch_gems(search_query: nil)
