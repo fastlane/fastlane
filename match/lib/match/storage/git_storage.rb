@@ -12,7 +12,6 @@ module Match
       # User provided values
       attr_accessor :git_url
       attr_accessor :shallow_clone
-      attr_accessor :manual_password
       attr_accessor :skip_docs
       attr_accessor :branch
       attr_accessor :git_full_name
@@ -25,7 +24,6 @@ module Match
                     platform: nil,
                     git_url: nil,
                     shallow_clone: nil,
-                    manual_password: nil, # Do we need this? I think just for changing password right?
                     skip_docs: false,
                     branch: "master",
                     git_full_name: nil,
@@ -33,8 +31,7 @@ module Match
                     clone_branch_directly: false)
         self.git_url = git_url
         self.shallow_clone = shallow_clone
-        self.manual_password = manual_password
-        self.skip_docs = skip_docs # We don't use this yet
+        self.skip_docs = skip_docs
         self.branch = branch
         self.git_full_name = git_full_name
         self.git_user_email = git_user_email
@@ -42,12 +39,6 @@ module Match
 
         self.type = type if type
         self.platform = platform if platform
-
-        # Note: if you modify the parameters above, don't forget to also update the method call in
-        # - runner.rb
-        # - nuke.rb
-        # - change_password.rb
-        # - commands_generator.rb
       end
 
       def download
