@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Deliver
   # upload description, rating, etc.
   class UploadMetadata
@@ -44,10 +46,10 @@ module Deliver
     }
 
     # Localized app details values, that are editable in live state
-    LOCALISED_LIVE_VALUES = [:description, :release_notes, :support_url, :marketing_url, :promotional_text]
+    LOCALISED_LIVE_VALUES = [:description, :release_notes, :support_url, :marketing_url, :promotional_text, :privacy_url]
 
     # Non localized app details values, that are editable in live state
-    NON_LOCALISED_LIVE_VALUES = [:privacy_url]
+    NON_LOCALISED_LIVE_VALUES = [:copyright]
 
     # Directory name it contains trade representative contact information
     TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR = "trade_representative_contact_information"
@@ -58,6 +60,8 @@ module Deliver
     ALL_META_SUB_DIRS = [TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR, REVIEW_INFORMATION_DIR]
 
     # rubocop:disable Metrics/PerceivedComplexity
+
+    require_relative 'loader'
 
     # Make sure to call `load_from_filesystem` before calling upload
     def upload(options)
@@ -77,7 +81,7 @@ module Deliver
         non_localised_options = NON_LOCALISED_LIVE_VALUES
 
         if v.nil?
-          UI.message("Couldn't find live version, editing the current version on iTunes Connect instead")
+          UI.message("Couldn't find live version, editing the current version on App Store Connect instead")
           v = app.edit_version(platform: options[:platform])
           # we don't want to update the localised_options and non_localised_options
           # as we also check for `options[:edit_live]` at other areas in the code
@@ -122,12 +126,12 @@ module Deliver
       set_review_information(v, options)
       set_app_rating(v, options)
 
-      Helper.show_loading_indicator("Uploading metadata to iTunes Connect")
+      Helper.show_loading_indicator("Uploading metadata to App Store Connect")
       v.save!
       Helper.hide_loading_indicator
       begin
         details.save!
-        UI.success("Successfully uploaded set of metadata to iTunes Connect")
+        UI.success("Successfully uploaded set of metadata to App Store Connect")
       rescue Spaceship::TunesClient::ITunesConnectError => e
         # This makes sure that we log invalid app names as user errors
         # If another string needs to be checked here we should
@@ -222,7 +226,7 @@ module Deliver
       # Collect all languages we need
       # We only care about languages from user provided values
       # as the other languages are on iTC already anyway
-      v = options[:app].edit_version
+      v = options[:app].edit_version(platform: options[:platform])
       UI.user_error!("Could not find a version to edit for app '#{options[:app].name}', the app metadata is read-only currently") unless v
 
       enabled_languages = options[:languages] || []

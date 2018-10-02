@@ -1,5 +1,8 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
+
+require_relative 'module'
+require_relative 'upload_assets'
 
 module Deliver
   # rubocop:disable Metrics/ClassLength
@@ -14,26 +17,23 @@ module Deliver
                                      short_option: "-u",
                                      env_name: "DELIVER_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: user),
+                                     default_value: user,
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "DELIVER_APP_IDENTIFIER",
                                      description: "The bundle identifier of your app",
                                      optional: true,
                                      code_gen_sensitive: true,
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
-        FastlaneCore::ConfigItem.new(key: :app,
-                                     short_option: "-p",
-                                     env_name: "DELIVER_APP_ID",
-                                     description: "The app ID of the app you want to use/modify",
-                                     is_string: false), # don't add any verification here, as it's used to store a spaceship ref
-        FastlaneCore::ConfigItem.new(key: :edit_live,
-                                     short_option: "-o",
-                                     optional: true,
-                                     default_value: false,
-                                     env_name: "DELIVER_EDIT_LIVE",
-                                     description: "Modify live metadata, this option disables ipa upload and screenshot upload",
-                                     is_string: false),
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                     default_value_dynamic: true),
+        # version
+        FastlaneCore::ConfigItem.new(key: :app_version,
+                                     short_option: '-z',
+                                     description: "The version that should be edited or created",
+                                     optional: true),
+
+        # binary / build
         FastlaneCore::ConfigItem.new(key: :ipa,
                                      short_option: "-i",
                                      optional: true,
@@ -41,6 +41,7 @@ module Deliver
                                      description: "Path to your ipa file",
                                      code_gen_sensitive: true,
                                      default_value: Dir["*.ipa"].sort_by { |x| File.mtime(x) }.last,
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find ipa file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with?(".ipa")
@@ -56,6 +57,7 @@ module Deliver
                                      description: "Path to your pkg file",
                                      code_gen_sensitive: true,
                                      default_value: Dir["*.pkg"].sort_by { |x| File.mtime(x) }.last,
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find pkg file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be a pkg file") unless value.end_with?(".pkg")
@@ -64,6 +66,14 @@ module Deliver
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'pkg' and '#{value.key}' options in one run.")
                                      end),
+        FastlaneCore::ConfigItem.new(key: :build_number,
+                                     short_option: "-n",
+                                     description: "If set the given build number (already uploaded to iTC) will be used instead of the current built one",
+                                     optional: true,
+                                     conflicting_options: [:ipa, :pkg],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'build_number' and '#{value.key}' options in one run.")
+                                     end),
         FastlaneCore::ConfigItem.new(key: :platform,
                                      short_option: "-j",
                                      env_name: "DELIVER_PLATFORM",
@@ -71,8 +81,23 @@ module Deliver
                                      optional: true,
                                      default_value: "ios",
                                      verify_block: proc do |value|
-                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include? value
+                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include?(value)
                                      end),
+
+        # live version
+        FastlaneCore::ConfigItem.new(key: :edit_live,
+                                     short_option: "-o",
+                                     optional: true,
+                                     default_value: false,
+                                     env_name: "DELIVER_EDIT_LIVE",
+                                     description: "Modify live metadata, this option disables ipa upload and screenshot upload",
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :use_live_version,
+                                     description: "Force usage of live version rather than edit version",
+                                     is_string: false,
+                                     default_value: false),
+
+        # paths
         FastlaneCore::ConfigItem.new(key: :metadata_path,
                                      short_option: '-m',
                                      description: "Path to the folder containing the metadata files",
@@ -81,18 +106,16 @@ module Deliver
                                      short_option: '-w',
                                      description: "Path to the folder containing the screenshots",
                                      optional: true),
+
+        # skip
         FastlaneCore::ConfigItem.new(key: :skip_binary_upload,
-                                     description: "Skip uploading an ipa or pkg to iTunes Connect",
+                                     description: "Skip uploading an ipa or pkg to App Store Connect",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_screenshots,
                                      description: "Don't upload the screenshots",
                                      is_string: false,
                                      default_value: false),
-        FastlaneCore::ConfigItem.new(key: :app_version,
-                                     short_option: '-z',
-                                     description: "The version that should be edited or created",
-                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_metadata,
                                      description: "Don't upload the metadata (e.g. title, description). This will still upload screenshots",
                                      is_string: false,
@@ -101,9 +124,16 @@ module Deliver
                                      description: "Don't update app version for submission",
                                      is_string: false,
                                      default_value: false),
+
+        # how to operate
         FastlaneCore::ConfigItem.new(key: :force,
                                      short_option: "-f",
                                      description: "Skip the HTML report file verification",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :overwrite_screenshots,
+                                     env_name: "DELIVER_OVERWRITE_SCREENSHOTS",
+                                     description: "Clear all previously uploaded screenshots before uploading the new ones",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :submit_for_review,
@@ -111,6 +141,13 @@ module Deliver
                                      description: "Submit the new version for Review after uploading everything",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :reject_if_possible,
+                                     env_name: "DELIVER_REJECT_IF_POSSIBLE",
+                                     description: "Rejects the previously submitted build if it's in a state where it's possible",
+                                     is_string: false,
+                                     default_value: false),
+
+        # release
         FastlaneCore::ConfigItem.new(key: :automatic_release,
                                      description: "Should the app be automatically released once it's approved?",
                                      is_string: false,
@@ -129,19 +166,13 @@ module Deliver
                                      optional: true,
                                      is_string: false,
                                      default_value: false),
+
+        # other app configuration
         FastlaneCore::ConfigItem.new(key: :price_tier,
                                      short_option: "-r",
                                      description: "The price tier of this application",
                                      is_string: false,
                                      optional: true),
-        FastlaneCore::ConfigItem.new(key: :build_number,
-                                     short_option: "-n",
-                                     description: "If set the given build number (already uploaded to iTC) will be used instead of the current built one",
-                                     optional: true,
-                                     conflicting_options: [:ipa, :pkg],
-                                     conflict_block: proc do |value|
-                                       UI.user_error!("You can't use 'build_number' and '#{value.key}' options in one run.")
-                                     end),
         FastlaneCore::ConfigItem.new(key: :app_rating_config_path,
                                      short_option: "-g",
                                      description: "Path to the app rating's config",
@@ -149,31 +180,35 @@ module Deliver
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find config file at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                       UI.user_error! "'#{value}' doesn't seem to be a JSON file" unless FastlaneCore::Helper.json_file?(File.expand_path(value))
+                                       UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless FastlaneCore::Helper.json_file?(File.expand_path(value))
                                      end),
         FastlaneCore::ConfigItem.new(key: :submission_information,
                                      short_option: "-b",
                                      description: "Extra information for the submission (e.g. third party content)",
                                      is_string: false,
                                      optional: true),
+
+        # affiliation
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-k",
                                      env_name: "DELIVER_TEAM_ID",
-                                     description: "The ID of your iTunes Connect team if you're in multiple teams",
+                                     description: "The ID of your App Store Connect team if you're in multiple teams",
                                      optional: true,
                                      is_string: false, # as we also allow integers, which we convert to strings anyway
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-e",
                                      env_name: "DELIVER_TEAM_NAME",
-                                     description: "The name of your iTunes Connect team if you're in multiple teams",
+                                     description: "The name of your App Store Connect team if you're in multiple teams",
                                      optional: true,
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                      end),
@@ -185,6 +220,7 @@ module Deliver
                                      is_string: true,
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
@@ -195,6 +231,7 @@ module Deliver
                                      optional: true,
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
@@ -204,11 +241,8 @@ module Deliver
                                      description: "The provider short name to be used with the iTMSTransporter to identify your team. To get provider short name run `pathToXcode.app/Contents/Applications/Application\\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column",
                                      optional: true),
         # rubocop:enable Metrics/LineLength
-        FastlaneCore::ConfigItem.new(key: :overwrite_screenshots,
-                                     env_name: "DELIVER_OVERWRITE_SCREENSHOTS",
-                                     description: "Clear all previously uploaded screenshots before uploading the new ones",
-                                     is_string: false,
-                                     default_value: false),
+
+        # precheck
         FastlaneCore::ConfigItem.new(key: :run_precheck_before_submit,
                                      short_option: "-x",
                                      env_name: "DELIVER_RUN_PRECHECK_BEFORE_SUBMIT",
@@ -218,7 +252,7 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :precheck_default_rule_level,
                                      short_option: "-d",
                                      env_name: "DELIVER_PRECHECK_DEFAULT_RULE_LEVEL",
-                                     description: "The default rule level unless otherwise configured",
+                                     description: "The default precheck rule level unless otherwise configured",
                                      is_string: false,
                                      default_value: :warn),
 
@@ -350,7 +384,14 @@ module Deliver
                                      description: "Should precheck check in-app purchases?",
                                      is_string: false,
                                      optional: true,
-                                     default_value: true)
+                                     default_value: true),
+
+        # internal
+        FastlaneCore::ConfigItem.new(key: :app,
+                                     short_option: "-p",
+                                     env_name: "DELIVER_APP_ID",
+                                     description: "The (spaceship) app ID of the app you want to use/modify",
+                                     is_string: false) # don't add any verification here, as it's used to store a spaceship ref
       ]
     end
   end

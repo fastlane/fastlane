@@ -1,42 +1,24 @@
-require 'spaceship/globals'
-require 'spaceship/base'
-require 'spaceship/client'
-require 'spaceship/provider'
-require 'spaceship/launcher'
+require_relative 'spaceship/globals'
+require_relative 'spaceship/base'
+require_relative 'spaceship/client'
+require_relative 'spaceship/provider'
+require_relative 'spaceship/launcher'
+
+# Dev Portal
+require_relative 'spaceship/portal/portal'
+require_relative 'spaceship/portal/spaceship'
+
+# App Store Connect
+require_relative 'spaceship/tunes/tunes'
+require_relative 'spaceship/tunes/spaceship'
+require_relative 'spaceship/test_flight'
+
+require_relative 'spaceship/module'
+
+# Support for legacy wrappers
+require_relative 'spaceship/portal/legacy_wrapper'
+require_relative 'spaceship/tunes/legacy_wrapper'
 
 # For basic user inputs
 require 'highline/import'
-
-# Dev Portal
-require 'spaceship/portal/portal'
-require 'spaceship/portal/spaceship'
-
-# iTunes Connect
-require 'spaceship/tunes/tunes'
-require 'spaceship/tunes/spaceship'
-require 'spaceship/test_flight'
-
-# To support legacy code
-module Spaceship
-  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
-
-  # Dev Portal
-  Certificate = Spaceship::Portal::Certificate
-  ProvisioningProfile = Spaceship::Portal::ProvisioningProfile
-  Device = Spaceship::Portal::Device
-  App = Spaceship::Portal::App
-  AppGroup = Spaceship::Portal::AppGroup
-  Passbook = Spaceship::Portal::Passbook
-  WebsitePush = Spaceship::Portal::WebsitePush
-  AppService = Spaceship::Portal::AppService
-  Merchant = Spaceship::Portal::Merchant
-
-  # iTunes Connect
-  AppVersion = Spaceship::Tunes::AppVersion
-  AppSubmission = Spaceship::Tunes::AppSubmission
-  Application = Spaceship::Tunes::Application
-  Members = Spaceship::Tunes::Members
-  Persons = Spaceship::Portal::Persons
-
-  DESCRIPTION = "Ruby library to access the Apple Dev Center and iTunes Connect".freeze
-end
+require 'colored'

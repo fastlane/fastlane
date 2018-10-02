@@ -23,7 +23,7 @@ module Fastlane
 
         if params[:fail_on_missing]
           missing = artifacts.reject { |a| File.exist?(a) }
-          UI.user_error! "Not all files were present in copy artifacts. Missing #{missing.join(', ')}" unless missing.empty?
+          UI.user_error!("Not all files were present in copy artifacts. Missing #{missing.join(', ')}") unless missing.empty?
         else
           # If we don't fail on non-existent files, don't try to copy non-existent files
           artifacts.select! { |artifact| File.exist?(artifact) }
@@ -48,8 +48,8 @@ module Fastlane
 
       def self.details
         [
-          "This action copies artifacts to a target directory. It's useful if you have a CI that will pick up these artifacts and attach them to the build. Useful e.g. for storing your `.ipa`s, `.dSYM.zip`s, `.mobileprovision`s, `.cert`s",
-          "Make sure your target_path is gitignored, and if you use `reset_git_repo`, make sure the artifacts are added to the exclude list"
+          "This action copies artifacts to a target directory. It's useful if you have a CI that will pick up these artifacts and attach them to the build. Useful e.g. for storing your `.ipa`s, `.dSYM.zip`s, `.mobileprovision`s, `.cert`s.",
+          "Make sure your `:target_path` is ignored from git, and if you use `reset_git_repo`, make sure the artifacts are added to the exclude list."
         ].join("\n")
       end
 

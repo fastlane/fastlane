@@ -8,7 +8,7 @@ module Fastlane
       require 'shellwords'
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.run(params)
@@ -30,11 +30,8 @@ module Fastlane
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
         # Attention: This is NOT the version number - but the build number
 
-        # We do not want to run agvtool under tests to avoid output about not having a project available
-        unless Helper.test?
-          agv_enabled = system([command_prefix, 'agvtool what-version', command_suffix].join(' '))
-          raise "Apple Generic Versioning is not enabled." unless agv_enabled
-        end
+        agv_enabled = system([command_prefix, 'agvtool what-version', command_suffix].join(' '))
+        raise "Apple Generic Versioning is not enabled." unless agv_enabled
 
         command = [
           command_prefix,
@@ -43,16 +40,16 @@ module Fastlane
           command_suffix
         ].join(' ')
 
-        if Helper.test?
-          return Actions.lane_context[SharedValues::BUILD_NUMBER] = command
-        else
-          Actions.sh command
-
-          # Store the new number in the shared hash
-          build_number = `#{command_prefix} agvtool what-version`.split("\n").last.strip
-
-          return Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
+        output = Actions.sh(command)
+        if output.include?('$(SRCROOT)')
+          UI.error('Cannot set build number with plist path containing $(SRCROOT)')
+          UI.error('Please remove $(SRCROOT) in your Xcode target build settings')
         end
+
+        # Store the new number in the shared hash
+        build_number = Actions.sh("#{command_prefix} agvtool what-version", log: false).split("\n").last.strip
+
+        return Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
       rescue
         UI.user_error!("Apple Generic Versioning is not enabled in this project.\nBefore being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html")
       end
@@ -73,8 +70,8 @@ module Fastlane
                                        description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
-                                         UI.user_error!("Could not find Xcode project") if !File.exist?(value) and !Helper.is_test?
+                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
+                                         UI.user_error!("Could not find Xcode project") if !File.exist?(value) && !Helper.test?
                                        end)
         ]
       end

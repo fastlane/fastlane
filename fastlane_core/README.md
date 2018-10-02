@@ -1,29 +1,3 @@
-<h3 align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
-    <img src="../fastlane/assets/fastlane.png" width="150" />
-    <br />
-    fastlane
-  </a>
-</h3>
-<p align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/spaceship">spaceship</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/pilot">pilot</a> &bull;
-  <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/precheck">precheck</a>
-</p>
-
--------
-
 FastlaneCore
 ============
 
@@ -41,32 +15,32 @@ This gem contains all shared classes and code:
 - Checking for updates for a specific gem and showing an update message
 - All output of all tools with different logging levels
 - Finding of the current Xcode and iTunes Transporter path
-- Crash Reporting
 - More helper methods and classes
 
 You can hide the inline changelog by setting the `FASTLANE_HIDE_CHANGELOG` environment variable
 
-## Timestamps
+## Output environment variables
 
-To hide timestamps in each row, set the `FASTLANE_HIDE_TIMESTAMP` environment variable.
+- To hide timestamps in each row, set the `FASTLANE_HIDE_TIMESTAMP` environment variable to true.
+- To disable output formatting, set the `FASTLANE_DISABLE_OUTPUT_FORMAT` environment variable to true.
 
 ## Interacting with the user
 
 Instead of using `puts`, `raise` and `gets`, please use the helper class `UI` across all fastlane tools:
 
 ```ruby
-UI.message "Neutral message (usually white)"
-UI.success "Successfully finished processing (usually green)"
-UI.error "Wahaha, what's going on here! (usually red)"
-UI.important "Make sure to use Windows (usually yellow)"
+UI.message("Neutral message (usually white)")
+UI.success("Successfully finished processing (usually green)")
+UI.error("Wahaha, what's going on here! (usually red)")
+UI.important("Make sure to use Windows (usually yellow)")
 
-UI.header "Inputs" # a big box
+UI.header("Inputs") # a big box
 
 name = UI.input("What's your name? ")
 if UI.confirm("Are you '#{name}'?")
-  UI.success "Oh yeah"
+  UI.success("Oh yeah")
 else
-  UI.error "Wups, invalid"
+  UI.error("Wups, invalid")
 end
 
 UI.password("Your password please: ") # password inputs are hidden
@@ -97,7 +71,7 @@ UI.deprecated("The '--key' parameter is deprecated")
 ```
 
 # Code of Conduct
-Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

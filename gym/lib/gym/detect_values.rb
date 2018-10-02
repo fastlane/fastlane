@@ -1,4 +1,7 @@
-require "fastlane_core/core_ext/cfpropertylist"
+require 'fastlane_core/core_ext/cfpropertylist'
+require 'fastlane_core/project'
+require_relative 'module'
+require_relative 'code_signing_mapping'
 
 module Gym
   # This class detects all kinds of default values
@@ -16,9 +19,14 @@ module Gym
       Gym.project = FastlaneCore::Project.new(config)
 
       # Go into the project's folder, as there might be a Gymfile there
-      Dir.chdir(File.expand_path("..", Gym.project.path)) do
-        config.load_configuration_file(Gym.gymfile_name)
+      project_path = File.expand_path("..", Gym.project.path)
+      unless File.expand_path(".") == project_path
+        Dir.chdir(project_path) do
+          config.load_configuration_file(Gym.gymfile_name)
+        end
       end
+
+      ensure_export_options_is_hash
 
       detect_scheme
       detect_platform # we can only do that *after* we have the scheme
@@ -123,7 +131,7 @@ module Gym
       if config[:configuration]
         # Verify the configuration is available
         unless configurations.include?(config[:configuration])
-          UI.error "Couldn't find specified configuration '#{config[:configuration]}'."
+          UI.error("Couldn't find specified configuration '#{config[:configuration]}'.")
           config[:configuration] = nil
         end
       end
@@ -137,6 +145,27 @@ module Gym
       if Gym.config[:toolchain].to_s == "swift_2_3"
         Gym.config[:toolchain] = "com.apple.dt.toolchain.Swift_2_3"
       end
+    end
+
+    def self.ensure_export_options_is_hash
+      return if Gym.config[:export_options].nil? || Gym.config[:export_options].kind_of?(Hash)
+
+      # Reads options from file
+      plist_file_path = Gym.config[:export_options]
+      UI.user_error!("Couldn't find plist file at path #{File.expand_path(plist_file_path)}") unless File.exist?(plist_file_path)
+      hash = Plist.parse_xml(plist_file_path)
+      UI.user_error!("Couldn't read provided plist at path #{File.expand_path(plist_file_path)}") if hash.nil?
+      # Convert keys to symbols
+      Gym.config[:export_options] = keys_to_symbols(hash)
+    end
+
+    def self.keys_to_symbols(hash)
+      # Convert keys to symbols
+      hash = hash.each_with_object({}) do |(k, v), memo|
+        memo[k.b.to_s.to_sym] = v
+        memo
+      end
+      hash
     end
   end
 end

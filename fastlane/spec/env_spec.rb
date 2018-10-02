@@ -8,6 +8,13 @@ describe Fastlane do
         to_return(status: 200, body: '{"version": "0.16.2"}', headers: {})
     end
 
+    let(:fastlane_files) { Fastlane::EnvironmentPrinter.print_fastlane_files }
+    it "contains the key words" do
+      expect(fastlane_files).to include("fastlane files")
+      expect(fastlane_files).to include("Fastfile")
+      expect(fastlane_files).to include("Appfile")
+    end
+
     let(:env) { Fastlane::EnvironmentPrinter.get }
 
     it "contains the key words" do
@@ -47,7 +54,7 @@ describe Fastlane do
       it 'contains stack information other than Xcode Version', requires_xcode: true do
         expect(env).to include("Bundler?")
         expect(env).to include("Xcode Path")
-        expect(env).not_to include("Xcode Version")
+        expect(env).not_to(include("Xcode Version"))
         expect(env).to include("OpenSSL")
       end
     end

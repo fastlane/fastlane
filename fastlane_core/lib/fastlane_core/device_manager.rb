@@ -1,6 +1,9 @@
 require 'open3'
 require 'plist'
 
+require_relative 'command_executor'
+require_relative 'helper'
+
 module FastlaneCore
   class DeviceManager
     class << self
@@ -52,6 +55,7 @@ module FastlaneCore
             name = matches.join(' ')
 
             if matches.count && (os_type == requested_os_type || requested_os_type == "")
+              # This is disabled here because the Device is defined later in the file, and that's a problem for the cop
               @devices << Device.new(name: name, os_type: os_type, os_version: (exact_versions[os_type][os_version] || os_version), udid: udid, state: state, is_simulator: true)
             end
           end
@@ -251,7 +255,7 @@ module FastlaneCore
 
         simulator_path = File.join(Helper.xcode_path, 'Applications', 'Simulator.app')
 
-        UI.verbose "Launching #{simulator_path} for device: #{device.name} (#{device.udid})"
+        UI.verbose("Launching #{simulator_path} for device: #{device.name} (#{device.udid})")
 
         Helper.backticks("open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}", print: FastlaneCore::Globals.verbose?)
       end
@@ -282,13 +286,13 @@ module FastlaneCore
 
         FileUtils.rm_f(logfile_dst)
         FileUtils.cp(logfile_src, logfile_dst)
-        UI.success "Copying file '#{logfile_src}' to '#{logfile_dst}'..."
+        UI.success("Copying file '#{logfile_src}' to '#{logfile_dst}'...")
       end
 
       def copy_logarchive(device, log_identity, logs_destination_dir)
         require 'shellwords'
 
-        logarchive_dst = Shellwords.escape(File.join(logs_destination_dir, "system_logs-#{log_identity}.logarchive"))
+        logarchive_dst = File.join(logs_destination_dir, "system_logs-#{log_identity}.logarchive").shellescape
         FileUtils.rm_rf(logarchive_dst)
         FileUtils.mkdir_p(File.expand_path("..", logarchive_dst))
         command = "xcrun simctl spawn #{device.udid} log collect --output #{logarchive_dst} 2>/dev/null"

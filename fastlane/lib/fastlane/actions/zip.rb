@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class ZipAction < Action
       def self.run(params)
-        UI.message "Compressing #{params[:path]}..."
+        UI.message("Compressing #{params[:path]}...")
 
         params[:output_path] ||= params[:path]
 
@@ -19,10 +19,15 @@ module Fastlane
         Dir.chdir(File.expand_path("..", params[:path])) do # required to properly zip
           zip_options = params[:verbose] ? "r" : "rq"
 
-          Actions.sh "zip -#{zip_options} #{absolute_output_path.shellescape} #{File.basename(params[:path]).shellescape}"
+          if params[:password]
+            password_option = "-P '#{params[:password]}'"
+            Actions.sh("zip -#{zip_options} #{password_option} #{absolute_output_path.shellescape} #{File.basename(params[:path]).shellescape}")
+          else
+            Actions.sh("zip -#{zip_options} #{absolute_output_path.shellescape} #{File.basename(params[:path]).shellescape}")
+          end
         end
 
-        UI.success "Successfully generated zip file at path '#{File.expand_path(absolute_output_path)}'"
+        UI.success("Successfully generated zip file at path '#{File.expand_path(absolute_output_path)}'")
         return File.expand_path(absolute_output_path)
       end
 
@@ -32,9 +37,6 @@ module Fastlane
 
       def self.description
         "Compress a file or folder to a zip"
-      end
-
-      def self.details
       end
 
       def self.available_options
@@ -53,6 +55,11 @@ module Fastlane
                                        env_name: "FL_ZIP_VERBOSE",
                                        description: "Enable verbose output of zipped file",
                                        default_value: true,
+                                       type: Boolean,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :password,
+                                       env_name: "FL_ZIP_PASSWORD",
+                                       description: "Encrypt the contents of the zip archive using a password",
                                        optional: true)
         ]
       end

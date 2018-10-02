@@ -38,7 +38,7 @@ describe Pilot::CommandsGenerator do
   end
 
   def expect_tester_manager_call_with(method_sym, expected_options_sets)
-    expected_options_sets = [expected_options_sets] unless expected_options_sets.kind_of? Array
+    expected_options_sets = [expected_options_sets] unless expected_options_sets.kind_of?(Array)
 
     fake_tester_manager = "tester_manager"
     expect(Pilot::TesterManager).to receive(:new).and_return(fake_tester_manager)
@@ -51,6 +51,7 @@ describe Pilot::CommandsGenerator do
 
   describe ":list option handling" do
     it "can use the username short flag from tool options" do
+      stub_const('ENV', { 'PILOT_APP_IDENTIFIER' => 'your.awesome.App' })
       stub_commander_runner_args(['list', '-u', 'me@it.com'])
 
       expected_options = FastlaneCore::Configuration.create(available_options, { username: 'me@it.com' })

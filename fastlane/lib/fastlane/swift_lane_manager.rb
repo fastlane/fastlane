@@ -1,13 +1,18 @@
 require_relative 'lane_manager_base.rb'
+require_relative 'swift_runner_upgrader.rb'
 
 module Fastlane
   class SwiftLaneManager < LaneManagerBase
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # @param env Dot Env Information
-    def self.cruise_lane(lane, parameters = nil, env = nil)
-      UI.user_error!("lane must be a string") unless lane.kind_of?(String) or lane.nil?
-      UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) or parameters.nil?
+    def self.cruise_lane(lane, parameters = nil, env = nil, disable_runner_upgrades: false, swift_server_port: nil)
+      UI.user_error!("lane must be a string") unless lane.kind_of?(String) || lane.nil?
+      UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) || parameters.nil?
+
+      # Sets environment variable and lane context for lane name
+      ENV["FASTLANE_LANE_NAME"] = lane
+      Actions.lane_context[Actions::SharedValues::LANE_NAME] = lane
 
       # xcodeproj has a bug in certain versions that causes it to change directories
       # and not return to the original working directory
@@ -15,34 +20,64 @@ module Fastlane
       # Setting this environment variable causes xcodeproj to work around the problem
       ENV["FORK_XCODE_WRITING"] = "true"
 
-      FastlaneCore.session.is_fastfile = true
-
-      load_dot_env(env)
+      Fastlane::Helper::DotenvHelper.load_dot_env(env)
 
       started = Time.now
       e = nil
       begin
+        display_upgraded_message = false
+        if disable_runner_upgrades
+          UI.verbose("disable_runner_upgrades is true, not attempting to update the FastlaneRunner project".yellow)
+        elsif Helper.ci?
+          UI.verbose("Running in CI, not attempting to update the FastlaneRunner project".yellow)
+        else
+          display_upgraded_message = self.ensure_runner_up_to_date_fastlane!
+        end
+
         self.ensure_runner_built!
-        socket_thread = self.start_socket_thread
+        swift_server_port ||= 2000
+        socket_thread = self.start_socket_thread(port: swift_server_port)
         sleep(0.250) while socket_thread[:ready].nil?
         # wait on socket_thread to be in ready state, then start the runner thread
-        runner_thread = self.cruise_swift_lane_in_thread(lane, parameters)
+        self.cruise_swift_lane_in_thread(lane, parameters, swift_server_port)
 
-        runner_thread.join
         socket_thread.join
       rescue Exception => ex # rubocop:disable Lint/RescueException
+        e = ex
+      end
+      # If we have a thread exception, drop that in the exception
+      # won't ever have a situation where e is non-nil, and socket_thread[:exception] is also non-nil
+      e ||= socket_thread[:exception]
+
+      unless e.nil?
+        print_lane_context
+
         # We also catch Exception, since the implemented action might send a SystemExit signal
         # (or similar). We still want to catch that, since we want properly finish running fastlane
         # Tested with `xcake`, which throws a `Xcake::Informative` object
+        UI.error(e.to_s) if e.kind_of?(StandardError) # we don't want to print things like 'system exit'
+      end
 
-        print_lane_context
-        UI.error ex.to_s if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
-        e = ex
+      skip_message = false
+
+      # if socket_thread is nil, we were probably debugging, or something else weird happened
+      exit_reason = :cancelled if socket_thread.nil?
+
+      # normal exit means we have a reason
+      exit_reason ||= socket_thread[:exit_reason]
+
+      if exit_reason == :cancelled && e.nil?
+        skip_message = true
       end
 
       duration = ((Time.now - started) / 60.0).round
 
-      finish_fastlane(nil, duration, e)
+      finish_fastlane(nil, duration, e, skip_message: skip_message)
+
+      if display_upgraded_message
+        UI.message("We updated your FastlaneRunner project during this run to make it compatible with your current version of fastlane.".yellow)
+        UI.message("Please make sure to check the changes into source control.".yellow)
+      end
     end
 
     def self.display_lanes
@@ -50,7 +85,7 @@ module Fastlane
       Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lanes))
     end
 
-    def self.cruise_swift_lane_in_thread(lane, parameters = nil)
+    def self.cruise_swift_lane_in_thread(lane, parameters = nil, swift_server_port)
       if parameters.nil?
         parameters = {}
       end
@@ -63,6 +98,8 @@ module Fastlane
       if FastlaneCore::Globals.verbose?
         parameter_string += " logMode verbose"
       end
+
+      parameter_string += " swiftServerPort #{swift_server_port}"
 
       return Thread.new do
         Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lane #{lane}#{parameter_string} > /dev/null))
@@ -167,11 +204,11 @@ module Fastlane
       )
 
       # Swap out any configs the user has removed, inserting fastlane defaults
-      project_modified ||= swap_paths_in_target(
+      project_modified = swap_paths_in_target(
         target: runner_target,
         file_refs_to_swap: target_file_refs,
         expected_path_to_replacement_path_tuples: user_tool_files_possibly_removed
-      )
+      ) || project_modified
 
       if project_modified
         fastlane_runner_project.save
@@ -184,13 +221,13 @@ module Fastlane
       return project_modified
     end
 
-    def self.start_socket_thread
+    def self.start_socket_thread(port: nil)
       require 'fastlane/server/socket_server'
       require 'fastlane/server/socket_server_action_command_executor'
 
       return Thread.new do
         command_executor = SocketServerActionCommandExecutor.new
-        server = Fastlane::SocketServer.new(command_executor: command_executor)
+        server = Fastlane::SocketServer.new(command_executor: command_executor, port: port)
         server.start
       end
     end
@@ -218,6 +255,30 @@ module Fastlane
       if runner_needs_building
         self.build_runner!
       end
+    end
+
+    # do we have the latest FastlaneSwiftRunner code from the current version of fastlane?
+    def self.ensure_runner_up_to_date_fastlane!
+      upgraded = false
+      upgrader = SwiftRunnerUpgrader.new
+
+      upgrade_needed = upgrader.upgrade_if_needed!(dry_run: true)
+      if upgrade_needed
+        UI.message("It looks like your `FastlaneSwiftRunner` project is not up-to-date".green)
+        UI.message("If you don't update it, fastlane could fail".green)
+        UI.message("We can try to automatically update it for you, usually this works 🎈 🐐".green)
+        user_wants_upgrade = UI.confirm("Should we try to upgrade just your `FastlaneSwiftRunner` project?")
+
+        UI.important("Ok, if things break, you can try to run this lane again and you'll be prompted to upgrade another time") unless user_wants_upgrade
+
+        if user_wants_upgrade
+          upgraded = upgrader.upgrade_if_needed!
+          UI.success("Updated your FastlaneSwiftRunner project with the newest runner code") if upgraded
+          self.build_runner! if upgraded
+        end
+      end
+
+      return upgraded
     end
 
     def self.build_runner!

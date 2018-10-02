@@ -1,3 +1,5 @@
+require_relative 'ui/ui'
+
 module FastlaneCore
   class FastlaneFolder
     FOLDER_NAME = 'fastlane'
@@ -19,6 +21,7 @@ module FastlaneCore
     end
 
     def self.swift?
+      return false unless self.fastfile_path
       return self.fastfile_path.downcase.end_with?(".swift")
     end
 
@@ -63,7 +66,7 @@ module FastlaneCore
       return if File.directory?(path) # directory is already there
       UI.user_error!("Found a file called 'fastlane' at path '#{path}', please delete it") if File.exist?(path)
       FileUtils.mkdir_p(path)
-      UI.success "Created new folder '#{path}'."
+      UI.success("Created new folder '#{path}'.")
     end
   end
 end

@@ -1,4 +1,5 @@
-require 'fastlane/server/command.rb'
+require 'fastlane/server/action_command_return.rb'
+require 'fastlane/server/command_parser.rb'
 require 'fastlane/server/command_executor.rb'
 
 module Fastlane
@@ -44,7 +45,7 @@ module Fastlane
         parameter_map: parameter_map
       )
 
-      command_return = CommandReturn.new(
+      command_return = ActionCommandReturn.new(
         return_value: action_return,
         return_value_type: action_class_ref.return_type,
         closure_argument_value: closure_argument_value
@@ -69,7 +70,7 @@ module Fastlane
     end
 
     def run(action_named: nil, action_class_ref: nil, parameter_map: nil)
-      action_return = runner.execute_action(action_named, action_class_ref, [parameter_map], custom_dir: '.', configuration_language: "swift")
+      action_return = runner.execute_action(action_named, action_class_ref, [parameter_map], custom_dir: '.')
       return action_return
     end
 
@@ -88,7 +89,7 @@ module Fastlane
         action_return = Fastlane::FastFile.sh(command_param, log: log_param, error_callback: error_callback)
       end
 
-      command_return = CommandReturn.new(
+      command_return = ActionCommandReturn.new(
         return_value: action_return,
         return_value_type: action_return_type,
         closure_argument_value: closure_argument_value

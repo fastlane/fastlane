@@ -8,7 +8,7 @@ module Fastlane
         installer = XcodeInstall::Installer.new
         installed = installer.installed_versions.reverse
         installed.detect do |xcode|
-          req.satisfied_by? Gem::Version.new(xcode.version)
+          req.satisfied_by?(Gem::Version.new(xcode.version))
         end
       end
 

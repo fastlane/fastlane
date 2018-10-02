@@ -1,4 +1,6 @@
-require "fastlane_core"
+require_relative 'module'
+require_relative 'manager'
+require_relative 'tester_manager'
 
 module Pilot
   class TesterImporter < Manager
@@ -40,8 +42,8 @@ module Pilot
         begin
           tester_manager.add_tester(config)
           imported_tester_count += 1
-        rescue
-          # do nothing, move on to the next row
+        rescue => exception
+          UI.error("Error adding tester #{email}: #{exception}")
         end
       end
 

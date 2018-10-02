@@ -1,4 +1,6 @@
-require 'snapshot/test_command_generator_base'
+require_relative 'test_command_generator_base'
+require_relative 'module'
+require_relative 'latest_os_version'
 
 module Snapshot
   # Responsible for building the fully working xcodebuild command
@@ -10,7 +12,7 @@ module Snapshot
       def generate(device_type: nil, language: nil, locale: nil)
         parts = prefix
         parts << "xcodebuild"
-        parts += options
+        parts += options(language, locale)
         parts += destination(device_type)
         parts += build_settings
         parts += actions

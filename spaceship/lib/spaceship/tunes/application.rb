@@ -1,7 +1,21 @@
+require_relative '../test_flight/group'
+require_relative '../test_flight/build'
+require_relative 'app_analytics'
+require_relative 'app_details'
+require_relative 'app_ratings'
+require_relative 'app_submission'
+require_relative 'app_version'
+require_relative 'app_version_generated_promocodes'
+require_relative 'app_version_history'
+require_relative 'build_train'
+require_relative 'iap'
+require_relative 'tunes_base'
+require_relative 'version_set'
+
 module Spaceship
   module Tunes
     class Application < TunesBase
-      # @return (String) The App identifier of this app, provided by iTunes Connect
+      # @return (String) The App identifier of this app, provided by App Store Connect
       # @example
       #   "1013943394"
       attr_accessor :apple_id
@@ -11,7 +25,7 @@ module Spaceship
       #   "Spaceship App"
       attr_accessor :name
 
-      # @return (String) The Vendor ID provided by iTunes Connect
+      # @return (String) The Vendor ID provided by App Store Connect
       # @example
       #   "1435592086"
       attr_accessor :vendor_id
@@ -24,7 +38,7 @@ module Spaceship
       # @return (String) Last modified
       attr_accessor :last_modified
 
-      # @return (Integer) The number of issues provided by iTunes Connect
+      # @return (Integer) The number of issues provided by App Store Connect
       attr_accessor :issues_count
 
       # @return (String) The URL to a low resolution app icon of this app (340x340px). Might be nil
@@ -62,7 +76,7 @@ module Spaceship
           end
         end
 
-        # Creates a new application on iTunes Connect
+        # Creates a new application on App Store Connect
         # @param name (String): The name of your app as it will appear on the App Store.
         #   This can't be longer than 255 characters.
         # @param primary_language (String): If localized app information isn't available in an
@@ -78,7 +92,7 @@ module Spaceship
         #  should it be an ios or an osx app
 
         def create!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil, itunes_connect_users: nil)
-          puts "The `version` parameter is deprecated. Use `ensure_version!` method instead" if version
+          puts("The `version` parameter is deprecated. Use `ensure_version!` method instead") if version
           client.create_application!(name: name,
                          primary_language: primary_language,
                                       sku: sku,
@@ -87,6 +101,10 @@ module Spaceship
                                 company_name: company_name,
                                     platform: platform,
                                     itunes_connect_users: itunes_connect_users)
+        end
+
+        def available_bundle_ids(platform: nil)
+          client.get_available_bundle_ids(platform: platform)
         end
       end
 
@@ -101,18 +119,18 @@ module Spaceship
         nil
       end
 
-      # @return (Spaceship::AppVersion) Receive the version that is currently live on the
+      # @return (Spaceship::Tunes::AppVersion) Receive the version that is currently live on the
       #  App Store. You can't modify all values there, so be careful.
       def live_version(platform: nil)
-        Spaceship::AppVersion.find(self, self.apple_id, true, platform: platform)
+        Spaceship::Tunes::AppVersion.find(self, self.apple_id, true, platform: platform)
       end
 
-      # @return (Spaceship::AppVersion) Receive the version that can fully be edited
+      # @return (Spaceship::Tunes::AppVersion) Receive the version that can fully be edited
       def edit_version(platform: nil)
-        Spaceship::AppVersion.find(self, self.apple_id, false, platform: platform)
+        Spaceship::Tunes::AppVersion.find(self, self.apple_id, false, platform: platform)
       end
 
-      # @return (Spaceship::AppVersion) This will return the `edit_version` if available
+      # @return (Spaceship::Tunes::AppVersion) This will return the `edit_version` if available
       #   and fallback to the `live_version`. Use this to just access the latest data
       def latest_version(platform: nil)
         edit_version(platform: platform) || live_version(platform: platform)
@@ -120,7 +138,17 @@ module Spaceship
 
       # @return (String) An URL to this specific resource. You can enter this URL into your browser
       def url
-        "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.apple_id}"
+        "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.apple_id}"
+      end
+
+      def analytics
+        if self.live_version.nil?
+          raise 'Analytics are only available for live apps.'
+        end
+
+        attrs = {}
+        attrs[:apple_id] = self.apple_id
+        Spaceship::Tunes::AppAnalytics.factory(attrs)
       end
 
       # @return (Hash) Contains the reason for rejection.
@@ -224,6 +252,15 @@ module Spaceship
         end
       end
 
+      def reject_version_if_possible!
+        can_reject = edit_version.can_reject_version
+        if can_reject
+          client.reject!(apple_id, edit_version.version_id)
+        end
+
+        return can_reject
+      end
+
       # set the price tier. This method doesn't require `save` to be called
       def update_price_tier!(price_tier)
         client.update_price_tier!(self.apple_id, price_tier)
@@ -284,6 +321,30 @@ module Spaceship
         return TestFlight::Build.all_processing_builds(app_id: self.apple_id, platform: platform || self.platform)
       end
 
+      def tunes_all_build_trains(app_id: nil, platform: nil)
+        resp = client.all_build_trains(app_id: apple_id, platform: platform)
+        trains = resp["trains"] or []
+        trains.map do |attrs|
+          attrs['application'] = self
+          Tunes::BuildTrain.factory(attrs)
+        end
+      end
+
+      def tunes_all_builds_for_train(train: nil, platform: nil)
+        resp = client.all_builds_for_train(app_id: apple_id, train: train, platform: platform)
+        items = resp["items"] or []
+        items.map do |attrs|
+          attrs['apple_id'] = apple_id
+          Tunes::Build.factory(attrs)
+        end
+      end
+
+      def tunes_build_details(train: nil, build_number: nil, platform: nil)
+        resp = client.build_details(app_id: apple_id, train: train, build_number: build_number, platform: platform)
+        resp['apple_id'] = apple_id
+        Tunes::BuildDetails.factory(resp)
+      end
+
       # Get all builds that are already processed for all build trains
       # You can either use the return value (array) or pass a block
       def builds(platform: nil)
@@ -296,13 +357,13 @@ module Spaceship
       # @!group Submit for Review
       #####################################################
 
-      def create_submission
-        version = self.latest_version
+      def create_submission(platform: nil)
+        version = self.latest_version(platform: platform)
         if version.nil?
           raise "Could not find a valid version to submit for review"
         end
 
-        Spaceship::AppSubmission.create(self, version)
+        Spaceship::Tunes::AppSubmission.create(self, version, platform: platform)
       end
 
       # Cancels all ongoing TestFlight beta submission for this application

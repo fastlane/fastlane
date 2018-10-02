@@ -54,6 +54,7 @@ module Fastlane
                                        sensitive: true,
                                        code_gen_sensitive: true,
                                        default_value: ENV["GITHUB_API_TOKEN"],
+                                       default_value_dynamic: true,
                                        is_string: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :repo,
@@ -77,6 +78,7 @@ module Fastlane
                                        is_string: true,
                                        code_gen_sensitive: true,
                                        default_value: Actions.git_branch,
+                                       default_value_dynamic: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :base,
                                        env_name: "GITHUB_PULL_REQUEST_BASE",
@@ -109,7 +111,7 @@ module Fastlane
       def self.example_code
         [
           'create_pull_request(
-            api_token: ENV["GITHUB_TOKEN"],
+            api_token: "secret",                # optional, defaults to ENV["GITHUB_API_TOKEN"]
             repo: "fastlane/fastlane",
             title: "Amazing new feature",
             head: "my-feature",                 # optional, defaults to current branch name

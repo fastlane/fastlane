@@ -5,14 +5,14 @@ module Fastlane
       def self.run(params)
         validate(params)
 
-        cmd = ["carthage"]
+        cmd = [params[:executable]]
         command_name = params[:command]
         cmd << command_name
 
         if command_name == "archive" && params[:frameworks].count > 0
-          cmd.concat params[:frameworks]
-        elsif (command_name == "update" || command_name == "build") && params[:dependencies].count > 0
-          cmd.concat params[:dependencies]
+          cmd.concat(params[:frameworks])
+        elsif ["update", "build", "bootstrap"].include?(command_name) && params[:dependencies].count > 0
+          cmd.concat(params[:dependencies])
         end
 
         cmd << "--output #{params[:output]}" if params[:output]
@@ -29,6 +29,7 @@ module Fastlane
         cmd << "--project-directory #{params[:project_directory]}" if params[:project_directory]
         cmd << "--cache-builds" if params[:cache_builds]
         cmd << "--new-resolver" if params[:new_resolver]
+        cmd << "--log-path #{params[:log_path]}" if params[:log_path]
 
         Actions.sh(cmd.join(' '))
       end
@@ -41,6 +42,10 @@ module Fastlane
         end
         if command_name != "archive" && params[:output]
           UI.user_error!("Output option is available only for 'archive' command.")
+        end
+
+        if params[:log_path] && !%w(build bootstrap update).include?(command_name)
+          UI.user_error!("Log path option is available only for 'build', 'bootstrap', and 'update' command.")
         end
       end
 
@@ -63,10 +68,10 @@ module Fastlane
                                        description: "Carthage command (one of: #{available_commands.join(', ')})",
                                        default_value: 'bootstrap',
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid command. Use one of the following: #{available_commands.join(', ')}") unless available_commands.include? value
+                                         UI.user_error!("Please pass a valid command. Use one of the following: #{available_commands.join(', ')}") unless available_commands.include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :dependencies,
-                                       description: "Carthage dependencies to update or build",
+                                       description: "Carthage dependencies to update, build or bootstrap",
                                        default_value: [],
                                        is_string: false,
                                        type: Array),
@@ -158,7 +163,15 @@ module Fastlane
                                        description: "Use new resolver when resolving dependency graph",
                                        is_string: false,
                                        optional: true,
-                                       type: Boolean)
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :log_path,
+                                       env_name: "FL_CARTHAGE_LOG_PATH",
+                                       description: "Path to the xcode build output",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :executable,
+                                       env_name: "FL_CARTHAGE_EXECUTABLE",
+                                       description: "Path to the `carthage` executable on your machine",
+                                       default_value: 'carthage')
         ]
       end
 
@@ -169,7 +182,7 @@ module Fastlane
             frameworks: ["MyFramework1", "MyFramework2"],   # Specify which frameworks to archive (only for the archive command)
             output: "MyFrameworkBundle.framework.zip",      # Specify the output archive name (only for the archive command)
             command: "bootstrap",                           # One of: build, bootstrap, update, archive. (default: bootstrap)
-            dependencies: ["Alamofire", "Notice"],          # Specify which dependencies to update or build (only for update and build commands)
+            dependencies: ["Alamofire", "Notice"],          # Specify which dependencies to update or build (only for update, build and bootstrap commands)
             use_ssh: false,                                 # Use SSH for downloading GitHub repositories.
             use_submodules: false,                          # Add dependencies as Git submodules.
             use_binaries: true,                             # Check out dependency repositories even when prebuilt frameworks exist
@@ -180,7 +193,8 @@ module Fastlane
             configuration: "Release",                       # Build configuration to use when building
             cache_builds: true,                             # By default Carthage will rebuild a dependency regardless of whether its the same resolved version as before.
             toolchain: "com.apple.dt.toolchain.Swift_2_3",  # Specify the xcodebuild toolchain
-            new_resolver: false                             # Use the new resolver to resolve depdendency graph
+            new_resolver: false,                            # Use the new resolver to resolve depdendency graph
+            log_path: "carthage.log"                        # Path to the xcode build output
           )'
         ]
       end
@@ -190,7 +204,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.authors

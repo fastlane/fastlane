@@ -1,3 +1,5 @@
+require_relative 'errors'
+
 module FastlaneCore
   # Abstract super class
   class Interface
@@ -73,6 +75,14 @@ module FastlaneCore
     # Print a header = a text in a box
     #   use this if this message is really important
     def header(_message)
+      not_implemented(__method__)
+    end
+
+    # Print lines of content around specific line where
+    #   failed to parse.
+    #
+    #   This message will be shown as error
+    def content_error(content, error_line)
       not_implemented(__method__)
     end
 
@@ -178,6 +188,7 @@ module FastlaneCore
     # @!group Helpers
     #####################################################
     def not_implemented(method_name)
+      require_relative 'ui'
       UI.user_error!("Current UI '#{self}' doesn't support method '#{method_name}'")
     end
 

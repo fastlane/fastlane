@@ -1,10 +1,33 @@
 #!/usr/bin/env ruby
 
 if RUBY_VERSION < '2.0.0'
-  abort "fastlane requires Ruby 2.0.0 or higher"
+  abort("fastlane requires Ruby 2.0.0 or higher")
 end
 
-$LOAD_PATH.push File.expand_path("../../lib", __FILE__)
+def self.windows?
+  # taken from: https://stackoverflow.com/a/171011/1945875
+  (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
+end
+
+if ENV["FASTLANE_OPTIMIZE_BOOT"]
+  require 'bootsnap'
+  require 'tmpdir'
+  require 'fileutils'
+  require_relative "../fastlane/lib/fastlane/version.rb"
+  cache_dir = "#{Dir.tmpdir}/fastlane/bootsnap-cache/" + Fastlane::VERSION
+  unless File.directory?(cache_dir)
+    FileUtils.mkdir_p(cache_dir)
+  end
+  Bootsnap.setup(
+    cache_dir:            cache_dir, # Path to your cache
+    development_mode:     false, # Current working environment
+    load_path_cache:      true, # Optimize the LOAD_PATH with a cache
+    autoload_paths_cache: false, # Not relevant for fastlane (Optimize ActiveSupport autoloads with cache)
+    disable_trace:        true, # (Alpha) Set `RubyVM::InstructionSequence.compile_option = { trace_instruction: false }`
+    compile_cache_iseq:   !self.windows?, # Compile Ruby code into ISeq cache, breaks coverage reporting.
+    compile_cache_yaml:   true # Compile YAML into a cache
+  )
+end
 
 require "fastlane/cli_tools_distributor"
 
@@ -12,9 +35,9 @@ if Fastlane::CLIToolsDistributor.running_version_command?
   # This will print out the fastlane binary path right above the
   # version number. Very often, users are not aware they have
   # e.g. bundled fastlane installed
-  puts "fastlane installation at path:"
-  puts File.expand_path(__FILE__)
-  puts "-----------------------------"
+  puts("fastlane installation at path:")
+  puts(File.expand_path(__FILE__))
+  puts("-----------------------------")
 end
 
 Fastlane::CLIToolsDistributor.take_off

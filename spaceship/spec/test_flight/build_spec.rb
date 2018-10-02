@@ -6,7 +6,8 @@ describe Spaceship::TestFlight::Build do
 
   before do
     # Use a simple client for all data models
-    Spaceship::TestFlight::Base.client = mock_client
+    allow(Spaceship::TestFlight::Base).to receive(:client).and_return(mock_client)
+    allow(mock_client).to receive(:team_id).and_return('')
   end
 
   context '.find' do
@@ -67,6 +68,13 @@ describe Spaceship::TestFlight::Build do
             trainVersion: '1.1',
             uploadDate: '2017-01-03T12:00:00.000+0000',
             externalState: 'testflight.build.state.processing'
+          },
+          {
+            id: 4,
+            appAdamId: 10,
+            trainVersion: '1.1',
+            uploadDate: '2017-01-04T12:00:00.000+0000',
+            externalState: 'testflight.build.state.review.waiting'
           }
         ]
       end
@@ -75,7 +83,7 @@ describe Spaceship::TestFlight::Build do
     context '.all' do
       it 'contains all of the builds across all build trains' do
         builds = Spaceship::TestFlight::Build.all(app_id: 10, platform: 'ios')
-        expect(builds.size).to eq(3)
+        expect(builds.size).to eq(4)
         expect(builds.sample).to be_instance_of(Spaceship::TestFlight::Build)
         expect(builds.map(&:train_version).uniq).to eq(['1.0', '1.1'])
       end
@@ -97,10 +105,18 @@ describe Spaceship::TestFlight::Build do
       end
     end
 
+    context '.all_waiting_for_review' do
+      it 'returns a collection of builds that are waiting for review' do
+        builds = Spaceship::TestFlight::Build.all_waiting_for_review(app_id: 10, platform: 'ios')
+        expect(builds.size).to eq(1)
+        expect(builds.sample.id).to eq(4)
+      end
+    end
+
     context '.latest' do
       it 'returns the latest build across all build trains' do
         latest_build = Spaceship::TestFlight::Build.latest(app_id: 10, platform: 'ios')
-        expect(latest_build.upload_date).to eq(Time.utc(2017, 1, 3, 12))
+        expect(latest_build.upload_date).to eq(Time.utc(2017, 1, 4, 12))
       end
     end
   end
@@ -273,7 +289,7 @@ describe Spaceship::TestFlight::Build do
       end
     end
 
-    RSpec::Matchers.define :same_test_info do |other_test_info|
+    RSpec::Matchers.define(:same_test_info) do |other_test_info|
       match do |args|
         args[:build].test_info.to_s == other_test_info.to_s
       end

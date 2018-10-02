@@ -1,6 +1,8 @@
-require 'fastlane_core/configuration/config_item'
-require 'fastlane_core/configuration/commander_generator'
-require 'fastlane_core/configuration/configuration_file'
+require_relative '../helper'
+require_relative '../globals'
+require_relative 'config_item'
+require_relative 'commander_generator'
+require_relative 'configuration_file'
 
 module FastlaneCore
   class Configuration
@@ -68,9 +70,9 @@ module FastlaneCore
     end
 
     def verify_input_types
-      UI.user_error!("available_options parameter must be an array of ConfigItems but is #{@available_options.class}") unless @available_options.kind_of? Array
+      UI.user_error!("available_options parameter must be an array of ConfigItems but is #{@available_options.class}") unless @available_options.kind_of?(Array)
       @available_options.each do |item|
-        UI.user_error!("available_options parameter must be an array of ConfigItems. Found #{item.class}.") unless item.kind_of? ConfigItem
+        UI.user_error!("available_options parameter must be an array of ConfigItems. Found #{item.class}.") unless item.kind_of?(ConfigItem)
       end
       UI.user_error!("values parameter must be a hash") unless @values.kind_of?(Hash)
     end
@@ -196,7 +198,7 @@ module FastlaneCore
       paths += Dir["./fastlane/#{config_file_name}"]
       paths += Dir["./.fastlane/#{config_file_name}"]
       paths += Dir["./#{config_file_name}"]
-      paths += Dir["./fastlane_core/spec/fixtures/#{config_file_name}"] if Helper.is_test?
+      paths += Dir["./fastlane_core/spec/fixtures/#{config_file_name}"] if Helper.test?
       return nil if paths.count == 0
       return paths.first
     end
@@ -207,15 +209,16 @@ module FastlaneCore
 
     # Returns the value for a certain key. fastlane_core tries to fetch the value from different sources
     # if 'ask' is true and the value is not present, the user will be prompted to provide a value
+    # rubocop:disable Metrics/PerceivedComplexity
     def fetch(key, ask: true)
       UI.user_error!("Key '#{key}' must be a symbol. Example :app_id.") unless key.kind_of?(Symbol)
 
       option = verify_options_key!(key)
 
       # Same order as https://docs.fastlane.tools/advanced/#priorities-of-parameters-and-options
-      value = if @values.key?(key) and !@values[key].nil?
+      value = if @values.key?(key) && !@values[key].nil?
                 @values[key]
-              elsif option.env_name and !ENV[option.env_name].nil?
+              elsif option.env_name && !ENV[option.env_name].nil?
                 ENV[option.env_name].dup
               elsif self.config_file_options.key?(key)
                 self.config_file_options[key]
@@ -224,11 +227,11 @@ module FastlaneCore
               end
 
       value = option.auto_convert_value(value)
-      value = nil if value.nil? and !option.string? # by default boolean flags are false
-      return value unless value.nil? and !option.optional and ask
+      value = nil if value.nil? && !option.string? # by default boolean flags are false
+      return value unless value.nil? && !option.optional && ask
 
       # fallback to asking
-      if Helper.is_test? or !UI.interactive?
+      if Helper.test? || !UI.interactive?
         # Since we don't want to be asked on tests, we'll just call the verify block with no value
         # to raise the exception that is shown when the user passes an invalid value
         set(key, '')
@@ -237,24 +240,30 @@ module FastlaneCore
       end
 
       while value.nil?
-        UI.important("To not be asked about this value, you can specify it using '#{option.key}'")
+        UI.important("To not be asked about this value, you can specify it using '#{option.key}'") if ENV["FASTLANE_ONBOARDING_IN_PROCESS"].to_s.length == 0
         value = option.sensitive ? UI.password("#{option.description}: ") : UI.input("#{option.description}: ")
         # Also store this value to use it from now on
         begin
           set(key, value)
         rescue => ex
-          puts ex
+          puts(ex)
           value = nil
         end
       end
 
-      value
+      # It's very, very important to use the self[:my_key] notation
+      # as this will make sure to use the `fetch` method
+      # that is responsible for auto converting the values into the right
+      # data type
+      # Found out via https://github.com/fastlane/fastlane/issues/11243
+      return self[key]
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     # Overwrites or sets a new value for a given key
     # @param key [Symbol] Must be a symbol
     def set(key, value)
-      UI.user_error!("Key '#{key}' must be a symbol. Example :#{key}.") unless key.kind_of? Symbol
+      UI.user_error!("Key '#{key}' must be a symbol. Example :#{key}.") unless key.kind_of?(Symbol)
       option = option_for_key(key)
 
       unless option

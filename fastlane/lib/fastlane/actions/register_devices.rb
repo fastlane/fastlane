@@ -3,10 +3,11 @@ require 'credentials_manager'
 module Fastlane
   module Actions
     class RegisterDevicesAction < Action
-      UDID_REGEXP = /^\h{40}$/
+      UDID_REGEXP_IOS = /^(\h{40}|\h{8}-\h{16})$/
+      UDID_REGEXP_MAC = /^[\h\-]{36}$/
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?(platform)
       end
 
       def self.run(params)
@@ -15,14 +16,21 @@ module Fastlane
         devices = params[:devices]
         devices_file = params[:devices_file]
 
+        mac = params[:platform] == "mac"
+        udid_regexp = mac ? UDID_REGEXP_MAC : UDID_REGEXP_IOS
+
         credentials = CredentialsManager::AccountManager.new(user: params[:username])
         Spaceship.login(credentials.user, credentials.password)
         Spaceship.select_team
 
+        UI.message("Fetching list of currently registered devices...")
+        existing_devices = Spaceship::Device.all(mac: mac)
+
         if devices
           device_objs = devices.map do |k, v|
-            UI.user_error!("Passed invalid UDID: #{v} for device: #{k}") unless UDID_REGEXP =~ v
-            Spaceship::Device.create!(name: k, udid: v)
+            UI.user_error!("Passed invalid UDID: #{v} for device: #{k}") unless udid_regexp =~ v
+            next if existing_devices.map(&:udid).include?(v)
+            Spaceship::Device.create!(name: k, udid: v, mac: mac)
           end
         elsif devices_file
           require 'csv'
@@ -30,16 +38,13 @@ module Fastlane
           devices_file = CSV.read(File.expand_path(File.join(devices_file)), col_sep: "\t")
           UI.user_error!("Please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)") unless devices_file.first == ['Device ID', 'Device Name']
 
-          UI.message("Fetching list of currently registered devices...")
-          existing_devices = Spaceship::Device.all
-
           device_objs = devices_file.drop(1).map do |device|
             next if existing_devices.map(&:udid).include?(device[0])
 
-            UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)") unless device.count == 2
-            UI.user_error!("Passed invalid UDID: #{device[0]} for device: #{device[1]}") unless UDID_REGEXP =~ device[0]
+            UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (http://devimages.apple.com/downloads/devices/Multiple-Upload-Samples.zip)") unless device.count == 2
+            UI.user_error!("Passed invalid UDID: #{device[0]} for device: #{device[1]}") unless udid_regexp =~ device[0]
 
-            Spaceship::Device.create!(name: device[1], udid: device[0])
+            Spaceship::Device.create!(name: device[1], udid: device[0], mac: mac)
           end
         else
           UI.user_error!("You must pass either a valid `devices` or `devices_file`. Please check the readme.")
@@ -56,6 +61,7 @@ module Fastlane
       def self.available_options
         user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
         user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+        platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME].to_s
 
         [
           FastlaneCore::ConfigItem.new(key: :devices,
@@ -75,6 +81,7 @@ module Fastlane
                                      env_name: "REGISTER_DEVICES_TEAM_ID",
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                       default_value_dynamic: true,
                                      description: "The ID of your Developer Portal team if you're in multiple teams",
                                      optional: true,
                                      verify_block: proc do |value|
@@ -86,19 +93,29 @@ module Fastlane
                                        optional: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                        end),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "DELIVER_USER",
                                        description: "Optional: Your Apple ID",
-                                       default_value: user)
+                                       default_value: user,
+                                       default_value_dynamic: true),
+          FastlaneCore::ConfigItem.new(key: :platform,
+                                       env_name: "REGISTER_DEVICES_PLATFORM",
+                                       description: "The platform to use (optional)",
+                                       optional: true,
+                                       default_value: platform.empty? ? "ios" : platform,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The platform can only be ios or mac") unless %('ios', 'mac').include?(value)
+                                       end)
         ]
       end
 
       def self.details
         [
-          "This will register iOS devices with the Developer Portal so that you can include them in your provisioning profiles.",
+          "This will register iOS/Mac devices with the Developer Portal so that you can include them in your provisioning profiles.",
           "This is an optimistic action, in that it will only ever add new devices to the member center, and never remove devices. If a device which has already been registered within the member center is not passed to this action, it will be left alone in the member center and continue to work.",
           "The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option, or by setting the env variable `ENV['DELIVER_USER']`."
         ].join("\n")
@@ -118,12 +135,19 @@ module Fastlane
           ) # Simply provide a list of devices as a Hash',
           'register_devices(
             devices_file: "./devices.txt"
-          ) # Alternatively provide a standard UDID export .txt file, see the Apple Sample (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)',
+          ) # Alternatively provide a standard UDID export .txt file, see the Apple Sample (http://devimages.apple.com/downloads/devices/Multiple-Upload-Samples.zip)',
           'register_devices(
             devices_file: "./devices.txt", # You must pass in either `devices_file` or `devices`.
             team_id: "XXXXXXXXXX",         # Optional, if you"re a member of multiple teams, then you need to pass the team ID here.
             username: "luka@goonbee.com"   # Optional, lets you override the Apple Member Center username.
-          )'
+          )',
+          'register_devices(
+            devices: {
+              "Luka MacBook" => "12345678-1234-1234-1234-123456789012",
+              "Felix MacBook Pro" => "ABCDEFGH-ABCD-ABCD-ABCD-ABCDEFGHIJKL"
+            },
+            platform: "mac"
+          ) # Register devices for Mac'
         ]
       end
 

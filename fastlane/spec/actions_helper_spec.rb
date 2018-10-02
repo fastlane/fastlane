@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "#execute_action" do
-      let (:step_name) { "My Step" }
+      let(:step_name) { "My Step" }
 
       it "stores the action properly" do
         Fastlane::Actions.execute_action(step_name) {}
@@ -15,12 +15,12 @@ describe Fastlane do
           Fastlane::Actions.execute_action(step_name) do
             UI.user_error!("Some error")
           end
-        end.to raise_error "Some error"
+        end.to raise_error("Some error")
 
         result = Fastlane::Actions.executed_actions.last
         expect(result[:name]).to eq(step_name)
-        expect(result[:error]).to include "Some error"
-        expect(result[:error]).to include "actions_helper.rb"
+        expect(result[:error]).to include("Some error")
+        expect(result[:error]).to include("actions_helper.rb")
       end
     end
 
@@ -42,9 +42,17 @@ describe Fastlane do
         Fastlane::Actions::ArchiveAction.run(nil)
       end
 
-      it "can throws an error if plugin is damaged" do
+      it "throws an error if plugin is damaged" do
         expect(UI).to receive(:user_error!).with("Action 'broken_action' is damaged!", { show_github_issues: true })
         Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/broken_actions")
+      end
+
+      it "throws errors when syntax is incorrect" do
+        content = File.read('./fastlane/spec/fixtures/broken_files/broken_file.rb', encoding: 'utf-8')
+        expect(UI).to receive(:content_error).with(content, '7')
+        expect(UI).to receive(:content_error).with(content, '8')
+        expect(UI).to receive(:user_error!).with("Syntax error in broken_file.rb")
+        Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/broken_files")
       end
     end
 

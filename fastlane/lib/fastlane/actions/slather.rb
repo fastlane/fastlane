@@ -48,7 +48,7 @@ module Fastlane
         validate_params!(params)
 
         command = build_command(params)
-        sh command
+        sh(command)
       end
 
       def self.has_config_file
@@ -110,10 +110,10 @@ module Fastlane
       end
 
       def self.details
-        return <<-eos
-Slather works with multiple code coverage formats including Xcode7 code coverage.
-Slather is available at https://github.com/SlatherOrg/slather
-        eos
+        [
+          "Slather works with multiple code coverage formats, including Xcode 7 code coverage.",
+          "Slather is available at [https://github.com/SlatherOrg/slather](https://github.com/SlatherOrg/slather)."
+        ].join("\n")
       end
 
       def self.available_options
@@ -126,7 +126,7 @@ Slather is available at https://github.com/SlatherOrg/slather
                                        env_name: "FL_SLATHER_PROJ", # The name of the environment variable
                                        description: "The project file that slather looks at", # a short description of this parameter
                                        verify_block: proc do |value|
-                                         UI.user_error!("No project file specified, pass using `proj: 'Project.xcodeproj'`") unless value and !value.empty?
+                                         UI.user_error!("No project file specified, pass using `proj: 'Project.xcodeproj'`") unless value && !value.empty?
                                        end,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :workspace,
@@ -280,7 +280,7 @@ Slather is available at https://github.com/SlatherOrg/slather
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

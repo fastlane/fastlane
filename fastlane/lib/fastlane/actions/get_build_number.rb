@@ -32,6 +32,7 @@ module Fastlane
         end
         return build_number
       rescue => ex
+        return false if params[:hide_error_when_versioning_disabled]
         UI.error('Before being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html')
         raise ex
       end
@@ -47,9 +48,8 @@ module Fastlane
       def self.details
         [
           "This action will return the current build number set on your project.",
-          "You first have to set up your Xcode project, if you haven't done it already:",
-          "https://developer.apple.com/library/ios/qa/qa1827/_index.html"
-        ].join(' ')
+          "You first have to set up your Xcode project, if you haven't done it already: [https://developer.apple.com/library/ios/qa/qa1827/_index.html](https://developer.apple.com/library/ios/qa/qa1827/_index.html)."
+        ].join("\n")
       end
 
       def self.available_options
@@ -59,9 +59,14 @@ module Fastlane
                              description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
                              optional: true,
                              verify_block: proc do |value|
-                               UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
-                               UI.user_error!("Could not find Xcode project") if !File.exist?(value) and !Helper.is_test?
-                             end)
+                               UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
+                               UI.user_error!("Could not find Xcode project") if !File.exist?(value) && !Helper.test?
+                             end),
+          FastlaneCore::ConfigItem.new(key: :hide_error_when_versioning_disabled,
+                             env_name: "FL_BUILD_NUMBER_HIDE_ERROR_WHEN_VERSIONING_DISABLED",
+                             description: "Used during `fastlane init` to hide the error message",
+                             default_value: false,
+                             type: Boolean)
         ]
       end
 
@@ -76,7 +81,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

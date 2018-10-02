@@ -3,7 +3,6 @@
 //  Example
 //
 //  Created by Felix Krause on 10/8/15.
-//  Copyright © 2015 Felix Krause. All rights reserved.
 //
 
 // -----------------------------------------------------
@@ -43,6 +42,7 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
     case cannotFindHomeDirectory
     case cannotFindSimulatorHomeDirectory
     case cannotAccessSimulatorHomeDirectory(String)
+    case cannotRunOnPhysicalDevice
 
     var debugDescription: String {
         switch self {
@@ -54,23 +54,27 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
             return "Couldn't find simulator home location. Please, check SIMULATOR_HOST_HOME env variable."
         case .cannotAccessSimulatorHomeDirectory(let simulatorHostHome):
             return "Can't prepare environment. Simulator home location is inaccessible. Does \(simulatorHostHome) exist?"
+        case .cannotRunOnPhysicalDevice:
+            return "Can't use Snapshot on a physical device."
         }
     }
 }
 
 @objcMembers
 open class Snapshot: NSObject {
-    static var app: XCUIApplication!
-    static var cacheDirectory: URL!
+    static var app: XCUIApplication?
+    static var cacheDirectory: URL?
     static var screenshotsDirectory: URL? {
-        return cacheDirectory.appendingPathComponent("screenshots", isDirectory: true)
+        return cacheDirectory?.appendingPathComponent("screenshots", isDirectory: true)
     }
 
     open class func setupSnapshot(_ app: XCUIApplication) {
+        
+        Snapshot.app = app
+
         do {
             let cacheDir = try pathPrefix()
             Snapshot.cacheDirectory = cacheDir
-            Snapshot.app = app
             setLanguage(app)
             setLocale(app)
             setLaunchArguments(app)
@@ -80,6 +84,11 @@ open class Snapshot: NSObject {
     }
 
     class func setLanguage(_ app: XCUIApplication) {
+        guard let cacheDirectory = self.cacheDirectory else {
+            print("CacheDirectory is not set - probably running on a physical device?")
+            return
+        }
+        
         let path = cacheDirectory.appendingPathComponent("language.txt")
 
         do {
@@ -92,6 +101,11 @@ open class Snapshot: NSObject {
     }
 
     class func setLocale(_ app: XCUIApplication) {
+        guard let cacheDirectory = self.cacheDirectory else {
+            print("CacheDirectory is not set - probably running on a physical device?")
+            return
+        }
+        
         let path = cacheDirectory.appendingPathComponent("locale.txt")
 
         do {
@@ -107,6 +121,11 @@ open class Snapshot: NSObject {
     }
 
     class func setLaunchArguments(_ app: XCUIApplication) {
+        guard let cacheDirectory = self.cacheDirectory else {
+            print("CacheDirectory is not set - probably running on a physical device?")
+            return
+        }
+        
         let path = cacheDirectory.appendingPathComponent("snapshot-launch_arguments.txt")
         app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES", "-ui_testing"]
 
@@ -128,14 +147,21 @@ open class Snapshot: NSObject {
             waitForLoadingIndicatorToDisappear(within: timeout)
         }
 
-        print("snapshot: \(name)") // more information about this, check out https://github.com/fastlane/fastlane/tree/master/snapshot#how-does-it-work
+        print("snapshot: \(name)") // more information about this, check out https://docs.fastlane.tools/actions/snapshot/#how-does-it-work
 
         sleep(1) // Waiting for the animation to be finished (kind of)
 
         #if os(OSX)
             XCUIApplication().typeKey(XCUIKeyboardKeySecondaryFn, modifierFlags: [])
         #else
-            let screenshot = app.windows.firstMatch.screenshot()
+            
+            guard let app = self.app else {
+                print("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
+                return
+            }
+            
+            let window = app.windows.firstMatch
+            let screenshot = window.screenshot()
             guard let simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
             let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
             do {
@@ -166,19 +192,23 @@ open class Snapshot: NSObject {
                 throw SnapshotError.cannotDetectUser
             }
 
-            guard let usersDir =  FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
+            guard let usersDir = FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
                 throw SnapshotError.cannotFindHomeDirectory
             }
 
             homeDir = usersDir.appendingPathComponent(user)
         #else
-            guard let simulatorHostHome = ProcessInfo().environment["SIMULATOR_HOST_HOME"] else {
-                throw SnapshotError.cannotFindSimulatorHomeDirectory
-            }
-            guard let homeDirUrl = URL(string: simulatorHostHome) else {
-                throw SnapshotError.cannotAccessSimulatorHomeDirectory(simulatorHostHome)
-            }
-            homeDir = URL(fileURLWithPath: homeDirUrl.path)
+            #if arch(i386) || arch(x86_64)
+                guard let simulatorHostHome = ProcessInfo().environment["SIMULATOR_HOST_HOME"] else {
+                    throw SnapshotError.cannotFindSimulatorHomeDirectory
+                }
+                guard let homeDirUrl = URL(string: simulatorHostHome) else {
+                    throw SnapshotError.cannotAccessSimulatorHomeDirectory(simulatorHostHome)
+                }
+                homeDir = URL(fileURLWithPath: homeDirUrl.path)
+            #else
+                throw SnapshotError.cannotRunOnPhysicalDevice
+            #endif
         #endif
         return homeDir.appendingPathComponent("Library/Caches/tools.fastlane")
     }
@@ -223,7 +253,7 @@ private extension XCUIElementQuery {
     }
 
     var deviceStatusBars: XCUIElementQuery {
-        let deviceWidth = XCUIApplication().frame.width
+        let deviceWidth = XCUIApplication().windows.firstMatch.frame.width
 
         let isStatusBar = NSPredicate { (evaluatedObject, _) in
             guard let element = evaluatedObject as? XCUIElementAttributes else { return false }
@@ -243,4 +273,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.8]
+// SnapshotHelperVersion [1.12]

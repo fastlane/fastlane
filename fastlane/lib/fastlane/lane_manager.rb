@@ -6,12 +6,14 @@ module Fastlane
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # @param env Dot Env Information
-    def self.cruise_lane(platform, lane, parameters = nil, env = nil)
-      UI.user_error!("lane must be a string") unless lane.kind_of?(String) or lane.nil?
-      UI.user_error!("platform must be a string") unless platform.kind_of?(String) or platform.nil?
-      UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) or parameters.nil?
+    # @param A custom Fastfile path, this is used by fastlane.ci
+    # rubocop:disable Metrics/PerceivedComplexity
+    def self.cruise_lane(platform, lane, parameters = nil, env = nil, fastfile_path = nil)
+      UI.user_error!("lane must be a string") unless lane.kind_of?(String) || lane.nil?
+      UI.user_error!("platform must be a string") unless platform.kind_of?(String) || platform.nil?
+      UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) || parameters.nil?
 
-      ff = Fastlane::FastFile.new(FastlaneCore::FastlaneFolder.fastfile_path)
+      ff = Fastlane::FastFile.new(fastfile_path || FastlaneCore::FastlaneFolder.fastfile_path)
 
       is_platform = false
       begin
@@ -29,7 +31,7 @@ module Fastlane
         end
       end
 
-      if !platform and lane
+      if !platform && lane
         # Either, the user runs a specific lane in root or want to auto complete the available lanes for a platform
         # e.g. `fastlane ios` should list all available iOS actions
         if ff.is_platform_block?(lane)
@@ -40,27 +42,30 @@ module Fastlane
 
       platform, lane = choose_lane(ff, platform) unless lane
 
-      FastlaneCore.session.is_fastfile = true
-
       # xcodeproj has a bug in certain versions that causes it to change directories
       # and not return to the original working directory
       # https://github.com/CocoaPods/Xcodeproj/issues/426
       # Setting this environment variable causes xcodeproj to work around the problem
       ENV["FORK_XCODE_WRITING"] = "true" unless platform == 'android'
 
-      load_dot_env(env)
+      Fastlane::Helper::DotenvHelper.load_dot_env(env)
 
       started = Time.now
       e = nil
       begin
         ff.runner.execute(lane, platform, parameters)
+      rescue NameError => ex
+        print_lane_context
+        print_error_line(ex)
+        e = ex
       rescue Exception => ex # rubocop:disable Lint/RescueException
         # We also catch Exception, since the implemented action might send a SystemExit signal
         # (or similar). We still want to catch that, since we want properly finish running fastlane
         # Tested with `xcake`, which throws a `Xcake::Informative` object
 
         print_lane_context
-        UI.error ex.to_s if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
+        print_error_line(ex)
+        UI.error(ex.to_s) if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
         e = ex
       end
 
@@ -68,58 +73,14 @@ module Fastlane
       Fastlane::DocsGenerator.run(ff) unless skip_docs?
 
       duration = ((Time.now - started) / 60.0).round
-
       finish_fastlane(ff, duration, e)
 
       return ff
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     def self.skip_docs?
       Helper.test? || FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
-    end
-
-    # All the finishing up that needs to be done
-    def self.finish_fastlane(ff, duration, error)
-      # Finished with all the lanes
-      Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
-      print_table(Fastlane::Actions.executed_actions)
-
-      Fastlane::PluginUpdateManager.show_update_status
-
-      if error
-        UI.error 'fastlane finished with errors'
-        raise error
-      elsif duration > 5
-        UI.success "fastlane.tools just saved you #{duration} minutes! 🎉"
-      else
-        UI.success 'fastlane.tools finished successfully 🎉'
-      end
-    end
-
-    # Print a table as summary of the executed actions
-    def self.print_table(actions)
-      return if actions.count == 0
-
-      require 'terminal-table'
-
-      rows = []
-      actions.each_with_index do |current, i|
-        is_error_step = !current[:error].to_s.empty?
-
-        name = current[:name][0..60]
-        name = name.red if is_error_step
-        index = i + 1
-        index = "💥" if is_error_step
-        rows << [index, name, current[:time].to_i]
-      end
-
-      puts ""
-      puts Terminal::Table.new(
-        title: "fastlane summary".green,
-        headings: ["Step", "Action", "Time (in s)"],
-        rows: FastlaneCore::PrintTable.transform_output(rows)
-      )
-      puts ""
     end
 
     # Lane chooser if user didn't provide a lane
@@ -134,7 +95,7 @@ module Fastlane
       end
 
       if available.empty?
-        UI.user_error! "It looks like you don't have any lanes to run just yet. Check out how to get started here: https://github.com/fastlane/fastlane 🚀"
+        UI.user_error!("It looks like you don't have any lanes to run just yet. Check out how to get started here: https://github.com/fastlane/fastlane 🚀")
       end
 
       rows = []
@@ -144,22 +105,24 @@ module Fastlane
 
       rows << [0, "cancel", "No selection, exit fastlane!"]
 
+      require 'terminal-table'
+
       table = Terminal::Table.new(
         title: "Available lanes to run",
         headings: ['Number', 'Lane Name', 'Description'],
         rows: FastlaneCore::PrintTable.transform_output(rows)
       )
 
-      UI.message "Welcome to fastlane! Here's what your app is setup to do:"
+      UI.message("Welcome to fastlane! Here's what your app is setup to do:")
 
-      puts table
+      puts(table)
 
-      i = UI.input "Which number would you like run?"
+      i = UI.input("Which number would you like run?")
 
       i = i.to_i - 1
       if i >= 0 && available[i]
         selection = available[i].last.pretty_name
-        UI.important "Running lane `#{selection}`. Next time you can do this by directly typing `fastlane #{selection}` 🚀."
+        UI.important("Running lane `#{selection}`. Next time you can do this by directly typing `fastlane #{selection}` 🚀.")
         platform = selection.split(' ')[0]
         lane_name = selection.split(' ')[1]
 
@@ -170,7 +133,7 @@ module Fastlane
 
         return platform, lane_name # yeah
       else
-        UI.user_error! "Run `fastlane` the next time you need to build, test or release your app 🚀"
+        UI.user_error!("Run `fastlane` the next time you need to build, test or release your app 🚀")
       end
     end
   end

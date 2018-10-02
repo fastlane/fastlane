@@ -41,14 +41,15 @@ module Fastlane
         return
       end
 
-      puts Terminal::Table.new({
+      require 'terminal-table'
+      puts(Terminal::Table.new({
         rows: FastlaneCore::PrintTable.transform_output(rows),
         title: "Plugin updates available".yellow,
         headings: ["Plugin", "Your Version", "Latest Version"]
-      })
-      UI.message "To update all plugins, just run"
+      }))
+      UI.message("To update all plugins, just run")
       UI.command "bundle exec fastlane update_plugins"
-      puts ''
+      puts('')
       @server_results = nil
     end
 

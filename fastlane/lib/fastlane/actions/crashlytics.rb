@@ -35,7 +35,7 @@ module Fastlane
                  .gsub(params[:build_secret], '[[BUILD_SECRET]]')
         end
 
-        UI.verbose sanitizer.call(command.join(' ')) if FastlaneCore::Globals.verbose?
+        UI.verbose(sanitizer.call(command.join(' '))) if FastlaneCore::Globals.verbose?
 
         error_callback = proc do |error|
           clean_error = sanitizer.call(error)
@@ -51,20 +51,20 @@ module Fastlane
 
         return command if Helper.test?
 
-        UI.verbose sanitizer.call(result) if FastlaneCore::Globals.verbose?
+        UI.verbose(sanitizer.call(result)) if FastlaneCore::Globals.verbose?
 
         UI.success('Build successfully uploaded to Crashlytics Beta 🌷')
         UI.success('Visit https://fabric.io/_/beta to add release notes and notify testers.')
       end
 
       def self.description
-        "Upload a new build to Crashlytics Beta"
+        "Upload a new build to [Crashlytics Beta](http://try.crashlytics.com/beta/)"
       end
 
       def self.available_options
         platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
 
-        if platform == :ios or platform.nil?
+        if platform == :ios || platform.nil?
           ipa_path_default = Dir["*.ipa"].sort_by { |x| File.mtime(x) }.last
         end
 
@@ -78,6 +78,7 @@ module Fastlane
                                        env_name: "CRASHLYTICS_IPA_PATH",
                                        description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || ipa_path_default,
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
@@ -87,6 +88,7 @@ module Fastlane
                                        env_name: "CRASHLYTICS_APK_PATH",
                                        description: "Path to your APK file",
                                        default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] || apk_path_default,
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find apk file at path '#{value}'") unless File.exist?(value)
@@ -159,8 +161,8 @@ module Fastlane
 
       def self.details
         [
-          "Additionally you can specify `notes`, `emails`, `groups` and `notifications`.",
-          "Distributing to Groups: When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog here:"
+          "Additionally, you can specify `notes`, `emails`, `groups` and `notifications`.",
+          "Distributing to Groups: When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog by clicking the 'Manage Groups' button."
         ].join("\n")
       end
 

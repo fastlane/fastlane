@@ -38,9 +38,9 @@ module Fastlane
         http.use_ssl = true
 
         if params[:platform] == 'ios'
-          UI.message "Uploading ipa to appetize... this might take a while"
+          UI.message("Uploading ipa to appetize... this might take a while")
         else
-          UI.message "Uploading apk to appetize... this might take a while"
+          UI.message("Uploading apk to appetize... this might take a while")
         end
 
         response = http.request(req)
@@ -60,7 +60,7 @@ module Fastlane
 
       def self.create_request(uri, params)
         if params[:url]
-          req = Net::HTTP::Post.new(uri.request_uri, initheader: { 'Content-Type' => 'application/json' })
+          req = Net::HTTP::Post.new(uri.request_uri, { 'Content-Type' => 'application/json' })
           req.body = JSON.generate(params)
         else
           req = Net::HTTP::Post::Multipart.new(uri.path, params)
@@ -81,20 +81,20 @@ module Fastlane
         Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL] = manage_url
         return true
       rescue => ex
-        UI.error ex
+        UI.error(ex)
         UI.user_error!("Error uploading to Appetize.io: #{response.body}")
       end
       private_class_method :parse_response
 
       def self.description
-        "Upload your app to Appetize.io to stream it in the browser"
+        "Upload your app to [Appetize.io](https://appetize.io/) to stream it in browser"
       end
 
       def self.details
         [
           "If you provide a `public_key`, this will overwrite an existing application. If you want to have this build as a new app version, you shouldn't provide this value.",
           "",
-          "To integrate appetize into your GitHub workflow check out the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)"
+          "To integrate appetize into your GitHub workflow check out the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)."
         ].join("\n")
       end
 
@@ -115,7 +115,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        env_name: "APPETIZE_PLATFORM",
-                                       description: "Platform. Either `ios` or `android`. Default is `ios`",
+                                       description: "Platform. Either `ios` or `android`",
                                        is_string: true,
                                        default_value: 'ios'),
           FastlaneCore::ConfigItem.new(key: :path,

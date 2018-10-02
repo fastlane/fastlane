@@ -60,11 +60,11 @@ module Fastlane
         gcovr_args = nil
 
         # Allows for a whole variety of configurations
-        if params.kind_of? Hash
+        if params.kind_of?(Hash)
           params_hash = params
 
           # Check if an output path was given
-          if params_hash.key? :output
+          if params_hash.key?(:output)
             create_output_dir_if_not_exists(params_hash[:output])
           end
 
@@ -80,15 +80,15 @@ module Fastlane
         command = "gcovr #{gcovr_args}"
         UI.success("Generating code coverage.")
         UI.verbose(command)
-        Actions.sh command
+        Actions.sh(command)
       end
 
       def self.create_output_dir_if_not_exists(output_path)
         output_dir = File.dirname(output_path)
 
         # If the output directory doesn't exist, create it
-        unless Dir.exist? output_dir
-          FileUtils.mkpath output_dir
+        unless Dir.exist?(output_dir)
+          FileUtils.mkpath(output_dir)
         end
       end
 

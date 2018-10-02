@@ -2,40 +2,44 @@ module Fastlane
   module Actions
     class PodPushAction < Action
       def self.run(params)
+        command = []
+
+        command << "bundle exec" if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
+
         if params[:repo]
           repo = params[:repo]
-          command = "pod repo push #{repo}"
+          command << "pod repo push #{repo}"
         else
-          command = 'pod trunk push'
+          command << 'pod trunk push'
         end
 
         if params[:path]
-          command << " '#{params[:path]}'"
+          command << "'#{params[:path]}'"
         end
 
         if params[:sources]
           sources = params[:sources].join(",")
-          command << " --sources='#{sources}'"
+          command << "--sources='#{sources}'"
         end
 
         if params[:swift_version]
           swift_version = params[:swift_version]
-          command << " --swift-version=#{swift_version}"
+          command << "--swift-version=#{swift_version}"
         end
 
         if params[:allow_warnings]
-          command << " --allow-warnings"
+          command << "--allow-warnings"
         end
 
         if params[:use_libraries]
-          command << " --use-libraries"
+          command << "--use-libraries"
         end
 
         if params[:verbose]
-          command << " --verbose"
+          command << "--verbose"
         end
 
-        result = Actions.sh(command.to_s)
+        result = Actions.sh(command.join(' '))
         UI.success("Successfully pushed Podspec ⬆️ ")
         return result
       end
@@ -48,12 +52,12 @@ module Fastlane
         "Push a Podspec to Trunk or a private repository"
       end
 
-      def self.details
-        ""
-      end
-
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
+                                         description: "Use bundle exec when there is a Gemfile presented",
+                                         is_string: false,
+                                         default_value: false),
           FastlaneCore::ConfigItem.new(key: :path,
                                        description: "The Podspec you want to push",
                                        optional: true,
@@ -76,6 +80,7 @@ module Fastlane
                                        description: "The sources of repos you want the pod spec to lint with, separated by commas",
                                        optional: true,
                                        is_string: false,
+                                       type: Array,
                                        verify_block: proc do |value|
                                          UI.user_error!("Sources must be an array.") unless value.kind_of?(Array)
                                        end),
@@ -100,7 +105,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

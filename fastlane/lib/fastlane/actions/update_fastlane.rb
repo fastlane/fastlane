@@ -10,7 +10,7 @@ module Fastlane
       def self.run(options)
         return if options[:no_update] # this is used to update itself
 
-        tools_to_update = options[:tools].split ',' unless options[:tools].nil?
+        tools_to_update = options[:tools].split(',') unless options[:tools].nil?
         tools_to_update ||= all_installed_tools
 
         if tools_to_update.count == 0
@@ -28,16 +28,16 @@ module Fastlane
         sudo_needed = !File.writable?(gem_dir)
 
         if sudo_needed
-          UI.important("It seems that your Gem directory is not writable by your current User.")
+          UI.important("It seems that your Gem directory is not writable by your current user.")
           UI.important("fastlane would need sudo rights to update itself, however, running 'sudo fastlane' is not recommended.")
-          UI.important("If you still want to use this action, please read the documentation on a guide how to set this up:")
+          UI.important("If you still want to use this action, please read the documentation on how to set this up:")
           UI.important("https://docs.fastlane.tools/actions/#update_fastlane")
           return
         end
 
         unless updater.respond_to?(:highest_installed_gems)
-          UI.important "The update_fastlane action requires rubygems version 2.1.0 or greater."
-          UI.important "Please update your version of ruby gems before proceeding."
+          UI.important("The update_fastlane action requires rubygems version 2.1.0 or greater.")
+          UI.important("Please update your version of ruby gems before proceeding.")
           UI.command "gem install rubygems-update"
           UI.command "update_rubygems"
           UI.command "gem update --system"
@@ -89,7 +89,7 @@ module Fastlane
         UI.message("fastlane.tools successfully updated! I will now restart myself... 😴")
 
         # Set no_update to true so we don't try to update again
-        exec "FL_NO_UPDATE=true #{$PROGRAM_NAME} #{ARGV.join ' '}"
+        exec("FL_NO_UPDATE=true #{$PROGRAM_NAME} #{ARGV.join(' ')}")
       end
 
       def self.show_information_about_nightly_builds
@@ -104,7 +104,7 @@ module Fastlane
       end
 
       def self.all_installed_tools
-        Gem::Specification.select { |s| ALL_TOOLS.include? s.name }.map(&:name).uniq
+        Gem::Specification.select { |s| ALL_TOOLS.include?(s.name) }.map(&:name).uniq
       end
 
       def self.description
@@ -112,17 +112,24 @@ module Fastlane
       end
 
       def self.details
+        sample = <<-SAMPLE.markdown_sample
+          ```bash
+          export GEM_HOME=~/.gems
+          export PATH=$PATH:~/.gems/bin
+          ```
+        SAMPLE
+
         [
           "This action will update fastlane to the most recent version - major version updates will not be performed automatically, as they might include breaking changes. If an update was performed, fastlane will be restarted before the run continues.",
+          "",
           "If you are using rbenv or rvm, everything should be good to go. However, if you are using the system's default ruby, some additional setup is needed for this action to work correctly. In short, fastlane needs to be able to access your gem library without running in `sudo` mode.",
-          "The simplest possible fix for this is putting the following lines into your `~/.bashrc` or `~/.zshrc` file:",
-          "```bash",
-          "export GEM_HOME=~/.gems",
-          "export PATH=$PATH:~/.gems/bin",
-          "```",
+          "",
+          "The simplest possible fix for this is putting the following lines into your `~/.bashrc` or `~/.zshrc` file:".markdown_preserve_newlines,
+          sample,
           "After the above changes, restart your terminal, then run `mkdir $GEM_HOME` to create the new gem directory. After this, you're good to go!",
-          "Recommended usage of the `update_fastlane` action is at the top inside of the `before_all` block, before running any other action"
-        ].join("\n\n")
+          "",
+          "Recommended usage of the `update_fastlane` action is at the top inside of the `before_all` block, before running any other action."
+        ].join("\n")
       end
 
       def self.available_options
@@ -134,12 +141,12 @@ module Fastlane
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :no_update,
                                        env_name: "FL_NO_UPDATE",
-                                       description: "Don't update during this run. Defaults to false. This is used internally",
+                                       description: "Don't update during this run. This is used internally",
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :tools,
                                        env_name: "FL_TOOLS_TO_UPDATE",
-                                       description: "Comma separated list of fastlane tools to update (e.g. fastlane,deliver,sigh)",
+                                       description: "Comma separated list of fastlane tools to update (e.g. `fastlane,deliver,sigh`)",
                                        deprecated: true,
                                        optional: true)
         ]

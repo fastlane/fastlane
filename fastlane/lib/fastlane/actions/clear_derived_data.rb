@@ -1,3 +1,5 @@
+require 'fastlane_core/core_ext/cfpropertylist'
+
 module Fastlane
   module Actions
     class ClearDerivedDataAction < Action
@@ -6,6 +8,16 @@ module Fastlane
         UI.message("Derived Data path located at: #{path}")
         FileUtils.rm_rf(path) if File.directory?(path)
         UI.success("Successfully cleared Derived Data ♻️")
+      end
+
+      # Helper Methods
+      def self.xcode_preferences
+        file = File.expand_path("~/Library/Preferences/com.apple.dt.Xcode.plist")
+        if File.exist?(file)
+          plist = CFPropertyList::List.new(file: file).value
+          return CFPropertyList.native_types(plist) unless plist.nil?
+        end
+        return nil
       end
 
       #####################################################
@@ -17,15 +29,18 @@ module Fastlane
       end
 
       def self.details
-        "Deletes the Derived Data from '~/Library/Developer/Xcode/DerivedData' or a supplied path"
+        "Deletes the Derived Data from path set on Xcode or a supplied path"
       end
 
       def self.available_options
+        path = xcode_preferences ? xcode_preferences['IDECustomDerivedDataLocation'] : nil
+        path ||= "~/Library/Developer/Xcode/DerivedData"
         [
           FastlaneCore::ConfigItem.new(key: :derived_data_path,
                                        env_name: "DERIVED_DATA_PATH",
                                        description: "Custom path for derivedData",
-                                       default_value: "~/Library/Developer/Xcode/DerivedData")
+                                       default_value_dynamic: true,
+                                       default_value: path)
         ]
       end
 

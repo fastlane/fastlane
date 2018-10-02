@@ -63,7 +63,8 @@ describe Spaceship::TestFlight::AppTestInfo do
 
   before do
     # Use a simple client for all data models
-    Spaceship::TestFlight::Base.client = mock_client
+    allow(Spaceship::TestFlight::Base).to receive(:client).and_return(mock_client)
+    allow(mock_client).to receive(:team_id).and_return('')
   end
 
   it 'gets the TestInfo' do
@@ -108,7 +109,7 @@ describe Spaceship::TestFlight::AppTestInfo do
       expect(found_app_test_info.raw_data.to_h.to_s).to eq(app_test_info.raw_data.to_h.to_s)
     end
 
-    RSpec::Matchers.define :same_app_test_info do |other_app_test_info|
+    RSpec::Matchers.define(:same_app_test_info) do |other_app_test_info|
       match do |args|
         args[:app_test_info].raw_data.to_h.to_s == other_app_test_info.raw_data.to_h.to_s
       end

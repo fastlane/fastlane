@@ -1,3 +1,5 @@
+require_relative 'xcpretty_reporter_options_generator'
+
 module Scan
   # Responsible for building the fully working xcodebuild command
   class TestCommandGenerator
@@ -35,10 +37,11 @@ module Scan
       options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
       options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
       options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
+      options << "-maximum-concurrent-test-simulator-destinations #{config[:max_concurrent_simulators]}" if config[:max_concurrent_simulators]
+      options << "-disable-concurrent-testing" if config[:disable_concurrent_testing]
       options << "-enableCodeCoverage #{config[:code_coverage] ? 'YES' : 'NO'}" unless config[:code_coverage].nil?
       options << "-enableAddressSanitizer #{config[:address_sanitizer] ? 'YES' : 'NO'}" unless config[:address_sanitizer].nil?
       options << "-enableThreadSanitizer #{config[:thread_sanitizer] ? 'YES' : 'NO'}" unless config[:thread_sanitizer].nil?
-      options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
       options << "-xctestrun '#{config[:xctestrun]}'" if config[:xctestrun]
       options << config[:xcargs] if config[:xcargs]
 
@@ -81,8 +84,12 @@ module Scan
       end
 
       formatter = []
-      if Scan.config[:formatter]
-        formatter << "-f `#{Scan.config[:formatter]}`"
+      if (custom_formatter = Scan.config[:formatter])
+        if custom_formatter.end_with?(".rb")
+          formatter << "-f '#{custom_formatter}'"
+        else
+          formatter << "-f `#{custom_formatter}`"
+        end
       elsif FastlaneCore::Env.truthy?("TRAVIS")
         formatter << "-f `xcpretty-travis-formatter`"
         UI.success("Automatically switched to Travis formatter")
@@ -104,9 +111,11 @@ module Scan
                                                                          Scan.config[:output_types],
                                                                          Scan.config[:output_files] || Scan.config[:custom_report_file_name],
                                                                          Scan.config[:output_directory],
-                                                                         Scan.config[:use_clang_report_name])
+                                                                         Scan.config[:use_clang_report_name],
+                                                                         Scan.config[:xcpretty_args])
       reporter_options = @reporter_options_generator.generate_reporter_options
-      return pipe << "| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')}"
+      reporter_xcpretty_args = @reporter_options_generator.generate_xcpretty_args_options
+      return pipe << "| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')} #{reporter_xcpretty_args}"
     end
 
     # Store the raw file
@@ -132,14 +141,18 @@ module Scan
         day = Time.now.strftime("%F") # e.g. 2015-08-07
 
         Scan.cache[:build_path] = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}/")
-        FileUtils.mkdir_p Scan.cache[:build_path]
+        FileUtils.mkdir_p(Scan.cache[:build_path])
       end
       Scan.cache[:build_path]
     end
 
     def result_bundle_path
       unless Scan.cache[:result_bundle_path]
-        Scan.cache[:result_bundle_path] = File.join(Scan.config[:output_directory], Scan.config[:scheme]) + ".test_result"
+        path = File.join(Scan.config[:output_directory], Scan.config[:scheme]) + ".test_result"
+        if File.directory?(path)
+          FileUtils.remove_dir(path)
+        end
+        Scan.cache[:result_bundle_path] = path
       end
       return Scan.cache[:result_bundle_path]
     end

@@ -5,11 +5,9 @@ module Fastlane
 
     class UpdateInfoPlistAction < Action
       def self.run(params)
-        require 'xcodeproj'
-
         # Check if parameters are set
-        if params[:app_identifier] or params[:display_name] or params[:block]
-          if (params[:app_identifier] or params[:display_name]) and params[:block]
+        if params[:app_identifier] || params[:display_name] || params[:block]
+          if (params[:app_identifier] || params[:display_name]) && params[:block]
             UI.important("block parameter can not be specified with app_identifier or display_name")
             return false
           end
@@ -34,18 +32,15 @@ module Fastlane
           # Read existing plist file
           info_plist_path = File.join(folder, "..", params[:plist_path])
           UI.user_error!("Couldn't find info plist file at path '#{info_plist_path}'") unless File.exist?(info_plist_path)
-          plist = Xcodeproj::Plist.read_from_path(info_plist_path)
 
-          # Update plist values
-          plist['CFBundleIdentifier'] = params[:app_identifier] if params[:app_identifier]
-          plist['CFBundleDisplayName'] = params[:display_name] if params[:display_name]
-          params[:block].call(plist) if params[:block]
-
-          # Write changes to file
-          Xcodeproj::Plist.write_to_path(plist, info_plist_path)
-
-          UI.success("Updated #{params[:plist_path]} 💾.")
-          File.read(info_plist_path)
+          UpdatePlistAction.run(
+            plist_path: info_plist_path,
+            block: proc do |plist|
+              plist['CFBundleIdentifier'] = params[:app_identifier] if params[:app_identifier]
+              plist['CFBundleDisplayName'] = params[:display_name] if params[:display_name]
+              params[:block].call(plist) if params[:block]
+            end
+          )
         else
           UI.important("You haven't specified any parameters to update your plist.")
           false
@@ -76,7 +71,7 @@ module Fastlane
                                        description: "Path to your Xcode project",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
+                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
                                          UI.user_error!("Could not find Xcode project") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :plist_path,
@@ -95,6 +90,7 @@ module Fastlane
                                        description: 'The App Identifier of your app',
                                        code_gen_sensitive: true,
                                        default_value: ENV['PRODUCE_APP_IDENTIFIER'],
+                                       default_value_dynamic: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :display_name,
                                        env_name: 'FL_UPDATE_PLIST_DISPLAY_NAME',
@@ -130,10 +126,10 @@ module Fastlane
           'update_info_plist( # Advanced processing: find URL scheme for particular key and replace value
             xcodeproj: "path/to/Example.proj",
             plist_path: "path/to/Info.plist",
-            block: lambda { |plist|
+            block: proc do |plist|
               urlScheme = plist["CFBundleURLTypes"].find{|scheme| scheme["CFBundleURLName"] == "com.acme.default-url-handler"}
               urlScheme[:CFBundleURLSchemes] = ["acme-production"]
-            }
+            end
           )'
         ]
       end

@@ -19,7 +19,7 @@ module Fastlane
     #
     class XcodeSelectAction < Action
       def self.run(params)
-        params = nil unless params.kind_of? Array
+        params = nil unless params.kind_of?(Array)
         xcode_path = (params || []).first
 
         # Verify that a param was passed in
@@ -46,12 +46,12 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code
         [
-          'xcode_select "/Applications/Xcode-8.3.2.app"'
+          'xcode_select("/Applications/Xcode-8.3.2.app")'
         ]
       end
 

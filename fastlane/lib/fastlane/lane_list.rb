@@ -1,12 +1,12 @@
 module Fastlane
   class LaneList
     # Print out the result of `generate`
-    SWIFT_FUNCTION_REGEX = /\s*func\s*(\w*)\s*\(\s*\)\s*/
+    SWIFT_FUNCTION_REGEX = /\s*func\s*(\w*)\s*\((.*)\)\s*/
     SWIFT_DESC_REGEX = /\s*desc\s*\(\s*"(.*)"\s*\)\s*/
     def self.output(path)
-      puts generate(path)
+      puts(generate(path))
 
-      puts "Execute using `fastlane [lane_name]`".yellow
+      puts("Execute using `fastlane [lane_name]`".yellow)
     end
 
     def self.generate_swift_lanes(path)
@@ -20,15 +20,15 @@ module Fastlane
 
       lane_content.split("\n").reject(&:empty?).each do |line|
         line.strip!
-        if line.start_with?("func")
-          current_lane_name = self.lane_name_from_swift_line(potential_lane_line: line)
+        if line.start_with?("func") && (current_lane_name = self.lane_name_from_swift_line(potential_lane_line: line))
+          lanes_by_name[current_lane_name] = Fastlane::Lane.new(platform: nil, name: current_lane_name.to_sym, description: [])
         elsif line.start_with?("desc")
           lane_description = self.desc_entry_for_swift_lane(named: current_lane_name, potential_desc_line: line)
           unless lane_description
             next
           end
 
-          lanes_by_name[current_lane_name] = Fastlane::Lane.new(platform: nil, name: current_lane_name.to_sym, description: [lane_description])
+          lanes_by_name[current_lane_name].description = [lane_description]
           current_lane_name = nil
         end
       end
@@ -103,7 +103,7 @@ module Fastlane
     end
 
     def self.output_json(path)
-      puts JSON.pretty_generate(self.generate_json(path))
+      puts(JSON.pretty_generate(self.generate_json(path)))
     end
 
     # Returns a hash

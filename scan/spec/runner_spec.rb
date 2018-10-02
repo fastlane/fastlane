@@ -29,7 +29,7 @@ describe Scan do
             include_simulator_logs: false
           })
 
-          expect(FastlaneCore::Simulator).not_to receive(:copy_logs)
+          expect(FastlaneCore::Simulator).not_to(receive(:copy_logs))
           @scan.handle_results(0)
         end
       end
@@ -61,7 +61,7 @@ describe Scan do
             expect(custom_parser).to receive(:parse_result).and_return({ tests: 5, failures: 3 })
 
             @scan.handle_results(0)
-          end.to raise_error FastlaneCore::Interface::FastlaneTestFailure, "Tests have failed"
+          end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Tests have failed")
         end
       end
     end
@@ -87,8 +87,8 @@ describe Scan do
 
       it "still proceeds successfully if the temp junit report was deleted", requires_xcodebuild: true do
         Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
-        expect(@scan.test_results).to_not be_nil
-        expect(Scan.cache[:temp_junit_report]).to_not eq('/var/folders/non_existent_file.junit')
+        expect(@scan.test_results).to_not(be_nil)
+        expect(Scan.cache[:temp_junit_report]).to_not(eq('/var/folders/non_existent_file.junit'))
       end
 
       describe "when output_style is raw" do
@@ -101,9 +101,45 @@ describe Scan do
           })
 
           Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
-          expect(@scan.test_results).to_not be_nil
-          expect(Scan.cache[:temp_junit_report]).to_not eq('/var/folders/non_existent_file.junit')
+          expect(@scan.test_results).to_not(be_nil)
+          expect(Scan.cache[:temp_junit_report]).to_not(eq('/var/folders/non_existent_file.junit'))
         end
+      end
+    end
+
+    describe "#zip_build_products" do
+      it "doesn't zip data when :should_zip_build_products is false", requires_xcodebuild: true do
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+          output_directory: '/tmp/scan_results',
+          project: './scan/examples/standard/app.xcodeproj',
+          should_zip_build_products: false
+        })
+
+        expect(FastlaneCore::Helper).to receive(:backticks).with(anything).exactly(0).times
+
+        scan = Scan::Runner.new
+        scan.zip_build_products
+      end
+
+      it "zips data when :should_zip_build_products is true", requires_xcodebuild: true do
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+          output_directory: '/tmp/scan_results',
+          derived_data_path: '/tmp/derived_data/app',
+          project: './scan/examples/standard/app.xcodeproj',
+          should_zip_build_products: true
+        })
+
+        path = File.join(Scan.config[:derived_data_path], "Build/Products")
+        path = File.absolute_path(path)
+
+        output_path = File.absolute_path('/tmp/scan_results/build_products.zip')
+
+        expect(FastlaneCore::Helper).to receive(:backticks)
+          .with("cd '#{path}' && rm -f '#{output_path}' && zip -r '#{output_path}' *", { print: false })
+          .exactly(1).times
+
+        scan = Scan::Runner.new
+        scan.zip_build_products
       end
     end
   end

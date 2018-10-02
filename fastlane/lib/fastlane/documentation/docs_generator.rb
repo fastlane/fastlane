@@ -14,13 +14,11 @@ module Fastlane
       output << "xcode-select --install"
       output << "```"
       output << ""
-      output << "## Choose your installation method:"
-      output << ""
-      output << "| Method                     | OS support                              | Description                                                                                                                           |"
-      output << "|----------------------------|-----------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|"
-      output << "| [Homebrew](http://brew.sh) | macOS                                   | `brew cask install fastlane`                                                                                                          |"
-      output << "| Installer Script           | macOS                                   | [Download the zip file](https://download.fastlane.tools). Then double click on the `install` script (or run it in a terminal window). |"
-      output << "| RubyGems                   | macOS or Linux with Ruby 2.0.0 or above | `sudo gem install fastlane -NV`                                                                                                       |"
+      output << "Install _fastlane_ using"
+      output << "```"
+      output << "[sudo] gem install fastlane -NV"
+      output << "```"
+      output << "or alternatively using `brew cask install fastlane`"
       output << ""
       output << "# Available Actions"
 
@@ -53,7 +51,7 @@ module Fastlane
 
       begin
         File.write(output_path, output.join("\n"))
-        UI.success "Successfully generated documentation at path '#{File.expand_path(output_path)}'" if FastlaneCore::Globals.verbose?
+        UI.success("Successfully generated documentation at path '#{File.expand_path(output_path)}'") if FastlaneCore::Globals.verbose?
       rescue => ex
         UI.error(ex)
         UI.error("Couldn't save fastlane documentation at path '#{File.expand_path(output_path)}', make sure you have write access to the containing directory.")

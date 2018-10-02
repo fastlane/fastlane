@@ -18,19 +18,17 @@ module Fastlane
       end
 
       def self.description
-        "Upload metadata and binary to iTunes Connect (via _deliver_)"
+        "Upload metadata and binary to App Store Connect (via _deliver_)"
       end
 
       def self.details
         [
-          "Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the",
-          "latest ipa and screenshots with no other configuration",
+          "Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the latest ipa and screenshots with no other configuration.",
           "",
           "If you don't want a PDF report for App Store builds, use the `:force` option.",
           "This is useful when running _fastlane_ on your Continuous Integration server:",
           "`_upload_to_app_store_(force: true)`",
-          "If your account is on multiple teams and you need to tell the `iTMSTransporter`",
-          "which 'provider' to use, you can set the `itc_provider` option to pass this info."
+          "If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info."
         ].join("\n")
       end
 

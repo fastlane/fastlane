@@ -1,3 +1,5 @@
+require_relative 'helper'
+
 module FastlaneCore
   class ToolCollector
     # Learn more at https://docs.fastlane.tools/#metrics
@@ -57,7 +59,7 @@ module FastlaneCore
     def did_finish
       return false if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
 
-      if !did_show_message? and !Helper.is_ci?
+      if !did_show_message? && !Helper.ci?
         show_message
       end
 
@@ -68,7 +70,7 @@ module FastlaneCore
 
       # Never generate web requests during tests
       unless Helper.test?
-        fork do
+        Thread.new do
           begin
             Excon.post(url,
                        body: analytic_event_body,

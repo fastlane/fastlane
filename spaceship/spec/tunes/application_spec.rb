@@ -27,7 +27,7 @@ describe Spaceship::Application do
     end
 
     it "#url" do
-      expect(Spaceship::Application.all.first.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088')
+      expect(Spaceship::Application.all.first.url).to eq('https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088')
     end
 
     describe "#find" do
@@ -78,7 +78,7 @@ describe Spaceship::Application do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.123")
-        end.to raise_error "You must choose a primary language. You must choose a primary language."
+        end.to raise_error("You must choose a primary language. You must choose a primary language.")
       end
 
       it "raises an error if bundle is wildcard and bundle_id_suffix has not specified" do
@@ -87,7 +87,7 @@ describe Spaceship::Application do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.*")
-        end.to raise_error "You must enter a Bundle ID Suffix. You must enter a Bundle ID Suffix."
+        end.to raise_error("You must enter a Bundle ID Suffix. You must enter a Bundle ID Suffix.")
       end
     end
 
@@ -106,7 +106,20 @@ describe Spaceship::Application do
           Spaceship::Tunes::Application.create!(name: "My Name",
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.123")
-        end.to raise_error "You must provide a company name to use on the App Store. You must provide a company name to use on the App Store."
+        end.to raise_error("You must provide a company name to use on the App Store. You must provide a company name to use on the App Store.")
+      end
+    end
+
+    describe '#available_bundle_ids' do
+      it "returns the list of bundle ids" do
+        TunesStubbing.itc_stub_applications_first_create
+        bundle_ids = Spaceship::Tunes::Application.available_bundle_ids
+        expect(bundle_ids.length).to eq(5)
+        expect(bundle_ids[0]).to eq("com.krausefx.app_name")
+        expect(bundle_ids[1]).to eq("net.sunapps.*")
+        expect(bundle_ids[2]).to eq("net.sunapps.947474")
+        expect(bundle_ids[3]).to eq("*")
+        expect(bundle_ids[4]).to eq("net.sunapps.100")
       end
     end
 
@@ -131,7 +144,8 @@ describe Spaceship::Application do
       require_relative '../mock_servers'
 
       before do
-        Spaceship::TestFlight::Base.client = mock_client
+        allow(Spaceship::TestFlight::Base).to receive(:client).and_return(mock_client)
+        allow(mock_client).to receive(:team_id).and_return('')
         mock_client_response(:get_build_trains) do
           ['1.0', '1.1']
         end
@@ -220,7 +234,7 @@ describe Spaceship::Application do
       end
 
       describe "BUNDLES" do
-        let (:bundle) { Spaceship::Application.find(928_444_013) }
+        let(:bundle) { Spaceship::Application.find(928_444_013) }
         it "can find a bundle" do
           expect(bundle.raw_data['type']).to eq("iOS App Bundle")
         end
@@ -244,7 +258,7 @@ describe Spaceship::Application do
         app = Spaceship::Application.all.first
         expect do
           app.create_version!('0.1')
-        end.to raise_error "Cannot create a new version for this app as there already is an `edit_version` available"
+        end.to raise_error("Cannot create a new version for this app as there already is an `edit_version` available")
       end
     end
 
@@ -336,6 +350,19 @@ describe Spaceship::Application do
         availability.include_future_territories = false
         availability = app.update_availability!(availability)
         expect(availability.inspect).to include("Tunes::Availability")
+      end
+    end
+
+    describe "#update_price_tier" do
+      let(:app) { Spaceship::Application.all.first }
+      let(:effective_date) { 1_525_488_436 }
+      before { TunesStubbing.itc_stub_app_pricing_intervals }
+
+      it "inspect works" do
+        allow_any_instance_of(Time).to receive(:to_i).and_return(effective_date)
+        TunesStubbing.itc_stub_update_price_tier
+
+        app.update_price_tier!(3)
       end
     end
   end

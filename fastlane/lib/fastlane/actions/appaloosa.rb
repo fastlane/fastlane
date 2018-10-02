@@ -22,13 +22,13 @@ module Fastlane
       def self.upload_on_s3(file, api_key, store_id, group_ids = '')
         file_name = file.split('/').last
         uri = URI("#{APPALOOSA_SERVER}/upload_services/presign_form")
-        params = { file: file_name, store_id: store_id, group_ids: group_ids }
+        params = { file: file_name, store_id: store_id, group_ids: group_ids, api_key: api_key }
         uri.query = URI.encode_www_form(params)
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
         presign_form_response = http.request(Net::HTTP::Get.new(uri.request_uri))
         json_res = JSON.parse(presign_form_response.body)
-        return if error_detected json_res['errors']
+        return if error_detected(json_res['errors'])
         s3_sign = json_res['s3_sign']
         path = json_res['path']
         uri = URI.parse(Base64.decode64(s3_sign))
@@ -123,9 +123,9 @@ module Fastlane
         uoa_response = http.request(req)
         json_res = JSON.parse(uoa_response.body)
         if json_res['errors']
-          UI.error "App: #{json_res['errors']}"
+          UI.error("App: #{json_res['errors']}")
         else
-          UI.success "Binary processing: Check your app': #{json_res['link']}"
+          UI.success("Binary processing: Check your app': #{json_res['link']}")
         end
       end
 
@@ -168,15 +168,14 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Upload your app to Appaloosa Store'
+        'Upload your app to [Appaloosa Store](https://www.appaloosa-store.com/)'
       end
 
       def self.details
         [
-          "Appaloosa is a private mobile application store. This action ",
-          "offers a quick deployment on the platform. You can create an ",
-          "account, push to your existing account, or manage your user ",
-          "groups. We accept iOS and Android applications."
+          "Appaloosa is a private mobile application store. This action offers a quick deployment on the platform.",
+          "You can create an account, push to your existing account, or manage your user groups.",
+          "We accept iOS and Android applications."
         ].join("\n")
       end
 
@@ -186,6 +185,7 @@ module Fastlane
                                        env_name: 'FL_APPALOOSA_BINARY',
                                        description: 'Binary path. Optional for ipa if you use the `ipa` or `xcodebuild` action',
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa || apk file at path '#{value}'") unless File.exist?(value)
                                        end),
@@ -204,7 +204,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :screenshots,
                                        env_name: 'FL_APPALOOSA_SCREENSHOTS',
                                        description: 'Add some screenshots application to your store or hit [enter]',
-                                       default_value: Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]),
+                                       default_value: Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH],
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :locale,
                                        env_name: 'FL_APPALOOSA_LOCALE',
                                        description: 'Select the folder locale for your screenshots',
@@ -226,7 +227,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac, :android].include? platform
+        [:ios, :mac, :android].include?(platform)
       end
 
       def self.invalid_response?(url_for_download_response)

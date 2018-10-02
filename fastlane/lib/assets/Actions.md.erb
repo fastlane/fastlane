@@ -1,7 +1,9 @@
 <!--
 This file is auto-generated and will be re-generated every time the docs are updated.
-To modify it, go to its source at https://github.com/fastlane/fastlane.
+To modify it, go to its source at https://github.com/fastlane/fastlane/blob/master/fastlane/lib/assets/Actions.md.erb
 -->
+
+{!docs/includes/setup-fastlane-header.md!}
 
 # fastlane actions
 
@@ -20,21 +22,22 @@ You can import another `Fastfile` by using the `import` action. This is useful i
 import './path/to/other/Fastfile'
 ```
 
-For _fastlane_ plugins, check out the [available plugins](https://docs.fastlane.tools/plugins/available-plugins) page.
+For _fastlane_ plugins, check out the [available plugins](/plugins/available-plugins/) page.
+If you want to create your own action, check out the [local actions](/create-action/#local-actions) page.
 
 <%- @categories.each do |category, actions| -%>
 - [<%= category %>](#<%= category.gsub(" ", "-").downcase %>)
 <%- end -%>
-- [Plugins](https://docs.fastlane.tools/plugins/available-plugins)
+- [Plugins](/plugins/available-plugins/)
 
 <%- @categories.each do |category, actions| %>
 # <%= category %>
 
-Action | Description
----|---
+Action | Description | Supported Platforms
+---|---|---
 <%- actions.sort.to_h.each do |_number_of_launches, action| -%>
-<%- link = "/actions/#{action.action_name}" -%>
-<a href="<%= link %>"><%= action.action_name %></a> | <%= action.description %>
+<%- link = "/actions/#{action.action_name}/" -%>
+<a href="<%= link %>"><%= action.action_name %></a> | <%= action.description %> | <%= [:ios, :android, :mac].find_all { |a| action.is_supported?(a) }.join(", ") %>
 <%- end %><%# End of actions.sort... %>
 
 <%- end %><%# End of categories.each %>

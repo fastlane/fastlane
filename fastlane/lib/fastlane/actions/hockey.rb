@@ -5,6 +5,7 @@ module Fastlane
       HOCKEY_BUILD_INFORMATION = :HOCKEY_BUILD_INFORMATION # contains all keys/values from the HockeyApp API, like :title, :bundle_identifier
     end
 
+    # rubocop:disable Metrics/ClassLength
     class HockeyAction < Action
       def self.connection(options)
         require 'faraday'
@@ -15,11 +16,11 @@ module Fastlane
           url: base_url
         }
         Faraday.new(foptions) do |builder|
-          builder.request :multipart
-          builder.request :url_encoded
-          builder.response :json, content_type: /\bjson$/
-          builder.use FaradayMiddleware::FollowRedirects
-          builder.adapter :net_http
+          builder.request(:multipart)
+          builder.request(:url_encoded)
+          builder.response(:json, content_type: /\bjson$/)
+          builder.use(FaradayMiddleware::FollowRedirects)
+          builder.adapter(:net_http)
         end
       end
 
@@ -38,7 +39,7 @@ module Fastlane
       def self.upload_build(api_token, ipa, options)
         connection = self.connection(options)
 
-        options[:ipa] = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa and File.exist?(ipa)
+        options[:ipa] = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa && File.exist?(ipa)
 
         dsym_filename = options.delete(:dsym_filename)
         if dsym_filename
@@ -73,11 +74,11 @@ module Fastlane
         options.delete(:apk)
         app_id = options.delete(:public_identifier)
 
-        ipaio = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa and File.exist?(ipa)
+        ipaio = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa && File.exist?(ipa)
         dsym = options.delete(:dsym)
 
         if dsym
-          dsym_io = Faraday::UploadIO.new(dsym, 'application/octet-stream') if dsym and File.exist?(dsym)
+          dsym_io = Faraday::UploadIO.new(dsym, 'application/octet-stream') if dsym && File.exist?(dsym)
         end
 
         # https://support.hockeyapp.net/discussions/problems/83559
@@ -182,7 +183,7 @@ module Fastlane
       end
 
       def self.description
-        "Upload a new build to HockeyApp"
+        "Upload a new build to [HockeyApp](https://hockeyapp.net/)"
       end
 
       def self.available_options
@@ -191,6 +192,7 @@ module Fastlane
                                        env_name: "FL_HOCKEY_APK",
                                        description: "Path to your APK file",
                                        default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find apk file at path '#{value}'") unless File.exist?(value)
@@ -204,12 +206,13 @@ module Fastlane
                                        sensitive: true,
                                        description: "API Token for Hockey Access",
                                        verify_block: proc do |value|
-                                         UI.user_error!("No API token for Hockey given, pass using `api_token: 'token'`") unless value and !value.empty?
+                                         UI.user_error!("No API token for Hockey given, pass using `api_token: 'token'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "FL_HOCKEY_IPA",
                                        description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action. For Mac zip the .app. For Android provide path to .apk file. In addition you could use this to upload .msi, .zip, .pkg, etc if you use the 'create_update' mechanism",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
@@ -222,6 +225,7 @@ module Fastlane
                                        env_name: "FL_HOCKEY_DSYM",
                                        description: "Path to your symbols file. For iOS and Mac provide path to app.dSYM.zip. For Android provide path to mappings.txt file",
                                        default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          # validation is done in the action
@@ -238,7 +242,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :notes,
                                        env_name: "FL_HOCKEY_NOTES",
                                        description: "Beta Notes",
-                                       default_value: Actions.lane_context[SharedValues::FL_CHANGELOG] || "No changelog given"),
+                                       default_value: Actions.lane_context[SharedValues::FL_CHANGELOG] || "No changelog given",
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :notify,
                                        env_name: "FL_HOCKEY_NOTIFY",
                                        description: "Notify testers? \"1\" for yes",
@@ -318,7 +323,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :timeout,
                                       env_name: "FL_HOCKEY_TIMEOUT",
                                       description: "Request timeout in seconds",
-                                      is_string: false,
+                                      type: Integer,
                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :bypass_cdn,
                                       env_name: "FL_HOCKEY_BYPASS_CDN",
@@ -351,7 +356,7 @@ module Fastlane
 
       def self.details
         [
-          "Symbols will also be uploaded automatically if a `app.dSYM.zip` file is found next to `app.ipa`. In case it is located in a different place you can specify the path explicitly in `:dsym` parameter.",
+          "Symbols will also be uploaded automatically if a `app.dSYM.zip` file is found next to `app.ipa`. In case it is located in a different place you can specify the path explicitly in the `:dsym` parameter.",
           "More information about the available options can be found in the [HockeyApp Docs](http://support.hockeyapp.net/kb/api/api-versions#upload-version)."
         ].join("\n")
       end
@@ -379,5 +384,6 @@ module Fastlane
         :beta
       end
     end
+    # rubocop:enable Metrics/ClassLength
   end
 end

@@ -5,10 +5,10 @@ module Supply
 
       client.begin_edit(package_name: Supply.config[:package_name])
 
-      UI.user_error!("No local metadata found, make sure to run `fastlane supply init` to setup supply") unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths]
+      verify_config!
 
       if metadata_path
-        UI.user_error!("Could not find folder #{metadata_path}") unless File.directory? metadata_path
+        UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
 
         all_languages.each do |language|
           next if language.start_with?('.') # e.g. . or .. or hidden folders
@@ -23,7 +23,14 @@ module Supply
         end
       end
 
-      upload_binaries unless Supply.config[:skip_upload_apk]
+      apk_version_codes = []
+      apk_version_codes.concat(upload_apks) unless Supply.config[:skip_upload_apk]
+      apk_version_codes.concat(upload_bundles) unless Supply.config[:skip_upload_aab]
+      upload_mapping(apk_version_codes)
+
+      # Only update tracks if we have version codes
+      # Updating a track with empty version codes can completely clear out a track
+      update_track(apk_version_codes) unless apk_version_codes.empty?
 
       promote_track if Supply.config[:track_promote_to]
 
@@ -38,11 +45,26 @@ module Supply
       end
     end
 
+    def verify_config!
+      unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths] || Supply.config[:aab] || (Supply.config[:track] && Supply.config[:track_promote_to])
+        UI.user_error!("No local metadata, apks, aab, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+      end
+
+      # Can't upload both at apk and aab at same time
+      # Need to error out users when there both apks and aabs are detected
+      apk_paths = [Supply.config[:apk], Supply.config[:apk_paths]].flatten.compact
+      could_upload_apk = !apk_paths.empty? && !Supply.config[:skip_upload_apk]
+      could_upload_aab = Supply.config[:aab] && !Supply.config[:skip_upload_aab]
+      if could_upload_apk && could_upload_aab
+        UI.user_error!("Cannot provide both apk(s) and aab - use `skip_upload_apk`, `skip_upload_aab`, or  make sure to remove any existing .apk or .aab files that are no longer needed")
+      end
+    end
+
     def promote_track
       version_codes = client.track_version_codes(Supply.config[:track])
       # the actual value passed for the rollout argument does not matter because it will be ignored by the Google Play API
       # but it has to be between 0.0 and 1.0 to pass the validity check. So we are passing the default value 0.1
-      client.update_track(Supply.config[:track], 0.1, nil)
+      client.update_track(Supply.config[:track], 0.1, nil) if Supply.config[:deactivate_on_promote]
       client.update_track(Supply.config[:track_promote_to], Supply.config[:rollout] || 0.1, version_codes)
     end
 
@@ -50,13 +72,16 @@ module Supply
       client.apks_version_codes.each do |apk_version_code|
         upload_changelog(language, apk_version_code)
       end
+      client.aab_version_codes.each do |aab_version_code|
+        upload_changelog(language, aab_version_code)
+      end
     end
 
-    def upload_changelog(language, apk_version_code)
-      path = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME, "#{apk_version_code}.txt")
+    def upload_changelog(language, version_code)
+      path = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME, "#{version_code}.txt")
       if File.exist?(path)
-        UI.message("Updating changelog for code version '#{apk_version_code}' and language '#{language}'...")
-        apk_listing = ApkListing.new(File.read(path, encoding: 'UTF-8'), language, apk_version_code)
+        UI.message("Updating changelog for code version '#{version_code}' and language '#{language}'...")
+        apk_listing = ApkListing.new(File.read(path, encoding: 'UTF-8'), language, version_code)
         client.update_apk_listing_for_language(apk_listing)
       end
     end
@@ -104,8 +129,9 @@ module Supply
       end
     end
 
-    def upload_binaries
+    def upload_apks
       apk_paths = [Supply.config[:apk]] unless (apk_paths = Supply.config[:apk_paths])
+      apk_paths.compact!
 
       apk_version_codes = []
 
@@ -113,14 +139,24 @@ module Supply
         apk_version_codes.push(upload_binary_data(apk_path))
       end
 
+      return apk_version_codes
+    end
+
+    def upload_mapping(apk_version_codes)
       mapping_paths = [Supply.config[:mapping]] unless (mapping_paths = Supply.config[:mapping_paths])
       mapping_paths.zip(apk_version_codes).each do |mapping_path, version_code|
         if mapping_path
           client.upload_mapping(mapping_path, version_code)
         end
       end
+    end
 
-      update_track(apk_version_codes)
+    def upload_bundles
+      aab_path = Supply.config[:aab]
+      return [] unless aab_path
+
+      UI.message("Preparing aab at path '#{aab_path}' for upload...")
+      return [client.upload_bundle(aab_path)]
     end
 
     private
@@ -172,15 +208,20 @@ module Supply
       max_apk_version_code = apk_version_codes.max
       max_tracks_version_code = nil
 
-      tracks = ["production", "rollout", "beta", "alpha"]
+      tracks = ["production", "rollout", "beta", "alpha", "internal"]
       config_track_index = tracks.index(Supply.config[:track])
+
+      # Custom "closed" tracks are now allowed (https://support.google.com/googleplay/android-developer/answer/3131213)
+      # Custom tracks have an equal level with alpha (alpha is considered a closed track as well)
+      # If a track index is not found, we will assume is a custom track so an alpha index is given
+      config_track_index = tracks.index("alpha") unless config_track_index
 
       tracks.each_index do |track_index|
         track = tracks[track_index]
         track_version_codes = client.track_version_codes(track).sort
         UI.verbose("Found '#{track_version_codes}' on track '#{track}'")
 
-        next if track_index.eql? config_track_index
+        next if track_index.eql?(config_track_index)
         next if track_version_codes.empty?
 
         if max_tracks_version_code.nil?
@@ -203,7 +244,7 @@ module Supply
     # returns only language directories from metadata_path
     def all_languages
       Dir.entries(metadata_path)
-         .select { |f| File.directory? File.join(metadata_path, f) }
+         .select { |f| File.directory?(File.join(metadata_path, f)) }
          .reject { |f| f.start_with?('.') }
          .sort { |x, y| x <=> y }
     end

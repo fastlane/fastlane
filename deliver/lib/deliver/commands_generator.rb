@@ -1,6 +1,11 @@
 require 'commander'
-require 'deliver/download_screenshots'
 require 'fastlane/version'
+
+require_relative 'download_screenshots'
+require_relative 'options'
+require_relative 'module'
+require_relative 'generate_summary'
+require_relative 'runner'
 
 HighLine.track_eof = false
 
@@ -41,7 +46,7 @@ module Deliver
       program :description, Deliver::DESCRIPTION
       program :help, 'Author', 'Felix Krause <deliver@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/deliver#readme'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/deliver/'
       program :help_formatter, :compact
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
@@ -50,7 +55,7 @@ module Deliver
 
       command :run do |c|
         c.syntax = 'fastlane deliver'
-        c.description = 'Upload metadata and binary to iTunes Connect'
+        c.description = 'Upload metadata and binary to App Store Connect'
 
         FastlaneCore::CommanderGenerator.new.generate(deliverfile_options, command: c)
 
@@ -97,7 +102,7 @@ module Deliver
         FastlaneCore::CommanderGenerator.new.generate(deliverfile_options, command: c)
 
         c.action do |args, options|
-          if File.exist?("Deliverfile") or File.exist?("fastlane/Deliverfile")
+          if File.exist?("Deliverfile") || File.exist?("fastlane/Deliverfile")
             UI.important("You already have a running deliver setup in this directory")
             return 0
           end
@@ -123,14 +128,14 @@ module Deliver
           options.load_configuration_file("Deliverfile")
           Deliver::Runner.new(options)
           html_path = Deliver::GenerateSummary.new.run(options)
-          UI.success "Successfully generated HTML report at '#{html_path}'"
+          UI.success("Successfully generated HTML report at '#{html_path}'")
           system("open '#{html_path}'") unless options[:force]
         end
       end
 
       command :download_screenshots do |c|
         c.syntax = 'fastlane deliver download_screenshots'
-        c.description = "Downloads all existing screenshots from iTunes Connect and stores them in the screenshots folder"
+        c.description = "Downloads all existing screenshots from App Store Connect and stores them in the screenshots folder"
 
         FastlaneCore::CommanderGenerator.new.generate(deliverfile_options, command: c)
 
@@ -172,7 +177,7 @@ module Deliver
         end
       end
 
-      default_command :run
+      default_command(:run)
 
       run!
     end

@@ -3,7 +3,7 @@ require 'credentials_manager'
 module Fastlane
   module Actions
     class RegisterDeviceAction < Action
-      UDID_REGEXP = /^\h{40}$/
+      UDID_REGEXP = /^(\h{40}|\h{8}-\h{16})$/
 
       def self.is_supported?(platform)
         platform == :ios
@@ -45,6 +45,7 @@ module Fastlane
                                      env_name: "REGISTER_DEVICE_TEAM_ID",
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                       default_value_dynamic: true,
                                      description: "The ID of your Developer Portal team if you're in multiple teams",
                                      optional: true,
                                      verify_block: proc do |value|
@@ -56,13 +57,15 @@ module Fastlane
                                        optional: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                        end),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "DELIVER_USER",
                                        description: "Optional: Your Apple ID",
-                                       default_value: user)
+                                       default_value: user,
+                                       default_value_dynamic: true)
         ]
       end
 
@@ -70,7 +73,7 @@ module Fastlane
         [
           "This will register an iOS device with the Developer Portal so that you can include it in your provisioning profiles.",
           "This is an optimistic action, in that it will only ever add a device to the member center. If the device has already been registered within the member center, it will be left alone in the member center.",
-          "The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option."
+          "The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `:username` option."
         ].join("\n")
       end
 

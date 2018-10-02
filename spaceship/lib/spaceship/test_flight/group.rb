@@ -1,3 +1,6 @@
+require_relative 'base'
+require_relative 'build'
+
 module Spaceship::TestFlight
   class Group < Base
     attr_accessor :id
@@ -26,6 +29,11 @@ module Spaceship::TestFlight
       return group unless group.nil?
       data = client.create_group_for_app(app_id: app_id, group_name: group_name)
       self.new(data)
+    end
+
+    def self.delete!(app_id: nil, group_name: nil)
+      group = self.find(app_id: app_id, group_name: group_name)
+      client.delete_group_for_app(app_id: app_id, group_id: group.id)
     end
 
     def self.all(app_id: nil)
@@ -57,7 +65,7 @@ module Spaceship::TestFlight
     # It's ok if the tester already exists, we just have to do this... don't ask
     # This will enable testing for the tester for a given app, as just creating the tester on an account-level
     # is not enough to add the tester to a group. If this isn't done the next request would fail.
-    # This is a bug we reported to the iTunes Connect team, as it also happens on the iTunes Connect UI on 18. April 2017
+    # This is a bug we reported to the App Store Connect team, as it also happens on the App Store Connect UI on 18. April 2017
     def add_tester!(tester)
       # This post request creates an account-level tester and then makes it available to the app, or just makes
       # it available to the app if it already exists
@@ -95,6 +103,11 @@ module Spaceship::TestFlight
 
     def active?
       is_active
+    end
+
+    def builds
+      builds = client.builds_for_group(app_id: self.app_id, group_id: self.id)
+      builds.map { |b| Spaceship::TestFlight::Build.new(b) }
     end
 
     def self.perform_for_groups_in_app(app: nil, groups: nil, &block)

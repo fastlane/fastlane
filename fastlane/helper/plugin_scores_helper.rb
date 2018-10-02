@@ -2,6 +2,7 @@ module Fastlane
   module Helper
     module PluginScoresHelper
       require 'faraday'
+      require 'yaml'
 
       class FastlanePluginRating
         attr_accessor :key
@@ -37,8 +38,9 @@ module Fastlane
         attr_accessor :raw_hash
 
         attr_accessor :data
+        attr_accessor :cache
 
-        def initialize(hash)
+        def initialize(hash, cache_path)
           if ENV["GITHUB_USER_NAME"].to_s.length == 0 || ENV["GITHUB_API_TOKEN"].to_s.length == 0
             raise "Missing ENV variables GITHUB_USER_NAME and/or GITHUB_API_TOKEN"
           end
@@ -59,12 +61,27 @@ module Fastlane
             has_mit_license: includes_license?("MIT"),
             has_gnu_license: includes_license?("GNU") || includes_license?("GPL"),
             major_release: Gem::Version.new(hash["version"]) >= Gem::Version.new("1.0.0"),
-            actions: []
+            actions: [],
+            sha: hash["sha"]
           }
 
+          if File.exist?(cache_path)
+            self.cache = YAML.load_file(cache_path)
+          else
+            self.cache = {}
+          end
+
           if has_github_page
-            self.append_git_data
-            self.append_github_data
+            is_cached = self.load_cache
+
+            unless is_cached
+              self.append_git_data
+              self.append_github_data
+            end
+          end
+
+          File.open(cache_path, 'w') do |file|
+            file.write(self.cache.to_yaml)
           end
 
           self.data[:overall_score] = 0
@@ -139,11 +156,40 @@ module Fastlane
           self.raw_hash["licenses"].any? { |l| l.include?(license) }
         end
 
+        def load_cache
+          if self.cache.key?(self.name)
+            cache_data = self.cache[self.name]
+          else
+            cache_data = {}
+          end
+
+          self.cache[self.name] = cache_data
+
+          if self.data[:sha] == cache_data[:sha]
+            self.data[:initial_commit] = cache_data[:initial_commit]
+            self.data[:age_in_days] = (DateTime.now - self.data[:initial_commit]).to_i
+            self.data[:readme_score] = cache_data[:readme_score]
+            self.data[:tests] = cache_data[:tests]
+            self.data[:actions] = cache_data[:actions]
+            self.data[:sha] = cache_data[:sha]
+
+            self.data[:github_stars] = cache_data[:github_stars]
+            self.data[:github_subscribers] = cache_data[:github_subscribers]
+            self.data[:github_issues] = cache_data[:github_issues]
+            self.data[:github_forks] = cache_data[:github_forks]
+            self.data[:github_contributors] = cache_data[:github_contributors]
+
+            return true
+          end
+
+          return false
+        end
+
         # Everything that needs to be fetched from the content of the Git repo
         def append_git_data
           Dir.mktmpdir("fastlane-plugin") do |tmp|
             clone_folder = File.join(tmp, self.name)
-            `GIT_TERMINAL_PROMPT=0 git clone '#{self.homepage}' '#{clone_folder}'`
+            `GIT_TERMINAL_PROMPT=0 git clone #{self.homepage.shellescape} #{clone_folder.shellescape}`
 
             break unless File.directory?(clone_folder)
 
@@ -174,7 +220,16 @@ module Fastlane
                 FastlaneActionFileParser.new.parse_file(action_file)
               end
               # Result of the above is an array of arrays, this merges all of them into data[:actions]
-              self.data[:actions].concat(*actions)
+              self.data[:actions] = actions.flatten
+
+              cache_data = self.cache[self.name]
+
+              cache_data[:initial_commit] = self.data[:initial_commit]
+              cache_data[:age_in_days] = self.data[:age_in_days]
+              cache_data[:readme_score] = self.data[:readme_score]
+              cache_data[:tests] = self.data[:tests]
+              cache_data[:actions] = self.data[:actions]
+              cache_data[:sha] = self.data[:sha]
             end
           end
         end
@@ -184,24 +239,24 @@ module Fastlane
           # e.g. https://api.github.com/repos/fastlane/fastlane
           url = self.homepage.gsub("github.com/", "api.github.com/repos/")
           url = url[0..-2] if url.end_with?("/") # what is this, 2001? We got to remove the trailing `/` otherwise GitHub will fail
-          puts "Fetching #{url}"
+          puts("Fetching #{url}")
           conn = Faraday.new(url: url) do |builder|
             # The order below IS important
             # See bug here https://github.com/lostisland/faraday_middleware/issues/105
-            builder.use FaradayMiddleware::FollowRedirects
-            builder.adapter Faraday.default_adapter
+            builder.use(FaradayMiddleware::FollowRedirects)
+            builder.adapter(Faraday.default_adapter)
           end
           conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
           response = conn.get('')
           repo_details = JSON.parse(response.body)
 
           url += "/stats/contributors"
-          puts "Fetching #{url}"
+          puts("Fetching #{url}")
           conn = Faraday.new(url: url) do |builder|
             # The order below IS important
             # See bug here https://github.com/lostisland/faraday_middleware/issues/105
-            builder.use FaradayMiddleware::FollowRedirects
-            builder.adapter Faraday.default_adapter
+            builder.use(FaradayMiddleware::FollowRedirects)
+            builder.adapter(Faraday.default_adapter)
           end
 
           conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
@@ -213,12 +268,20 @@ module Fastlane
           self.data[:github_issues] = repo_details["open_issues_count"].to_i
           self.data[:github_forks] = repo_details["forks_count"].to_i
           self.data[:github_contributors] = contributor_details.count
+
+          cache_data = self.cache[self.name]
+
+          cache_data[:github_stars] = self.data[:github_stars]
+          cache_data[:github_subscribers] = self.data[:github_subscribers]
+          cache_data[:github_issues] = self.data[:github_issues]
+          cache_data[:github_forks] = self.data[:github_forks]
+          cache_data[:github_contributors] = self.data[:github_contributors]
         rescue => ex
-          puts "error fetching #{self}"
-          puts self.homepage
-          puts "Chances are high you exceeded the GitHub API limit"
-          puts ex
-          puts ex.backtrace
+          puts("error fetching #{self}")
+          puts(self.homepage)
+          puts("Chances are high you exceeded the GitHub API limit")
+          puts(ex)
+          puts(ex.backtrace)
           raise ex
         end
       end
@@ -282,10 +345,10 @@ module Fastlane
               self.state.pop if is_end?(line)
             end
             next unless debug_state
-            puts "Current line: #{line}"
-            puts "Full State: #{state}"
-            puts "Current action name: #{name}, category: #{category}, description: \"#{description}\", details: \"#{details}\""
-            puts "Last string statement: #{last_string_statement}, last method name: #{last_method_name}"
+            puts("Current line: #{line}")
+            puts("Full State: #{state}")
+            puts("Current action name: #{name}, category: #{category}, description: \"#{description}\", details: \"#{details}\"")
+            puts("Last string statement: #{last_string_statement}, last method name: #{last_method_name}")
           end
           actions
         end

@@ -3,7 +3,13 @@
 //  FastlaneRunner
 //
 //  Created by Joshua Liebowitz on 9/28/17.
-//  Copyright © 2017 Joshua Liebowitz. All rights reserved.
+//
+
+//
+//  ** NOTE **
+//  This file is provided by fastlane and WILL be overwritten in future updates
+//  If you want to add extra functionality to this project, create a new file in a
+//  new group so that it won't be marked for upgrade
 //
 
 import Foundation
@@ -12,6 +18,7 @@ struct ArgumentProcessor {
     let args: [RunnerArgument]
     let currentLane: String
     let commandTimeout: Int
+    let port: UInt32
     
     init(args: [String]) {        
         // Dump the first arg which is the program name
@@ -27,6 +34,8 @@ struct ArgumentProcessor {
         let potentialLogMode = fastlaneArgsMinusLanes.filter { arg in
             return arg.name.lowercased() == "logmode"
         }
+        
+        port = UInt32(fastlaneArgsMinusLanes.first(where: { $0.name == "swiftServerPort" })?.value ?? "") ?? 2000
         
         // Configure logMode since we might need to use it before we finish parsing
         if let logModeArg = potentialLogMode.first {
@@ -81,4 +90,4 @@ struct ArgumentProcessor {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.1]
+// FastlaneRunnerAPIVersion [0.9.2]

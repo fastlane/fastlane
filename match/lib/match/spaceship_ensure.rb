@@ -1,10 +1,13 @@
+require 'spaceship'
+require_relative 'module'
+
 module Match
-  # Ensures the certificate and profiles are also available on iTunes Connect
+  # Ensures the certificate and profiles are also available on App Store Connect
   class SpaceshipEnsure
-    def initialize(user)
+    def initialize(user, team_id, team_name)
       # We'll try to manually fetch the password
       # to tell the user that a password is optional
-      require 'credentials_manager'
+      require 'credentials_manager/account_manager'
 
       keychain_entry = CredentialsManager::AccountManager.new(user: user)
 
@@ -12,19 +15,19 @@ module Match
         UI.important("You can also run `fastlane match` in readonly mode to not require any access to the")
         UI.important("Developer Portal. This way you only share the keys and credentials")
         UI.command("fastlane match --readonly")
-        UI.important("More information https://github.com/fastlane/fastlane/tree/master/match#access-control")
+        UI.important("More information https://docs.fastlane.tools/actions/match/#access-control")
       end
 
       UI.message("Verifying that the certificate and profile are still valid on the Dev Portal...")
       Spaceship.login(user)
-      Spaceship.select_team
+      Spaceship.select_team(team_id: team_id, team_name: team_name)
     end
 
     def bundle_identifier_exists(username: nil, app_identifier: nil)
       found = Spaceship.app.find(app_identifier)
       return if found
 
-      require 'sigh'
+      require 'sigh/runner'
       Sigh::Runner.new.print_produce_command({
         username: username,
         app_identifier: app_identifier
@@ -47,7 +50,7 @@ module Match
       UI.error("for the user #{username}")
       UI.error("Make sure to use the same user and team every time you run 'match' for this")
       UI.error("Git repository. This might be caused by revoking the certificate on the Dev Portal")
-      UI.user_error!("To reset the certificates of your Apple account, you can use the `fastlane match nuke` feature, more information on https://github.com/fastlane/fastlane/tree/master/match")
+      UI.user_error!("To reset the certificates of your Apple account, you can use the `fastlane match nuke` feature, more information on https://docs.fastlane.tools/actions/match/")
     end
 
     def profile_exists(username: nil, uuid: nil)
@@ -60,7 +63,7 @@ module Match
         UI.error("for the user #{username}")
         UI.error("Make sure to use the same user and team every time you run 'match' for this")
         UI.error("Git repository. This might be caused by deleting the provisioning profile on the Dev Portal")
-        UI.user_error!("To reset the provisioning profiles of your Apple account, you can use the `fastlane match nuke` feature, more information on https://github.com/fastlane/fastlane/tree/master/match")
+        UI.user_error!("To reset the provisioning profiles of your Apple account, you can use the `fastlane match nuke` feature, more information on https://docs.fastlane.tools/actions/match/")
       end
 
       if found.valid?

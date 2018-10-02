@@ -1,6 +1,8 @@
-require "colored"
-require "credentials_manager"
+require 'colored'
+require 'credentials_manager/appfile_config'
 require 'yaml'
+
+require_relative 'tunes/tunes_client'
 
 module Spaceship
   class SpaceauthRunner
@@ -12,17 +14,17 @@ module Spaceship
 
     def run
       begin
-        puts "Logging into to iTunes Connect (#{@username})..."
+        puts("Logging into to App Store Connect (#{@username})...")
         Spaceship::Tunes.login(@username)
-        puts "Successfully logged in to iTunes Connect".green
-        puts ""
+        puts("Successfully logged in to App Store Connect".green)
+        puts("")
       rescue
-        puts "Could not login to iTunes Connect".red
-        puts "Please check your credentials and try again.".yellow
-        puts "This could be an issue with iTunes Connect,".yellow
-        puts "Please try unsetting the FASTLANE_SESSION environment variable".yellow
-        puts "and re-run `fastlane spaceauth`".yellow
-        raise "Problem connecting to iTunes Connect"
+        puts("Could not login to App Store Connect".red)
+        puts("Please check your credentials and try again.".yellow)
+        puts("This could be an issue with App Store Connect,".yellow)
+        puts("Please try unsetting the FASTLANE_SESSION environment variable".yellow)
+        puts("and re-run `fastlane spaceauth`".yellow)
+        raise "Problem connecting to App Store Connect"
       end
 
       itc_cookie_content = Spaceship::Tunes.client.store_cookie
@@ -42,19 +44,19 @@ module Spaceship
 
       # We remove all the un-needed cookies
       cookies.select! do |cookie|
-        cookie.name.start_with?("DES5") || cookie.name == 'dqsid'
+        cookie.name.start_with?("myacinfo") || cookie.name == 'dqsid'
       end
 
       yaml = cookies.to_yaml.gsub("\n", "\\n")
 
-      puts "---"
-      puts ""
-      puts "Pass the following via the FASTLANE_SESSION environment variable:"
-      puts yaml.cyan.underline
-      puts ""
-      puts ""
-      puts "Example:"
-      puts "export FASTLANE_SESSION='#{yaml}'".cyan.underline
+      puts("---")
+      puts("")
+      puts("Pass the following via the FASTLANE_SESSION environment variable:")
+      puts(yaml.cyan.underline)
+      puts("")
+      puts("")
+      puts("Example:")
+      puts("export FASTLANE_SESSION='#{yaml}'".cyan.underline)
     end
   end
 end

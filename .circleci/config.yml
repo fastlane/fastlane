@@ -1,7 +1,7 @@
 version: 2
 
 jobs:
-  "macOS":
+  "Execute tests on macOS":
     macos:
       xcode: "9.0.0"
     environment:
@@ -13,7 +13,11 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: v1-macos-gems-{{ checksum "Gemfile" }}
+          key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+      - restore_cache:
+          keys:
+            - v3-homebrew-{{ epoch }}
+            - v3-homebrew
       - run:
           name: Setup Build
           command: |
@@ -22,8 +26,13 @@ jobs:
             gem update --system
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+
       - save_cache:
-          key: v1-macos-gems-{{ checksum "Gemfile" }}
+          key: v3-homebrew-{{ epoch }}
+          paths:
+            - /usr/local/Homebrew
+      - save_cache:
+          key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
           paths:
             - .bundle
 
@@ -34,7 +43,7 @@ jobs:
       - restore_cache:
           key: v1-{{ arch }}-rubocop
 
-      - run: bundle exec fastlane test
+      - run: bundle exec fastlane execute_tests
 
       - save_cache:
           key: v1-{{ arch }}-rubocop
@@ -50,13 +59,73 @@ jobs:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
-  
-  "Ubuntu":
+  "Execute tests on Ubuntu":
     environment:
       CIRCLE_TEST_REPORTS: ~/test-reports
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
       FASTLANE_ITUNES_TRANSPORTER_PATH: .bundle
+    docker:
+      - image: fastlanetools/fastlane:2.3.4
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+      - run:
+          name: Setup Build
+          command: |
+            mkdir -p ~/test-reports
+            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+      - save_cache:
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+          paths:
+            - .bundle
+
+      - run:
+          name: Check PR Metadata
+          command: bundle exec danger || echo "danger failed"
+
+      - restore_cache:
+          key: v1-{{ arch }}-rubocop
+
+      - run: bundle exec fastlane execute_tests
+
+      - save_cache:
+          key: v1-{{ arch }}-rubocop
+          paths:
+            - ~/.cache/rubocop_cache
+      - store_test_results:
+          path: ~/test-reports
+      - store_artifacts:
+          path: ~/test-reports/rspec
+          destination: test-reports
+
+      - run:
+          name: Post Test Results to GitHub
+          command: bundle exec danger || echo "danger failed"
+          when: always # Run this even when tests fail
+
+  "Validate Documentation":
+    docker:
+      - image: circleci/ruby:2.3
+    steps:
+      - checkout
+      
+      - restore_cache:
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
+      - run:
+          name: Setup Build
+          command: |
+            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+      - save_cache:
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
+          paths:
+            - .bundle
+
+      - run: bundle exec fastlane validate_docs
+
+  "Lint Source Code":
     docker:
       - image: circleci/ruby:2.3
     steps:
@@ -67,55 +136,19 @@ jobs:
       - run:
           name: Setup Build
           command: |
-            mkdir -p ~/test-reports
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-            sudo apt-get install shellcheck
       - save_cache:
           key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
           paths:
             - .bundle
 
-      - run:
-          name: Install additional dependency xar
-          command: |
-            cd /tmp
-            mkdir download
-            cd download
-            wget https://github.com/downloads/mackyle/xar/xar-1.6.1.tar.gz
-            tar -xzf xar-1.6.1.tar.gz
-            cd xar-1.6.1
-            ./autogen.sh --noconfigure
-            ./configure
-            make
-            sudo make install
-
-      - run:
-          name: Check PR Metadata
-          command: bundle exec danger || echo "danger failed"
-
-      - restore_cache:
-          key: v1-{{ arch }}-rubocop
-
-      - run: bundle exec fastlane test
-
-      - save_cache:
-          key: v1-{{ arch }}-rubocop
-          paths:
-            - ~/.cache/rubocop_cache
-      - store_test_results:
-          path: ~/test-reports
-      - store_artifacts:
-          path: ~/test-reports/rspec
-          destination: test-reports
-
-      - run:
-          name: Post Test Results to GitHub
-          command: bundle exec danger || echo "danger failed"
-          when: always # Run this even when tests fail
+      - run: bundle exec fastlane lint_source
 
 workflows:
   version: 2
   build:
     jobs:
-      - "macOS"
-      - "Ubuntu"
+      - "Execute tests on macOS"
+      - "Execute tests on Ubuntu"
+      - "Validate Documentation"
+      - "Lint Source Code"

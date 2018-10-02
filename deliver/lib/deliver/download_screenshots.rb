@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Deliver
   class DownloadScreenshots
     def self.run(options, path)
@@ -6,11 +8,11 @@ module Deliver
       UI.success("Successfully downloaded all existing screenshots")
     rescue => ex
       UI.error(ex)
-      UI.error("Couldn't download already existing screenshots from iTunes Connect.")
+      UI.error("Couldn't download already existing screenshots from App Store Connect.")
     end
 
     def self.download(options, folder_path)
-      v = options[:app].latest_version
+      v = options[:use_live_version] ? options[:app].live_version : options[:app].latest_version
 
       v.screenshots.each do |language, screenshots|
         screenshots.each do |screenshot|

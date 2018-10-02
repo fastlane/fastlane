@@ -80,7 +80,7 @@ module Fastlane
             UI.important("Archive #{archive_path} already exists, not unzipping again...")
           else
             # unzip the archive
-            sh "unzip -q \"#{zipped_archive_path}\" -d \"#{archive_dir_path}\""
+            sh("unzip -q \"#{zipped_archive_path}\" -d \"#{archive_dir_path}\"")
           end
 
           # reload asset entries to also contain the xcarchive file
@@ -149,7 +149,7 @@ module Fastlane
             out_folder = File.join(dir, "out_#{rand(1_000_000)}")
             FileUtils.mkdir_p(out_folder)
 
-            action.sh "cd \"#{out_folder}\"; cat \"#{temp_file}\" | gzip -d | tar -x"
+            action.sh("cd \"#{out_folder}\"; cat \"#{temp_file}\" | gzip -d | tar -x")
 
             # then pull the real name from headers
             asset_filename = response.headers['Content-Disposition'].split(';')[1].split('=')[1].delete('"')
@@ -186,7 +186,7 @@ module Fastlane
             'X-XCSAPIVersion' => 1 # XCS API version with this API, Xcode needs this otherwise it explodes in a 500 error fire. Currently Xcode 7 Beta 5 is on Version 5.
           }
 
-          if @username and @password
+          if @username && @password
             userpass = "#{@username}:#{@password}"
             headers['Authorization'] = "Basic #{Base64.strict_encode64(userpass)}"
           end
@@ -223,11 +223,11 @@ module Fastlane
       end
 
       def self.details
-        "This action downloads assets from your Xcode Server Bot (works with Xcode Server
-          using Xcode 6 and 7. By default this action downloads all assets, unzips them and
-          deletes everything except for the `.xcarchive`. If you'd like to keep all downloaded
-          assets, pass `:keep_all_assets: true`. This action returns the path to the downloaded
-          assets folder and puts into shared values the paths to the asset folder and to the `.xcarchive` inside it"
+        [
+          "This action downloads assets from your Xcode Server Bot (works with Xcode Server using Xcode 6 and 7. By default, this action downloads all assets, unzips them and deletes everything except for the `.xcarchive`.",
+          "If you'd like to keep all downloaded assets, pass `keep_all_assets: true`.",
+          "This action returns the path to the downloaded assets folder and puts into shared values the paths to the asset folder and to the `.xcarchive` inside it."
+        ].join("\n")
       end
 
       def self.available_options
@@ -292,7 +292,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

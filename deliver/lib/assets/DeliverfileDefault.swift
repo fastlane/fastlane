@@ -1,13 +1,13 @@
-/************************ More Options ************************/
-// If you want to have even more control, check out the documentation
-// https://docs.fastlane.tools/actions/deliver
+// The Deliverfile allows you to store various App Store Connect metadata
+// For more information, check out the docs
+// https://docs.fastlane.tools/actions/deliver/
 
+// In general, you can use the options available
+// fastlane deliver --help
 
-/************************ Automatically generated ************************/
+// Remove the // in front of the line to enable the option
 
 class Deliverfile: DeliverfileProtocol {
-	// Feel free to remove the following lines
-	// These values can go in Appfile.swift
-	var appIdentifier: String { return "[[APP_IDENTIFIER]]" } // The bundle identifier of your app
-	var username: String { return "[[USERNAME]]" } // your Apple ID user
+  //var username: String { return "" }
+  //var appIdentifier: String? { return "" }
 }

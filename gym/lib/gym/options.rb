@@ -1,5 +1,6 @@
-require "fastlane_core"
-require "credentials_manager"
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
+require_relative 'module'
 
 module Gym
   class Options
@@ -66,6 +67,7 @@ module Gym
                                      short_option: "-q",
                                      env_name: "GYM_CONFIGURATION",
                                      description: "The configuration to use when building the app. Defaults to 'Release'",
+                                     default_value_dynamic: true,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :silent,
                                      short_option: "-a",
@@ -109,7 +111,7 @@ module Gym
                                      end),
         FastlaneCore::ConfigItem.new(key: :export_options,
                                      env_name: "GYM_EXPORT_OPTIONS",
-                                     description: "Specifies path to export options plist. Use 'xcodebuild -help' to print the full set of available options",
+                                     description: "Path to an export options plist or a hash with export options. Use 'xcodebuild -help' to print the full set of available options",
                                      is_string: false,
                                      optional: true,
                                      type: Hash,
@@ -156,13 +158,15 @@ module Gym
                                      short_option: "-u",
                                      env_name: "GYM_RESULT_BUNDLE",
                                      is_string: false,
-                                     description: "Location of the Xcode result bundle",
+                                     description: "Should an Xcode result bundle be generated in the output directory",
+                                     default_value: false,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :buildlog_path,
                                      short_option: "-l",
                                      env_name: "GYM_BUILDLOG_PATH",
                                      description: "The directory where to store the build log",
-                                     default_value: "#{FastlaneCore::Helper.buildlog_path}/gym"),
+                                     default_value: "#{FastlaneCore::Helper.buildlog_path}/gym",
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :sdk,
                                      short_option: "-k",
                                      env_name: "GYM_SDK",

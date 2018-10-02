@@ -18,6 +18,14 @@ unless Object.const_defined?("OpenSSL")
   end
 end
 
+require 'commander'
+
+require_relative '../env'
+require_relative '../globals'
+require_relative '../analytics/action_completion_context'
+require_relative '../analytics/action_launch_context'
+require_relative 'errors'
+
 module Commander
   # This class override the run method with our custom stack trace handling
   # In particular we want to distinguish between user_error! and crash! (one with, one without stack trace)
@@ -27,8 +35,8 @@ module Commander
     attr_accessor :collector
 
     def run!
-      require_program :version, :description
-      trap('INT') { abort program(:int_message) } if program(:int_message)
+      require_program(:version, :description)
+      trap('INT') { abort(program(:int_message)) } if program(:int_message)
       trap('INT') { program(:int_block).call } if program(:int_block)
       global_option('-h', '--help', 'Display help documentation') do
         args = @args - %w(-h --help)
@@ -36,11 +44,11 @@ module Commander
         return
       end
       global_option('-v', '--version', 'Display version information') do
-        say version
+        say(version)
         return
       end
       parse_global_options
-      remove_global_options options, @args
+      remove_global_options(options, @args)
 
       xcode_outdated = false
       begin
@@ -60,21 +68,22 @@ module Commander
           FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_RELEASE}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
         end
 
-        action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(@program[:name], args: ARGV)
+        is_swift = FastlaneCore::FastlaneFolder.swift?
+        fastlane_client_language = is_swift ? :swift : :ruby
+        action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(@program[:name], fastlane_client_language: fastlane_client_language, args: ARGV)
         FastlaneCore.session.action_launched(launch_context: action_launch_context)
 
         return_value = run_active_command
 
         action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::SUCCESS)
         return return_value
-      rescue InvalidCommandError => e
+      rescue Commander::Runner::InvalidCommandError => e
         # calling `abort` makes it likely that tests stop without failing, so
         # we'll disable that during tests.
         if FastlaneCore::Helper.test?
           raise e
         else
-          FastlaneCore::CrashReporter.report_crash(exception: e)
-          abort "#{e}. Use --help for more information"
+          abort("#{e}. Use --help for more information")
         end
       rescue Interrupt => e
         # We catch it so that the stack trace is hidden by default when using ctrl + c
@@ -82,7 +91,7 @@ module Commander
           raise e
         else
           action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::INTERRUPTED, exception: e)
-          puts "\nCancelled... use --verbose to show the stack trace"
+          abort("\nCancelled... use --verbose to show the stack trace")
         end
       rescue \
         OptionParser::InvalidOption,
@@ -93,20 +102,19 @@ module Commander
         if FastlaneCore::Helper.test?
           raise e
         else
-          FastlaneCore::CrashReporter.report_crash(exception: e)
           if self.active_command.name == "help" && @default_command == :help # need to access directly via @
             # This is a special case, for example for pilot
             # when the user runs `fastlane pilot -u user@google.com`
             # This would be confusing, as the user probably wanted to use `pilot list`
             # or some other command. Because `-u` isn't available for the `pilot --help`
             # command it would show this very confusing error message otherwise
-            abort "Please ensure to use one of the available commands (#{self.commands.keys.join(', ')})".red
+            abort("Please ensure to use one of the available commands (#{self.commands.keys.join(', ')})".red)
           else
             # This would print something like
             #
             #   invalid option: -u
             #
-            abort e.to_s
+            abort(e.to_s)
           end
         end
       rescue FastlaneCore::Interface::FastlaneCommonException => e # these are exceptions that we dont count as crashes
@@ -127,34 +135,31 @@ module Commander
     end
 
     def action_completed(action_name, status: nil, exception: nil)
-      if exception.nil? || exception.fastlane_should_report_metrics?
-        action_completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV, status: status)
-        FastlaneCore.session.action_completed(completion_context: action_completion_context)
-      end
+      # https://github.com/fastlane/fastlane/issues/11913
+      # if exception.nil? || exception.fastlane_should_report_metrics?
+      #   action_completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV, status: status)
+      #   FastlaneCore.session.action_completed(completion_context: action_completion_context)
+      # end
     end
 
     def rescue_file_error(e)
       # We're also printing the new-lines, as otherwise the message is not very visible in-between the error and the stack trace
-      puts ""
+      puts("")
       FastlaneCore::UI.important("Error accessing file, this might be due to fastlane's directory handling")
       FastlaneCore::UI.important("Check out https://docs.fastlane.tools/advanced/#directory-behavior for more details")
-      puts ""
-      FastlaneCore::CrashReporter.report_crash(exception: e)
+      puts("")
       raise e
     end
 
     def rescue_connection_failed_error(e)
-      if e.message.include? 'Connection reset by peer - SSL_connect'
+      if e.message.include?('Connection reset by peer - SSL_connect')
         handle_tls_error!(e)
       else
-        FastlaneCore::CrashReporter.report_crash(exception: e)
         handle_unknown_error!(e)
       end
     end
 
     def rescue_unknown_error(e)
-      FastlaneCore::CrashReporter.report_crash(exception: e)
-
       action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::FAILED, exception: e)
 
       handle_unknown_error!(e)
@@ -164,12 +169,11 @@ module Commander
       action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::USER_ERROR, exception: e)
 
       show_github_issues(e.message) if e.show_github_issues
-      FastlaneCore::CrashReporter.report_crash(exception: e)
       display_user_error!(e, e.message)
     end
 
     def handle_tls_error!(e)
-      # Apple has upgraded its iTunes Connect servers to require TLS 1.2, but
+      # Apple has upgraded its App Store Connect servers to require TLS 1.2, but
       # system Ruby 2.0 does not support it. We want to suggest that users upgrade
       # their Ruby version
       suggest_ruby_reinstall(e)
@@ -187,45 +191,45 @@ module Commander
 
     def suggest_ruby_reinstall(e)
       ui = FastlaneCore::UI
-      ui.error "-----------------------------------------------------------------------"
-      ui.error e.to_s
-      ui.error ""
-      ui.error "SSL errors can be caused by various components on your local machine."
+      ui.error("-----------------------------------------------------------------------")
+      ui.error(e.to_s)
+      ui.error("")
+      ui.error("SSL errors can be caused by various components on your local machine.")
       if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.1')
-        ui.error "Apple has recently changed their servers to require TLS 1.2, which may"
-        ui.error "not be available to your system installed Ruby (#{RUBY_VERSION})"
+        ui.error("Apple has recently changed their servers to require TLS 1.2, which may")
+        ui.error("not be available to your system installed Ruby (#{RUBY_VERSION})")
       end
-      ui.error ""
-      ui.error "The best solution is to use the self-contained fastlane version."
-      ui.error "Which ships with a bundled OpenSSL,ruby and all gems - so you don't depend on system libraries"
-      ui.error " - Use Homebrew"
-      ui.error "    - update brew with `brew update`"
-      ui.error "    - install fastlane using:"
-      ui.error "      - `brew cask install fastlane`"
-      ui.error " - Use One-Click-Installer:"
-      ui.error "    - download fastlane at https://download.fastlane.tools"
-      ui.error "    - extract the archive and double click the `install`"
-      ui.error "-----------------------------------------------------------"
-      ui.error "for more details on ways to install fastlane please refer the documentation:"
-      ui.error "-----------------------------------------------------------"
-      ui.error "        🚀       https://docs.fastlane.tools          🚀   "
-      ui.error "-----------------------------------------------------------"
-      ui.error ""
-      ui.error "You can also install a new version of Ruby"
-      ui.error ""
-      ui.error "- Make sure OpenSSL is installed with Homebrew: `brew update && brew upgrade openssl`"
-      ui.error "- If you use system Ruby:"
-      ui.error "  - Run `brew update && brew install ruby`"
-      ui.error "- If you use rbenv with ruby-build:"
-      ui.error "  - Run `brew update && brew upgrade ruby-build && rbenv install 2.3.1`"
-      ui.error "  - Run `rbenv global 2.3.1` to make it the new global default Ruby version"
-      ui.error "- If you use rvm:"
-      ui.error "  - First run `rvm osx-ssl-certs update all`"
-      ui.error "  - Then run `rvm reinstall ruby-2.3.1 --with-openssl-dir=/usr/local`"
-      ui.error ""
-      ui.error "If that doesn't fix your issue, please google for the following error message:"
-      ui.error "  '#{e}'"
-      ui.error "-----------------------------------------------------------------------"
+      ui.error("")
+      ui.error("The best solution is to use the self-contained fastlane version.")
+      ui.error("Which ships with a bundled OpenSSL,ruby and all gems - so you don't depend on system libraries")
+      ui.error(" - Use Homebrew")
+      ui.error("    - update brew with `brew update`")
+      ui.error("    - install fastlane using:")
+      ui.error("      - `brew cask install fastlane`")
+      ui.error(" - Use One-Click-Installer:")
+      ui.error("    - download fastlane at https://download.fastlane.tools")
+      ui.error("    - extract the archive and double click the `install`")
+      ui.error("-----------------------------------------------------------")
+      ui.error("for more details on ways to install fastlane please refer the documentation:")
+      ui.error("-----------------------------------------------------------")
+      ui.error("        🚀       https://docs.fastlane.tools          🚀   ")
+      ui.error("-----------------------------------------------------------")
+      ui.error("")
+      ui.error("You can also install a new version of Ruby")
+      ui.error("")
+      ui.error("- Make sure OpenSSL is installed with Homebrew: `brew update && brew upgrade openssl`")
+      ui.error("- If you use system Ruby:")
+      ui.error("  - Run `brew update && brew install ruby`")
+      ui.error("- If you use rbenv with ruby-build:")
+      ui.error("  - Run `brew update && brew upgrade ruby-build && rbenv install 2.3.1`")
+      ui.error("  - Run `rbenv global 2.3.1` to make it the new global default Ruby version")
+      ui.error("- If you use rvm:")
+      ui.error("  - First run `rvm osx-ssl-certs update all`")
+      ui.error("  - Then run `rvm reinstall ruby-2.3.1 --with-openssl-dir=/usr/local`")
+      ui.error("")
+      ui.error("If that doesn't fix your issue, please google for the following error message:")
+      ui.error("  '#{e}'")
+      ui.error("-----------------------------------------------------------------------")
     end
 
     def handle_unknown_error!(e)
@@ -260,12 +264,13 @@ module Commander
       else
         # without stack trace
         action_completed(@program[:name], status: FastlaneCore::ActionCompletionStatus::USER_ERROR, exception: e)
-        abort "\n[!] #{message}".red
+        abort("\n[!] #{message}".red)
       end
     end
 
     def reraise_formatted!(e, message)
-      raise e, "[!] #{message}".red, e.backtrace
+      backtrace = FastlaneCore::Env.truthy?("FASTLANE_HIDE_BACKTRACE") ? [] : e.backtrace
+      raise e, "[!] #{message}".red, backtrace
     end
 
     def show_github_issues(message_or_error)

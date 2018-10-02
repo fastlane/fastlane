@@ -3,16 +3,20 @@
 //  FastlaneSwiftRunner
 //
 //  Created by Joshua Liebowitz on 8/4/17.
-//  Copyright © 2017 Joshua Liebowitz. All rights reserved.
+//
+
+//
+//  ** NOTE **
+//  This file is provided by fastlane and WILL be overwritten in future updates
+//  If you want to add extra functionality to this project, create a new file in a
+//  new group so that it won't be marked for upgrade
 //
 
 import Foundation
 
-protocol RubyCommandable {
-    var json: String { get }
-}
-
 struct RubyCommand: RubyCommandable {
+    var type: CommandType { return .action }
+
     struct Argument {
         enum ArgType {
             case stringClosure
@@ -41,7 +45,6 @@ struct RubyCommand: RubyCommandable {
 
         var json: String {
             get {
-
                 if let someValue = value {
                     let typeJson: String
                     if let type = type {
@@ -102,7 +105,7 @@ struct RubyCommand: RubyCommandable {
         callbackClosure(callbackArg)
     }
 
-    var json: String {
+    var commandJson: String {
         let argsArrayJson = self.args
             .map { $0.json }
             .filter { $0 != "" }
@@ -135,4 +138,4 @@ struct RubyCommand: RubyCommandable {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.1]
+// FastlaneRunnerAPIVersion [0.9.2]

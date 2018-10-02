@@ -22,11 +22,11 @@ describe Snapshot do
         allow(Snapshot).to receive(:config).and_return({ ios_version: os_version })
         devices = ["iPhone 4s", "iPhone 6", "iPhone 6s"]
         result = Snapshot::TestCommandGenerator.destination(devices)
-        expect(result).to eq [[
+        expect(result).to eq([[
           "-destination 'platform=iOS Simulator,name=iPhone 4s,OS=9.0'",
           "-destination 'platform=iOS Simulator,name=iPhone 6,OS=9.3'",
           "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3'"
-        ].join(' ')]
+        ].join(' ')])
       end
     end
 
@@ -159,7 +159,7 @@ describe Snapshot do
 
       context 'default options' do
         it "uses the default parameters", requires_xcode: true do
-          configure options
+          configure(options)
           expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
           command = Snapshot::TestCommandGenerator.generate(
             devices: ["iPhone 6"],
@@ -186,7 +186,7 @@ describe Snapshot do
         end
 
         it "allows to supply custom xcargs", requires_xcode: true do
-          configure options.merge(xcargs: "-only-testing:TestBundle/TestSuite/Screenshots")
+          configure(options.merge(xcargs: "-only-testing:TestBundle/TestSuite/Screenshots"))
           expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
           command = Snapshot::TestCommandGenerator.generate(
             devices: ["iPhone 6"],
@@ -214,7 +214,7 @@ describe Snapshot do
         end
 
         it "uses the default parameters on tvOS too", requires_xcode: true do
-          configure options.merge(devices: ["Apple TV 1080p"])
+          configure(options.merge(devices: ["Apple TV 1080p"]))
           expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
           command = Snapshot::TestCommandGenerator.generate(
             devices: ["Apple TV 1080p"],
@@ -243,13 +243,25 @@ describe Snapshot do
 
       context 'fixed derivedDataPath' do
         before do
-          configure options.merge(derived_data_path: 'fake/derived/path')
+          configure(options.merge(derived_data_path: 'fake/derived/path'))
         end
 
         it 'uses the fixed derivedDataPath if given', requires_xcode: true do
-          expect(Dir).not_to receive(:mktmpdir)
+          expect(Dir).not_to(receive(:mktmpdir))
           command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
           expect(command.join('')).to include("-derivedDataPath 'fake/derived/path'")
+        end
+      end
+
+      context 'test-without-building' do
+        before do
+          configure(options.merge(derived_data_path: 'fake/derived/path', test_without_building: true))
+        end
+
+        it 'uses the "test-without-building" command and not the default "build test"', requires_xcode: true do
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("test-without-building")
+          expect(command.join('')).not_to(include("build test"))
         end
       end
     end

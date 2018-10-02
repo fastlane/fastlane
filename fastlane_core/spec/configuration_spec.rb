@@ -4,25 +4,25 @@ describe FastlaneCore do
       it "raises an error if no hash is given" do
         expect do
           FastlaneCore::Configuration.create([], "string")
-        end.to raise_error "values parameter must be a hash"
+        end.to raise_error("values parameter must be a hash")
       end
 
       it "raises an error if no array is given" do
         expect do
           FastlaneCore::Configuration.create("string", {})
-        end.to raise_error "available_options parameter must be an array of ConfigItems but is String"
+        end.to raise_error("available_options parameter must be an array of ConfigItems but is String")
       end
 
       it "raises an error if array contains invalid elements" do
         expect do
           FastlaneCore::Configuration.create(["string"], {})
-        end.to raise_error "available_options parameter must be an array of ConfigItems. Found String."
+        end.to raise_error("available_options parameter must be an array of ConfigItems. Found String.")
       end
 
       it "raises an error if the option of a given value is not available" do
         expect do
           FastlaneCore::Configuration.create([], { cert_name: "value" })
-        end.to raise_error "Could not find option 'cert_name' in the list of available options: "
+        end.to raise_error("Could not find option 'cert_name' in the list of available options: ")
       end
 
       it "raises an error if a description ends with a ." do
@@ -32,7 +32,7 @@ describe FastlaneCore do
        env_name: "asdf",
     description: "Set the profile name."
           )], {})
-        end.to raise_error "Do not let descriptions end with a '.', since it's used for user inputs as well for key :cert_name"
+        end.to raise_error("Do not let descriptions end with a '.', since it's used for user inputs as well for key :cert_name")
       end
 
       describe "config conflicts" do
@@ -46,7 +46,7 @@ describe FastlaneCore do
                                                   key: :cert_name,
                                              env_name: "asdf"
                                                 )], {})
-          end.to raise_error "Multiple entries for configuration key 'cert_name' found!"
+          end.to raise_error("Multiple entries for configuration key 'cert_name' found!")
         end
 
         it "raises an error if a short_option was used twice" do
@@ -61,7 +61,7 @@ describe FastlaneCore do
 
           expect do
             FastlaneCore::Configuration.create(conflicting_options, {})
-          end.to raise_error "Multiple entries for short_option '-f' found!"
+          end.to raise_error("Multiple entries for short_option '-f' found!")
         end
 
         it "raises an error for unresolved conflict between options" do
@@ -79,7 +79,7 @@ describe FastlaneCore do
 
           expect do
             FastlaneCore::Configuration.create(conflicting_options, values)
-          end.to raise_error "Unresolved conflict between options: 'foo' and 'bar'"
+          end.to raise_error("Unresolved conflict between options: 'foo' and 'bar'")
         end
 
         it "calls custom conflict handler when conflict happens between two options" do
@@ -103,7 +103,7 @@ describe FastlaneCore do
 
           expect do
             FastlaneCore::Configuration.create(conflicting_options, values)
-          end.to raise_error "You can't use option 'bar' along with 'foo'"
+          end.to raise_error("You can't use option 'bar' along with 'foo'")
         end
       end
 
@@ -136,7 +136,7 @@ describe FastlaneCore do
 
       describe "#sensitive flag" do
         before(:each) do
-          allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
+          allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
           allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
           allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
         end
@@ -235,9 +235,10 @@ describe FastlaneCore do
                                                      description: 'xcargs',
                                                      type: :shell_string)
 
-          value = config_item.auto_convert_value(['a b', 'c d', :e])
+          array = ['a b', 'c d', :e]
+          value = config_item.auto_convert_value(array)
 
-          expect(value).to eq('a\\ b c\\ d e')
+          expect(value).to eq(array.shelljoin)
         end
 
         it "auto converts Hash values to Strings if allowed" do
@@ -245,9 +246,12 @@ describe FastlaneCore do
                                                      description: 'xcargs',
                                                      type: :shell_string)
 
-          value = config_item.auto_convert_value({ 'FOO BAR' => 'I\'m foo bar', :BAZ => 'And I\'m baz' })
+          hash = { 'FOO BAR' => 'I\'m foo bar', :BAZ => 'And I\'m baz' }
+          value = config_item.auto_convert_value(hash)
 
-          expect(value).to eq('FOO\\ BAR=I\\\'m\\ foo\\ bar BAZ=And\\ I\\\'m\\ baz')
+          expected = 'FOO\\ BAR=I\\\'m\\ foo\\ bar BAZ=And\\ I\\\'m\\ baz'
+          expected = "\"FOO BAR\"=\"I'm foo bar\" BAZ=\"And I'm baz\"" if FastlaneCore::Helper.windows?
+          expect(value).to eq(expected)
         end
 
         it "does not auto convert Array values to Strings if not allowed" do
@@ -322,6 +326,27 @@ describe FastlaneCore do
           expect(config[:false_value2]).to eq(false)
         end
 
+        it "doesn't auto convert booleans as strings to booleans if type is explicitly set to String" do
+          c = [
+            FastlaneCore::ConfigItem.new(key: :true_value, type: String),
+            FastlaneCore::ConfigItem.new(key: :true_value2, type: String),
+            FastlaneCore::ConfigItem.new(key: :false_value, type: String),
+            FastlaneCore::ConfigItem.new(key: :false_value2, type: String)
+          ]
+
+          config = FastlaneCore::Configuration.create(c, {
+            true_value: "true",
+            true_value2: "YES",
+            false_value: "false",
+            false_value2: "NO"
+          })
+
+          expect(config[:true_value]).to eq("true")
+          expect(config[:true_value2]).to eq("YES")
+          expect(config[:false_value]).to eq("false")
+          expect(config[:false_value2]).to eq("NO")
+        end
+
         it "auto converts strings to integers" do
           c = [
             FastlaneCore::ConfigItem.new(key: :int_value,
@@ -368,16 +393,75 @@ describe FastlaneCore do
                                 end)
           expect do
             @config = FastlaneCore::Configuration.create([c], {})
-          end.to raise_error "Invalid default value for output, doesn't match verify_block"
+          end.to raise_error("Invalid default value for output, doesn't match verify_block")
+        end
+
+        it "calls verify_block for non nil values" do
+          c = FastlaneCore::ConfigItem.new(key: :param,
+                                      env_name: "PARAM",
+                                   description: "Description",
+                                          type: Object,
+                                  verify_block: proc do |value|
+                                    UI.user_error!("'#{value}' is not valid!")
+                                  end)
+          [true, false, '', 'a string', ['an array'], {}, :hash].each do |value|
+            expect do
+              c.valid?(value)
+            end.to raise_error("'#{value}' is not valid!")
+          end
+        end
+
+        it "passes for nil values" do
+          c = FastlaneCore::ConfigItem.new(key: :param,
+                                      env_name: "param",
+                                   description: "Description",
+                                  verify_block: proc do |value|
+                                    UI.user_error!("'#{value}' is not valid!")
+                                  end)
+
+          expect(c.valid?(nil)).to eq(true)
+        end
+
+        it "verifies type" do
+          c = FastlaneCore::ConfigItem.new(key: :param,
+                                      env_name: "param",
+                                          type: Float,
+                                   description: "Description")
+          expect do
+            c.valid?('a string')
+          end.to raise_error("'param' value must be a Float! Found String instead.")
+        end
+
+        it "skips type verification" do
+          c = FastlaneCore::ConfigItem.new(key: :param,
+                                      env_name: "param",
+                                          type: Float,
+                          skip_type_validation: true,
+                                   description: "Description")
+
+          expect(c.valid?('a string')).to eq(true)
         end
       end
 
       describe "deprecation", focus: true do
-        it "deprecated changes the description" do
+        it "deprecated message changes the description" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
                                                      description: 'foo',
                                                      deprecated: 'replaced by bar')
-          expect(config_item.description).to eq("[DEPRECATED!] replaced by bar - foo")
+          expect(config_item.description).to eq("**DEPRECATED!** replaced by bar - foo")
+        end
+
+        it "deprecated boolean changes the description" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo. use bar instead',
+                                                     deprecated: true)
+          expect(config_item.description).to eq("**DEPRECATED!** foo. use bar instead")
+        end
+
+        it "deprecated messages replaces empty description" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     deprecated: 'replaced by bar')
+          expect(config_item.description).to eq("**DEPRECATED!** replaced by bar")
         end
 
         it "deprecated makes it optional" do
@@ -412,7 +496,7 @@ describe FastlaneCore do
                                            description: 'foo',
                                            deprecated: 'replaced by bar')
 
-          expect(FastlaneCore::UI).not_to receive(:deprecated)
+          expect(FastlaneCore::UI).not_to(receive(:deprecated))
           config = FastlaneCore::Configuration.create([c], {})
         end
       end
@@ -520,7 +604,7 @@ describe FastlaneCore do
             FastlaneCore::ConfigItem.new(key: :wait_processing_interval,
                                 short_option: "-k",
                                     env_name: "PILOT_WAIT_PROCESSING_INTERVAL",
-                                 description: "Interval in seconds to wait for iTunes Connect processing",
+                                 description: "Interval in seconds to wait for App Store Connect processing",
                                default_value: 30,
                                         type: Integer,
                                 verify_block: proc do |value|
@@ -562,13 +646,13 @@ describe FastlaneCore do
           it "raises an error if a non symbol was given" do
             expect do
               @config.fetch(123)
-            end.to raise_error "Key '123' must be a symbol. Example :app_id."
+            end.to raise_error("Key '123' must be a symbol. Example :app_id.")
           end
 
           it "raises an error if this option does not exist" do
             expect do
               @config[:asdfasdf]
-            end.to raise_error "Could not find option 'asdfasdf' in the list of available options: cert_name, output, wait_processing_interval"
+            end.to raise_error("Could not find option 'asdfasdf' in the list of available options: cert_name, output, wait_processing_interval")
           end
 
           it "returns the value for the given key if given" do
@@ -582,6 +666,30 @@ describe FastlaneCore do
           it "returns the default value if nothing else was given" do
             @config.set(:cert_name, nil)
             expect(@config[:cert_name]).to eq("production_default")
+          end
+
+          it "auto converts the value after asking the user for one" do
+            allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
+            allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
+            allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
+
+            # Taken from match/options.rb
+            config_item = FastlaneCore::ConfigItem.new(key: :app_identifiers,
+                                     short_option: "-a",
+                                     env_name: "MATCH_APP_IDENTIFIER",
+                                     description: "The bundle identifier(s) of your app (comma-separated)",
+                                     is_string: false,
+                                     type: Array, # we actually allow String and Array here
+                                     skip_type_validation: true,
+                                     code_gen_sensitive: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                     default_value_dynamic: true)
+            config = FastlaneCore::Configuration.create([config_item], {})
+
+            config.set(:app_identifiers, nil)
+            expect(FastlaneCore::UI).to receive(:input).and_return("app.identifier")
+            expect(config[:app_identifiers].class).to eq(Array)
+            expect(config[:app_identifiers]).to eq(["app.identifier"])
           end
         end
 
@@ -645,7 +753,7 @@ describe FastlaneCore do
           end
 
           it "asks if no other option" do
-            allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
+            allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
             allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
             allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
 
