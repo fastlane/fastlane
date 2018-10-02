@@ -80,7 +80,7 @@ describe FastlaneCore do
       end
       it "returns cached value" do
         FastlaneCore::Helper.instance_variable_set(:@fs_sensitivity_cache, "fastlane")
-        expect(FastlaneCore::Helper.fs_is_insensitive?).to eq "fastlane"
+        expect(FastlaneCore::Helper.fs_is_insensitive?).to eq("fastlane")
       end
     end
     describe "#fs_is_insensitive?" do
