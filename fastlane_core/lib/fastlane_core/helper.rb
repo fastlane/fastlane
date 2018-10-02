@@ -99,11 +99,6 @@ module FastlaneCore
       (/darwin/ =~ RUBY_PLATFORM) != nil
     end
 
-    # Use Helper.test? and Helper.ci? instead (legacy calls)
-    def self.is_test?
-      self.test?
-    end
-
     # Compare given paths if they are equal, respecting filesystem case sensitivity.
     # Some systems have insensitive filesystems (e.g.: macOS AFPS)
     #   https://developer.apple.com/library/content/documentation/FileManagement/Conceptual/APFS_Guide/FAQ/FAQ.html
@@ -133,18 +128,6 @@ module FastlaneCore
         is_insensitive = File.exist?(File.join(dir, "fastlane"))
       end
       @fs_sensitivity_cache = is_insensitive
-    end
-
-    def self.is_ci?
-      ci?
-    end
-
-    def self.is_mac?
-      self.mac?
-    end
-
-    def self.is_windows?
-      self.windows?
     end
 
     # Do we want to disable the colored output?
