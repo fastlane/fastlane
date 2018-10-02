@@ -4,6 +4,9 @@ require 'securerandom'
 require 'security'
 require 'shellwords'
 
+require_relative '../module'
+require_relative '../change_password'
+
 module Match
   module Encryption
     class OpenSSL

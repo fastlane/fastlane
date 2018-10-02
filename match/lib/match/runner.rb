@@ -8,6 +8,9 @@ require_relative 'table_printer'
 require_relative 'spaceship_ensure'
 require_relative 'utils'
 
+require_relative 'storage'
+require_relative 'encryption'
+
 module Match
   class Runner
     attr_accessor :files_to_commit

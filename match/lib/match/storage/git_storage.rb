@@ -1,5 +1,8 @@
 require 'fastlane_core/command_executor'
 
+require_relative '../module'
+require_relative './interface'
+
 module Match
   module Storage
     # Store the code signing identities in a git repo
@@ -22,7 +25,7 @@ module Match
                     platform: nil,
                     git_url: nil,
                     shallow_clone: nil,
-                    manual_password: nil, # TODO: do we need this? I think just for changing password right?
+                    manual_password: nil, # Do we need this? I think just for changing password right?
                     skip_docs: false,
                     branch: "master",
                     git_full_name: nil,
@@ -31,7 +34,7 @@ module Match
         self.git_url = git_url
         self.shallow_clone = shallow_clone
         self.manual_password = manual_password
-        self.skip_docs = skip_docs # TODO: We don't use this yet
+        self.skip_docs = skip_docs # We don't use this yet
         self.branch = branch
         self.git_full_name = git_full_name
         self.git_user_email = git_user_email
@@ -41,7 +44,6 @@ module Match
         self.platform = platform if platform
 
         # Note: if you modify the parameters above, don't forget to also update the method call in
-        # TODO
         # - runner.rb
         # - nuke.rb
         # - change_password.rb
@@ -142,7 +144,6 @@ module Match
       end
 
       def clear_changes
-        # TODO: what does this method actually do
         return unless @working_directory
 
         FileUtils.rm_rf(self.working_directory)

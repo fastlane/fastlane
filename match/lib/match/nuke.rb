@@ -3,7 +3,11 @@ require 'terminal-table'
 require 'spaceship'
 require 'fastlane_core/provisioning_profile'
 require 'fastlane_core/print_table'
+
 require_relative 'module'
+
+require_relative 'storage'
+require_relative 'encryption'
 
 module Match
   class Nuke
