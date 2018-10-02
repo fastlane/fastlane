@@ -9,7 +9,7 @@ require_relative '../change_password'
 
 module Match
   module Encryption
-    class OpenSSL
+    class OpenSSL < Interface
       attr_accessor :git_url
 
       attr_accessor :working_directory
