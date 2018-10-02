@@ -113,7 +113,7 @@ describe Match do
         expected_commands = [
           "git add #{random_file}",
           "git add match_version.txt",
-          "git commit -m \\[fastlane\\]\\ Updated\\ appstore\\ and\\ platform\\ ios",
+          "git commit -m " + '[fastlane] Updated appstore and platform ios'.shellescape,
           "GIT_TERMINAL_PROMPT=0 git push origin master",
           "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}'"
         ]
