@@ -2,11 +2,15 @@ require 'commander'
 
 require 'fastlane_core/configuration/configuration'
 require_relative 'module'
+
 require_relative 'nuke'
 require_relative 'change_password'
 require_relative 'setup'
 require_relative 'runner'
 require_relative 'options'
+
+require_relative 'storage'
+require_relative 'encryption'
 
 HighLine.track_eof = false
 

@@ -1,5 +1,8 @@
 require_relative 'module'
 
+require_relative 'storage'
+require_relative 'encryption'
+
 module Match
   # These functions should only be used while in (UI.) interactive mode
   class ChangePassword

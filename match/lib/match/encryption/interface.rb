@@ -4,9 +4,10 @@ module Match
       # Returns the class to be used for a given `storage_mode`
       def self.encryption_class_for_storage_mode(storage_mode)
         if storage_mode == "git"
+          require_relative './openssl'
           return Encryption::OpenSSL
         elsif storage_mode == "google_cloud"
-          return Encryption::GoogleCloudKMS
+          # return Encryption::GoogleCloudKMS
         else
           UI.user_error!("Invalid storage mode '#{storage_mode}'")
         end

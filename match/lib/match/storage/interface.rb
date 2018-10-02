@@ -4,9 +4,10 @@ module Match
       # Returns the class to be used for a given `storage_mode`
       def self.storage_class_for_storage_mode(storage_mode)
         if storage_mode == "git"
+          require_relative './git_storage'
           return Storage::GitStorage
         elsif storage_mode == "google_cloud"
-          return Storage::GoogleCloudStorage
+          # return Storage::GoogleCloudStorage
         else
           UI.user_error!("Invalid storage mode '#{storage_mode}'")
         end
@@ -52,8 +53,7 @@ module Match
         not_implemented(__method__)
       end
 
-      # TODO: what is this method used for exactly
-      # and how should it behave
+      # Call this method to reset any changes made locally to the files
       def clear_changes
         not_implemented(__method__)
       end
