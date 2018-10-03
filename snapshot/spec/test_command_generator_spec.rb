@@ -242,6 +242,34 @@ describe Snapshot do
             ]
           )
         end
+
+        it "allows to supply configuration", requires_xcode: true do
+          configure(options.merge(configuration: "Debug"))
+          expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
+          command = Snapshot::TestCommandGenerator.generate(
+            devices: ["iPhone 6"],
+            language: "en",
+            locale: nil,
+            log_path: '/path/to/logs'
+          )
+          name = command.join('').match(/name=(.+?),/)[1]
+          ios = command.join('').match(/OS=(\d+.\d+)/)[1]
+          expect(command).to eq(
+            [
+              "set -o pipefail &&",
+              "xcodebuild",
+              "-scheme ExampleUITests",
+              "-project ./snapshot/example/Example.xcodeproj",
+              "-configuration Debug",
+              "-derivedDataPath '/tmp/path/to/snapshot_derived'",
+              "-destination 'platform=iOS Simulator,name=#{name},OS=#{ios}'",
+              "FASTLANE_SNAPSHOT=YES",
+              :build,
+              :test,
+              "| tee /path/to/logs | xcpretty "
+            ]
+          )
+        end
       end
 
       context 'fixed derivedDataPath' do

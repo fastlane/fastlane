@@ -30,6 +30,8 @@ module Snapshot
 
       Snapshot.project.select_scheme(preferred_to_include: "UITests")
 
+      detect_configuration
+
       # Devices
       if config[:devices].nil? && !Snapshot.project.mac?
         config[:devices] = []
@@ -65,6 +67,12 @@ module Snapshot
         end
       elsif Snapshot.project.mac?
         config[:devices] = ["Mac"]
+      end
+    end
+
+    def self.detect_configuration
+      if Snapshot.config[:configuration].nil? && Snapshot.project.configurations.include?("Release")
+        Snapshot.config[:configuration] = "Release"
       end
     end
   end
