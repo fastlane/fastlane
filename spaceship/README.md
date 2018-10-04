@@ -138,7 +138,7 @@ Copy everything from `---\n` to your CI server and provide it as environment var
 If you have a trusted device configured for your Apple account, then Apple will not send a SMS code to your phone when you try to generate a web session with fastlane — instead a code will be displayed on one of your account's trusted devices. This can be problematic if you are trying to authenticate, but don't have access to a device. To circumvent the device and use SMS instead, take the following steps:
 
 - Attempt to generate a web session with `fastlane spaceauth -u apple@krausefx.com` and wait for security code prompt to appear
-- Open a browser to appleid.apple.com or an address that requires you to login with your Apple ID; logout of any previous session
+- Open a browser to appleid.apple.com or an address that requires you to login with your Apple ID, and logout of any previous session
 - Login with your Apple ID, and when prompted for a security code, request a code be sent to the desired phone
 - Use the code sent to phone with fastlane instead of with the browser
 
