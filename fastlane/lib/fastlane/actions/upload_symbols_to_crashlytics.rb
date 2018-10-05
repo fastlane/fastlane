@@ -10,7 +10,7 @@ module Fastlane
         find_api_token(params)
         find_gsp_path(params)
 
-        if !params[:api_token] && !params[:gsp_path]
+        if !params[:api_token] || !params[:gsp_path]
           UI.user_error!('Either Fabric API key or path to Firebase Crashlytics GoogleService-Info.plist must be given.')
         end
 
