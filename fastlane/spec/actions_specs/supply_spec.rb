@@ -4,6 +4,7 @@ describe Fastlane do
       let(:apk_path) { "app/my.apk" }
       let(:apk_paths) { ["app/my1.apk", "app/my2.apk"] }
       let(:wrong_apk_paths) { ['wrong.apk', 'nope.apk'] }
+      let(:aab_path) { "app/bundle.aab" }
 
       before :each do
         allow(File).to receive(:exist?).and_call_original
@@ -111,6 +112,46 @@ describe Fastlane do
 
           expect(Supply.config[:apk]).to be_nil
           expect(Supply.config[:apk_paths]).to eq(apk_paths)
+        end
+      end
+
+      describe "single AAB path handling" do
+        before :each do
+          allow(File).to receive(:exist?).with(aab_path).and_return(true)
+        end
+
+        it "uses a provided AAB path" do
+          Fastlane::FastFile.new.parse("lane :test do
+            supply(aab: '#{aab_path}')
+          end").runner.execute(:test)
+
+          expect(Supply.config[:apk]).to be_nil
+          expect(Supply.config[:apk_paths]).to be_nil
+          expect(Supply.config[:aab]).to eq(aab_path)
+        end
+
+        it "uses the lane context AAB path if no other AAB info is present" do
+          with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_AAB_OUTPUT_PATH => aab_path) do
+            Fastlane::FastFile.new.parse("lane :test do
+              supply
+            end").runner.execute(:test)
+          end
+
+          expect(Supply.config[:apk]).to be_nil
+          expect(Supply.config[:apk_paths]).to be_nil
+          expect(Supply.config[:aab]).to eq(aab_path)
+        end
+
+        it "ignores the lane context AAB path if the AAB param is present" do
+          with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_AAB_OUTPUT_PATH => 'app/wrong.aab') do
+            Fastlane::FastFile.new.parse("lane :test do
+              supply(aab: '#{aab_path}')
+            end").runner.execute(:test)
+          end
+
+          expect(Supply.config[:apk]).to be_nil
+          expect(Supply.config[:apk_paths]).to be_nil
+          expect(Supply.config[:aab]).to eq(aab_path)
         end
       end
     end
