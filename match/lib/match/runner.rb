@@ -23,17 +23,17 @@ module Match
                                              title: "Summary for match #{Fastlane::VERSION}")
 
       # Choose the right storage and encryption implementations
-      storage = Storage::Interface.storage_class_for_storage_mode(params[:storage_mode]).new
-
-      storage.configure(git_url: params[:git_url],
-                    shallow_clone: params[:shallow_clone],
-                    skip_docs: params[:skip_docs],
-                    branch: params[:git_branch],
-                    git_full_name: params[:git_full_name],
-                    git_user_email: params[:git_user_email],
-                    clone_branch_directly: params[:clone_branch_directly],
-                    type: params[:type].to_s,
-                    platform: params[:platform].to_s)
+      storage = Storage.for_mode(params[:storage_mode], {
+        git_url: params[:git_url],
+        shallow_clone: params[:shallow_clone],
+        skip_docs: params[:skip_docs],
+        git_branch: params[:git_branch],
+        git_full_name: params[:git_full_name],
+        git_user_email: params[:git_user_email],
+        clone_branch_directly: params[:clone_branch_directly],
+        type: params[:type].to_s,
+        platform: params[:platform].to_s
+      })
       storage.download
 
       # Init the encryption only after the `storage.download` was called to have the right working directory

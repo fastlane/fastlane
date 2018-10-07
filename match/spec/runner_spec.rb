@@ -25,18 +25,17 @@ describe Match do
       destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
 
       fake_storage = "fake_storage"
-      expect(Match::Storage::GitStorage).to receive(:new).and_return(fake_storage)
-      expect(fake_storage).to receive(:configure).with(
+      expect(Match::Storage::GitStorage).to receive(:configure).with(
         git_url: git_url,
         shallow_clone: true,
         skip_docs: false,
-        branch: "master",
+        git_branch: "master",
         git_full_name: nil,
         git_user_email: nil,
         clone_branch_directly: false,
         type: config[:type],
         platform: config[:platform]
-      ).and_return(repo_dir)
+      ).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download).and_return(nil)
       expect(fake_storage).to receive(:clear_changes).and_return(nil)
@@ -90,18 +89,17 @@ describe Match do
       key_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.p12"
 
       fake_storage = "fake_storage"
-      expect(Match::Storage::GitStorage).to receive(:new).and_return(fake_storage)
-      expect(fake_storage).to receive(:configure).with(
+      expect(Match::Storage::GitStorage).to receive(:configure).with(
         git_url: git_url,
         shallow_clone: false,
         skip_docs: false,
-        branch: "master",
+        git_branch: "master",
         git_full_name: nil,
         git_user_email: nil,
         clone_branch_directly: false,
         type: config[:type],
         platform: config[:platform]
-      ).and_return(repo_dir)
+      ).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download).and_return(nil)
       expect(fake_storage).to receive(:clear_changes).and_return(nil)

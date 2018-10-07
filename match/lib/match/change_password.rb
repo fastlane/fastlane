@@ -12,15 +12,15 @@ module Match
       to ||= ChangePassword.ask_password(message: "New passphrase for Git Repo: ", confirm: true)
 
       # Choose the right storage and encryption implementations
-      storage = Storage::Interface.storage_class_for_storage_mode(params[:storage_mode]).new
-
-      storage.configure(git_url: params[:git_url],
-                    shallow_clone: params[:shallow_clone],
-                    skip_docs: params[:skip_docs],
-                    branch: params[:git_branch],
-                    git_full_name: params[:git_full_name],
-                    git_user_email: params[:git_user_email],
-                    clone_branch_directly: params[:clone_branch_directly])
+      storage = Storage.for_mode(params[:storage_mode], {
+        git_url: params[:git_url],
+        shallow_clone: params[:shallow_clone],
+        skip_docs: params[:skip_docs],
+        git_branch: params[:git_branch],
+        git_full_name: params[:git_full_name],
+        git_user_email: params[:git_user_email],
+        clone_branch_directly: params[:clone_branch_directly]
+      })
       storage.download
 
       encryption = Encryption::Interface.encryption_class_for_storage_mode(params[:storage_mode]).new(

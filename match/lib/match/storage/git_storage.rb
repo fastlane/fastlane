@@ -20,7 +20,21 @@ module Match
       attr_accessor :type
       attr_accessor :platform
 
-      def configure(type: nil,
+      def self.configure(params)
+        return self.new(
+          type: params[:type].to_s,
+          platform: params[:platform].to_s,
+          git_url: params[:git_url],
+          shallow_clone: params[:shallow_clone],
+          skip_docs: params[:skip_docs],
+          branch: params[:git_branch],
+          git_full_name: params[:git_full_name],
+          git_user_email: params[:git_user_email],
+          clone_branch_directly: params[:clone_branch_directly]
+        )
+      end
+
+      def initialize(type: nil,
                     platform: nil,
                     git_url: nil,
                     shallow_clone: nil,
