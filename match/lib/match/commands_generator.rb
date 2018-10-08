@@ -121,10 +121,10 @@ module Match
           })
           storage.download
 
-          encryption = Encryption::Interface.encryption_class_for_storage_mode(params[:storage_mode]).new(
+          encryption = Encryption.for_storage_mode(params[:storage_mode], {
             git_url: storage.git_url,
             working_directory: storage.working_directory
-          )
+          })
           encryption.decrypt_files
           UI.success("Repo is at: '#{storage.working_directory}'")
         end

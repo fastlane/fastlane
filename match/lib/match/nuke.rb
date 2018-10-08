@@ -37,10 +37,10 @@ module Match
       self.storage.download
 
       # After the download was complete
-      self.encryption = Encryption::Interface.encryption_class_for_storage_mode(params[:storage_mode]).new(
+      self.encryption = Encryption.for_storage_mode(params[:storage_mode], {
         git_url: storage.git_url,
         working_directory: storage.working_directory
-      )
+      })
       self.encryption.decrypt_files
 
       had_app_identifier = self.params.fetch(:app_identifier, ask: false)

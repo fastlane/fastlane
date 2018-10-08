@@ -37,10 +37,10 @@ module Match
       storage.download
 
       # Init the encryption only after the `storage.download` was called to have the right working directory
-      encryption = Encryption::Interface.encryption_class_for_storage_mode(params[:storage_mode]).new(
+      encryption = Encryption.for_storage_mode(params[:storage_mode], {
         git_url: storage.git_url,
         working_directory: storage.working_directory
-      )
+      })
       encryption.decrypt_files
 
       unless params[:readonly]

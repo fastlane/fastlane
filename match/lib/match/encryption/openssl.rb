@@ -14,6 +14,13 @@ module Match
 
       attr_accessor :working_directory
 
+      def self.configure(params)
+        return self.new(
+          git_url: params[:git_url],
+          working_directory: params[:working_directory]  
+        )
+      end
+
       # @param git_url: The Git URL is used for identifiying a specific repo
       #                 which is used to store the passphrase in the Keychain
       # @param working_directory: The path to where the certificates are stored

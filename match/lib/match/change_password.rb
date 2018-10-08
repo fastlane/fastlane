@@ -9,7 +9,7 @@ module Match
     def self.update(params: nil)
       ensure_ui_interactive
 
-      to ||= ChangePassword.ask_password(message: "New passphrase for Git Repo: ", confirm: true)
+      to = ChangePassword.ask_password(message: "New passphrase for Git Repo: ", confirm: true)
 
       # Choose the right storage and encryption implementations
       storage = Storage.for_mode(params[:storage_mode], {
@@ -23,10 +23,10 @@ module Match
       })
       storage.download
 
-      encryption = Encryption::Interface.encryption_class_for_storage_mode(params[:storage_mode]).new(
+      encryption = Encryption.for_storage_mode(params[:storage_mode], {
         git_url: storage.git_url,
         working_directory: storage.working_directory
-      )
+      })
       encryption.decrypt_files
 
       encryption.clear_password
