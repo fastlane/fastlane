@@ -133,14 +133,14 @@ export FASTLANE_SESSION='---\n- !ruby/object:HTTP::Cookie\n  name: DES5c148586df
 
 Copy everything from `---\n` to your CI server and provide it as environment variable named `FASTLANE_SESSION`.
 
-#### Bypass device and use SMS for verification
+#### Bypass trusted device and use SMS for verification
 
-If you have a trusted device configured for your Apple account, then Apple will not send a SMS code to your phone when you try to generate a web session with fastlane — instead a code will be displayed on one of your account's trusted devices. This can be problematic if you are trying to authenticate, but don't have access to a device. To circumvent the device and use SMS instead, take the following steps:
+Apple will not send a SMS code to your phone if you have a trusted device configured for your Apple account when you try to generate a web session with _fastlane_ — instead a code will be displayed on one of your account's trusted devices. This can be problematic if you are trying to authenticate but don't have access to a trusted device. Take the following steps to circumvent the device and use SMS instead:
 
-- Attempt to generate a web session with `fastlane spaceauth -u apple@krausefx.com` and wait for security code prompt to appear
-- Open a browser to appleid.apple.com or an address that requires you to login with your Apple ID, and logout of any previous session
-- Login with your Apple ID, and when prompted for a security code, request a code be sent to the desired phone
-- Use the code sent to phone with fastlane instead of with the browser
+- Attempt to generate a web session with `fastlane spaceauth -u [email]` and wait for security code prompt to appear
+- Open a browser to [appleid.apple.com](https://appleid.apple.com) or an address that requires you to login with your Apple ID, and logout of any previous session
+- Login with your Apple ID and request a code be sent to the desired phone when prompted for a security code
+- Use the code sent to phone with _fastlane_ instead of with the browser
 
 #### Transporter
 
