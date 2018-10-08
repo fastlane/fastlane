@@ -25,21 +25,22 @@ module Match
       self.params = params
       self.type = type
 
-      self.storage = Storage::Interface.storage_class_for_storage_mode(params[:storage_mode]).new
-      self.storage.configure(git_url: params[:git_url],
-                             shallow_clone: params[:shallow_clone],
-                             skip_docs: params[:skip_docs],
-                             branch: params[:git_branch],
-                             git_full_name: params[:git_full_name],
-                             git_user_email: params[:git_user_email],
-                             clone_branch_directly: params[:clone_branch_directly])
+      self.storage = Storage.for_mode(params[:storage_mode], {
+        git_url: params[:git_url],
+        shallow_clone: params[:shallow_clone],
+        skip_docs: params[:skip_docs],
+        git_branch: params[:git_branch],
+        git_full_name: params[:git_full_name],
+        git_user_email: params[:git_user_email],
+        clone_branch_directly: params[:clone_branch_directly]
+      })
       self.storage.download
 
       # After the download was complete
-      self.encryption = Encryption::Interface.encryption_class_for_storage_mode(params[:storage_mode]).new(
-        git_url: storage.git_url,
+      self.encryption = Encryption.for_storage_mode(params[:storage_mode], {
+        git_url: params[:git_url],
         working_directory: storage.working_directory
-      )
+      })
       self.encryption.decrypt_files
 
       had_app_identifier = self.params.fetch(:app_identifier, ask: false)
@@ -134,7 +135,9 @@ module Match
         rows = self.profiles.collect do |p|
           status = p.status == 'Active' ? p.status.green : p.status.red
 
-          [p.name, p.id, status, p.type, p.expires.strftime("%Y-%m-%d")]
+          # Expires is somtimes nil
+          expires = p.expires ? p.expires.strftime("%Y-%m-%d") : nil
+          [p.name, p.id, status, p.type, expires]
         end
         puts(Terminal::Table.new({
           title: "Provisioning Profiles that are going to be revoked".green,

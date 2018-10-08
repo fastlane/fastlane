@@ -1,18 +1,6 @@
 module Match
   module Storage
     class Interface
-      # Returns the class to be used for a given `storage_mode`
-      def self.storage_class_for_storage_mode(storage_mode)
-        if storage_mode == "git"
-          require_relative './git_storage'
-          return Storage::GitStorage
-        elsif storage_mode == "google_cloud"
-          # return Storage::GoogleCloudStorage
-        else
-          UI.user_error!("Invalid storage mode '#{storage_mode}'")
-        end
-      end
-
       # The working directory in which we download all the profiles
       # and decrypt/encrypt them
       attr_accessor :working_directory

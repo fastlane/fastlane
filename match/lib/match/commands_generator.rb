@@ -113,19 +113,18 @@ module Match
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
           params.load_configuration_file("Matchfile")
 
-          storage = Storage::Interface.storage_class_for_storage_mode(params[:storage_mode]).new
-          storage.configure(
+          storage = Storage.for_mode(params[:storage_mode], {
             git_url: params[:git_url],
             shallow_clone: params[:shallow_clone],
-            branch: params[:git_branch],
+            git_branch: params[:git_branch],
             clone_branch_directly: params[:clone_branch_directly]
-          )
+          })
           storage.download
 
-          encryption = Encryption::Interface.encryption_class_for_storage_mode(params[:storage_mode]).new(
-            git_url: storage.git_url,
+          encryption = Encryption.for_storage_mode(params[:storage_mode], {
+            git_url: params[:git_url],
             working_directory: storage.working_directory
-          )
+          })
           encryption.decrypt_files
           UI.success("Repo is at: '#{storage.working_directory}'")
         end

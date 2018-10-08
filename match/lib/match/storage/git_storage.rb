@@ -20,15 +20,29 @@ module Match
       attr_accessor :type
       attr_accessor :platform
 
-      def configure(type: nil,
-                    platform: nil,
-                    git_url: nil,
-                    shallow_clone: nil,
-                    skip_docs: false,
-                    branch: "master",
-                    git_full_name: nil,
-                    git_user_email: nil,
-                    clone_branch_directly: false)
+      def self.configure(params)
+        return self.new(
+          type: params[:type].to_s,
+          platform: params[:platform].to_s,
+          git_url: params[:git_url],
+          shallow_clone: params[:shallow_clone],
+          skip_docs: params[:skip_docs],
+          branch: params[:git_branch],
+          git_full_name: params[:git_full_name],
+          git_user_email: params[:git_user_email],
+          clone_branch_directly: params[:clone_branch_directly]
+        )
+      end
+
+      def initialize(type: nil,
+                     platform: nil,
+                     git_url: nil,
+                     shallow_clone: nil,
+                     skip_docs: false,
+                     branch: "master",
+                     git_full_name: nil,
+                     git_user_email: nil,
+                     clone_branch_directly: false)
         self.git_url = git_url
         self.shallow_clone = shallow_clone
         self.skip_docs = skip_docs
