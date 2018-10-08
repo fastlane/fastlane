@@ -1,4 +1,4 @@
-require 'credentials_manager'
+require_relative internal('credentials_manager')
 
 module Fastlane
   module Actions

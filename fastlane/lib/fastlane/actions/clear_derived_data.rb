@@ -1,4 +1,4 @@
-require 'fastlane_core/core_ext/cfpropertylist'
+require_relative internal('fastlane_core/core_ext/cfpropertylist')
 
 module Fastlane
   module Actions

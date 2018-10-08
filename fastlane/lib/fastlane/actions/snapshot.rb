@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/capture_ios_screenshots'
+    require_relative 'capture_ios_screenshots'
     class SnapshotAction < CaptureIosScreenshotsAction
       #####################################################
       # @!group Documentation

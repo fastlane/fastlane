@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/puts'
+    require_relative 'puts'
     class PrintlnAction < PutsAction
       #####################################################
       # @!group Documentation

@@ -1,5 +1,6 @@
-require 'fastlane_core/helper'
+require_relative '../../../fastlane_core/lib/fastlane_core/require_relative_helper'
 
+require_relative internal('fastlane_core/helper')
 require_relative 'config_parser'
 
 module Frameit

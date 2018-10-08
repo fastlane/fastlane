@@ -6,7 +6,7 @@ module Fastlane
 
     class SyncCodeSigningAction < Action
       def self.run(params)
-        require 'match'
+        require_relative internal('match')
 
         params.load_configuration_file("Matchfile")
         Match::Runner.new.run(params)
@@ -63,7 +63,7 @@ module Fastlane
       end
 
       def self.available_options
-        require 'match'
+        require_relative internal('match')
         Match::Options.available_options
       end
 

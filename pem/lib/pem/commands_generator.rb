@@ -1,7 +1,7 @@
 require 'commander'
 
-require 'fastlane/version'
-require 'fastlane_core/configuration/configuration'
+require_relative internal('fastlane/version')
+require_relative internal('fastlane_core/configuration/configuration')
 require_relative 'options'
 require_relative 'manager'
 

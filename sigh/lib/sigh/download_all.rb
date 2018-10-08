@@ -1,4 +1,4 @@
-require 'spaceship'
+require_relative internal('spaceship')
 
 require_relative 'manager'
 require_relative 'module'

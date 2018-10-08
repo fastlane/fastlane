@@ -1,5 +1,7 @@
-require 'fastlane_core/helper'
-require 'fastlane/boolean'
+require_relative '../../../fastlane_core/lib/fastlane_core/require_relative_helper'
+
+require_relative internal('fastlane_core/helper')
+require_relative internal('fastlane/boolean')
 require_relative 'detect_values'
 require_relative 'dependency_checker'
 

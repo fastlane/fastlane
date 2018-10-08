@@ -34,11 +34,11 @@ module Fastlane
 
           # this might take a long time if there is no Gemfile :(
           # That's why we show the loading indicator here also
-          require "fastlane"
+          require_relative '../fastlane'
 
           require_fastlane_spinner.success
         else
-          require "fastlane"
+          require_relative '../fastlane'
         end
         # We want to avoid printing output other than the version number if we are running `fastlane -v`
         unless running_version_command? || running_init_command?
@@ -57,14 +57,14 @@ module Fastlane
         # Loading any .env files before any lanes are called since
         # variables like FASTLANE_HIDE_CHANGELOG and FASTLANE_DISABLE_COLORS
         # need to be set early on in execution
-        require 'fastlane/helper/dotenv_helper'
+        require_relative 'helper/dotenv_helper'
         Fastlane::Helper::DotenvHelper.load_dot_env(nil)
 
         # Needs to go after load_dot_env for variable FASTLANE_SKIP_UPDATE_CHECK
         FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
 
         # Disabling colors if environment variable set
-        require 'fastlane_core/ui/disable_colors' if FastlaneCore::Helper.colors_disabled?
+        require_relative internal('fastlane_core/ui/disable_colors') if FastlaneCore::Helper.colors_disabled?
 
         ARGV.unshift("spaceship") if ARGV.first == "spaceauth"
         tool_name = ARGV.first ? ARGV.first.downcase : nil
@@ -99,12 +99,12 @@ module Fastlane
           end
           commands_generator.start
         elsif tool_name == "fastlane-credentials"
-          require 'credentials_manager'
+          require_relative internal('credentials_manager')
           ARGV.shift
           CredentialsManager::CLI.new.run
         else
           # Triggering fastlane to call a lane
-          require "fastlane/commands_generator"
+          require_relative 'commands_generator'
           Fastlane::CommandsGenerator.start
         end
       ensure

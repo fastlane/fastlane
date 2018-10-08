@@ -1,50 +1,30 @@
-require 'fastlane_core'
+require_relative 'fastlane/module'
 
-require 'fastlane/version'
-require 'fastlane/features'
-require 'fastlane/shells'
-require 'fastlane/tools'
-require 'fastlane/documentation/actions_list'
-require 'fastlane/actions/actions_helper' # has to be before fast_file
-require 'fastlane/fast_file'
-require 'fastlane/runner'
-require 'fastlane/setup/setup'
-require 'fastlane/lane'
-require 'fastlane/junit_generator'
-require 'fastlane/lane_manager'
-require 'fastlane/lane_manager_base'
-require 'fastlane/swift_lane_manager'
-require 'fastlane/action'
-require 'fastlane/action_collector'
-require 'fastlane/supported_platforms'
-require 'fastlane/configuration_helper'
-require 'fastlane/one_off'
-require 'fastlane/server/socket_server_action_command_executor'
-require 'fastlane/server/socket_server'
-require 'fastlane/command_line_handler'
-require 'fastlane/documentation/docs_generator'
-require 'fastlane/other_action'
-require 'fastlane/plugins/plugins'
-require 'fastlane/fastlane_require'
+require_relative internal('fastlane_core')
 
-module Fastlane
-  Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
-  UI = FastlaneCore::UI
-  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
-
-  class << self
-    def load_actions
-      Fastlane::Actions.load_default_actions
-      Fastlane::Actions.load_helpers
-
-      if FastlaneCore::FastlaneFolder.path
-        actions_path = File.join(FastlaneCore::FastlaneFolder.path, 'actions')
-        Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
-      end
-    end
-
-    def plugin_manager
-      @plugin_manager ||= Fastlane::PluginManager.new
-    end
-  end
-end
+require_relative 'fastlane/version'
+require_relative 'fastlane/features'
+require_relative 'fastlane/shells'
+require_relative 'fastlane/tools'
+require_relative 'fastlane/documentation/actions_list'
+require_relative 'fastlane/actions/actions_helper' # has to be before fast_file
+require_relative 'fastlane/fast_file'
+require_relative 'fastlane/runner'
+require_relative 'fastlane/setup/setup'
+require_relative 'fastlane/lane'
+require_relative 'fastlane/junit_generator'
+require_relative 'fastlane/lane_manager'
+require_relative 'fastlane/lane_manager_base'
+require_relative 'fastlane/swift_lane_manager'
+require_relative 'fastlane/action'
+require_relative 'fastlane/action_collector'
+require_relative 'fastlane/supported_platforms'
+require_relative 'fastlane/configuration_helper'
+require_relative 'fastlane/one_off'
+require_relative 'fastlane/server/socket_server_action_command_executor'
+require_relative 'fastlane/server/socket_server'
+require_relative 'fastlane/command_line_handler'
+require_relative 'fastlane/documentation/docs_generator'
+require_relative 'fastlane/other_action'
+require_relative 'fastlane/plugins/plugins'
+require_relative 'fastlane/fastlane_require'

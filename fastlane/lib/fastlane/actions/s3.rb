@@ -1,4 +1,4 @@
-require 'fastlane/erb_template_helper'
+require_relative '../erb_template_helper'
 require 'ostruct'
 require 'uri'
 require 'cgi'

@@ -2,12 +2,12 @@ module Fastlane
   module Actions
     class DownloadFromPlayStoreAction < Action
       def self.run(params)
-        require 'supply'
-        require 'supply/options'
+        require_relative internal('supply')
+        require_relative internal('supply/options')
 
         Supply.config = params # we already have the finished config
 
-        require 'supply/setup'
+        require_relative internal('supply/setup')
         Supply::Setup.new.perform_download
       end
 
@@ -24,8 +24,8 @@ module Fastlane
       end
 
       def self.available_options
-        require 'supply'
-        require 'supply/options'
+        require_relative internal('supply')
+        require_relative internal('supply/options')
         options = Supply::Options.available_options.clone
 
         # remove all the unnecessary (for this action) options

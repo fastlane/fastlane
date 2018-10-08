@@ -1,6 +1,6 @@
 require 'terminal-table'
 
-require 'fastlane_core/print_table'
+require_relative internal('fastlane_core/print_table')
 require_relative 'module'
 require_relative 'utils'
 

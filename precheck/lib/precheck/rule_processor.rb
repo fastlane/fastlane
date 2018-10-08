@@ -1,5 +1,5 @@
-require 'spaceship/tunes/language_item'
-require 'fastlane/markdown_table_formatter'
+require_relative internal('spaceship/tunes/language_item')
+require_relative internal('fastlane/markdown_table_formatter')
 
 require_relative 'module'
 require_relative 'item_to_check'

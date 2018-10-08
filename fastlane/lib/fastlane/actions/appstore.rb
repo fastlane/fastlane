@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/upload_to_app_store'
+    require_relative 'upload_to_app_store'
     class AppstoreAction < UploadToAppStoreAction
       #####################################################
       # @!group Documentation

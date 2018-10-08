@@ -1,13 +1,13 @@
-require 'spaceship/tunes/errors'
-require 'spaceship/tunes/iap_list'
-require 'spaceship/tunes/iap_detail'
-require 'spaceship/tunes/iap_status'
-require 'spaceship/tunes/iap_type'
-require 'spaceship/tunes/iap_family_list'
-require 'spaceship/tunes/iap_families'
-require 'spaceship/tunes/iap_family_details'
-require 'spaceship/tunes/iap_families'
-require 'spaceship/tunes/iap_subscription_pricing_tier'
+require_relative 'errors'
+require_relative 'iap_list'
+require_relative 'iap_detail'
+require_relative 'iap_status'
+require_relative 'iap_type'
+require_relative 'iap_family_list'
+require_relative 'iap_families'
+require_relative 'iap_family_details'
+require_relative 'iap_families'
+require_relative 'iap_subscription_pricing_tier'
 
 module Spaceship
   module Tunes

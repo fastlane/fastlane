@@ -1,4 +1,4 @@
-require 'fastlane/erb_template_helper'
+require_relative '../erb_template_helper'
 
 module Fastlane
   module Actions

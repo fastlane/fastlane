@@ -1,5 +1,5 @@
-require 'fastlane_core/configuration/configuration'
-require 'credentials_manager/appfile_config'
+require_relative internal('fastlane_core/configuration/configuration')
+require_relative internal('credentials_manager/appfile_config')
 require_relative 'module'
 
 module Sigh

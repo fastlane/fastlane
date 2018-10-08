@@ -1,9 +1,9 @@
-require 'pilot/features'
-require "pilot/options"
-require "pilot/manager"
-require "pilot/build_manager"
-require "pilot/tester_manager"
-require "pilot/tester_importer"
-require "pilot/tester_exporter"
-
 require_relative 'pilot/module'
+
+require_relative 'pilot/features'
+require_relative 'pilot/options'
+require_relative 'pilot/manager'
+require_relative 'pilot/build_manager'
+require_relative 'pilot/tester_manager'
+require_relative 'pilot/tester_importer'
+require_relative 'pilot/tester_exporter'

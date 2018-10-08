@@ -1,5 +1,6 @@
-require 'fastlane/actions/actions_helper'
 require 'forwardable'
+
+require_relative 'actions/actions_helper'
 
 module Fastlane
   class Action

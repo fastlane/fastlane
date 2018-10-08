@@ -1,11 +1,12 @@
 require 'json'
-require 'supply/options'
-require 'supply/client'
-require 'supply/listing'
-require 'supply/apk_listing'
-require 'supply/uploader'
 
-require 'fastlane_core'
+require_relative '../../fastlane_core/lib/fastlane_core/require_relative_helper'
+require_relative 'supply/options'
+require_relative 'supply/client'
+require_relative 'supply/listing'
+require_relative 'supply/apk_listing'
+require_relative 'supply/uploader'
+require_relative internal('fastlane_core')
 
 module Supply
   # Use this to just setup the configuration attribute and set it later somewhere else

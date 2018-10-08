@@ -19,7 +19,7 @@ module Fastlane
 
     def self.get
       UI.important("Generating fastlane environment output, this might take a few seconds...")
-      require "fastlane/markdown_table_formatter"
+      require_relative 'markdown_table_formatter'
       env_output = ""
       env_output << print_system_environment
       env_output << print_system_locale

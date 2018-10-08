@@ -2,8 +2,8 @@ module Fastlane
   module Actions
     class UploadToPlayStoreAction < Action
       def self.run(params)
-        require 'supply'
-        require 'supply/options'
+        require_relative internal('supply')
+        require_relative internal('supply/options')
 
         # If no APK params were provided, try to fill in the values from lane context, preferring
         # the multiple APKs over the single APK if set.
@@ -34,8 +34,8 @@ module Fastlane
       end
 
       def self.available_options
-        require 'supply'
-        require 'supply/options'
+        require_relative internal('supply')
+        require_relative internal('supply/options')
         Supply::Options.available_options
       end
 

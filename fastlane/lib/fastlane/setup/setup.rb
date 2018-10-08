@@ -35,7 +35,7 @@ module Fastlane
     # rubocop:disable Metrics/BlockNesting
     def self.start(user: nil, is_swift_fastfile: false)
       if FastlaneCore::FastlaneFolder.setup? && !Helper.test?
-        require 'fastlane/lane_list'
+        require_relative '../lane_list'
         Fastlane::LaneList.output(FastlaneCore::FastlaneFolder.fastfile_path)
         UI.important("------------------")
         UI.important("fastlane is already set up at path `#{FastlaneCore::FastlaneFolder.path}`, see the available lanes above")
@@ -351,5 +351,5 @@ module Fastlane
   end
 end
 
-require 'fastlane/setup/setup_ios'
-require 'fastlane/setup/setup_android'
+require_relative 'setup_ios'
+require_relative 'setup_android'

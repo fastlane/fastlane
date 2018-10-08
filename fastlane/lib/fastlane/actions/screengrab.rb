@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/capture_android_screenshots'
+    require_relative 'capture_android_screenshots'
     class ScreengrabAction < CaptureAndroidScreenshotsAction
       #####################################################
       # @!group Documentation

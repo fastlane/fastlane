@@ -1,3 +1,3 @@
 require_relative 'precheck/runner'
 require_relative 'precheck/options'
-require 'spaceship'
+require_relative internal('spaceship')

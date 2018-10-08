@@ -1,5 +1,5 @@
 require 'open3'
-require 'fastlane_core/ui/ui'
+require_relative internal('fastlane_core/ui/ui')
 
 module Snapshot
   class LatestOsVersion

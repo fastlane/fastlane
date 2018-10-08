@@ -1,7 +1,7 @@
 require 'commander'
 
-require 'fastlane/version'
-require 'fastlane_core/configuration/config_item'
+require_relative internal('fastlane/version')
+require_relative internal('fastlane_core/configuration/config_item')
 require_relative 'module'
 require_relative 'manager'
 require_relative 'options'
@@ -75,7 +75,7 @@ module Produce
           allowed_keys = Produce::Options.available_options.collect(&:key)
           Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include?(key) })
 
-          require 'produce/service'
+          require_relative 'service'
           Produce::Service.enable(options, args)
         end
       end
@@ -115,7 +115,7 @@ module Produce
           allowed_keys = Produce::Options.available_options.collect(&:key)
           Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include?(key) })
 
-          require 'produce/service'
+          require_relative internal('produce/service')
           Produce::Service.disable(options, args)
         end
       end
@@ -134,7 +134,7 @@ module Produce
           allowed_keys = Produce::Options.available_options.collect(&:key)
           Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include?(key) })
 
-          require 'produce/group'
+          require_relative internal('produce/group')
           Produce::Group.new.create(options, args)
         end
       end
@@ -149,7 +149,7 @@ module Produce
         c.action do |args, options|
           Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__)
 
-          require 'produce/group'
+          require_relative internal('produce/group')
           Produce::Group.new.associate(options, args)
         end
       end
@@ -168,7 +168,7 @@ module Produce
           allowed_keys = Produce::Options.available_options.collect(&:key)
           Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include?(key) })
 
-          require 'produce/cloud_container'
+          require_relative internal('produce/cloud_container')
           Produce::CloudContainer.new.create(options, args)
         end
       end
@@ -183,7 +183,7 @@ module Produce
         c.action do |args, options|
           Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__)
 
-          require 'produce/cloud_container'
+          require_relative internal('produce/cloud_container')
           Produce::CloudContainer.new.associate(options, args)
         end
       end
@@ -205,7 +205,7 @@ module Produce
 
           Produce.config = FastlaneCore::Configuration.create(all_options, options.__hash__.select { |key, value| allowed_keys.include?(key) })
 
-          require 'produce/merchant'
+          require_relative internal('produce/merchant')
           Produce::Merchant.new.create(options, args)
         end
       end
@@ -220,7 +220,7 @@ module Produce
         c.action do |args, options|
           Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__)
 
-          require 'produce/merchant'
+          require_relative internal('produce/merchant')
           Produce::Merchant.new.associate(options, args)
         end
       end

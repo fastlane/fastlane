@@ -1,5 +1,5 @@
-require 'credentials_manager/appfile_config'
-require 'fastlane_core/configuration/config_item'
+require_relative internal('credentials_manager/appfile_config')
+require_relative internal('fastlane_core/configuration/config_item')
 
 require_relative 'module'
 require_relative 'item_to_check'

@@ -7,7 +7,7 @@ module Fastlane
     class CaptureIosScreenshotsAction < Action
       def self.run(params)
         return nil unless Helper.mac?
-        require 'snapshot'
+        require_relative internal('snapshot')
 
         Snapshot.config = params
         Snapshot::DependencyChecker.check_simulators
@@ -24,7 +24,7 @@ module Fastlane
 
       def self.available_options
         return [] unless Helper.mac?
-        require 'snapshot'
+        require_relative internal('snapshot')
         Snapshot::Options.available_options
       end
 
