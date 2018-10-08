@@ -5,6 +5,8 @@ describe Fastlane do
       let(:apk_paths) { ["app/my1.apk", "app/my2.apk"] }
       let(:wrong_apk_paths) { ['wrong.apk', 'nope.apk'] }
       let(:aab_path) { "app/bundle.aab" }
+      let(:aab_paths_unique) { ["app/bundle1.aab"] }
+      let(:aab_paths_multiple) { ["app/bundle1.aab", "app/bundle2.aab"] }
 
       before :each do
         allow(File).to receive(:exist?).and_call_original
@@ -152,6 +154,70 @@ describe Fastlane do
           expect(Supply.config[:apk]).to be_nil
           expect(Supply.config[:apk_paths]).to be_nil
           expect(Supply.config[:aab]).to eq(aab_path)
+        end
+      end
+
+      describe "multiple AAB path handling" do
+        before :each do
+          allow(File).to receive(:exist?).with(aab_path).and_return(true)
+          allow(File).to receive(:exist?).with(aab_paths_unique).and_return(true)
+          aab_paths_multiple.each do |path|
+            allow(File).to receive(:exist?).with(path).and_return(true)
+          end
+        end
+
+        it "uses the lane context AAB paths if no other AAB info is present" do
+          with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS => aab_paths_unique) do
+            Fastlane::FastFile.new.parse("lane :test do
+              supply
+            end").runner.execute(:test)
+          end
+
+          expect(Supply.config[:apk]).to be_nil
+          expect(Supply.config[:apk_paths]).to be_nil
+          expect(Supply.config[:aab]).to eq(aab_paths_unique.first)
+        end
+
+        it "ignores the lane context AAB paths if the AAB path param is present" do
+          with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS => aab_paths_unique) do
+            Fastlane::FastFile.new.parse("lane :test do
+              supply(aab: '#{aab_path}')
+            end").runner.execute(:test)
+          end
+
+          expect(Supply.config[:apk]).to be_nil
+          expect(Supply.config[:apk_paths]).to be_nil
+          expect(Supply.config[:aab]).to eq(aab_path)
+        end
+
+        it "use the lane context AAB unique path if the AAB paths has multiple values" do
+          with_action_context_values(
+            Fastlane::Actions::SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS => aab_paths_multiple,
+            Fastlane::Actions::SharedValues::GRADLE_AAB_OUTPUT_PATH => aab_path
+          ) do
+            Fastlane::FastFile.new.parse("lane :test do
+              supply
+            end").runner.execute(:test)
+          end
+
+          expect(Supply.config[:apk]).to be_nil
+          expect(Supply.config[:apk_paths]).to be_nil
+          expect(Supply.config[:aab]).to eq(aab_path)
+        end
+
+        it "use the lane context AAB paths firt value if both unique and multiple contexts are set" do
+          with_action_context_values(
+            Fastlane::Actions::SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS => aab_paths_unique,
+            Fastlane::Actions::SharedValues::GRADLE_AAB_OUTPUT_PATH => aab_path
+          ) do
+            Fastlane::FastFile.new.parse("lane :test do
+              supply
+            end").runner.execute(:test)
+          end
+
+          expect(Supply.config[:apk]).to be_nil
+          expect(Supply.config[:apk_paths]).to be_nil
+          expect(Supply.config[:aab]).to eq(aab_paths_unique.first)
         end
       end
     end
