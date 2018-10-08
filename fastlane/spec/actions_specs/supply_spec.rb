@@ -25,6 +25,7 @@ describe Fastlane do
 
           expect(Supply.config[:apk]).to eq(apk_path)
           expect(Supply.config[:apk_paths]).to be_nil
+          expect(Supply.config[:aab]).to be_nil
         end
 
         it "uses the lane context APK path if no other APK info is present" do
@@ -36,6 +37,7 @@ describe Fastlane do
 
           expect(Supply.config[:apk]).to eq(apk_path)
           expect(Supply.config[:apk_paths]).to be_nil
+          expect(Supply.config[:aab]).to be_nil
         end
 
         it "ignores the lane context APK path if the APK param is present" do
@@ -47,6 +49,7 @@ describe Fastlane do
 
           expect(Supply.config[:apk]).to eq(apk_path)
           expect(Supply.config[:apk_paths]).to be_nil
+          expect(Supply.config[:aab]).to be_nil
         end
 
         it "ignores the lane context APK paths if the APK param is present" do
@@ -62,6 +65,7 @@ describe Fastlane do
 
           expect(Supply.config[:apk]).to eq(apk_path)
           expect(Supply.config[:apk_paths]).to be_nil
+          expect(Supply.config[:aab]).to be_nil
         end
       end
 
@@ -79,6 +83,7 @@ describe Fastlane do
 
           expect(Supply.config[:apk]).to be_nil
           expect(Supply.config[:apk_paths]).to eq(apk_paths)
+          expect(Supply.config[:aab]).to be_nil
         end
 
         it "uses the lane context APK paths if no other APK info is present" do
@@ -90,6 +95,7 @@ describe Fastlane do
 
           expect(Supply.config[:apk]).to be_nil
           expect(Supply.config[:apk_paths]).to eq(apk_paths)
+          expect(Supply.config[:aab]).to be_nil
         end
 
         it "ignores the lane context APK paths if the APK paths param is present" do
@@ -101,6 +107,7 @@ describe Fastlane do
 
           expect(Supply.config[:apk]).to be_nil
           expect(Supply.config[:apk_paths]).to eq(apk_paths)
+          expect(Supply.config[:aab]).to be_nil
         end
 
         it "ignores the lane context APK path if the APK paths param is present" do
@@ -114,6 +121,7 @@ describe Fastlane do
 
           expect(Supply.config[:apk]).to be_nil
           expect(Supply.config[:apk_paths]).to eq(apk_paths)
+          expect(Supply.config[:aab]).to be_nil
         end
       end
 
