@@ -116,6 +116,12 @@ describe Spaceship::Device do
       end.to raise_error("Device name must be 50 characters or less. \"Demo Device (Apple Watch Series 3 - 42mm GPS Black)\" has a 51 character length.")
     end
 
+    it "should fail to create a device with an invalid UDID" do
+      expect do
+        Spaceship::Device.create!(name: "Demo Device", udid: "1234")
+      end.to raise_error("An invalid value '1234' was provided for the parameter 'deviceNumber'.")
+    end
+
     it "doesn't trigger an ITC call if the device ID is already registered" do
       expect(client).to_not(receive(:create_device!))
       device = Spaceship::Device.create!(name: "Personal iPhone", udid: "e5814abb3b1d92087d48b64f375d8e7694932c39")
