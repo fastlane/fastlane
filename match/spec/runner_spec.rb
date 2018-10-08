@@ -39,7 +39,6 @@ describe Match do
 
       expect(fake_storage).to receive(:download).and_return(nil)
       expect(fake_storage).to receive(:clear_changes).and_return(nil)
-      expect(fake_storage).to receive(:git_url).and_return(git_url)
       allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
       expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory).and_return(cert_path)
       expect(Match::Generator).to receive(:generate_provisioning_profile).with(params: config,
@@ -107,7 +106,7 @@ describe Match do
       allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
 
       fake_encryption = "fake_encryption"
-      expect(Match::Encryption::OpenSSL).to receive(:new).with(git_url: fake_storage.git_url, working_directory: fake_storage.working_directory).and_return(fake_encryption)
+      expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: fake_storage.git_url, working_directory: fake_storage.working_directory).and_return(fake_encryption)
       expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
 
       expect(Match::Utils).to receive(:import).with(key_path, keychain, password: nil).and_return(nil)

@@ -10,7 +10,7 @@ describe Match do
       ENV["MATCH_PASSWORD"] = '2"QAHg@v(Qp{=*n^'
 
       @e = Match::Encryption::OpenSSL.new(
-        git_url: @git_url,
+        keychain_name: @git_url,
         working_directory: @directory
       )
     end

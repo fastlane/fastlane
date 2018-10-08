@@ -10,22 +10,21 @@ require_relative '../change_password'
 module Match
   module Encryption
     class OpenSSL < Interface
-      attr_accessor :git_url
+      attr_accessor :keychain_name
 
       attr_accessor :working_directory
 
       def self.configure(params)
         return self.new(
-          git_url: params[:git_url],
+          keychain_name: params[:keychain_name],
           working_directory: params[:working_directory]  
         )
       end
 
-      # @param git_url: The Git URL is used for identifiying a specific repo
-      #                 which is used to store the passphrase in the Keychain
+      # @param keychain_name: The identifier used to store the passphrase in the Keychain
       # @param working_directory: The path to where the certificates are stored
-      def initialize(git_url: nil, working_directory: nil)
-        self.git_url = git_url
+      def initialize(keychain_name: nil, working_directory: nil)
+        self.keychain_name = keychain_name
         self.working_directory = working_directory
       end
 
@@ -55,12 +54,12 @@ module Match
       end
 
       def store_password(password)
-        Security::InternetPassword.add(server_name(self.git_url), "", password)
+        Security::InternetPassword.add(server_name(self.keychain_name), "", password)
       end
 
       # removes the password from the keychain again
       def clear_password
-        Security::InternetPassword.delete(server: server_name(self.git_url))
+        Security::InternetPassword.delete(server: server_name(self.keychain_name))
       end
 
       private
@@ -73,15 +72,15 @@ module Match
       end
 
       # server name used for accessing the macOS keychain
-      def server_name(git_url)
-        ["match", git_url].join("_")
+      def server_name(keychain_name)
+        ["match", keychain_name].join("_")
       end
 
       # Access the MATCH_PASSWORD, either from ENV variable, Keychain or user input
       def password
         password = ENV["MATCH_PASSWORD"]
         unless password
-          item = Security::InternetPassword.find(server: server_name(self.git_url))
+          item = Security::InternetPassword.find(server: server_name(self.keychain_name))
           password = item.password if item
         end
 

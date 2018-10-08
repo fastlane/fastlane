@@ -38,7 +38,7 @@ module Match
 
       # After the download was complete
       self.encryption = Encryption.for_storage_mode(params[:storage_mode], {
-        git_url: storage.git_url,
+        git_url: params[:git_url],
         working_directory: storage.working_directory
       })
       self.encryption.decrypt_files

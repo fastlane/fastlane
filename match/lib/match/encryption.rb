@@ -6,6 +6,7 @@ module Match
     # Returns the class to be used for a given `storage_mode`
     def self.for_storage_mode(storage_mode, params)
       if storage_mode == "git"
+        params[:keychain_name] = params[:git_url]
         return Encryption::OpenSSL.configure(params)
       elsif storage_mode == "google_cloud"
         # return Encryption::GoogleCloudKMS.configure(params)
