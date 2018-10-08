@@ -17,7 +17,7 @@ module Match
       def self.configure(params)
         return self.new(
           keychain_name: params[:keychain_name],
-          working_directory: params[:working_directory]  
+          working_directory: params[:working_directory]
         )
       end
 

@@ -105,7 +105,7 @@ describe Match do
         expect(Dir).to receive(:mktmpdir).and_return(path)
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         random_file = "random_file"
-        
+
         storage = Match::Storage::GitStorage.new(
           type: "appstore",
           platform: "ios",
@@ -131,7 +131,6 @@ describe Match do
         end
 
         expect(storage).to receive(:clear_changes).and_return(nil) # so we can inspect the folder
-
 
         storage.download
         storage.save_changes!(files_to_commit: [random_file])

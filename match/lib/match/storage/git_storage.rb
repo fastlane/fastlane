@@ -35,14 +35,14 @@ module Match
       end
 
       def initialize(type: nil,
-                    platform: nil,
-                    git_url: nil,
-                    shallow_clone: nil,
-                    skip_docs: false,
-                    branch: "master",
-                    git_full_name: nil,
-                    git_user_email: nil,
-                    clone_branch_directly: false)
+                     platform: nil,
+                     git_url: nil,
+                     shallow_clone: nil,
+                     skip_docs: false,
+                     branch: "master",
+                     git_full_name: nil,
+                     git_user_email: nil,
+                     clone_branch_directly: false)
         self.git_url = git_url
         self.shallow_clone = shallow_clone
         self.skip_docs = skip_docs
