@@ -44,7 +44,7 @@ module Spaceship
         puts("Please select a phone number to verify your identity")
 
         available = r.body["trustedPhoneNumbers"].collect do |current|
-          "#{current["numberWithDialCode"]}\tSMS\t(#{current["id"]})"
+          "#{current['numberWithDialCode']}\tSMS\t(#{current['id']})"
         end
         result = choose(*available)
         device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
