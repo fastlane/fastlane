@@ -40,7 +40,16 @@ module Spaceship
         device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
         select_device(r, device_id)
       elsif r.body.kind_of?(Hash) && r.body["trustedPhoneNumbers"].kind_of?(Array) && r.body["trustedPhoneNumbers"].first.kind_of?(Hash)
-        handle_two_factor(r)
+        puts("Two Step Verification for account '#{self.user}' is enabled")
+        puts("Please select a phone number to verify your identity")
+
+        available = r.body["trustedPhoneNumbers"].collect do |current|
+          "#{current["numberWithDialCode"]}\tSMS\t(#{current["id"]})"
+        end
+        result = choose(*available)
+        device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
+        response = select_number(r, device_id)
+        handle_two_factor(response)
       else
         raise "Invalid 2 step response #{r.body}"
       end
@@ -118,6 +127,23 @@ module Spaceship
     # (if exists)
     def self.spaceship_session_env
       ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
+    end
+
+    def select_number(r, device_id)
+      # Request Token
+      r = request(:put) do |req|
+        req.url("https://idmsa.apple.com/appleauth/auth/verify/phone")
+        req.body = { "phoneNumber" => { "id" => device_id }, "mode" => "sms" }.to_json
+        req.headers['Content-Type'] = 'application/json'
+        update_request_headers(req)
+      end
+
+      # we use `Spaceship::TunesClient.new.handle_itc_response`
+      # since this might be from the Dev Portal, but for 2 step
+      Spaceship::TunesClient.new.handle_itc_response(r.body)
+
+      puts("Successfully requested SMS code")
+      r
     end
 
     def select_device(r, device_id)
