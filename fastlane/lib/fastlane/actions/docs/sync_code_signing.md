@@ -2,7 +2,7 @@
   <img src="/img/actions/match.png" width="250">
 </p>
 
-###### Easily sync your certificates and profiles across your team using git
+###### Easily sync your certificates and profiles across your team
 
 A new approach to iOS code signing: Share one code signing identity across your development team to simplify your codesigning setup and prevent code signing issues.
 
