@@ -33,6 +33,7 @@ describe Fastlane do
             binary_basename: ['YourApp', 'YourFramework'],
             binary_file: 'you',
             workspace: 'foo.xcworkspace',
+            arch: 'arm64',
             source_files: '#{source_files}',
             decimals: '2'
           })
@@ -64,6 +65,7 @@ describe Fastlane do
                     --binary-file you
                     --binary-basename YourApp
                     --binary-basename YourFramework
+                    --arch arm64
                     --source-files #{source_files.shellescape}
                     --decimals 2 foo.xcodeproj".gsub(/\s+/, ' ')
         expect(result).to eq(expected)
