@@ -18,4 +18,4 @@ class Deliverfile: DeliverfileProtocol {
 
 
 
-// Generated with fastlane 2.105.2
+// Generated with fastlane 2.106.0
