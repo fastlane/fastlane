@@ -155,7 +155,6 @@ module Spaceship
           return existing if existing
 
           # It is valid to have the same name for multiple devices
-
           device = client.create_device!(name, udid, mac: mac)
 
           # Update self with the new device
