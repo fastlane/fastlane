@@ -48,7 +48,7 @@ module Fastlane
         return device_objs
       end
 
-      def self.try_create_device(name:, udid:, mac:)
+      def self.try_create_device(name: nil, udid: nil, mac: false)
         Spaceship::Device.create!(name: name, udid: udid, mac: mac)
       rescue => ex
         UI.error(ex.to_s)
