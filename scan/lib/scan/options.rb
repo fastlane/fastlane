@@ -147,7 +147,7 @@ module Scan
                                      default_value: false,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :suppress_xcode_output,
-                                     env_name: "SUPPRESS_XCODE_OUTPUT",
+                                     env_name: "SCAN_SUPPRESS_XCODE_OUTPUT",
                                      description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
                                      optional: true,
                                      is_string: false),
