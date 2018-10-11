@@ -841,7 +841,7 @@ function resign {
     rm -f "$APP_ENTITLEMENTS"
     rm -f "$PATCHED_ENTITLEMENTS"
     rm -f "$PATCHED_ENTITLEMENTS.bak"
-    rm -r "$TEMP_DIR/old-embedded-profile.plist"
+    rm -f "$TEMP_DIR/old-embedded-profile.plist"
     rm -f "$TEMP_DIR/profile.plist"
     rm -f "$TEMP_DIR/old-embedded.mobileprovision"
     rm -f "$TEMP_DIR/oldInfo.plist"
