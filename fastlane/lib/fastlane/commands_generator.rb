@@ -11,7 +11,6 @@ module Fastlane
       # since at this point we haven't yet loaded commander
       # however we do want to log verbose information in the PluginManager
       FastlaneCore::Globals.verbose = true if ARGV.include?("--verbose")
-      FastlaneCore::Globals.capture_output = true  if ARGV.include?("--capture_output")
       if ARGV.include?("--capture_output")
         FastlaneCore::Globals.verbose = true
         FastlaneCore::Globals.capture_output = true
@@ -102,6 +101,7 @@ module Fastlane
         c.description = 'Run a specific lane. Pass the lane name and optionally the platform first.'
         c.option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
         c.option('--disable_runner_upgrades', 'Prevents fastlane from attempting to update FastlaneRunner swift project')
+        c.option('--swift_server_port INT', 'Set specific port to communicate between fastlane and FastlaneRunner')
 
         c.action do |args, options|
           if ensure_fastfile

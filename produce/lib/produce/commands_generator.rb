@@ -29,7 +29,7 @@ module Produce
 
       command :create do |c|
         c.syntax = 'fastlane produce create'
-        c.description = 'Creates a new app on iTunes Connect and the Apple Developer Portal'
+        c.description = 'Creates a new app on App Store Connect and the Apple Developer Portal'
 
         FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
 
@@ -47,6 +47,7 @@ module Produce
 
         c.option('--app-group', 'Enable App Groups')
         c.option('--apple-pay', 'Enable Apple Pay')
+        c.option('--auto-fill-credential', 'Enable AutoFill Credential')
         c.option('--associated-domains', 'Enable Associated Domains')
         c.option('--data-protection STRING', String, 'Enable Data Protection, suitable values are "complete", "unlessopen" and "untilfirstauth"')
         c.option('--game-center', 'Enable Game Center')
@@ -86,6 +87,7 @@ module Produce
 
         c.option('--app-group', 'Disable App Groups')
         c.option('--apple-pay', 'Disable Apple Pay')
+        c.option('--auto-fill-credential', 'Disable AutoFill Credential')
         c.option('--associated-domains', 'Disable Associated Domains')
         c.option('--data-protection', 'Disable Data Protection')
         c.option('--game-center', 'Disable Game Center')
@@ -149,6 +151,40 @@ module Produce
 
           require 'produce/group'
           Produce::Group.new.associate(options, args)
+        end
+      end
+
+      command :cloud_container do |c|
+        c.syntax = 'fastlane produce cloud_container'
+        c.description = 'Ensure that a specific iCloud Container exists'
+        c.example('Create iCloud Container', 'fastlane produce cloud_container -g iCloud.com.example.app -n "Example iCloud Container"')
+
+        c.option('-n', '--container_name STRING', String, 'Name for the iCloud Container that is created (PRODUCE_CLOUD_CONTAINER_NAME)')
+        c.option('-g', '--container_identifier STRING', String, 'Identifier for the iCloud Container (PRODUCE_CLOUD_CONTAINER_IDENTIFIER')
+
+        FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
+
+        c.action do |args, options|
+          allowed_keys = Produce::Options.available_options.collect(&:key)
+          Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include?(key) })
+
+          require 'produce/cloud_container'
+          Produce::CloudContainer.new.create(options, args)
+        end
+      end
+
+      command :associate_cloud_container do |c|
+        c.syntax = 'fastlane produce associate_cloud_container -a APP_IDENTIFIER CONTAINER_IDENTIFIER1, CONTAINER_IDENTIFIER2, ...'
+        c.description = 'Associate with a iCloud Container, which is created if needed or simply located otherwise'
+        c.example('Associate with iCloud Container', 'fastlane produce associate_cloud_container -a com.example.app iCloud.com.example.com')
+
+        FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
+
+        c.action do |args, options|
+          Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__)
+
+          require 'produce/cloud_container'
+          Produce::CloudContainer.new.associate(options, args)
         end
       end
 

@@ -14,26 +14,27 @@ File.write("#{lib}/fastlane/plugins/template/.rubocop.yml", YAML.dump(config))
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
+  # list of authors is regenerated and resorted on each release
   spec.authors       = ["Manu Wallner",
-                        "Jorge Revuelta H",
                         "Olivier Halligon",
-                        "Matthew Ellis",
-                        "Jérôme Lacoste",
-                        "Danielle Tomlinson",
-                        "Helmut Januschka",
                         "Felix Krause",
-                        "Joshua Liebowitz",
-                        "Josh Holtz",
-                        "Iulian Onofrei",
-                        "Jan Piotrowski",
-                        "Aaron Brager",
-                        "Jimmy Dee",
-                        "Luka Mirosevic",
-                        "Kohki Miki",
-                        "Stefan Natchev",
-                        "Maksym Grebenets",
+                        "Danielle Tomlinson",
                         "Fumiya Nakamura",
-                        "Andrew McBurney"]
+                        "Maksym Grebenets",
+                        "Luka Mirosevic",
+                        "Iulian Onofrei",
+                        "Jérôme Lacoste",
+                        "Kohki Miki",
+                        "Jorge Revuelta H",
+                        "Stefan Natchev",
+                        "Helmut Januschka",
+                        "Aaron Brager",
+                        "Andrew McBurney",
+                        "Jimmy Dee",
+                        "Josh Holtz",
+                        "Joshua Liebowitz",
+                        "Jan Piotrowski",
+                        "Matthew Ellis"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -54,8 +55,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = Dir["*/lib"]
 
   spec.add_dependency('slack-notifier', '>= 2.0.0', '< 3.0.0') # Slack notifications
-  spec.add_dependency('xcodeproj', '>= 1.5.7', '< 2.0.0') # Needed for commit_version_bump action and gym code_signing_mapping
-  spec.add_dependency('xcpretty', '>= 0.2.4', '< 1.0.0') # prettify xcodebuild output
+  spec.add_dependency('xcodeproj', '>= 1.6.0', '< 2.0.0') # Modify Xcode projects
+  spec.add_dependency('xcpretty', '~> 0.3.0') # prettify xcodebuild output
   spec.add_dependency('terminal-notifier', '>= 1.6.2', '< 2.0.0') # macOS notifications
   spec.add_dependency('terminal-table', '>= 1.4.5', '< 2.0.0') # Actions documentation
   spec.add_dependency('plist', '>= 3.1.0', '< 4.0.0') # Needed for set_build_number_repository and get_info_plist_value actions
@@ -82,7 +83,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('mini_magick', '~> 4.5.1') # To open, edit and export PSD files
   spec.add_dependency('multi_json') # Because sometimes it's just not installed
   spec.add_dependency('multi_xml', '~> 0.5')
-  spec.add_dependency('rubyzip', '>= 1.1.0', '< 2.0.0') # fix swift/ipa in gym
+  spec.add_dependency('rubyzip', '>= 1.2.2', '< 2.0.0') # fix swift/ipa in gym
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
   spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3')
   spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
@@ -93,7 +94,10 @@ Gem::Specification.new do |spec|
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.
-  spec.add_dependency('google-api-client', '>= 0.13.1', '< 0.14.0') # Google API Client to access Play Publishing API
+  spec.add_dependency('google-api-client', '>= 0.21.2', '< 0.24.0') # Google API Client to access Play Publishing API
+
+  spec.add_dependency('emoji_regex', '~> 0.1') # Used to scan for Emoji in the changelog
+  spec.add_dependency('bootsnap', '>= 1.3.1', '< 1.4.0') # Optimize ruby startup time
 
   # Development only
   spec.add_development_dependency('rake', '< 12')
@@ -112,4 +116,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('rest-client', '>= 1.8.0')
   spec.add_development_dependency('fakefs', '~> 0.8.1')
   spec.add_development_dependency('sinatra', '~> 1.4.8')
+  spec.add_development_dependency('xcov', '~> 1.4.1') # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
 end

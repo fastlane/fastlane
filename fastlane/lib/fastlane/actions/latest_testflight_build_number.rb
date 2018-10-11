@@ -22,8 +22,8 @@ module Fastlane
 
       def self.details
         [
-          "Provides a way to have increment_build_number be based on the latest build you uploaded to iTC.",
-          "Fetches most recent build number from TestFlight based on the version number. Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC."
+          "Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC.",
+          "Fetches the most recent build number from TestFlight based on the version number. Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC."
         ].join("\n")
       end
 
@@ -74,7 +74,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        short_option: "-k",
                                        env_name: "LATEST_TESTFLIGHT_BUILD_NUMBER_TEAM_ID",
-                                       description: "The ID of your iTunes Connect team if you're in multiple teams",
+                                       description: "The ID of your App Store Connect team if you're in multiple teams",
                                        optional: true,
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
@@ -86,7 +86,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :team_name,
                                        short_option: "-e",
                                        env_name: "LATEST_TESTFLIGHT_BUILD_NUMBER_TEAM_NAME",
-                                       description: "The name of your iTunes Connect team if you're in multiple teams",
+                                       description: "The name of your App Store Connect team if you're in multiple teams",
                                        optional: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
@@ -133,7 +133,7 @@ module Fastlane
       end
 
       def self.category
-        :misc
+        :app_store_connect
       end
     end
   end

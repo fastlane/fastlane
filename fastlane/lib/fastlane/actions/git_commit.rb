@@ -21,10 +21,6 @@ module Fastlane
         "Directly commit the given file with the given message"
       end
 
-      def self.details
-        ""
-      end
-
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :path,

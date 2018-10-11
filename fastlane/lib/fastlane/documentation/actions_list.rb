@@ -112,7 +112,16 @@ module Fastlane
       end
 
       if action.details
-        rows << [action.details]
+        details = action.details
+        details.gsub!(/^>/, "") # remove Markdown quotes
+        details.gsub!(/\[http[^\]]+\]\(([^)]+)\)/, '\1 🔗') # remove Markdown links
+        details.gsub!(/\[([^\]]+)\]\(([^\)]+)\)/, '"\1" (\2 🔗)') # remove Markdown links with custom text
+        details.gsub!("|", "") # remove new line preserve markers
+        details.split("\n").each do |detail|
+          row = detail.empty? ? ' ' : detail
+          rows << [row]
+        end
+
         rows << [' ']
       end
 
@@ -191,7 +200,7 @@ module Fastlane
       if options.kind_of?(Array)
         options.each do |current|
           if current.kind_of?(FastlaneCore::ConfigItem)
-            rows << [current.key.to_s.yellow, current.description, current.env_name, current.help_default_value]
+            rows << [current.key.to_s.yellow, current.deprecated ? current.description.red : current.description, current.env_name, current.help_default_value]
           elsif current.kind_of?(Array)
             # Legacy actions that don't use the new config manager
             UI.user_error!("Invalid number of elements in this row: #{current}. Must be 2 or 3") unless [2, 3].include?(current.count)

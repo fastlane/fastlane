@@ -35,7 +35,7 @@ module Frameit
             next # we don't care about watches right now
           end
 
-          UI.message("Framing screenshot '#{full_path}'")
+          Helper.show_loading_indicator("Framing screenshot '#{full_path}'")
 
           begin
             screenshot = Screenshot.new(full_path, color)

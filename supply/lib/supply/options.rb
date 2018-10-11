@@ -5,7 +5,7 @@ module Supply
   class Options
     # rubocop:disable Metrics/PerceivedComplexity
     def self.available_options
-      valid_tracks = %w(production beta alpha internal rollout)
+      default_tracks = %w(production beta alpha internal rollout)
       @options ||= [
         FastlaneCore::ConfigItem.new(key: :package_name,
                                      env_name: "SUPPLY_PACKAGE_NAME",
@@ -17,12 +17,8 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :track,
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",
-                                     description: "The track of the application to use: #{valid_tracks.join(', ')}",
-                                     default_value: 'production',
-                                     verify_block: proc do |value|
-                                       available = valid_tracks
-                                       UI.user_error!("Invalid value '#{value}', must be #{available.join(', ')}") unless available.include?(value)
-                                     end),
+                                     description: "The track of the application to use. The default available tracks are: #{default_tracks.join(', ')}",
+                                     default_value: 'production'),
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
                                      description: "The percentage of the user fraction when uploading to the rollout track",
@@ -43,7 +39,7 @@ module Supply
                                      env_name: "SUPPLY_KEY",
                                      short_option: "-k",
                                      conflicting_options: [:json_key],
-                                     deprecated: 'Use --json_key instead',
+                                     deprecated: 'Use `--json_key` instead',
                                      description: "The p12 File used to authenticate with Google",
                                      code_gen_sensitive: true,
                                      default_value: Dir["*.p12"].first || CredentialsManager::AppfileConfig.try_fetch_value(:keyfile),
@@ -55,7 +51,7 @@ module Supply
                                      env_name: "SUPPLY_ISSUER",
                                      short_option: "-i",
                                      conflicting_options: [:json_key],
-                                     deprecated: 'Use --json_key instead',
+                                     deprecated: 'Use `--json_key` instead',
                                      description: "The issuer of the p12 file (email address of the service account)",
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:issuer),
@@ -96,7 +92,7 @@ module Supply
                                      env_name: "SUPPLY_APK",
                                      description: "Path to the APK file to upload",
                                      short_option: "-b",
-                                     conflicting_options: [:apk_paths],
+                                     conflicting_options: [:apk_paths, :aab],
                                      code_gen_sensitive: true,
                                      default_value: Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-Release.apk")].last,
                                      default_value_dynamic: true,
@@ -107,7 +103,7 @@ module Supply
                                      end),
         FastlaneCore::ConfigItem.new(key: :apk_paths,
                                      env_name: "SUPPLY_APK_PATHS",
-                                     conflicting_options: [:apk],
+                                     conflicting_options: [:apk, :aab],
                                      optional: true,
                                      type: Array,
                                      description: "An array of paths to APK files to upload",
@@ -119,10 +115,29 @@ module Supply
                                          UI.user_error!("file at path '#{path}' is not an apk") unless path.end_with?('.apk')
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :aab,
+                                     env_name: "SUPPLY_AAB",
+                                     description: "Path to the AAB file to upload",
+                                     short_option: "-f",
+                                     conflicting_options: [:apk_path, :apk_paths],
+                                     code_gen_sensitive: true,
+                                     default_value: Dir["*.aab"].last || Dir[File.join("app", "build", "outputs", "bundle", "release", "bundle.aab")].last,
+                                     default_value_dynamic: true,
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Could not find aab file at path '#{value}'") unless File.exist?(value)
+                                       UI.user_error!("aab file is not an aab") unless value.end_with?('.aab')
+                                     end),
         FastlaneCore::ConfigItem.new(key: :skip_upload_apk,
                                      env_name: "SUPPLY_SKIP_UPLOAD_APK",
                                      optional: true,
                                      description: "Whether to skip uploading APK",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_upload_aab,
+                                     env_name: "SUPPLY_SKIP_UPLOAD_AAB",
+                                     optional: true,
+                                     description: "Whether to skip uploading AAB",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_upload_metadata,
@@ -146,11 +161,7 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :track_promote_to,
                                      env_name: "SUPPLY_TRACK_PROMOTE_TO",
                                      optional: true,
-                                     description: "The track to promote to: #{valid_tracks.join(', ')}",
-                                     verify_block: proc do |value|
-                                       available = valid_tracks
-                                       UI.user_error!("Invalid value '#{value}', must be #{available.join(', ')}") unless available.include?(value)
-                                     end),
+                                     description: "The track to promote to. The default available tracks are: #{default_tracks.join(', ')}"),
         FastlaneCore::ConfigItem.new(key: :validate_only,
                                      env_name: "SUPPLY_VALIDATE_ONLY",
                                      optional: true,
@@ -191,8 +202,19 @@ module Supply
                                      optional: true,
                                      description: "Check the other tracks for superseded versions and disable them",
                                      is_string: false,
-                                     default_value: false)
-
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :timeout,
+                                     env_name: "SUPPLY_TIMEOUT",
+                                     optional: true,
+                                     description: "Timeout for read, open, and send (in seconds)",
+                                     type: Integer,
+                                     default_value: 300),
+        FastlaneCore::ConfigItem.new(key: :deactivate_on_promote,
+                                     env_name: "SUPPLY_DEACTIVATE_ON_PROMOTE",
+                                     optional: true,
+                                     description: "When promoting to a new track, deactivate the binary in the origin track",
+                                     is_string: false,
+                                     default_value: true)
       ]
     end
     # rubocop:enable Metrics/PerceivedComplexity

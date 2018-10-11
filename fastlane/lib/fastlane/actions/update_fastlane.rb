@@ -28,9 +28,9 @@ module Fastlane
         sudo_needed = !File.writable?(gem_dir)
 
         if sudo_needed
-          UI.important("It seems that your Gem directory is not writable by your current User.")
+          UI.important("It seems that your Gem directory is not writable by your current user.")
           UI.important("fastlane would need sudo rights to update itself, however, running 'sudo fastlane' is not recommended.")
-          UI.important("If you still want to use this action, please read the documentation on a guide how to set this up:")
+          UI.important("If you still want to use this action, please read the documentation on how to set this up:")
           UI.important("https://docs.fastlane.tools/actions/#update_fastlane")
           return
         end
@@ -112,17 +112,24 @@ module Fastlane
       end
 
       def self.details
+        sample = <<-SAMPLE.markdown_sample
+          ```bash
+          export GEM_HOME=~/.gems
+          export PATH=$PATH:~/.gems/bin
+          ```
+        SAMPLE
+
         [
           "This action will update fastlane to the most recent version - major version updates will not be performed automatically, as they might include breaking changes. If an update was performed, fastlane will be restarted before the run continues.",
+          "",
           "If you are using rbenv or rvm, everything should be good to go. However, if you are using the system's default ruby, some additional setup is needed for this action to work correctly. In short, fastlane needs to be able to access your gem library without running in `sudo` mode.",
-          "The simplest possible fix for this is putting the following lines into your `~/.bashrc` or `~/.zshrc` file:",
-          "```bash",
-          "export GEM_HOME=~/.gems",
-          "export PATH=$PATH:~/.gems/bin",
-          "```",
+          "",
+          "The simplest possible fix for this is putting the following lines into your `~/.bashrc` or `~/.zshrc` file:".markdown_preserve_newlines,
+          sample,
           "After the above changes, restart your terminal, then run `mkdir $GEM_HOME` to create the new gem directory. After this, you're good to go!",
-          "Recommended usage of the `update_fastlane` action is at the top inside of the `before_all` block, before running any other action"
-        ].join("\n\n")
+          "",
+          "Recommended usage of the `update_fastlane` action is at the top inside of the `before_all` block, before running any other action."
+        ].join("\n")
       end
 
       def self.available_options
@@ -139,7 +146,7 @@ module Fastlane
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :tools,
                                        env_name: "FL_TOOLS_TO_UPDATE",
-                                       description: "Comma separated list of fastlane tools to update (e.g. fastlane,deliver,sigh)",
+                                       description: "Comma separated list of fastlane tools to update (e.g. `fastlane,deliver,sigh`)",
                                        deprecated: true,
                                        optional: true)
         ]

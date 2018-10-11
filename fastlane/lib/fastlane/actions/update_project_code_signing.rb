@@ -35,8 +35,8 @@ module Fastlane
                                          UI.user_error!("Path is invalid") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :udid,
+                                       deprecated: "Use `:uuid` instead",
                                        env_name: "FL_PROJECT_SIGNING_UDID",
-                                       description: "DEPRECATED: see :uuid",
                                        code_gen_sensitive: true,
                                        default_value: ENV["SIGH_UUID"],
                                        default_value_dynamic: true),
@@ -58,7 +58,7 @@ module Fastlane
       end
 
       def self.example_code
-        []
+        nil
       end
 
       def self.category
@@ -66,9 +66,10 @@ module Fastlane
       end
 
       def self.deprecated_notes
-        "You shouldn't use update_project_code_signing.\n" \
-          "Have you considered using the recommended way to do code signing?\n" \
-          "https://docs.fastlane.tools/codesigning/getting-started/"
+        [
+          "You shouldn't use `update_project_code_signing`.",
+          "Have you considered using the recommended way to do code signing: [https://docs.fastlane.tools/codesigning/getting-started/](https://docs.fastlane.tools/codesigning/getting-started/)?"
+        ].join("\n")
       end
     end
   end

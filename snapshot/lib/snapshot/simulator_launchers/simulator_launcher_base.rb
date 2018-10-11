@@ -27,6 +27,11 @@ module Snapshot
     end
 
     def prepare_for_launch(device_types, language, locale, launch_arguments)
+      prepare_directories_for_launch(language: language, locale: locale, launch_arguments: launch_arguments)
+      prepare_simulators_for_launch(device_types, language: language, locale: locale)
+    end
+
+    def prepare_directories_for_launch(language: nil, locale: nil, launch_arguments: nil)
       screenshots_path = TestCommandGenerator.derived_data_path
       FileUtils.rm_rf(File.join(screenshots_path, "Logs"))
       FileUtils.rm_rf(screenshots_path) if launcher_config.clean
@@ -38,8 +43,6 @@ module Snapshot
       File.write(File.join(CACHE_DIR, "language.txt"), language)
       File.write(File.join(CACHE_DIR, "locale.txt"), locale || "")
       File.write(File.join(CACHE_DIR, "snapshot-launch_arguments.txt"), launch_arguments.last)
-
-      prepare_simulators_for_launch(device_types, language: language, locale: locale)
     end
 
     def prepare_simulators_for_launch(device_types, language: nil, locale: nil)
@@ -77,7 +80,16 @@ module Snapshot
 
         paths.each do |path|
           UI.message("Adding '#{path}'")
-          Helper.backticks("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape} &> /dev/null")
+
+          # Attempting addmedia since addphoto and addvideo are deprecated
+          output = Helper.backticks("xcrun simctl addmedia #{device_udid} #{path.shellescape} &> /dev/null")
+
+          # Run legacy addphoto and addvideo if addmedia isn't found
+          # Output will be empty strin gif it was a success
+          # Output will contain "usage: simctl" if command not found
+          if output.include?('usage: simctl')
+            Helper.backticks("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape} &> /dev/null")
+          end
         end
       end
     end

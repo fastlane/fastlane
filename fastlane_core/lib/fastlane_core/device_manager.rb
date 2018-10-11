@@ -98,8 +98,8 @@ module FastlaneCore
 
           instruments_devices_output.split(/\n/).each do |instruments_device|
             device_uuids.each do |device_uuid|
-              match = instruments_device.match(/(.+) \(([0-9.]+)\) \[([0-9a-f]+)\]?/)
-              if match && match[3] == device_uuid
+              match = instruments_device.match(/(.+) \(([0-9.]+)\) \[(\h{40}|\h{8}-\h{16})\]?/)
+              if match && match[3].delete("-") == device_uuid
                 devices << Device.new(name: match[1], udid: match[3], os_type: requested_os_type, os_version: match[2], state: "Booted", is_simulator: false)
                 UI.verbose("USB Device Found - \"" + match[1] + "\" (" + match[2] + ") UUID:" + match[3])
               end
@@ -118,10 +118,11 @@ module FastlaneCore
         end
 
         is_supported_device = device_types.any? { |device_type| usb_item['_name'] == device_type }
-        has_serial_number = (usb_item['serial_num'] || '').length == 40
+        serial_num = usb_item['serial_num'] || ''
+        has_serial_number = serial_num.length == 40 || serial_num.length == 24
 
         if is_supported_device && has_serial_number
-          discovered_device_udids << usb_item['serial_num']
+          discovered_device_udids << serial_num
         end
       end
 
@@ -292,7 +293,7 @@ module FastlaneCore
       def copy_logarchive(device, log_identity, logs_destination_dir)
         require 'shellwords'
 
-        logarchive_dst = Shellwords.escape(File.join(logs_destination_dir, "system_logs-#{log_identity}.logarchive"))
+        logarchive_dst = File.join(logs_destination_dir, "system_logs-#{log_identity}.logarchive").shellescape
         FileUtils.rm_rf(logarchive_dst)
         FileUtils.mkdir_p(File.expand_path("..", logarchive_dst))
         command = "xcrun simctl spawn #{device.udid} log collect --output #{logarchive_dst} 2>/dev/null"

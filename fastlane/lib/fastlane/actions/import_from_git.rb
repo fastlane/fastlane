@@ -14,10 +14,7 @@ module Fastlane
       end
 
       def self.details
-        [
-          "This is useful if you have shared lanes across multiple apps and you want to store the Fastfile",
-          "in a remote git repository."
-        ].join("\n")
+        "This is useful if you have shared lanes across multiple apps and you want to store the Fastfile in a remote git repository."
       end
 
       def self.available_options
@@ -36,6 +33,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        description: "The version to checkout on the respository. Optimistic match operator or multiple conditions can be used to select the latest version within constraints",
                                        default_value: nil,
+                                       is_string: false,
                                        optional: true)
         ]
       end

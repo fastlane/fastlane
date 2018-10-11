@@ -183,7 +183,7 @@ module Fastlane
       end
 
       def self.description
-        "Upload a new build to HockeyApp"
+        "Upload a new build to [HockeyApp](https://hockeyapp.net/)"
       end
 
       def self.available_options
@@ -323,7 +323,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :timeout,
                                       env_name: "FL_HOCKEY_TIMEOUT",
                                       description: "Request timeout in seconds",
-                                      is_string: false,
+                                      type: Integer,
                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :bypass_cdn,
                                       env_name: "FL_HOCKEY_BYPASS_CDN",
@@ -356,7 +356,7 @@ module Fastlane
 
       def self.details
         [
-          "Symbols will also be uploaded automatically if a `app.dSYM.zip` file is found next to `app.ipa`. In case it is located in a different place you can specify the path explicitly in `:dsym` parameter.",
+          "Symbols will also be uploaded automatically if a `app.dSYM.zip` file is found next to `app.ipa`. In case it is located in a different place you can specify the path explicitly in the `:dsym` parameter.",
           "More information about the available options can be found in the [HockeyApp Docs](http://support.hockeyapp.net/kb/api/api-versions#upload-version)."
         ].join("\n")
       end

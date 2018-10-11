@@ -104,6 +104,32 @@ module Fastlane
       return nil
     end
 
+    def actions_md_contents
+      action_mds = {}
+
+      ActionsList.all_actions do |action|
+        @action = action
+        @action_filename = filename_for_action(action)
+
+        unless @action_filename
+          next
+        end
+
+        @custom_content = load_custom_action_md(action)
+
+        if action.superclass != Fastlane::Action
+          @custom_content ||= load_custom_action_md(action.superclass)
+        end
+
+        template = File.join(Fastlane::ROOT, "lib/assets/ActionDetails.md.erb")
+        result = ERB.new(File.read(template), 0, '-').result(binding)
+
+        action_mds[action.action_name] = result
+      end
+
+      return action_mds
+    end
+
     def generate!(target_path: nil)
       require 'yaml'
       FileUtils.mkdir_p(target_path)
@@ -131,8 +157,8 @@ module Fastlane
         if action.superclass != Fastlane::Action
           # This means, the current method is an alias
           # meaning we're gonna look if the parent class
-          # as a custom md file.
-          # e.g. `deliver.rb` super class is `upload_to_app_store.rb`
+          # has a custom md file.
+          # e.g. `DeliverAction`'s superclass is `UploadToAppStoreAction`
           @custom_content ||= load_custom_action_md(action.superclass)
         end
 
@@ -190,6 +216,8 @@ module Fastlane
         "Beta"
       when :production
         "Releasing your app"
+      when :app_store_connect
+        "App Store Connect"
       when :deprecated
         "Deprecated"
       else

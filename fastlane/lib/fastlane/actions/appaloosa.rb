@@ -168,15 +168,14 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Upload your app to Appaloosa Store'
+        'Upload your app to [Appaloosa Store](https://www.appaloosa-store.com/)'
       end
 
       def self.details
         [
-          "Appaloosa is a private mobile application store. This action ",
-          "offers a quick deployment on the platform. You can create an ",
-          "account, push to your existing account, or manage your user ",
-          "groups. We accept iOS and Android applications."
+          "Appaloosa is a private mobile application store. This action offers a quick deployment on the platform.",
+          "You can create an account, push to your existing account, or manage your user groups.",
+          "We accept iOS and Android applications."
         ].join("\n")
       end
 

@@ -144,13 +144,13 @@
         <% if @options[:app_icon] %>
         <div class="app-icon">
           Large App Icon:<br>
-          <img src="<%= @options[:app_icon] %>">
+          <img src="<%= render_relative_path(@export_path, @options[:app_icon]) %>">
         </div>
         <% end %>
         <% if @options[:apple_watch_app_icon] %>
         <div class="watch-icon">
           Watch App Icon:<br>
-          <img src="<%= @options[:apple_watch_app_icon] %>">
+          <img src="<%= render_relative_path(@export_path, @options[:apple_watch_app_icon]) %>">
         </div>
         <% end %>
       </div>
@@ -237,7 +237,7 @@
               <div class="app-screenshot-row">
 
               <% screenshots.each_with_index do |screenshot, index| %>
-                <a href="<%= URI.escape(screenshot.path) %>" target="_blank"><img class="app-screenshot" src="<%= URI.escape(screenshot.path) %>" title="Screenshot #<%=index%> for <%=language%>"></a>
+                <a href="<%= URI.escape(screenshot.path) %>" target="_blank"><img class="app-screenshot" src="<%= render_relative_path(@export_path, URI.escape(screenshot.path)) %>" title="Screenshot #<%=index%> for <%=language%>"></a>
               <% end %>
               </div>
             <% end %>
@@ -250,7 +250,7 @@
                 <% if options[:overwrite_screenshots] %>
                   <b>--overwrite_screenshots</b> is set, existing screenshots will be removed, but none will be uploaded.
                 <% else %>
-                  The existing screenshots on iTunes Connect will be kept. 
+                  The existing screenshots on App Store Connect will be kept. 
                   if you want to remove them you have to use the <i>--overwrite_screenshots</i> flag.
                 <% end %>
               <p>

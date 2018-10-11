@@ -9,7 +9,7 @@ describe Supply do
         Supply.config = {}
         expect do
           subject.verify_config!
-        end.to raise_error("No local metadata, apks, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+        end.to raise_error("No local metadata, apks, aab, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
       end
 
       it "raises error if only track" do
@@ -18,7 +18,7 @@ describe Supply do
         }
         expect do
           subject.verify_config!
-        end.to raise_error("No local metadata, apks, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+        end.to raise_error("No local metadata, apks, aab, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
       end
 
       it "raises error if only track_promote_to" do
@@ -27,7 +27,7 @@ describe Supply do
         }
         expect do
           subject.verify_config!
-        end.to raise_error("No local metadata, apks, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+        end.to raise_error("No local metadata, apks, aab, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
       end
 
       it "does not raise error if only metadata" do
@@ -47,6 +47,13 @@ describe Supply do
       it "does not raise error if only apk_paths" do
         Supply.config = {
           apk_paths: ['some/path/app1.apk', 'some/path/app2.apk']
+        }
+        subject.verify_config!
+      end
+
+      it "does not raise error if only aab" do
+        Supply.config = {
+          aab: 'some/path/app1.aab'
         }
         subject.verify_config!
       end
@@ -149,6 +156,42 @@ describe Supply do
       end
     end
 
+    describe 'promote_track' do
+      subject { Supply::Uploader.new.promote_track }
+
+      let(:client) { double('client') }
+      let(:version_codes) { [1, 2, 3] }
+      let(:config) { { track: 'alpha', track_promote_to: 'beta' } }
+
+      before do
+        Supply.config = config
+        allow(Supply::Client).to receive(:make_from_config).and_return(client)
+        allow(client).to receive(:track_version_codes).and_return(version_codes)
+        allow(client).to receive(:update_track).with(config[:track], 0.1, nil)
+        allow(client).to receive(:update_track).with(config[:track_promote_to], 0.1, version_codes)
+      end
+
+      context 'when deactivate_on_promote is true' do
+        it 'should update track multiple times' do
+          Supply.config[:deactivate_on_promote] = true
+
+          expect(client).to receive(:update_track).with(config[:track], 0.1, nil).once
+          expect(client).to receive(:update_track).with(config[:track_promote_to], 0.1, version_codes).once
+          subject
+        end
+      end
+
+      context 'when deactivate_on_promote is false' do
+        it 'should only update track once' do
+          Supply.config[:deactivate_on_promote] = false
+
+          expect(client).not_to(receive(:update_track).with(config[:track], 0.1, nil))
+          expect(client).to receive(:update_track).with(config[:track_promote_to], 0.1, version_codes).once
+          subject
+        end
+      end
+    end
+
     describe 'check superseded tracks' do
       let(:client) { double('client') }
 
@@ -240,6 +283,54 @@ describe Supply do
           track: 'beta'
         }
         Supply::Uploader.new.check_superseded_tracks([105])
+      end
+
+      it 'combined case with custom track as alpha' do
+        allow(client).to receive(:track_version_codes) do |track|
+          next [103] if track.eql?('production')
+          next [102] if track.eql?('rollout')
+          next [105] if track.eql?('alpha')
+          next [104] if track.eql?('custom')
+          next [101] if track.eql?('internal')
+          []
+        end
+
+        allow(client).to receive(:update_track) do |track, rollout, apk_version_code|
+          expect(track).to eq('rollout').or(eq('alpha')).or(eq('custom')).or(eq('internal'))
+          expect(rollout).to eq(1.0)
+          expect(apk_version_code).to be_empty
+        end
+
+        expect(client).to receive(:update_track).exactly(2).times
+
+        Supply.config = {
+          track: 'alpha'
+        }
+        Supply::Uploader.new.check_superseded_tracks([106])
+      end
+
+      it 'combined case with custom track as custom' do
+        allow(client).to receive(:track_version_codes) do |track|
+          next [103] if track.eql?('production')
+          next [102] if track.eql?('rollout')
+          next [105] if track.eql?('alpha')
+          next [104] if track.eql?('custom')
+          next [101] if track.eql?('internal')
+          []
+        end
+
+        allow(client).to receive(:update_track) do |track, rollout, apk_version_code|
+          expect(track).to eq('rollout').or(eq('alpha')).or(eq('custom')).or(eq('internal'))
+          expect(rollout).to eq(1.0)
+          expect(apk_version_code).to be_empty
+        end
+
+        expect(client).to receive(:update_track).exactly(2).times
+
+        Supply.config = {
+          track: 'custom'
+        }
+        Supply::Uploader.new.check_superseded_tracks([106])
       end
     end
   end

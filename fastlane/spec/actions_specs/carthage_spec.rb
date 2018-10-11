@@ -328,14 +328,26 @@ describe Fastlane do
       end
 
       it "use custom derived data" do
+        path = "../derived data"
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
-              derived_data: '../derived data'
+              derived_data: '#{path}'
             )
           end").runner.execute(:test)
 
         expect(result).to \
-          eq("carthage bootstrap --derived-data ../derived\\ data")
+          eq("carthage bootstrap --derived-data #{path.shellescape}")
+      end
+
+      it "use custom executable" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              executable: 'custom_carthage'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to \
+          eq("custom_carthage bootstrap")
       end
 
       it "updates with a single dependency" do
@@ -384,6 +396,30 @@ describe Fastlane do
 
         expect(result).to \
           eq("carthage build TestDependency1 TestDependency2")
+      end
+
+      it "bootstraps with a single dependency" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'bootstrap',
+              dependencies: ['TestDependency']
+            )
+          end").runner.execute(:test)
+
+        expect(result).to \
+          eq("carthage bootstrap TestDependency")
+      end
+
+      it "bootstraps with multiple dependencies" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'bootstrap',
+              dependencies: ['TestDependency1', 'TestDependency2']
+            )
+          end").runner.execute(:test)
+
+        expect(result).to \
+          eq("carthage bootstrap TestDependency1 TestDependency2")
       end
 
       it "works with no parameters" do
@@ -537,6 +573,52 @@ describe Fastlane do
                   carthage(command: '#{command}', output: 'bla.framework.zip')
                 end").runner.execute(:test)
             end.to raise_error("Output option is available only for 'archive' command.")
+          end
+        end
+      end
+
+      context "when specify log_path" do
+        context "when command is archive" do
+          let(:command) { 'archive' }
+          it "--log-path option is not present" do
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: '#{command}', log_path: 'bla.log')
+              end").runner.execute(:test)
+            end.to raise_error("Log path option is available only for 'build', 'bootstrap', and 'update' command.")
+          end
+        end
+
+        context "when command is update" do
+          let(:command) { 'update' }
+
+          it "--log-path option is present" do
+            result = Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: '#{command}', log_path: 'bla.log')
+              end").runner.execute(:test)
+            expect(result).to eq("carthage update --log-path bla.log")
+          end
+        end
+
+        context "when command is build" do
+          let(:command) { 'build' }
+
+          it "--log-path option is present" do
+            result = Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: '#{command}', log_path: 'bla.log')
+              end").runner.execute(:test)
+            expect(result).to eq("carthage build --log-path bla.log")
+          end
+        end
+
+        context "when command is bootstrap" do
+          let(:command) { 'bootstrap' }
+
+          it "--log-path option is present" do
+            result = Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: '#{command}', log_path: 'bla.log')
+              end").runner.execute(:test)
+            expect(result).to eq("carthage bootstrap --log-path bla.log")
           end
         end
       end

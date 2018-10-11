@@ -62,6 +62,8 @@ describe Fastlane do
           puts
           println
           echo
+          xcov
+          download_from_play_store
         )
       end
 

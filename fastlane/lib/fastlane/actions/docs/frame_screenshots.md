@@ -16,7 +16,7 @@ _frameit_ allows you to put a gorgeous device frame around your iOS and macOS sc
 
 -------
 
-<h5 align="center"><code>frameit</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
+<h5 align="center"><em>frameit</em> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 
 # Features
@@ -56,7 +56,7 @@ Here is a nice gif, that shows _frameit_ in action:
 
 ![img/actions/MacExample.png](/img/actions/MacExample.png?raw=1)
 
-<h5 align="center">The <code>frameit</code> 2.0 update was kindly sponsored by <a href="https://mindnode.com/">MindNode</a>, seen in the screenshots above.</h5>
+<h5 align="center">The <em>frameit</em> 2.0 update was kindly sponsored by <a href="https://mindnode.com/">MindNode</a>, seen in the screenshots above.</h5>
 
 
 The first time that _frameit_ is executed the frames will be downloaded automatically. Originally the frames are coming from [Facebook frameset](http://facebook.design/devices) and they are kept on [this repo](https://github.com/fastlane/frameit-frames).
@@ -71,15 +71,21 @@ Why should you have to use Photoshop, just to add a frame around your screenshot
 
 Just navigate to your folder of screenshots and use the following command:
 
-    fastlane frameit
+```no-highlight
+fastlane frameit
+```
 
 To use the silver version of the frames:
 
-    fastlane frameit silver
+```no-highlight
+fastlane frameit silver
+```
 
 To download the latest frames
 
-    fastlane frameit download_frames
+```no-highlight
+fastlane frameit download_frames
+```
 
 When using _frameit_ without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store.
 
@@ -120,7 +126,7 @@ The general parameters are defined in the `default` key and can be:
 | `stack_title` | Specifies whether _frameit_ should display the keyword above the title when both keyword and title are defined. If it is false, the title and keyword will be displayed side by side when both keyword and title are defined. | `false` |
 | `title_below_image` | Specifies whether _frameit_ should place the title and optional keyword below the device frame. If it is false, it will be placed above the device frame. | `false` |
 | `show_complete_frame` | Specifies whether _frameit_ should shrink the device frame so that it is completely shown in the framed screenshot. If it is false, clipping of the device frame might occur at the bottom (when `title_below_image` is `false`) or top (when `title_below_image` is `true`) of the framed screenshot. | `false` |
-| `padding` | The content of the framed screenshot will be resized to match the specified `padding` around all edges. The vertical padding is also applied between the text and the top or bottom (depending on `title_below_image`) of the device frame. <P> There are 3 different options of specyfying the padding: <P> 1. Default: An integer value that defines both horizontal and vertical padding in pixels. <BR> 2. A string that defines (different) padding values in pixels for horizontal and vertical padding. The syntax is `"<horizontal>x<vertical>"`, e.g. `"30x60"`. <BR> 3. A string that defines (different) padding values in percentage for horizontal and vertical padding. The syntax is `"<horizontal>%x<vertical>%"`, e.g. `"5%x10%"`. <BR> **Note:** The percentage is calculated from the smallest image dimension (height or width). <P> A combination of option 2 and 3 is possible, e.g. `"5%x40"`. | `50` |
+| `padding` | The content of the framed screenshot will be resized to match the specified `padding` around all edges. The vertical padding is also applied between the text and the top or bottom (depending on `title_below_image`) of the device frame. <p> There are 3 different options of specyfying the padding: <p> 1. Default: An integer value that defines both horizontal and vertical padding in pixels. <br> 2. A string that defines (different) padding values in pixels for horizontal and vertical padding. The syntax is `"<horizontal>x<vertical>"`, e.g. `"30x60"`. <br> 3. A string that defines (different) padding values in percentage for horizontal and vertical padding. The syntax is `"<horizontal>%x<vertical>%"`, e.g. `"5%x10%"`. <br> **Note:** The percentage is calculated from the smallest image dimension (height or width). <p> A combination of option 2 and 3 is possible, e.g. `"5%x40"`. | `50` |
 | `interline_spacing` | Specifies whether _frameit_ should add or subtract this many pixels between the individual lines of text. This only applies to a multi-line `title` and/or `keyword` to expand or squash together the individual lines of text. | `0` |
 | `font_scale_factor` | Specifies whether _frameit_ should increase or decrease the font size of the text. | `0.1` |
 
@@ -131,7 +137,7 @@ These are defined in the `data` key. This is an array with the following keys fo
 
 | Key | Description |
 |-----|-------------|
-| `filter` | This is mandatory to link the individual configuration to the screenshot, based on part of the file name. <P>Example:<BR>If a screenshot is named `iPhone 8-Brainstorming.png` you can use value `Brainstorming` for `filter`. All other keys from that array element will only be applied on this specific screenshot. |
+| `filter` | This is mandatory to link the individual configuration to the screenshot, based on part of the file name. <p>Example:<br>If a screenshot is named `iPhone 8-Brainstorming.png` you can use value `Brainstorming` for `filter`. All other keys from that array element will only be applied on this specific screenshot. |
 | `keyword` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
 | `title` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
 
@@ -143,9 +149,10 @@ The `keyword` and `title` parameters are both used in `default` and `data`. They
 |-----|-------------|---------------|
 | `color` | The font color for the text. Specify a hex/html color code. | `#000000` (black) |
 | `font` | The font family for the text. Specify the (relative) path to the font file (e.g. an OpenType Font). | The default `imagemagick` font, which is system dependent. |
-| `text` | The text that should be used for the `keyword` or `title`. <P> Note: If you want to use localised text, use [`.strings` files](#strings-files). | NA |
+| `text` | The text that should be used for the `keyword` or `title`. <p> Note: If you want to use localised text, use [`.strings` files](#strings-files). | NA |
 
 ### Example
+
 ```json
 {
   "device_frame_version": "latest",
@@ -203,8 +210,9 @@ To define the title and optionally the keyword, put two `.strings` files into th
 
 The `keyword.strings` and `title.strings` are standard `.strings` file you already use for your iOS apps, making it easy to use your existing translation service to get localized titles.
 
-**Notes** 
-- These `.strings` files **MUST** be utf-16 encoded (UTF-16 BE with BOM).  They also must begin with an empty line. If you are having trouble see [issue #1740](https://github.com/fastlane/fastlane/issues/1740)
+**Notes**
+
+- These `.strings` files **MUST** be utf-8 (UTF-8) or utf-16 encoded (UTF-16 BE with BOM). They also must begin with an empty line. If you are having trouble see [issue #1740](https://github.com/fastlane/fastlane/issues/1740)
 - You **MUST** provide a background if you want titles. _frameit_ will not add the tiles if a background is not specified.
 
 # Mac
@@ -250,7 +258,7 @@ Check out [_snapshot_](https://docs.fastlane.tools/actions/snapshot/) to automat
 
 ## Upload screenshots
 
-Use [_deliver_](https://docs.fastlane.tools/actions/deliver/) to upload iOS screenshots to iTunes Connect, or [_supply_](https://docs.fastlane.tools/actions/supply/) to upload Android screenshots to Play Store completely automatically 🚀
+Use [_deliver_](https://docs.fastlane.tools/actions/deliver/) to upload iOS screenshots to App Store Connect, or [_supply_](https://docs.fastlane.tools/actions/supply/) to upload Android screenshots to Play Store completely automatically 🚀
 
 ## Alternative location to store device_frames
 
@@ -274,5 +282,6 @@ brew install imagemagick
 ```
 
 ## Uninstall
-- ```sudo gem uninstall fastlane```
-- ```rm -rf ~/.frameit```
+
+- `sudo gem uninstall fastlane`
+- `rm -rf ~/.frameit`

@@ -110,7 +110,7 @@ module CredentialsManager
       setter(:team_name, *args, &block)
     end
 
-    # iTunes Connect
+    # App Store Connect
     def itc_team_id(*args, &block)
       setter(:itc_team_id, *args, &block)
     end

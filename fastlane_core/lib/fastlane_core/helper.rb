@@ -72,7 +72,7 @@ module FastlaneCore
     # @return [boolean] true if building in a known CI environment
     def self.ci?
       # Check for Jenkins, Travis CI, ... environment variables
-      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS'].each do |current|
+      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD'].each do |current|
         return true if ENV.key?(current)
       end
       return false
@@ -193,22 +193,34 @@ module FastlaneCore
 
     # @return the full path to the iTMSTransporter executable
     def self.transporter_path
-      return File.join(self.itms_path, 'bin', 'iTMSTransporter')
+      return File.join(self.itms_path, 'bin', 'iTMSTransporter') unless Helper.windows?
+      return File.join(self.itms_path, 'iTMSTransporter')
     end
 
     # @return the full path to the iTMSTransporter executable
     def self.itms_path
       return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
-      return '' unless self.mac? # so tests work on Linux and Windows too
 
-      [
-        "../Applications/Application Loader.app/Contents/MacOS/itms",
-        "../Applications/Application Loader.app/Contents/itms"
-      ].each do |path|
-        result = File.expand_path(File.join(self.xcode_path, path))
-        return result if File.exist?(result)
+      if self.mac?
+        [
+          "../Applications/Application Loader.app/Contents/MacOS/itms",
+          "../Applications/Application Loader.app/Contents/itms"
+        ].each do |path|
+          result = File.expand_path(File.join(self.xcode_path, path))
+          return result if File.exist?(result)
+        end
+        UI.user_error!("Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.")
+      elsif self.windows?
+        [
+          "C:/Program Files (x86)/itms"
+        ].each do |path|
+          return path if File.exist?(path)
+        end
+        UI.user_error!("Could not find transporter at usual locations. Please use environment variable `FASTLANE_ITUNES_TRANSPORTER_PATH` to specify your installation path.")
+      else
+        # not Mac or Windows
+        return ''
       end
-      UI.user_error!("Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.")
     end
 
     # keychain
@@ -264,6 +276,27 @@ module FastlaneCore
     # removes ANSI colors from string
     def self.strip_ansi_colors(str)
       str.gsub(/\e\[([;\d]+)?m/, '')
+    end
+
+    # Zips directory
+    def self.zip_directory(path, output_path, contents_only: false, overwrite: false, print: true)
+      if overwrite
+        overwrite_command = " && rm -f '#{output_path}'"
+      else
+        overwrite_command = ""
+      end
+
+      if contents_only
+        command = "cd '#{path}'#{overwrite_command} && zip -r '#{output_path}' *"
+      else
+        containing_path = File.expand_path("..", path)
+        contents_path = File.basename(path)
+
+        command = "cd '#{containing_path}'#{overwrite_command} && zip -r '#{output_path}' '#{contents_path}'"
+      end
+
+      UI.command(command) unless print
+      Helper.backticks(command, print: print)
     end
 
     # loading indicator

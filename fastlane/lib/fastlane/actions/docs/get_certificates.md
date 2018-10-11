@@ -12,7 +12,7 @@
 
 -------
 
-<h5 align="center"><code>cert</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
+<h5 align="center"><em>cert</em> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 ![/img/actions/cert.gif](/img/actions/cert.gif)
 
@@ -20,7 +20,7 @@ In the gif we used `cert && sigh`, which will first create an iOS code signing c
 
 # Usage
 
-**Note**: It is recommended to use [_match_](/actions/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.
+**Note**: It is recommended to use [_match_](/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.
 
 ```no-highlight
 fastlane cert

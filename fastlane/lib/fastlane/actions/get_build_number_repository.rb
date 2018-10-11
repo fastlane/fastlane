@@ -72,7 +72,7 @@ module Fastlane
       def self.details
         [
           "This action will get the **build number** according to what the SCM HEAD reports.",
-          "Currently supported SCMs are svn (uses root revision), git-svn (uses svn revision) and git (uses short hash) and mercurial (uses short hash or revision number).",
+          "Currently supported SCMs are svn (uses root revision), git-svn (uses svn revision), git (uses short hash) and mercurial (uses short hash or revision number).",
           "There is an option, `:use_hg_revision_number`, which allows to use mercurial revision number instead of hash."
         ].join("\n")
       end

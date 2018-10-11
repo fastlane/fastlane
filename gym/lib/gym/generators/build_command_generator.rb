@@ -9,8 +9,8 @@ module Gym
         parts = prefix
         parts << "xcodebuild"
         parts += options
-        parts += actions
-        parts += suffix
+        parts += buildactions
+        parts += setting
         parts += pipe
 
         parts
@@ -46,26 +46,25 @@ module Gym
         options
       end
 
-      def actions
+      def buildactions
         config = Gym.config
 
-        actions = []
-        actions << :clean if config[:clean]
-        actions << :archive unless config[:skip_archive]
+        buildactions = []
+        buildactions << :clean if config[:clean]
+        buildactions << :archive unless config[:skip_archive]
 
-        actions
+        buildactions
       end
 
-      def suffix
-        suffix = []
-        suffix << "CODE_SIGN_IDENTITY=#{Gym.config[:codesigning_identity].shellescape}" if Gym.config[:codesigning_identity]
-        suffix
+      def setting
+        setting = []
+        setting << "CODE_SIGN_IDENTITY=#{Gym.config[:codesigning_identity].shellescape}" if Gym.config[:codesigning_identity]
+        setting
       end
 
       def pipe
         pipe = []
         pipe << "| tee #{xcodebuild_log_path.shellescape}"
-        pipe << "| grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt" if Gym.config[:analyze_build_time]
         unless Gym.config[:disable_xcpretty]
           formatter = Gym.config[:xcpretty_formatter]
           pipe << "| xcpretty"
@@ -89,8 +88,13 @@ module Gym
           end
         end
         pipe << "> /dev/null" if Gym.config[:suppress_xcode_output]
-
         pipe
+      end
+
+      def post_build
+        commands = []
+        commands << %{grep -E '^[0-9.]+ms' #{xcodebuild_log_path.shellescape} | grep -vE '^0\.[0-9]' | sort -nr > culprits.txt} if Gym.config[:analyze_build_time]
+        commands
       end
 
       def xcodebuild_log_path
@@ -125,7 +129,11 @@ module Gym
 
       def result_bundle_path
         unless Gym.cache[:result_bundle_path]
-          Gym.cache[:result_bundle_path] = File.join(Gym.config[:output_directory], Gym.config[:output_name]) + ".result"
+          path = File.join(Gym.config[:output_directory], Gym.config[:output_name]) + ".result"
+          if File.directory?(path)
+            FileUtils.remove_dir(path)
+          end
+          Gym.cache[:result_bundle_path] = path
         end
         return Gym.cache[:result_bundle_path]
       end

@@ -19,8 +19,9 @@ module Frameit
       self.screenshot = screenshot
       prepare_image
 
-      if load_frame # Mac doesn't need a frame
-        self.frame = MiniMagick::Image.open(load_frame)
+      frame = load_frame
+      if frame # Mac doesn't need a frame
+        self.frame = MiniMagick::Image.open(frame)
         # Rotate the frame according to the device orientation
         self.frame.rotate(self.rotation_for_device_orientation)
       elsif self.class == Editor
@@ -59,6 +60,7 @@ module Frameit
       output_path = screenshot.path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
       image.format("png")
       image.write(output_path)
+      Helper.hide_loading_indicator
       UI.success("Added frame: '#{File.expand_path(output_path)}'")
     end
 

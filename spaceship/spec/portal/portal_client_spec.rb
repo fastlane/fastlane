@@ -35,14 +35,42 @@ describe Spaceship::Client do
       end
 
       it "set custom Team ID" do
+        allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([
+                                                                                       { 'teamId' => 'XXXXXXXXXX', 'currentTeamMember' => { 'teamMemberId' => '' } },
+                                                                                       { 'teamId' => 'ABCDEF', 'currentTeamMember' => { 'teamMemberId' => '' } }
+                                                                                     ])
+
         team_id = "ABCDEF"
-        subject.team_id = team_id
+        subject.select_team(team_id: team_id)
         expect(subject.team_id).to eq(team_id)
       end
 
       it "shows a warning when user is in multiple teams and didn't call select_team" do
         PortalStubbing.adp_stub_multiple_teams
         expect(subject.team_id).to eq("SecondTeam")
+      end
+    end
+
+    describe '#team_name' do
+      it 'returns the default team_name' do
+        expect(subject.team_name).to eq('SpaceShip')
+      end
+
+      it "returns team_name from selected team_id" do
+        allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([
+                                                                                       { 'teamId' => 'XXXXXXXXXX', 'name' => 'SpaceShip', 'currentTeamMember' => { 'teamMemberId' => '' } },
+                                                                                       { 'teamId' => 'ABCDEF', 'name' => 'PirateShip', 'currentTeamMember' => { 'teamMemberId' => '' } }
+                                                                                     ])
+
+        team_id = "ABCDEF"
+        subject.select_team(team_id: team_id)
+        expect(subject.team_id).to eq(team_id)
+        expect(subject.team_name).to eq('PirateShip')
+      end
+
+      it "return nil if no teams" do
+        allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([])
+        expect(subject.team_name).to eq(nil)
       end
     end
 
@@ -121,11 +149,11 @@ describe Spaceship::Client do
         expect(response['identifier']).to eq('tools.fastlane.spaceship.some-explicit-app')
       end
 
-      it 'should make a request create an explicit app id with no push feature' do
+      it 'should make a request create an explicit app id with push feature' do
         payload = {}
         payload[Spaceship.app_service.push_notification.on.service_id] = Spaceship.app_service.push_notification.on
         response = subject.create_app!(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', enable_services: payload)
-        expect(response['enabledFeatures']).to_not(include("push"))
+        expect(response['enabledFeatures']).to(include("push"))
         expect(response['identifier']).to eq('tools.fastlane.spaceship.some-explicit-app')
       end
     end

@@ -3,7 +3,7 @@ require_relative 'base'
 module Spaceship
   module TestFlight
     class Tester < Base
-      # @return (String) The identifier of this tester, provided by iTunes Connect
+      # @return (String) The identifier of this tester, provided by App Store Connect
       # @example
       #   "60f858b4-60a8-428a-963a-f943a3d68d17"
       attr_accessor :tester_id
@@ -74,7 +74,7 @@ module Spaceship
       def pretty_install_date
         return nil unless latest_installed_date
 
-        Time.at((latest_installed_date / 1000)).strftime("%m/%d/%y %H:%M")
+        Time.at((latest_installed_date / 1000)).strftime("%Y-%m-%d %H:%M")
       end
 
       # @return (Array) Returns all beta testers available for this account
@@ -109,6 +109,10 @@ module Spaceship
         return testers_matching_text
       end
 
+      def self.remove_testers_from_testflight(app_id: nil, tester_ids: nil)
+        client.remove_testers_from_testflight(app_id: app_id, tester_ids: tester_ids)
+      end
+
       def self.create_app_level_tester(app_id: nil, first_name: nil, last_name: nil, email: nil)
         client.create_app_level_tester(app_id: app_id,
                                        first_name: first_name,
@@ -118,6 +122,10 @@ module Spaceship
 
       def remove_from_app!(app_id: nil)
         client.delete_tester_from_app(app_id: app_id, tester_id: self.tester_id)
+      end
+
+      def remove_from_testflight!(app_id: nil)
+        client.remove_testers_from_testflight(app_id: app_id, tester_ids: [self.tester_id])
       end
 
       def resend_invite(app_id: nil)

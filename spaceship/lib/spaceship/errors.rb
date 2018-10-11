@@ -22,6 +22,12 @@ module Spaceship
     end
   end
 
+  class AppleIDAndPrivacyAcknowledgementNeeded < BasicPreferredInfoError
+    def show_github_issues
+      false
+    end
+  end
+
   # User doesn't have enough permission for given action
   class InsufficientPermissions < BasicPreferredInfoError
     TITLE = 'Insufficient permissions for your Apple ID:'.freeze
@@ -62,6 +68,9 @@ module Spaceship
   # Raised when 401 is received from portal request
   class UnauthorizedAccessError < BasicPreferredInfoError; end
 
-  # Raised when 500 is received from iTunes Connect
+  # Raised when 500 is received from App Store Connect
   class InternalServerError < BasicPreferredInfoError; end
+
+  # Raised when 504 is received from App Store Connect
+  class GatewayTimeoutError < BasicPreferredInfoError; end
 end

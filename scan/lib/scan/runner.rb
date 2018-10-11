@@ -87,9 +87,31 @@ module Scan
         UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
       end
 
+      zip_build_products
+
       if !Helper.ci? && Scan.cache[:open_html_report_path]
         `open --hide '#{Scan.cache[:open_html_report_path]}'`
       end
+    end
+
+    def zip_build_products
+      return unless Scan.config[:should_zip_build_products]
+
+      # Gets :derived_data_path/Build/Products directory for zipping zip
+      derived_data_path = Scan.config[:derived_data_path]
+      path = File.join(derived_data_path, "Build/Products")
+
+      # Gets absolute path of output directory
+      output_directory = File.absolute_path(Scan.config[:output_directory])
+      output_path = File.join(output_directory, "build_products.zip")
+
+      # Caching path for action to put into lane_context
+      Scan.cache[:zip_build_products_path] = output_path
+
+      # Zips build products and moves it to output directory
+      UI.message("Zipping build products")
+      FastlaneCore::Helper.zip_directory(path, output_path, contents_only: true, overwrite: true, print: false)
+      UI.message("Succesfully zipped build products: #{output_path}")
     end
 
     def test_results
@@ -100,9 +122,10 @@ module Scan
       # We'll have to regenerate from the xcodebuild log, like we did before version 2.34.0.
       UI.message("Generating test results. This may take a while for large projects.")
 
-      reporter_options_generator = XCPrettyReporterOptionsGenerator.new(false, [], [], "", false)
+      reporter_options_generator = XCPrettyReporterOptionsGenerator.new(false, [], [], "", false, nil)
       reporter_options = reporter_options_generator.generate_reporter_options
-      cmd = "cat #{@test_command_generator.xcodebuild_log_path.shellescape} | xcpretty #{reporter_options.join(' ')} &> /dev/null"
+      xcpretty_args_options = reporter_options_generator.generate_xcpretty_args_options
+      cmd = "cat #{@test_command_generator.xcodebuild_log_path.shellescape} | xcpretty #{reporter_options.join(' ')} #{xcpretty_args_options} &> /dev/null"
       system(cmd)
       File.read(Scan.cache[:temp_junit_report])
     end

@@ -1,7 +1,6 @@
 require 'googleauth'
 require 'google/apis/androidpublisher_v2'
 Androidpublisher = Google::Apis::AndroidpublisherV2
-CredentialsLoader = Google::Auth::CredentialsLoader
 
 require 'net/http'
 
@@ -68,8 +67,9 @@ module Supply
 
       Google::Apis::ClientOptions.default.application_name = "fastlane - supply"
       Google::Apis::ClientOptions.default.application_version = Fastlane::VERSION
-      Google::Apis::ClientOptions.default.read_timeout_sec = 300
-      Google::Apis::ClientOptions.default.open_timeout_sec = 300
+      Google::Apis::ClientOptions.default.read_timeout_sec = Supply.config[:timeout]
+      Google::Apis::ClientOptions.default.open_timeout_sec = Supply.config[:timeout]
+      Google::Apis::ClientOptions.default.send_timeout_sec = Supply.config[:timeout]
       Google::Apis::RequestOptions.default.retries = 5
 
       self.android_publisher = Androidpublisher::AndroidPublisherService.new
@@ -155,13 +155,22 @@ module Supply
       end
     end
 
-    # Get a list of all apks verion codes - returns the list of version codes
+    # Get a list of all APK version codes - returns the list of version codes
     def apks_version_codes
       ensure_active_edit!
 
       result = call_google_api { android_publisher.list_apks(current_package_name, current_edit.id) }
 
       return Array(result.apks).map(&:version_code)
+    end
+
+    # Get a list of all AAB version codes - returns the list of version codes
+    def aab_version_codes
+      ensure_active_edit!
+
+      result = call_google_api { android_publisher.list_edit_bundles(current_package_name, current_edit.id) }
+
+      return Array(result.bundles).map(&:version_code)
     end
 
     # Get a list of all apk listings (changelogs) - returns the list
@@ -236,11 +245,31 @@ module Supply
       end
     end
 
+    def upload_bundle(path_to_aab)
+      ensure_active_edit!
+
+      result_upload = call_google_api do
+        android_publisher.upload_edit_bundle(
+          current_package_name,
+          self.current_edit.id,
+          upload_source: path_to_aab,
+          content_type: "application/octet-stream"
+        )
+      end
+
+      return result_upload.version_code
+    end
+
     # Updates the track for the provided version code(s)
     def update_track(track, rollout, apk_version_code)
       ensure_active_edit!
 
       track_version_codes = apk_version_code.kind_of?(Array) ? apk_version_code : [apk_version_code]
+
+      # This change happend on 2018-04-24
+      # rollout cannot be sent on any other track besides "rollout"
+      # https://github.com/fastlane/fastlane/issues/12372
+      rollout = nil unless track == "rollout"
 
       track_body = Androidpublisher::Track.new({
         track: track,
@@ -268,7 +297,7 @@ module Supply
           current_edit.id,
           track
         )
-        return result.version_codes
+        return result.version_codes || []
       rescue Google::Apis::ClientError => e
         return [] if e.status_code == 404 && e.to_s.include?("trackEmpty")
         raise

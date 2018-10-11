@@ -11,7 +11,7 @@ module Snapshot
       def generate(devices: nil, language: nil, locale: nil, log_path: nil)
         parts = prefix
         parts << "xcodebuild"
-        parts += options
+        parts += options(language, locale)
         parts += destination(devices)
         parts += build_settings
         parts += actions
@@ -25,7 +25,11 @@ module Snapshot
         tee_command = ['tee']
         tee_command << '-a' if log_path && File.exist?(log_path)
         tee_command << log_path.shellescape if log_path
-        return ["| #{tee_command.join(' ')} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
+
+        xcpretty = "xcpretty #{Snapshot.config[:xcpretty_args]}"
+        xcpretty << "--no-color" if Helper.colors_disabled?
+
+        return ["| #{tee_command.join(' ')} | #{xcpretty}"]
       end
 
       def destination(devices)
