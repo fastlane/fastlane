@@ -85,12 +85,12 @@ module Frameit
           when 'color'
             UI.user_error!("Invalid color '#{value}'. Must be valid Hex #123123") unless value.include?("#")
           when 'padding'
-            unless value.kind_of?(Integer) || value.split('x').length == 2 || (value.end_with?('%') && value.to_f > 0)
-              UI.user_error!("padding must be type integer or pair of integers of format 'AxB' or a percentage of screen size")
+            unless integer_or_percentage(value) || value.split('x').length == 2
+              UI.user_error!("padding must be an integer, or pair of integers of format 'AxB', or a percentage of screen size")
             end
           when 'title_min_height'
-            unless value.kind_of?(Integer) || (value.end_with?('%') && value.to_f > 0)
-              UI.user_error!("padding must be type integer or a percentage of screen size")
+            unless integer_or_percentage(value)
+              UI.user_error!("padding must be an integer, or a percentage of screen size")
             end
           when 'show_complete_frame', 'title_below_image'
             UI.user_error!("'#{key}' must be a Boolean") unless [true, false].include?(value)
@@ -99,6 +99,10 @@ module Frameit
           end
         end
       end
+    end
+
+    def integer_or_percentage(value)
+      value.kind_of?(Integer) || (value.end_with?('%') && value.to_f > 0)
     end
   end
 end

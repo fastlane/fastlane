@@ -208,7 +208,6 @@ module Frameit
       @title_below_image ||= fetch_config['title_below_image']
     end
 
-
     # Returns a correctly sized background image
     def generate_background
       background = MiniMagick::Image.open(fetch_config['background'])
@@ -222,11 +221,10 @@ module Frameit
 
     def put_device_into_background(background)
       left_space = (background.width / 2.0 - image.width / 2.0).round
-      title_below_image = fetch_config['title_below_image']
 
       @image = background.composite(image, "png") do |c|
         c.compose("Over")
-        c.geometry "+#{left_space}+#{device_top(background)}"
+        c.geometry("+#{left_space}+#{device_top(background)}")
       end
 
       return image
@@ -257,9 +255,7 @@ module Frameit
       resize_text(keyword)
 
       vertical_padding = vertical_frame_padding # assign padding to variable
-      keyword_top_space = vertical_padding
       spacing_between_title_and_keyword = (actual_font_size / 2)
-      title_top_space = vertical_padding + keyword.height + spacing_between_title_and_keyword
       title_left_space = (background.width / 2.0 - title.width / 2.0).round
       keyword_left_space = (background.width / 2.0 - keyword.width / 2.0).round
 
@@ -275,12 +271,12 @@ module Frameit
       # keyword
       background = background.composite(keyword, "png") do |c|
         c.compose("Over")
-        c.geometry "+#{keyword_left_space}+#{keyword_top}"
+        c.geometry("+#{keyword_left_space}+#{keyword_top}")
       end
       # Place the title below the keyword
       background = background.composite(title, "png") do |c|
         c.compose("Over")
-        c.geometry "+#{title_left_space}+#{title_top}"
+        c.geometry("+#{title_left_space}+#{title_top}")
       end
       background
     end
@@ -318,7 +314,6 @@ module Frameit
       end
 
       vertical_padding = vertical_frame_padding # assign padding to variable
-      top_space = vertical_padding + (actual_font_size - title.height) / 2
       left_space = (background.width / 2.0 - sum_width / 2.0).round
 
       self.space_to_device += actual_font_size + vertical_padding
@@ -329,12 +324,11 @@ module Frameit
         title_top = device_top(background) / 2 - title.height / 2
       end
 
-
       # First, put the keyword on top of the screenshot, if we have one
       if keyword
         background = background.composite(keyword, "png") do |c|
           c.compose("Over")
-          c.geometry "+#{left_space}+#{title_top}"
+          c.geometry("+#{left_space}+#{title_top}")
         end
 
         left_space += keyword.width + (keyword_padding * image_scale_factor)
@@ -343,7 +337,7 @@ module Frameit
       # Then, put the title on top of the screenshot next to the keyword
       background = background.composite(title, "png") do |c|
         c.compose("Over")
-        c.geometry "+#{left_space}+#{title_top}"
+        c.geometry("+#{left_space}+#{title_top}")
       end
       background
     end
