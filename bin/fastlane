@@ -9,26 +9,6 @@ def self.windows?
   (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
 end
 
-if ENV["FASTLANE_OPTIMIZE_BOOT"]
-  require 'bootsnap'
-  require 'tmpdir'
-  require 'fileutils'
-  require_relative "../fastlane/lib/fastlane/version.rb"
-  cache_dir = "#{Dir.tmpdir}/fastlane/bootsnap-cache/" + Fastlane::VERSION
-  unless File.directory?(cache_dir)
-    FileUtils.mkdir_p(cache_dir)
-  end
-  Bootsnap.setup(
-    cache_dir:            cache_dir, # Path to your cache
-    development_mode:     false, # Current working environment
-    load_path_cache:      true, # Optimize the LOAD_PATH with a cache
-    autoload_paths_cache: false, # Not relevant for fastlane (Optimize ActiveSupport autoloads with cache)
-    disable_trace:        true, # (Alpha) Set `RubyVM::InstructionSequence.compile_option = { trace_instruction: false }`
-    compile_cache_iseq:   !self.windows?, # Compile Ruby code into ISeq cache, breaks coverage reporting.
-    compile_cache_yaml:   true # Compile YAML into a cache
-  )
-end
-
 require "fastlane/cli_tools_distributor"
 
 if Fastlane::CLIToolsDistributor.running_version_command?
