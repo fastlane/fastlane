@@ -128,20 +128,20 @@ module Supply
                                        UI.user_error!("Could not find aab file at path '#{value}'") unless File.exist?(value)
                                        UI.user_error!("aab file is not an aab") unless value.end_with?('.aab')
                                      end),
-       FastlaneCore::ConfigItem.new(key: :aab_paths,
-                                    env_name: "SUPPLY_AAB_PATHS",
-                                    conflicting_options: [:apk_path, :apk_paths, :aab],
-                                    optional: true,
-                                    type: Array,
-                                    description: "An array of paths to Bundle files to upload",
-                                    short_option: "-z",
-                                    verify_block: proc do |value|
-                                      UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
-                                      value.each do |path|
-                                        UI.user_error!("Could not find aab file at path '#{path}'") unless File.exist?(path)
-                                        UI.user_error!("file at path '#{path}' is not an aab") unless path.end_with?('.aab')
-                                      end
-                                    end),
+        FastlaneCore::ConfigItem.new(key: :aab_paths,
+                                     env_name: "SUPPLY_AAB_PATHS",
+                                     conflicting_options: [:apk_path, :apk_paths, :aab],
+                                     optional: true,
+                                     type: Array,
+                                     description: "An array of paths to Bundle files to upload",
+                                     short_option: "-z",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
+                                       value.each do |path|
+                                         UI.user_error!("Could not find aab file at path '#{path}'") unless File.exist?(path)
+                                         UI.user_error!("file at path '#{path}' is not an aab") unless path.end_with?('.aab')
+                                       end
+                                     end),
         FastlaneCore::ConfigItem.new(key: :skip_upload_apk,
                                      env_name: "SUPPLY_SKIP_UPLOAD_APK",
                                      optional: true,
