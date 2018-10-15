@@ -36,7 +36,7 @@ describe Scan do
       )
     end
 
-    it "properly parses the xcodebuild output " do
+    it "properly parses the xcodebuild output" do
       output = "<?xml version='1.0' encoding='UTF-8'?>
       <testsuites tests='2' failures='1'/>"
 
