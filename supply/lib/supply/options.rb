@@ -92,7 +92,7 @@ module Supply
                                      env_name: "SUPPLY_APK",
                                      description: "Path to the APK file to upload",
                                      short_option: "-b",
-                                     conflicting_options: [:apk_paths, :aab],
+                                     conflicting_options: [:apk_paths, :aab, :aab_paths],
                                      code_gen_sensitive: true,
                                      default_value: Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-Release.apk")].last,
                                      default_value_dynamic: true,
@@ -103,7 +103,7 @@ module Supply
                                      end),
         FastlaneCore::ConfigItem.new(key: :apk_paths,
                                      env_name: "SUPPLY_APK_PATHS",
-                                     conflicting_options: [:apk, :aab],
+                                     conflicting_options: [:apk, :aab, :aab_paths],
                                      optional: true,
                                      type: Array,
                                      description: "An array of paths to APK files to upload",
@@ -119,7 +119,7 @@ module Supply
                                      env_name: "SUPPLY_AAB",
                                      description: "Path to the AAB file to upload",
                                      short_option: "-f",
-                                     conflicting_options: [:apk_path, :apk_paths],
+                                     conflicting_options: [:apk_path, :apk_paths, :aab_paths],
                                      code_gen_sensitive: true,
                                      default_value: Dir["*.aab"].last || Dir[File.join("app", "build", "outputs", "bundle", "release", "bundle.aab")].last,
                                      default_value_dynamic: true,
@@ -128,6 +128,20 @@ module Supply
                                        UI.user_error!("Could not find aab file at path '#{value}'") unless File.exist?(value)
                                        UI.user_error!("aab file is not an aab") unless value.end_with?('.aab')
                                      end),
+       FastlaneCore::ConfigItem.new(key: :aab_paths,
+                                    env_name: "SUPPLY_AAB_PATHS",
+                                    conflicting_options: [:apk_path, :apk_paths, :aab],
+                                    optional: true,
+                                    type: Array,
+                                    description: "An array of paths to Bundle files to upload",
+                                    short_option: "-z",
+                                    verify_block: proc do |value|
+                                      UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
+                                      value.each do |path|
+                                        UI.user_error!("Could not find aab file at path '#{path}'") unless File.exist?(path)
+                                        UI.user_error!("file at path '#{path}' is not an aab") unless path.end_with?('.aab')
+                                      end
+                                    end),
         FastlaneCore::ConfigItem.new(key: :skip_upload_apk,
                                      env_name: "SUPPLY_SKIP_UPLOAD_APK",
                                      optional: true,
