@@ -276,6 +276,16 @@ module FastlaneCore
         end
       end
 
+      def uninstall_app(app_identifier, device_type, device_udid)
+        UI.verbose("Uninstalling app '#{app_identifier}' from #{device_type}...")
+
+        UI.message("Launch Simulator #{device_type}")
+        Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
+
+        UI.message("Uninstall application #{app_identifier}")
+        Helper.backticks("xcrun simctl uninstall #{device_udid} #{app_identifier} &> /dev/null")
+      end
+
       private
 
       def copy_logfile(device, log_identity, logs_destination_dir)
