@@ -6,6 +6,7 @@ require_relative 'module'
 require_relative 'offsets'
 require_relative 'config_parser'
 require_relative 'strings_parser'
+require_relative 'device_types'
 
 module Frameit
   # Currently the class is 2 lines too long. Reevaluate refactoring when it's length changes significantly
@@ -41,6 +42,10 @@ module Frameit
     end
 
     def load_frame
+      color = fetch_frame_color
+      if color
+        screenshot.color = color
+      end
       TemplateFinder.get_template(screenshot)
     end
 
@@ -486,6 +491,21 @@ module Frameit
       end
 
       return text
+    end
+
+    def fetch_frame_color
+      color = fetch_config['frame']
+      if color == "BLACK"
+        return Frameit::Color::BLACK
+      elsif color == "WHITE"
+        return Frameit::Color::SILVER
+      elsif color == "GOLD"
+        return Frameit::Color::GOLD
+      elsif color == "ROSE_GOLD"
+        return Frameit::Color::ROSE_GOLD
+      end
+
+      return nil
     end
 
     # The font we want to use
