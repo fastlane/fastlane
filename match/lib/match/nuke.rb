@@ -36,6 +36,13 @@ module Match
       })
       self.storage.download
 
+      # After the download was complete
+      self.encryption = Encryption.for_storage_mode(params[:storage_mode], {
+        git_url: params[:git_url],
+        working_directory: storage.working_directory
+      })
+      self.encryption.decrypt_files
+
       had_app_identifier = self.params.fetch(:app_identifier, ask: false)
       self.params[:app_identifier] = '' # we don't really need a value here
       FastlaneCore::PrintTable.print_values(config: params,
@@ -184,6 +191,8 @@ module Match
       if self.files.count > 0
         delete_files!
       end
+
+      self.encryption.encrypt_files
 
       # Now we need to commit and push all this too
       message = ["[fastlane]", "Nuked", "files", "for", type.to_s].join(" ")
