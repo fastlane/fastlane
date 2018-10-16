@@ -2637,6 +2637,7 @@ func runTests(workspace: String? = nil,
               outputFiles: String? = nil,
               buildlogPath: String = "~/Library/Logs/scan",
               includeSimulatorLogs: Bool = false,
+              suppressXcodeOutput: String? = nil,
               formatter: String? = nil,
               xcprettyArgs: String? = nil,
               maxConcurrentSimulators: Int? = nil,
@@ -2662,6 +2663,8 @@ func runTests(workspace: String? = nil,
               slackOnlyOnFailure: Bool = false,
               useClangReportName: Bool = false,
               customReportFileName: String? = nil,
+              appIdentifier: String? = nil,
+              reinstallApp: Bool = false,
               failBuild: Bool = true) {
   let command = RubyCommand(commandID: "", methodName: "run_tests", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                            RubyCommand.Argument(name: "project", value: project),
@@ -2681,6 +2684,7 @@ func runTests(workspace: String? = nil,
                                                                                            RubyCommand.Argument(name: "output_files", value: outputFiles),
                                                                                            RubyCommand.Argument(name: "buildlog_path", value: buildlogPath),
                                                                                            RubyCommand.Argument(name: "include_simulator_logs", value: includeSimulatorLogs),
+                                                                                           RubyCommand.Argument(name: "suppress_xcode_output", value: suppressXcodeOutput),
                                                                                            RubyCommand.Argument(name: "formatter", value: formatter),
                                                                                            RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                            RubyCommand.Argument(name: "max_concurrent_simulators", value: maxConcurrentSimulators),
@@ -2706,6 +2710,8 @@ func runTests(workspace: String? = nil,
                                                                                            RubyCommand.Argument(name: "slack_only_on_failure", value: slackOnlyOnFailure),
                                                                                            RubyCommand.Argument(name: "use_clang_report_name", value: useClangReportName),
                                                                                            RubyCommand.Argument(name: "custom_report_file_name", value: customReportFileName),
+                                                                                           RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
+                                                                                           RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                            RubyCommand.Argument(name: "fail_build", value: failBuild)])
   _ = runner.executeCommand(command)
 }
@@ -2767,6 +2773,7 @@ func scan(workspace: String? = scanfile.workspace,
           outputFiles: String? = scanfile.outputFiles,
           buildlogPath: String = scanfile.buildlogPath,
           includeSimulatorLogs: Bool = scanfile.includeSimulatorLogs,
+          suppressXcodeOutput: String? = scanfile.suppressXcodeOutput,
           formatter: String? = scanfile.formatter,
           xcprettyArgs: String? = scanfile.xcprettyArgs,
           maxConcurrentSimulators: Int? = scanfile.maxConcurrentSimulators,
@@ -2792,6 +2799,8 @@ func scan(workspace: String? = scanfile.workspace,
           slackOnlyOnFailure: Bool = scanfile.slackOnlyOnFailure,
           useClangReportName: Bool = scanfile.useClangReportName,
           customReportFileName: String? = scanfile.customReportFileName,
+          appIdentifier: String? = scanfile.appIdentifier,
+          reinstallApp: Bool = scanfile.reinstallApp,
           failBuild: Bool = scanfile.failBuild) {
   let command = RubyCommand(commandID: "", methodName: "scan", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -2811,6 +2820,7 @@ func scan(workspace: String? = scanfile.workspace,
                                                                                       RubyCommand.Argument(name: "output_files", value: outputFiles),
                                                                                       RubyCommand.Argument(name: "buildlog_path", value: buildlogPath),
                                                                                       RubyCommand.Argument(name: "include_simulator_logs", value: includeSimulatorLogs),
+                                                                                      RubyCommand.Argument(name: "suppress_xcode_output", value: suppressXcodeOutput),
                                                                                       RubyCommand.Argument(name: "formatter", value: formatter),
                                                                                       RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                       RubyCommand.Argument(name: "max_concurrent_simulators", value: maxConcurrentSimulators),
@@ -2836,6 +2846,8 @@ func scan(workspace: String? = scanfile.workspace,
                                                                                       RubyCommand.Argument(name: "slack_only_on_failure", value: slackOnlyOnFailure),
                                                                                       RubyCommand.Argument(name: "use_clang_report_name", value: useClangReportName),
                                                                                       RubyCommand.Argument(name: "custom_report_file_name", value: customReportFileName),
+                                                                                      RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
+                                                                                      RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                       RubyCommand.Argument(name: "fail_build", value: failBuild)])
   _ = runner.executeCommand(command)
 }
@@ -4109,4 +4121,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.31]
+// FastlaneRunnerAPIVersion [0.9.32]
