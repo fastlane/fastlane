@@ -119,7 +119,7 @@ module Supply
                                      env_name: "SUPPLY_AAB",
                                      description: "Path to the AAB file to upload",
                                      short_option: "-f",
-                                     conflicting_options: [:apk_path, :apk_paths, :aab_paths],
+                                     conflicting_options: [:apk, :apk_paths, :aab_paths],
                                      code_gen_sensitive: true,
                                      default_value: Dir["*.aab"].last || Dir[File.join("app", "build", "outputs", "bundle", "release", "bundle.aab")].last,
                                      default_value_dynamic: true,
@@ -130,10 +130,10 @@ module Supply
                                      end),
         FastlaneCore::ConfigItem.new(key: :aab_paths,
                                      env_name: "SUPPLY_AAB_PATHS",
-                                     conflicting_options: [:apk_path, :apk_paths, :aab],
+                                     conflicting_options: [:apk, :apk_paths, :aab],
                                      optional: true,
                                      type: Array,
-                                     description: "An array of paths to Bundle files to upload",
+                                     description: "An array of paths to AAB files to upload",
                                      short_option: "-z",
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
