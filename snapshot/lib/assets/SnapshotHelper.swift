@@ -117,7 +117,10 @@ open class Snapshot: NSObject {
         if locale.isEmpty {
             locale = Locale(identifier: deviceLanguage).identifier
         }
-        app.launchArguments += ["-AppleLocale", "\"\(locale)\""]
+        
+        if !locale.isEmpty {
+            app.launchArguments += ["-AppleLocale", "\"\(locale)\""]
+        }
     }
 
     class func setLaunchArguments(_ app: XCUIApplication) {
