@@ -50,6 +50,8 @@ module Spaceship
       two_factor_url = "https://github.com/fastlane/fastlane/tree/master/spaceship#2-step-verification"
       puts("Two Factor Authentication for account '#{self.user}' is enabled")
 
+      select_phone(response)
+
       if !File.exist?(persistent_cookie_path) && self.class.spaceship_session_env.to_s.length.zero?
         puts("If you're running this in a non-interactive session (e.g. server or CI)")
         puts("check out #{two_factor_url}")
@@ -118,6 +120,33 @@ module Spaceship
     # (if exists)
     def self.spaceship_session_env
       ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
+    end
+
+    def select_phone(response)
+      puts("Please select a phone to send code too:")
+
+      available = response.body["trustedPhoneNumbers"].collect do |c|
+        c["numberWithDialCode"] + "\t" + c["pushMode"] + "\t(" + c["id"].to_s + ")"
+      end
+      result = choose(*available)
+
+      phone_id = result.match(/.*\t.*\t\((.*)\)/)[1]
+
+      # Request code
+      r = request(:put) do |req|
+        req.url("https://idmsa.apple.com/appleauth/auth/verify/phone")
+        req.body = {
+          "phoneNumber" => {
+            "id" => phone_id
+          },
+          "mode" => "sms"
+        }.to_json
+        update_request_headers(req)
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['X-Requested-With'] = 'XMLHttpRequest'
+      end
+
+      return r.body
     end
 
     def select_device(r, device_id)
