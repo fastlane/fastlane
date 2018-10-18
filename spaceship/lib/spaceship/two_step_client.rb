@@ -146,7 +146,11 @@ module Spaceship
         req.headers['X-Requested-With'] = 'XMLHttpRequest'
       end
 
-      return r.body
+      # we use `Spaceship::TunesClient.new.handle_itc_response`
+      # since this might be from the Dev Portal, but for 2 step
+      Spaceship::TunesClient.new.handle_itc_response(r.body)
+
+      puts("Successfully requested SMS code")
     end
 
     def select_device(r, device_id)
