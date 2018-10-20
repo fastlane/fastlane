@@ -1,8 +1,11 @@
-require "google/apis/playcustomapp_v1"
+require 'google/apis/playcustomapp_v1'
+
 module Fastlane
   module Actions
     class CreateAppOnManagedPlayStoreAction < Action
       def self.run(params)
+        require 'supply'
+
         client = PlaycustomappClient.make_from_config(params: params)
 
         FastlaneCore::PrintTable.print_values(
@@ -110,7 +113,7 @@ module Fastlane
             env_name: "SUPPLY_APP_TITLE",
             short_option: "-q",
             description: "App Title",
-            optional: false)
+            optional: false),
           # Language
           FastlaneCore::ConfigItem.new(key: :language,
             short_option: "-m",

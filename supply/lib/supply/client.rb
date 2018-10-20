@@ -5,8 +5,6 @@ Androidpublisher = Google::Apis::AndroidpublisherV2
 require 'net/http'
 
 module Supply
-  UI = FastlaneCore::UI unless defined?(UI)
-
   class AbstractGoogleServiceClient
     SCOPE = nil
     SERVICE = nil
