@@ -44,12 +44,13 @@ module Fastlane
 
       def self.available_options
         [
+          # Authorization
           FastlaneCore::ConfigItem.new(
             key: :json_key,
             env_name: "SUPPLY_JSON_KEY",
             short_option: "-j",
             conflicting_options: [:json_key_data],
-            optional: true, # this shouldn't be optional but is until I find out how json_key OR json_key_data can be required
+            optional: true,
             description: "The path to a file containing service account JSON, used to authenticate with Google",
             code_gen_sensitive: true,
             default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
@@ -77,19 +78,18 @@ module Fastlane
               end
             end
           ),
-          # developer_account
           FastlaneCore::ConfigItem.new(key: :developer_account_id,
             short_option: "-k",
-            env_name: "PRODUCE_ITC_TEAM_ID",
+            env_name: "SUPPLY_DEVELOPER_ACCOUNT_ID",
             description: "The ID of your Google Play Console account. Can be obtained from the URL when you log in (`https://play.google.com/apps/publish/?account=...` or when you 'Obtain private app publishing rights' (https://developers.google.com/android/work/play/custom-app-api/get-started#retrieve_the_developer_account_id)",
             optional: false,
-            is_string: false, # as we also allow integers, which we convert to strings anyway
             code_gen_sensitive: true,
             default_value: CredentialsManager::AppfileConfig.try_fetch_value(:developer_account_id),
             default_value_dynamic: true,
             verify_block: proc do |value|
               raise UI.error("No Developer Account ID given, pass using `developer_account_id: 123456789`") if value.to_s.empty?
             end),
+          # APK
           FastlaneCore::ConfigItem.new(
             key: :apk,
             env_name: "SUPPLY_APK",
@@ -105,19 +105,16 @@ module Fastlane
               UI.user_error!("apk file is not an apk") unless value.end_with?('.apk')
             end
           ),
-          # title
+          # Title
           FastlaneCore::ConfigItem.new(key: :app_title,
-            env_name: "PRODUCE_APP_NAME",
+            env_name: "SUPPLY_APP_TITLE",
             short_option: "-q",
             description: "App Title",
-            optional: false,
-            verify_block: proc do |value|
-              raise UI.error("No App Title given, pass using `app_title: 'Title'`") if value.to_s.empty?
-            end),
-          # language
+            optional: false)
+          # Language
           FastlaneCore::ConfigItem.new(key: :language,
             short_option: "-m",
-            env_name: "PRODUCE_LANGUAGE",
+            env_name: "SUPPLY_LANGUAGE",
             description: "Default app language (e.g. 'en_US')",
             default_value: "en_US",
             optional: false,
@@ -126,7 +123,7 @@ module Fastlane
                 UI.user_error!("Please enter one of available languages: #{AvailablePlayStoreLanguages.all_languages}")
               end
             end),
-          # stuff
+          # Google Play API
           FastlaneCore::ConfigItem.new(key: :root_url,
             env_name: "SUPPLY_ROOT_URL",
             description: "Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/",
