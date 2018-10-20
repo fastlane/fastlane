@@ -64,6 +64,7 @@ describe Fastlane do
           echo
           xcov
           download_from_play_store
+          create_app_on_managed_play_store
         )
       end
 
