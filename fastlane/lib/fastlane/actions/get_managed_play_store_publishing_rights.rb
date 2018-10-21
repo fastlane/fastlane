@@ -13,13 +13,14 @@ module Fastlane
           title: "Summary for get_managed_play_store_publishing_rights"
         )
 
-        @keyfile = params[:json_key]
+        if keyfile = params[:json_key]
+          json_key_data = File.open(keyfile, 'rb').read
+        else
+          json_key_data = params[:json_key_data]
+        end
 
-        # login
-        credentials = JSON.parse(File.open(@keyfile, 'rb').read)
-        # puts 'credentials: '+credentials.inspect
-        # puts 'email: ' + credentials['client_email']
-
+        # Login
+        credentials = JSON.parse(json_key_data)
         callback_uri = 'https://fastlane.github.io/managed_google_play-callback/callback.html'
         uri = "https://play.google.com/apps/publish/delegatePrivateApp?service_account=#{credentials['client_email']}&continueUrl=#{URI.escape(callback_uri)}"
 
@@ -71,7 +72,7 @@ module Fastlane
             env_name: "SUPPLY_JSON_KEY",
             short_option: "-j",
             conflicting_options: [:json_key_data],
-            optional: true, # this shouldn't be optional but is until I find out how json_key OR json_key_data can be required
+            optional: true, # optional until it is possible specify either json_key OR json_key_data are required
             description: "The path to a file containing service account JSON, used to authenticate with Google",
             code_gen_sensitive: true,
             default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
