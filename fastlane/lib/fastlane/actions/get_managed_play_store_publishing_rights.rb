@@ -13,7 +13,7 @@ module Fastlane
           title: "Summary for get_managed_play_store_publishing_rights"
         )
 
-        if keyfile = params[:json_key]
+        if (keyfile = params[:json_key])
           json_key_data = File.open(keyfile, 'rb').read
         else
           json_key_data = params[:json_key_data]
