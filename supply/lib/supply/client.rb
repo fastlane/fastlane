@@ -15,7 +15,11 @@ module Supply
     def self.make_from_config(params: nil)
       unless params[:json_key] || params[:json_key_data]
         UI.important("To not be asked about this value, you can specify it using 'json_key'")
-        params[:json_key] = UI.input("The service account json file used to authenticate with Google: ")
+        json_key_path = UI.input("The service account json file used to authenticate with Google: ")
+        json_key_path = File.expand_path(json_key_path)
+
+        UI.user_error!("Could not find service account json file at path '#{json_key_path}'") unless File.exist?(json_key_path)
+        params[:json_key] = json_key_path
       end
 
       if params[:json_key]

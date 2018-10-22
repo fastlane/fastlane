@@ -14,7 +14,12 @@ module Fastlane
           title: "Summary for create_app_on_managed_play_store"
         )
 
-        client.create_app(app_title: params[:app_title], language_code: params[:language], developer_account: params[:developer_account_id], apk_path: params[:apk])
+        client.create_app(
+          app_title: params[:app_title],
+          language_code: params[:language],
+          developer_account: params[:developer_account_id],
+          apk_path: params[:apk]
+        )
       end
 
       def self.description
@@ -98,6 +103,7 @@ module Fastlane
             default_value: Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-release.apk")].last,
             default_value_dynamic: true,
             verify_block: proc do |value|
+              UI.user_error!("No value found for 'apk'") if value.to_s.length == 0
               UI.user_error!("Could not find apk file at path '#{value}'") unless File.exist?(value)
               UI.user_error!("apk file is not an apk") unless value.end_with?('.apk')
             end
@@ -115,7 +121,7 @@ module Fastlane
             default_value: "en_US",
             verify_block: proc do |language|
               unless AvailablePlayStoreLanguages.all_languages.include?(language)
-                UI.user_error!("Please enter one of available languages: #{AvailablePlayStoreLanguages.all_languages}")
+                UI.user_error!("Please enter one of the available languages: #{AvailablePlayStoreLanguages.all_languages}")
               end
             end),
           # Google Play API
