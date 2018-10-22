@@ -1,14 +1,13 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "get_managed_play_store_publishing_rights" do
-
       let(:json_key_path) { File.expand_path("./fastlane/spec/fixtures/google_play/google_play.json") }
       let(:json_key_data) { File.open(json_key_path, 'rb').read }
       let(:json_key_client_email) { JSON.parse(json_key_data)['client_email'] }
 
       before :each do
         allow(File).to receive(:exist?).and_call_original
-        #expect(Supply::Uploader).to receive_message_chain(:new, :perform_upload)
+        # expect(Supply::Uploader).to receive_message_chain(:new, :perform_upload)
       end
 
       describe "without options" do
@@ -56,7 +55,6 @@ describe Fastlane do
           end").runner.execute(:test)
         end
       end
-      
     end
   end
 end
