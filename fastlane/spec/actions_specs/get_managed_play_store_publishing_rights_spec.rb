@@ -5,11 +5,6 @@ describe Fastlane do
       let(:json_key_data) { File.open(json_key_path, 'rb').read }
       let(:json_key_client_email) { JSON.parse(json_key_data)['client_email'] }
 
-      before :each do
-        allow(File).to receive(:exist?).and_call_original
-        # expect(Supply::Uploader).to receive_message_chain(:new, :perform_upload)
-      end
-
       describe "without options" do
         it "could not find file" do
           expect(UI).to receive(:important).with("To not be asked about this value, you can specify it using 'json_key'")
