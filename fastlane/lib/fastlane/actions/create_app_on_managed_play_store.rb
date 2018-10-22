@@ -1,11 +1,10 @@
 require 'google/apis/playcustomapp_v1'
+require 'supply'
 
 module Fastlane
   module Actions
     class CreateAppOnManagedPlayStoreAction < Action
       def self.run(params)
-        require 'supply'
-
         client = PlaycustomappClient.make_from_config(params: params)
 
         FastlaneCore::PrintTable.print_values(
@@ -120,8 +119,8 @@ module Fastlane
             description: "Default app language (e.g. 'en_US')",
             default_value: "en_US",
             verify_block: proc do |language|
-              unless AvailablePlayStoreLanguages.all_languages.include?(language)
-                UI.user_error!("Please enter one of the available languages: #{AvailablePlayStoreLanguages.all_languages}")
+              unless Supply::Languages::ALL_LANGUAGES.include?(language)
+                UI.user_error!("Please enter one of the available languages: #{Supply::Languages::ALL_LANGUAGES}")
               end
             end),
           # Google Play API
@@ -171,94 +170,5 @@ class PlaycustomappClient < Supply::AbstractGoogleServiceClient
         upload_source: apk_path
       )
     end
-  end
-end
-
-# https://support.google.com/googleplay/android-developer/answer/3125566?hl=en
-# => Add your own text translations & localized graphic assets => See available languages => replace `-` with `_`
-# %w => https://stackoverflow.com/a/1274703/252627
-class AvailablePlayStoreLanguages
-  def self.all_languages
-    %w[
-      af
-      am
-      ar
-      az_AZ
-      be
-      bg
-      bn_BD
-      ca
-      cs_CZ
-      da_DK
-      de_DE
-      el_GR
-      en_AU
-      en_CA
-      en_GB
-      en_IN
-      en_SG
-      en_US
-      en_ZA
-      es_419
-      es_ES
-      es_US
-      et
-      eu_ES
-      fa
-      fi_FI
-      fil
-      fr_CA
-      fr_FR
-      gl_ES
-      hi_IN
-      hr
-      hu_HU
-      hy_AM
-      id
-      is_IS
-      it_IT
-      iw_IL
-      ja_JP
-      ka_GE
-      km_KH
-      kn_IN
-      ko_KR
-      ky_KG
-      lo_LA
-      lt
-      lv
-      mk_MK
-      ml_IN
-      mn_MN
-      mr_IN
-      ms
-      ms_MY
-      my_MM
-      ne_NP
-      nl_NL
-      no_NO
-      pl_PL
-      pt_BR
-      pt_PT
-      rm
-      ro
-      ru_RU
-      si_LK
-      sk
-      sl
-      sr
-      sv_SE
-      sw
-      ta_IN
-      te_IN
-      th
-      tr_TR
-      uk
-      vi
-      zh_CN
-      zh_HK
-      zh_TW
-      zu
-    ]
   end
 end
