@@ -101,20 +101,6 @@ describe Fastlane do
           end
         end
       end
-
-      describe "with options" do
-      end
-
-      #        it "with :json_key_data" do
-      #          expect(UI).to receive(:important).with("https://play.google.com/apps/publish/delegatePrivateApp?service_account=#{json_key_client_email}&continueUrl=https://fastlane.github.io/managed_google_play-callback/callback.html")
-      #
-      #          Fastlane::FastFile.new.parse("lane :test do
-      #            get_managed_play_store_publishing_rights(
-      #              json_key_data: '#{json_key_data}'
-      #            )
-      #          end").runner.execute(:test)
-      #        end
-      #      end
     end
   end
 end
