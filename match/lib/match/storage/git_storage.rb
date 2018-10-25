@@ -148,13 +148,6 @@ module Match
         end
       end
 
-      def clear_changes
-        return unless @working_directory
-
-        FileUtils.rm_rf(self.working_directory)
-        self.working_directory = nil
-      end
-
       # Generate the commit message based on the user's parameters
       def generate_commit_message
         [
