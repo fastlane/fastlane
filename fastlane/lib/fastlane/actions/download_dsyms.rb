@@ -3,8 +3,8 @@ module Fastlane
     module SharedValues
       DSYM_PATHS = :DSYM_PATHS
     end
-
     class DownloadDsymsAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         require 'spaceship'
         require 'net/http'
@@ -34,12 +34,7 @@ module Fastlane
 
           UI.user_error!("Could not find latest version for your app, please try setting a specific version") if latest_version.version.nil?
 
-          candidate_build = latest_version.candidate_builds.first
-          if candidate_build.nil?
-            version = latest_version.version
-          else
-            version = candidate_build.train_version
-          end
+          version = get_version(latest_version)
           build_number = latest_version.build_version
         end
 
@@ -101,6 +96,16 @@ module Fastlane
         Actions.lane_context[SharedValues::DSYM_PATHS] ||= []
         Actions.lane_context[SharedValues::DSYM_PATHS] << File.expand_path(path)
       end
+
+      def self.get_version(latest_version)
+        candidate_build = latest_version.candidate_builds.first
+        if candidate_build.nil?
+          latest_version.version
+        else
+          candidate_build.train_version
+        end
+      end
+      private_class_method :get_version
 
       def self.write_dsym(data, bundle_id, train_number, build_number, output_directory)
         file_name = "#{bundle_id}-#{train_number}-#{build_number}.dSYM.zip"
