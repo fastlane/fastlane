@@ -30,7 +30,7 @@ describe Fastlane do
           expect(app).to receive(:tunes_build_details).with(train: '2.0.0', build_number: '1.0.0', platform: :ios).and_return(build_detail)
           expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, app.bundle_id, train.version_string, build.build_version, nil)
           Fastlane::FastFile.new.parse("lane :test do
-              download_dsyms(app_identifier: 'tools.fastlane.myapp', version: 'latest')
+              download_dsyms(username: 'user@fastlane.tools', app_identifier: 'tools.fastlane.myapp', version: 'latest')
           end").runner.execute(:test)
         end
       end
