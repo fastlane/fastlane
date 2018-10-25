@@ -35,7 +35,7 @@ module Fastlane
 
           UI.user_error!("Could not find latest version for your app, please try setting a specific version") if latest_version.version.nil?
 
-          version = latest_version.version
+          version = latest_version.candidate_builds.first&.train_version || latest_version.version
           build_number = latest_version.build_version
         end
 
