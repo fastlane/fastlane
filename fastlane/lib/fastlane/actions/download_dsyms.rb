@@ -5,7 +5,6 @@ module Fastlane
     end
 
     class DownloadDsymsAction < Action
-      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         require 'spaceship'
         require 'net/http'
@@ -35,7 +34,12 @@ module Fastlane
 
           UI.user_error!("Could not find latest version for your app, please try setting a specific version") if latest_version.version.nil?
 
-          version = latest_version.candidate_builds.first&.train_version || latest_version.version
+          candidate_build = latest_version.candidate_builds.first
+          if candidate_build.nil?
+            version = latest_version.version
+          else
+            version = candidate_build.train_version
+          end
           build_number = latest_version.build_version
         end
 
