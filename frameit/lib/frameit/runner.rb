@@ -41,8 +41,13 @@ module Frameit
             screenshot = Screenshot.new(full_path, color)
             screenshot.frame!
           rescue => ex
-            UI.error(ex.to_s)
-            UI.error("Backtrace:\n\t#{ex.backtrace.join("\n\t")}") if FastlaneCore::Globals.verbose?
+            # We don't want to show an error message for
+            #   [23:47:09]: Unsupported screen size [1295, 2590] for path './IMG_2343_framed_black.png'
+            # but instead silently skip framed screenshots
+            if full_path.ends_with?("_framed.png") && !FastlaneCore::Globals.verbose?
+              UI.error(ex.to_s)
+              UI.error("Backtrace:\n\t#{ex.backtrace.join("\n\t")}") if FastlaneCore::Globals.verbose?
+            end
           end
         end
       else
