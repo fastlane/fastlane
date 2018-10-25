@@ -22,6 +22,15 @@ module Match
       FastlaneCore::PrintTable.print_values(config: params,
                                              title: "Summary for match #{Fastlane::VERSION}")
 
+      # Be smart about optional values here
+      # Depending on the storage mode, different vlaues are required
+
+      if params[:storage_mode] == "git"
+        params.option_for_key(:git_url).optional = false
+      elsif params[:storage_mode] == "google_cloud" 
+
+      end
+
       # Choose the right storage and encryption implementations
       storage = Storage.for_mode(params[:storage_mode], {
         git_url: params[:git_url],

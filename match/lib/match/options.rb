@@ -12,7 +12,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :git_url,
                                      env_name: "MATCH_GIT_URL",
                                      description: "URL to the git repo containing all the certificates",
-                                     optional: false,
+                                     optional: true,
                                      short_option: "-r"),
         FastlaneCore::ConfigItem.new(key: :git_branch,
                                      env_name: "MATCH_GIT_BRANCH",
