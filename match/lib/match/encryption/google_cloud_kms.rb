@@ -5,7 +5,6 @@ require 'security'
 require 'shellwords'
 
 require_relative '../module'
-require_relative '../change_password'
 
 module Match
   module Encryption
@@ -30,7 +29,7 @@ module Match
 
       def encrypt_files
         iterate(self.working_directory) do |current|
-          encrypt_specific_file(path: current, password: password)
+          encrypt_specific_file(path: current)
           UI.success("🔒  Encrypted '#{File.basename(current)}'") if FastlaneCore::Globals.verbose?
         end
         UI.success("🔒  Successfully encrypted certificates repo")
@@ -39,9 +38,10 @@ module Match
       def decrypt_files
         iterate(self.working_directory) do |current|
           begin
-            decrypt_specific_file(path: current, password: password)
+            decrypt_specific_file(path: current)
           rescue => ex
             UI.verbose(ex.to_s)
+            # TODO: actual error message
             UI.error("Couldn't decrypt the repo, please make sure you enter the right password!")
             raise ex
           end
@@ -59,7 +59,7 @@ module Match
         end
       end
 
-      def encrypt_specific_file(path: nil, password: nil)
+      def encrypt_specific_file(path: nil)
         # TODO: implement
       end
 

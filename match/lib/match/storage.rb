@@ -1,5 +1,6 @@
 require_relative 'storage/interface'
 require_relative 'storage/git_storage'
+require_relative 'storage/google_cloud_storage'
 
 module Match
   module Storage
@@ -7,7 +8,7 @@ module Match
       if storage_mode == "git"
         return Storage::GitStorage.configure(params)
       elsif storage_mode == "google_cloud"
-        # return Storage::GoogleCloudStorage
+        return Storage::GoogleCloudStorage.configure(params)
       else
         UI.user_error!("Invalid storage mode '#{storage_mode}'")
       end

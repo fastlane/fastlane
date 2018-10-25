@@ -1,5 +1,6 @@
 require_relative 'encryption/interface'
 require_relative 'encryption/openssl'
+require_relative 'encryption/google_cloud_kms'
 
 module Match
   module Encryption
@@ -9,7 +10,7 @@ module Match
         params[:keychain_name] = params[:git_url]
         return Encryption::OpenSSL.configure(params)
       elsif storage_mode == "google_cloud"
-        # return Encryption::GoogleCloudKMS.configure(params)
+        return Encryption::GoogleCloudKMS.configure(params)
       else
         UI.user_error!("Invalid storage mode '#{storage_mode}'")
       end
