@@ -123,7 +123,7 @@ module Spaceship
     end
 
     def select_phone(response)
-      puts("Please select a phone to send code too:")
+      puts("Please select a phone to send code to:")
 
       available = response.body["trustedPhoneNumbers"].collect do |c|
         c["numberWithDialCode"] + "\t" + c["pushMode"] + "\t(" + c["id"].to_s + ")"
