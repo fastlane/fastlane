@@ -260,7 +260,11 @@ module Sigh
         profile_name += "_tvos"
       end
 
-      profile_name += '.mobileprovision'
+      if Sigh.config[:platform].to_s == 'macos'
+        profile_name += '.provisionprofile'
+      else
+        profile_name += '.mobileprovision'
+      end
 
       tmp_path = Dir.mktmpdir("profile_download")
       output_path = File.join(tmp_path, profile_name)
