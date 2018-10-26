@@ -445,7 +445,7 @@ module Spaceship
             if self.kind_of?(Development)
               self.certificates = [Spaceship::Portal::Certificate::MacDevelopment.all.first]
             elsif self.kind_of?(Direct)
-              self.certificates = [Spaceship::Portal::Certificate::DeveloperIDApplication.all.first]
+              self.certificates = [Spaceship::Portal::Certificate::DeveloperIdApplication.all.first]
             else
               self.certificates = [Spaceship::Portal::Certificate::MacAppDistribution.all.first]
             end
