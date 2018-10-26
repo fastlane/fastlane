@@ -54,9 +54,10 @@ module Match
           download_path = File.join(self.working_directory, file_path)
 
           FileUtils.mkdir_p(File.expand_path("..", download_path))
-          UI.verbose("Download file from Google Cloud storage '#{file_path}'")
+          UI.verbose("Downloading file from Google Cloud Storage '#{file_path}'")
           current_file.download(download_path)
         end
+        UI.verbose("Successfully downloaded files from GCS to #{self.working_directory}")
       end
 
       def save_changes!(files_to_commit: [], custom_message: nil)
