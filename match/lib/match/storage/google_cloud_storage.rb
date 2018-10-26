@@ -30,7 +30,7 @@ module Match
         self.type = type if type
         self.platform = platform if platform
 
-        self.bucket_name = "fastlane-kms-testing" # TODO: 
+        self.bucket_name = "fastlane-kms-testing" # TODO:
 
         self.gc_storage = Google::Cloud::Storage.new(
           project_id: "fastlane-kms-testing",
@@ -45,7 +45,6 @@ module Match
         # No existing working directory, creating a new one now
         self.working_directory = Dir.mktmpdir
 
-        bucket = self.gc_storage.bucket(self.bucket_name)
         # TODO: error handling
         # TODO: create bucket for the user
         # TODO: verify permission
@@ -60,8 +59,66 @@ module Match
         UI.verbose("Successfully downloaded files from GCS to #{self.working_directory}")
       end
 
-      def save_changes!(files_to_commit: [], custom_message: nil)
-        # TODO: implement
+      def save_changes!(files_to_commit: [], files_to_delete: [], custom_message: nil)
+        # the `custom_message` will be ignored by the GCS implementation
+        # TODO: migrate the new header and checks over to git_storage
+        Dir.chdir(File.expand_path(self.working_directory)) do
+          commands = []
+
+          if files_to_commit.count > 0 # everything that isn't `match nuke`
+            UI.user_error!("You can't provide both `files_to_delete` and `files_to_commit` right now") if files_to_delete.count > 0
+
+            if !File.exist?(MATCH_VERSION_FILE_NAME) || File.read(MATCH_VERSION_FILE_NAME) != Fastlane::VERSION.to_s
+              files_to_commit << MATCH_VERSION_FILE_NAME
+              File.write(MATCH_VERSION_FILE_NAME, Fastlane::VERSION) # stored unencrypted
+            end
+
+            # TODO: how to deal with README
+            template = File.read("#{Match::ROOT}/lib/assets/READMETemplate.md")
+            readme_path = "README.md"
+            if (!File.exist?(readme_path) || File.read(readme_path) != template) && !self.skip_docs
+              files_to_commit << readme_path
+              File.write(readme_path, template)
+            end
+
+            # TODO: encryption as part of
+            # https://googleapis.github.io/google-cloud-ruby/docs/google-cloud-storage/latest/
+
+            files_to_commit.map do |current_file|
+              # Go from
+              #   "/var/folders/px/bz2kts9n69g8crgv4jpjh6b40000gn/T/d20181026-96528-1av4gge/profiles/development/Development_me.mobileprovision"
+              # to
+              #   "profiles/development/Development_me.mobileprovision"
+              #
+              # TODO: prefix with team_id?
+
+              # We also have to remove the trailing `/` as Google Cloud doesn't handle it nicely
+              target_path = current_file.gsub(self.working_directory + "/", "") # TODO: maybe find a better solution for this
+              UI.verbose("Uploading '#{target_path}' to Google Cloud Storage...")
+              bucket.create_file(current_file, target_path)
+            end
+          elsif files_to_delete.count > 0
+            # This code is used currently only for `fastlane match nuke`
+            # TODO
+            require 'pry'; binding.pry
+            files_to_delete.each do |current_file|
+              target_path = current_file.gsub(self.working_directory + "/", "") # TODO: maybe find a better solution for this
+              file = bucket.file(target_path)
+              UI.message("Deleting '#{target_path}' from Google Cloud Storage...")
+              file.delete
+            end
+          else
+            UI.user_error!("Neither `files_to_commit` nor `files_to_delete` were provided to the `save_changes!` method call")
+          end
+
+          UI.message("Finished pushing changes up to Google Cloud Storage")
+        end
+      end
+
+      private
+
+      def bucket
+        @_bucket ||= self.gc_storage.bucket(self.bucket_name)
       end
     end
   end
