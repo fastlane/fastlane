@@ -26,8 +26,8 @@ module Match
       # Depending on the storage mode, different vlaues are required
 
       if params[:storage_mode] == "git"
-        
-      elsif params[:storage_mode] == "google_cloud" 
+
+      elsif params[:storage_mode] == "google_cloud"
         params.option_for_key(:git_url).optional = true
       end
 
