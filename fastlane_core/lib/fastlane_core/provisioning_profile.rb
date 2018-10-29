@@ -45,7 +45,7 @@ module FastlaneCore
       end
 
       def mac?(path, keychain_path = nil)
-        parse(path, keychain_path).fetch("Platform", []).include? 'OSX'
+        parse(path, keychain_path).fetch("Platform", []).include?('OSX')
       end
 
       def profile_filename(path, keychain_path = nil)
