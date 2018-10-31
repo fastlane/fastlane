@@ -70,7 +70,9 @@ fastlane pem --development
 
 If you want to generate a Website Push certificate:
 
-    fastlane pem --website_push
+```no-highlight
+fastlane pem --website_push
+```
 
 Set a password for your `p12` file:
 
