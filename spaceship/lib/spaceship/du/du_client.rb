@@ -101,17 +101,19 @@ module Spaceship
     def picture_type_map
       # rubocop:enable Layout/ExtraSpacing
       {
-        watch:        "MZPFT.SortedN27ScreenShot",
-        watchSeries4: "MZPFT.SortedN131ScreenShot",
         ipad:         "MZPFT.SortedTabletScreenShot",
-        ipadPro:      "MZPFT.SortedJ99ScreenShot",
         ipad105:      "MZPFT.SortedJ207ScreenShot",
+        ipadPro:      "MZPFT.SortedJ99ScreenShot",
+        iPadPro11:    "MZPFT.SortedJ317ScreenShot", 
+        iPadPro129:   "MZPFT.SortedJ320ScreenShot",
+        iphone35:     "MZPFT.SortedScreenShot",
+        iphone4:      "MZPFT.SortedN41ScreenShot",
         iphone6:      "MZPFT.SortedN61ScreenShot",
         iphone6Plus:  "MZPFT.SortedN56ScreenShot",
         iphone58:     "MZPFT.SortedD22ScreenShot",
         iphone65:     "MZPFT.SortedD33ScreenShot",
-        iphone4:      "MZPFT.SortedN41ScreenShot",
-        iphone35:     "MZPFT.SortedScreenShot",
+        watch:        "MZPFT.SortedN27ScreenShot",
+        watchSeries4: "MZPFT.SortedN131ScreenShot",
         appleTV:      "MZPFT.SortedATVScreenShot",
         desktop:      "MZPFT.SortedDesktopScreenShot"
       }
@@ -121,13 +123,15 @@ module Spaceship
       # rubocop:enable Layout/ExtraSpacing
       {
         ipad:         "MZPFT.SortedTabletMessagesScreenShot",
-        ipadPro:      "MZPFT.SortedJ99MessagesScreenShot",
         ipad105:      "MZPFT.SortedJ207MessagesScreenShot",
+        ipadPro:      "MZPFT.SortedJ99MessagesScreenShot",
+        iPadPro11:    "MZPFT.SortedJ317MessagesScreenSho", 
+        iPadPro129:   "MZPFT.SortedJ320MessagesScreenSho", 
+        iphone4:      "MZPFT.SortedN41MessagesScreenShot",
         iphone6:      "MZPFT.SortedN61MessagesScreenShot",
         iphone6Plus:  "MZPFT.SortedN56MessagesScreenShot",
         iphone58:     "MZPFT.SortedD22MessagesScreenShot",
-        iphone65:     "MZPFT.SortedD33MessagesScreenShot",
-        iphone4:      "MZPFT.SortedN41MessagesScreenShot"
+        iphone65:     "MZPFT.SortedD33MessagesScreenShot"
       }
     end
 
