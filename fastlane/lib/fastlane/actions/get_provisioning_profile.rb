@@ -36,6 +36,7 @@ module Fastlane
         profile_type = "app-store"
         profile_type = "ad-hoc" if values[:adhoc]
         profile_type = "development" if values[:development]
+        profile_type = "developer-id" if values[:developer_id]
         profile_type = "enterprise" if enterprise
 
         UI.message("Setting Provisioning Profile type to '#{profile_type}'")
@@ -65,7 +66,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

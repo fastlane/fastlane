@@ -44,6 +44,19 @@ module FastlaneCore
         parse(path, keychain_path).fetch("Name")
       end
 
+      def mac?(path, keychain_path = nil)
+        parse(path, keychain_path).fetch("Platform", []).include?('OSX')
+      end
+
+      def profile_filename(path, keychain_path = nil)
+        basename = uuid(path, keychain_path)
+        if mac?(path, keychain_path)
+          basename + ".provisionprofile"
+        else
+          basename + ".mobileprovision"
+        end
+      end
+
       def profiles_path
         path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
         # If the directory doesn't exist, create it first
@@ -57,8 +70,7 @@ module FastlaneCore
       # Installs a provisioning profile for Xcode to use
       def install(path, keychain_path = nil)
         UI.message("Installing provisioning profile...")
-        profile_filename = uuid(path, keychain_path) + ".mobileprovision"
-        destination = File.join(profiles_path, profile_filename)
+        destination = File.join(profiles_path, profile_filename(path, keychain_path))
 
         if path != destination
           # copy to Xcode provisioning profile directory
