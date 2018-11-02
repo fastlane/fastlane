@@ -73,7 +73,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :swift_version,
                                        description: "The SWIFT_VERSION that should be used to lint the spec. This takes precedence over a .swift-version file",
                                        optional: true,
-                                       is_string: false),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :use_libraries,
                                        description: "Lint uses static libraries to install the spec",
                                        is_string: false,
