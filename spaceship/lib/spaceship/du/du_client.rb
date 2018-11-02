@@ -125,8 +125,8 @@ module Spaceship
         ipad:         "MZPFT.SortedTabletMessagesScreenShot",
         ipad105:      "MZPFT.SortedJ207MessagesScreenShot",
         ipadPro:      "MZPFT.SortedJ99MessagesScreenShot",
-        iPadPro11:    "MZPFT.SortedJ317MessagesScreenShot", 
-        iPadPro129:   "MZPFT.SortedJ320MessagesScreenShot", 
+        iPadPro11:    "MZPFT.SortedJ317MessagesScreenShot",
+        iPadPro129:   "MZPFT.SortedJ320MessagesScreenShot",
         iphone4:      "MZPFT.SortedN41MessagesScreenShot",
         iphone6:      "MZPFT.SortedN61MessagesScreenShot",
         iphone6Plus:  "MZPFT.SortedN56MessagesScreenShot",
@@ -151,7 +151,7 @@ module Spaceship
         iphone6Plus:  [[1242, 2208], [2208, 1242]],
         iphone58:     [[1125, 2436], [2436, 1125]],
         iphone65:     [[1242, 2688], [2688, 1242]],
-        appleTV:      [[1920, 1080]],
+        appleTV:      [[1920, 1080], [3840, 2160]],
         desktop:      [[1280, 800], [1440, 900], [2560, 1600], [2880, 1800]]
       }
     end
