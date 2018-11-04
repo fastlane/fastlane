@@ -24,7 +24,7 @@ module Scan
           print("https://stackoverflow.com/a/17031697/445598")
         when /Testing failed/
           UI.build_failure!("Error building the application - see the log above")
-        when /Executed/
+        when /Executed/, /Failing tests:/
           # this is *really* important:
           # we don't want to raise an exception here
           # as we handle this in runner.rb at a later point
