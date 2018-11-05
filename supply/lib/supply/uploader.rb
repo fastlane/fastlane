@@ -153,7 +153,7 @@ module Supply
 
     def upload_bundles
       aab_paths = [Supply.config[:aab]] unless (aab_paths = Supply.config[:aab_paths])
-      return [] unless aab_paths
+      return [] unless aab_paths.compact
 
       aab_version_codes = []
 
