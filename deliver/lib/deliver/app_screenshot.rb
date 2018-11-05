@@ -23,6 +23,8 @@ module Deliver
       IOS_IPAD = "iOS-iPad"
       # iPad 10.5
       IOS_IPAD_10_5 = "iOS-iPad-10.5"
+      # iPad 11
+      IOS_IPAD_11 = "iOS-iPad-11"
       # iPad Pro
       IOS_IPAD_PRO = "iOS-iPad-Pro"
       # iPhone 5 iMessage
@@ -39,6 +41,8 @@ module Deliver
       IOS_IPAD_MESSAGES = "iOS-iPad-messages"
       # iPad 10.5 iMessage
       IOS_IPAD_10_5_MESSAGES = "iOS-10.5-messages"
+      # iPad 11 iMessage
+      IOS_IPAD_11_MESSAGES = "iOS-11-messages"
       # iPad Pro iMessage
       IOS_IPAD_PRO_MESSAGES = "iOS-iPad-Pro-messages"
       # Apple Watch
@@ -75,6 +79,8 @@ module Deliver
 
     # The iTC API requires a different notation for the device
     def device_type
+      # This list does not include iPad Pro 12.9-inch (3rd generation)
+      # because it has same resoluation as IOS_IPAD_PRO and will clobber
       matching = {
         ScreenSize::IOS_35 => "iphone35",
         ScreenSize::IOS_40 => "iphone4",
@@ -84,6 +90,7 @@ module Deliver
         ScreenSize::IOS_65 => "iphone65",
         ScreenSize::IOS_IPAD => "ipad",
         ScreenSize::IOS_IPAD_10_5 => "ipad105",
+        ScreenSize::IOS_IPAD_11 => "ipadPro11",
         ScreenSize::IOS_IPAD_PRO => "ipadPro",
         ScreenSize::IOS_40_MESSAGES => "iphone4",
         ScreenSize::IOS_47_MESSAGES => "iphone6",
@@ -93,6 +100,7 @@ module Deliver
         ScreenSize::IOS_IPAD_MESSAGES => "ipad",
         ScreenSize::IOS_IPAD_PRO_MESSAGES => "ipadPro",
         ScreenSize::IOS_IPAD_10_5_MESSAGES => "ipad105",
+        ScreenSize::IOS_IPAD_11_MESSAGES => "ipadPro11",
         ScreenSize::MAC => "desktop",
         ScreenSize::IOS_APPLE_WATCH => "watch",
         ScreenSize::IOS_APPLE_WATCH_SERIES4 => "watchSeries4",
@@ -103,6 +111,8 @@ module Deliver
 
     # Nice name
     def formatted_name
+      # This list does not include iPad Pro 12.9-inch (3rd generation)
+      # because it has same resoluation as IOS_IPAD_PRO and will clobber
       matching = {
         ScreenSize::IOS_35 => "iPhone 4",
         ScreenSize::IOS_40 => "iPhone 5",
@@ -112,6 +122,7 @@ module Deliver
         ScreenSize::IOS_65 => "iPhone XS Max",
         ScreenSize::IOS_IPAD => "iPad",
         ScreenSize::IOS_IPAD_10_5 => "iPad 10.5",
+        ScreenSize::IOS_IPAD_11 => "iPad 11",
         ScreenSize::IOS_IPAD_PRO => "iPad Pro",
         ScreenSize::IOS_40_MESSAGES => "iPhone 5 (iMessage)",
         ScreenSize::IOS_47_MESSAGES => "iPhone 6 (iMessage)",
@@ -121,6 +132,7 @@ module Deliver
         ScreenSize::IOS_IPAD_MESSAGES => "iPad (iMessage)",
         ScreenSize::IOS_IPAD_PRO_MESSAGES => "iPad Pro (iMessage)",
         ScreenSize::IOS_IPAD_10_5_MESSAGES => "iPad 10.5 (iMessage)",
+        ScreenSize::IOS_IPAD_11_MESSAGES => "iPad 11 (iMessage)",
         ScreenSize::MAC => "Mac",
         ScreenSize::IOS_APPLE_WATCH => "Watch",
         ScreenSize::IOS_APPLE_WATCH_SERIES4 => "Watch Series4",
@@ -145,7 +157,8 @@ module Deliver
         ScreenSize::IOS_65_MESSAGES,
         ScreenSize::IOS_IPAD_MESSAGES,
         ScreenSize::IOS_IPAD_PRO_MESSAGES,
-        ScreenSize::IOS_IPAD_10_5_MESSAGES
+        ScreenSize::IOS_IPAD_10_5_MESSAGES,
+        ScreenSize::IOS_IPAD_11_MESSAGES
       ].include?(self.screen_size)
     end
 
@@ -182,6 +195,10 @@ module Deliver
         ScreenSize::IOS_IPAD_10_5_MESSAGES => [
           [1668, 2224],
           [2224, 1668]
+        ],
+        ScreenSize::IOS_IPAD_11 => [
+          [1668, 2388],
+          [2388, 1668]
         ],
         ScreenSize::IOS_IPAD_PRO_MESSAGES => [
           [2732, 2048],
@@ -228,6 +245,10 @@ module Deliver
         ScreenSize::IOS_IPAD_10_5 => [
           [1668, 2224],
           [2224, 1668]
+        ],
+        ScreenSize::IOS_IPAD_11 => [
+          [1668, 2388],
+          [2388, 1668]
         ],
         ScreenSize::IOS_IPAD_PRO => [
           [2732, 2048],
