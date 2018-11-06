@@ -58,6 +58,13 @@ describe Supply do
         subject.verify_config!
       end
 
+      it "does not raise error if only aab_paths" do
+        Supply.config = {
+          aab_paths: ['some/path/app1.aab', 'some/path/app2.aab']
+        }
+        subject.verify_config!
+      end
+
       it "does not raise error if only track and track_promote_to" do
         Supply.config = {
           track: 'alpha',
