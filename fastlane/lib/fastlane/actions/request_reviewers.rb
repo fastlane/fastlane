@@ -48,7 +48,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "This will request reviewers for a given pull request on GitHub"
+        "Requests a PR review on GitHub"
       end
 
       def self.available_options
