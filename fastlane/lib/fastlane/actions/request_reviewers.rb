@@ -12,7 +12,7 @@ module Fastlane
           path: "repos/#{params[:repo]}/pulls/#{params[:number]}/requested_reviewers",
           body: {
             'reviewers' => params[:reviewers],
-            'team_reviewers' => params[:team_reviewers],
+            'team_reviewers' => params[:team_reviewers]
           },
           error_handlers: {
             '*' => proc do |result|
@@ -21,21 +21,28 @@ module Fastlane
             end
           }
         ) do |result|
-          UI.success("Successfully requested reviewers for pull request ##{params[:number]}")
-          return result[:json]
+          json = result[:json]
+          number = json['number']
+          html_url = json['html_url']
+          UI.success("Successfully requested reviewers for pull request #{number}}")
+
+          Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_HTML_URL] = html_url
+          return html_url
         end
       end
 
       def self.default_repo
         uri = Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_HTML_URL]
-        URI.parse(uri).path.split('/').slice(1, 2).join('/')
+        return nil if uri.nil?
+        URI.parse(uri).path.split('/').reverse.slice(2, 2).reverse.join('/')
       end
 
       def self.default_number
         uri = Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_HTML_URL]
-        File.basename(uri).to_i
+        return nil if uri.nil?
+        URI.parse(uri).path.split('/').last.to_i
       end
-      
+
       #####################################################
       # @!group Documentation
       #####################################################
