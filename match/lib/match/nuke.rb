@@ -41,7 +41,7 @@ module Match
         git_url: params[:git_url],
         working_directory: storage.working_directory
       })
-      self.encryption.decrypt_files
+      self.encryption.decrypt_files if self.encryption
 
       had_app_identifier = self.params.fetch(:app_identifier, ask: false)
       self.params[:app_identifier] = '' # we don't really need a value here
@@ -192,7 +192,7 @@ module Match
         files_to_delete = delete_files!
       end
 
-      self.encryption.encrypt_files
+      self.encryption.encrypt_files if self.encryption
 
       # Now we need to commit and push all this too
       message = ["[fastlane]", "Nuked", "files", "for", type.to_s].join(" ")

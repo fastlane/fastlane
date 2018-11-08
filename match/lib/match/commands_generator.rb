@@ -125,7 +125,7 @@ module Match
             git_url: params[:git_url],
             working_directory: storage.working_directory
           })
-          encryption.decrypt_files
+          encryption.decrypt_files if encryption
           UI.success("Repo is at: '#{storage.working_directory}'")
         end
       end

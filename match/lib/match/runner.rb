@@ -50,7 +50,7 @@ module Match
         git_url: params[:git_url],
         working_directory: storage.working_directory
       })
-      encryption.decrypt_files
+      encryption.decrypt_files if encryption
 
       unless params[:readonly]
         self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name])
@@ -96,7 +96,7 @@ module Match
           return if `git status`.include?("nothing to commit")
         end
 
-        encryption.encrypt_files
+        encryption.encrypt_files if encryption
         storage.save_changes!(files_to_commit: self.files_to_commit)
       end
 
