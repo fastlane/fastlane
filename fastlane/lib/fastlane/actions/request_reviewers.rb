@@ -107,7 +107,7 @@ module Fastlane
       end
 
       def self.return_value
-        "The parsed JSON when successful"
+        "The pull request page URL"
       end
 
       def self.example_code
