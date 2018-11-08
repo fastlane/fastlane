@@ -24,7 +24,7 @@ module Fastlane
           json = result[:json]
           number = json['number']
           html_url = json['html_url']
-          UI.success("Successfully requested reviewers for pull request #{number}}")
+          UI.success("Successfully requested reviewers for pull request ##{number}")
 
           Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_HTML_URL] = html_url
           return html_url
