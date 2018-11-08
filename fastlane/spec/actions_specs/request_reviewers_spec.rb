@@ -48,7 +48,7 @@ describe Fastlane do
         context 'passing the parameters' do
           before do
             stub_request(:post, 'https://api.github.com/repos/octocat/Hello-World/pulls/1347/requested_reviewers').
-            with(body: '{"reviewers":null,"team_reviewers":null}').
+            with(body: '{"reviewers":[],"team_reviewers":[]}').
             to_return(status: 422)
           end
 
@@ -69,7 +69,7 @@ describe Fastlane do
         context 'from pull request page' do
           before do
             stub_request(:post, 'https://api.github.com/repos//pulls//requested_reviewers').
-            with(body: '{"reviewers":null,"team_reviewers":null}').
+            with(body: '{"reviewers":[],"team_reviewers":[]}').
             to_return(status: 404)
           end
 
