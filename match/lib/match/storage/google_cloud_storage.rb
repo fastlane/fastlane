@@ -100,7 +100,6 @@ module Match
           elsif files_to_delete.count > 0
             # This code is used currently only for `fastlane match nuke`
             # TODO
-            require 'pry'; binding.pry
             files_to_delete.each do |current_file|
               target_path = current_file.gsub(self.working_directory + "/", "") # TODO: maybe find a better solution for this
               file = bucket.file(target_path)
