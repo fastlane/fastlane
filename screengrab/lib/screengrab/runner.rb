@@ -235,7 +235,14 @@ module Screengrab
 
       @config[:locales].each do |locale|
         if @config[:reinstall_app]
-          uninstall_apks(device_serial, @config[:app_package_name], @config[:tests_package_name])
+          app_package_name = @config[:app_package_name]
+          packages = run_adb_command("adb -s #{device_serial} shell pm list packages #{app_package_name}",
+                                     print_all: true,
+                                     print_command: true)
+          if packages =~ /#{app_package_name}/
+            UI.important("Uninstalling #{app_package_name}")
+            uninstall_apks(device_serial, app_package_name, @config[:tests_package_name])
+          end
           install_apks(device_serial, app_apk_path, tests_apk_path)
           grant_permissions(device_serial)
         end
