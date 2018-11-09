@@ -12,7 +12,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :git_url,
                                      env_name: "MATCH_GIT_URL",
                                      description: "URL to the git repo containing all the certificates",
-                                     optional: false, # TODO: handle this nicely for all sub-commands (e.g. decrypt)
+                                     optional: false,
                                      short_option: "-r"),
         FastlaneCore::ConfigItem.new(key: :git_branch,
                                      env_name: "MATCH_GIT_BRANCH",
@@ -29,6 +29,11 @@ module Match
                                          UI.user_error!("Unsupported environment #{value}, must be in #{Match.environments.join(', ')}")
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :google_cloud_bucket_name,
+                                     env_name: "MATCH_GOOGLE_CLOUD_BUCKET_NAME",
+                                     description: "Name of the Google Cloud Storage bucket to use",
+                                     optional: false,
+                                     short_option: "-x"),
         FastlaneCore::ConfigItem.new(key: :storage_mode,
                                      env_name: "MATCH_STORAGE_MODE",
                                      description: "Define where you want to store your certificates",

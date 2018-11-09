@@ -26,7 +26,7 @@ module Match
       # Depending on the storage mode, different vlaues are required
 
       if params[:storage_mode] == "git"
-
+        params.option_for_key(:google_cloud_bucket_name).optional = true
       elsif params[:storage_mode] == "google_cloud"
         params.option_for_key(:git_url).optional = true
       end
@@ -41,7 +41,8 @@ module Match
         git_user_email: params[:git_user_email],
         clone_branch_directly: params[:clone_branch_directly],
         type: params[:type].to_s,
-        platform: params[:platform].to_s
+        platform: params[:platform].to_s,
+        google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s
       })
       storage.download
 

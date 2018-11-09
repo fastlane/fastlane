@@ -21,16 +21,17 @@ module Match
       def self.configure(params)
         return self.new(
           type: params[:type].to_s,
-          platform: params[:platform].to_s
+          platform: params[:platform].to_s,
+          google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s
         )
       end
 
       def initialize(type: nil,
-                     platform: nil)
+                     platform: nil,
+                     google_cloud_bucket_name: nil)
         self.type = type if type
         self.platform = platform if platform
-
-        self.bucket_name = "fastlane-kms-testing" # TODO:
+        self.bucket_name = google_cloud_bucket_name
 
         self.gc_storage = Google::Cloud::Storage.new(
           project_id: "fastlane-kms-testing",
