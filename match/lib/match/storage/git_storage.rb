@@ -99,7 +99,7 @@ module Match
       def delete_files(files_to_delete: [], custom_message: nil)
         # No specific list given, e.g. this happens on `fastlane match nuke`
         # We just want to run `git add -A` to commit everything
-        git_push(commands: ["git add -A"], custom_message: custom_message)
+        git_push(commands: ["git add -A"], commit_message: custom_message)
       end
 
       def upload_files(files_to_upload: [], custom_message: nil)
@@ -107,7 +107,7 @@ module Match
           "git add #{current_file.shellescape}"
         end
 
-        git_push(commands: commands, custom_message: custom_message)
+        git_push(commands: commands, commit_message: custom_message)
       end
 
       def clear_changes
@@ -189,7 +189,7 @@ module Match
       private # rubocop:disable Lint/UselessAccessModifier
 
       def git_push(commands: [], commit_message: nil)
-        commit_message = custom_message || generate_commit_message
+        commit_message ||= generate_commit_message
         commands << "git commit -m #{commit_message.shellescape}"
         commands << "GIT_TERMINAL_PROMPT=0 git push origin #{self.branch.shellescape}"
 
