@@ -39,7 +39,6 @@ module Match
       team_id = Spaceship.client.team_id
       UI.message("Detect team ID '#{team_id}' for Google Cloud Storage...")
 
-
       files_to_commit = []
       Dir.chdir(git_storage.working_directory) do
         Dir[File.join("**", "*")].each do |current_file|
@@ -58,6 +57,12 @@ module Match
       end
 
       google_cloud_storage.save_changes!(files_to_commit: files_to_commit)
+
+      UI.success("Successfully migrated your code signing certificates and provisioning profiles to Google Cloud Storage")
+      UI.success("Make sure to update your configuration to specify the `storage_mode`, as well as the bucket to use:")
+      UI.command_output("\tstorage_mode \"google_cloud\"")
+      UI.command_output("\tgoogle_cloud_bucket_name \"#{params[:google_cloud_bucket_name]}\"")
+      UI.success("You can also remove the `git_url`, as well as any other git related configurations from your Fastfile and Matchfile")
     end
   end
 end
