@@ -77,7 +77,7 @@ module Match
             # TODO: how to deal with README
             template = File.read("#{Match::ROOT}/lib/assets/READMETemplate.md")
             readme_path = "README.md"
-            if (!File.exist?(readme_path) || File.read(readme_path) != template) && !self.skip_docs
+            if (!File.exist?(readme_path) || File.read(readme_path) != template)
               files_to_commit << readme_path
               File.write(readme_path, template)
             end
