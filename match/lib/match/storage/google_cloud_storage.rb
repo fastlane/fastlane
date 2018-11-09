@@ -119,6 +119,12 @@ module Match
 
       def bucket
         @_bucket ||= self.gc_storage.bucket(self.bucket_name)
+
+        if @_bucket.nil?
+          UI.user_error!("Couldn't find Google Cloud Storage bucket with name #{self.bucket_name} for the currently used account. Please make sure you have access")
+        end
+
+        return @_bucket
       end
     end
   end
