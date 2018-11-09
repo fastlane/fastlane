@@ -186,7 +186,7 @@ module Match
         end
       end
 
-      private
+      private # rubocop:disable Lint/UselessAccessModifier
 
       def git_push(commands: [], commit_message: nil)
         commit_message = custom_message || generate_commit_message
