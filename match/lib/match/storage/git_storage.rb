@@ -98,7 +98,8 @@ module Match
         checkout_branch unless self.branch == "master"
       end
 
-      def save_changes!(files_to_commit: [], custom_message: nil)
+      def save_changes!(files_to_commit: [], files_to_delete: [], custom_message: nil)
+        # files_to_delete is unused for `git_storage` and is only needed for `google_cloud_storage`
         Dir.chdir(File.expand_path(self.working_directory)) do
           commands = []
 
