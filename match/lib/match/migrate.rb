@@ -60,8 +60,10 @@ module Match
 
       UI.success("Successfully migrated your code signing certificates and provisioning profiles to Google Cloud Storage")
       UI.success("Make sure to update your configuration to specify the `storage_mode`, as well as the bucket to use:")
-      UI.command_output("\tstorage_mode \"google_cloud\"")
-      UI.command_output("\tgoogle_cloud_bucket_name \"#{params[:google_cloud_bucket_name]}\"")
+      UI.message("")
+      UI.command_output("\t\tstorage_mode \"google_cloud\"")
+      UI.command_output("\t\tgoogle_cloud_bucket_name \"#{params[:google_cloud_bucket_name]}\"")
+      UI.message("")
       UI.success("You can also remove the `git_url`, as well as any other git related configurations from your Fastfile and Matchfile")
     end
   end
