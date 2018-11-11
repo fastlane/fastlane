@@ -195,15 +195,23 @@ module Screengrab
     end
 
     def uninstall_apks(device_serial, app_package_name, tests_package_name)
-      UI.message('Uninstalling app APK')
-      run_adb_command("adb -s #{device_serial} uninstall #{app_package_name}",
-                      print_all: true,
-                      print_command: true)
+      packages = run_adb_command("adb -s #{device_serial} shell pm list packages #{app_package_name}",
+                                 print_all: true,
+                                 print_command: true)
 
-      UI.message('Uninstalling tests APK')
-      run_adb_command("adb -s #{device_serial} uninstall #{tests_package_name}",
-                      print_all: true,
-                      print_command: true)
+      if packages =~ /#{app_package_name}/
+        UI.message('Uninstalling app APK')
+        run_adb_command("adb -s #{device_serial} uninstall #{app_package_name}",
+                        print_all: true,
+                        print_command: true)
+      end
+
+      if packages =~ /#{tests_package_name}/
+        UI.message('Uninstalling tests APK')
+        run_adb_command("adb -s #{device_serial} uninstall #{tests_package_name}",
+                        print_all: true,
+                        print_command: true)
+      end
     end
 
     def grant_permissions(device_serial)
@@ -235,14 +243,7 @@ module Screengrab
 
       @config[:locales].each do |locale|
         if @config[:reinstall_app]
-          app_package_name = @config[:app_package_name]
-          packages = run_adb_command("adb -s #{device_serial} shell pm list packages #{app_package_name}",
-                                     print_all: true,
-                                     print_command: true)
-          if packages =~ /#{app_package_name}/
-            UI.important("Uninstalling #{app_package_name}")
-            uninstall_apks(device_serial, app_package_name, @config[:tests_package_name])
-          end
+          uninstall_apks(device_serial, @config[:app_package_name], @config[:tests_package_name])
           install_apks(device_serial, app_apk_path, tests_apk_path)
           grant_permissions(device_serial)
         end
