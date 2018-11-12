@@ -238,7 +238,20 @@ module Match
 
       if portal_profile
         profile_device_count = portal_profile.devices.count
-        portal_device_count = Spaceship.device.all.count
+
+        platform = params[:platform].to_s
+        portal_device_count =
+          case platform
+          when :ios.to_s
+            Spaceship.device.all_ios_profile_devices.count
+          when :tvos.to_s
+            Spaceship.device.all_apple_tvs.count
+          when :mac.to_s
+            Spaceship.device.all_macs.count
+          else
+            Spaceship.device.all.count
+          end
+
         return portal_device_count != profile_device_count
       end
       return false
