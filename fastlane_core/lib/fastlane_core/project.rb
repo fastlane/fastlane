@@ -451,7 +451,7 @@ module FastlaneCore
         # Use Xcodeproj gem here to
         # * parse the contents.xcworkspacedata XML file
         # * handle different types (group:, container: etc.) of file references and their paths
-        # for details see https://github.com/CocoaPods/Xcodeproj/blob/master/lib/xcodeproj/workspace/file_reference.rb
+        # for details see https://github.com/CocoaPods/Xcodeproj/blob/e0287156d426ba588c9234bb2a4c824149889860/lib/xcodeproj/workspace/file_reference.rb```
 
         workspace_dir_path = File.expand_path("..", self.path)
         file_references_paths = workspace.file_references.map { |fr| fr.absolute_path(workspace_dir_path) }
