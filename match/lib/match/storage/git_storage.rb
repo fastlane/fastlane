@@ -7,8 +7,6 @@ module Match
   module Storage
     # Store the code signing identities in a git repo
     class GitStorage < Interface
-      MATCH_VERSION_FILE_NAME = "match_version.txt"
-
       # User provided values
       attr_accessor :git_url
       attr_accessor :shallow_clone
@@ -98,55 +96,18 @@ module Match
         checkout_branch unless self.branch == "master"
       end
 
-      def save_changes!(files_to_commit: [], files_to_delete: [], custom_message: nil)
-        # files_to_delete is unused for `git_storage` and is only needed for `google_cloud_storage`
-        Dir.chdir(File.expand_path(self.working_directory)) do
-          commands = []
+      def delete_files(files_to_delete: [], custom_message: nil)
+        # No specific list given, e.g. this happens on `fastlane match nuke`
+        # We just want to run `git add -A` to commit everything
+        git_push(commands: ["git add -A"], commit_message: custom_message)
+      end
 
-          if files_to_commit.count > 0 # e.g. for nuke this is treated differently
-            if !File.exist?(MATCH_VERSION_FILE_NAME) || File.read(MATCH_VERSION_FILE_NAME) != Fastlane::VERSION.to_s
-              files_to_commit << MATCH_VERSION_FILE_NAME
-              File.write(MATCH_VERSION_FILE_NAME, Fastlane::VERSION) # stored unencrypted
-            end
-
-            template = File.read("#{Match::ROOT}/lib/assets/READMETemplate.md")
-            readme_path = "README.md"
-            if (!File.exist?(readme_path) || File.read(readme_path) != template) && !self.skip_docs
-              files_to_commit << readme_path
-              File.write(readme_path, template)
-            end
-
-            # `git add` each file we want to commit
-            #   - Fixes https://github.com/fastlane/fastlane/issues/8917
-            #   - Fixes https://github.com/fastlane/fastlane/issues/8793
-            #   - Replaces, closes and fixes https://github.com/fastlane/fastlane/pull/8919
-            commands += files_to_commit.map do |current_file|
-              "git add #{current_file.shellescape}"
-            end
-          else
-            # No specific list given, e.g. this happens on `fastlane match nuke`
-            # We just want to run `git add -A` to commit everything
-            commands << "git add -A"
-          end
-          commit_message = custom_message || generate_commit_message
-          commands << "git commit -m #{commit_message.shellescape}"
-          commands << "GIT_TERMINAL_PROMPT=0 git push origin #{self.branch.shellescape}"
-
-          UI.message("Pushing changes to remote git repo...")
-
-          begin
-            commands.each do |command|
-              FastlaneCore::CommandExecutor.execute(command: command,
-                                                  print_all: FastlaneCore::Globals.verbose?,
-                                              print_command: FastlaneCore::Globals.verbose?)
-            end
-
-            self.clear_changes
-          rescue => ex
-            UI.error("Couldn't commit or push changes back to git...")
-            UI.error(ex)
-          end
+      def upload_files(files_to_upload: [], custom_message: nil)
+        commands = files_to_upload.map do |current_file|
+          "git add #{current_file.shellescape}"
         end
+
+        git_push(commands: commands, commit_message: custom_message)
       end
 
       # Generate the commit message based on the user's parameters
@@ -216,6 +177,26 @@ module Match
                                                   print_command: FastlaneCore::Globals.verbose?)
           end
         end
+      end
+
+      private # rubocop:disable Lint/UselessAccessModifier
+
+      def git_push(commands: [], commit_message: nil)
+        commit_message ||= generate_commit_message
+        commands << "git commit -m #{commit_message.shellescape}"
+        commands << "GIT_TERMINAL_PROMPT=0 git push origin #{self.branch.shellescape}"
+
+        UI.message("Pushing changes to remote git repo...")
+        commands.each do |command|
+          FastlaneCore::CommandExecutor.execute(command: command,
+                                                print_all: FastlaneCore::Globals.verbose?,
+                                                print_command: FastlaneCore::Globals.verbose?)
+        end
+
+        self.clear_changes
+      rescue => ex
+        UI.error("Couldn't commit or push changes back to git...")
+        UI.error(ex)
       end
     end
   end
