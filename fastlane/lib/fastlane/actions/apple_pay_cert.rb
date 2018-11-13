@@ -69,7 +69,7 @@ module Fastlane
       end
 
       def self.description
-        'Creates Apple Pay certificate'
+        'Creates an Apple Pay certificate'
       end
 
       def self.details
