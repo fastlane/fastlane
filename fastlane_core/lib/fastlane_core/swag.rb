@@ -38,7 +38,7 @@ module FastlaneCore
 
     def self.should_be_shown?
       return false unless FastlaneCore::Env.truthy?("FL_ENABLE_LOGO_ANIMATION")
-      return false if Helper.is_ci?
+      return false if Helper.ci?
       return false unless UI.interactive?
       return true
     end

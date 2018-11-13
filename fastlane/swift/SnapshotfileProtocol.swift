@@ -2,6 +2,7 @@ protocol SnapshotfileProtocol: class {
   var workspace: String? { get }
   var project: String? { get }
   var xcargs: String? { get }
+  var xcconfig: String? { get }
   var devices: [String]? { get }
   var languages: [String] { get }
   var launchArguments: [String] { get }
@@ -27,6 +28,7 @@ protocol SnapshotfileProtocol: class {
   var numberOfRetries: Int { get }
   var stopAfterFirstError: Bool { get }
   var derivedDataPath: String? { get }
+  var resultBundle: Bool { get }
   var testTargetName: String? { get }
   var namespaceLogFiles: String? { get }
   var concurrentSimulators: Bool { get }
@@ -36,6 +38,7 @@ extension SnapshotfileProtocol {
   var workspace: String? { return nil }
   var project: String? { return nil }
   var xcargs: String? { return nil }
+  var xcconfig: String? { return nil }
   var devices: [String]? { return nil }
   var languages: [String] { return ["en-US"] }
   var launchArguments: [String] { return [""] }
@@ -61,12 +64,12 @@ extension SnapshotfileProtocol {
   var numberOfRetries: Int { return 1 }
   var stopAfterFirstError: Bool { return false }
   var derivedDataPath: String? { return nil }
+  var resultBundle: Bool { return false }
   var testTargetName: String? { return nil }
   var namespaceLogFiles: String? { return nil }
   var concurrentSimulators: Bool { return true }
 }
 
-
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.2]
+// FastlaneRunnerAPIVersion [0.9.4]

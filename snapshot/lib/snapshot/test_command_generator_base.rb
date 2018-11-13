@@ -17,12 +17,15 @@ module Snapshot
         UI.user_error!("No project/workspace found")
       end
 
-      def options
+      def options(language, locale)
         config = Snapshot.config
+        result_bundle_path = resolve_result_bundle_path(language, locale) if config[:result_bundle]
+
         options = []
         options += project_path_array
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-derivedDataPath '#{derived_data_path}'"
+        options << "-resultBundlePath '#{result_bundle_path}'" if result_bundle_path
         options << config[:xcargs] if config[:xcargs]
         return options
       end
@@ -43,7 +46,7 @@ module Snapshot
           actions << "test-without-building"
         else
           actions << :clean if Snapshot.config[:clean]
-          actions << :build # https://github.com/fastlane/snapshot/issues/246
+          actions << :build # https://github.com/fastlane/fastlane/issues/2581
           actions << :test
         end
         return actions
@@ -78,6 +81,20 @@ module Snapshot
 
       def derived_data_path
         Snapshot.cache[:derived_data_path] ||= (Snapshot.config[:derived_data_path] || Dir.mktmpdir("snapshot_derived"))
+      end
+
+      def resolve_result_bundle_path(language, locale)
+        Snapshot.cache[:result_bundle_path] = {}
+        language_key = locale || language
+
+        unless Snapshot.cache[:result_bundle_path][language_key]
+          path = File.join(Snapshot.config[:output_directory], "test_output", language_key, Snapshot.config[:scheme]) + ".test_result"
+          if File.directory?(path)
+            FileUtils.remove_dir(path)
+          end
+          Snapshot.cache[:result_bundle_path][language_key] = path
+        end
+        return Snapshot.cache[:result_bundle_path][language_key]
       end
 
       def initialize

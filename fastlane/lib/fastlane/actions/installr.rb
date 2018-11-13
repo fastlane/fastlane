@@ -60,7 +60,7 @@ module Fastlane
       end
 
       def self.description
-        "Upload a new build to Installr"
+        "Upload a new build to [Installr](http://installrapp.com/)"
       end
 
       def self.available_options
@@ -70,12 +70,13 @@ module Fastlane
                                      sensitive: true,
                                      description: "API Token for Installr Access",
                                      verify_block: proc do |value|
-                                       UI.user_error!("No API token for Installr given, pass using `api_token: 'token'`") unless value and !value.empty?
+                                       UI.user_error!("No API token for Installr given, pass using `api_token: 'token'`") unless value && !value.empty?
                                      end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                      env_name: "INSTALLR_IPA_PATH",
                                      description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action",
                                      default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Couldn't find build file at path '#{value}'") unless File.exist?(value)
                                      end),

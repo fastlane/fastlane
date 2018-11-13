@@ -16,7 +16,7 @@ module Fastlane
       return unless (path || '').length > 0
       UI.user_error!("Could not find Fastfile at path '#{path}'") unless File.exist?(path)
       @path = File.expand_path(path)
-      content = File.read(path)
+      content = File.read(path, encoding: "utf-8")
 
       # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
       if content.tr!('“”‘’‛', %(""'''))
@@ -29,7 +29,7 @@ module Fastlane
       content.scan(/^\s*require (.*)/).each do |current|
         gem_name = current.last
         next if gem_name.include?(".") # these are local gems
-        UI.important("You require a gem, if this is a third party gem, please use `fastlane_require #{gem_name}` to ensure the gem is installed locally")
+        UI.important("You have required a gem, if this is a third party gem, please use `fastlane_require #{gem_name}` to ensure the gem is installed locally.")
       end
 
       parse(content, @path)
@@ -57,6 +57,7 @@ module Fastlane
           # rubocop:enable Security/Eval
         rescue SyntaxError => ex
           line = ex.to_s.match(/#{Regexp.escape(relative_path)}:(\d+)/)[1]
+          UI.content_error(data, line)
           UI.user_error!("Syntax error in your Fastfile on line #{line}: #{ex}")
         end
       end
@@ -306,12 +307,9 @@ module Fastlane
     def say(value)
       # Overwrite this, since there is already a 'say' method defined in the Ruby standard library
       value ||= yield
-      Actions.execute_action('say') do
-        action_launched('say')
-        return_value = Fastlane::Actions::SayAction.run([value])
-        action_completed('say', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
-        return return_value
-      end
+
+      value = { text: value } if value.kind_of?(String) || value.kind_of?(Array)
+      self.runner.trigger_action_by_name(:say, nil, false, value)
     end
 
     def puts(value)
@@ -330,12 +328,16 @@ module Fastlane
     end
 
     def action_launched(action_name)
-      action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name, configuration_language: "ruby", args: ARGV)
+      action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name,
+                                                                                        fastlane_client_language: :ruby,
+                                                                                        args: ARGV)
       FastlaneCore.session.action_launched(launch_context: action_launch_context)
     end
 
     def action_completed(action_name, status: nil)
-      completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV, status: status)
+      completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name,
+                                                                                         args: ARGV,
+                                                                                         status: status)
       FastlaneCore.session.action_completed(completion_context: completion_context)
     end
   end

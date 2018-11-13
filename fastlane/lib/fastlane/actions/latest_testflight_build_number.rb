@@ -22,8 +22,8 @@ module Fastlane
 
       def self.details
         [
-          "Provides a way to have increment_build_number be based on the latest build you uploaded to iTC.",
-          "Fetches most recent build number from TestFlight based on the version number. Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC."
+          "Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC.",
+          "Fetches the most recent build number from TestFlight based on the version number. Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC."
         ].join("\n")
       end
 
@@ -44,12 +44,14 @@ module Fastlane
                                        env_name: "FASTLANE_APP_IDENTIFIER",
                                        description: "The bundle identifier of your app",
                                        code_gen_sensitive: true,
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :username,
                                        short_option: "-u",
                                        env_name: "ITUNESCONNECT_USER",
                                        description: "Your Apple ID Username",
-                                       default_value: user),
+                                       default_value: user,
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "LATEST_VERSION",
                                        description: "The version number whose latest build number we want",
@@ -72,21 +74,23 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        short_option: "-k",
                                        env_name: "LATEST_TESTFLIGHT_BUILD_NUMBER_TEAM_ID",
-                                       description: "The ID of your iTunes Connect team if you're in multiple teams",
+                                       description: "The ID of your App Store Connect team if you're in multiple teams",
                                        optional: true,
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
                                        end),
           FastlaneCore::ConfigItem.new(key: :team_name,
                                        short_option: "-e",
                                        env_name: "LATEST_TESTFLIGHT_BUILD_NUMBER_TEAM_NAME",
-                                       description: "The name of your iTunes Connect team if you're in multiple teams",
+                                       description: "The name of your App Store Connect team if you're in multiple teams",
                                        optional: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                        end)
@@ -129,7 +133,7 @@ module Fastlane
       end
 
       def self.category
-        :misc
+        :app_store_connect
       end
     end
   end

@@ -6,6 +6,10 @@ require_relative 'appfile_config'
 module CredentialsManager
   class AccountManager
     DEFAULT_PREFIX = "deliver"
+
+    # Is used for iTunes Transporter
+    attr_reader :prefix
+
     # @param prefix [String] Very optional, is used for the
     #   iTunes Transporter which uses application specific passwords
     # @param note [String] An optional note that will be shown next
@@ -66,7 +70,7 @@ module CredentialsManager
       end
 
       if force || agree("Do you want to re-enter your password? (y/n)", true)
-        puts("Removing Keychain entry for user '#{user}'...".yellow)
+        puts("Removing Keychain entry for user '#{user}'...".yellow) if mac?
         remove_from_keychain
         ask_for_login
         return true
@@ -107,12 +111,12 @@ module CredentialsManager
       if ENV["FASTLANE_HIDE_LOGIN_INFORMATION"].to_s.length == 0
         puts("-------------------------------------------------------------------------------------".green)
         puts("Please provide your Apple Developer Program account credentials".green)
-        puts("The login information you enter will be stored in your macOS Keychain".green)
+        puts("The login information you enter will be stored in your macOS Keychain".green) if mac?
         if default_prefix?
           # We don't want to show this message, if we ask for the application specific password
           # which has a different prefix
           puts("You can also pass the password using the `FASTLANE_PASSWORD` environment variable".green)
-          puts("See more information about it on GitHub: https://github.com/fastlane/fastlane/tree/master/credentials_manager".green)
+          puts("See more information about it on GitHub: https://github.com/fastlane/fastlane/tree/master/credentials_manager".green) if mac?
         end
         puts("-------------------------------------------------------------------------------------".green)
       end
@@ -134,7 +138,7 @@ module CredentialsManager
       end
 
       return true if ENV["FASTLANE_DONT_STORE_PASSWORD"]
-      return true if (/darwin/ =~ RUBY_PLATFORM).nil? # mac?, since we don't have access to the helper here
+      return true unless mac?
 
       # Now we store this information in the keychain
       if add_to_keychain
@@ -143,6 +147,11 @@ module CredentialsManager
         puts("Could not store password in keychain".red)
         return false
       end
+    end
+
+    # Helper.mac? - but we don't have access to the helper here
+    def mac?
+      (/darwin/ =~ RUBY_PLATFORM) != nil
     end
   end
 end

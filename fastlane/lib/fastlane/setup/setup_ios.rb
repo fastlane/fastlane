@@ -25,11 +25,12 @@ module Fastlane
 
       welcome_to_fastlane
 
+      self.fastfile_content = fastfile_template_content
+      self.appfile_content = appfile_template_content
+
       if preferred_setup_method
         self.send(preferred_setup_method)
 
-        # We call `choose_swift` here also, as we skip the selection (see below)
-        choose_swift
         return
       end
 
@@ -41,19 +42,14 @@ module Fastlane
       }
 
       selected = UI.select("What would you like to use fastlane for?", options.keys)
-      method_to_use = options[selected]
-
-      # we want to first ask the user of what they want to do
-      # to make them already excited about all the things they can do with fastlane
-      # and only then we ask them about the language they want to use
-      choose_swift
+      @method_to_use = options[selected]
 
       begin
-        self.send(method_to_use)
+        self.send(@method_to_use)
       rescue => ex
         # If it's already manual, and it has failed
         # we need to re-raise the exception, as something definitely is wrong
-        raise ex if method_to_use == :ios_manual
+        raise ex if @method_to_use == :ios_manual
 
         # If we're here, that means something else failed. We now show the
         # error message and fallback to `:ios_manual`
@@ -74,7 +70,7 @@ module Fastlane
         if UI.confirm("Would you like to fallback to a manual Fastfile?")
           self.ios_manual
         else
-          self.send(method_to_use)
+          self.send(@method_to_use)
         end
         # the second time, we're just failing, and don't use a `begin` `rescue` block any more
       end
@@ -208,10 +204,10 @@ module Fastlane
       ui_testing_scheme = UI.select("Which is your UI Testing scheme? If you can't find it in this list, make sure it's marked as `Shared` in the Xcode scheme list", available_schemes)
 
       UI.header("Automatically upload to iTC?")
-      UI.message("Would you like fastlane to automatically upload all generated screenshots to iTunes Connect")
+      UI.message("Would you like fastlane to automatically upload all generated screenshots to App Store Connect")
       UI.message("after generating them?")
-      UI.message("If you enable this feature you'll need to provide your iTunes Connect credentials so fastlane can upload the screenshots to iTunes Connect")
-      automatic_upload = UI.confirm("Enable automatic upload of localized screenshots to iTunes Connect?")
+      UI.message("If you enable this feature you'll need to provide your App Store Connect credentials so fastlane can upload the screenshots to App Store Connect")
+      automatic_upload = UI.confirm("Enable automatic upload of localized screenshots to App Store Connect?")
       if automatic_upload
         ask_for_credentials(adp: true, itc: true)
         verify_app_exists_itc!
@@ -297,13 +293,13 @@ module Fastlane
 
     def ask_for_credentials(itc: true, adp: false)
       UI.header("Login with your Apple ID")
-      UI.message("To use iTunes Connect and Apple Developer Portal features as part of fastlane,")
+      UI.message("To use App Store Connect and Apple Developer Portal features as part of fastlane,")
       UI.message("we will ask you for your Apple ID username and password")
       UI.message("This is necessary for certain fastlane features, for example:")
       UI.message("")
       UI.message("- Create and manage your provisioning profiles on the Developer Portal")
-      UI.message("- Upload and manage TestFlight and App Store builds on iTunes Connect")
-      UI.message("- Manage your iTunes Connect app metadata and screenshots")
+      UI.message("- Upload and manage TestFlight and App Store builds on App Store Connect")
+      UI.message("- Manage your App Store Connect app metadata and screenshots")
       UI.message("")
       UI.message("Your Apple ID credentials will only be stored in your Keychain, on your local machine")
       UI.message("For more information, check out")
@@ -325,9 +321,9 @@ module Fastlane
         Spaceship::Tunes.select_team
         self.itc_team_id = Spaceship::Tunes.client.team_id
         if self.is_swift_fastfile
-          self.append_team("var itcTeam: String? { return \"#{self.itc_team_id}\" } // iTunes Connect Team ID")
+          self.append_team("var itcTeam: String? { return \"#{self.itc_team_id}\" } // App Store Connect Team ID")
         else
-          self.append_team("itc_team_id \"#{self.itc_team_id}\" # iTunes Connect Team ID")
+          self.append_team("itc_team_id(\"#{self.itc_team_id}\") # App Store Connect Team ID")
         end
       end
 
@@ -338,7 +334,7 @@ module Fastlane
         if self.is_swift_fastfile
           self.append_team("var teamID: String { return \"#{self.adp_team_id}\" } // Apple Developer Portal Team ID")
         else
-          self.append_team("team_id \"#{self.adp_team_id}\" # Developer Portal Team ID")
+          self.append_team("team_id(\"#{self.adp_team_id}\") # Developer Portal Team ID")
         end
       end
 
@@ -384,25 +380,25 @@ module Fastlane
           UI.important("Alright, we won't create the app for you. Be aware, the build is probably going to fail when you try it")
         end
       else
-        UI.success("✅  Your app '#{self.app_identifier}' is available on iTunes Connect")
+        UI.success("✅  Your app '#{self.app_identifier}' is available in your Apple Developer Portal")
       end
     end
 
     def verify_app_exists_itc!
       UI.user_error!("No app identifier provided") if self.app_identifier.to_s.length == 0
-      UI.message("Checking if the app '#{self.app_identifier}' exists on iTunes Connect...")
+      UI.message("Checking if the app '#{self.app_identifier}' exists on App Store Connect...")
       app = Spaceship::Tunes::Application.find(self.app_identifier)
       if app.nil?
-        UI.error("Looks like the app '#{self.app_identifier}' isn't available on #{'iTunes Connect'.bold.underline}")
+        UI.error("Looks like the app '#{self.app_identifier}' isn't available on #{'App Store Connect'.bold.underline}")
         UI.error("for the team ID '#{self.itc_team_id}' on Apple ID '#{self.user}'")
-        if UI.confirm("Would you like fastlane to create the App on iTunes Connect for you?")
+        if UI.confirm("Would you like fastlane to create the App on App Store Connect for you?")
           create_app_online!(mode: :itc)
           self.app_exists_on_itc = true
         else
           UI.important("Alright, we won't create the app for you. Be aware, the build is probably going to fail when you try it")
         end
       else
-        UI.success("✅  Your app '#{self.app_identifier}' is available on iTunes Connect")
+        UI.success("✅  Your app '#{self.app_identifier}' is available on App Store Connect")
         self.app_exists_on_itc = true
       end
     end
@@ -419,7 +415,9 @@ module Fastlane
         self.appfile_content.gsub!("[[APPLE_ID]]", self.user)
       end
 
-      self.show_information_about_version_bumps unless self.automatic_versioning_enabled
+      if !self.automatic_versioning_enabled && @method_to_use != :ios_manual
+        self.show_information_about_version_bumps
+      end
 
       super
     end
@@ -436,17 +434,6 @@ module Fastlane
       else
         return "project: \"#{self.project_path}\", "
       end
-    end
-
-    # Choose the language the config files should be based in
-    def choose_swift
-      # The Swift question below is removed, as we don't want everyone
-      # to use the Beta setup yet
-      # using `||=` since if the user already used `fastlane init swift` we want to just use swift
-      # self.is_swift_fastfile ||= UI.confirm("[Beta] Do you want to try our new experimental Swift based configuration files?")
-
-      self.fastfile_content = fastfile_template_content
-      self.appfile_content = appfile_template_content
     end
 
     def increment_build_number_if_applicable
@@ -483,14 +470,16 @@ module Fastlane
         produce_options[:skip_devcenter] = true
       end
 
-      Produce.config = FastlaneCore::Configuration.create(
-        Produce::Options.available_options,
-        produce_options
-      )
-
       # The retrying system allows people to correct invalid inputs
       # e.g. the app's name is already taken
       loop do
+        # Creating config in the loop so user will be reprompted
+        # for app name if app name is taken or too long
+        Produce.config = FastlaneCore::Configuration.create(
+          Produce::Options.available_options,
+          produce_options
+        )
+
         begin
           Produce::Manager.start_producing
           UI.success("✅  Successfully created app")

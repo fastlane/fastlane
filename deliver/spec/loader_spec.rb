@@ -45,4 +45,13 @@ describe Deliver::Loader do
                                                                "\nValid directory names are: #{allowed_directory_names}" \
                                                                "\n\nEnable 'ignore_language_directory_validation' to prevent this validation from happening")
   end
+
+  it 'allows but ignores the special "fonts" directory used by frameit"' do
+    FileUtils.mkdir(File.join(@root, 'fonts'))
+
+    @folders = Deliver::Loader.language_folders(@root, false)
+
+    basenames = @folders.map { |f| File.basename(f) }
+    expect(basenames.include?('fonts')).to eq(false)
+  end
 end

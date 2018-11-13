@@ -11,7 +11,7 @@ Pilot makes it easier to manage your app on Apple’s TestFlight. You can:
 - Retrieve information about testers & devices
 - Import/export all available testers
 
-_pilot_ uses [spaceship.airforce](https://spaceship.airforce) to interact with iTunes Connect 🚀
+_pilot_ uses [spaceship.airforce](https://spaceship.airforce) to interact with App Store Connect 🚀
 
 -------
 
@@ -22,11 +22,11 @@ _pilot_ uses [spaceship.airforce](https://spaceship.airforce) to interact with i
 
 -------
 
-<h5 align="center"><code>pilot</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
+<h5 align="center"><em>pilot</em> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # Usage
 
-For all commands you can specify the Apple ID to use using `-u felix@krausefx.com`. If you execute _pilot_ in a project already using [fastlane](https://fastlane.tools) the username and app identifier will automatically be determined.
+For all commands you can specify the Apple ID to use using `-u felix@krausefx.com`. If you execute _pilot_ in a project already using [_fastlane_](https://fastlane.tools) the username and app identifier will automatically be determined.
 
 ## Uploading builds
 
@@ -61,7 +61,7 @@ _pilot_ does all kinds of magic for you:
 - Automatically detects the bundle identifier from your `ipa` file
 - Automatically fetch the AppID of your app based on the bundle identifier
 
-_pilot_ uses [spaceship](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary. Because iTunes Transporter's upload capability is only supported on OS X, `pilot upload` does not work on Linux, as described [in this issue](https://github.com/fastlane/fastlane/issues/5789)
+_pilot_ uses [_spaceship_](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary. Because iTunes Transporter's upload capability is only supported on OS X, `pilot upload` does not work on Linux, as described [in this issue](https://github.com/fastlane/fastlane/issues/5789)
 
 ## List builds
 
@@ -119,7 +119,7 @@ The output will look like this:
 
 ### Add a new tester
 
-To add a new tester to both your iTunes Connect account and to your app (if given), use the `pilot add` command. This will create a new tester (if necessary) or add an existing tester to the app to test.
+To add a new tester to both your App Store Connect account and to your app (if given), use the `pilot add` command. This will create a new tester (if necessary) or add an existing tester to the app to test.
 
 ```no-highlight
 fastlane pilot add email@invite.com
@@ -173,7 +173,11 @@ fastlane pilot export
 
 ### Import testers
 
-Add external testers from a CSV file. Sample CSV file available [here](https://itunesconnect.apple.com/itc/docs/tester_import.csv).
+Add external testers from a CSV file. Create a file (ex: `testers.csv`) and fill it with the following format:
+
+```no-highlight
+John,Appleseed,appleseed_john@mac.com,group-1;group-2
+```
 
 ```no-highlight
 fastlane pilot import
@@ -192,7 +196,9 @@ fastlane pilot import -c ~/Desktop/testers.csv
 
 If you run into any issues you can use the `verbose` mode to get a more detailed output:
 
-    fastlane pilot upload --verbose
+```no-highlight
+fastlane pilot upload --verbose
+```
 
 ## Firewall Issues
 

@@ -32,19 +32,31 @@ describe Spaceship::Client do
           expect(subject.select_team).to eq("XXXXXXXXXX") # a different team
         end
 
-        it "Uses the specific team (1/2)" do
+        it "Uses the specific team (1/2) using environment variables" do
           ENV["FASTLANE_TEAM_ID"] = "SecondTeam"
           expect(subject.select_team).to eq("SecondTeam") # a different team
         end
 
-        it "Uses the specific team (2/2)" do
+        it "Uses the specific team (2/2) using environment variables" do
           ENV["FASTLANE_TEAM_ID"] = "XXXXXXXXXX"
           expect(subject.select_team).to eq("XXXXXXXXXX") # a different team
         end
 
-        it "Let's the user specify the team name" do
+        it "Let's the user specify the team name using environment variables" do
           ENV["FASTLANE_TEAM_NAME"] = "SecondTeamProfiName"
           expect(subject.select_team).to eq("SecondTeam")
+        end
+
+        it "Uses the specific team (1/2) using method parameters" do
+          expect(subject.select_team(team_id: "SecondTeam")).to eq("SecondTeam") # a different team
+        end
+
+        it "Uses the specific team (2/2) using method parameters" do
+          expect(subject.select_team(team_id: "XXXXXXXXXX")).to eq("XXXXXXXXXX") # a different team
+        end
+
+        it "Let's the user specify the team name using method parameters" do
+          expect(subject.select_team(team_name: "SecondTeamProfiName")).to eq("SecondTeam")
         end
 
         it "Strips out spaces before and after the team name" do
@@ -70,7 +82,7 @@ describe Spaceship::Client do
           expect(Spaceship::Client::UserInterface).to receive(:interactive?).and_return(false)
           expect do
             subject.select_team
-          end.to raise_error("Multiple Teams found; unable to choose, terminal not ineractive!")
+          end.to raise_error("Multiple Teams found; unable to choose, terminal not interactive!")
         end
 
         after do

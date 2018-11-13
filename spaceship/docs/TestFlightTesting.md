@@ -35,7 +35,8 @@ At the top of your data model spec, set the client to be a `mock_client`:
 describe Spaceship::TestFlight::Tester do
   let(:mock_client) { double('MockClient') }
   before do
-    Spaceship::TestFlight::Base.client = mock_client
+    allow(Spaceship::TestFlight::Base).to receive(:client).and_return(mock_client)
+    allow(mock_client).to receive(:team_id).and_return('')
   end
 end
 ```
@@ -98,7 +99,7 @@ context '#get_build_trains' do
   it 'executes the request' do
     MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/platforms/ios/trains') {}
     subject.get_build_trains(app_id: app_id, platform: platform)
-    expect(WebMock).to have_requested(:get, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/platforms/ios/trains')
+    expect(WebMock).to have_requested(:get, 'https://appstoreconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/platforms/ios/trains')
   end
 end
 ```
@@ -110,7 +111,7 @@ context '#add_group_to_build' do
   it 'executes the request' do
     MockAPI::TestFlightServer.put('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/builds/fake-build-id') {}
     subject.add_group_to_build(app_id: app_id, group_id: 'fake-group-id', build_id: 'fake-build-id')
-    expect(WebMock).to have_requested(:put, 'https://itunesconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/builds/fake-build-id')
+    expect(WebMock).to have_requested(:put, 'https://appstoreconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/builds/fake-build-id')
   end
 end
 ```

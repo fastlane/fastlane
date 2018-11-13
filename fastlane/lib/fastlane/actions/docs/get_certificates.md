@@ -12,7 +12,7 @@
 
 -------
 
-<h5 align="center"><code>cert</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
+<h5 align="center"><em>cert</em> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 ![/img/actions/cert.gif](/img/actions/cert.gif)
 
@@ -20,7 +20,7 @@ In the gif we used `cert && sigh`, which will first create an iOS code signing c
 
 # Usage
 
-**Note**: It is recommended to use [match](/actions/match) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.
+**Note**: It is recommended to use [_match_](/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.
 
 ```no-highlight
 fastlane cert
@@ -56,9 +56,9 @@ Keep in mind, there is no way for _cert_ to download existing certificates + pri
 
 Run `fastlane action cert` to get a list of all available environment variables.
 
-## Use with [_sigh_](https://docs.fastlane.tools/actions/sigh)
+## Use with [_sigh_](https://docs.fastlane.tools/actions/sigh/)
 
-_cert_ becomes really interesting when used in [_fastlane_](https://fastlane.tools) in combination with [_sigh_](https://docs.fastlane.tools/actions/sigh).
+_cert_ becomes really interesting when used in [_fastlane_](https://fastlane.tools) in combination with [_sigh_](https://docs.fastlane.tools/actions/sigh/).
 
 Update your `Fastfile` to contain the following code:
 
@@ -78,5 +78,9 @@ _cert_ uses the [password manager](https://github.com/fastlane/fastlane/tree/mas
 
 # Tips
 
-## Use the 'Provisioning Quicklook plugin'
-Download and install the [Provisioning Plugin](https://github.com/chockenberry/Provisioning) to easily preview provisioning profile files and certificates.
+## Use 'ProvisionQL' for advanced Quick Look in Finder
+
+Install [ProvisionQL](https://github.com/ealeksandrov/ProvisionQL).
+
+It will show you `mobileprovision` files like this:
+![img/actions/QuickLookScreenshot-Provision.png](/img/actions/QuickLookScreenshot-Provision.png)

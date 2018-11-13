@@ -1,3 +1,4 @@
+require 'open-uri'
 require 'spaceship/tunes/tunes'
 
 require_relative 'module'
@@ -24,12 +25,13 @@ module Deliver
     def setup_deliver(file_path, data, deliver_path, options)
       File.write(file_path, data)
 
+      screenshots_path = options[:screenshots_path] || File.join(deliver_path, 'screenshots')
       unless options[:skip_screenshots]
-        download_screenshots(deliver_path, options)
+        download_screenshots(screenshots_path, options)
 
         # Add a README to the screenshots folder
-        FileUtils.mkdir_p(File.join(deliver_path, 'screenshots')) # just in case the fetching didn't work
-        File.write(File.join(deliver_path, 'screenshots', 'README.txt'), File.read("#{Deliver::ROOT}/lib/assets/ScreenshotsHelp"))
+        FileUtils.mkdir_p(screenshots_path) # just in case the fetching didn't work
+        File.write(File.join(screenshots_path, 'README.txt'), File.read("#{Deliver::ROOT}/lib/assets/ScreenshotsHelp"))
       end
 
       UI.success("Successfully created new Deliverfile at path '#{file_path}'")
@@ -39,7 +41,8 @@ module Deliver
     # and screenshots folders
     def generate_deliver_file(deliver_path, options)
       v = options[:app].latest_version
-      generate_metadata_files(v, File.join(deliver_path, 'metadata'))
+      metadata_path = options[:metadata_path] || File.join(deliver_path, 'metadata')
+      generate_metadata_files(v, metadata_path)
 
       # Generate the final Deliverfile here
       return File.read(deliverfile_path)
@@ -92,7 +95,6 @@ module Deliver
         base_dir = File.join(path, UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR)
         FileUtils.mkdir_p(base_dir)
         resulting_path = File.join(base_dir, "#{option_name}.txt")
-        next if content.to_s.chomp.length == 0 # as many developers won't need trade information
         File.write(resulting_path, content)
         UI.message("Writing to '#{resulting_path}'")
       end
@@ -125,8 +127,7 @@ module Deliver
       end
     end
 
-    def download_screenshots(deliver_path, options)
-      path = File.join(deliver_path, 'screenshots')
+    def download_screenshots(path, options)
       FileUtils.mkdir_p(path)
       Deliver::DownloadScreenshots.run(options, path)
     end

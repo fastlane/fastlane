@@ -10,13 +10,13 @@ module Fastlane
 
         PEM.config = params
 
-        if Helper.is_test?
+        if Helper.test?
           profile_path = './test.pem'
         else
           profile_path = PEM::Manager.start
         end
 
-        if success_block and profile_path
+        if success_block && profile_path
           success_block.call(File.expand_path(profile_path)) if success_block
         end
       end
@@ -30,15 +30,20 @@ module Fastlane
       end
 
       def self.details
+        sample = <<-SAMPLE.markdown_sample
+          ```ruby
+          get_push_certificate(
+            new_profile: proc do
+              # your upload code
+            end
+          )
+          ```
+        SAMPLE
+
         [
-          "Additionally to the available options, you can also specify a block that only gets executed if a new",
-          "profile was created. You can use it to upload the new profile to your server.",
-          "Use it like this: ",
-          "get_push_certificate(",
-          "  new_profile: proc do ",
-          "    # your upload code",
-          "  end",
-          ")"
+          "Additionally to the available options, you can also specify a block that only gets executed if a new profile was created. You can use it to upload the new profile to your server.",
+          "Use it like this:".markdown_preserve_newlines,
+          sample
         ].join("\n")
       end
 

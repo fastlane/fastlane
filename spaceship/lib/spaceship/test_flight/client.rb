@@ -15,7 +15,7 @@ module Spaceship
       # Each request method should make only one request. For more high-level logic, put code in the data models.
 
       def self.hostname
-        'https://itunesconnect.apple.com/testflight/v2/'
+        'https://appstoreconnect.apple.com/testflight/v2/'
       end
 
       ##
@@ -92,11 +92,13 @@ module Spaceship
       #   {"b6f65dbd-c845-4d91-bc39-0b661d608970" => "Boarding",
       #    "70402368-9deb-409f-9a26-bb3f215dfee3" => "Automatic"}
       def get_groups(app_id: nil)
-        return @cached_groups if @cached_groups
+        @cached_groups = {} unless @cached_groups
+
+        return @cached_groups[app_id] if @cached_groups[app_id]
         assert_required_params(__method__, binding)
 
         response = request(:get, "/testflight/v2/providers/#{provider_id}/apps/#{app_id}/groups")
-        @cached_groups = handle_response(response)
+        @cached_groups[app_id] = handle_response(response)
       end
 
       def create_group_for_app(app_id: nil, group_name: nil)
@@ -110,6 +112,17 @@ module Spaceship
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
+
+        # This is invalid now.
+        @cached_groups.delete(app_id) if @cached_groups
+
+        handle_response(response)
+      end
+
+      def delete_group_for_app(app_id: nil, group_id: nil)
+        assert_required_params(__method__, binding)
+        url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}"
+        response = request(:delete, url)
         handle_response(response)
       end
 
@@ -155,6 +168,17 @@ module Spaceship
         testers
       end
 
+      #####################################################
+      # @!Internal Testers
+      #####################################################
+      def internal_users(app_id: nil)
+        assert_required_params(__method__, binding)
+        url = "providers/#{team_id}/apps/#{app_id}/internalUsers"
+        r = request(:get, url)
+
+        parse_response(r, 'data')
+      end
+
       ##
       # @!group Testers API
       ##
@@ -190,6 +214,17 @@ module Spaceship
         assert_required_params(__method__, binding)
         url = "providers/#{team_id}/apps/#{app_id}/testers/#{tester_id}"
         response = request(:delete, url)
+        handle_response(response)
+      end
+
+      def remove_testers_from_testflight(app_id: nil, tester_ids: nil)
+        assert_required_params(__method__, binding)
+        url = "providers/#{team_id}/apps/#{app_id}/deleteTesters"
+        response = request(:post) do |req|
+          req.url(url)
+          req.body = tester_ids.map { |i| { "id" => i } }.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
         handle_response(response)
       end
 
@@ -252,6 +287,14 @@ module Spaceship
         handle_response(response)
       end
 
+      def builds_for_group(app_id: nil, group_id: nil)
+        assert_required_params(__method__, binding)
+
+        url = "providers/#{team_id}/apps/#{app_id}/groups/#{group_id}/builds"
+        response = request(:get, url)
+        handle_response(response)
+      end
+
       ##
       # @!group AppTestInfo
       ##
@@ -289,7 +332,7 @@ module Spaceship
 
         raise UnexpectedResponse, response.body['error'] if response.body['error']
 
-        raise UnexpectedResponse, "Temporary iTunes Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
+        raise UnexpectedResponse, "Temporary App Store Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
 
         return response.body['data'] if response.body['data']
 

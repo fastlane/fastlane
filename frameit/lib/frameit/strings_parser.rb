@@ -10,7 +10,12 @@ module Frameit
       result = {}
 
       # A .strings file is UTF-16 encoded. We only want to deal with UTF-8
-      content = `iconv -f UTF-16 -t UTF-8 '#{path}' 2>&1`
+      encoding = encoding_type(path)
+      if encoding.include?('utf-8') || encoding.include?('us-ascii')
+        content = File.read(path)
+      else
+        content = `iconv -f UTF-16 -t UTF-8 "#{path}" 2>&1` # note: double quotes around path so command also works on Windows
+      end
 
       content.split("\n").each_with_index do |line, index|
         begin
@@ -32,6 +37,10 @@ module Frameit
       end
 
       result
+    end
+
+    def self.encoding_type(path)
+      `file --mime-encoding #{path}`.downcase
     end
   end
 end

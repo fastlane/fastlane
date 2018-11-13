@@ -48,6 +48,7 @@ module Spaceship
       attr_accessor :invite_count
       attr_accessor :crash_count
 
+      attr_accessor :auto_notify_enabled
       attr_accessor :did_notify
 
       attr_accessor :upload_date
@@ -73,6 +74,7 @@ module Spaceship
         'installCount' => :install_count,
         'inviteCount' => :invite_count,
         'crashCount' => :crash_count,
+        'autoNotifyEnabled' => :auto_notify_enabled,
         'didNotify' => :did_notify,
         'uploadDate' => :upload_date,
         'id' => :id,
@@ -90,7 +92,8 @@ module Spaceship
         ready_to_submit: 'testflight.build.state.submit.ready',
         ready_to_test: 'testflight.build.state.testing.ready',
         export_compliance_missing: 'testflight.build.state.export.compliance.missing',
-        review_rejected: 'testflight.build.state.review.rejected'
+        review_rejected: 'testflight.build.state.review.rejected',
+        approved: 'testflight.build.state.review.approved'
       }
 
       # Find a Build by `build_id`.
@@ -114,6 +117,11 @@ module Spaceship
       # Just the builds, as a flat array, that are still processing
       def self.all_processing_builds(app_id: nil, platform: nil, retry_count: 0)
         all(app_id: app_id, platform: platform, retry_count: retry_count).find_all(&:processing?)
+      end
+
+      # Just the builds, as a flat array, that are waiting for beta review
+      def self.all_waiting_for_review(app_id: nil, platform: nil, retry_count: 0)
+        all(app_id: app_id, platform: platform, retry_count: retry_count).select { |app| app.external_state == 'testflight.build.state.review.waiting' }
       end
 
       def self.latest(app_id: nil, platform: nil)
@@ -153,6 +161,10 @@ module Spaceship
 
       def review_rejected?
         external_state == BUILD_STATES[:review_rejected]
+      end
+
+      def approved?
+        external_state == BUILD_STATES[:approved]
       end
 
       def processed?
@@ -201,6 +213,7 @@ module Spaceship
 
       def submit_for_testflight_review!
         return if ready_to_test?
+        return if approved?
         client.post_for_testflight_review(app_id: app_id, build_id: id, build: self)
       end
 

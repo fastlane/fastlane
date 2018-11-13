@@ -59,6 +59,12 @@ describe Fastlane do
           upload_to_app_store
           upload_to_play_store
           upload_to_testflight
+          puts
+          println
+          echo
+          xcov
+          create_app_on_managed_play_store
+          download_from_play_store
         )
       end
 

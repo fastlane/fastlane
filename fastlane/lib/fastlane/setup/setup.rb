@@ -34,13 +34,16 @@ module Fastlane
     # Start the setup process
     # rubocop:disable Metrics/BlockNesting
     def self.start(user: nil, is_swift_fastfile: false)
-      if FastlaneCore::FastlaneFolder.setup? and !Helper.is_test?
+      if FastlaneCore::FastlaneFolder.setup? && !Helper.test?
         require 'fastlane/lane_list'
         Fastlane::LaneList.output(FastlaneCore::FastlaneFolder.fastfile_path)
         UI.important("------------------")
         UI.important("fastlane is already set up at path `#{FastlaneCore::FastlaneFolder.path}`, see the available lanes above")
         UI.message("")
-        self.new.suggest_next_steps
+
+        setup_ios = self.new
+        setup_ios.add_or_update_gemfile(update_gemfile_if_needed: false)
+        setup_ios.suggest_next_steps
         return
       end
 
@@ -51,6 +54,10 @@ module Fastlane
       spinner.auto_spin
 
       ios_projects = Dir["**/*.xcodeproj"] + Dir["**/*.xcworkspace"]
+      ios_projects.delete_if do |path|
+        Gem.path.any? { |gem_path| File.expand_path(path).start_with?(gem_path) }
+      end
+      ios_projects.delete_if { |path| path.match("fastlane/swift/FastlaneSwiftRunner/FastlaneSwiftRunner.xcodeproj") }
       android_projects = Dir["**/*.gradle"]
 
       spinner.success
@@ -170,13 +177,85 @@ module Fastlane
 
       File.write(appfile_path, self.appfile_content)
 
+      add_or_update_gemfile(update_gemfile_if_needed: true)
+
       UI.header("✅  Successfully generated fastlane configuration")
       UI.message("Generated Fastfile at path `#{fastfile_path}`")
       UI.message("Generated Appfile at path `#{appfile_path}`")
+      UI.message("Gemfile and Gemfile.lock at path `#{gemfile_path}`")
 
       UI.message("Please check the newly generated configuration files into git along with your project")
       UI.message("This way everyone in your team can benefit from your fastlane setup")
       continue_with_enter
+    end
+
+    def gemfile_path
+      "Gemfile"
+    end
+
+    # Gemfile related code:
+    def gemfile_exists?
+      return File.exist?(gemfile_path)
+    end
+
+    def setup_gemfile!
+      # No Gemfile yet
+      gemfile_content = []
+      gemfile_content << "source \"https://rubygems.org\""
+      gemfile_content << ""
+      gemfile_content << 'gem "fastlane"'
+      gemfile_content << ""
+      File.write(gemfile_path, gemfile_content.join("\n"))
+
+      UI.message("Installing dependencies for you...")
+      FastlaneCore::CommandExecutor.execute(
+        command: "bundle update",
+        print_all: FastlaneCore::Globals.verbose?,
+        print_command: true,
+        error: proc do |error_output|
+          UI.error("Something went wrong when running `bundle update` for you")
+          UI.error("Please take a look at your Gemfile at path `#{gemfile_path}`")
+          UI.error("and make sure you can run `bundle update` on your machine.")
+        end
+      )
+    end
+
+    def ensure_gemfile_valid!(update_gemfile_if_needed: false)
+      gemfile_content = File.read(gemfile_path)
+      unless gemfile_content.include?("https://rubygems.org")
+        UI.error("You have a local Gemfile, but RubyGems isn't defined as source")
+        UI.error("Please update your Gemfile at path `#{gemfile_path}` to include")
+        UI.important("")
+        UI.important("source \"https://rubygems.org\"")
+        UI.important("")
+        UI.error("Update your Gemfile, and run `bundle update` afterwards")
+      end
+
+      unless gemfile_content.include?("fastlane")
+        if update_gemfile_if_needed
+          gemfile_content << "\n\ngem \"fastlane\""
+          UI.message("Adding `fastlane` to your existing Gemfile at path '#{gemfile_path}'")
+
+          File.write(gemfile_path, gemfile_content)
+        else
+          UI.error("You have a local Gemfile, but it doesn't include \"fastlane\" as a dependency")
+          UI.error("Please add `gem \"fastlane\"` to your Gemfile")
+        end
+      end
+    end
+
+    # This method is responsible for ensuring there is a working
+    # Gemfile, and that `fastlane` is defined as a dependency
+    # while also having `rubygems` as a gem source
+    def add_or_update_gemfile(update_gemfile_if_needed: false)
+      if gemfile_exists?
+        ensure_gemfile_valid!(update_gemfile_if_needed: update_gemfile_if_needed)
+      else
+        if update_gemfile_if_needed || UI.confirm("It is recommended to run fastlane with a Gemfile set up, do you want fastlane to create one for you?")
+          setup_gemfile!
+        end
+      end
+      return gemfile_path
     end
 
     def finish_up
@@ -254,7 +333,7 @@ module Fastlane
         UI.message("\t\thttps://docs.fastlane.tools/getting-started/ios/beta-deployment/".cyan)
         UI.message("🚀  Learn more about how to automate the App Store release process:")
         UI.message("\t\thttps://docs.fastlane.tools/getting-started/ios/appstore-deployment/".cyan)
-        UI.message("👩‍⚕️  Lern more about how to setup code signing with fastlane")
+        UI.message("👩‍⚕️  Learn more about how to setup code signing with fastlane")
         UI.message("\t\thttps://docs.fastlane.tools/codesigning/getting-started/".cyan)
       end
 
@@ -274,10 +353,3 @@ end
 
 require 'fastlane/setup/setup_ios'
 require 'fastlane/setup/setup_android'
-require 'fastlane/setup/crashlytics_beta_ui'
-require 'fastlane/setup/crashlytics_beta'
-require 'fastlane/setup/crashlytics_project_parser'
-require 'fastlane/setup/crashlytics_beta_info'
-require 'fastlane/setup/crashlytics_beta_info_collector'
-require 'fastlane/setup/crashlytics_beta_command_line_handler'
-require 'fastlane/setup/crashlytics_beta_user_email_fetcher'

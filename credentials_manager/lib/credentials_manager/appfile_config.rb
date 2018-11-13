@@ -29,12 +29,12 @@ module CredentialsManager
 
       path ||= self.class.default_path
 
-      if path and File.exist?(path) # it might not exist, we still want to use the default values
+      if path && File.exist?(path) # it might not exist, we still want to use the default values
         full_path = File.expand_path(path)
         Dir.chdir(File.expand_path('..', path)) do
-          content = File.read(full_path)
+          content = File.read(full_path, encoding: "utf-8")
 
-          # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
+          # From https://github.com/orta/danger/blob/master/lib/danger/danger_core/dangerfile.rb
           if content.tr!('“”‘’‛', %(""'''))
             puts("Your #{File.basename(path)} has had smart quotes sanitised. " \
                  'To avoid issues in the future, you should not use ' \
@@ -110,7 +110,7 @@ module CredentialsManager
       setter(:team_name, *args, &block)
     end
 
-    # iTunes Connect
+    # App Store Connect
     def itc_team_id(*args, &block)
       setter(:itc_team_id, *args, &block)
     end

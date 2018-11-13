@@ -6,8 +6,8 @@
 
 # Remove the # in front of the line to enable the option
 
-# scheme "Example"
+# scheme("Example")
 
-# sdk "iphoneos9.0"
+# sdk("iphoneos9.0")
 
-output_directory "./"
+output_directory("./")

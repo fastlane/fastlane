@@ -3,11 +3,11 @@ module Fastlane
     def self.parse(action, params)
       first_element = (action.available_options || []).first
 
-      if first_element and first_element.kind_of?(FastlaneCore::ConfigItem)
+      if first_element && first_element.kind_of?(FastlaneCore::ConfigItem)
         # default use case
         return FastlaneCore::Configuration.create(action.available_options, params)
       elsif first_element
-        UI.error("Old configuration format for action '#{action}'") if Helper.is_test?
+        UI.error("Old configuration format for action '#{action}'") if Helper.test?
         return params
       else
 

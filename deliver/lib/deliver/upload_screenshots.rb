@@ -5,7 +5,7 @@ require_relative 'module'
 require_relative 'loader'
 
 module Deliver
-  # upload screenshots to iTunes Connect
+  # upload screenshots to App Store Connect
   class UploadScreenshots
     def upload(options, screenshots)
       return if options[:skip_screenshots]
@@ -26,7 +26,7 @@ module Deliver
           # We have to nil check for languages not activated
           next if v.screenshots[language].nil?
           v.screenshots[language].each_with_index do |t, index|
-            v.upload_screenshot!(nil, t.sort_order, t.language, t.device_type, false)
+            v.upload_screenshot!(nil, t.sort_order, t.language, t.device_type, t.is_imessage)
           end
         end
       end
@@ -55,7 +55,7 @@ module Deliver
 
           index = indized[screenshot.language][screenshot.formatted_name]
 
-          if index > 5
+          if index > 10
             UI.error("Too many screenshots found for device '#{screenshot.formatted_name}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
             next
           end
@@ -75,7 +75,7 @@ module Deliver
         v = app.edit_version
         Helper.hide_loading_indicator
       end
-      UI.success("Successfully uploaded screenshots to iTunes Connect")
+      UI.success("Successfully uploaded screenshots to App Store Connect")
     end
 
     def collect_screenshots(options)

@@ -49,7 +49,7 @@ module Fastlane
       end
 
       def self.should_run?(params)
-        Helper.is_ci? || params[:force]
+        Helper.ci? || params[:force]
       end
 
       #####################################################
@@ -61,12 +61,15 @@ module Fastlane
       end
 
       def self.details
+        list = <<-LIST.markdown_list(true)
+          Creates a new temporary keychain for use with match
+          Switches match to `readonly` mode to not create new profiles/cert on CI
+          Sets up log and test result paths to be easily collectible
+        LIST
+
         [
-          "- Creates a new temporary keychain for use with match",
-          "- Switches match to `readonly` mode to not create new profiles/cert on CI",
-          "- Sets up log and test result paths to be easily collectible",
-          "",
-          "This action helps with CircleCI integration, add this to the top of your Fastfile if you use CircleCI"
+          list,
+          "This action helps with CircleCI integration. Add this to the top of your Fastfile if you use CircleCI."
         ].join("\n")
       end
 

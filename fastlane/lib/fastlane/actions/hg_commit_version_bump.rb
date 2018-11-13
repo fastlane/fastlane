@@ -10,17 +10,17 @@ module Fastlane
 
         xcodeproj_path = params[:xcodeproj] ? File.expand_path(File.join('.', params[:xcodeproj])) : nil
 
-        if Helper.is_test?
+        if Helper.test?
           xcodeproj_path = "/tmp/Test.xcodeproj"
         end
 
         # get the repo root path
-        repo_path = Helper.is_test? ? '/tmp/repo' : Actions.sh('hg root').strip
+        repo_path = Helper.test? ? '/tmp/repo' : Actions.sh('hg root').strip
         repo_pathname = Pathname.new(repo_path)
 
         if xcodeproj_path
           # ensure that the xcodeproj passed in was OK
-          unless Helper.is_test?
+          unless Helper.test?
             UI.user_error!("Could not find the specified xcodeproj: #{xcodeproj_path}") unless File.directory?(xcodeproj_path)
           end
         else
@@ -42,7 +42,7 @@ module Fastlane
         end
 
         # find the pbxproj path, relative to hg directory
-        if Helper.is_test?
+        if Helper.test?
           hg_dirty_files = params[:test_dirty_files].split(",")
           expected_changed_files = params[:test_expected_files].split(",")
         else
@@ -94,7 +94,7 @@ module Fastlane
 
         # create a commit with a message
         command = "hg commit -m '#{params[:message]}'"
-        return command if Helper.is_test?
+        return command if Helper.test?
         begin
           Actions.sh(command)
 
@@ -152,14 +152,17 @@ module Fastlane
       end
 
       def self.details
+        list = <<-LIST.markdown_list
+          All `.plist` files
+          The `.xcodeproj/project.pbxproj` file
+        LIST
         [
-          "The mercurial equivalent of the [`commit_version_bump`](#commit_version_bump) git action. Like the git version, it is useful in conjunction with [`increment_build_number`](#increment_build_number).",
-          "It checks the repo to make sure that only the relevant files have changed, these are the files that `increment_build_number` (`agvtool`) touches:",
-          "- All .plist files",
-          "- The `.xcodeproj/project.pbxproj` file",
+          "The mercurial equivalent of the [commit_version_bump](https://docs.fastlane.tools/actions/commit_version_bump/) git action. Like the git version, it is useful in conjunction with [`increment_build_number`](https://docs.fastlane.tools/actions/increment_build_number/).",
+          "It checks the repo to make sure that only the relevant files have changed, these are the files that `increment_build_number` (`agvtool`) touches:".markdown_preserve_newlines,
+          list,
           "Then commits those files to the repo.",
           "Customize the message with the `:message` option, defaults to 'Version Bump'",
-          "If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the [`clean_build_artifacts`](#clean_build_artifacts) action to clean those temporary files up before running this action."
+          "If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the [clean_build_artifacts](https://docs.fastlane.tools/actions/clean_build_artifacts/) action to clean those temporary files up before running this action."
         ].join("\n")
       end
 

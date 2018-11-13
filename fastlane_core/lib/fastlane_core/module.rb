@@ -10,7 +10,7 @@ module FastlaneCore
   # If you opt out, we will not send anything.
   # You can confirm this by observing how we use the environment variable: FASTLANE_OPT_OUT_USAGE
   # Specifically, in AnalyticsSession.finalize_session
-  # Learn more at https://github.com/fastlane/fastlane#metrics
+  # Learn more at https://docs.fastlane.tools/#metrics
   def self.session
     @session ||= AnalyticsSession.new
   end
@@ -24,7 +24,7 @@ module FastlaneCore
   # Since we don't want to access FastlaneCore from spaceship
   # this method is duplicated in spaceship/client.rb
   def self.fastlane_user_dir
-    path = File.expand_path(File.join("~", ".fastlane"))
+    path = File.expand_path(File.join(Dir.home, ".fastlane"))
     FileUtils.mkdir_p(path) unless File.directory?(path)
     return path
   end

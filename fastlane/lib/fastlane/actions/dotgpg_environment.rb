@@ -17,7 +17,7 @@ module Fastlane
       end
 
       def self.details
-        "More information about dotgpg can be found at https://github.com/ConradIrwin/dotgpg"
+        "More information about dotgpg can be found at [https://github.com/ConradIrwin/dotgpg](https://github.com/ConradIrwin/dotgpg)."
       end
 
       def self.available_options
@@ -27,6 +27,7 @@ module Fastlane
                                        description: "Path to your gpg file",
                                        code_gen_sensitive: true,
                                        default_value: Dir["dotgpg/*.gpg"].last,
+                                       default_value_dynamic: true,
                                        optional: false,
                                        verify_block: proc do |value|
                                          UI.user_error!("Dotgpg file '#{File.expand_path(value)}' not found") unless File.exist?(value)

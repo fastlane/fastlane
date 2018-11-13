@@ -1,10 +1,10 @@
 require_relative 'module'
+require 'fastlane_core/fastlane_pty'
 
 module Snapshot
   # This class takes care of rotating images
   class ScreenshotRotate
     require 'shellwords'
-    require 'pty'
 
     # @param (String) The path in which the screenshots are located in
     def run(path)
@@ -25,16 +25,11 @@ module Snapshot
           command = "sips -r 180 '#{file}'"
         end
 
+        # Only rotate if we need to
         next unless command
 
-        # Only rotate if we need to
-        PTY.spawn(command) do |r, w, pid|
-          r.sync
-          r.each do |line|
-            # We need to read this otherwise things hang
-          end
-          ::Process.wait(pid)
-        end
+        # Rotate
+        FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: false)
       end
     end
   end

@@ -48,9 +48,8 @@ module Fastlane
       def self.details
         [
           "This action will return the current build number set on your project.",
-          "You first have to set up your Xcode project, if you haven't done it already:",
-          "https://developer.apple.com/library/ios/qa/qa1827/_index.html"
-        ].join(' ')
+          "You first have to set up your Xcode project, if you haven't done it already: [https://developer.apple.com/library/ios/qa/qa1827/_index.html](https://developer.apple.com/library/ios/qa/qa1827/_index.html)."
+        ].join("\n")
       end
 
       def self.available_options
@@ -61,7 +60,7 @@ module Fastlane
                              optional: true,
                              verify_block: proc do |value|
                                UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
-                               UI.user_error!("Could not find Xcode project") if !File.exist?(value) and !Helper.is_test?
+                               UI.user_error!("Could not find Xcode project") if !File.exist?(value) && !Helper.test?
                              end),
           FastlaneCore::ConfigItem.new(key: :hide_error_when_versioning_disabled,
                              env_name: "FL_BUILD_NUMBER_HIDE_ERROR_WHEN_VERSIONING_DISABLED",

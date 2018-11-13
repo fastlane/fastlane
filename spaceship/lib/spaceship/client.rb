@@ -23,6 +23,7 @@ module Spaceship
   class Client
     PROTOCOL_VERSION = "QH65B2"
     USER_AGENT = "Spaceship #{Fastlane::VERSION}"
+    AUTH_TYPES = ["sa", "hsa", "non-sa", "hsa2"]
 
     attr_reader :client
 
@@ -40,8 +41,6 @@ module Spaceship
 
     attr_accessor :provider
 
-    attr_accessor :available_providers
-
     # legacy support
     BasicPreferredInfoError = Spaceship::BasicPreferredInfoError
     InvalidUserCredentialsError = Spaceship::InvalidUserCredentialsError
@@ -51,6 +50,7 @@ module Spaceship
     UnexpectedResponse = Spaceship::UnexpectedResponse
     AppleTimeoutError = Spaceship::AppleTimeoutError
     UnauthorizedAccessError = Spaceship::UnauthorizedAccessError
+    GatewayTimeoutError = Spaceship::GatewayTimeoutError
     InternalServerError = Spaceship::InternalServerError
 
     # Authenticates with Apple's web services. This method has to be called once
@@ -193,6 +193,11 @@ module Spaceship
       end
     end
 
+    # @return (String) Fetches name from currently used team
+    def team_name
+      (team_information || {})['name']
+    end
+
     # Instantiates a client but with a cookie derived from another client.
     #
     # HACK: since the `@cookie` is not exposed, we use this hacky way of sharing the instance.
@@ -222,6 +227,9 @@ module Spaceship
           # This enables tracking of networking requests using Charles Web Proxy
           c.proxy("https://127.0.0.1:8888")
           c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
+        elsif ENV["SPACESHIP_PROXY"]
+          c.proxy(ENV["SPACESHIP_PROXY"])
+          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
         end
 
         if ENV["DEBUG"]
@@ -337,7 +345,7 @@ module Spaceship
     #
     # @return (Spaceship::Client) The client the login method was called for
     def login(user = nil, password = nil)
-      if user.to_s.empty? or password.to_s.empty?
+      if user.to_s.empty? || password.to_s.empty?
         require 'credentials_manager/account_manager'
 
         keychain_entry = CredentialsManager::AccountManager.new(user: user, password: password)
@@ -345,7 +353,7 @@ module Spaceship
         password = keychain_entry.password
       end
 
-      if user.to_s.strip.empty? or password.to_s.strip.empty?
+      if user.to_s.strip.empty? || password.to_s.strip.empty?
         raise NoUserCredentialsError.new, "No login data provided"
       end
 
@@ -364,7 +372,7 @@ module Spaceship
       end
     end
 
-    # This method is used for both the Apple Dev Portal and iTunes Connect
+    # This method is used for both the Apple Dev Portal and App Store Connect
     # This will also handle 2 step verification
     def send_shared_login_request(user, password)
       # Check if we have a cached/valid session here
@@ -387,7 +395,7 @@ module Spaceship
           # As this will raise an exception if the old session has expired
           # If the old session is still valid, we don't have to do anything else in this method
           # that's why we return true
-          return true if fetch_olympus_session.count > 0
+          return true if fetch_olympus_session
         rescue
           # If the `fetch_olympus_session` method raises an exception
           # we'll land here, and therefore continue doing a full login process
@@ -459,8 +467,12 @@ module Spaceship
         if (response.body || "").include?('invalid="true"')
           # User Credentials are wrong
           raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
+        elsif response.status == 412 && AUTH_TYPES.include?(response.body["authType"])
+          # Need to acknowledge Apple ID and Privacy statement - https://github.com/fastlane/fastlane/issues/12577
+          # Looking for status of 412 might be enough but might be safer to keep looking only at what is being reported
+          raise AppleIDAndPrivacyAcknowledgementNeeded.new, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement."
         elsif (response['Set-Cookie'] || "").include?("itctx")
-          raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
+          raise "Looks like your Apple ID is not enabled for App Store Connect, make sure to be able to login online"
         else
           info = [response.body, response['Set-Cookie']]
           raise Tunes::Error.new, info.join("\n")
@@ -480,14 +492,13 @@ module Spaceship
         end
 
         provider = body["provider"]
-        self.provider = Spaceship::Provider.new(provider_hash: provider) unless provider.nil?
-
-        available_providers_list = body["availableProviders"].compact
-
-        self.available_providers = available_providers_list.map do |provider_hash|
-          Spaceship::Provider.new(provider_hash: provider_hash)
+        if provider
+          self.provider = Spaceship::Provider.new(provider_hash: provider)
+          return true
         end
       end
+
+      return false
     end
 
     def itc_service_key
@@ -497,6 +508,9 @@ module Spaceship
       itc_service_key_path = "/tmp/spaceship_itc_service_key.txt"
       return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
 
+      # Fixes issue https://github.com/fastlane/fastlane/issues/13281
+      # Even though we are using https://appstoreconnect.apple.com, the service key needs to still use a
+      # hostname through itunesconnect.apple.com
       response = request(:get, "https://olympus.itunes.apple.com/v1/app/config?hostname=itunesconnect.apple.com")
       @service_key = response.body["authServiceKey"].to_s
 
@@ -508,7 +522,7 @@ module Spaceship
       return @service_key
     rescue => ex
       puts(ex.to_s)
-      raise AppleTimeoutError.new, "Could not receive latest API key from iTunes Connect, this might be a server issue."
+      raise AppleTimeoutError.new, "Could not receive latest API key from App Store Connect, this might be a server issue."
     end
 
     #####################################################
@@ -522,6 +536,7 @@ module Spaceship
         Faraday::Error::TimeoutError,
         Faraday::ParsingError, # <h2>Internal Server Error</h2> with content type json
         AppleTimeoutError,
+        GatewayTimeoutError,
         InternalServerError => ex # New Faraday version: Faraday::TimeoutError => ex
       tries -= 1
       unless tries.zero?
@@ -609,7 +624,7 @@ module Spaceship
     end
 
     def detect_most_common_errors_and_raise_exceptions(body)
-      # Check if the failure is due to missing permissions (iTunes Connect)
+      # Check if the failure is due to missing permissions (App Store Connect)
       if body["messages"] && body["messages"]["error"].include?("Forbidden")
         raise_insuffient_permission_error!
       elsif body["messages"] && body["messages"]["error"].include?("insufficient privileges")
@@ -617,7 +632,9 @@ module Spaceship
         # With the default location the error would say that `parse_response` is the caller
         raise_insuffient_permission_error!(caller_location: 3)
       elsif body.to_s.include?("Internal Server Error - Read")
-        raise InternalServerError, "Received an internal server error from iTunes Connect / Developer Portal, please try again later"
+        raise InternalServerError, "Received an internal server error from App Store Connect / Developer Portal, please try again later"
+      elsif body.to_s.include?("Gateway Timeout - In read")
+        raise GatewayTimeoutError, "Received a gateway timeout error from App Store Connect / Developer Portal, please try again later"
       elsif (body["resultString"] || "").include?("Program License Agreement")
         raise ProgramLicenseAgreementUpdated, "#{body['userString']} Please manually log into your Apple Developer account to review and accept the updated agreement."
       end
@@ -654,9 +671,9 @@ module Spaceship
 
     # Is called from `parse_response` to store the latest csrf_token (if available)
     def store_csrf_tokens(response)
-      if response and response.headers
+      if response && response.headers
         tokens = response.headers.select { |k, v| %w(csrf csrf_ts).include?(k) }
-        if tokens and !tokens.empty?
+        if tokens && !tokens.empty?
           @csrf_tokens = tokens
         end
       end

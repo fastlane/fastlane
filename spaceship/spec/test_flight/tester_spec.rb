@@ -4,7 +4,8 @@ describe Spaceship::TestFlight::Tester do
   let(:mock_client) { double('MockClient') }
 
   before do
-    Spaceship::TestFlight::Base.client = mock_client
+    allow(Spaceship::TestFlight::Base).to receive(:client).and_return(mock_client)
+    allow(mock_client).to receive(:team_id).and_return('')
   end
 
   context 'attr_mapping' do
@@ -134,6 +135,13 @@ describe Spaceship::TestFlight::Tester do
       it 'removes a tester from the app' do
         expect(mock_client).to receive(:delete_tester_from_app).with(app_id: 'app-id', tester_id: 2)
         tester.remove_from_app!(app_id: 'app-id')
+      end
+    end
+
+    context '.remove_from_testflight!' do
+      it 'removes a tester from TestFlight' do
+        expect(mock_client).to receive(:remove_testers_from_testflight).with(app_id: 'app-id', tester_ids: [2])
+        tester.remove_from_testflight!(app_id: 'app-id')
       end
     end
   end

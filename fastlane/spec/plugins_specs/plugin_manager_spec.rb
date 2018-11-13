@@ -106,20 +106,26 @@ describe Fastlane do
         end
 
         it "supports specifying a custom local path" do
-          expect(FastlaneCore::UI.current).to receive(:select).and_return("Local Path")
-          expect(FastlaneCore::UI.current).to receive(:input).and_return("../yoo")
+          expect(FastlaneCore::UI.ui_object).to receive(:select).and_return("Local Path")
+          expect(FastlaneCore::UI.ui_object).to receive(:input).and_return("../yoo")
           expect(plugin_manager.gem_dependency_suffix("fastlane")).to eq(", path: '../yoo'")
         end
 
         it "supports specifying a custom git URL" do
-          expect(FastlaneCore::UI.current).to receive(:select).and_return("Git URL")
-          expect(FastlaneCore::UI.current).to receive(:input).and_return("https://github.com/fastlane/fastlane")
+          expect(FastlaneCore::UI.ui_object).to receive(:select).and_return("Git URL")
+          expect(FastlaneCore::UI.ui_object).to receive(:input).and_return("https://github.com/fastlane/fastlane")
           expect(plugin_manager.gem_dependency_suffix("fastlane")).to eq(", git: 'https://github.com/fastlane/fastlane'")
         end
 
         it "supports falling back to RubyGems" do
-          expect(FastlaneCore::UI.current).to receive(:select).and_return("RubyGems.org ('fastlane' seems to not be available there)")
+          expect(FastlaneCore::UI.ui_object).to receive(:select).and_return("RubyGems.org ('fastlane' seems to not be available there)")
           expect(plugin_manager.gem_dependency_suffix("fastlane")).to eq("")
+        end
+
+        it "supports specifying a custom source" do
+          expect(FastlaneCore::UI.ui_object).to receive(:select).and_return("Other Gem Server")
+          expect(FastlaneCore::UI.ui_object).to receive(:input).and_return("https://gems.mycompany.com")
+          expect(plugin_manager.gem_dependency_suffix("fastlane")).to eq(", source: 'https://gems.mycompany.com'")
         end
       end
     end

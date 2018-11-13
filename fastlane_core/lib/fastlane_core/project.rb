@@ -1,5 +1,5 @@
-require_relative 'xcodebuild_list_output_parser'
 require_relative 'helper'
+require 'xcodeproj'
 
 module FastlaneCore
   # Represents an Xcode project
@@ -7,7 +7,7 @@ module FastlaneCore
     class << self
       # Project discovery
       def detect_projects(config)
-        if config[:workspace].to_s.length > 0 and config[:project].to_s.length > 0
+        if config[:workspace].to_s.length > 0 && config[:project].to_s.length > 0
           UI.user_error!("You can only pass either a workspace or a project path, not both")
         end
 
@@ -25,7 +25,7 @@ module FastlaneCore
 
         return if config[:workspace].to_s.length > 0
 
-        if config[:workspace].to_s.length == 0 and config[:project].to_s.length == 0
+        if config[:workspace].to_s.length == 0 && config[:project].to_s.length == 0
           project = Dir["./*.xcodeproj"]
           if project.count > 1
             puts("Select Project: ")
@@ -35,7 +35,7 @@ module FastlaneCore
           end
         end
 
-        if config[:workspace].nil? and config[:project].nil?
+        if config[:workspace].nil? && config[:project].nil?
           select_project(config)
         end
       end
@@ -83,7 +83,7 @@ module FastlaneCore
       self.xcodebuild_list_silent = xcodebuild_list_silent
       self.xcodebuild_suppress_stderr = xcodebuild_suppress_stderr
 
-      if !path or !File.directory?(path)
+      if !path || !File.directory?(path)
         UI.user_error!("Could not find project at path '#{path}'")
       end
     end
@@ -100,9 +100,29 @@ module FastlaneCore
       end
     end
 
+    # returns the Xcodeproj::Workspace or nil if it is a project
+    def workspace
+      return nil unless workspace?
+      @workspace ||= Xcodeproj::Workspace.new_from_xcworkspace(path)
+      @workspace.load_schemes(path)
+      @workspace
+    end
+
+    # returns the Xcodeproj::Project or nil if it is a workspace
+    def project
+      return nil if workspace?
+      @project ||= Xcodeproj::Project.open(path)
+    end
+
     # Get all available schemes in an array
     def schemes
-      parsed_info.schemes
+      @schemes ||= if workspace?
+                     workspace.schemes.reject do |k, v|
+                       v.include?("Pods/Pods.xcodeproj")
+                     end.keys
+                   else
+                     Xcodeproj::Project.schemes(path)
+                   end
     end
 
     # Let the user select a scheme
@@ -111,7 +131,7 @@ module FastlaneCore
       if options[:scheme].to_s.length > 0
         # Verify the scheme is available
         unless schemes.include?(options[:scheme].to_s)
-          UI.error("Couldn't find specified scheme '#{options[:scheme]}'.")
+          UI.error("Couldn't find specified scheme '#{options[:scheme]}'. Please make sure that the scheme is shared, see https://developer.apple.com/library/content/documentation/IDEs/Conceptual/xcode_guide-continuous_integration/ConfigureBots.html#//apple_ref/doc/uid/TP40013292-CH9-SW3")
           options[:scheme] = nil
         end
       end
@@ -126,12 +146,12 @@ module FastlaneCore
           preferred = schemes.find_all { |a| a.downcase.include?(preferred_to_include.downcase) }
         end
 
-        if preferred_to_include and preferred.count == 1
+        if preferred_to_include && preferred.count == 1
           options[:scheme] = preferred.last
         elsif automated_scheme_selection? && schemes.include?(project_name)
           UI.important("Using scheme matching project name (#{project_name}).")
           options[:scheme] = project_name
-        elsif Helper.is_ci?
+        elsif Helper.ci?
           UI.error("Multiple schemes found but you haven't specified one.")
           UI.error("Since this is a CI, please pass one using the `scheme` option")
           show_scheme_shared_information
@@ -155,7 +175,27 @@ module FastlaneCore
 
     # Get all available configurations in an array
     def configurations
-      parsed_info.configurations
+      @configurations ||= if workspace?
+                            workspace
+                              .file_references
+                              .map(&:path)
+                              .reject { |p| p.include?("Pods/Pods.xcodeproj") }
+                              .map do |p|
+                                # To maintain backwards compatibility, we
+                                # silently ignore non-existent projects from
+                                # workspaces.
+                                begin
+                                  Xcodeproj::Project.open(p).build_configurations
+                                rescue
+                                  []
+                                end
+                              end
+                              .flatten
+                              .compact
+                              .map(&:name)
+                          else
+                            project.build_configurations.map(&:name)
+                          end
     end
 
     # Returns bundle_id and sets the scheme for xcrun
@@ -271,6 +311,7 @@ module FastlaneCore
       proj << "-scheme #{options[:scheme].shellescape}" if options[:scheme]
       proj << "-project #{options[:project].shellescape}" if options[:project]
       proj << "-configuration #{options[:configuration].shellescape}" if options[:configuration]
+      proj << "-xcconfig #{options[:xcconfig].shellescape}" if options[:xcconfig]
 
       return proj
     end
@@ -317,8 +358,8 @@ module FastlaneCore
             UI.error("Could not read build settings. Make sure that the scheme \"#{options[:scheme]}\" is configured for running by going to Product → Scheme → Edit Scheme…, selecting the \"Build\" section, checking the \"Run\" checkbox and closing the scheme window.")
           end
         rescue Timeout::Error
-          raise FastlaneCore::Interface::FastlaneDependencyCausedException.new, "xcodebuild -showBuildSettings timed-out after #{timeout} seconds and #{retries} retries." \
-            " You can override the timeout value with the environment variable FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT," \
+          raise FastlaneCore::Interface::FastlaneDependencyCausedException.new, "xcodebuild -showBuildSettings timed out after #{retries + 1} retries with a base timeout of #{timeout}." \
+            " You can override the base timeout value with the environment variable FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT," \
             " and the number of retries with the environment variable FASTLANE_XCODEBUILD_SETTINGS_RETRIES ".red
         end
       end
@@ -346,76 +387,9 @@ module FastlaneCore
       build_settings(key: key, optional: optional)
     end
 
-    def build_xcodebuild_list_command
-      # Unfortunately since we pass the workspace we also get all the
-      # schemes generated by CocoaPods
-      options = xcodebuild_parameters.delete_if { |a| a.to_s.include?("scheme") }
-      command = "xcodebuild -list #{options.join(' ')}"
-      command += " 2> /dev/null" if xcodebuild_suppress_stderr
-      command
-    end
-
-    def raw_info(silent: false)
-      # Examples:
-
-      # Standard:
-      #
-      # Information about project "Example":
-      #     Targets:
-      #         Example
-      #         ExampleUITests
-      #
-      #     Build Configurations:
-      #         Debug
-      #         Release
-      #
-      #     If no build configuration is specified and -scheme is not passed then "Release" is used.
-      #
-      #     Schemes:
-      #         Example
-      #         ExampleUITests
-
-      # CococaPods
-      #
-      # Example.xcworkspace
-      # Information about workspace "Example":
-      #     Schemes:
-      #         Example
-      #         HexColors
-      #         Pods-Example
-
-      return @raw if @raw
-
-      command = build_xcodebuild_list_command
-
-      # xcode >= 6 might hang here if the user schemes are missing
-      begin
-        timeout = FastlaneCore::Project.xcode_list_timeout
-        retries = FastlaneCore::Project.xcode_list_retries
-        @raw = FastlaneCore::Project.run_command(command, timeout: timeout, retries: retries, print: !silent)
-      rescue Timeout::Error
-        UI.user_error!("xcodebuild -list timed-out after #{timeout * retries} seconds. You might need to recreate the user schemes." \
-          " You can override the timeout value with the environment variable FASTLANE_XCODE_LIST_TIMEOUT")
-      end
-
-      UI.user_error!("Error parsing xcode file using `#{command}`") if @raw.length == 0
-
-      return @raw
-    end
-
-    # @internal to module
-    def self.xcode_list_timeout
-      (ENV['FASTLANE_XCODE_LIST_TIMEOUT'] || 10).to_i
-    end
-
-    # @internal to module
-    def self.xcode_list_retries
-      (ENV['FASTLANE_XCODE_LIST_RETRIES'] || 3).to_i
-    end
-
     # @internal to module
     def self.xcode_build_settings_timeout
-      (ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] || 10).to_i
+      (ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] || 3).to_i
     end
 
     # @internal to module
@@ -424,7 +398,9 @@ module FastlaneCore
     end
 
     # @internal to module
-    # runs the specified command with the specified number of retries, killing each run if it times out
+    # runs the specified command with the specified number of retries, killing each run if it times out.
+    # the first run times out after specified timeout elapses, and each successive run times out after
+    # a doubling of the previous timeout has elapsed.
     # @raises Timeout::Error if all tries result in a timeout
     # @returns the output of the command
     # Note: - currently affected by https://github.com/fastlane/fastlane/issues/1504
@@ -438,22 +414,27 @@ module FastlaneCore
 
       total_tries = retries + 1
       try = 1
+      try_timeout = timeout
       begin
-        Timeout.timeout(timeout) do
+        Timeout.timeout(try_timeout) do
           # Using Helper.backticks didn't work here. `Timeout` doesn't time out, and the command hangs forever
           result = `#{command}`.to_s
         end
       rescue Timeout::Error
         try_limit_reached = try >= total_tries
 
-        message = "Command timed out after #{timeout} seconds on try #{try} of #{total_tries}"
-        message += ", trying again..." unless try_limit_reached
+        # Try harder on each iteration
+        next_timeout = try_timeout * 2
+
+        message = "Command timed out after #{try_timeout} seconds on try #{try} of #{total_tries}"
+        message += ", trying again with a #{next_timeout} second timeout..." unless try_limit_reached
 
         UI.important(message)
 
         raise if try_limit_reached
 
         try += 1
+        try_timeout = next_timeout
         retry
       end
 
@@ -475,10 +456,13 @@ module FastlaneCore
         @_project_paths = workspace_data.scan(/\"group:(.*)\"/).collect do |current_match|
           # It's a relative path from the workspace file
           File.join(File.expand_path("..", path), current_match.first)
-        end.find_all do |current_match|
+        end.select do |current_match|
+          # Xcode workspaces can contain loose files now, so let's filter non-xcodeproj files.
+          current_match.end_with?(".xcodeproj")
+        end.reject do |current_match|
           # We're not interested in a `Pods` project, as it doesn't contain any relevant
           # information about code signing
-          !current_match.end_with?("Pods/Pods.xcodeproj")
+          current_match.end_with?("Pods/Pods.xcodeproj")
         end
 
         return @_project_paths
@@ -489,13 +473,6 @@ module FastlaneCore
     end
 
     private
-
-    def parsed_info
-      unless @parsed_info
-        @parsed_info = FastlaneCore::XcodebuildListOutputParser.new(raw_info(silent: xcodebuild_list_silent))
-      end
-      @parsed_info
-    end
 
     # If scheme not specified, do we want the scheme
     # matching project name?

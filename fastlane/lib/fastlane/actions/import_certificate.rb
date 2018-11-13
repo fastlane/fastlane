@@ -38,7 +38,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :log_output,
                                        description: "If output should be logged to the console",
-                                       type: TrueClass,
+                                       type: Boolean,
                                        default_value: false,
                                        optional: true)
         ]

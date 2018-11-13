@@ -2,7 +2,7 @@
   <img src="/img/actions/match.png" width="250">
 </p>
 
-###### Easily sync your certificates and profiles across your team using git
+###### Easily sync your certificates and profiles across your team
 
 A new approach to iOS code signing: Share one code signing identity across your development team to simplify your codesigning setup and prevent code signing issues.
 
@@ -20,7 +20,7 @@ _match_ is the implementation of the https://codesigning.guide concept. _match_ 
 
 -------
 
-<h5 align="center"><code>match</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
+<h5 align="center"><em>match</em> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 ## Why match?
 
@@ -56,7 +56,7 @@ Before starting to use _match_, make sure to read the [codesigning.guide](https:
 💥  | Easily reset your existing profiles and certificates if your current account has expired or invalid profiles
 ♻️  | Automatically renew your provisioning profiles to include all your devices using the `--force` option
 👥  | Support for multiple Apple accounts and multiple teams
-✨ | Tightly integrated with [fastlane](https://fastlane.tools) to work seamlessly with [gym](https://docs.fastlane.tools/actions/gym) and other build tools
+✨ | Tightly integrated with [_fastlane_](https://fastlane.tools) to work seamlessly with [_gym_](https://docs.fastlane.tools/actions/gym/) and other build tools
 
 For more information about the concept, visit [codesigning.guide](https://codesigning.guide).
 
@@ -65,9 +65,7 @@ For more information about the concept, visit [codesigning.guide](https://codesi
 ### Setup
 
 1. Create a **new, private Git repo** (e.g. on [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)) and name it something like `certificates`. **Important:** Make sure the repository is set to *private*.
-
 2. Optional: Create a **new, shared Apple Developer Portal account**, something like `office@company.com` that will be shared across your team from now on (for more information visit [codesigning.guide](https://codesigning.guide))
-
 3. Run the following in your project folder to start using _match_:
 
 ```no-highlight
@@ -83,10 +81,10 @@ This will create a `Matchfile` in your current directory (or in your `./fastlane
 Example content (for more advanced setups check out the [fastlane section](#fastlane)):
 
 ```ruby-skip-tests
-git_url "https://github.com/fastlane/certs"
+git_url("https://github.com/fastlane/certificates")
 
-app_identifier "tools.fastlane.app"
-username "user@fastlane.tools"
+app_identifier("tools.fastlane.app")
+username("user@fastlane.tools")
 ```
 
 #### Important: Use one git branch per team
@@ -138,7 +136,7 @@ If you have several targets with different bundle identifiers, supply them as a 
 fastlane match appstore -a tools.fastlane.app,tools.fastlane.app.watchkitapp
 ```
 
-You can make this even easier using [fastlane](https://fastlane.tools) by creating a `certificates` lane like this:
+You can make this even easier using [_fastlane_](https://fastlane.tools) by creating a `certificates` lane like this:
 
 ```ruby
 lane :certificates do
@@ -147,6 +145,18 @@ end
 ```
 
 Then all your team has to do is `fastlane certificates` and keys, certs and profiles for all targets will be synced.
+
+#### Handle multiple apps per developer/distribution certificate
+If you want to use a single developer and/or distribution certificate for multiple apps belonging to the same development team, you may use the same signing identities repository and branch to store the signing identities for your apps:
+
+Matchfile for both App #1 and #2:
+
+```ruby-skip-tests
+git_url("https://github.com/example/example-repo.git")
+git_branch("master")
+```
+
+_match_ will reuse certificates and will create separate provisioning profiles for each app.
 
 #### Passphrase
 
@@ -196,7 +206,7 @@ Additionally, _match_ creates a nice repo `README.md` for you, making it easy to
 
 #### fastlane
 
-Add _match_ to your `Fastfile` to automatically fetch the latest code signing certificates with [fastlane](https://fastlane.tools).
+Add _match_ to your `Fastfile` to automatically fetch the latest code signing certificates with [_fastlane_](https://fastlane.tools).
 
 ```
 match(type: "appstore")
@@ -248,11 +258,21 @@ match(app_identifier: ["tools.fastlane.app", "tools.fastlane.app.today_widget"],
 
 _match_ can even use the same one Git repository for all bundle identifiers.
 
+##### Templates (aka: custom entitlements)
+
+Match can generate profiles that contain custom entitlements by passing in the entitlement's name with the `template_name` parameter.
+
+```
+match(git_url: "https://github.com/fastlane/certificates",
+      type: "development",
+      template_name: "Apple Pay Pass Suppression Development")
+```
+
 ### Setup Xcode project
 
 [Docs on how to set up your Xcode project](/codesigning/xcode-project/)
 
-#### To build from the command line using [fastlane](https://fastlane.tools)
+#### To build from the command line using [_fastlane_](https://fastlane.tools)
 
 _match_ automatically pre-fills environment variables with the UUIDs of the correct provisioning profiles, ready to be used in your Xcode project.
 
@@ -301,7 +321,7 @@ You'll have to confirm a list of profiles / certificates that will be deleted.
 
 ### Change Password
 
-To change the password of your repo and therefore decrypting and encrypting all files run
+To change the password of your repo and therefore decrypting and encrypting all files run:
 
 ```no-highlight
 fastlane match change_password
@@ -317,6 +337,28 @@ If you want to manually decrypt a file you can.
 openssl aes-256-cbc -k "<password>" -in "<fileYouWantToDecryptPath>" -out "<decryptedFilePath>" -a -d
 ```
 
+#### Export Distribution Certificate and Private Key as Single .p12 File
+
+_match_ stores the certificate (`.cer`) and the private key (`.p12`) files separately. The following steps will repackage the separate certificate and private key into a single `.p12` file.
+
+Decrypt your cert found in `certs/<type>/<unique-id>.cer` as a pem file:
+
+```no-highlight
+openssl aes-256-cbc -k "<password>" -in "certs/<type>/<unique-id>.cer" -out "cert.der" -a -d
+openssl x509 -inform der -in cert.der -out cert.pem
+```
+
+Decrypt your private key found in `certs/<type>/<unique-id>.p12` as a pem file:
+
+```no-highlight
+openssl aes-256-cbc -k "<password>" -in "certs/distribution/<unique-id>.p12" -out "key.pem" -a -d
+```
+
+Generate an encrypted p12 file with the same or new password:
+
+```no-highlight
+openssl pkcs12 -export -out "cert.p12" -inkey "key.pem" -in "cert.pem" -password pass:<password>
+```
 
 ## Is this secure?
 
@@ -332,7 +374,7 @@ What's the worst that could happen for each of the profile types?
 
 ##### App Store Profiles
 
-An App Store profile can't be used for anything as long as it's not re-signed by Apple. The only way to get an app resigned is to submit an app for review which could take anywhere from 24 hours to a few days (checkout [appreviewtimes.com](http://appreviewtimes.com) for up-to-date expectations). Attackers could only submit an app for review, if they also got access to your iTunes Connect credentials (which are not stored in git, but in your local keychain). Additionally you get an email notification every time a build gets uploaded to cancel the submission even before your app gets into the review stage.
+An App Store profile can't be used for anything as long as it's not re-signed by Apple. The only way to get an app resigned is to submit an app for review which could take anywhere from 24 hours to a few days (checkout [appreviewtimes.com](http://appreviewtimes.com) for up-to-date expectations). Attackers could only submit an app for review, if they also got access to your App Store Connect credentials (which are not stored in git, but in your local keychain). Additionally you get an email notification every time a build gets uploaded to cancel the submission even before your app gets into the review stage.
 
 ##### Development and Ad Hoc Profiles
 
@@ -347,7 +389,7 @@ Because of the potentially dangerous nature of In-House profiles please use _mat
 ##### To sum up
 
 - You have full control over the access list of your Git repo, no third party service involved
-- Even if your certificates are leaked, they can't be used to cause any harm without your iTunes Connect login credentials
+- Even if your certificates are leaked, they can't be used to cause any harm without your App Store Connect login credentials
 - Use In-House enterprise profile with _match_ with caution
 - If you use GitHub or Bitbucket we encourage enabling 2 factor authentication for all accounts that have access to the certificates repo
-- The complete source code of _match_ is fully open source on [GitHub](https://docs.fastlane.tools/actions/match)
+- The complete source code of _match_ is fully open source on [GitHub](https://docs.fastlane.tools/actions/match/)

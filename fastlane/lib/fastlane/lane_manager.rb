@@ -6,12 +6,14 @@ module Fastlane
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # @param env Dot Env Information
-    def self.cruise_lane(platform, lane, parameters = nil, env = nil)
-      UI.user_error!("lane must be a string") unless lane.kind_of?(String) or lane.nil?
-      UI.user_error!("platform must be a string") unless platform.kind_of?(String) or platform.nil?
-      UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) or parameters.nil?
+    # @param A custom Fastfile path, this is used by fastlane.ci
+    # rubocop:disable Metrics/PerceivedComplexity
+    def self.cruise_lane(platform, lane, parameters = nil, env = nil, fastfile_path = nil)
+      UI.user_error!("lane must be a string") unless lane.kind_of?(String) || lane.nil?
+      UI.user_error!("platform must be a string") unless platform.kind_of?(String) || platform.nil?
+      UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) || parameters.nil?
 
-      ff = Fastlane::FastFile.new(FastlaneCore::FastlaneFolder.fastfile_path)
+      ff = Fastlane::FastFile.new(fastfile_path || FastlaneCore::FastlaneFolder.fastfile_path)
 
       is_platform = false
       begin
@@ -29,7 +31,7 @@ module Fastlane
         end
       end
 
-      if !platform and lane
+      if !platform && lane
         # Either, the user runs a specific lane in root or want to auto complete the available lanes for a platform
         # e.g. `fastlane ios` should list all available iOS actions
         if ff.is_platform_block?(lane)
@@ -40,26 +42,29 @@ module Fastlane
 
       platform, lane = choose_lane(ff, platform) unless lane
 
-      FastlaneCore.session.is_fastfile = true
-
       # xcodeproj has a bug in certain versions that causes it to change directories
       # and not return to the original working directory
       # https://github.com/CocoaPods/Xcodeproj/issues/426
       # Setting this environment variable causes xcodeproj to work around the problem
       ENV["FORK_XCODE_WRITING"] = "true" unless platform == 'android'
 
-      load_dot_env(env)
+      Fastlane::Helper::DotenvHelper.load_dot_env(env)
 
       started = Time.now
       e = nil
       begin
         ff.runner.execute(lane, platform, parameters)
+      rescue NameError => ex
+        print_lane_context
+        print_error_line(ex)
+        e = ex
       rescue Exception => ex # rubocop:disable Lint/RescueException
         # We also catch Exception, since the implemented action might send a SystemExit signal
         # (or similar). We still want to catch that, since we want properly finish running fastlane
         # Tested with `xcake`, which throws a `Xcake::Informative` object
 
         print_lane_context
+        print_error_line(ex)
         UI.error(ex.to_s) if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
         e = ex
       end
@@ -72,6 +77,7 @@ module Fastlane
 
       return ff
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     def self.skip_docs?
       Helper.test? || FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
@@ -98,6 +104,8 @@ module Fastlane
       end
 
       rows << [0, "cancel", "No selection, exit fastlane!"]
+
+      require 'terminal-table'
 
       table = Terminal::Table.new(
         title: "Available lanes to run",

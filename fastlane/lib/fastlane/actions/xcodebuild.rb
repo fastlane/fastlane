@@ -332,7 +332,10 @@ module Fastlane
             value = (v != true && v.to_s.length > 0 ? "\"#{v}\"" : "")
             "#{arg} #{value}".strip
           elsif k == :build_settings
-            v.map {|setting, val| "#{setting}=\"#{val}\""}.join(' ')
+            v.map do |setting, val|
+              val = clean_build_setting_value(val)
+              "#{setting}=\"#{val}\""
+            end.join(' ')
           elsif k == :destination
             [*v].collect { |dst| "-destination \"#{dst}\"" }.join(' ')
           elsif k == :keychain && v.to_s.length > 0
@@ -343,6 +346,13 @@ module Fastlane
             "#{v}"
           end
         end.compact
+      end
+
+      # Cleans values for build settings
+      # Only escaping `$(inherit)` types of values since "sh"
+      # interprets these as sub-commands instead of passing value into xcodebuild
+      def self.clean_build_setting_value(value)
+        value.to_s.gsub('$(', '\\$(')
       end
 
       def self.detect_workspace
@@ -382,7 +392,7 @@ module Fastlane
       end
 
       def self.details
-        "**Note**: `xcodebuild` is a complex command, so it is recommended to use [gym](https://docs.fastlane.tools/actions/gym/) for building your ipa file and [scan](https://docs.fastlane.tools/actions/scan/) for testing your app instead."
+        "**Note**: `xcodebuild` is a complex command, so it is recommended to use [_gym_](https://docs.fastlane.tools/actions/gym/) for building your ipa file and [_scan_](https://docs.fastlane.tools/actions/scan/) for testing your app instead."
       end
 
       def self.author
