@@ -33,7 +33,7 @@
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
 
-_spaceship_ exposes both the Apple Developer Center and the iTunes Connect API. This fast and powerful API powers parts of fastlane, and can be leveraged for more advanced fastlane features. Scripting your Developer Center workflow has never been easier!
+_spaceship_ exposes both the Apple Developer Center and the App Store Connect API. This fast and powerful API powers parts of fastlane, and can be leveraged for more advanced fastlane features. Scripting your Developer Center workflow has never been easier!
 
 Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.com/fastlanetools)
 
@@ -49,7 +49,7 @@ Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.co
 
 -------
 
-<h5 align="center"><code>spaceship</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
+<h5 align="center"><em>spaceship</em> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # What's spaceship?
 
@@ -107,13 +107,13 @@ This requires you to install `pry` using `sudo gem install pry`. `pry` is not in
 
 ##### Open [DeveloperPortal.md](docs/DeveloperPortal.md) for code samples
 
-## iTunes Connect API
+## App Store Connect API
 
-##### Open [iTunesConnect.md](docs/iTunesConnect.md) for code samples
+##### Open [AppStoreConnect.md](docs/AppStoreConnect.md) for code samples
 
 ## 2 Step Verification
 
-When your Apple account has 2 factor verification enabled, you'll automatically be asked to verify your identity using your phone. The resulting session will be stored in `~/.fastlane/spaceship/[email]/cookie`. The session should be valid for about one month, however there is no way to test this without actually waiting for over a month.
+When your Apple account has 2 factor verification enabled, you'll automatically be asked to verify your identity. If you have a trusted device configured for your account, then a code will appear on the device. If you don't have any devices configured, but have trusted a phone number, then a code will be sent to your phone. The resulting session will be stored in `~/.fastlane/spaceship/[email]/cookie`. The session should be valid for about one month, however there is no way to test this without actually waiting for over a month.
 
 ### Support for CI machines
 
@@ -133,9 +133,18 @@ export FASTLANE_SESSION='---\n- !ruby/object:HTTP::Cookie\n  name: DES5c148586df
 
 Copy everything from `---\n` to your CI server and provide it as environment variable named `FASTLANE_SESSION`.
 
+#### Bypass trusted device and use SMS for verification
+
+If you have a trusted device configured, Apple will not send a SMS code to your phone for your Apple account when you try to generate a web session with _fastlane_. Instead, a code will be displayed on one of your account's trusted devices. This can be problematic if you are trying to authenticate but don't have access to a trusted device. Take the following steps to circumvent the device and use SMS instead:
+
+- Attempt to generate a web session with `fastlane spaceauth -u [email]` and wait for security code prompt to appear
+- Open a browser to [appleid.apple.com](https://appleid.apple.com) or an address that requires you to login with your Apple ID, and logout of any previous session
+- Login with your Apple ID and request a code be sent to the desired phone when prompted for a security code
+- Use the code sent to phone with _fastlane_ instead of with the browser
+
 #### Transporter
 
-If you want to upload builds to TestFlight/iTunes Connect from your CI, you have to generate an application specific password:
+If you want to upload builds to TestFlight/App Store Connect from your CI, you have to generate an application specific password:
 
 1. Visit [appleid.apple.com/account/manage](https://appleid.apple.com/account/manage)
 1. Generate a new application specific password
@@ -177,12 +186,12 @@ Overview of the used API endpoints
   - Repair provisioning profiles
   - Download provisioning profiles
   - Team selection
-- `https://itunesconnect.apple.com`:
+- `https://appstoreconnect.apple.com`:
   - Managing apps
   - Managing beta testers
   - Submitting updates to review
   - Managing app metadata
-- `https://du-itc.itunesconnect.apple.com`:
+- `https://du-itc.appstoreconnect.apple.com`:
   - Upload icons, screenshots, trailers ...
 
 _spaceship_ uses all those API points to offer this seamless experience.

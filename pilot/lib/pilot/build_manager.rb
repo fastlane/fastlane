@@ -18,7 +18,7 @@ module Pilot
 
       if options[:changelog].nil? && options[:distribute_external] == true
         if UI.interactive?
-          options[:changelog] = UI.input("No changelog provided for new build. Please provide a changelog. You can also provide a changelog using the `changelog` option")
+          options[:changelog] = UI.input("No changelog provided for new build. You can provide a changelog using the `changelog` option. For now, please provide a changelog here:")
         else
           UI.user_error!("No changelog provided for new build. Please either disable `distribute_external` or provide a changelog using the `changelog` option")
         end
@@ -41,7 +41,7 @@ module Pilot
         UI.user_error!("Error uploading ipa file, for more information see above")
       end
 
-      UI.success("Successfully uploaded the new binary to iTunes Connect")
+      UI.success("Successfully uploaded the new binary to App Store Connect")
 
       if config[:skip_waiting_for_build_processing]
         UI.important("Skip waiting for build processing")
@@ -96,6 +96,15 @@ module Pilot
       build.auto_notify_enabled = config[:notify_external_testers]
 
       return if config[:skip_submission]
+      if options[:reject_build_waiting_for_review]
+        waiting_for_review_build = Spaceship::TestFlight::Build.all_waiting_for_review(app_id: build.app_id, platform: fetch_app_platform).first
+        unless waiting_for_review_build.nil?
+          UI.important("Another build is already in review. Going to expire that build and submit the new one.")
+          UI.important("Expiring build: #{waiting_for_review_build.train_version} - #{waiting_for_review_build.build_version}")
+          waiting_for_review_build.expire!
+          UI.success("Expired previous build: #{waiting_for_review_build.train_version} - #{waiting_for_review_build.build_version}")
+        end
+      end
       distribute_build(build, options)
       type = options[:distribute_external] ? 'External' : 'Internal'
       UI.success("Successfully distributed build to #{type} testers 🚀")
@@ -173,7 +182,7 @@ module Pilot
         begin
           uploaded_build.submit_for_testflight_review!
         rescue => ex
-          # iTunes Connect currently may 504 on this request even though it manages to get the build in
+          # App Store Connect currently may 504 on this request even though it manages to get the build in
           # the approved state, this is a temporary workaround.
           raise ex unless ex.to_s.include?("504")
           UI.message("Submitting the build for review timed out, trying to recover.")

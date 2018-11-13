@@ -14,26 +14,27 @@ File.write("#{lib}/fastlane/plugins/template/.rubocop.yml", YAML.dump(config))
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
-  spec.authors       = ["Danielle Tomlinson",
-                        "Joshua Liebowitz",
-                        "Andrew McBurney",
-                        "Manu Wallner",
-                        "Jérôme Lacoste",
-                        "Aaron Brager",
-                        "Kohki Miki",
-                        "Felix Krause",
-                        "Iulian Onofrei",
-                        "Fumiya Nakamura",
-                        "Maksym Grebenets",
-                        "Josh Holtz",
-                        "Jorge Revuelta H",
-                        "Matthew Ellis",
-                        "Jimmy Dee",
+  # list of authors is regenerated and resorted on each release
+  spec.authors       = ["Stefan Natchev",
                         "Luka Mirosevic",
+                        "Danielle Tomlinson",
+                        "Fumiya Nakamura",
+                        "Aaron Brager",
                         "Jan Piotrowski",
-                        "Stefan Natchev",
+                        "Jérôme Lacoste",
+                        "Olivier Halligon",
+                        "Felix Krause",
+                        "Manu Wallner",
+                        "Iulian Onofrei",
+                        "Matthew Ellis",
+                        "Jorge Revuelta H",
+                        "Kohki Miki",
+                        "Jimmy Dee",
+                        "Maksym Grebenets",
+                        "Andrew McBurney",
+                        "Joshua Liebowitz",
                         "Helmut Januschka",
-                        "Olivier Halligon"]
+                        "Josh Holtz"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -54,8 +55,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = Dir["*/lib"]
 
   spec.add_dependency('slack-notifier', '>= 2.0.0', '< 3.0.0') # Slack notifications
-  spec.add_dependency('xcodeproj', '>= 1.5.7', '< 2.0.0') # Needed for commit_version_bump action and gym code_signing_mapping
-  spec.add_dependency('xcpretty', '>= 0.2.4', '< 1.0.0') # prettify xcodebuild output
+  spec.add_dependency('xcodeproj', '>= 1.6.0', '< 2.0.0') # Modify Xcode projects
+  spec.add_dependency('xcpretty', '~> 0.3.0') # prettify xcodebuild output
   spec.add_dependency('terminal-notifier', '>= 1.6.2', '< 2.0.0') # macOS notifications
   spec.add_dependency('terminal-table', '>= 1.4.5', '< 2.0.0') # Actions documentation
   spec.add_dependency('plist', '>= 3.1.0', '< 4.0.0') # Needed for set_build_number_repository and get_info_plist_value actions
@@ -82,7 +83,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('mini_magick', '~> 4.5.1') # To open, edit and export PSD files
   spec.add_dependency('multi_json') # Because sometimes it's just not installed
   spec.add_dependency('multi_xml', '~> 0.5')
-  spec.add_dependency('rubyzip', '>= 1.2.1', '< 2.0.0') # fix swift/ipa in gym
+  spec.add_dependency('rubyzip', '>= 1.2.2', '< 2.0.0') # fix swift/ipa in gym
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
   spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3')
   spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
@@ -93,7 +94,7 @@ Gem::Specification.new do |spec|
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.
-  spec.add_dependency('google-api-client', '>= 0.21.2', '< 0.22.0') # Google API Client to access Play Publishing API
+  spec.add_dependency('google-api-client', '>= 0.21.2', '< 0.24.0') # Google API Client to access Play Publishing API
 
   spec.add_dependency('emoji_regex', '~> 0.1') # Used to scan for Emoji in the changelog
 

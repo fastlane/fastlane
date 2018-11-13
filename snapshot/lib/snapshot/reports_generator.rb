@@ -69,6 +69,9 @@ module Snapshot
       {
         # snapshot in Xcode 9 saves screenshots with the SIMULATOR_DEVICE_NAME
         # which includes spaces
+        'iPhone XS Max' => "iPhone XS Max",
+        'iPhone XS' => "iPhone XS",
+        'iPhone XR' => "iPhone XR",
         'iPhone 8 Plus' => "iPhone 8 Plus",
         'iPhone 8' => "iPhone 8",
         'iPhone X' => "iPhone X",
@@ -78,16 +81,22 @@ module Snapshot
         'iPhone 6 Plus' => "iPhone 6 Plus (5.5-Inch)",
         'iPhone 6s' => "iPhone 6s (4.7-Inch)",
         'iPhone 6' => "iPhone 6 (4.7-Inch)",
-        'iPhone 5s' => "iPhone 5 (4-Inch)",
+        'iPhone 5s' => "iPhone 5s (4-Inch)",
+        'iPhone 5' => "iPhone 5 (4-Inch)",
         'iPhone SE' => "iPhone SE",
-        'iPhone 4s' => "iPhone 4 (3.5-Inch)",
-        'iPad Air' => 'iPad Air',
+        'iPhone 4s' => "iPhone 4s (3.5-Inch)",
+        'iPad 2' => 'iPad 2',
         'iPad Air 2' => 'iPad Air 2',
+        'iPad Air' => 'iPad Air',
         'iPad (5th generation)' => 'iPad (5th generation)',
         'iPad Pro (9.7-inch)' => 'iPad Pro (9.7-inch)',
+        'iPad Pro (9.7 inch)' => 'iPad Pro (9.7-inch)', # iOS 10.3.1 simulator
         'iPad Pro (10.5-inch)' => 'iPad Pro (10.5-inch)',
+        'iPad Pro (11-inch)' => 'iPad Pro (11-inch)',
         'iPad Pro (12.9-inch) (2nd generation)' => 'iPad Pro (12.9-inch) (2nd generation)',
         'iPad Pro (12.9-inch)' => 'iPad Pro (12.9-inch)',
+        'iPad Pro (12.9 inch)' => 'iPad Pro (12.9-inch)', # iOS 10.3.1 simulator
+        'iPad Pro' => 'iPad Pro (12.9-inch)', # iOS 9.3 simulator
         'Apple TV 1080p' => 'Apple TV',
         'Apple TV 4K (at 1080p)' => 'Apple TV 4K (at 1080p)',
         'Apple TV 4K' => 'Apple TV 4K',

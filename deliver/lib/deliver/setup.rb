@@ -1,3 +1,4 @@
+require 'open-uri'
 require 'spaceship/tunes/tunes'
 
 require_relative 'module'
@@ -126,8 +127,7 @@ module Deliver
       end
     end
 
-    def download_screenshots(deliver_path, options)
-      path = File.join(deliver_path, 'screenshots')
+    def download_screenshots(path, options)
       FileUtils.mkdir_p(path)
       Deliver::DownloadScreenshots.run(options, path)
     end

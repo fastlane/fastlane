@@ -7,19 +7,25 @@ describe Spaceship::TestFlight::TestInfo do
                                             'locale' => 'en-US',
                                             'description' => 'en-US description',
                                             'feedbackEmail' => 'enUS@email.com',
-                                            'whatsNew' => 'US News'
+                                            'whatsNew' => 'US News',
+                                            'marketingUrl' => 'www.markingurl.com/en',
+                                            'privacyPolicyUrl' => 'www.privacypolicy.com/en'
                                           },
                                           {
                                             'locale' => 'de-DE',
                                             'description' => 'de-DE description',
                                             'feedbackEmail' => 'deDE@email.com',
-                                            'whatsNew' => 'German News'
+                                            'whatsNew' => 'German News',
+                                            'marketingUrl' => 'www.markingurl.com/de',
+                                            'privacyPolicyUrl' => 'www.privacypolicy.com/de'
                                           },
                                           {
                                             'locale' => 'de-AT',
                                             'description' => 'de-AT description',
                                             'feedbackEmail' => 'deAT@email.com',
-                                            'whatsNew' => 'Austrian News'
+                                            'whatsNew' => 'Austrian News',
+                                            'marketingUrl' => 'www.markingurl.com/at',
+                                            'privacyPolicyUrl' => 'www.privacypolicy.com/at'
                                           }
                                         ])
   end
@@ -36,6 +42,8 @@ describe Spaceship::TestFlight::TestInfo do
     expect(test_info.feedback_email).to eq('enUS@email.com')
     expect(test_info.description).to eq('en-US description')
     expect(test_info.whats_new).to eq('US News')
+    expect(test_info.marketing_url).to eq('www.markingurl.com/en')
+    expect(test_info.privacy_policy_url).to eq('www.privacypolicy.com/en')
   end
 
   it 'sets values to all locales' do

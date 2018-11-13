@@ -23,8 +23,14 @@ module Supply
         end
       end
 
-      upload_binaries unless Supply.config[:skip_upload_apk]
-      upload_bundles unless Supply.config[:skip_upload_aab]
+      apk_version_codes = []
+      apk_version_codes.concat(upload_apks) unless Supply.config[:skip_upload_apk]
+      apk_version_codes.concat(upload_bundles) unless Supply.config[:skip_upload_aab]
+      upload_mapping(apk_version_codes)
+
+      # Only update tracks if we have version codes
+      # Updating a track with empty version codes can completely clear out a track
+      update_track(apk_version_codes) unless apk_version_codes.empty?
 
       promote_track if Supply.config[:track_promote_to]
 
@@ -40,7 +46,7 @@ module Supply
     end
 
     def verify_config!
-      unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths] || Supply.config[:aab] || (Supply.config[:track] && Supply.config[:track_promote_to])
+      unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths] || Supply.config[:aab] || Supply.config[:aab_paths] || (Supply.config[:track] && Supply.config[:track_promote_to])
         UI.user_error!("No local metadata, apks, aab, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
       end
 
@@ -58,7 +64,7 @@ module Supply
       version_codes = client.track_version_codes(Supply.config[:track])
       # the actual value passed for the rollout argument does not matter because it will be ignored by the Google Play API
       # but it has to be between 0.0 and 1.0 to pass the validity check. So we are passing the default value 0.1
-      client.update_track(Supply.config[:track], 0.1, nil)
+      client.update_track(Supply.config[:track], 0.1, nil) if Supply.config[:deactivate_on_promote]
       client.update_track(Supply.config[:track_promote_to], Supply.config[:rollout] || 0.1, version_codes)
     end
 
@@ -66,13 +72,16 @@ module Supply
       client.apks_version_codes.each do |apk_version_code|
         upload_changelog(language, apk_version_code)
       end
+      client.aab_version_codes.each do |aab_version_code|
+        upload_changelog(language, aab_version_code)
+      end
     end
 
-    def upload_changelog(language, apk_version_code)
-      path = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME, "#{apk_version_code}.txt")
+    def upload_changelog(language, version_code)
+      path = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME, "#{version_code}.txt")
       if File.exist?(path)
-        UI.message("Updating changelog for code version '#{apk_version_code}' and language '#{language}'...")
-        apk_listing = ApkListing.new(File.read(path, encoding: 'UTF-8'), language, apk_version_code)
+        UI.message("Updating changelog for code version '#{version_code}' and language '#{language}'...")
+        apk_listing = ApkListing.new(File.read(path, encoding: 'UTF-8'), language, version_code)
         client.update_apk_listing_for_language(apk_listing)
       end
     end
@@ -120,7 +129,7 @@ module Supply
       end
     end
 
-    def upload_binaries
+    def upload_apks
       apk_paths = [Supply.config[:apk]] unless (apk_paths = Supply.config[:apk_paths])
       apk_paths.compact!
 
@@ -130,28 +139,31 @@ module Supply
         apk_version_codes.push(upload_binary_data(apk_path))
       end
 
+      return apk_version_codes
+    end
+
+    def upload_mapping(apk_version_codes)
       mapping_paths = [Supply.config[:mapping]] unless (mapping_paths = Supply.config[:mapping_paths])
       mapping_paths.zip(apk_version_codes).each do |mapping_path, version_code|
         if mapping_path
           client.upload_mapping(mapping_path, version_code)
         end
       end
-
-      # Only update tracks if we have version codes
-      # Updating a track with empty version codes can completely clear out a track
-      update_track(apk_version_codes) unless apk_version_codes.empty?
     end
 
     def upload_bundles
-      aab_path = Supply.config[:aab]
-      return unless aab_path
+      aab_paths = [Supply.config[:aab]] unless (aab_paths = Supply.config[:aab_paths])
+      return [] unless aab_paths
+      aab_paths.compact!
 
-      UI.message("Preparing aab at path '#{aab_path}' for upload...")
-      apk_version_codes = [client.upload_bundle(aab_path)]
+      aab_version_codes = []
 
-      # Only update tracks if we have version codes
-      # Updating a track with empty version codes can completely clear out a track
-      update_track(apk_version_codes) unless apk_version_codes.empty?
+      aab_paths.each do |aab_path|
+        UI.message("Preparing aab at path '#{aab_path}' for upload...")
+        aab_version_codes.push(client.upload_bundle(aab_path))
+      end
+
+      return aab_version_codes
     end
 
     private

@@ -1,6 +1,7 @@
 require_relative 'fastlane_core/globals'
 # Ruby monkey-patches - should be before almost all else
 require_relative 'fastlane_core/core_ext/string'
+require_relative 'fastlane_core/core_ext/shellwords'
 
 require_relative 'fastlane_core/env'
 require_relative 'fastlane_core/feature/feature'
@@ -9,7 +10,6 @@ require_relative 'fastlane_core/helper'
 require_relative 'fastlane_core/configuration/configuration'
 require_relative 'fastlane_core/update_checker/update_checker'
 require_relative 'fastlane_core/languages'
-require_relative 'fastlane_core/itunes_search_api'
 require_relative 'fastlane_core/cert_checker'
 require_relative 'fastlane_core/ipa_file_analyser'
 require_relative 'fastlane_core/itunes_transporter'

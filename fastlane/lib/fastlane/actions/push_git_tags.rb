@@ -5,9 +5,14 @@ module Fastlane
         command = [
           'git',
           'push',
-          params[:remote],
-          params[:tag] || '--tags'
+          params[:remote]
         ]
+
+        if params[:tag]
+          command << "refs/tags/#{params[:tag]}"
+        else
+          command << '--tags'
+        end
 
         # optionally add the force component
         command << '--force' if params[:force]

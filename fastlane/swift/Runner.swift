@@ -3,7 +3,6 @@
 //  FastlaneSwiftRunner
 //
 //  Created by Joshua Liebowitz on 8/26/17.
-//  Copyright © 2017 Joshua Liebowitz. All rights reserved.
 //
 
 //
@@ -34,7 +33,7 @@ class Runner {
     fileprivate var returnValue: String? // lol, so safe
     fileprivate var currentlyExecutingCommand: RubyCommandable? = nil
     fileprivate var shouldLeaveDispatchGroupDuringDisconnect = false
-
+    
     func executeCommand(_ command: RubyCommandable) -> String {
         self.dispatchGroup.enter()
         currentlyExecutingCommand = command
@@ -60,12 +59,12 @@ class Runner {
 
 // Handle threading stuff
 extension Runner {
-    func startSocketThread() {
+    func startSocketThread(port: UInt32) {
         let secondsToWait = DispatchTimeInterval.seconds(SocketClient.connectTimeoutSeconds)
         
         self.dispatchGroup.enter()
         
-        self.socketClient = SocketClient(commandTimeoutSeconds:timeout, socketDelegate: self)
+        self.socketClient = SocketClient(port: port, commandTimeoutSeconds:timeout, socketDelegate: self)
         self.thread = Thread(target: self, selector: #selector(startSocketComs), object: nil)
         self.thread!.name = "socket thread"
         self.thread!.start()
@@ -94,7 +93,7 @@ extension Runner {
         guard let socketClient = self.socketClient else {
             return
         }
-
+        
         socketClient.connectAndOpenStreams()
         self.dispatchGroup.leave()
     }
@@ -125,11 +124,11 @@ extension Runner : SocketClientDelegateProtocol {
         case .clientInitiatedCancelAcknowledged:
             verbose(message: "server acknowledged a cancel request")
             self.dispatchGroup.leave()
-
+            
         case .alreadyClosedSockets, .connectionFailure, .malformedRequest, .malformedResponse, .serverError:
             log(message: "error encountered while executing command:\n\(serverResponse)")
             self.dispatchGroup.leave()
-
+            
         case .commandTimeout(let timeout):
             log(message: "Runner timed out after \(timeout) second(s)")
         }
@@ -198,3 +197,4 @@ func verbose(message: String) {
 // Please don't remove the lines below
 // They are used to detect outdated files
 // FastlaneRunnerAPIVersion [0.9.2]
+

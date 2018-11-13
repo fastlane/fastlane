@@ -58,7 +58,7 @@ module Fastlane
       end
 
       def self.description
-        "Create a new OneSignal application"
+        "Create a new [OneSignal](https://onesignal.com/) application"
       end
 
       def self.details

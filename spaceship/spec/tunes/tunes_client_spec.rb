@@ -30,7 +30,7 @@ describe Spaceship::TunesClient do
 
       expect do
         Spaceship::Tunes.login(username, password)
-      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://itunesconnect.apple.com) to acknowledge the statement.")
+      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement.")
     end
 
     it 'has authType of hsa' do
@@ -41,7 +41,7 @@ describe Spaceship::TunesClient do
 
       expect do
         Spaceship::Tunes.login(username, password)
-      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://itunesconnect.apple.com) to acknowledge the statement.")
+      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement.")
     end
 
     it 'has authType of non-sa' do
@@ -52,7 +52,7 @@ describe Spaceship::TunesClient do
 
       expect do
         Spaceship::Tunes.login(username, password)
-      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://itunesconnect.apple.com) to acknowledge the statement.")
+      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement.")
     end
 
     it 'has authType of hsa2' do
@@ -63,7 +63,7 @@ describe Spaceship::TunesClient do
 
       expect do
         Spaceship::Tunes.login(username, password)
-      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://itunesconnect.apple.com) to acknowledge the statement.")
+      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement.")
     end
   end
 
@@ -81,7 +81,7 @@ describe Spaceship::TunesClient do
     end
 
     it "#hostname" do
-      expect(subject.class.hostname).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/')
+      expect(subject.class.hostname).to eq('https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/')
     end
 
     describe "#handle_itc_response" do
@@ -131,7 +131,7 @@ describe Spaceship::TunesClient do
       expect(FastlaneCore::Helper).to receive(:ci?).and_return(true)
       provider = { 'contentProvider' => { 'name' => 'Tom', 'contentProviderId' => 1234 } }
       allow(subject).to receive(:teams).and_return([provider, provider]) # pass it twice, to call the team selection
-      expect { subject.select_team }.to raise_error("Multiple iTunes Connect Teams found; unable to choose, terminal not interactive!")
+      expect { subject.select_team }.to raise_error("Multiple App Store Connect Teams found; unable to choose, terminal not interactive!")
     end
   end
 end

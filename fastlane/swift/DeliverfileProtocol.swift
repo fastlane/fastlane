@@ -1,27 +1,27 @@
 protocol DeliverfileProtocol: class {
   var username: String { get }
   var appIdentifier: String? { get }
-  var app: String { get }
-  var editLive: Bool { get }
+  var appVersion: String? { get }
   var ipa: String? { get }
   var pkg: String? { get }
+  var buildNumber: String? { get }
   var platform: String { get }
+  var editLive: Bool { get }
+  var useLiveVersion: Bool { get }
   var metadataPath: String? { get }
   var screenshotsPath: String? { get }
   var skipBinaryUpload: Bool { get }
-  var useLiveVersion: Bool { get }
   var skipScreenshots: Bool { get }
-  var appVersion: String? { get }
   var skipMetadata: Bool { get }
   var skipAppVersionUpdate: Bool { get }
   var force: Bool { get }
+  var overwriteScreenshots: Bool { get }
   var submitForReview: Bool { get }
   var rejectIfPossible: Bool { get }
   var automaticRelease: Bool { get }
   var autoReleaseDate: String? { get }
   var phasedRelease: Bool { get }
   var priceTier: String? { get }
-  var buildNumber: String? { get }
   var appRatingConfigPath: String? { get }
   var submissionInformation: String? { get }
   var teamId: String? { get }
@@ -29,7 +29,6 @@ protocol DeliverfileProtocol: class {
   var devPortalTeamId: String? { get }
   var devPortalTeamName: String? { get }
   var itcProvider: String? { get }
-  var overwriteScreenshots: Bool { get }
   var runPrecheckBeforeSubmit: Bool { get }
   var precheckDefaultRuleLevel: String { get }
   var appIcon: String? { get }
@@ -55,32 +54,33 @@ protocol DeliverfileProtocol: class {
   var languages: [String]? { get }
   var ignoreLanguageDirectoryValidation: Bool { get }
   var precheckIncludeInAppPurchases: Bool { get }
+  var app: String { get }
 }
 
 extension DeliverfileProtocol {
   var username: String { return "" }
   var appIdentifier: String? { return nil }
-  var app: String { return "" }
-  var editLive: Bool { return false }
+  var appVersion: String? { return nil }
   var ipa: String? { return nil }
   var pkg: String? { return nil }
+  var buildNumber: String? { return nil }
   var platform: String { return "ios" }
+  var editLive: Bool { return false }
+  var useLiveVersion: Bool { return false }
   var metadataPath: String? { return nil }
   var screenshotsPath: String? { return nil }
   var skipBinaryUpload: Bool { return false }
-  var useLiveVersion: Bool { return false }
   var skipScreenshots: Bool { return false }
-  var appVersion: String? { return nil }
   var skipMetadata: Bool { return false }
   var skipAppVersionUpdate: Bool { return false }
   var force: Bool { return false }
+  var overwriteScreenshots: Bool { return false }
   var submitForReview: Bool { return false }
   var rejectIfPossible: Bool { return false }
   var automaticRelease: Bool { return false }
   var autoReleaseDate: String? { return nil }
   var phasedRelease: Bool { return false }
   var priceTier: String? { return nil }
-  var buildNumber: String? { return nil }
   var appRatingConfigPath: String? { return nil }
   var submissionInformation: String? { return nil }
   var teamId: String? { return nil }
@@ -88,7 +88,6 @@ extension DeliverfileProtocol {
   var devPortalTeamId: String? { return nil }
   var devPortalTeamName: String? { return nil }
   var itcProvider: String? { return nil }
-  var overwriteScreenshots: Bool { return false }
   var runPrecheckBeforeSubmit: Bool { return true }
   var precheckDefaultRuleLevel: String { return "warn" }
   var appIcon: String? { return nil }
@@ -114,8 +113,9 @@ extension DeliverfileProtocol {
   var languages: [String]? { return nil }
   var ignoreLanguageDirectoryValidation: Bool { return false }
   var precheckIncludeInAppPurchases: Bool { return true }
+  var app: String { return "" }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.3]
+// FastlaneRunnerAPIVersion [0.9.4]

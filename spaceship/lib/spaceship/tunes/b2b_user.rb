@@ -17,8 +17,13 @@ module Spaceship
         'value.dsUsername' => :ds_username
       )
 
-      def self.from_username(username)
-        self.new({ 'value' => { 'add' => true, 'delete' => false, 'dsUsername' => username } })
+      def self.from_username(username, is_add_type: true)
+        self.new({ 'value' => { 'add' => is_add_type, 'delete' => !is_add_type, 'dsUsername' => username } })
+      end
+
+      # equality check for the two objects
+      def ==(other)
+        add == other.add && delete == other.delete && ds_username == other.ds_username
       end
     end
   end

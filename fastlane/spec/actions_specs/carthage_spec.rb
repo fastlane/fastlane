@@ -328,14 +328,26 @@ describe Fastlane do
       end
 
       it "use custom derived data" do
+        path = "../derived data"
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
-              derived_data: '../derived data'
+              derived_data: '#{path}'
             )
           end").runner.execute(:test)
 
         expect(result).to \
-          eq("carthage bootstrap --derived-data ../derived\\ data")
+          eq("carthage bootstrap --derived-data #{path.shellescape}")
+      end
+
+      it "use custom executable" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              executable: 'custom_carthage'
+            )
+          end").runner.execute(:test)
+
+        expect(result).to \
+          eq("custom_carthage bootstrap")
       end
 
       it "updates with a single dependency" do
@@ -384,6 +396,30 @@ describe Fastlane do
 
         expect(result).to \
           eq("carthage build TestDependency1 TestDependency2")
+      end
+
+      it "bootstraps with a single dependency" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'bootstrap',
+              dependencies: ['TestDependency']
+            )
+          end").runner.execute(:test)
+
+        expect(result).to \
+          eq("carthage bootstrap TestDependency")
+      end
+
+      it "bootstraps with multiple dependencies" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'bootstrap',
+              dependencies: ['TestDependency1', 'TestDependency2']
+            )
+          end").runner.execute(:test)
+
+        expect(result).to \
+          eq("carthage bootstrap TestDependency1 TestDependency2")
       end
 
       it "works with no parameters" do

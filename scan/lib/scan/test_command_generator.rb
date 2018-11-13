@@ -84,8 +84,12 @@ module Scan
       end
 
       formatter = []
-      if Scan.config[:formatter]
-        formatter << "-f `#{Scan.config[:formatter]}`"
+      if (custom_formatter = Scan.config[:formatter])
+        if custom_formatter.end_with?(".rb")
+          formatter << "-f '#{custom_formatter}'"
+        else
+          formatter << "-f `#{custom_formatter}`"
+        end
       elsif FastlaneCore::Env.truthy?("TRAVIS")
         formatter << "-f `xcpretty-travis-formatter`"
         UI.success("Automatically switched to Travis formatter")
@@ -107,9 +111,11 @@ module Scan
                                                                          Scan.config[:output_types],
                                                                          Scan.config[:output_files] || Scan.config[:custom_report_file_name],
                                                                          Scan.config[:output_directory],
-                                                                         Scan.config[:use_clang_report_name])
+                                                                         Scan.config[:use_clang_report_name],
+                                                                         Scan.config[:xcpretty_args])
       reporter_options = @reporter_options_generator.generate_reporter_options
-      return pipe << "| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')}"
+      reporter_xcpretty_args = @reporter_options_generator.generate_xcpretty_args_options
+      return pipe << "| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')} #{reporter_xcpretty_args}"
     end
 
     # Store the raw file

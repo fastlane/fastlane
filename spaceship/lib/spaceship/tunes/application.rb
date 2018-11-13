@@ -1,5 +1,6 @@
 require_relative '../test_flight/group'
 require_relative '../test_flight/build'
+require_relative 'app_analytics'
 require_relative 'app_details'
 require_relative 'app_ratings'
 require_relative 'app_submission'
@@ -14,7 +15,7 @@ require_relative 'version_set'
 module Spaceship
   module Tunes
     class Application < TunesBase
-      # @return (String) The App identifier of this app, provided by iTunes Connect
+      # @return (String) The App identifier of this app, provided by App Store Connect
       # @example
       #   "1013943394"
       attr_accessor :apple_id
@@ -24,7 +25,7 @@ module Spaceship
       #   "Spaceship App"
       attr_accessor :name
 
-      # @return (String) The Vendor ID provided by iTunes Connect
+      # @return (String) The Vendor ID provided by App Store Connect
       # @example
       #   "1435592086"
       attr_accessor :vendor_id
@@ -37,7 +38,7 @@ module Spaceship
       # @return (String) Last modified
       attr_accessor :last_modified
 
-      # @return (Integer) The number of issues provided by iTunes Connect
+      # @return (Integer) The number of issues provided by App Store Connect
       attr_accessor :issues_count
 
       # @return (String) The URL to a low resolution app icon of this app (340x340px). Might be nil
@@ -75,7 +76,7 @@ module Spaceship
           end
         end
 
-        # Creates a new application on iTunes Connect
+        # Creates a new application on App Store Connect
         # @param name (String): The name of your app as it will appear on the App Store.
         #   This can't be longer than 255 characters.
         # @param primary_language (String): If localized app information isn't available in an
@@ -100,6 +101,10 @@ module Spaceship
                                 company_name: company_name,
                                     platform: platform,
                                     itunes_connect_users: itunes_connect_users)
+        end
+
+        def available_bundle_ids(platform: nil)
+          client.get_available_bundle_ids(platform: platform)
         end
       end
 
@@ -133,7 +138,17 @@ module Spaceship
 
       # @return (String) An URL to this specific resource. You can enter this URL into your browser
       def url
-        "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.apple_id}"
+        "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.apple_id}"
+      end
+
+      def analytics
+        if self.live_version.nil?
+          raise 'Analytics are only available for live apps.'
+        end
+
+        attrs = {}
+        attrs[:apple_id] = self.apple_id
+        Spaceship::Tunes::AppAnalytics.factory(attrs)
       end
 
       # @return (Hash) Contains the reason for rejection.
@@ -342,13 +357,13 @@ module Spaceship
       # @!group Submit for Review
       #####################################################
 
-      def create_submission
-        version = self.latest_version
+      def create_submission(platform: nil)
+        version = self.latest_version(platform: platform)
         if version.nil?
           raise "Could not find a valid version to submit for review"
         end
 
-        Spaceship::Tunes::AppSubmission.create(self, version)
+        Spaceship::Tunes::AppSubmission.create(self, version, platform: platform)
       end
 
       # Cancels all ongoing TestFlight beta submission for this application

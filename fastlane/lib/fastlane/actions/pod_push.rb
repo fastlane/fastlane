@@ -80,13 +80,14 @@ module Fastlane
                                        description: "The sources of repos you want the pod spec to lint with, separated by commas",
                                        optional: true,
                                        is_string: false,
+                                       type: Array,
                                        verify_block: proc do |value|
                                          UI.user_error!("Sources must be an array.") unless value.kind_of?(Array)
                                        end),
           FastlaneCore::ConfigItem.new(key: :swift_version,
                                        description: "The SWIFT_VERSION that should be used to lint the spec. This takes precedence over a .swift-version file",
                                        optional: true,
-                                       is_string: false),
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        description: "Show more debugging information",
                                        optional: true,

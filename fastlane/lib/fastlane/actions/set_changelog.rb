@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         require 'spaceship'
 
-        UI.message("Login to iTunes Connect (#{params[:username]})")
+        UI.message("Login to App Store Connect (#{params[:username]})")
         Spaceship::Tunes.login(params[:username])
         Spaceship::Tunes.select_team
         UI.message("Login successful")
@@ -63,7 +63,7 @@ module Fastlane
         end
 
         UI.message("Found and updated changelog for the following languages: #{v.release_notes.languages.join(', ')}")
-        UI.message("Uploading changes to iTunes Connect...")
+        UI.message("Uploading changes to App Store Connect...")
         v.save!
 
         UI.success("👼  Successfully pushed the new changelog to #{v.url}")
@@ -78,7 +78,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Set the changelog for all languages on iTunes Connect"
+        "Set the changelog for all languages on App Store Connect"
       end
 
       def self.details
@@ -113,12 +113,12 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :changelog,
                                        env_name: "FL_SET_CHANGELOG_CHANGELOG",
-                                       description: "Changelog text that should be uploaded to iTunes Connect",
+                                       description: "Changelog text that should be uploaded to App Store Connect",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        short_option: "-k",
                                        env_name: "FL_SET_CHANGELOG_TEAM_ID",
-                                       description: "The ID of your iTunes Connect team if you're in multiple teams",
+                                       description: "The ID of your App Store Connect team if you're in multiple teams",
                                        optional: true,
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
@@ -130,7 +130,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :team_name,
                                        short_option: "-e",
                                        env_name: "FL_SET_CHANGELOG_TEAM_NAME",
-                                       description: "The name of your iTunes Connect team if you're in multiple teams",
+                                       description: "The name of your App Store Connect team if you're in multiple teams",
                                        optional: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
@@ -165,7 +165,7 @@ module Fastlane
       end
 
       def self.category
-        :beta
+        :app_store_connect
       end
     end
   end

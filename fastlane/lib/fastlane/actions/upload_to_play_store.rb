@@ -16,6 +16,18 @@ module Fastlane
           end
         end
 
+        # If no AAB param was provided, try to fill in the value from lane context.
+        # First GRADLE_ALL_AAB_OUTPUT_PATHS if only one
+        # Else from GRADLE_AAB_OUTPUT_PATH
+        if params[:aab].nil?
+          all_aab_paths = Actions.lane_context[SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS] || []
+          if all_aab_paths.count == 1
+            params[:aab] = all_aab_paths.first
+          else
+            params[:aab] = Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+          end
+        end
+
         Supply.config = params # we already have the finished config
 
         Supply::Uploader.new.perform_upload

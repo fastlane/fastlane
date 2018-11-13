@@ -1,5 +1,6 @@
 module Fastlane
   class PluginSearch
+    require 'terminal-table'
     require 'word_wrap'
 
     def self.print_plugins(search_query: nil)

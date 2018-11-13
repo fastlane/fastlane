@@ -25,7 +25,7 @@ module Fastlane
         cmd << '--no-ansi' unless params[:ansi]
 
         Actions.sh(cmd.join(' '), error_callback: lambda { |result|
-          if params[:try_repo_update_on_error]
+          if !params[:repo_update] && params[:try_repo_update_on_error]
             cmd << '--repo-update'
             Actions.sh(cmd.join(' '), error_callback: lambda { |retry_result|
               call_error_callback(params, retry_result)
@@ -52,22 +52,11 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :clean,
-                                       env_name: "FL_COCOAPODS_CLEAN",
-                                       description: "Remove SCM directories",
-                                       is_string: false,
-                                       default_value: true),
-          FastlaneCore::ConfigItem.new(key: :integrate,
-                                       env_name: "FL_COCOAPODS_INTEGRATE",
-                                       description: "Integrate the Pods libraries into the Xcode project(s)",
-                                       is_string: false,
-                                       default_value: true),
           FastlaneCore::ConfigItem.new(key: :repo_update,
                                        env_name: "FL_COCOAPODS_REPO_UPDATE",
                                        description: "Add `--repo-update` flag to `pod install` command",
                                        is_string: false,
-                                       default_value: false,
-                                       conflicting_options: [:try_repo_update_on_error]),
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :silent,
                                        env_name: "FL_COCOAPODS_SILENT",
                                        description: "Execute command without logging output",
@@ -107,8 +96,22 @@ module Fastlane
                                        description: 'Retry with --repo-update if action was finished with error',
                                        optional: true,
                                        is_string: false,
-                                       type: Boolean,
-                                       conflicting_options: [:repo_update])
+                                       default_value: false,
+                                       type: Boolean),
+
+          # Deprecated
+          FastlaneCore::ConfigItem.new(key: :clean,
+                                       env_name: "FL_COCOAPODS_CLEAN",
+                                       description: "(Option removed from cocoapods) Remove SCM directories",
+                                       deprecated: true,
+                                       is_string: false,
+                                       default_value: true),
+          FastlaneCore::ConfigItem.new(key: :integrate,
+                                       env_name: "FL_COCOAPODS_INTEGRATE",
+                                       description: "(Option removed from cocoapods) Integrate the Pods libraries into the Xcode project(s)",
+                                       deprecated: true,
+                                       is_string: false,
+                                       default_value: true)
         ]
         # Please don't add a version parameter to the `cocoapods` action. If you need to specify a version when running
         # `cocoapods`, please start using a Gemfile and lock the version there

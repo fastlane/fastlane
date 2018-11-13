@@ -107,10 +107,10 @@ module Spaceship
       class MacInstallerDistribution < Certificate; end
 
       # A Mac Developer ID signing certificate for building .app bundles
-      class DeveloperIDApplication < Certificate; end
+      class DeveloperIdApplication < Certificate; end
 
       # A Mac Developer ID signing certificate for building .pkg installers
-      class DeveloperIDInstaller < Certificate; end
+      class DeveloperIdInstaller < Certificate; end
 
       #####################################################
       # Certs that are specific for one app
@@ -138,6 +138,9 @@ module Spaceship
       # ApplePay certificate
       class ApplePayCertificate < Certificate; end
 
+      # ApplePayMerchantIdentity certificate
+      class ApplePayMerchantIdentity < Certificate; end
+
       # A Mac push notification certificate for development environment
       class MacDevelopmentPush < PushCertificate; end
 
@@ -154,7 +157,8 @@ module Spaceship
         "Y3B2F3TYSI" => Passbook,
         "3T2ZP62QW8" => WebsitePush,
         "E5D663CMZW" => VoipPush,
-        "4APLUP237T" => ApplePayCertificate
+        "4APLUP237T" => ApplePayCertificate,
+        "MD8Q2VRT6A" => ApplePayMerchantIdentity
       }
 
       OLDER_IOS_CERTIFICATE_TYPES = [
@@ -171,11 +175,11 @@ module Spaceship
         "749Y1QAGU7" => MacDevelopment,
         "HXZEUKP0FP" => MacAppDistribution,
         "2PQI8IDXNH" => MacInstallerDistribution,
-        "OYVN2GW35E" => DeveloperIDInstaller,
-        "W0EURJRMC5" => DeveloperIDApplication,
+        "OYVN2GW35E" => DeveloperIdInstaller,
+        "W0EURJRMC5" => DeveloperIdApplication,
         "CDZ7EMXIZ1" => MacProductionPush,
         "HQ4KP3I34R" => MacDevelopmentPush,
-        "DIVN2GW3XT" => DeveloperIDApplication
+        "DIVN2GW3XT" => DeveloperIdApplication
       }
 
       CERTIFICATE_TYPE_IDS = IOS_CERTIFICATE_TYPE_IDS.merge(MAC_CERTIFICATE_TYPE_IDS)

@@ -6,7 +6,7 @@ module Fastlane
 
         if params[:pathspec]
           paths = params[:pathspec]
-          UI.success("Successfully added from \"#{paths}\" 💾.")
+          success_message = "Successfully added from \"#{paths}\" 💾."
         elsif params[:path]
           if params[:path].kind_of?(String)
             paths = shell_escape(params[:path], should_escape)
@@ -15,13 +15,14 @@ module Fastlane
               shell_escape(p, should_escape)
             end.join(' ')
           end
-          UI.success("Successfully added \"#{paths}\" 💾.")
+          success_message = "Successfully added \"#{paths}\" 💾."
         else
           paths = "."
-          UI.success("Successfully added all files 💾.")
+          success_message = "Successfully added all files 💾."
         end
 
         result = Actions.sh("git add #{paths}", log: FastlaneCore::Globals.verbose?).chomp
+        UI.success(success_message)
         return result
       end
 

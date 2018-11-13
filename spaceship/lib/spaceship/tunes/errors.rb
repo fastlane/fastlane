@@ -2,7 +2,7 @@ require_relative '../errors'
 
 module Spaceship
   module Tunes
-    # ITunesConnectError is only thrown when iTunes Connect raises an exception
+    # ITunesConnectError is only thrown when App Store Connect raises an exception
     class Error < BasicPreferredInfoError
     end
 
