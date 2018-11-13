@@ -29,6 +29,7 @@ module Fastlane
 
         begin
           connection.post do |req|
+            req.options.timeout = options.delete(:timeout)
             req.url("/api/upload/")
             req.body = options
           end
@@ -221,7 +222,12 @@ module Fastlane
                                        type: Array,
                                        env_name: "FL_TESTFAIRY_OPTIONS",
                                        description: "Array of options (shake,video_only_wifi,anonymous)",
-                                       default_value: [])
+                                       default_value: []),
+          FastlaneCore::ConfigItem.new(key: :timeout,
+                                       env_name: "FL_TESTFAIRY_TIMEOUT",
+                                       description: "Request timeout in seconds",
+                                       type: Integer,
+                                       optional: true)
         ]
       end
 
