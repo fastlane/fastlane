@@ -73,7 +73,7 @@ module Fastlane
       end
 
       def self.details
-        "This action allows you to create Apple Pay merchant certificate."
+        "This action allows you to create an Apple Pay merchant certificate."
       end
 
       def self.available_options
