@@ -80,7 +80,6 @@ def resize_missing_frames
     width = resize_config["width"]
     output_path = resize_config["output_path"]
 
-
     system("sips --resampleHeightWidth #{height} #{width} '#{current_raw}' --out '#{output_path}'")
   end
 end
