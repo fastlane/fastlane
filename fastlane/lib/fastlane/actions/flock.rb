@@ -30,14 +30,11 @@ module Fastlane
       end
 
       def self.description
-        "Send a message to a Flock group"
+        "Send a message to a [Flock](https://flock.com/) group"
       end
 
       def self.details
-        [
-          "To obtain the token, create a new [incoming message webhook](https://dev.flock.co/wiki/display/FlockAPI/Incoming+Webhooks)",
-          "in your Flock admin panel."
-        ].join("\n")
+        "To obtain the token, create a new [incoming message webhook](https://dev.flock.co/wiki/display/FlockAPI/Incoming+Webhooks) in your Flock admin panel."
       end
 
       def self.available_options

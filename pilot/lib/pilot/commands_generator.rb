@@ -151,7 +151,7 @@ module Pilot
 
       command :import do |c|
         c.syntax = "fastlane pilot import"
-        c.description = "Create external testers from a CSV file"
+        c.description = "Import external testers from a CSV file called testers.csv"
 
         FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
 

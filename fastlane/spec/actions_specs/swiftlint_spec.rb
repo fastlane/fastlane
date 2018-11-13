@@ -101,6 +101,31 @@ describe Fastlane do
         end
       end
 
+      context "when specify path options" do
+        it "adds path option" do
+          path = "./spec/fixtures"
+          result = Fastlane::FastFile.new.parse("
+            lane :test do
+              swiftlint(
+                path: '#{path}'
+              )
+            end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint --path #{path}")
+        end
+
+        it "adds invalid path option" do
+          path = "./non/existent/path"
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              swiftlint(
+                path: '#{path}'
+              )
+            end").runner.execute(:test)
+          end.to raise_error(/Couldn't find path '.*#{path}'/)
+        end
+      end
+
       context "the `ignore_exit_status` option" do
         context "by default" do
           it 'should raise if swiftlint completes with a non-zero exit status' do
@@ -193,24 +218,27 @@ describe Fastlane do
 
       context "when file paths contain spaces" do
         it "escapes spaces in output and config file paths" do
+          output_file = "output path with spaces.txt"
+          config_file = ".config file with spaces.yml"
           result = Fastlane::FastFile.new.parse("lane :test do
             swiftlint(
-              output_file: 'output path with spaces.txt',
-              config_file: '.config file with spaces.yml'
+              output_file: '#{output_file}',
+              config_file: '#{config_file}'
             )
           end").runner.execute(:test)
 
-          expect(result).to eq("swiftlint lint --config .config\\ file\\ with\\ spaces.yml > output\\ path\\ with\\ spaces.txt")
+          expect(result).to eq("swiftlint lint --config #{config_file.shellescape} > #{output_file.shellescape}")
         end
 
         it "escapes spaces in list of files to process" do
+          file = "path/to/my project/source code/AppDelegate.swift"
           result = Fastlane::FastFile.new.parse("lane :test do
             swiftlint(
-                files: ['path/to/my project/source code/AppDelegate.swift']
+                files: ['#{file}']
             )
           end").runner.execute(:test)
 
-          expect(result).to eq("SCRIPT_INPUT_FILE_COUNT=1 SCRIPT_INPUT_FILE_0=path/to/my\\ project/source\\ code/AppDelegate.swift swiftlint lint --use-script-input-files")
+          expect(result).to eq("SCRIPT_INPUT_FILE_COUNT=1 SCRIPT_INPUT_FILE_0=#{file.shellescape} swiftlint lint --use-script-input-files")
         end
       end
 

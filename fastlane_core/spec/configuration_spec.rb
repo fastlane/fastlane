@@ -136,7 +136,7 @@ describe FastlaneCore do
 
       describe "#sensitive flag" do
         before(:each) do
-          allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
+          allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
           allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
           allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
         end
@@ -235,9 +235,10 @@ describe FastlaneCore do
                                                      description: 'xcargs',
                                                      type: :shell_string)
 
-          value = config_item.auto_convert_value(['a b', 'c d', :e])
+          array = ['a b', 'c d', :e]
+          value = config_item.auto_convert_value(array)
 
-          expect(value).to eq('a\\ b c\\ d e')
+          expect(value).to eq(array.shelljoin)
         end
 
         it "auto converts Hash values to Strings if allowed" do
@@ -245,9 +246,12 @@ describe FastlaneCore do
                                                      description: 'xcargs',
                                                      type: :shell_string)
 
-          value = config_item.auto_convert_value({ 'FOO BAR' => 'I\'m foo bar', :BAZ => 'And I\'m baz' })
+          hash = { 'FOO BAR' => 'I\'m foo bar', :BAZ => 'And I\'m baz' }
+          value = config_item.auto_convert_value(hash)
 
-          expect(value).to eq('FOO\\ BAR=I\\\'m\\ foo\\ bar BAZ=And\\ I\\\'m\\ baz')
+          expected = 'FOO\\ BAR=I\\\'m\\ foo\\ bar BAZ=And\\ I\\\'m\\ baz'
+          expected = "\"FOO BAR\"=\"I'm foo bar\" BAZ=\"And I'm baz\"" if FastlaneCore::Helper.windows?
+          expect(value).to eq(expected)
         end
 
         it "does not auto convert Array values to Strings if not allowed" do
@@ -322,6 +326,27 @@ describe FastlaneCore do
           expect(config[:false_value2]).to eq(false)
         end
 
+        it "doesn't auto convert booleans as strings to booleans if type is explicitly set to String" do
+          c = [
+            FastlaneCore::ConfigItem.new(key: :true_value, type: String),
+            FastlaneCore::ConfigItem.new(key: :true_value2, type: String),
+            FastlaneCore::ConfigItem.new(key: :false_value, type: String),
+            FastlaneCore::ConfigItem.new(key: :false_value2, type: String)
+          ]
+
+          config = FastlaneCore::Configuration.create(c, {
+            true_value: "true",
+            true_value2: "YES",
+            false_value: "false",
+            false_value2: "NO"
+          })
+
+          expect(config[:true_value]).to eq("true")
+          expect(config[:true_value2]).to eq("YES")
+          expect(config[:false_value]).to eq("false")
+          expect(config[:false_value2]).to eq("NO")
+        end
+
         it "auto converts strings to integers" do
           c = [
             FastlaneCore::ConfigItem.new(key: :int_value,
@@ -370,14 +395,73 @@ describe FastlaneCore do
             @config = FastlaneCore::Configuration.create([c], {})
           end.to raise_error("Invalid default value for output, doesn't match verify_block")
         end
+
+        it "calls verify_block for non nil values" do
+          c = FastlaneCore::ConfigItem.new(key: :param,
+                                      env_name: "PARAM",
+                                   description: "Description",
+                                          type: Object,
+                                  verify_block: proc do |value|
+                                    UI.user_error!("'#{value}' is not valid!")
+                                  end)
+          [true, false, '', 'a string', ['an array'], {}, :hash].each do |value|
+            expect do
+              c.valid?(value)
+            end.to raise_error("'#{value}' is not valid!")
+          end
+        end
+
+        it "passes for nil values" do
+          c = FastlaneCore::ConfigItem.new(key: :param,
+                                      env_name: "param",
+                                   description: "Description",
+                                  verify_block: proc do |value|
+                                    UI.user_error!("'#{value}' is not valid!")
+                                  end)
+
+          expect(c.valid?(nil)).to eq(true)
+        end
+
+        it "verifies type" do
+          c = FastlaneCore::ConfigItem.new(key: :param,
+                                      env_name: "param",
+                                          type: Float,
+                                   description: "Description")
+          expect do
+            c.valid?('a string')
+          end.to raise_error("'param' value must be a Float! Found String instead.")
+        end
+
+        it "skips type verification" do
+          c = FastlaneCore::ConfigItem.new(key: :param,
+                                      env_name: "param",
+                                          type: Float,
+                          skip_type_validation: true,
+                                   description: "Description")
+
+          expect(c.valid?('a string')).to eq(true)
+        end
       end
 
       describe "deprecation", focus: true do
-        it "deprecated changes the description" do
+        it "deprecated message changes the description" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
                                                      description: 'foo',
                                                      deprecated: 'replaced by bar')
-          expect(config_item.description).to eq("[DEPRECATED!] replaced by bar - foo")
+          expect(config_item.description).to eq("**DEPRECATED!** replaced by bar - foo")
+        end
+
+        it "deprecated boolean changes the description" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     description: 'foo. use bar instead',
+                                                     deprecated: true)
+          expect(config_item.description).to eq("**DEPRECATED!** foo. use bar instead")
+        end
+
+        it "deprecated messages replaces empty description" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo,
+                                                     deprecated: 'replaced by bar')
+          expect(config_item.description).to eq("**DEPRECATED!** replaced by bar")
         end
 
         it "deprecated makes it optional" do
@@ -520,7 +604,7 @@ describe FastlaneCore do
             FastlaneCore::ConfigItem.new(key: :wait_processing_interval,
                                 short_option: "-k",
                                     env_name: "PILOT_WAIT_PROCESSING_INTERVAL",
-                                 description: "Interval in seconds to wait for iTunes Connect processing",
+                                 description: "Interval in seconds to wait for App Store Connect processing",
                                default_value: 30,
                                         type: Integer,
                                 verify_block: proc do |value|
@@ -585,7 +669,7 @@ describe FastlaneCore do
           end
 
           it "auto converts the value after asking the user for one" do
-            allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
+            allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
             allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
             allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
 
@@ -598,7 +682,8 @@ describe FastlaneCore do
                                      type: Array, # we actually allow String and Array here
                                      skip_type_validation: true,
                                      code_gen_sensitive: true,
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier))
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                     default_value_dynamic: true)
             config = FastlaneCore::Configuration.create([config_item], {})
 
             config.set(:app_identifiers, nil)
@@ -668,7 +753,7 @@ describe FastlaneCore do
           end
 
           it "asks if no other option" do
-            allow(FastlaneCore::Helper).to receive(:is_test?).and_return(false)
+            allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
             allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
             allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
 

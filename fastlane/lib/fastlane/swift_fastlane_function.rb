@@ -53,6 +53,8 @@ module Fastlane
         return "[String]"
       when :hash_of_strings
         return "[String : String]"
+      when :hash
+        return "[String : Any]"
       when :bool
         return "Bool"
       when :int
@@ -106,6 +108,10 @@ module Fastlane
         type = "Bool"
       elsif default_value.kind_of?(Array)
         type = "[String]"
+      elsif default_value.kind_of?(Hash)
+        type = "[String : Any]"
+      elsif default_value.kind_of?(Integer)
+        type = "Int"
       end
       return "#{type}#{optional_specifier}"
     end
@@ -192,6 +198,8 @@ module Fastlane
       when :array_of_strings
         returned_object = "parseArray(fromString: #{returned_object})"
       when :hash_of_strings
+        returned_object = "parseDictionary(fromString: #{returned_object})"
+      when :hash
         returned_object = "parseDictionary(fromString: #{returned_object})"
       when :bool
         returned_object = "parseBool(fromString: #{returned_object})"

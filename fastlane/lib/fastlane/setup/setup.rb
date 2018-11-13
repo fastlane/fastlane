@@ -34,7 +34,7 @@ module Fastlane
     # Start the setup process
     # rubocop:disable Metrics/BlockNesting
     def self.start(user: nil, is_swift_fastfile: false)
-      if FastlaneCore::FastlaneFolder.setup? and !Helper.is_test?
+      if FastlaneCore::FastlaneFolder.setup? && !Helper.test?
         require 'fastlane/lane_list'
         Fastlane::LaneList.output(FastlaneCore::FastlaneFolder.fastfile_path)
         UI.important("------------------")
@@ -54,6 +54,10 @@ module Fastlane
       spinner.auto_spin
 
       ios_projects = Dir["**/*.xcodeproj"] + Dir["**/*.xcworkspace"]
+      ios_projects.delete_if do |path|
+        Gem.path.any? { |gem_path| File.expand_path(path).start_with?(gem_path) }
+      end
+      ios_projects.delete_if { |path| path.match("fastlane/swift/FastlaneSwiftRunner/FastlaneSwiftRunner.xcodeproj") }
       android_projects = Dir["**/*.gradle"]
 
       spinner.success
@@ -329,7 +333,7 @@ module Fastlane
         UI.message("\t\thttps://docs.fastlane.tools/getting-started/ios/beta-deployment/".cyan)
         UI.message("🚀  Learn more about how to automate the App Store release process:")
         UI.message("\t\thttps://docs.fastlane.tools/getting-started/ios/appstore-deployment/".cyan)
-        UI.message("👩‍⚕️  Lern more about how to setup code signing with fastlane")
+        UI.message("👩‍⚕️  Learn more about how to setup code signing with fastlane")
         UI.message("\t\thttps://docs.fastlane.tools/codesigning/getting-started/".cyan)
       end
 
@@ -349,10 +353,3 @@ end
 
 require 'fastlane/setup/setup_ios'
 require 'fastlane/setup/setup_android'
-require 'fastlane/setup/crashlytics_beta_ui'
-require 'fastlane/setup/crashlytics_beta'
-require 'fastlane/setup/crashlytics_project_parser'
-require 'fastlane/setup/crashlytics_beta_info'
-require 'fastlane/setup/crashlytics_beta_info_collector'
-require 'fastlane/setup/crashlytics_beta_command_line_handler'
-require 'fastlane/setup/crashlytics_beta_user_email_fetcher'

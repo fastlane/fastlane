@@ -58,6 +58,7 @@ module Sigh
       @profile_type = Spaceship.provisioning_profile.app_store
       @profile_type = Spaceship.provisioning_profile.in_house if Spaceship.client.in_house?
       @profile_type = Spaceship.provisioning_profile.ad_hoc if Sigh.config[:adhoc]
+      @profile_type = Spaceship.provisioning_profile.direct if Sigh.config[:developer_id]
       @profile_type = Spaceship.provisioning_profile.development if Sigh.config[:development]
 
       @profile_type
@@ -176,6 +177,11 @@ module Sigh
           certificates = Spaceship.certificate.development.all
         elsif profile_type == Spaceship.provisioning_profile.InHouse
           certificates = Spaceship.certificate.in_house.all
+        # handles case where the desired certificate type is adhoc but the account is an enterprise account
+        # the apple dev portal api has a weird quirk in it where if you query for distribution certificates
+        # for enterprise accounts, you get nothing back even if they exist.
+        elsif profile_type == Spaceship.provisioning_profile.AdHoc && Spaceship.client && Spaceship.client.in_house?
+          certificates = Spaceship.certificate.in_house.all
         else
           certificates = Spaceship.certificate.production.all # Ad hoc or App Store
         end
@@ -222,7 +228,7 @@ module Sigh
         end
       end
 
-      if certificates.count > 1 and !Sigh.config[:development]
+      if certificates.count > 1 && !Sigh.config[:development]
         UI.important("Found more than one code signing identity. Choosing the first one. Check out `fastlane sigh --help` to see all available options.")
         UI.important("Available Code Signing Identities for current filters:")
         certificates.each do |c|
@@ -237,7 +243,7 @@ module Sigh
         filters << "Certificate ID: '#{Sigh.config[:cert_id]}' " if Sigh.config[:cert_id]
         UI.important("No certificates for filter: #{filters}") if filters.length > 0
         message = "Could not find a matching code signing identity for type '#{profile_type.to_s.split(':').last}'. "
-        message += "It is recommended to use match to manage code signing for you, more information on https://codesigning.guide."
+        message += "It is recommended to use match to manage code signing for you, more information on https://codesigning.guide. "
         message += "If you don't want to do so, you can also use cert to generate a new one: https://fastlane.tools/cert"
         UI.user_error!(message)
       end
@@ -255,7 +261,11 @@ module Sigh
         profile_name += "_tvos"
       end
 
-      profile_name += '.mobileprovision'
+      if Sigh.config[:platform].to_s == 'macos'
+        profile_name += '.provisionprofile'
+      else
+        profile_name += '.mobileprovision'
+      end
 
       tmp_path = Dir.mktmpdir("profile_download")
       output_path = File.join(tmp_path, profile_name)
@@ -283,7 +293,7 @@ module Sigh
       UI.message("fastlane produce -u #{config[:username]} -a #{config[:app_identifier]} --skip_itc".yellow)
       UI.message("")
       UI.message("You will be asked for any missing information, like the full name of your app")
-      UI.message("If the app should also be created on iTunes Connect, remove the " + "--skip_itc".yellow + " from the command above")
+      UI.message("If the app should also be created on App Store Connect, remove the " + "--skip_itc".yellow + " from the command above")
       UI.message("==========================================".yellow)
       UI.message("")
     end

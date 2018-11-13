@@ -54,7 +54,17 @@ module Fastlane
           end
         end
 
+        # Loading any .env files before any lanes are called since
+        # variables like FASTLANE_HIDE_CHANGELOG and FASTLANE_DISABLE_COLORS
+        # need to be set early on in execution
+        require 'fastlane/helper/dotenv_helper'
+        Fastlane::Helper::DotenvHelper.load_dot_env(nil)
+
+        # Needs to go after load_dot_env for variable FASTLANE_SKIP_UPDATE_CHECK
         FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
+
+        # Disabling colors if environment variable set
+        require 'fastlane_core/ui/disable_colors' if FastlaneCore::Helper.colors_disabled?
 
         ARGV.unshift("spaceship") if ARGV.first == "spaceauth"
         tool_name = ARGV.first ? ARGV.first.downcase : nil

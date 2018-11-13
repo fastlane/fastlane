@@ -100,6 +100,9 @@ describe Fastlane do
     end
 
     it "sets code sign identity" do
+      temp_dir = Dir.tmpdir
+      FileUtils.copy_entry('./fastlane/spec/fixtures/xcodeproj/automatic_code_signing.xcodeproj', temp_dir)
+
       # G3KGXDXQL9
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
@@ -108,11 +111,11 @@ describe Fastlane do
       expect(UI).to receive(:important).with("Set Code Sign identity to: iPhone Distribution for target: demo")
       expect(UI).to receive(:important).with("Set Code Sign identity to: iPhone Distribution for target: today")
       result = Fastlane::FastFile.new.parse("lane :test do
-        disable_automatic_code_signing(path: './fastlane/spec/fixtures/xcodeproj/automatic_code_signing.xcodeproj', team_id: 'G3KGXDXQL9', code_sign_identity: 'iPhone Distribution')
+        disable_automatic_code_signing(path: '#{temp_dir}', team_id: 'G3KGXDXQL9', code_sign_identity: 'iPhone Distribution')
       end").runner.execute(:test)
       expect(result).to eq(false)
 
-      project = Xcodeproj::Project.open("./fastlane/spec/fixtures/xcodeproj/automatic_code_signing.xcodeproj")
+      project = Xcodeproj::Project.open(temp_dir.to_s)
       root_attrs = project.root_object.attributes["TargetAttributes"]
 
       expect(root_attrs["771D79501D9E69C900D840FA"]["ProvisioningStyle"]).to eq("Manual")
@@ -126,6 +129,10 @@ describe Fastlane do
           expect(value).to eq("Manual")
         end
         target.build_configuration_list.get_setting("CODE_SIGN_IDENTITY").map do |build_config, value|
+          expect(value).to eq("iPhone Distribution")
+        end
+        next unless target.name == 'demo'
+        target.build_configuration_list.get_setting("CODE_SIGN_IDENTITY[sdk=iphoneos*]").map do |build_config, value|
           expect(value).to eq("iPhone Distribution")
         end
       end

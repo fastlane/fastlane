@@ -12,6 +12,7 @@ rspec_logs.json
 test_output/
 .DS_STORE
 .keys
+*.swp 
 
 ## Specific to Android
 .gradle/
@@ -48,6 +49,7 @@ Gemfile.lock
 # fastlane specific
 /*.itmsp
 .idea
+.rakeTasks
 spec/fixtures/*.itmsp/*.png
 /integration
 **/report.xml
@@ -60,6 +62,7 @@ fastlane/swift/FastlaneRunner
 vendor
 
 # iOS specific ignores, used in sample projects inside the repo
+DerivedData
 *.pbxuser
 !default.pbxuser
 *.mode1v3

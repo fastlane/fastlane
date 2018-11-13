@@ -16,7 +16,7 @@ require_relative 'simulator_launchers/launcher_configuration'
 module Snapshot
   class Runner
     def work
-      if File.exist?("./fastlane/snapshot.js") or File.exist?("./snapshot.js")
+      if File.exist?("./fastlane/snapshot.js") || File.exist?("./snapshot.js")
         UI.error("Found old snapshot configuration file 'snapshot.js'")
         UI.error("You updated to snapshot 1.0 which now uses UI Automation")
         UI.error("Please follow the migration guide: https://github.com/fastlane/fastlane/blob/master/snapshot/MigrationGuide.md")
@@ -122,6 +122,15 @@ module Snapshot
       UI.verbose("Checking that helper files contain #{current_version}")
 
       helper_files = Update.find_helper
+      if helper_files.empty?
+        UI.error("Your Snapshot Helper file is missing, please place a copy")
+        UI.error("in your project directory")
+        UI.message("More information about Snapshot setup can be found here:")
+        UI.message("https://docs.fastlane.tools/actions/snapshot/#quick-start")
+        UI.user_error!("Please add a Snapshot Helper file to your project")
+        return
+      end
+
       helper_files.each do |path|
         content = File.read(path)
 

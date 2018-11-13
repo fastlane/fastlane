@@ -2,16 +2,36 @@ module Fastlane
   module Actions
     class SayAction < Action
       def self.run(params)
-        text = params.join(' ') if params.kind_of?(Array) # that's usually the case
-        text = params if params.kind_of?(String)
-        UI.user_error!("You can't call the `say` action as OneOff") unless text
+        text = params[:text]
+        text = text.join(' ') if text.kind_of?(Array)
         text = text.tr("'", '"')
 
-        Actions.sh("say '#{text}'")
+        if params[:mute]
+          UI.message(text)
+          return text
+        else
+          Actions.sh("say '#{text}'")
+        end
       end
 
       def self.description
-        "This action speaks out loud the given text"
+        "This action speaks the given text out loud"
+      end
+
+      def self.available_options
+        [
+          FastlaneCore::ConfigItem.new(key: :text,
+                                       description: 'Text to be spoken out loud (as string or array of strings)',
+                                       optional: false,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :mute,
+                                       env_name: "SAY_MUTE",
+                                       description: 'If say should be muted with text printed out',
+                                       optional: false,
+                                       is_string: false,
+                                       type: Boolean,
+                                       default_value: false)
+        ]
       end
 
       def self.is_supported?(platform)
@@ -24,7 +44,7 @@ module Fastlane
 
       def self.example_code
         [
-          'say "I can speak"'
+          'say("I can speak")'
         ]
       end
 

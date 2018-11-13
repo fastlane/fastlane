@@ -150,11 +150,11 @@ describe Spaceship::AppVersion, all: true do
 
     describe "#url" do
       it "live version" do
-        expect(app.live_version.url).to eq("https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app.apple_id}/ios/versioninfo/deliverable")
+        expect(app.live_version.url).to eq("https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app.apple_id}/#{app.platform}/versioninfo/deliverable")
       end
 
       it "edit version" do
-        expect(app.edit_version.url).to eq("https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app.apple_id}/ios/versioninfo/")
+        expect(app.edit_version.url).to eq("https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app.apple_id}/#{app.platform}/versioninfo/")
       end
     end
 
@@ -479,8 +479,8 @@ describe Spaceship::AppVersion, all: true do
 
         it "prevents from using too large sort_order" do
           expect do
-            version.upload_screenshot!(screenshot_path, 6, "English", 'iphone4', false)
-          end.to raise_error("sort_order must not be > 5")
+            version.upload_screenshot!(screenshot_path, 11, "English", 'iphone4', false)
+          end.to raise_error("sort_order must not be > 10")
         end
 
         # not really sure if we want to enforce that
@@ -493,19 +493,19 @@ describe Spaceship::AppVersion, all: true do
         it "prevent from using invalid language" do
           expect do
             version.upload_screenshot!(screenshot_path, 1, "NotALanguage", 'iphone4', false)
-          end.to raise_error("iTunes Connect error: NotALanguage isn't an activated language")
+          end.to raise_error("App Store Connect error: NotALanguage isn't an activated language")
         end
 
         it "prevent from using invalid language" do
           expect do
             version.upload_screenshot!(screenshot_path, 1, "English_CA", 'iphone4', false)
-          end.to raise_error("iTunes Connect error: English_CA isn't an activated language")
+          end.to raise_error("App Store Connect error: English_CA isn't an activated language")
         end
 
         it "prevent from using invalid device" do
           expect do
             version.upload_screenshot!(screenshot_path, 1, "English", :android, false)
-          end.to raise_error("iTunes Connect error: android isn't a valid device name")
+          end.to raise_error("App Store Connect error: android isn't a valid device name")
         end
       end
 

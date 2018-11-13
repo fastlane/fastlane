@@ -26,35 +26,45 @@ describe FastlaneCore do
       end
     end
 
-    describe "#is_ci?" do
+    describe "#ci?" do
       it "returns false when not building in a known CI environment" do
         stub_const('ENV', {})
-        expect(FastlaneCore::Helper.is_ci?).to be(false)
+        expect(FastlaneCore::Helper.ci?).to be(false)
       end
 
       it "returns true when building in Jenkins" do
         stub_const('ENV', { 'JENKINS_URL' => 'http://fake.jenkins.url' })
-        expect(FastlaneCore::Helper.is_ci?).to be(true)
+        expect(FastlaneCore::Helper.ci?).to be(true)
       end
 
       it "returns true when building in Jenkins Slave" do
         stub_const('ENV', { 'JENKINS_HOME' => '/fake/jenkins/home' })
-        expect(FastlaneCore::Helper.is_ci?).to be(true)
+        expect(FastlaneCore::Helper.ci?).to be(true)
       end
 
       it "returns true when building in Travis CI" do
         stub_const('ENV', { 'TRAVIS' => true })
-        expect(FastlaneCore::Helper.is_ci?).to be(true)
+        expect(FastlaneCore::Helper.ci?).to be(true)
       end
 
       it "returns true when building in gitlab-ci" do
         stub_const('ENV', { 'GITLAB_CI' => true })
-        expect(FastlaneCore::Helper.is_ci?).to be(true)
+        expect(FastlaneCore::Helper.ci?).to be(true)
+      end
+
+      it "returns true when building in AppCenter" do
+        stub_const('ENV', { 'APPCENTER_BUILD_ID' => '185' })
+        expect(FastlaneCore::Helper.ci?).to be(true)
       end
 
       it "returns true when building in Xcode Server" do
         stub_const('ENV', { 'XCS' => true })
-        expect(FastlaneCore::Helper.is_ci?).to be(true)
+        expect(FastlaneCore::Helper.ci?).to be(true)
+      end
+
+      it "returns true when building in Azure DevOps (VSTS) " do
+        stub_const('ENV', { 'TF_BUILD' => true })
+        expect(FastlaneCore::Helper.ci?).to be(true)
       end
     end
 
@@ -100,6 +110,29 @@ describe FastlaneCore do
 
       it "#xcode_version", requires_xcode: true do
         expect(FastlaneCore::Helper.xcode_version).to match(/^\d[\.\d]+$/)
+      end
+    end
+
+    describe "#zip_directory" do
+      let(:directory) { File.absolute_path('/tmp/directory') }
+      let(:directory_to_zip) { File.absolute_path('/tmp/directory/to_zip') }
+      let(:the_zip) { File.absolute_path('/tmp/thezip.zip') }
+
+      it "creates correct zip command with contents_only set to false with default print option (true)" do
+        expect(FastlaneCore::Helper).to receive(:backticks)
+          .with("cd '#{directory}' && zip -r '#{the_zip}' 'to_zip'", print: true)
+          .exactly(1).times
+
+        FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: false)
+      end
+
+      it "creates correct zip command with contents_only set to true with print set to false" do
+        expect(FastlaneCore::Helper).to receive(:backticks)
+          .with("cd '#{directory_to_zip}' && zip -r '#{the_zip}' *", print: false)
+          .exactly(1).times
+        expect(FastlaneCore::UI).to receive(:command).exactly(1).times
+
+        FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: true, print: false)
       end
     end
   end

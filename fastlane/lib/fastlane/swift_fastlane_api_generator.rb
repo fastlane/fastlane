@@ -169,6 +169,14 @@ module Fastlane
 }
 
 func parseDictionary(fromString: String, function: String = #function) -> [String : String] {
+    return parseDictionaryHelper(fromString: fromString, function: function) as! [String: String]
+}
+
+func parseDictionary(fromString: String, function: String = #function) -> [String : Any] {
+    return parseDictionaryHelper(fromString: fromString, function: function)
+}
+
+func parseDictionaryHelper(fromString: String, function: String = #function) -> [String : Any] {
   verbose(message: "parsing an Array from data: \(fromString), from function: \(function)")
   let potentialDictionary: String
   if fromString.count < 2 {
@@ -177,7 +185,7 @@ func parseDictionary(fromString: String, function: String = #function) -> [Strin
   } else {
       potentialDictionary = fromString
   }
-  let dictionary: [String : String] = try! JSONSerialization.jsonObject(with: potentialDictionary.data(using: .utf8)!, options: []) as! [String : String]
+  let dictionary: [String : Any] = try! JSONSerialization.jsonObject(with: potentialDictionary.data(using: .utf8)!, options: []) as! [String : Any]
   return dictionary
 }
 
@@ -321,10 +329,7 @@ func parseInt(fromString: String, function: String = #function) -> Int {
     end
 
     def process_action(action: nil)
-      unless action.available_options
-        return nil
-      end
-      options = action.available_options
+      options = action.available_options || []
 
       action_name = action.action_name
       keys = []

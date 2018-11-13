@@ -31,7 +31,7 @@ module Spaceship
       #     {...}
       #   ]
 
-      # rubocop:disable Lint/MissingRequireStatement
+      # rubocop:disable Require/MissingRequireStatement
       def self.ci?
         if Object.const_defined?("FastlaneCore") && FastlaneCore.const_defined?("Helper")
           return FastlaneCore::Helper.ci?
@@ -45,9 +45,9 @@ module Spaceship
         end
         return true
       end
-      # rubocop:enable Lint/MissingRequireStatement
+      # rubocop:enable Require/MissingRequireStatement
 
-      def select_team
+      def select_team(team_id: nil, team_name: nil)
         teams = client.teams
 
         if teams.count == 0
@@ -57,8 +57,8 @@ module Spaceship
           raise "Your account is in no teams"
         end
 
-        team_id = (ENV['FASTLANE_TEAM_ID'] || '').strip
-        team_name = (ENV['FASTLANE_TEAM_NAME'] || '').strip
+        team_id = (team_id || ENV['FASTLANE_TEAM_ID'] || '').strip
+        team_name = (team_name || ENV['FASTLANE_TEAM_NAME'] || '').strip
 
         if team_id.length > 0
           # User provided a value, let's see if it's valid
@@ -87,7 +87,7 @@ module Spaceship
           teams.each_with_index do |team, i|
             puts("#{i + 1}) #{team['teamId']} \"#{team['name']}\" (#{team['type']})")
           end
-          raise "Multiple Teams found; unable to choose, terminal not ineractive!"
+          raise "Multiple Teams found; unable to choose, terminal not interactive!"
         end
 
         # User Selection

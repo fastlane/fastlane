@@ -160,8 +160,16 @@ describe Fastlane do
       end
 
       it "prints a warning if a lane is called like an action" do
-        expect(UI).to receive(:important).with("Name of the lane 'cocoapods' is already taken by the action named 'cocoapods'")
+        expect(UI).to receive(:error).with("------------------------------------------------")
+        expect(UI).to receive(:error).with("Name of the lane 'cocoapods' is already taken by the action named 'cocoapods'")
+        expect(UI).to receive(:error).with("------------------------------------------------")
         Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileLaneNameEqualsActionName')
+      end
+
+      it "prefers a lane over a built-in action" do
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileLaneNameEqualsActionName')
+        result = ff.runner.execute(:test_lane)
+        expect(result).to eq("laneResult")
       end
 
       it "allows calling a lane directly even with a default_platform" do
@@ -322,12 +330,32 @@ describe Fastlane do
 
       it "properly shows an error message when there is a syntax error in the Fastfile" do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+        expect(UI).to receive(:content_error).with("
+
+
+# empty lines to test the line parsing as well
+
+
+
+
+
+
+
+
+
+
+lane :beta do
+  sigh(app_identifier: \"hi\"
+end", "17")
         expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileSytnaxError')
       end
 
       it "properly shows an error message when there is a syntax error in the Fastfile from string" do
         # ruby error message differs in 2.5 and earlier. We use a matcher
+        expect(UI).to receive(:content_error).with("lane :test do
+          cases = [:abc,
+        end", "3")
         expect(UI).to receive(:user_error!).with(/Syntax error in your Fastfile on line 3: \(eval\):3: syntax error, unexpected keyword_end, expecting '\]'\n        end\n.*/)
 
         ff = Fastlane::FastFile.new.parse("lane :test do
@@ -338,6 +366,23 @@ describe Fastlane do
       it "properly shows an error message when there is a syntax error in the imported Fastfile" do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile')
+        expect(UI).to receive(:content_error).with("
+
+
+# empty lines to test the line parsing as well
+
+
+
+
+
+
+
+
+
+
+lane :beta do
+  sigh(app_identifier: \"hi\"
+end", "17")
         expect(UI).to receive(:user_error!).with("Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected keyword_end, expecting ')'")
         ff.import('./FastfileSytnaxError')
       end

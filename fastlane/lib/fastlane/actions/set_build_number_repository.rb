@@ -31,7 +31,7 @@ module Fastlane
         [
           "This action will set the **build number** according to what the SCM HEAD reports.",
           "Currently supported SCMs are svn (uses root revision), git-svn (uses svn revision) and git (uses short hash) and mercurial (uses short hash or revision number).",
-          "There is an option, `:use_hg_revision_number`, which allows to use mercurial revision number instead of hash"
+          "There is an option, `:use_hg_revision_number`, which allows to use mercurial revision number instead of hash."
         ].join("\n")
       end
 
@@ -50,7 +50,7 @@ module Fastlane
                                        verify_block: proc do |value|
                                          path = File.expand_path(value)
                                          UI.user_error!("Please pass the path to the project, not the workspace") if path.end_with?(".xcworkspace")
-                                         UI.user_error!("Could not find Xcode project at #{path}") unless Helper.is_test? || File.exist?(path)
+                                         UI.user_error!("Could not find Xcode project at #{path}") unless Helper.test? || File.exist?(path)
                                        end)
         ]
       end

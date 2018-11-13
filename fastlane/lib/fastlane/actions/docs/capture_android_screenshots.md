@@ -26,7 +26,7 @@ sudo gem install fastlane
 
 ##### Gradle dependency
 ```java
-androidTestCompile 'tools.fastlane:screengrab:x.x.x'
+androidTestCompile('tools.fastlane:screengrab:x.x.x')
 ```
 
 The latest version is [ ![Download](https://api.bintray.com/packages/fastlane/fastlane/screengrab/images/download.svg) ](https://bintray.com/fastlane/fastlane/screengrab/_latestVersion)
@@ -50,14 +50,28 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 
 ##### Configuring your <a href="#ui-tests">UI Tests</a> for Screenshots
 
-1.  Add `@ClassRule public static final LocaleTestRule localeTestRule = new LocaleTestRule();` to your tests class to handle automatic switching of locales
-2.  To capture screenshots, add the following to your tests `Screengrab.screenshot("name_of_screenshot_here");` on the appropriate screens
+1. Add `@ClassRule public static final LocaleTestRule localeTestRule = new LocaleTestRule();` to your tests class to handle automatic switching of locales
+2. To capture screenshots, add the following to your tests `Screengrab.screenshot("name_of_screenshot_here");` on the appropriate screens
 
 # Generating Screenshots with Screengrab
 - Then, before running `fastlane screengrab` you'll need a debug and test apk
-  - You can create your APKs with `./gradlew assembleDebug assembleAndroidTest`
+  - You can create your APKs manually with `./gradlew assembleDebug assembleAndroidTest`
+  - You can also create a lane and use `build_android_app`:
+    ```ruby
+    desc "Build debug and test APK for screenshots"
+    lane :build_for_screengrab do
+      build_android_app(
+        task: 'assemble',
+        build_type: 'Debug'
+      )
+      build_android_app(
+        task: 'assemble',
+        build_type: 'AndroidTest'
+      )
+    end
+    ```
 - Once complete run `fastlane screengrab` in your app project directory to generate screenshots
-    - You will be prompted to provide any required parameters which are not in your **Screengrabfile** or provided as command line arguments
+  - You will be prompted to provide any required parameters which are not in your **Screengrabfile** or provided as command line arguments
 - Your screenshots will be saved to `fastlane/metadata/android` in the directory where you ran _screengrab_
 
 ## Improved screenshot capture with UI Automator
@@ -74,6 +88,19 @@ However, UI Automator requires a device with **API level >= 18**, so it is not y
 Screengrab.setDefaultScreenshotStrategy(new UiAutomatorScreenshotStrategy());
 ```
 
+## Improved screenshot capture with Falcon
+
+As of _screengrab_ 1.2.0, you can specify a new strategy to delegate to [Falcon](https://github.com/jraska/Falcon). Falcon may work better than UI Automator in some situations and also provides similar benefits as UI Automator:
+
+* Multi-window situations are correctly captured (dialogs, etc.)
+* Works on Android N
+
+Falcon requires a device with **API level >= 10**. To enable it for all screenshots by default, make the following call before your tests run:
+
+```java
+Screengrab.setDefaultScreenshotStrategy(new FalconScreenshotStrategy(activityRule.getActivity()));
+```
+
 ## Advanced Screengrabfile Configuration
 
 Running `fastlane screengrab init` generated a Screengrabfile which can store all of your configuration options. Since most values will not change often for your project, it is recommended to store them there.
@@ -83,16 +110,16 @@ The `Screengrabfile` is written in Ruby, so you may find it helpful to use an ed
 ```ruby-skip-tests
 # remove the leading '#' to uncomment lines
 
-# app_package_name 'your.app.package'
-# use_tests_in_packages ['your.screenshot.tests.package']
+# app_package_name('your.app.package')
+# use_tests_in_packages(['your.screenshot.tests.package'])
 
-# app_apk_path 'path/to/your/app.apk'
-# tests_apk_path 'path/to/your/tests.apk'
+# app_apk_path('path/to/your/app.apk')
+# tests_apk_path('path/to/your/tests.apk')
 
-locales ['en-US', 'fr-FR', 'it-IT']
+locales(['en-US', 'fr-FR', 'it-IT'])
 
 # clear all previously generated screenshots in your local output directory before creating new ones
-clear_previous_screenshots true
+clear_previous_screenshots(true)
 ```
 
 For more information about all available options run

@@ -1,4 +1,3 @@
-require 'pty'
 require 'open3'
 require 'fileutils'
 require 'shellwords'
@@ -18,7 +17,7 @@ module Gym
       unless Gym.config[:skip_build_archive]
         build_app
       end
-      verify_archive
+      verify_archive unless Gym.config[:skip_archive]
       FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
       if Gym.project.ios? || Gym.project.tvos?
@@ -101,6 +100,23 @@ module Gym
       mark_archive_as_built_by_gym(BuildCommandGenerator.archive_path)
       UI.success("Successfully stored the archive. You can find it in the Xcode Organizer.") unless Gym.config[:archive_path].nil?
       UI.verbose("Stored the archive in: " + BuildCommandGenerator.archive_path)
+
+      post_build_app
+    end
+
+    # Post-processing of build_app
+    def post_build_app
+      command = BuildCommandGenerator.post_build
+
+      return if command.empty?
+
+      print_command(command, "Generated Post-Build Command") if FastlaneCore::Globals.verbose?
+      FastlaneCore::CommandExecutor.execute(command: command,
+                                          print_all: true,
+                                      print_command: !Gym.config[:silent],
+                                              error: proc do |output|
+                                                ErrorHandler.handle_build_error(output)
+                                              end)
     end
 
     # Makes sure the archive is there and valid
@@ -128,14 +144,25 @@ module Gym
 
       # Compress and move the dsym file
       containing_directory = File.expand_path("..", PackageCommandGenerator.dsym_path)
-
+      bcsymbolmaps_directory = File.expand_path("../../BCSymbolMaps", PackageCommandGenerator.dsym_path)
       available_dsyms = Dir.glob("#{containing_directory}/*.dSYM")
+
+      if Dir.exist?(bcsymbolmaps_directory)
+        UI.message("Mapping dSYM(s) using generated BCSymbolMaps") unless Gym.config[:silent]
+        available_dsyms.each do |dsym|
+          command = []
+          command << "dsymutil"
+          command << "--symbol-map #{bcsymbolmaps_directory.shellescape}"
+          command << dsym.shellescape
+          Helper.backticks(command.join(" "), print: !Gym.config[:silent])
+        end
+      end
+
       UI.message("Compressing #{available_dsyms.count} dSYM(s)") unless Gym.config[:silent]
 
       output_path = File.expand_path(File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".app.dSYM.zip"))
       command = "cd '#{containing_directory}' && zip -r '#{output_path}' *.dSYM"
       Helper.backticks(command, print: !Gym.config[:silent])
-
       puts("") # new line
 
       UI.success("Successfully exported and compressed dSYM file")

@@ -1,5 +1,6 @@
 require 'tmpdir'
 require 'terminal-table'
+require 'emoji_regex'
 
 require 'fastlane_core/itunes_transporter'
 require 'fastlane_core/build_watcher'
@@ -11,9 +12,17 @@ module Pilot
     def upload(options)
       start(options)
 
-      options[:changelog] = self.class.truncate_changelog(options[:changelog]) if options[:changelog]
+      options[:changelog] = self.class.sanitize_changelog(options[:changelog]) if options[:changelog]
 
       UI.user_error!("No ipa file given") unless config[:ipa]
+
+      if options[:changelog].nil? && options[:distribute_external] == true
+        if UI.interactive?
+          options[:changelog] = UI.input("No changelog provided for new build. You can provide a changelog using the `changelog` option. For now, please provide a changelog here:")
+        else
+          UI.user_error!("No changelog provided for new build. Please either disable `distribute_external` or provide a changelog using the `changelog` option")
+        end
+      end
 
       UI.success("Ready to upload new build to TestFlight (App: #{app.apple_id})...")
 
@@ -32,7 +41,7 @@ module Pilot
         UI.user_error!("Error uploading ipa file, for more information see above")
       end
 
-      UI.success("Successfully uploaded the new binary to iTunes Connect")
+      UI.success("Successfully uploaded the new binary to App Store Connect")
 
       if config[:skip_waiting_for_build_processing]
         UI.important("Skip waiting for build processing")
@@ -54,7 +63,7 @@ module Pilot
 
     def distribute(options, build: nil)
       start(options)
-      if config[:apple_id].to_s.length == 0 and config[:app_identifier].to_s.length == 0
+      if config[:apple_id].to_s.length == 0 && config[:app_identifier].to_s.length == 0
         config[:app_identifier] = UI.input("App Identifier: ")
       end
 
@@ -84,7 +93,18 @@ module Pilot
         end
       end
 
+      build.auto_notify_enabled = config[:notify_external_testers]
+
       return if config[:skip_submission]
+      if options[:reject_build_waiting_for_review]
+        waiting_for_review_build = Spaceship::TestFlight::Build.all_waiting_for_review(app_id: build.app_id, platform: fetch_app_platform).first
+        unless waiting_for_review_build.nil?
+          UI.important("Another build is already in review. Going to expire that build and submit the new one.")
+          UI.important("Expiring build: #{waiting_for_review_build.train_version} - #{waiting_for_review_build.build_version}")
+          waiting_for_review_build.expire!
+          UI.success("Expired previous build: #{waiting_for_review_build.train_version} - #{waiting_for_review_build.build_version}")
+        end
+      end
       distribute_build(build, options)
       type = options[:distribute_external] ? 'External' : 'Internal'
       UI.success("Successfully distributed build to #{type} testers 🚀")
@@ -92,7 +112,7 @@ module Pilot
 
     def list(options)
       start(options)
-      if config[:apple_id].to_s.length == 0 and config[:app_identifier].to_s.length == 0
+      if config[:apple_id].to_s.length == 0 && config[:app_identifier].to_s.length == 0
         config[:app_identifier] = UI.input("App Identifier: ")
       end
 
@@ -117,7 +137,20 @@ module Pilot
         changelog = "#{changelog[0...max_changelog_length - bottom_message.length]}#{bottom_message}"
         UI.important("Changelog has been truncated since it exceeds Apple's #{max_changelog_length} character limit. It currently contains #{original_length} characters.")
       end
-      return changelog
+      changelog
+    end
+
+    def self.strip_emoji(changelog)
+      if changelog && changelog =~ EmojiRegex::Regex
+        changelog.gsub!(EmojiRegex::Regex, "")
+        UI.important("Emoji symbols have been removed from the changelog, since they're not allowed by Apple.")
+      end
+      changelog
+    end
+
+    def self.sanitize_changelog(changelog)
+      changelog = strip_emoji(changelog)
+      truncate_changelog(changelog)
     end
 
     private
@@ -145,8 +178,17 @@ module Pilot
       uploaded_build.export_compliance.encryption_updated = false
 
       if options[:groups] || options[:distribute_external]
-        uploaded_build.beta_review_info.demo_account_required ||= false # this needs to be set for iTC to continue
-        uploaded_build.submit_for_testflight_review!
+        uploaded_build.beta_review_info.demo_account_required = options[:demo_account_required] # this needs to be set for iTC to continue
+        begin
+          uploaded_build.submit_for_testflight_review!
+        rescue => ex
+          # App Store Connect currently may 504 on this request even though it manages to get the build in
+          # the approved state, this is a temporary workaround.
+          raise ex unless ex.to_s.include?("504")
+          UI.message("Submitting the build for review timed out, trying to recover.")
+          updated_build = Spaceship::TestFlight::Build.find(app_id: uploaded_build.app_id, build_id: uploaded_build.id)
+          raise ex unless updated_build.approved?
+        end
       end
 
       if options[:groups]

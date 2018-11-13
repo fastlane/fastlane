@@ -146,11 +146,11 @@ module Fastlane
       end
 
       def self.details
-        "Creates a new release on GitHub. You must provide your GitHub Personal token
-        (get one from https://github.com/settings/tokens/new), the repository name
-        and tag name. By default that's 'master'. If the tag doesn't exist, one will be created on the commit or branch passed-in as
-        commitish. Out parameters provide the release's id, which can be used for later editing and the
-        release html link to GitHub. You can also specify a list of assets to be uploaded to the release with the upload_assets parameter."
+        [
+          "Creates a new release on GitHub. You must provide your GitHub Personal token (get one from [https://github.com/settings/tokens/new](https://github.com/settings/tokens/new)), the repository name and tag name. By default, that's `master`.",
+          "If the tag doesn't exist, one will be created on the commit or branch passed in as commitish.",
+          "Out parameters provide the release's id, which can be used for later editing and the release HTML link to GitHub. You can also specify a list of assets to be uploaded to the release with the `:upload_assets` parameter."
+        ].join("\n")
       end
 
       def self.available_options
@@ -177,6 +177,7 @@ module Fastlane
                                        code_gen_sensitive: true,
                                        is_string: true,
                                        default_value: ENV["GITHUB_API_TOKEN"],
+                                       default_value_dynamic: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :tag_name,
                                        env_name: "FL_SET_GITHUB_RELEASE_TAG_NAME",
@@ -198,7 +199,8 @@ module Fastlane
                                        description: "Description of this release",
                                        is_string: true,
                                        optional: true,
-                                       default_value: Actions.lane_context[SharedValues::FL_CHANGELOG]),
+                                       default_value: Actions.lane_context[SharedValues::FL_CHANGELOG],
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :is_draft,
                                        env_name: "FL_SET_GITHUB_RELEASE_IS_DRAFT",
                                        description: "Whether the release should be marked as draft",

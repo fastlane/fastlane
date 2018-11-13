@@ -3,8 +3,11 @@ require 'terminal-table'
 require 'spaceship'
 require 'fastlane_core/provisioning_profile'
 require 'fastlane_core/print_table'
+
 require_relative 'module'
-require_relative 'git_helper'
+
+require_relative 'storage'
+require_relative 'encryption'
 
 module Match
   class Nuke
@@ -15,22 +18,35 @@ module Match
     attr_accessor :profiles
     attr_accessor :files
 
+    attr_accessor :storage
+    attr_accessor :encryption
+
     def run(params, type: nil)
       self.params = params
       self.type = type
 
-      params[:workspace] = GitHelper.clone(params[:git_url],
-                                           params[:shallow_clone],
-                                           skip_docs: params[:skip_docs],
-                                           branch: params[:git_branch],
-                                           git_full_name: params[:git_full_name],
-                                           git_user_email: params[:git_user_email],
-                                           clone_branch_directly: params[:clone_branch_directly])
+      self.storage = Storage.for_mode(params[:storage_mode], {
+        git_url: params[:git_url],
+        shallow_clone: params[:shallow_clone],
+        skip_docs: params[:skip_docs],
+        git_branch: params[:git_branch],
+        git_full_name: params[:git_full_name],
+        git_user_email: params[:git_user_email],
+        clone_branch_directly: params[:clone_branch_directly]
+      })
+      self.storage.download
+
+      # After the download was complete
+      self.encryption = Encryption.for_storage_mode(params[:storage_mode], {
+        git_url: params[:git_url],
+        working_directory: storage.working_directory
+      })
+      self.encryption.decrypt_files
 
       had_app_identifier = self.params.fetch(:app_identifier, ask: false)
       self.params[:app_identifier] = '' # we don't really need a value here
       FastlaneCore::PrintTable.print_values(config: params,
-                                         hide_keys: [:app_identifier, :workspace],
+                                         hide_keys: [:app_identifier],
                                              title: "Summary for match nuke #{Fastlane::VERSION}")
 
       prepare_list
@@ -89,11 +105,11 @@ module Match
         self.profiles += profile_type(prov_type).all
       end
 
-      certs = Dir[File.join(params[:workspace], "**", cert_type.to_s, "*.cer")]
-      keys = Dir[File.join(params[:workspace], "**", cert_type.to_s, "*.p12")]
+      certs = Dir[File.join(self.storage.working_directory, "**", cert_type.to_s, "*.cer")]
+      keys = Dir[File.join(self.storage.working_directory, "**", cert_type.to_s, "*.p12")]
       profiles = []
       prov_types.each do |prov_type|
-        profiles += Dir[File.join(params[:workspace], "**", prov_type.to_s, "*.mobileprovision")]
+        profiles += Dir[File.join(self.storage.working_directory, "**", prov_type.to_s, "*.mobileprovision")]
       end
 
       self.files = certs + keys + profiles
@@ -119,7 +135,9 @@ module Match
         rows = self.profiles.collect do |p|
           status = p.status == 'Active' ? p.status.green : p.status.red
 
-          [p.name, p.id, status, p.type, p.expires.strftime("%Y-%m-%d")]
+          # Expires is somtimes nil
+          expires = p.expires ? p.expires.strftime("%Y-%m-%d") : nil
+          [p.name, p.id, status, p.type, expires]
         end
         puts(Terminal::Table.new({
           title: "Provisioning Profiles that are going to be revoked".green,
@@ -174,15 +192,17 @@ module Match
         delete_files!
       end
 
+      self.encryption.encrypt_files
+
       # Now we need to commit and push all this too
       message = ["[fastlane]", "Nuked", "files", "for", type.to_s].join(" ")
-      GitHelper.commit_changes(params[:workspace], message, self.params[:git_url], params[:git_branch])
+      self.storage.save_changes!(files_to_commit: [], custom_message: message)
     end
 
     private
 
     def delete_files!
-      UI.header("Deleting #{self.files.count} files from the git repo...")
+      UI.header("Deleting #{self.files.count} files from the storage...")
 
       self.files.each do |file|
         UI.message("Deleting file '#{File.basename(file)}'...")

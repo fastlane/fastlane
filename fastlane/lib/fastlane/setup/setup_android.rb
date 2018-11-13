@@ -28,7 +28,7 @@ module Fastlane
       self.append_lane([
                          "desc \"Submit a new Beta Build to Crashlytics Beta\"",
                          "lane :beta do",
-                         "  gradle(task: \"assembleRelease\")",
+                         "  gradle(task: \"clean assembleRelease\")",
                          "  crashlytics",
                          "",
                          "  # sh \"your_script.sh\"",
@@ -39,7 +39,7 @@ module Fastlane
       self.append_lane([
                          "desc \"Deploy a new version to the Google Play\"",
                          "lane :deploy do",
-                         "  gradle(task: \"assembleRelease\")",
+                         "  gradle(task: \"clean assembleRelease\")",
                          "  upload_to_play_store",
                          "end"
                        ])

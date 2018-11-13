@@ -45,7 +45,7 @@ module Fastlane
         user_name = options[:user]
         binary = options[:ipa] || options[:apk]
         upload_options = options.values.select do |key, _|
-          [:message, :distribution_key, :release_note, :disable_notify].include?(key)
+          [:message, :distribution_key, :release_note, :disable_notify, :distribution_name].include?(key)
         end
 
         UI.user_error!('missing `ipa` and `apk`. deploygate action needs least one.') unless binary
@@ -104,7 +104,7 @@ module Fastlane
 
       def self.details
         [
-          "You can retrieve your username and API token on [your settings page](https://deploygate.com/settings)",
+          "You can retrieve your username and API token on [your settings page](https://deploygate.com/settings).",
           "More information about the available options can be found in the [DeployGate Push API document](https://deploygate.com/docs/api)."
         ].join("\n")
       end
@@ -128,6 +128,7 @@ module Fastlane
                                        env_name: "DEPLOYGATE_IPA_PATH",
                                        description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
@@ -136,6 +137,7 @@ module Fastlane
                                        env_name: "DEPLOYGATE_APK_PATH",
                                        description: "Path to your APK file",
                                        default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find apk file at path '#{value}'") unless File.exist?(value)
@@ -158,7 +160,12 @@ module Fastlane
                                        is_string: false,
                                        default_value: false,
                                        env_name: "DEPLOYGATE_DISABLE_NOTIFY",
-                                       description: "Disables Push notification emails")
+                                       description: "Disables Push notification emails"),
+          FastlaneCore::ConfigItem.new(key: :distribution_name,
+                                       optional: true,
+                                       is_string: true,
+                                       env_name: "DEPLOYGATE_DISTRIBUTION_NAME",
+                                       description: "Target Distribution Name")
         ]
       end
 
@@ -177,14 +184,16 @@ module Fastlane
             user: "target username or organization name",
             ipa: "./ipa_file.ipa",
             message: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
-            distribution_key: "(Optional) Target Distribution Key"
+            distribution_key: "(Optional) Target Distribution Key",
+            distribution_name: "(Optional) Target Distribution Name"
           )',
           'deploygate(
             api_token: "...",
             user: "target username or organization name",
             apk: "./apk_file.apk",
             message: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
-            distribution_key: "(Optional) Target Distribution Key"
+            distribution_key: "(Optional) Target Distribution Key",
+            distribution_name: "(Optional) Target Distribution Name"
           )'
         ]
       end

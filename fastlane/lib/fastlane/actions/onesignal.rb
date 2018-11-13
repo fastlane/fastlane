@@ -16,6 +16,7 @@ module Fastlane
         app_name = params[:app_name]
         apns_p12_password = params[:apns_p12_password]
         android_token = params[:android_token]
+        android_gcm_sender_id = params[:android_gcm_sender_id]
 
         payload = {}
         payload['name'] = app_name
@@ -30,6 +31,7 @@ module Fastlane
         end
 
         payload["gcm_key"] = android_token unless android_token.nil?
+        payload["android_gcm_sender_id"] = android_gcm_sender_id unless android_gcm_sender_id.nil?
 
         # here's the actual lifting - POST to OneSignal
 
@@ -56,11 +58,11 @@ module Fastlane
       end
 
       def self.description
-        "Create a new OneSignal application"
+        "Create a new [OneSignal](https://onesignal.com/) application"
       end
 
       def self.details
-        "You can use this action to automatically create a OneSignal application. You can also upload a .p12 with password, a GCM key, or both"
+        "You can use this action to automatically create a OneSignal application. You can also upload a `.p12` with password, a GCM key, or both."
       end
 
       def self.available_options
@@ -89,6 +91,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :android_token,
                                        env_name: "ANDROID_TOKEN",
                                        description: "ANDROID GCM KEY",
+                                       sensitive: true,
+                                       optional: true),
+
+          FastlaneCore::ConfigItem.new(key: :android_gcm_sender_id,
+                                       env_name: "ANDROID_GCM_SENDER_ID",
+                                       description: "GCM SENDER ID",
                                        sensitive: true,
                                        optional: true),
 
@@ -123,7 +131,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :android].include?(platform)
       end
 
       def self.example_code
@@ -132,6 +140,7 @@ module Fastlane
             auth_token: "Your OneSignal Auth Token",
             app_name: "Name for OneSignal App",
             android_token: "Your Android GCM key (optional)",
+            android_gcm_sender_id: "Your Android GCM Sender ID (optional)",
             apns_p12: "Path to Apple .p12 file (optional)",
             apns_p12_password: "Password for .p12 file (optional)",
             apns_env: "production/sandbox (defaults to production)"

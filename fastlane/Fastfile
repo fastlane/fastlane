@@ -1,24 +1,29 @@
 require 'fileutils'
-fastlane_require('xcodeproj')
+fastlane_require 'xcodeproj'
 
 skip_docs # Do not create fastlane/README.txt
 
 # Test and Validate
 
-desc("Runs the unit tests and other verifications for the fastlane repo")
-lane(:test) do |options|
+desc "Runs the unit tests and other verifications for the fastlane repo"
+lane :test do |options|
   validate_repo
 end
 
-desc("Verifies all tests pass and the current state of the repo is valid")
-private_lane(:validate_repo) do
-  verify_source
+desc "Verifies all tests pass and the current state of the repo is valid"
+lane :validate_repo do
+  lint_source
   execute_tests
   validate_docs
+  ensure_tool_name_formatting
+  ensure_code_samples
+  ensure_special_docs_code_samples
+  ensure_code_snippets
+  ensure_actions_config_items_formatting
 end
 
-desc("Verifies source code is in a good state")
-private_lane(:verify_source) do
+desc "Verifies source code is in a good state"
+lane :lint_source do
   # Verifying that no debug code is in the code base
   #
   ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "playground.rb", exclude_dirs: ["\.bundle"]) # debugging code
@@ -34,26 +39,54 @@ private_lane(:verify_source) do
 
   Dir.chdir("..") do
     # Verify shell code style
-    if FastlaneCore::Helper.is_mac?
+    if FastlaneCore::Helper.mac?
       sh('find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +')
-    else
+    elsif !FastlaneCore::Helper.windows?
       sh('find . -regextype posix-egrep -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +')
     end
   end
 end
 
-desc("Runs the tests")
-private_lane(:execute_tests) do
+desc "Measure the execution time of the --help command"
+lane :benchmark_help_command do
+  Dir.chdir("..") do
+    # install gnomon if not installed yet
+    Actions.sh("echo foo | gnomon", log: true, error_callback: lambda { |result|
+      if Helper.windows? || Helper.mac?
+        sh('npm install -g gnomon')
+      else
+        # install npm if not installed yet
+        Actions.sh("echo foo | npm", log: true, error_callback: lambda { |result2|
+          sh('curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -')
+          sh('sudo apt-get install -y nodejs')
+        })
+        sh('sudo npm install -g gnomon')
+      end
+    })
+    cmd = Helper.windows? ? "cd bin && fastlane --help | gnomon" : "bin/fastlane --help | gnomon"
+    3.times do
+      content = sh(cmd, log: false)
+      content.each_line do |line|
+        UI.message("🏎️ '#{line.strip}'") if ["Total", "real", "user", "sys"].any? { |word| line.include?(word) }
+      end
+    end
+  end
+end
+
+desc "Runs the tests"
+lane :execute_tests do
   version = local_version # has to be outside of the `Dir.chdir`
 
   # Verifying the --help command
-  #
   Dir.chdir("..") do
-    content = sh("PAGER=cat bin/fastlane --help")
+    cmd = Helper.windows? ? "cd bin && fastlane --help" : "PAGER=cat bin/fastlane --help"
+    content = sh(cmd)
     ["--version", "https://fastlane.tools", "fastlane"].each do |current|
       UI.user_error!("--help missing information: '#{current}'") unless content.include?(current)
     end
   end
+
+  benchmark_help_command
 
   Dir.chdir("..") do
     # Install the bundle and the actual gem
@@ -72,8 +105,8 @@ end
 
 # Release Management
 
-desc("Increment the version number of this gem, after generating new Swift API")
-lane(:bump) do |options|
+desc "Increment the version number of this gem, after generating new Swift API"
+lane :bump do |options|
   verify_env_variables
   ensure_git_branch(branch: "master")
   ensure_git_status_clean
@@ -86,7 +119,7 @@ lane(:bump) do |options|
 
   # Verify everything is in a consistent state
   latest_version = current_version
-  local_version = version_get_podspec(path: version_file_path)
+  local_version = version_get_podspec(path: version_file_path, require_variable_prefix: false)
   UI.user_error!("Version on RubyGems doesn't match local repo: #{latest_version} != #{local_version}") if latest_version != local_version
 
   changelog_text = show_changelog
@@ -95,10 +128,10 @@ lane(:bump) do |options|
   bump_type ||= 'patch'
 
   slug = "fastlane/fastlane"
-  new_version = version_bump_podspec(path: version_file_path, bump_type: bump_type)
+  new_version = version_bump_podspec(path: version_file_path, bump_type: bump_type, require_variable_prefix: false)
 
   # Everything looks good, let's generate the Swift API
-  generated_files = generate_swift_api
+  generated_files = generate_swift_api(fastlane_version: new_version)
 
   # Alright, now let's update our FastlaneSwiftRunner manifest
   generated_files << generate_fastlane_swift_runner_manifest
@@ -145,9 +178,9 @@ lane(:bump) do |options|
   sh("git checkout master")
 end
 
-desc("Generate the Swift api and test it")
-lane(:generate_swift_api) do |options|
-  require "../fastlane/lib/fastlane/version.rb" # ensure we use the version we are releasing with
+desc "Generate the Swift api and test it"
+lane :generate_swift_api do |options|
+  Fastlane::VERSION = options[:fastlane_version]
   require "../fastlane/lib/fastlane/swift_fastlane_api_generator.rb"
   swift_generator = Fastlane::SwiftFastlaneAPIGenerator.new
   generated_files = swift_generator.generate_swift
@@ -160,8 +193,8 @@ lane(:generate_swift_api) do |options|
   generated_files
 end
 
-desc("Generate the FastlaneSwiftRunner project manifest")
-lane(:generate_fastlane_swift_runner_manifest) do |options|
+desc "Generate the FastlaneSwiftRunner project manifest"
+lane :generate_fastlane_swift_runner_manifest do |options|
   # Don't attempt to upgrade config files, like Fastfile.swift, Deliverfile.swift, etc...
   non_upgrade_set = TOOL_CONFIG_FILES.map { |tool_name| "#{tool_name}.swift" }.to_set
 
@@ -184,9 +217,9 @@ lane(:generate_fastlane_swift_runner_manifest) do |options|
   manifest_path
 end
 
-desc("Does everything that's needed for a release")
-desc("This includes running tests and verifying the GitHub release")
-lane(:release) do
+desc "Does everything that's needed for a release"
+desc "This includes running tests and verifying the GitHub release"
+lane :release do
   verify_env_variables
   slack_train_start(distance: 2,
                        train: "🚀",
@@ -275,8 +308,8 @@ lane(:release) do
   slack_train
 end
 
-desc("Notifies Fabric Slack to run CI Job for Mac App")
-private_lane(:send_mac_app_ci_reminder) do
+desc "Notifies Fabric Slack to run CI Job for Mac App"
+private_lane :send_mac_app_ci_reminder do
   if ENV['FABRIC_SLACK_URL']
     slack(
       slack_url: ENV['FABRIC_SLACK_URL'],
@@ -287,8 +320,8 @@ private_lane(:send_mac_app_ci_reminder) do
   end
 end
 
-desc("Print out the changelog since the last tagged release and open the GitHub page with the changes")
-lane(:show_changelog) do |options|
+desc "Print out the changelog since the last tagged release and open the GitHub page with the changes"
+lane :show_changelog do |options|
   old_version = options[:old_version] || current_version
 
   changes = sh("git log --pretty='* %s via %aN' #{old_version}...HEAD --no-merges ..", log: $verbose).gsub("\n\n", "\n")
@@ -301,16 +334,24 @@ lane(:show_changelog) do |options|
   changes # return the text without the modified colors
 end
 
-desc("Add a git tag in the fastlane repo for this release")
-private_lane(:add_fastlane_git_tag) do |options|
+desc "Add a git tag in the fastlane repo for this release"
+private_lane :add_fastlane_git_tag do |options|
   `git tag -am #{options[:message].shellescape} #{options[:tag].shellescape}`
   push_git_tags
 end
 
 # Docs
 
-desc("Validates the docs still are good")
-private_lane(:validate_docs) do
+desc "Validates the docs still are good"
+lane :validate_docs do
+  # Validate docs content
+  ensure_tool_name_formatting
+  ensure_code_samples
+  ensure_special_docs_code_samples
+  ensure_code_snippets
+  # (Validate action documentation)
+  ensure_actions_config_items_formatting
+
   # Test if generating the docs is successful
   clone_docs do
     generate_markdown_docs(target_path: ".")
@@ -320,8 +361,8 @@ private_lane(:validate_docs) do
   verify_docs
 end
 
-desc("Makes sure the tests on https://docs.fastlane.tools still work with the latest version")
-lane(:verify_docs) do
+desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
+lane :verify_docs do
   clone_docs do
     Bundler.with_clean_env do
       puts(`sed -i -e "s/activate_bin_path/bin_path/g" $(which bundle)`) # workaround for bundler https://github.com/bundler/bundler/issues/4602#issuecomment-233619696
@@ -331,13 +372,19 @@ lane(:verify_docs) do
   end
 end
 
-desc("Update the actions.md on https://docs.fastlane.tools")
-desc("This will also automatically submit a pull request to fastlane/docs")
-lane(:update_docs) do
-  verify_env_variables
+desc "Update the actions.md on https://docs.fastlane.tools"
+desc "This will also automatically submit a pull request to fastlane/docs"
+lane :update_docs do |options|
+  debug = options[:debug]
+
+  unless debug
+    verify_env_variables
+    ensure_actions_config_items_formatting
+  end
 
   template_path = File.expand_path("./assets/render_plugin.md.erb")
-  clone_docs do
+  clone_docs(debug: debug) do
+    plugin_scores_cache_path = File.expand_path("./plugin_scores_cache.yml")
     docs_path = generate_markdown_docs(target_path: ".")
     yml_path = File.expand_path("./mkdocs.yml")
     actions_md_path = File.expand_path(File.join(docs_path, "docs/actions.md"))
@@ -354,22 +401,29 @@ lane(:update_docs) do
       File.expand_path(current_output_path) # to make sure we commit the change
     end
 
-    Bundler.with_clean_env do
-      sh("bundle update")
+    unless options[:skip_bundle_update]
+      Bundler.with_clean_env do
+        sh("bundle update")
+      end
     end
 
     if `git status --porcelain`.length == 0
       UI.success("No changes in the actions.md ✅")
     else
       # Create a new branch
-      sh("git checkout -b 'update-actions-md-#{Time.now.to_i}'")
+      sh("git checkout -b 'update-actions-md-#{Time.now.to_i}'") unless debug
       plugins_path = "docs/plugins/available-plugins.md"
-      plugin_scores(template_path: template_path,
-                      output_path: plugins_path)
+      unless options[:skip_plugin_scores]
+        plugin_scores(template_path: template_path,
+                        output_path: plugins_path,
+                         cache_path: plugin_scores_cache_path)
+      end
+
+      next if debug
 
       Dir.chdir("fastlane") do # this is an assumption of fastlane, that we have to .. when shelling out
         # Commit the changes
-        changes_to_commit = [actions_md_path, "Gemfile.lock", plugins_path, yml_path] + action_docs + custom_assets
+        changes_to_commit = [plugin_scores_cache_path, actions_md_path, "Gemfile.lock", plugins_path, yml_path] + action_docs + custom_assets
         git_add(path: changes_to_commit)
         git_commit(path: changes_to_commit,
                 message: "Update docs for latest fastlane release (actions.md, available-plugins.md) 🚀")
@@ -389,15 +443,23 @@ lane(:update_docs) do
   end
 end
 
-def clone_docs
-  require 'tmpdir'
-  git_url = ENV['FASTLANE_DOCS_GIT_URL'] || "https://github.com/fastlane/docs"
+def clone_docs(debug: false)
+  if debug
+    clone_url = ENV['FASTLANE_DOCS_CLONE_URL'] || "../../docs"
 
-  Dir.mktmpdir("fl_clone") do |tmp_dir|
-    Dir.chdir(tmp_dir) do
-      sh("git clone #{git_url} --depth=1")
-      Dir.chdir("docs") do
-        yield
+    Dir.chdir(clone_url) do
+      yield
+    end
+  else
+    require 'tmpdir'
+    git_url = ENV['FASTLANE_DOCS_GIT_URL'] || "https://github.com/fastlane/docs"
+
+    Dir.mktmpdir("fl_clone") do |tmp_dir|
+      Dir.chdir(tmp_dir) do
+        sh("git clone #{git_url} --depth=1")
+        Dir.chdir("docs") do
+          yield
+        end
       end
     end
   end
@@ -420,24 +482,118 @@ end
 
 # Helper
 
-desc("Ensure all the requirement environment variables are provided")
-desc("this way the deployment script will fail early (and often)")
-private_lane(:verify_env_variables) do
+desc "Ensure all the requirement environment variables are provided"
+desc "this way the deployment script will fail early (and often)"
+private_lane :verify_env_variables do
   ["GITHUB_USER_NAME", "GITHUB_API_TOKEN"].each do |variable|
     next if ENV[variable].to_s.length > 0
     UI.user_error!("Missing ENV variables #{variable}, make sure to provide one for fastlane to be successful")
   end
+  UI.user_error!("You're not logged in RubyGems. Log in using `gem push` if using RubyGems < 2.7.0 or `gem signin` if using RubyGems >=2.7.0") unless File.file?(File.expand_path("~/.gem/credentials"))
 end
 
-desc("Get the local version number per version.rb")
-private_lane(:local_version) do
-  require "../fastlane/lib/fastlane/version.rb"
+desc "Get the local version number per version.rb"
+private_lane :local_version do
+  require_relative "../fastlane/lib/fastlane/version.rb"
 
   Fastlane::VERSION
 end
 
-desc("Get the version number of the last release")
-private_lane(:current_version) do
+desc "Get the version number of the last release"
+private_lane :current_version do
   puts("Checking the latest version on RubyGems")
   download(url: "https://rubygems.org/api/v1/gems/fastlane.json")["version"]
+end
+
+desc "Ensure the correct formatting for the fastlane tools"
+private_lane :ensure_tool_name_formatting do
+  UI.message("🕗  Verifying tool name formatting...")
+  require 'fastlane/tools'
+  errors = []
+  Dir.chdir("..") do
+    Dir["**/*.md"].each do |path|
+      content = File.read(path)
+      Fastlane::TOOLS.each do |tool|
+        errors << "Use _#{tool}_ instead of `#{tool}` to mention a tool in the docs in '#{path}'" if content.include?("`#{tool}`")
+        errors << "Use _#{tool}_ instead of `_#{tool}_` to mention a tool in the docs in '#{path}'" if content.include?("`_#{tool}_`")
+        errors << "Use [_#{tool}_] instead of [#{tool}] to mention a tool in the docs in '#{path}'" if content.include?("[#{tool}]")
+        errors << "Use <em>#{tool}<em> instead of <code>#{tool}</code> to mention a tool in the docs in '#{path}'" if content.include?("<code>#{tool}</code>")
+        if content.include?("_#{tool.to_s.capitalize}_") || content.include?("`#{tool.to_s.capitalize}`")
+          errors << "fastlane tools have to be formatted in lower case: #{tool} in '#{path}'"
+        end
+      end
+    end
+  end
+  errors.each { |a| UI.error(a) }
+  UI.user_error!("Invalid formatting of one of the fastlane tools") unless errors.empty?
+  UI.success("✅  fastlane tools formatting is correct")
+end
+
+# Run the code samples, yo
+private_lane :ensure_code_samples do
+  UI.message("🕗  Verifying all action code samples work with the current fastlane release")
+  all_content = ""
+  count_actions = 0
+  ActionsList.all_actions do |action|
+    all_content += "```ruby\n"
+    all_content += action.example_code.map { |code| code.gsub(/^\s+/, '') }.join("\n") if action.example_code
+    all_content += "\n```"
+    count_actions += 1
+  end
+  test_sample_code(content: all_content) # to not have to call the action 200 times
+  UI.success("✅  All fastlane action code samples (from #{count_actions} actions) work as expected")
+end
+
+# Run the other code samples, yo
+private_lane :ensure_special_docs_code_samples do
+  UI.message("🕗  Verifying all action special docs (`fastlane/lib/fastlane/actions/docs`) code samples work with the latest fastlane release")
+  all_content = ""
+  files = Dir["../fastlane/lib/fastlane/actions/docs/*.md"]
+  files.each do |special_docs_page_path|
+    all_content += File.read(special_docs_page_path)
+  end
+  test_sample_code(content: all_content) # to not have to call the action 200 times
+  UI.success("✅  All fastlane action special docs code samples (from #{files.length} files) work as expected")
+end
+
+private_lane :ensure_code_snippets do
+  UI.message("🕗  Verifying all code snippets are correctly formatted")
+
+  shell_commands_start = '((bundle|fastlane)[ ]|[A-Z_]+=)'
+  errors = []
+
+  require 'fastlane/documentation/markdown_docs_generator'
+
+  Fastlane::MarkdownDocsGenerator.new.actions_md_contents.each do |action_name, content|
+    errors << "Use '```no-highlight ↵ <code snippet> ↵ ```' instead of '```<language> ↵ <code snippet> ↵ ```' for code snippets for action '#{action_name}'" if content =~ /```(?<!no-higlight)\w+\s*#{shell_commands_start}/
+    errors << "Use '```no-highlight ↵ <code snippet> ↵ ```' instead of '    <code snippet>' for code snippets for action '#{action_name}'" if content =~ /^[ ]{4}#{shell_commands_start}/
+  end
+
+  errors.each { |a| UI.error(a) }
+
+  UI.user_error!("Invalid formatting of one of the code snippets") unless errors.empty?
+  UI.success("✅  All code snippets are formatted as expected")
+end
+
+private_lane :ensure_actions_config_items_formatting do
+  UI.message("🕗  Verifying actions' config items formatting...")
+
+  errors = []
+
+  require 'fastlane_core/configuration/config_item'
+
+  ActionsList.all_actions do |action|
+    next if action.available_options.nil?
+
+    action.available_options.each do |option|
+      next unless option.kind_of?(FastlaneCore::ConfigItem)
+
+      errors << "Remove the '\\n' from the config item ':#{option.key}' of the action '#{action.action_name}'" if option.description && option.description =~ /\n|\\n/
+    end
+  end
+
+  errors.each { |a| UI.error(a) }
+
+  UI.user_error!("Invalid formatting of one of the actions' config items") unless errors.empty?
+  UI.success("✅  fastlane actions' config items formatting is correct")
 end

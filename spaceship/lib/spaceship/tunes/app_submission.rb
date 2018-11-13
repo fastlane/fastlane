@@ -2,7 +2,7 @@ require_relative 'tunes_base'
 
 module Spaceship
   module Tunes
-    # Represents a submission for review of an iTunes Connect Application
+    # Represents a submission for review of an App Store Connect Application
     # This class handles the submission of all review information and documents
     class AppSubmission < TunesBase
       # @return (Spaceship::Tunes::Application) A reference to the application
@@ -11,6 +11,11 @@ module Spaceship
 
       # @return (AppVersion) The version to use for this submission
       attr_accessor :version
+
+      # @return (String) The platform of the device. This is usually "ios"
+      # @example
+      #   "appletvos"
+      attr_accessor :platform
 
       # @return (Boolean) Submitted for Review
       attr_accessor :submitted_for_review
@@ -115,10 +120,11 @@ module Spaceship
         end
 
         # @param application (Spaceship::Tunes::Application) The app this submission is for
-        def create(application, version)
-          attrs = client.prepare_app_submissions(application.apple_id, application.edit_version.version_id)
+        def create(application, version, platform: nil)
+          attrs = client.prepare_app_submissions(application.apple_id, application.edit_version(platform: platform).version_id)
           attrs[:application] = application
           attrs[:version] = version
+          attrs[:platform] = platform
 
           return self.factory(attrs)
         end
@@ -142,7 +148,7 @@ module Spaceship
           )
         end
 
-        client.send_app_submission(application.apple_id, application.edit_version.version_id, raw_data_clone)
+        client.send_app_submission(application.apple_id, application.edit_version(platform: platform).version_id, raw_data_clone)
         @submitted_for_review = true
       end
 

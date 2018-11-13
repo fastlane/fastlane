@@ -3,7 +3,6 @@
 //  ExampleMacOSUITests
 //
 //  Created by Alexander Semenov on 1/19/17.
-//  Copyright © 2017 Felix Krause. All rights reserved.
 //
 
 import XCTest

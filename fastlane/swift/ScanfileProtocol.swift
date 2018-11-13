@@ -4,6 +4,7 @@ protocol ScanfileProtocol: class {
   var device: String? { get }
   var toolchain: String? { get }
   var devices: [String]? { get }
+  var skipDetectDevices: Bool { get }
   var scheme: String? { get }
   var clean: Bool { get }
   var codeCoverage: Bool? { get }
@@ -16,12 +17,17 @@ protocol ScanfileProtocol: class {
   var outputFiles: String? { get }
   var buildlogPath: String { get }
   var includeSimulatorLogs: Bool { get }
+  var suppressXcodeOutput: String? { get }
   var formatter: String? { get }
+  var xcprettyArgs: String? { get }
+  var maxConcurrentSimulators: Int? { get }
+  var disableConcurrentTesting: Bool { get }
   var testWithoutBuilding: Bool? { get }
   var buildForTesting: Bool? { get }
   var xctestrun: String? { get }
   var derivedDataPath: String? { get }
-  var resultBundle: String? { get }
+  var shouldZipBuildProducts: Bool { get }
+  var resultBundle: Bool { get }
   var sdk: String? { get }
   var openReport: Bool { get }
   var configuration: String? { get }
@@ -37,6 +43,8 @@ protocol ScanfileProtocol: class {
   var slackOnlyOnFailure: Bool { get }
   var useClangReportName: Bool { get }
   var customReportFileName: String? { get }
+  var appIdentifier: String? { get }
+  var reinstallApp: Bool { get }
   var failBuild: Bool { get }
 }
 
@@ -46,6 +54,7 @@ extension ScanfileProtocol {
   var device: String? { return nil }
   var toolchain: String? { return nil }
   var devices: [String]? { return nil }
+  var skipDetectDevices: Bool { return false }
   var scheme: String? { return nil }
   var clean: Bool { return false }
   var codeCoverage: Bool? { return nil }
@@ -58,12 +67,17 @@ extension ScanfileProtocol {
   var outputFiles: String? { return nil }
   var buildlogPath: String { return "~/Library/Logs/scan" }
   var includeSimulatorLogs: Bool { return false }
+  var suppressXcodeOutput: String? { return nil }
   var formatter: String? { return nil }
+  var xcprettyArgs: String? { return nil }
+  var maxConcurrentSimulators: Int? { return nil }
+  var disableConcurrentTesting: Bool { return false }
   var testWithoutBuilding: Bool? { return nil }
   var buildForTesting: Bool? { return nil }
   var xctestrun: String? { return nil }
   var derivedDataPath: String? { return nil }
-  var resultBundle: String? { return nil }
+  var shouldZipBuildProducts: Bool { return false }
+  var resultBundle: Bool { return false }
   var sdk: String? { return nil }
   var openReport: Bool { return false }
   var configuration: String? { return nil }
@@ -79,10 +93,11 @@ extension ScanfileProtocol {
   var slackOnlyOnFailure: Bool { return false }
   var useClangReportName: Bool { return false }
   var customReportFileName: String? { return nil }
+  var appIdentifier: String? { return nil }
+  var reinstallApp: Bool { return false }
   var failBuild: Bool { return true }
 }
 
-
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.1]
+// FastlaneRunnerAPIVersion [0.9.6]

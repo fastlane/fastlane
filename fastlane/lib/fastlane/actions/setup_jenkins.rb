@@ -19,7 +19,7 @@ module Fastlane
 
       def self.run(params)
         # Stop if not executed by CI
-        if !Helper.is_ci? && !params[:force]
+        if !Helper.ci? && !params[:force]
           UI.important("Not executed by Continuous Integration system.")
           return
         end
@@ -88,16 +88,18 @@ module Fastlane
       end
 
       def self.details
+        list = <<-LIST.markdown_list(true)
+          Adds and unlocks keychains from Jenkins 'Keychains and Provisioning Profiles Plugin'
+          Sets code signing identity from Jenkins 'Keychains and Provisioning Profiles Plugin'
+          Sets output directory to './output' (gym, scan and backup_xcarchive)
+          Sets derived data path to './derivedData' (xcodebuild, gym, scan and clear_derived_data, carthage)
+          Produce result bundle (gym and scan)
+        LIST
+
         [
-          "- Adds and unlocks keychains from Jenkins 'Keychains and Provisioning Profiles Plugin'",
-          "- Sets code signing identity from Jenkins 'Keychains and Provisioning Profiles Plugin'",
-          "- Sets output directory to './output' (gym, scan and backup_xcarchive).",
-          "- Sets derived data path to './derivedData' (xcodebuild, gym, scan and clear_derived_data, carthage).",
-          "- Produce result bundle (gym and scan).",
-          "",
+          list,
           "This action helps with Jenkins integration. Creates own derived data for each job. All build results like IPA files and archives will be stored in the `./output` directory.",
-          "The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), selected keychain",
-          "will be automatically unlocked and the selected code signing identity will be used. By default this action will only work when fastlane is executed on a CI system."
+          "The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), the selected keychain will be automatically unlocked and the selected code signing identity will be used. By default this action will only work when _fastlane_ is executed on a CI system."
         ].join("\n")
       end
 

@@ -23,7 +23,7 @@ module Spaceship
       # @return (Hash) A hash representing the privacy URL in all languages
       attr_reader :privacy_url
 
-      # @return (Hash) Some bla bla about privacy
+      # @return (Hash) A hash prepresenting the privacy URL in all languages for Apple TV
       attr_reader :apple_tv_privacy_policy
 
       # Categories (e.g. MZGenre.Business)
@@ -78,7 +78,7 @@ module Spaceship
         end
       end
 
-      # Push all changes that were made back to iTunes Connect
+      # Push all changes that were made back to App Store Connect
       def save!
         client.update_app_details!(application.apple_id, raw_data)
       rescue Spaceship::Tunes::Error => ex

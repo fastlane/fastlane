@@ -24,6 +24,10 @@ describe Screengrab::Runner do
     let(:test_classes_to_use) { nil }
     let(:test_packages_to_use) { nil }
 
+    before do
+      expect(mock_android_environment).to receive(:adb_path).and_return("adb")
+    end
+
     context "when launch arguments are specified" do
       before do
         config[:launch_arguments] = ["username hjanuschka", "build_type x500"]
@@ -101,6 +105,10 @@ describe Screengrab::Runner do
   describe :select_device do
     let(:adb_list_devices_command) { 'adb devices -l' }
 
+    before do
+      expect(mock_android_environment).to receive(:adb_path).and_return("adb")
+    end
+
     context 'no devices' do
       it 'does not find any active devices' do
         adb_response = strip_heredoc(<<-ADB_OUTPUT)
@@ -176,6 +184,10 @@ describe Screengrab::Runner do
   end
 
   describe :run_adb_command do
+    before do
+      expect(mock_android_environment).to receive(:adb_path).and_return("adb")
+    end
+
     it 'filters out lines which are ADB warnings' do
       adb_response = strip_heredoc(<<-ADB_OUTPUT)
             adb: /home/me/rubystack-2.3.1-4/common/lib/libcrypto.so.1.0.0: no version information available (required by adb)

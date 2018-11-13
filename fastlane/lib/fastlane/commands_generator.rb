@@ -11,7 +11,6 @@ module Fastlane
       # since at this point we haven't yet loaded commander
       # however we do want to log verbose information in the PluginManager
       FastlaneCore::Globals.verbose = true if ARGV.include?("--verbose")
-      FastlaneCore::Globals.capture_output = true  if ARGV.include?("--capture_output")
       if ARGV.include?("--capture_output")
         FastlaneCore::Globals.verbose = true
         FastlaneCore::Globals.capture_output = true
@@ -56,7 +55,7 @@ module Fastlane
     end
 
     def self.confirm_troubleshoot
-      if Helper.is_ci?
+      if Helper.ci?
         UI.error("---")
         UI.error("You are trying to use '--troubleshoot' on CI")
         UI.error("this option is not usable in CI, as it is insecure")
@@ -102,6 +101,7 @@ module Fastlane
         c.description = 'Run a specific lane. Pass the lane name and optionally the platform first.'
         c.option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
         c.option('--disable_runner_upgrades', 'Prevents fastlane from attempting to update FastlaneRunner swift project')
+        c.option('--swift_server_port INT', 'Set specific port to communicate between fastlane and FastlaneRunner')
 
         c.action do |args, options|
           if ensure_fastfile
@@ -116,18 +116,14 @@ module Fastlane
 
         c.option('-u STRING', '--user STRING', String, 'iOS projects only: Your Apple ID')
 
-        # CrashlyticsBetaCommandLineHandler.apply_options(c)
-
         c.action do |args, options|
-          # if args[0] == 'beta'
-          #   beta_info = CrashlyticsBetaCommandLineHandler.info_from_options(options)
-          #   Fastlane::CrashlyticsBeta.new(beta_info, Fastlane::CrashlyticsBetaUi.new).run
-          # else
           is_swift_fastfile = args.include?("swift")
           Fastlane::Setup.start(user: options.user, is_swift_fastfile: is_swift_fastfile)
-          # end
         end
       end
+
+      # Creating alias for mapping "swift init" to "init swift"
+      alias_command(:'swift init', :init, 'swift')
 
       command :new_action do |c|
         c.syntax = 'fastlane new_action'

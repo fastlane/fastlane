@@ -14,15 +14,17 @@ module Deliver
 
     SPECIAL_DIR_NAMES = [APPLE_TV_DIR_NAME, IMESSAGE_DIR_NAME, DEFAULT_DIR_NAME].freeze
 
-    # If the user also uses `supply` in the same project, an 'android' folder might exist
+    # Some exception directories may exist from other actions that should not be iterated through
     SUPPLY_DIR_NAME = "android".freeze
+    FRAMEIT_FONTS_DIR_NAME = "fonts".freeze
+    META_DIR_NAMES = UploadMetadata::ALL_META_SUB_DIRS.map(&:downcase)
 
-    EXCEPTION_DIRECTORIES = (UploadMetadata::ALL_META_SUB_DIRS.map(&:downcase) << SUPPLY_DIR_NAME).freeze
+    EXCEPTION_DIRECTORIES =  (META_DIR_NAMES << SUPPLY_DIR_NAME << FRAMEIT_FONTS_DIR_NAME).freeze
 
     def self.language_folders(root, ignore_validation)
       folders = Dir.glob(File.join(root, '*'))
 
-      if Helper.is_test?
+      if Helper.test?
         available_languages = FastlaneCore::Languages::ALL_LANGUAGES
       else
         available_languages = Spaceship::Tunes.client.available_languages.sort

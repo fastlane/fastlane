@@ -17,7 +17,7 @@ unless ENV["DEBUG"]
   $stdout = File.open(fastlane_tests_tmpdir, "w")
 end
 
-if FastlaneCore::Helper.is_mac?
+if FastlaneCore::Helper.mac?
   xcode_path = FastlaneCore::Helper.xcode_path
   unless xcode_path.include?("Contents/Developer")
     UI.error("Seems like you didn't set the developer tools path correctly")
@@ -44,6 +44,7 @@ RSpec.configure do |config|
 
     ENV['FASTLANE_PLATFORM_NAME'] = nil
 
+    # execute `before_each_*` method from spec_helper for each tool
     tool_name = current_test.id.match(%r{\.\/(\w+)\/})[1]
     method_name = "before_each_#{tool_name}".to_sym
     begin
@@ -51,9 +52,13 @@ RSpec.configure do |config|
     rescue NoMethodError
       # no method implemented
     end
+
+    # Make sure PATH didnt get emptied during execution of previous (!) test
+    expect(ENV['PATH']).to be_truthy, "PATH is missing. (Previous test probably emptied it.)"
   end
 
   config.after(:each) do |current_test|
+    # execute `after_each_*` method from spec_helper for each tool
     tool_name = current_test.id.match(%r{\.\/(\w+)\/})[1]
     method_name = "after_each_#{tool_name}".to_sym
     begin
@@ -63,10 +68,10 @@ RSpec.configure do |config|
     end
   end
 
-  config.example_status_persistence_file_path = "/tmp/rspec_failed_tests.txt"
+  config.example_status_persistence_file_path = "#{Dir.tmpdir}/rspec_failed_tests.txt"
 
   # skip some tests if not running on mac
-  unless FastlaneCore::Helper.is_mac?
+  unless FastlaneCore::Helper.mac?
 
     # define metadata tags that also imply :skip
     config.define_derived_metadata(:requires_xcode) do |meta|
@@ -85,9 +90,9 @@ RSpec.configure do |config|
       meta[:skip] = "Skipped: Requires `security` to be installed (which is not possible on this platform and no workaround has been implemented)"
     end
 
-    # also skip `before()` for test groups that are skipped because of their tags
-    # only works for `describe` groups (that are parents of the `before`, not if the tag is set on `it`
-    # caution! has unexpected side effect on usage of `skip: false` for individual examples
+    # also skip `before()` for test groups that are skipped because of their tags.
+    # only works for `describe` groups (that are parents of the `before`, not if the tag is set on `it`.
+    # caution: has unexpected side effect on usage of `skip: false` for individual examples,
     # see https://groups.google.com/d/msg/rspec/5qeKQr_7G7k/Pb3ss2hOAAAJ
     module HookOverrides
       def before(*args)
@@ -96,6 +101,16 @@ RSpec.configure do |config|
     end
     config.extend(HookOverrides)
 
+  end
+
+  # skip some more tests if run on on Windows
+  if FastlaneCore::Helper.windows?
+    config.define_derived_metadata(:requires_xar) do |meta|
+      meta[:skip] = "Skipped: Requires `xar` to be installed (which is not possible on Windows and no workaround has been implemented)"
+    end
+    config.define_derived_metadata(:requires_pty) do |meta|
+      meta[:skip] = "Skipped: Requires `pty` to be available (which is not possible on Windows and no workaround has been implemented)"
+    end
   end
 end
 

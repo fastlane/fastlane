@@ -19,8 +19,13 @@ describe Spaceship do
     end
 
     it "may have different teams" do
+      allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([
+                                                                                     { 'teamId' => 'XXXXXXXXXX', 'currentTeamMember' => { 'teamMemberId' => '' } },
+                                                                                     { 'teamId' => 'ABCDEF', 'currentTeamMember' => { 'teamMemberId' => '' } }
+                                                                                   ])
+
       team_id = "ABCDEF"
-      spaceship1.client.team_id = team_id
+      spaceship1.client.select_team(team_id: team_id)
 
       expect(spaceship1.client.team_id).to eq(team_id) # custom
       expect(spaceship2.client.team_id).to eq("XXXXXXXXXX") # default

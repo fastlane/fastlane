@@ -5,8 +5,8 @@ GEMS = %w(fastlane danger-device_grid)
 SECONDS_PER_DAY = 60 * 60 * 24
 
 task(:rubygems_admins) do
-  names = ["KrauseFx", "ohayon", "mpirri", "taquitos"]
-  (GEMS + ["krausefx-shenzhen", "commander-fastlane"]).each do |gem_name|
+  names = ["KrauseFx", "joshdholtz", "powerivq"]
+  (GEMS + ["krausefx-shenzhen", "commander-fastlane", "fastlane-plugin-firebase_test_lab"]).each do |gem_name|
     names.each do |name|
       puts(`gem owner #{gem_name} -a #{name}`)
     end
@@ -73,7 +73,8 @@ task(:update_gem_spec_authors) do
   end.shuffle
 
   gemspec = File.read("fastlane.gemspec")
-  gemspec.gsub!(/spec.authors\s+\=\s.*/, "spec.authors       = [\"#{names.join('", "')}\"]")
+  names = names.join("\",\n                        \"")
+  gemspec.gsub!(/spec.authors\s+\=\s.*?\]/m, "spec.authors       = [\"#{names}\"]")
   File.write("fastlane.gemspec", gemspec)
 end
 

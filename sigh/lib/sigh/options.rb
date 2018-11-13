@@ -14,18 +14,27 @@ module Sigh
                                      description: "Setting this flag will generate AdHoc profiles instead of App Store Profiles",
                                      is_string: false,
                                      default_value: false,
-                                     conflicting_options: [:development],
-                                     conflict_block: proc do |value|
-                                       UI.user_error!("You can't enable both :development and :adhoc")
+                                     conflicting_options: [:developer_id, :development],
+                                     conflict_block: proc do |option|
+                                       UI.user_error!("You can't enable both :#{option.key} and :adhoc")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :developer_id,
+                                     env_name: "SIGH_DEVELOPER_ID",
+                                     description: "Setting his flag will generate Developer ID profiles instead of App Store Profiles",
+                                     is_string: false,
+                                     default_value: false,
+                                     conflicting_options: [:adhoc, :development],
+                                     conflict_block: proc do |option|
+                                       UI.user_error!("You can't enable both :#{option.key} and :developer_id")
                                      end),
         FastlaneCore::ConfigItem.new(key: :development,
                                      env_name: "SIGH_DEVELOPMENT",
                                      description: "Renew the development certificate instead of the production one",
                                      is_string: false,
                                      default_value: false,
-                                     conflicting_options: [:adhoc],
-                                     conflict_block: proc do |value|
-                                       UI.user_error!("You can't enable both :development and :adhoc")
+                                     conflicting_options: [:adhoc, :developer_id],
+                                     conflict_block: proc do |option|
+                                       UI.user_error!("You can't enable both :#{option.key} and :development")
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_install,
                                      env_name: "SIGH_SKIP_INSTALL",
@@ -43,12 +52,14 @@ module Sigh
                                      env_name: "SIGH_APP_IDENTIFIER",
                                      description: "The bundle identifier of your app",
                                      code_gen_sensitive: true,
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "SIGH_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: user),
+                                     default_value: user,
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
                                      env_name: "SIGH_TEAM_ID",
@@ -56,6 +67,7 @@ module Sigh
                                      optional: true,
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
@@ -66,6 +78,7 @@ module Sigh
                                      optional: true,
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
@@ -138,7 +151,7 @@ module Sigh
                                      end),
         FastlaneCore::ConfigItem.new(key: :template_name,
                                      env_name: "SIGH_PROVISIONING_PROFILE_TEMPLATE_NAME",
-                                     description: "The name of provisioning profile template. If the developer account has provisioning profile templates, template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile",
+                                     description: "The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. \"Apple Pay Pass Suppression Development\")",
                                      optional: true,
                                      default_value: nil)
       ]

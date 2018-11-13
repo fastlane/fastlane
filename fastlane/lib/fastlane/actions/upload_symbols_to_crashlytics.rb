@@ -8,10 +8,18 @@ module Fastlane
 
         find_binary_path(params)
         find_api_token(params)
+        find_gsp_path(params)
+
+        if !params[:api_token] && !params[:gsp_path]
+          UI.user_error!('Either Fabric API key or path to Firebase Crashlytics GoogleService-Info.plist must be given.')
+        end
 
         dsym_paths = []
         dsym_paths << params[:dsym_path] if params[:dsym_path]
         dsym_paths += Actions.lane_context[SharedValues::DSYM_PATHS] if Actions.lane_context[SharedValues::DSYM_PATHS]
+
+        # Allows adding of additional multiple dsym_paths since :dsym_path can be autoset by other actions
+        dsym_paths += params[:dsym_paths] if params[:dsym_paths]
 
         if dsym_paths.count == 0
           UI.error("Couldn't find any dSYMs, please pass them using the dsym_path option")
@@ -79,7 +87,8 @@ module Fastlane
         UI.message("Uploading '#{path}'...")
         command = []
         command << File.expand_path(params[:binary_path]).shellescape
-        command << "-a #{params[:api_token]}"
+        command << "-a #{params[:api_token]}" if params[:api_token]
+        command << "-gsp #{params[:gsp_path].shellescape}" if params[:gsp_path]
         command << "-p #{params[:platform] == 'appletvos' ? 'tvos' : params[:platform]}"
         command << File.expand_path(path).shellescape
         begin
@@ -101,7 +110,17 @@ module Fastlane
             UI.verbose("found an APIKey in #{current}")
           end
         end
-        UI.user_error!("Please provide an api_token using api_token:") unless params[:api_token]
+      end
+
+      def self.find_gsp_path(params)
+        return if params[:api_token]
+
+        if params[:gsp_path].to_s.length > 0
+          params[:gsp_path] = File.expand_path(params[:gsp_path])
+        else
+          gsp_path = Dir["./**/GoogleService-Info.plist"].first
+          params[:gsp_path] = File.expand_path(gsp_path) unless gsp_path.nil?
+        end
       end
 
       def self.find_binary_path(params)
@@ -120,13 +139,7 @@ module Fastlane
       end
 
       def self.details
-        [
-          "This action allows you to upload symbolication files to Crashlytics.",
-          "It's extra useful if you use it to download the latest dSYM files from Apple when you",
-          "use Bitcode. This action will not fail the build if one of the uploads failed.",
-          "The reason for that is that sometimes some of dSYM files are invalid, and we don't want",
-          "them to fail the complete build."
-        ].join(" ")
+        "This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode. This action will not fail the build if one of the uploads failed. The reason for that is that sometimes some of dSYM files are invalid, and we don't want them to fail the complete build."
       end
 
       def self.available_options
@@ -135,10 +148,22 @@ module Fastlane
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DSYM_PATH",
                                        description: "Path to the DSYM file or zip to upload",
                                        default_value: ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] || (Dir["./**/*.dSYM"] + Dir["./**/*.dSYM.zip"]).sort_by { |f| File.mtime(f) }.last,
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                          UI.user_error!("Symbolication file needs to be dSYM or zip") unless value.end_with?(".zip", ".dSYM")
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :dsym_paths,
+                                       env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DSYM_PATHS",
+                                       description: "Paths to the DSYM files or zips to upload",
+                                       optional: true,
+                                       type: Array,
+                                       verify_block: proc do |values|
+                                         values.each do |value|
+                                           UI.user_error!("Couldn't find file at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                           UI.user_error!("Symbolication file needs to be dSYM or zip") unless value.end_with?(".zip", ".dSYM")
+                                         end
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "CRASHLYTICS_API_TOKEN",
@@ -147,6 +172,15 @@ module Fastlane
                                        description: "Crashlytics API Key",
                                        verify_block: proc do |value|
                                          UI.user_error!("No API token for Crashlytics given, pass using `api_token: 'token'`") if value.to_s.length == 0
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :gsp_path,
+                                       env_name: "GOOGLE_SERVICES_INFO_PLIST_PATH",
+                                       code_gen_sensitive: true,
+                                       optional: true,
+                                       description: "Path to GoogleService-Info.plist",
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find file at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                         UI.user_error!("No Path to GoogleService-Info.plist for Firebase Crashlytics given, pass using `gsp_path: 'path'`") if value.to_s.length == 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :binary_path,
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_BINARY_PATH",
@@ -171,9 +205,7 @@ module Fastlane
                                        description: "The number of threads to use for simultaneous dSYM upload",
                                        verify_block: proc do |value|
                                          min_threads = 1
-                                         max_threads = 15
                                          UI.user_error!("Too few threads (#{value}) minimum number of threads: #{min_threads}") unless value >= min_threads
-                                         UI.user_error!("Too many threads (#{value}) maximum number of threads: #{max_threads}") unless value <= max_threads
                                        end)
         ]
       end

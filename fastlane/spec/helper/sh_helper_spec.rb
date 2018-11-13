@@ -106,18 +106,22 @@ describe Fastlane::Actions do
     end
 
     it 'shelljoins multiple args' do
-      command = command_from_args("git", "commit", "-m", "A message")
-      expect(command).to eq('git commit -m A\ message')
+      message = "A message"
+      command = command_from_args("git", "commit", "-m", message)
+      expect(command).to eq("git commit -m #{message.shellescape}")
     end
 
     it 'adds an environment Hash at the beginning' do
-      command = command_from_args({ "PATH" => "/usr/local/bin" }, "git", "commit", "-m", "A message")
-      expect(command).to eq('PATH=/usr/local/bin git commit -m A\ message')
+      message = "A message"
+      command = command_from_args({ "PATH" => "/usr/local/bin" }, "git", "commit", "-m", message)
+      expect(command).to eq("PATH=/usr/local/bin git commit -m #{message.shellescape}")
     end
 
     it 'shell-escapes environment variable values' do
-      command = command_from_args({ "PATH" => "/usr/my local/bin" }, "git", "commit", "-m", "A message")
-      expect(command).to eq('PATH=/usr/my\ local/bin git commit -m A\ message')
+      message = "A message"
+      path = "/usr/my local/bin"
+      command = command_from_args({ "PATH" => path }, "git", "commit", "-m", message)
+      expect(command).to eq("PATH=#{path.shellescape} git commit -m #{message.shellescape}")
     end
 
     it 'recognizes an array as the only element of a command' do
@@ -126,8 +130,9 @@ describe Fastlane::Actions do
     end
 
     it 'recognizes an array as the first element of a command' do
-      command = command_from_args(["/usr/local/bin/git", "git"], "commit", "-m", "A message")
-      expect(command).to eq('/usr/local/bin/git commit -m A\ message')
+      message = "A message"
+      command = command_from_args(["/usr/local/bin/git", "git"], "commit", "-m", message)
+      expect(command).to eq("/usr/local/bin/git commit -m #{message.shellescape}")
     end
   end
 end

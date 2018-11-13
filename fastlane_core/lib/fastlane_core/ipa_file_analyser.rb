@@ -51,7 +51,7 @@ module FastlaneCore
           end
           result = CFPropertyList.native_types(CFPropertyList::List.new(file: tmp_path).value)
 
-          if result['CFBundleIdentifier'] or result['CFBundleVersion']
+          if result['CFBundleIdentifier'] || result['CFBundleVersion']
             return result
           end
         end

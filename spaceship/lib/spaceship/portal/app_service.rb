@@ -40,26 +40,31 @@ module Spaceship
         return m
       end
 
+      AccessWiFi = AppService.new_service("AWEQ28MY3E")
       AppGroup = AppService.new_service("APG3427HIY")
       ApplePay = AppService.new_service("OM633U5T5G")
       AssociatedDomains = AppService.new_service("SKC3T5S89Y")
+      ClassKit = AppService.new_service("PKTJAN2017")
+      AutoFillCredential = AppService.new_service("CPEQ28MX4E")
       DataProtection = AppService.new_service("dataProtection", values: { off: "", complete: "complete", unless_open: "unlessopen", until_first_auth: "untilfirstauth" })
       GameCenter = AppService.new_service("gameCenter")
       HealthKit = AppService.new_service("HK421J6T7P")
       HomeKit = AppService.new_service("homeKit")
-      WirelessAccessory = AppService.new_service("WC421J6T7P")
+      Hotspot = AppService.new_service("HSC639VEI8")
       Cloud = AppService.new_service("iCloud")
       CloudKit = AppService.new_service("cloudKitVersion", values: { xcode5_compatible: 1, cloud_kit: 2 })
       InAppPurchase = AppService.new_service("inAppPurchase")
       InterAppAudio = AppService.new_service("IAD53UNK2F")
+      Multipath = AppService.new_service("MP49FN762P")
+      NetworkExtension = AppService.new_service("NWEXT04537")
+      NFCTagReading = AppService.new_service("NFCTRMAY17")
+      PersonalVPN = AppService.new_service("V66P55NK2I")
       Passbook = AppService.new_service("pass")
       PushNotification = AppService.new_service("push")
       SiriKit = AppService.new_service("SI015DKUHP")
       VPNConfiguration = AppService.new_service("V66P55NK2I")
-      NetworkExtension = AppService.new_service("NWEXT04537")
-      Hotspot = AppService.new_service("HSC639VEI8")
-      Multipath = AppService.new_service("MP49FN762P")
-      NFCTagReading = AppService.new_service("NFCTRMAY17")
+      Wallet = AppService.new_service("pass")
+      WirelessAccessory = AppService.new_service("WC421J6T7P")
 
       constants.each do |c|
         name = c.to_s

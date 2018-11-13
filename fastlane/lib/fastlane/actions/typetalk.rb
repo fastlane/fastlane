@@ -18,7 +18,7 @@ module Fastlane
         message = "#{emoticon} #{options[:message]}"
 
         note_path = File.expand_path(options[:note_path]) if options[:note_path]
-        if note_path and File.exist?(note_path)
+        if note_path && File.exist?(note_path)
           contents = File.read(note_path)
           message += "\n\n```\n#{contents}\n```"
         end
@@ -52,7 +52,7 @@ module Fastlane
       end
 
       def self.description
-        "Post a message to Typetalk"
+        "Post a message to [Typetalk](https://www.typetalk.com/)"
       end
 
       def self.available_options

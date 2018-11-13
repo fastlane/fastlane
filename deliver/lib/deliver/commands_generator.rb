@@ -55,7 +55,7 @@ module Deliver
 
       command :run do |c|
         c.syntax = 'fastlane deliver'
-        c.description = 'Upload metadata and binary to iTunes Connect'
+        c.description = 'Upload metadata and binary to App Store Connect'
 
         FastlaneCore::CommanderGenerator.new.generate(deliverfile_options, command: c)
 
@@ -102,7 +102,7 @@ module Deliver
         FastlaneCore::CommanderGenerator.new.generate(deliverfile_options, command: c)
 
         c.action do |args, options|
-          if File.exist?("Deliverfile") or File.exist?("fastlane/Deliverfile")
+          if File.exist?("Deliverfile") || File.exist?("fastlane/Deliverfile")
             UI.important("You already have a running deliver setup in this directory")
             return 0
           end
@@ -135,7 +135,7 @@ module Deliver
 
       command :download_screenshots do |c|
         c.syntax = 'fastlane deliver download_screenshots'
-        c.description = "Downloads all existing screenshots from iTunes Connect and stores them in the screenshots folder"
+        c.description = "Downloads all existing screenshots from App Store Connect and stores them in the screenshots folder"
 
         FastlaneCore::CommanderGenerator.new.generate(deliverfile_options, command: c)
 
