@@ -90,6 +90,8 @@ module Fastlane
             ['auto-update', value]
           when :notify
             [key, value]
+          when :timeout
+            [key, value]
           when :options
             [key, options_to_client.call(value).join(',')]
           else
