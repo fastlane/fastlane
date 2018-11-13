@@ -114,7 +114,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :generate_p12,
                                      env_name: "APPLE_PAY_CERT_GENERATE_P12_FILE",
-                                     description: "Generate a p12 file additionally to a PEM file",
+                                     description: "Generate a p12 file additionally to the PEM file",
                                      is_string: false,
                                      default_value: true),
           FastlaneCore::ConfigItem.new(key: :save_private_key,
