@@ -18,7 +18,7 @@ module Fastlane
       def initialize(adb_path: nil)
         android_home = ENV['ANDROID_HOME'] || ENV['ANDROID_SDK_ROOT'] || ENV['ANDROID_SDK']
         if (adb_path.nil? || adb_path == "adb") && android_home
-          adb_path = Pathname.new(android_home).join("platform-tools/adb").to_s
+          adb_path = File.join(android_home, "platform-tools", "adb")
         end
         self.adb_path = adb_path
       end
