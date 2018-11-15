@@ -14,7 +14,7 @@ describe Fastlane do
           it "works with valid parameters" do
             command = Fastlane::FastFile.new.parse('lane :test do
               crashlytics(
-                crashlytics_path: "./fastlane/spec/fixtures/fastfiles/Fastfile1",
+                crashlytics_path: "./fastlane/spec/fixtures/actions/crashlytics/submit",
                 api_token: "api_token",
                 build_secret: "build_secret",
                 apk_path: "./fastlane/spec/fixtures/fastfiles/Fastfile2",
@@ -56,7 +56,7 @@ describe Fastlane do
 
             Fastlane::FastFile.new.parse('lane :test do
             crashlytics(
-              crashlytics_path: "./fastlane/spec/fixtures/fastfiles/Fastfile1",
+              crashlytics_path: "./fastlane/spec/fixtures/actions/crashlytics/submit",
               api_token: "PEANUTS",
               build_secret: "MAJOR_KEY",
               apk_path: "./fastlane/spec/fixtures/fastfiles/Fastfile2",
@@ -74,7 +74,7 @@ describe Fastlane do
           it "works with valid parameters" do
             command = Fastlane::FastFile.new.parse("lane :test do
               crashlytics({
-                crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                crashlytics_path: './fastlane/spec/fixtures/actions/crashlytics/submit',
                 api_token: 'wadus',
                 build_secret: 'secret',
                 ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
@@ -93,6 +93,7 @@ describe Fastlane do
 
           it "hides sensitive parameters" do
             with_verbose(true) do
+              expect(UI).to receive(:verbose).with(/crashlytics_path/).once
               expect(UI).to receive(:verbose) do |message|
                 expect(message).to_not(include('PEANUTS'))
                 expect(message).to_not(include('MAJOR_KEY'))
@@ -100,9 +101,10 @@ describe Fastlane do
                 expect(message).to include('[[BUILD_SECRET]]')
                 expect(message).to include('[[API_TOKEN')
               end
+
               Fastlane::FastFile.new.parse("lane :test do
                 crashlytics({
-                  crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                  crashlytics_path: './fastlane/spec/fixtures/actions/crashlytics/submit',
                   api_token: 'MAJOR_KEY',
                   build_secret: 'PEANUTS',
                   ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
@@ -114,7 +116,7 @@ describe Fastlane do
           it "works automatically stores the notes in a file if given" do
             command = Fastlane::FastFile.new.parse("lane :test do
               crashlytics({
-                crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                crashlytics_path: './fastlane/spec/fixtures/actions/crashlytics/submit',
                 api_token: 'wadus',
                 build_secret: 'secret',
                 ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
@@ -135,7 +137,7 @@ describe Fastlane do
           it "works when using environment variables in place of parameters" do
             ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
             ENV["CRASHLYTICS_BUILD_SECRET"] = "secret"
-            ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/fastfiles/Fastfile1"
+            ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/actions/crashlytics/submit"
 
             command = Fastlane::FastFile.new.parse("lane :test do
               crashlytics({
@@ -156,7 +158,7 @@ describe Fastlane do
           it "works when using TrueClass variable in place of notifications parameter" do
             ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
             ENV["CRASHLYTICS_BUILD_SECRET"] = "secret"
-            ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/fastfiles/Fastfile1"
+            ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/actions/crashlytics/submit"
 
             command = Fastlane::FastFile.new.parse("lane :test do
                 crashlytics({
@@ -178,7 +180,7 @@ describe Fastlane do
           it "works when using 'false' String variable in place of notifications parameter" do
             ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
             ENV["CRASHLYTICS_BUILD_SECRET"] = "secret"
-            ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/fastfiles/Fastfile1"
+            ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/actions/crashlytics/submit"
 
             command = Fastlane::FastFile.new.parse("lane :test do
               crashlytics({
@@ -200,7 +202,7 @@ describe Fastlane do
           it "works when using TrueClass variable in place of debug parameter" do
             ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
             ENV["CRASHLYTICS_BUILD_SECRET"] = "secret"
-            ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/fastfiles/Fastfile1"
+            ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/actions/crashlytics/submit"
 
             command = Fastlane::FastFile.new.parse("lane :test do
                 crashlytics({
@@ -222,7 +224,7 @@ describe Fastlane do
           it "works when using 'false' String variable in place of debug parameter" do
             ENV["CRASHLYTICS_API_TOKEN"] = "wadus"
             ENV["CRASHLYTICS_BUILD_SECRET"] = "secret"
-            ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/fastfiles/Fastfile1"
+            ENV["CRASHLYTICS_FRAMEWORK_PATH"] = "./fastlane/spec/fixtures/actions/crashlytics/submit"
 
             command = Fastlane::FastFile.new.parse("lane :test do
               crashlytics({
@@ -248,7 +250,7 @@ describe Fastlane do
 
             command = Fastlane::FastFile.new.parse("lane :test do
                 crashlytics({
-                  crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                  crashlytics_path: './fastlane/spec/fixtures/actions/crashlytics/submit',
                   notes_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
                   groups: ['groups', '123'],
                   emails: ['email1', 'email2'],
@@ -273,7 +275,7 @@ describe Fastlane do
 
         describe "Invalid Parameters" do
           it "raises an error if no crashlytics path was given" do
-            expect(Fastlane::Helper::CrashlyticsHelper).to receive(:discover_default_crashlytics_path).and_return(nil)
+            expect(Fastlane::Helper::CrashlyticsHelper).to receive(:discover_crashlytics_path).and_return(nil)
             expect do
               Fastlane::FastFile.new.parse("lane :test do
                 crashlytics({
@@ -282,7 +284,7 @@ describe Fastlane do
                   ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
                 })
               end").runner.execute(:test)
-            end.to raise_error("No value found for 'crashlytics_path'")
+            end.to raise_error("Couldn't find Crashlytics' submit binary in current directory. Make sure to add the 'Crashlytics' pod to your 'Podfile' and run `pod update`")
           end
 
           it "raises an error if the given crashlytics path was not found" do
@@ -296,6 +298,20 @@ describe Fastlane do
                 })
               end").runner.execute(:test)
             end.to raise_error(%r{Couldn't find crashlytics at path .*fastlane/wadus})
+          end
+
+          it "raises an error if the given crashlytics path is not a submit binary" do
+            expect(Fastlane::Helper::CrashlyticsHelper).to receive(:discover_crashlytics_path).and_return("./fastfile/spec/fixtures/fastfiles/Fastfile1")
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                crashlytics({
+                  crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+                  api_token: 'wadus',
+                  build_secret: 'wadus',
+                  ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+                })
+              end").runner.execute(:test)
+            end.to raise_error(%r{Invalid crashlytics path was detected with '.*Fastfile1'. Path must point to the `submit` binary \(example: './Pods/Crashlytics/submit'\)})
           end
 
           it "raises an error if no api token was given" do

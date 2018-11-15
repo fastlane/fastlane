@@ -16,7 +16,7 @@ module Fastlane
           headers = construct_headers(params[:api_token], params[:headers])
           payload = construct_body(params[:body], params[:raw_body])
           error_handlers = params[:error_handlers] || {}
-          secure = params[:secure] || true
+          secure = params[:secure]
 
           response = call_endpoint(
             url,
@@ -140,7 +140,7 @@ module Fastlane
             FastlaneCore::ConfigItem.new(key: :secure,
                                          env_name: "FL_GITHUB_API_SECURE",
                                          description: "Optionally disable secure requests (ssl_verify_peer)",
-                                         is_string: false,
+                                         type: Boolean,
                                          default_value: true,
                                          optional: true)
           ]
@@ -223,6 +223,8 @@ module Fastlane
           if raw_body
             raw_body
           elsif body.kind_of?(Hash)
+            body.to_json
+          elsif body.kind_of?(Array)
             body.to_json
           else
             UI.user_error!("Please provide valid JSON, or a hash as request body") unless parse_json(body)

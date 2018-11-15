@@ -11,7 +11,7 @@ Pilot makes it easier to manage your app on Apple’s TestFlight. You can:
 - Retrieve information about testers & devices
 - Import/export all available testers
 
-_pilot_ uses [spaceship.airforce](https://spaceship.airforce) to interact with iTunes Connect 🚀
+_pilot_ uses [spaceship.airforce](https://spaceship.airforce) to interact with App Store Connect 🚀
 
 -------
 
@@ -22,7 +22,7 @@ _pilot_ uses [spaceship.airforce](https://spaceship.airforce) to interact with i
 
 -------
 
-<h5 align="center"><code>pilot</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
+<h5 align="center"><em>pilot</em> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # Usage
 
@@ -119,7 +119,7 @@ The output will look like this:
 
 ### Add a new tester
 
-To add a new tester to both your iTunes Connect account and to your app (if given), use the `pilot add` command. This will create a new tester (if necessary) or add an existing tester to the app to test.
+To add a new tester to both your App Store Connect account and to your app (if given), use the `pilot add` command. This will create a new tester (if necessary) or add an existing tester to the app to test.
 
 ```no-highlight
 fastlane pilot add email@invite.com
@@ -173,7 +173,11 @@ fastlane pilot export
 
 ### Import testers
 
-Add external testers from a CSV file. Sample CSV file available [here](https://itunesconnect.apple.com/itc/docs/tester_import.csv).
+Add external testers from a CSV file. Create a file (ex: `testers.csv`) and fill it with the following format:
+
+```no-highlight
+John,Appleseed,appleseed_john@mac.com,group-1;group-2
+```
 
 ```no-highlight
 fastlane pilot import

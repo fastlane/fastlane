@@ -2,6 +2,7 @@ require_relative '../client'
 
 require_relative 'app'
 require_relative 'app_group'
+require_relative 'cloud_container'
 require_relative 'device'
 require_relative 'merchant'
 require_relative 'passbook'
@@ -28,8 +29,8 @@ module Spaceship
       return response if self.cookie.include?("myacinfo")
 
       # When the user has 2 step enabled, we might have to call this method again
-      # This only occurs when the user doesn't have a team on iTunes Connect
-      # For 2 step verification we use the iTunes Connect back-end
+      # This only occurs when the user doesn't have a team on App Store Connect
+      # For 2 step verification we use the App Store Connect back-end
       # which is enough to get the DES... cookie, however we don't get a valid
       # myacinfo cookie at that point. That means, after getting the DES... cookie
       # we have to send the login request again. This will then get us a valid myacinfo
@@ -149,6 +150,18 @@ module Spaceship
       details_for_app(app)
     end
 
+    def associate_cloud_containers_with_app(app, containers)
+      ensure_csrf(Spaceship::Portal::CloudContainer)
+
+      request(:post, 'account/ios/identifiers/assignCloudContainerToAppId.action', {
+          teamId: team_id,
+          appIdId: app.app_id,
+          cloudContainers: containers.map(&:cloud_container)
+      })
+
+      details_for_app(app)
+    end
+
     def associate_merchants_with_app(app, merchants, mac)
       ensure_csrf(Spaceship::Portal::Merchant)
 
@@ -184,7 +197,6 @@ module Spaceship
                        {
                          type: 'explicit',
                          identifier: bundle_id,
-                         push: 'on',
                          inAppPurchase: 'on',
                          gameCenter: 'on'
                        }
@@ -377,6 +389,37 @@ module Spaceship
     end
 
     #####################################################
+    # @!group Cloud Containers
+    #####################################################
+
+    def cloud_containers
+      paging do |page_number|
+        r = request(:post, 'account/cloudContainer/listCloudContainers.action', {
+            teamId: team_id,
+            pageNumber: page_number,
+            pageSize: page_size,
+            sort: 'name=asc'
+        })
+        result = parse_response(r, 'cloudContainerList')
+
+        csrf_cache[Spaceship::Portal::CloudContainer] = self.csrf_tokens
+
+        result
+      end
+    end
+
+    def create_cloud_container!(name, identifier)
+      ensure_csrf(Spaceship::Portal::CloudContainer)
+
+      r = request(:post, 'account/cloudContainer/addCloudContainer.action', {
+          name: valid_name_for(name),
+          identifier: identifier,
+          teamId: team_id
+      })
+      parse_response(r, 'cloudContainer')
+    end
+
+    #####################################################
     # @!group Team
     #####################################################
     def team_members
@@ -489,7 +532,13 @@ module Spaceship
         register: 'single'
       })
 
-      parse_response(req, 'devices').first
+      devices = parse_response(req, 'devices')
+      return devices.first unless devices.empty?
+
+      validation_messages = parse_response(req, 'validationMessages').map { |message| message["validationUserMessage"] }.compact.uniq
+
+      raise UnexpectedResponse.new, validation_messages.join('\n') unless validation_messages.empty?
+      raise UnexpectedResponse.new, "Couldn't register new device, got this: #{parse_response(req)}"
     end
 
     def disable_device!(device_id, device_udid, mac: false)
@@ -657,10 +706,7 @@ module Spaceship
     end
 
     def delete_provisioning_profile!(profile_id, mac: false)
-      ensure_csrf(Spaceship::Portal::ProvisioningProfile) do
-        fetch_csrf_token_for_provisioning
-      end
-
+      fetch_csrf_token_for_provisioning
       r = request(:post, "account/#{platform_slug(mac)}/profile/deleteProvisioningProfile.action", {
         teamId: team_id,
         provisioningProfileId: profile_id

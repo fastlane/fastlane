@@ -34,8 +34,9 @@ module FastlaneCore
       # @param error [Block] A block that's called if an error occurs
       # @param prefix [Array] An array containing a prefix + block which might get applied to the output
       # @param loading [String] A loading string that is shown before the first output
+      # @param suppress_output [Boolean] Should we print the command's output?
       # @return [String] All the output as string
-      def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil)
+      def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil, suppress_output: false)
         print_all = true if FastlaneCore::Globals.verbose?
         prefix ||= {}
 
@@ -48,29 +49,25 @@ module FastlaneCore
         end
 
         begin
-          FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
-            begin
-              command_stdout.each do |l|
-                line = l.strip # strip so that \n gets removed
-                output << line
+          status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
+            command_stdout.each do |l|
+              line = l.strip # strip so that \n gets removed
+              output << line
 
-                next unless print_all
+              next unless print_all
 
-                # Prefix the current line with a string
-                prefix.each do |element|
-                  line = element[:prefix] + line if element[:block] && element[:block].call(line)
-                end
-
-                UI.command_output(line)
+              # Prefix the current line with a string
+              prefix.each do |element|
+                line = element[:prefix] + line if element[:block] && element[:block].call(line)
               end
-            rescue Errno::EIO
-              # This is expected on some linux systems, that indicates that the subcommand finished
-              # and we kept trying to read, ignore it
-            ensure
-              Process.wait(pid)
+
+              UI.command_output(line) unless suppress_output
             end
           end
         rescue => ex
+          # FastlanePty adds exit_status on to StandardError so every error will have a status code
+          status = ex.exit_status
+
           # This could happen when the environment is wrong:
           # > invalid byte sequence in US-ASCII (ArgumentError)
           output << ex.to_s
@@ -84,10 +81,9 @@ module FastlaneCore
         end
 
         # Exit status for build command, should be 0 if build succeeded
-        status = $?.exitstatus
         if status != 0
           o = output.join("\n")
-          puts(o) # the user has the right to see the raw output
+          puts(o) unless suppress_output # the user has the right to see the raw output
           UI.error("Exit status: #{status}")
           if error
             error.call(o, status)

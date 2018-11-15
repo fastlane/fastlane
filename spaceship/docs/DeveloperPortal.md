@@ -7,7 +7,7 @@ To quickly play around with _spaceship_ launch `irb` in your terminal and execut
 
 ## Login
 
-*Note*: If you use both the Developer Portal and iTunes Connect API, you'll have to login on both, as the user might have different user credentials.
+*Note*: If you use both the Developer Portal and App Store Connect API, you'll have to login on both, as the user might have different user credentials.
 
 ```ruby
 Spaceship::Portal.login("felix@krausefx.com", "password")
@@ -100,6 +100,29 @@ group = Spaceship::Portal.app_group.create!(group_id: "group.com.example.another
 # Associate an app with this group (overwrites any previous associations)
 # Assumes app contains a fetched app, as described above
 app = app.associate_groups([group])
+```
+
+## iCloud Containers
+
+```ruby
+# Fetch all existing containers
+all_containers = Spaceship::Portal.cloud_container.all
+
+# Find a specific container, based on the identifier
+container = Spaceship::Portal.cloud_container.find("iCloud.com.example.application")
+
+# Show the names of all the containers
+Spaceship::Portal.cloud_container.all.collect do |container|
+  container.name
+end
+
+# Create a new iCloud Container
+container = Spaceship::Portal.cloud_container.create!(identifier: "iCloud.com.example.another",
+                                        name: "Another iCloud Container")
+
+# Associate an app with this container (overwrites any previous associations)
+# Assumes app contains a fetched app, as described above
+app = app.associate_cloud_containers([container])
 ```
 
 ## Apple Pay Merchants

@@ -21,7 +21,7 @@
     "isWildCard": false,
     "isDuplicate": false,
     "features": {
-      "push": true,
+      "push": false,
       "inAppPurchase": true,
       "gameCenter": true,
       "passbook": false,
@@ -39,8 +39,7 @@
     },
     "enabledFeatures": [
       "gameCenter",
-      "inAppPurchase",
-      "push"
+      "inAppPurchase"
     ],
     "isDevPushEnabled": false,
     "isProdPushEnabled": false,

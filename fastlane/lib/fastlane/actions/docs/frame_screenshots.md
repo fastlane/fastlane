@@ -16,7 +16,7 @@ _frameit_ allows you to put a gorgeous device frame around your iOS and macOS sc
 
 -------
 
-<h5 align="center"><code>frameit</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
+<h5 align="center"><em>frameit</em> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 
 # Features
@@ -56,7 +56,7 @@ Here is a nice gif, that shows _frameit_ in action:
 
 ![img/actions/MacExample.png](/img/actions/MacExample.png?raw=1)
 
-<h5 align="center">The <code>frameit</code> 2.0 update was kindly sponsored by <a href="https://mindnode.com/">MindNode</a>, seen in the screenshots above.</h5>
+<h5 align="center">The <em>frameit</em> 2.0 update was kindly sponsored by <a href="https://mindnode.com/">MindNode</a>, seen in the screenshots above.</h5>
 
 
 The first time that _frameit_ is executed the frames will be downloaded automatically. Originally the frames are coming from [Facebook frameset](http://facebook.design/devices) and they are kept on [this repo](https://github.com/fastlane/frameit-frames).
@@ -137,7 +137,7 @@ These are defined in the `data` key. This is an array with the following keys fo
 
 | Key | Description |
 |-----|-------------|
-| `filter` | This is mandatory to link the individual configuration to the screenshot, based on part of the file name. <p>Example:<br>If a screenshot is named `iPhone 8-Brainstorming.png` you can use value `Brainstorming` for `filter`. All other keys from that array element will only be applied on this specific screenshot. |
+| `filter` | This is mandatory to link the individual configuration to the screenshot, based on part of the file name. <p>Example:<br>If a screenshot is named `iPhone 8-Brainstorming.png` you can use value `Brainstorming` for `filter`.  If there are more than one `filter` matching an entry, they will all be applied in order (which means that the last one has the highest precedence). All other keys from that array element will only be applied on this specific screenshot. |
 | `keyword` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
 | `title` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
 
@@ -258,7 +258,7 @@ Check out [_snapshot_](https://docs.fastlane.tools/actions/snapshot/) to automat
 
 ## Upload screenshots
 
-Use [_deliver_](https://docs.fastlane.tools/actions/deliver/) to upload iOS screenshots to iTunes Connect, or [_supply_](https://docs.fastlane.tools/actions/supply/) to upload Android screenshots to Play Store completely automatically 🚀
+Use [_deliver_](https://docs.fastlane.tools/actions/deliver/) to upload iOS screenshots to App Store Connect, or [_supply_](https://docs.fastlane.tools/actions/supply/) to upload Android screenshots to Play Store completely automatically 🚀
 
 ## Alternative location to store device_frames
 

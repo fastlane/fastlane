@@ -70,12 +70,20 @@ If you want to run code style verification only for one tool, use `bundle exec r
 
 After introducing some changes to the _fastlane_ source code, you probably want to test the changes for your application. The easiest way to do so it use [bundler](https://bundler.io/).
 
-Copy the Gemfile [.assets/Gemfile](.assets/Gemfile) from your local _fastlane_ clone and drop it into your project's root folder.
+Edit your `Gemfile` in your project's root folder and replace the `gem 'fastlane'` line with:
+
+```
+gemspec path: File.expand_path("<PATH_TO_YOUR_LOCAL_FASTLANE_CLONE>")
+```
+
+If you don't have a `Gemfile` yet, copy the `Gemfile` [.assets/Gemfile](.assets/Gemfile) from your local _fastlane_ clone and drop it into your project's root folder.
 
 Make sure to replace `<PATH_TO_YOUR_LOCAL_FASTLANE_CLONE>` with the path to your _fastlane_ clone, e.g. `~/fastlane`, then you can run
+
 ```
 bundle update
 ```
+
 in your project’s root directory. After doing so, you can verify you’re using the local version by running
 
 ```
@@ -88,4 +96,4 @@ From now on, every time you introduce a change to your local _fastlane_ code bas
 
 If you want to run a command with your normal _fastlane_ installation, simply do not run the command with the `bundle exec` prefix.
 
-To fully remove your local _fastlane_ from your local project again, delete the `Gemfile` you created above.
+To fully remove your local _fastlane_ from your local project again, delete the `Gemfile` you created above or remove the adaptions you did to match the `Gemfile` template.

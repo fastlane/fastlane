@@ -15,7 +15,7 @@ module Spaceship
       # Each request method should make only one request. For more high-level logic, put code in the data models.
 
       def self.hostname
-        'https://itunesconnect.apple.com/testflight/v2/'
+        'https://appstoreconnect.apple.com/testflight/v2/'
       end
 
       ##
@@ -112,6 +112,10 @@ module Spaceship
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
+
+        # This is invalid now.
+        @cached_groups.delete(app_id) if @cached_groups
+
         handle_response(response)
       end
 
@@ -162,6 +166,17 @@ module Spaceship
         end
 
         testers
+      end
+
+      #####################################################
+      # @!Internal Testers
+      #####################################################
+      def internal_users(app_id: nil)
+        assert_required_params(__method__, binding)
+        url = "providers/#{team_id}/apps/#{app_id}/internalUsers"
+        r = request(:get, url)
+
+        parse_response(r, 'data')
       end
 
       ##
@@ -317,7 +332,7 @@ module Spaceship
 
         raise UnexpectedResponse, response.body['error'] if response.body['error']
 
-        raise UnexpectedResponse, "Temporary iTunes Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
+        raise UnexpectedResponse, "Temporary App Store Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
 
         return response.body['data'] if response.body['data']
 

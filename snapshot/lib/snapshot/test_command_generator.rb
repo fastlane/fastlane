@@ -11,7 +11,7 @@ module Snapshot
       def generate(devices: nil, language: nil, locale: nil, log_path: nil)
         parts = prefix
         parts << "xcodebuild"
-        parts += options
+        parts += options(language, locale)
         parts += destination(devices)
         parts += build_settings
         parts += actions

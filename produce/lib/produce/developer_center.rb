@@ -15,6 +15,7 @@ module Produce
       app_group: [SERVICE_ON, SERVICE_OFF],
       apple_pay: [SERVICE_ON, SERVICE_OFF],
       associated_domains: [SERVICE_ON, SERVICE_OFF],
+      auto_fill_credential: [SERVICE_ON, SERVICE_OFF],
       data_protection: [
         SERVICE_COMPLETE,
         SERVICE_UNLESS_OPEN,
@@ -62,7 +63,7 @@ module Produce
         if app.name != Produce.config[:app_name]
           UI.important("Your app name includes non-ASCII characters, which are not supported by the Apple Developer Portal.")
           UI.important("To fix this a unique (internal) name '#{app.name}' has been created for you. Your app's real name '#{Produce.config[:app_name]}'")
-          UI.important("will still show up correctly on iTunes Connect and the App Store.")
+          UI.important("will still show up correctly on App Store Connect and the App Store.")
         end
 
         UI.message("Created app #{app.app_id}")
@@ -81,8 +82,8 @@ module Produce
       app_service = Spaceship.app_service
       enabled_clean_options = {}
 
-      # "enable_services" was deprecated in favor of "enable_services"
-      config_enabled_services = Produce.config[:enable_services] || Produce.config[:enable_services]
+      # "enabled_features" was deprecated in favor of "enable_services"
+      config_enabled_services = Produce.config[:enable_services] || Produce.config[:enabled_features]
 
       config_enabled_services.each do |k, v|
         if k.to_sym == :data_protection

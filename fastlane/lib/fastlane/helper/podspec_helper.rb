@@ -10,7 +10,7 @@ module Fastlane
       def initialize(path = nil, require_variable_prefix = true)
         version_var_name = 'version'
         variable_prefix = require_variable_prefix ? /\w\./ : //
-        @version_regex = /^(?<begin>[^#]*#{variable_prefix}#{version_var_name}\s*=\s*['"])(?<value>(?<major>[0-9]+)(\.(?<minor>[0-9]+))?(\.(?<patch>[0-9]+))?(?<appendix>(\.[0-9]+)*)?)(?<end>['"])/i
+        @version_regex = /^(?<begin>[^#]*#{variable_prefix}#{version_var_name}\s*=\s*['"])(?<value>(?<major>[0-9]+)(\.(?<minor>[0-9]+))?(\.(?<patch>[0-9]+))?(?<appendix>(\.[0-9]+)*)?(-(?<prerelease>(.+)))?)(?<end>['"])/i
 
         return unless (path || '').length > 0
         UI.user_error!("Could not find podspec file at path '#{path}'") unless File.exist?(path)

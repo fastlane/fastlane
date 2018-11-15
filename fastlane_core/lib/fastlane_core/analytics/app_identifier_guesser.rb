@@ -31,7 +31,7 @@ module FastlaneCore
     # Use the `FASTLANE_OPT_OUT_USAGE` variable to opt out
     # The resulting value is e.g. ce12f8371df11ef6097a83bdf2303e4357d6f5040acc4f76019489fa5deeae0d
     def generate_p_hash(app_id)
-      unless !FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE") && !app_id.nil?
+      if app_id.nil?
         return nil
       end
 

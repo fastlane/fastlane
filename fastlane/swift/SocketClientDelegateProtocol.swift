@@ -3,7 +3,6 @@
 //  FastlaneSwiftRunner
 //
 //  Created by Joshua Liebowitz on 8/12/17.
-//  Copyright © 2017 Joshua Liebowitz. All rights reserved.
 //
 
 //

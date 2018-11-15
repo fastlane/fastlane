@@ -20,7 +20,6 @@ end
 
 class Exception
   def fastlane_should_report_metrics?
-    # https://github.com/fastlane/fastlane/issues/11913
     return false
   end
 end

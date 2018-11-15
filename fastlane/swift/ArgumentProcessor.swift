@@ -3,7 +3,6 @@
 //  FastlaneRunner
 //
 //  Created by Joshua Liebowitz on 9/28/17.
-//  Copyright © 2017 Joshua Liebowitz. All rights reserved.
 //
 
 //
@@ -19,6 +18,7 @@ struct ArgumentProcessor {
     let args: [RunnerArgument]
     let currentLane: String
     let commandTimeout: Int
+    let port: UInt32
     
     init(args: [String]) {        
         // Dump the first arg which is the program name
@@ -34,6 +34,8 @@ struct ArgumentProcessor {
         let potentialLogMode = fastlaneArgsMinusLanes.filter { arg in
             return arg.name.lowercased() == "logmode"
         }
+        
+        port = UInt32(fastlaneArgsMinusLanes.first(where: { $0.name == "swiftServerPort" })?.value ?? "") ?? 2000
         
         // Configure logMode since we might need to use it before we finish parsing
         if let logModeArg = potentialLogMode.first {

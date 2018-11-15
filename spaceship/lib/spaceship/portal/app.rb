@@ -1,5 +1,6 @@
 require_relative 'portal_base'
 require_relative 'app_group'
+require_relative 'cloud_container'
 
 module Spaceship
   module Portal
@@ -57,6 +58,9 @@ module Spaceship
       # @return (Array of Spaceship::Portal::AppGroup) Associated groups
       attr_accessor :associated_groups
 
+      # @return (Array of Spaceship::Portal::CloudContainer) Associated cloud containers
+      attr_accessor :associated_cloud_containers
+
       attr_mapping(
         'appIdId' => :app_id,
         'name' => :name,
@@ -70,7 +74,8 @@ module Spaceship
         'isProdPushEnabled' => :prod_push_enabled,
         'associatedApplicationGroupsCount' => :app_groups_count,
         'associatedCloudContainersCount' => :cloud_containers_count,
-        'associatedIdentifiersCount' => :identifiers_count
+        'associatedIdentifiersCount' => :identifiers_count,
+        'associatedCloudContainers' => :associated_cloud_containers
       )
 
       class << self
@@ -117,6 +122,14 @@ module Spaceship
         end
       end
 
+      def associated_cloud_containers
+        return unless raw_data['associatedCloudContainers']
+
+        @associated_cloud_containers ||= raw_data['associatedCloudContainers'].map do |info|
+          Spaceship::Portal::CloudContainer.new(info)
+        end
+      end
+
       # Delete this App ID. This action will most likely fail if the App ID is already in the store
       # or there are active profiles
       # @return (App) The app you just deletd
@@ -144,6 +157,14 @@ module Spaceship
       def associate_groups(groups)
         raise "`associate_groups` not available for Mac apps" if mac?
         app = client.associate_groups_with_app(self, groups)
+        self.class.factory(app)
+      end
+
+      # Associate specific iCloud Containers with this app
+      # @return (App) The updated detailed app. This is nil if the app couldn't be found.
+      def associate_cloud_containers(containers)
+        raise "`associate_cloud_containers` not available for Mac apps" if mac?
+        app = client.associate_cloud_containers_with_app(self, containers)
         self.class.factory(app)
       end
 

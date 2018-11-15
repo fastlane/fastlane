@@ -27,7 +27,7 @@ describe Spaceship::Application do
     end
 
     it "#url" do
-      expect(Spaceship::Application.all.first.url).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088')
+      expect(Spaceship::Application.all.first.url).to eq('https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/898536088')
     end
 
     describe "#find" do
@@ -107,6 +107,19 @@ describe Spaceship::Application do
                                                 sku: "SKU123",
                                                 bundle_id: "net.sunapps.123")
         end.to raise_error("You must provide a company name to use on the App Store. You must provide a company name to use on the App Store.")
+      end
+    end
+
+    describe '#available_bundle_ids' do
+      it "returns the list of bundle ids" do
+        TunesStubbing.itc_stub_applications_first_create
+        bundle_ids = Spaceship::Tunes::Application.available_bundle_ids
+        expect(bundle_ids.length).to eq(5)
+        expect(bundle_ids[0]).to eq("com.krausefx.app_name")
+        expect(bundle_ids[1]).to eq("net.sunapps.*")
+        expect(bundle_ids[2]).to eq("net.sunapps.947474")
+        expect(bundle_ids[3]).to eq("*")
+        expect(bundle_ids[4]).to eq("net.sunapps.100")
       end
     end
 

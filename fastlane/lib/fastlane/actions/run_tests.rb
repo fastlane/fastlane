@@ -4,6 +4,7 @@ module Fastlane
       SCAN_DERIVED_DATA_PATH = :SCAN_DERIVED_DATA_PATH
       SCAN_GENERATED_PLIST_FILE = :SCAN_GENERATED_PLIST_FILE
       SCAN_GENERATED_PLIST_FILES = :SCAN_GENERATED_PLIST_FILES
+      SCAN_ZIP_BUILD_PRODUCTS_PATH = :SCAN_ZIP_BUILD_PRODUCTS_PATH
     end
 
     class RunTestsAction < Action
@@ -21,7 +22,15 @@ module Fastlane
           values[:destination] = destination # restore destination value
           Scan::Manager.new.work(values)
 
+          zip_build_products_path = Scan.cache[:zip_build_products_path]
+          Actions.lane_context[SharedValues::SCAN_ZIP_BUILD_PRODUCTS_PATH] = zip_build_products_path if zip_build_products_path
+
           return true
+        rescue FastlaneCore::Interface::FastlaneBuildFailure => ex
+          # Specifically catching FastlaneBuildFailure to prevent build/compile errors from being
+          # silenced when :fail_build is set to false
+          # :fail_build should only suppress testing failures
+          raise ex
         rescue => ex
           if values[:fail_build]
             raise ex
@@ -68,7 +77,15 @@ module Fastlane
       private_class_method
 
       def self.test_summary_filenames(derived_data_path)
-        Dir["#{derived_data_path}/**/Logs/Test/*TestSummaries.plist"]
+        files = []
+
+        # Xcode < 10
+        files += Dir["#{derived_data_path}/**/Logs/Test/*TestSummaries.plist"]
+
+        # Xcode 10
+        files += Dir["#{derived_data_path}/**/Logs/Test/*.xcresult/TestSummaries.plist"]
+
+        return files
       end
 
       def self.example_code

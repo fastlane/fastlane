@@ -1,6 +1,6 @@
 RSpec::Matchers.define(:a_configuration_matching) do |expected|
   match do |actual|
-    actual._values == expected._values
+    actual.values == expected.values
   end
 end
 
