@@ -66,6 +66,10 @@ module Fastlane
       def self.is_supported?(platform)
         platform == :android
       end
+
+      def self.is_incompatible?(operating_system)
+        ["Linux", "Windows"].include?(operating_system)
+      end
     end
   end
 end

@@ -222,6 +222,7 @@ module Fastlane
       end
 
       verify_supported_os(method_sym, class_ref)
+      verify_compatible_os(method_sym, class_ref)
 
       begin
         Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
@@ -290,6 +291,16 @@ module Fastlane
           unless class_ref.is_supported?(platform)
             UI.important("Action '#{name}' isn't known to support operating system '#{platform}'.")
           end
+        end
+      end
+    end
+
+    def verify_compatible_os(name, class_ref)
+      if class_ref.respond_to?(:is_incompatible?)
+        operating_system = Helper.operating_system
+        incompat = class_ref.is_incompatible?(operating_system)
+         if !incompat
+          UI.important("Action '#{name}' is not compatible with operating system '#{operating_system}'. Execution is skipped.")
         end
       end
     end

@@ -77,6 +77,9 @@ module Fastlane
 
         platform == :ios
       end
+
+      def self.is_incompatible?(operating_system)
+      end
     end
   end
 end
