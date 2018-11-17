@@ -144,6 +144,10 @@ module Fastlane
         [:ios, :mac].include?(platform)
       end
 
+      def self.is_incompatible?(operating_system)
+        ["Linux", "Windows"].include?(operating_system)
+      end
+      
       def self.example_code
         [
           'version = get_version_number(xcodeproj: "Project.xcodeproj")'
