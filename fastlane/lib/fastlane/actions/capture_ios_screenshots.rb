@@ -37,7 +37,7 @@ module Fastlane
       end
 
       def self.is_incompatible?(operating_system)
-        "Mac" != operating_system
+        operating_system != "macOS"
       end
 
       def self.example_code

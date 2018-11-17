@@ -302,10 +302,9 @@ module Fastlane
         operating_system = Helper.operating_system
         incompat = class_ref.is_incompatible?(operating_system)
         if incompat
-          #UI.user_error!("Action '#{name}' is not compatible with operating system '#{operating_system}'. Execution is skipped.")
           UI.error("------------------------------------------------")
           UI.error("Action '#{name}' is not compatible with operating system '#{operating_system}'.")
-          UI.error("Execution of the action is skipped.") 
+          UI.error("Execution of the action is skipped.")
           UI.error("------------------------------------------------")
           return true
         end
