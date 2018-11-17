@@ -299,8 +299,8 @@ module Fastlane
       if class_ref.respond_to?(:is_incompatible?)
         operating_system = Helper.operating_system
         incompat = class_ref.is_incompatible?(operating_system)
-        unless incompat
-          UI.important("Action '#{name}' is not compatible with operating system '#{operating_system}'. Execution is skipped.")
+        if incompat
+          UI.user_error!("Action '#{name}' is not compatible with operating system '#{operating_system}'. Execution is skipped.")
         end
       end
     end
