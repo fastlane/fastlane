@@ -36,6 +36,10 @@ module Fastlane
         [:ios, :mac].include?(platform)
       end
 
+      def self.is_incompatible?(operating_system)
+        "Mac" != operating_system
+      end
+
       def self.example_code
         [
           'capture_ios_screenshots',
