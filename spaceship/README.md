@@ -5,22 +5,6 @@
     fastlane
   </a>
 </h3>
-<p align="center">
-  <a href="https://docs.fastlane.tools/actions/deliver/">deliver</a> &bull;
-  <a href="https://docs.fastlane.tools/actions/snapshot/">snapshot</a> &bull;
-  <a href="https://docs.fastlane.tools/actions/frameit/">frameit</a> &bull;
-  <a href="https://docs.fastlane.tools/actions/pem/">pem</a> &bull;
-  <a href="https://docs.fastlane.tools/actions/sigh/">sigh</a> &bull;
-  <a href="https://docs.fastlane.tools/actions/produce/">produce</a> &bull;
-  <a href="https://docs.fastlane.tools/actions/cert/">cert</a> &bull;
-  <b>spaceship</b> &bull;
-  <a href="https://docs.fastlane.tools/actions/pilot/">pilot</a> &bull;
-  <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
-  <a href="https://docs.fastlane.tools/actions/gym/">gym</a> &bull;
-  <a href="https://docs.fastlane.tools/actions/scan/">scan</a> &bull;
-  <a href="https://docs.fastlane.tools/actions/match/">match</a> &bull;
-  <a href="https://docs.fastlane.tools/actions/precheck/">precheck</a>
-</p>
 
 -------
 
