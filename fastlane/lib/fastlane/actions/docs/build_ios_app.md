@@ -134,25 +134,28 @@ export_options("./ExportOptions.plist")
 or you can provide hash of values directly in the `Gymfile`:
 
 ```ruby-skip-tests
-export_options = {
+export_options({
   method: "ad-hoc",
   manifest: {
     appURL: "https://example.com/My App.ipa",
   },
   thinning: "<thin-for-all-variants>"
-}
+})
 ```
 
 Optional: If _gym_ can't automatically detect the provisioning profiles to use, you can pass a mapping of bundle identifiers to provisioning profiles:
 
-```ruby-skip-tests
-export_options: {
-  method: "app-store",
-  provisioningProfiles: { 
-    "com.example.bundleid" => "Provisioning Profile Name",
-    "com.example.bundleid2" => "Provisioning Profile Name 2"
+```ruby
+build_ios_app(
+  scheme: "Release",
+  export_options: {
+    method: "app-store",
+    provisioningProfiles: { 
+      "com.example.bundleid" => "Provisioning Profile Name",
+      "com.example.bundleid2" => "Provisioning Profile Name 2"
+    }
   }
-}
+)
 ```
 
 **Note**: If you use [_fastlane_](https://fastlane.tools) with [_match_](https://fastlane.tools/match) you don't need to provide those values manually.
