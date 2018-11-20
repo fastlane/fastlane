@@ -17,7 +17,7 @@
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
 
-_spaceship_ exposes both the Apple Developer Center and the App Store Connect API. This fast and powerful API powers parts of fastlane, and can be leveraged for more advanced fastlane features. Scripting your Developer Center workflow has never been easier!
+_spaceship_ exposes both the Apple Developer Center and the App Store Connect API. It’s super fast, well tested and supports all of the operations you can do via the browser. It powers parts of fastlane, and can be leveraged for more advanced _fastlane_ features. Scripting your Developer Center workflow has never been easier!
 
 Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.com/fastlanetools)
 
@@ -37,17 +37,21 @@ Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.co
 
 # What's spaceship?
 
-Up until now, the [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. With spaceship it is possible to directly access the underlying APIs using a simple HTTP client only.
+_spaceship_ uses a combination of 3 different API endpoints, used by the Apple Developer Portal and Xcode. As no API offers everything we need, spaceship combines all APIs for you. [More details about the APIs](#technical-details).
 
-Using spaceship, the execution time of [_sigh_](https://docs.fastlane.tools/actions/sigh/) was reduced from over 1 minute to less than 5 seconds.
-
-spaceship uses a combination of 3 different API endpoints, used by the Apple Developer Portal and Xcode. As no API offers everything we need, spaceship combines all APIs for you. [More details about the APIs](#technical-details).
+- Blazing fast communication using only a HTTP client
+- Object oriented access to all resources
+- Resistant against front-end design changes of the of the Apple Developer Portal
+- One central tool for the communication
+- Automatic re-trying of requests in case a timeout occurs
+- No web scraping
+- 90%+ test coverage by stubbing server responses
 
 More details about why spaceship is useful on [spaceship.airforce](https://spaceship.airforce).
 
 > No matter how many apps or certificates you have, spaceship **can** handle your scale.
 
-Enough words, here is some code:
+## Example spaceship code
 
 ```ruby
 Spaceship.login
@@ -69,11 +73,15 @@ profile.download
 
 ## Speed
 
-How fast are tools using _spaceship_ compared to web scraping?
+Before _spaceship_, the [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. With spaceship it is possible to directly access the underlying APIs using a simple HTTP client only.
+
+Using spaceship, the execution time of [_sigh_](https://docs.fastlane.tools/actions/sigh/) was reduced from over 1 minute to less than 5 seconds.
 
 ![assets/SpaceshipRecording.gif](assets/SpaceshipRecording.gif)
 
 # Installation
+
+_spaceship_ is part of `fastlane`:
 
     sudo gem install fastlane
 
@@ -136,23 +144,11 @@ If you want to upload builds to TestFlight/App Store Connect from your CI, you h
 
 Alternatively you can enter the password when you're asked the first time _fastlane_ uploads a build.
 
-### _spaceship_ in use
+## _spaceship_ in use
 
 All [fastlane tools](https://fastlane.tools) that communicate with Apple's web services in some way, use _spaceship_ to do so.
 
 # Technical Details
-
-## HTTP Client
-
-Up until now all [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. _spaceship_ uses a simple HTTP client only, resulting in much less overhead and extremely improved speed.
-
-Advantages of _spaceship_ (HTTP client) over web scraping:
-
-- Blazing fast :rocket: 90% faster than previous methods
-- No more overhead by loading images, HTML, JS and CSS files on each page load
-- Great test coverage by stubbing server responses
-- Resistant against design changes of the Apple Developer Portal
-- Automatic re-trying of requests in case a timeout occurs
 
 ## API Endpoints
 
