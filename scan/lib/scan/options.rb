@@ -73,7 +73,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :toolchain,
                                      env_name: "SCAN_TOOLCHAIN",
                                      conflicting_options: [:xctestrun],
-                                     description: "The toolchain that should be used for building the application (e.g. com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a)",
+                                     description: "The toolchain that should be used for building the application (e.g. `com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a`)",
                                      optional: true,
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :clean,
