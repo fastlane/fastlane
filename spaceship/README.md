@@ -17,7 +17,7 @@
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
 
-_spaceship_ exposes both the Apple Developer Center and the App Store Connect API. It’s super fast, well tested and supports all of the operations you can do via the browser. It powers parts of fastlane, and can be leveraged for more advanced _fastlane_ features. Scripting your Developer Center workflow has never been easier!
+_spaceship_ exposes both the Apple Developer Center and the App Store Connect API. It’s super fast, well tested and supports all of the operations you can do via the browser. It powers parts of _fastlane_, and can be leveraged for more advanced _fastlane_ features. Scripting your Developer Center workflow has never been easier!
 
 Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.com/fastlanetools)
 
@@ -81,7 +81,7 @@ Using spaceship, the execution time of [_sigh_](https://docs.fastlane.tools/acti
 
 # Installation
 
-_spaceship_ is part of `fastlane`:
+_spaceship_ is part of _fastlane_:
 
     sudo gem install fastlane
 
