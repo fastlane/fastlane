@@ -22,34 +22,38 @@ module Spaceship
       end
 
       if r.body.kind_of?(Hash) && r.body["trustedDevices"].kind_of?(Array)
-        if r.body.fetch("securityCode", {})["tooManyCodesLock"].to_s.length > 0
-          raise Tunes::Error.new, "Too many verification codes have been sent. Enter the last code you received, use one of your devices, or try again later."
-        end
-
-        old_client = (begin
-                        Tunes::RecoveryDevice.client
-                      rescue
-                        nil # since client might be nil, which raises an exception
-                      end)
-        Tunes::RecoveryDevice.client = self # temporary set it as it's required by the factory method
-        devices = r.body["trustedDevices"].collect do |current|
-          Tunes::RecoveryDevice.factory(current)
-        end
-        Tunes::RecoveryDevice.client = old_client
-
-        puts("Two Step Verification for account '#{self.user}' is enabled")
-        puts("Please select a device to verify your identity")
-        available = devices.collect do |c|
-          "#{c.name}\t#{c.model_name || 'SMS'}\t(#{c.device_id})"
-        end
-        result = choose(*available)
-        device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
-        select_device(r, device_id)
+        handle_two_step(r)
       elsif r.body.kind_of?(Hash) && r.body["trustedPhoneNumbers"].kind_of?(Array) && r.body["trustedPhoneNumbers"].first.kind_of?(Hash)
         handle_two_factor(r)
       else
         raise "Invalid 2 step response #{r.body}"
       end
+    end
+
+    def handle_two_step(r)
+      if r.body.fetch("securityCode", {})["tooManyCodesLock"].to_s.length > 0
+        raise Tunes::Error.new, "Too many verification codes have been sent. Enter the last code you received, use one of your devices, or try again later."
+      end
+
+      old_client = (begin
+                      Tunes::RecoveryDevice.client
+                    rescue
+                      nil # since client might be nil, which raises an exception
+                    end)
+      Tunes::RecoveryDevice.client = self # temporary set it as it's required by the factory method
+      devices = r.body["trustedDevices"].collect do |current|
+        Tunes::RecoveryDevice.factory(current)
+      end
+      Tunes::RecoveryDevice.client = old_client
+
+      puts("Two-step Verification for account '#{self.user}' is enabled")
+      puts("Please select a device to verify your identity")
+      available = devices.collect do |c|
+        "#{c.name}\t#{c.model_name || 'SMS'}\t(#{c.device_id})"
+      end
+      result = choose(*available)
+      device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
+      select_device(r, device_id)
     end
 
     def handle_two_factor(response)
