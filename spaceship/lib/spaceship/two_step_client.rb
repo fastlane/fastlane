@@ -56,6 +56,65 @@ module Spaceship
       select_device(r, device_id)
     end
 
+    # this is extracted into its own method so it can be called multiple times (see end)
+    def select_device(r, device_id)
+      # Request Token
+      r = request(:put) do |req|
+        req.url("https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode")
+        update_request_headers(req)
+      end
+
+      # we use `Spaceship::TunesClient.new.handle_itc_response`
+      # since this might be from the Dev Portal, but for 2 step
+      Spaceship::TunesClient.new.handle_itc_response(r.body)
+
+      puts("Successfully requested notification")
+      code = ask("Please enter the 4 digit code: ")
+      puts("Requesting session...")
+
+      # Send token back to server to get a valid session
+      r = request(:post) do |req|
+        req.url("https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode")
+        req.body = { "code" => code.to_s }.to_json
+        req.headers['Content-Type'] = 'application/json'
+
+        update_request_headers(req)
+      end
+
+      begin
+        Spaceship::TunesClient.new.handle_itc_response(r.body) # this will fail if the code is invalid
+      rescue => ex
+        # If the code was entered wrong
+        # {
+        #   "securityCode": {
+        #     "code": "1234"
+        #   },
+        #   "securityCodeLocked": false,
+        #   "recoveryKeyLocked": false,
+        #   "recoveryKeySupported": true,
+        #   "manageTrustedDevicesLinkName": "appleid.apple.com",
+        #   "suppressResend": false,
+        #   "authType": "hsa",
+        #   "accountLocked": false,
+        #   "validationErrors": [{
+        #     "code": "-21669",
+        #     "title": "Incorrect Verification Code",
+        #     "message": "Incorrect verification code."
+        #   }]
+        # }
+        if ex.to_s.include?("verification code") # to have a nicer output
+          puts("Error: Incorrect verification code")
+          return select_device(r, device_id)
+        end
+
+        raise ex
+      end
+
+      store_session
+
+      return true
+    end
+
     def handle_two_factor(response)
       two_factor_url = "https://github.com/fastlane/fastlane/tree/master/spaceship#2-step-verification"
       puts("Two Factor Authentication for account '#{self.user}' is enabled")
@@ -123,64 +182,6 @@ module Spaceship
     # (if exists)
     def self.spaceship_session_env
       ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
-    end
-
-    def select_device(r, device_id)
-      # Request Token
-      r = request(:put) do |req|
-        req.url("https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode")
-        update_request_headers(req)
-      end
-
-      # we use `Spaceship::TunesClient.new.handle_itc_response`
-      # since this might be from the Dev Portal, but for 2 step
-      Spaceship::TunesClient.new.handle_itc_response(r.body)
-
-      puts("Successfully requested notification")
-      code = ask("Please enter the 4 digit code: ")
-      puts("Requesting session...")
-
-      # Send token back to server to get a valid session
-      r = request(:post) do |req|
-        req.url("https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode")
-        req.body = { "code" => code.to_s }.to_json
-        req.headers['Content-Type'] = 'application/json'
-
-        update_request_headers(req)
-      end
-
-      begin
-        Spaceship::TunesClient.new.handle_itc_response(r.body) # this will fail if the code is invalid
-      rescue => ex
-        # If the code was entered wrong
-        # {
-        #   "securityCode": {
-        #     "code": "1234"
-        #   },
-        #   "securityCodeLocked": false,
-        #   "recoveryKeyLocked": false,
-        #   "recoveryKeySupported": true,
-        #   "manageTrustedDevicesLinkName": "appleid.apple.com",
-        #   "suppressResend": false,
-        #   "authType": "hsa",
-        #   "accountLocked": false,
-        #   "validationErrors": [{
-        #     "code": "-21669",
-        #     "title": "Incorrect Verification Code",
-        #     "message": "Incorrect verification code."
-        #   }]
-        # }
-        if ex.to_s.include?("verification code") # to have a nicer output
-          puts("Error: Incorrect verification code")
-          return select_device(r, device_id)
-        end
-
-        raise ex
-      end
-
-      store_session
-
-      return true
     end
 
     def store_session
