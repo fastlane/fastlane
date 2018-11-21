@@ -46,7 +46,7 @@ module Spaceship
       end
       Tunes::RecoveryDevice.client = old_client
 
-      puts("Two-step Verification for account '#{self.user}' is enabled")
+      puts("Two-step Verification (4 digits code) is enabled for account '#{self.user}'")
       puts("Please select a device to verify your identity")
       available = devices.collect do |c|
         "#{c.name}\t#{c.model_name || 'SMS'}\t(#{c.device_id})"
@@ -117,7 +117,7 @@ module Spaceship
 
     def handle_two_factor(response)
       two_factor_url = "https://github.com/fastlane/fastlane/tree/master/spaceship#2-step-verification"
-      puts("Two Factor Authentication for account '#{self.user}' is enabled")
+      puts("Two-factor Authentication (6 digits code) is enabled for account '#{self.user}'")
 
       puts("If you're running this in a non-interactive session (e.g. server or CI)")
       puts("check out #{two_factor_url}")
