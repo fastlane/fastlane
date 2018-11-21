@@ -10,6 +10,12 @@ module Spaceship
       @x_apple_id_session_id = response["x-apple-id-session-id"]
       @scnt = response["scnt"]
 
+      puts("")
+      puts("Two-step Verification (4 digits code) or Two-factor Authentication (6 digits code) is enabled for account '#{self.user}'")
+      puts("More information about Two-step Verification (4 digits code): https://support.apple.com/en-us/HT204152")
+      puts("More information about Two-factor Authentication (6 digits code): https://support.apple.com/en-us/HT204915")
+      puts("")
+
       r = request(:get) do |req|
         req.url("https://idmsa.apple.com/appleauth/auth")
         update_request_headers(req)
