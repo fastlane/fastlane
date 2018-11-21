@@ -75,8 +75,8 @@ module Spaceship
       # Send token back to server to get a valid session
       r = request(:post) do |req|
         req.url("https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode")
-        req.body = { "code" => code.to_s }.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.body = { "code" => code.to_s }.to_json
 
         update_request_headers(req)
       end
@@ -123,6 +123,7 @@ module Spaceship
       puts("check out #{two_factor_url}")
 
       security_code = response.body["securityCode"]
+      # securityCode =
       # {"length"=>6,
       #  "tooManyCodesSent"=>false,
       #  "tooManyCodesValidated"=>false,
