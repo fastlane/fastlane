@@ -408,7 +408,19 @@ module Spaceship
 
       # If this is a CI, the user can pass the session via environment variable
       # This is used for 2FA related sessions
-      load_session_from_env
+      if load_session_from_env
+        # see above
+        begin
+          # see above
+          return true if fetch_olympus_session
+        rescue
+          # see above
+        end
+      end
+
+      #
+      # After this point, we sure have no valid session any more
+      #
 
       data = {
         accountName: user,
