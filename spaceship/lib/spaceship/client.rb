@@ -466,8 +466,8 @@ module Spaceship
         return response
       when 409
         # 2 step/factor is enabled for this account, first handle that
+        handle_two_step_or_factor(response)
         # and then get the olympus session
-        handle_two_step(response)
         fetch_olympus_session
         return true
       else
@@ -745,4 +745,4 @@ module Spaceship
   # rubocop:enable Metrics/ClassLength
 end
 
-require 'spaceship/two_step_client'
+require 'spaceship/two_step_or_factor_client'

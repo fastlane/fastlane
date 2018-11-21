@@ -6,7 +6,7 @@ require_relative 'tunes/recovery_device'
 
 module Spaceship
   class Client
-    def handle_two_step(response)
+    def handle_two_step_or_factor(response)
       @x_apple_id_session_id = response["x-apple-id-session-id"]
       @scnt = response["scnt"]
 
@@ -77,7 +77,6 @@ module Spaceship
         req.url("https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode")
         req.headers['Content-Type'] = 'application/json'
         req.body = { "code" => code.to_s }.to_json
-
         update_request_headers(req)
       end
 
