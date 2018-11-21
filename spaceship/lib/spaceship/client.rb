@@ -414,6 +414,7 @@ module Spaceship
           # see above
           return true if fetch_olympus_session
         rescue
+          puts("Session loaded from environment variable is not valid. Continuing with normal login.")
           # see above
         end
       end
