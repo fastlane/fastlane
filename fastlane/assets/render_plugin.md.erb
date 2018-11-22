@@ -2,7 +2,7 @@
 
 <div class="quality-index" style="color: #<%= @plugin.color_to_use %>"><%= @plugin.data[:overall_score] %></div>
 
-<h3><a href="<%= @plugin.homepage %>" target="_blank"><code><%= @plugin.name.gsub("fastlane-plugin-", "") %></code></a></h3>
+<h3 id="<%= @plugin.name.gsub("fastlane-plugin-", "") %>"><a href="<%= @plugin.homepage %>" target="_blank"><code><%= @plugin.name.gsub("fastlane-plugin-", "") %></code></a></h3>
 
 <p class="via-text">via <%= @plugin.raw_hash["authors"] %></p>
 
