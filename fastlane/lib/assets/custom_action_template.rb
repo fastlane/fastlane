@@ -79,6 +79,14 @@ module Fastlane
       end
 
       def self.is_incompatible?(operating_system)
+        # you can do things like
+        # 
+        #  operating_system != "macOS"
+        #
+        #  ["macOS", "Linux", "Windows"].include?(operating_system)
+        # 
+
+        false
       end
     end
   end
