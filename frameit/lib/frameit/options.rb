@@ -46,7 +46,7 @@ module Frameit
                            default_value: false),
         FastlaneCore::ConfigItem.new(key: :force_orientation_block,
                            type: :string_callback,
-                           description: "[Advanced] A block to customize your screnshots' device orientation",
+                           description: "[Advanced] A block to customize your screenshots' device orientation",
                            display_in_shell: false,
                            optional: true,
                            default_value: proc do |filename|
