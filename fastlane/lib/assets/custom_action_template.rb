@@ -6,10 +6,10 @@ module Fastlane
 
     class [[NAME_CLASS]] < Action
       def self.run(params)
-        # fastlane will take care of reading in the parameter and fetching the environment variable:
+        # fastlane will take care of reading in the parameter and fetching the environment variable. Example:
         UI.message "Parameter API Token: #{params[:api_token]}"
 
-        # sh "shellcommand ./path"
+        # sh("shellcommand ./path")
 
         # Actions.lane_context[SharedValues::[[NAME_UP]]_CUSTOM_VALUE] = "my_val"
       end
@@ -26,6 +26,11 @@ module Fastlane
         # Optional:
         # this is your chance to provide a more detailed description of this action
         "You can use this action to do cool things..."
+      end
+
+      def self.authors
+        # So no one will ever forget your contribution to fastlane :) You are awesome btw!
+        ["Your GitHub/Twitter Name"]
       end
 
       def self.available_options
@@ -48,21 +53,16 @@ module Fastlane
         ]
       end
 
+      def self.return_value
+        # If your method provides a return value, you can describe here what it does
+      end
+
       def self.output
         # Define the shared values you are going to provide
         # Example
         [
           ['[[NAME_UP]]_CUSTOM_VALUE', 'A description of what this value contains']
         ]
-      end
-
-      def self.return_value
-        # If your method provides a return value, you can describe here what it does
-      end
-
-      def self.authors
-        # So no one will ever forget your contribution to fastlane :) You are awesome btw!
-        ["Your GitHub/Twitter Name"]
       end
 
       def self.is_supported?(platform)
@@ -72,10 +72,10 @@ module Fastlane
         # 
         #  platform == :ios
         # 
-        #  [:ios, :mac].include?(platform)
+        #  [:ios, :mac, :android].include?(platform)
         # 
 
-        platform == :ios
+        true
       end
 
       def self.is_incompatible?(operating_system)

@@ -12,17 +12,13 @@ module Fastlane
         "<%= summary.gsub('"', "'") %>"
       end
 
-      def self.authors
-        ["<%= author.gsub('"', "'") %>"]
-      end
-
-      def self.return_value
-        # If your method provides a return value, you can describe here what it does
-      end
-
       def self.details
         # Optional:
         "<%= details.gsub('"', "'") %>"
+      end
+
+      def self.authors
+        ["<%= author.gsub('"', "'") %>"]
       end
 
       def self.available_options
@@ -35,11 +31,28 @@ module Fastlane
         ]
       end
 
+      def self.return_value
+        # If your method provides a return value, you can describe here what it does
+      end
+      
+      def self.output
+        # Define the shared values you are going to provide
+        # Example
+        [
+          ['[[NAME_UP]]_CUSTOM_VALUE', 'A description of what this value contains']
+        ]
+      end
+
       def self.is_supported?(platform)
-        # Adjust this if your plugin only works for a particular platform (iOS vs. Android, for example)
-        # See: https://docs.fastlane.tools/advanced/#control-configuration-by-lane-and-by-platform
-        #
-        # [:ios, :mac, :android].include?(platform)
+        # you can do things like
+        # 
+        #  true
+        # 
+        #  platform == :ios
+        # 
+        #  [:ios, :mac].include?(platform)
+        # 
+
         true
       end
 
