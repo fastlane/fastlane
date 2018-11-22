@@ -378,7 +378,7 @@ module Spaceship
       # Check if we have a cached/valid session here
       #
       # December 4th 2017 Apple introduced a rate limit - which is of course fine by itself -
-      # but unfortunately also rate limits successful logins. If if you call multiple tools in a 
+      # but unfortunately also rate limits successful logins. If you call multiple tools in a
       # lane (e.g. call match 5 times), this would lock you out of the account for a while.
       # By loading existing sessions and checking if they're valid, we're sending less login requests.
       # More context on why this change was necessary https://github.com/fastlane/fastlane/pull/11108
