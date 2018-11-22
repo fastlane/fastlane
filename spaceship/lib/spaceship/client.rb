@@ -376,7 +376,7 @@ module Spaceship
       self.user = user
       @password = password
       begin
-        do_login(user, password)
+        do_login(user, password) # calls `send_login_request` in sub class (which then will redirect back here to `send_shared_login_request`, below)
       rescue InvalidUserCredentialsError => ex
         raise ex unless keychain_entry
 
@@ -390,9 +390,12 @@ module Spaceship
 
     # This method is used for both the Apple Dev Portal and App Store Connect
     # This will also handle 2 step verification
+    #
+    # It is called in `send_login_request` of sub classes (which the method `login`, above, transferred over to via `do_login`)
     def send_shared_login_request(user, password)
-      # Check if we have a cached/valid session here
+      # Check if we have a cached/valid session
       #
+      # Background:
       # December 4th 2017 Apple introduced a rate limit - which is of course fine by itself -
       # but unfortunately also rate limits successful logins. If you call multiple tools in a
       # lane (e.g. call match 5 times), this would lock you out of the account for a while.
