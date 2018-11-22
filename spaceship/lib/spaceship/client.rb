@@ -364,6 +364,8 @@ module Spaceship
       if user.to_s.empty? || password.to_s.empty?
         require 'credentials_manager/account_manager'
 
+        puts("Reading keychain entry as user or password were empty") if Spaceship::Globals.verbose?
+
         keychain_entry = CredentialsManager::AccountManager.new(user: user, password: password)
         user ||= keychain_entry.user
         password = keychain_entry.password
