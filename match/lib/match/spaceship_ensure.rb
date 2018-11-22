@@ -53,20 +53,14 @@ module Match
       UI.user_error!("To reset the certificates of your Apple account, you can use the `fastlane match nuke` feature, more information on https://docs.fastlane.tools/actions/match/")
     end
 
-    def profile_exists(username: nil, uuid: nil, return_if_missing: false)
+    def profile_exists(username: nil, uuid: nil)
       found = Spaceship.provisioning_profile.all.find do |profile|
         profile.uuid == uuid
       end
 
       unless found
-        UI.error("Provisioning profile '#{uuid}' is not available on the Developer Portal")
-        UI.error("for the user #{username}")
-
-        return false if return_if_missing
-
-        UI.error("Make sure to use the same user and team every time you run 'match' for this")
-        UI.error("Git repository. This might be caused by deleting the provisioning profile on the Dev Portal")
-        UI.user_error!("To reset the provisioning profiles of your Apple account, you can use the `fastlane match nuke` feature, more information on https://docs.fastlane.tools/actions/match/")
+        UI.error("Provisioning profile '#{uuid}' is not available on the Developer Portal for the user #{username}, fixing this now for you 🔨")
+        return false
       end
 
       if found.valid?

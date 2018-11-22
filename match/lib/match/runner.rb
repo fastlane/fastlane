@@ -197,7 +197,7 @@ module Match
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       uuid = parsed["UUID"]
 
-      if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid, return_if_missing: params[:recreate_deleted_profiles])
+      if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
         # This profile is invalid, let's remove the local file and generate a new one
         File.delete(profile)
         # This method will be called again, no need to modify `files_to_commit`
