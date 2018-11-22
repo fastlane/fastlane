@@ -533,21 +533,33 @@ module Spaceship
       return yield
     rescue \
         Faraday::Error::ConnectionFailed,
-        Faraday::Error::TimeoutError,
-        Faraday::ParsingError, # <h2>Internal Server Error</h2> with content type json
+        Faraday::Error::TimeoutError, # New Faraday version: Faraday::TimeoutError => ex
         AppleTimeoutError,
         GatewayTimeoutError,
-        InternalServerError => ex # New Faraday version: Faraday::TimeoutError => ex
       tries -= 1
       unless tries.zero?
-        logger.warn("Timeout received: '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})...")
+        msg = "Timeout received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
+        logger.warn(msg)
+
+        sleep(3) unless Object.const_defined?("SpecHelper")
+        retry
+      end
+      raise ex # re-raise the exception
+    rescue \
+        Faraday::ParsingError, # <h2>Internal Server Error</h2> with content type json
+        InternalServerError => ex
+      tries -= 1
+      unless tries.zero?
+        msg = "Internal Server Error received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
+        logger.warn(msg)
+
         sleep(3) unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex # re-raise the exception
     rescue UnauthorizedAccessError => ex
       if @loggedin && !(tries -= 1).zero?
-        msg = "Auth error received: '#{ex.message}'. Login in again then retrying after 3 seconds (remaining: #{tries})..."
+        msg = "Auth error received: '#{ex.class}', '#{ex.message}'. Login in again then retrying after 3 seconds (remaining: #{tries})..."
         puts(msg) if Spaceship::Globals.verbose?
         logger.warn(msg)
 
