@@ -222,9 +222,7 @@ module Fastlane
       end
 
       verify_supported_os(method_sym, class_ref)
-      if verify_compatible_os(method_sym, class_ref)
-        return
-      end
+      verify_compatible_os(method_sym, class_ref)
 
       begin
         Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
@@ -302,14 +300,10 @@ module Fastlane
         operating_system = Helper.operating_system
         incompat = class_ref.is_incompatible?(operating_system)
         if incompat
-          UI.error("------------------------------------------------")
-          UI.error("Action '#{name}' is not compatible with operating system '#{operating_system}'.")
-          UI.error("Execution of the action is skipped.")
-          UI.error("------------------------------------------------")
-          return true
+          incompat_message = "Action '#{name}' is not compatible with operating system '#{operating_system}'. For information how to handle this check out: TODO"
+          UI.user_error!(incompat_message)
         end
       end
-      return false
     end
 
     # Called internally to setup the runner object
