@@ -251,7 +251,7 @@ module Spaceship
         end
 
         @logger.formatter = proc do |severity, datetime, progname, msg|
-          "#{sprintf('%-5.5s', severity)} [#{datetime.strftime('%H:%M:%S')}]: #{msg}\n"
+          "#{'%-5.5s' % severity} [#{datetime.strftime('%H:%M:%S')}]: #{msg}\n"
         end
       end
 
@@ -542,7 +542,7 @@ module Spaceship
         Faraday::Error::ConnectionFailed,
         Faraday::Error::TimeoutError, # New Faraday version: Faraday::TimeoutError => ex
         AppleTimeoutError,
-        GatewayTimeoutError,
+        GatewayTimeoutError
       tries -= 1
       unless tries.zero?
         msg = "Timeout received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
@@ -731,14 +731,18 @@ module Spaceship
           def url(value)
             @url = value
           end
+          
           attr_accessor :body
           attr_accessor :headers
+
           def geturl
             @url
           end
+
           def getbody
             @body
           end
+
           def getheaders
             @headers
           end
