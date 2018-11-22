@@ -23,7 +23,7 @@ module Spaceship
         puts("Please check your credentials and try again.".yellow)
         puts("This could be an issue with App Store Connect,".yellow)
         puts("Please try unsetting the FASTLANE_SESSION environment variable".yellow)
-        puts("and re-run `fastlane spaceauth`".yellow)
+        puts("(if it is set) and re-run `fastlane spaceauth`".yellow)
         raise "Problem connecting to App Store Connect"
       end
 
