@@ -41,7 +41,7 @@ describe Spaceship::Client do
 
   describe 'detect_most_common_errors_and_raise_exceptions' do
     it "raises Spaceship::InsufficientPermissions for Forbidden" do
-      body = JSON.generate({ messages: { error: "InsufficentPermissions" } })
+      body = JSON.generate({ messages: { error: "InsufficientPermissions" } })
       stub_client_request(Spaceship::InsufficientPermissions, 6, 200, body)
 
       expect do
