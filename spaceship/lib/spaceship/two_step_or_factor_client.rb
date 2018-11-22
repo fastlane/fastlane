@@ -1,5 +1,3 @@
-require 'tempfile'
-
 require_relative 'globals'
 require_relative 'tunes/tunes_client'
 require_relative 'tunes/recovery_device'
@@ -182,6 +180,5 @@ module Spaceship
       req.headers["Accept"] = "application/json"
       req.headers["scnt"] = @scnt
     end
-
   end
 end

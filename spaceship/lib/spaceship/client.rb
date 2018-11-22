@@ -4,6 +4,7 @@ require 'faraday_middleware'
 require 'logger'
 require 'tmpdir'
 require 'cgi'
+require 'tempfile'
 
 require 'fastlane/version'
 require_relative 'babosa_fix'
@@ -591,7 +592,7 @@ module Spaceship
     def self.spaceship_session_env
       ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
     end
-    
+
     #####################################################
     # @!group Helpers
     #####################################################
