@@ -708,12 +708,13 @@ module Spaceship
       params_to_log = params_to_log.collect do |key, value|
         "{#{key}: #{value}}"
       end
-      logger.info(">> #{method.upcase}: #{url} #{params_to_log.join(', ')}")
+      logger.info(">> #{method.upcase} #{url}: #{params_to_log.join(', ')}")
     end
 
     def log_response(method, url, response)
       body = response.body.kind_of?(String) ? response.body.force_encoding(Encoding::UTF_8) : response.body
-      logger.debug("<< #{method.upcase}: #{url}: #{body}")
+      resp_hash = response.to_hash
+      logger.debug("<< #{method.upcase} #{url}: #{resp_hash[:status]} #{body}")
     end
 
     # Actually sends the request to the remote server
