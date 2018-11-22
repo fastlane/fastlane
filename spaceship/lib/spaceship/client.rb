@@ -546,6 +546,7 @@ module Spaceship
       tries -= 1
       unless tries.zero?
         msg = "Timeout received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
+        puts(msg) if Spaceship::Globals.verbose?
         logger.warn(msg)
 
         sleep(3) unless Object.const_defined?("SpecHelper")
@@ -558,6 +559,7 @@ module Spaceship
       tries -= 1
       unless tries.zero?
         msg = "Internal Server Error received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
+        puts(msg) if Spaceship::Globals.verbose?
         logger.warn(msg)
 
         sleep(3) unless Object.const_defined?("SpecHelper")
