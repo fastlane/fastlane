@@ -706,9 +706,7 @@ module Spaceship
       body = extract_key_from_block('body', &block)
       if body
         body = JSON.parse(body)
-        puts body
         body['password'] = '***'
-        puts body
       end
       params_to_log = Hash(params).dup # to also work with nil
       params_to_log.delete(:accountPassword) # Dev Portal
