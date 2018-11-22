@@ -586,7 +586,7 @@ module Spaceship
       headers['User-Agent'] = USER_AGENT
 
       # Before encoding the parameters, log them
-      log_request(method, url_or_path, params)
+      log_request(method, url_or_path, params, headers, &block)
 
       # form-encode the params only if there are params, and the block is not supplied.
       # this is so that certain requests can be made using the block for more control
@@ -694,7 +694,7 @@ module Spaceship
       end
     end
 
-    def log_request(method, url, params)
+    def log_request(method, url, params, headers = nil, &block)
       params_to_log = Hash(params).dup # to also work with nil
       params_to_log.delete(:accountPassword) # Dev Portal
       params_to_log.delete(:theAccountPW) # iTC
@@ -704,7 +704,7 @@ module Spaceship
       logger.info(">> #{method.upcase} #{url}: #{params_to_log.join(', ')}")
     end
 
-    def log_response(method, url, response)
+    def log_response(method, url, response, headers = nil, &block)
       body = response.body.kind_of?(String) ? response.body.force_encoding(Encoding::UTF_8) : response.body
       resp_hash = response.to_hash
       logger.debug("<< #{method.upcase} #{url}: #{resp_hash[:status]} #{body}")
@@ -715,7 +715,7 @@ module Spaceship
     def send_request(method, url_or_path, params, headers, &block)
       with_retry do
         response = @client.send(method, url_or_path, params, headers, &block)
-        log_response(method, url_or_path, response)
+        log_response(method, url_or_path, response, headers, &block)
 
         resp_hash = response.to_hash
         if resp_hash[:status] == 401
