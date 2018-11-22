@@ -621,9 +621,12 @@ module Spaceship
 
         content = expected_key ? response.body[expected_key] : response.body
       end
+
+      # if content (filled with whole body or just expected_key) is missing
       if content.nil?
         detect_most_common_errors_and_raise_exceptions(response.body) if response.body
         raise UnexpectedResponse, response.body
+      # else if it is a hash and `resultString` includes `NotAllowed`
       elsif content.kind_of?(Hash) && (content["resultString"] || "").include?("NotAllowed")
         # example content when doing a Developer Portal action with not enough permission
         # => {"responseId"=>"e5013d83-c5cb-4ba0-bb62-734a8d56007f",
