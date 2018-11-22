@@ -542,7 +542,7 @@ module Spaceship
         Faraday::Error::ConnectionFailed,
         Faraday::Error::TimeoutError, # New Faraday version: Faraday::TimeoutError => ex
         AppleTimeoutError,
-        GatewayTimeoutError
+        GatewayTimeoutError => ex
       tries -= 1
       unless tries.zero?
         msg = "Timeout received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
