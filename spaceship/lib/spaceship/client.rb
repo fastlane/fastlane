@@ -702,19 +702,47 @@ module Spaceship
     end
 
     def log_request(method, url, params, headers = nil, &block)
+      url ||= extract_key_from_block('url', &block)
+      body = extract_key_from_block('body', &block)
       params_to_log = Hash(params).dup # to also work with nil
       params_to_log.delete(:accountPassword) # Dev Portal
       params_to_log.delete(:theAccountPW) # iTC
       params_to_log = params_to_log.collect do |key, value|
         "{#{key}: #{value}}"
       end
-      logger.info(">> #{method.upcase} #{url}: #{params_to_log.join(', ')}")
+      logger.info(">> #{method.upcase} #{url}: #{body.to_json}#{params_to_log.join(', ')}")
     end
 
     def log_response(method, url, response, headers = nil, &block)
+      url ||= extract_key_from_block('url', &block)
       body = response.body.kind_of?(String) ? response.body.force_encoding(Encoding::UTF_8) : response.body
       resp_hash = response.to_hash
       logger.debug("<< #{method.upcase} #{url}: #{resp_hash[:status]} #{body}")
+    end
+
+    def extract_key_from_block(key, &block)
+      if block_given?
+        obj = Object.new
+        class << obj
+          def url(value)
+            @url = value
+          end
+          attr_accessor :body
+          attr_accessor :headers
+          def geturl
+            @url
+          end
+          def getbody
+            @body
+          end
+          def getheaders
+            @headers
+          end
+        end
+        obj.headers = {}
+        block.call(obj)
+        obj.public_send('get' + key)
+      end
     end
 
     # Actually sends the request to the remote server
