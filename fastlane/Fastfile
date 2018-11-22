@@ -514,10 +514,10 @@ private_lane :ensure_tool_name_formatting do
     Dir["**/*.md"].each do |path|
       content = File.read(path)
       Fastlane::TOOLS.each do |tool|
-        errors << "Use _#{tool}_ instead of `#{tool}` to mention a tool in the docs in '#{path}'" if content.include?("`#{tool}`")
-        errors << "Use _#{tool}_ instead of `_#{tool}_` to mention a tool in the docs in '#{path}'" if content.include?("`_#{tool}_`")
-        errors << "Use [_#{tool}_] instead of [#{tool}] to mention a tool in the docs in '#{path}'" if content.include?("[#{tool}]")
-        errors << "Use <em>#{tool}<em> instead of <code>#{tool}</code> to mention a tool in the docs in '#{path}'" if content.include?("<code>#{tool}</code>")
+        errors << "Use _#{tool}_ instead of `#{tool}` to mention a tool in the docs in '#{path}'" if content.include?("`#{tool}`") && tool != :spaceship
+        errors << "Use _#{tool}_ instead of `_#{tool}_` to mention a tool in the docs in '#{path}'" if content.include?("`_#{tool}_`") && tool != :spaceship
+        errors << "Use [_#{tool}_] instead of [#{tool}] to mention a tool in the docs in '#{path}'" if content.include?("[#{tool}]") && tool != :spaceship
+        errors << "Use <em>#{tool}<em> instead of <code>#{tool}</code> to mention a tool in the docs in '#{path}'" if content.include?("<code>#{tool}</code>") && tool != :spaceship
         if content.include?("_#{tool.to_s.capitalize}_") || content.include?("`#{tool.to_s.capitalize}`")
           errors << "fastlane tools have to be formatted in lower case: #{tool} in '#{path}'"
         end
