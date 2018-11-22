@@ -75,7 +75,7 @@ module Fastlane
       end
 
       def self.is_incompatible?(operating_system)
-        ["Linux", "Windows"].include?(operating_system)
+        operating_system != "macOS"
       end
 
       private_class_method
