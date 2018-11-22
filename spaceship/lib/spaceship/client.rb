@@ -586,8 +586,6 @@ module Spaceship
                    send_request(method, url_or_path, params, headers, &block)
                  end
 
-      log_response(method, url_or_path, response)
-
       return response
     end
 
@@ -699,6 +697,8 @@ module Spaceship
     def send_request(method, url_or_path, params, headers, &block)
       with_retry do
         response = @client.send(method, url_or_path, params, headers, &block)
+        log_response(method, url_or_path, response)
+
         resp_hash = response.to_hash
         if resp_hash[:status] == 401
           msg = "Auth lost"
@@ -709,6 +709,7 @@ module Spaceship
         if response.body.to_s.include?("<title>302 Found</title>")
           raise AppleTimeoutError.new, "Apple 302 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
         end
+
         return response
       end
     end
