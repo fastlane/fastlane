@@ -724,8 +724,7 @@ module Spaceship
     def log_response(method, url, response, headers = nil, &block)
       url ||= extract_key_from_block('url', &block)
       body = response.body.kind_of?(String) ? response.body.force_encoding(Encoding::UTF_8) : response.body
-      resp_hash = response.to_hash
-      logger.debug("<< #{method.upcase} #{url}: #{resp_hash[:status]} #{body}")
+      logger.debug("<< #{method.upcase} #{url}: #{response.status} #{body}")
     end
 
     def extract_key_from_block(key, &block)
