@@ -301,9 +301,14 @@ module Fastlane
     end
 
     def verify_compatible_os(name, class_ref)
+      puts "\nname: " + name.to_s
+      puts "class_ref: " + class_ref.to_s
       if class_ref.respond_to?(:is_incompatible?)
+        puts "does respond to"
         operating_system = Helper.operating_system
+        puts "os: " + operating_system
         incompat = class_ref.is_incompatible?(operating_system)
+        puts "incompat: " + incompat.to_s
         if incompat
           incompat_message = "Action '#{name}' is not compatible with operating system '#{operating_system}'. For information how to handle this check out: TODO"
           incompat_env_var = 'FASTLANE_IGNORE_OS_INCOMPAT'
@@ -316,7 +321,10 @@ module Fastlane
             UI.error("------------------------------------------------")
           end
         end
+      else
+        puts "does not respond to"
       end
+
     end
 
     # Called internally to setup the runner object

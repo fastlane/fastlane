@@ -65,7 +65,7 @@ describe Fastlane do
       it "does not raise an exception but output a message for action scan on OS Linux" do
         allow(FastlaneCore::Helper).to receive(:operating_system).and_return('Linux')
         with_env_values('FASTLANE_IGNORE_OS_INCOMPAT' => 1) do
-          expectiation = expect do
+          expectation = expect do
             @ff.runner.verify_compatible_os(@action, @class_ref)
           end
           expectation.not_to raise_error
