@@ -45,7 +45,7 @@ describe Fastlane do
       end
      
       it "does raise an exception for action scan on OS Linux" do
-        allow(FastlaneCore::Helper).to receive(:operating_system).and_return('Windows')
+        allow(FastlaneCore::Helper).to receive(:operating_system).and_return('Linux')
         expect do
           @ff.runner.verify_compatible_os(@action, @class_ref)
         end.to raise_error(FastlaneCore::Interface::FastlaneError)
@@ -62,7 +62,7 @@ describe Fastlane do
       end
      
       it "does not raise an exception but output a message for action scan on OS Linux" do
-        allow(FastlaneCore::Helper).to receive(:operating_system).and_return('Windows')
+        allow(FastlaneCore::Helper).to receive(:operating_system).and_return('Linux')
         with_env_values('FASTLANE_IGNORE_OS_INCOMPAT' => 1) do
           expectiation = expect do
             @ff.runner.verify_compatible_os(@action, @class_ref)
