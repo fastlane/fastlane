@@ -56,10 +56,10 @@ describe Fastlane do
         with_env_values('FASTLANE_IGNORE_OS_INCOMPAT' => 1) do
           expectation = expect do
             @ff.runner.verify_compatible_os(@action, @class_ref)
-        end
           end
           expectation.not_to raise_error
           expectation.to output("Continuing anyway").to_stdout
+        end
       end
      
       it "does not raise an exception but output a message for action scan on OS Linux" do
