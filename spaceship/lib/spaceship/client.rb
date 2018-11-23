@@ -735,20 +735,20 @@ module Spaceship
           def url(value)
             @url = value
           end
-          
           attr_accessor :body
           attr_accessor :headers
-
+          attr_accessor :params
           def geturl
             @url
           end
-
           def getbody
             @body
           end
-
           def getheaders
             @headers
+          end
+          def getparams
+            @params
           end
         end
         obj.headers = {}
