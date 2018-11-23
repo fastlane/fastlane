@@ -221,7 +221,7 @@ module Fastlane
         custom_dir ||= ".."
       end
 
-      verify_supported_os(method_sym, class_ref)
+      verify_supported_platform(method_sym, class_ref)
       verify_compatible_os(method_sym, class_ref)
 
       begin
@@ -283,7 +283,7 @@ module Fastlane
       block[nil].call(lane, parameters) if block[nil]
     end
 
-    def verify_supported_os(name, class_ref)
+    def verify_supported_platform(name, class_ref)
       if class_ref.respond_to?(:is_supported?)
         # This value is filled in based on the executed platform block. Might be nil when lane is in root of Fastfile
         platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
