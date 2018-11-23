@@ -26,7 +26,7 @@ describe Fastlane do
       before do
         @ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileGrouped')
         @action = 'scan' # TODO Somehow mock action instead of reusing scan
-        @class_ref = @ff.runner.get_class_ref(@action)
+        @class_ref, arguments_unused = @ff.runner.get_class_ref(@action)
         puts 'class_ref = '+ @class_ref.to_s
       end
 
