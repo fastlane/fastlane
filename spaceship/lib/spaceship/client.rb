@@ -733,7 +733,7 @@ module Spaceship
         obj = Object.new
         class << obj
           # rubocop: disable Style/TrivialAccessors
-          # from my testing this advice is actually not true, 
+          # from my testing this advice is actually not true,
           # the suggested replacement would be equal to `def url=(value)`
           # so we have to disable instead of fix
           def url(value)
