@@ -133,7 +133,7 @@ module Fastlane
           class_ref.alias_used(orig_action, arguments.first)
         end
       end
-      class_ref
+      return class_ref, arguments
     end
 
     # This is being called from `method_missing` from the Fastfile
@@ -142,7 +142,7 @@ module Fastlane
     #                    If so, it won't show up in summary.
     def trigger_action_by_name(method_sym, custom_dir, from_action, *arguments)
       # First, check if there is a predefined method in the actions folder
-      class_ref = get_class_ref(method_sym, arguments)
+      class_ref,arguments = get_class_ref(method_sym, *arguments)
 
       # It's important to *not* have this code inside the rescue block
       # otherwise all NameErrors will be caught and the error message is
