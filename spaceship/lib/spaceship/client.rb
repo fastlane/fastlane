@@ -709,7 +709,7 @@ module Spaceship
         begin
           body = JSON.parse(body)
           body['password'] = '***' if body.kind_of?(Hash) && body.key?("password")
-        rescue JSON::ParserError  
+        rescue JSON::ParserError
           # no json, no password
         end
       end
@@ -732,9 +732,14 @@ module Spaceship
       if block_given?
         obj = Object.new
         class << obj
+          # rubocop: disable Style/TrivialAccessors
+          # from my testing this advice is actually not true, 
+          # the suggested replacement would be equal to `def url=(value)`
+          # so we have to disable instead of fix
           def url(value)
             @url = value
           end
+          # rubocop: enable Style/TrivialAccessors
 
           attr_accessor :body
           attr_accessor :headers
@@ -751,13 +756,13 @@ module Spaceship
           def getheaders
             @headers
           end
-          
+
           def getparams
             @params
           end
         end
         obj.headers = {}
-        block.call(obj)
+        yield(obj)
         obj.public_send('get' + key)
       end
     end
