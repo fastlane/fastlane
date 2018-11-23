@@ -15,9 +15,11 @@ describe Spaceship::Client do
 
   class TestResponse
     attr_accessor :body
+    attr_accessor :status
 
-    def initialize(body = nil)
+    def initialize(body = nil, status = 200)
       @body = body
+      @status = status
     end
   end
 
