@@ -638,7 +638,7 @@ module Spaceship
         #    "userLocale"=>"en_US",
         #    "requestUrl"=>"https://developer.apple.com/services-account/QH65B2/account/ios/certificate/downloadCertificateContent.action",
         #    "httpCode"=>200}
-        raise_insuffient_permission_error!(additional_error_string: content["userString"])
+        raise_insufficient_permission_error!(additional_error_string: content["userString"])
       else
         store_csrf_tokens(response)
         content
@@ -648,11 +648,11 @@ module Spaceship
     def detect_most_common_errors_and_raise_exceptions(body)
       # Check if the failure is due to missing permissions (App Store Connect)
       if body["messages"] && body["messages"]["error"].include?("Forbidden")
-        raise_insuffient_permission_error!
+        raise_insufficient_permission_error!
       elsif body["messages"] && body["messages"]["error"].include?("insufficient privileges")
         # Passing a specific `caller_location` here to make sure we return the correct method
         # With the default location the error would say that `parse_response` is the caller
-        raise_insuffient_permission_error!(caller_location: 3)
+        raise_insufficient_permission_error!(caller_location: 3)
       elsif body.to_s.include?("Internal Server Error - Read")
         raise InternalServerError, "Received an internal server error from App Store Connect / Developer Portal, please try again later"
       elsif body.to_s.include?("Gateway Timeout - In read")
@@ -663,7 +663,7 @@ module Spaceship
     end
 
     # This also gets called from subclasses
-    def raise_insuffient_permission_error!(additional_error_string: nil, caller_location: 2)
+    def raise_insufficient_permission_error!(additional_error_string: nil, caller_location: 2)
       # get the method name of the request that failed
       # `block in` is used very often for requests when surrounded for paging or retrying blocks
       # The ! is part of some methods when they modify or delete a resource, so we don't want to show it
