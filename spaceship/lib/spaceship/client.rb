@@ -251,7 +251,8 @@ module Spaceship
         end
 
         @logger.formatter = proc do |severity, datetime, progname, msg|
-          "#{'%-5.5s' % severity} [#{datetime.strftime('%H:%M:%S')}]: #{msg}\n"
+          severity = format('%-5.5s', severity)
+          "#{severity} [#{datetime.strftime('%H:%M:%S')}]: #{msg}\n"
         end
       end
 
@@ -707,8 +708,8 @@ module Spaceship
       if body
         begin
           body = JSON.parse(body)
-          body['password'] = '***' if body.is_a?(Hash) && body.key?("password")
-        rescue JSON::ParserError => e  
+          body['password'] = '***' if body.kind_of?(Hash) && body.key?("password")
+        rescue JSON::ParserError  
           # no json, no password
         end
       end
@@ -734,18 +735,23 @@ module Spaceship
           def url(value)
             @url = value
           end
+
           attr_accessor :body
           attr_accessor :headers
           attr_accessor :params
+
           def geturl
             @url
           end
+
           def getbody
             @body
           end
+
           def getheaders
             @headers
           end
+          
           def getparams
             @params
           end
