@@ -705,8 +705,12 @@ module Spaceship
       url ||= extract_key_from_block('url', &block)
       body = extract_key_from_block('body', &block)
       if body
-        body = JSON.parse(body)
-        body['password'] = '***' if body['password']
+        begin
+          body = JSON.parse(body)
+          body['password'] = '***' if body.is_a?(Hash) && body.key?("password")
+        rescue JSON::ParserError => e  
+          # no json, no password
+        end
       end
       params_to_log = Hash(params).dup # to also work with nil
       params_to_log.delete(:accountPassword) # Dev Portal
