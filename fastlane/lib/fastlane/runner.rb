@@ -307,7 +307,7 @@ module Fastlane
         if incompat
           incompat_message = "Action '#{name}' is not compatible with operating system '#{operating_system}'. For information how to handle this check out: TODO"
           incompat_env_var = 'FASTLANE_IGNORE_OS_INCOMPAT'
-          unless ENV[incompat_env_var] do
+          unless ENV[incompat_env_var]
             UI.user_error!(incompat_message)
           else
             UI.error("------------------------------------------------")
