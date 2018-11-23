@@ -122,12 +122,7 @@ module Fastlane
       nil
     end
 
-    # This is being called from `method_missing` from the Fastfile
-    # It's also used when an action is called from another action
-    # @param from_action Indicates if this action is being trigged by another action.
-    #                    If so, it won't show up in summary.
-    def trigger_action_by_name(method_sym, custom_dir, from_action, *arguments)
-      # First, check if there is a predefined method in the actions folder
+    def get_class_ref(method_sym)
       class_ref = class_reference_from_action_name(method_sym)
       unless class_ref
         class_ref = class_reference_from_action_alias(method_sym)
@@ -138,6 +133,16 @@ module Fastlane
           class_ref.alias_used(orig_action, arguments.first)
         end
       end
+      class_ref
+    end
+
+    # This is being called from `method_missing` from the Fastfile
+    # It's also used when an action is called from another action
+    # @param from_action Indicates if this action is being trigged by another action.
+    #                    If so, it won't show up in summary.
+    def trigger_action_by_name(method_sym, custom_dir, from_action, *arguments)
+      # First, check if there is a predefined method in the actions folder
+      class_ref = get_class_ref(method_sym)
 
       # It's important to *not* have this code inside the rescue block
       # otherwise all NameErrors will be caught and the error message is
