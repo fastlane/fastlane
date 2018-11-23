@@ -27,7 +27,7 @@ describe Fastlane do
         @ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileGrouped')
         @action = 'scan' # TODO Somehow mock action instead of reusing scan
         @class_ref, arguments_unused = @ff.runner.get_class_ref(@action)
-        puts 'class_ref = '+ @class_ref.to_s
+        allow(FastlaneCore::Helper).to receive(:test?).and_return(false) # fake not being in test so exception logic actually triggers
       end
 
       it "does not raise an expcetion for action scan on OS macOS" do
@@ -58,7 +58,7 @@ describe Fastlane do
             @ff.runner.verify_compatible_os(@action, @class_ref)
           end
           expectation.not_to raise_error
-          expectation.to output("Continuing anyway").to_stdout
+          expectation.to output("Continuing anyway").to_stdout # TODO does not work yet
         end
       end
      
@@ -69,7 +69,7 @@ describe Fastlane do
             @ff.runner.verify_compatible_os(@action, @class_ref)
           end
           expectation.not_to raise_error
-          expectation.to output("Continuing anyway").to_stdout
+          expectation.to output("Continuing anyway").to_stdout # TODO does not work yet
         end
       end
     end
