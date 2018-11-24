@@ -1,6 +1,7 @@
 ---
-name: 😱 Regression
-about: If a recent release broke a feature 😬 (Please make sure you know the last known working release version)
+name: "\U0001F631 Regression"
+about: "If a recent release broke a feature \U0001F62C (Please make sure you know
+  the last known working release version)"
 
 ---
 
