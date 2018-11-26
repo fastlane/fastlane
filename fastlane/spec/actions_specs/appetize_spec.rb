@@ -72,7 +72,7 @@ describe Fastlane do
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_API_HOST]).to eql('api.appetize.io')
       end
 
-      it "works with custom API URL" do
+      it "works with custom API host" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             appetize({
