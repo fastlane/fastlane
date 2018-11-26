@@ -19,22 +19,23 @@ module Match
       attr_accessor :gc_storage
 
       # Append Google Cloud specific options to `Match::Options`
-      # The `optional: false` is a little hacky, as it's being set by
-      # `match/runner.rb` depending on the selected storage type
       Match::Options.append_option(
         FastlaneCore::ConfigItem.new(
           key: :google_cloud_bucket_name,
           env_name: "MATCH_GOOGLE_CLOUD_BUCKET_NAME",
           description: "Name of the Google Cloud Storage bucket to use",
-          optional: false
+          optional: true
         )
       )
       Match::Options.append_option(
         FastlaneCore::ConfigItem.new(
           key: :google_cloud_keys_file,
           env_name: "MATCH_GOOGLE_CLOUD_KEYS_FILE",
-          description: "Path to the `keys.json` file",
-          optional: false
+          description: "Path to the `gc_keys.json` file",
+          optional: true,
+          verify_block: proc do |value|
+            UI.user_error!("Could not find keys file at path '#{File.expand_path(value)}'") unless File.exist?(value)
+          end
         )
       )
 
@@ -42,20 +43,28 @@ module Match
         return self.new(
           type: params[:type].to_s,
           platform: params[:platform].to_s,
-          google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s
+          google_cloud_bucket_name: params[:google_cloud_bucket_name],
+          google_cloud_keys_file: params[:google_cloud_keys_file]
         )
       end
 
       def initialize(type: nil,
                      platform: nil,
-                     google_cloud_bucket_name: nil)
+                     google_cloud_bucket_name: nil,
+                     google_cloud_keys_file: nil)
         self.type = type if type
         self.platform = platform if platform
         self.bucket_name = google_cloud_bucket_name
 
+        keys_file_content = JSON.parse(File.read(google_cloud_keys_file))
+        project_id = keys_file_content["project_id"]
+        if project_id.to_s.length == 0
+          UI.user_error!("Provided keys file on path #{File.expand_path(google_cloud_keys_file)} doesn't include required value for `project_id`")
+        end
+
         self.gc_storage = Google::Cloud::Storage.new(
-          project_id: "fastlane-kms-testing",
-          credentials: "./keys.json"
+          credentials: google_cloud_keys_file,
+          project_id: project_id
         )
       end
 
@@ -136,6 +145,15 @@ module Match
       private
 
       def bucket
+        if self.bucket_name.to_s.length == 0
+          # Have a nice selection of the available buckets here
+          # This happens deeper down in the stack, as it requires
+          # us to already be authenticated with Google Cloud
+          available_bucket_identifiers = self.gc_storage.buckets.collect(&:id)
+          self.bucket_name = UI.select("What Google Cloud Storage bucket do you want to use?", available_bucket_identifiers)
+        end
+        # TODO: `google_cloud_bucket_name` isn't actually assigned after selection
+
         @_bucket ||= self.gc_storage.bucket(self.bucket_name)
 
         if @_bucket.nil?

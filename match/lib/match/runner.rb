@@ -36,6 +36,7 @@ module Match
         type: params[:type].to_s,
         platform: params[:platform].to_s,
         google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s
+        # TODO: add second one also
       })
       storage.download
 
@@ -113,10 +114,7 @@ module Match
     # Be smart about optional values here
     # Depending on the storage mode, different vlaues are required
     def update_optional_values_depending_on_storage_type
-      if params[:storage_mode] == "git"
-        params.option_for_key(:google_cloud_bucket_name).optional = true
-        params.option_for_key(:google_cloud_keys_file).optional = true
-      elsif params[:storage_mode] == "google_cloud"
+      if params[:storage_mode] != "git"
         params.option_for_key(:git_url).optional = true
       end
     end
