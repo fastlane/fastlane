@@ -27,6 +27,7 @@ module Match
         git_url: params[:git_url],
         working_directory: storage.working_directory
       })
+      # TODO: for non git-based encryption show nice error message, as you can't change password
       encryption.decrypt_files
 
       encryption.clear_password

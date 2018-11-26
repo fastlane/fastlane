@@ -11,7 +11,7 @@ module Match
   end
 
   def self.storage_modes
-    return %w(git)
+    return %w(git google_cloud)
   end
 
   def self.profile_type_sym(type)

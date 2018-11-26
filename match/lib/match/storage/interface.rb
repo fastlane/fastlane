@@ -79,7 +79,10 @@ module Match
 
       # Call this method to reset any changes made locally to the files
       def clear_changes
-        not_implemented(__method__)
+        return unless @working_directory
+
+        FileUtils.rm_rf(self.working_directory)
+        self.working_directory = nil
       end
     end
   end

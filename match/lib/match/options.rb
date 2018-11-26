@@ -29,6 +29,11 @@ module Match
                                          UI.user_error!("Unsupported environment #{value}, must be in #{Match.environments.join(', ')}")
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :google_cloud_bucket_name,
+                                     env_name: "MATCH_GOOGLE_CLOUD_BUCKET_NAME",
+                                     description: "Name of the Google Cloud Storage bucket to use",
+                                     optional: false,
+                                     short_option: "-x"),
         FastlaneCore::ConfigItem.new(key: :storage_mode,
                                      env_name: "MATCH_STORAGE_MODE",
                                      description: "Define where you want to store your certificates",

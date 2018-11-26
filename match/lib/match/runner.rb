@@ -22,6 +22,15 @@ module Match
       FastlaneCore::PrintTable.print_values(config: params,
                                              title: "Summary for match #{Fastlane::VERSION}")
 
+      # Be smart about optional values here
+      # Depending on the storage mode, different vlaues are required
+
+      if params[:storage_mode] == "git"
+        params.option_for_key(:google_cloud_bucket_name).optional = true
+      elsif params[:storage_mode] == "google_cloud"
+        params.option_for_key(:git_url).optional = true
+      end
+
       # Choose the right storage and encryption implementations
       storage = Storage.for_mode(params[:storage_mode], {
         git_url: params[:git_url],
@@ -32,7 +41,8 @@ module Match
         git_user_email: params[:git_user_email],
         clone_branch_directly: params[:clone_branch_directly],
         type: params[:type].to_s,
-        platform: params[:platform].to_s
+        platform: params[:platform].to_s,
+        google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s
       })
       storage.download
 
@@ -41,7 +51,7 @@ module Match
         git_url: params[:git_url],
         working_directory: storage.working_directory
       })
-      encryption.decrypt_files
+      encryption.decrypt_files if encryption
 
       unless params[:readonly]
         self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name])
@@ -87,7 +97,7 @@ module Match
           return if `git status`.include?("nothing to commit")
         end
 
-        encryption.encrypt_files
+        encryption.encrypt_files if encryption
         storage.save_changes!(files_to_commit: self.files_to_commit)
       end
 

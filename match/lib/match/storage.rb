@@ -1,5 +1,6 @@
 require_relative 'storage/interface'
 require_relative 'storage/git_storage'
+require_relative 'storage/google_cloud_storage'
 
 module Match
   module Storage
@@ -8,6 +9,9 @@ module Match
         @backends ||= {
           "git" => lambda { |params|
             return Storage::GitStorage.configure(params)
+          },
+          "google_cloud" => lambda { |params|
+            return Storage::GoogleCloudStorage.configure(params)
           }
         }
       end

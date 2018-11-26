@@ -144,7 +144,7 @@ module Match
       rescue => error
         fallback_hash_algorithm = "SHA256"
         if hash_algorithm != fallback_hash_algorithm
-          decrypt_specific_file(path, password, fallback_hash_algorithm)
+          decrypt_specific_file(path: path, password: password, hash_algorithm: fallback_hash_algorithm)
         else
           UI.error(error.to_s)
           UI.crash!("Error decrypting '#{path}'")
