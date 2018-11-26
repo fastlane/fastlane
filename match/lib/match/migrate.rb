@@ -7,7 +7,7 @@ module Match
       params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
       params.load_configuration_file("Matchfile")
 
-      UI.user_error!("fastlane match migrate doesn't work in `readonly` mode") if params[:readonly]
+      ensure_parameters_are_valid(params)
 
       return unless UI.confirm("Right now, the migration tool only supports migrating from the git based storage to Google Cloud Storage. Sounds good?")
 
@@ -65,6 +65,16 @@ module Match
       UI.command_output("\t\tgoogle_cloud_bucket_name \"#{params[:google_cloud_bucket_name]}\"")
       UI.message("")
       UI.success("You can also remove the `git_url`, as well as any other git related configurations from your Fastfile and Matchfile")
+    end
+
+    def ensure_parameters_are_valid(params)
+      if params[:readonly]
+        UI.user_error!("`fastlane match migrate` doesn't work in `readonly` mode")
+      end
+
+      if params[:storage_mode] != "git"
+        UI.user_error!("`fastlane match migrate` only allows migration from `git` to `google_cloud` right now, looks like your currently selected `storage_mode` is '#{params[:storage_mode]}'")
+      end
     end
   end
 end
