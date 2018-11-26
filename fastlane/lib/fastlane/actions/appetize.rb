@@ -172,7 +172,7 @@ module Fastlane
         [
           'appetize(
             path: "./MyApp.zip",
-            api_host: "company.appetize.io" # only needed for enterprise hosted solution
+            api_host: "company.appetize.io", # only needed for enterprise hosted solution
             api_token: "yourapitoken", # get it from https://appetize.io/docs#request-api-token
             public_key: "your_public_key" # get it from https://appetize.io/dashboard
           )'
