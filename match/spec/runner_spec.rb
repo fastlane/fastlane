@@ -34,7 +34,8 @@ describe Match do
         git_user_email: nil,
         clone_branch_directly: false,
         type: config[:type],
-        platform: config[:platform]
+        platform: config[:platform],
+        google_cloud_bucket_name: ""
       ).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download).and_return(nil)
@@ -97,7 +98,8 @@ describe Match do
         git_user_email: nil,
         clone_branch_directly: false,
         type: config[:type],
-        platform: config[:platform]
+        platform: config[:platform],
+        google_cloud_bucket_name: ""
       ).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download).and_return(nil)
