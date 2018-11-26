@@ -376,7 +376,7 @@ module Deliver
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :ignore_language_directory_validation,
                                      env_name: "DELIVER_IGNORE_LANGUAGE_DIRECTORY_VALIDATION",
-                                     description: "Ignore errors when invalid languages are found in metadata and screeenshot directories",
+                                     description: "Ignore errors when invalid languages are found in metadata and screenshot directories",
                                      default_value: false,
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :precheck_include_in_app_purchases,

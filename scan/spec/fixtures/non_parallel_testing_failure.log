@@ -1,0 +1,90 @@
+Test Suite 'All tests' started at 2018-11-04 10:28:22.431
+Test Suite 'TestingTestTests.xctest' started at 2018-11-04 10:28:22.432
+Test Suite 'TestingTestTests' started at 2018-11-04 10:28:22.432
+Test Case '-[TestingTestTests.TestingTestTests testA]' started.
+Test Case '-[TestingTestTests.TestingTestTests testA]' passed (0.001 seconds).
+Test Case '-[TestingTestTests.TestingTestTests testB]' started.
+Test Case '-[TestingTestTests.TestingTestTests testB]' passed (0.000 seconds).
+Test Case '-[TestingTestTests.TestingTestTests testC]' started.
+Test Case '-[TestingTestTests.TestingTestTests testC]' passed (0.000 seconds).
+Test Case '-[TestingTestTests.TestingTestTests testD]' started.
+Test Case '-[TestingTestTests.TestingTestTests testD]' passed (0.000 seconds).
+Test Case '-[TestingTestTests.TestingTestTests testE]' started.
+Test Case '-[TestingTestTests.TestingTestTests testE]' passed (0.000 seconds).
+Test Case '-[TestingTestTests.TestingTestTests testF]' started.
+Test Case '-[TestingTestTests.TestingTestTests testF]' passed (0.000 seconds).
+Test Case '-[TestingTestTests.TestingTestTests testFailure]' started.
+Fatal error: Unexpectedly found nil while unwrapping an Optional value
+2018-11-04 10:28:22.440644-0800 TestingTest[28750:2314289] Fatal error: Unexpectedly found nil while unwrapping an Optional value
+2018-11-04 10:28:37.684 xcodebuild[28288:2312297]  IDETestOperationsObserverDebug: Writing diagnostic log for test session to:
+/Users/basher/Library/Developer/Xcode/DerivedData/TestingTest-gdgaczvhjqcyjkdnismgbepkohom/Logs/Test/Run-TestingTest-2018.11.04_10-28-04--0800.xcresult/2_Test/Diagnostics/TestingTestTests-83EB5B33-3051-4535-A51E-7850989104A1/TestingTestTests-D47F259D-E153-4666-8AE8-BCC1CC2C93AC/Session-TestingTestTests-2018-11-04_102837-HHL6RY.log
+2018-11-04 10:28:37.684 xcodebuild[28288:2312282] [MT] IDETestOperationsObserverDebug: (A82144CB-A0CC-4563-953C-8937FD395D8D) Beginning test session TestingTestTests-A82144CB-A0CC-4563-953C-8937FD395D8D at 2018-11-04 10:28:37.684 with Xcode 10B61 on target <DVTiPhoneSimulator: 0x7fa92eac65d0> {
+		SimDevice: iPad Air 2 (8CB426F7-7F07-48E8-B7B8-7A7F21E0A618, iOS 12.1, Booted)
+} (12.1 (16B91))
+2018-11-04 10:28:40.745379-0800 TestingTest[28769:2314916] libMobileGestalt MobileGestalt.c:890: MGIsDeviceOneOfType is not supported on this platform.
+
+Restarting after unexpected exit or crash in TestingTestTests/testFailure(); summary will include totals from previous launches.
+
+Test Suite 'Selected tests' started at 2018-11-04 10:28:40.939
+Test Suite 'TestingTestTests.xctest' started at 2018-11-04 10:28:40.940
+Test Suite 'TestingTestTests' started at 2018-11-04 10:28:40.940
+Test Case '-[TestingTestTests.TestingTestTests testG]' started.
+Test Case '-[TestingTestTests.TestingTestTests testG]' passed (0.001 seconds).
+Test Case '-[TestingTestTests.TestingTestTests testH]' started.
+Test Case '-[TestingTestTests.TestingTestTests testH]' passed (0.001 seconds).
+Test Suite 'TestingTestTests' failed at 2018-11-04 10:28:40.943.
+	 Executed 9 tests, with 1 failure (0 unexpected) in 0.002 (0.003) seconds
+Test Suite 'TestingTestTests.xctest' failed at 2018-11-04 10:28:40.944.
+	 Executed 9 tests, with 1 failure (0 unexpected) in 0.002 (0.004) seconds
+Test Suite 'Selected tests' failed at 2018-11-04 10:28:40.945.
+	 Executed 9 tests, with 1 failure (0 unexpected) in 0.002 (0.006) seconds
+
+
+Test session results and logs:
+	/Users/basher/Library/Developer/Xcode/DerivedData/TestingTest-gdgaczvhjqcyjkdnismgbepkohom/Logs/Test/Run-TestingTest-2018.11.04_10-28-04--0800.xcresult
+
+2018-11-04 10:28:41.222 xcodebuild[28288:2313256]  IDETestOperationsObserverDebug: Writing diagnostic log for test session to:
+/Users/basher/Library/Developer/Xcode/DerivedData/TestingTest-gdgaczvhjqcyjkdnismgbepkohom/Logs/Test/Run-TestingTest-2018.11.04_10-28-04--0800.xcresult/2_Test/Diagnostics/TestingTestTestsClone-DC884BA5-E8CA-437F-9E85-4388CDA39574/TestingTestTestsClone-28AC8B97-9869-4367-9767-4256883A8563/Session-TestingTestTestsClone-2018-11-04_102841-YBCI4E.log
+2018-11-04 10:28:41.222 xcodebuild[28288:2312282] [MT] IDETestOperationsObserverDebug: (56A4804A-8CB1-483E-8D55-9AC48553984B) Beginning test session TestingTestTestsClone-56A4804A-8CB1-483E-8D55-9AC48553984B at 2018-11-04 10:28:41.223 with Xcode 10B61 on target <DVTiPhoneSimulator: 0x7fa92eac65d0> {
+		SimDevice: iPad Air 2 (8CB426F7-7F07-48E8-B7B8-7A7F21E0A618, iOS 12.1, Booted)
+} (12.1 (16B91))
+2018-11-04 10:28:43.997956-0800 TestingTest[28773:2314975] libMobileGestalt MobileGestalt.c:890: MGIsDeviceOneOfType is not supported on this platform.
+Test Suite 'All tests' started at 2018-11-04 10:28:44.201
+Test Suite 'TestingTestTestsClone.xctest' started at 2018-11-04 10:28:44.202
+Test Suite 'TestingTestPassing' started at 2018-11-04 10:28:44.202
+Test Case '-[TestingTestTestsClone.TestingTestPassing testA]' started.
+Test Case '-[TestingTestTestsClone.TestingTestPassing testA]' passed (0.001 seconds).
+Test Case '-[TestingTestTestsClone.TestingTestPassing testB]' started.
+Test Case '-[TestingTestTestsClone.TestingTestPassing testB]' passed (0.001 seconds).
+Test Case '-[TestingTestTestsClone.TestingTestPassing testC]' started.
+Test Case '-[TestingTestTestsClone.TestingTestPassing testC]' passed (0.000 seconds).
+Test Case '-[TestingTestTestsClone.TestingTestPassing testD]' started.
+Test Case '-[TestingTestTestsClone.TestingTestPassing testD]' passed (0.001 seconds).
+Test Case '-[TestingTestTestsClone.TestingTestPassing testE]' started.
+Test Case '-[TestingTestTestsClone.TestingTestPassing testE]' passed (0.001 seconds).
+Test Case '-[TestingTestTestsClone.TestingTestPassing testF]' started.
+Test Case '-[TestingTestTestsClone.TestingTestPassing testF]' passed (0.001 seconds).
+Test Case '-[TestingTestTestsClone.TestingTestPassing testG]' started.
+Test Case '-[TestingTestTestsClone.TestingTestPassing testG]' passed (0.001 seconds).
+Test Case '-[TestingTestTestsClone.TestingTestPassing testH]' started.
+Test Case '-[TestingTestTestsClone.TestingTestPassing testH]' passed (0.001 seconds).
+Test Case '-[TestingTestTestsClone.TestingTestPassing testPass]' started.
+Test Case '-[TestingTestTestsClone.TestingTestPassing testPass]' passed (0.001 seconds).
+Test Suite 'TestingTestPassing' passed at 2018-11-04 10:28:44.213.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 0.006 (0.010) seconds
+Test Suite 'TestingTestTestsClone.xctest' passed at 2018-11-04 10:28:44.213.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 0.006 (0.011) seconds
+Test Suite 'All tests' passed at 2018-11-04 10:28:44.214.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 0.006 (0.013) seconds
+
+
+Test session results and logs:
+	/Users/basher/Library/Developer/Xcode/DerivedData/TestingTest-gdgaczvhjqcyjkdnismgbepkohom/Logs/Test/Run-TestingTest-2018.11.04_10-28-04--0800.xcresult
+
+2018-11-04 10:28:47.208 xcodebuild[28288:2312282] [MT] IDETestOperationsObserverDebug: 37.885 elapsed -- Testing started completed.
+2018-11-04 10:28:47.208 xcodebuild[28288:2312282] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2018-11-04 10:28:47.209 xcodebuild[28288:2312282] [MT] IDETestOperationsObserverDebug: 37.885 sec, +37.885 sec -- end
+Failing tests:
+	TestingTestTests.testFailure()
+** TEST FAILED **
+

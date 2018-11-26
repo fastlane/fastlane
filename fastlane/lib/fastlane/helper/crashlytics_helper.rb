@@ -69,19 +69,19 @@ module Fastlane
           if ENV['JAVA_HOME'].nil?
             command = ["java"]
           else
-            command = [Shellwords.escape(File.join(ENV['JAVA_HOME'], "/bin/java"))]
+            command = [File.join(ENV['JAVA_HOME'], "/bin/java").shellescape]
           end
           command << "-jar #{File.expand_path(params[:crashlytics_path])}"
           command << "-androidRes ."
           command << "-apiKey #{params[:api_token]}"
           command << "-apiSecret #{params[:build_secret]}"
-          command << "-uploadDist '#{File.expand_path(params[:apk_path])}'"
-          command << "-androidManifest '#{xml.path}'"
+          command << "-uploadDist #{File.expand_path(params[:apk_path]).shellescape}"
+          command << "-androidManifest #{xml.path.shellescape}"
 
           # Optional
-          command << "-betaDistributionEmails '#{params[:emails]}'" if params[:emails]
-          command << "-betaDistributionReleaseNotesFilePath '#{File.expand_path(params[:notes_path])}'" if params[:notes_path]
-          command << "-betaDistributionGroupAliases '#{params[:groups]}'" if params[:groups]
+          command << "-betaDistributionEmails #{params[:emails].shellescape}" if params[:emails]
+          command << "-betaDistributionReleaseNotesFilePath #{File.expand_path(params[:notes_path]).shellescape}" if params[:notes_path]
+          command << "-betaDistributionGroupAliases #{params[:groups].shellescape}" if params[:groups]
           command << "-betaDistributionNotifications #{(params[:notifications] ? 'true' : 'false')}"
 
           return command

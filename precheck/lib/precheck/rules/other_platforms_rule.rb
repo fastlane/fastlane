@@ -19,7 +19,10 @@ module Precheck
     end
 
     def allowed_lowercased_words
-      ["google analytics"]
+      [
+        "google analytics",
+        "google drive"
+      ]
     end
 
     def lowercased_words_to_look_for

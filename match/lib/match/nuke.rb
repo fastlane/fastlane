@@ -192,6 +192,8 @@ module Match
         delete_files!
       end
 
+      self.encryption.encrypt_files
+
       # Now we need to commit and push all this too
       message = ["[fastlane]", "Nuked", "files", "for", type.to_s].join(" ")
       self.storage.save_changes!(files_to_commit: [], custom_message: message)
