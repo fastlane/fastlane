@@ -18,6 +18,26 @@ module Match
       # Managed values
       attr_accessor :gc_storage
 
+      # Append Google Cloud specific options to `Match::Options`
+      # The `optional: false` is a little hacky, as it's being set by
+      # `match/runner.rb` depending on the selected storage type
+      Match::Options.append_option(
+        FastlaneCore::ConfigItem.new(
+          key: :google_cloud_bucket_name,
+          env_name: "MATCH_GOOGLE_CLOUD_BUCKET_NAME",
+          description: "Name of the Google Cloud Storage bucket to use",
+          optional: false
+        )
+      )
+      Match::Options.append_option(
+        FastlaneCore::ConfigItem.new(
+          key: :google_cloud_keys_file,
+          env_name: "MATCH_GOOGLE_CLOUD_KEYS_FILE",
+          description: "Path to the `keys.json` file",
+          optional: false
+        )
+      )
+
       def self.configure(params)
         return self.new(
           type: params[:type].to_s,

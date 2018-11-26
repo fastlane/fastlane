@@ -27,6 +27,7 @@ module Match
 
       if params[:storage_mode] == "git"
         params.option_for_key(:google_cloud_bucket_name).optional = true
+        params.option_for_key(:google_cloud_keys_file).optional = true
       elsif params[:storage_mode] == "google_cloud"
         params.option_for_key(:git_url).optional = true
       end
