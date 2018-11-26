@@ -201,7 +201,7 @@ module Fastlane
     end
 
     def generated_fastfile_id(id)
-      UI.important("The `generated_fastfile_id` action was deprected, you can remove the line from your Fastfile")
+      UI.important("The `generated_fastfile_id` action was deprecated, you can remove the line from your `Fastfile`")
     end
 
     def import(path = nil)
