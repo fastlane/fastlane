@@ -179,8 +179,6 @@ module Match
         end
       end
 
-      private
-
       def git_push(commands: [], commit_message: nil)
         commit_message ||= generate_commit_message
         commands << "git commit -m #{commit_message.shellescape}"

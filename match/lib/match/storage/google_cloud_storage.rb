@@ -84,8 +84,6 @@ module Match
         # the `custom_message` will be ignored by the GCS implementation
         # TODO: migrate the new header and checks over to git_storage
         Dir.chdir(File.expand_path(self.working_directory)) do
-          commands = []
-
           if files_to_commit.count > 0 # everything that isn't `match nuke`
             UI.user_error!("You can't provide both `files_to_delete` and `files_to_commit` right now") if files_to_delete.count > 0
 
