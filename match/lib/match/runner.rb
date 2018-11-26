@@ -22,15 +22,7 @@ module Match
       FastlaneCore::PrintTable.print_values(config: params,
                                              title: "Summary for match #{Fastlane::VERSION}")
 
-      # Be smart about optional values here
-      # Depending on the storage mode, different vlaues are required
-
-      if params[:storage_mode] == "git"
-        params.option_for_key(:google_cloud_bucket_name).optional = true
-        params.option_for_key(:google_cloud_keys_file).optional = true
-      elsif params[:storage_mode] == "google_cloud"
-        params.option_for_key(:git_url).optional = true
-      end
+      update_optional_values_depending_on_storage_type
 
       # Choose the right storage and encryption implementations
       storage = Storage.for_mode(params[:storage_mode], {
@@ -116,6 +108,17 @@ module Match
       raise ex
     ensure
       storage.clear_changes if storage
+    end
+
+    # Be smart about optional values here
+    # Depending on the storage mode, different vlaues are required
+    def update_optional_values_depending_on_storage_type
+      if params[:storage_mode] == "git"
+        params.option_for_key(:google_cloud_bucket_name).optional = true
+        params.option_for_key(:google_cloud_keys_file).optional = true
+      elsif params[:storage_mode] == "google_cloud"
+        params.option_for_key(:git_url).optional = true
+      end
     end
 
     def fetch_certificate(params: nil, working_directory: nil)
