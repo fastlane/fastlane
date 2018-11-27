@@ -5,7 +5,7 @@ module Match
   class Migrate
     def migrate(args, options)
       params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
-      params.load_configuration_file("Matchfile")
+      loaded_matchfile = params.load_configuration_file("Matchfile")
 
       ensure_parameters_are_valid(params)
       ask_for_missing_user_inputs(params)
@@ -61,12 +61,23 @@ module Match
       google_cloud_storage.save_changes!(files_to_commit: files_to_commit)
 
       UI.success("Successfully migrated your code signing certificates and provisioning profiles to Google Cloud Storage")
-      UI.success("Make sure to update your configuration to specify the `storage_mode`, as well as the bucket to use:")
+      UI.success("Make sure to update your configuration to specify the `storage_mode`, as well as the bucket to use.")
       UI.message("")
-      UI.command_output("\t\tstorage_mode \"google_cloud\"")
-      UI.command_output("\t\tgoogle_cloud_bucket_name \"#{params[:google_cloud_bucket_name]}\"")
+      if loaded_matchfile
+        UI.message("Update your Matchfile at path '#{loaded_matchfile.configfile_path}':")
+        UI.message("")
+        UI.command_output("\t\tstorage_mode \"google_cloud\"")
+        UI.command_output("\t\tgoogle_cloud_bucket_name \"#{google_cloud_storage.bucket_name}\"")
+      else
+        UI.message("Update your Fastfile `match` call to include")
+        UI.message("")
+        UI.command_output("\t\tstorage_mode: \"google_cloud\",")
+        UI.command_output("\t\tgoogle_cloud_bucket_name: \"#{google_cloud_storage.bucket_name}\",")
+      end
       UI.message("")
       UI.success("You can also remove the `git_url`, as well as any other git related configurations from your Fastfile and Matchfile")
+      UI.message("")
+      UI.input("Please make sure to read the above and confirm with enter")
     end
 
     def ensure_parameters_are_valid(params)
