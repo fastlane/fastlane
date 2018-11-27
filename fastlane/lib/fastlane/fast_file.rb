@@ -56,7 +56,8 @@ module Fastlane
           eval(data, parsing_binding, relative_path) # using eval is ok for this case
           # rubocop:enable Security/Eval
         rescue SyntaxError => ex
-          if match = ex.to_s.match(/#{Regexp.escape(relative_path)}:(\d+)/)
+          match = ex.to_s.match(/#{Regexp.escape(relative_path)}:(\d+)/)
+          if match
             line = match[1]
             UI.content_error(data, line)
             UI.user_error!("Syntax error in your Fastfile on line #{line}: #{ex}")
