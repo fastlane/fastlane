@@ -55,17 +55,30 @@ module Match
         self.type = type if type
         self.platform = platform if platform
 
+        # Extract the Project ID from the `JSON` file
+        # so the user doesn't have to provide it manually
         keys_file_content = JSON.parse(File.read(google_cloud_keys_file))
         project_id = keys_file_content["project_id"]
         if project_id.to_s.length == 0
           UI.user_error!("Provided keys file on path #{File.expand_path(google_cloud_keys_file)} doesn't include required value for `project_id`")
         end
 
-        self.gc_storage = Google::Cloud::Storage.new(
-          credentials: google_cloud_keys_file,
-          project_id: project_id
-        )
+        # Create the Google Cloud Storage client
+        # If the JSON auth file is invalid, this line will
+        # raise an exception
+        begin
+          self.gc_storage = Google::Cloud::Storage.new(
+            credentials: google_cloud_keys_file,
+            project_id: project_id
+          )
+        rescue => ex
+          UI.error(ex)
+          UI.verbose(ex.backtrace.join("\n"))
+          UI.user_error!("Couldn't log into your Google Cloud account using the provided JSON file at path '#{File.expand_path(google_cloud_keys_file)}'")
+        end
 
+        # In case the user didn't provide a bucket name yet, they will
+        # be asked to provide one here
         if self.bucket_name.to_s.length == 0
           # Have a nice selection of the available buckets here
           # This can only happen after we went through auth of Google Cloud
