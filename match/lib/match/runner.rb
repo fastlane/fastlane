@@ -166,7 +166,7 @@ module Match
 
       if params[:force_for_new_devices] && !params[:readonly]
         if prov_type != :appstore
-          params[:force] = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_s) unless params[:force]
+          params[:force] = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym) unless params[:force]
         else
           # App Store provisioning profiles don't contain device identifiers and
           # thus shouldn't be renewed if the device count has changed.
@@ -241,11 +241,11 @@ module Match
 
         portal_device_count =
           case platform
-          when :ios.to_s
+          when :ios
             Spaceship.device.all_ios_profile_devices.count
-          when :tvos.to_s
+          when :tvos
             Spaceship.device.all_apple_tvs.count
-          when :mac.to_s
+          when :mac
             Spaceship.device.all_macs.count
           else
             Spaceship.device.all.count
