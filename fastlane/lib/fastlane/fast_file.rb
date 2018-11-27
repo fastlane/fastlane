@@ -201,9 +201,7 @@ module Fastlane
     end
 
     def generated_fastfile_id(id)
-      # This value helps us track success/failure metrics for Fastfiles we
-      # generate as part of an automated process.
-      ENV['GENERATED_FASTFILE_ID'] = id
+      UI.important("The `generated_fastfile_id` action was deprecated, you can remove the line from your `Fastfile`")
     end
 
     def import(path = nil)
