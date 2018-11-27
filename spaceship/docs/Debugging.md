@@ -26,7 +26,7 @@ If your proxy is listening on another port or address, you can use `SPACESHIP_PR
 
 - If you have timeout problems, you can use `SPACESHIP_TIMEOUT` to set any timeout (in seconds)
 - If your session cookie is saved at a different path, use `SPACESHIP_COOKIE_PATH` to specify it
-- [`SPACESHIP_AVOID_XCODE_API`](https://github.com/fastlane/fastlane/pull/8359)
+- Set [`SPACESHIP_AVOID_XCODE_API`](https://github.com/fastlane/fastlane/pull/8359) to use the Apple Developer Portal API instead of the Xcode API. (You probably want the Xcode API unless you have a reason not to.)
 
 ## Further instructions
 
