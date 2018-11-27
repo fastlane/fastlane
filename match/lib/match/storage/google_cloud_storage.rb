@@ -54,7 +54,6 @@ module Match
                      google_cloud_keys_file: nil)
         self.type = type if type
         self.platform = platform if platform
-        self.bucket_name = google_cloud_bucket_name
 
         keys_file_content = JSON.parse(File.read(google_cloud_keys_file))
         project_id = keys_file_content["project_id"]
@@ -66,6 +65,13 @@ module Match
           credentials: google_cloud_keys_file,
           project_id: project_id
         )
+
+        if self.bucket_name.to_s.length == 0
+          # Have a nice selection of the available buckets here
+          # This can only happen after we went through auth of Google Cloud
+          available_bucket_identifiers = self.gc_storage.buckets.collect(&:id)
+          self.bucket_name = UI.select("What Google Cloud Storage bucket do you want to use?", available_bucket_identifiers)
+        end
       end
 
       def download
@@ -145,15 +151,6 @@ module Match
       private
 
       def bucket
-        if self.bucket_name.to_s.length == 0
-          # Have a nice selection of the available buckets here
-          # This happens deeper down in the stack, as it requires
-          # us to already be authenticated with Google Cloud
-          available_bucket_identifiers = self.gc_storage.buckets.collect(&:id)
-          self.bucket_name = UI.select("What Google Cloud Storage bucket do you want to use?", available_bucket_identifiers)
-        end
-        # TODO: `google_cloud_bucket_name` isn't actually assigned after selection
-
         @_bucket ||= self.gc_storage.bucket(self.bucket_name)
 
         if @_bucket.nil?
