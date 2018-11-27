@@ -22,7 +22,7 @@ module Match
       FastlaneCore::PrintTable.print_values(config: params,
                                              title: "Summary for match #{Fastlane::VERSION}")
 
-      update_optional_values_depending_on_storage_type
+      update_optional_values_depending_on_storage_type(params)
 
       # Choose the right storage and encryption implementations
       storage = Storage.for_mode(params[:storage_mode], {
@@ -113,7 +113,7 @@ module Match
 
     # Be smart about optional values here
     # Depending on the storage mode, different vlaues are required
-    def update_optional_values_depending_on_storage_type
+    def update_optional_values_depending_on_storage_type(params)
       if params[:storage_mode] != "git"
         params.option_for_key(:git_url).optional = true
       end
