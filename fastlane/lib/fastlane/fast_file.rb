@@ -62,7 +62,7 @@ module Fastlane
             UI.content_error(data, line)
             UI.user_error!("Syntax error in your Fastfile on line #{line}: #{ex}")
           else
-            UI.user_error!("Syntax error in your Fastfile on unknown line: #{ex}")
+            UI.user_error!("Syntax error in your Fastfile: #{ex}")
           end
         end
       end
