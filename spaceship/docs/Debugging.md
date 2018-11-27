@@ -4,7 +4,7 @@ If you have a problem with `spaceship` or its usage in _fastlane_, there are mul
 
 ## Logging
 
-`spaceship` logs all requests and their responses to logfiles in `/tmp`. They follow the naming pattern `spaceship[time]_[pid].log` andinclude timestamps, incoming/outgoing, request method, request params and response body.  
+`spaceship` logs all requests and their responses to logfiles in `/tmp`. They follow the naming pattern `spaceship[time]_[pid].log` and include timestamps, incoming/outgoing, request method, request params and response body.  
   
 Example logfile:
 
