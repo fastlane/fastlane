@@ -79,11 +79,23 @@ module Match
 
         # In case the user didn't provide a bucket name yet, they will
         # be asked to provide one here
-        if self.bucket_name.to_s.length == 0
+        while self.bucket_name.to_s.length == 0
           # Have a nice selection of the available buckets here
           # This can only happen after we went through auth of Google Cloud
           available_bucket_identifiers = self.gc_storage.buckets.collect(&:id)
-          self.bucket_name = UI.select("What Google Cloud Storage bucket do you want to use?", available_bucket_identifiers)
+          if available_bucket_identifiers.count > 0
+            self.bucket_name = UI.select("What Google Cloud Storage bucket do you want to use?", available_bucket_identifiers)
+          else
+            UI.error("Looks like your Google Cloud account for the project ID '#{project_id}' doesn't")
+            UI.error("have any available storage buckets yet. Please visit the following URL")
+            UI.message("")
+            UI.message("\t\thttps://console.cloud.google.com/storage/browser".cyan)
+            UI.message("")
+            UI.message("and make sure to have the right project selected on top of the page")
+            UI.message("click on " + "Create Bucket".cyan + ", choose a name and confirm")
+            UI.message("")
+            UI.input("Once you're finished, please confirm with enter")
+          end
         end
       end
 
