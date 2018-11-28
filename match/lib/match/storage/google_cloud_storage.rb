@@ -107,18 +107,17 @@ module Match
           download_path = File.join(self.working_directory, file_path)
 
           FileUtils.mkdir_p(File.expand_path("..", download_path))
-          UI.verbose("Downloading file from Google Cloud Storage '#{file_path}'")
+          UI.verbose("Downloading file from Google Cloud Storage '#{file_path}' on bucket #{self.bucket_name}")
           current_file.download(download_path)
         end
         UI.verbose("Successfully downloaded files from GCS to #{self.working_directory}")
       end
 
       def delete_files(files_to_delete: [], custom_message: nil)
-        require 'pry'; binding.pry
-        delete_files.each do |current_file|
+        files_to_delete.each do |current_file|
           target_path = current_file.gsub(self.working_directory + "/", "")
           file = bucket.file(target_path)
-          UI.message("Deleting '#{target_path}' from Google Cloud Storage...")
+          UI.message("Deleting '#{target_path}' from Google Cloud Storage bucket '#{self.bucket_name}'...")
           file.delete
         end
         finished_pushing_message

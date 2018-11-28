@@ -35,8 +35,8 @@ module Match
         clone_branch_directly: params[:clone_branch_directly],
         type: params[:type].to_s,
         platform: params[:platform].to_s,
-        google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s
-        # TODO: add second one also
+        google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
+        google_cloud_keys_file: params[:google_cloud_keys_file].to_s
       })
       storage.download
 

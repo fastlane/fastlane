@@ -25,6 +25,8 @@ module Match
       self.params = params
       self.type = type
 
+      update_optional_values_depending_on_storage_type(params)
+
       self.storage = Storage.for_mode(params[:storage_mode], {
         git_url: params[:git_url],
         shallow_clone: params[:shallow_clone],
@@ -32,7 +34,9 @@ module Match
         git_branch: params[:git_branch],
         git_full_name: params[:git_full_name],
         git_user_email: params[:git_user_email],
-        clone_branch_directly: params[:clone_branch_directly]
+        clone_branch_directly: params[:clone_branch_directly],
+        google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
+        google_cloud_keys_file: params[:google_cloud_keys_file].to_s
       })
       self.storage.download
 
@@ -73,6 +77,14 @@ module Match
         end
       else
         UI.success("No relevant certificates or provisioning profiles found, nothing to nuke here :)")
+      end
+    end
+
+    # Be smart about optional values here
+    # Depending on the storage mode, different vlaues are required
+    def update_optional_values_depending_on_storage_type(params)
+      if params[:storage_mode] != "git"
+        params.option_for_key(:git_url).optional = true
       end
     end
 
