@@ -1,10 +1,10 @@
-# Debugging `spaceship`
+# Debugging _spaceship_
 
-If you have a problem with `spaceship` or its usage in _fastlane_, there are multiple way to debug what is going on:
+If you have a problem with _spaceship_ or its usage in _fastlane_, there are multiple way to debug what is going on:
 
 ## Logging
 
-`spaceship` logs all requests and their responses to logfiles in `/tmp`. They follow the naming pattern `spaceship[time]_[pid].log` and include timestamps, incoming/outgoing, request method, request params and response body.  
+_spaceship_ logs all requests and their responses to logfiles in `/tmp`. They follow the naming pattern `spaceship[time]_[pid].log` and include timestamps, incoming/outgoing, request method, request params and response body.  
   
 Example logfile:
 
@@ -18,7 +18,7 @@ Example logfile:
 
 ## Proxy Support
 
-`spaceship` also comes with support for proxies (e.g. [Charles Web Proxy](https://www.charlesproxy.com/), free endless 30 minute trial available, available for all platforms) that listen on `https://127.0.0.1:8888`. Just set the environment variable `SPACESHIP_DEBUG` to activate.  
+_spaceship_ also comes with support for proxies (e.g. [Charles Web Proxy](https://www.charlesproxy.com/), free endless 30 minute trial available, available for all platforms) that listen on `https://127.0.0.1:8888`. Just set the environment variable `SPACESHIP_DEBUG` to activate.  
 
 If your proxy is listening on another port or address, you can use `SPACESHIP_PROXY` to set this. Use `SPACESHIP_PROXY_SSL_VERIFY_NONE` to additionally disable certificate checking.
 
