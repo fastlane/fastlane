@@ -4,6 +4,7 @@ module Fastlane
       APPETIZE_PUBLIC_KEY = :APPETIZE_PUBLIC_KEY
       APPETIZE_APP_URL = :APPETIZE_APP_URL
       APPETIZE_MANAGE_URL = :APPETIZE_MANAGE_URL
+      APPETIZE_API_HOST = :APPETIZE_API_HOST
     end
 
     class AppetizeAction < Action
@@ -54,7 +55,8 @@ module Fastlane
       end
 
       def self.appetize_url(options)
-        "https://api.appetize.io/v1/apps/#{options[:public_key]}"
+        Actions.lane_context[SharedValues::APPETIZE_API_HOST] = options[:api_host]
+        "https://#{options[:api_host]}/v1/apps/#{options[:public_key]}"
       end
       private_class_method :appetize_url
 
@@ -100,6 +102,14 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :api_host,
+                                       env_name: "APPETIZE_API_HOST",
+                                       description: "Appetize API host",
+                                       is_string: true,
+                                       default_value: 'api.appetize.io',
+                                       verify_block: proc do |value|
+                                         UI.user_error!("API host should not contain the scheme e.g. `https`") if value.start_with?('https')
+                                       end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "APPETIZE_API_TOKEN",
                                        sensitive: true,
@@ -143,14 +153,15 @@ module Fastlane
 
       def self.output
         [
-          ['APPETIZE_PUBLIC_KEY', 'a public identifier for your app. Use this to update your app after it has been initially created'],
+          ['APPETIZE_API_HOST', 'Appetize API host.'],
+          ['APPETIZE_PUBLIC_KEY', 'a public identifier for your app. Use this to update your app after it has been initially created.'],
           ['APPETIZE_APP_URL', 'a page to test and share your app.'],
           ['APPETIZE_MANAGE_URL', 'a page to manage your app.']
         ]
       end
 
       def self.authors
-        ["klundberg", "giginet"]
+        ["klundberg", "giginet", "steprescott"]
       end
 
       def self.category
@@ -161,6 +172,12 @@ module Fastlane
         [
           'appetize(
             path: "./MyApp.zip",
+            api_token: "yourapitoken", # get it from https://appetize.io/docs#request-api-token
+            public_key: "your_public_key" # get it from https://appetize.io/dashboard
+          )',
+          'appetize(
+            path: "./MyApp.zip",
+            api_host: "company.appetize.io", # only needed for enterprise hosted solution
             api_token: "yourapitoken", # get it from https://appetize.io/docs#request-api-token
             public_key: "your_public_key" # get it from https://appetize.io/dashboard
           )'

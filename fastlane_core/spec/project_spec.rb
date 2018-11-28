@@ -507,14 +507,25 @@ describe FastlaneCore do
         expect(project.project_paths).to eq([File.expand_path("gym/lib")])
       end
 
-      it "works with workspaces" do
-        workspace_path = "gym/spec/fixtures/projects/cocoapods/Example.xcworkspace"
+      it "works with workspaces containing projects referenced relative by group" do
+        workspace_path = "fastlane_core/spec/fixtures/projects/project_paths/groups/FooBar.xcworkspace"
         project = FastlaneCore::Project.new({
           workspace: workspace_path
         })
 
         expect(project.project_paths).to eq([
-                                              File.expand_path(workspace_path.gsub("xcworkspace", "xcodeproj")) # this should point to the included Xcode project
+                                              File.expand_path(workspace_path.gsub("FooBar.xcworkspace", "FooBar/FooBar.xcodeproj"))
+                                            ])
+      end
+
+      it "works with workspaces containing projects referenced relative by workspace" do
+        workspace_path = "fastlane_core/spec/fixtures/projects/project_paths/containers/FooBar.xcworkspace"
+        project = FastlaneCore::Project.new({
+          workspace: workspace_path
+        })
+
+        expect(project.project_paths).to eq([
+                                              File.expand_path(workspace_path.gsub("FooBar.xcworkspace", "FooBar/FooBar.xcodeproj"))
                                             ])
       end
     end

@@ -39,11 +39,22 @@ module Scan
         }
       ]
       exit_status = 0
+
+      if Scan.config[:reinstall_app]
+        app_identifier = Scan.config[:app_identifier]
+        app_identifier ||= UI.input("App Identifier: ")
+
+        Scan.devices.each do |device|
+          FastlaneCore::Simulator.uninstall_app(app_identifier, device.name, device.udid)
+        end
+      end
+
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: true,
                                       print_command: true,
                                              prefix: prefix_hash,
                                             loading: "Loading...",
+                                    suppress_output: Scan.config[:suppress_xcode_output],
                                               error: proc do |error_output|
                                                 begin
                                                   exit_status = $?.exitstatus
@@ -80,6 +91,8 @@ module Scan
       copy_simulator_logs
 
       if result[:failures] > 0
+        open_report
+
         UI.test_failure!("Tests have failed")
       end
 
@@ -88,7 +101,10 @@ module Scan
       end
 
       zip_build_products
+      open_report
+    end
 
+    def open_report
       if !Helper.ci? && Scan.cache[:open_html_report_path]
         `open --hide '#{Scan.cache[:open_html_report_path]}'`
       end
@@ -122,9 +138,10 @@ module Scan
       # We'll have to regenerate from the xcodebuild log, like we did before version 2.34.0.
       UI.message("Generating test results. This may take a while for large projects.")
 
-      reporter_options_generator = XCPrettyReporterOptionsGenerator.new(false, [], [], "", false)
+      reporter_options_generator = XCPrettyReporterOptionsGenerator.new(false, [], [], "", false, nil)
       reporter_options = reporter_options_generator.generate_reporter_options
-      cmd = "cat #{@test_command_generator.xcodebuild_log_path.shellescape} | xcpretty #{reporter_options.join(' ')} &> /dev/null"
+      xcpretty_args_options = reporter_options_generator.generate_xcpretty_args_options
+      cmd = "cat #{@test_command_generator.xcodebuild_log_path.shellescape} | xcpretty #{reporter_options.join(' ')} #{xcpretty_args_options} &> /dev/null"
       system(cmd)
       File.read(Scan.cache[:temp_junit_report])
     end

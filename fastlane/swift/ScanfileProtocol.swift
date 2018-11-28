@@ -17,7 +17,9 @@ protocol ScanfileProtocol: class {
   var outputFiles: String? { get }
   var buildlogPath: String { get }
   var includeSimulatorLogs: Bool { get }
+  var suppressXcodeOutput: String? { get }
   var formatter: String? { get }
+  var xcprettyArgs: String? { get }
   var maxConcurrentSimulators: Int? { get }
   var disableConcurrentTesting: Bool { get }
   var testWithoutBuilding: Bool? { get }
@@ -41,6 +43,8 @@ protocol ScanfileProtocol: class {
   var slackOnlyOnFailure: Bool { get }
   var useClangReportName: Bool { get }
   var customReportFileName: String? { get }
+  var appIdentifier: String? { get }
+  var reinstallApp: Bool { get }
   var failBuild: Bool { get }
 }
 
@@ -63,7 +67,9 @@ extension ScanfileProtocol {
   var outputFiles: String? { return nil }
   var buildlogPath: String { return "~/Library/Logs/scan" }
   var includeSimulatorLogs: Bool { return false }
+  var suppressXcodeOutput: String? { return nil }
   var formatter: String? { return nil }
+  var xcprettyArgs: String? { return nil }
   var maxConcurrentSimulators: Int? { return nil }
   var disableConcurrentTesting: Bool { return false }
   var testWithoutBuilding: Bool? { return nil }
@@ -87,9 +93,11 @@ extension ScanfileProtocol {
   var slackOnlyOnFailure: Bool { return false }
   var useClangReportName: Bool { return false }
   var customReportFileName: String? { return nil }
+  var appIdentifier: String? { return nil }
+  var reinstallApp: Bool { return false }
   var failBuild: Bool { return true }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.4]
+// FastlaneRunnerAPIVersion [0.9.6]

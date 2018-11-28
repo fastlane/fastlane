@@ -1,11 +1,33 @@
-Developer Portal API
-====================
+# Developer Portal API
 
-# Usage
+- [Usage](#usage)
+  * [Login](#login)
+  * [Apps](#apps)
+    + [App Services](#app-services)
+  * [App Groups](#app-groups)
+  * [iCloud Containers](#icloud-containers)
+  * [Apple Pay Merchants](#apple-pay-merchants)
+  * [Passbook](#passbook)
+  * [Certificates](#certificates)
+    + [Code Signing Certificates](#code-signing-certificates)
+    + [Push Certificates](#push-certificates)
+    + [Create a Certificate](#create-a-certificate)
+  * [Provisioning Profiles](#provisioning-profiles)
+    + [Receiving profiles](#receiving-profiles)
+    + [Create a Provisioning Profile](#create-a-provisioning-profile)
+    + [Repair all broken provisioning profiles](#repair-all-broken-provisioning-profiles)
+  * [Devices](#devices)
+  * [Enterprise](#enterprise)
+  * [Multiple Spaceships](#multiple-spaceships)
+  * [More cool things you can do](#more-cool-things-you-can-do)
+  * [Example Data](#example-data)
+- [License](#license)
+
+## Usage
 
 To quickly play around with _spaceship_ launch `irb` in your terminal and execute `require "spaceship"`.
 
-## Login
+### Login
 
 *Note*: If you use both the Developer Portal and App Store Connect API, you'll have to login on both, as the user might have different user credentials.
 
@@ -15,7 +37,7 @@ Spaceship::Portal.login("felix@krausefx.com", "password")
 Spaceship::Portal.select_team # call this method to let the user select a team
 ```
 
-## Apps
+### Apps
 
 ```ruby
 # Fetch all available apps
@@ -33,7 +55,7 @@ end
 app = Spaceship::Portal.app.create!(bundle_id: "com.krausefx.app_name", name: "fastlane App")
 ```
 
-### App Services
+#### App Services
 
 App Services are part of the application, however, they are one of the few things that can be changed about the app once it has been created.
 
@@ -79,7 +101,7 @@ app.update_service(Spaceship::Portal.app_service.passbook.off)
 app.update_service(Spaceship::Portal.app_service.cloud_kit.cloud_kit)
 ```
 
-## App Groups
+### App Groups
 
 ```ruby
 # Fetch all existing app groups
@@ -102,7 +124,7 @@ group = Spaceship::Portal.app_group.create!(group_id: "group.com.example.another
 app = app.associate_groups([group])
 ```
 
-## iCloud Containers
+### iCloud Containers
 
 ```ruby
 # Fetch all existing containers
@@ -125,7 +147,7 @@ container = Spaceship::Portal.cloud_container.create!(identifier: "iCloud.com.ex
 app = app.associate_cloud_containers([container])
 ```
 
-## Apple Pay Merchants
+### Apple Pay Merchants
 
 ```ruby
 # Fetch all existing merchants
@@ -150,7 +172,7 @@ another_merchant.delete!
 app = app.associate_merchants([sandbox_merchant, production_merchant])
 ```
 
-## Passbook
+### Passbook
 
 ```ruby
 # Fetch all existing passbooks
@@ -167,14 +189,14 @@ passbook = Spaceship::Portal.passbook.find("pass.com.example.passbook").delete!
 
 ```
 
-## Certificates
+### Certificates
 
 ```ruby
 # Fetch all available certificates (includes signing and push profiles)
 certificates = Spaceship::Portal.certificate.all
 ```
 
-### Code Signing Certificates
+#### Code Signing Certificates
 
 ```ruby
 # Production identities
@@ -187,7 +209,7 @@ dev_certs = Spaceship::Portal.certificate.development.all
 cert_content = prod_certs.first.download
 ```
 
-### Push Certificates
+#### Push Certificates
 ```ruby
 # Production push profiles
 prod_push_certs = Spaceship::Portal.certificate.production_push.all
@@ -207,7 +229,7 @@ csr, pkey = Spaceship::Portal.certificate.create_certificate_signing_request
 Spaceship::Portal.certificate.production_push.create!(csr: csr, bundle_id: "com.krausefx.app")
 ```
 
-### Create a Certificate
+#### Create a Certificate
 
 ```ruby
 # Create a new certificate signing request
@@ -217,9 +239,9 @@ csr, pkey = Spaceship::Portal.certificate.create_certificate_signing_request
 Spaceship::Portal.certificate.production.create!(csr: csr)
 ```
 
-## Provisioning Profiles
+### Provisioning Profiles
 
-### Receiving profiles
+#### Receiving profiles
 
 ```ruby
 ##### Finding #####
@@ -263,7 +285,7 @@ first_profile = matching_profiles.first
 File.write("output.mobileprovision", first_profile.download)
 ```
 
-### Create a Provisioning Profile
+#### Create a Provisioning Profile
 
 ```ruby
 # Choose the certificate to use
@@ -283,7 +305,7 @@ profile = Spaceship::Portal.provisioning_profile.ad_hoc.create!(bundle_id: "com.
 File.write("NewProfile.mobileprovision", profile.download)
 ```
 
-### Repair all broken provisioning profiles
+#### Repair all broken provisioning profiles
 
 ```ruby
 # Select all 'Invalid' or 'Expired' provisioning profiles
@@ -301,7 +323,7 @@ end
 Spaceship::Portal.provisioning_profile.all.find_all { |p| !p.valid? || !p.certificate_valid? }.map(&:repair!)
 ```
 
-## Devices
+### Devices
 
 ```ruby
 # Get all enabled devices
@@ -325,7 +347,7 @@ disabled_devices = Spaceship::Portal.device.all(include_disabled: true).select(&
 Spaceship::Portal.device.create!(name: "Private iPhone 6", udid: "5814abb3...")
 ```
 
-## Enterprise
+### Enterprise
 
 ```ruby
 # Use the InHouse class to get all enterprise certificates
@@ -339,7 +361,7 @@ profile = Spaceship::Portal.provisioning_profile.in_house.create!(bundle_id: "co
 profiles = Spaceship::Portal.provisioning_profile.in_house.all
 ```
 
-## Multiple Spaceships
+### Multiple Spaceships
 
 Sometimes one _spaceship_ just isn't enough. That's why this library has its own Spaceship Launcher to launch and use multiple _spaceships_ at the same time :rocket:
 
@@ -358,7 +380,7 @@ devices.each do |device|
 end
 ```
 
-## More cool things you can do
+### More cool things you can do
 ```ruby
 # Find a profile with a specific name
 profile = Spaceship::Portal.provisioning_profile.development.all.find { |p| p.name == "Name" }
@@ -382,7 +404,7 @@ app.update_name!('New App Name')
 app.delete!
 ```
 
-## Example Data
+### Example Data
 
 Some unnecessary information was removed, check out [provisioning_profile.rb](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/portal/provisioning_profile.rb) for all available attributes.
 
@@ -419,6 +441,6 @@ The example data below is a provisioning profile, containing a device, certifica
 >
 ```
 
-### License
+## License
 
 > This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.

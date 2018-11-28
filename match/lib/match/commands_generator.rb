@@ -2,12 +2,15 @@ require 'commander'
 
 require 'fastlane_core/configuration/configuration'
 require_relative 'module'
+
 require_relative 'nuke'
-require_relative 'git_helper'
 require_relative 'change_password'
 require_relative 'setup'
 require_relative 'runner'
 require_relative 'options'
+
+require_relative 'storage'
+require_relative 'encryption'
 
 HighLine.track_eof = false
 
@@ -96,7 +99,7 @@ module Match
           params.load_configuration_file("Matchfile")
 
           Match::ChangePassword.update(params: params)
-          UI.success("Successfully changed the password. Make sure to update the password on all your clients and servers")
+          UI.success("Successfully changed the password. Make sure to update the password on all your clients and servers by running `fastlane match [environment]`")
         end
       end
 
@@ -109,11 +112,21 @@ module Match
         c.action do |args, options|
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
           params.load_configuration_file("Matchfile")
-          decrypted_repo = Match::GitHelper.clone(params[:git_url],
-                                                  params[:shallow_clone],
-                                                  branch: params[:git_branch],
-                                                  clone_branch_directly: params[:clone_branch_directly])
-          UI.success("Repo is at: '#{decrypted_repo}'")
+
+          storage = Storage.for_mode(params[:storage_mode], {
+            git_url: params[:git_url],
+            shallow_clone: params[:shallow_clone],
+            git_branch: params[:git_branch],
+            clone_branch_directly: params[:clone_branch_directly]
+          })
+          storage.download
+
+          encryption = Encryption.for_storage_mode(params[:storage_mode], {
+            git_url: params[:git_url],
+            working_directory: storage.working_directory
+          })
+          encryption.decrypt_files
+          UI.success("Repo is at: '#{storage.working_directory}'")
         end
       end
 

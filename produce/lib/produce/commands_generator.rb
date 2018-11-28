@@ -47,6 +47,7 @@ module Produce
 
         c.option('--app-group', 'Enable App Groups')
         c.option('--apple-pay', 'Enable Apple Pay')
+        c.option('--auto-fill-credential', 'Enable AutoFill Credential')
         c.option('--associated-domains', 'Enable Associated Domains')
         c.option('--data-protection STRING', String, 'Enable Data Protection, suitable values are "complete", "unlessopen" and "untilfirstauth"')
         c.option('--game-center', 'Enable Game Center')
@@ -86,6 +87,7 @@ module Produce
 
         c.option('--app-group', 'Disable App Groups')
         c.option('--apple-pay', 'Disable Apple Pay')
+        c.option('--auto-fill-credential', 'Disable AutoFill Credential')
         c.option('--associated-domains', 'Disable Associated Domains')
         c.option('--data-protection', 'Disable Data Protection')
         c.option('--game-center', 'Disable Game Center')

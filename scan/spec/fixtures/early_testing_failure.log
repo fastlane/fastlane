@@ -1,0 +1,27 @@
+Testing started on 'iPad Air 2'
+2018-11-04 10:33:12.548 xcodebuild[29559:2319983]  IDETestOperationsObserverDebug: Writing diagnostic log for test session to:
+/Users/basher/Library/Developer/Xcode/DerivedData/TestingTest-gdgaczvhjqcyjkdnismgbepkohom/Logs/Test/Run-TestingTest-2018.11.04_10-33-09--0800.xcresult/2_Test/Diagnostics/TestingTestTests-2AB26E26-E9AB-4C2F-B5C6-8635107CFC73/TestingTestTests-956F4A0D-DFAB-4F84-AA47-8CA22766F658/Session-TestingTestTests-2018-11-04_103312-uwb1nH.log
+2018-11-04 10:33:12.549 xcodebuild[29559:2319971] [MT] IDETestOperationsObserverDebug: (D350D682-C021-400C-B6B9-D10FAD114613) Beginning test session TestingTestTests-D350D682-C021-400C-B6B9-D10FAD114613 at 2018-11-04 10:33:12.549 with Xcode 10B61 on target <DVTiPhoneSimulator: 0x7fdd1f6a0590> {
+		SimDevice: iPad Air 2 (8CB426F7-7F07-48E8-B7B8-7A7F21E0A618, iOS 12.1, Shutdown)
+} (12.1 (16B91))
+2018-11-04 10:33:21.784927-0800 TestingTest[30007:2321848] libMobileGestalt MobileGestalt.c:890: MGIsDeviceOneOfType is not supported on this platform.
+Precondition failed: : file /Users/basher/Code/TestingTest/TestingTest/AppDelegate.swift, line 19
+2018-11-04 10:33:21.838307-0800 TestingTest[30007:2321848] Precondition failed: : file /Users/basher/Code/TestingTest/TestingTest/AppDelegate.swift, line 19
+2018-11-04 10:33:45.319 xcodebuild[29559:2321846]  IDETestOperationsObserverDebug: Writing diagnostic log for test session to:
+/Users/basher/Library/Developer/Xcode/DerivedData/TestingTest-gdgaczvhjqcyjkdnismgbepkohom/Logs/Test/Run-TestingTest-2018.11.04_10-33-09--0800.xcresult/2_Test/Diagnostics/TestingTestTestsClone-1839D686-073A-4949-992D-C29FB0972E47/TestingTestTestsClone-15AA3B6A-3C63-4500-A25C-C3E9C5140FDF/Session-TestingTestTestsClone-2018-11-04_103345-pcZlMv.log
+2018-11-04 10:33:45.319 xcodebuild[29559:2319971] [MT] IDETestOperationsObserverDebug: (34D322DB-5B96-4E2D-A60C-05E80A51EE55) Beginning test session TestingTestTestsClone-34D322DB-5B96-4E2D-A60C-05E80A51EE55 at 2018-11-04 10:33:45.319 with Xcode 10B61 on target <DVTiPhoneSimulator: 0x7fdd1f6a0590> {
+		SimDevice: iPad Air 2 (8CB426F7-7F07-48E8-B7B8-7A7F21E0A618, iOS 12.1, Booted)
+} (12.1 (16B91))
+2018-11-04 10:33:48.382674-0800 TestingTest[30033:2322616] libMobileGestalt MobileGestalt.c:890: MGIsDeviceOneOfType is not supported on this platform.
+Precondition failed: : file /Users/basher/Code/TestingTest/TestingTest/AppDelegate.swift, line 19
+2018-11-04 10:33:48.427073-0800 TestingTest[30033:2322616] Precondition failed: : file /Users/basher/Code/TestingTest/TestingTest/AppDelegate.swift, line 19
+2018-11-04 10:34:05.284 xcodebuild[29559:2319971] [MT] IDETestOperationsObserverDebug: 52.741 elapsed -- Testing started completed.
+2018-11-04 10:34:05.284 xcodebuild[29559:2319971] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2018-11-04 10:34:05.284 xcodebuild[29559:2319971] [MT] IDETestOperationsObserverDebug: 52.741 sec, +52.741 sec -- end
+2018-11-04 10:34:05.285 xcodebuild[29559:2319971] Error Domain=IDETestOperationsObserverErrorDomain Code=6 "Early unexpected exit, operation never finished bootstrapping - no restart will be attempted" UserInfo={NSLocalizedDescription=Early unexpected exit, operation never finished bootstrapping - no restart will be attempted, NSUnderlyingError=0x7fdd1f417390 {Error Domain=IDETestOperationsObserverErrorDomain Code=5 "Test runner exited before starting test execution." UserInfo={NSLocalizedDescription=Test runner exited before starting test execution., NSLocalizedRecoverySuggestion=If you believe this error represents a bug, please attach the result bundle at /Users/basher/Library/Developer/Xcode/DerivedData/TestingTest-gdgaczvhjqcyjkdnismgbepkohom/Logs/Test/Run-TestingTest-2018.11.04_10-33-09--0800.xcresult}}}
+2018-11-04 10:34:05.285 xcodebuild[29559:2319971] Error Domain=IDETestOperationsObserverErrorDomain Code=6 "Early unexpected exit, operation never finished bootstrapping - no restart will be attempted" UserInfo={NSLocalizedDescription=Early unexpected exit, operation never finished bootstrapping - no restart will be attempted, NSUnderlyingError=0x7fdd1f42b1c0 {Error Domain=IDETestOperationsObserverErrorDomain Code=5 "Test runner exited before starting test execution." UserInfo={NSLocalizedDescription=Test runner exited before starting test execution., NSLocalizedRecoverySuggestion=If you believe this error represents a bug, please attach the result bundle at /Users/basher/Library/Developer/Xcode/DerivedData/TestingTest-gdgaczvhjqcyjkdnismgbepkohom/Logs/Test/Run-TestingTest-2018.11.04_10-33-09--0800.xcresult}}}
+
+Testing failed:
+	TestingTest.app (30007) encountered an error (Early unexpected exit, operation never finished bootstrapping - no restart will be attempted. (Underlying error: Test runner exited before starting test execution.))
+	TestingTest.app (30033) encountered an error (Early unexpected exit, operation never finished bootstrapping - no restart will be attempted. (Underlying error: Test runner exited before starting test execution.))
+** TEST FAILED **
