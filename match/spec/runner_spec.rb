@@ -14,7 +14,8 @@ describe Match do
         app_identifier: "tools.fastlane.app",
         type: "appstore",
         git_url: git_url,
-        shallow_clone: true
+        shallow_clone: true,
+        username: "flapple@something.com"
       }
 
       config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
@@ -80,7 +81,8 @@ describe Match do
       values = {
         app_identifier: "tools.fastlane.app",
         type: "appstore",
-        git_url: git_url
+        git_url: git_url,
+        username: "flapple@something.com"
       }
 
       config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
