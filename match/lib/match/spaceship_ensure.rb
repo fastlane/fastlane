@@ -23,6 +23,11 @@ module Match
       Spaceship.select_team(team_id: team_id, team_name: team_name)
     end
 
+    # The team ID of the currently logged in team
+    def team_id
+      return Spaceship.client.team_id
+    end
+
     def bundle_identifier_exists(username: nil, app_identifier: nil)
       found = Spaceship.app.find(app_identifier)
       return if found

@@ -16,6 +16,12 @@ module Match
     attr_accessor :files_to_commit
     attr_accessor :spaceship
 
+    attr_accessor :storage_mode
+
+    # The Team ID that was fetched
+    # This will always be `nil` in readonly mode
+    attr_accessor :currently_used_team_id
+
     def run(params)
       self.files_to_commit = []
 
@@ -23,6 +29,8 @@ module Match
                                              title: "Summary for match #{Fastlane::VERSION}")
 
       update_optional_values_depending_on_storage_type(params)
+
+      self.storage_mode = params[:storage_mode]
 
       # Choose the right storage and encryption implementations
       storage = Storage.for_mode(params[:storage_mode], {
@@ -49,6 +57,8 @@ module Match
 
       unless params[:readonly]
         self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name])
+        self.currently_used_team_id = self.spaceship.team_id
+
         if params[:type] == "enterprise" && !Spaceship.client.in_house?
           UI.user_error!("You defined the profile type 'enterprise', but your Apple account doesn't support In-House profiles")
         end
@@ -111,6 +121,11 @@ module Match
       storage.clear_changes if storage
     end
 
+    # Used when creating a new certificate or profile
+    def folder_prefix
+      self.storage_mode == "git" ? "" : self.currently_used_team_id
+    end
+
     # Be smart about optional values here
     # Depending on the storage mode, different vlaues are required
     def update_optional_values_depending_on_storage_type(params)
@@ -122,13 +137,13 @@ module Match
     def fetch_certificate(params: nil, working_directory: nil)
       cert_type = Match.cert_type_sym(params[:type])
 
-      certs = Dir[File.join(working_directory, "certs", cert_type.to_s, "*.cer")]
-      keys = Dir[File.join(working_directory, "certs", cert_type.to_s, "*.p12")]
+      certs = Dir[File.join(working_directory, folder_prefix, "certs", cert_type.to_s, "*.cer")]
+      keys = Dir[File.join(working_directory, folder_prefix, "certs", cert_type.to_s, "*.p12")]
 
       if certs.count == 0 || keys.count == 0
         UI.important("Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now")
         UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
-        cert_path = Generator.generate_certificate(params, cert_type, working_directory)
+        cert_path = Generator.generate_certificate(params, cert_type, File.join(working_directory, folder_prefix))
         private_key_path = cert_path.gsub(".cer", ".p12")
 
         self.files_to_commit << cert_path
@@ -169,7 +184,7 @@ module Match
       end
 
       profile_name = names.join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
-      base_dir = File.join(working_directory, "profiles", prov_type.to_s)
+      base_dir = File.join(working_directory, folder_prefix, "profiles", prov_type.to_s)
       profiles = Dir[File.join(base_dir, "#{profile_name}.mobileprovision")]
       keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
 
@@ -201,7 +216,7 @@ module Match
                                                        prov_type: prov_type,
                                                   certificate_id: certificate_id,
                                                   app_identifier: app_identifier,
-                                               working_directory: working_directory)
+                                               working_directory: File.join(working_directory, folder_prefix))
         self.files_to_commit << profile
       end
 

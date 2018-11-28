@@ -38,7 +38,7 @@ module Match
       # no concept of branches in Google Cloud Storage (omg thanks), we use
       # the team id properly
       SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name])
-      team_id = Spaceship.client.team_id
+      team_id = SpaceshipEnsure.team_id
       UI.message("Detected team ID '#{team_id}' to use for Google Cloud Storage...")
 
       files_to_commit = []

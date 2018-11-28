@@ -127,6 +127,13 @@ module Match
         # `files_to_upload` is an array of files that need to be uploaded to Google Cloud
         # Those doesn't mean they're new, it might just be they're changed
         # Either way, we'll upload them using the same technique
+
+        # TODO: questions rearding team_id
+        # - This must work in `readonly` mode also somehow, wah, I guess not necessary as we're only reading
+        # - Does reading the existing profiles consider the team_id? If so, how?
+        # - Does this cause any issues with existing git-based implementation
+        # - How do we access the team_id here, without logging in again for all non-readonly runs
+
         files_to_upload.map do |current_file|
           # Go from
           #   "/var/folders/px/bz2kts9n69g8crgv4jpjh6b40000gn/T/d20181026-96528-1av4gge/profiles/development/Development_me.mobileprovision"
@@ -140,6 +147,10 @@ module Match
           bucket.create_file(current_file, target_path)
         end
         finished_pushing_message
+      end
+
+      def skip_docs
+        false
       end
 
       private

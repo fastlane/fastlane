@@ -39,7 +39,11 @@ module Match
       #   that should be committed to the storage provider
       # @parameter custom_message: [String] Custom change message
       #           that's optional, is used for commit title
-      def save_changes!(files_to_commit: [], files_to_delete: [], custom_message: nil)
+      def save_changes!(files_to_commit: nil, files_to_delete: nil, custom_message: nil)
+        # Custom init to `[]` in case `nil` is passed
+        files_to_commit ||= []
+        files_to_delete ||= []
+
         Dir.chdir(File.expand_path(self.working_directory)) do
           if files_to_commit.count > 0 # everything that isn't `match nuke`
             UI.user_error!("You can't provide both `files_to_delete` and `files_to_commit` right now") if files_to_delete.count > 0
