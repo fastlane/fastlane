@@ -50,13 +50,8 @@ module Spaceship
       two_factor_url = "https://github.com/fastlane/fastlane/tree/master/spaceship#2-step-verification"
       puts("Two Factor Authentication for account '#{self.user}' is enabled")
 
-      if !File.exist?(persistent_cookie_path) && self.class.spaceship_session_env.to_s.length.zero?
-        puts("If you're running this in a non-interactive session (e.g. server or CI)")
-        puts("check out #{two_factor_url}")
-      else
-        # If the cookie is set but still required, the cookie is expired
-        puts("Your session cookie has been expired.")
-      end
+      puts("If you're running this in a non-interactive session (e.g. server or CI)")
+      puts("check out #{two_factor_url}")
 
       security_code = response.body["securityCode"]
       # {"length"=>6,
