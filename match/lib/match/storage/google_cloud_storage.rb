@@ -195,7 +195,7 @@ module Match
         UI.message("\t\thttps://console.cloud.google.com".cyan)
         UI.message("")
         UI.input("Press enter once you're logged in")
-        
+
         UI.message("Now it's time to generate a new JSON auth file for fastlane to access Google Cloud")
         UI.message("First, switch to the Google Cloud project you want to use.")
         UI.message("If you don't have one yet, create a new one and switch to it")
@@ -203,7 +203,7 @@ module Match
         UI.message("\t\thttps://console.cloud.google.com/apis/credentials".cyan)
         UI.message("")
         UI.input("Ensure the right project is selected on top of the page and confirm with enter")
-        
+
         UI.message("Now create a new JSON auth file by clicking on")
         UI.message("")
         UI.message("\t\t 1. Create credentials".cyan)
@@ -220,7 +220,7 @@ module Match
         UI.input("Confirm with enter")
 
         # TODO: Put the name into a constant
-        while !File.exist?(DEFAULT_KEYS_FILE_NAME)
+        until File.exist?(DEFAULT_KEYS_FILE_NAME)
           UI.message("Make sure to place the file in '#{Dir.pwd.cyan}' and name it '#{DEFAULT_KEYS_FILE_NAME.cyan}'")
           UI.input("Confirm with enter")
         end
