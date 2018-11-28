@@ -1,5 +1,11 @@
+require 'spaceship/tunes/tunes'
+
+require_relative 'app_screenshot'
+require_relative 'module'
+require_relative 'loader'
+
 module Deliver
-  # upload screenshots to iTunes Connect
+  # upload screenshots to App Store Connect
   class UploadScreenshots
     def upload(options, screenshots)
       return if options[:skip_screenshots]
@@ -17,8 +23,10 @@ module Deliver
         UI.message("Removing all previously uploaded screenshots...")
         # First, clear all previously uploaded screenshots
         screenshots_per_language.keys.each do |language|
+          # We have to nil check for languages not activated
+          next if v.screenshots[language].nil?
           v.screenshots[language].each_with_index do |t, index|
-            v.upload_screenshot!(nil, t.sort_order, t.language, t.device_type, false)
+            v.upload_screenshot!(nil, t.sort_order, t.language, t.device_type, t.is_imessage)
           end
         end
       end
@@ -31,10 +39,11 @@ module Deliver
         v.create_languages(enabled_languages)
         lng_text = "language"
         lng_text += "s" if enabled_languages.count != 1
-        UI.message("Activating #{lng_text} #{enabled_languages.join(', ')}...")
+        Helper.show_loading_indicator("Activating #{lng_text} #{enabled_languages.join(', ')}...")
         v.save!
         # This refreshes the app version from iTC after enabling a localization
         v = app.edit_version
+        Helper.hide_loading_indicator
       end
 
       screenshots_per_language.each do |language, screenshots_for_language|
@@ -46,7 +55,7 @@ module Deliver
 
           index = indized[screenshot.language][screenshot.formatted_name]
 
-          if index > 5
+          if index > 10
             UI.error("Too many screenshots found for device '#{screenshot.formatted_name}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
             next
           end
@@ -60,18 +69,21 @@ module Deliver
         end
         # ideally we should only save once, but itunes server can't cope it seems
         # so we save per language. See issue #349
-        UI.message("Saving changes")
+        Helper.show_loading_indicator("Saving changes")
         v.save!
+        # Refresh app version to start clean again. See issue #9859
+        v = app.edit_version
+        Helper.hide_loading_indicator
       end
-      UI.success("Successfully uploaded screenshots to iTunes Connect")
+      UI.success("Successfully uploaded screenshots to App Store Connect")
     end
 
     def collect_screenshots(options)
       return [] if options[:skip_screenshots]
-      return collect_screenshots_for_languages(options[:screenshots_path])
+      return collect_screenshots_for_languages(options[:screenshots_path], options[:ignore_language_directory_validation])
     end
 
-    def collect_screenshots_for_languages(path)
+    def collect_screenshots_for_languages(path, ignore_validation)
       screenshots = []
       extensions = '{png,jpg,jpeg}'
 
@@ -79,12 +91,12 @@ module Deliver
         lang_hash[lang.downcase] = lang
       end
 
-      Loader.language_folders(path).each do |lng_folder|
+      Loader.language_folders(path, ignore_validation).each do |lng_folder|
         language = File.basename(lng_folder)
 
         # Check to see if we need to traverse multiple platforms or just a single platform
         if language == Loader::APPLE_TV_DIR_NAME || language == Loader::IMESSAGE_DIR_NAME
-          screenshots.concat(collect_screenshots_for_languages(File.join(path, language)))
+          screenshots.concat(collect_screenshots_for_languages(File.join(path, language), ignore_validation))
           next
         end
 

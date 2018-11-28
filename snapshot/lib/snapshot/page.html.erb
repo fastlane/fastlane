@@ -64,118 +64,100 @@
       }
     </style>
   </head>
-  <body>
-    <% divide_size_by = 5.0 %>
-    <% max_width = 180 %>
-    <% image_counter = 0 %>
+  <body><% image_counter = 0 %><% @data.each do |language, content| %>
+    <h1 id="<%= language %>" class="language"><%= language %></h1>
+    <hr>
+    <table><% content.each do |device_name, screens| %>
+      <tr>
+        <th colspan="<%= screens.count %>">
+          <a id="<%= language %>-<%= device_name %>" class="deviceName" href="#<%= language %>-<%= device_name %>"><%= device_name %></a>
+        </th>
+      </tr>
+      <tr><% screens.each do |screen_path| %><% next if screen_path.include?"_framed.png" %>
+        <td><% image_counter += 1 %>
+          <a href="<%= screen_path %>" target="_blank" class="screenshotLink">
+            <img class="screenshot" src="<%= screen_path %>" style="width: 100%;" alt="<%= language %> <%= device_name %>" data-counter="<%= image_counter %>">
+          </a>
+        </td><% end %>
+      </tr><% end %>
+    </table><% end %>
+    <div id="overlay">
+      <img id="imageDisplay" src="" alt="" />
+      <div id="imageInfo"></div>
+    </div>
+    <script type="text/javascript">
+      var overlay        = document.getElementById('overlay');
+      var imageDisplay   = document.getElementById('imageDisplay');
+      var imageInfo      = document.getElementById('imageInfo');
+      var screenshotLink = document.getElementsByClassName('screenshotLink');
 
-
-    <% @data.each do |language, content| %>
-      <h1 class="language"><%= language %></h1>
-      <hr>
-      <table>
-        <% content.each do |device_name, screens| %>
-          <tr>
-            <th colspan="<%= screens.count %>">
-              <span class="deviceName"><%= device_name %></span>
-            </th>
-          </tr>
-          <tr>
-            <% screens.each do |screen_path| %>
-              <% next if screen_path.include?"_framed.png" %>
-              <td>
-                <% style = "width: 100%;" %>
-                <% image_counter += 1 %>
-                <a href="<%= screen_path %>" target="_blank" class="screenshotLink">
-                  <img class="screenshot"
-                         src="<%= screen_path %>"
-                       style="<%= style %>"
-                         alt="<%= language %> <%= device_name %>"
-                data-counter="<%= image_counter %>" />
-                </a>
-              </td>
-            <% end %>
-          </tr>
-        <% end %>
-      </table>
-    <% end %>
-      <div id="overlay">
-        <img id="imageDisplay" src="" alt="" />
-        <div id="imageInfo"></div>
-      </div>
-      <script type="text/javascript">
-        var overlay        = document.getElementById('overlay');
-        var imageDisplay   = document.getElementById('imageDisplay');
-        var imageInfo      = document.getElementById('imageInfo');
-        var screenshotLink = document.getElementsByClassName('screenshotLink');
-
-        function doClick(el) {
-          if (document.createEvent) {
-            var evObj = document.createEvent('MouseEvents', true);
-            evObj.initMouseEvent("click", false, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-            el.dispatchEvent(evObj);
-          } else if (document.createEventObject) { //IE
-            var evObj = document.createEventObject();
-            el.fireEvent('onclick', evObj);
-          }
+      function doClick(el) {
+        if (document.createEvent) {
+          var evObj = document.createEvent('MouseEvents', true);
+          evObj.initMouseEvent("click", false, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+          el.dispatchEvent(evObj);
+        } else if (document.createEventObject) { //IE
+          var evObj = document.createEventObject();
+          el.fireEvent('onclick', evObj);
         }
+      }
 
-        for (index = 0; index < screenshotLink.length; ++index) {
-          screenshotLink[index].addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            var img = e.target;
-            if (e.target.tagName == 'A') {
-              img = e.target.children[0];
-            }
-            
-            // beautify
-            var tmpImg = new Image();
-            tmpImg.src = img.src;
-            imageDisplay.style.height     = 'auto';
-            imageDisplay.style.width     = 'auto';
-            if (window.innerHeight < tmpImg.height) {
-              imageDisplay.style.height = document.documentElement.clientHeight+'px';
-            } else if (window.innerWidth < tmpImg.width) {
-              imageDisplay.style.width = document.documentElement.clientWidth;+'px';
-            } else {
-              imageDisplay.style.paddingTop = parseInt((window.innerHeight - tmpImg.height) / 2)+'px';
-            }
+      for (index = 0; index < screenshotLink.length; ++index) {
+        screenshotLink[index].addEventListener('click', function(e) {
+          e.preventDefault();
 
-            imageDisplay.src             = img.src;
-            imageDisplay.alt             = img.alt;
-            imageDisplay.dataset.counter = img.dataset.counter;
-            
-            imageInfo.innerHTML          = '<h3>'+img.alt+'</h3>';
-            imageInfo.innerHTML         += decodeURI(img.src.split("/").pop());
-            imageInfo.innerHTML         += '<br />'+tmpImg.height+'&times;'+tmpImg.width+'px';
-                    
-            overlay.style.display        = "block";
-          });
-        }
-        
-        imageDisplay.addEventListener('click', function(e) {
-          e.stopPropagation(); // !
-          
-          overlay.style.display = "none";
-          
-          img_counter = parseInt(e.target.dataset.counter) + 1;
-          try {
-            link = document.body.querySelector('img[data-counter="'+img_counter+'"]').parentNode;
-          } catch (e) {
-            try {
-              link = document.body.querySelector('img[data-counter="0"]').parentNode;
-            } catch (e) {
-              return false;
-            }
+          var img = e.target;
+          if (e.target.tagName == 'A') {
+            img = e.target.children[0];
           }
-          doClick(link);
+
+          // beautify
+          var tmpImg = new Image();
+          tmpImg.src = img.src;
+          imageDisplay.style.height     = 'auto';
+          imageDisplay.style.width     = 'auto';
+          if (window.innerHeight < tmpImg.height) {
+            imageDisplay.style.height = document.documentElement.clientHeight+'px';
+          } else if (window.innerWidth < tmpImg.width) {
+            imageDisplay.style.width = document.documentElement.clientWidth;+'px';
+          } else {
+            imageDisplay.style.paddingTop = parseInt((window.innerHeight - tmpImg.height) / 2)+'px';
+          }
+
+          imageDisplay.src             = img.src;
+          imageDisplay.alt             = img.alt;
+          imageDisplay.dataset.counter = img.dataset.counter;
+
+          imageInfo.innerHTML          = '<h3>'+img.alt+'</h3>';
+          imageInfo.innerHTML         += decodeURI(img.src.split("/").pop());
+          imageInfo.innerHTML         += '<br />'+tmpImg.height+'&times;'+tmpImg.width+'px';
+
+          overlay.style.display        = "block";
         });
+      }
 
-        overlay.addEventListener('click', function(e) {
-          overlay.style.display = "none";
-        })
-        
+      imageDisplay.addEventListener('click', function(e) {
+        e.stopPropagation(); // !
+
+        overlay.style.display = "none";
+
+        img_counter = parseInt(e.target.dataset.counter) + 1;
+        try {
+          link = document.body.querySelector('img[data-counter="'+img_counter+'"]').parentNode;
+        } catch (e) {
+          try {
+            link = document.body.querySelector('img[data-counter="0"]').parentNode;
+          } catch (e) {
+            return false;
+          }
+        }
+        doClick(link);
+      });
+
+      overlay.addEventListener('click', function(e) {
+        overlay.style.display = "none";
+      })
+
       function keyPressed(e) {
         e = e || window.event;
         var charCode = e.keyCode || e.which;
@@ -183,17 +165,19 @@
           case 27: // Esc
             overlay.style.display = "none";
             break;
-          case 34: // right-arrow, Page Down, keypad right, ...
-          case 39:
-          case 54:
-          case 102:
+          case 34: // Page Down
+          case 39: // Right arrow
+          case 54: // Keypad right
+          case 76: // l
+          case 102: // Keypad right
             e.preventDefault();
             doClick(imageDisplay);
             break;
-          case 33: // left-arrow, Page Up, keypad right, ...
-          case 37:
-          case 52:
-          case 100:
+          case 33: // Page up
+          case 37: // Left arrow
+          case 52: // Keypad left
+          case 72: // h
+          case 100: // Keypad left
             e.preventDefault();
             document.getElementById('imageDisplay').dataset.counter -= 2; // hacky
             doClick(imageDisplay);
@@ -201,6 +185,6 @@
          }
       };
       document.body.addEventListener('keydown', keyPressed);
-      </script>
+    </script>
   </body>
 </html>

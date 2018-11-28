@@ -60,6 +60,9 @@
 # 4. extracts the entitlements from the provisioning profile
 # 5. copy the entitlements as archived-expanded-entitlements.xcent inside the app bundle (because Xcode does too)
 #
+# new features November 2018
+# 1. only create the archived-expanded-entitlements.xcent file if the version of Xcode < 9.3 as Xcode 10 does not create it.
+#
 
 # Logging functions
 
@@ -81,8 +84,7 @@ warning() {
 function checkStatus {
 
     # shellcheck disable=SC2181
-    if [ $? -ne 0 ];
-    then
+    if [ $? -ne 0 ]; then
         error "Encountered an error, aborting!"
     fi
 }
@@ -154,6 +156,7 @@ PROVISIONS_BY_ID=()
 DEFAULT_PROVISION=""
 TEMP_DIR="_floatsignTemp"
 USE_APP_ENTITLEMENTS=""
+XCODE_VERSION="$(xcodebuild -version | grep "Xcode" | /usr/bin/cut -f 2 -d ' ')"
 
 # List of plist keys used for reference to and from nested apps and extensions
 NESTED_APP_REFERENCE_KEYS=(":WKCompanionAppBundleIdentifier" ":NSExtension:NSExtensionAttributes:WKAppBundleIdentifier")
@@ -220,8 +223,7 @@ while [ "$1" != "" ]; do
 done
 
 KEYCHAIN_FLAG=
-if [ -n "$KEYCHAIN_PATH" ]
-then
+if [ -n "$KEYCHAIN_PATH" ]; then
     KEYCHAIN_FLAG="--keychain $KEYCHAIN_PATH"
 fi
 
@@ -254,8 +256,7 @@ log "Certificate: '$CERTIFICATE'"
 [[ -n "${USE_APP_ENTITLEMENTS}" && -n ${ENTITLEMENTS} ]] && error "--use-app-entitlements option cannot be used in combination with -e, --entitlements option."
 
 # Check output file name
-if [ -z "$NEW_FILE" ];
-then
+if [ -z "$NEW_FILE" ]; then
     error "Output file name required"
 fi
 
@@ -264,8 +265,7 @@ if [[ "${#RAW_PROVISIONS[*]}" == "0" ]]; then
 fi
 
 # Check for and remove the temporary directory if it already exists
-if [ -d "$TEMP_DIR" ];
-then
+if [ -d "$TEMP_DIR" ]; then
     log "Removing previous temporary directory: '$TEMP_DIR'"
     rm -Rf "$TEMP_DIR"
 fi
@@ -275,13 +275,11 @@ extension="${filename##*.}"
 filename="${filename%.*}"
 
 # Check if the supplied file is an ipa or an app file
-if [ "${extension}" = "ipa" ]
-then
+if [ "${extension}" = "ipa" ]; then
     # Unzip the old ipa quietly
     unzip -q "$ORIGINAL_FILE" -d $TEMP_DIR
     checkStatus
-elif [ "${extension}" = "app" ]
-then
+elif [ "${extension}" = "app" ]; then
     # Copy the app file into an ipa-like structure
     mkdir -p "$TEMP_DIR/Payload"
     cp -Rf "${ORIGINAL_FILE}" "$TEMP_DIR/Payload/${filename}.app"
@@ -291,8 +289,7 @@ else
 fi
 
 # check the keychain
-if [ "${KEYCHAIN}" != "" ];
-then
+if [ "${KEYCHAIN}" != "" ]; then
     security list-keychains -s "$KEYCHAIN"
     security unlock "$KEYCHAIN"
     security default-keychain -s "$KEYCHAIN"
@@ -301,7 +298,6 @@ fi
 # Set the app name
 # In Payload directory may be another file except .app file, such as StoreKit folder.
 # Search the first .app file within the Payload directory
-# TODO: Replace with glob or call to 'find'; and remove shellcheck directive
 # shellcheck disable=SC2010
 APP_NAME=$(ls "$TEMP_DIR/Payload/" | grep ".app$" | head -1)
 
@@ -401,8 +397,7 @@ function resign {
     fi
 
     # Make sure that the Info.plist file is where we expect it
-    if [ ! -e "$APP_PATH/Info.plist" ];
-    then
+    if [ ! -e "$APP_PATH/Info.plist" ]; then
         error "Expected file does not exist: '$APP_PATH/Info.plist'"
     fi
 
@@ -448,10 +443,8 @@ function resign {
     log "New bundle identifier will be: '$BUNDLE_IDENTIFIER'"
 
     # Update the CFBundleDisplayName property in the Info.plist if a new name has been provided
-    if [ "${DISPLAY_NAME}" != "" ];
-    then
-        if [ "${DISPLAY_NAME}" != "${CURRENT_NAME}" ];
-        then
+    if [ "${DISPLAY_NAME}" != "" ]; then
+        if [ "${DISPLAY_NAME}" != "${CURRENT_NAME}" ]; then
             log "Changing display name from '$CURRENT_NAME' to '$DISPLAY_NAME'"
             PlistBuddy -c "Set :CFBundleDisplayName $DISPLAY_NAME" "$APP_PATH/Info.plist"
         fi
@@ -466,8 +459,7 @@ function resign {
     if [ "$APP_IDENTIFIER_PREFIX" == "" ];
     then
         APP_IDENTIFIER_PREFIX=$(PlistBuddy -c "Print :ApplicationIdentifierPrefix:0" "$TEMP_DIR/profile.plist")
-        if [ "$APP_IDENTIFIER_PREFIX" == "" ];
-        then
+        if [ "$APP_IDENTIFIER_PREFIX" == "" ]; then
             error "Failed to extract any app identifier prefix from '$NEW_PROVISION'"
         else
             warning "WARNING: extracted an app identifier prefix '$APP_IDENTIFIER_PREFIX' from '$NEW_PROVISION', but it was not found in the profile's entitlements"
@@ -480,11 +472,9 @@ function resign {
     PlistBuddy -c "Set :AppIdentifierPrefix $APP_IDENTIFIER_PREFIX." "$APP_PATH/Info.plist" 2>/dev/null
 
     TEAM_IDENTIFIER=$(PlistBuddy -c "Print :Entitlements:com.apple.developer.team-identifier" "$TEMP_DIR/profile.plist" | tr -d '\n')
-    if [ "$TEAM_IDENTIFIER" == "" ];
-    then
+    if [ "$TEAM_IDENTIFIER" == "" ]; then
         TEAM_IDENTIFIER=$(PlistBuddy -c "Print :TeamIdentifier:0" "$TEMP_DIR/profile.plist")
-        if [ "$TEAM_IDENTIFIER" == "" ];
-        then
+        if [ "$TEAM_IDENTIFIER" == "" ]; then
             warning "Failed to extract team identifier from '$NEW_PROVISION', resigned ipa may fail on iOS 8 and higher"
         else
             warning "WARNING: extracted a team identifier '$TEAM_IDENTIFIER' from '$NEW_PROVISION', but it was not found in the profile's entitlements, resigned ipa may fail on iOS 8 and higher"
@@ -500,19 +490,16 @@ function resign {
     cp -f "$NEW_PROVISION" "$APP_PATH/embedded.mobileprovision"
 
     #if the current bundle identifier is different from the new one in the provisioning profile, then change it.
-    if [ "$CURRENT_BUNDLE_IDENTIFIER" != "$BUNDLE_IDENTIFIER" ];
-    then
+    if [ "$CURRENT_BUNDLE_IDENTIFIER" != "$BUNDLE_IDENTIFIER" ]; then
         log "Updating the bundle identifier from '$CURRENT_BUNDLE_IDENTIFIER' to '$BUNDLE_IDENTIFIER'"
         PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_IDENTIFIER" "$APP_PATH/Info.plist"
         checkStatus
     fi
 
     # Update the version number properties in the Info.plist if a version number has been provided
-    if [ "$VERSION_NUMBER" != "" ];
-    then
+    if [ "$VERSION_NUMBER" != "" ]; then
         CURRENT_VERSION_NUMBER=$(PlistBuddy -c "Print :CFBundleVersion" "$APP_PATH/Info.plist")
-        if [ "$VERSION_NUMBER" != "$CURRENT_VERSION_NUMBER" ];
-        then
+        if [ "$VERSION_NUMBER" != "$CURRENT_VERSION_NUMBER" ]; then
             log "Updating the version from '$CURRENT_VERSION_NUMBER' to '$VERSION_NUMBER'"
             PlistBuddy -c "Set :CFBundleVersion $VERSION_NUMBER" "$APP_PATH/Info.plist"
             PlistBuddy -c "Set :CFBundleShortVersionString $VERSION_NUMBER" "$APP_PATH/Info.plist"
@@ -520,8 +507,7 @@ function resign {
     fi
 
     # Update short version string in the Info.plist if provided
-    if [[ -n "$SHORT_VERSION" ]];
-    then
+    if [[ -n "$SHORT_VERSION" ]]; then
         CURRENT_VALUE="$(PlistBuddy -c "Print :CFBundleShortVersionString" "$APP_PATH/Info.plist")"
         # Even if the old value is same - just update, less code, less debugging
         log "Updating the short version string (CFBundleShortVersionString) from '$CURRENT_VALUE' to '$SHORT_VERSION'"
@@ -529,8 +515,7 @@ function resign {
     fi
 
     # Update bundle version in the Info.plist if provided
-    if [[ -n "$BUNDLE_VERSION" ]];
-    then
+    if [[ -n "$BUNDLE_VERSION" ]]; then
         CURRENT_VALUE="$(PlistBuddy -c "Print :CFBundleVersion" "$APP_PATH/Info.plist")"
         # Even if the old value is same - just update, less code, less debugging
         log "Updating the bundle version (CFBundleVersion) from '$CURRENT_VALUE' to '$BUNDLE_VERSION'"
@@ -539,18 +524,15 @@ function resign {
 
     # Check for and resign any embedded frameworks (new feature for iOS 8 and above apps)
     FRAMEWORKS_DIR="$APP_PATH/Frameworks"
-    if [ -d "$FRAMEWORKS_DIR" ];
-    then
-        if [ "$TEAM_IDENTIFIER" == "" ];
-        then
+    if [ -d "$FRAMEWORKS_DIR" ]; then
+        if [ "$TEAM_IDENTIFIER" == "" ]; then
             error "ERROR: embedded frameworks detected, re-signing iOS 8 (or higher) applications wihout a team identifier in the certificate/profile does not work"
         fi
 
         log "Resigning embedded frameworks using certificate: '$CERTIFICATE'"
         for framework in "$FRAMEWORKS_DIR"/*
         do
-            if [[ "$framework" == *.framework || "$framework" == *.dylib ]]
-            then
+            if [[ "$framework" == *.framework || "$framework" == *.dylib ]]; then
                 log "Resigning '$framework'"
                 # Must not qote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
                 # shellcheck disable=SC2086
@@ -567,46 +549,37 @@ function resign {
     for key in "${NESTED_APP_REFERENCE_KEYS[@]}"; do
         # Check if Info.plist has a reference to another app or extension
         REF_BUNDLE_ID=$(PlistBuddy -c "Print ${key}" "$APP_PATH/Info.plist" 2>/dev/null)
-        if [ -n "$REF_BUNDLE_ID" ];
-        then
+        if [ -n "$REF_BUNDLE_ID" ]; then
             # Found a reference bundle id, now get the corresponding provisioning profile for this bundle id
             REF_PROVISION=$(provision_for_bundle_id "$REF_BUNDLE_ID")
             # Map to the new bundle id
             NEW_REF_BUNDLE_ID=$(bundle_id_for_provison "$REF_PROVISION")
             # Change if not the same and if doesn't contain wildcard
             # shellcheck disable=SC2049
-            if [[ "$REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" ]] && ! [[ "$NEW_REF_BUNDLE_ID" =~ \* ]];
-            then
+            if [[ "$REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" ]] && ! [[ "$NEW_REF_BUNDLE_ID" =~ \* ]]; then
                 log "Updating nested app or extension reference for ${key} key from ${REF_BUNDLE_ID} to ${NEW_REF_BUNDLE_ID}"
                 PlistBuddy -c "Set ${key} $NEW_REF_BUNDLE_ID" "$APP_PATH/Info.plist"
             fi
         fi
     done
 
-    if [ "$ENTITLEMENTS" != "" ];
-    then
-        if [ -n "$APP_IDENTIFIER_PREFIX" ];
-        then
+    if [ "$ENTITLEMENTS" != "" ]; then
+        if [ -n "$APP_IDENTIFIER_PREFIX" ]; then
             # sanity check the 'application-identifier' is present in the provided entitlements and matches the provisioning profile value
             ENTITLEMENTS_APP_ID_PREFIX=$(PlistBuddy -c "Print :application-identifier" "$ENTITLEMENTS" | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
-            if [ "$ENTITLEMENTS_APP_ID_PREFIX" == "" ];
-            then
+            if [ "$ENTITLEMENTS_APP_ID_PREFIX" == "" ]; then
                 error "Provided entitlements file is missing a value for the required 'application-identifier' key"
-            elif [ "$ENTITLEMENTS_APP_ID_PREFIX" != "$APP_IDENTIFIER_PREFIX" ];
-            then
+            elif [ "$ENTITLEMENTS_APP_ID_PREFIX" != "$APP_IDENTIFIER_PREFIX" ]; then
                 error "Provided entitlements file's app identifier prefix value '$ENTITLEMENTS_APP_ID_PREFIX' does not match the provided provisioning profile's value '$APP_IDENTIFIER_PREFIX'"
             fi
         fi
 
-        if [ -n "$TEAM_IDENTIFIER" ];
-        then
+        if [ -n "$TEAM_IDENTIFIER" ]; then
             # sanity check the 'com.apple.developer.team-identifier' is present in the provided entitlements and matches the provisioning profile value
             ENTITLEMENTS_TEAM_IDENTIFIER=$(PlistBuddy -c "Print :com.apple.developer.team-identifier" "$ENTITLEMENTS" | tr -d '\n')
-            if [ "$ENTITLEMENTS_TEAM_IDENTIFIER" == "" ];
-            then
+            if [ "$ENTITLEMENTS_TEAM_IDENTIFIER" == "" ]; then
                 error "Provided entitlements file is missing a value for the required 'com.apple.developer.team-identifier' key"
-            elif [ "$ENTITLEMENTS_TEAM_IDENTIFIER" != "$TEAM_IDENTIFIER" ];
-            then
+            elif [ "$ENTITLEMENTS_TEAM_IDENTIFIER" != "$TEAM_IDENTIFIER" ]; then
                 error "Provided entitlements file's 'com.apple.developer.team-identifier' '$ENTITLEMENTS_TEAM_IDENTIFIER' does not match the provided provisioning profile's value '$TEAM_IDENTIFIER'"
             fi
         fi
@@ -616,8 +589,7 @@ function resign {
         cp -f "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
         /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
         checkStatus
-    elif  [[ -n "${USE_APP_ENTITLEMENTS}" ]];
-    then
+    elif  [[ -n "${USE_APP_ENTITLEMENTS}" ]]; then
         # Extract entitlements from provisioning profile and from the app binary
         # then combine them together
 
@@ -638,6 +610,71 @@ function resign {
         PATCHED_ENTITLEMENTS="$TEMP_DIR/patchedEntitlements"
         # Start with using what comes in provisioning profile entitlements before patching
         cp -f "$PROFILE_ENTITLEMENTS" "$PATCHED_ENTITLEMENTS"
+
+        log "Removing blacklisted keys from patched profile"
+        # See https://github.com/facebook/buck/issues/798 and https://github.com/facebook/buck/pull/802/files
+
+        # Update in https://github.com/facebook/buck/commit/99c0fbc3ab5ecf04d186913374f660683deccdef
+        # Update in https://github.com/facebook/buck/commit/36db188da9f6acbb9df419dc1904315ab00c4e19
+
+        # Buck changes referenced above are not self-explanatory and do not seem exhaustive or up-to-date
+        # Comments below explain the rules applied to each key in order to make realignment with future Xcode export logic easier
+        BLACKLISTED_KEYS=(\
+            # PP list identifiers inconsistent with app-defined ones and this key does not seem to appear in IPA entitlements, so ignore it
+            "com.apple.developer.icloud-container-development-container-identifiers" \
+            # This key has an invalid generic value in PP (actual value is set by Xcode during export), see dedicated processing a few blocks below
+            "com.apple.developer.icloud-container-environment" \
+            # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
+            "com.apple.developer.icloud-container-identifiers" \
+            # PP enable all available services and not app-defined ones, must use App entitlements value
+            "com.apple.developer.icloud-services" \
+            # Was already blacklisted in previous version, but has someone ever seen this key in a PP?
+            "com.apple.developer.restricted-resource-mode" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.nfc.readersession.formats" \
+            # PP list a single TeamID.* identifier and not app-defined ones, must use App entitlements value
+            "com.apple.developer.pass-type-identifiers" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.siri" \
+            # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
+            "com.apple.developer.ubiquity-container-identifiers" \
+            # PP define a generic TeamID.* identifier and not the app-defined one, must use App entitlements value
+            "com.apple.developer.ubiquity-kvstore-identifier" \
+            # If actually used by the App, this value will be set in its entitlements
+            "inter-app-audio" \
+            # PP define a generic TeamID.* identifier and not the app-defined one, must use App entitlements value
+            "keychain-access-groups" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.homekit" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.healthkit" \
+            # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
+            "com.apple.developer.in-app-payments" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.networking.vpn.api" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.networking.HotspotConfiguration" \
+            # PP list all available extensions and not app-defined ones, must use App entitlements value
+            "com.apple.developer.networking.networkextension" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.networking.multipath" \
+            # PP enable all domains via a non-AppStore-compliant '*' value, must use App entitlements value
+            "com.apple.developer.associated-domains" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.default-data-protection" \
+            # PP seem to list the same groups as the App, but use App entitlements value to be sure
+            "com.apple.security.application-groups" \
+            # Was already blacklisted in previous version, seems to be an artifact from an old Xcode release
+            "com.apple.developer.maps" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.external-accessory.wireless-configuration"
+        )
+
+        # Blacklisted keys must not be included into new profile, so remove them from patched profile
+        for KEY in "${BLACKLISTED_KEYS[@]}"; do
+            log "Removing blacklisted key: $KEY"
+            PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
+        done
 
         # Get the old and new app identifier (prefix)
         APP_ID_KEY="application-identifier"
@@ -665,13 +702,22 @@ function resign {
         # There can be only one ID_TYPE specified
         # If entitlements use more than one ID type for single entitlement, then this way of resigning will not work
         # instead an entitlements file must be provided explicitly
-        ENTITLEMENTS_TRANSFER_RULES=("com.apple.developer.associated-domains" \
+        ENTITLEMENTS_TRANSFER_RULES=(\
+            "com.apple.developer.associated-domains" \
+            "com.apple.developer.default-data-protection" \
             "com.apple.developer.healthkit" \
             "com.apple.developer.homekit" \
+            "com.apple.developer.icloud-container-environment" \
             "com.apple.developer.icloud-container-identifiers" \
             "com.apple.developer.icloud-services" \
             "com.apple.developer.in-app-payments" \
+            "com.apple.developer.networking.HotspotConfiguration" \
+            "com.apple.developer.networking.multipath" \
+            "com.apple.developer.networking.networkextension" \
             "com.apple.developer.networking.vpn.api" \
+            "com.apple.developer.nfc.readersession.formats" \
+            "com.apple.developer.pass-type-identifiers|TEAM_ID" \
+            "com.apple.developer.siri" \
             "com.apple.developer.ubiquity-container-identifiers" \
             "com.apple.developer.ubiquity-kvstore-identifier|TEAM_ID" \
             "com.apple.external-accessory.wireless-configuration" \
@@ -690,6 +736,22 @@ function resign {
             if [[ -z "$ENTITLEMENTS_VALUE" ]]; then
                 log "No value for '$KEY'"
                 continue
+            fi
+
+            if [[ "$KEY" == "com.apple.developer.icloud-container-environment" ]]; then
+                # Add specific iCloud Environment key to patched entitlements
+                # This value is set by Xcode during export (manually selected for Development and AdHoc, automatically set to Production for Store)
+                # Would need an additional dedicated option to specify the iCloud environment to be used (Development or Production)
+                # For now, we assume Production is to be used when signing with a Distribution certificate, Development if not
+                if [[ "$CERTIFICATE" =~ "Distribution:" ]]; then
+                    ICLOUD_ENV="Production"
+                else
+                    ICLOUD_ENV="Development"
+                fi
+                log "Overriding value for $KEY"
+                log "Old value: $ENTITLEMENTS_VALUE"
+                log "New value: $ICLOUD_ENV"
+                ENTITLEMENTS_VALUE="$ICLOUD_ENV"
             fi
 
             log "App entitlements value for key '$KEY':"
@@ -712,7 +774,7 @@ function resign {
                 log "Replacing old app identifier prefix '$OLD_APP_ID' with new value '$NEW_APP_ID'"
                 sed -i .bak "s/$OLD_APP_ID/$NEW_APP_ID/g" "$PATCHED_ENTITLEMENTS"
             elif [[ "$ID_TYPE" == "TEAM_ID" ]]; then
-                # Replace new team identifier with new value
+                # Replace old team identifier with new value
                 log "Replacing old team ID '$OLD_TEAM_ID' with new team ID: '$NEW_TEAM_ID'"
                 sed -i .bak "s/$OLD_TEAM_ID/$NEW_TEAM_ID/g" "$PATCHED_ENTITLEMENTS"
             else
@@ -727,33 +789,6 @@ function resign {
         log "Replacing old bundle ID '$OLD_BUNDLE_ID' with new bundle ID '$NEW_BUNDLE_ID' in patched entitlements"
         sed -i .bak "s/$OLD_BUNDLE_ID/$NEW_BUNDLE_ID/g" "$PATCHED_ENTITLEMENTS"
 
-        log "Removing blacklisted keys from patched profile"
-        # See https://github.com/facebook/buck/issues/798 and https://github.com/facebook/buck/pull/802/files
-
-        # Update in https://github.com/facebook/buck/commit/99c0fbc3ab5ecf04d186913374f660683deccdef
-        # Update in https://github.com/facebook/buck/commit/36db188da9f6acbb9df419dc1904315ab00c4e19
-        BLACKLISTED_KEYS=(\
-            "com.apple.developer.icloud-container-development-container-identifiers" \
-            "com.apple.developer.icloud-container-environment" \
-            "com.apple.developer.icloud-container-identifiers" \
-            "com.apple.developer.icloud-services" \
-            "com.apple.developer.restricted-resource-mode" \
-            "com.apple.developer.ubiquity-container-identifiers" \
-            "com.apple.developer.ubiquity-kvstore-identifier" \
-            "inter-app-audio" \
-            "com.apple.developer.homekit" \
-            "com.apple.developer.healthkit" \
-            "com.apple.developer.in-app-payments" \
-            "com.apple.developer.maps" \
-            "com.apple.external-accessory.wireless-configuration"
-        )
-
-        # Blacklisted keys must not be included into new profile, so remove them from patched profile
-        for KEY in "${BLACKLISTED_KEYS[@]}"; do
-            log "Removing blacklisted key: $KEY"
-            PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
-        done
-
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and patched entitlements:"
         log "$(cat "$PATCHED_ENTITLEMENTS")"
@@ -766,7 +801,10 @@ function resign {
         checkStatus
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and entitlements from provisioning profile: $NEW_PROVISION"
-        cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
+        if [[ "${XCODE_VERSION/.*/}" -lt 10 ]]; then
+            log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
+            cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
+        fi
         # Must not qote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
         # shellcheck disable=SC2086
         /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
@@ -779,7 +817,7 @@ function resign {
     rm -f "$APP_ENTITLEMENTS"
     rm -f "$PATCHED_ENTITLEMENTS"
     rm -f "$PATCHED_ENTITLEMENTS.bak"
-    rm -r "$TEMP_DIR/old-embedded-profile.plist"
+    rm -f "$TEMP_DIR/old-embedded-profile.plist"
     rm -f "$TEMP_DIR/profile.plist"
     rm -f "$TEMP_DIR/old-embedded.mobileprovision"
     rm -f "$TEMP_DIR/oldInfo.plist"

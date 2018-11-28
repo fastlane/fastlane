@@ -5,7 +5,7 @@ describe Spaceship::AppSubmission do
   let(:app) { Spaceship::Application.all.first }
 
   describe "successfully creates a new app submission" do
-    it "generates a new app submission from iTunes Connect response" do
+    it "generates a new app submission from App Store Connect response" do
       TunesStubbing.itc_stub_app_submissions
       submission = app.create_submission
 
@@ -16,7 +16,7 @@ describe Spaceship::AppSubmission do
       expect(submission.export_compliance_compliance_required).to eq(true)
     end
 
-    it "submits a valid app submission to iTunes Connect" do
+    it "submits a valid app submission to App Store Connect" do
       TunesStubbing.itc_stub_app_submissions
       submission = app.create_submission
       submission.content_rights_contains_third_party_content = true
@@ -25,6 +25,17 @@ describe Spaceship::AppSubmission do
       submission.complete!
 
       expect(submission.submitted_for_review).to eq(true)
+    end
+
+    it "sets automatically the limitsTracking value for the usesIdfa" do
+      TunesStubbing.itc_stub_app_submissions
+      submission = app.create_submission
+      submission.content_rights_contains_third_party_content = true
+      submission.content_rights_has_rights = true
+      submission.add_id_info_uses_idfa = true
+      submission.complete!
+
+      expect(submission.raw_data["adIdInfo"]["limitsTracking"]["value"]).to eq(true)
     end
 
     it "raises an error when submitting an app that has validation errors" do

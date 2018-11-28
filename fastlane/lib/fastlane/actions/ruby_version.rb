@@ -20,7 +20,7 @@ module Fastlane
       end
 
       def self.step_text
-        "Verifying required ruby version"
+        "Verifying Ruby version"
       end
 
       def self.author
@@ -32,7 +32,9 @@ module Fastlane
       end
 
       def self.example_code
-        ['ruby_version "2.4.0"']
+        [
+          'ruby_version("2.4.0")'
+        ]
       end
 
       def self.details

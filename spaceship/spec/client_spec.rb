@@ -39,10 +39,57 @@ describe Spaceship::Client do
       then.to_return(status: status_ok, body: body)
   end
 
+  describe 'detect_most_common_errors_and_raise_exceptions' do
+    it "raises Spaceship::InsufficientPermissions for Forbidden" do
+      body = JSON.generate({ messages: { error: "InsufficentPermissions" } })
+      stub_client_request(Spaceship::InsufficientPermissions, 6, 200, body)
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::InsufficientPermissions)
+    end
+
+    it "raises Spaceship::InsufficientPermissions for insufficient privileges" do
+      body = JSON.generate({ messages: { error: "insufficient privileges" } })
+      stub_client_request(Spaceship::InsufficientPermissions, 6, 200, body)
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::InsufficientPermissions)
+    end
+
+    it "raises Spaceship::InternalServerError" do
+      stub_client_request(Spaceship::GatewayTimeoutError, 6, 504, "<html>Internal Server - Read</html>")
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::GatewayTimeoutError)
+    end
+
+    it "raises Spaceship::GatewayTimeoutError" do
+      stub_client_request(Spaceship::GatewayTimeoutError, 6, 504, "<html>Gateway Timeout - In Read</html>")
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::GatewayTimeoutError)
+    end
+
+    it "raises Spaceship::ProgramLicenseAgreementUpdated" do
+      stub_client_request(Spaceship::ProgramLicenseAgreementUpdated, 6, 200, "Program License Agreement")
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::ProgramLicenseAgreementUpdated)
+    end
+  end
+
   describe 'retry' do
     [
       Faraday::Error::TimeoutError,
-      Faraday::Error::ConnectionFailed
+      Faraday::Error::ConnectionFailed,
+      Faraday::ParsingError,
+      Spaceship::InternalServerError,
+      Spaceship::GatewayTimeoutError
     ].each do |thrown|
       it "re-raises when retry limit reached throwing #{thrown}" do
         stub_client_request(thrown, 6, 200, nil)
@@ -125,8 +172,9 @@ describe Spaceship::Client do
     end
 
     it "uses $SPACESHIP_COOKIE_PATH when set" do
-      ENV["SPACESHIP_COOKIE_PATH"] = "/custom_path"
-      expect(subject.persistent_cookie_path).to eq("/custom_path/spaceship/username/cookie")
+      tmp_path = Dir.mktmpdir
+      ENV["SPACESHIP_COOKIE_PATH"] = "#{tmp_path}/custom_path"
+      expect(subject.persistent_cookie_path).to eq("#{tmp_path}/custom_path/spaceship/username/cookie")
     end
 
     it "uses home dir by default" do
@@ -143,14 +191,14 @@ describe Spaceship::Client do
     it "uses /var/tmp if home not available" do
       allow(subject).to receive(:directory_accessible?).with(File.expand_path("~/.fastlane")).and_return(false)
       allow(subject).to receive(:directory_accessible?).with(File.expand_path("~")).and_return(false)
-      allow(subject).to receive(:directory_accessible?).with("/var/tmp").and_return(true)
-      expect(subject.persistent_cookie_path).to eq("/var/tmp/spaceship/username/cookie")
+      allow(subject).to receive(:directory_accessible?).with(File.expand_path("/var/tmp")).and_return(true)
+      expect(subject.persistent_cookie_path).to eq(File.expand_path("/var/tmp/spaceship/username/cookie"))
     end
 
     it "falls back to Dir.tmpdir as last resort" do
       allow(subject).to receive(:directory_accessible?).with(File.expand_path("~")).and_return(false)
       allow(subject).to receive(:directory_accessible?).with(File.expand_path("~/.fastlane")).and_return(false)
-      allow(subject).to receive(:directory_accessible?).with("/var/tmp").and_return(false)
+      allow(subject).to receive(:directory_accessible?).with(File.expand_path("/var/tmp")).and_return(false)
       allow(subject).to receive(:directory_accessible?).with(Dir.tmpdir).and_return(true)
       expect(subject.persistent_cookie_path).to eq("#{Dir.tmpdir}/spaceship/username/cookie")
     end

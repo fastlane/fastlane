@@ -9,7 +9,7 @@ describe Spaceship::Client do
   describe '#login' do
     it 'sets the session cookies' do
       response = subject.login(username, password)
-      expect(response.env.request_headers['Cookie']).to eq('myacinfo=abcdef')
+      expect(subject.cookie).to eq("myacinfo=abcdef")
     end
 
     it 'raises an exception if authentication failed' do
@@ -35,14 +35,42 @@ describe Spaceship::Client do
       end
 
       it "set custom Team ID" do
+        allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([
+                                                                                       { 'teamId' => 'XXXXXXXXXX', 'currentTeamMember' => { 'teamMemberId' => '' } },
+                                                                                       { 'teamId' => 'ABCDEF', 'currentTeamMember' => { 'teamMemberId' => '' } }
+                                                                                     ])
+
         team_id = "ABCDEF"
-        subject.team_id = team_id
+        subject.select_team(team_id: team_id)
         expect(subject.team_id).to eq(team_id)
       end
 
       it "shows a warning when user is in multiple teams and didn't call select_team" do
         PortalStubbing.adp_stub_multiple_teams
         expect(subject.team_id).to eq("SecondTeam")
+      end
+    end
+
+    describe '#team_name' do
+      it 'returns the default team_name' do
+        expect(subject.team_name).to eq('SpaceShip')
+      end
+
+      it "returns team_name from selected team_id" do
+        allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([
+                                                                                       { 'teamId' => 'XXXXXXXXXX', 'name' => 'SpaceShip', 'currentTeamMember' => { 'teamMemberId' => '' } },
+                                                                                       { 'teamId' => 'ABCDEF', 'name' => 'PirateShip', 'currentTeamMember' => { 'teamMemberId' => '' } }
+                                                                                     ])
+
+        team_id = "ABCDEF"
+        subject.select_team(team_id: team_id)
+        expect(subject.team_id).to eq(team_id)
+        expect(subject.team_name).to eq('PirateShip')
+      end
+
+      it "return nil if no teams" do
+        allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([])
+        expect(subject.team_name).to eq(nil)
       end
     end
 
@@ -121,11 +149,11 @@ describe Spaceship::Client do
         expect(response['identifier']).to eq('tools.fastlane.spaceship.some-explicit-app')
       end
 
-      it 'should make a request create an explicit app id with no push feature' do
+      it 'should make a request create an explicit app id with push feature' do
         payload = {}
         payload[Spaceship.app_service.push_notification.on.service_id] = Spaceship.app_service.push_notification.on
         response = subject.create_app!(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', enable_services: payload)
-        expect(response['enabledFeatures']).to_not include("push")
+        expect(response['enabledFeatures']).to(include("push"))
         expect(response['identifier']).to eq('tools.fastlane.spaceship.some-explicit-app')
       end
     end
@@ -253,6 +281,13 @@ describe Spaceship::Client do
         response = subject.create_provisioning_profile!("net.sunapps.106 limited", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], ['C8DLAAAARQ'], mac: false, sub_platform: nil)
         expect(response.keys).to include('name', 'status', 'type', 'appId', 'deviceIds')
         expect(response['distributionMethod']).to eq('limited')
+      end
+
+      it "works when template name is specified" do
+        template_name = 'Subscription Service iOS (dist)'
+        response = subject.create_provisioning_profile!("net.sunapps.106 limited", "limited", 'R9YNDTPLJX', ['C8DL7464RQ'], [], mac: false, sub_platform: nil, template_name: template_name)
+        expect(response.keys).to include('name', 'status', 'type', 'appId', 'deviceIds', 'template')
+        expect(response['template']['purposeDisplayName']).to eq(template_name)
       end
     end
 

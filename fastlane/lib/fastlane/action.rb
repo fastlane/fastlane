@@ -1,4 +1,5 @@
 require 'fastlane/actions/actions_helper'
+require 'forwardable'
 
 module Fastlane
   class Action
@@ -14,12 +15,27 @@ module Fastlane
       :production,
       :source_control,
       :notifications,
-      :deprecated,
-      :misc
+      :app_store_connect,
+      :misc,
+      :deprecated # This should be the last item
+    ]
+
+    RETURN_TYPES = [
+      :string,
+      :array_of_strings,
+      :hash_of_strings,
+      :hash,
+      :bool,
+      :int
     ]
 
     class << self
       attr_accessor :runner
+
+      extend(Forwardable)
+
+      # to allow a simple `sh` in the custom actions
+      def_delegator(Actions, :sh_control_output, :sh)
     end
 
     def self.run(params)
@@ -31,7 +47,7 @@ module Fastlane
     end
 
     def self.details
-      nil # this is your change to provide a more detailed description of this action
+      nil # this is your chance to provide a more detailed description of this action
     end
 
     def self.available_options
@@ -48,6 +64,11 @@ module Fastlane
       # [
       #   ['IPA_OUTPUT_PATH', 'The path to the newly generated ipa file']
       # ]
+      nil
+    end
+
+    def self.return_type
+      # Describes what type of data is expected to be returned, see RETURN_TYPES
       nil
     end
 
@@ -93,11 +114,6 @@ module Fastlane
       self.action_name
     end
 
-    # to allow a simple `sh` in the custom actions
-    def self.sh(command, print_command: true, print_command_output: true, error_callback: nil)
-      Fastlane::Actions.sh_control_output(command, print_command: print_command, print_command_output: print_command_output, error_callback: error_callback)
-    end
-
     # Documentation category, available values defined in AVAILABLE_CATEGORIES
     def self.category
       :undefined
@@ -135,5 +151,40 @@ module Fastlane
     def self.deprecated_notes
       nil
     end
+  end
+end
+
+class String
+  def markdown_preserve_newlines
+    self.gsub(/(\n|$)/, '|\1') # prepend new lines with "|" so the erb template knows *not* to replace them with "<br>"s
+  end
+
+  def markdown_sample(is_first = false)
+    self.markdown_clean_heredoc!
+    self.markdown_details(is_first)
+  end
+
+  def markdown_list(is_first = false)
+    self.markdown_clean_heredoc!
+    self.gsub!(/^/, "- ") # add list dashes
+    self.prepend(">") unless is_first # the empty line that will be added breaks the quote
+    self.markdown_details(is_first)
+  end
+
+  def markdown_details(is_first)
+    self.prepend("\n") unless is_first
+    self << "\n>" # continue the quote
+    self.markdown_preserve_newlines
+  end
+
+  def markdown_clean_heredoc!
+    self.chomp! # remove the last new line added by the heredoc
+    self.dedent! # remove the leading whitespace (similar to the squigly heredoc `<<~`)
+  end
+
+  def dedent!
+    first_line_indent = self.match(/^\s*/)[0]
+
+    self.gsub!(/^#{first_line_indent}/, "")
   end
 end

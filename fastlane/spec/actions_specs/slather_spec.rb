@@ -4,6 +4,7 @@ describe Fastlane do
       let(:action) { Fastlane::Actions::SlatherAction }
       it "works with all parameters" do
         allow(Fastlane::Actions::SlatherAction).to receive(:slather_version).and_return(Gem::Version.create('2.4.1'))
+        source_files = "*.swift"
         result = Fastlane::FastFile.new.parse("lane :test do
           slather({
             use_bundle_exec: false,
@@ -14,12 +15,14 @@ describe Fastlane do
             buildkite: true,
             jenkins: true,
             travis: true,
+            travis_pro: true,
             circleci: true,
             coveralls: true,
             teamcity: true,
             simple_output: true,
             gutter_json: true,
             cobertura_xml: true,
+            llvm_cov: true,
             html: true,
             show: true,
             verbose: true,
@@ -30,13 +33,15 @@ describe Fastlane do
             binary_basename: ['YourApp', 'YourFramework'],
             binary_file: 'you',
             workspace: 'foo.xcworkspace',
-            source_files: '*.swift',
+            arch: 'arm64',
+            source_files: '#{source_files}',
             decimals: '2'
           })
         end").runner.execute(:test)
 
         expected = "slather coverage
                     --travis
+                    --travispro
                     --circleci
                     --jenkins
                     --buildkite
@@ -45,6 +50,7 @@ describe Fastlane do
                     --simple-output
                     --gutter-json
                     --cobertura-xml
+                    --llvm-cov
                     --html
                     --show
                     --build-directory foo
@@ -59,7 +65,8 @@ describe Fastlane do
                     --binary-file you
                     --binary-basename YourApp
                     --binary-basename YourFramework
-                    --source-files \\*.swift
+                    --arch arm64
+                    --source-files #{source_files.shellescape}
                     --decimals 2 foo.xcodeproj".gsub(/\s+/, ' ')
         expect(result).to eq(expected)
       end
@@ -77,11 +84,13 @@ describe Fastlane do
             buildkite: true,
             jenkins: true,
             travis: true,
+            travis_pro: true,
             circleci: true,
             coveralls: true,
             simple_output: true,
             gutter_json: true,
             cobertura_xml: true,
+            llvm_cov: true,
             html: true,
             show: true,
             source_directory: 'baz',
@@ -96,6 +105,7 @@ describe Fastlane do
 
         expected = 'bundle exec slather coverage
                     --travis
+                    --travispro
                     --circleci
                     --jenkins
                     --buildkite
@@ -103,6 +113,7 @@ describe Fastlane do
                     --simple-output
                     --gutter-json
                     --cobertura-xml
+                    --llvm-cov
                     --html
                     --show
                     --build-directory foo
@@ -149,39 +160,46 @@ describe Fastlane do
       end
 
       it "works with spaces in paths" do
+        build_dir = "build dir"
+        source_dir = "source dir"
+        output_dir = "output dir"
+        ignore = "nothing to ignore"
+        scheme = "Foo App"
+        proj = "foo bar.xcodeproj"
         result = Fastlane::FastFile.new.parse("lane :test do
           slather({
-            build_directory: 'build dir',
+            build_directory: '#{build_dir}',
             input_format: 'bah',
-            scheme: 'Foo App',
-            source_directory: 'source dir',
-            output_directory: 'output dir',
-            ignore: 'nothing to ignore',
-            proj: 'foo bar.xcodeproj'
+            scheme: '#{scheme}',
+            source_directory: '#{source_dir}',
+            output_directory: '#{output_dir}',
+            ignore: '#{ignore}',
+            proj: '#{proj}'
           })
         end").runner.execute(:test)
 
         expected = "slather coverage
-                    --build-directory build\\ dir
-                    --source-directory source\\ dir
-                    --output-directory output\\ dir
-                    --ignore nothing\\ to\\ ignore
+                    --build-directory #{build_dir.shellescape}
+                    --source-directory #{source_dir.shellescape}
+                    --output-directory #{output_dir.shellescape}
+                    --ignore #{ignore.shellescape}
                     --input-format bah
-                    --scheme Foo\\ App
-                    foo\\ bar.xcodeproj".gsub(/\s+/, ' ')
-
+                    --scheme #{scheme.shellescape}
+                    #{proj.shellescape}".gsub(/\s+/, ' ')
         expect(result).to eq(expected)
       end
 
       it "works with multiple ignore patterns" do
+        pattern1 = "Pods/*"
+        pattern2 = "../**/*/Xcode*"
         result = Fastlane::FastFile.new.parse("lane :test do
           slather({
-            ignore: ['Pods/*', '../**/*/Xcode*'],
+            ignore: ['#{pattern1}', '#{pattern2}'],
             proj: 'foo.xcodeproj'
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("slather coverage --ignore Pods/\\* --ignore ../\\*\\*/\\*/Xcode\\* foo.xcodeproj")
+        expect(result).to eq("slather coverage --ignore #{pattern1.shellescape} --ignore #{pattern2.shellescape} foo.xcodeproj")
       end
 
       describe "#configuration_available?" do

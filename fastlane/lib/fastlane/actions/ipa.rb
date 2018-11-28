@@ -58,7 +58,7 @@ module Fastlane
         UI.verbose(command)
 
         begin
-          Actions.sh command
+          Actions.sh(command)
 
           # Finds absolute path of IPA and dSYM
           absolute_ipa_path = find_ipa_file(absolute_dest_directory)
@@ -78,7 +78,7 @@ module Fastlane
             " => " + ex.to_s,
             "A build error occurred. You are using legacy `shenzhen` for building",
             "it is recommended to upgrade to _gym_: ",
-            "https://github.com/fastlane/fastlane/tree/master/gym",
+            "https://docs.fastlane.tools/actions/gym/",
             core_command,
             "-------------------------------------------------------"
           ].each do |txt|
@@ -163,6 +163,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :destination,
                                        env_name: "IPA_DESTINATION",
                                        description: "Build destination. Defaults to current directory",
+                                       default_value_dynamic: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :embed,
                                        env_name: "IPA_EMBED",
@@ -227,10 +228,12 @@ module Fastlane
       end
 
       def self.deprecated_notes
-        "You are using legacy `shenzhen` to build your app, which will be removed soon!\n" \
-        "It is recommended to upgrade to _gym_\n" \
-        "To do so, just replace `ipa(...)` with `gym(...)` in your Fastfile\n" \
-        "To make code signing work, follow https://docs.fastlane.tools/codesigning/xcode-project/#"
+        [
+          "You are using legacy `shenzhen` to build your app, which will be removed soon!",
+          "It is recommended to upgrade to _gym_.",
+          "To do so, just replace `ipa(...)` with `gym(...)` in your Fastfile.",
+          "To make code signing work, follow [https://docs.fastlane.tools/codesigning/xcode-project/](https://docs.fastlane.tools/codesigning/xcode-project/)."
+        ].join("\n")
       end
     end
   end

@@ -7,9 +7,9 @@ describe Spaceship::ProvisioningProfile do
     let(:provisioning_profiles) { Spaceship::ProvisioningProfile.all }
 
     it "properly retrieves and filters the provisioning profiles" do
-      expect(provisioning_profiles.count).to eq(6)
+      expect(provisioning_profiles.count).to eq(7)
 
-      profile = provisioning_profiles.last
+      profile = provisioning_profiles[5]
       expect(profile.name).to eq('delete.me.please AppStore')
       expect(profile.type).to eq('iOS Distribution')
       expect(profile.app.app_id).to eq('2UMR2S6P4L')
@@ -26,8 +26,8 @@ describe Spaceship::ProvisioningProfile do
 
     it 'should filter by the correct types' do
       expect(Spaceship::ProvisioningProfile::Development.all.count).to eq(1)
-      expect(Spaceship::ProvisioningProfile::AdHoc.all.count).to eq(5)
-      expect(Spaceship::ProvisioningProfile::AppStore.all.count).to eq(5)
+      expect(Spaceship::ProvisioningProfile::AdHoc.all.count).to eq(6)
+      expect(Spaceship::ProvisioningProfile::AppStore.all.count).to eq(6)
     end
 
     it "AppStore and AdHoc are the same" do
@@ -44,12 +44,12 @@ describe Spaceship::ProvisioningProfile do
     describe "include managed by Xcode" do
       it 'filters Xcode managed profiles' do
         provisioning_profiles = Spaceship::ProvisioningProfile.all(xcode: false)
-        expect(provisioning_profiles.count).to eq(6) # ignore the Xcode generated profiles
+        expect(provisioning_profiles.count).to eq(7) # ignore the Xcode generated profiles
       end
 
       it 'includes Xcode managed profiles' do
         provisioning_profiles = Spaceship::ProvisioningProfile.all(xcode: true)
-        expect(provisioning_profiles.count).to eq(6) # include the Xcode generated profiles
+        expect(provisioning_profiles.count).to eq(7) # include the Xcode generated profiles
       end
     end
   end
@@ -64,29 +64,37 @@ describe Spaceship::ProvisioningProfile do
     it 'should use the Xcode api to get provisioning profiles and their appIds' do
       ENV['SPACESHIP_AVOID_XCODE_API'] = nil
       expect(client).to receive(:provisioning_profiles_via_xcode_api).and_call_original
-      expect(client).not_to receive(:provisioning_profiles)
-      expect(client).not_to receive(:provisioning_profile_details)
-      Spaceship::ProvisioningProfile.find_by_bundle_id('some-fake-id')
+      expect(client).not_to(receive(:provisioning_profiles))
+      expect(client).not_to(receive(:provisioning_profile_details))
+      Spaceship::ProvisioningProfile.find_by_bundle_id(bundle_id: 'some-fake-id')
     end
 
     it 'should use the developer portal api to get provisioning profiles and their appIds' do
       ENV['SPACESHIP_AVOID_XCODE_API'] = 'true'
-      expect(client).not_to receive(:provisioning_profiles_via_xcode_api)
+      expect(client).not_to(receive(:provisioning_profiles_via_xcode_api))
       expect(client).to receive(:provisioning_profiles).and_call_original
-      expect(client).to receive(:provisioning_profile_details).and_call_original.exactly(6).times
-      Spaceship::ProvisioningProfile.find_by_bundle_id('some-fake-id')
+      expect(client).to receive(:provisioning_profile_details).and_call_original.exactly(7).times
+      Spaceship::ProvisioningProfile.find_by_bundle_id(bundle_id: 'some-fake-id')
     end
   end
 
   describe '#find_by_bundle_id' do
     it "returns [] if there are no profiles" do
-      profiles = Spaceship::ProvisioningProfile.find_by_bundle_id("notExistent")
+      profiles = Spaceship::ProvisioningProfile.find_by_bundle_id(bundle_id: "notExistent")
       expect(profiles).to eq([])
     end
 
-    it "returns the profile in an array if matching" do
-      profiles = Spaceship::ProvisioningProfile.find_by_bundle_id("net.sunapps.1")
+    it "returns the profile in an array if matching for ios" do
+      profiles = Spaceship::ProvisioningProfile.find_by_bundle_id(bundle_id: "net.sunapps.1")
       expect(profiles.count).to eq(6)
+
+      expect(profiles.first.app.bundle_id).to eq('net.sunapps.1')
+      expect(profiles.first.distribution_method).to eq('store')
+    end
+
+    it "returns the profile in an array if matching for tvos" do
+      profiles = Spaceship::ProvisioningProfile.find_by_bundle_id(bundle_id: "net.sunapps.1", sub_platform: 'tvOS')
+      expect(profiles.count).to eq(1)
 
       expect(profiles.first.app.bundle_id).to eq('net.sunapps.1')
       expect(profiles.first.distribution_method).to eq('store')
@@ -163,12 +171,12 @@ describe Spaceship::ProvisioningProfile do
 
     it 'creates a new development provisioning profile' do
       expect(Spaceship::Device).to receive(:all).and_return([])
-      expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'limited', '2UMR2S6PAA', "XC5PH8DAAA", [], mac: false, sub_platform: nil).and_return({})
+      expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'limited', '2UMR2S6PAA', "XC5PH8DAAA", [], mac: false, sub_platform: nil, template_name: nil).and_return({})
       Spaceship::ProvisioningProfile::Development.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate)
     end
 
     it 'creates a new appstore provisioning profile' do
-      expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'store', '2UMR2S6PAA', "XC5PH8DAAA", [], mac: false, sub_platform: nil).and_return({})
+      expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'store', '2UMR2S6PAA', "XC5PH8DAAA", [], mac: false, sub_platform: nil, template_name: nil).and_return({})
       Spaceship::ProvisioningProfile::AppStore.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate)
     end
 
@@ -179,43 +187,50 @@ describe Spaceship::ProvisioningProfile do
                                                                     "XC5PH8DAAA",
                                                                     [],
                                                                     mac: false,
-                                                                    sub_platform: nil).
+                                                                    sub_platform: nil,
+                                                                    template_name: nil).
         and_return({})
       Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: 'net.sunapps.1', certificate: certificate)
+    end
+
+    it 'creates a new appstore provisioning profile with template' do
+      template_name = 'Test Template'
+      expect(client).to receive(:create_provisioning_profile!).with('Delete Me', 'store', '2UMR2S6PAA', "XC5PH8DAAA", [], mac: false, sub_platform: nil, template_name: template_name).and_return({})
+      Spaceship::ProvisioningProfile::AppStore.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate, template_name: template_name)
     end
 
     it 'raises an error if the user wants to create a profile for a non-existing app' do
       expect do
         Spaceship::ProvisioningProfile::AppStore.create!(bundle_id: 'notExisting', certificate: certificate)
-      end.to raise_error "Could not find app with bundle id 'notExisting'"
+      end.to raise_error("Could not find app with bundle id 'notExisting'")
     end
 
     describe 'modify devices to prevent having devices on profile types where it does not make sense' do
       it 'Direct (Mac) profile types have no devices' do
         fake_devices = Spaceship::Device.all
         expected_devices = []
-        expect(Spaceship::ProvisioningProfile::Direct.client).to receive(:create_provisioning_profile!).with('Delete Me', 'direct', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: true, sub_platform: nil).and_return({})
+        expect(Spaceship::ProvisioningProfile::Direct.client).to receive(:create_provisioning_profile!).with('Delete Me', 'direct', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: true, sub_platform: nil, template_name: nil).and_return({})
         Spaceship::ProvisioningProfile::Direct.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate, mac: true, devices: fake_devices)
       end
 
       it 'Development profile types have devices' do
         fake_devices = Spaceship::Device.all
         expected_devices = fake_devices.collect(&:id)
-        expect(Spaceship::ProvisioningProfile::Development.client).to receive(:create_provisioning_profile!).with('Delete Me', 'limited', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: false, sub_platform: nil).and_return({})
+        expect(Spaceship::ProvisioningProfile::Development.client).to receive(:create_provisioning_profile!).with('Delete Me', 'limited', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: false, sub_platform: nil, template_name: nil).and_return({})
         Spaceship::ProvisioningProfile::Development.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate, devices: fake_devices)
       end
 
       it 'AdHoc profile types have no devices' do
         fake_devices = Spaceship::Device.all
         expected_devices = fake_devices.collect(&:id)
-        expect(Spaceship::ProvisioningProfile::AdHoc.client).to receive(:create_provisioning_profile!).with('Delete Me', 'adhoc', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: false, sub_platform: nil).and_return({})
+        expect(Spaceship::ProvisioningProfile::AdHoc.client).to receive(:create_provisioning_profile!).with('Delete Me', 'adhoc', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: false, sub_platform: nil, template_name: nil).and_return({})
         Spaceship::ProvisioningProfile::AdHoc.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate, devices: fake_devices)
       end
 
       it 'AppStore profile types have no devices' do
         fake_devices = Spaceship::Device.all
         expected_devices = []
-        expect(Spaceship::ProvisioningProfile::AppStore.client).to receive(:create_provisioning_profile!).with('Delete Me', 'store', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: false, sub_platform: nil).and_return({})
+        expect(Spaceship::ProvisioningProfile::AppStore.client).to receive(:create_provisioning_profile!).with('Delete Me', 'store', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: false, sub_platform: nil, template_name: nil).and_return({})
         Spaceship::ProvisioningProfile::AppStore.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate, devices: fake_devices)
       end
     end
@@ -234,13 +249,13 @@ describe Spaceship::ProvisioningProfile do
 
     it "repairs an existing profile with added devices" do
       profile.devices = Spaceship::Device.all_for_profile_type(profile.type)
-      expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [cert_id], ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"], mac: false, sub_platform: nil).and_return({})
+      expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [cert_id], ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"], mac: false, sub_platform: nil, template_name: nil).and_return({})
       profile.repair!
     end
 
     it "update the certificate if the current one doesn't exist" do
       profile.certificates = []
-      expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: nil).and_return({})
+      expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: nil, template_name: nil).and_return({})
 
       # expect(client).to receive(:repair_provisioning_profile!).with('PP00000002', '1 Gut Altentann Ad Hoc', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: nil).and_return({})
       profile.repair!
@@ -248,12 +263,12 @@ describe Spaceship::ProvisioningProfile do
 
     it "update the certificate if the current one is invalid" do
       expect(profile.certificates.first.id).to eq("3BH4JJSWM4")
-      expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: nil).and_return({})
+      expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: nil, template_name: nil).and_return({})
       profile.repair! # repair will replace the old certificate with the new one
     end
 
     it "repairs an existing profile with no devices" do
-      expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: nil).and_return({})
+      expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: nil, template_name: nil).and_return({})
       profile.repair!
     end
 
@@ -261,7 +276,17 @@ describe Spaceship::ProvisioningProfile do
       it "Development" do
         profile = Spaceship::ProvisioningProfile::Development.all.first
         devices = ["FVRY7XH22J", "4ZE252U553"]
-        expect(client).to receive(:repair_provisioning_profile!).with('PP00000005', '112 Wombats RC Development', 'limited', '2UMR2S6P4L', [cert_id], devices, mac: false, sub_platform: nil).and_return({})
+        expect(client).to receive(:repair_provisioning_profile!).with('PP00000005', '112 Wombats RC Development', 'limited', '2UMR2S6P4L', [cert_id], devices, mac: false, sub_platform: nil, template_name: nil).and_return({})
+        profile.repair!
+      end
+    end
+
+    context "if the profile was created with a template" do
+      let(:profile) { Spaceship::ProvisioningProfile.all.detect { |pp| pp.id == 'PP00000007' } }
+
+      it "repairs an existing profile with template" do
+        expect(client).to receive(:repair_provisioning_profile!).with('PP00000007', 'Profile with Template App Store', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: nil, template_name: "Subscription Service (dist)").and_return({})
+
         profile.repair!
       end
     end
@@ -272,13 +297,23 @@ describe Spaceship::ProvisioningProfile do
     let(:tvOSProfile) { Spaceship::ProvisioningProfile.all_tvos.first }
 
     it "updates an existing iOS profile" do
-      expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: nil).and_return({})
+      expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: nil, template_name: nil).and_return({})
       profile.update!
     end
 
     it "updates an existing tvOS profile" do
-      expect(client).to receive(:repair_provisioning_profile!).with('PP00000004', '107 GC Lorenzen AppStore tvOS', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: 'tvOS').and_return({})
+      expect(client).to receive(:repair_provisioning_profile!).with('PP00000004', '107 GC Lorenzen AppStore tvOS', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: 'tvOS', template_name: nil).and_return({})
       tvOSProfile.update!
+    end
+
+    context "if the profile was created with a template" do
+      let(:profile) { Spaceship::ProvisioningProfile.all.detect { |pp| pp.id == 'PP00000007' } }
+
+      it "updates an existing profile with template" do
+        expect(client).to receive(:repair_provisioning_profile!).with('PP00000007', 'Profile with Template App Store', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: nil, template_name: "Subscription Service (dist)").and_return({})
+
+        profile.update!
+      end
     end
   end
 

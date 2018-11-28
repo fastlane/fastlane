@@ -1,8 +1,9 @@
-lane :snappy do |options|
+lane(:snappy) do |options|
   snapshot(
     project: 'Example.xcodeproj',
     scheme: 'ExampleUITests',
-    devices: ['iPhone 6s', 'iPad Air'],
-    output_simulator_logs: true
+    devices: ['iPhone 6s', 'iPhone 6s Plus', 'iPhone 7', 'iPhone 7 Plus'],
+    output_simulator_logs: true,
+    clear_previous_screenshots: true
   )
 end

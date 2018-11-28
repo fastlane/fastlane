@@ -1,3 +1,8 @@
+require_relative 'app'
+require_relative 'device'
+require_relative 'certificate'
+require_relative 'provisioning_profile_template'
+
 module Spaceship
   module Portal
     # Represents a provisioning profile of the Apple Dev Portal
@@ -81,7 +86,7 @@ module Spaceship
       # @return (App) The app this profile is for
       #
       # @example Example Value
-      #   <Spaceship::App
+      #   <Spaceship::Portal::App
       #     @app_id="2UMR2S6PAA"
       #     @name="App Name"
       #     @platform="ios"
@@ -98,7 +103,7 @@ module Spaceship
       # @return (Array) A list of certificates used for this profile
       # @example Example Value
       #  [
-      #   <Spaceship::Certificate::Production
+      #   <Spaceship::Portal::Certificate::Production
       #     @status=nil
       #     @id="XC5PH8D4AA"
       #     @name="iOS Distribution"
@@ -118,7 +123,7 @@ module Spaceship
       #   This will always be [] for AppStore profiles
       #
       # @example Example Value
-      #  <Spaceship::Device
+      #  <Spaceship::Portal::Device
       #    @id="WXQ7V239BE"
       #    @name="Grahams iPhone 4s"
       #    @udid="ba0ac7d70f7a14c6fa02ef0e02f4fe9c5178e2f7"
@@ -134,6 +139,29 @@ module Spaceship
       # more information on this issue https://github.com/fastlane/fastlane/issues/6137
       attr_accessor :profile_details
 
+      # @return (Bool) Does the profile use a template (has extended entitlements)?
+      #
+      # @example
+      #   false
+      attr_accessor :is_template_profile
+
+      # @return (Spaceship::Portal::ProvisioningProfileTemplate)
+      #   Model representation of the provisioning profile template.
+      #   This will be always nil if is_template_profile returns false
+      #
+      # @example Example Value
+      #  <Spaceship::Portal::ProvisioningProfileTemplate
+      #    @template_description="Subscription Service iOS (dist)",
+      #    @entitlements=nil,
+      #    @purpose_description="Generic Provisioning Profile Template for App: com.apple.smoot.subscriptionservice",
+      #    @purpose_display_name="Subscription Service iOS (dist)",
+      #    @purpose_name="Subscription Service iOS (dist)",
+      #    @version=1>
+      #
+      # @example Usage
+      #  profile.template.purpose_display_name
+      attr_accessor :template
+
       attr_mapping({
         'provisioningProfileId' => :id,
         'UUID' => :uuid,
@@ -146,7 +174,9 @@ module Spaceship
         'proProPlatform' => :platform,
         'proProSubPlatform' => :sub_platform,
         'managingApp' => :managing_app,
-        'appId' => :app
+        'appId' => :app,
+        'isTemplateProfile' => :is_template_profile,
+        'template' => :template
       })
 
       class << self
@@ -182,6 +212,18 @@ module Spaceship
           attrs['dateExpire'] = (Time.parse(attrs['dateExpire']) rescue attrs['dateExpire'])
           # rubocop:enable Style/RescueModifier
 
+          # When a profile is created with a template name, the response
+          # (provisioning profiles info) already contains the data about
+          # template, which is used to instantiate the
+          # ProvisioningProfileTemplate model.
+          # Doing so saves an API call needed to fetch profile details.
+          #
+          # Verify if `attrs` contains the info needed to instantiate a template.
+          # If not, the template will be lazily loaded.
+          if attrs['profile'] && attrs['profile']['description']
+            attrs['template'] = ProvisioningProfileTemplate.factory(attrs['template'])
+          end
+
           klass.client = @client
           obj = klass.new(attrs)
 
@@ -209,15 +251,18 @@ module Spaceship
         #  and Development profiles and add none for AppStore and Enterprise Profiles
         # @param mac (Bool) (optional): Pass true if you're making a Mac provisioning profile
         # @param sub_platform (String) Used to create tvOS profiles at the moment. Value should equal 'tvOS' or nil.
+        # @param template_name (String) (optional): The name of the provisioning profile template.
+        #  The value can be found by inspecting the Entitlements drop-down when creating/editing a
+        #  provisioning profile in Developer Portal.
         # @return (ProvisioningProfile): The profile that was just created
-        def create!(name: nil, bundle_id: nil, certificate: nil, devices: [], mac: false, sub_platform: nil)
+        def create!(name: nil, bundle_id: nil, certificate: nil, devices: [], mac: false, sub_platform: nil, template_name: nil)
           raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
-          raise "Missing required parameter 'certificate'. e.g. use `Spaceship::Certificate::Production.all.first`" if certificate.to_s.empty?
+          raise "Missing required parameter 'certificate'. e.g. use `Spaceship::Portal::Certificate::Production.all.first`" if certificate.to_s.empty?
 
-          app = Spaceship::App.find(bundle_id, mac: mac)
+          app = Spaceship::Portal::App.find(bundle_id, mac: mac)
           raise "Could not find app with bundle id '#{bundle_id}'" unless app
 
-          raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? and sub_platform != 'tvOS'
+          raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? && sub_platform != 'tvOS'
 
           # Fill in sensible default values
           name ||= [bundle_id, self.pretty_type].join(' ')
@@ -227,21 +272,21 @@ module Spaceship
             devices = []
           end
 
-          certificate_parameter = certificate.collect(&:id) if certificate.kind_of? Array
+          certificate_parameter = certificate.collect(&:id) if certificate.kind_of?(Array)
           certificate_parameter ||= [certificate.id]
 
           # Fix https://github.com/KrauseFx/fastlane/issues/349
           certificate_parameter = certificate_parameter.first if certificate_parameter.count == 1
 
-          if devices.nil? or devices.count == 0
-            if self == Development or self == AdHoc
+          if devices.nil? || devices.count == 0
+            if self == Development || self == AdHoc
               # For Development and AdHoc we usually want all compatible devices by default
               if mac
-                devices = Spaceship::Device.all_macs
+                devices = Spaceship::Portal::Device.all_macs
               elsif sub_platform == 'tvOS'
-                devices = Spaceship::Device.all_apple_tvs
+                devices = Spaceship::Portal::Device.all_apple_tvs
               else
-                devices = Spaceship::Device.all_ios_profile_devices
+                devices = Spaceship::Portal::Device.all_ios_profile_devices
               end
             end
           end
@@ -253,7 +298,8 @@ module Spaceship
                                                 certificate_parameter,
                                                 devices.map(&:id),
                                                 mac: mac,
-                                                sub_platform: sub_platform)
+                                                sub_platform: sub_platform,
+                                                template_name: template_name)
           end
 
           self.new(profile)
@@ -285,8 +331,8 @@ module Spaceship
           # a details request (see `profile_details`). This is an expensive operation
           # which we can't do for every single provisioning profile
           # Instead we'll treat App Store profiles the same way as Ad Hoc profiles
-          # Spaceship::ProvisioningProfile::AdHoc.all will return the same array as
-          # Spaceship::ProvisioningProfile::AppStore.all, containing only AppStore
+          # Spaceship::Portal::ProvisioningProfile::AdHoc.all will return the same array as
+          # Spaceship::Portal::ProvisioningProfile::AppStore.all, containing only AppStore
           # profiles. To determine if it's an Ad Hoc profile, you can use the
           # is_adhoc? method on the profile.
           klass = self
@@ -316,9 +362,12 @@ module Spaceship
         #   profiles matching the bundle identifier
         #   Returns [] if no profiles were found
         #   This may also contain invalid or expired profiles
-        def find_by_bundle_id(bundle_id, mac: false)
+        def find_by_bundle_id(bundle_id: nil, mac: false, sub_platform: nil)
+          raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
+          raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? && sub_platform != 'tvOS'
+          find_tvos_profiles = sub_platform == 'tvOS'
           all(mac: mac).find_all do |profile|
-            profile.app.bundle_id == bundle_id
+            profile.app.bundle_id == bundle_id && profile.tvos? == find_tvos_profiles
           end
         end
       end
@@ -393,20 +442,20 @@ module Spaceship
         # This is the minimum protection needed for people using spaceship directly
         unless certificate_valid?
           if mac?
-            if self.kind_of? Development
-              self.certificates = [Spaceship::Certificate::MacDevelopment.all.first]
-            elsif self.kind_of? Direct
-              self.certificates = [Spaceship::Certificate::DeveloperIDApplication.all.first]
+            if self.kind_of?(Development)
+              self.certificates = [Spaceship::Portal::Certificate::MacDevelopment.all.first]
+            elsif self.kind_of?(Direct)
+              self.certificates = [Spaceship::Portal::Certificate::DeveloperIdApplication.all.first]
             else
-              self.certificates = [Spaceship::Certificate::MacAppDistribution.all.first]
+              self.certificates = [Spaceship::Portal::Certificate::MacAppDistribution.all.first]
             end
           else
-            if self.kind_of? Development
-              self.certificates = [Spaceship::Certificate::Development.all.first]
-            elsif self.kind_of? InHouse
-              self.certificates = [Spaceship::Certificate::InHouse.all.first]
+            if self.kind_of?(Development)
+              self.certificates = [Spaceship::Portal::Certificate::Development.all.first]
+            elsif self.kind_of?(InHouse)
+              self.certificates = [Spaceship::Portal::Certificate::InHouse.all.first]
             else
-              self.certificates = [Spaceship::Certificate::Production.all.first]
+              self.certificates = [Spaceship::Portal::Certificate::Production.all.first]
             end
           end
         end
@@ -420,12 +469,13 @@ module Spaceship
             certificates.map(&:id),
             devices.map(&:id),
             mac: mac?,
-            sub_platform: tvos? ? 'tvOS' : nil
+            sub_platform: tvos? ? 'tvOS' : nil,
+            template_name: template_name
           )
         end
 
         # We need to fetch the provisioning profile again, as the ID changes
-        profile = Spaceship::ProvisioningProfile.all(mac: mac?).find do |p|
+        profile = Spaceship::Portal::ProvisioningProfile.all(mac: mac?).find do |p|
           p.name == self.name # we can use the name as it's valid
         end
 
@@ -437,7 +487,7 @@ module Spaceship
       def certificate_valid?
         return false if (certificates || []).count == 0
         certificates.each do |c|
-          if Spaceship::Certificate.all(mac: mac?).collect(&:id).include?(c.id)
+          if Spaceship::Portal::Certificate.all(mac: mac?).collect(&:id).include?(c.id)
             return true
           end
         end
@@ -508,6 +558,22 @@ module Spaceship
         # Since 15th September 2016 certificates and devices are hidden behind another request
         # see https://github.com/fastlane/fastlane/issues/6137 for more information
         @profile_details ||= client.provisioning_profile_details(provisioning_profile_id: self.id, mac: mac?)
+      end
+
+      # Lazily instantiates the provisioning profile template model
+      #
+      # @return (Bool) The template model if the provisioning profile has a
+      #   template or nil if provisioning profile doesn't have a template
+      def template
+        return nil unless is_template_profile
+
+        @template ||= ProvisioningProfileTemplate.factory(profile_details['template'])
+      end
+
+      # @return (String) The name of the template (as displayed in Dev Portal)
+      #   or nil if provisioning profile doesn't have a template
+      def template_name
+        is_template_profile ? template.purpose_display_name : nil
       end
     end
   end

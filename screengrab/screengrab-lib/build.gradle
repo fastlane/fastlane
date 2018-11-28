@@ -40,7 +40,7 @@ publish {
     groupId = 'tools.fastlane'
     artifactId = 'screengrab'
     publishVersion = versionNameString
-    website = 'https://github.com/fastlane/screengrab'
+    website = 'https://docs.fastlane.tools/actions/screengrab/'
     bintrayUser = lookupProperty(project, 'bintrayUser', 'BINTRAY_USER')
     bintrayKey = lookupProperty(project, 'bintrayKey', 'BINTRAY_KEY')
 }
@@ -51,4 +51,5 @@ dependencies {
     compile 'com.android.support.test:rules:0.5'
     compile 'com.android.support.test.espresso:espresso-core:2.2.2'
     compile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
+    compile 'com.jraska:falcon:1.0.4'
 }

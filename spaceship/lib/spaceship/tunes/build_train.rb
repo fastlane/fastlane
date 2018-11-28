@@ -1,6 +1,10 @@
+require_relative 'tunes_base'
+require_relative 'errors'
+require_relative 'build'
+
 module Spaceship
   module Tunes
-    # Represents a build train of builds from iTunes Connect
+    # Represents a build train of builds from App Store Connect
     # A build train is all builds for a given version number with different build numbers
     class BuildTrain < TunesBase
       # @return (Spaceship::Tunes::Application) A reference to the application this train is for
@@ -34,6 +38,7 @@ module Spaceship
       attr_reader :invalid_builds
 
       attr_mapping(
+        'application' => 'application',
         'versionString' => :version_string,
         'platform' => :platform,
         'externalTesting.value' => :external_testing_enabled,
@@ -146,7 +151,7 @@ module Spaceship
 
         begin
           result = client.update_build_trains!(application.apple_id, testing_type, data)
-        rescue Spaceship::TunesClient::ITunesConnectError => ex
+        rescue Spaceship::Tunes::Error => ex
           if ex.to_s.include?("You must provide an answer for this question")
             # This is a very common error message that's raised by TestFlight
             # We want to show a nicer error message with instructions on how
@@ -160,7 +165,7 @@ module Spaceship
             error_message << "<key>ITSAppUsesNonExemptEncryption</key><false/>"
             error_message << ""
             error_message << "Afterwards re-build your app and try again"
-            error_message << "iTunes Connect reported: '#{ex}'"
+            error_message << "App Store Connect reported: '#{ex}'"
             raise error_message.join("\n")
           else
             raise ex

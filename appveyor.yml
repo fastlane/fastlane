@@ -1,0 +1,47 @@
+# https://www.appveyor.com/docs/appveyor-yml/
+
+version: "{build}"
+
+# branches to build
+branches:
+  # whitelist
+  only:
+    - master
+
+# Do not build on tags (GitHub and BitBucket)
+skip_tags: true
+
+# Do not build additional commits to feature branch with open Pull Requests
+skip_branch_with_pr: true
+
+# Rolling builds
+# can only be configured via UI: https://www.appveyor.com/docs/build-configuration/#rolling-builds
+
+init:
+  - git config --global core.autocrlf true
+
+# cloning the repository happens here
+
+install:
+  - set PATH=C:\Ruby24-x64\bin;%PATH%
+  - bundle install
+  # iconv
+  - appveyor DownloadFile https://downloads.sourceforge.net/project/gnuwin32/libiconv/1.9.2-1/libiconv-1.9.2-1.exe?download
+  - libiconv-1.9.2-1.exe /SILENT /SUPPRESSMSGBOXES
+
+environment:
+  LC_ALL: en_US.UTF-8
+  LANG: en_US.UTF-8
+  FASTLANE_ITUNES_TRANSPORTER_PATH: C:/tmp
+
+before_test:
+  - ruby -v
+  - which ruby
+  - gem -v
+  - bundle -v
+  - which iconv
+
+build: off
+
+test_script:
+  - bundle exec fastlane execute_tests

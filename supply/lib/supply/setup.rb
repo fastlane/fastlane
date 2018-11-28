@@ -1,6 +1,8 @@
 module Supply
   class Setup
     def perform_download
+      UI.message("🕗  Downloading metadata, images, screenshots...")
+
       if File.exist?(metadata_path)
         UI.important("Metadata already exists at path '#{metadata_path}'")
         return
@@ -22,10 +24,12 @@ module Supply
 
       client.abort_current_edit
 
-      UI.success("Successfully stored metadata in '#{metadata_path}'")
+      UI.success("✅  Successfully stored metadata in '#{metadata_path}'")
     end
 
     def store_metadata(listing)
+      UI.message("📝  Downloading metadata (#{listing.language})")
+
       containing = File.join(metadata_path, listing.language)
       FileUtils.mkdir_p(containing)
 
@@ -37,6 +41,8 @@ module Supply
     end
 
     def download_images(listing)
+      UI.message("🖼️  Downloading images (#{listing.language})")
+
       # We cannot download existing screenshots as they are compressed
       # But we can at least download the images
       require 'net/http'
@@ -44,12 +50,12 @@ module Supply
       IMAGES_TYPES.each do |image_type|
         if ['featureGraphic'].include?(image_type)
           # we don't get all files in full resolution :(
-          UI.message("Due to a limitation of the Google Play API, there is no way for `supply` to download your existing feature graphics. Please copy your feature graphics into `metadata/android/en-US/images/`")
+          UI.message("📵  Due to a limitation of the Google Play API, there is no way for `supply` to download your existing feature graphic. Please copy your feature graphic to `metadata/android/#{listing.language}/images/featureGraphic.png`")
           next
         end
 
         begin
-          UI.message("Downloading #{image_type} for #{listing.language}...")
+          UI.message("Downloading `#{image_type}` for #{listing.language}...")
 
           url = client.fetch_images(image_type: image_type, language: listing.language).last
           next unless url
@@ -64,6 +70,8 @@ module Supply
     end
 
     def create_screenshots_folder(listing)
+      UI.message("📱  Downloading screenshots (#{listing.language})")
+
       containing = File.join(metadata_path, listing.language)
 
       FileUtils.mkdir_p(File.join(containing, IMAGES_FOLDER_NAME))
@@ -71,10 +79,12 @@ module Supply
         FileUtils.mkdir_p(File.join(containing, IMAGES_FOLDER_NAME, screenshot_type))
       end
 
-      UI.message("Due to a limitation of the Google Play API, there is no way for `supply` to download your existing screenshots. Please copy your screenshots into `metadata/android/en-US/images/`")
+      UI.message("📵  Due to a limitation of the Google Play API, there is no way for `supply` to download your existing screenshots. Please copy your screenshots into `metadata/android/#{listing.language}/images/`")
     end
 
     def store_apk_listing(apk_listing)
+      UI.message("🔨  Downloading changelogs (#{apk_listing.language}, #{apk_listing.apk_version_code})")
+
       containing = File.join(metadata_path, apk_listing.language, CHANGELOGS_FOLDER_NAME)
       unless File.exist?(containing)
         FileUtils.mkdir_p(containing)

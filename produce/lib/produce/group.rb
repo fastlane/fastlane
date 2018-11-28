@@ -1,4 +1,5 @@
 require 'spaceship'
+require_relative 'module'
 
 module Produce
   class Group
@@ -9,7 +10,7 @@ module Produce
 
       group_identifier = options.group_identifier || UI.input("Group identifier: ")
 
-      if app_group_exists? group_identifier
+      if app_group_exists?(group_identifier)
         UI.success("[DevCenter] Group '#{options.group_name} (#{options.group_identifier})' already exists, nothing to do on the Dev Center")
         ENV["CREATED_NEW_GROUP_ID"] = nil
         # Nothing to do here
@@ -28,7 +29,7 @@ module Produce
 
         UI.message("Created group #{group.app_group_id}")
 
-        UI.user_error!("Something went wrong when creating the new app group - it's not listed in the app groups list") unless app_group_exists? group_identifier
+        UI.user_error!("Something went wrong when creating the new app group - it's not listed in the app groups list") unless app_group_exists?(group_identifier)
 
         ENV["CREATED_NEW_GROUP_ID"] = Time.now.to_i.to_s
 

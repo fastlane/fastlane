@@ -96,17 +96,44 @@ describe Spaceship::Tunes::IAPDetail do
     end
 
     it "saved and changed screenshot" do
-      detailed.review_screenshot = "/tmp/fastlane_tests"
+      detailed.review_screenshot = "#{Dir.tmpdir}/fastlane_tests"
       expect(client.du_client).to receive(:upload_purchase_review_screenshot).and_return({ "token" => "tok", "height" => 100, "width" => 200, "md5" => "xxxx" })
+      expect(client.du_client).to receive(:get_picture_type).and_return("MZPFT.SortedScreenShot")
       expect(Spaceship::Utilities).to receive(:content_type).and_return("image/jpg")
       expect(client).to receive(:update_iap!).with(app_id: '898536088', purchase_id: "1195137656", data: detailed.raw_data)
       detailed.save!
     end
 
-    it "saved with subscription priceing goal" do
-      expect(client).to receive(:update_iap!).with(app_id: '898536088', purchase_id: "1195137656", data: detailed.raw_data)
-      detailed.subscription_price_target = { currency: "EUR", tier: 1 }
-      detailed.save!
+    it "saved with subscription pricing goal" do
+      edited = app.in_app_purchases.find("x.a.a.b.b.c.d.x.y.z").edit
+      price_goal = TunesStubbing.itc_read_fixture_file('iap_price_goal_calc.json')
+
+      transformed_pricing_intervals = JSON.parse(price_goal)["data"].map do |language_code, value|
+        existing_interval =
+          edited.pricing_intervals.find { |interval| interval[:country] == language_code }
+        grandfathered =
+          if existing_interval
+            existing_interval[:grandfathered].clone
+          else
+            { "value" => "FUTURE_NONE" }
+          end
+
+        {
+          "value" => {
+            "tierStem" => value["tierStem"],
+            "priceTierEffectiveDate" => value["priceTierEffectiveDate"],
+            "priceTierEndDate" => value["priceTierEndDate"],
+            "country" => language_code,
+            "grandfathered" => grandfathered
+          }
+        }
+      end
+
+      expect(client).to receive(:update_iap!).with(app_id: '898536088', purchase_id: "1195137657", data: edited.raw_data)
+      expect(client).to receive(:update_recurring_iap_pricing!).with(app_id: '898536088', purchase_id: "1195137657", pricing_intervals: transformed_pricing_intervals)
+
+      edited.subscription_price_target = { currency: "EUR", tier: 1 }
+      edited.save!
     end
 
     it "saved with changed pricing detail" do
@@ -122,6 +149,21 @@ describe Spaceship::Tunes::IAPDetail do
       ]
       edited.save!
       expect(edited.pricing_intervals).to eq([{ tier: 4, begin_date: nil, end_date: nil, grandfathered: nil, country: "WW" }])
+    end
+
+    it "saved with changed pricing detail for recurring product" do
+      edited = app.in_app_purchases.find("x.a.a.b.b.c.d.x.y.z").edit
+      edited.pricing_intervals = [
+        {
+          country: "WW",
+          begin_date: nil,
+          end_date: nil,
+          tier: 4
+        }
+      ]
+      expect(client).to receive(:update_iap!).with(app_id: '898536088', purchase_id: "1195137657", data: edited.raw_data)
+      expect(client).to receive(:update_recurring_iap_pricing!).with(app_id: '898536088', purchase_id: "1195137657", pricing_intervals: edited.raw_data["pricingIntervals"])
+      edited.save!
     end
 
     it "saved with changed versions" do

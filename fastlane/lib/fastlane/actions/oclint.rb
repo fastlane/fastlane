@@ -8,7 +8,7 @@ module Fastlane
       # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         oclint_path = params[:oclint_path]
-        if `which #{oclint_path}`.to_s.empty? and !Helper.test?
+        if `which #{oclint_path}`.to_s.empty? && !Helper.test?
           UI.user_error!("You have to install oclint or provide path to oclint binary. Fore more details: ") + "http://docs.oclint.org/en/stable/intro/installation.html".yellow
         end
 
@@ -31,7 +31,10 @@ module Fastlane
         end
 
         select_regex = params[:select_regex] if params[:select_regex] # Overwrite deprecated select_reqex
+        select_regex = ensure_regex_is_not_string!(select_regex)
+
         exclude_regex = params[:exclude_regex]
+        exclude_regex = ensure_regex_is_not_string!(exclude_regex)
 
         files = JSON.parse(File.read(compile_commands)).map do |compile_command|
           file = compile_command['file']
@@ -64,7 +67,7 @@ module Fastlane
           oclint_args << "-rc=#{params[:rc]}" if params[:rc] # Deprecated
         end
 
-        oclint_args << params[:thresholds].map { |t| "-rc=#{t}" } if params[:thresholds]
+        oclint_args << ensure_array_is_not_string!(params[:thresholds]).map { |t| "-rc=#{t}" } if params[:thresholds]
         # Escape ' in rule names with \' when passing on to shell command
         oclint_args << params[:enable_rules].map { |r| "-rule #{r.shellescape}" } if params[:enable_rules]
         oclint_args << params[:disable_rules].map { |r| "-disable-rule #{r.shellescape}" } if params[:disable_rules]
@@ -88,6 +91,20 @@ module Fastlane
         Actions.lane_context[SharedValues::FL_OCLINT_REPORT_PATH] = File.expand_path(report_path)
 
         return Action.sh(command)
+      end
+
+      # return a proper regex object if regex string is single-quoted
+      def self.ensure_regex_is_not_string!(regex)
+        return regex unless regex.kind_of?(String)
+
+        Regexp.new(regex)
+      end
+
+      # return a proper array of strings if array string is single-quoted
+      def self.ensure_array_is_not_string!(array)
+        return array unless array.kind_of?(String)
+
+        array.split(',')
       end
 
       #####################################################
@@ -207,7 +224,7 @@ module Fastlane
       end
 
       def self.details
-        "Run the static analyzer tool [OCLint](http://oclint.org) for your project. You need to have a `compile_commands.json` file in your _fastlane_ directory or pass a path to your file"
+        "Run the static analyzer tool [OCLint](http://oclint.org) for your project. You need to have a `compile_commands.json` file in your _fastlane_ directory or pass a path to your file."
       end
 
       def self.example_code

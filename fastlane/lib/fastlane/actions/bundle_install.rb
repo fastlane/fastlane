@@ -56,8 +56,7 @@ module Fastlane
       end
 
       def self.example_code
-        [
-        ]
+        nil
       end
 
       def self.category
@@ -88,6 +87,7 @@ module Fastlane
                                        env_name: "FL_BUNDLE_INSTALL_JOBS",
                                        description: "Install gems using parallel workers",
                                        is_string: false,
+                                       type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :local,
                                        env_name: "FL_BUNDLE_INSTALL_LOCAL",
@@ -127,6 +127,7 @@ module Fastlane
                                        env_name: "FL_BUNDLE_INSTALL_RETRY",
                                        description: "Retry network and git requests that have failed",
                                        is_string: false,
+                                       type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :shebang,
                                        env_name: "FL_BUNDLE_INSTALL_SHEBANG",

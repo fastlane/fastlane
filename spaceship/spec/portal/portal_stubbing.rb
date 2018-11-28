@@ -4,6 +4,10 @@ class PortalStubbing
       File.read(File.join('spaceship', 'spec', 'portal', 'fixtures', filename))
     end
 
+    def adp_read_binary_fixture_file(filename)
+      File.binread(File.join('spaceship', 'spec', 'portal', 'fixtures', filename))
+    end
+
     # Necessary, as we're now running this in a different context
     def stub_request(*args)
       WebMock::API.stub_request(*args)
@@ -75,6 +79,10 @@ class PortalStubbing
         with(body: { "provisioningProfileId" => "PP00000005", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileDevelopment.action.json'), headers: { 'Content-Type' => 'application/json' })
 
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
+        with(body: { "provisioningProfileId" => "PP00000007", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileWithTemplateiOSAppStore.action.json'), headers: { 'Content-Type' => 'application/json' })
+
       # Create Profiles
 
       # Name is free
@@ -86,6 +94,11 @@ class PortalStubbing
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
         with(body: { "appIdId" => "R9YNDTPLJX", "certificateIds" => "C8DL7464RQ", "deviceIds" => "C8DLAAAARQ", "distributionType" => "limited", "provisioningProfileName" => "taken", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file("create_profile_name_taken.txt"))
+
+      # Profile with template
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
+        with(body: { "appIdId" => "R9YNDTPLJX", "certificateIds" => "C8DL7464RQ", "distributionType" => "limited", "provisioningProfileName" => "net.sunapps.106 limited", "teamId" => "XXXXXXXXXX", "template" => "Subscription Service iOS (dist)" }).
+        to_return(status: 200, body: adp_read_fixture_file('create_profile_with_template_success.json'), headers: { 'Content-Type' => 'application/json' })
 
       # Repair Profiles
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/regenProvisioningProfile.action").
@@ -153,6 +166,11 @@ class PortalStubbing
         with(body: { "deviceClasses" => "iphone", "deviceNames" => "Demo Device", "deviceNumbers" => "7f6c8dc83d77134b5a3a1c53f1202b395b04482b", "register" => "single", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('addDeviceResponse.action.json'), headers: { 'Content-Type' => 'application/json' })
 
+      # Fail to register a new device with an invalid UDID
+      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/device/addDevices.action").
+        with(body: { "deviceClasses" => "iphone", "deviceNames" => "Demo Device", "deviceNumbers" => "1234", "register" => "single", "teamId" => "XXXXXXXXXX" }).
+        to_return(status: 200, body: adp_read_fixture_file('addDeviceFailureResponse.json'), headers: { 'Content-Type' => 'application/json' })
+
       # Custom paging
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action").
         with(body: { "pageNumber" => "1", "pageSize" => "8", "sort" => "name=asc", "teamId" => "XXXXXXXXXX", includeRemovedDevices: "false" }).
@@ -164,7 +182,7 @@ class PortalStubbing
 
     def adp_stub_certificates
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/listCertRequests.action").
-        with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "certRequestStatusCode=asc", "teamId" => "XXXXXXXXXX", "types" => "5QPB9NHCEI,R58UK2EWSO,9RQEK7MSXA,LA30L5BJEU,BKLRAVXMGM,UPV3DW712I,Y3B2F3TYSI,3T2ZP62QW8,E5D663CMZW,4APLUP237T,T44PTHVNID,DZQUP8189Y,FGQUP4785Z,S5WE21TULA,3BQKVH9I2X,FUOY7LWJET" }).
+        with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "certRequestStatusCode=asc", "teamId" => "XXXXXXXXXX", "types" => "5QPB9NHCEI,R58UK2EWSO,9RQEK7MSXA,LA30L5BJEU,BKLRAVXMGM,UPV3DW712I,Y3B2F3TYSI,3T2ZP62QW8,E5D663CMZW,4APLUP237T,MD8Q2VRT6A,T44PTHVNID,DZQUP8189Y,FGQUP4785Z,S5WE21TULA,3BQKVH9I2X,FUOY7LWJET" }).
         to_return(status: 200, body: adp_read_fixture_file('listCertRequests.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/listCertRequests.action").
@@ -177,7 +195,7 @@ class PortalStubbing
         to_return(status: 200, body: adp_read_fixture_file("list_certificates_filtered.json"), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:get, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/downloadCertificateContent.action?certificateId=XC5PH8DAAA&teamId=XXXXXXXXXX&type=R58UK2EAAA").
-        to_return(status: 200, body: adp_read_fixture_file('aps_development.cer'))
+        to_return(status: 200, body: adp_read_binary_fixture_file('aps_development.cer')) # note: binary!
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/submitCertificateRequest.action").
         with(body: { "appIdId" => "2HNR359G63", "csrContent" => adp_read_fixture_file('certificateSigningRequest.certSigningRequest'), "type" => "BKLRAVXMGM", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('submitCertificateRequest.action.json'), headers: { 'Content-Type' => 'application/json' })
@@ -200,7 +218,7 @@ class PortalStubbing
         to_return(status: 200, body: adp_read_fixture_file('getAppIdDetail.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addAppId.action").
-        with(body: { "name" => "Production App", "identifier" => "tools.fastlane.spaceship.some-explicit-app", "gameCenter" => "on", "inAppPurchase" => "on", "push" => "on", "teamId" => "XXXXXXXXXX", "type" => "explicit" }).
+        with(body: { "name" => "Production App", "identifier" => "tools.fastlane.spaceship.some-explicit-app", "gameCenter" => "on", "inAppPurchase" => "on", "teamId" => "XXXXXXXXXX", "type" => "explicit" }).
         to_return(status: 200, body: adp_read_fixture_file('addAppId.action.explicit.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addAppId.action").
@@ -208,7 +226,7 @@ class PortalStubbing
         to_return(status: 200, body: adp_read_fixture_file('addAppId.action.wildcard.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addAppId.action").
-        with(body: { "gameCenter" => "on", "identifier" => "tools.fastlane.spaceship.some-explicit-app", "inAppPurchase" => "on", "name" => "pp Test 1ed9e25c93ac7142ff9df53e7f80e84c", "push" => "on", "teamId" => "XXXXXXXXXX", "type" => "explicit" }).
+        with(body: { "gameCenter" => "on", "identifier" => "tools.fastlane.spaceship.some-explicit-app", "inAppPurchase" => "on", "name" => "pp Test 1ed9e25c93ac7142ff9df53e7f80e84c", "teamId" => "XXXXXXXXXX", "type" => "explicit" }).
         to_return(status: 200, body: adp_read_fixture_file('addAppId.action.apostroph.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/deleteAppId.action").
@@ -216,8 +234,8 @@ class PortalStubbing
         to_return(status: 200, body: adp_read_fixture_file('deleteAppId.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addAppId.action").
-        with(body: { "gameCenter" => "on", "identifier" => "tools.fastlane.spaceship.some-explicit-app", "inAppPurchase" => "on", "name" => "Production App", "push" => "true", "teamId" => "XXXXXXXXXX", "type" => "explicit" }).
-        to_return(status: 200, body: adp_read_fixture_file('addAppId.action.nopush.json'), headers: { 'Content-Type' => 'application/json' })
+        with(body: { "gameCenter" => "on", "identifier" => "tools.fastlane.spaceship.some-explicit-app", "inAppPurchase" => "on", "push" => "true", "name" => "Production App", "teamId" => "XXXXXXXXXX", "type" => "explicit" }).
+        to_return(status: 200, body: adp_read_fixture_file('addAppId.action.push.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
     def adp_stub_persons

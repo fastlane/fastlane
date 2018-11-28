@@ -1,5 +1,5 @@
-# Customise this file, documentation can be found here:
-# https://github.com/fastlane/fastlane/tree/master/fastlane/docs
+# Customize this file, documentation can be found here:
+# https://docs.fastlane.tools/actions/
 # All available actions: https://docs.fastlane.tools/actions
 # can also be listed using the `fastlane actions` command
 
@@ -11,22 +11,22 @@
 
 # This is the minimum version number required.
 # Update this, if you use features of a newer version
-fastlane_version "1.46.1"
+fastlane_version("1.46.1")
 
-default_platform :android
+default_platform(:android)
 
-platform :android do
+platform(:android) do
   before_all do
     # ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
   end
 
-  desc "Runs all the tests"
-  lane :test do
+  desc("Runs all the tests")
+  lane(:test) do
     gradle(task: "test")
   end
 
-  desc "Submit a new Beta Build to Crashlytics Beta"
-  lane :beta do
+  desc("Submit a new Beta Build to Crashlytics Beta")
+  lane(:beta) do
     gradle(task: "assembleRelease")
     crashlytics
 
@@ -34,14 +34,14 @@ platform :android do
     # You can also use other beta testing services here
   end
 
-  desc "Deploy a new version to the Google Play"
-  lane :deploy do
+  desc("Deploy a new version to the Google Play")
+  lane(:deploy) do
     gradle(task: "assembleRelease")
     supply
   end
 
-  desc "Assemble the debug app and tests APKs"
-  lane :assemble do
+  desc("Assemble the debug app and tests APKs")
+  lane(:assemble) do
     gradle(task: "assemble assembleAndroidTest", gradle_path: '../gradlew')
   end
 
@@ -63,8 +63,8 @@ platform :android do
   end
 end
 
-# More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md
+# More information about multiple platforms in fastlane: https://docs.fastlane.tools/advanced/#control-configuration-by-lane-and-by-platform
 # All available actions: https://docs.fastlane.tools/actions
 
 # fastlane reports which actions are used. No personal data is recorded.
-# Learn more at https://github.com/fastlane/fastlane#metrics
+# Learn more at https://docs.fastlane.tools/#metrics

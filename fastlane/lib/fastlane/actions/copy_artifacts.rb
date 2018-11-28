@@ -23,7 +23,7 @@ module Fastlane
 
         if params[:fail_on_missing]
           missing = artifacts.reject { |a| File.exist?(a) }
-          UI.user_error! "Not all files were present in copy artifacts. Missing #{missing.join(', ')}" unless missing.empty?
+          UI.user_error!("Not all files were present in copy artifacts. Missing #{missing.join(', ')}") unless missing.empty?
         else
           # If we don't fail on non-existent files, don't try to copy non-existent files
           artifacts.select! { |artifact| File.exist?(artifact) }
@@ -43,20 +43,20 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Small action to save your build artifacts. Useful when you use reset_git_repo"
+        "Copy and save your build artifacts (useful when you use reset_git_repo)"
       end
 
       def self.details
         [
-          "This action copies artifacts to a target directory. It's useful if you have a CI that will pick up these artifacts and attach them to the build. Useful e.g. for storing your `.ipa`s, `.dSYM.zip`s, `.mobileprovision`s, `.cert`s",
-          "Make sure your target_path is gitignored, and if you use `reset_git_repo`, make sure the artifacts are added to the exclude list"
+          "This action copies artifacts to a target directory. It's useful if you have a CI that will pick up these artifacts and attach them to the build. Useful e.g. for storing your `.ipa`s, `.dSYM.zip`s, `.mobileprovision`s, `.cert`s.",
+          "Make sure your `:target_path` is ignored from git, and if you use `reset_git_repo`, make sure the artifacts are added to the exclude list."
         ].join("\n")
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :keep_original,
-                                       description: "Set this to true if you want copy, rather than move, semantics",
+                                       description: "Set this to false if you want move, rather than copy, the found artifacts",
                                        is_string: false,
                                        optional: true,
                                        default_value: true),
@@ -90,12 +90,18 @@ module Fastlane
         [
           'copy_artifacts(
             target_path: "artifacts",
-            artifacts: ["*.cer", "*.mobileprovision", "*.ipa", "*.dSYM.zip"]
+            artifacts: ["*.cer", "*.mobileprovision", "*.ipa", "*.dSYM.zip", "path/to/file.txt", "another/path/*.extension"]
           )
 
           # Reset the git repo to a clean state, but leave our artifacts in place
           reset_git_repo(
             exclude: "artifacts"
+          )',
+          '# Copy the .ipa created by _gym_ if it was successfully created
+          artifacts = []
+          artifacts << lane_context[SharedValues::IPA_OUTPUT_PATH] if lane_context[SharedValues::IPA_OUTPUT_PATH]
+          copy_artifacts(
+             artifacts: artifacts
           )'
         ]
       end

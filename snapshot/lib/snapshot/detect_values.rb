@@ -1,3 +1,8 @@
+require 'fastlane_core/project'
+require 'fastlane_core/device_manager'
+
+require_relative 'module'
+
 module Snapshot
   class DetectValues
     # This is needed as these are more complex default values
@@ -17,6 +22,10 @@ module Snapshot
         unless File.expand_path(Snapshot.snapfile_name) == configuration_file_path
           config.load_configuration_file(Snapshot.snapfile_name)
         end
+      end
+
+      if config[:test_without_building] == true && config[:derived_data_path].to_s.length == 0
+        UI.user_error!("Cannot use test_without_building option without a derived_data_path!")
       end
 
       Snapshot.project.select_scheme(preferred_to_include: "UITests")
@@ -41,6 +50,9 @@ module Snapshot
           # In Xcode 8, we only need iPad Pro 9.7 inch, not the iPad Air
           next if all_simulators.any? { |a| a.name.include?("9.7-inch") } && sim.name.include?("iPad Air")
 
+          # In Xcode 9, we only need one iPad Pro (12.9-inch)
+          next if sim.name.include?('iPad Pro (12.9-inch) (2nd generation)')
+
           # Filter iPhones
           # Full list: ["iPhone 4s", "iPhone 5", "iPhone 5s", "iPhone 6", "iPhone 6 Plus", "iPhone 6s", "iPhone 6s Plus"]
           next if sim.name.include?("5s") # same screen resolution as iPhone 5
@@ -52,7 +64,7 @@ module Snapshot
           config[:devices] << sim.name
         end
       elsif Snapshot.project.mac?
-        config[:devices] << "Mac"
+        config[:devices] = ["Mac"]
       end
     end
   end

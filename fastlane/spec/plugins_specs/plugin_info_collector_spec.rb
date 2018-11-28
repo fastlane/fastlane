@@ -58,7 +58,7 @@ describe Fastlane::PluginInfoCollector do
 
     describe "with valid initial input" do
       it "accepts a valid plugin name" do
-        expect(test_ui).not_to receive(:input)
+        expect(test_ui).not_to(receive(:input))
 
         expect(collector.collect_plugin_name('test_name')).to eq('test_name')
       end
@@ -162,7 +162,7 @@ describe Fastlane::PluginInfoCollector do
     end
 
     it "has an author name from git config" do
-      expect(test_ui).not_to receive(:input)
+      expect(test_ui).not_to(receive(:input))
       expect(collector.collect_author('Fabricio Devtoolio')).to eq('Fabricio Devtoolio')
     end
   end
@@ -207,7 +207,7 @@ describe Fastlane::PluginInfoCollector do
     end
 
     it "has an email from git config" do
-      expect(test_ui).not_to receive(:input)
+      expect(test_ui).not_to(receive(:input))
       expect(collector.collect_email('fabric.devtools@gmail.com')).to eq('fabric.devtools@gmail.com')
     end
   end
@@ -258,27 +258,6 @@ describe Fastlane::PluginInfoCollector do
       expect(test_ui).to receive(:input).and_return('details')
 
       expect(collector.collect_details).to eq('details')
-    end
-
-    it "accepts a valid details after rejecting an invalid details" do
-      expect(test_ui).to receive(:input).and_return('')
-      expect(test_ui).to receive(:input).and_return('details')
-
-      expect(collector.collect_details).to eq('details')
-    end
-  end
-
-  describe "#details_valid?" do
-    it "handles valid details" do
-      expect(collector.details_valid?('details')).to be_truthy
-    end
-
-    it "handles an empty details" do
-      expect(collector.details_valid?('')).to be_falsey
-    end
-
-    it "handles all-spaces details" do
-      expect(collector.details_valid?('    ')).to be_falsey
     end
   end
 

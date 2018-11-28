@@ -68,16 +68,17 @@ describe Fastlane do
       end
 
       it "works with single quote in rule name" do
+        rule = "CoveredSwitchStatementsDon'tNeedDefault"
         result = Fastlane::FastFile.new.parse("lane :test do
             oclint(
               compile_commands: './fastlane/spec/fixtures/oclint/compile_commands.json',
-              enable_rules: [\"CoveredSwitchStatementsDon'tNeedDefault\"],
-              disable_rules: [\"CoveredSwitchStatementsDon'tNeedDefault\"]
+              enable_rules: [\"#{rule}\"],
+              disable_rules: [\"#{rule}\"]
             )
           end").runner.execute(:test)
 
-        expect(result).to include(" -rule CoveredSwitchStatementsDon\\'tNeedDefault ")
-        expect(result).to include(" -disable-rule CoveredSwitchStatementsDon\\'tNeedDefault ")
+        expect(result).to include(" -rule #{rule.shellescape} ")
+        expect(result).to include(" -disable-rule #{rule.shellescape} ")
       end
 
       it "works with select regex" do
@@ -91,7 +92,18 @@ describe Fastlane do
         expect(result).to include('"fastlane/spec/fixtures/oclint/src/AppDelegate.m"')
       end
 
-      it "worsk with exclude regex" do
+      it "works with select regex when regex is string" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            oclint(
+              compile_commands: './fastlane/spec/fixtures/oclint/compile_commands.json',
+              select_regex: \"\/AppDelegate\"
+            )
+          end").runner.execute(:test)
+
+        expect(result).to include('"fastlane/spec/fixtures/oclint/src/AppDelegate.m"')
+      end
+
+      it "works with exclude regex" do
         result = Fastlane::FastFile.new.parse("lane :test do
             oclint(
               compile_commands: './fastlane/spec/fixtures/oclint/compile_commands.json',
@@ -99,7 +111,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).not_to include('"fastlane/spec/fixtures/oclint/src/Test.m"')
+        expect(result).not_to(include('"fastlane/spec/fixtures/oclint/src/Test.m"'))
       end
 
       it "works with both select and exclude regex" do
@@ -112,7 +124,7 @@ describe Fastlane do
           end").runner.execute(:test)
 
         expect(result).to include('"fastlane/spec/fixtures/oclint/src/AppDelegate.m"')
-        expect(result).not_to include('Test')
+        expect(result).not_to(include('Test'))
       end
 
       context 'with valid path to compile_commands.json' do

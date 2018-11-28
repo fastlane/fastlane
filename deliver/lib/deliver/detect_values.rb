@@ -1,3 +1,11 @@
+require 'fastlane_core/fastlane_folder'
+require 'fastlane_core/ipa_file_analyser'
+require 'fastlane_core/pkg_file_analyser'
+require 'spaceship/tunes/tunes'
+require 'spaceship/tunes/application'
+
+require_relative 'module'
+
 module Deliver
   class DetectValues
     def run!(options, skip_params = {})
@@ -7,6 +15,8 @@ module Deliver
       find_folders(options)
       ensure_folders_created(options)
       find_version(options) unless skip_params[:skip_version]
+
+      verify_languages!(options)
     end
 
     def find_app_identifier(options)
@@ -28,11 +38,11 @@ module Deliver
     def find_app(options)
       search_by = options[:app_identifier]
       search_by = options[:app] if search_by.to_s.length == 0
-      app = Spaceship::Application.find(search_by, mac: options[:platform] == "osx")
+      app = Spaceship::Tunes::Application.find(search_by, mac: options[:platform] == "osx")
       if app
         options[:app] = app
       else
-        UI.user_error!("Could not find app with app identifier '#{options[:app_identifier]}' in your iTunes Connect account (#{options[:username]} - Team: #{Spaceship::Tunes.client.team_id})")
+        UI.user_error!("Could not find app with app identifier '#{options[:app_identifier]}' in your App Store Connect account (#{options[:username]} - Team: #{Spaceship::Tunes.client.team_id})")
       end
     end
 
@@ -65,6 +75,18 @@ module Deliver
         options[:platform] ||= FastlaneCore::IpaFileAnalyser.fetch_app_platform(options[:ipa])
       elsif options[:pkg]
         options[:platform] = 'osx'
+      end
+    end
+
+    def verify_languages!(options)
+      languages = options[:languages]
+      return unless languages
+
+      all_languages = Spaceship::Tunes.client.available_languages
+      diff = languages - all_languages
+
+      unless diff.empty?
+        UI.user_error!("The following languages are invalid and cannot be activated: #{diff.join(',')}\n\nValid languages are: #{all_languages}")
       end
     end
   end

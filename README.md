@@ -1,196 +1,194 @@
 <h3 align="center">
-  <img src="fastlane/assets/fastlane_text.png" alt="fastlane Logo" />
+  <a href="https://github.com/fastlane/fastlane/blob/master/fastlane/assets/fastlane_text.png">
+  <img src="https://github.com/fastlane/fastlane/blob/master/fastlane/assets/fastlane_text.png?raw=true" alt="fastlane Logo" width="500">
+  </a>
 </h3>
-
-fastlane
-============
 
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](https://rubygems.org/gems/fastlane)
-[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
+[![Build Status](https://img.shields.io/circleci/project/github/fastlane/fastlane/master.svg)](https://circleci.com/gh/fastlane/fastlane)
 
-#### ✨ Check out [docs.fastlane.tools](https://docs.fastlane.tools) on how to get started with fastlane ✨
-
-`fastlane` is a tool for iOS and Android developers to automate tedious tasks like generating screenshots, dealing with provisioning profiles, and releasing your application.
-
-Use a lane to define your process:
-
-```ruby
-lane :beta do
-  increment_build_number
-  cocoapods
-  match
-  testflight
-  sh "./customScript.sh"
-  slack
-end
-```
-
-Then to deploy a new 'beta' version of your app just run
-`fastlane beta` :rocket:
-
-
-
-|          |  fastlane  |
-|----------|------------|
-:sparkles: | Connect iOS and Android build tools into one workflow (both _fastlane_ tools and third party tools)
-:monorail: | Define different `deployment lanes` for App Store deployment, beta builds, or testing
-:ship: | Deploy from any computer, including a CI server
-:wrench: | Extend and customise functionality
-:thought_balloon: | Never remember any difficult commands, just `fastlane`
-:tophat: | Easy setup assistant to get started in a few minutes
-:email: | Automatically pass on information from one build step to another (*e.g.* path to the `ipa` file)
-:page_with_curl: | Store **everything** in Git. Never lookup build commands on your CI system again.
-:rocket: | Saves you **hours** for every app update you release
-:pencil2: | Flexible configuration using a fully customisable `Fastfile`
-:mountain_cableway: | Implement a fully working Continuous Delivery process
-:ghost: | [Jenkins Integration](https://docs.fastlane.tools/best-practices/continuous-integration/#jenkins-integration): Show output directly in test results
-:book: | Automatically generate Markdown documentation of your lane configurations
-:hatching_chick: | Over 170 built-in integrations and 170 plugins available
-:computer: | Support for iOS and Android apps
-:octocat: | Full Git and Mercurial support
+_fastlane_ is a tool for iOS and Android developers to automate tedious tasks like generating screenshots, dealing with provisioning profiles, and releasing your application.
 
 <hr />
-<h4 align="center">
-  Check out the new <a href="https://docs.fastlane.tools/">fastlane docs</a>
-</h4>
+<h2 align="center">
+  ✨ All fastlane docs were moved to <a href="https://docs.fastlane.tools/">docs.fastlane.tools</a> ✨
+</h2>
 <hr />
-
-##### Like this tool? [Be the first to know about updates and new fastlane tools](https://tinyletter.com/fastlane-tools).
-
-## Installation
-Make sure you have the latest version of the Xcode command line tools installed:
-
-```
-xcode-select --install
-```
-
-### Choose your installation method:
-
-<table width="100%" >
-<tr>
-<th width="33%"><a href="http://brew.sh">Homebrew</a></td>
-<th width="33%">Installer Script</td>
-<th width="33%">Rubygems</td>
-</tr>
-<tr>
-<td width="33%" align="center">macOS</td>
-<td width="33%" align="center">macOS</td>
-<td width="33%" align="center">macOS or Linux with Ruby 2.0.0 or above</td>
-</tr>
-<tr> 
-<td width="33%"><code>brew cask install fastlane</code></td>
-<td width="33%"><a href="https://download.fastlane.tools/">Download the zip file</a>. Then double click on the <code>install</code> script (or run it in a terminal window).</td>
-<td width="33%"><code>sudo gem install fastlane -NV</code></td>
-</tr>
-</table>
-
-## Quick Start
-
-Get started distributing your first app with fastlane within minutes:
-
-[Create your first Fastfile](https://fabric.io/features/distribution?utm_campaign=github_readme)
-
-Want to learn more? Explore guides for [iOS](https://docs.fastlane.tools/getting-started/ios/setup/)
- or [Android](https://docs.fastlane.tools/getting-started/android/setup/).
-
-## System Requirements
-
-Currently, _fastlane_ is officially supported to run on macOS. Support for other operating systems is limited and untested at this point in time. _fastlane_ uses system APIs that may not be implemented on other platforms, for example, we use the Ruby `fork` method for sub-process management, which isn't available on Windows.
-
-## Available Commands
-
-Typically you'll use `fastlane` by triggering individual lanes:
-
-    fastlane [lane_name]
-
-#### Other Commands
-
-- `fastlane actions`: List all available `fastlane` actions
-- `fastlane action [action_name]`: Shows a more detailed description of an action
-- `fastlane lanes`: Lists all available lanes with description
-- `fastlane list`: Lists all available lanes without description
-- `fastlane new_action`: Create a new action *(integration)* for fastlane
-- `fastlane env`: Print out the fastlane ruby environment when submitting an issue
-
-
-If you'd like to take a look at a project already using `fastlane` check out [fastlane-examples](https://github.com/fastlane/examples) which includes `fastlane` setups by Wikipedia, Product Hunt, MindNode, and more.
-
-<hr />
-<h4 align="center">
-  Check out the new <a href="https://docs.fastlane.tools/">fastlane docs</a>
-</h4>
-<hr />
-
-## [`fastlane`](https://fastlane.tools) Toolchain
-
-In addition to `fastlane`'s commands, you also have access to these `fastlane` tools:
-
-- [`deliver`](https://github.com/fastlane/fastlane/tree/master/deliver): Upload screenshots, metadata, and your app to the App Store
-- [`supply`](https://github.com/fastlane/fastlane/tree/master/supply): Upload your Android app and its metadata to Google Play
-- [`snapshot`](https://github.com/fastlane/fastlane/tree/master/snapshot): Automate taking localized screenshots of your iOS and tvOS apps on every device
-- [`screengrab`](https://github.com/fastlane/fastlane/tree/master/screengrab): Automate taking localized screenshots of your Android app on every device
-- [`frameit`](https://github.com/fastlane/fastlane/tree/master/frameit): Quickly put your screenshots into the right device frames
-- [`pem`](https://github.com/fastlane/fastlane/tree/master/pem): Automatically generate and renew your push notification profiles
-- [`sigh`](https://github.com/fastlane/fastlane/tree/master/sigh): Because you would rather spend your time building stuff than fighting provisioning
-- [`produce`](https://github.com/fastlane/fastlane/tree/master/produce): Create new iOS apps on iTunes Connect and Dev Portal using the command line
-- [`cert`](https://github.com/fastlane/fastlane/tree/master/cert): Automatically create and maintain iOS code signing certificates
-- [`spaceship`](https://github.com/fastlane/fastlane/tree/master/spaceship): Ruby library to access the Apple Dev Center and iTunes Connect
-- [`pilot`](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
-- [`boarding`](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
-- [`gym`](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
-- [`match`](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using Git
-- [`scan`](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
-- [`precheck`](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
-
-## Metrics
-
-_fastlane_ tracks a few key metrics to understand how developers are using the tool and to help us know what areas need improvement. No personal/sensitive information is ever collected. Metrics that are collected include: 
-
-* The number of successes, errors, and crashes for _fastlane_ and each action run in a Fastfile
-* The running time of _fastlane_
-* The method by which _fastlane_ was installed
-* Whether _fastlane_ is being run on CI
-* The platform (e.g. iOS, Android) for which _fastlane_ is run
-* A hash of the app identifier or package name, which helps us anonymously identify unique usage of _fastlane_
-
-We have recently changed the destination service to which these metrics are reported, as well as the format of the data, but the data that is collected has not changed.
-
-You can easily opt-out of metrics collection by adding `opt_out_usage` at the top of your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. Participating helps us provide the best possible support for _fastlane_, so we hope you'll consider it a plus! :heavy_plus_sign:
-
-## Crash Reporting
-
-In order to continuously improve stability, _fastlane_ will record crash reports with sanitized stacktraces. Sanitization removes personal information from the stacktrace and error message (including home directories, _fastlane_ path, gem paths, environment variables, and parameters).
-
-You can easily opt-out of crash reporting by adding `opt_out_crash_reporting` at the top of your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_CRASH_REPORTING`. Just like metrics mentioned above, participating helps us provide the best possible support for _fastlane_, so we hope you'll consider it a plus! :heavy_plus_sign:
 
 ## Need Help?
 
 Before submitting a new GitHub issue, please make sure to
 
 - Check out [docs.fastlane.tools](https://docs.fastlane.tools)
-- Check out the README pages on [this repo](https://github.com/fastlane/fastlane)
 - Search for [existing GitHub issues](https://github.com/fastlane/fastlane/issues)
 
 If the above doesn't help, please [submit an issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup, in particular the output of the `fastlane env` command.
 
 **Note**: If you want to report a regression in _fastlane_ (something that has worked before, but broke with a new release), please mark your issue title as such using `[Regression] Your title here`. This enables us to quickly detect and fix regressions.
 
-## Special Thanks
+## _fastlane_ team
 
-Thanks to all [contributors](https://github.com/fastlane/fastlane/graphs/contributors) for extending and improving `fastlane`.
+<!-- This table is regenerated and resorted on each release -->
+<table id='team'>
+<tr>
+<td id='fumiya-nakamura'>
+<a href='https://github.com/nafu'>
+<img src='https://github.com/nafu.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/nafu003'>Fumiya Nakamura</a></h4>
+</td>
+<td id='jorge-revuelta-h'>
+<a href='https://github.com/minuscorp'>
+<img src='https://github.com/minuscorp.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/minuscorp'>Jorge Revuelta H</a></h4>
+</td>
+<td id='maksym-grebenets'>
+<a href='https://github.com/mgrebenets'>
+<img src='https://github.com/mgrebenets.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/mgrebenets'>Maksym Grebenets</a></h4>
+</td>
+<td id='danielle-tomlinson'>
+<a href='https://github.com/DanToml'>
+<img src='https://github.com/DanToml.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/DanToml'>Danielle Tomlinson</a></h4>
+</td>
+<td id='joshua-liebowitz'>
+<a href='https://github.com/taquitos'>
+<img src='https://github.com/taquitos.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/taquitos'>Joshua Liebowitz</a></h4>
+</td>
+</tr>
+<tr>
+<td id='matthew-ellis'>
+<a href='https://github.com/matthewellis'>
+<img src='https://github.com/matthewellis.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/mellis1995'>Matthew Ellis</a></h4>
+</td>
+<td id='helmut-januschka'>
+<a href='https://github.com/hjanuschka'>
+<img src='https://github.com/hjanuschka.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/hjanuschka'>Helmut Januschka</a></h4>
+</td>
+<td id='josh-holtz'>
+<a href='https://github.com/joshdholtz'>
+<img src='https://github.com/joshdholtz.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/joshdholtz'>Josh Holtz</a></h4>
+</td>
+<td id='manu-wallner'>
+<a href='https://github.com/milch'>
+<img src='https://github.com/milch.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/acrooow'>Manu Wallner</a></h4>
+</td>
+<td id='iulian-onofrei'>
+<a href='https://github.com/revolter'>
+<img src='https://github.com/revolter.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/Revolt666'>Iulian Onofrei</a></h4>
+</td>
+</tr>
+<tr>
+<td id='jérôme-lacoste'>
+<a href='https://github.com/lacostej'>
+<img src='https://github.com/lacostej.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/lacostej'>Jérôme Lacoste</a></h4>
+</td>
+<td id='felix-krause'>
+<a href='https://github.com/KrauseFx'>
+<img src='https://github.com/KrauseFx.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/KrauseFx'>Felix Krause</a></h4>
+</td>
+<td id='aaron-brager'>
+<a href='https://github.com/getaaron'>
+<img src='https://github.com/getaaron.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/getaaron'>Aaron Brager</a></h4>
+</td>
+<td id='luka-mirosevic'>
+<a href='https://github.com/lmirosevic'>
+<img src='https://github.com/lmirosevic.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/lmirosevic'>Luka Mirosevic</a></h4>
+</td>
+<td id='andrew-mcburney'>
+<a href='https://github.com/armcburney'>
+<img src='https://github.com/armcburney.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/armcburney'>Andrew McBurney</a></h4>
+</td>
+</tr>
+<tr>
+<td id='olivier-halligon'>
+<a href='https://github.com/AliSoftware'>
+<img src='https://github.com/AliSoftware.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/aligatr'>Olivier Halligon</a></h4>
+</td>
+<td id='stefan-natchev'>
+<a href='https://github.com/snatchev'>
+<img src='https://github.com/snatchev.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/snatchev'>Stefan Natchev</a></h4>
+</td>
+<td id='kohki-miki'>
+<a href='https://github.com/giginet'>
+<img src='https://github.com/giginet.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/giginet'>Kohki Miki</a></h4>
+</td>
+<td id='jan-piotrowski'>
+<a href='https://github.com/janpio'>
+<img src='https://github.com/janpio.png?size=140'>
+</a>
+<h4 align='center'><a href='https://twitter.com/Sujan'>Jan Piotrowski</a></h4>
+</td>
+<td id='jimmy-dee'>
+<a href='https://github.com/jdee'>
+<img src='https://github.com/jdee.png?size=140'>
+</a>
+<h4 align='center'>Jimmy Dee</h4>
+</td>
+</tr>
+</table>
 
-## Speakers
+Special thanks to all [contributors](https://github.com/fastlane/fastlane/graphs/contributors) for extending and improving _fastlane_.
 
-Are you giving a talk on fastlane? Great! [Let us know](https://fastlane.tools/speaking) so we can help you give the best possible presentation. 
+## Contribute to _fastlane_
+
+Check out [CONTRIBUTING.md](CONTRIBUTING.md) for more information on how to help with _fastlane_.
 
 ## Code of Conduct
 
-Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+
+## Metrics
+ 
+_fastlane_ tracks a few key metrics to understand how developers are using the tool and to help us know what areas need improvement. No personal/sensitive information is ever collected. Metrics that are collected include: 
+ 
+* The number of _fastlane_ runs
+* A salted hash of the app identifier or package name, which helps us anonymously identify unique usage of _fastlane_
+ 
+You can easily opt-out of metrics collection by adding `opt_out_usage` at the top of your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. [Check out the metrics code on GitHub](https://github.com/fastlane/fastlane/tree/master/fastlane_core/lib/fastlane_core/analytics)
 
 ## License
 
 This project is licensed under the terms of the MIT license. See the [LICENSE](LICENSE) file.
 
 > This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.
+
+<hr />
+<h2 align="center">
+  ✨ All fastlane docs were moved to <a href="https://docs.fastlane.tools/">docs.fastlane.tools</a> ✨
+</h2>
+<hr />

@@ -2,11 +2,24 @@
 
 <div class="quality-index" style="color: #<%= @plugin.color_to_use %>"><%= @plugin.data[:overall_score] %></div>
 
-<h3><a href="<%= @plugin.homepage %>" target="_blank"><code><%= @plugin.name.gsub("fastlane-plugin-", "") %></code></a></h3>
+<h3 id="<%= @plugin.name.gsub("fastlane-plugin-", "") %>"><a href="<%= @plugin.homepage %>" target="_blank"><code><%= @plugin.name.gsub("fastlane-plugin-", "") %></code></a></h3>
 
 <p class="via-text">via <%= @plugin.raw_hash["authors"] %></p>
 
 > <%= @plugin.info %>
+
+<% if @plugin.data[:actions].count > 0 %>
+<details>
+<summary class="plugin-actions">Provided actions</summary>
+
+ Name | Category | Description
+------|----------|------------
+<%- @plugin.data[:actions].each do |action| -%>
+  **<%= action.name %>** | <%= action.category || "-" %> | <%= action.description || action.details || "-" %>
+<%- end -%>
+
+</details>
+<% end %>
 
 <details>
 <summary class="score-details">Score details</summary>

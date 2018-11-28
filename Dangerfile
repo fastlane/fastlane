@@ -15,6 +15,10 @@ if git.modified_files.include?("snapshot/lib/assets/SnapshotHelper.swift")
   warn("You modified `SnapshotHelper.swift`, make sure to update the version number at the bottom of the file to notify users about the new helper file.")
 end
 
+if git.modified_files.include?("snapshot/lib/assets/SnapshotHelperXcode8.swift")
+  warn("You modified `SnapshotHelperXcode8.swift`, make sure to update the version number at the bottom of the file to notify users about the new helper file.")
+end
+
 # To avoid "PR & Runs" for which tests don't pass, we want to make spec errors more visible
 # The code below will run on Circle, parses the results in JSON and posts them to the PR as comment
 containing_dir = ENV["CIRCLE_TEST_REPORTS"] || "." # for local testing
@@ -25,5 +29,5 @@ if File.exist?(file_path)
   junit.headers = [:name, :file]
   junit.report
 else
-  puts "Couldn't find any test artifacts in path #{file_path}"
+  puts("Couldn't find any test artifacts in path #{file_path}")
 end

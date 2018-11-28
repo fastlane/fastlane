@@ -6,6 +6,8 @@ module Fastlane
     module SharedValues
       GRADLE_APK_OUTPUT_PATH = :GRADLE_APK_OUTPUT_PATH
       GRADLE_ALL_APK_OUTPUT_PATHS = :GRADLE_ALL_APK_OUTPUT_PATHS
+      GRADLE_AAB_OUTPUT_PATH = :GRADLE_AAB_OUTPUT_PATH
+      GRADLE_ALL_AAB_OUTPUT_PATHS = :GRADLE_ALL_AAB_OUTPUT_PATHS
       GRADLE_FLAVOR = :GRADLE_FLAVOR
       GRADLE_BUILD_TYPE = :GRADLE_BUILD_TYPE
     end
@@ -36,6 +38,7 @@ module Fastlane
         flags = []
         flags << "-p #{project_dir.shellescape}"
         flags << params[:properties].map { |k, v| "-P#{k.to_s.shellescape}=#{v.to_s.shellescape}" }.join(' ') unless params[:properties].nil?
+        flags << params[:system_properties].map { |k, v| "-D#{k.to_s.shellescape}=#{v.to_s.shellescape}" }.join(' ') unless params[:system_properties].nil?
         flags << params[:flags] unless params[:flags].nil?
 
         # Run the actual gradle task
@@ -52,24 +55,33 @@ module Fastlane
                                 print_command: params[:print_command],
                                 print_command_output: params[:print_command_output])
 
-        # If we didn't build, then we return now, as it makes no sense to search for apk's in a non-`assemble` scenario
-        return result unless task =~ /\b(assemble)/
+        # If we didn't build, then we return now, as it makes no sense to search for apk's in a non-`assemble` or non-`build` scenario
+        return result unless task =~ /\b(assemble)/ || task =~ /\b(bundle)/
 
         apk_search_path = File.join(project_dir, '**', 'build', 'outputs', 'apk', '**', '*.apk')
+        aab_search_path = File.join(project_dir, '**', 'build', 'outputs', 'bundle', '**', '*.aab')
 
-        # Our apk is now built, but there might actually be multiple ones that were built if a flavor was not specified in a multi-flavor project (e.g. `assembleRelease`), however we're not interested in unaligned apk's...
+        # Our apk/aab is now built, but there might actually be multiple ones that were built if a flavor was not specified in a multi-flavor project (e.g. `assembleRelease`)
+        # However, we're not interested in unaligned apk's...
         new_apks = Dir[apk_search_path].reject { |path| path =~ /^.*-unaligned.apk$/i }
         new_apks = new_apks.map { |path| File.expand_path(path) }
+        new_aabs = Dir[aab_search_path]
+        new_aabs = new_aabs.map { |path| File.expand_path(path) }
 
-        # We expose all of these new apk's
+        # We expose all of these new apks and aabs
         Actions.lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS] = new_apks
+        Actions.lane_context[SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS] = new_aabs
 
-        # We also take the most recent apk to return as SharedValues::GRADLE_APK_OUTPUT_PATH, this is the one that will be relevant for most projects that just build a single build variant (flavor + build type combo). In multi build variants this value is undefined
+        # We also take the most recent apk and aab to return as SharedValues::GRADLE_APK_OUTPUT_PATH and SharedValues::GRADLE_AAB_OUTPUT_PATH
+        # This is the one that will be relevant for most projects that just build a single build variant (flavor + build type combo).
+        # In multi build variants this value is undefined
         last_apk_path = new_apks.sort_by(&File.method(:mtime)).last
+        last_aab_path = new_aabs.sort_by(&File.method(:mtime)).last
         Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] = File.expand_path(last_apk_path) if last_apk_path
+        Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH] = File.expand_path(last_aab_path) if last_aab_path
 
-        # Give a helpful message in case there were no new apk's. Remember we're only running this code when assembling, in which case we certainly expect there to be an apk
-        UI.message('Couldn\'t find any new signed apk files...') if new_apks.empty?
+        # Give a helpful message in case there were no new apks or aabs. Remember we're only running this code when assembling, in which case we certainly expect there to be an apk or aab
+        UI.message('Couldn\'t find any new signed apk files...') if new_apks.empty? && new_aabs.empty?
 
         return result
       end
@@ -83,9 +95,7 @@ module Fastlane
       end
 
       def self.details
-        [
-          'Run `./gradlew tasks` to get a list of all available gradle tasks for your project'
-        ].join("\n")
+        'Run `./gradlew tasks` to get a list of all available gradle tasks for your project'
       end
 
       def self.available_options
@@ -97,7 +107,7 @@ module Fastlane
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :flavor,
                                        env_name: 'FL_GRADLE_FLAVOR',
-                                       description: 'The flavor that you want the task for, e.g. `MyFlavor`. If you are running the `assemble` task in a multi-flavor project, and you rely on Actions.lane_context[Actions.SharedValues::GRADLE_APK_OUTPUT_PATH] then you must specify a flavor here or else this value will be undefined',
+                                       description: 'The flavor that you want the task for, e.g. `MyFlavor`. If you are running the `assemble` task in a multi-flavor project, and you rely on Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] then you must specify a flavor here or else this value will be undefined',
                                        optional: true,
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :build_type,
@@ -112,7 +122,7 @@ module Fastlane
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :project_dir,
                                        env_name: 'FL_GRADLE_PROJECT_DIR',
-                                       description: 'The root directory of the gradle project. Defaults to `.`',
+                                       description: 'The root directory of the gradle project',
                                        default_value: '.',
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :gradle_path,
@@ -123,6 +133,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :properties,
                                        env_name: 'FL_GRADLE_PROPERTIES',
                                        description: 'Gradle properties to be exposed to the gradle script',
+                                       optional: true,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :system_properties,
+                                       env_name: 'FL_GRADLE_SYSTEM_PROPERTIES',
+                                       description: 'Gradle system properties to be exposed to the gradle script',
                                        optional: true,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :serial,
@@ -179,8 +194,23 @@ module Fastlane
               "versionName" => "1.0.0",
               # ...
             }
+          )
+          ```
+
+          You can use this to automatically [sign and zipalign](https://developer.android.com/studio/publish/app-signing.html) your app:
+          ```ruby
+          gradle(
+            task: "assemble",
+            build_type: "Release",
+            print_command: false,
+            properties: {
+              "android.injected.signing.store.file" => "keystore.jks",
+              "android.injected.signing.store.password" => "store_password",
+              "android.injected.signing.key.alias" => "key_alias",
+              "android.injected.signing.key.password" => "key_password",
+            }
           )',
-          '# If you need to pass sensitive information through the `gradle` action, and don"t want the generated command to be printed before it is run, you can suppress that:
+          '# If you need to pass sensitive information through the `gradle` action, and don\'t want the generated command to be printed before it is run, you can suppress that:
           gradle(
             # ...
             print_command: false
@@ -201,6 +231,10 @@ module Fastlane
             # ...
 
             flags: "--exitcode --xml file.xml"
+          )',
+          '# Delete the build directory and generated APKs
+          gradle(
+            task: "clean"
           )'
         ]
       end

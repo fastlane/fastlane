@@ -18,7 +18,11 @@ module Fastlane
           user_input = STDIN.gets(end_tag).chomp.gsub(end_tag, "").strip
         else
           # Standard one line input
-          user_input = STDIN.gets.chomp.strip while (user_input || "").length == 0
+          if params[:secure_text]
+            user_input = STDIN.noecho(&:gets).chomp while (user_input || "").length == 0
+          else
+            user_input = STDIN.gets.chomp.strip while (user_input || "").length == 0
+          end
         end
 
         return user_input
@@ -34,8 +38,8 @@ module Fastlane
 
       def self.details
         [
-          "You can use `prompt` to ask the user for a value or to just let the user confirm the next step",
-          "When this is executed on a CI service, the passed `ci_input` value will be returned",
+          "You can use `prompt` to ask the user for a value or to just let the user confirm the next step.",
+          "When this is executed on a CI service, the passed `ci_input` value will be returned.",
           "This action also supports multi-line inputs using the `multi_line_end_keyword` option."
         ].join("\n")
       end
@@ -44,12 +48,16 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :text,
                                        description: "The text that will be displayed to the user",
-                                       default_value: "Please enter a text: "),
+                                       default_value: "Please enter some text: "),
           FastlaneCore::ConfigItem.new(key: :ci_input,
                                        description: "The default text that will be used when being executed on a CI service",
                                        default_value: ''),
           FastlaneCore::ConfigItem.new(key: :boolean,
                                        description: "Is that a boolean question (yes/no)? This will add (y/n) at the end",
+                                       default_value: false,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :secure_text,
+                                       description: "Is that a secure text (yes/no)?",
                                        default_value: false,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :multi_line_end_keyword,
@@ -85,6 +93,10 @@ module Fastlane
 
       def self.sample_return_value
         "User Content\nWithNewline"
+      end
+
+      def self.return_type
+        :string
       end
 
       def self.category

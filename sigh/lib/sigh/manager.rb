@@ -1,5 +1,6 @@
-require 'plist'
-require 'sigh/runner'
+require 'fastlane_core/provisioning_profile'
+
+require_relative 'runner'
 
 module Sigh
   class Manager
@@ -24,7 +25,7 @@ module Sigh
 
       install_profile(output) unless Sigh.config[:skip_install]
 
-      puts output.green
+      puts(output.green)
 
       return File.expand_path(output)
     end
@@ -36,7 +37,9 @@ module Sigh
 
     def self.install_profile(profile)
       uuid = FastlaneCore::ProvisioningProfile.uuid(profile)
+      name = FastlaneCore::ProvisioningProfile.name(profile)
       ENV["SIGH_UDID"] = ENV["SIGH_UUID"] = uuid if uuid
+      ENV["SIGH_NAME"] = name if name
 
       FastlaneCore::ProvisioningProfile.install(profile)
     end

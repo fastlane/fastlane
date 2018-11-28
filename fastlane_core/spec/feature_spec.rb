@@ -24,19 +24,19 @@ describe FastlaneCore do
       it "registers a feature successfully with environment variable and description" do
         expect do
           FastlaneCore::Feature.register(env_var: "TEST_ENV_VAR_VALID", description: "A valid test feature")
-        end.not_to raise_error
+        end.not_to(raise_error)
       end
 
       it "raises an error if no environment variable specified" do
         expect do
           FastlaneCore::Feature.register(description: "An invalid test feature")
-        end.to raise_error "Invalid Feature"
+        end.to raise_error("Invalid Feature")
       end
 
       it "raises an error if no description specified" do
         expect do
           FastlaneCore::Feature.register(env_var: "TEST_ENV_VAR_INVALID_NO_DESCRIPTION")
-        end.to raise_error "Invalid Feature"
+        end.to raise_error("Invalid Feature")
       end
     end
 

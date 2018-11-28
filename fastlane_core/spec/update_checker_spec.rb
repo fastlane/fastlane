@@ -1,8 +1,9 @@
 require 'fastlane_core/update_checker/update_checker'
+require 'fastlane_core/analytics/app_identifier_guesser'
 
 describe FastlaneCore do
   describe FastlaneCore::UpdateChecker do
-    let (:name) { 'fastlane' }
+    let(:name) { 'fastlane' }
     def android_hash_of(value)
       hash_of("android_project_#{value}")
     end
@@ -77,7 +78,7 @@ describe FastlaneCore do
     end
 
     describe "#p_hash?" do
-      let (:package_name) { 'com.test.app' }
+      let(:package_name) { 'com.test.app' }
 
       before do
         ENV.delete("FASTLANE_OPT_OUT_USAGE")
@@ -85,29 +86,34 @@ describe FastlaneCore do
 
       it "chooses the correct param for package name for supply" do
         args = ["--skip_upload_screenshots", "-a", "beta", "-p", package_name]
-        expect(FastlaneCore::UpdateChecker.p_hash(args, 'supply')).to eq(android_hash_of(package_name))
+        guesser = FastlaneCore::AppIdentifierGuesser.new(args: args, gem_name: 'supply')
+
+        expect(guesser.p_hash).to eq(android_hash_of(package_name))
       end
 
       it "chooses the correct param for package name for screengrab" do
         args = ["--skip_open_summary", "-a", package_name, "-p", "com.test.app.test"]
-        expect(FastlaneCore::UpdateChecker.p_hash(args, 'screengrab')).to eq(android_hash_of(package_name))
+
+        guesser = FastlaneCore::AppIdentifierGuesser.new(args: args, gem_name: 'screengrab')
+        expect(guesser.p_hash).to eq(android_hash_of(package_name))
       end
 
       it "chooses the correct param for package name for gym" do
         args = ["--clean", "-a", package_name, "-p", "test.xcodeproj"]
-        expect(FastlaneCore::UpdateChecker.p_hash(args, 'gym')).to eq(hash_of(package_name))
+        guesser = FastlaneCore::AppIdentifierGuesser.new(args: args, gem_name: 'gym')
+        expect(guesser.p_hash).to eq(hash_of(package_name))
       end
     end
 
     describe "#send_launch_analytic_events_for" do
       before do
         ENV.delete("FASTLANE_OPT_OUT_USAGE")
-        allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
       end
 
       it "sends no events when opted out" do
         with_env_values('FASTLANE_OPT_OUT_USAGE' => 'true') do
-          expect(FastlaneCore::UpdateChecker).to_not receive(:send_events)
+          expect(FastlaneCore::UpdateChecker).to_not(receive(:send_events))
           FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
         end
       end
@@ -122,7 +128,7 @@ describe FastlaneCore do
       end
 
       it "identifies CI correctly" do
-        allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(true)
+        allow(FastlaneCore::Helper).to receive(:ci?).and_return(true)
 
         expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
           expect(analytics.size).to eq(1)
@@ -133,7 +139,7 @@ describe FastlaneCore do
       end
 
       it "contains p_hash event and uses the bundle identifier and hashes the value if available" do
-        ENV["PILOT_APP_IDENTIFIER"] = "com.krausefx.app"
+        stub_const('ENV', { 'PILOT_APP_IDENTIFIER' => 'com.krausefx.app' })
         p_hashed_id = hash_of(ENV["PILOT_APP_IDENTIFIER"])
 
         expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
@@ -144,41 +150,17 @@ describe FastlaneCore do
 
         FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
       end
-
-      describe "#platform" do
-        it "ios" do
-          FastlaneSpec::Env.with_ARGV(["--app_identifier", "yolo.app"]) do
-            expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
-              expect(analytics.size).to eq(2)
-              expect(analytics.find_all { |a| a[:action][:name] == 'update_checked' && a[:secondary_target][:detail] == :ios }.size).to eq(1)
-            end
-
-            FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
-          end
-        end
-
-        it "android" do
-          FastlaneSpec::Env.with_ARGV(["--app_package_name", "yolo.android.app"]) do
-            expect(FastlaneCore::UpdateChecker).to receive(:send_events) do |analytics|
-              expect(analytics.size).to eq(2)
-              expect(analytics.find_all { |a| a[:action][:name] == 'update_checked' && a[:secondary_target][:detail] == :android }.size).to eq(1)
-            end
-
-            FastlaneCore::UpdateChecker.send_launch_analytic_events_for("fastlane")
-          end
-        end
-      end
     end
 
     describe "#send_completion_events_for" do
       before do
         ENV.delete("FASTLANE_OPT_OUT_USAGE")
-        allow(FastlaneCore::Helper).to receive(:is_ci?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
       end
 
       it "sends no events when opted out" do
         with_env_values('FASTLANE_OPT_OUT_USAGE' => 'true') do
-          expect(FastlaneCore::UpdateChecker).to_not receive(:send_events)
+          expect(FastlaneCore::UpdateChecker).to_not(receive(:send_events))
           FastlaneCore::UpdateChecker.send_completion_events_for("fastlane")
         end
       end

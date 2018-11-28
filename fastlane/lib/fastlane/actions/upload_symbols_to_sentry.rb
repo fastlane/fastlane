@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         # Warning about usinging new plugin
         UI.important("It's recommended to use the official Sentry Fastlane plugin")
-        UI.important("Github: https://github.com/getsentry/fastlane-plugin-sentry")
+        UI.important("GitHub: https://github.com/getsentry/fastlane-plugin-sentry")
         UI.important("Installation: fastlane add_plugin sentry")
 
         Actions.verify_gem!('rest-client')
@@ -40,7 +40,7 @@ module Fastlane
           resource = RestClient::Resource.new(url, headers: { Authorization: "Bearer #{auth_token}" })
         end
 
-        UI.message "Will upload dSYM(s) to #{url}"
+        UI.message("Will upload dSYM(s) to #{url}")
 
         # Upload dsym(s)
         dsym_paths += [dsym_path]
@@ -53,13 +53,13 @@ module Fastlane
       end
 
       def self.upload_dsym(resource, dsym)
-        UI.message "Uploading... #{dsym}"
+        UI.message("Uploading... #{dsym}")
         resource.post(file: File.new(dsym, 'rb')) unless Helper.test?
-        UI.success 'dSYM successfully uploaded to Sentry!'
+        UI.success('dSYM successfully uploaded to Sentry!')
 
         dsym
       rescue
-        UI.user_error! 'Error while trying to upload dSYM to Sentry'
+        UI.user_error!('Error while trying to upload dSYM to Sentry')
       end
 
       #####################################################
@@ -71,11 +71,7 @@ module Fastlane
       end
 
       def self.details
-        [
-          "This action allows you to upload symbolication files to Sentry.",
-          "It's extra useful if you use it to download the latest dSYM files from Apple when you",
-          "use Bitcode"
-        ].join(" ")
+        "This action allows you to upload symbolication files to Sentry. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode."
       end
 
       def self.available_options
@@ -100,18 +96,19 @@ module Fastlane
                                        env_name: "SENTRY_ORG_SLUG",
                                        description: "Organization slug for Sentry project",
                                        verify_block: proc do |value|
-                                         UI.user_error!("No organization slug for SentryAction given, pass using `org_slug: 'org'`") unless value and !value.empty?
+                                         UI.user_error!("No organization slug for SentryAction given, pass using `org_slug: 'org'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :project_slug,
                                        env_name: "SENTRY_PROJECT_SLUG",
                                        description: "Project slug for Sentry",
                                        verify_block: proc do |value|
-                                         UI.user_error!("No project slug for SentryAction given, pass using `project_slug: 'project'`") unless value and !value.empty?
+                                         UI.user_error!("No project slug for SentryAction given, pass using `project_slug: 'project'`") unless value && !value.empty?
                                        end),
           FastlaneCore::ConfigItem.new(key: :dsym_path,
                                        env_name: "SENTRY_DSYM_PATH",
                                        description: "Path to your symbols file. For iOS and Mac provide path to app.dSYM.zip",
                                        default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          # validation is done in the action
@@ -120,6 +117,7 @@ module Fastlane
                                        env_name: "SENTRY_DSYM_PATHS",
                                        description: "Path to an array of your symbols file. For iOS and Mac provide path to app.dSYM.zip",
                                        default_value: Actions.lane_context[SharedValues::DSYM_PATHS],
+                                       default_value_dynamic: true,
                                        is_string: false,
                                        optional: true,
                                        verify_block: proc do |value|
@@ -156,9 +154,11 @@ module Fastlane
       end
 
       def self.deprecated_notes
-        "Please use the `sentry` plugin instead.\n" \
-          "Install using `fastlane add_plugin sentry`.\n" \
-          "Replace `upload_symbols_to_sentry` with `sentry_upload_dsym`"
+        [
+          "Please use the `sentry` plugin instead.",
+          "Install using `fastlane add_plugin sentry`.",
+          "Replace `upload_symbols_to_sentry(...)` with `sentry_upload_dsym(...)`."
+        ].join("\n")
       end
     end
   end

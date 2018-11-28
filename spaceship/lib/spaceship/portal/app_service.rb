@@ -30,69 +30,49 @@ module Spaceship
         end
       end
 
-      class << self
-        def app_group
-          self::AppGroup
+      def self.new_service(id, values: { on: true, off: false })
+        m = Module.new
+        values.each do |k, v|
+          m.define_singleton_method(k) do
+            AppService.new(id, v)
+          end
         end
+        return m
+      end
 
-        def apple_pay
-          self::ApplePay
-        end
+      AccessWiFi = AppService.new_service("AWEQ28MY3E")
+      AppGroup = AppService.new_service("APG3427HIY")
+      ApplePay = AppService.new_service("OM633U5T5G")
+      AssociatedDomains = AppService.new_service("SKC3T5S89Y")
+      ClassKit = AppService.new_service("PKTJAN2017")
+      AutoFillCredential = AppService.new_service("CPEQ28MX4E")
+      DataProtection = AppService.new_service("dataProtection", values: { off: "", complete: "complete", unless_open: "unlessopen", until_first_auth: "untilfirstauth" })
+      GameCenter = AppService.new_service("gameCenter")
+      HealthKit = AppService.new_service("HK421J6T7P")
+      HomeKit = AppService.new_service("homeKit")
+      Hotspot = AppService.new_service("HSC639VEI8")
+      Cloud = AppService.new_service("iCloud")
+      CloudKit = AppService.new_service("cloudKitVersion", values: { xcode5_compatible: 1, cloud_kit: 2 })
+      InAppPurchase = AppService.new_service("inAppPurchase")
+      InterAppAudio = AppService.new_service("IAD53UNK2F")
+      Multipath = AppService.new_service("MP49FN762P")
+      NetworkExtension = AppService.new_service("NWEXT04537")
+      NFCTagReading = AppService.new_service("NFCTRMAY17")
+      PersonalVPN = AppService.new_service("V66P55NK2I")
+      Passbook = AppService.new_service("pass")
+      PushNotification = AppService.new_service("push")
+      SiriKit = AppService.new_service("SI015DKUHP")
+      VPNConfiguration = AppService.new_service("V66P55NK2I")
+      Wallet = AppService.new_service("pass")
+      WirelessAccessory = AppService.new_service("WC421J6T7P")
 
-        def associated_domains
-          self::AssociatedDomains
-        end
-
-        def data_protection
-          self::DataProtection
-        end
-
-        def game_center
-          self::GameCenter
-        end
-
-        def health_kit
-          self::HealthKit
-        end
-
-        def home_kit
-          self::HomeKit
-        end
-
-        def wireless_accessory
-          self::WirelessAccessory
-        end
-
-        def icloud
-          self::Cloud
-        end
-
-        def cloud_kit
-          self::CloudKit
-        end
-
-        def in_app_purchase
-          self::InAppPurchase
-        end
-
-        def inter_app_audio
-          self::InterAppAudio
-        end
-
-        def passbook
-          self::Passbook
-        end
-
-        def push_notification
-          self::PushNotification
-        end
-
-        def siri_kit
-          self::SiriKit
-        end
-
-        def vpn_configuration
-          self::VPNConfiguration
+      constants.each do |c|
+        name = c.to_s
+                .gsub(/([A-Z0-9]+)([A-Z][a-z])/, '\1_\2') # ABBRVString -> ABBRV_String
+                .gsub(/([a-z0-9])([A-Z])/, '\1_\2')       # CamelCase -> Camel_Case
+                .downcase
+        self.class.send(:define_method, name) do
+          AppService.const_get(c)
         end
       end
 
@@ -101,177 +81,6 @@ module Spaceship
           self.service_id == other.service_id &&
           self.value == other.value &&
           self.service_uri == other.service_uri
-      end
-
-      #
-      # Modules for "constants"
-      #
-      module AppGroup
-        def self.off
-          AppService.new("APG3427HIY", false)
-        end
-
-        def self.on
-          AppService.new("APG3427HIY", true)
-        end
-      end
-
-      module ApplePay
-        def self.off
-          AppService.new("OM633U5T5G", false)
-        end
-
-        def self.on
-          AppService.new("OM633U5T5G", true)
-        end
-      end
-
-      module AssociatedDomains
-        def self.off
-          AppService.new("SKC3T5S89Y", false)
-        end
-
-        def self.on
-          AppService.new("SKC3T5S89Y", true)
-        end
-      end
-
-      module DataProtection
-        def self.off
-          AppService.new("dataProtection", "")
-        end
-
-        def self.complete
-          AppService.new("dataProtection", "complete")
-        end
-
-        def self.unless_open
-          AppService.new("dataProtection", "unlessopen")
-        end
-
-        def self.until_first_auth
-          AppService.new("dataProtection", "untilfirstauth")
-        end
-      end
-
-      module GameCenter
-        def self.off
-          AppService.new("gameCenter", false)
-        end
-
-        def self.on
-          AppService.new("gameCenter", true)
-        end
-      end
-
-      module HealthKit
-        def self.off
-          AppService.new("HK421J6T7P", false)
-        end
-
-        def self.on
-          AppService.new("HK421J6T7P", true)
-        end
-      end
-
-      module HomeKit
-        def self.off
-          AppService.new("homeKit", false)
-        end
-
-        def self.on
-          AppService.new("homeKit", true)
-        end
-      end
-
-      module WirelessAccessory
-        def self.off
-          AppService.new("WC421J6T7P", false)
-        end
-
-        def self.on
-          AppService.new("WC421J6T7P", true)
-        end
-      end
-
-      module Cloud
-        def self.off
-          AppService.new("iCloud", false)
-        end
-
-        def self.on
-          AppService.new("iCloud", true)
-        end
-      end
-
-      module CloudKit
-        def self.xcode5_compatible
-          AppService.new("cloudKitVersion", 1)
-        end
-
-        def self.cloud_kit
-          AppService.new("cloudKitVersion", 2)
-        end
-      end
-
-      module InAppPurchase
-        def self.off
-          AppService.new("inAppPurchase", false)
-        end
-
-        def self.on
-          AppService.new("inAppPurchase", true)
-        end
-      end
-
-      module InterAppAudio
-        def self.off
-          AppService.new("IAD53UNK2F", false)
-        end
-
-        def self.on
-          AppService.new("IAD53UNK2F", true)
-        end
-      end
-
-      module Passbook
-        def self.off
-          AppService.new("pass", false)
-        end
-
-        def self.on
-          AppService.new("pass", true)
-        end
-      end
-
-      module PushNotification
-        def self.off
-          AppService.new("push", false)
-        end
-
-        def self.on
-          AppService.new("push", true)
-        end
-      end
-
-      module SiriKit
-        def self.off
-          AppService.new("SI015DKUHP", false)
-        end
-
-        def self.on
-          AppService.new("SI015DKUHP", true)
-        end
-      end
-
-      module VPNConfiguration
-        def self.off
-          AppService.new("V66P55NK2I", false)
-        end
-
-        def self.on
-          AppService.new("V66P55NK2I", true)
-        end
       end
     end
   end

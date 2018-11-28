@@ -2,8 +2,7 @@ module Fastlane
   module Actions
     class OptOutCrashReportingAction < Action
       def self.run(params)
-        ENV['FASTLANE_OPT_OUT_CRASH_REPORTING'] = "YES"
-        UI.message("Disabled crash reporting")
+        UI.message("fastlane doesn't have crash reporting any more, feel free to remove `opt_out_crash_reporting` from your Fastfile")
       end
 
       def self.description
@@ -11,12 +10,7 @@ module Fastlane
       end
 
       def self.details
-        [
-          "By default, fastlane will send a report when it crashes",
-          "The stacktrace is sanitized so no personal information is sent.",
-          "Learn more at https://github.com/fastlane/fastlane#crash-reporting",
-          "Add `opt_out_crash_reporting` at the top of your Fastfile to disable crash reporting"
-        ].join(' ')
+        "_fastlane_ doesn't have crash reporting any more. Feel free to remove `opt_out_crash_reporting` from your Fastfile."
       end
 
       def self.authors
@@ -28,13 +22,11 @@ module Fastlane
       end
 
       def self.example_code
-        [
-          'opt_out_crash_reporting # add this to the top of your Fastfile'
-        ]
+        nil
       end
 
       def self.category
-        :misc
+        :deprecated
       end
     end
   end

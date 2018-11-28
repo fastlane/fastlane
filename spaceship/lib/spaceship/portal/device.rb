@@ -1,3 +1,5 @@
+require_relative 'portal_base'
+
 module Spaceship
   module Portal
     # Represents a device from the Apple Developer Portal
@@ -7,7 +9,7 @@ module Spaceship
       #   "XJXGVS46MW"
       attr_accessor :id
 
-      # @return (String) The name of the device
+      # @return (String) The name of the device, must be 50 characters or less.
       # @example
       #   "Felix Krause's iPhone 6"
       attr_accessor :name
@@ -96,12 +98,12 @@ module Spaceship
 
         # @return (Array) Returns all devices matching the provided profile_type
         def all_for_profile_type(profile_type)
-          if profile_type.include? "tvOS"
-            Spaceship::Device.all_apple_tvs
-          elsif profile_type.include? "Mac"
-            Spaceship::Device.all_macs
+          if profile_type.include?("tvOS")
+            Spaceship::Portal::Device.all_apple_tvs
+          elsif profile_type.include?("Mac")
+            Spaceship::Portal::Device.all_macs
           else
-            Spaceship::Device.all_ios_profile_devices
+            Spaceship::Portal::Device.all_ios_profile_devices
           end
         end
 
@@ -146,12 +148,13 @@ module Spaceship
             raise "You cannot create a device without a device_id (UDID) and name"
           end
 
+          raise "Device name must be 50 characters or less. \"#{name}\" has a #{name.length} character length." if name.length > 50
+
           # Find the device by UDID, raise an exception if it already exists
           existing = self.find_by_udid(udid, mac: mac)
           return existing if existing
 
           # It is valid to have the same name for multiple devices
-
           device = client.create_device!(name, udid, mac: mac)
 
           # Update self with the new device

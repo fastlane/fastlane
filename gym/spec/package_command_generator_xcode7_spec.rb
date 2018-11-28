@@ -8,7 +8,25 @@ describe Gym do
     allow(Gym).to receive(:project).and_return(@project)
   end
 
-  describe Gym::PackageCommandGeneratorXcode7 do
+  describe Gym::PackageCommandGeneratorXcode7, requires_xcodebuild: true do
+    it "passes xcargs through to xcode build wrapper " do
+      options = {
+        project: "./gym/examples/standard/Example.xcodeproj",
+        xcargs: "-allowProvisioningUpdates"
+      }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      result = Gym::PackageCommandGeneratorXcode7.generate
+      expect(result).to eq([
+                             "/usr/bin/xcrun #{Gym::PackageCommandGeneratorXcode7.wrap_xcodebuild.shellescape} -exportArchive",
+                             "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                             "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
+                             "-allowProvisioningUpdates",
+                             ""
+                           ])
+    end
+
     it "works with the example project with no additional parameters" do
       options = { project: "./gym/examples/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
@@ -82,9 +100,7 @@ describe Gym do
       config_path = Gym::PackageCommandGeneratorXcode7.config_path
 
       expect(Plist.parse_xml(config_path)).to eq({
-        'method' => "app-store",
-        'uploadBitcode' => false,
-        'uploadSymbols' => true
+        'method' => "app-store"
       })
     end
 

@@ -19,8 +19,8 @@ module Fastlane
         UI.important("Creating commit on #{repo_name} on branch \"#{branch}\" for file \"#{file_path}\"")
 
         api_file_path = file_path
-        api_file_path = "/#{api_file_path}" unless api_file_path.start_with? '/'
-        api_file_path = api_file_path[0..-2] if api_file_path.end_with? '/'
+        api_file_path = "/#{api_file_path}" unless api_file_path.start_with?('/')
+        api_file_path = api_file_path[0..-2] if api_file_path.end_with?('/')
 
         payload = {
           path: api_file_path,
@@ -77,10 +77,11 @@ module Fastlane
       end
 
       def self.details
-        "Commits a file directly to GitHub. You must provide your GitHub Personal token
-        (get one from https://github.com/settings/tokens/new), the repository name and the relative file path from the root git project.
-        Out parameters provide the commit sha created, which can be used for later usage for examples such as releases, the direct download link and the full response JSON.
-        Documentation: https://developer.github.com/v3/repos/contents/#create-a-file"
+        [
+          "Commits a file directly to GitHub. You must provide your GitHub Personal token (get one from [https://github.com/settings/tokens/new](https://github.com/settings/tokens/new)), the repository name and the relative file path from the root git project.",
+          "Out parameters provide the commit sha created, which can be used for later usage for examples such as releases, the direct download link and the full response JSON.",
+          "Documentation: [https://developer.github.com/v3/repos/contents/#create-a-file](https://developer.github.com/v3/repos/contents/#create-a-file)."
+        ].join("\n")
       end
 
       def self.available_options
@@ -89,7 +90,7 @@ module Fastlane
                                        env_name: "FL_COMMIT_GITHUB_FILE_REPOSITORY_NAME",
                                        description: "The path to your repo, e.g. 'fastlane/fastlane'",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please only pass the path, e.g. 'fastlane/fastlane'") if value.include? "github.com"
+                                         UI.user_error!("Please only pass the path, e.g. 'fastlane/fastlane'") if value.include?("github.com")
                                          UI.user_error!("Please only pass the path, e.g. 'fastlane/fastlane'") if value.split('/').count != 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :server_url,
@@ -98,14 +99,16 @@ module Fastlane
                                        default_value: "https://api.github.com",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server/api/v3") unless value.include? "//"
+                                         UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server/api/v3") unless value.include?("//")
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_COMMIT_GITHUB_FILE_API_TOKEN",
                                        description: "Personal API Token for GitHub - generate one at https://github.com/settings/tokens",
                                        sensitive: true,
                                        is_string: true,
+                                       code_gen_sensitive: true,
                                        default_value: ENV["GITHUB_API_TOKEN"],
+                                       default_value_dynamic: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :branch,
                                        env_name: "FL_COMMIT_GITHUB_FILE_BRANCH",
@@ -124,6 +127,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "FL_COMMIT_GITHUB_FILE_MESSAGE",
                                        description: "The commit message. Defaults to the file name",
+                                       default_value_dynamic: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :secure,
                                        env_name: "FL_COMMIT_GITHUB_FILE_SECURE",
@@ -140,6 +144,10 @@ module Fastlane
           ['COMMIT_GITHUB_FILE_SHA', 'Commit SHA generated'],
           ['COMMIT_GITHUB_FILE_JSON', 'The whole commit JSON object response']
         ]
+      end
+
+      def self.return_type
+        :hash_of_strings
       end
 
       def self.return_value

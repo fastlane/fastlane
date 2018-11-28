@@ -23,6 +23,7 @@ describe Spaceship::AppVersion, all: true do
       expect(version.can_send_version_live).to eq(false)
       expect(version.release_on_approval).to eq(true)
       expect(version.auto_release_date).to eq(nil)
+      expect(version.ratings_reset).to eq(false)
       expect(version.can_beta_test).to eq(true)
       expect(version.version).to eq('0.9.13')
       expect(version.supports_apple_watch).to eq(false)
@@ -149,11 +150,11 @@ describe Spaceship::AppVersion, all: true do
 
     describe "#url" do
       it "live version" do
-        expect(app.live_version.url).to eq("https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app.apple_id}/ios/versioninfo/deliverable")
+        expect(app.live_version.url).to eq("https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app.apple_id}/#{app.platform}/versioninfo/deliverable")
       end
 
       it "edit version" do
-        expect(app.edit_version.url).to eq("https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app.apple_id}/ios/versioninfo/")
+        expect(app.edit_version.url).to eq("https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app.apple_id}/#{app.platform}/versioninfo/")
       end
     end
 
@@ -467,19 +468,19 @@ describe Spaceship::AppVersion, all: true do
         it "prevents from using negative sort_order" do
           expect do
             version.upload_screenshot!(screenshot_path, -1, "English", 'iphone4', false)
-          end.to raise_error "sort_order must be higher than 0"
+          end.to raise_error("sort_order must be higher than 0")
         end
 
         it "prevents from using sort_order 0" do
           expect do
             version.upload_screenshot!(screenshot_path, 0, "English", 'iphone4', false)
-          end.to raise_error "sort_order must be higher than 0"
+          end.to raise_error("sort_order must be higher than 0")
         end
 
         it "prevents from using too large sort_order" do
           expect do
-            version.upload_screenshot!(screenshot_path, 6, "English", 'iphone4', false)
-          end.to raise_error "sort_order must not be > 5"
+            version.upload_screenshot!(screenshot_path, 11, "English", 'iphone4', false)
+          end.to raise_error("sort_order must not be > 10")
         end
 
         # not really sure if we want to enforce that
@@ -492,19 +493,19 @@ describe Spaceship::AppVersion, all: true do
         it "prevent from using invalid language" do
           expect do
             version.upload_screenshot!(screenshot_path, 1, "NotALanguage", 'iphone4', false)
-          end.to raise_error "iTunes Connect error: NotALanguage isn't an activated language"
+          end.to raise_error("App Store Connect error: NotALanguage isn't an activated language")
         end
 
         it "prevent from using invalid language" do
           expect do
             version.upload_screenshot!(screenshot_path, 1, "English_CA", 'iphone4', false)
-          end.to raise_error "iTunes Connect error: English_CA isn't an activated language"
+          end.to raise_error("App Store Connect error: English_CA isn't an activated language")
         end
 
         it "prevent from using invalid device" do
           expect do
             version.upload_screenshot!(screenshot_path, 1, "English", :android, false)
-          end.to raise_error "iTunes Connect error: android isn't a valid device name"
+          end.to raise_error("App Store Connect error: android isn't a valid device name")
         end
       end
 
@@ -586,7 +587,7 @@ describe Spaceship::AppVersion, all: true do
         it "fails with error if the screenshot to remove doesn't exist" do
           expect do
             version.upload_screenshot!(nil, 5, "English", 'iphone4', false)
-          end.to raise_error "cannot remove screenshot with non existing sort_order"
+          end.to raise_error("cannot remove screenshot with non existing sort_order")
         end
       end
     end
@@ -636,6 +637,17 @@ describe Spaceship::AppVersion, all: true do
         TunesStubbing.itc_stub_valid_update
       end
 
+      def setup_handle_itc_potential_server_failure(nb_failures)
+        @times_called = 0
+        allow(client).to receive(:handle_itc_response) do |data|
+          @times_called += 1
+          raise Spaceship::TunesClient::ITunesConnectPotentialServerError, "simulated try again" if @times_called <= nb_failures
+          update_success_data
+        end
+        # arbitrary stub to prevent mock network failures. We override itc_response
+        TunesStubbing.itc_stub_valid_update
+      end
+
       it "retries when ITC is temporarily unable to save changes" do
         setup_handle_itc_response_failure(1)
 
@@ -643,13 +655,29 @@ describe Spaceship::AppVersion, all: true do
         expect(@times_called).to eq(2)
       end
 
+      it "retries when ITC throws an error and it might be a server issue" do
+        setup_handle_itc_potential_server_failure(1)
+
+        version.save!
+        expect(@times_called).to eq(2)
+      end
+
       it "retries a maximum number of times when ITC is temporarily unable to save changes" do
-        setup_handle_itc_response_failure(5)
+        setup_handle_itc_response_failure(6) # set to more than should happen
 
         expect do
           version.save!
         end.to raise_error(Spaceship::TunesClient::ITunesConnectTemporaryError)
         expect(@times_called).to eq(5)
+      end
+
+      it "retries a maximum number of times when ITC is not responding properly" do
+        setup_handle_itc_potential_server_failure(4) # set to more than should happen
+
+        expect do
+          version.save!
+        end.to raise_error(Spaceship::TunesClient::ITunesConnectPotentialServerError)
+        expect(@times_called).to eq(3)
       end
     end
 
@@ -657,7 +685,7 @@ describe Spaceship::AppVersion, all: true do
       it "raises an exception if language is not available" do
         expect do
           version.description["ja-JP"]
-        end.to raise_error "Language 'ja-JP' is not activated / available for this app version."
+        end.to raise_error("Language 'ja-JP' is not activated / available for this app version.")
       end
 
       # it "allows the creation of a new language" do
@@ -679,7 +707,7 @@ describe Spaceship::AppVersion, all: true do
         TunesStubbing.itc_stub_valid_update
         expect do
           version.reject!
-        end.to raise_error "Version not rejectable"
+        end.to raise_error("Version not rejectable")
       end
     end
   end

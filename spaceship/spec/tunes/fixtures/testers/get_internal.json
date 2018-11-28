@@ -30,12 +30,14 @@
       },
       "testerId": "4bb959dd-6a57-4aaf-b3ff-761041868817",
       "devices": [],
-      "latestInstalledAppAdamId": null,
-      "latestInstalledVersion": null,
-      "latestInstalledShortVersion": null,
-      "latestInstalledDate": null,
+      "latestInstallByPlatform": {
+        "ios": {
+          "installDate": 1504114590,
+          "shortVersion": "0.9.14",
+          "version": "1"
+        }
+      },
       "latestInstalledName": null,
-      "latestInstallByPlatform": null,
       "hasAddedOrInvitedApp": null,
       "warnOnDelete": true,
       "itcUsername": "detlef@krausefx.com",
@@ -79,12 +81,15 @@
         "osVersion": "8.3",
         "name": null
       }],
+      "latestInstallByPlatform": {
+        "ios": {
+          "installDate": 1427565638420,
+          "shortVersion": "0.9.14",
+          "version": "1"
+        }
+      },
       "latestInstalledAppAdamId": 794902327,
-      "latestInstalledVersion": "0.9.14",
-      "latestInstalledShortVersion": "1",
-      "latestInstalledDate": 1427565638420,
       "latestInstalledName": "Golfclub Gut Altentann",
-      "latestInstallByPlatform": null,
       "hasAddedOrInvitedApp": null,
       "warnOnDelete": true,
       "itcUsername": "felix@sunapps.net",

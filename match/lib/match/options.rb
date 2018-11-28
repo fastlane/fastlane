@@ -1,5 +1,6 @@
-require 'fastlane_core'
-require 'credentials_manager'
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
+require_relative 'module'
 
 module Match
   class Options
@@ -28,17 +29,33 @@ module Match
                                          UI.user_error!("Unsupported environment #{value}, must be in #{Match.environments.join(', ')}")
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :storage_mode,
+                                     env_name: "MATCH_STORAGE_MODE",
+                                     description: "Define where you want to store your certificates",
+                                     is_string: true,
+                                     short_option: "-q",
+                                     default_value: 'git',
+                                     verify_block: proc do |value|
+                                       unless Match.storage_modes.include?(value)
+                                         UI.user_error!("Unsupported storage_mode #{value}, must be in #{Match.storage_modes.join(', ')}")
+                                       end
+                                     end),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "MATCH_APP_IDENTIFIER",
                                      description: "The bundle identifier(s) of your app (comma-separated)",
                                      is_string: false,
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
+                                     type: Array, # we actually allow String and Array here
+                                     skip_type_validation: true,
+                                     code_gen_sensitive: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "MATCH_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: user),
+                                     default_value: user,
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :keychain_name,
                                      short_option: "-s",
                                      env_name: "MATCH_KEYCHAIN_NAME",
@@ -60,10 +77,9 @@ module Match
                                      env_name: "FASTLANE_TEAM_ID",
                                      description: "The ID of your Developer Portal team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
-                                     verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
-                                     end),
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :git_full_name,
                                      env_name: "MATCH_GIT_FULL_NAME",
                                      description: "git user full name to commit",
@@ -79,10 +95,9 @@ module Match
                                      env_name: "FASTLANE_TEAM_NAME",
                                      description: "The name of your Developer Portal team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
-                                     verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_NAME"] = value.to_s
-                                     end),
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :verbose,
                                      env_name: "MATCH_VERBOSE",
                                      description: "Print out extra information and all commands",
@@ -111,21 +126,9 @@ module Match
                                      description: "Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail",
                                      is_string: false,
                                      default_value: false),
-        FastlaneCore::ConfigItem.new(key: :workspace,
-                                     description: nil,
-                                     verify_block: proc do |value|
-                                       unless Helper.test?
-                                         if value.start_with?("/var/folders") or value.include?("tmp/") or value.include?("temp/")
-                                           # that's fine
-                                         else
-                                           UI.user_error!("Specify the `git_url` instead of the `path`")
-                                         end
-                                       end
-                                     end,
-                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :force_for_new_devices,
                                      env_name: "MATCH_FORCE_FOR_NEW_DEVICES",
-                                     description: "Renew the provisioning profiles if the device count on the developer portal has changed",
+                                     description: "Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile type 'appstore'",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_docs,
@@ -143,7 +146,12 @@ module Match
                                        value = value.to_s
                                        pt = %w(tvos ios)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :template_name,
+                                     env_name: "MATCH_PROVISIONING_PROFILE_TEMPLATE_NAME",
+                                     description: "The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. \"Apple Pay Pass Suppression Development\")",
+                                     optional: true,
+                                     default_value: nil)
       ]
     end
   end

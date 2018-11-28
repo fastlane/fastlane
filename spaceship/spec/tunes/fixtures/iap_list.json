@@ -208,6 +208,32 @@
     "isEmptyValue": false,
     "iTunesConnectStatus": "missingMetadata"
   }, {
+    "adamId": "1195137657",
+    "referenceName": "localizeddemo",
+    "familyReferenceName": null,
+    "vendorId": "x.a.a.b.b.c.d.x.y.z",
+    "addOnType": "ITC.addons.type.recurring",
+    "durationDays": 0,
+    "versions": [{
+      "screenshotUrl": null,
+      "canSubmit": false,
+      "issuesCount": 0,
+      "itunesConnectStatus": "missingMetadata"
+    }],
+    "purpleSoftwareAdamIds": ["898536088"],
+    "lastModifiedDate": 1484213790000,
+    "isNewsSubscription": false,
+    "numberOfCodes": 0,
+    "maximumNumberOfCodes": 100,
+    "appMaximumNumberOfCodes": 1000,
+    "isEditable": false,
+    "isRequired": false,
+    "canDeleteAddOn": true,
+    "errorKeys": null,
+    "itcsubmitNextVersion": false,
+    "isEmptyValue": false,
+    "iTunesConnectStatus": "missingMetadata"
+  },{
     "adamId": "1194424965",
     "referenceName": "1internalReferenceName1",
     "familyReferenceName": null,

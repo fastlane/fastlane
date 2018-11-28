@@ -1,3 +1,5 @@
+require_relative 'member'
+
 module Spaceship
   module Tunes
     class Members < TunesBase
@@ -22,6 +24,10 @@ module Spaceship
 
         def create!(firstname: nil, lastname: nil, email_address: nil, roles: [], apps: [])
           client.create_member!(firstname: firstname, lastname: lastname, email_address: email_address, roles: roles, apps: apps)
+        end
+
+        def update_member_roles!(member, roles: [], apps: [])
+          client.update_member_roles!(member, roles: roles, apps: apps)
         end
       end
     end

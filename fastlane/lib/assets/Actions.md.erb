@@ -1,3 +1,10 @@
+<!--
+This file is auto-generated and will be re-generated every time the docs are updated.
+To modify it, go to its source at https://github.com/fastlane/fastlane/blob/master/fastlane/lib/assets/Actions.md.erb
+-->
+
+{!docs/includes/setup-fastlane-header.md!}
+
 # fastlane actions
 
 This page contains a list of all built-in fastlane actions and their available options.
@@ -15,61 +22,22 @@ You can import another `Fastfile` by using the `import` action. This is useful i
 import './path/to/other/Fastfile'
 ```
 
-For _fastlane_ plugins, check out the [available plugins](https://docs.fastlane.tools/plugins/available-plugins) page.
+For _fastlane_ plugins, check out the [available plugins](/plugins/available-plugins/) page.
+If you want to create your own action, check out the [local actions](/create-action/#local-actions) page.
 
 <%- @categories.each do |category, actions| -%>
 - [<%= category %>](#<%= category.gsub(" ", "-").downcase %>)
 <%- end -%>
-- [Plugins](https://docs.fastlane.tools/plugins/available-plugins)
+- [Plugins](/plugins/available-plugins/)
 
 <%- @categories.each do |category, actions| %>
 # <%= category %>
 
+Action | Description | Supported Platforms
+---|---|---
 <%- actions.sort.to_h.each do |_number_of_launches, action| -%>
-
-### <%= action.action_name %>
-
-<%= action.description %>
-
-<%= "> #{action.deprecated_notes.gsub("\n\n", "\n")}" unless action.deprecated_notes.to_s.empty? %>
-
-<%= "> #{action.details.gsub("\n\n", "\n")}" unless action.details.to_s.empty? %>
-
-<%= action.action_name %> |
------|----
-Supported platforms | <%= [:ios, :android, :mac].find_all { |a| action.is_supported?(a) }.join(", ") %>
-Author | @<%= Array(action.author || action.authors).join(", @") %>
-<%- unless action.return_value.to_s.empty? -%>
-Returns | <%= action.return_value %>
-<%- end -%>
-
-<% if (action.example_code || []).count > 0 %>
-
-<details>
-<summary><%= action.example_code.count %> Example<%= (action.example_code.count > 1) ? "s" : "" %></summary>
-<% action.example_code.each do |current_sample| %>
-```ruby
-<%= current_sample.gsub("          ", "") %>
-```
-<% end %><%# End of action.example_code... %>
-<% end %><%# End of if %>
-</details>
-
-<% if action.available_options && action.available_options.first.kind_of?(FastlaneCore::ConfigItem) %>
-<details>
-<summary>Parameters</summary>
-
-Key | Description
-----|------------
-<%- (action.available_options || []).each do |config_item| -%>
-  <%- next unless config_item.kind_of?(FastlaneCore::ConfigItem) -%>
-  <%- next if config_item.description.to_s.length == 0 -%>
-  `<%= config_item.key %>` | <%= config_item.description %>
-<%- end %>
-</details>
-
-<% end %><%# End of action.available_options... %>
-
-  <%- end %><%# End of actions.sort... %>
+<%- link = "/actions/#{action.action_name}/" -%>
+<a href="<%= link %>"><%= action.action_name %></a> | <%= action.description %> | <%= [:ios, :android, :mac].find_all { |a| action.is_supported?(a) }.join(", ") %>
+<%- end %><%# End of actions.sort... %>
 
 <%- end %><%# End of categories.each %>

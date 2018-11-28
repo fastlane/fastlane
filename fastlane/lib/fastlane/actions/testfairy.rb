@@ -5,28 +5,36 @@ module Fastlane
     end
 
     class TestfairyAction < Action
-      def self.upload_build(ipa, options)
+      def self.upload_build(upload_url, ipa, options, timeout)
         require 'faraday'
         require 'faraday_middleware'
 
-        connection = Faraday.new(url: "https://app.testfairy.com") do |builder|
-          builder.request :multipart
-          builder.request :url_encoded
-          builder.response :json, content_type: /\bjson$/
-          builder.use FaradayMiddleware::FollowRedirects
-          builder.adapter :net_http
+        UI.success("Uploading to #{upload_url}...")
+
+        connection = Faraday.new(url: upload_url) do |builder|
+          builder.request(:multipart)
+          builder.request(:url_encoded)
+          builder.request(:retry, max: 3, interval: 5)
+          builder.response(:json, content_type: /\bjson$/)
+          builder.use(FaradayMiddleware::FollowRedirects)
+          builder.adapter(:net_http)
         end
 
-        options[:file] = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa and File.exist?(ipa)
+        options[:file] = Faraday::UploadIO.new(ipa, 'application/octet-stream') if ipa && File.exist?(ipa)
 
         symbols_file = options.delete(:symbols_file)
         if symbols_file
           options[:symbols_file] = Faraday::UploadIO.new(symbols_file, 'application/octet-stream')
         end
 
-        connection.post do |req|
-          req.url("/api/upload/")
-          req.body = options
+        begin
+          connection.post do |req|
+            req.options.timeout = timeout
+            req.url("/api/upload/")
+            req.body = options
+          end
+        rescue Faraday::Error::TimeoutError
+          UI.crash!("Uploading build to TestFairy timed out ⏳")
         end
       end
 
@@ -59,11 +67,16 @@ module Fastlane
           end
         end
 
-        client_options = Hash[params.values.map do |key, value|
+        # Rejecting key `upload_url` and `timeout` as we don't need it in options
+        client_options = Hash[params.values.reject do |key, value|
+          [:upload_url, :timeout].include?(key)
+        end.map do |key, value|
           case key
           when :api_key
             [key, value]
           when :ipa
+            [key, value]
+          when :apk
             [key, value]
           when :symbols_file
             [key, value]
@@ -71,8 +84,6 @@ module Fastlane
             [key, value.join(',')]
           when :metrics
             [key, metrics_to_client.call(value).join(',')]
-          when :icon_watermark
-            ['icon-watermark', value]
           when :comment
             [key, value]
           when :auto_update
@@ -86,9 +97,12 @@ module Fastlane
           end
         end]
 
-        return params[:ipa] if Helper.test?
+        path = params[:ipa] || params[:apk]
+        UI.user_error!("No ipa or apk were given") unless path
 
-        response = self.upload_build(params[:ipa], client_options)
+        return path if Helper.test?
+
+        response = self.upload_build(params[:upload_url], path, client_options, params[:timeout])
         if parse_response(response)
           UI.success("Build URL: #{Actions.lane_context[SharedValues::TESTFAIRY_BUILD_URL]}")
           UI.success("Build successfully uploaded to TestFairy.")
@@ -117,7 +131,7 @@ module Fastlane
       private_class_method :parse_response
 
       def self.description
-        'Upload a new build to TestFairy'
+        'Upload a new build to [TestFairy](https://www.testfairy.com/)'
       end
 
       def self.details
@@ -136,10 +150,23 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: 'TESTFAIRY_IPA_PATH',
-                                       description: 'Path to your IPA file for iOS or APK for Android',
+                                       description: 'Path to your IPA file for iOS',
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true,
+                                       optional: true,
+                                       conflicting_options: [:apk],
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :apk,
+                                       env_name: 'TESTFAIRY_APK_PATH',
+                                       description: 'Path to your APK file for Android',
+                                       default_value: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH],
+                                       default_value_dynamic: true,
+                                       optional: true,
+                                       conflicting_options: [:ipa],
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find apk file at path '#{value}'") unless File.exist?(value)
                                        end),
           # optional
           FastlaneCore::ConfigItem.new(key: :symbols_file,
@@ -147,9 +174,16 @@ module Fastlane
                                        env_name: "FL_TESTFAIRY_SYMBOLS_FILE",
                                        description: "Symbols mapping file",
                                        default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find dSYM file at path '#{value}'") unless File.exist?(value)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :upload_url,
+                                       env_name: "FL_TESTFAIRY_UPLOAD_URL", # The name of the environment variable
+                                       description: "API URL for TestFairy", # a short description of this parameter
+                                       default_value: "https://upload.testfairy.com",
+                                       is_string: true,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :testers_groups,
                                        optional: true,
                                        type: Array,
@@ -167,11 +201,6 @@ module Fastlane
           # video
           # video-quality
           # video-rate
-          FastlaneCore::ConfigItem.new(key: :icon_watermark,
-                                       optional: true,
-                                       env_name: "FL_TESTFAIRY_ICON_WATERMARK",
-                                       description: "Add a small watermark to app icon",
-                                       default_value: 'off'),
           FastlaneCore::ConfigItem.new(key: :comment,
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_COMMENT",
@@ -180,7 +209,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :auto_update,
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_AUTO_UPDATE",
-                                       description: "Allows easy upgrade of all users to current version",
+                                       description: "Allows an easy upgrade of all users to the current version. To enable set to 'on'",
                                        default_value: 'off'),
           # not well documented
           FastlaneCore::ConfigItem.new(key: :notify,
@@ -193,7 +222,12 @@ module Fastlane
                                        type: Array,
                                        env_name: "FL_TESTFAIRY_OPTIONS",
                                        description: "Array of options (shake,video_only_wifi,anonymous)",
-                                       default_value: [])
+                                       default_value: []),
+          FastlaneCore::ConfigItem.new(key: :timeout,
+                                       env_name: "FL_TESTFAIRY_TIMEOUT",
+                                       description: "Request timeout in seconds",
+                                       type: Integer,
+                                       optional: true)
         ]
       end
 
@@ -222,7 +256,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :android].include? platform
+        [:ios, :android].include?(platform)
       end
     end
   end

@@ -4,18 +4,28 @@ describe Frameit do
       it "raise error when file can't be found" do
         expect do
           Frameit::StringsParser.parse("./nothere")
-        end.to raise_exception "Couldn't find strings file at path './nothere'"
+        end.to raise_exception("Couldn't find strings file at path './nothere'")
       end
 
       it "raise error when file isn't a .strings file" do
         expect do
           Frameit::StringsParser.parse("./frameit/spec/fixtures/background.jpg")
-        end.to raise_exception "Must be .strings file, only got './frameit/spec/fixtures/background.jpg'"
+        end.to raise_exception("Must be .strings file, only got './frameit/spec/fixtures/background.jpg'")
       end
 
       describe "successfully parsing" do
-        it "parses a valid .strings file" do
+        it "parses a valid .strings file (utf16)" do
           translations = Frameit::StringsParser.parse("./frameit/spec/fixtures/translations.strings")
+
+          expect(translations).to eq({
+            "Cancel" => "Abbrechen",
+            "OK" => "OK",
+            "Multiple words working" => "einlangesdeutshceswort mit Abstand"
+          })
+        end
+
+        it "parses a valid .strings file (utf8)" do
+          translations = Frameit::StringsParser.parse("./frameit/spec/fixtures/translations.utf8.strings")
 
           expect(translations).to eq({
             "Cancel" => "Abbrechen",
@@ -35,10 +45,10 @@ describe Frameit do
           expect(translations). to eq({})
         end
 
-        it "explains that only UTF-16 is allowed if a UTF-8 encoded, but otherwise valid file is parsed" do
-          expect(Frameit::UI).to receive(:error).with(/.*translations.utf8.strings.*UTF16/)
+        it "explains that only UTF-8 and UTF-16 encoded are allowed" do
+          expect(Frameit::UI).to receive(:error).with(/.*translations.utf32.strings.*UTF16/)
 
-          translations = Frameit::StringsParser.parse("./frameit/spec/fixtures/translations.utf8.strings")
+          translations = Frameit::StringsParser.parse("./frameit/spec/fixtures/translations.utf32.strings")
           expect(translations). to eq({})
         end
       end

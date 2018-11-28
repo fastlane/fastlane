@@ -1,4 +1,4 @@
-"== Devices ==
+== Devices ==
 -- iOS 7.1 --
     iPhone 4s (8E3D97C4-1143-4E84-8D57-F697140F2ED0) (Shutdown) (unavailable, failed to open liblaunch_sim.dylib)
     iPhone 5 (65D0F571-1260-4241-9583-611EAF4D56AE) (Shutdown) (unavailable, failed to open liblaunch_sim.dylib)
@@ -16,4 +16,3 @@
 -- watchOS 2.0 --
     Apple Watch - 38mm (FE0C82A5-CDD2-4062-A62C-21278EEE32BB) (Shutdown)
     Apple Watch - 38mm (66D1BF17-3003-465F-A165-E6E3A565E5EB) (Booted)
-"

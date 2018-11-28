@@ -5,6 +5,12 @@
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
 
 require 'tempfile'
+require 'xcodeproj'
+
+require 'fastlane_core/core_ext/cfpropertylist'
+require_relative '../module'
+require_relative '../error_handler'
+require_relative 'build_command_generator'
 
 module Gym
   # Responsible for building the fully working xcodebuild command
@@ -31,6 +37,7 @@ module Gym
         options << "-exportPath '#{temporary_output_path}'"
         options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
         options << config[:export_xcargs] if config[:export_xcargs]
+        options << config[:xcargs] if config[:xcargs]
 
         options
       end
@@ -117,27 +124,10 @@ module Gym
         hash
       end
 
-      def keys_to_symbols(hash)
-        # Convert keys to symbols
-        hash = hash.each_with_object({}) do |(k, v), memo|
-          memo[k.to_sym] = v
-          memo
-        end
-        hash
-      end
-
       def read_export_options
         # Reads export options
         if Gym.config[:export_options]
-          if Gym.config[:export_options].kind_of?(Hash)
-            # Reads options from hash
-            hash = normalize_export_options(Gym.config[:export_options])
-          else
-            # Reads options from file
-            hash = Plist.parse_xml(Gym.config[:export_options])
-            # Convert keys to symbols
-            hash = keys_to_symbols(hash)
-          end
+          hash = normalize_export_options(Gym.config[:export_options])
 
           # Saves configuration for later use
           Gym.config[:export_method] ||= hash[:method] || DEFAULT_EXPORT_METHOD
@@ -155,8 +145,6 @@ module Gym
       end
 
       def config_content
-        require 'plist'
-
         hash = read_export_options
 
         # Overrides export options if needed
@@ -165,6 +153,13 @@ module Gym
           hash[:uploadSymbols] = (Gym.config[:include_symbols] ? true : false) unless Gym.config[:include_symbols].nil?
           hash[:uploadBitcode] = (Gym.config[:include_bitcode] ? true : false) unless Gym.config[:include_bitcode].nil?
         end
+
+        # xcodebuild will not use provisioning profiles
+        # if we don't specify signingStyle as manual
+        if Helper.xcode_at_least?("9.0") && hash[:provisioningProfiles]
+          hash[:signingStyle] = 'manual'
+        end
+
         hash[:teamID] = Gym.config[:export_team_id] if Gym.config[:export_team_id]
 
         UI.important("Generated plist file with the following values:")
@@ -174,16 +169,24 @@ module Gym
         if FastlaneCore::Globals.verbose?
           UI.message("This results in the following plist file:")
           UI.command_output("-----------------------------------------")
-          UI.command_output(to_plist(hash))
+          UI.command_output(hash.to_plist)
           UI.command_output("-----------------------------------------")
         end
 
-        to_plist(hash)
+        hash.to_plist
       end
 
-      # Avoids a Hash#to_plist conflict between CFPropertyList and plist gems
-      def to_plist(hash)
-        Plist::Emit.dump(hash, true)
+      def signing_style
+        projects = Gym.project.project_paths
+        project = projects.first
+        xcodeproj = Xcodeproj::Project.open(project)
+        xcodeproj.root_object.attributes["TargetAttributes"].each do |target, sett|
+          return sett["ProvisioningStyle"].to_s.downcase
+        end
+      rescue => e
+        UI.verbose(e.to_s)
+        UI.error("Unable to read provisioning style from .pbxproj file.")
+        return "automatic"
       end
     end
   end

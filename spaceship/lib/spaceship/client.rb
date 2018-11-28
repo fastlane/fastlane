@@ -1,14 +1,20 @@
 require 'faraday' # HTTP Client
 require 'faraday-cookie_jar'
 require 'faraday_middleware'
-require 'fastlane/version'
 require 'logger'
-require 'spaceship/babosa_fix'
-require 'spaceship/helper/net_http_generic_request'
-require 'spaceship/helper/plist_middleware'
-require 'spaceship/ui'
 require 'tmpdir'
 require 'cgi'
+
+require 'fastlane/version'
+require_relative 'babosa_fix'
+require_relative 'helper/net_http_generic_request'
+require_relative 'helper/plist_middleware'
+require_relative 'helper/rels_middleware'
+require_relative 'ui'
+require_relative 'errors'
+require_relative 'tunes/errors'
+require_relative 'globals'
+require_relative 'provider'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
@@ -17,6 +23,7 @@ module Spaceship
   class Client
     PROTOCOL_VERSION = "QH65B2"
     USER_AGENT = "Spaceship #{Fastlane::VERSION}"
+    AUTH_TYPES = ["sa", "hsa", "non-sa", "hsa2"]
 
     attr_reader :client
 
@@ -32,71 +39,19 @@ module Spaceship
 
     attr_accessor :csrf_tokens
 
-    # Base class for errors that want to present their message as
-    # preferred error info for fastlane error handling. See:
-    # fastlane_core/lib/fastlane_core/ui/fastlane_runner.rb
-    class BasicPreferredInfoError < StandardError
-      TITLE = 'The request could not be completed because:'.freeze
+    attr_accessor :provider
 
-      def preferred_error_info
-        message ? [TITLE, message] : nil
-      end
-    end
-
-    # Invalid user credentials were provided
-    class InvalidUserCredentialsError < BasicPreferredInfoError; end
-
-    # Raised when no user credentials were passed at all
-    class NoUserCredentialsError < BasicPreferredInfoError; end
-
-    class ProgramLicenseAgreementUpdated < BasicPreferredInfoError
-      def show_github_issues
-        false
-      end
-    end
-
-    # User doesn't have enough permission for given action
-    class InsufficientPermissions < BasicPreferredInfoError
-      TITLE = 'Insufficient permissions for your Apple ID:'.freeze
-
-      def preferred_error_info
-        message ? [TITLE, message] : nil
-      end
-
-      # We don't want to show similar GitHub issues, as the error message
-      # should be pretty clear
-      def show_github_issues
-        false
-      end
-    end
-
-    class UnexpectedResponse < StandardError
-      attr_reader :error_info
-
-      def initialize(error_info = nil)
-        super(error_info)
-        @error_info = error_info
-      end
-
-      def preferred_error_info
-        return nil unless @error_info.kind_of?(Hash) && @error_info['resultString']
-
-        [
-          "Apple provided the following error info:",
-          @error_info['resultString'],
-          @error_info['userString']
-        ].compact.uniq # sometimes 'resultString' and 'userString' are the same value
-      end
-    end
-
-    # Raised when 302 is received from portal request
-    class AppleTimeoutError < BasicPreferredInfoError; end
-
-    # Raised when 401 is received from portal request
-    class UnauthorizedAccessError < BasicPreferredInfoError; end
-
-    # Raised when 500 is received from iTunes Connect
-    class InternalServerError < BasicPreferredInfoError; end
+    # legacy support
+    BasicPreferredInfoError = Spaceship::BasicPreferredInfoError
+    InvalidUserCredentialsError = Spaceship::InvalidUserCredentialsError
+    NoUserCredentialsError = Spaceship::NoUserCredentialsError
+    ProgramLicenseAgreementUpdated = Spaceship::ProgramLicenseAgreementUpdated
+    InsufficientPermissions = Spaceship::InsufficientPermissions
+    UnexpectedResponse = Spaceship::UnexpectedResponse
+    AppleTimeoutError = Spaceship::AppleTimeoutError
+    UnauthorizedAccessError = Spaceship::UnauthorizedAccessError
+    GatewayTimeoutError = Spaceship::GatewayTimeoutError
+    InternalServerError = Spaceship::InternalServerError
 
     # Authenticates with Apple's web services. This method has to be called once
     # to generate a valid session. The session will automatically be used from then
@@ -189,7 +144,7 @@ module Spaceship
       return @current_team_id if @current_team_id
 
       if teams.count > 1
-        puts "The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
+        puts("The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now.")
       end
       @current_team_id ||= teams[0]['contentProvider']['contentProviderId']
     end
@@ -202,19 +157,23 @@ module Spaceship
       #     invalid content provider id
       #
       available_teams = teams.collect do |team|
-        (team["contentProvider"] || {})["contentProviderId"]
+        {
+          team_id: (team["contentProvider"] || {})["contentProviderId"],
+          team_name: (team["contentProvider"] || {})["name"]
+        }
       end
 
-      result = available_teams.find do |available_team_id|
-        team_id.to_s == available_team_id.to_s
+      result = available_teams.find do |available_team|
+        team_id.to_s == available_team[:team_id].to_s
       end
 
       unless result
-        raise TunesClient::ITunesConnectError.new, "Could not set team ID to '#{team_id}', only found the following available teams: #{available_teams.join(', ')}"
+        error_string = "Could not set team ID to '#{team_id}', only found the following available teams:\n\n#{available_teams.map { |team| "- #{team[:team_id]} (#{team[:team_name]})" }.join("\n")}\n"
+        raise Tunes::Error.new, error_string
       end
 
       response = request(:post) do |req|
-        req.url "ra/v1/session/webSession"
+        req.url("ra/v1/session/webSession")
         req.body = {
           contentProviderId: team_id,
           dsId: user_detail_data.ds_id # https://github.com/fastlane/fastlane/issues/6711
@@ -234,6 +193,11 @@ module Spaceship
       end
     end
 
+    # @return (String) Fetches name from currently used team
+    def team_name
+      (team_information || {})['name']
+    end
+
     # Instantiates a client but with a cookie derived from another client.
     #
     # HACK: since the `@cookie` is not exposed, we use this hacky way of sharing the instance.
@@ -251,21 +215,25 @@ module Spaceship
       @current_team_id = current_team_id
       @cookie = cookie || HTTP::CookieJar.new
       @client = Faraday.new(self.class.hostname, options) do |c|
-        c.response :json, content_type: /\bjson$/
-        c.response :xml, content_type: /\bxml$/
-        c.response :plist, content_type: /\bplist$/
-        c.use :cookie_jar, jar: @cookie
-        c.adapter Faraday.default_adapter
+        c.response(:json, content_type: /\bjson$/)
+        c.response(:xml, content_type: /\bxml$/)
+        c.response(:plist, content_type: /\bplist$/)
+        c.use(:cookie_jar, jar: @cookie)
+        c.use(FaradayMiddleware::RelsMiddleware)
+        c.adapter(Faraday.default_adapter)
 
         if ENV['SPACESHIP_DEBUG']
           # for debugging only
           # This enables tracking of networking requests using Charles Web Proxy
-          c.proxy "https://127.0.0.1:8888"
+          c.proxy("https://127.0.0.1:8888")
           c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
+        elsif ENV["SPACESHIP_PROXY"]
+          c.proxy(ENV["SPACESHIP_PROXY"])
+          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
         end
 
         if ENV["DEBUG"]
-          puts "To run _spaceship_ through a local proxy, use SPACESHIP_DEBUG"
+          puts("To run _spaceship_ through a local proxy, use SPACESHIP_DEBUG")
         end
       end
     end
@@ -310,7 +278,7 @@ module Spaceship
 
     # This is a duplicate method of fastlane_core/fastlane_core.rb#fastlane_user_dir
     def fastlane_user_dir
-      path = File.expand_path(File.join("~", ".fastlane"))
+      path = File.expand_path(File.join(Dir.home, ".fastlane"))
       FileUtils.mkdir_p(path) unless File.directory?(path)
       return path
     end
@@ -377,15 +345,15 @@ module Spaceship
     #
     # @return (Spaceship::Client) The client the login method was called for
     def login(user = nil, password = nil)
-      if user.to_s.empty? or password.to_s.empty?
-        require 'credentials_manager'
+      if user.to_s.empty? || password.to_s.empty?
+        require 'credentials_manager/account_manager'
 
         keychain_entry = CredentialsManager::AccountManager.new(user: user, password: password)
         user ||= keychain_entry.user
         password = keychain_entry.password
       end
 
-      if user.to_s.strip.empty? or password.to_s.strip.empty?
+      if user.to_s.strip.empty? || password.to_s.strip.empty?
         raise NoUserCredentialsError.new, "No login data provided"
       end
 
@@ -404,14 +372,42 @@ module Spaceship
       end
     end
 
-    # This method is used for both the Apple Dev Portal and iTunes Connect
+    # This method is used for both the Apple Dev Portal and App Store Connect
     # This will also handle 2 step verification
     def send_shared_login_request(user, password)
-      # First we see if we have a stored cookie for 2 step enabled accounts
-      # this is needed as it stores the information on if this computer is a
-      # trusted one. In general I think spaceship clients should be trusted
-      load_session_from_file
+      # Check if we have a cached/valid session here
+      # Fixes
+      #   - https://github.com/fastlane/fastlane/issues/10812
+      #   - https://github.com/fastlane/fastlane/issues/10793
+      #
+      # Before 4th December 2017 we didn't load existing session from the disk
+      # but changed it, because Apple introduced a rate limit, which is fine by itself
+      # but unfortunately it also rate limits successful logins, meaning if you call multiple
+      # tools in a lane (e.g. call match 5 times), this would mean it locks you out of the account
+      # for a while.
+      # By loading existing sessions and checking if they're valid, we're sending less login requests
+      # More context on why this change was necessary https://github.com/fastlane/fastlane/pull/11108
+      #
+      if load_session_from_file
+        # Check if the session is still valid here
+        begin
+          # We use the olympus session to determine if the old session is still valid
+          # As this will raise an exception if the old session has expired
+          # If the old session is still valid, we don't have to do anything else in this method
+          # that's why we return true
+          return true if fetch_olympus_session
+        rescue
+          # If the `fetch_olympus_session` method raises an exception
+          # we'll land here, and therefore continue doing a full login process
+          # This happens if the session we loaded from the cache isn't valid any more
+          # which is common, as the session automatically invalidates after x hours (we don't know x)
+          # In this case we don't actually care about the exact exception, and why it was failing
+          # because either way, we'll have to do a fresh login, where we do the actual error handling
+        end
+      end
+
       # If this is a CI, the user can pass the session via environment variable
+      # This is used for 2FA related sessions
       load_session_from_env
 
       data = {
@@ -441,7 +437,7 @@ module Spaceship
         end
 
         response = request(:post) do |req|
-          req.url "https://idmsa.apple.com/appleauth/auth/signin"
+          req.url("https://idmsa.apple.com/appleauth/auth/signin")
           req.body = data.to_json
           req.headers['Content-Type'] = 'application/json'
           req.headers['X-Requested-With'] = 'XMLHttpRequest'
@@ -471,11 +467,15 @@ module Spaceship
         if (response.body || "").include?('invalid="true"')
           # User Credentials are wrong
           raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
+        elsif response.status == 412 && AUTH_TYPES.include?(response.body["authType"])
+          # Need to acknowledge Apple ID and Privacy statement - https://github.com/fastlane/fastlane/issues/12577
+          # Looking for status of 412 might be enough but might be safer to keep looking only at what is being reported
+          raise AppleIDAndPrivacyAcknowledgementNeeded.new, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement."
         elsif (response['Set-Cookie'] || "").include?("itctx")
-          raise "Looks like your Apple ID is not enabled for iTunes Connect, make sure to be able to login online"
+          raise "Looks like your Apple ID is not enabled for App Store Connect, make sure to be able to login online"
         else
           info = [response.body, response['Set-Cookie']]
-          raise TunesClient::ITunesConnectError.new, info.join("\n")
+          raise Tunes::Error.new, info.join("\n")
         end
       end
     end
@@ -483,12 +483,22 @@ module Spaceship
     # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
     def fetch_olympus_session
       response = request(:get, "https://olympus.itunes.apple.com/v1/session")
-      if response.body
-        user_map = response.body["user"]
+      body = response.body
+      if body
+        body = JSON.parse(body) if body.kind_of?(String)
+        user_map = body["user"]
         if user_map
           self.user_email = user_map["emailAddress"]
         end
+
+        provider = body["provider"]
+        if provider
+          self.provider = Spaceship::Provider.new(provider_hash: provider)
+          return true
+        end
       end
+
+      return false
     end
 
     def itc_service_key
@@ -498,6 +508,9 @@ module Spaceship
       itc_service_key_path = "/tmp/spaceship_itc_service_key.txt"
       return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
 
+      # Fixes issue https://github.com/fastlane/fastlane/issues/13281
+      # Even though we are using https://appstoreconnect.apple.com, the service key needs to still use a
+      # hostname through itunesconnect.apple.com
       response = request(:get, "https://olympus.itunes.apple.com/v1/app/config?hostname=itunesconnect.apple.com")
       @service_key = response.body["authServiceKey"].to_s
 
@@ -508,8 +521,8 @@ module Spaceship
 
       return @service_key
     rescue => ex
-      puts ex.to_s
-      raise AppleTimeoutError.new, "Could not receive latest API key from iTunes Connect, this might be a server issue."
+      puts(ex.to_s)
+      raise AppleTimeoutError.new, "Could not receive latest API key from App Store Connect, this might be a server issue."
     end
 
     #####################################################
@@ -521,27 +534,29 @@ module Spaceship
     rescue \
         Faraday::Error::ConnectionFailed,
         Faraday::Error::TimeoutError,
+        Faraday::ParsingError, # <h2>Internal Server Error</h2> with content type json
         AppleTimeoutError,
+        GatewayTimeoutError,
         InternalServerError => ex # New Faraday version: Faraday::TimeoutError => ex
       tries -= 1
       unless tries.zero?
         logger.warn("Timeout received: '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})...")
-        sleep 3 unless defined? SpecHelper
+        sleep(3) unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex # re-raise the exception
     rescue UnauthorizedAccessError => ex
       if @loggedin && !(tries -= 1).zero?
         msg = "Auth error received: '#{ex.message}'. Login in again then retrying after 3 seconds (remaining: #{tries})..."
-        puts msg if Spaceship::Globals.verbose?
-        logger.warn msg
+        puts(msg) if Spaceship::Globals.verbose?
+        logger.warn(msg)
 
         if self.class.spaceship_session_env.to_s.length > 0
           raise UnauthorizedAccessError.new, "Authentication error, you passed an invalid session using the environment variable FASTLANE_SESSION or SPACESHIP_SESSION"
         end
 
         do_login(self.user, @password)
-        sleep 3 unless defined? SpecHelper
+        sleep(3) unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex # re-raise the exception
@@ -552,7 +567,7 @@ module Spaceship
       @csrf_tokens || {}
     end
 
-    def request(method, url_or_path = nil, params = nil, headers = {}, &block)
+    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
       headers.merge!(csrf_tokens)
       headers['User-Agent'] = USER_AGENT
 
@@ -565,7 +580,11 @@ module Spaceship
         params, headers = encode_params(params, headers)
       end
 
-      response = send_request(method, url_or_path, params, headers, &block)
+      response = if auto_paginate
+                   send_request_auto_paginate(method, url_or_path, params, headers, &block)
+                 else
+                   send_request(method, url_or_path, params, headers, &block)
+                 end
 
       log_response(method, url_or_path, response)
 
@@ -605,31 +624,33 @@ module Spaceship
     end
 
     def detect_most_common_errors_and_raise_exceptions(body)
-      # Check if the failure is due to missing permissions (iTunes Connect)
+      # Check if the failure is due to missing permissions (App Store Connect)
       if body["messages"] && body["messages"]["error"].include?("Forbidden")
         raise_insuffient_permission_error!
+      elsif body["messages"] && body["messages"]["error"].include?("insufficient privileges")
+        # Passing a specific `caller_location` here to make sure we return the correct method
+        # With the default location the error would say that `parse_response` is the caller
+        raise_insuffient_permission_error!(caller_location: 3)
       elsif body.to_s.include?("Internal Server Error - Read")
-        raise InternalServerError, "Received an internal server error from iTunes Connect / Developer Portal, please try again later"
+        raise InternalServerError, "Received an internal server error from App Store Connect / Developer Portal, please try again later"
+      elsif body.to_s.include?("Gateway Timeout - In read")
+        raise GatewayTimeoutError, "Received a gateway timeout error from App Store Connect / Developer Portal, please try again later"
       elsif (body["resultString"] || "").include?("Program License Agreement")
-        raise ProgramLicenseAgreementUpdated, "#{body['userString']} Please manually log into iTunes Connect to review and accept the updated agreement."
+        raise ProgramLicenseAgreementUpdated, "#{body['userString']} Please manually log into your Apple Developer account to review and accept the updated agreement."
       end
     end
 
     # This also gets called from subclasses
-    def raise_insuffient_permission_error!(additional_error_string: nil)
+    def raise_insuffient_permission_error!(additional_error_string: nil, caller_location: 2)
       # get the method name of the request that failed
       # `block in` is used very often for requests when surrounded for paging or retrying blocks
       # The ! is part of some methods when they modify or delete a resource, so we don't want to show it
       # Using `sub` instead of `delete` as we don't want to allow multiple matches
-      calling_method_name = caller_locations(2, 2).first.label.sub("block in", "").delete("!").strip
-      begin
-        team_id = "(Team ID #{self.team_id}) "
-      rescue
-        # Showing the team ID is something that's nice to have, however it might cause an exception
-        # when the user doesn't have any permission at all (e.g. failing at login)
-        # we still want the error message to show the actual string, but without the team_id in that case
-        team_id = ""
-      end
+      calling_method_name = caller_locations(caller_location, 2).first.label.sub("block in", "").delete("!").strip
+
+      # calling the computed property self.team_id can get us into an exception handling loop
+      team_id = @current_team_id ? "(Team ID #{@current_team_id}) " : ""
+
       error_message = "User #{self.user} #{team_id}doesn't have enough permission for the following action: #{calling_method_name}"
       error_message += " (#{additional_error_string})" if additional_error_string.to_s.length > 0
       raise InsufficientPermissions, error_message
@@ -650,9 +671,9 @@ module Spaceship
 
     # Is called from `parse_response` to store the latest csrf_token (if available)
     def store_csrf_tokens(response)
-      if response and response.headers
+      if response && response.headers
         tokens = response.headers.select { |k, v| %w(csrf csrf_ts).include?(k) }
-        if tokens and !tokens.empty?
+        if tokens && !tokens.empty?
           @csrf_tokens = tokens
         end
       end
@@ -681,15 +702,31 @@ module Spaceship
         resp_hash = response.to_hash
         if resp_hash[:status] == 401
           msg = "Auth lost"
-          logger.warn msg
+          logger.warn(msg)
           raise UnauthorizedAccessError.new, "Unauthorized Access"
         end
 
         if response.body.to_s.include?("<title>302 Found</title>")
-          raise AppleTimeoutError.new, "Apple 302 detected"
+          raise AppleTimeoutError.new, "Apple 302 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
         end
         return response
       end
+    end
+
+    def send_request_auto_paginate(method, url_or_path, params, headers, &block)
+      response = send_request(method, url_or_path, params, headers, &block)
+      return response unless should_process_next_rel?(response)
+      last_response = response
+      while last_response.env.rels[:next]
+        last_response = send_request(method, last_response.env.rels[:next], params, headers, &block)
+        break unless should_process_next_rel?(last_response)
+        response.body['data'].concat(last_response.body['data'])
+      end
+      response
+    end
+
+    def should_process_next_rel?(response)
+      response.body.kind_of?(Hash) && response.body['data'].kind_of?(Array)
     end
 
     def encode_params(params, headers)
