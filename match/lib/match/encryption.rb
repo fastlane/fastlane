@@ -13,7 +13,7 @@ module Match
             return Encryption::OpenSSL.configure(params)
           },
           "google_cloud" => lambda { |params|
-            return nil # TODO: is this needed
+            return nil
           }
         }
       end
