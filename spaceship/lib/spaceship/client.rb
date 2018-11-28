@@ -376,18 +376,14 @@ module Spaceship
     # This will also handle 2 step verification
     def send_shared_login_request(user, password)
       # Check if we have a cached/valid session here
-      # Fixes
-      #   - https://github.com/fastlane/fastlane/issues/10812
-      #   - https://github.com/fastlane/fastlane/issues/10793
       #
-      # Before 4th December 2017 we didn't load existing session from the disk
-      # but changed it, because Apple introduced a rate limit, which is fine by itself
-      # but unfortunately it also rate limits successful logins, meaning if you call multiple
-      # tools in a lane (e.g. call match 5 times), this would mean it locks you out of the account
-      # for a while.
-      # By loading existing sessions and checking if they're valid, we're sending less login requests
+      # December 4th 2017 Apple introduced a rate limit - which is of course fine by itself -
+      # but unfortunately also rate limits successful logins. If you call multiple tools in a
+      # lane (e.g. call match 5 times), this would lock you out of the account for a while.
+      # By loading existing sessions and checking if they're valid, we're sending less login requests.
       # More context on why this change was necessary https://github.com/fastlane/fastlane/pull/11108
       #
+      # If there was a successful manual login before, we have a session on disk
       if load_session_from_file
         # Check if the session is still valid here
         begin
@@ -405,10 +401,21 @@ module Spaceship
           # because either way, we'll have to do a fresh login, where we do the actual error handling
         end
       end
-
-      # If this is a CI, the user can pass the session via environment variable
-      # This is used for 2FA related sessions
-      load_session_from_env
+      #
+      # The user can pass the session via environment variable (Mainly used in CI environments)
+      if load_session_from_env
+        # see above
+        begin
+          # see above
+          return true if fetch_olympus_session
+        rescue
+          puts("Session loaded from environment variable is not valid. Continuing with normal login.")
+          # see above
+        end
+      end
+      #
+      # After this point, we sure have no valid session any more and have to create a new one
+      #
 
       data = {
         accountName: user,
@@ -458,7 +465,7 @@ module Spaceship
         fetch_olympus_session
         return response
       when 409
-        # 2 factor is enabled for this account, first handle that
+        # 2 step/factor is enabled for this account, first handle that
         # and then get the olympus session
         handle_two_step(response)
         fetch_olympus_session
