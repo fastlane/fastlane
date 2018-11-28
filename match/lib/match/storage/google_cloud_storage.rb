@@ -41,6 +41,13 @@ module Match
       )
 
       def self.configure(params)
+        if params[:git_url].to_s.length > 0
+          UI.important("Looks like you still define a `git_url` somewhere, even though")
+          UI.important("you use Google Cloud Storage. You can remove the `git_url`")
+          UI.important("from your Matchfile and Fastfile")
+          UI.message("The above is just a warning, fastlane will continue as usual now...")
+        end
+
         return self.new(
           type: params[:type].to_s,
           platform: params[:platform].to_s,

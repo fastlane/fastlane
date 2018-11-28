@@ -24,8 +24,6 @@ module Match
       })
       git_storage.download
 
-      # TODO: Show deprecation if user provides the git_url on the other storage mode
-
       encryption = Encryption.for_storage_mode(params[:storage_mode], {
         git_url: params[:git_url],
         working_directory: git_storage.working_directory
