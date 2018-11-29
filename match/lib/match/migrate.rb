@@ -1,3 +1,7 @@
+require_relative 'options'
+require_relative 'spaceship_ensure'
+require_relative 'encryption'
+require_relative 'storage'
 require_relative 'module'
 require 'fileutils'
 
