@@ -732,38 +732,17 @@ module Spaceship
       if block_given?
         obj = Object.new
         class << obj
+          attr_writer :body, :headers, :params, :url
           # rubocop: disable Style/TrivialAccessors
-          # from my testing this advice is actually not true,
-          # the suggested replacement would be equal to `def url=(value)`
-          # so we have to disable instead of fix
-          def url(value)
-            @url = value
+          # the block calls `url` (not `url=`) so need to define `url` method
+          def url(url)
+            @url = url
           end
           # rubocop: enable Style/TrivialAccessors
-
-          attr_accessor :body
-          attr_accessor :headers
-          attr_accessor :params
-
-          def geturl
-            @url
-          end
-
-          def getbody
-            @body
-          end
-
-          def getheaders
-            @headers
-          end
-
-          def getparams
-            @params
-          end
         end
         obj.headers = {}
         yield(obj)
-        obj.public_send('get' + key)
+        obj.instance_variable_get("@#{key}")
       end
     end
 
