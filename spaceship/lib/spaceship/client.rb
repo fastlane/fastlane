@@ -719,7 +719,7 @@ module Spaceship
       params_to_log = params_to_log.collect do |key, value|
         "{#{key}: #{value}}"
       end
-      logger.info(">> #{method.upcase} #{url}: #{body.to_json}#{params_to_log.join(', ')}")
+      logger.info(">> #{method.upcase} #{url}: #{body.to_json} #{params_to_log.join(', ')}")
     end
 
     def log_response(method, url, response, headers = nil, &block)
