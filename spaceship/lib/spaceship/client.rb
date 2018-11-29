@@ -4,6 +4,7 @@ require 'faraday_middleware'
 require 'logger'
 require 'tmpdir'
 require 'cgi'
+require 'tempfile'
 
 require 'fastlane/version'
 require_relative 'babosa_fix'
@@ -53,31 +54,13 @@ module Spaceship
     GatewayTimeoutError = Spaceship::GatewayTimeoutError
     InternalServerError = Spaceship::InternalServerError
 
-    # Authenticates with Apple's web services. This method has to be called once
-    # to generate a valid session. The session will automatically be used from then
-    # on.
-    #
-    # This method will automatically use the username from the Appfile (if available)
-    # and fetch the password from the Keychain (if available)
-    #
-    # @param user (String) (optional): The username (usually the email address)
-    # @param password (String) (optional): The password
-    #
-    # @raise InvalidUserCredentialsError: raised if authentication failed
-    #
-    # @return (Spaceship::Client) The client the login method was called for
-    def self.login(user = nil, password = nil)
-      instance = self.new
-      if instance.login(user, password)
-        instance
-      else
-        raise InvalidUserCredentialsError.new, "Invalid User Credentials"
-      end
-    end
-
     def self.hostname
       raise "You must implement self.hostname"
     end
+
+    #####################################################
+    # @!group Teams + User
+    #####################################################
 
     # @return (Array) A list of all available teams
     def teams
@@ -198,6 +181,10 @@ module Spaceship
       (team_information || {})['name']
     end
 
+    #####################################################
+    # @!group Client Init
+    #####################################################
+
     # Instantiates a client but with a cookie derived from another client.
     #
     # HACK: since the `@cookie` is not exposed, we use this hacky way of sharing the instance.
@@ -238,6 +225,10 @@ module Spaceship
       end
     end
 
+    #####################################################
+    # @!group Request Logger
+    #####################################################
+
     # The logger in which all requests are logged
     # /tmp/spaceship[time]_[pid].log by default
     def logger
@@ -257,6 +248,10 @@ module Spaceship
 
       @logger
     end
+
+    #####################################################
+    # @!group Session Cookie
+    #####################################################
 
     ##
     # Return the session cookie.
@@ -344,9 +339,33 @@ module Spaceship
     # @raise InvalidUserCredentialsError: raised if authentication failed
     #
     # @return (Spaceship::Client) The client the login method was called for
+    def self.login(user = nil, password = nil)
+      instance = self.new
+      if instance.login(user, password)
+        instance
+      else
+        raise InvalidUserCredentialsError.new, "Invalid User Credentials"
+      end
+    end
+
+    # Authenticates with Apple's web services. This method has to be called once
+    # to generate a valid session. The session will automatically be used from then
+    # on.
+    #
+    # This method will automatically use the username from the Appfile (if available)
+    # and fetch the password from the Keychain (if available)
+    #
+    # @param user (String) (optional): The username (usually the email address)
+    # @param password (String) (optional): The password
+    #
+    # @raise InvalidUserCredentialsError: raised if authentication failed
+    #
+    # @return (Spaceship::Client) The client the login method was called for
     def login(user = nil, password = nil)
       if user.to_s.empty? || password.to_s.empty?
         require 'credentials_manager/account_manager'
+
+        puts("Reading keychain entry as user or password were empty") if Spaceship::Globals.verbose?
 
         keychain_entry = CredentialsManager::AccountManager.new(user: user, password: password)
         user ||= keychain_entry.user
@@ -360,7 +379,7 @@ module Spaceship
       self.user = user
       @password = password
       begin
-        do_login(user, password)
+        do_login(user, password) # calls `send_login_request` in sub class (which then will redirect back here to `send_shared_login_request`, below)
       rescue InvalidUserCredentialsError => ex
         raise ex unless keychain_entry
 
@@ -374,9 +393,12 @@ module Spaceship
 
     # This method is used for both the Apple Dev Portal and App Store Connect
     # This will also handle 2 step verification
+    #
+    # It is called in `send_login_request` of sub classes (which the method `login`, above, transferred over to via `do_login`)
     def send_shared_login_request(user, password)
-      # Check if we have a cached/valid session here
+      # Check if we have a cached/valid session
       #
+      # Background:
       # December 4th 2017 Apple introduced a rate limit - which is of course fine by itself -
       # but unfortunately also rate limits successful logins. If you call multiple tools in a
       # lane (e.g. call match 5 times), this would lock you out of the account for a while.
@@ -399,6 +421,7 @@ module Spaceship
           # which is common, as the session automatically invalidates after x hours (we don't know x)
           # In this case we don't actually care about the exact exception, and why it was failing
           # because either way, we'll have to do a fresh login, where we do the actual error handling
+          puts("Available session is not valid any more. Continuing with normal login.")
         end
       end
       #
@@ -466,8 +489,8 @@ module Spaceship
         return response
       when 409
         # 2 step/factor is enabled for this account, first handle that
+        handle_two_step_or_factor(response)
         # and then get the olympus session
-        handle_two_step(response)
         fetch_olympus_session
         return true
       else
@@ -530,6 +553,44 @@ module Spaceship
     rescue => ex
       puts(ex.to_s)
       raise AppleTimeoutError.new, "Could not receive latest API key from App Store Connect, this might be a server issue."
+    end
+
+    #####################################################
+    # @!group Session
+    #####################################################
+
+    def load_session_from_file
+      if File.exist?(persistent_cookie_path)
+        puts("Loading session from '#{persistent_cookie_path}'") if Spaceship::Globals.verbose?
+        @cookie.load(persistent_cookie_path)
+        return true
+      end
+      return false
+    end
+
+    def load_session_from_env
+      return if self.class.spaceship_session_env.to_s.length == 0
+      puts("Loading session from environment variable") if Spaceship::Globals.verbose?
+
+      file = Tempfile.new('cookie.yml')
+      file.write(self.class.spaceship_session_env.gsub("\\n", "\n"))
+      file.close
+
+      begin
+        @cookie.load(file.path)
+      rescue => ex
+        puts("Error loading session from environment")
+        puts("Make sure to pass the session in a valid format")
+        raise ex
+      ensure
+        file.unlink
+      end
+    end
+
+    # Fetch the session cookie from the environment
+    # (if exists)
+    def self.spaceship_session_env
+      ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
     end
 
     #####################################################
@@ -745,4 +806,4 @@ module Spaceship
   # rubocop:enable Metrics/ClassLength
 end
 
-require 'spaceship/two_step_client'
+require 'spaceship/two_step_or_factor_client'
