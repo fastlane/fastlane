@@ -14,7 +14,7 @@ task(:generate_device_frames) do
 
   puts("Download and extract the latest devices from Facebook")
   puts("")
-  puts("  http://facebook.design/devices")
+  puts("  https://facebook.design/devices")
   puts("")
   confirm
   puts("Move the content of the zip file into './raw'")
