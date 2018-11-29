@@ -94,7 +94,7 @@ module Deliver
         non_localised_options = (NON_LOCALISED_VERSION_VALUES + NON_LOCALISED_APP_VALUES)
       end
 
-      individual = options[:individual_metadata_items]
+      individual = options[:individual_metadata_items] || []
       localised_options.each do |key|
         current = options[key]
         next unless current
