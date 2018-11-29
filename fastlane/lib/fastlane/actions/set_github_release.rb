@@ -218,6 +218,7 @@ module Fastlane
                                        description: "Path to assets to be uploaded with the release",
                                        optional: true,
                                        is_string: false,
+                                       type: Array,
                                        verify_block: proc do |value|
                                          UI.user_error!("upload_assets must be an Array of paths to assets") unless value.kind_of?(Array)
                                        end)
