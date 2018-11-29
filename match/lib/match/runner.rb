@@ -122,8 +122,12 @@ module Match
     end
 
     # Used when creating a new certificate or profile
-    def folder_prefix
-      self.storage_mode == "git" ? "" : self.currently_used_team_id
+    def prefixed_working_directory(working_directory)
+      if self.storage_mode == "git"
+        return working_directory
+      else
+        return File.join(working_directory, self.currently_used_team_id)
+      end
     end
 
     # Be smart about optional values here
@@ -137,13 +141,13 @@ module Match
     def fetch_certificate(params: nil, working_directory: nil)
       cert_type = Match.cert_type_sym(params[:type])
 
-      certs = Dir[File.join(working_directory, folder_prefix, "certs", cert_type.to_s, "*.cer")]
-      keys = Dir[File.join(working_directory, folder_prefix, "certs", cert_type.to_s, "*.p12")]
+      certs = Dir[File.join(prefixed_working_directory(working_directory), "certs", cert_type.to_s, "*.cer")]
+      keys = Dir[File.join(prefixed_working_directory(working_directory), "certs", cert_type.to_s, "*.p12")]
 
       if certs.count == 0 || keys.count == 0
         UI.important("Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now")
         UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
-        cert_path = Generator.generate_certificate(params, cert_type, File.join(working_directory, folder_prefix))
+        cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory(working_directory))
         private_key_path = cert_path.gsub(".cer", ".p12")
 
         self.files_to_commit << cert_path
@@ -184,7 +188,7 @@ module Match
       end
 
       profile_name = names.join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
-      base_dir = File.join(working_directory, folder_prefix, "profiles", prov_type.to_s)
+      base_dir = File.join(prefixed_working_directory(working_directory), "profiles", prov_type.to_s)
       profiles = Dir[File.join(base_dir, "#{profile_name}.mobileprovision")]
       keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
 
@@ -216,7 +220,7 @@ module Match
                                                        prov_type: prov_type,
                                                   certificate_id: certificate_id,
                                                   app_identifier: app_identifier,
-                                               working_directory: File.join(working_directory, folder_prefix))
+                                               working_directory: prefixed_working_directory(working_directory))
         self.files_to_commit << profile
       end
 
