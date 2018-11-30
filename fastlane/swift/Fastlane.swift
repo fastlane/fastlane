@@ -2962,7 +2962,7 @@ func setChangelog(appIdentifier: String,
                                          description: String? = nil,
                                          isDraft: Bool = false,
                                          isPrerelease: Bool = false,
-                                         uploadAssets: [String]? = nil) -> [String : String] {
+                                         uploadAssets: String? = nil) -> [String : String] {
   let command = RubyCommand(commandID: "", methodName: "set_github_release", className: nil, args: [RubyCommand.Argument(name: "repository_name", value: repositoryName),
                                                                                                     RubyCommand.Argument(name: "server_url", value: serverUrl),
                                                                                                     RubyCommand.Argument(name: "api_token", value: apiToken),
