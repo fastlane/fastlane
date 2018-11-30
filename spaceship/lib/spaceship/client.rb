@@ -732,7 +732,7 @@ module Spaceship
       if block_given?
         obj = Object.new
         class << obj
-          attr_writer :body, :headers, :params, :url
+          attr_accessor :body, :headers, :params, :url
           # rubocop: disable Style/TrivialAccessors
           # the block calls `url` (not `url=`) so need to define `url` method
           def url(url)
