@@ -1,3 +1,6 @@
+require 'fastlane/action'
+require 'fastlane/actions/slack'
+
 require_relative 'module'
 
 module Scan
