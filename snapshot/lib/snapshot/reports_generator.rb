@@ -10,19 +10,27 @@ module Snapshot
 
       screens_path = Snapshot.config[:output_directory]
 
-      @data = {}
+      @data_by_language = {}
+      @data_by_screen = {}
 
       Dir[File.join(screens_path, "*")].sort.each do |language_folder|
         language = File.basename(language_folder)
         Dir[File.join(language_folder, '*.png')].sort.each do |screenshot|
+          file_name = File.basename(screenshot)
+          screen_name = file_name[/#{Regexp.escape("-")}(.*?)#{Regexp.escape(".png")}/m, 1]
           available_devices.each do |key_name, output_name|
-            next unless File.basename(screenshot).include?(key_name)
+            next unless file_name.include?(key_name)
             # This screenshot is from this device
-            @data[language] ||= {}
-            @data[language][output_name] ||= []
 
-            resulting_path = File.join('.', language, File.basename(screenshot))
-            @data[language][output_name] << resulting_path
+            @data_by_language[language] ||= {}
+            @data_by_language[language][output_name] ||= []
+
+            @data_by_screen[screen_name] ||= {}
+            @data_by_screen[screen_name][output_name] ||= {}
+
+            resulting_path = File.join('.', language, file_name)
+            @data_by_language[language][output_name] << resulting_path
+            @data_by_screen[screen_name][output_name][language] = resulting_path
             break # to not include iPhone 6 and 6 Plus (name is contained in the other name)
           end
         end

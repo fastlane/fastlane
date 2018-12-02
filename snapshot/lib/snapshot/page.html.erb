@@ -8,8 +8,28 @@
         font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
         font-weight: 300;
       }
-      .language {
-
+      .tab {
+          overflow: hidden;
+          border: 1px solid #ccc;
+          background-color: #f1f1f1;
+      }
+      .tab button {
+          background-color: inherit;
+          float: left;
+          border: none;
+          outline: none;
+          cursor: pointer;
+          padding: 14px 16px;
+          font-size: 17px;
+      }
+      .tab button:hover {
+          background-color: #ddd;
+      }
+      .tab button.active {
+          background-color: #ccc;
+      }
+      .tabContent {
+          display: none;
       }
       .deviceName {
         display: block;
@@ -21,6 +41,11 @@
         cursor: pointer;
         border: 1px #EEE solid;
         z-index: 0;
+      }
+      .caption {
+        font-size: 24px;
+        padding-bottom: 24px;
+        padding-top: 30px;
       }
       th {
         text-align: left;
@@ -64,23 +89,48 @@
       }
     </style>
   </head>
-  <body><% image_counter = 0 %><% @data.each do |language, content| %>
-    <h1 id="<%= language %>" class="language"><%= language %></h1>
-    <hr>
-    <table><% content.each do |device_name, screens| %>
-      <tr>
-        <th colspan="<%= screens.count %>">
-          <a id="<%= language %>-<%= device_name %>" class="deviceName" href="#<%= language %>-<%= device_name %>"><%= device_name %></a>
-        </th>
-      </tr>
-      <tr><% screens.each do |screen_path| %><% next if screen_path.include?"_framed.png" %>
-        <td><% image_counter += 1 %>
-          <a href="<%= screen_path %>" target="_blank" class="screenshotLink">
-            <img class="screenshot" src="<%= screen_path %>" style="width: 100%;" alt="<%= language %> <%= device_name %>" data-counter="<%= image_counter %>">
-          </a>
-        </td><% end %>
-      </tr><% end %>
-    </table><% end %>
+  <body>
+    <div class="tab">
+      <button id="defaultTab" class="tabLink" onclick="openTab(event, 'byLanguage')">By Language</button>
+      <button class="tabLink" onclick="openTab(event, 'byScreen')">By Screen</button>
+    </div>
+    <div id="byLanguage" class="tabContent"><% image_counter = 0 %><% @data_by_language.each do |language, content| %>
+      <h1 id="<%= language %>"><%= language %></h1>
+      <hr>
+      <table><% content.each do |device_name, screens| %>
+        <tr>
+          <th colspan="<%= screens.count %>">
+            <a id="<%= language %>-<%= device_name %>" class="deviceName" href="#<%= language %>-<%= device_name %>"><%= device_name %></a>
+          </th>
+        </tr>
+        <tr><% screens.each do |screen_path| %><% next if screen_path.include?"_framed.png" %>
+          <td><% image_counter += 1 %>
+            <a href="<%= screen_path %>" target="_blank" class="screenshotLink">
+              <img class="screenshot" src="<%= screen_path %>" style="width: 100%;" alt="<%= language %> <%= device_name %>" data-counter="<%= image_counter %>">
+            </a>
+          </td><% end %>
+        </tr><% end %>
+      </table><% end %>
+    </div>
+    <div id="byScreen" class="tabContent"><% image_counter = 0 %><% @data_by_screen.each do |screen, content| %>
+      <h1 id="<%= screen %>" class="screen"><%= screen %></h1>
+      <hr>
+      <table><% content.each do |device_name, screens| %>
+        <tr>
+          <th colspan="<%= screens.count %>">
+            <a id="<%= screen %>-<%= device_name %>" class="deviceName" href="#<%= screen %>-<%= device_name %>"><%= device_name %></a>
+          </th>
+        </tr>
+        <tr><% screens.each do |language, screen_path| %><% next if screen_path.include?"_framed.png" %>
+          <td><% image_counter += 1 %>
+            <a href="<%= screen_path %>" target="_blank" class="screenshotLink">
+              <img class="screenshot" src="<%= screen_path %>" style="width: 100%;" alt="<%= screen %> <%= device_name %>" data-counter="<%= image_counter %>">
+            </a>
+            <div class="caption"><%= language %></div>
+          </td><% end %>
+        </tr><% end %>
+      </table><% end %>
+    </div>
     <div id="overlay">
       <img id="imageDisplay" src="" alt="" />
       <div id="imageInfo"></div>
@@ -90,6 +140,22 @@
       var imageDisplay   = document.getElementById('imageDisplay');
       var imageInfo      = document.getElementById('imageInfo');
       var screenshotLink = document.getElementsByClassName('screenshotLink');
+
+      window.onload = doClick(document.getElementById("defaultTab"));
+
+      function openTab(evt, tabName) {
+        var i, tabContent, tabLinks;
+        tabContent = document.getElementsByClassName("tabContent");
+        for (i = 0; i < tabContent.length; i++) {
+          tabContent[i].style.display = "none";
+        }
+        tabLinks = document.getElementsByClassName("tabLink");
+        for (i = 0; i < tabLinks.length; i++) {
+          tabLinks[i].className = tabLinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+      }
 
       function doClick(el) {
         if (document.createEvent) {
