@@ -55,7 +55,11 @@ module Match
       })
       encryption.decrypt_files if encryption
 
-      unless params[:readonly]
+      if params[:readonly]
+        # In readonly mode, we still want to see if the user provided a team_id
+        # see `prefixed_working_directory` comments for more details
+        self.currently_used_team_id = params[:team_id]
+      else
         self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name])
         self.currently_used_team_id = self.spaceship.team_id
 
@@ -121,7 +125,18 @@ module Match
       if self.storage_mode == "git"
         return working_directory
       else
-        return File.join(working_directory, self.currently_used_team_id)
+        # We fall back to "*", which means certificates and profiles
+        # from all teams that use this bucket would be installed. This is not ideal, but
+        # unless the user provides a `team_id`, we can't know which one to use
+        # This only happens if `readonly` is activated, and no `team_id` was provided
+        @_folder_prefix ||= self.currently_used_team_id
+        if @_folder_prefix.nil?
+          # We use a `@_folder_prefix` variable, to keep state between multiple calls of this
+          # method, as the value won't change. This way the warning is only printed once
+          UI.important("Looks like you run `match` in `readonly` mode, and didn't provide a `team_id`. This will still work, however it is recommended to provide a `team_id` in your Appfile or Matchfile")
+          @_folder_prefix = "*"
+        end
+        return File.join(working_directory, @_folder_prefix)
       end
     end
 

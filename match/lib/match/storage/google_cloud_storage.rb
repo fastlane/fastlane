@@ -128,7 +128,6 @@ module Match
         # Either way, we'll upload them using the same technique
 
         # TODO: questions rearding team_id
-        # - This must work in `readonly` mode also somehow, wah, I guess not necessary as we're only reading
         # - Does reading the existing profiles consider the team_id? If so, how?
         # - Does this cause any issues with existing git-based implementation
         # - How do we access the team_id here, without logging in again for all non-readonly runs
