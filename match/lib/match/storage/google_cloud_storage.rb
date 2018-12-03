@@ -127,11 +127,6 @@ module Match
         # Those doesn't mean they're new, it might just be they're changed
         # Either way, we'll upload them using the same technique
 
-        # TODO: questions rearding team_id
-        # - Does reading the existing profiles consider the team_id? If so, how?
-        # - Does this cause any issues with existing git-based implementation
-        # - How do we access the team_id here, without logging in again for all non-readonly runs
-
         files_to_upload.map do |current_file|
           # Go from
           #   "/var/folders/px/bz2kts9n69g8crgv4jpjh6b40000gn/T/d20181026-96528-1av4gge/profiles/development/Development_me.mobileprovision"
