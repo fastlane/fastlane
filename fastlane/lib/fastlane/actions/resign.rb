@@ -24,9 +24,9 @@ module Fastlane
             signing_identity: "iPhone Distribution: Luka Mirosevic (0123456789)",
             provisioning_profile: "path/to/profile", # can omit if using the _sigh_ action
           )',
-          '# You may provide multiple provisioning profiles if the application contains nested 
+          '# You may provide multiple provisioning profiles if the application contains nested
           # applications or app extensions, which need their own provisioning profile.
-          # You can do so by passing an array of provisiong profile strings or a hash 
+          # You can do so by passing an array of provisiong profile strings or a hash
           # that associates provisioning profile values to bundle identifier keys.
           resign(
             ipa: "path/to/ipa", # can omit if using the `ipa` action
