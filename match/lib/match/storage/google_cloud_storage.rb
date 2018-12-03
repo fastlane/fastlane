@@ -216,7 +216,6 @@ module Match
         UI.message("")
         UI.input("Confirm with enter")
 
-        # TODO: Put the name into a constant
         until File.exist?(DEFAULT_KEYS_FILE_NAME)
           UI.message("Make sure to place the file in '#{Dir.pwd.cyan}' and name it '#{DEFAULT_KEYS_FILE_NAME.cyan}'")
           UI.input("Confirm with enter")
