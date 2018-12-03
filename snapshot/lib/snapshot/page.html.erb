@@ -109,7 +109,7 @@
         <tr><% screens.each do |screen_path| %><% next if screen_path.include?"_framed.png" %>
           <td><% image_counter += 1 %>
             <a href="<%= screen_path %>" target="_blank" class="screenshotLink">
-              <img class="screenshot" src="<%= screen_path %>" style="width: 100%;" alt="<%= language %> <%= device_name %>" data-counter="<%= image_counter %>">
+              <img class="screenshot" src="<%= screen_path %>" style="width: 100%;" alt="<%= language %> <%= device_name %>" data-tab="1" data-counter="<%= image_counter %>">
             </a>
           </td><% end %>
         </tr><% end %>
@@ -127,7 +127,7 @@
         <tr><% screens.each do |language, screen_path| %><% next if screen_path.include?"_framed.png" %>
           <td><% image_counter += 1 %>
             <a href="<%= screen_path %>" target="_blank" class="screenshotLink">
-              <img class="screenshot" src="<%= screen_path %>" style="width: 100%;" alt="<%= screen %> <%= device_name %>" data-counter="<%= image_counter %>">
+              <img class="screenshot" src="<%= screen_path %>" style="width: 100%;" alt="<%= language %> <%= device_name %>" data-tab="2" data-counter="<%= image_counter %>">
             </a>
             <div class="caption"><%= language %></div>
           </td><% end %>
@@ -146,11 +146,22 @@
 
       window.onload = doClick(document.getElementById("defaultTab"));
 
+      function getCurrentTab() {
+        var i, tabs;
+        tabs = document.getElementsByClassName("tabContent");
+        for (i = 0; i < tabs.length; i++) {
+          if (tabs[i].style.display != "none") {
+            return i + 1;
+          }
+        }
+        return 1; // fallback
+      }
+
       function openTab(evt, tabName) {
         var i, tabContent, tabLinks;
-        tabContent = document.getElementsByClassName("tabContent");
-        for (i = 0; i < tabContent.length; i++) {
-          tabContent[i].style.display = "none";
+        tabs = document.getElementsByClassName("tabContent");
+        for (i = 0; i < tabs.length; i++) {
+          tabs[i].style.display = "none";
         }
         tabLinks = document.getElementsByClassName("tabLink");
         for (i = 0; i < tabLinks.length; i++) {
@@ -210,12 +221,13 @@
 
         overlay.style.display = "none";
 
+        img_tab = parseInt(getCurrentTab());
         img_counter = parseInt(e.target.dataset.counter) + 1;
         try {
-          link = document.body.querySelector('img[data-counter="'+img_counter+'"]').parentNode;
+          link = document.body.querySelector('img[data-tab="'+img_tab+'"][data-counter="'+img_counter+'"]').parentNode;
         } catch (e) {
           try {
-            link = document.body.querySelector('img[data-counter="0"]').parentNode;
+            link = document.body.querySelector('img[data-tab="'+img_tab+'"][data-counter="0"]').parentNode;
           } catch (e) {
             return false;
           }
