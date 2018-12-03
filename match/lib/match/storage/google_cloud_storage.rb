@@ -99,9 +99,6 @@ module Match
         # No existing working directory, creating a new one now
         self.working_directory = Dir.mktmpdir
 
-        # TODO: error handling
-        # TODO: create bucket for the user
-        # TODO: verify permission
         bucket.files.each do |current_file|
           file_path = current_file.url.split(self.bucket_name).last # TODO: is there a way to get the full path without this
           download_path = File.join(self.working_directory, file_path)
