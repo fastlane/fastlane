@@ -648,6 +648,8 @@ function resign {
             "com.apple.developer.homekit" \
             # If actually used by the App, this value will be set in its entitlements
             "com.apple.developer.healthkit" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.healthkit.access" \
             # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
             "com.apple.developer.in-app-payments" \
             # If actually used by the App, this value will be set in its entitlements
@@ -706,6 +708,7 @@ function resign {
             "com.apple.developer.associated-domains" \
             "com.apple.developer.default-data-protection" \
             "com.apple.developer.healthkit" \
+            "com.apple.developer.healthkit.access" \
             "com.apple.developer.homekit" \
             "com.apple.developer.icloud-container-environment" \
             "com.apple.developer.icloud-container-identifiers" \
