@@ -1,3 +1,4 @@
+require_relative '../module'
 
 module Match
   module Storage

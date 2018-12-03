@@ -4,8 +4,8 @@ require 'securerandom'
 require 'security'
 require 'shellwords'
 
-require_relative '../module'
 require_relative '../change_password'
+require_relative '../module'
 
 module Match
   module Encryption

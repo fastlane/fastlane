@@ -1,6 +1,8 @@
 require 'fastlane_core/command_executor'
+require 'fastlane_core/configuration/configuration'
 require 'google/cloud/storage'
 
+require_relative '../options'
 require_relative '../module'
 require_relative './interface'
 
