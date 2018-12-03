@@ -49,13 +49,14 @@ module FastlaneCore
     end
 
     def self.list_available_identities(in_keychain: nil)
+      return '' if Helper.windows?
       commands = ['security find-identity -v -p codesigning']
       commands << in_keychain if in_keychain
       `#{commands.join(' ')}`
     end
 
     def self.wwdr_certificate_installed?
-      return true if Helper.windows?
+      return false if Helper.windows?
       certificate_name = "Apple Worldwide Developer Relations Certification Authority"
       keychain = wwdr_keychain
       response = Helper.backticks("security find-certificate -c '#{certificate_name}' #{keychain.shellescape}", print: FastlaneCore::Globals.verbose?)
