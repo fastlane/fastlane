@@ -28,10 +28,10 @@ describe Fastlane do
              "-androidRes .",
              "-apiKey api_token",
              "-apiSecret build_secret",
-             "-uploadDist '",
-             "-betaDistributionReleaseNotesFilePath '",
-             "-betaDistributionEmails 'email1@krausefx.com,email2@krausefx.com'",
-             "-betaDistributionGroupAliases 'testgroup'",
+             "-uploadDist ",
+             "-betaDistributionReleaseNotesFilePath ",
+             "-betaDistributionEmails email1@krausefx.com,email2@krausefx.com",
+             "-betaDistributionGroupAliases testgroup",
              "-betaDistributionNotifications true"].each do |to_be|
               expect(command.join(" ")).to include(to_be)
             end

@@ -58,6 +58,7 @@ module Sigh
       @profile_type = Spaceship.provisioning_profile.app_store
       @profile_type = Spaceship.provisioning_profile.in_house if Spaceship.client.in_house?
       @profile_type = Spaceship.provisioning_profile.ad_hoc if Sigh.config[:adhoc]
+      @profile_type = Spaceship.provisioning_profile.direct if Sigh.config[:developer_id]
       @profile_type = Spaceship.provisioning_profile.development if Sigh.config[:development]
 
       @profile_type
@@ -260,7 +261,11 @@ module Sigh
         profile_name += "_tvos"
       end
 
-      profile_name += '.mobileprovision'
+      if Sigh.config[:platform].to_s == 'macos'
+        profile_name += '.provisionprofile'
+      else
+        profile_name += '.mobileprovision'
+      end
 
       tmp_path = Dir.mktmpdir("profile_download")
       output_path = File.join(tmp_path, profile_name)
