@@ -15,9 +15,11 @@ describe Spaceship::Client do
 
   class TestResponse
     attr_accessor :body
+    attr_accessor :status
 
-    def initialize(body = nil)
+    def initialize(body = nil, status = 200)
       @body = body
+      @status = status
     end
   end
 
@@ -40,8 +42,18 @@ describe Spaceship::Client do
   end
 
   describe 'detect_most_common_errors_and_raise_exceptions' do
-    it "raises Spaceship::InsufficientPermissions for Forbidden" do
+    # this test is strange, the `error` has a typo "InsufficentPermissions" and is not really relevant
+    it "raises Spaceship::InsufficientPermissions for InsufficentPermissions" do
       body = JSON.generate({ messages: { error: "InsufficentPermissions" } })
+      stub_client_request(Spaceship::InsufficientPermissions, 6, 200, body)
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::InsufficientPermissions)
+    end
+
+    it "raises Spaceship::InsufficientPermissions for Forbidden" do
+      body = JSON.generate({ messages: { error: "Forbidden" } })
       stub_client_request(Spaceship::InsufficientPermissions, 6, 200, body)
 
       expect do
