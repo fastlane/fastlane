@@ -102,7 +102,7 @@ module Match
         self.working_directory = Dir.mktmpdir
 
         bucket.files.each do |current_file|
-          file_path = current_file.url.split(self.bucket_name).last # TODO: is there a way to get the full path without this
+          file_path = current_file.name # e.g. "N8X438SEU2/certs/distribution/XD9G7QCACF.cer"
           download_path = File.join(self.working_directory, file_path)
 
           FileUtils.mkdir_p(File.expand_path("..", download_path))
