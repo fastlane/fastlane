@@ -64,10 +64,9 @@ module Match
                      google_cloud_keys_file: nil)
         @type = type if type
         @platform = platform if platform
-        @google_cloud_keys_file = google_cloud_keys_file
         @bucket_name = google_cloud_bucket_name
 
-        ensure_keys_file_exists
+        @google_cloud_keys_file = ensure_keys_file_exists(google_cloud_keys_file)
 
         # Extract the Project ID from the `JSON` file
         # so the user doesn't have to provide it manually
@@ -166,12 +165,15 @@ module Match
       # Setup related methods
       ##########################
 
-      def ensure_keys_file_exists
-        return if self.google_cloud_keys_file && File.exist?(self.google_cloud_keys_file)
+      # This method will make sure the keys file exists
+      # If it's missing, it will help the user set things up
+      def ensure_keys_file_exists(google_cloud_keys_file)
+        if google_cloud_keys_file && File.exist?(google_cloud_keys_file)
+          return google_cloud_keys_file
+        end
 
         if File.exist?(DEFAULT_KEYS_FILE_NAME)
-          @google_cloud_keys_file = DEFAULT_KEYS_FILE_NAME
-          return
+          return DEFAULT_KEYS_FILE_NAME
         end
 
         # User doesn't seem to have provided a keys file
@@ -215,7 +217,7 @@ module Match
           UI.input("Confirm with enter")
         end
 
-        @google_cloud_keys_file = DEFAULT_KEYS_FILE_NAME
+        return DEFAULT_KEYS_FILE_NAME
       end
 
       def ensure_bucket_is_selected
