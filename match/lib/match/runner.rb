@@ -124,7 +124,7 @@ module Match
     def prefixed_working_directory(working_directory)
       if self.storage_mode == "git"
         return working_directory
-      else
+      elsif self.storage_mode == "google_cloud"
         # We fall back to "*", which means certificates and profiles
         # from all teams that use this bucket would be installed. This is not ideal, but
         # unless the user provides a `team_id`, we can't know which one to use
@@ -137,6 +137,8 @@ module Match
           @_folder_prefix = "*"
         end
         return File.join(working_directory, @_folder_prefix)
+      else
+        UI.crash!("No implementation for `prefixed_working_directory`")
       end
     end
 
