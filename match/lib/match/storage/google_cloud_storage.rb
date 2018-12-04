@@ -13,10 +13,10 @@ module Match
       DEFAULT_KEYS_FILE_NAME = "gc_keys.json"
 
       # User provided values
-      attr_accessor :type
-      attr_accessor :platform
-      attr_accessor :bucket_name
-      attr_accessor :google_cloud_keys_file
+      attr_reader :type
+      attr_reader :platform
+      attr_reader :bucket_name
+      attr_reader :google_cloud_keys_file
 
       # Managed values
       attr_accessor :gc_storage
@@ -62,10 +62,10 @@ module Match
                      platform: nil,
                      google_cloud_bucket_name: nil,
                      google_cloud_keys_file: nil)
-        self.type = type if type
-        self.platform = platform if platform
-        self.google_cloud_keys_file = google_cloud_keys_file
-        self.bucket_name = google_cloud_bucket_name
+        @type = type if type
+        @platform = platform if platform
+        @google_cloud_keys_file = google_cloud_keys_file
+        @bucket_name = google_cloud_bucket_name
 
         ensure_keys_file_exists
 
@@ -170,7 +170,7 @@ module Match
         return if self.google_cloud_keys_file && File.exist?(self.google_cloud_keys_file)
 
         if File.exist?(DEFAULT_KEYS_FILE_NAME)
-          self.google_cloud_keys_file = DEFAULT_KEYS_FILE_NAME
+          @google_cloud_keys_file = DEFAULT_KEYS_FILE_NAME
           return
         end
 
@@ -215,7 +215,7 @@ module Match
           UI.input("Confirm with enter")
         end
 
-        self.google_cloud_keys_file = DEFAULT_KEYS_FILE_NAME
+        @google_cloud_keys_file = DEFAULT_KEYS_FILE_NAME
       end
 
       def ensure_bucket_is_selected
@@ -226,7 +226,7 @@ module Match
           # This can only happen after we went through auth of Google Cloud
           available_bucket_identifiers = self.gc_storage.buckets.collect(&:id)
           if available_bucket_identifiers.count > 0
-            self.bucket_name = UI.select("What Google Cloud Storage bucket do you want to use?", available_bucket_identifiers)
+            @bucket_name = UI.select("What Google Cloud Storage bucket do you want to use?", available_bucket_identifiers)
           else
             UI.error("Looks like your Google Cloud account for the project ID '#{project_id}' doesn't")
             UI.error("have any available storage buckets yet. Please visit the following URL")
