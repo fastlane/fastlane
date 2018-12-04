@@ -81,7 +81,7 @@ module Match
     end
 
     # Be smart about optional values here
-    # Depending on the storage mode, different vlaues are required
+    # Depending on the storage mode, different values are required
     def update_optional_values_depending_on_storage_type(params)
       if params[:storage_mode] != "git"
         params.option_for_key(:git_url).optional = true

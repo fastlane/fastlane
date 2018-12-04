@@ -127,7 +127,7 @@ module Match
         # Those doesn't mean they're new, it might just be they're changed
         # Either way, we'll upload them using the same technique
 
-        files_to_upload.map do |current_file|
+        files_to_upload.each do |current_file|
           # Go from
           #   "/var/folders/px/bz2kts9n69g8crgv4jpjh6b40000gn/T/d20181026-96528-1av4gge/profiles/development/Development_me.mobileprovision"
           # to
