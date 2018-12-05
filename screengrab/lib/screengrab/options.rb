@@ -32,7 +32,7 @@ module Screengrab
                                      env_name: 'SCREENGRAB_CLEAR_PREVIOUS_SCREENSHOTS',
                                      description: "Enabling this option will automatically clear previously generated screenshots before running screengrab",
                                      default_value: false,
-                                     is_string: false),
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :output_directory,
                                      short_option: "-o",
                                      env_name: "SCREENGRAB_OUTPUT_DIRECTORY",
@@ -43,7 +43,7 @@ module Screengrab
                                      description: "Don't open the summary after running _screengrab_",
                                      default_value: DEFAULT_SKIP_OPEN_SUMMARY,
                                      default_value_dynamic: true,
-                                     is_string: false),
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :app_package_name,
                                      env_name: 'SCREENGRAB_APP_PACKAGE_NAME',
                                      short_option: "-a",
@@ -81,7 +81,6 @@ module Screengrab
         FastlaneCore::ConfigItem.new(key: :ending_locale,
                                      env_name: 'SCREENGRAB_ENDING_LOCALE',
                                      optional: true,
-                                     is_string: true,
                                      default_value: 'en-US',
                                      description: "Return the device to this locale after running tests"),
         FastlaneCore::ConfigItem.new(key: :app_apk_path,
@@ -123,12 +122,12 @@ module Screengrab
                                      env_name: 'EXIT_ON_TEST_FAILURE',
                                      description: "Whether or not to exit Screengrab on test failure. Exiting on failure will not copy sceenshots to local machine nor open sceenshots summary",
                                      default_value: true,
-                                     is_string: false),
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :reinstall_app,
                                      env_name: 'SCREENGRAB_REINSTALL_APP',
                                      description: "Enabling this option will automatically uninstall the application before running it",
                                      default_value: false,
-                                     is_string: false)
+                                     type: Boolean)
       ]
     end
   end
