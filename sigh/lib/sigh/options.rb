@@ -134,6 +134,7 @@ module Sigh
                                      env_name: "SIGH_PLATFORM",
                                      description: "Set the provisioning profile's platform (i.e. ios, tvos)",
                                      type: String,
+                                     skip_type_validation: true, # Skipping as we can expect symbols
                                      default_value: "ios",
                                      verify_block: proc do |value|
                                        value = value.to_s
