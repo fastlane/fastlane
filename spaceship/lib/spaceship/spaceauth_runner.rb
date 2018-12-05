@@ -49,6 +49,11 @@ module Spaceship
 
       yaml = cookies.to_yaml.gsub("\n", "\\n")
 
+      if FastlaneCore::Helper.mac? && UI.interactive? && UI.confirm("🙄  Wow, that's a lot of markdown text... should fastlane put it into your clipboard, so you can easily paste it on GitHub?") 
+        copy_to_clipboard(yaml) 
+        UI.success("Successfully copied markdown into your clipboard 🎨") 
+      end
+
       puts("---")
       puts("")
       puts("Pass the following via the FASTLANE_SESSION environment variable:")
