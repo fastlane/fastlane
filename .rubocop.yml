@@ -1,6 +1,7 @@
 require:
   - rubocop/require_tools
   - ./rubocop/fork_usage.rb
+  - ./rubocop/is_string_usage.rb
 
 Style/MultipleComparison:
   Enabled: false
