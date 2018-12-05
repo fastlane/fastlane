@@ -8,6 +8,8 @@ module Fastlane
 
         command << "pod lib lint"
 
+        command << params[:podspec] if params[:podspec] 
+
         if params[:verbose]
           command << "--verbose"
         end
@@ -54,6 +56,10 @@ module Fastlane
                                        description: "Use bundle exec when there is a Gemfile presented",
                                        is_string: false,
                                        default_value: true),
+          FastlaneCore::ConfigItem.new(key: :podspec,
+                                       description: "pod lib lint podspec name",
+                                       optional: true,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        description: "Allow output detail in console",
                                        optional: true,
