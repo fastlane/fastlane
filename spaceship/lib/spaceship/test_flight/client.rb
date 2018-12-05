@@ -187,8 +187,8 @@ module Spaceship
         assert_required_params(__method__, binding)
         page_size = 40 # that's enforced by the iTC servers
         resulting_array = []
-        # Sort order is set to `default` instead of `email`, because any other sort order breaks
-        # pagination when dealing with lots of anonymous (public link) testers.
+        # Sort order is set to `default` instead of `email`, because any other sort order breaks pagination
+        # when dealing with lots of anonymous (public link) testers: https://github.com/fastlane/fastlane/pull/13778
         initial_url = "providers/#{team_id}/apps/#{app_id}/testers?limit=#{page_size}&sort=default&order=asc"
         response = request(:get, initial_url)
         link_from_response = proc do |r|
