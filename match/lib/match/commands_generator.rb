@@ -24,6 +24,23 @@ module Match
       self.new.run
     end
 
+    # We have a custom method to handle this, as match
+    # allows a custom list of parameters depending on the
+    # storage_type
+    def generate_params(options: nil)
+      params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
+      params.load_configuration_file("Matchfile")
+      additional_options = Storage.for_mode(params[:storage_mode], {}).additional_options
+
+      params = FastlaneCore::Configuration.create(
+        Match::Options.available_options + additional_options,
+        options.__hash__
+      )
+      params.load_configuration_file("Matchfile") # this has to be done *before* overwriting the value
+
+      return params
+    end
+
     def run
       program :name, 'match'
       program :version, Fastlane::VERSION
@@ -46,8 +63,7 @@ module Match
             FastlaneCore::UI.user_error!("Please run `fastlane match [type]`, allowed values: development, adhoc, enterprise  or appstore")
           end
 
-          params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
-          params.load_configuration_file("Matchfile")
+          params = generate_params(options: options)
           Match::Runner.new.run(params)
         end
       end
@@ -60,8 +76,7 @@ module Match
           FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options, command: c)
 
           c.action do |args, options|
-            params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
-            params.load_configuration_file("Matchfile") # this has to be done *before* overwriting the value
+            params = generate_params(options: options)
             params[:type] = type.to_s
             Match::Runner.new.run(params)
           end
@@ -97,8 +112,7 @@ module Match
         FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options, command: c)
 
         c.action do |args, options|
-          params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
-          params.load_configuration_file("Matchfile")
+          params = generate_params(options: options)
 
           Match::ChangePassword.update(params: params)
           UI.success("Successfully changed the password. Make sure to update the password on all your clients and servers by running `fastlane match [environment]`")
@@ -112,8 +126,7 @@ module Match
         FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options, command: c)
 
         c.action do |args, options|
-          params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
-          params.load_configuration_file("Matchfile")
+          params = generate_params(options: options)
 
           storage = Storage.for_mode(params[:storage_mode], {
             git_url: params[:git_url],
@@ -160,8 +173,7 @@ module Match
           FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options, command: c)
 
           c.action do |args, options|
-            params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
-            params.load_configuration_file("Matchfile")
+            params = generate_params(options: options)
             Match::Nuke.new.run(params, type: type.to_s)
           end
         end

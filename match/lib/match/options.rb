@@ -4,26 +4,11 @@ require_relative 'module'
 
 module Match
   class Options
-    # This is match specific, as users can append storage specific options
-    def self.append_option(option)
-      self.available_options # to ensure we created the initial `@available_options` array
-      @available_options << option
-    end
-
     def self.available_options
       user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
       user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
-      @available_options ||= [
-        FastlaneCore::ConfigItem.new(key: :git_url,
-                                     env_name: "MATCH_GIT_URL",
-                                     description: "URL to the git repo containing all the certificates",
-                                     optional: false,
-                                     short_option: "-r"),
-        FastlaneCore::ConfigItem.new(key: :git_branch,
-                                     env_name: "MATCH_GIT_BRANCH",
-                                     description: "Specific git branch to use",
-                                     default_value: 'master'),
+      [
         FastlaneCore::ConfigItem.new(key: :type,
                                      env_name: "MATCH_TYPE",
                                      description: "Define the profile type, can be #{Match.environments.join(', ')}",
@@ -86,16 +71,6 @@ module Match
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                      default_value_dynamic: true),
-        FastlaneCore::ConfigItem.new(key: :git_full_name,
-                                     env_name: "MATCH_GIT_FULL_NAME",
-                                     description: "git user full name to commit",
-                                     optional: true,
-                                     default_value: nil),
-        FastlaneCore::ConfigItem.new(key: :git_user_email,
-                                     env_name: "MATCH_GIT_USER_EMAIL",
-                                     description: "git user email to commit",
-                                     optional: true,
-                                     default_value: nil),
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-l",
                                      env_name: "FASTLANE_TEAM_NAME",
@@ -120,16 +95,6 @@ module Match
         FastlaneCore::ConfigItem.new(key: :skip_confirmation,
                                      env_name: "MATCH_SKIP_CONFIRMATION",
                                      description: "Disables confirmation prompts during nuke, answering them with yes",
-                                     is_string: false,
-                                     default_value: false),
-        FastlaneCore::ConfigItem.new(key: :shallow_clone,
-                                     env_name: "MATCH_SHALLOW_CLONE",
-                                     description: "Make a shallow clone of the repository (truncate the history to 1 revision)",
-                                     is_string: false,
-                                     default_value: false),
-        FastlaneCore::ConfigItem.new(key: :clone_branch_directly,
-                                     env_name: "MATCH_CLONE_BRANCH_DIRECTLY",
-                                     description: "Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :force_for_new_devices,

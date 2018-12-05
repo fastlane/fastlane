@@ -21,27 +21,6 @@ module Match
       # Managed values
       attr_accessor :gc_storage
 
-      # Append Google Cloud specific options to `Match::Options`
-      Match::Options.append_option(
-        FastlaneCore::ConfigItem.new(
-          key: :google_cloud_bucket_name,
-          env_name: "MATCH_GOOGLE_CLOUD_BUCKET_NAME",
-          description: "Name of the Google Cloud Storage bucket to use",
-          optional: true
-        )
-      )
-      Match::Options.append_option(
-        FastlaneCore::ConfigItem.new(
-          key: :google_cloud_keys_file,
-          env_name: "MATCH_GOOGLE_CLOUD_KEYS_FILE",
-          description: "Path to the `#{DEFAULT_KEYS_FILE_NAME}` file",
-          optional: true,
-          verify_block: proc do |value|
-            UI.user_error!("Could not find keys file at path '#{File.expand_path(value)}'") unless File.exist?(value)
-          end
-        )
-      )
-
       def self.configure(params)
         if params[:git_url].to_s.length > 0
           UI.important("Looks like you still define a `git_url` somewhere, even though")
@@ -91,6 +70,26 @@ module Match
         end
 
         ensure_bucket_is_selected
+      end
+
+      def additional_options
+        return [
+          FastlaneCore::ConfigItem.new(
+            key: :google_cloud_bucket_name,
+            env_name: "MATCH_GOOGLE_CLOUD_BUCKET_NAME",
+            description: "Name of the Google Cloud Storage bucket to use",
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :google_cloud_keys_file,
+            env_name: "MATCH_GOOGLE_CLOUD_KEYS_FILE",
+            description: "Path to the `#{DEFAULT_KEYS_FILE_NAME}` file",
+            optional: true,
+            verify_block: proc do |value|
+              UI.user_error!("Could not find keys file at path '#{File.expand_path(value)}'") unless File.exist?(value)
+            end
+          )
+        ]
       end
 
       def download
