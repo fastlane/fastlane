@@ -766,12 +766,16 @@ module Spaceship
     def log_request(method, url, params, headers = nil, &block)
       url ||= extract_key_from_block('url', &block)
       body = extract_key_from_block('body', &block)
+      body_to_log = '[undefined body]'
       if body
         begin
           body = JSON.parse(body)
+          # replace password in body if present
           body['password'] = '***' if body.kind_of?(Hash) && body.key?("password")
+          body_to_log = body.to_json
         rescue JSON::ParserError
-          # no json, no password
+          # no json, no password to replace
+          body_to_log = "[non JSON body]"
         end
       end
       params_to_log = Hash(params).dup # to also work with nil
@@ -780,7 +784,7 @@ module Spaceship
       params_to_log = params_to_log.collect do |key, value|
         "{#{key}: #{value}}"
       end
-      logger.info(">> #{method.upcase} #{url}: #{body.to_json} #{params_to_log.join(', ')}")
+      logger.info(">> #{method.upcase} #{url}: #{body_to_log} #{params_to_log.join(', ')}")
     end
 
     def log_response(method, url, response, headers = nil, &block)
