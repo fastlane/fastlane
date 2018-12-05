@@ -44,8 +44,7 @@ module Produce
                                      description: "SKU Number (e.g. '1234')",
                                      code_gen_sensitive: true,
                                      default_value: Time.now.to_i.to_s,
-                                     default_value_dynamic: true,
-                                     is_string: true),
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :platform,
                                      short_option: "-j",
                                      env_name: "PRODUCE_PLATFORM",
@@ -71,22 +70,21 @@ module Produce
                                      short_option: "-i",
                                      env_name: "PRODUCE_SKIP_ITC",
                                      description: "Skip the creation of the app on App Store Connect",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :itc_users,
                                      short_option: "-s",
                                      env_name: "ITC_USERS",
                                      optional: true,
                                      type: Array,
-                                     description: "Array of App Store Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles",
-                                     is_string: false),
+                                     description: "Array of App Store Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles"),
         # Deprecating this in favor of a rename from "enabled_features" to "enable_services"
         FastlaneCore::ConfigItem.new(key: :enabled_features,
                                      deprecated: "Please use `enable_services` instead",
                                      display_in_shell: false,
                                      env_name: "PRODUCE_ENABLED_FEATURES",
                                      description: "Array with Spaceship App Services",
-                                     is_string: false,
+                                     type: Hash,
                                      default_value: {},
                                      verify_block: proc do |value|
                                                      allowed_keys = Produce::DeveloperCenter::ALLOWED_SERVICES.keys
@@ -99,7 +97,7 @@ module Produce
                                      display_in_shell: false,
                                      env_name: "PRODUCE_ENABLE_SERVICES",
                                      description: "Array with Spaceship App Services (e.g. #{allowed_services_description})",
-                                     is_string: false,
+                                     type: Hash,
                                      default_value: {},
                                      verify_block: proc do |value|
                                                      allowed_keys = Produce::DeveloperCenter::ALLOWED_SERVICES.keys
@@ -113,7 +111,7 @@ module Produce
                                      short_option: "-d",
                                      env_name: "PRODUCE_SKIP_DEVCENTER",
                                      description: "Skip the creation of the app on the Apple Developer Portal",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
@@ -142,7 +140,8 @@ module Produce
                                      env_name: "PRODUCE_ITC_TEAM_ID",
                                      description: "The ID of your App Store Connect team if you're in multiple teams",
                                      optional: true,
-                                     is_string: false, # as we also allow integers, which we convert to strings anyway
+                                     type: String,
+                                     skip_type_validation: true, # as we also allow integers, which we convert to strings anyway
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                      default_value_dynamic: true,
