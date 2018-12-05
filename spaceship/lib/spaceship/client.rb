@@ -766,10 +766,12 @@ module Spaceship
     def log_request(method, url, params, headers = nil, &block)
       url ||= extract_key_from_block('url', &block)
       body = extract_key_from_block('body', &block)
+      log_body = false
       if body
         begin
           body = JSON.parse(body)
           body['password'] = '***' if body.kind_of?(Hash) && body.key?("password")
+          log_body = true
         rescue JSON::ParserError
           # no json, no password
         end
@@ -780,7 +782,9 @@ module Spaceship
       params_to_log = params_to_log.collect do |key, value|
         "{#{key}: #{value}}"
       end
-      logger.info(">> #{method.upcase} #{url}: #{body.to_json} #{params_to_log.join(', ')}")
+      if log_body
+        logger.info(">> #{method.upcase} #{url}: #{body.to_json} #{params_to_log.join(', ')}")
+      end
     end
 
     def log_response(method, url, response, headers = nil, &block)
