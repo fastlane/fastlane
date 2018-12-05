@@ -1,4 +1,5 @@
 require 'fastlane_core/configuration/configuration'
+require 'fastlane/boolean'
 require 'credentials_manager/appfile_config'
 require_relative 'module'
 
@@ -12,7 +13,7 @@ module Sigh
         FastlaneCore::ConfigItem.new(key: :adhoc,
                                      env_name: "SIGH_AD_HOC",
                                      description: "Setting this flag will generate AdHoc profiles instead of App Store Profiles",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false,
                                      conflicting_options: [:developer_id, :development],
                                      conflict_block: proc do |option|
@@ -21,7 +22,7 @@ module Sigh
         FastlaneCore::ConfigItem.new(key: :developer_id,
                                      env_name: "SIGH_DEVELOPER_ID",
                                      description: "Setting his flag will generate Developer ID profiles instead of App Store Profiles",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false,
                                      conflicting_options: [:adhoc, :development],
                                      conflict_block: proc do |option|
@@ -30,7 +31,7 @@ module Sigh
         FastlaneCore::ConfigItem.new(key: :development,
                                      env_name: "SIGH_DEVELOPMENT",
                                      description: "Renew the development certificate instead of the production one",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false,
                                      conflicting_options: [:adhoc, :developer_id],
                                      conflict_block: proc do |option|
@@ -39,12 +40,12 @@ module Sigh
         FastlaneCore::ConfigItem.new(key: :skip_install,
                                      env_name: "SIGH_SKIP_INSTALL",
                                      description: "By default, the certificate will be added to your local machine. Setting this flag will skip this action",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :force,
                                      env_name: "SIGH_FORCE",
                                      description: "Renew provisioning profiles regardless of its state - to automatically add all devices for ad hoc profiles",
-                                     is_string: false,
+                                     type: Boolean,
                                      short_option: "-f",
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
@@ -91,7 +92,7 @@ module Sigh
                                      env_name: "SIGH_IGNORE_PROFILES_WITH_DIFFERENT_NAME",
                                      description: "Use in combination with :provisioning_name - when true only profiles matching this exact name will be downloaded",
                                      optional: true,
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :output_path,
                                      short_option: "-o",
@@ -119,20 +120,20 @@ module Sigh
         FastlaneCore::ConfigItem.new(key: :skip_fetch_profiles,
                                      env_name: "SIGH_SKIP_FETCH_PROFILES",
                                      description: "Skips the verification of existing profiles which is useful if you have thousands of profiles",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false,
                                      short_option: "-w"),
         FastlaneCore::ConfigItem.new(key: :skip_certificate_verification,
                                      short_option: '-z',
                                      env_name: "SIGH_SKIP_CERTIFICATE_VERIFICATION",
                                      description: "Skips the verification of the certificates for every existing profiles. This will make sure the provisioning profile can be used on the local machine",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :platform,
                                      short_option: '-p',
                                      env_name: "SIGH_PLATFORM",
                                      description: "Set the provisioning profile's platform (i.e. ios, tvos)",
-                                     is_string: false,
+                                     type: String,
                                      default_value: "ios",
                                      verify_block: proc do |value|
                                        value = value.to_s
@@ -143,7 +144,7 @@ module Sigh
                                      env_name: "SIGH_READONLY",
                                      description: "Only fetch existing profile, don't generate new ones",
                                      optional: true,
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false,
                                      conflicting_options: [:force],
                                      conflict_block: proc do |value|

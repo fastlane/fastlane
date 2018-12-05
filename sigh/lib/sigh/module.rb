@@ -1,5 +1,6 @@
 require 'fastlane_core/ui/ui'
 require 'fastlane_core/helper'
+require 'fastlane/boolean'
 
 module Sigh
   # Use this to just setup the configuration attribute and set it later somewhere else
@@ -9,6 +10,7 @@ module Sigh
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
+  Boolean = Fastlane::Boolean
   ROOT = Pathname.new(File.expand_path('../../..', __FILE__))
 
   ENV['FASTLANE_TEAM_ID'] ||= ENV["SIGH_TEAM_ID"]
