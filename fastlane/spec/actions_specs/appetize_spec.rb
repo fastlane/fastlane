@@ -11,6 +11,7 @@ describe Fastlane do
       EOS
     end
 
+    let(:api_host) { 'custom.appetize.io' }
     let(:api_token) { 'mysecrettoken' }
     let(:url) { 'https://example.com/app.zip' }
     let(:http) { double('http') }
@@ -68,6 +69,21 @@ describe Fastlane do
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_PUBLIC_KEY]).to eql('sKdfjL')
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_APP_URL]).to eql('https://appetize.io/app/sKdfjL')
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_MANAGE_URL]).to eql('https://appetize.io/manage/private_Djksfj')
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_API_HOST]).to eql('api.appetize.io')
+      end
+
+      it "works with custom API host" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            appetize({
+              api_host: '#{api_host}',
+              api_token: '#{api_token}',
+              url: '#{url}'
+            })
+          end").runner.execute(:test)
+        end.not_to(raise_error)
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_API_HOST]).to eql(api_host)
       end
     end
   end
