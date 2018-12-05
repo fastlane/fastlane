@@ -6,7 +6,10 @@ describe Fastlane do
           changelog_from_git_commits
         end").runner.execute(:test)
 
-        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
+        inner_command = "git describe --tags `git rev-list --tags --max-count=1`"
+        # this is not really the command that would have been executed, but a "fabricated" representation for tests (by Actions.sh) that includes both command that would have been run
+        pseudocommand = "git log --pretty=\"%B\" #{inner_command.shellescape}...HEAD"
+        expect(result).to eq(pseudocommand)
       end
 
       it "Uses the provided pretty format to collect log messages" do
@@ -14,7 +17,9 @@ describe Fastlane do
           changelog_from_git_commits(pretty: '%s%n%b')
         end").runner.execute(:test)
 
-        expect(result).to eq("git log --pretty=\"%s%n%b\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
+        inner_command = "git describe --tags `git rev-list --tags --max-count=1`"
+        pseudocommand = "git log --pretty=\"%s%n%b\" #{inner_command.shellescape}...HEAD"
+        expect(result).to eq(pseudocommand)
       end
 
       it "Uses the provided date format to collect log messages if specified" do
@@ -22,7 +27,9 @@ describe Fastlane do
           changelog_from_git_commits(pretty: '%s%n%b', date_format: 'short')
         end").runner.execute(:test)
 
-        expect(result).to eq("git log --pretty=\"%s%n%b\" --date=\"short\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
+        inner_command = "git describe --tags `git rev-list --tags --max-count=1`"
+        pseudocommand = "git log --pretty=\"%s%n%b\" --date=\"short\" #{inner_command.shellescape}...HEAD"
+        expect(result).to eq(pseudocommand)
       end
 
       it "Does not match lightweight tags when searching for the last one if so requested" do
@@ -30,7 +37,9 @@ describe Fastlane do
           changelog_from_git_commits(match_lightweight_tag: false)
         end").runner.execute(:test)
 
-        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
+        inner_command = "git describe `git rev-list --tags --max-count=1`"
+        pseudocommand = "git log --pretty=\"%B\" #{inner_command.shellescape}...HEAD"
+        expect(result).to eq(pseudocommand)
       end
 
       it "Collects logs in the specified revision range if specified" do
@@ -42,19 +51,12 @@ describe Fastlane do
       end
 
       it "Handles tag names with characters that need shell escaping" do
+        tag = 'v1.8.0(30)'
         result = Fastlane::FastFile.new.parse("lane :test do
-          changelog_from_git_commits(between: ['v1.8.0(30)', 'HEAD'])
+          changelog_from_git_commits(between: ['#{tag}', 'HEAD'])
         end").runner.execute(:test)
 
-        expect(result).to eq("git log --pretty=\"%B\" v1.8.0\\(30\\)...HEAD")
-      end
-
-      it "Does not accept a string value for between" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            changelog_from_git_commits(between: 'abcd...1234')
-          end").runner.execute(:test)
-        end.to raise_error(":between must be of type array")
+        expect(result).to eq("git log --pretty=\"%B\" #{tag.shellescape}...HEAD")
       end
 
       it "Does not accept a :between array of size 1" do
@@ -121,7 +123,9 @@ describe Fastlane do
           changelog_from_git_commits(include_merges: false)
         end").runner.execute(:test)
 
-        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD --no-merges")
+        inner_command = "git describe --tags `git rev-list --tags --max-count=1`"
+        pseudocommand = "git log --pretty=\"%B\" #{inner_command.shellescape}...HEAD --no-merges"
+        expect(result).to eq(pseudocommand)
       end
 
       it "Only include merge commits if merge_commit_filtering is only_include_merges" do
@@ -129,7 +133,9 @@ describe Fastlane do
           changelog_from_git_commits(merge_commit_filtering: 'only_include_merges')
         end").runner.execute(:test)
 
-        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD --merges")
+        inner_command = "git describe --tags `git rev-list --tags --max-count=1`"
+        pseudocommand = "git log --pretty=\"%B\" #{inner_command.shellescape}...HEAD --merges"
+        expect(result).to eq(pseudocommand)
       end
 
       it "Include merge commits if merge_commit_filtering is include_merges" do
@@ -137,7 +143,9 @@ describe Fastlane do
           changelog_from_git_commits(merge_commit_filtering: 'include_merges')
         end").runner.execute(:test)
 
-        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
+        inner_command = "git describe --tags `git rev-list --tags --max-count=1`"
+        pseudocommand = "git log --pretty=\"%B\" #{inner_command.shellescape}...HEAD"
+        expect(result).to eq(pseudocommand)
       end
 
       it "Does not include merge commits if merge_commit_filtering is exclude_merges" do
@@ -145,15 +153,20 @@ describe Fastlane do
           changelog_from_git_commits(merge_commit_filtering: 'exclude_merges')
         end").runner.execute(:test)
 
-        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD --no-merges")
+        inner_command = "git describe --tags `git rev-list --tags --max-count=1`"
+        pseudocommand = "git log --pretty=\"%B\" #{inner_command.shellescape}...HEAD --no-merges"
+        expect(result).to eq(pseudocommand)
       end
 
       it "Uses pattern matching for tag name if requested" do
+        tag_match_pattern = '*1.8*'
         result = Fastlane::FastFile.new.parse("lane :test do
-          changelog_from_git_commits(tag_match_pattern: '*1.8*')
+          changelog_from_git_commits(tag_match_pattern: '#{tag_match_pattern}')
         end").runner.execute(:test)
 
-        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\=\\\\\\*1.8\\\\\\*\\ --max-count\\=1\\`...HEAD")
+        inner_command = "git describe --tags `git rev-list --tags=#{tag_match_pattern.shellescape} --max-count=1`"
+        pseudocommand = "git log --pretty=\"%B\" #{inner_command.shellescape}...HEAD"
+        expect(result).to eq(pseudocommand)
       end
 
       it "Does not use pattern matching for tag name if so requested" do
@@ -161,7 +174,29 @@ describe Fastlane do
           changelog_from_git_commits()
         end").runner.execute(:test)
 
-        expect(result).to eq("git log --pretty=\"%B\" git\\ describe\\ --tags\\ \\`git\\ rev-list\\ --tags\\ --max-count\\=1\\`...HEAD")
+        inner_command = "git describe --tags `git rev-list --tags --max-count=1`"
+        pseudocommand = "git log --pretty=\"%B\" #{inner_command.shellescape}...HEAD"
+        expect(result).to eq(pseudocommand)
+      end
+
+      it "Runs between option from command line" do
+        expect(system("fastlane run changelog_from_git_commits between:123456,HEAD")).to be
+      end
+
+      it "Accepts string value for :between" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(between: 'abcd,1234')
+        end").runner.execute(:test)
+
+        expect(result).to eq("git log --pretty=\"%B\" abcd...1234")
+      end
+
+      it "Does not accept string if it does not contain comma" do
+        expect do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            changelog_from_git_commits(between: 'abcd1234')
+          end").runner.execute(:test)
+        end.to raise_error(":between must contain comma")
       end
     end
   end

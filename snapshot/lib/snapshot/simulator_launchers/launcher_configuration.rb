@@ -1,4 +1,3 @@
-
 module Snapshot
   class SimulatorLauncherConfiguration
     # both

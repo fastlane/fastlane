@@ -24,6 +24,10 @@ describe Screengrab::Runner do
     let(:test_classes_to_use) { nil }
     let(:test_packages_to_use) { nil }
 
+    before do
+      expect(mock_android_environment).to receive(:adb_path).and_return("adb")
+    end
+
     context "when launch arguments are specified" do
       before do
         config[:launch_arguments] = ["username hjanuschka", "build_type x500"]
@@ -78,8 +82,8 @@ describe Screengrab::Runner do
   describe :validate_apk do
     context 'no aapt' do
       it 'prints an error unless aapt can be found' do
-        expect(mock_android_environment).to receive(:aapt_path).and_return nil
-        expect(mock_executor).not_to receive(:execute)
+        expect(mock_android_environment).to receive(:aapt_path).and_return(nil)
+        expect(mock_executor).not_to(receive(:execute))
         expect(ui).to receive(:important).with(/.*aapt.*could not be found/)
 
         @runner.validate_apk('fake_apk_path')
@@ -88,7 +92,7 @@ describe Screengrab::Runner do
 
     context 'no permissions' do
       it 'prints if permissions are missing' do
-        allow(mock_android_environment).to receive(:aapt_path).and_return 'fake_aapt_path'
+        allow(mock_android_environment).to receive(:aapt_path).and_return('fake_aapt_path')
         mock_adb_response_for_command('fake_aapt_path dump permissions fake_apk_path', '')
 
         expect(ui).to receive(:user_error!).with(/permission.* could not be found/).and_call_original
@@ -99,11 +103,15 @@ describe Screengrab::Runner do
   end
 
   describe :select_device do
-    let (:adb_list_devices_command) { 'adb devices -l' }
+    let(:adb_list_devices_command) { 'adb devices -l' }
+
+    before do
+      expect(mock_android_environment).to receive(:adb_path).and_return("adb")
+    end
 
     context 'no devices' do
       it 'does not find any active devices' do
-        adb_response = strip_heredoc <<-ADB_OUTPUT
+        adb_response = strip_heredoc(<<-ADB_OUTPUT)
         List of devices attached
 
         ADB_OUTPUT
@@ -117,7 +125,7 @@ describe Screengrab::Runner do
 
     context 'one device with spurious ADB output mixed in' do
       it 'finds an active device' do
-        adb_response = strip_heredoc <<-ADB_OUTPUT
+        adb_response = strip_heredoc(<<-ADB_OUTPUT)
           List of devices attached
           adb server version (39) doesn't match this client (36); killing...
           * daemon started successfully
@@ -133,7 +141,7 @@ describe Screengrab::Runner do
 
     context 'one device' do
       it 'finds an active device' do
-        adb_response = strip_heredoc <<-ADB_OUTPUT
+        adb_response = strip_heredoc(<<-ADB_OUTPUT)
           List of devices attached
           T065002LTT             device usb:437387264X product:ghost_retail model:XT1053 device:ghost
 
@@ -147,7 +155,7 @@ describe Screengrab::Runner do
 
     context 'multiple devices' do
       it 'finds an active device' do
-        adb_response = strip_heredoc <<-ADB_OUTPUT
+        adb_response = strip_heredoc(<<-ADB_OUTPUT)
           List of devices attached
           emulator-5554          device product:sdk_phone_x86_64 model:Android_SDK_built_for_x86_64 device:generic_x86_64
           T065002LTT             device usb:437387264X product:ghost_retail model:XT1053 device:ghost
@@ -161,7 +169,7 @@ describe Screengrab::Runner do
 
     context 'one device booting' do
       it 'finds an active device' do
-        adb_response = strip_heredoc <<-ADB_OUTPUT
+        adb_response = strip_heredoc(<<-ADB_OUTPUT)
           List of devices attached
           emulator-5554 offline
           T065002LTT  device
@@ -176,8 +184,12 @@ describe Screengrab::Runner do
   end
 
   describe :run_adb_command do
+    before do
+      expect(mock_android_environment).to receive(:adb_path).and_return("adb")
+    end
+
     it 'filters out lines which are ADB warnings' do
-      adb_response = strip_heredoc <<-ADB_OUTPUT
+      adb_response = strip_heredoc(<<-ADB_OUTPUT)
             adb: /home/me/rubystack-2.3.1-4/common/lib/libcrypto.so.1.0.0: no version information available (required by adb)
             List of devices attached
             e1dbf228               device usb:1-1.2 product:a33gdd model:SM_A300H device:a33g

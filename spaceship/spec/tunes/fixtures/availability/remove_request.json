@@ -38,6 +38,21 @@
   "unavailableDate": -2,
   "creatingApp": false,
   "hasApprovedVersion": false,
+  "preOrder":{  
+    "clearedForPreOrder":{  
+      "value":false,
+      "isEditable":true,
+      "isRequired":true,
+      "errorKeys":null
+    },
+    "appAvailableDate":{  
+      "value":null,
+      "isEditable":true,
+      "isRequired":true,
+      "errorKeys":null
+    },
+    "preOrderAvailableDate":null
+  },
   "appVersionsForOTAByPlatforms": {
     "iOS": [
 

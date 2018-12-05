@@ -3,7 +3,6 @@
 //  ExampleUITests
 //
 //  Created by Felix Krause on 19/06/15.
-//  Copyright © 2015 Felix Krause. All rights reserved.
 //
 
 import Foundation
@@ -19,8 +18,7 @@ class ExampleTVUITests: XCTestCase {
     app.launch()
   }
 
-  func testExample()
-  {
+  func testExample() {
     snapshot("0Launch")
   }
 }

@@ -4,6 +4,7 @@ module Fastlane
       APPETIZE_PUBLIC_KEY = :APPETIZE_PUBLIC_KEY
       APPETIZE_APP_URL = :APPETIZE_APP_URL
       APPETIZE_MANAGE_URL = :APPETIZE_MANAGE_URL
+      APPETIZE_API_HOST = :APPETIZE_API_HOST
     end
 
     class AppetizeAction < Action
@@ -38,9 +39,9 @@ module Fastlane
         http.use_ssl = true
 
         if params[:platform] == 'ios'
-          UI.message "Uploading ipa to appetize... this might take a while"
+          UI.message("Uploading ipa to appetize... this might take a while")
         else
-          UI.message "Uploading apk to appetize... this might take a while"
+          UI.message("Uploading apk to appetize... this might take a while")
         end
 
         response = http.request(req)
@@ -54,13 +55,14 @@ module Fastlane
       end
 
       def self.appetize_url(options)
-        "https://api.appetize.io/v1/apps/#{options[:public_key]}"
+        Actions.lane_context[SharedValues::APPETIZE_API_HOST] = options[:api_host]
+        "https://#{options[:api_host]}/v1/apps/#{options[:public_key]}"
       end
       private_class_method :appetize_url
 
       def self.create_request(uri, params)
         if params[:url]
-          req = Net::HTTP::Post.new(uri.request_uri, initheader: { 'Content-Type' => 'application/json' })
+          req = Net::HTTP::Post.new(uri.request_uri, { 'Content-Type' => 'application/json' })
           req.body = JSON.generate(params)
         else
           req = Net::HTTP::Post::Multipart.new(uri.path, params)
@@ -81,25 +83,33 @@ module Fastlane
         Actions.lane_context[SharedValues::APPETIZE_MANAGE_URL] = manage_url
         return true
       rescue => ex
-        UI.error ex
+        UI.error(ex)
         UI.user_error!("Error uploading to Appetize.io: #{response.body}")
       end
       private_class_method :parse_response
 
       def self.description
-        "Upload your app to Appetize.io to stream it in the browser"
+        "Upload your app to [Appetize.io](https://appetize.io/) to stream it in browser"
       end
 
       def self.details
         [
           "If you provide a `public_key`, this will overwrite an existing application. If you want to have this build as a new app version, you shouldn't provide this value.",
           "",
-          "To integrate appetize into your GitHub workflow check out the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)"
+          "To integrate appetize into your GitHub workflow check out the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)."
         ].join("\n")
       end
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :api_host,
+                                       env_name: "APPETIZE_API_HOST",
+                                       description: "Appetize API host",
+                                       is_string: true,
+                                       default_value: 'api.appetize.io',
+                                       verify_block: proc do |value|
+                                         UI.user_error!("API host should not contain the scheme e.g. `https`") if value.start_with?('https')
+                                       end),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "APPETIZE_API_TOKEN",
                                        sensitive: true,
@@ -115,7 +125,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        env_name: "APPETIZE_PLATFORM",
-                                       description: "Platform. Either `ios` or `android`. Default is `ios`",
+                                       description: "Platform. Either `ios` or `android`",
                                        is_string: true,
                                        default_value: 'ios'),
           FastlaneCore::ConfigItem.new(key: :path,
@@ -143,14 +153,15 @@ module Fastlane
 
       def self.output
         [
-          ['APPETIZE_PUBLIC_KEY', 'a public identifier for your app. Use this to update your app after it has been initially created'],
+          ['APPETIZE_API_HOST', 'Appetize API host.'],
+          ['APPETIZE_PUBLIC_KEY', 'a public identifier for your app. Use this to update your app after it has been initially created.'],
           ['APPETIZE_APP_URL', 'a page to test and share your app.'],
           ['APPETIZE_MANAGE_URL', 'a page to manage your app.']
         ]
       end
 
       def self.authors
-        ["klundberg", "giginet"]
+        ["klundberg", "giginet", "steprescott"]
       end
 
       def self.category
@@ -161,6 +172,12 @@ module Fastlane
         [
           'appetize(
             path: "./MyApp.zip",
+            api_token: "yourapitoken", # get it from https://appetize.io/docs#request-api-token
+            public_key: "your_public_key" # get it from https://appetize.io/dashboard
+          )',
+          'appetize(
+            path: "./MyApp.zip",
+            api_host: "company.appetize.io", # only needed for enterprise hosted solution
             api_token: "yourapitoken", # get it from https://appetize.io/docs#request-api-token
             public_key: "your_public_key" # get it from https://appetize.io/dashboard
           )'

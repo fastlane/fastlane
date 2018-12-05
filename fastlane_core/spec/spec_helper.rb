@@ -8,7 +8,7 @@ end
 def before_each_fastlane_core
   # iTunes Lookup API by Apple ID
   ["invalid", "", 0, '284882215', ['338986109', 'FR']].each do |current|
-    if current.kind_of? Array
+    if current.kind_of?(Array)
       id = current[0]
       country = current[1]
       url = "https://itunes.apple.com/lookup?id=#{id}&country=#{country}"
@@ -37,15 +37,8 @@ end
 # provided keys and values set as defined in hash. After the block
 # completes, restores the ENV to its previous state.
 def with_env_values(hash)
-  old_vals = ENV.select { |k, v| hash.include?(k) }
   hash.each do |k, v|
-    ENV[k] = hash[k]
-  end
-  yield
-ensure
-  hash.each do |k, v|
-    ENV.delete(k) unless old_vals.include?(k)
-    ENV[k] = old_vals[k]
+    stub_const('ENV', ENV.to_h.merge(k => v))
   end
 end
 

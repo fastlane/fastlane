@@ -8,8 +8,8 @@ describe Match do
       Match::Setup.new.run(path)
 
       content = File.read(path)
-      expect(content).to include("git_url \"#{git_url}\"")
-      expect(content).to include("type \"development\"")
+      expect(content).to include("git_url(\"#{git_url}\")")
+      expect(content).to include("type(\"development\")")
       expect(content).to include("match --help")
     end
   end

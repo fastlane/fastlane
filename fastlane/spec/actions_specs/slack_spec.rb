@@ -32,11 +32,12 @@ describe Fastlane do
 
         notifier, attachments = Fastlane::Actions::SlackAction.run(arguments)
 
-        expect(notifier.default_payload[:username]).to eq('fastlane')
-        expect(notifier.default_payload[:channel]).to eq(channel)
+        expect(notifier.config.defaults[:username]).to eq('fastlane')
+        expect(notifier.config.defaults[:channel]).to eq(channel)
 
         expect(attachments[:color]).to eq('danger')
         expect(attachments[:text]).to eq(message)
+        expect(attachments[:pretext]).to eq(nil)
 
         fields = attachments[:fields]
         expect(fields[1][:title]).to eq('Built by')
@@ -47,6 +48,33 @@ describe Fastlane do
 
         expect(fields[3][:title]).to eq('Result')
         expect(fields[3][:value]).to eq('Error')
+      end
+
+      it "works so perfect, like Slack does with pretext" do
+        channel = "#myChannel"
+        message = "Custom Message"
+        pretext = "This is pretext"
+        lane_name = "lane_name"
+
+        Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME] = lane_name
+
+        require 'fastlane/actions/slack'
+        arguments = Fastlane::ConfigurationHelper.parse(Fastlane::Actions::SlackAction, {
+          slack_url: 'https://127.0.0.1',
+          message: message,
+          pretext: pretext,
+          success: false,
+          channel: channel
+        })
+
+        notifier, attachments = Fastlane::Actions::SlackAction.run(arguments)
+
+        expect(notifier.config.defaults[:username]).to eq('fastlane')
+        expect(notifier.config.defaults[:channel]).to eq(channel)
+
+        expect(attachments[:color]).to eq('danger')
+        expect(attachments[:text]).to eq(message)
+        expect(attachments[:pretext]).to eq(pretext)
       end
 
       it "merges attachment_properties when specified" do

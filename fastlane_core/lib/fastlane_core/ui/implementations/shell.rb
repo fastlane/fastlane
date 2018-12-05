@@ -1,3 +1,9 @@
+require_relative '../../helper'
+require_relative '../../globals'
+require_relative '../../env'
+
+require_relative '../interface'
+
 module FastlaneCore
   # Shell is the terminal output of things
   # For documentation for each of the methods open `interface.rb`
@@ -9,8 +15,8 @@ module FastlaneCore
 
       $stdout.sync = true
 
-      if Helper.is_test? && !ENV.key?('DEBUG')
-        $stdout.puts "Logging disabled while running tests. Force them by setting the DEBUG environment variable"
+      if Helper.test? && !ENV.key?('DEBUG')
+        $stdout.puts("Logging disabled while running tests. Force them by setting the DEBUG environment variable")
         @log ||= Logger.new(nil) # don't show any logs when running tests
       else
         @log ||= Logger.new($stdout)
@@ -19,8 +25,6 @@ module FastlaneCore
       @log.formatter = proc do |severity, datetime, progname, msg|
         "#{format_string(datetime, severity)}#{msg}\n"
       end
-
-      require 'fastlane_core/ui/disable_colors' if FastlaneCore::Helper.colors_disabled?
 
       @log
     end
@@ -66,8 +70,12 @@ module FastlaneCore
     def command_output(message)
       actual = (message.split("\r").last || "") # as clearing the line will remove the `>` and the time stamp
       actual.split("\n").each do |msg|
-        prefix = msg.include?("▸") ? "" : "▸ "
-        log.info(prefix + "" + msg.magenta)
+        if FastlaneCore::Env.truthy?("FASTLANE_DISABLE_OUTPUT_FORMAT")
+          log.info(msg)
+        else
+          prefix = msg.include?("▸") ? "" : "▸ "
+          log.info(prefix + "" + msg.magenta)
+        end
       end
     end
 
@@ -86,6 +94,23 @@ module FastlaneCore
       success("-" * i)
       success(message)
       success("-" * i)
+    end
+
+    def content_error(content, error_line)
+      error_line = error_line.to_i
+      return unless error_line > 0
+
+      contents = content.split(/\r?\n/).map(&:chomp)
+
+      start_line = error_line - 2 < 1 ? 1 : error_line - 2
+      end_line = error_line + 2 < contents.length ? error_line + 2 : contents.length
+
+      Range.new(start_line, end_line).each do |line|
+        str = line == error_line ? " => " : "    "
+        str << line.to_s.rjust(Math.log10(end_line) + 1)
+        str << ":\t#{contents[line - 1]}"
+        error(str)
+      end
     end
 
     #####################################################

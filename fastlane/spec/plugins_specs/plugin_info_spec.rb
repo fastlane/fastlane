@@ -9,7 +9,7 @@ describe Fastlane::PluginInfo do
     it "detects differing PluginInfo objects" do
       object_a = Fastlane::PluginInfo.new('name', 'Me', 'me@you.com', 'summary', 'details')
       object_b = Fastlane::PluginInfo.new('name2', 'Me2', 'me2@you.com', 'summary2', 'details')
-      expect(object_a).not_to eq(object_b)
+      expect(object_a).not_to(eq(object_b))
     end
   end
 

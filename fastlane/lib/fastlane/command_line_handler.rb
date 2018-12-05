@@ -7,7 +7,7 @@ module Fastlane
       lane_parameters = {} # the parameters we'll pass to the lane
       platform_lane_info = [] # the part that's responsible for the lane/platform definition
       args.each do |current|
-        if current.include? ":" # that's a key/value which we want to pass to the lane
+        if current.include?(":") # that's a key/value which we want to pass to the lane
           key, value = current.split(":", 2)
           UI.user_error!("Please pass values like this: key:value") unless key.length > 0
           value = convert_value(value)
@@ -26,8 +26,15 @@ module Fastlane
         lane = platform_lane_info[0]
       end
 
-      dot_env = Helper.is_test? ? nil : options.env
-      Fastlane::LaneManager.cruise_lane(platform, lane, lane_parameters, dot_env)
+      dot_env = Helper.test? ? nil : options.env
+
+      if FastlaneCore::FastlaneFolder.swift?
+        disable_runner_upgrades = options.disable_runner_upgrades || false
+        swift_server_port = options.swift_server_port
+        Fastlane::SwiftLaneManager.cruise_lane(lane, lane_parameters, dot_env, disable_runner_upgrades: disable_runner_upgrades, swift_server_port: swift_server_port)
+      else
+        Fastlane::LaneManager.cruise_lane(platform, lane, lane_parameters, dot_env)
+      end
     end
 
     # Helper to convert into the right data type

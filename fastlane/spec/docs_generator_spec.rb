@@ -9,7 +9,7 @@ describe Fastlane do
 
       output = File.read(output_path)
 
-      expect(output).to include('sudo gem install fastlane')
+      expect(output).to include('gem install fastlane')
       expect(output).to include('# Available Actions')
       expect(output).to include('### test')
       expect(output).to include('# iOS')
@@ -28,17 +28,17 @@ describe Fastlane do
 
       output = File.read(output_path)
 
-      expect(output).to include('sudo gem install fastlane')
+      expect(output).to include('gem install fastlane')
       expect(output).to include('# Available Actions')
       expect(output).to include('## Android')
       expect(output).to include('### android lane')
       expect(output).to include('fastlane android lane')
       expect(output).to include("I'm a lane")
 
-      expect(output).not_to include('## iOS')
-      expect(output).not_to include('## Mac')
-      expect(output).not_to include('mac_lane')
-      expect(output).not_to include("I'm a mac private_lane")
+      expect(output).not_to(include('## iOS'))
+      expect(output).not_to(include('## Mac'))
+      expect(output).not_to(include('mac_lane'))
+      expect(output).not_to(include("I'm a mac private_lane"))
     end
   end
 end

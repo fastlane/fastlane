@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     module SharedValues
-      GIT_BRANCH_ENV_VARS = %w(GIT_BRANCH BRANCH_NAME TRAVIS_BRANCH BITRISE_GIT_BRANCH CI_BUILD_REF_NAME CI_COMMIT_REF_NAME).freeze
+      GIT_BRANCH_ENV_VARS = %w(GIT_BRANCH BRANCH_NAME TRAVIS_BRANCH BITRISE_GIT_BRANCH CI_BUILD_REF_NAME CI_COMMIT_REF_NAME WERCKER_GIT_BRANCH BUILDKITE_BRANCH).freeze
     end
 
     class GitBranchAction < Action
@@ -42,6 +42,10 @@ module Fastlane
         [
           'git_branch'
         ]
+      end
+
+      def self.return_type
+        :string
       end
 
       def self.category

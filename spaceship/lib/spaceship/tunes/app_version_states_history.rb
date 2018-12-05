@@ -1,6 +1,8 @@
+require_relative 'tunes_base'
+
 module Spaceship
   module Tunes
-    # Represents a read only version of an iTunes Connect Versions State History
+    # Represents a read only version of an App Store Connect Versions State History
     class AppVersionStatesHistory < TunesBase
       # @return (String) the state
       attr_reader :state_key

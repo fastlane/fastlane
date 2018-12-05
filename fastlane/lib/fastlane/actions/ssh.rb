@@ -14,7 +14,7 @@ module Fastlane
         ssh.open_channel do |channel|
           channel.exec(command) do |ch, success|
             unless success
-              abort "FAILED: couldn't execute command (ssh.channel.exec)"
+              abort("FAILED: couldn't execute command (ssh.channel.exec)")
             end
             channel.on_data do |ch1, data|
               stdout_data += data
@@ -80,7 +80,7 @@ module Fastlane
       end
 
       def self.details
-        "Lets you execute remote commands via ssh using username/password or ssh-agent. If one of the commands in command-array returns non 0 - it fails."
+        "Lets you execute remote commands via ssh using username/password or ssh-agent. If one of the commands in command-array returns non 0, it fails."
       end
 
       def self.available_options

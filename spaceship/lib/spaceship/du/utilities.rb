@@ -66,8 +66,8 @@ module Spaceship
       video_infos = output.split("\n").select { |l| l =~ /Stream.*Video/ }
       raise "Unable to find Stream Video information from ffmpeg output of #{command}" if video_infos.count == 0
       video_info = video_infos[0]
-      res = video_info.match(/.* ([0-9]+)x([0-9]+),.*/)
-      raise "Unable to parse resolution information from #{video_info}" if res.count < 3
+      res = video_info.match(/.* ([0-9]+)x([0-9]+).*/)
+      raise "Unable to parse resolution information from #{video_info}" if res.size < 3
       [res[1].to_i, res[2].to_i]
     end
 

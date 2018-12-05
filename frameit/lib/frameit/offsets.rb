@@ -1,3 +1,6 @@
+require_relative 'module'
+require_relative 'frame_downloader'
+
 module Frameit
   class Offsets
     # Returns the image offset needed for a certain device type for a given orientation

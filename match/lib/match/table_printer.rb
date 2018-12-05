@@ -1,3 +1,9 @@
+require 'terminal-table'
+
+require 'fastlane_core/print_table'
+require_relative 'module'
+require_relative 'utils'
+
 module Match
   class TablePrinter
     # logs public key's  name, user, organisation, country, availability dates
@@ -7,9 +13,9 @@ module Match
         title: "Installed Certificate".green
       }
 
-      puts ""
-      puts Terminal::Table.new(params)
-      puts ""
+      puts("")
+      puts(Terminal::Table.new(params))
+      puts("")
     rescue => ex
       UI.error(ex)
     end
@@ -37,9 +43,9 @@ module Match
       params[:title] = "Installed Provisioning Profile".green
       params[:headings] = ['Parameter', 'Environment Variable', 'Value']
 
-      puts ""
-      puts Terminal::Table.new(params)
-      puts ""
+      puts("")
+      puts(Terminal::Table.new(params))
+      puts("")
     end
   end
 end

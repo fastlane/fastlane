@@ -1,21 +1,6 @@
-require 'json'
-require 'produce/manager'
-require 'produce/options'
-require 'produce/developer_center'
-require 'produce/itunes_connect'
-require 'produce/available_default_languages'
-
-require 'fastlane_core'
-
-module Produce
-  class << self
-    attr_accessor :config
-  end
-
-  Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
-  UI = FastlaneCore::UI
-  ROOT = Pathname.new(File.expand_path('../..', __FILE__))
-
-  ENV['FASTLANE_TEAM_ID'] ||= ENV["PRODUCE_TEAM_ID"]
-  ENV['DELIVER_USER'] ||= ENV["PRODUCE_USERNAME"]
-end
+require_relative 'produce/manager'
+require_relative 'produce/options'
+require_relative 'produce/developer_center'
+require_relative 'produce/itunes_connect'
+require_relative 'produce/available_default_languages'
+require_relative 'produce/module'

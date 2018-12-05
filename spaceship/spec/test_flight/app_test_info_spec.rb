@@ -46,11 +46,25 @@ describe Spaceship::TestFlight::AppTestInfo do
                                         ])
   end
 
+  let(:beta_review_info) do
+    Spaceship::TestFlight::BetaReviewInfo.new({
+                                                 'contactFirstName' => 'Test_First',
+                                                 'contactLastName' => 'Test_Last',
+                                                 'contactPhone' => '2345678901',
+                                                 'contactEmail' => 'test_contact@email.com',
+                                                 'demoAccountName' => 'Test User Name',
+                                                 'demoAccountPassword' => 'Test_Password',
+                                                 'demoAccountRequired' => true,
+                                                 'notes' => 'test_notes!!'
+                                             })
+  end
+
   let(:mock_client) { double('MockClient') }
 
   before do
     # Use a simple client for all data models
-    Spaceship::TestFlight::Base.client = mock_client
+    allow(Spaceship::TestFlight::Base).to receive(:client).and_return(mock_client)
+    allow(mock_client).to receive(:team_id).and_return('')
   end
 
   it 'gets the TestInfo' do
@@ -63,6 +77,23 @@ describe Spaceship::TestFlight::AppTestInfo do
   it 'sets the TestInfo' do
     app_test_info.test_info = test_info
     expect(app_test_info.raw_data['details']).to eq(test_info.raw_data)
+  end
+
+  it 'gets beta review info' do
+    expect(app_test_info.beta_review_info).to be_instance_of(Spaceship::TestFlight::BetaReviewInfo)
+    expect(app_test_info.beta_review_info.contact_first_name).to eq("First")
+    expect(app_test_info.beta_review_info.contact_last_name).to eq("Last")
+    expect(app_test_info.beta_review_info.contact_phone).to eq("1234567890")
+    expect(app_test_info.beta_review_info.contact_email).to eq("contact@email.com")
+    expect(app_test_info.beta_review_info.demo_account_name).to eq("User Name")
+    expect(app_test_info.beta_review_info.demo_account_password).to eq("Password")
+    expect(app_test_info.beta_review_info.demo_account_required).to eq(false)
+    expect(app_test_info.beta_review_info.notes).to eq("notes!!")
+  end
+
+  it 'sets beta review info' do
+    app_test_info.beta_review_info = beta_review_info
+    expect(app_test_info.raw_data['betaReviewInfo']).to eq(beta_review_info.raw_data)
   end
 
   context 'client interactions' do
@@ -78,7 +109,7 @@ describe Spaceship::TestFlight::AppTestInfo do
       expect(found_app_test_info.raw_data.to_h.to_s).to eq(app_test_info.raw_data.to_h.to_s)
     end
 
-    RSpec::Matchers.define :same_app_test_info do |other_app_test_info|
+    RSpec::Matchers.define(:same_app_test_info) do |other_app_test_info|
       match do |args|
         args[:app_test_info].raw_data.to_h.to_s == other_app_test_info.raw_data.to_h.to_s
       end

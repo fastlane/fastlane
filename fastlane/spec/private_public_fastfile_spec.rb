@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Public/Private lanes" do
-      let (:path) { './fastlane/spec/fixtures/fastfiles/FastfilePrivatePublic' }
+      let(:path) { './fastlane/spec/fixtures/fastfiles/FastfilePrivatePublic' }
       before do
         FileUtils.rm_rf('/tmp/fastlane/')
 
@@ -11,7 +11,7 @@ describe Fastlane do
       it "raise an exception when calling a private lane" do
         expect do
           @ff.runner.execute('private_helper')
-        end.to raise_error "You can't call the private lane 'private_helper' directly"
+        end.to raise_error("You can't call the private lane 'private_helper' directly")
       end
 
       it "still supports calling public lanes" do
@@ -28,7 +28,7 @@ describe Fastlane do
         require 'fastlane/lane_list'
         result = Fastlane::LaneList.generate(path)
         expect(result).to include("such smooth")
-        expect(result).to_not include("private call")
+        expect(result).to_not(include("private call"))
       end
 
       it "doesn't expose the private lanes in `fastlane docs`" do
@@ -37,9 +37,9 @@ describe Fastlane do
         Fastlane::DocsGenerator.run(ff, output_path)
         output = File.read(output_path)
 
-        expect(output).to include('sudo gem install fastlane')
+        expect(output).to include('gem install fastlane')
         expect(output).to include('such smooth')
-        expect(output).to_not include('private')
+        expect(output).to_not(include('private'))
       end
     end
   end

@@ -1,5 +1,7 @@
 require 'fileutils'
 
+require_relative 'utilities'
+
 module Spaceship
   # a wrapper around the concept of file required to make uploads to DU
   class UploadFile

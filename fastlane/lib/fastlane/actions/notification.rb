@@ -6,7 +6,7 @@ module Fastlane
 
         options = params.values
         # :message is non-optional
-        message = options.delete :message
+        message = options.delete(:message)
         # remove nil keys, since `notify` below does not ignore them and instead translates them into empty strings in output, which looks ugly
         options = options.select { |_, v| v }
         option_map = {

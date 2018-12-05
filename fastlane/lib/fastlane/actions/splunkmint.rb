@@ -14,7 +14,7 @@ module Fastlane
         # will reanable it when it is fixed
         # result = Fastlane::Actions.sh(command.join(' '), log: false)
         shell_command = command.join(' ')
-        result = Helper.is_test? ? shell_command : `#{shell_command}`
+        result = Helper.test? ? shell_command : `#{shell_command}`
         fail_on_error(result)
 
         result
@@ -79,7 +79,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Upload dSYM file to Splunk MINT"
+        "Upload dSYM file to [Splunk MINT](https://mint.splunk.com/)"
       end
 
       def self.available_options

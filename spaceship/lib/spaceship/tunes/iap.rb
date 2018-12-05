@@ -1,3 +1,4 @@
+require 'spaceship/tunes/errors'
 require 'spaceship/tunes/iap_list'
 require 'spaceship/tunes/iap_detail'
 require 'spaceship/tunes/iap_status'
@@ -21,7 +22,7 @@ module Spaceship
         Tunes::IAPFamilies.new(attrs)
       end
 
-      # Creates a new In-App-Purchese on iTunes Connect
+      # Creates a new In-App-Purchese on App Store Connect
       # if the In-App-Purchase already exists an exception is raised. Spaceship::TunesClient::ITunesConnectError
       # @param type (String): The Type of the in-app-purchase (Spaceship::Tunes::IAPType::CONSUMABLE,Spaceship::Tunes::IAPType::NON_CONSUMABLE,Spaceship::Tunes::IAPType::RECURRING,Spaceship::Tunes::IAPType::NON_RENEW_SUBSCRIPTION)
       # @param versions (Hash): a Hash of the languages
@@ -51,6 +52,14 @@ module Spaceship
       # @param family_id (String) Only used on RECURRING purchases, assigns the In-App-Purchase to a specific familie
       # @param subscription_free_trial (String) Free Trial duration (1w,1m,3m....)
       # @param subscription_duration (String) 1w,1m.....
+      # @param subscription_price_target (Hash) Only used on RECURRING purchases, used to set the
+      # price of all the countries to be roughly the same as the price calculated from the price
+      # tier and currency given as input.
+      # @example:
+      #  {
+      #    currency: "EUR",
+      #    tier: 2
+      #  }
       def create!(type: "consumable",
                   versions: nil,
                   reference_name: nil,
@@ -61,8 +70,8 @@ module Spaceship
                   pricing_intervals: nil,
                   family_id: nil,
                   subscription_free_trial: nil,
-                  subscription_duration: nil)
-
+                  subscription_duration: nil,
+                  subscription_price_target: nil)
         client.create_iap!(app_id: self.application.apple_id,
                            type: type,
                            versions: versions,
@@ -75,6 +84,23 @@ module Spaceship
                            family_id: family_id,
                            subscription_duration: subscription_duration,
                            subscription_free_trial: subscription_free_trial)
+
+        # Update pricing for a recurring subscription.
+        if type == Spaceship::Tunes::IAPType::RECURRING &&
+           (pricing_intervals || subscription_price_target)
+          # There are cases where the product that was just created is not immediately found,
+          # and in order to update its pricing the purchase_id is needed. Therefore polling is done
+          # for 4 times until it is found. If it's not found after 6 tries, a PotentialServerError
+          # exception is raised.
+          product = find_product_with_retries(product_id, 6)
+          raw_pricing_intervals =
+            client.transform_to_raw_pricing_intervals(application.apple_id,
+                                                      product.purchase_id, pricing_intervals,
+                                                      subscription_price_target)
+          client.update_recurring_iap_pricing!(app_id: self.application.apple_id,
+                                               purchase_id: product.purchase_id,
+                                               pricing_intervals: raw_pricing_intervals)
+        end
       end
 
       # find a specific product
@@ -90,7 +116,7 @@ module Spaceship
 
       # return all available In-App-Purchase's of current app
       # this is not paged inside iTC-API so if you have a lot if IAP's (2k+)
-      # it might take some time to load, same as it takes when you load the list via iTunes Connect
+      # it might take some time to load, same as it takes when you load the list via App Store Connect
       def all(include_deleted: false)
         r = client.iaps(app_id: self.application.apple_id)
         return_iaps = []
@@ -102,6 +128,23 @@ module Spaceship
           return_iaps << loaded_iap
         end
         return_iaps
+      end
+
+      private
+
+      def find_product_with_retries(product_id, max_tries)
+        try_number = 0
+        product = nil
+        until product
+          if try_number > max_tries
+            raise PotentialServerError.new, "Failed to find the product with id=#{product_id}. "\
+            "This can be caused either by a server error or due to the removal of the product."
+          end
+          product = find(product_id)
+          try_number += 1
+        end
+
+        product
       end
     end
   end

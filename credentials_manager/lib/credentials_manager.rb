@@ -1,12 +1,6 @@
-require 'fastlane/version'
-require 'credentials_manager/account_manager'
-require 'credentials_manager/cli'
-require 'credentials_manager/appfile_config'
-
-# Third Party code
-require 'colored'
-require 'security'
-require 'highline/import' # to hide the entered password
+require_relative 'credentials_manager/account_manager'
+require_relative 'credentials_manager/cli'
+require_relative 'credentials_manager/appfile_config'
 
 module CredentialsManager
   ROOT = Pathname.new(File.expand_path('../..', __FILE__))

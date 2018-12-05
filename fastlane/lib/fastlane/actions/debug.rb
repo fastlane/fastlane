@@ -2,8 +2,8 @@ module Fastlane
   module Actions
     class DebugAction < Action
       def self.run(params)
-        puts "Lane Context".green
-        puts Actions.lane_context
+        puts("Lane Context".green)
+        puts(Actions.lane_context)
       end
 
       def self.description

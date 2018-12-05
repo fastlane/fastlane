@@ -1,4 +1,4 @@
-lane :snappy do |options|
+lane(:snappy) do |options|
   snapshot(
     project: 'Example.xcodeproj',
     scheme: 'ExampleUITests',

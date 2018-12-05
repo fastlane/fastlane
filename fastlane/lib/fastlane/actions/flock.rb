@@ -16,28 +16,25 @@ module Fastlane
         response = Net::HTTP.start(
           uri.host, uri.port, use_ssl: uri.scheme == 'https'
         ) do |http|
-          request = Net::HTTP::Post.new uri.path
+          request = Net::HTTP::Post.new(uri.path)
           request.content_type = 'application/json'
           request.body = JSON.generate("text" => message)
-          http.request request
+          http.request(request)
         end
-        if response.kind_of? Net::HTTPSuccess
-          UI.success 'Message sent to Flock.'
+        if response.kind_of?(Net::HTTPSuccess)
+          UI.success('Message sent to Flock.')
         else
-          UI.error "HTTP request to '#{uri}' with message '#{message}' failed with a #{response.code} response."
-          UI.user_error! 'Error sending message to Flock. Please verify the Flock webhook token.'
+          UI.error("HTTP request to '#{uri}' with message '#{message}' failed with a #{response.code} response.")
+          UI.user_error!('Error sending message to Flock. Please verify the Flock webhook token.')
         end
       end
 
       def self.description
-        "Send a message to a Flock group"
+        "Send a message to a [Flock](https://flock.com/) group"
       end
 
       def self.details
-        [
-          "To obtain the token, create a new [incoming message webhook](https://dev.flock.co/wiki/display/FlockAPI/Incoming+Webhooks)",
-          "in your Flock admin panel."
-        ].join("\n")
+        "To obtain the token, create a new [incoming message webhook](https://dev.flock.co/wiki/display/FlockAPI/Incoming+Webhooks) in your Flock admin panel."
       end
 
       def self.available_options
@@ -55,7 +52,7 @@ module Fastlane
                                        optional: true,
                                        default_value: BASE_URL,
                                        verify_block: proc do |value|
-                                         UI.user_error! 'Invalid https URL' unless value.start_with? 'https://'
+                                         UI.user_error!('Invalid https URL') unless value.start_with?('https://')
                                        end)
         ]
       end

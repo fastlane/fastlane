@@ -19,11 +19,11 @@ module Fastlane
         end
 
         Fastlane::Actions.sh("security default-keychain -s #{original}", log: false) unless original.nil?
-        Fastlane::Actions.sh "security delete-keychain #{keychain_path.shellescape}", log: false
+        Fastlane::Actions.sh("security delete-keychain #{keychain_path.shellescape}", log: false)
       end
 
       def self.details
-        "Keychains can be deleted after being creating with `create_keychain`"
+        "Keychains can be deleted after being created with `create_keychain`"
       end
 
       def self.description

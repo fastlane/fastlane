@@ -5,11 +5,11 @@ describe Gym do
     @project = FastlaneCore::Project.new(@config)
   end
 
-  describe "Project with multiple Schemes and Gymfile" do
+  describe "Project with multiple Schemes and Gymfile", requires_xcodebuild: true do
     before(:each) { Gym.config = @config }
 
     it "#schemes returns all available schemes" do
-      expect(@project.schemes).to eq(["Example", "ExampleTests"])
+      expect(@project.schemes).to contain_exactly("Example", "ExampleTests")
     end
 
     it "executing `gym` will not ask for the scheme" do

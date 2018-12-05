@@ -1,5 +1,5 @@
 describe FastlaneCore::FastlaneFolder do
-  let (:fastfile_name) { "Fastfile" }
+  let(:fastfile_name) { "Fastfile" }
   describe "#path" do
     it "returns the fastlane path if it exists" do
       expect(FastlaneCore::FastlaneFolder.path).to eq("./fastlane/")
@@ -40,6 +40,23 @@ describe FastlaneCore::FastlaneFolder do
           File.delete(fastfile_name)
         end
       end
+    end
+  end
+
+  describe "#swift?" do
+    it "returns false if nil fastfile_path" do
+      allow(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return(nil)
+      expect(FastlaneCore::FastlaneFolder.swift?).to eq(false)
+    end
+
+    it "returns false if not Fastfile" do
+      allow(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("Fastfile")
+      expect(FastlaneCore::FastlaneFolder.swift?).to eq(false)
+    end
+
+    it "returns true if Fastfile.swift" do
+      allow(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("Fastfile.swift")
+      expect(FastlaneCore::FastlaneFolder.swift?).to eq(true)
     end
   end
 end

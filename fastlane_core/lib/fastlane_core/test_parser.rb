@@ -1,3 +1,10 @@
+require 'plist'
+
+require 'fastlane/junit_generator'
+
+require_relative 'ui/ui'
+require_relative 'print_table'
+
 module FastlaneCore
   class TestParser
     attr_accessor :data
@@ -5,41 +12,6 @@ module FastlaneCore
     attr_accessor :file_content
 
     attr_accessor :raw_json
-
-    # Returns a hash with the path being the key, and the value
-    # defining if the tests were successful
-    def self.auto_convert(config)
-      FastlaneCore::PrintTable.print_values(config: config,
-                                             title: "Summary for trainer #{Trainer::VERSION}")
-
-      containing_dir = config[:path]
-      files = Dir["#{containing_dir}/**/Logs/Test/*TestSummaries.plist"]
-      files += Dir["#{containing_dir}/Test/*TestSummaries.plist"]
-      files += Dir["#{containing_dir}/*TestSummaries.plist"]
-      files += Dir[containing_dir] if containing_dir.end_with?(".plist") # if it's the exact path to a plist file
-
-      if files.empty?
-        UI.user_error!("No test result files found in directory '#{containing_dir}', make sure the file name ends with 'TestSummaries.plist'")
-      end
-
-      return_hash = {}
-      files.each do |path|
-        if config[:output_directory]
-          FileUtils.mkdir_p(config[:output_directory])
-          filename = File.basename(path).gsub(".plist", config[:extension])
-          to_path = File.join(config[:output_directory], filename)
-        else
-          to_path = path.gsub(".plist", config[:extension])
-        end
-
-        tp = Trainer::TestParser.new(path)
-        File.write(to_path, tp.to_junit)
-        puts "Successfully generated '#{to_path}'"
-
-        return_hash[to_path] = tp.tests_successful?
-      end
-      return_hash
-    end
 
     def initialize(path)
       path = File.expand_path(path)
@@ -51,16 +23,6 @@ module FastlaneCore
 
       ensure_file_valid!
       parse_content
-    end
-
-    # Returns the JUnit report as String
-    def to_junit
-      JunitGenerator.new(self.data).generate
-    end
-
-    # @return [Bool] were all tests successful? Is false if at least one test failed
-    def tests_successful?
-      self.data.collect { |a| a[:number_of_failures] }.all?(&:zero?)
     end
 
     private

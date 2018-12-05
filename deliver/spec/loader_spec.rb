@@ -2,7 +2,7 @@ require 'deliver/loader'
 require 'fakefs/spec_helpers'
 
 describe Deliver::Loader do
-  include FakeFS::SpecHelpers
+  include(FakeFS::SpecHelpers)
 
   before do
     @languages = FastlaneCore::Languages::ALL_LANGUAGES
@@ -21,7 +21,7 @@ describe Deliver::Loader do
   it 'only returns directories in the specified directory' do
     @folders = Deliver::Loader.language_folders(@root, false)
 
-    expect(@folders.size).not_to eq(0)
+    expect(@folders.size).not_to(eq(0))
     expect(@folders.all? { |f| File.directory?(f) }).to eq(true)
   end
 
@@ -29,7 +29,7 @@ describe Deliver::Loader do
     FileUtils.mkdir(File.join(@root, 'unrelated-dir'))
     @folders = Deliver::Loader.language_folders(@root, true)
 
-    expect(@folders.size).not_to eq(0)
+    expect(@folders.size).not_to(eq(0))
     expected_languages = @languages[1..-1].map(&:downcase).sort
     actual_languages = @folders.map { |f| File.basename(f) }.map(&:downcase).sort
     expect(actual_languages).to eq(expected_languages)
@@ -41,8 +41,17 @@ describe Deliver::Loader do
     FileUtils.mkdir(File.join(@root, 'unrelated-dir'))
     expect do
       @folders = Deliver::Loader.language_folders(@root, false)
-    end.to raise_error FastlaneCore::Interface::FastlaneError, "Unsupported directory name(s) for screenshots/metadata in '#{@root}': unrelated-dir" \
+    end.to raise_error(FastlaneCore::Interface::FastlaneError, "Unsupported directory name(s) for screenshots/metadata in '#{@root}': unrelated-dir" \
                                                                "\nValid directory names are: #{allowed_directory_names}" \
-                                                               "\n\nEnable 'ignore_language_directory_validation' to prevent this validation from happening"
+                                                               "\n\nEnable 'ignore_language_directory_validation' to prevent this validation from happening")
+  end
+
+  it 'allows but ignores the special "fonts" directory used by frameit"' do
+    FileUtils.mkdir(File.join(@root, 'fonts'))
+
+    @folders = Deliver::Loader.language_folders(@root, false)
+
+    basenames = @folders.map { |f| File.basename(f) }
+    expect(basenames.include?('fonts')).to eq(false)
   end
 end

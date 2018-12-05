@@ -14,7 +14,7 @@ describe Fastlane do
         rescue => e
           expect(e.to_s).to eq("Failed to fetch Bots from Xcode Server at https://1.2.3.4, response: 500: .")
         else
-          fail "Error should have been raised"
+          fail("Error should have been raised")
         end
       end
 
@@ -34,7 +34,7 @@ describe Fastlane do
         rescue => e
           expect(e.to_s).to eq("Failed to find any completed integration for Bot \"bot-2\"")
         else
-          fail "Error should have been raised"
+          fail("Error should have been raised")
         end
       end
 
@@ -55,7 +55,7 @@ describe Fastlane do
         rescue => e
           expect(e.to_s).to eq("Specified integration number 3 does not exist.")
         else
-          fail "Error should have been raised"
+          fail("Error should have been raised")
         end
       end
 
@@ -77,7 +77,7 @@ describe Fastlane do
         rescue => e
           expect(e.to_s).to eq("Integration doesn't have any assets (it probably never ran).")
         else
-          fail "Error should have been raised"
+          fail("Error should have been raised")
         end
       end
     end

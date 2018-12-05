@@ -52,7 +52,9 @@ module Fastlane
                                        env_name: "GITHUB_PULL_REQUEST_API_TOKEN",
                                        description: "Personal API Token for GitHub - generate one at https://github.com/settings/tokens",
                                        sensitive: true,
+                                       code_gen_sensitive: true,
                                        default_value: ENV["GITHUB_API_TOKEN"],
+                                       default_value_dynamic: true,
                                        is_string: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :repo,
@@ -74,7 +76,9 @@ module Fastlane
                                        env_name: "GITHUB_PULL_REQUEST_HEAD",
                                        description: "The name of the branch where your changes are implemented (defaults to the current branch name)",
                                        is_string: true,
+                                       code_gen_sensitive: true,
                                        default_value: Actions.git_branch,
+                                       default_value_dynamic: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :base,
                                        env_name: "GITHUB_PULL_REQUEST_BASE",
@@ -84,8 +88,9 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :api_url,
                                        env_name: "GITHUB_PULL_REQUEST_API_URL",
-                                       description: "The URL of Github API - used when the Enterprise (default to `https://api.github.com`)",
+                                       description: "The URL of GitHub API - used when the Enterprise (default to `https://api.github.com`)",
                                        is_string: true,
+                                       code_gen_default_value: 'https://api.github.com',
                                        default_value: 'https://api.github.com',
                                        optional: true)
         ]
@@ -106,13 +111,13 @@ module Fastlane
       def self.example_code
         [
           'create_pull_request(
-            api_token: ENV["GITHUB_TOKEN"],
+            api_token: "secret",                # optional, defaults to ENV["GITHUB_API_TOKEN"]
             repo: "fastlane/fastlane",
             title: "Amazing new feature",
             head: "my-feature",                 # optional, defaults to current branch name
             base: "master",                     # optional, defaults to "master"
             body: "Please pull this in!",       # optional
-            api_url: "http://yourdomain/api/v3" # optional, for Github Enterprise, defaults to "https://api.github.com"
+            api_url: "http://yourdomain/api/v3" # optional, for GitHub Enterprise, defaults to "https://api.github.com"
           )'
         ]
       end

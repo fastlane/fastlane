@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Gym
   class Xcode
     class << self

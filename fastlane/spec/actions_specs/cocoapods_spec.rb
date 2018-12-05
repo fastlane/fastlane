@@ -119,6 +119,53 @@ describe Fastlane do
                                                                               hash_including(error_callback: error_callback))
         }
       end
+
+      it "retries with --repo-update on error if try_repo_update_on_error is true" do
+        allow(Fastlane::Actions).to receive(:sh_control_output) { |command, params|
+          if command == 'bundle exec pod install'
+            error_callback = params[:error_callback]
+            error_callback.call('error')
+          end
+        }
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            try_repo_update_on_error: true
+          )
+        end").runner.execute(:test)
+
+        expect(Fastlane::Actions).to have_received(:sh_control_output).with("bundle exec pod install", hash_including(print_command: true)).ordered
+        expect(Fastlane::Actions).to have_received(:sh_control_output).with("bundle exec pod install --repo-update", hash_including(print_command: true)).ordered
+      end
+
+      it 'doesnt retry with --repo-update if there were no errors' do
+        allow(Fastlane::Actions).to receive(:sh_control_output) {}
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            try_repo_update_on_error: true
+          )
+        end").runner.execute(:test)
+
+        expect(Fastlane::Actions).to have_received(:sh_control_output).with("bundle exec pod install", hash_including(print_command: true)).ordered
+        expect(Fastlane::Actions).to_not(have_received(:sh_control_output).with("bundle exec pod install --repo-update", hash_including(print_command: true)).ordered)
+      end
+
+      it "calls error_callback if retry with --repo-update finished with error" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return('.')
+        allow(Fastlane::Actions).to receive(:sh_control_output) { |_, params|
+          error_callback = params[:error_callback]
+          error_callback.call('error')
+        }
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            cocoapods(
+              try_repo_update_on_error: true,
+              error_callback: lambda { |r| raise r }
+            )
+          end").runner.execute(:test)
+        end.to raise_error('error')
+      end
     end
   end
 end

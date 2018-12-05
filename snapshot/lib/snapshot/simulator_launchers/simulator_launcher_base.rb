@@ -1,3 +1,11 @@
+require 'plist'
+
+require_relative '../module'
+require_relative '../test_command_generator'
+require_relative '../collector'
+require_relative '../fixes/hardware_keyboard_fix'
+require_relative '../fixes/simulator_zoom_fix'
+
 module Snapshot
   class SimulatorLauncherBase
     attr_accessor :collected_errors
@@ -18,7 +26,12 @@ module Snapshot
       @current_number_of_retries_due_to_failing_simulator || 0
     end
 
-    def prepare_for_launch(language, locale, launch_arguments)
+    def prepare_for_launch(device_types, language, locale, launch_arguments)
+      prepare_directories_for_launch(language: language, locale: locale, launch_arguments: launch_arguments)
+      prepare_simulators_for_launch(device_types, language: language, locale: locale)
+    end
+
+    def prepare_directories_for_launch(language: nil, locale: nil, launch_arguments: nil)
       screenshots_path = TestCommandGenerator.derived_data_path
       FileUtils.rm_rf(File.join(screenshots_path, "Logs"))
       FileUtils.rm_rf(screenshots_path) if launcher_config.clean
@@ -30,21 +43,18 @@ module Snapshot
       File.write(File.join(CACHE_DIR, "language.txt"), language)
       File.write(File.join(CACHE_DIR, "locale.txt"), locale || "")
       File.write(File.join(CACHE_DIR, "snapshot-launch_arguments.txt"), launch_arguments.last)
-
-      prepare_simulators_for_launch(language: language, locale: locale)
     end
 
-    def prepare_simulators_for_launch(language: nil, locale: nil)
+    def prepare_simulators_for_launch(device_types, language: nil, locale: nil)
       # Kill and shutdown all currently running simulators so that the following settings
       # changes will be picked up when they are started again.
-      Snapshot.kill_simulator # because of https://github.com/fastlane/snapshot/issues/337
+      Snapshot.kill_simulator # because of https://github.com/fastlane/fastlane/issues/2533
       `xcrun simctl shutdown booted &> /dev/null`
 
       Fixes::SimulatorZoomFix.patch
       Fixes::HardwareKeyboardFix.patch
 
-      devices = launcher_config.devices || []
-      devices.each do |type|
+      device_types.each do |type|
         if launcher_config.erase_simulator || launcher_config.localize_simulator
           erase_simulator(type)
           if launcher_config.localize_simulator
@@ -62,29 +72,33 @@ module Snapshot
       media_type = media_type.to_s
 
       device_types.each do |device_type|
-        UI.verbose "Adding #{media_type}s to #{device_type}..."
+        UI.verbose("Adding #{media_type}s to #{device_type}...")
         device_udid = TestCommandGenerator.device_udid(device_type)
 
-        UI.message "Launch Simulator #{device_type}"
+        UI.message("Launch Simulator #{device_type}")
         Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
 
         paths.each do |path|
-          UI.message "Adding '#{path}'"
-          Helper.backticks("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape} &> /dev/null")
+          UI.message("Adding '#{path}'")
+
+          # Attempting addmedia since addphoto and addvideo are deprecated
+          output = Helper.backticks("xcrun simctl addmedia #{device_udid} #{path.shellescape} &> /dev/null")
+
+          # Run legacy addphoto and addvideo if addmedia isn't found
+          # Output will be empty strin gif it was a success
+          # Output will contain "usage: simctl" if command not found
+          if output.include?('usage: simctl')
+            Helper.backticks("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape} &> /dev/null")
+          end
         end
       end
     end
 
     def uninstall_app(device_type)
-      UI.verbose "Uninstalling app '#{launcher_config.app_identifier}' from #{device_type}..."
       launcher_config.app_identifier ||= UI.input("App Identifier: ")
       device_udid = TestCommandGenerator.device_udid(device_type)
 
-      UI.message "Launch Simulator #{device_type}"
-      Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
-
-      UI.message "Uninstall application #{launcher_config.app_identifier}"
-      Helper.backticks("xcrun simctl uninstall #{device_udid} #{launcher_config.app_identifier} &> /dev/null")
+      FastlaneCore::Simulator.uninstall_app(launcher_config.app_identifier, device_type, device_udid)
     end
 
     def erase_simulator(device_type)
@@ -104,7 +118,7 @@ module Snapshot
           AppleLocale: locale,
           AppleLanguages: [language]
         }
-        UI.message "Localizing #{device_type} (AppleLocale=#{locale} AppleLanguages=[#{language}])"
+        UI.message("Localizing #{device_type} (AppleLocale=#{locale} AppleLanguages=[#{language}])")
         plist_path = "#{ENV['HOME']}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/.GlobalPreferences.plist"
         File.write(plist_path, Plist::Emit.dump(plist))
       end

@@ -31,6 +31,7 @@ module Spaceship
       #     {...}
       #   ]
 
+      # rubocop:disable Require/MissingRequireStatement
       def self.ci?
         if Object.const_defined?("FastlaneCore") && FastlaneCore.const_defined?("Helper")
           return FastlaneCore::Helper.ci?
@@ -44,19 +45,20 @@ module Spaceship
         end
         return true
       end
+      # rubocop:enable Require/MissingRequireStatement
 
-      def select_team
+      def select_team(team_id: nil, team_name: nil)
         teams = client.teams
 
         if teams.count == 0
-          puts "No teams available on the Developer Portal"
-          puts "You must accept an invitation to a team for it to be available"
-          puts "To learn more about teams and how to use them visit https://developer.apple.com/library/ios/documentation/IDEs/Conceptual/AppDistributionGuide/ManagingYourTeam/ManagingYourTeam.html"
+          puts("No teams available on the Developer Portal")
+          puts("You must accept an invitation to a team for it to be available")
+          puts("To learn more about teams and how to use them visit https://developer.apple.com/library/ios/documentation/IDEs/Conceptual/AppDistributionGuide/ManagingYourTeam/ManagingYourTeam.html")
           raise "Your account is in no teams"
         end
 
-        team_id = (ENV['FASTLANE_TEAM_ID'] || '').strip
-        team_name = (ENV['FASTLANE_TEAM_NAME'] || '').strip
+        team_id = (team_id || ENV['FASTLANE_TEAM_ID'] || '').strip
+        team_name = (team_name || ENV['FASTLANE_TEAM_NAME'] || '').strip
 
         if team_id.length > 0
           # User provided a value, let's see if it's valid
@@ -65,7 +67,7 @@ module Spaceship
             return team['teamId'] if team['teamId'].strip == team_id
             return team['teamId'] if team['currentTeamMember']['teamMemberId'].to_s.strip == team_id
           end
-          puts "Couldn't find team with ID '#{team_id}'"
+          puts("Couldn't find team with ID '#{team_id}'")
         end
 
         if team_name.length > 0
@@ -73,27 +75,27 @@ module Spaceship
           teams.each_with_index do |team, i|
             return team['teamId'] if team['name'].strip == team_name
           end
-          puts "Couldn't find team with Name '#{team_name}'"
+          puts("Couldn't find team with Name '#{team_name}'")
         end
 
         return teams[0]['teamId'] if teams.count == 1 # user is just in one team
 
         unless self.class.interactive?
-          puts "Multiple teams found on the Developer Portal, Your Terminal is running in non-interactive mode! Cannot continue from here."
-          puts "Please check that you set FASTLANE_TEAM_ID or FASTLANE_TEAM_NAME to the right value."
-          puts "Available Teams:"
+          puts("Multiple teams found on the Developer Portal, Your Terminal is running in non-interactive mode! Cannot continue from here.")
+          puts("Please check that you set FASTLANE_TEAM_ID or FASTLANE_TEAM_NAME to the right value.")
+          puts("Available Teams:")
           teams.each_with_index do |team, i|
-            puts "#{i + 1}) #{team['teamId']} \"#{team['name']}\" (#{team['type']})"
+            puts("#{i + 1}) #{team['teamId']} \"#{team['name']}\" (#{team['type']})")
           end
-          raise "Multiple Teams found; unable to choose, terminal not ineractive!"
+          raise "Multiple Teams found; unable to choose, terminal not interactive!"
         end
 
         # User Selection
         loop do
           # Multiple teams, user has to select
-          puts "Multiple teams found on the Developer Portal, please enter the number of the team you want to use: "
+          puts("Multiple teams found on the " + "Developer Portal".yellow + ", please enter the number of the team you want to use: ")
           teams.each_with_index do |team, i|
-            puts "#{i + 1}) #{team['teamId']} \"#{team['name']}\" (#{team['type']})"
+            puts("#{i + 1}) #{team['teamId']} \"#{team['name']}\" (#{team['type']})")
           end
 
           selected = ($stdin.gets || '').strip.to_i - 1

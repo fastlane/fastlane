@@ -18,7 +18,7 @@ module Fastlane
         UI.important("  gem '#{gem_name}'")
         UI.error("and run `bundle install`")
 
-        UI.user_error!("You have to install the `#{gem_name}` gem on this machine") unless Helper.is_test?
+        UI.user_error!("You have to install the `#{gem_name}` gem on this machine") unless Helper.test?
       end
       true
     end

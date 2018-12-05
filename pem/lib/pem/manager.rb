@@ -1,5 +1,8 @@
 require 'pathname'
+
 require 'spaceship'
+require 'fastlane_core/print_table'
+require_relative 'module'
 
 module PEM
   # Creates the push profile and stores it in the correct location
@@ -15,13 +18,13 @@ module PEM
 
         if existing_certificate
           remaining_days = (existing_certificate.expires - Time.now) / 60 / 60 / 24
-          UI.message "Existing push notification profile for '#{existing_certificate.owner_name}' is valid for #{remaining_days.round} more days."
+          UI.message("Existing push notification profile for '#{existing_certificate.owner_name}' is valid for #{remaining_days.round} more days.")
           if remaining_days > PEM.config[:active_days_limit]
             if PEM.config[:force]
-              UI.success "You already have an existing push certificate, but a new one will be created since the --force option has been set."
+              UI.success("You already have an existing push certificate, but a new one will be created since the --force option has been set.")
             else
-              UI.success "You already have a push certificate, which is active for more than #{PEM.config[:active_days_limit]} more days. No need to create a new one"
-              UI.success "If you still want to create a new one, use the --force option when running PEM."
+              UI.success("You already have a push certificate, which is active for more than #{PEM.config[:active_days_limit]} more days. No need to create a new one")
+              UI.success("If you still want to create a new one, use the --force option when running PEM.")
               return false
             end
           end
@@ -31,23 +34,23 @@ module PEM
       end
 
       def login
-        UI.message "Starting login with user '#{PEM.config[:username]}'"
+        UI.message("Starting login with user '#{PEM.config[:username]}'")
         Spaceship.login(PEM.config[:username], nil)
         Spaceship.client.select_team
-        UI.message "Successfully logged in"
+        UI.message("Successfully logged in")
       end
 
       def create_certificate
-        UI.important "Creating a new push certificate for app '#{PEM.config[:app_identifier]}'."
+        UI.important("Creating a new push certificate for app '#{PEM.config[:app_identifier]}'.")
 
         csr, pkey = Spaceship.certificate.create_certificate_signing_request
 
         begin
           cert = certificate.create!(csr: csr, bundle_id: PEM.config[:app_identifier])
         rescue => ex
-          if ex.to_s.include? "You already have a current"
+          if ex.to_s.include?("You already have a current")
             # That's the most common failure probably
-            UI.message ex.to_s
+            UI.message(ex.to_s)
             UI.user_error!("You already have 2 active push profiles for this application/environment. You'll need to revoke an old certificate to make room for a new one")
           else
             raise ex
@@ -59,8 +62,8 @@ module PEM
         filename_base = PEM.config[:pem_name] || "#{certificate_type}_#{PEM.config[:app_identifier]}"
         filename_base = File.basename(filename_base, ".pem") # strip off the .pem if it was provided.
 
-        output_path = PEM.config[:output_path]
-        FileUtils.mkdir_p(File.expand_path(output_path))
+        output_path = File.expand_path(PEM.config[:output_path])
+        FileUtils.mkdir_p(output_path)
 
         if PEM.config[:save_private_key]
           private_key_path = File.join(output_path, "#{filename_base}.pkey")

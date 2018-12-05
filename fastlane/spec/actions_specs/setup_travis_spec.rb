@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Setup Travis Integration" do
-      let (:tmp_keychain_name) { "fastlane_tmp_keychain" }
+      let(:tmp_keychain_name) { "fastlane_tmp_keychain" }
       it "doesn't work outside CI" do
         stub_const("ENV", {})
 

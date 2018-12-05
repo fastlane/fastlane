@@ -1,12 +1,15 @@
-require "commander"
-require "fastlane_core"
+require 'commander'
+
+require 'fastlane_core/configuration/configuration'
+require_relative 'module'
+require_relative 'manager'
+require_relative 'options'
 
 HighLine.track_eof = false
 
 module Gym
   class CommandsGenerator
     include Commander::Methods
-    UI = FastlaneCore::UI
 
     def self.start
       new.run
@@ -24,7 +27,7 @@ module Gym
       program :description, Gym::DESCRIPTION
       program :help, "Author", "Felix Krause <gym@krausefx.com>"
       program :help, "Website", "https://fastlane.tools"
-      program :help, "GitHub", "https://github.com/fastlane/fastlane/tree/master/gym"
+      program :help, "Documentation", "https://docs.fastlane.tools/actions/gym/"
       program :help_formatter, :compact
 
       global_option("--verbose") { FastlaneCore::Globals.verbose = true }
@@ -45,17 +48,29 @@ module Gym
       command :init do |c|
         c.syntax = "fastlane gym init"
         c.description = "Creates a new Gymfile for you"
-        c.action do |_args, options|
+        c.action do |args, options|
           containing = FastlaneCore::Helper.fastlane_enabled_folder_path
           path = File.join(containing, Gym.gymfile_name)
-          UI.user_error! "Gymfile already exists" if File.exist?(path)
-          template = File.read("#{Gym::ROOT}/lib/assets/GymfileTemplate")
+          UI.user_error!("Gymfile already exists") if File.exist?(path)
+
+          is_swift_fastfile = args.include?("swift")
+          if is_swift_fastfile
+            path = File.join(containing, Gym.gymfile_name + ".swift")
+            UI.user_error!("Gymfile.swift already exists") if File.exist?(path)
+          end
+
+          if is_swift_fastfile
+            template = File.read("#{Gym::ROOT}/lib/assets/GymfileTemplate.swift")
+          else
+            template = File.read("#{Gym::ROOT}/lib/assets/GymfileTemplate")
+          end
+
           File.write(path, template)
-          UI.success "Successfully created '#{path}'. Open the file using a code editor."
+          UI.success("Successfully created '#{path}'. Open the file using a code editor.")
         end
       end
 
-      default_command :build
+      default_command(:build)
 
       run!
     end

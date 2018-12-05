@@ -2,7 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "xcversion integration" do
       after(:each) do
-        ENV.delete "DEVELOPER_DIR"
+        ENV.delete("DEVELOPER_DIR")
       end
 
       context "when no params are passed" do

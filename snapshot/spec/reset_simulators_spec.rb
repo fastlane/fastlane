@@ -20,17 +20,43 @@ describe Snapshot::ResetSimulators do
     ]
   end
 
+  let(:runtimes) do
+    [
+      ["iOS 10.3", "com.apple.CoreSimulator.SimRuntime.iOS-10-3"],
+      ["tvOS 10.2", "com.apple.CoreSimulator.SimRuntime.tvOS-10-2"],
+      ["watchOS 3.2", "com.apple.CoreSimulator.SimRuntime.watchOS-3-2"]
+    ]
+  end
+
   let(:all_devices) do
     usable_devices + unusable_devices
   end
 
   let(:fixture_data) { File.read('snapshot/spec/fixtures/xcrun-simctl-list-devices.txt') }
 
+  let(:fixture_runtimes_xcode8) { File.read('snapshot/spec/fixtures/xcrun-simctl-list-runtimes-Xcode8.txt') }
+
+  let(:fixture_runtimes_xcode9) { File.read('snapshot/spec/fixtures/xcrun-simctl-list-runtimes-Xcode9.txt') }
+
   describe '#devices' do
     it 'should read simctl output into arrays of device info' do
       expect(FastlaneCore::Helper).to receive(:backticks).with(/xcrun simctl list devices/, print: FastlaneCore::Globals.verbose?).and_return(fixture_data)
 
       expect(Snapshot::ResetSimulators.devices).to eq(all_devices)
+    end
+  end
+
+  describe '#clear_everything' do
+    describe 'runtimes' do
+      it "should find runtimes that are available for Xcode 8" do
+        expect(FastlaneCore::Helper).to receive(:backticks).with(/xcrun simctl list runtimes/, print: FastlaneCore::Globals.verbose?).and_return(fixture_runtimes_xcode8)
+        expect(Snapshot::ResetSimulators.runtimes).to eq(runtimes)
+      end
+
+      it "should find runtimes that are available for Xcode 9" do
+        expect(FastlaneCore::Helper).to receive(:backticks).with(/xcrun simctl list runtimes/, print: FastlaneCore::Globals.verbose?).and_return(fixture_runtimes_xcode9)
+        expect(Snapshot::ResetSimulators.runtimes).to eq(runtimes)
+      end
     end
   end
 
@@ -62,7 +88,7 @@ describe Snapshot::ResetSimulators do
           ["    Apple Watch - 42mm (C8250DD7-8C4E-4803-838A-731B42785262) (Shutdown)", "Apple Watch - 42mm", "C8250DD7-8C4E-4803-838A-731B42785262"]
         ]
         expect(Snapshot::ResetSimulators).to receive(:devices).and_return(mocked_devices)
-        expect(FastlaneCore::Helper).not_to receive(:backticks)
+        expect(FastlaneCore::Helper).not_to(receive(:backticks))
 
         Snapshot::ResetSimulators.make_phone_watch_pair
       end
@@ -76,7 +102,7 @@ describe Snapshot::ResetSimulators do
           ["    Apple TV 1080p (D7D591A8-17D2-47B4-8D2A-AFAFA28874C9) (Shutdown)", "Apple TV 1080p", "D7D591A8-17D2-47B4-8D2A-AFAFA28874C9"]
         ]
         expect(Snapshot::ResetSimulators).to receive(:devices).and_return(mocked_devices)
-        expect(FastlaneCore::Helper).not_to receive(:backticks)
+        expect(FastlaneCore::Helper).not_to(receive(:backticks))
 
         Snapshot::ResetSimulators.make_phone_watch_pair
       end

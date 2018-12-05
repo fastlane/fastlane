@@ -1,4 +1,7 @@
 require 'shellwords'
+require 'fastlane_core/globals'
+
+require_relative 'module'
 
 module Sigh
   # Resigns an existing ipa file
@@ -55,14 +58,14 @@ module Sigh
         ipa.shellescape # Output path must always be last argument
       ].join(' ')
 
-      puts command.magenta
-      puts `#{command}`
+      puts(command.magenta)
+      puts(`#{command}`)
 
       if $?.to_i == 0
-        UI.success "Successfully signed #{ipa}!"
+        UI.success("Successfully signed #{ipa}!")
         true
       else
-        UI.error "Something went wrong while code signing #{ipa}"
+        UI.error("Something went wrong while code signing #{ipa}")
         false
       end
     end
@@ -81,7 +84,7 @@ module Sigh
       keychain_path = options.keychain_path || nil
 
       if options.provisioning_name
-        UI.important "The provisioning_name (-n) option is not applicable to resign. You should use provisioning_profile (-p) instead"
+        UI.important("The provisioning_name (-n) option is not applicable to resign. You should use provisioning_profile (-p) instead")
       end
 
       return ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path
@@ -101,7 +104,7 @@ module Sigh
 
     def find_signing_identity(signing_identity)
       until (signing_identity = sha1_for_signing_identity(signing_identity))
-        UI.error "Couldn't find signing identity '#{signing_identity}'."
+        UI.error("Couldn't find signing identity '#{signing_identity}'.")
         signing_identity = ask_for_signing_identity
       end
 
@@ -157,7 +160,7 @@ module Sigh
     end
 
     def print_available_identities
-      UI.message "Available identities: \n\t#{installed_identity_descriptions.join("\n\t")}\n"
+      UI.message("Available identities: \n\t#{installed_identity_descriptions.join("\n\t")}\n")
     end
 
     def ask_for_signing_identity

@@ -1,10 +1,27 @@
+require 'pathname'
+
 module Fastlane
   module Actions
+    module SharedValues
+      MODIFIED_FILES = :MODIFIED_FILES
+    end
+
+    class << self
+      # Add an array of paths relative to the repo root or absolute paths that have been modified by
+      # an action.
+      #
+      # :files: An array of paths relative to the repo root or absolute paths
+      def add_modified_files(files)
+        modified_files = lane_context[SharedValues::MODIFIED_FILES] || Set.new
+        modified_files += files
+        lane_context[SharedValues::MODIFIED_FILES] = modified_files
+      end
+    end
+
     # Commits the current changes in the repo as a version bump, checking to make sure only files which contain version information have been changed.
     class CommitVersionBumpAction < Action
       def self.run(params)
         require 'xcodeproj'
-        require 'pathname'
         require 'set'
         require 'shellwords'
 
@@ -61,14 +78,17 @@ module Fastlane
           end
         end
 
+        extra_files = params[:include]
+        extra_files += modified_files_relative_to_repo_root(repo_path)
+
         # create our list of files that we expect to have changed, they should all be relative to the project root, which should be equal to the git workdir root
-        expected_changed_files = []
+        expected_changed_files = extra_files
         expected_changed_files << pbxproj_path
         expected_changed_files << info_plist_files
 
         if params[:settings]
           settings_plists_from_param(params[:settings]).each do |file|
-            settings_file_pathname = Pathname.new settings_bundle_file_path(project, file)
+            settings_file_pathname = Pathname.new(settings_bundle_file_path(project, file))
             expected_changed_files << settings_file_pathname.relative_path_from(repo_pathname).to_s
           end
         end
@@ -82,7 +102,7 @@ module Fastlane
         UI.user_error!("No file changes picked up. Make sure you run the `increment_build_number` action first.") if git_dirty_files.empty?
 
         # check if the files changed are the ones we expected to change (these should be only the files that have version info in them)
-        changed_files_as_expected = (Set.new(git_dirty_files.map(&:downcase)).subset? Set.new(expected_changed_files.map(&:downcase)))
+        changed_files_as_expected = Set.new(git_dirty_files.map(&:downcase)).subset?(Set.new(expected_changed_files.map(&:downcase)))
         unless changed_files_as_expected
           unless params[:force]
             error = [
@@ -135,7 +155,7 @@ module Fastlane
                                        description: "The path to your project file (Not the workspace). If you have only one, this is optional",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with? ".xcworkspace"
+                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
                                          UI.user_error!("Could not find Xcode project") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :force,
@@ -154,23 +174,28 @@ module Fastlane
                                        description: "A regular expression used to filter matched plist files to be modified",
                                        optional: true,
                                        default_value: nil,
-                                       is_string: false)
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :include,
+                                       description: "A list of extra files to be included in the version bump (string array or comma-separated string)",
+                                       optional: true,
+                                       default_value: [],
+                                       type: Array)
         ]
       end
 
       def self.details
+        list = <<-LIST.markdown_list
+          All `.plist` files
+          The `.xcodeproj/project.pbxproj` file
+        LIST
+
         [
           "This action will create a 'Version Bump' commit in your repo. Useful in conjunction with `increment_build_number`.",
-          "",
-          "It checks the repo to make sure that only the relevant files have changed, these are the files that `increment_build_number` (`agvtool`) touches:",
-          "- All .plist files",
-          "- The `.xcodeproj/project.pbxproj` file",
-          "",
+          "It checks the repo to make sure that only the relevant files have changed. These are the files that `increment_build_number` (`agvtool`) touches:".markdown_preserve_newlines,
+          list,
           "Then commits those files to the repo.",
-          "",
-          "Customise the message with the `:message` option, defaults to 'Version Bump'",
-          "",
-          "If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the `clean_build_artifacts` action to clean those temporary files up before running this action."
+          "Customize the message with the `:message` option. It defaults to 'Version Bump'.",
+          "If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the [clean_build_artifacts](https://docs.fastlane.tools/actions/clean_build_artifacts/) action to clean those temporary files up before running this action."
         ].join("\n")
       end
 
@@ -179,7 +204,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code
@@ -197,6 +222,12 @@ module Fastlane
           )',
           'commit_version_bump(
             settings: %w[About.plist Root.plist] # Include more than one plist from Settings.bundle
+          )',
+          'commit_version_bump(
+            include: %w[package.json custom.cfg] # include other updated files as part of the version bump
+          )',
+          'commit_version_bump(
+            ignore: /OtherProject/ # ignore files matching a regular expression
           )'
         ]
       end
@@ -207,23 +238,34 @@ module Fastlane
 
       class << self
         def settings_plists_from_param(param)
-          if param.kind_of? String
-            # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: "About.plist"
+          if param.kind_of?(String)
+            # commit_version_bump settings: "About.plist"
             return [param]
-          elsif param.kind_of? Array
-            # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: [ "Root.plist", "About.plist" ]
+          elsif param.kind_of?(Array)
+            # commit_version_bump settings: ["Root.plist", "About.plist"]
             return param
+          else
+            # commit_version_bump settings: true # Root.plist
+            return ["Root.plist"]
           end
-
-          # commit_version_bump xcodeproj: "MyProject.xcodeproj", settings: true # Root.plist
-          ["Root.plist"]
         end
 
         def settings_bundle_file_path(project, settings_file_name)
           settings_bundle = project.files.find { |f| f.path =~ /Settings.bundle/ }
           raise "No Settings.bundle in project" if settings_bundle.nil?
 
-          File.join(settings_bundle.real_path, settings_file_name)
+          return File.join(settings_bundle.real_path, settings_file_name)
+        end
+
+        def modified_files_relative_to_repo_root(repo_root)
+          return [] if Actions.lane_context[SharedValues::MODIFIED_FILES].nil?
+
+          root_pathname = Pathname.new(repo_root)
+          all_modified_files = Actions.lane_context[SharedValues::MODIFIED_FILES].map do |path|
+            next path unless path =~ %r{^/}
+            Pathname.new(path).relative_path_from(root_pathname).to_s
+          end
+          return all_modified_files.uniq
         end
       end
     end

@@ -1,18 +1,23 @@
+require 'spaceship'
+
+require_relative 'manager'
+require_relative 'module'
+
 module Sigh
   class DownloadAll
     # Download all valid provisioning profiles
     def download_all(download_xcode_profiles: false)
-      UI.message "Starting login with user '#{Sigh.config[:username]}'"
+      UI.message("Starting login with user '#{Sigh.config[:username]}'")
       Spaceship.login(Sigh.config[:username], nil)
       Spaceship.select_team
-      UI.message "Successfully logged in"
+      UI.message("Successfully logged in")
 
       Spaceship.provisioning_profile.all(xcode: download_xcode_profiles).each do |profile|
         if profile.valid?
-          UI.message "Downloading profile '#{profile.name}'..."
+          UI.message("Downloading profile '#{profile.name}'...")
           download_profile(profile)
         else
-          UI.important "Skipping invalid/expired profile '#{profile.name}'"
+          UI.important("Skipping invalid/expired profile '#{profile.name}'")
         end
       end
 

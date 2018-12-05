@@ -32,14 +32,12 @@ module Fastlane
           UI.user_error!("Failed to run Appium spec. status code: #{status}")
         end
       ensure
-        Actions.sh "kill #{appium_pid}" if appium_pid
+        Actions.sh("kill #{appium_pid}") if appium_pid
       end
 
       def self.invoke_appium_server(params)
         appium = detect_appium(params)
-        fork do
-          Process.exec("#{appium} -a #{params[:host]} -p #{params[:port]}")
-        end
+        Process.spawn("#{appium} -a #{params[:host]} -p #{params[:port]}")
       end
 
       def self.detect_appium(params)
@@ -72,7 +70,7 @@ module Fastlane
           if count * 5 > INVOKE_TIMEOUT
             UI.user_error!("Invoke Appium server timed out")
           end
-          sleep 5
+          sleep(5)
         end
       end
 
@@ -84,10 +82,13 @@ module Fastlane
             caps[:autoAcceptAlerts] ||= true
             caps[:app] = params[:app_path]
 
+            appium_lib = params[:appium_lib] || {}
+
             @driver = Appium::Driver.new(
               caps: caps,
               server_url: params[:host],
-              port: params[:port]
+              port: params[:port],
+              appium_lib: appium_lib
             ).start_driver
             Appium.promote_appium_methods(RSpec::Core::ExampleGroup)
           end
@@ -158,6 +159,15 @@ module Fastlane
             env_name: 'FL_APPIUM_CAPS',
             description: 'Hash of caps for Appium::Driver',
             is_string: false,
+            type: Hash,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :appium_lib,
+            env_name: 'FL_APPIUM_LIB',
+            description: 'Hash of appium_lib for Appium::Driver',
+            is_string: false,
+            type: Hash,
             optional: true
           )
         ]
@@ -168,7 +178,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :android].include?(platform)
       end
 
       def self.category
@@ -184,6 +194,9 @@ module Fastlane
             caps: {
               versionNumber: "9.1",
               deviceName:    "iPhone 6"
+            },
+            appium_lib: {
+              wait: 10
             }
           )'
         ]

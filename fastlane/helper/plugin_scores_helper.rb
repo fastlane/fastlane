@@ -2,6 +2,7 @@ module Fastlane
   module Helper
     module PluginScoresHelper
       require 'faraday'
+      require 'yaml'
 
       class FastlanePluginRating
         attr_accessor :key
@@ -15,6 +16,20 @@ module Fastlane
         end
       end
 
+      class FastlanePluginAction
+        attr_accessor :name
+        attr_accessor :category
+        attr_accessor :description
+        attr_accessor :details
+
+        def initialize(name: nil, category: nil, description: nil, details: nil)
+          self.name = name
+          self.category = category
+          self.description = description
+          self.details = details
+        end
+      end
+
       class FastlanePluginScore
         attr_accessor :name
         attr_accessor :downloads
@@ -23,8 +38,9 @@ module Fastlane
         attr_accessor :raw_hash
 
         attr_accessor :data
+        attr_accessor :cache
 
-        def initialize(hash)
+        def initialize(hash, cache_path)
           if ENV["GITHUB_USER_NAME"].to_s.length == 0 || ENV["GITHUB_API_TOKEN"].to_s.length == 0
             raise "Missing ENV variables GITHUB_USER_NAME and/or GITHUB_API_TOKEN"
           end
@@ -44,12 +60,28 @@ module Fastlane
             has_github_page: has_github_page,
             has_mit_license: includes_license?("MIT"),
             has_gnu_license: includes_license?("GNU") || includes_license?("GPL"),
-            major_release: Gem::Version.new(hash["version"]) >= Gem::Version.new("1.0.0")
+            major_release: Gem::Version.new(hash["version"]) >= Gem::Version.new("1.0.0"),
+            actions: [],
+            sha: hash["sha"]
           }
 
+          if File.exist?(cache_path)
+            self.cache = YAML.load_file(cache_path)
+          else
+            self.cache = {}
+          end
+
           if has_github_page
-            self.append_git_data
-            self.append_github_data
+            is_cached = self.load_cache
+
+            unless is_cached
+              self.append_git_data
+              self.append_github_data
+            end
+          end
+
+          File.open(cache_path, 'w') do |file|
+            file.write(self.cache.to_yaml)
           end
 
           self.data[:overall_score] = 0
@@ -124,11 +156,40 @@ module Fastlane
           self.raw_hash["licenses"].any? { |l| l.include?(license) }
         end
 
+        def load_cache
+          if self.cache.key?(self.name)
+            cache_data = self.cache[self.name]
+          else
+            cache_data = {}
+          end
+
+          self.cache[self.name] = cache_data
+
+          if self.data[:sha] == cache_data[:sha]
+            self.data[:initial_commit] = cache_data[:initial_commit]
+            self.data[:age_in_days] = (DateTime.now - self.data[:initial_commit]).to_i
+            self.data[:readme_score] = cache_data[:readme_score]
+            self.data[:tests] = cache_data[:tests]
+            self.data[:actions] = cache_data[:actions]
+            self.data[:sha] = cache_data[:sha]
+
+            self.data[:github_stars] = cache_data[:github_stars]
+            self.data[:github_subscribers] = cache_data[:github_subscribers]
+            self.data[:github_issues] = cache_data[:github_issues]
+            self.data[:github_forks] = cache_data[:github_forks]
+            self.data[:github_contributors] = cache_data[:github_contributors]
+
+            return true
+          end
+
+          return false
+        end
+
         # Everything that needs to be fetched from the content of the Git repo
         def append_git_data
           Dir.mktmpdir("fastlane-plugin") do |tmp|
             clone_folder = File.join(tmp, self.name)
-            `git clone '#{self.homepage}' '#{clone_folder}'`
+            `GIT_TERMINAL_PROMPT=0 git clone #{self.homepage.shellescape} #{clone_folder.shellescape}`
 
             break unless File.directory?(clone_folder)
 
@@ -154,6 +215,21 @@ module Fastlane
                 tests_count += File.read(spec_file).scan(/ it /).count
               end
               self.data[:tests] = tests_count
+
+              actions = Dir["**/actions/*.rb"].map do |action_file|
+                FastlaneActionFileParser.new.parse_file(action_file)
+              end
+              # Result of the above is an array of arrays, this merges all of them into data[:actions]
+              self.data[:actions] = actions.flatten
+
+              cache_data = self.cache[self.name]
+
+              cache_data[:initial_commit] = self.data[:initial_commit]
+              cache_data[:age_in_days] = self.data[:age_in_days]
+              cache_data[:readme_score] = self.data[:readme_score]
+              cache_data[:tests] = self.data[:tests]
+              cache_data[:actions] = self.data[:actions]
+              cache_data[:sha] = self.data[:sha]
             end
           end
         end
@@ -162,25 +238,25 @@ module Fastlane
         def append_github_data
           # e.g. https://api.github.com/repos/fastlane/fastlane
           url = self.homepage.gsub("github.com/", "api.github.com/repos/")
-          url = url[0..-2] if url.end_with?("/") # what is this, 2001? We got to remove the trailing `/` otherwise Github will fail
-          puts "Fetching #{url}"
+          url = url[0..-2] if url.end_with?("/") # what is this, 2001? We got to remove the trailing `/` otherwise GitHub will fail
+          puts("Fetching #{url}")
           conn = Faraday.new(url: url) do |builder|
             # The order below IS important
             # See bug here https://github.com/lostisland/faraday_middleware/issues/105
-            builder.use FaradayMiddleware::FollowRedirects
-            builder.adapter Faraday.default_adapter
+            builder.use(FaradayMiddleware::FollowRedirects)
+            builder.adapter(Faraday.default_adapter)
           end
           conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
           response = conn.get('')
           repo_details = JSON.parse(response.body)
 
           url += "/stats/contributors"
-          puts "Fetching #{url}"
+          puts("Fetching #{url}")
           conn = Faraday.new(url: url) do |builder|
             # The order below IS important
             # See bug here https://github.com/lostisland/faraday_middleware/issues/105
-            builder.use FaradayMiddleware::FollowRedirects
-            builder.adapter Faraday.default_adapter
+            builder.use(FaradayMiddleware::FollowRedirects)
+            builder.adapter(Faraday.default_adapter)
           end
 
           conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
@@ -192,13 +268,136 @@ module Fastlane
           self.data[:github_issues] = repo_details["open_issues_count"].to_i
           self.data[:github_forks] = repo_details["forks_count"].to_i
           self.data[:github_contributors] = contributor_details.count
+
+          cache_data = self.cache[self.name]
+
+          cache_data[:github_stars] = self.data[:github_stars]
+          cache_data[:github_subscribers] = self.data[:github_subscribers]
+          cache_data[:github_issues] = self.data[:github_issues]
+          cache_data[:github_forks] = self.data[:github_forks]
+          cache_data[:github_contributors] = self.data[:github_contributors]
         rescue => ex
-          puts "error fetching #{self}"
-          puts self.homepage
-          puts "Chances are high you exceeded the GitHub API limit"
-          puts ex
-          puts ex.backtrace
+          puts("error fetching #{self}")
+          puts(self.homepage)
+          puts("Chances are high you exceeded the GitHub API limit")
+          puts(ex)
+          puts(ex.backtrace)
           raise ex
+        end
+      end
+
+      class FastlaneActionFileParser
+        attr_accessor :state
+
+        def initialize
+          self.state = []
+        end
+
+        # Parses the file to find all included actions
+        def parse_file(file, debug_state: false)
+          lines = File.read(file).lines
+          actions = []
+
+          # Class state information
+          name = nil
+          description = nil
+          category = nil
+          details = nil
+          # Method state information
+          last_method_name = nil
+          last_string_statement = nil
+
+          lines.each do |line|
+            case self.state.last
+            when nil
+              name = action_name_from_line(line)
+              self.state << :in_class if is_class?(line)
+            when :in_class
+              if (method_name = method_name_from_line(line))
+                last_method_name = method_name
+                self.state << :in_method
+              end
+              if is_end?(line)
+                self.state.pop
+                # Make sure to skip helper classes where the name is nil
+                actions << FastlanePluginAction.new(name: name.fastlane_underscore, category: category, description: description, details: details) unless name.nil?
+                name = category = description = details = nil
+              end
+            when :in_method
+              if (string_statement = string_statement_from_line(line))
+                last_string_statement = string_statement
+              end
+              if is_block?(line)
+                self.state << :in_block
+              end
+              if is_end?(line)
+                category = last_string_statement if last_method_name == "category"
+                description = last_string_statement if last_method_name == "description"
+                details = last_string_statement if last_method_name == "details"
+                last_method_name = last_string_statement = nil
+                self.state.pop
+              end
+            when :in_block
+              if is_block?(line)
+                self.state << :in_block
+              end
+
+              self.state.pop if is_end?(line)
+            end
+            next unless debug_state
+            puts("Current line: #{line}")
+            puts("Full State: #{state}")
+            puts("Current action name: #{name}, category: #{category}, description: \"#{description}\", details: \"#{details}\"")
+            puts("Last string statement: #{last_string_statement}, last method name: #{last_method_name}")
+          end
+          actions
+        end
+
+        def is_block?(line)
+          # Matches beginning block statement from the list of keywords
+          # `do` has to be handled separately because it can be preceded by a function call
+          !!line.match(/^(?:[\s\w]*=)?\s*(if|unless|case|while|loop|for|until|begin)/) \
+          || !!line.match(/^(?:[\s\w]*=)?\s*.*\s+do\s*(?:\|.*\|)?\s*(?:#.*)?$/)
+        end
+
+        def is_end?(line)
+          !!line.match(/^\s*end\s*/)
+        end
+
+        def is_class?(line)
+          !!line.match(/^\s*class\s+/)
+        end
+
+        def action_name_from_line(line)
+          # matches `class <action name>Action < Action` and returns action_name
+          line.match(/^\s*class\s+(\w+)Action\s+<\s+Action\s*(?:#.*)?$/) do |matching|
+            matching.captures.first
+          end
+        end
+
+        def method_name_from_line(line)
+          # matches `def <method>`, strips self. if is there, returns <method>
+          line.match(/^\s*def\s+(?:self\.)?(\w+)/) do |matching|
+            matching.captures.first
+          end
+        end
+
+        def string_statement_from_line(line)
+          # All the ways ruby can represent single-line strings
+          regex = [
+            "[\"]([^\"]+)\"",               # Matches strings with "
+            "[\']([^\']+)\'",               # Matches strings with '
+            ":([@$_a-zA-Z]\\w*[!=?\\w])",   # Matches `:<symbol>`
+            "%(?:[Q]?|[qs])(?:#{[           # Matches `%Q`, `%q`, `%s` and just `%`, with subexpression:
+              '([\\W_])([^\\4]*)\\4',       # Matches <symbol><string><symbol>, returns <string>
+              '\[([^\\]]*)\]',              # Matches [<string>]
+              '\(([^\\)]*)\)',              # Matches (<string>)
+              '\{([^\\]]*)\}'               # Matches {<string>}
+            ].join('|')})"
+          ].join('|')
+          line.match(regex) do |matching|
+            matching.captures.compact.last
+          end
         end
       end
     end

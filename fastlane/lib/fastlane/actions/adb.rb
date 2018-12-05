@@ -19,9 +19,7 @@ module Fastlane
       end
 
       def self.details
-        [
-          "see adb --help for more details"
-        ].join("\n")
+        "see adb --help for more details"
       end
 
       def self.available_options
@@ -39,7 +37,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :adb_path,
                                        env_name: "FL_ADB_PATH",
                                        optional: true,
-                                       description: "The path to your `adb` binary",
+                                       description: "The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT environment variable is set)",
                                        is_string: true,
                                        default_value: "adb")
         ]
@@ -62,6 +60,10 @@ module Fastlane
 
       def self.return_value
         "The output of the adb command"
+      end
+
+      def self.return_type
+        :string
       end
 
       def self.authors

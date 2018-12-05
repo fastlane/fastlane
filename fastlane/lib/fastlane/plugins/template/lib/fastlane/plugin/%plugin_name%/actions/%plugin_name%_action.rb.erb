@@ -1,3 +1,6 @@
+require 'fastlane/action'
+require_relative '../helper/<%= plugin_name %>_helper'
+
 module Fastlane
   module Actions
     class <%= plugin_name.fastlane_class %>Action < Action
@@ -34,7 +37,7 @@ module Fastlane
 
       def self.is_supported?(platform)
         # Adjust this if your plugin only works for a particular platform (iOS vs. Android, for example)
-        # See: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md
+        # See: https://docs.fastlane.tools/advanced/#control-configuration-by-lane-and-by-platform
         #
         # [:ios, :mac, :android].include?(platform)
         true

@@ -1,13 +1,13 @@
 # For more information about this configuration visit
-# https://github.com/fastlane/fastlane/tree/master/gym#gymfile
+# https://docs.fastlane.tools/actions/gym/#gymfile
 
 # In general, you can use the options available
 # fastlane gym --help
 
 # Remove the # in front of the line to enable the option
 
-# scheme "Example"
+# scheme("Example")
 
-# sdk "iphoneos9.0"
+# sdk("iphoneos9.0")
 
-output_directory "./"
+output_directory("./")

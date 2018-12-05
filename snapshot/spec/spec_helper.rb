@@ -17,5 +17,5 @@ Information about project "Example":
         ExampleUITests
         ExampleMacOS
 EOS
-  allow_any_instance_of(FastlaneCore::Project).to receive(:raw_info).and_return fake_result
+  allow_any_instance_of(FastlaneCore::Project).to receive(:raw_info).and_return(fake_result)
 end

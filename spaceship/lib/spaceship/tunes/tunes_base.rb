@@ -1,3 +1,5 @@
+require_relative '../base'
+
 module Spaceship
   module Tunes
     class TunesBase < Spaceship::Base

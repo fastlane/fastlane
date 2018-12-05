@@ -100,7 +100,7 @@ describe Spaceship::Portal::App do
         { 'enabledFeatures' => ["inAppPurchase"] }
       }
       app = Spaceship::Portal::App.create!(bundle_id: 'tools.fastlane.spaceship.some-explicit-app', name: 'Production App', enable_services: { push_notification: "off" })
-      expect(app.enable_services).not_to include("push")
+      expect(app.enable_services).not_to(include("push"))
     end
 
     it 'creates an app id with a wildcard bundle_id' do

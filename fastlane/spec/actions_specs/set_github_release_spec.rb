@@ -66,7 +66,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to_not be_nil
+        expect(result).to_not(be_nil)
       end
 
       it "prefers an explicit description over a generated changelog" do
@@ -89,7 +89,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to_not be_nil
+        expect(result).to_not(be_nil)
       end
     end
   end

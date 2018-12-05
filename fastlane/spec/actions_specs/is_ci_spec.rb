@@ -6,7 +6,7 @@ describe Fastlane do
           is_ci
         end").runner.execute(:test)
 
-        expect(result).to eq(FastlaneCore::Helper.is_ci?)
+        expect(result).to eq(FastlaneCore::Helper.ci?)
       end
 
       it "works with a ? in the end" do
@@ -14,7 +14,7 @@ describe Fastlane do
           is_ci?
         end").runner.execute(:test)
 
-        expect(result).to eq(FastlaneCore::Helper.is_ci?)
+        expect(result).to eq(FastlaneCore::Helper.ci?)
       end
     end
   end

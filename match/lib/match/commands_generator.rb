@@ -1,13 +1,22 @@
 require 'commander'
-require 'fastlane_core'
-require 'fastlane/version'
+
+require 'fastlane_core/configuration/configuration'
+require_relative 'module'
+
+require_relative 'nuke'
+require_relative 'change_password'
+require_relative 'setup'
+require_relative 'runner'
+require_relative 'options'
+
+require_relative 'storage'
+require_relative 'encryption'
 
 HighLine.track_eof = false
 
 module Match
   class CommandsGenerator
     include Commander::Methods
-    UI = FastlaneCore::UI
 
     def self.start
       self.new.run
@@ -19,7 +28,7 @@ module Match
       program :description, Match::DESCRIPTION
       program :help, 'Author', 'Felix Krause <match@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/match#readme'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/match/'
       program :help_formatter, :compact
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
@@ -62,14 +71,20 @@ module Match
         c.description = 'Create the Matchfile for you'
         c.action do |args, options|
           containing = FastlaneCore::Helper.fastlane_enabled_folder_path
-          path = File.join(containing, "Matchfile")
+          is_swift_fastfile = args.include?("swift")
+
+          if is_swift_fastfile
+            path = File.join(containing, "Matchfile.swift")
+          else
+            path = File.join(containing, "Matchfile")
+          end
 
           if File.exist?(path)
-            FastlaneCore::UI.user_error!("You already got a Matchfile in this directory")
+            FastlaneCore::UI.user_error!("You already have a Matchfile in this directory (#{path})")
             return 0
           end
 
-          Match::Setup.new.run(path)
+          Match::Setup.new.run(path, is_swift_fastfile: is_swift_fastfile)
         end
       end
 
@@ -84,7 +99,7 @@ module Match
           params.load_configuration_file("Matchfile")
 
           Match::ChangePassword.update(params: params)
-          UI.success "Successfully changed the password. Make sure to update the password on all your clients and servers"
+          UI.success("Successfully changed the password. Make sure to update the password on all your clients and servers by running `fastlane match [environment]`")
         end
       end
 
@@ -97,11 +112,21 @@ module Match
         c.action do |args, options|
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
           params.load_configuration_file("Matchfile")
-          decrypted_repo = Match::GitHelper.clone(params[:git_url],
-                                                  params[:shallow_clone],
-                                                  branch: params[:git_branch],
-                                                  clone_branch_directly: params[:clone_branch_directly])
-          UI.success "Repo is at: '#{decrypted_repo}'"
+
+          storage = Storage.for_mode(params[:storage_mode], {
+            git_url: params[:git_url],
+            shallow_clone: params[:shallow_clone],
+            git_branch: params[:git_branch],
+            clone_branch_directly: params[:clone_branch_directly]
+          })
+          storage.download
+
+          encryption = Encryption.for_storage_mode(params[:storage_mode], {
+            git_url: params[:git_url],
+            working_directory: storage.working_directory
+          })
+          encryption.decrypt_files
+          UI.success("Repo is at: '#{storage.working_directory}'")
         end
       end
 
@@ -110,11 +135,11 @@ module Match
         c.syntax = "fastlane match nuke"
         c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal"
         c.action do |args, options|
-          FastlaneCore::UI.user_error!("Please run `fastlane match nuke [type], allowed values: distribution and development. For the 'adhoc' type, please use 'distribution' instead.")
+          FastlaneCore::UI.user_error!("Please run `fastlane match nuke [type], allowed values: development, distribution and enterprise. For the 'adhoc' type, please use 'distribution' instead.")
         end
       end
 
-      ["development", "distribution"].each do |type|
+      ["development", "distribution", "enterprise"].each do |type|
         command "nuke #{type}" do |c|
           c.syntax = "fastlane match nuke #{type}"
           c.description = "Delete all certificates and provisioning profiles from the Apple Dev Portal of the type #{type}"
@@ -129,7 +154,7 @@ module Match
         end
       end
 
-      default_command :run
+      default_command(:run)
 
       run!
     end

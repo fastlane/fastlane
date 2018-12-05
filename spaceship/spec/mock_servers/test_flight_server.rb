@@ -7,7 +7,7 @@ module MockAPI
     set :show_exceptions, false
 
     before do
-      content_type :json
+      content_type(:json)
     end
 
     after do
@@ -17,8 +17,8 @@ module MockAPI
     end
 
     not_found do
-      content_type :html
-      status 404
+      content_type(:html)
+      status(404)
       <<-HTML
         <html>
           <body>

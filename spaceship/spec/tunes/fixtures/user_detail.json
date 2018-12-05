@@ -13,7 +13,16 @@
     "visibility": true,
     "DYCVisibility": false,
     "contentProvider": "We Want To Believe",
-    "userName": "foo@bar.com"
+    "userName": "foo@bar.com",
+    "associatedAccounts": [{
+            "contentProvider": {
+                "contentProviderId": 1234,
+                "name": "Joshua Liebowitz",
+                "contentProviderTypes": ["Purple Software"]
+            },
+            "roles": ["Legal", "Admin"],
+            "lastLogin": 1510791269000
+        }]
   },
   "messages": {
     "warn": null,

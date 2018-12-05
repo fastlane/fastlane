@@ -3,8 +3,6 @@ require 'credentials_manager'
 module Fastlane
   module Actions
     class RegisterDeviceAction < Action
-      UDID_REGEXP = /^\h{40}$/
-
       def self.is_supported?(platform)
         platform == :ios
       end
@@ -19,8 +17,12 @@ module Fastlane
         Spaceship.login(credentials.user, credentials.password)
         Spaceship.select_team
 
-        UI.user_error!("Passed invalid UDID: #{udid} for device: #{name}") unless UDID_REGEXP =~ udid
-        Spaceship::Device.create!(name: name, udid: udid)
+        begin
+          Spaceship::Device.create!(name: name, udid: udid)
+        rescue => ex
+          UI.error(ex.to_s)
+          UI.crash!("Failed to register new device (name: #{name}, UDID: #{udid})")
+        end
 
         UI.success("Successfully registered new device")
         return udid
@@ -43,7 +45,9 @@ module Fastlane
                                        description: "Provide the UDID of the device to register as"),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                      env_name: "REGISTER_DEVICE_TEAM_ID",
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                       default_value_dynamic: true,
                                      description: "The ID of your Developer Portal team if you're in multiple teams",
                                      optional: true,
                                      verify_block: proc do |value|
@@ -53,14 +57,17 @@ module Fastlane
                                        env_name: "REGISTER_DEVICE_TEAM_NAME",
                                        description: "The name of your Developer Portal team if you're in multiple teams",
                                        optional: true,
+                                       code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                        end),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "DELIVER_USER",
                                        description: "Optional: Your Apple ID",
-                                       default_value: user)
+                                       default_value: user,
+                                       default_value_dynamic: true)
         ]
       end
 
@@ -68,7 +75,7 @@ module Fastlane
         [
           "This will register an iOS device with the Developer Portal so that you can include it in your provisioning profiles.",
           "This is an optimistic action, in that it will only ever add a device to the member center. If the device has already been registered within the member center, it will be left alone in the member center.",
-          "The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option."
+          "The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `:username` option."
         ].join("\n")
       end
 
@@ -89,6 +96,10 @@ module Fastlane
             username: "luka@goonbee.com"   # Optional, lets you override the Apple Member Center username.
           )'
         ]
+      end
+
+      def self.return_type
+        :string
       end
 
       def self.category

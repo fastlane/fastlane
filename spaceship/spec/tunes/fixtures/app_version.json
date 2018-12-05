@@ -825,6 +825,12 @@
             "isEditable": false,
             "isRequired": false,
             "errorKeys": null
+        },
+        "ratingsReset": {
+            "value": false,
+            "isEditable": false,
+            "isRequired": false,
+            "errorKeys": null
         }
     },
     "messages": {

@@ -7,6 +7,10 @@ describe Precheck do
     let(:fake_happy_app) { "fake_app_object" }
     let(:fake_happy_app_details) { "fake_app_details" }
     let(:fake_happy_app_version) { "fake_app_version_object" }
+    let(:fake_in_app_purchase) { "fake_in_app_purchase" }
+    let(:fake_in_app_purchase_edit) { "fake_in_app_purchase_edit" }
+    let(:fake_in_app_purchase_edit_version) { { :"de-DE" => { name: "iap name", description: "iap desc" } } }
+    let(:fake_in_app_purchases) { [fake_in_app_purchase] }
 
     before do
       setup_happy_app
@@ -17,6 +21,7 @@ describe Precheck do
     def setup_happy_app
       allow(fake_happy_app).to receive(:apple_id).and_return("com.whatever")
       allow(fake_happy_app).to receive(:name).and_return("My Fake App")
+      allow(fake_happy_app).to receive(:in_app_purchases).and_return(fake_in_app_purchases)
       allow(fake_happy_app).to receive(:details).and_return(fake_happy_app_details)
 
       allow(fake_happy_app_details).to receive(:name).and_return(fake_language_item_for_text_item(fieldname: "name"))
@@ -30,6 +35,10 @@ describe Precheck do
       allow(fake_happy_app_version).to receive(:release_notes).and_return(fake_language_item_for_text_item(fieldname: "release_notes"))
       allow(fake_happy_app_version).to receive(:support_url).and_return(fake_language_item_for_url_item(fieldname: "support_url"))
       allow(fake_happy_app_version).to receive(:marketing_url).and_return(fake_language_item_for_url_item(fieldname: "marketing_url"))
+
+      allow(fake_in_app_purchases).to receive(:all).and_return(fake_in_app_purchases)
+      allow(fake_in_app_purchase).to receive(:edit).and_return(fake_in_app_purchase_edit)
+      allow(fake_in_app_purchase_edit).to receive(:versions).and_return(fake_in_app_purchase_edit_version)
 
       setup_happy_url_rule_mock
     end

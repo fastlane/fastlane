@@ -1,5 +1,4 @@
-require 'precheck/rule'
-require 'precheck/rules/abstract_text_match_rule'
+require_relative 'abstract_text_match_rule'
 
 module Precheck
   class OtherPlatformsRule < AbstractTextMatchRule
@@ -20,7 +19,10 @@ module Precheck
     end
 
     def allowed_lowercased_words
-      ["google analytics"]
+      [
+        "google analytics",
+        "google drive"
+      ]
     end
 
     def lowercased_words_to_look_for

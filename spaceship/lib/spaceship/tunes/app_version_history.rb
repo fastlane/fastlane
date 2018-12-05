@@ -1,6 +1,8 @@
+require_relative 'app_version_states_history'
+
 module Spaceship
   module Tunes
-    # Represents a read only version of an iTunes Connect Versions State History
+    # Represents a read only version of an App Store Connect Versions State History
     class AppVersionHistory < TunesBase
       # @return (Spaceship::Tunes::Application) A reference to the application
       #   this version is for

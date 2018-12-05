@@ -19,6 +19,7 @@ module Fastlane
         sonar_scanner_args << "-Dsonar.language=\"#{params[:project_language]}\"" if params[:project_language]
         sonar_scanner_args << "-Dsonar.sourceEncoding=\"#{params[:source_encoding]}\"" if params[:source_encoding]
         sonar_scanner_args << "-Dsonar.login=\"#{params[:sonar_login]}\"" if params[:sonar_login]
+        sonar_scanner_args << "-Dsonar.host.url=\"#{params[:sonar_url]}\"" if params[:sonar_url]
         sonar_scanner_args << params[:sonar_runner_args] if params[:sonar_runner_args]
 
         command = [
@@ -44,8 +45,8 @@ module Fastlane
 
       def self.details
         [
-          "See http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner for details.",
-          "It can process unit test results if formatted as junit report as shown in [xctest](#xctest) action. It can also integrate coverage reports in Cobertura format, which can be transformed into by [slather](#slather) action."
+          "See [http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner](http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) for details.",
+          "It can process unit test results if formatted as junit report as shown in [xctest](https://docs.fastlane.tools/actions/xctest/) action. It can also integrate coverage reports in Cobertura format, which can be transformed into by the [slather](https://docs.fastlane.tools/actions/slather/) action."
         ].join("\n")
       end
 
@@ -56,7 +57,7 @@ module Fastlane
                                         description: "The path to your sonar project configuration file; defaults to `sonar-project.properties`", # default is enforced by sonar-scanner binary
                                         optional: true,
                                         verify_block: proc do |value|
-                                          UI.user_error!("Couldn't find file at path '#{value}'") unless value.nil? or File.exist?(value)
+                                          UI.user_error!("Couldn't find file at path '#{value}'") unless value.nil? || File.exist?(value)
                                         end),
           FastlaneCore::ConfigItem.new(key: :project_key,
                                        env_name: "FL_SONAR_RUNNER_PROJECT_KEY",
@@ -91,7 +92,12 @@ module Fastlane
                                        description: "Pass the Sonar Login token (e.g: xxxxxxprivate_token_XXXXbXX7e)",
                                        optional: true,
                                        is_string: true,
-                                       sensitive: true)
+                                       sensitive: true),
+          FastlaneCore::ConfigItem.new(key: :sonar_url,
+                                       env_name: "FL_SONAR_URL",
+                                       description: "Pass the url of the Sonar server",
+                                       optional: true,
+                                       is_string: true)
         ]
       end
 

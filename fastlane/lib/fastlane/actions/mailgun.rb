@@ -91,8 +91,14 @@ module Fastlane
                                       env_name: "MAILGUN_ATTACHMENT",
                                       description: "Mail Attachment filenames, either an array or just one string",
                                       optional: true,
-                                      is_string: false)
-
+                                      is_string: false),
+          FastlaneCore::ConfigItem.new(key: :custom_placeholders,
+                                       short_option: "-p",
+                                       env_name: "MAILGUN_CUSTOM_PLACEHOLDERS",
+                                       description: "Placeholders for template given as a hash",
+                                       default_value: {},
+                                       is_string: false,
+                                       type: Hash)
         ]
       end
 
@@ -102,16 +108,16 @@ module Fastlane
 
       def self.handle_params_transition(options)
         options[:postmaster] = options[:mailgun_sandbox_postmaster] if options[:mailgun_sandbox_postmaster]
-        puts "\nUsing :mailgun_sandbox_postmaster is deprecated, please change to :postmaster".yellow if options[:mailgun_sandbox_postmaster]
+        puts("\nUsing :mailgun_sandbox_postmaster is deprecated, please change to :postmaster".yellow) if options[:mailgun_sandbox_postmaster]
 
         options[:apikey] = options[:mailgun_apikey] if options[:mailgun_apikey]
-        puts "\nUsing :mailgun_apikey is deprecated, please change to :apikey".yellow if options[:mailgun_apikey]
+        puts("\nUsing :mailgun_apikey is deprecated, please change to :apikey".yellow) if options[:mailgun_apikey]
       end
 
       def self.mailgunit(options)
         sandbox_domain = options[:postmaster].split("@").last
         params = {
-          from: "#{options[:from]}<#{options[:postmaster]}>",
+          from: "#{options[:from]} <#{options[:postmaster]}>",
           to: (options[:to]).to_s,
           subject: options[:subject],
           html: mail_template(options)
@@ -126,7 +132,7 @@ module Fastlane
           params.store(:attachment, attachments)
         end
 
-        RestClient.post "https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages", params
+        RestClient.post("https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages", params)
         mail_template(options)
       end
 
@@ -139,6 +145,9 @@ module Fastlane
         }
         hash[:success] = options[:success]
         hash[:ci_build_link] = options[:ci_build_link]
+
+        # concatenate with custom placeholders passed by user
+        hash = hash.merge(options[:custom_placeholders])
 
         # grabs module
         eth = Fastlane::ErbTemplateHelper
@@ -171,6 +180,10 @@ module Fastlane
             app_link: "http://www.myapplink.com",
             ci_build_link: "http://www.mycibuildlink.com",
             template_path: "HTML_TEMPLATE_PATH",
+            custom_placeholders: {
+              :var1 => 123,
+              :var2 => "string"
+            },
             attachment: "dirname/filename.ext"
           )'
         ]

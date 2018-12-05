@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class HelloAction < Action
       def self.run(params)
-        UI.message "Param1: #{params[:param1]}"
+        UI.message("Param1: #{params[:param1]}")
       end
 
       def self.available_options

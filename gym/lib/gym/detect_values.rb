@@ -1,4 +1,8 @@
-require 'cfpropertylist'
+require 'fastlane_core/core_ext/cfpropertylist'
+require 'fastlane_core/project'
+require_relative 'module'
+require_relative 'code_signing_mapping'
+
 module Gym
   # This class detects all kinds of default values
   class DetectValues
@@ -14,21 +18,30 @@ module Gym
       FastlaneCore::Project.detect_projects(config)
       Gym.project = FastlaneCore::Project.new(config)
 
-      detect_selected_provisioning_profiles
-
       # Go into the project's folder, as there might be a Gymfile there
-      Dir.chdir(File.expand_path("..", Gym.project.path)) do
-        config.load_configuration_file(Gym.gymfile_name)
+      project_path = File.expand_path("..", Gym.project.path)
+      unless File.expand_path(".") == project_path
+        Dir.chdir(project_path) do
+          config.load_configuration_file(Gym.gymfile_name)
+        end
       end
+
+      ensure_export_options_is_hash
 
       detect_scheme
       detect_platform # we can only do that *after* we have the scheme
+      detect_selected_provisioning_profiles # we can only do that *after* we have the platform
       detect_configuration
       detect_toolchain
 
       config[:output_name] ||= Gym.project.app_name
 
       config[:build_path] ||= archive_path_from_local_xcode_preferences
+
+      # Make sure the output name is valid and remove a trailing `.ipa` extension
+      # as it will be added by gym for free
+      config[:output_name].gsub!(".ipa", "")
+      config[:output_name].gsub!(File::SEPARATOR, "_")
 
       return config
     end
@@ -37,10 +50,9 @@ module Gym
       day = Time.now.strftime("%F") # e.g. 2015-08-07
       archive_path = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}/")
 
-      path = xcode_preference_plist_path
-      return archive_path unless File.exist?(path.to_s) # this file only exists when you edit the Xcode preferences to set custom values
+      return archive_path unless has_xcode_preferences_plist?
 
-      custom_archive_path = xcode_preferences_dictionary(path)['IDECustomDistributionArchivesLocation']
+      custom_archive_path = xcode_preferences_dictionary['IDECustomDistributionArchivesLocation']
       return archive_path if custom_archive_path.to_s.length == 0
 
       return File.join(custom_archive_path, day)
@@ -48,11 +60,16 @@ module Gym
 
     # Helper Methods
 
+    # this file only exists when you edit the Xcode preferences to set custom values
+    def self.has_xcode_preferences_plist?
+      File.exist?(xcode_preference_plist_path)
+    end
+
     def self.xcode_preference_plist_path
       File.expand_path("~/Library/Preferences/com.apple.dt.Xcode.plist")
     end
 
-    def self.xcode_preferences_dictionary(path)
+    def self.xcode_preferences_dictionary(path = xcode_preference_plist_path)
       CFPropertyList.native_types(CFPropertyList::List.new(file: path).value)
     end
 
@@ -62,9 +79,11 @@ module Gym
       Gym.config[:export_options] ||= {}
       hash_to_use = (Gym.config[:export_options][:provisioningProfiles] || {}).dup || {} # dup so we can show the original values in `verbose` mode
 
-      mapping_object = CodeSigningMapping.new(project: Gym.project)
-      hash_to_use = mapping_object.merge_profile_mapping(primary_mapping: hash_to_use,
+      unless Gym.config[:skip_profile_detection]
+        mapping_object = CodeSigningMapping.new(project: Gym.project)
+        hash_to_use = mapping_object.merge_profile_mapping(primary_mapping: hash_to_use,
                                                            export_method: Gym.config[:export_method])
+      end
 
       return if hash_to_use.count == 0 # We don't want to set a mapping if we don't have one
       Gym.config[:export_options][:provisioningProfiles] = hash_to_use
@@ -112,7 +131,7 @@ module Gym
       if config[:configuration]
         # Verify the configuration is available
         unless configurations.include?(config[:configuration])
-          UI.error "Couldn't find specified configuration '#{config[:configuration]}'."
+          UI.error("Couldn't find specified configuration '#{config[:configuration]}'.")
           config[:configuration] = nil
         end
       end
@@ -126,6 +145,27 @@ module Gym
       if Gym.config[:toolchain].to_s == "swift_2_3"
         Gym.config[:toolchain] = "com.apple.dt.toolchain.Swift_2_3"
       end
+    end
+
+    def self.ensure_export_options_is_hash
+      return if Gym.config[:export_options].nil? || Gym.config[:export_options].kind_of?(Hash)
+
+      # Reads options from file
+      plist_file_path = Gym.config[:export_options]
+      UI.user_error!("Couldn't find plist file at path #{File.expand_path(plist_file_path)}") unless File.exist?(plist_file_path)
+      hash = Plist.parse_xml(plist_file_path)
+      UI.user_error!("Couldn't read provided plist at path #{File.expand_path(plist_file_path)}") if hash.nil?
+      # Convert keys to symbols
+      Gym.config[:export_options] = keys_to_symbols(hash)
+    end
+
+    def self.keys_to_symbols(hash)
+      # Convert keys to symbols
+      hash = hash.each_with_object({}) do |(k, v), memo|
+        memo[k.b.to_s.to_sym] = v
+        memo
+      end
+      hash
     end
   end
 end

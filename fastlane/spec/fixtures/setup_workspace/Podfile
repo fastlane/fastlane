@@ -1,9 +1,9 @@
 # Uncomment this line to define a global platform for your project
 # platform :ios, '6.0'
 
-target 'fastlane' do
-  pod "TSMessages"
+target('fastlane') do
+  pod("TSMessages")
 end
 
-target 'fastlaneTests' do
+target('fastlaneTests') do
 end

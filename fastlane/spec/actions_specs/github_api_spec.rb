@@ -42,6 +42,25 @@ describe Fastlane do
           end
         end
 
+        context 'with an array body' do
+          it 'correctly submits to github api' do
+            result = Fastlane::FastFile.new.parse("
+              lane :test do
+                github_api(
+                  api_token: '123456789',
+                  http_method: 'PUT',
+                  path: 'repos/fastlane/fastlane/contents/TEST_FILE.md',
+                  body: %w(foo bar),
+                )
+              end
+            ").runner.execute(:test)
+
+            expect(result[:status]).to eq(200)
+            expect(result[:body]).to eq(response_body)
+            expect(result[:json]).to eq(JSON.parse(response_body))
+          end
+        end
+
         context 'with raw JSON body' do
           it 'correctly submits to github api' do
             result = Fastlane::FastFile.new.parse(%{
@@ -220,7 +239,7 @@ describe Fastlane do
 
                 expect(result[:status]).to eq(200)
                 expect(result[:html_url]).to eq("https://api.github.com/repos/fastlane/fastlane/contents/TEST_FILE.md")
-                expect(result[:html_url]).to_not eq("https://api.github.com/repos/fastlane/fastlane/contents/NONEXISTENT_TEST_FILE.md")
+                expect(result[:html_url]).to_not(eq("https://api.github.com/repos/fastlane/fastlane/contents/NONEXISTENT_TEST_FILE.md"))
               end
             end
           end
@@ -241,6 +260,64 @@ describe Fastlane do
                 expect(result[:status]).to eq(200)
                 expect(result[:html_url]).to eq("https://api.github.com/repos/fastlane/fastlane/contents/TEST_FILE.md")
               end
+            end
+          end
+
+          context 'secure is set' do
+            it 'correctly submits without ssl verification' do
+              Excon.defaults[:ssl_verify_peer] = true
+              result = Fastlane::FastFile.new.parse("
+                lane :test do
+                  github_api(
+                    api_token: '123456789',
+                    http_method: 'PUT',
+                    path: 'repos/fastlane/fastlane/contents/TEST_FILE.md',
+                    secure: false
+                  )
+                end
+              ").runner.execute(:test)
+
+              expect(Excon.defaults[:ssl_verify_peer]).to eq(false)
+              expect(result[:status]).to eq(200)
+              expect(result[:body]).to eq(response_body)
+              expect(result[:json]).to eq(JSON.parse(response_body))
+            end
+
+            it 'correctly submits with ssl verification' do
+              Excon.defaults[:ssl_verify_peer] = false
+              result = Fastlane::FastFile.new.parse("
+                lane :test do
+                  github_api(
+                    api_token: '123456789',
+                    http_method: 'PUT',
+                    path: 'repos/fastlane/fastlane/contents/TEST_FILE.md',
+                    secure: true
+                  )
+                end
+              ").runner.execute(:test)
+
+              expect(Excon.defaults[:ssl_verify_peer]).to eq(true)
+              expect(result[:status]).to eq(200)
+              expect(result[:body]).to eq(response_body)
+              expect(result[:json]).to eq(JSON.parse(response_body))
+            end
+
+            it 'correctly submits using default verification' do
+              Excon.defaults[:ssl_verify_peer] = false
+              result = Fastlane::FastFile.new.parse("
+                lane :test do
+                  github_api(
+                    api_token: '123456789',
+                    http_method: 'PUT',
+                    path: 'repos/fastlane/fastlane/contents/TEST_FILE.md'
+                  )
+                end
+              ").runner.execute(:test)
+
+              expect(Excon.defaults[:ssl_verify_peer]).to eq(true)
+              expect(result[:status]).to eq(200)
+              expect(result[:body]).to eq(response_body)
+              expect(result[:json]).to eq(JSON.parse(response_body))
             end
           end
         end

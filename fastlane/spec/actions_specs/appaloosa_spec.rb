@@ -69,7 +69,7 @@ describe Fastlane do
 
       context 'when upload_service returns an error' do
         before do
-          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?file=Fastfile1&group_ids=&store_id=556").
+          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?api_key=xxx&file=Fastfile1&group_ids=&store_id=556").
             to_return(status: 200, body: '{ "errors": "A group id is incorrect" }', headers: {})
         end
 
@@ -88,7 +88,7 @@ describe Fastlane do
         let(:expect_error) { 'ERROR: A problem occurred with your API token and your store id. Please try again.' }
 
         before do
-          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?file=Fastfile1&group_ids=&store_id=556").
+          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?api_key=xxx&file=Fastfile1&group_ids=&store_id=556").
             to_return(status: 200, body: presign_payload)
           stub_request(:put, "http://appaloosa.com/test").
             to_return(status: 200)
@@ -111,7 +111,7 @@ describe Fastlane do
         let(:expect_error) { 'ERROR: A problem occurred with your API token and your store id. Please try again.' }
 
         before do
-          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?file=Fastfile1&group_ids=&store_id=556").
+          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?api_key=xxx&file=Fastfile1&group_ids=&store_id=556").
             to_return(status: 200, body: presign_payload)
           stub_request(:put, "http://appaloosa.com/test").
             to_return(status: 200)
@@ -140,7 +140,7 @@ describe Fastlane do
         end
 
         before do
-          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?file=Fastfile1&group_ids=&store_id=556").
+          stub_request(:get, "#{APPALOOSA_SERVER}/upload_services/presign_form?api_key=xxx&file=Fastfile1&group_ids=&store_id=556").
             to_return(status: 200, body: presign_payload, headers: {})
           stub_request(:put, "http://appaloosa.com/test").
             to_return(status: 200, body: '', headers: {})

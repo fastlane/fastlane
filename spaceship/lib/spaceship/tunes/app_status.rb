@@ -25,7 +25,7 @@ module Spaceship
       # Developer rejected this version/binary
       DEVELOPER_REJECTED = "Developer Rejected"
 
-      # You have to renew your Apple account to keep using iTunes Connect
+      # You have to renew your Apple account to keep using App Store Connect
       PENDING_CONTRACT = "Pending Contract"
 
       UPLOAD_RECEIVED = "Upload Received"
@@ -36,7 +36,7 @@ module Spaceship
       REMOVED_FROM_SALE = "Removed From Sale"
       # INVALID_BINARY = "Invalid Binary"
 
-      # Get the app status matching based on a string (given by iTunes Connect)
+      # Get the app status matching based on a string (given by App Store Connect)
       def self.get_from_string(text)
         mapping = {
           'readyForSale' => READY_FOR_SALE,

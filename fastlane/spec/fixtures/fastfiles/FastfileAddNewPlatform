@@ -4,7 +4,7 @@ platform :windows do
   lane :empty do
   end
 
-  lane :echo do
+  lane :echo_lane do
     UI.message "echo :windows"
   end
 end

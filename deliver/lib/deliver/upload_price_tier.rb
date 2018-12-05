@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Deliver
   # Set the app's pricing
   class UploadPriceTier

@@ -17,7 +17,7 @@ def sigh_stub_spaceship(valid_profile = true, expect_create = false, expect_dele
   if expect_delete
     expect(profile).to receive(:delete!)
   else
-    expect(profile).to_not receive(:delete!)
+    expect(profile).to_not(receive(:delete!))
   end
 
   profile_type = Spaceship.provisioning_profile.app_store
@@ -26,7 +26,7 @@ def sigh_stub_spaceship(valid_profile = true, expect_create = false, expect_dele
   if expect_create
     expect(profile_type).to receive(:create!).and_return(profile)
   else
-    expect(profile_type).to_not receive(:create!)
+    expect(profile_type).to_not(receive(:create!))
   end
 
   certs = [Spaceship.certificate.production]

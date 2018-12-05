@@ -1,10 +1,10 @@
 require 'xcodeproj'
 
+require_relative 'module'
+
 module Gym
   class CodeSigningMapping
     attr_accessor :project
-
-    attr_accessor :project_paths
 
     def initialize(project: nil)
       self.project = project
@@ -24,7 +24,7 @@ module Gym
       #   (e.g. coming from `provisioningProfiles` of the `export_options` or from previous match calls)
       # with the secondary hash we just created (or was provided as parameter).
       # Both might include information about what profile to use
-      # This is important as it mght not be clear for the user that they have to call match for each app target
+      # This is important as it might not be clear for the user that they have to call match for each app target
       # before adding this code, we'd only either use whatever we get from match, or what's defined in the Xcode project
       # With the code below, we'll make sure to take the best of it:
       #
@@ -69,46 +69,33 @@ module Gym
     # We do some `gsub`bing, because we can't really know the profile type, so we'll just look at the name and see if it includes
     # the export method (which it usually does, but with different notations)
     def app_identifier_contains?(str, contains)
-      return str.to_s.gsub("-", "").gsub(" ", "").downcase.include?(contains.to_s.gsub("-", "").gsub(" ", "").downcase)
-    end
-
-    # Array of paths to all project files
-    # (might be multiple, because of workspaces)
-    def project_paths
-      return @_project_paths if @_project_paths
-      if self.project.workspace?
-        # Find the xcodeproj file, as the information isn't included in the workspace file
-        # We have a reference to the workspace, let's find the xcodeproj file
-        # For some reason the `plist` gem can't parse the content file
-        # so we'll use a regex to find all group references
-
-        workspace_data_path = File.join(self.project.path, "contents.xcworkspacedata")
-        workspace_data = File.read(workspace_data_path)
-        @_project_paths = workspace_data.scan(/\"group:(.*)\"/).collect do |current_match|
-          # It's a relative path from the workspace file
-          File.join(File.expand_path("..", self.project.path), current_match.first)
-        end.find_all do |current_match|
-          # We're not interested in a `Pods` project, as it doesn't contain any relevant
-          # information about code signing
-          !current_match.end_with?("Pods/Pods.xcodeproj")
-        end
-
-        return @_project_paths
-      else
-        # Return the path as an array
-        return @_project_paths = [self.project.path]
-      end
+      return str.to_s.gsub("-", "").gsub(" ", "").gsub("InHouse", "enterprise").downcase.include?(contains.to_s.gsub("-", "").gsub(" ", "").downcase)
     end
 
     def test_target?(build_settings)
       return (!build_settings["TEST_TARGET_NAME"].nil? || !build_settings["TEST_HOST"].nil?)
     end
 
+    def same_platform?(sdkroot)
+      destination = Gym.config[:destination].dup
+      destination.slice!("generic/platform=")
+      destination_sdkroot = []
+      case destination
+      when "macosx"
+        destination_sdkroot = ["macosx"]
+      when "iOS"
+        destination_sdkroot = ["iphoneos", "watchos"]
+      when "tvOS"
+        destination_sdkroot = ["appletvos"]
+      end
+      return destination_sdkroot.include?(sdkroot)
+    end
+
     def detect_project_profile_mapping
       provisioning_profile_mapping = {}
       specified_configuration = Gym.config[:configuration] || Gym.project.default_build_settings(key: "CONFIGURATION")
 
-      self.project_paths.each do |project_path|
+      self.project.project_paths.each do |project_path|
         UI.verbose("Parsing project file '#{project_path}' to find selected provisioning profiles")
         UI.verbose("Finding provision profiles for '#{specified_configuration}'") if specified_configuration
 
@@ -122,9 +109,12 @@ module Gym
             target.build_configuration_list.build_configurations.each do |build_configuration|
               current = build_configuration.build_settings
               next if test_target?(current)
+              sdkroot = build_configuration.resolve_build_setting("SDKROOT")
+              next unless same_platform?(sdkroot)
               next unless specified_configuration == build_configuration.name
 
               bundle_identifier = build_configuration.resolve_build_setting("PRODUCT_BUNDLE_IDENTIFIER")
+              next unless bundle_identifier
               provisioning_profile_specifier = build_configuration.resolve_build_setting("PROVISIONING_PROFILE_SPECIFIER")
               provisioning_profile_uuid = build_configuration.resolve_build_setting("PROVISIONING_PROFILE")
 

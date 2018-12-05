@@ -1,3 +1,7 @@
+require 'fastlane_core/print_table'
+require_relative 'module'
+require_relative 'runner'
+
 module Scan
   class Manager
     def work(options)

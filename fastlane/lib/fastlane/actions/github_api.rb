@@ -16,7 +16,7 @@ module Fastlane
           headers = construct_headers(params[:api_token], params[:headers])
           payload = construct_body(params[:body], params[:raw_body])
           error_handlers = params[:error_handlers] || {}
-          secure = params[:secure] || true
+          secure = params[:secure]
 
           response = call_endpoint(
             url,
@@ -69,9 +69,11 @@ module Fastlane
         end
 
         def details
-          "Calls any GitHub API endpoint. You must provide your GitHub Personal token (get one from https://github.com/settings/tokens/new).
-          Out parameters provide the status code and the full response JSON if valid, otherwise the raw response body.
-          Documentation: https://developer.github.com/v3"
+          [
+            "Calls any GitHub API endpoint. You must provide your GitHub Personal token (get one from [https://github.com/settings/tokens/new](https://github.com/settings/tokens/new)).",
+            "Out parameters provide the status code and the full response JSON if valid, otherwise the raw response body.",
+            "Documentation: [https://developer.github.com/v3](https://developer.github.com/v3)."
+          ].join("\n")
         end
 
         def available_options
@@ -82,14 +84,16 @@ module Fastlane
                                          default_value: "https://api.github.com",
                                          optional: true,
                                          verify_block: proc do |value|
-                                           UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server/api/v3") unless value.include? "//"
+                                           UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server/api/v3") unless value.include?("//")
                                          end),
             FastlaneCore::ConfigItem.new(key: :api_token,
                                          env_name: "FL_GITHUB_API_TOKEN",
                                          description: "Personal API Token for GitHub - generate one at https://github.com/settings/tokens",
                                          sensitive: true,
+                                         code_gen_sensitive: true,
                                          is_string: true,
                                          default_value: ENV["GITHUB_API_TOKEN"],
+                                         default_value_dynamic: true,
                                          optional: false),
             FastlaneCore::ConfigItem.new(key: :http_method,
                                          env_name: "FL_GITHUB_API_HTTP_METHOD",
@@ -97,7 +101,7 @@ module Fastlane
                                          default_value: "GET",
                                          optional: true,
                                          verify_block: proc do |value|
-                                           unless %w(GET POST PUT DELETE HEAD CONNECT).include?(value.to_s.upcase)
+                                           unless %w(GET POST PUT DELETE HEAD CONNECT PATCH).include?(value.to_s.upcase)
                                              UI.user_error!("Unrecognised HTTP method")
                                            end
                                          end),
@@ -121,7 +125,7 @@ module Fastlane
                                          description: "The complete full url - used instead of path. e.g. 'https://uploads.github.com/repos/fastlane...'",
                                          optional: true,
                                          verify_block: proc do |value|
-                                           UI.user_error!("Please include the protocol in the url, e.g. https://uploads.github.com") unless value.include? "//"
+                                           UI.user_error!("Please include the protocol in the url, e.g. https://uploads.github.com") unless value.include?("//")
                                          end),
             FastlaneCore::ConfigItem.new(key: :error_handlers,
                                          description: "Optional error handling hash based on status code, or pass '*' to handle all errors",
@@ -136,7 +140,7 @@ module Fastlane
             FastlaneCore::ConfigItem.new(key: :secure,
                                          env_name: "FL_GITHUB_API_SECURE",
                                          description: "Optionally disable secure requests (ssl_verify_peer)",
-                                         is_string: false,
+                                         type: Boolean,
                                          default_value: true,
                                          optional: true)
           ]
@@ -219,6 +223,8 @@ module Fastlane
           if raw_body
             raw_body
           elsif body.kind_of?(Hash)
+            body.to_json
+          elsif body.kind_of?(Array)
             body.to_json
           else
             UI.user_error!("Please provide valid JSON, or a hash as request body") unless parse_json(body)

@@ -18,16 +18,18 @@ module Fastlane
       end
 
       def self.details
+        sample = <<-SAMPLE.markdown_sample
+          ```ruby
+          resign(ipa: "path", signing_identity: "identity", provisioning_profile: {
+            "com.example.awesome-app" => "App.mobileprovision",
+            "com.example.awesome-app.app-extension" => "Extension.mobileprovision"
+          })
+          ```
+        SAMPLE
+
         [
-          "You may provide multiple provisioning profiles if the application contains",
-          "nested applications or app extensions, which need their own provisioning",
-          "profile. You can do so by passing an array of provisiong profile strings or a",
-          "hash that associates provisioning profile values to bundle identifier keys.",
-          "",
-          "resign(ipa: \"path\", signing_identity: \"identity\", provisioning_profile: {",
-          "  \"com.example.awesome-app\" => \"App.mobileprovision\",",
-          "  \"com.example.awesome-app.app-extension\" => \"Extension.mobileprovision\"",
-          "})"
+          "You may provide multiple provisioning profiles if the application contains nested applications or app extensions, which need their own provisioning profile. You can do so by passing an array of provisiong profile strings or a hash that associates provisioning profile values to bundle identifier keys.".markdown_preserve_newlines,
+          sample
         ].join("\n")
       end
 
@@ -59,15 +61,16 @@ module Fastlane
                                        env_name: "FL_RESIGN_IPA",
                                        description: "Path to the ipa file to resign. Optional if you use the _gym_ or _xcodebuild_ action",
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :signing_identity,
                                        env_name: "FL_RESIGN_SIGNING_IDENTITY",
-                                       description: "Code signing identity to use. e.g. \"iPhone Distribution: Luka Mirosevic (0123456789)\""),
+                                       description: "Code signing identity to use. e.g. `iPhone Distribution: Luka Mirosevic (0123456789)`"),
           FastlaneCore::ConfigItem.new(key: :entitlements,
                                        env_name: "FL_RESIGN_ENTITLEMENTS",
-                                       description: "Path to the entitlement file to use, e.g. \"myApp/MyApp.entitlements\"",
+                                       description: "Path to the entitlement file to use, e.g. `myApp/MyApp.entitlements`",
                                        conflicting_options: [:use_app_entitlements],
                                        is_string: true,
                                        optional: true),
@@ -75,6 +78,7 @@ module Fastlane
                                        env_name: "FL_RESIGN_PROVISIONING_PROFILE",
                                        description: "Path to your provisioning_profile. Optional if you use _sigh_",
                                        default_value: Actions.lane_context[SharedValues::SIGH_PROFILE_PATH],
+                                       default_value_dynamic: true,
                                        is_string: false,
                                        verify_block: proc do |value|
                                          files = case value
@@ -88,7 +92,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_RESIGN_VERSION",
-                                       description: "Version number to force resigned ipa to use.\nUpdates both CFBundleShortVersionString and CFBundleVersion values in Info.plist.\nApplies for main app and all nested apps or extensions",
+                                       description: "Version number to force resigned ipa to use. Updates both `CFBundleShortVersionString` and `CFBundleVersion` values in `Info.plist`. Applies for main app and all nested apps or extensions",
                                        conflicting_options: [:short_version, :bundle_version],
                                        is_string: true,
                                        optional: true),
@@ -99,30 +103,30 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :short_version,
                                        env_name: "FL_RESIGN_SHORT_VERSION",
-                                       description: "Short version string to force resigned ipa to use (CFBundleShortVersionString)",
+                                       description: "Short version string to force resigned ipa to use (`CFBundleShortVersionString`)",
                                        conflicting_options: [:version],
                                        is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :bundle_version,
                                        env_name: "FL_RESIGN_BUNDLE_VERSION",
-                                       description: "Bundle version to force resigned ipa to use (CFBundleVersion)",
+                                       description: "Bundle version to force resigned ipa to use (`CFBundleVersion`)",
                                        conflicting_options: [:version],
                                        is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :bundle_id,
                                        env_name: "FL_RESIGN_BUNDLE_ID",
-                                       description: "Set new bundle ID during resign (CFBundleIdentifier)",
+                                       description: "Set new bundle ID during resign (`CFBundleIdentifier`)",
                                        is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :use_app_entitlements,
                                        env_name: "FL_USE_APP_ENTITLEMENTS",
-                                       description: "Extract app bundle codesigning entitlements\nand combine with entitlements from new provisionin profile",
+                                       description: "Extract app bundle codesigning entitlements and combine with entitlements from new provisionin profile",
                                        conflicting_options: [:entitlements],
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :keychain_path,
                                        env_name: "FL_RESIGN_KEYCHAIN_PATH",
-                                       description: "Provide a path to a keychain file that should be used by /usr/bin/codesign",
+                                       description: "Provide a path to a keychain file that should be used by `/usr/bin/codesign`",
                                        is_string: true,
                                        optional: true)
         ]

@@ -1,3 +1,8 @@
+require 'plist'
+
+require_relative 'module'
+require_relative 'test_command_generator'
+
 module Snapshot
   # Responsible for collecting the generated screenshots and copying them over to the output directory
   class Collector
@@ -25,7 +30,7 @@ module Snapshot
       end
 
       if matches.count != to_store.count
-        UI.error "Looks like the number of screenshots (#{to_store.count}) doesn't match the number of names (#{matches.count})"
+        UI.error("Looks like the number of screenshots (#{to_store.count}) doesn't match the number of names (#{matches.count})")
       end
 
       matches.each_with_index do |current, index|
@@ -60,21 +65,21 @@ module Snapshot
 
     def self.copy(from_path, to_path)
       if FastlaneCore::Globals.verbose?
-        UI.success "Copying file '#{from_path}' to '#{to_path}'..."
+        UI.success("Copying file '#{from_path}' to '#{to_path}'...")
       else
-        UI.success "Copying '#{to_path}'..."
+        UI.success("Copying '#{to_path}'...")
       end
       FileUtils.cp(from_path, to_path)
     end
 
     def self.attachments(containing)
-      UI.message "Collecting screenshots..."
+      UI.message("Collecting screenshots...")
       plist_path = Dir[File.join(containing, "*.plist")].last # we clean the folder before each run
       return attachments_in_file(plist_path)
     end
 
     def self.attachments_in_file(plist_path)
-      UI.verbose "Loading up '#{plist_path}'..."
+      UI.verbose("Loading up '#{plist_path}'...")
       report = Plist.parse_xml(plist_path)
 
       to_store = [] # contains the names of all the attachments we want to use
@@ -93,8 +98,8 @@ module Snapshot
         end
       end
 
-      UI.message "Found #{to_store.count} screenshots..."
-      UI.verbose "Found #{to_store.join(', ')}"
+      UI.message("Found #{to_store.count} screenshots...")
+      UI.verbose("Found #{to_store.join(', ')}")
       return to_store
     end
 

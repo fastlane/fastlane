@@ -1,6 +1,7 @@
-require 'fastlane_core'
-require 'credentials_manager'
-Dir[File.dirname(__FILE__) + '/rules/*.rb'].each { |file| require file }
+require 'fastlane_core/configuration/config_item'
+require 'credentials_manager/appfile_config'
+
+require_relative 'rules/all'
 
 module Precheck
   class Options
@@ -12,6 +13,7 @@ module Precheck
         FutureFunctionalityRule,
         TestWordsRule,
         CurseWordsRule,
+        FreeStuffIAPRule,
         CustomTextRule,
         CopyrightDateRule,
         UnreachableURLRule
@@ -27,27 +29,34 @@ module Precheck
                                      short_option: "-a",
                                      env_name: "PRECHECK_APP_IDENTIFIER",
                                      description: "The bundle identifier of your app",
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
+                                     code_gen_sensitive: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "PRECHECK_USERNAME",
                                      description: "Your Apple ID Username",
-                                     default_value: user),
+                                     default_value: user,
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :team_id,
                                      short_option: "-b",
                                      env_name: "PRECHECK_TEAM_ID",
-                                     description: "The ID of your iTunes Connect team if you're in multiple teams",
+                                     description: "The ID of your App Store Connect team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
                                      end),
         FastlaneCore::ConfigItem.new(key: :team_name,
                                      short_option: "-l",
                                      env_name: "PRECHECK_TEAM_NAME",
-                                     description: "The name of your iTunes Connect team if you're in multiple teams",
+                                     description: "The name of your App Store Connect team if you're in multiple teams",
                                      optional: true,
+                                     code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                      end),
@@ -56,7 +65,14 @@ module Precheck
                                      env_name: "PRECHECK_DEFAULT_RULE_LEVEL",
                                      description: "The default rule level unless otherwise configured",
                                      is_string: false,
-                                     default_value: RULE_LEVELS[:error])
+                                     default_value: RULE_LEVELS[:error]),
+        FastlaneCore::ConfigItem.new(key: :include_in_app_purchases,
+                                     short_option: "-i",
+                                     env_name: "PRECHECK_INCLUDE_IN_APP_PURCHASES",
+                                     description: "Should check in-app purchases?",
+                                     is_string: false,
+                                     optional: true,
+                                     default_value: true)
       ] + rules
     end
   end

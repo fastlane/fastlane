@@ -1,8 +1,10 @@
+require 'highline'
+
 HighLine.track_eof = false
 
 require 'fastlane/version'
-require 'spaceship/playground'
-require 'spaceship/spaceauth_runner'
+require_relative 'playground'
+require_relative 'spaceauth_runner'
 
 module Spaceship
   class CommandsGenerator
@@ -22,6 +24,7 @@ module Spaceship
       program :help_formatter, :compact
 
       global_option('-u', '--user USERNAME', 'Specify the Apple ID you want to log in with')
+      global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
       command :playground do |c|
         c.syntax = 'fastlane spaceship playground'
@@ -41,7 +44,7 @@ module Spaceship
         end
       end
 
-      default_command :playground
+      default_command(:playground)
 
       run!
     end

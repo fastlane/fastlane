@@ -13,5 +13,25 @@ describe Fastlane do
       gem_require_name = Fastlane::FastlaneRequire.format_gem_require_name(gem_name)
       expect(gem_require_name).to eq("rest-client")
     end
+
+    describe "checks if a gem is installed" do
+      it "true on known installed gem" do
+        gem_name = "fastlane"
+        gem_installed = Fastlane::FastlaneRequire.gem_installed?(gem_name)
+        expect(gem_installed).to be(true)
+      end
+
+      it "false on known missing gem" do
+        gem_name = "foobar"
+        gem_installed = Fastlane::FastlaneRequire.gem_installed?(gem_name)
+        expect(gem_installed).to be(false)
+      end
+
+      it "true on known preinstalled gem" do
+        gem_name = "yaml"
+        gem_installed = Fastlane::FastlaneRequire.gem_installed?(gem_name)
+        expect(gem_installed).to be(true)
+      end
+    end
   end
 end

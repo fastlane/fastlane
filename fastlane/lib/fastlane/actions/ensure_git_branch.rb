@@ -9,7 +9,7 @@ module Fastlane
         branch = params[:branch]
         branch_expr = /#{branch}/
         if Actions.git_branch =~ branch_expr
-          UI.success("Git branch match `#{branch}`, all good! 💪")
+          UI.success("Git branch matches `#{branch}`, all good! 💪")
         else
           UI.user_error!("Git is not on a branch matching `#{branch}`. Current branch is `#{Actions.git_branch}`! Please ensure the repo is checked out to the correct branch.")
         end
@@ -25,9 +25,8 @@ module Fastlane
 
       def self.details
         [
-          'This action will check if your git repo is checked out to a specific branch.',
-          'You may only want to make releases from a specific branch, so `ensure_git_branch`',
-          'will stop a lane if it was accidentally executed on an incorrect branch.'
+          "This action will check if your git repo is checked out to a specific branch.",
+          "You may only want to make releases from a specific branch, so `ensure_git_branch` will stop a lane if it was accidentally executed on an incorrect branch."
         ].join("\n")
       end
 

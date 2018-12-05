@@ -1,4 +1,4 @@
-require 'precheck/rule'
+require_relative '../rule'
 
 module Precheck
   # abstract class that defines a default way to check for the presence of a list of words within a block of text
@@ -59,7 +59,7 @@ module Precheck
         if matches.length > 0 && word_search_type == WORD_SEARCH_TYPES[:fail_on_inclusion]
           # we are supposed to fail if any of the words are found
           friendly_matches = matches.join(', ')
-          UI.verbose "😭  #{self.class.name.split('::').last ||= self.class.name} found words \"#{friendly_matches}\""
+          UI.verbose("😭  #{self.class.name.split('::').last ||= self.class.name} found words \"#{friendly_matches}\"")
 
           return RuleReturn.new(validation_state: VALIDATION_STATES[:failed], failure_data: "found: #{friendly_matches}")
         elsif matches.length < lowercased_words_to_look_for.length && word_search_type == WORD_SEARCH_TYPES[:fail_on_exclusion]
@@ -68,7 +68,7 @@ module Precheck
           search_data_set.subtract(matches)
 
           missing_words = search_data_set.to_a.join(', ')
-          UI.verbose "😭  #{self.class.name.split('::').last ||= self.class.name} didn't find words \"#{missing_words}\""
+          UI.verbose("😭  #{self.class.name.split('::').last ||= self.class.name} didn't find words \"#{missing_words}\"")
 
           return RuleReturn.new(validation_state: VALIDATION_STATES[:failed], failure_data: "missing: #{missing_words}")
         else

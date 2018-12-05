@@ -1,5 +1,6 @@
 require 'digest'
-require 'precheck/rule'
+
+require_relative '../rule'
 
 module Precheck
   class CurseWordsRule < TextRule
@@ -40,9 +41,9 @@ module Precheck
 
         if found_words.length > 0
           friendly_found_words = found_words.join(', ')
-          UI.verbose "#{self.class.name.split('::').last ||= self.class.name} found potential curse words 😬"
-          UI.verbose "Keep in mind, these words might be ok given the context they are used in"
-          UI.verbose "Matched: \"#{friendly_found_words}\""
+          UI.verbose("#{self.class.name.split('::').last ||= self.class.name} found potential curse words 😬")
+          UI.verbose("Keep in mind, these words might be ok given the context they are used in")
+          UI.verbose("Matched: \"#{friendly_found_words}\"")
           return RuleReturn.new(validation_state: VALIDATION_STATES[:failed], failure_data: "found: #{friendly_found_words}")
         else
           return RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
