@@ -775,7 +775,7 @@ module Spaceship
           body_to_log = body.to_json
         rescue JSON::ParserError
           # no json, no password to replace
-          body_to_log = "[request body can not be represented as JSON]"
+          body_to_log = "[non JSON body]"
         end
       end
       params_to_log = Hash(params).dup # to also work with nil
