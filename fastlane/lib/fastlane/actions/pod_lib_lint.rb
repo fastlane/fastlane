@@ -8,7 +8,7 @@ module Fastlane
 
         command << "pod lib lint"
 
-        command << params[:podspec] if params[:podspec] 
+        command << params[:podspec] if params[:podspec]
 
         if params[:verbose]
           command << "--verbose"
