@@ -1,11 +1,11 @@
 describe Produce do
   describe Produce::Options do
     before(:each) do
-      ENV.delete('FASTLANE_TEAM_ID')
+      ENV.delete('FASTLANE_ITC_TEAM_ID')
     end
 
     after(:each) do
-      ENV.delete('FASTLANE_TEAM_ID')
+      ENV.delete('FASTLANE_ITC_TEAM_ID')
     end
 
     describe ":itc_team_id" do
