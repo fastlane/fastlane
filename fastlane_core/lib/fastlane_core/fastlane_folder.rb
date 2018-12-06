@@ -6,19 +6,19 @@ module FastlaneCore
 
     # Path to the fastlane folder containing the Fastfile and other configuration files
     def self.path
-      puts('fastlane_folder: 1')
+      puts("fastlane_folder: 1")
       value ||= "./#{FOLDER_NAME}/" if File.directory?("./#{FOLDER_NAME}/")
-      puts('fastlane_folder: 2: #{value}')
+      puts("fastlane_folder: 2: '#{value}'")
       value ||= "./.#{FOLDER_NAME}/" if File.directory?("./.#{FOLDER_NAME}/") # hidden folder
-      puts('fastlane_folder: 3: #{value}')
+      puts("fastlane_folder: 3: '#{value}'")
       value ||= "./" if File.basename(Dir.getwd) == FOLDER_NAME && File.exist?('Fastfile.swift') # inside the folder
-      puts('fastlane_folder: 4: #{value}')
+      puts("fastlane_folder: 4: '#{value}'")
       value ||= "./" if File.basename(Dir.getwd) == ".#{FOLDER_NAME}" && File.exist?('Fastfile.swift') # inside the folder and hidden
-      puts('fastlane_folder: 5: #{value}')
+      puts("fastlane_folder: 5: '#{value}'")
       value ||= "./" if File.basename(Dir.getwd) == FOLDER_NAME && File.exist?('Fastfile') # inside the folder
-      puts('fastlane_folder: 6: #{value}')
+      puts("fastlane_folder: 6: '#{value}'")
       value ||= "./" if File.basename(Dir.getwd) == ".#{FOLDER_NAME}" && File.exist?('Fastfile') # inside the folder and hidden
-      puts('fastlane_folder: 7: #{value}')
+      puts("fastlane_folder: 7: '#{value}'")
       puts("DEBUG: self.path = '#{value}', Dir.getwd = '#{Dir.getwd}'")
       return value
     end
