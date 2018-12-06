@@ -80,7 +80,7 @@ module Fastlane
 
         tool_name = process_emojis(tool_name)
 
-        puts('take_off: after tool_name (= #{tool_name}), before if ...')
+        puts("take_off: after tool_name (= '#{tool_name}'), before if ...")
         
         if tool_name && Fastlane::TOOLS.include?(tool_name.to_sym) && !available_lanes.include?(tool_name.to_sym)
           # Triggering a specific tool
