@@ -12,7 +12,7 @@ module FastlaneCore
       value ||= "./" if File.basename(Dir.getwd) == ".#{FOLDER_NAME}" && File.exist?('Fastfile.swift') # inside the folder and hidden
       value ||= "./" if File.basename(Dir.getwd) == FOLDER_NAME && File.exist?('Fastfile') # inside the folder
       value ||= "./" if File.basename(Dir.getwd) == ".#{FOLDER_NAME}" && File.exist?('Fastfile') # inside the folder and hidden
-      puts "DEBUG: self.path = '#{value}' ()"
+      puts("DEBUG: self.path = '#{value.to_s}', Dir.getwd = '#{Dir.getwd}'")
       return value
     end
 
