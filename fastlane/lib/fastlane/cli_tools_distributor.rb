@@ -17,6 +17,7 @@ module Fastlane
       end
 
       def take_off
+        puts('take_off')
         before_import_time = Time.now
 
         if !ENV["FASTLANE_DISABLE_ANIMATION"]
@@ -45,6 +46,8 @@ module Fastlane
           print_bundle_exec_warning(is_slow: (Time.now - before_import_time > 3))
         end
 
+        puts('take_off: after require')
+        
         unless (ENV['LANG'] || "").end_with?("UTF-8") || (ENV['LC_ALL'] || "").end_with?("UTF-8")
           warn = "WARNING: fastlane requires your locale to be set to UTF-8. To learn more go to https://docs.fastlane.tools/getting-started/ios/setup/#set-up-environment-variables"
           UI.error(warn)
@@ -54,15 +57,21 @@ module Fastlane
           end
         end
 
+        puts('take_off: after lang')
+        
         # Loading any .env files before any lanes are called since
         # variables like FASTLANE_HIDE_CHANGELOG and FASTLANE_DISABLE_COLORS
         # need to be set early on in execution
         require 'fastlane/helper/dotenv_helper'
         Fastlane::Helper::DotenvHelper.load_dot_env(nil)
 
+        puts('take_off: after dotenv')
+        
         # Needs to go after load_dot_env for variable FASTLANE_SKIP_UPDATE_CHECK
         FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
 
+        puts('take_off: after updatechecker')
+        
         # Disabling colors if environment variable set
         require 'fastlane_core/ui/disable_colors' if FastlaneCore::Helper.colors_disabled?
 
@@ -71,6 +80,8 @@ module Fastlane
 
         tool_name = process_emojis(tool_name)
 
+        puts('take_off: after tool_name (= #{tool_name}), before if ...')
+        
         if tool_name && Fastlane::TOOLS.include?(tool_name.to_sym) && !available_lanes.include?(tool_name.to_sym)
           # Triggering a specific tool
           # This happens when the users uses things like
@@ -78,6 +89,9 @@ module Fastlane
           #   fastlane sigh
           #   fastlane snapshot
           #
+          
+          puts('take_off: inside the if')
+          
           require tool_name
           begin
             # First, remove the tool's name from the arguments
