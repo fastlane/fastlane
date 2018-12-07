@@ -178,7 +178,7 @@ module Fastlane
       # every time one of the tools is launched
       # Use this only if performance is :key:
       def available_lanes
-        puts("available_lanes")
+        puts("1 available_lanes")
         fastfile_path = FastlaneCore::FastlaneFolder.fastfile_path
         return [] if fastfile_path.nil?
         output = `cat #{fastfile_path.shellescape} | grep \"^\s*lane \:\" | awk -F ':' '{print $2}' | awk -F ' ' '{print $1}'`
