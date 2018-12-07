@@ -6,37 +6,43 @@ module FastlaneCore
 
     # Path to the fastlane folder containing the Fastfile and other configuration files
     def self.path
-      puts("3 path: DEBUG: Dir.getwd = '#{Dir.getwd}'")
-      puts("3 path: all files in current wd = '#{Dir.glob("*")}'")
-      puts("3 path: all files in current wd/fastlane = '#{Dir.glob("#{FOLDER_NAME}/*")}'")
-      puts("3 path: 1")
+      puts("3 path: START Dir.getwd = '#{Dir.getwd}'\n")
+      puts("3 path: files in current wd = '#{Dir.glob("*")}'")
+      puts("3 path: files in current wd/fastlane = '#{Dir.glob("#{FOLDER_NAME}/*")}'")
+     
+      # original check
       fastlane_folder_is_directory = File.directory?("./#{FOLDER_NAME}/")
-      puts("3 path: DEBUG: fastlane_folder_is_directory = '#{fastlane_folder_is_directory}' (File.directory?(./FOLDER_NAME/))")
+      puts("3 path: fastlane_folder_is_directory = '#{fastlane_folder_is_directory}' (File.directory?(./FOLDER_NAME/))")
       
-      fastlane_folder_exists_no_trailing_slash = File.directory?("./#{FOLDER_NAME}")
-      puts("3 path: DEBUG: fastlane_folder_exists_no_trailing_slash = '#{fastlane_folder_exists_no_trailing_slash}' (File.directory?(./FOLDER_NAME))")
-      fastlane_folder_exists_no_slashes_at_all = File.directory?("#{FOLDER_NAME}")
-      puts("3 path: DEBUG: fastlane_folder_exists_no_slashes_at_all = '#{fastlane_folder_exists_no_slashes_at_all}' (File.directory?(FOLDER_NAME))")
+      # folder variants
+      fastlane_folder_is_directory_no_trailing_slash = File.directory?("./#{FOLDER_NAME}")
+      puts("3 path: fastlane_folder_is_directory_no_trailing_slash = '#{fastlane_folder_is_directory_no_trailing_slash}' (File.directory?(./FOLDER_NAME))")
+      fastlane_folder_is_directory_no_slashes_at_all = File.directory?("#{FOLDER_NAME}")
+      puts("3 path: fastlane_folder_is_directory_no_slashes_at_all = '#{fastlane_folder_is_directory_no_slashes_at_all}' (File.directory?(FOLDER_NAME))")
+      
+      # file?
       fastlane_folder_is_a_file = File.file?("./#{FOLDER_NAME}/")
-      puts("3 path: DEBUG: fastlane_folder_is_a_file = '#{fastlane_folder_is_a_file}' (File.file?(./FOLDER_NAME/))")
+      puts("3 path: fastlane_folder_is_a_file = '#{fastlane_folder_is_a_file}' (File.file?(./FOLDER_NAME/))")
       fastlane_folder_exists = File.exist?('./#{FOLDER_NAME}/')
-      puts("3 path: DEBUG: fastlane_folder_exists = '#{fastlane_folder_exists}' (File.exist?(./FOLDER_NAME/))")
+      puts("3 path: fastlane_folder_exists = '#{fastlane_folder_exists}' (File.exist?(./FOLDER_NAME/))")
       fastfile_exists_in_fastlane_folder = File.exist?('./#{FOLDER_NAME}/Fastfile')
-      puts("3 path: DEBUG: fastfile_exists_in_fastlane_folder = '#{fastfile_exists_in_fastlane_folder}' (File.exist?(./FOLDER_NAME/Fastfile))")
+      puts("3 path:  fastfile_exists_in_fastlane_folder = '#{fastfile_exists_in_fastlane_folder}' (File.exist?(./FOLDER_NAME/Fastfile))")
       
+      puts("3 path: 1: '#{value}'")
       value ||= "./#{FOLDER_NAME}/" if fastlane_folder_is_directory
-      puts("3 path: fastlane_folder: 2: '#{value}'")
+      puts("3 path: 2: '#{value}'")
       value ||= "./.#{FOLDER_NAME}/" if File.directory?("./.#{FOLDER_NAME}/") # hidden folder
-      puts("3 path: fastlane_folder: 3: '#{value}'")
+      puts("3 path: 3: '#{value}'")
       value ||= "./" if File.basename(Dir.getwd) == FOLDER_NAME && File.exist?('Fastfile.swift') # inside the folder
-      puts("3 path: fastlane_folder: 4: '#{value}'")
+      puts("3 path: 4: '#{value}'")
       value ||= "./" if File.basename(Dir.getwd) == ".#{FOLDER_NAME}" && File.exist?('Fastfile.swift') # inside the folder and hidden
-      puts("3 path: fastlane_folder: 5: '#{value}'")
+      puts("3 path: 5: '#{value}'")
       value ||= "./" if File.basename(Dir.getwd) == FOLDER_NAME && File.exist?('Fastfile') # inside the folder
-      puts("3 path: fastlane_folder: 6: '#{value}'")
+      puts("3 path: 6: '#{value}'")
       value ||= "./" if File.basename(Dir.getwd) == ".#{FOLDER_NAME}" && File.exist?('Fastfile') # inside the folder and hidden
-      puts("3 path: fastlane_folder: 7: '#{value}'")
-      puts("3 path: DEBUG: self.path = '#{value}', Dir.getwd = '#{Dir.getwd}'")
+      puts("3 path: 7: '#{value}'")
+      
+      puts("\n3 path: END Dir.getwd = '#{Dir.getwd}', value = '#{value}'\n")
       return value
     end
 
