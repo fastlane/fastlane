@@ -8,6 +8,7 @@ module FastlaneCore
     def self.path
       puts("DEBUG: Dir.getwd = '#{Dir.getwd}'")
       puts("all files in current wd = '#{Dir.glob("*")}'")
+      puts("all files in current wd/fastlane = '#{Dir.glob("#{FOLDER_NAME}/*")}'")
       puts("fastlane_folder: 1")
       fastlane_folder_is_directory = File.directory?("./#{FOLDER_NAME}/")
       puts("DEBUG: fastlane_folder_is_directory = '#{fastlane_folder_is_directory}' (File.directory?(./FOLDER_NAME/))")
