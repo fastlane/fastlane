@@ -56,19 +56,22 @@ module FastlaneCore
 
     # Path to the Fastfile inside the fastlane folder. This is nil when none is available
     def self.fastfile_path
-      puts("fastfile_path")
+      puts("fastfile_path 0: Dir.getwd = '#{Dir.getwd}'")
+      
       return nil if self.path.nil?
 
-      puts("fastfile_path: Fastfile.swift")
+      puts("fastfile_path 1: Fastfile.swift: Dir.getwd = '#{Dir.getwd}'")
+      
       # Check for Swift first, because Swift is #1
       path = File.join(self.path, 'Fastfile.swift')
       return path if File.exist?(path)
 
-      puts("fastfile_path: Fastfile")
+      puts("fastfile_path 2: Fastfile: Dir.getwd = '#{Dir.getwd}'")
+      
       path = File.join(self.path, 'Fastfile')
       return path if File.exist?(path)
       
-      puts("fastfile_path: nil")
+      puts("fastfile_path 3: nil")
       return nil
     end
 
