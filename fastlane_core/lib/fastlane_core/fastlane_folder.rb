@@ -27,6 +27,8 @@ module FastlaneCore
       puts("3 path: Dir.getwd = '#{Dir.getwd}' - fastlane_folder_exists =                          '#{fastlane_folder_exists}' (File.exist?(./FOLDER_NAME/)),")
       fastfile_exists_in_fastlane_folder = File.exist?('./#{FOLDER_NAME}/Fastfile')
       puts("3 path: Dir.getwd = '#{Dir.getwd}' - fastfile_exists_in_fastlane_folder =              '#{fastfile_exists_in_fastlane_folder}' (File.exist?(./FOLDER_NAME/Fastfile))")
+      fastfile_exists = File.exist?('Fastfile')
+      puts("3 path: Dir.getwd = '#{Dir.getwd}' - fastfile_exists =                                 '#{fastfile_exists}' (File.exist?(Fastfile))")
       
       puts("3 path: Dir.getwd = '#{Dir.getwd}' - 1: ''")
       value ||= "./#{FOLDER_NAME}/" if fastlane_folder_is_directory
