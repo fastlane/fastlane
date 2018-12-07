@@ -44,4 +44,4 @@ before_test:
 build: off
 
 test_script:
-  - bundle exec fastlane execute_tests
+  - bundle exec fastlane scan
