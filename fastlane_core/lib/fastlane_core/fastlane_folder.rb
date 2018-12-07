@@ -11,6 +11,14 @@ module FastlaneCore
       puts("fastlane_folder: 1")
       fastlane_folder_exists = File.directory?("./#{FOLDER_NAME}/")
       puts("DEBUG: fastlane_folder_exists = '#{fastlane_folder_exists}'")
+      
+      fastlane_folder_exists_no_trailing_slash = File.directory?("./#{FOLDER_NAME}")
+      puts("DEBUG: fastlane_folder_exists_no_trailing_slash = '#{fastlane_folder_exists_no_trailing_slash}'")
+      fastlane_folder_exists_no_slashes_at_all = File.directory?("#{FOLDER_NAME}")
+      puts("DEBUG: fastlane_folder_exists_no_slashes_at_all = '#{fastlane_folder_exists_no_slashes_at_all}'")
+      fastlane_folder_is_a_file = File.file?("./#{FOLDER_NAME}/")
+      puts("DEBUG: fastlane_folder_is_a_file = '#{fastlane_folder_is_a_file}'")
+      
       value ||= "./#{FOLDER_NAME}/" if fastlane_folder_exists
       puts("fastlane_folder: 2: '#{value}'")
       value ||= "./.#{FOLDER_NAME}/" if File.directory?("./.#{FOLDER_NAME}/") # hidden folder
