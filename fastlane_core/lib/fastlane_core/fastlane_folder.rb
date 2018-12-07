@@ -7,7 +7,7 @@ module FastlaneCore
     # Path to the fastlane folder containing the Fastfile and other configuration files
     def self.path
       puts("DEBUG: Dir.getwd = '#{Dir.getwd}'")
-      puts("all files in current wd = '#{Dir[Dir.getwd]}'")
+      puts("all files in current wd = '#{Dir.glob()}'")
       puts("fastlane_folder: 1")
       fastlane_folder_exists = File.directory?("./#{FOLDER_NAME}/")
       puts("DEBUG: fastlane_folder_exists = '#{fastlane_folder_exists}'")
