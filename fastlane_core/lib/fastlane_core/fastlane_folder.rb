@@ -28,7 +28,7 @@ module FastlaneCore
       fastfile_exists_in_fastlane_folder = File.exist?('./#{FOLDER_NAME}/Fastfile')
       puts("3 path:  fastfile_exists_in_fastlane_folder = '#{fastfile_exists_in_fastlane_folder}' (File.exist?(./FOLDER_NAME/Fastfile))")
       
-      puts("3 path: 1: '#{value}'")
+      puts("3 path: 1: ''")
       value ||= "./#{FOLDER_NAME}/" if fastlane_folder_is_directory
       puts("3 path: 2: '#{value}'")
       value ||= "./.#{FOLDER_NAME}/" if File.directory?("./.#{FOLDER_NAME}/") # hidden folder
