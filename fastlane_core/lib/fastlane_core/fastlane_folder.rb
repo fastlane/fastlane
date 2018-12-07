@@ -18,6 +18,10 @@ module FastlaneCore
       puts("DEBUG: fastlane_folder_exists_no_slashes_at_all = '#{fastlane_folder_exists_no_slashes_at_all}'")
       fastlane_folder_is_a_file = File.file?("./#{FOLDER_NAME}/")
       puts("DEBUG: fastlane_folder_is_a_file = '#{fastlane_folder_is_a_file}'")
+      fastlane_folder_exists = File.exist?('./#{FOLDER_NAME}/')
+      puts("DEBUG: fastlane_folder_exists = '#{fastlane_folder_exists}'")
+      fastfile_exists_in_fastlane_folder = File.exist?('./#{FOLDER_NAME}/Fastfile')
+      puts("DEBUG: fastfile_exists_in_fastlane_folder = '#{fastfile_exists_in_fastlane_folder}'")
       
       value ||= "./#{FOLDER_NAME}/" if fastlane_folder_exists
       puts("fastlane_folder: 2: '#{value}'")
