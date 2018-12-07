@@ -43,7 +43,7 @@ jobs:
       - restore_cache:
           key: v1-{{ arch }}-rubocop
 
-      - run: bundle exec fastlane execute_tests
+      - run: bundle exec fastlane scan
 
       - save_cache:
           key: v1-{{ arch }}-rubocop
@@ -89,7 +89,7 @@ jobs:
       - restore_cache:
           key: v1-{{ arch }}-rubocop
 
-      - run: bundle exec fastlane execute_tests
+      - run: bundle exec fastlane scan
 
       - save_cache:
           key: v1-{{ arch }}-rubocop
@@ -123,7 +123,7 @@ jobs:
           paths:
             - .bundle
 
-      - run: bundle exec fastlane validate_docs
+      - run: bundle exec fastlane scan
 
   "Lint Source Code":
     docker:
@@ -142,7 +142,7 @@ jobs:
           paths:
             - .bundle
 
-      - run: bundle exec fastlane lint_source
+      - run: bundle exec fastlane scan
 
 workflows:
   version: 2
