@@ -6,8 +6,12 @@ module FastlaneCore
 
     # Path to the fastlane folder containing the Fastfile and other configuration files
     def self.path
+      puts("DEBUG: Dir.getwd = '#{Dir.getwd}'")
+      puts("all files in current wd = '#{Dir[Dir.getwd]}'")
       puts("fastlane_folder: 1")
-      value ||= "./#{FOLDER_NAME}/" if File.directory?("./#{FOLDER_NAME}/")
+      fastlane_folder_exists = File.directory?("./#{FOLDER_NAME}/")
+      puts("DEBUG: fastlane_folder_exists = '#{fastlane_folder_exists}'")
+      value ||= "./#{FOLDER_NAME}/" if fastlane_folder_exists
       puts("fastlane_folder: 2: '#{value}'")
       value ||= "./.#{FOLDER_NAME}/" if File.directory?("./.#{FOLDER_NAME}/") # hidden folder
       puts("fastlane_folder: 3: '#{value}'")
