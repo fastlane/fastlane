@@ -204,7 +204,7 @@ module FastlaneCore
 
     def shell_escaped_password(password)
       password = password.shellescape
-      if Helper.mac?
+      unless Helper.windows?
         # because the shell handles passwords with single-quotes incorrectly, use `gsub` to replace `shellescape`'d single-quotes of this form:
         #    \'
         # with a sequence that wraps the escaped single-quote in double-quotes:
