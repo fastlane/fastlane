@@ -1,13 +1,25 @@
-App Store Connect API
-====================
+# App Store Connect API
 
-# Usage
+- [Usage](#usage)
+  * [Login](#login)
+  * [Applications](#applications)
+  * [AppVersions](#appversions)
+  * [Select a build for review](#select-a-build-for-review)
+  * [Build Trains (TestFlight)](#build-trains-testflight)
+  * [Builds](#builds)
+  * [Processing builds](#processing-builds)
+  * [Submit app for App Store Review](#submit-app-for-app-store-review)
+  * [Testers](#testers)
+  * [App ratings & reviews](#app-ratings--reviews)
+- [License](#license)
+
+## Usage
 
 To quickly play around with _spaceship_ launch `irb` in your terminal and execute `require "spaceship"`.
 
-In general the classes are pre-fixed with the `Tunes` module.
+In general the classes are pre-fixed with the `Tunes` module. This name is an artifact from when "App Store Connect" was still called "iTunes Connect".
 
-## Login
+### Login
 
 *Note*: If you use both the Developer Portal and App Store Connect API, you'll have to login on both, as the user might have different user credentials.
 
@@ -17,7 +29,7 @@ Spaceship::Tunes.login("felix@krausefx.com", "password")
 Spaceship::Tunes.select_team # call this method to let the user select a team
 ```
 
-## Applications
+### Applications
 
 ```ruby
 # Fetch all available applications
@@ -61,7 +73,7 @@ To change the price of the app (it's not necessary to call `save!` when updating
 app.update_price_tier!("3")
 ```
 
-## AppVersions
+### AppVersions
 
 <img src="/spaceship/assets/docs/AppVersions.png" width="500">
 
@@ -185,7 +197,7 @@ attr_reader :screenshots
 
 **Important**: For a complete documentation with the return type, description and notes for each of the properties, check out [app_version.rb](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/tunes/app_version.rb).
 
-## Select a build for review
+### Select a build for review
 
 ```ruby
 version = app.edit_version
@@ -195,7 +207,7 @@ version.select_build(builds.first)
 version.save!
 ```
 
-## Build Trains (TestFlight)
+### Build Trains (TestFlight)
 
 <img src="/spaceship/assets/docs/BuildTrains.png" width="700">
 
@@ -223,7 +235,7 @@ build = train.builds.first
 train.update_testing_status!(true, 'external')
 ```
 
-## Builds
+### Builds
 
 ```ruby
 # Continue from the BuildTrains example
@@ -257,7 +269,7 @@ parameters = {
 build.submit_for_beta_review!(parameters)
 ```
 
-## Processing builds
+### Processing builds
 
 To also access those builds that are "stuck" at `Processing` at App Store Connect for a while:
 
@@ -265,7 +277,7 @@ To also access those builds that are "stuck" at `Processing` at App Store Connec
 app.all_processing_builds       # => Array of processing builds for this application
 ```
 
-## Submit app for App Store Review
+### Submit app for App Store Review
 
 ```ruby
 submission = app.create_submission
@@ -281,7 +293,7 @@ submission.complete!
 
 For a full list of available options, check out [app_submission.rb](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/tunes/app_submission.rb).
 
-## Testers
+### Testers
 
 There are 3 types of testers:
 
@@ -324,7 +336,7 @@ Spaceship::Tunes::SandboxTester.delete!(['sandbox@test.com', 'sandbox2@test.com'
 Spaceship::Tunes::SandboxTester.delete_all!
 ```
 
-## App ratings & reviews
+### App ratings & reviews
 
 ```ruby
 # Get the rating summary for an application
@@ -344,6 +356,6 @@ reviews = ratings.reviews("US") # => Array of hashes representing review data
 
 ```
 
-### License
+## License
 
 > This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.

@@ -24,11 +24,18 @@ module Scan
           print("https://stackoverflow.com/a/17031697/445598")
         when /Testing failed/
           UI.build_failure!("Error building the application - see the log above")
-        when /Executed/
+        when /Executed/, /Failing tests:/
           # this is *really* important:
           # we don't want to raise an exception here
           # as we handle this in runner.rb at a later point
           # after parsing the actual test results
+          # ------------------------------------------------
+          # For the "Failing tests:" case, this covers Xcode
+          # 10 parallel testing failure, which doesn't
+          # print out the "Executed" line that would show
+          # test summary (number of tests passed, etc.).
+          # Instead, it just prints "Failing tests:"
+          # followed by a list of tests that failed.
           return
         end
         UI.build_failure!("Error building/testing the application - see the log above")

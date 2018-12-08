@@ -146,6 +146,11 @@ module Scan
                                      type: Boolean,
                                      default_value: false,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :suppress_xcode_output,
+                                     env_name: "SCAN_SUPPRESS_XCODE_OUTPUT",
+                                     description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
+                                     optional: true,
+                                     is_string: false),
         FastlaneCore::ConfigItem.new(key: :formatter,
                                      short_option: "-n",
                                      env_name: "SCAN_FORMATTER",
@@ -302,7 +307,19 @@ module Scan
                                      deprecated: "Use `--output_files` instead",
                                      conflicting_options: [:output_files],
                                      optional: true,
-                                     is_string: true)
+                                     is_string: true),
+        FastlaneCore::ConfigItem.new(key: :app_identifier,
+                                     env_name: 'SCAN_APP_IDENTIFIER',
+                                     optional: true,
+                                     description: "The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)",
+                                     code_gen_sensitive: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                     default_value_dynamic: true),
+        FastlaneCore::ConfigItem.new(key: :reinstall_app,
+                                     env_name: 'SCAN_REINSTALL_APP',
+                                     description: "Enabling this option will automatically uninstall the application before running it",
+                                     default_value: false,
+                                     is_string: false)
       ]
     end
   end

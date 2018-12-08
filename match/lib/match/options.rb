@@ -29,6 +29,17 @@ module Match
                                          UI.user_error!("Unsupported environment #{value}, must be in #{Match.environments.join(', ')}")
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :storage_mode,
+                                     env_name: "MATCH_STORAGE_MODE",
+                                     description: "Define where you want to store your certificates",
+                                     is_string: true,
+                                     short_option: "-q",
+                                     default_value: 'git',
+                                     verify_block: proc do |value|
+                                       unless Match.storage_modes.include?(value)
+                                         UI.user_error!("Unsupported storage_mode #{value}, must be in #{Match.storage_modes.join(', ')}")
+                                       end
+                                     end),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "MATCH_APP_IDENTIFIER",
@@ -115,18 +126,6 @@ module Match
                                      description: "Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail",
                                      is_string: false,
                                      default_value: false),
-        FastlaneCore::ConfigItem.new(key: :workspace,
-                                     description: nil,
-                                     verify_block: proc do |value|
-                                       unless Helper.test?
-                                         if value.start_with?("/var/folders") || value.include?("tmp/") || value.include?("temp/")
-                                           # that's fine
-                                         else
-                                           UI.user_error!("Specify the `git_url` instead of the `path`")
-                                         end
-                                       end
-                                     end,
-                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :force_for_new_devices,
                                      env_name: "MATCH_FORCE_FOR_NEW_DEVICES",
                                      description: "Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile type 'appstore'",

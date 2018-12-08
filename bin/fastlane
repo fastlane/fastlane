@@ -4,6 +4,11 @@ if RUBY_VERSION < '2.0.0'
   abort("fastlane requires Ruby 2.0.0 or higher")
 end
 
+def self.windows?
+  # taken from: https://stackoverflow.com/a/171011/1945875
+  (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
+end
+
 require "fastlane/cli_tools_distributor"
 
 if Fastlane::CLIToolsDistributor.running_version_command?

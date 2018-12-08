@@ -34,9 +34,12 @@ module Spaceship
             'iphone6' => [1334, 750],
             'iphone6Plus' => [2208, 1242],
             'iphone58' => [2436, 1125],
+            'iphone65' => [2688, 1242],
             'ipad' => [1024, 768],
             'ipad105' => [2224, 1668],
-            'ipadPro' => [2732, 2048]
+            'ipadPro' => [2732, 2048],
+            'iPadPro11' => [2388, 1668],
+            'iPadPro129' => [2732, 2048]
         }
 
         r = resolutions[device]
@@ -222,7 +225,7 @@ module Spaceship
         elsif errors.count == 1 && errors.first.include?("try again later")
           raise ITunesConnectTemporaryError.new, errors.first
         elsif errors.count == 1 && errors.first.include?("Forbidden")
-          raise_insuffient_permission_error!
+          raise_insufficient_permission_error!
         elsif flaky_api_call
           raise ITunesConnectPotentialServerError.new, errors.join(' ')
         else
