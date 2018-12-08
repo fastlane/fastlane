@@ -69,7 +69,46 @@ module Scan
                                      type: Boolean,
                                      optional: true),
 
+        # reinstall app
+        FastlaneCore::ConfigItem.new(key: :reinstall_app,
+                                     env_name: 'SCAN_REINSTALL_APP',
+                                     description: "Enabling this option will automatically uninstall the application before running it",
+                                     default_value: false,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :app_identifier,
+                                     env_name: 'SCAN_APP_IDENTIFIER',
+                                     optional: true,
+                                     description: "The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)",
+                                     code_gen_sensitive: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                     default_value_dynamic: true)
+
+        # tests to run
+        FastlaneCore::ConfigItem.new(key: :only_testing,
+                                     env_name: "SCAN_ONLY_TESTING",
+                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to run",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       verify_type('only_testing', [Array, String], value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :skip_testing,
+                                     env_name: "SCAN_SKIP_TESTING",
+                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to skip",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       verify_type('skip_testing', [Array, String], value)
+                                     end),
+
         # other test options
+        FastlaneCore::ConfigItem.new(key: :xctestrun,
+                                     short_option: "-X",
+                                     env_name: "SCAN_XCTESTRUN",
+                                     description: "Run tests using the provided `.xctestrun` file",
+                                     conflicting_options: [:build_for_testing],
+                                     is_string: true,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :toolchain,
                                      env_name: "SCAN_TOOLCHAIN",
                                      conflicting_options: [:xctestrun],
@@ -107,6 +146,12 @@ module Scan
                                      end),
 
         # output
+        FastlaneCore::ConfigItem.new(key: :open_report,
+                                     short_option: "-g",
+                                     env_name: "SCAN_OPEN_REPORT",
+                                     description: "Should the HTML report be opened when tests are completed?",
+                                     is_string: false,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :output_directory,
                                      short_option: "-o",
                                      env_name: "SCAN_OUTPUT_DIRECTORY",
@@ -180,6 +225,17 @@ module Scan
                                      description: "Should an Xcode result bundle be generated in the output directory",
                                      default_value: false,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :use_clang_report_name,
+                                     description: "Generate the json compilation database with clang naming convention (compile_commands.json)",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
+                                     env_name: "SCAN_CUSTOM_REPORT_FILE_NAME",
+                                     description: "Sets custom full report file name when generating a single report",
+                                     deprecated: "Use `--output_files` instead",
+                                     conflicting_options: [:output_files],
+                                     optional: true,
+                                     is_string: true),
 
         # concurrency
         FastlaneCore::ConfigItem.new(key: :max_concurrent_simulators,
@@ -244,46 +300,6 @@ module Scan
                                        UI.user_error!("File not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                      end),
 
-        FastlaneCore::ConfigItem.new(key: :xctestrun,
-                                     short_option: "-X",
-                                     env_name: "SCAN_XCTESTRUN",
-                                     description: "Run tests using the provided `.xctestrun` file",
-                                     conflicting_options: [:build_for_testing],
-                                     is_string: true,
-                                     optional: true),
-
-        FastlaneCore::ConfigItem.new(key: :open_report,
-                                     short_option: "-g",
-                                     env_name: "SCAN_OPEN_REPORT",
-                                     description: "Should the HTML report be opened when tests are completed?",
-                                     is_string: false,
-                                     default_value: false),
-        
-        FastlaneCore::ConfigItem.new(key: :destination,
-                                     short_option: "-d",
-                                     env_name: "SCAN_DESTINATION",
-                                     description: "Use only if you're a pro, use the other options instead",
-                                     is_string: false,
-                                     optional: true),
-
-        # tests to run
-        FastlaneCore::ConfigItem.new(key: :only_testing,
-                                     env_name: "SCAN_ONLY_TESTING",
-                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to run",
-                                     optional: true,
-                                     is_string: false,
-                                     verify_block: proc do |value|
-                                       verify_type('only_testing', [Array, String], value)
-                                     end),
-        FastlaneCore::ConfigItem.new(key: :skip_testing,
-                                     env_name: "SCAN_SKIP_TESTING",
-                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to skip",
-                                     optional: true,
-                                     is_string: false,
-                                     verify_block: proc do |value|
-                                       verify_type('skip_testing', [Array, String], value)
-                                     end),
-
         # slack
         FastlaneCore::ConfigItem.new(key: :slack_url,
                                      short_option: "-i",
@@ -315,31 +331,14 @@ module Scan
                                     is_string: false,
                                     default_value: false),
 
-        FastlaneCore::ConfigItem.new(key: :use_clang_report_name,
-                                    description: "Generate the json compilation database with clang naming convention (compile_commands.json)",
-                                    is_string: false,
-                                    default_value: false),
-        FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
-                                     env_name: "SCAN_CUSTOM_REPORT_FILE_NAME",
-                                     description: "Sets custom full report file name when generating a single report",
-                                     deprecated: "Use `--output_files` instead",
-                                     conflicting_options: [:output_files],
-                                     optional: true,
-                                     is_string: true),
+        # misc
+        FastlaneCore::ConfigItem.new(key: :destination,
+                                     short_option: "-d",
+                                     env_name: "SCAN_DESTINATION",
+                                     description: "Use only if you're a pro, use the other options instead",
+                                     is_string: false,
+                                     optional: true),
 
-        # reinstall app
-        FastlaneCore::ConfigItem.new(key: :reinstall_app,
-                                     env_name: 'SCAN_REINSTALL_APP',
-                                     description: "Enabling this option will automatically uninstall the application before running it",
-                                     default_value: false,
-                                     is_string: false),
-        FastlaneCore::ConfigItem.new(key: :app_identifier,
-                                     env_name: 'SCAN_APP_IDENTIFIER',
-                                     optional: true,
-                                     description: "The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)",
-                                     code_gen_sensitive: true,
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
-                                     default_value_dynamic: true)
       ]
     end
   end
