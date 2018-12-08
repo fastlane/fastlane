@@ -81,7 +81,7 @@ module Scan
                                      description: "The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)",
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
-                                     default_value_dynamic: true)
+                                     default_value_dynamic: true),
 
         # tests to run
         FastlaneCore::ConfigItem.new(key: :only_testing,
@@ -229,13 +229,6 @@ module Scan
                                      description: "Generate the json compilation database with clang naming convention (compile_commands.json)",
                                      is_string: false,
                                      default_value: false),
-        FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
-                                     env_name: "SCAN_CUSTOM_REPORT_FILE_NAME",
-                                     description: "Sets custom full report file name when generating a single report",
-                                     deprecated: "Use `--output_files` instead",
-                                     conflicting_options: [:output_files],
-                                     optional: true,
-                                     is_string: true),
 
         # concurrency
         FastlaneCore::ConfigItem.new(key: :max_concurrent_simulators,
@@ -338,6 +331,13 @@ module Scan
                                      description: "Use only if you're a pro, use the other options instead",
                                      is_string: false,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
+                                     env_name: "SCAN_CUSTOM_REPORT_FILE_NAME",
+                                     description: "Sets custom full report file name when generating a single report",
+                                     deprecated: "Use `--output_files` instead",
+                                     conflicting_options: [:output_files],
+                                     optional: true,
+                                     is_string: true)
 
       ]
     end
