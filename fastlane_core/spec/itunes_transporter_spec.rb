@@ -8,7 +8,7 @@ describe FastlaneCore do
   describe FastlaneCore::ItunesTransporter do
     def shell_upload_command(provider_short_name = nil)
       escaped_password = password.shellescape
-      if FastlaneCore::Helper.mac?
+      unless FastlaneCore::Helper.windows?
         escaped_password = escaped_password.gsub("\\'") do
           "'\"\\'\"'"
         end
@@ -30,7 +30,7 @@ describe FastlaneCore do
 
     def shell_download_command(provider_short_name = nil)
       escaped_password = password.shellescape
-      if FastlaneCore::Helper.mac?
+      unless FastlaneCore::Helper.windows?
         escaped_password = escaped_password.gsub("\\'") do
           "'\"\\'\"'"
         end
