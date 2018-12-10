@@ -26,7 +26,7 @@ module Fastlane
 
       def self.details
         [
-          "This action will check if you are using bundler."
+          "This action will check if you are using bundle exec to run fastlane."
         ].join("\n")
       end
 
