@@ -11,7 +11,7 @@ module Match
       end
 
       storage_mode = UI.select(
-        "fastlane match supports multiple storage backends, please select:",
+        "fastlane match supports multiple storage modes, please select the one you want to use:",
         self.storage_options
       )
 
