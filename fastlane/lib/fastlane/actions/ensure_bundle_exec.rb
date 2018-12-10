@@ -49,6 +49,10 @@ module Fastlane
         ]
       end
 
+      def self.category
+        :misc
+      end
+
       def self.is_supported?(platform)
         true
       end
