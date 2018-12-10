@@ -49,11 +49,10 @@ module Spaceship
 
       yaml = cookies.to_yaml.gsub("\n", "\\n")
 
-
       if FastlaneCore::Helper.mac? && Spaceship::Client::UserInterface.interactive? && agree("🙄 should fastlane put cookie into your clipboard, so you can easily paste it? (y/n)", true)
         require 'open3'
         Open3.popen3('pbcopy') { |input, _, _| input << yaml }
-        puts("Successfully copied text into your clipboard 🎨".green) 
+        puts("Successfully copied text into your clipboard 🎨".green)
       end
 
       puts("---")
