@@ -10,7 +10,7 @@ module Fastlane
         if FastlaneCore::Helper.bundler?
           UI.success("Using bundled fastlane ✅")
         else
-          UI.user_error!("fastlane detected a Gemfile in the current directory. however it seems like you don't use `bundle exec`. Use `bundle exec fastlane #{ARGV.join(' ')}`")
+          UI.user_error!("fastlane detected a Gemfile in the current directory. However it seems like you don't use `bundle exec`. Use `bundle exec fastlane #{ARGV.join(' ')}`")
         end
       end
 
