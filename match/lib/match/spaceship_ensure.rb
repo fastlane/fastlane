@@ -51,7 +51,7 @@ module Match
       end
       return if found
 
-      UI.error("Certificate '#{certificate_id}' (stored in your git repo) is not available on the Developer Portal")
+      UI.error("Certificate '#{certificate_id}' (stored in your storage) is not available on the Developer Portal")
       UI.error("for the user #{username}")
       UI.error("Make sure to use the same user and team every time you run 'match' for this")
       UI.error("Git repository. This might be caused by revoking the certificate on the Dev Portal")
