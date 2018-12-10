@@ -124,6 +124,10 @@ module Match
         false
       end
 
+      def generate_matchfile_content
+        return ""
+      end
+
       private
 
       def finished_pushing_message

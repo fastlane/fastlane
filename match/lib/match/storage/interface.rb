@@ -82,6 +82,13 @@ module Match
         not_implemented(__method__)
       end
 
+      # Implement this for the `fastlane match init` command
+      # This method must return the content of the Matchfile
+      # that should be generated
+      def generate_matchfile_content(template: nil)
+        not_implemented(__method__)
+      end
+
       # Call this method to reset any changes made locally to the files
       def clear_changes
         return unless @working_directory
