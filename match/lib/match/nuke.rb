@@ -25,6 +25,8 @@ module Match
       self.params = params
       self.type = type
 
+      update_optional_values_depending_on_storage_type(params)
+
       self.storage = Storage.for_mode(params[:storage_mode], {
         git_url: params[:git_url],
         shallow_clone: params[:shallow_clone],
@@ -32,7 +34,9 @@ module Match
         git_branch: params[:git_branch],
         git_full_name: params[:git_full_name],
         git_user_email: params[:git_user_email],
-        clone_branch_directly: params[:clone_branch_directly]
+        clone_branch_directly: params[:clone_branch_directly],
+        google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
+        google_cloud_keys_file: params[:google_cloud_keys_file].to_s
       })
       self.storage.download
 
@@ -41,7 +45,7 @@ module Match
         git_url: params[:git_url],
         working_directory: storage.working_directory
       })
-      self.encryption.decrypt_files
+      self.encryption.decrypt_files if self.encryption
 
       had_app_identifier = self.params.fetch(:app_identifier, ask: false)
       self.params[:app_identifier] = '' # we don't really need a value here
@@ -73,6 +77,14 @@ module Match
         end
       else
         UI.success("No relevant certificates or provisioning profiles found, nothing to nuke here :)")
+      end
+    end
+
+    # Be smart about optional values here
+    # Depending on the storage mode, different values are required
+    def update_optional_values_depending_on_storage_type(params)
+      if params[:storage_mode] != "git"
+        params.option_for_key(:git_url).optional = true
       end
     end
 
@@ -189,14 +201,16 @@ module Match
       end
 
       if self.files.count > 0
-        delete_files!
+        files_to_delete = delete_files!
       end
 
-      self.encryption.encrypt_files
+      self.encryption.encrypt_files if self.encryption
 
       # Now we need to commit and push all this too
       message = ["[fastlane]", "Nuked", "files", "for", type.to_s].join(" ")
-      self.storage.save_changes!(files_to_commit: [], custom_message: message)
+      self.storage.save_changes!(files_to_commit: [],
+                                 files_to_delete: files_to_delete,
+                                 custom_message: message)
     end
 
     private
@@ -204,7 +218,7 @@ module Match
     def delete_files!
       UI.header("Deleting #{self.files.count} files from the storage...")
 
-      self.files.each do |file|
+      return self.files.collect do |file|
         UI.message("Deleting file '#{File.basename(file)}'...")
 
         # Check if the profile is installed on the local machine
@@ -217,6 +231,8 @@ module Match
 
         File.delete(file)
         UI.success("Successfully deleted file")
+
+        file
       end
     end
 

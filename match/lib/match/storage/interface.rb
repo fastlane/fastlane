@@ -4,7 +4,6 @@ module Match
   module Storage
     class Interface
       MATCH_VERSION_FILE_NAME = "match_version.txt"
-
       # The working directory in which we download all the profiles
       # and decrypt/encrypt them
       attr_accessor :working_directory
@@ -41,7 +40,11 @@ module Match
       #   that should be committed to the storage provider
       # @parameter custom_message: [String] Custom change message
       #           that's optional, is used for commit title
-      def save_changes!(files_to_commit: [], files_to_delete: [], custom_message: nil)
+      def save_changes!(files_to_commit: nil, files_to_delete: nil, custom_message: nil)
+        # Custom init to `[]` in case `nil` is passed
+        files_to_commit ||= []
+        files_to_delete ||= []
+
         Dir.chdir(File.expand_path(self.working_directory)) do
           if files_to_commit.count > 0 # everything that isn't `match nuke`
             UI.user_error!("You can't provide both `files_to_delete` and `files_to_commit` right now") if files_to_delete.count > 0
@@ -81,7 +84,10 @@ module Match
 
       # Call this method to reset any changes made locally to the files
       def clear_changes
-        not_implemented(__method__)
+        return unless @working_directory
+
+        FileUtils.rm_rf(self.working_directory)
+        self.working_directory = nil
       end
     end
   end

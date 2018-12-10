@@ -14,7 +14,8 @@ describe Match do
         app_identifier: "tools.fastlane.app",
         type: "appstore",
         git_url: git_url,
-        shallow_clone: true
+        shallow_clone: true,
+        username: "flapple@something.com"
       }
 
       config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
@@ -34,7 +35,9 @@ describe Match do
         git_user_email: nil,
         clone_branch_directly: false,
         type: config[:type],
-        platform: config[:platform]
+        platform: config[:platform],
+        google_cloud_bucket_name: "",
+        google_cloud_keys_file: ""
       ).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download).and_return(nil)
@@ -56,6 +59,7 @@ describe Match do
       )
 
       spaceship = "spaceship"
+      allow(spaceship).to receive(:team_id).and_return("")
       expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
       expect(spaceship).to receive(:certificate_exists).and_return(true)
       expect(spaceship).to receive(:profile_exists).and_return(true)
@@ -79,7 +83,8 @@ describe Match do
       values = {
         app_identifier: "tools.fastlane.app",
         type: "appstore",
-        git_url: git_url
+        git_url: git_url,
+        username: "flapple@something.com"
       }
 
       config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
@@ -97,7 +102,9 @@ describe Match do
         git_user_email: nil,
         clone_branch_directly: false,
         type: config[:type],
-        platform: config[:platform]
+        platform: config[:platform],
+        google_cloud_bucket_name: "",
+        google_cloud_keys_file: ""
       ).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download).and_return(nil)
@@ -117,6 +124,7 @@ describe Match do
       expect(Match::Utils).to receive(:import).with(cert_path, keychain, password: nil).and_return(nil)
 
       spaceship = "spaceship"
+      allow(spaceship).to receive(:team_id).and_return("")
       expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
       expect(spaceship).to receive(:certificate_exists).and_return(true)
       expect(spaceship).to receive(:profile_exists).and_return(true)
