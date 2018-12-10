@@ -6,14 +6,13 @@ module Fastlane
     # Raises an exception and stop the lane execution if the repo is not on a specific branch
     class EnsureBundleExecAction < Action
       def self.run(params)
-
         gemfile_path = PluginManager.new.gemfile_path
         if gemfile_path
           if FastlaneCore::Helper.bundler?
             UI.success("Using bundled fastlane ✅")
           else
             UI.user_error!("fastlane detected a Gemfile in the current directory. however it seems like you don't use `bundle exec`. Use `bundle exec fastlane #{ARGV.join(' ')}`")
-          end    
+          end
         end
       end
 
