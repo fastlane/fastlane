@@ -55,7 +55,7 @@ module Match
 
       def download
         # Check if we already have a functional working_directory
-        return self.working_directory if @working_directory
+        return if @working_directory
 
         # No existing working directory, creating a new one now
         self.working_directory = Dir.mktmpdir
@@ -108,13 +108,6 @@ module Match
         end
 
         git_push(commands: commands, commit_message: custom_message)
-      end
-
-      def clear_changes
-        return unless @working_directory
-
-        FileUtils.rm_rf(self.working_directory)
-        self.working_directory = nil
       end
 
       # Generate the commit message based on the user's parameters
@@ -185,8 +178,6 @@ module Match
           end
         end
       end
-
-      private # rubocop:disable Lint/UselessAccessModifier
 
       def git_push(commands: [], commit_message: nil)
         commit_message ||= generate_commit_message
