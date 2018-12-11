@@ -77,7 +77,7 @@ module Fastlane
       end
 
       def self.authors
-        ["Flávio Caetano (@fjcaetano)", "Arjan Duijzer (@arjanduz)"]
+        ["fjcaetano", "nxtstep"]
       end
 
       def self.is_supported?(platform)
