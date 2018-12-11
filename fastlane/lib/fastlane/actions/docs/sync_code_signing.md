@@ -191,6 +191,16 @@ When running _match_ for the first time on a new machine, it will ask you for th
 
 To set the passphrase to decrypt your profiles using an environment variable, use `MATCH_PASSWORD`.
 
+#### Migrate from Git Repo to Google Cloud
+
+If you're already using a Git Repo, but would like to switch to using Google Cloud Storage, just run the following command to automatically migrate all your existing code signing identities and provisioning profiles
+
+```no-highlight
+fastlane match migrate
+```
+
+After a successful migration you can safely delete your git repo.
+
 #### Google Cloud `gc_keys.json`
 
 *Google Cloud Storage only*
