@@ -212,7 +212,7 @@ module Match
           # This can only happen after we went through auth of Google Cloud
           available_bucket_identifiers = self.gc_storage.buckets.collect(&:id)
           if available_bucket_identifiers.count > 0
-            @bucket_name = UI.select("What Google Cloud Storage bucket do you want to use?", available_bucket_identifiers)
+            @bucket_name = UI.select("What Google Cloud Storage bucket do you want to use? (you can define it using the `google_cloud_bucket_name` key)", available_bucket_identifiers)
           else
             UI.error("Looks like your Google Cloud account for the project ID '#{self.project_id}' doesn't")
             UI.error("have any available storage buckets yet. Please visit the following URL")
