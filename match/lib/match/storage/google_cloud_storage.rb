@@ -197,6 +197,10 @@ module Match
           UI.input("Confirm with enter")
         end
 
+        UI.important("Please never add the #{DEFAULT_KEYS_FILE_NAME.cyan} file in version control.")
+        UI.important("Instead please add the file to your .gitignore")
+        UI.input("Confirm with enter")
+
         return DEFAULT_KEYS_FILE_NAME
       end
 
