@@ -125,7 +125,7 @@ module Match
       end
 
       def generate_matchfile_content
-        return ""
+        return "bucket_name(\"#{self.bucket_name}\")"
       end
 
       private
