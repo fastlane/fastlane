@@ -1445,7 +1445,7 @@ module Spaceship
       raise ex # re-raise the exception
     rescue Spaceship::TunesClient::ITunesConnectPotentialServerError => ex
       unless (potential_server_error_tries -= 1).zero?
-        msg = "Potential server error received: '#{ex.message}'. Retrying after 10 seconds (remaining: #{tries})..."
+        msg = "Potential server error received: '#{ex.message}'. Retrying after 10 seconds (remaining: #{potential_server_error_tries})..."
         puts(msg)
         logger.warn(msg)
         sleep(10) unless Object.const_defined?("SpecHelper")
