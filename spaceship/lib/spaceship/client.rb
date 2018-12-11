@@ -53,6 +53,7 @@ module Spaceship
     UnauthorizedAccessError = Spaceship::UnauthorizedAccessError
     GatewayTimeoutError = Spaceship::GatewayTimeoutError
     InternalServerError = Spaceship::InternalServerError
+    BadGatewayError = Spaceship::BadGatewayError
 
     def self.hostname
       raise "You must implement self.hostname"
@@ -650,7 +651,7 @@ module Spaceship
       @csrf_tokens || {}
     end
 
-    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
+    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, retry_on_bad_gateway = true, &block)
       headers.merge!(csrf_tokens)
       headers['User-Agent'] = USER_AGENT
 
@@ -663,13 +664,20 @@ module Spaceship
         params, headers = encode_params(params, headers)
       end
 
-      response = if auto_paginate
-                   send_request_auto_paginate(method, url_or_path, params, headers, &block)
-                 else
-                   send_request(method, url_or_path, params, headers, &block)
-                 end
-
-      return response
+      # Retry requests when Apple returns BadGateway
+      max_retry_count = retry_on_bad_gateway ? 3 : 1
+      max_retry_count.times do
+        begin
+          response = if auto_paginate
+                       send_request_auto_paginate(method, url_or_path, params, headers, &block)
+                     else
+                       send_request(method, url_or_path, params, headers, &block)
+                     end
+          return response
+        rescue BadGatewayError
+          next
+        end
+      end
     end
 
     def parse_response(response, expected_key = nil)
@@ -827,6 +835,10 @@ module Spaceship
 
         if response.body.to_s.include?("<title>302 Found</title>")
           raise AppleTimeoutError.new, "Apple 302 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
+        end
+
+        if response.body.to_s.include?("<h3>Bad Gateway</h3>")
+          raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
         end
 
         return response
