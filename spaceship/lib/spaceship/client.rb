@@ -604,6 +604,7 @@ module Spaceship
     rescue \
         Faraday::Error::ConnectionFailed,
         Faraday::Error::TimeoutError, # New Faraday version: Faraday::TimeoutError => ex
+        BadGatewayError,
         AppleTimeoutError,
         GatewayTimeoutError => ex
       tries -= 1
@@ -651,7 +652,7 @@ module Spaceship
       @csrf_tokens || {}
     end
 
-    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, retry_on_bad_gateway = true, &block)
+    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
       headers.merge!(csrf_tokens)
       headers['User-Agent'] = USER_AGENT
 
@@ -664,20 +665,13 @@ module Spaceship
         params, headers = encode_params(params, headers)
       end
 
-      # Retry requests when Apple returns BadGateway
-      max_retry_count = retry_on_bad_gateway ? 3 : 1
-      max_retry_count.times do
-        begin
-          response = if auto_paginate
-                       send_request_auto_paginate(method, url_or_path, params, headers, &block)
-                     else
-                       send_request(method, url_or_path, params, headers, &block)
-                     end
-          return response
-        rescue BadGatewayError
-          next
-        end
-      end
+      response = if auto_paginate
+                   send_request_auto_paginate(method, url_or_path, params, headers, &block)
+                 else
+                   send_request(method, url_or_path, params, headers, &block)
+                 end
+
+      return response
     end
 
     def parse_response(response, expected_key = nil)
