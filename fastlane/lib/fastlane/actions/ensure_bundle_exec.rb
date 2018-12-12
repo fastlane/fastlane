@@ -3,7 +3,7 @@ module Fastlane
     module SharedValues
     end
 
-    # Raises an exception and stop the lane execution if the repo is not on a specific branch
+    # Raises an exception and stop the lane execution if not using bundle exec to run fastlane
     class EnsureBundleExecAction < Action
       def self.run(params)
         return if PluginManager.new.gemfile_path.nil?
@@ -19,7 +19,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Raises an exception if not on a using bundler"
+        "Raises an exception if not on a using bundler. You can put it into `before_all` and make sure that fastlane is run unsing `bundle exec fastlane` command."
       end
 
       def self.details
