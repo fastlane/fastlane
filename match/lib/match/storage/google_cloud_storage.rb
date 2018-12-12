@@ -152,9 +152,10 @@ module Match
           return google_cloud_keys_file
         end
 
-        if File.exist?(DEFAULT_KEYS_FILE_NAME)
-          return DEFAULT_KEYS_FILE_NAME
-        end
+        return DEFAULT_KEYS_FILE_NAME if File.exist?(DEFAULT_KEYS_FILE_NAME)
+
+        fastlane_folder_gc_keys_path = File.join(FastlaneCore::FastlaneFolder.path, DEFAULT_KEYS_FILE_NAME)
+        return fastlane_folder_gc_keys_path if File.exist?(fastlane_folder_gc_keys_path)
 
         # User doesn't seem to have provided a keys file
         UI.message("Looks like you don't have a Google Cloud #{DEFAULT_KEYS_FILE_NAME.cyan} file yet")
