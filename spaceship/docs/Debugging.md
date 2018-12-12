@@ -20,6 +20,8 @@ Example logfile:
 
 _spaceship_ also comes with support for proxies (e.g. [Charles Web Proxy](https://www.charlesproxy.com/), free endless 30 minute trial available, available for all platforms) that listen on `https://127.0.0.1:8888`. Just set the environment variable `SPACESHIP_DEBUG` to activate.  
 
+Read the [section on configuring Charles Web Proxy in fastlane's "Tooling and Debugging" docs](https://github.com/fastlane/fastlane/blob/master/ToolsAndDebugging.md#setting-up-charles-web-proxy) for information on how to set it up.
+
 If your proxy is listening on another port or address, you can use `SPACESHIP_PROXY` to set this. Use `SPACESHIP_PROXY_SSL_VERIFY_NONE` to additionally disable certificate checking.
 
 ## Client configuration
