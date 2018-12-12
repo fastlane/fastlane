@@ -31,6 +31,12 @@ module Match
         not_implemented(__method__)
       end
 
+      # Returns a short string describing + identifing the current
+      # storage backend. This will be printed when nuking a storage
+      def human_readable_description
+        not_implemented(__method__)
+      end
+
       # Call this method after locally modifying the files
       # This will commit the changes and push it back to the
       # given remote server
@@ -62,8 +68,10 @@ module Match
             end
 
             self.upload_files(files_to_upload: files_to_commit, custom_message: custom_message)
+            UI.message("Finished uploading files to #{self.human_readable_description}")
           elsif files_to_delete.count > 0
             self.delete_files(files_to_delete: files_to_delete, custom_message: custom_message)
+            UI.message("Finished deleting files from #{self.human_readable_description}")
           else
             UI.user_error!("Neither `files_to_commit` nor `files_to_delete` were provided to the `save_changes!` method call")
           end
