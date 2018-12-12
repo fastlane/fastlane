@@ -21,6 +21,16 @@ module Sigh
 
     def resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path)
       resign_path = find_resign_path
+
+      if keychain_path
+        keychain_path = File.expand_path(keychain_path)
+        current_keychains = `security list-keychains`
+        current_keychains.delete!("\n")
+        new_keychains = current_keychains
+        new_keychains = current_keychains + " '" + keychain_path + "'" unless current_keychains.include?(keychain_path)
+        `security list-keychains -s #{new_keychains}`
+      end
+
       signing_identity = find_signing_identity(signing_identity)
 
       unless provisioning_profiles.kind_of?(Enumerable)
@@ -60,8 +70,11 @@ module Sigh
 
       puts(command.magenta)
       puts(`#{command}`)
+      command_return_value = $?.to_i
 
-      if $?.to_i == 0
+      `security list-keychains -s #{current_keychains}` if current_keychains
+
+      if command_return_value == 0
         UI.success("Successfully signed #{ipa}!")
         true
       else
