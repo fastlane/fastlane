@@ -24,10 +24,10 @@ module Sigh
 
       if keychain_path
         keychain_path = File.expand_path(keychain_path)
-        current_keychains = `security list-keychains`
-        current_keychains.delete!("\n")
-        new_keychains = current_keychains
-        new_keychains = current_keychains + " '" + keychain_path + "'" unless current_keychains.include?(keychain_path)
+        previous_keychains = `security list-keychains`
+        previous_keychains.delete!("\n")
+        new_keychains = previous_keychains
+        new_keychains += " '" + keychain_path + "'" unless new_keychains.include?(keychain_path)
         `security list-keychains -s #{new_keychains}`
       end
 
@@ -72,7 +72,7 @@ module Sigh
       puts(`#{command}`)
       command_return_value = $?.to_i
 
-      `security list-keychains -s #{current_keychains}` if current_keychains
+      `security list-keychains -s #{previous_keychains}` if previous_keychains
 
       if command_return_value == 0
         UI.success("Successfully signed #{ipa}!")
