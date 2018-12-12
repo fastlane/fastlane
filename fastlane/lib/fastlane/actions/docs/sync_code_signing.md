@@ -239,7 +239,7 @@ A benefit of using _match_ is that it enables you to give the developers of your
 
 1. Run _match_ to store the certificates in a Git repo or Google Cloud Storage
 2. Grant access to the Git repo / Google Cloud Storage Bucket to your developers and give them the passphrase (for git storage)
-3. The developers can now run _match_ which will install the latest code signing profiles so they can build and sign the application without having to have access to the Developer Portal
+3. The developers can now run _match_ which will install the latest code signing profiles so they can build and sign the application without having to have access to the Apple Developer Portal
 4. Every time you run _match_ to update the profiles (e.g. add a new device), all your developers will automatically get the latest profiles when running _match_
 
 If you decide to run _match_ without access to the Developer Portal, make sure to use the `--readonly` option so that the commands don't ask you for the password to the Developer Portal.
