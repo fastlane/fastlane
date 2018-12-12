@@ -81,8 +81,13 @@ module Fastlane
           'zip(
             path: "MyApp.app",
             output_path: "Latest.app.zip",
+            verbose: false
+          )',
+          'zip(
+            path: "MyApp.app",
+            output_path: "Latest.app.zip",
             verbose: false,
-            symlinks: false
+            symlinks: true
           )'
         ]
       end
