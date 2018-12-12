@@ -98,7 +98,10 @@ module Match
           UI.message("Deleting '#{target_path}' from Google Cloud Storage bucket '#{self.bucket_name}'...")
           file.delete
         end
-        finished_pushing_message
+      end
+
+      def human_readable_description
+        "Google Cloud Bucket [#{self.project_id}/#{self.bucket_name}]"
       end
 
       def upload_files(files_to_upload: [], custom_message: nil)
@@ -118,7 +121,6 @@ module Match
           UI.verbose("Uploading '#{target_path}' to Google Cloud Storage...")
           bucket.create_file(current_file, target_path)
         end
-        finished_pushing_message
       end
 
       def skip_docs
@@ -126,10 +128,6 @@ module Match
       end
 
       private
-
-      def finished_pushing_message
-        UI.success("Finished applying changes up to Google Cloud Storage on bucket '#{self.bucket_name}'")
-      end
 
       def bucket
         @_bucket ||= self.gc_storage.bucket(self.bucket_name)

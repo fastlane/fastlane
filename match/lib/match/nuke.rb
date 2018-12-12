@@ -168,8 +168,9 @@ module Match
 
           [file_type, components[2]]
         end
+
         puts(Terminal::Table.new({
-          title: "Files that are going to be deleted".green,
+          title: "Files that are going to be deleted".green + "\n" + self.storage.human_readable_description,
           headings: ["Type", "File Name"],
           rows: rows
         }))
