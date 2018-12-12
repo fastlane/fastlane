@@ -19,12 +19,13 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Raises an exception if not on a using bundler. You can put it into `before_all` and make sure that fastlane is run using `bundle exec fastlane` command."
+        "Raises an exception if not on a using bundler."
       end
 
       def self.details
         [
-          "This action will check if you are using bundle exec to run fastlane."
+          "This action will check if you are using bundle exec to run fastlane.",
+          "You can put it into `before_all` and make sure that fastlane is run using `bundle exec fastlane` command."
         ].join("\n")
       end
 
