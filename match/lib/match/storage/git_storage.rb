@@ -96,7 +96,7 @@ module Match
         checkout_branch unless self.branch == "master"
       end
 
-      def human_readble_description
+      def human_readable_description
         "Git Repo [#{self.git_url}]"
       end
 

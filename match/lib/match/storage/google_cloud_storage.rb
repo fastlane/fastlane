@@ -100,7 +100,7 @@ module Match
         end
       end
 
-      def human_readble_description
+      def human_readable_description
         "Google Cloud Bucket [#{self.project_id}/#{self.bucket_name}]"
       end
 
