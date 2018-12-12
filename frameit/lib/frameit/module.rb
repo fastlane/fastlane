@@ -1,4 +1,5 @@
 require 'fastlane_core/helper'
+require 'fastlane/boolean'
 
 require_relative 'config_parser'
 
@@ -7,6 +8,7 @@ module Frameit
     attr_accessor :config
   end
 
+  Boolean = Fastlane::Boolean
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
   ROOT = Pathname.new(File.expand_path('../../..', __FILE__))
