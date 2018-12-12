@@ -18,6 +18,7 @@ module Fastlane
 
         Dir.chdir(File.expand_path("..", params[:path])) do # required to properly zip
           zip_options = params[:verbose] ? "r" : "rq"
+          zip_options += "y" if params[:symlinks]
 
           if params[:password]
             password_option = "-P '#{params[:password]}'"
@@ -60,7 +61,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "FL_ZIP_PASSWORD",
                                        description: "Encrypt the contents of the zip archive using a password",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :symlinks,
+                                       env_name: "FL_ZIP_SYMLINKS",
+                                       description: "Store symbolic links as such in the zip archive",
+                                       optional: true,
+                                       type: Boolean,
+                                       default_value: false)
         ]
       end
 
@@ -75,6 +82,12 @@ module Fastlane
             path: "MyApp.app",
             output_path: "Latest.app.zip",
             verbose: false
+          )',
+          'zip(
+            path: "MyApp.app",
+            output_path: "Latest.app.zip",
+            verbose: false,
+            symlinks: true
           )'
         ]
       end
