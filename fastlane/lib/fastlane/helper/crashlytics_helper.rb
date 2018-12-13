@@ -24,7 +24,8 @@ module Fastlane
           path ||= Dir["./Pods/iOS/Crashlytics/Crashlytics.framework/submit"].last
           path ||= Dir["./**/Crashlytics.framework/submit"].last
 
-          if path && path.downcase.include?("crashlytics.framework")
+          downcase_path = path ? path.downcase : nil
+          if downcase_path && downcase_path.include?("pods") && downcase_path.include?("crashlytics.framework")
             UI.deprecated("Crashlytics has moved the submit binary outside of Crashlytics.framework directory as of 3.4.1. Please change :crashlytics_path to `<PODS_ROOT>/Crashlytics/submit`")
           end
 
