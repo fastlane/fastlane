@@ -19,7 +19,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Raises an exception if not on a using bundler."
+        "Raises an exception if not on a using bundler"
       end
 
       def self.details
