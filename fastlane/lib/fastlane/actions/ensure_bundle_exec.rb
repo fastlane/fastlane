@@ -30,8 +30,7 @@ module Fastlane
       end
 
       def self.available_options
-        [
-        ]
+        []
       end
 
       def self.output
