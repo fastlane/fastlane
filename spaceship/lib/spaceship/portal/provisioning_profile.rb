@@ -203,6 +203,8 @@ module Spaceship
                     InHouse
                   when 'direct'
                     Direct # Mac-only
+                  when 'adhoc'
+                    AdHoc   
                   else
                     raise "Can't find class '#{attrs['distributionMethod']}'"
                   end
