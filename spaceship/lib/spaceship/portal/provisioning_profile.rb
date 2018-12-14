@@ -199,6 +199,8 @@ module Spaceship
                     Development
                   when 'store'
                     AppStore
+                  when 'adhoc'
+                    AdHoc
                   when 'inhouse'
                     InHouse
                   when 'direct'
