@@ -23,6 +23,8 @@ module CredentialsManager
     end
 
     def initialize(path = nil)
+      puts "$$$$$$$$$$$ Appfile! $$$$$$$$$$$$$ #{path}"
+
       if path
         raise "Could not find Appfile at path '#{path}'".red unless File.exist?(File.expand_path(path))
       end
@@ -31,7 +33,13 @@ module CredentialsManager
 
       if path && File.exist?(path) # it might not exist, we still want to use the default values
         full_path = File.expand_path(path)
+        
+        puts("Appfile path: Dir.getwd = '#{Dir.getwd}' - BEFORE")
+
         Dir.chdir(File.expand_path('..', path)) do
+
+          puts("Appfile path: Dir.getwd = '#{Dir.getwd}' - AFTER")
+
           content = File.read(full_path, encoding: "utf-8")
 
           # From https://github.com/orta/danger/blob/master/lib/danger/danger_core/dangerfile.rb
