@@ -157,14 +157,29 @@ describe Spaceship::ProvisioningProfile do
   end
 
   describe '#factory' do
-    it 'creates a Direct profile type for distributionMethod "direct"' do
-      fake_app_info = {}
-      expected_profile = "expected_profile"
-      expect(Spaceship::ProvisioningProfile::Direct).to receive(:new).and_return(expected_profile)
-      profile = Spaceship::ProvisioningProfile.factory({ 'appId' => fake_app_info, 'proProPlatform' => 'mac', 'distributionMethod' => 'direct' })
-      expect(profile).to eq(expected_profile)
+    let(:fake_app_info) { {} }
+
+    describe 'accepted distribution methods' do
+      let(:accepted_distribution_methods) do
+        {
+          'limited' => 'Development',
+          'store' => 'AppStore',
+          'adhoc' => 'AdHoc',
+          'inhouse' => 'InHouse',
+          'direct' => 'Direct'
+        }
+      end
+
+      let(:expected_profile) { "expected_profile" }
+
+      it 'creates proper profile types' do
+        accepted_distribution_methods.each do |k, v|
+          expect(Kernel.const_get("Spaceship::ProvisioningProfile::#{v}")).to receive(:new).and_return(expected_profile)
+          profile = Spaceship::ProvisioningProfile.factory({ 'appId' => fake_app_info, 'proProPlatform' => 'mac', 'distributionMethod' => k })
+          expect(profile).to eq(expected_profile)
+        end
+      end
     end
-  end
 
   describe '#create!' do
     let(:certificate) { Spaceship::Certificate.all.first }

@@ -193,18 +193,18 @@ module Spaceship
         # Create a new object based on a hash.
         # This is used to create a new object based on the server response.
         def factory(attrs)
-          # available values of `distributionMethod` at this point: ['adhoc', 'store', 'limited', 'direct']
+          # available values of `distributionMethod` at this point: ['adhoc', 'store', 'limited', 'direct', 'inhouse']
           klass = case attrs['distributionMethod']
                   when 'limited'
                     Development
                   when 'store'
                     AppStore
+                  when 'adhoc'
+                    AdHoc
                   when 'inhouse'
                     InHouse
                   when 'direct'
                     Direct # Mac-only
-                  when 'adhoc'
-                    AdHoc   
                   else
                     raise "Can't find class '#{attrs['distributionMethod']}'"
                   end
