@@ -1455,10 +1455,10 @@ func flock(message: String,
                                                                                        RubyCommand.Argument(name: "base_url", value: baseUrl)])
   _ = runner.executeCommand(command)
 }
-func frameScreenshots(white: String? = nil,
-                      silver: String? = nil,
-                      roseGold: String? = nil,
-                      gold: String? = nil,
+func frameScreenshots(white: Bool? = nil,
+                      silver: Bool? = nil,
+                      roseGold: Bool? = nil,
+                      gold: Bool? = nil,
                       forceDeviceType: String? = nil,
                       useLegacyIphone5s: Bool = false,
                       useLegacyIphone6s: Bool = false,
@@ -1475,10 +1475,10 @@ func frameScreenshots(white: String? = nil,
                                                                                                    RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
 }
-func frameit(white: String? = nil,
-             silver: String? = nil,
-             roseGold: String? = nil,
-             gold: String? = nil,
+func frameit(white: Bool? = nil,
+             silver: Bool? = nil,
+             roseGold: Bool? = nil,
+             gold: Bool? = nil,
              forceDeviceType: String? = nil,
              useLegacyIphone5s: Bool = false,
              useLegacyIphone6s: Bool = false,
@@ -4061,7 +4061,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode-10.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-9.0.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -4108,11 +4108,13 @@ func xcversion(version: String) {
 @discardableResult func zip(path: String,
                             outputPath: String? = nil,
                             verbose: Bool = true,
-                            password: String? = nil) -> String {
+                            password: String? = nil,
+                            symlinks: Bool = false) -> String {
   let command = RubyCommand(commandID: "", methodName: "zip", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
                                                                                      RubyCommand.Argument(name: "output_path", value: outputPath),
                                                                                      RubyCommand.Argument(name: "verbose", value: verbose),
-                                                                                     RubyCommand.Argument(name: "password", value: password)])
+                                                                                     RubyCommand.Argument(name: "password", value: password),
+                                                                                     RubyCommand.Argument(name: "symlinks", value: symlinks)])
   return runner.executeCommand(command)
 }
 
@@ -4169,4 +4171,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.35]
+// FastlaneRunnerAPIVersion [0.9.36]
