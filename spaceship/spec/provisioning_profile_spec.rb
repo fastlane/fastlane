@@ -181,6 +181,17 @@ describe Spaceship::ProvisioningProfile do
       end
     end
 
+    describe 'unrecognized distribution method' do
+      subject do
+        Spaceship::ProvisioningProfile.factory({ 'appId' => fake_app_info, 'proProPlatform' => 'mac', 'distributionMethod' => 'hamsandwich' })
+      end
+
+      it 'raises error' do
+        expect { subject }.to raise_error("Can't find class 'hamsandwich'")
+      end
+    end
+  end
+
   describe '#create!' do
     let(:certificate) { Spaceship::Certificate.all.first }
 
