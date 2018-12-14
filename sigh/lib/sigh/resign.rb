@@ -23,14 +23,14 @@ module Sigh
       resign_path = find_resign_path
 
       if keychain_path
-        keychain_path = File.expand_path(keychain_path)
+        keychain_path_absolute = File.expand_path(keychain_path)
 
         current_keychains = `security list-keychains`
         current_keychains.delete!("\n")
 
-        unless current_keychains.include?(keychain_path)
+        unless current_keychains.include?(keychain_path_absolute)
           previous_keychains = current_keychains
-          `security list-keychains -s #{current_keychains} '#{keychain_path}'`
+          `security list-keychains -s #{current_keychains} '#{keychain_path_absolute}'`
         end
       end
 
