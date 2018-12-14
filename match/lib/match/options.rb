@@ -4,6 +4,12 @@ require_relative 'module'
 
 module Match
   class Options
+    # This is match specific, as users can append storage specific options
+    def self.append_option(option)
+      self.available_options # to ensure we created the initial `@available_options` array
+      @available_options << option
+    end
+
     def self.available_options
       user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
       user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
@@ -151,7 +157,19 @@ module Match
                                      env_name: "MATCH_PROVISIONING_PROFILE_TEMPLATE_NAME",
                                      description: "The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. \"Apple Pay Pass Suppression Development\")",
                                      optional: true,
-                                     default_value: nil)
+                                     default_value: nil),
+        FastlaneCore::ConfigItem.new(key: :google_cloud_bucket_name,
+                                     env_name: "MATCH_GOOGLE_CLOUD_BUCKET_NAME",
+                                     description: "Name of the Google Cloud Storage bucket to use",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :google_cloud_keys_file,
+                                     env_name: "MATCH_GOOGLE_CLOUD_KEYS_FILE",
+                                     description: "Path to the gc_keys.json file",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Could not find keys file at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                     end)
+
       ]
     end
   end

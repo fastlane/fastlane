@@ -122,7 +122,7 @@ Note that these will replace the current images and screenshots on the play stor
 
 ## Changelogs (What's new)
 
-You can add changelog files under the `changelogs/` directory for each locale. The filename should exactly match the version code of the APK that it represents. `fastlane supply init` will populate changelog files from existing data on Google Play if no `metadata/` directory exists when it is run.
+You can add changelog files under the `changelogs/` directory for each locale. The filename should exactly match the [version code](https://developer.android.com/studio/publish/versioning#appversioning) of the APK that it represents. `fastlane supply init` will populate changelog files from existing data on Google Play if no `metadata/` directory exists when it is run.
 
 ```no-highlight
 └── fastlane
