@@ -24,11 +24,14 @@ module Sigh
 
       if keychain_path
         keychain_path = File.expand_path(keychain_path)
-        previous_keychains = `security list-keychains`
-        previous_keychains.delete!("\n")
-        new_keychains = previous_keychains
-        new_keychains += " '" + keychain_path + "'" unless new_keychains.include?(keychain_path)
-        `security list-keychains -s #{new_keychains}`
+
+        current_keychains = `security list-keychains`
+        current_keychains.delete!("\n")
+
+        unless current_keychains.include?(keychain_path)
+          previous_keychains = current_keychains
+          `security list-keychains -s #{current_keychains} '#{keychain_path}'`
+        end
       end
 
       signing_identity = find_signing_identity(signing_identity)
