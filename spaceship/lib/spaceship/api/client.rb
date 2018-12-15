@@ -4,7 +4,7 @@ module Spaceship
   module API
     class Client < Spaceship::Client
       ##
-      # Spaceship HTTP client for the testflight API.
+      # Spaceship HTTP client for the App Store Connect API.
       #
       # This client is solely responsible for the making HTTP requests and
       # parsing their responses. Parameters should be either named parameters, or
@@ -18,10 +18,51 @@ module Spaceship
         'https://appstoreconnect.apple.com/iris/v1/'
       end
 
-      def get_apps
+      def build_url(path: nil, filter: nil, includes: nil, limit: nil, sort: nil)
+        filters = filter.keys.map do |key|
+          "&filter[#{key}]=#{filter[key]}"
+        end.join("")
+        return "#{path}?&include=#{includes}&limit=#{limit}&sort=#{sort}#{filters}"
+      end
+
+      def get_builds(filter: {}, includes: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate")
         assert_required_params(__method__, binding)
 
-        response = request(:get, "apps")
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/builds
+        url = build_url(path: "builds", filter: filter, includes: includes, limit: limit, sort: sort)
+
+        response = request(:get, url)
+        handle_response(response)
+      end
+
+      def post_for_testflight_review(build_id: nil)
+        assert_required_params(__method__, binding)
+
+        # POST
+        # https://appstoreconnect.apple.com/iris/v1/betaAppReviewSubmissions
+        #
+        # {"data":{"type":"betaAppReviewSubmissions","relationships":{"build":{"data":{"type":"builds","id":"6f90f04a-3b48-4d4a-9bbd-9475c294a579"}}}}}
+
+        body = {
+          data: {
+            type: "betaAppReviewSubmissions",
+            relationships: {
+              build: {
+                data: {
+                  type: "builds",
+                  id: build_id
+                }
+              }
+            }
+          }
+        }
+
+        response = request(:post) do |req|
+          req.url("betaAppReviewSubmissions")
+          req.body = body.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
         handle_response(response)
       end
 
@@ -40,11 +81,33 @@ module Spaceship
 
         raise UnexpectedResponse, response.body['error'] if response.body['error']
 
+        raise UnexpectedResponse, handle_errors(response) if response.body['errors']
+
         raise UnexpectedResponse, "Temporary App Store Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
 
         return response.body['data'] if response.body['data']
 
         return response.body
+      end
+
+      def handle_errors(response)
+        # Example error format
+        # {
+        #   "errors" : [ {
+        #     "id" : "ce8c391e-f858-411b-a14b-5aa26e0915f2",
+        #     "status" : "400",
+        #     "code" : "PARAMETER_ERROR.INVALID",
+        #     "title" : "A parameter has an invalid value",
+        #     "detail" : "'uploadedDate3' is not a valid field name",
+        #     "source" : {
+        #       "parameter" : "sort"
+        #     }
+        #   } ]
+        # }
+
+        return response.body['errors'].map do |error|
+          "#{error['title']} - #{error['detail']}"
+        end.join(" ")
       end
 
       private
