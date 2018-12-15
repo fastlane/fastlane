@@ -75,7 +75,7 @@ describe "Build Manager" do
       })
     end
     let(:mock_api_client_builds) do
-      [{"id": "123"}]
+      [{ "id" => "123" }]
     end
 
     before(:each) do
