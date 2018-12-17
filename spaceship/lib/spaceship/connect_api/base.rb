@@ -2,7 +2,7 @@ require_relative '../base'
 require_relative '../tunes/tunes_client'
 
 module Spaceship
-  module API
+  module ConnectAPI
     class Base < Spaceship::Base
       def self.client
         # Verify there is a client that can be used

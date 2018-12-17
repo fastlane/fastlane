@@ -1,7 +1,7 @@
 require_relative '../client'
 
 module Spaceship
-  module API
+  module ConnectAPI
     class Client < Spaceship::Client
       ##
       # Spaceship HTTP client for the App Store Connect API.
@@ -116,7 +116,7 @@ module Spaceship
       #
       # @raises NameError if the values are nil
       def assert_required_params(method_name, binding)
-        parameter_names = method(method_name).parameters.map { |k, v| v }
+        parameter_names = method(method_name).parameters.map { |_, v| v }
         parameter_names.each do |name|
           if local_variable_get(binding, name).nil?
             raise NameError, "`#{name}' is a required parameter"
