@@ -225,7 +225,7 @@ module Spaceship
         elsif errors.count == 1 && errors.first.include?("try again later")
           raise ITunesConnectTemporaryError.new, errors.first
         elsif errors.count == 1 && errors.first.include?("Forbidden")
-          raise_insuffient_permission_error!
+          raise_insufficient_permission_error!
         elsif flaky_api_call
           raise ITunesConnectPotentialServerError.new, errors.join(' ')
         else

@@ -242,7 +242,8 @@ module Spaceship
         end
 
         @logger.formatter = proc do |severity, datetime, progname, msg|
-          "[#{datetime.strftime('%H:%M:%S')}]: #{msg}\n"
+          severity = format('%-5.5s', severity)
+          "#{severity} [#{datetime.strftime('%H:%M:%S')}]: #{msg}\n"
         end
       end
 
@@ -365,7 +366,7 @@ module Spaceship
       if user.to_s.empty? || password.to_s.empty?
         require 'credentials_manager/account_manager'
 
-        puts("Reading keychain entry as user or password were empty") if Spaceship::Globals.verbose?
+        puts("Reading keychain entry, because either user or password were empty") if Spaceship::Globals.verbose?
 
         keychain_entry = CredentialsManager::AccountManager.new(user: user, password: password)
         user ||= keychain_entry.user
@@ -601,21 +602,35 @@ module Spaceship
       return yield
     rescue \
         Faraday::Error::ConnectionFailed,
-        Faraday::Error::TimeoutError,
-        Faraday::ParsingError, # <h2>Internal Server Error</h2> with content type json
+        Faraday::Error::TimeoutError, # New Faraday version: Faraday::TimeoutError => ex
         AppleTimeoutError,
-        GatewayTimeoutError,
-        InternalServerError => ex # New Faraday version: Faraday::TimeoutError => ex
+        GatewayTimeoutError => ex
       tries -= 1
       unless tries.zero?
-        logger.warn("Timeout received: '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})...")
+        msg = "Timeout received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
+        puts(msg) if Spaceship::Globals.verbose?
+        logger.warn(msg)
+
+        sleep(3) unless Object.const_defined?("SpecHelper")
+        retry
+      end
+      raise ex # re-raise the exception
+    rescue \
+        Faraday::ParsingError, # <h2>Internal Server Error</h2> with content type json
+        InternalServerError => ex
+      tries -= 1
+      unless tries.zero?
+        msg = "Internal Server Error received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
+        puts(msg) if Spaceship::Globals.verbose?
+        logger.warn(msg)
+
         sleep(3) unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex # re-raise the exception
     rescue UnauthorizedAccessError => ex
       if @loggedin && !(tries -= 1).zero?
-        msg = "Auth error received: '#{ex.message}'. Login in again then retrying after 3 seconds (remaining: #{tries})..."
+        msg = "Auth error received: '#{ex.class}', '#{ex.message}'. Login in again then retrying after 3 seconds (remaining: #{tries})..."
         puts(msg) if Spaceship::Globals.verbose?
         logger.warn(msg)
 
@@ -640,7 +655,7 @@ module Spaceship
       headers['User-Agent'] = USER_AGENT
 
       # Before encoding the parameters, log them
-      log_request(method, url_or_path, params)
+      log_request(method, url_or_path, params, headers, &block)
 
       # form-encode the params only if there are params, and the block is not supplied.
       # this is so that certain requests can be made using the block for more control
@@ -653,8 +668,6 @@ module Spaceship
                  else
                    send_request(method, url_or_path, params, headers, &block)
                  end
-
-      log_response(method, url_or_path, response)
 
       return response
     end
@@ -670,9 +683,12 @@ module Spaceship
 
         content = expected_key ? response.body[expected_key] : response.body
       end
+
+      # if content (filled with whole body or just expected_key) is missing
       if content.nil?
         detect_most_common_errors_and_raise_exceptions(response.body) if response.body
         raise UnexpectedResponse, response.body
+      # else if it is a hash and `resultString` includes `NotAllowed`
       elsif content.kind_of?(Hash) && (content["resultString"] || "").include?("NotAllowed")
         # example content when doing a Developer Portal action with not enough permission
         # => {"responseId"=>"e5013d83-c5cb-4ba0-bb62-734a8d56007f",
@@ -684,7 +700,7 @@ module Spaceship
         #    "userLocale"=>"en_US",
         #    "requestUrl"=>"https://developer.apple.com/services-account/QH65B2/account/ios/certificate/downloadCertificateContent.action",
         #    "httpCode"=>200}
-        raise_insuffient_permission_error!(additional_error_string: content["userString"])
+        raise_insufficient_permission_error!(additional_error_string: content["userString"])
       else
         store_csrf_tokens(response)
         content
@@ -694,11 +710,11 @@ module Spaceship
     def detect_most_common_errors_and_raise_exceptions(body)
       # Check if the failure is due to missing permissions (App Store Connect)
       if body["messages"] && body["messages"]["error"].include?("Forbidden")
-        raise_insuffient_permission_error!
+        raise_insufficient_permission_error!
       elsif body["messages"] && body["messages"]["error"].include?("insufficient privileges")
         # Passing a specific `caller_location` here to make sure we return the correct method
         # With the default location the error would say that `parse_response` is the caller
-        raise_insuffient_permission_error!(caller_location: 3)
+        raise_insufficient_permission_error!(caller_location: 3)
       elsif body.to_s.include?("Internal Server Error - Read")
         raise InternalServerError, "Received an internal server error from App Store Connect / Developer Portal, please try again later"
       elsif body.to_s.include?("Gateway Timeout - In read")
@@ -709,7 +725,7 @@ module Spaceship
     end
 
     # This also gets called from subclasses
-    def raise_insuffient_permission_error!(additional_error_string: nil, caller_location: 2)
+    def raise_insufficient_permission_error!(additional_error_string: nil, caller_location: 2)
       # get the method name of the request that failed
       # `block in` is used very often for requests when surrounded for paging or retrying blocks
       # The ! is part of some methods when they modify or delete a resource, so we don't want to show it
@@ -747,19 +763,52 @@ module Spaceship
       end
     end
 
-    def log_request(method, url, params)
+    def log_request(method, url, params, headers = nil, &block)
+      url ||= extract_key_from_block('url', &block)
+      body = extract_key_from_block('body', &block)
+      body_to_log = '[undefined body]'
+      if body
+        begin
+          body = JSON.parse(body)
+          # replace password in body if present
+          body['password'] = '***' if body.kind_of?(Hash) && body.key?("password")
+          body_to_log = body.to_json
+        rescue JSON::ParserError
+          # no json, no password to replace
+          body_to_log = "[non JSON body]"
+        end
+      end
       params_to_log = Hash(params).dup # to also work with nil
       params_to_log.delete(:accountPassword) # Dev Portal
       params_to_log.delete(:theAccountPW) # iTC
       params_to_log = params_to_log.collect do |key, value|
         "{#{key}: #{value}}"
       end
-      logger.info(">> #{method.upcase}: #{url} #{params_to_log.join(', ')}")
+      logger.info(">> #{method.upcase} #{url}: #{body_to_log} #{params_to_log.join(', ')}")
     end
 
-    def log_response(method, url, response)
+    def log_response(method, url, response, headers = nil, &block)
+      url ||= extract_key_from_block('url', &block)
       body = response.body.kind_of?(String) ? response.body.force_encoding(Encoding::UTF_8) : response.body
-      logger.debug("<< #{method.upcase}: #{url}: #{body}")
+      logger.debug("<< #{method.upcase} #{url}: #{response.status} #{body}")
+    end
+
+    def extract_key_from_block(key, &block)
+      if block_given?
+        obj = Object.new
+        class << obj
+          attr_accessor :body, :headers, :params, :url
+          # rubocop: disable Style/TrivialAccessors
+          # the block calls `url` (not `url=`) so need to define `url` method
+          def url(url)
+            @url = url
+          end
+          # rubocop: enable Style/TrivialAccessors
+        end
+        obj.headers = {}
+        yield(obj)
+        obj.instance_variable_get("@#{key}")
+      end
     end
 
     # Actually sends the request to the remote server
@@ -767,6 +816,8 @@ module Spaceship
     def send_request(method, url_or_path, params, headers, &block)
       with_retry do
         response = @client.send(method, url_or_path, params, headers, &block)
+        log_response(method, url_or_path, response, headers, &block)
+
         resp_hash = response.to_hash
         if resp_hash[:status] == 401
           msg = "Auth lost"
@@ -777,6 +828,7 @@ module Spaceship
         if response.body.to_s.include?("<title>302 Found</title>")
           raise AppleTimeoutError.new, "Apple 302 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
         end
+
         return response
       end
     end
