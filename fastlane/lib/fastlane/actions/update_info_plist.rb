@@ -14,6 +14,7 @@ module Fastlane
 
           # Assign folder from parameter or search for xcodeproj file
           folder = params[:xcodeproj] || Dir["*.xcodeproj"].first
+          UI.user_error!("You must specify an xcodeproj path") if folder.nil?
 
           if params[:scheme]
             project = Xcodeproj::Project.open(folder)
