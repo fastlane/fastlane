@@ -1147,6 +1147,24 @@ module Spaceship
     end
 
     #####################################################
+    # @!group release to all users
+    #####################################################
+
+    def release_to_all_users!(app_id, version)
+      raise "app_id is required" unless app_id
+      raise "version is required" unless version
+
+      r = request(:post) do |req|
+        req.url("ra/apps/#{app_id}/versions/#{version}/phasedRelease/state/COMPLETE")
+        req.headers['Content-Type'] = 'application/json'
+        req.body = app_id.to_s
+      end
+
+      handle_itc_response(r.body)
+      parse_response(r, 'data')
+    end
+
+    #####################################################
     # @!group in-app-purchases
     #####################################################
 

@@ -624,6 +624,10 @@ module Spaceship
         client.release!(self.application.apple_id, self.version_id)
       end
 
+      def release_to_all_users!
+        client.release_to_all_users!(self.application.apple_id, self.version_id)
+      end
+
       #####################################################
       # @!group Promo codes
       #####################################################
