@@ -8,28 +8,25 @@
         font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
         font-weight: 300;
       }
-      .tab {
-          overflow: hidden;
-          border: 1px solid #ccc;
-          background-color: #f1f1f1;
+      #sortMenu {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: #f1f1f1;
       }
-      .tab button {
-          background-color: inherit;
-          float: left;
-          border: none;
-          outline: none;
-          cursor: pointer;
-          padding: 14px 16px;
-          font-size: 17px;
+      #sortMenu button {
+        background-color: inherit;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        font-size: 17px;
       }
-      .tab button:hover {
-          background-color: #ddd;
+      #sortMenu button:hover {
+        background-color: #ddd;
       }
-      .tab button.active {
-          background-color: #ccc;
-      }
-      .tabContent {
-          display: none;
+      #sortMenu button.active {
+        background-color: #ccc;
       }
       .deviceName {
         display: block;
@@ -93,7 +90,7 @@
     </style>
   </head>
   <body>
-    <div class="tab">
+    <div id="sortMenu">
       <button id="defaultTab" class="tabLink" onclick="openTab(event, 'byLanguage')">By Language</button>
       <button class="tabLink" onclick="openTab(event, 'byScreen')">By Screen</button>
     </div>
