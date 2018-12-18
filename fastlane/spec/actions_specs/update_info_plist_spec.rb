@@ -20,7 +20,7 @@ describe Fastlane do
                 display_name: '#{display_name}'
               })
             end").runner.execute(:test)
-          end.to raise_error("You must specify an xcodeproj path")
+          end.to raise_error("Could not figure out your xcodeproj path. Please specify it using the xcodeproj parameter")
         end
       end
 
