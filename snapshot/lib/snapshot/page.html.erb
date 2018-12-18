@@ -45,7 +45,7 @@
         padding-bottom: 24px;
         padding-top: 30px;
       }
-      h1 {
+      h1, h2 {
         font-weight: bold;
       }
       th {
@@ -96,7 +96,7 @@
       <button class="tabLink" onclick="openTab(event, 'byScreen')">By Screen</button>
     </div>
     <div id="byLanguage" class="tabContent"><h1 class="tabTitle">By Language:</h1><% image_counter = 0 %><% @data_by_language.each do |language, content| %>
-      <h1 id="<%= language %>"><%= language %></h1>
+      <h2 id="<%= language %>"><%= language %></h2>
       <hr>
       <table><% content.each do |device_name, screens| %>
         <tr>
@@ -114,7 +114,7 @@
       </table><% end %>
     </div>
     <div id="byScreen" class="tabContent"><h1 class="tabTitle">By Screen:</h1><% image_counter = 0 %><% @data_by_screen.each do |screen, content| %>
-      <h1 id="<%= screen %>" class="screen"><%= screen %></h1>
+      <h2 id="<%= screen %>" class="screen"><%= screen %></h2>
       <hr>
       <table><% content.each do |device_name, screens| %>
         <tr>
