@@ -74,9 +74,11 @@ module Match
 
         begin
           # GIT_TERMINAL_PROMPT will fail the `git clone` command if user credentials are missing
-          FastlaneCore::CommandExecutor.execute(command: "GIT_TERMINAL_PROMPT=0 #{command}",
-                                              print_all: FastlaneCore::Globals.verbose?,
-                                          print_command: FastlaneCore::Globals.verbose?)
+          Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
+            FastlaneCore::CommandExecutor.execute(command: command,
+                                                print_all: FastlaneCore::Globals.verbose?,
+                                            print_command: FastlaneCore::Globals.verbose?)
+          end
         rescue
           UI.error("Error cloning certificates repo, please make sure you have read access to the repository you want to use")
           if self.branch && self.clone_branch_directly
@@ -186,13 +188,15 @@ module Match
       def git_push(commands: [], commit_message: nil)
         commit_message ||= generate_commit_message
         commands << "git commit -m #{commit_message.shellescape}"
-        commands << "GIT_TERMINAL_PROMPT=0 git push origin #{self.branch.shellescape}"
+        commands << "git push origin #{self.branch.shellescape}"
 
         UI.message("Pushing changes to remote git repo...")
-        commands.each do |command|
-          FastlaneCore::CommandExecutor.execute(command: command,
+        Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
+          commands.each do |command|
+            FastlaneCore::CommandExecutor.execute(command: command,
                                                 print_all: FastlaneCore::Globals.verbose?,
-                                                print_command: FastlaneCore::Globals.verbose?)
+                                            print_command: FastlaneCore::Globals.verbose?)
+          end
         end
 
         self.clear_changes
