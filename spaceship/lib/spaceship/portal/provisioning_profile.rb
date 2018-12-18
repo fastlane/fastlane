@@ -329,16 +329,7 @@ module Spaceship
 
           return profiles if self == ProvisioningProfile
 
-          # To distinguish between AppStore and AdHoc profiles, we need to send
-          # a details request (see `profile_details`). This is an expensive operation
-          # which we can't do for every single provisioning profile
-          # Instead we'll treat App Store profiles the same way as Ad Hoc profiles
-          # Spaceship::Portal::ProvisioningProfile::AdHoc.all will return the same array as
-          # Spaceship::Portal::ProvisioningProfile::AppStore.all, containing only AppStore
-          # profiles. To determine if it's an Ad Hoc profile, you can use the
-          # is_adhoc? method on the profile.
           klass = self
-          klass = AppStore if self == AdHoc
 
           # only return the profiles that match the class
           return profiles.select do |profile|
@@ -548,11 +539,8 @@ module Spaceship
       end
 
       # @return (Bool) Is this current provisioning profile adhoc?
-      #                AppStore and AdHoc profiles are the same except that AdHoc has devices
       def is_adhoc?
-        return false unless self.kind_of?(AppStore) || self.kind_of?(AdHoc)
-
-        return devices.count > 0
+        self.kind_of?(AdHoc)
       end
 
       # This is an expensive operation as it triggers a new request

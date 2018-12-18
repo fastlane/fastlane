@@ -82,10 +82,6 @@ module Sigh
       # Take the provisioning profile name into account
       results = filter_profiles_by_name(results) if Sigh.config[:provisioning_name].to_s.length > 0
 
-      # Since September 20, 2016 spaceship doesn't distinguish between AdHoc and AppStore profiles
-      # any more, since it requires an additional request
-      # Instead we only call is_adhoc? on the matching profiles to speed up spaceship
-
       results = filter_profiles_for_adhoc_or_app_store(results)
 
       return results if Sigh.config[:skip_certificate_verification]
