@@ -26,13 +26,13 @@ describe Spaceship::ProvisioningProfile do
 
     it 'should filter by the correct types' do
       expect(Spaceship::ProvisioningProfile::Development.all.count).to eq(1)
-      expect(Spaceship::ProvisioningProfile::AdHoc.all.count).to eq(6)
-      expect(Spaceship::ProvisioningProfile::AppStore.all.count).to eq(6)
+      expect(Spaceship::ProvisioningProfile::AdHoc.all.count).to eq(1)
+      expect(Spaceship::ProvisioningProfile::AppStore.all.count).to eq(5)
     end
 
-    it "AppStore and AdHoc are the same" do
+    it "AppStore and AdHoc are not the same" do
       Spaceship::ProvisioningProfile::AdHoc.all.each do |adhoc|
-        expect(Spaceship::ProvisioningProfile::AppStore.all.find_all { |a| a.id == adhoc.id }.count).to eq(1)
+        expect(Spaceship::ProvisioningProfile::AppStore.all.find_all { |a| a.id == adhoc.id }.count).to eq(0)
       end
     end
 
@@ -89,7 +89,7 @@ describe Spaceship::ProvisioningProfile do
       expect(profiles.count).to eq(6)
 
       expect(profiles.first.app.bundle_id).to eq('net.sunapps.1')
-      expect(profiles.first.distribution_method).to eq('store')
+      expect(profiles.first.distribution_method).to eq('adhoc')
     end
 
     it "returns the profile in an array if matching for tvos" do
@@ -110,10 +110,9 @@ describe Spaceship::ProvisioningProfile do
     end
   end
 
-  it "distribution_method stays app store, even though it's an AdHoc profile which contains devices" do
-    adhoc = Spaceship::ProvisioningProfile::AdHoc.all.find(&:is_adhoc?)
-
-    expect(adhoc.distribution_method).to eq('store')
+  it "distribution_method says `adhoc` for AdHoc profile" do
+    adhoc = Spaceship::ProvisioningProfile::AdHoc.all.first
+    expect(adhoc.distribution_method).to eq('adhoc')
     expect(adhoc.devices.count).to eq(2)
 
     device = adhoc.devices.first
@@ -340,36 +339,6 @@ describe Spaceship::ProvisioningProfile do
 
         profile.update!
       end
-    end
-  end
-
-  describe "#is_adhoc?" do
-    it "returns true when the profile is adhoc" do
-      profile = Spaceship::ProvisioningProfile::AdHoc.new
-      expect(profile).to receive(:devices).and_return(["device"])
-      expect(profile.is_adhoc?).to eq(true)
-    end
-
-    it "returns true when the profile is appstore with devices" do
-      profile = Spaceship::ProvisioningProfile::AppStore.new
-      expect(profile).to receive(:devices).and_return(["device"])
-      expect(profile.is_adhoc?).to eq(true)
-    end
-
-    it "returns false when the profile is appstore with no devices" do
-      profile = Spaceship::ProvisioningProfile::AppStore.new
-      expect(profile).to receive(:devices).and_return([])
-      expect(profile.is_adhoc?).to eq(false)
-    end
-
-    it "returns false when the profile is development" do
-      profile = Spaceship::ProvisioningProfile::Development.new
-      expect(profile.is_adhoc?).to eq(false)
-    end
-
-    it "returns false when the profile is inhouse" do
-      profile = Spaceship::ProvisioningProfile::InHouse.new
-      expect(profile.is_adhoc?).to eq(false)
     end
   end
 end
