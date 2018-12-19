@@ -237,7 +237,7 @@ module Spaceship
           @logger = Logger.new(STDOUT)
         else
           # Log to file by default
-          path = "/tmp/spaceship#{Time.now.to_i}_#{Process.pid}.log"
+          path = "/tmp/spaceship#{Time.now.to_i}_#{Process.pid}_#{Thread.current.object_id}.log"
           @logger = Logger.new(path)
         end
 
