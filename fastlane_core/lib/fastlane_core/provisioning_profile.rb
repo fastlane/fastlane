@@ -26,14 +26,7 @@ module FastlaneCore
       def parse(path, keychain_path = nil)
         require 'plist'
 
-        if Helper.mac?
-          plist = Plist.parse_xml(decode(path, keychain_path))
-        else
-          # `decode` only works on Mac because of `security`, fallback `openssl`
-          # via https://stackoverflow.com/a/14379814/252627
-          xml = `openssl smime -inform der -verify -noverify -in #{path}`
-          plist = Plist.parse_xml(xml)
-        end
+        plist = Plist.parse_xml(decode(path, keychain_path))
         if (plist || []).count > 5
           plist
         else
@@ -98,10 +91,16 @@ module FastlaneCore
           err = "#{dir}/cms.err"
           # we want to prevent the error output to mix up with the standard output because of
           # /dev/null: https://github.com/fastlane/fastlane/issues/6387
-          if keychain_path.nil?
-            decoded = `security cms -D -i "#{path}" 2> #{err}`
+          if Helper.mac?
+            if keychain_path.nil?
+              decoded = `security cms -D -i "#{path}" 2> #{err}`
+            else
+              decoded = `security cms -D -i "#{path}" -k "#{keychain_path.shellescape}" 2> #{err}`
+            end
           else
-            decoded = `security cms -D -i "#{path}" -k "#{keychain_path.shellescape}" 2> #{err}`
+            # `security` only works on Mac, fallback to `openssl`
+            # via https://stackoverflow.com/a/14379814/252627
+            decoded = `openssl smime -inform der -verify -noverify -in #{path} 2> #{err}`
           end
           UI.error("Failure to decode #{path}. Exit: #{$?.exitstatus}: #{File.read(err)}") if $?.exitstatus != 0
           decoded

@@ -251,11 +251,10 @@ module Match
 
       if Helper.mac?
         installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
-        parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       else
         # TODO move table from below in here, so it better reflects that cert was not installed but downloaded (and copied to x)
-        parsed = FastlaneCore::ProvisioningProfile.parse(profile)
       end
+      parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       uuid = parsed["UUID"]
 
       if params[:export_path]
