@@ -17,6 +17,22 @@ describe Fastlane do
         expect(result).to eq("./fastlane/README.md test command with multiple parts")
       end
 
+      it "generates a valid command when a non-empty serial is passed" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          adb(command: 'test command with non-empty serial', adb_path: './fastlane/README.md', serial: 'emulator-1234')
+        end").runner.execute(:test)
+
+        expect(result).to eq("ANDROID_SERIAL=emulator-1234 ./fastlane/README.md test command with non-empty serial")
+      end
+
+      it "generates a valid command when an empty serial is passed" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          adb(command: 'test command with empty serial', adb_path: './fastlane/README.md', serial: '')
+        end").runner.execute(:test)
+
+        expect(result).to eq("./fastlane/README.md test command with empty serial")
+      end
+
       it "picks up path from ANDROID_HOME environment variable" do
         stub_const('ENV', { 'ANDROID_HOME' => '/usr/local/android-sdk' })
         result = Fastlane::FastFile.new.parse("lane :test do
