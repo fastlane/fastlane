@@ -26,7 +26,14 @@ module FastlaneCore
       def parse(path, keychain_path = nil)
         require 'plist'
 
-        plist = Plist.parse_xml(decode(path, keychain_path))
+        if Helper.mac?
+          plist = Plist.parse_xml(decode(path, keychain_path))
+        else
+          # `decode` only works on Mac because of `security`, fallback `openssl`
+          # via https://stackoverflow.com/a/14379814/252627
+          xml = `openssl smime -inform der -verify -noverify -in #{path}` 
+          plist = Plist.parse_xml(xml)
+        end
         if (plist || []).count > 5
           plist
         else
