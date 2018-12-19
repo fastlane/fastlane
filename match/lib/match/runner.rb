@@ -185,6 +185,12 @@ module Match
           Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
         else
           UI.message("Skipping installation of certificate as it would not work on this operating system.")
+          # TODO move table from below in here, so it better reflects that cert was not installed but downloaded (and copied to x)
+        end
+
+        if params[:export_path]
+          FileUtils.cp(cert_path, params[:export_path])
+          FileUtils.cp(keys.last, params[:export_path])
         end
 
         # Get and print info of certificate
@@ -247,9 +253,14 @@ module Match
         installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
         parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       else
+        # TODO move table from below in here, so it better reflects that cert was not installed but downloaded (and copied to x)
         parsed = FastlaneCore::ProvisioningProfile.parse(profile)
       end
       uuid = parsed["UUID"]
+
+      if params[:export_path]
+        FileUtils.cp(profile, params[:export_path])
+      end
 
       if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
         # This profile is invalid, let's remove the local file and generate a new one
