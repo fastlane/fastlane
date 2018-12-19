@@ -31,7 +31,7 @@ module FastlaneCore
         else
           # `decode` only works on Mac because of `security`, fallback `openssl`
           # via https://stackoverflow.com/a/14379814/252627
-          xml = `openssl smime -inform der -verify -noverify -in #{path}` 
+          xml = `openssl smime -inform der -verify -noverify -in #{path}`
           plist = Plist.parse_xml(xml)
         end
         if (plist || []).count > 5
