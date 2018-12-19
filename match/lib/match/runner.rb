@@ -166,21 +166,26 @@ module Match
         self.files_to_commit << private_key_path
       else
         cert_path = certs.last
-        UI.message("Installing certificate...")
 
-        # Only looking for cert in "custom" (non login.keychain) keychain
-        # Doing this for backwards compatability
-        keychain_name = params[:keychain_name] == "login.keychain" ? nil : params[:keychain_name]
+        if Helper.mac?
+          UI.message("Installing certificate...")
 
-        if FastlaneCore::CertChecker.installed?(cert_path, in_keychain: keychain_name)
-          UI.verbose("Certificate '#{File.basename(cert_path)}' is already installed on this machine")
+          # Only looking for cert in "custom" (non login.keychain) keychain
+          # Doing this for backwards compatability
+          keychain_name = params[:keychain_name] == "login.keychain" ? nil : params[:keychain_name]
+
+          if FastlaneCore::CertChecker.installed?(cert_path, in_keychain: keychain_name)
+            UI.verbose("Certificate '#{File.basename(cert_path)}' is already installed on this machine")
+          else
+            Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
+          end
+
+          # Import the private key
+          # there seems to be no good way to check if it's already installed - so just install it
+          Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
         else
-          Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
+          UI.message("Skipping installation of certificate as it would not work on this operating system.")
         end
-
-        # Import the private key
-        # there seems to be no good way to check if it's already installed - so just install it
-        Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
 
         # Get and print info of certificate
         info = Utils.get_cert_info(cert_path)
