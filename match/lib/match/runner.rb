@@ -207,7 +207,9 @@ module Match
       profile_name = names.join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
       base_dir = File.join(prefixed_working_directory(working_directory), "profiles", prov_type.to_s)
       profiles = Dir[File.join(base_dir, "#{profile_name}.mobileprovision")]
-      keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
+      if Helper.mac?
+        keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
+      end
 
       # Install the provisioning profiles
       profile = profiles.last
@@ -241,8 +243,12 @@ module Match
         self.files_to_commit << profile
       end
 
-      installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
-      parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
+      if Helper.mac?
+        installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
+        parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
+      else
+        parsed = FastlaneCore::ProvisioningProfile.parse(profile)
+      end
       uuid = parsed["UUID"]
 
       if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
