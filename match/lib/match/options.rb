@@ -168,7 +168,11 @@ module Match
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find keys file at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :export_path,
+                                     env_name: "MATCH_EXPORT_PATH",
+                                     description: "Path to export certificates, key and profile",
+                                     optional: true)
 
       ]
     end
