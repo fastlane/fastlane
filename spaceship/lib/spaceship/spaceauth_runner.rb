@@ -49,7 +49,7 @@ module Spaceship
 
       yaml = cookies.to_yaml.gsub("\n", "\\n")
 
-      if Spaceship::Client::UserInterface.interactive? && agree("🙄 Should fastlane copy the cookie into your clipboard, so you can easily paste it? (y/n)", true)
+      if mac? && Spaceship::Client::UserInterface.interactive? && agree("🙄 Should fastlane copy the cookie into your clipboard, so you can easily paste it? (y/n)", true)
         require 'open3'
         Open3.popen3('pbcopy') { |input, _, _| input << yaml }
         puts("Successfully copied text into your clipboard 🎨".green)
@@ -63,6 +63,10 @@ module Spaceship
       puts("")
       puts("Example:")
       puts("export FASTLANE_SESSION='#{yaml}'".cyan.underline)
+    end
+
+    def mac?
+      (/darwin/ =~ RUBY_PLATFORM) != nil
     end
   end
 end
