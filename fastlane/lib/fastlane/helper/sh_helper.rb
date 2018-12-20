@@ -2,30 +2,64 @@ require "open3"
 
 module Fastlane
   module Actions
-    # Execute a shell command
-    # This method will output the string and execute it
-    # Just an alias for sh_no_action
-    # When running this in tests, it will return the actual command instead of executing it
-    # @param log [Boolean] should fastlane print out the executed command
-    # @param error_callback [Block] a callback invoked with the command output if there is a non-zero exit status
+    # Execute a shell command. This method will output the string and execute it.
+    #
+    # The `log` argument accepts either a boolean or an aray of symbols
+    # determining what should be printed and what should be suppressed:
+    #
+    # ```
+    # # $ echo foo && exit 1
+    # sh("echo foo && exit 1", log: [:command])
+    #
+    # # > foo
+    # sh("echo foo && exit 1", log: [:output])
+    #
+    # # Exit status was 1 instead of 0.
+    # # foo
+    # sh("echo foo && exit 1", log: [:error])
+    # ```
+    #
+    # You can combine these together. The argument also supports just `true`
+    # which enables all output and `false` which suppresses all output.
+    #
+    # When running this in tests, it will return the actual command instead of
+    # executing it.
+    #
+    # @param log [Boolean, Array] Should fastlane print out the executed command, its output and error
+    # @param error_callback [Block] A callback invoked with the command output if there is a non-zero exit status
     def self.sh(*command, log: true, error_callback: nil, &b)
-      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, &b)
+      parse_log_argument = proc { |key|
+        case log
+        when true, false then log
+        when Array then log.include?(key)
+        end
+      }
+      sh_control_output(
+        *command,
+        print_command: parse_log_argument.call(:command),
+        print_command_output: parse_log_argument.call(:output),
+        print_command_error: parse_log_argument.call(:error),
+        error_callback: error_callback,
+        &b
+      )
     end
 
+    # Just an alias for `sh`.
     def self.sh_no_action(*command, log: true, error_callback: nil, &b)
-      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, &b)
+      sh(*command, log: log, error_callback: error_callback, &b)
     end
 
     # @param command The command to be executed (variadic)
     # @param print_command [Boolean] Should we print the command that's being executed
     # @param print_command_output [Boolean] Should we print the command output during execution
+    # @param print_command_error [Boolean] Should we print the command output if it exits with a non-zero status
     # @param error_callback [Block] A block that's called if the command exits with a non-zero status
     # @yield [status, result, cmd] The return status of the command, all output from the command and an equivalent shell command
     # @yieldparam [Process::Status] status A Process::Status indicating the status of the completed command
     # @yieldparam [String] result The complete output to stdout and stderr of the completed command
     # @yieldparam [String] cmd A shell command equivalent to the arguments passed
     # rubocop: disable Metrics/PerceivedComplexity
-    def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil)
+    def self.sh_control_output(*command, print_command: true, print_command_output: true, print_command_error: true, error_callback: nil)
       print_command = print_command_output = true if $troubleshoot
       # Set the encoding first, the user might have set it wrong
       previous_encoding = [Encoding.default_external, Encoding.default_internal]
@@ -70,7 +104,7 @@ module Fastlane
                     else
                       "Shell command exited with exit status #{exit_status.exitstatus} instead of 0."
                     end
-          message += "\n#{result}" if print_command_output
+          message += "\n#{result}" if print_command_error
 
           if error_callback || block_given?
             UI.error(message)
