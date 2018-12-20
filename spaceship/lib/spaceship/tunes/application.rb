@@ -391,6 +391,18 @@ module Spaceship
       end
 
       #####################################################
+      # @!group release to all users
+      #####################################################
+
+      def release_to_all_users!
+        version = self.live_version
+        if version.nil?
+          raise "Could not find a valid version to release"
+        end
+        version.release_to_all_users!
+      end
+
+      #####################################################
       # @!group General
       #####################################################
       def setup
