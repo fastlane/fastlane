@@ -1,4 +1,5 @@
 require_relative 'helper'
+require 'open3'
 
 module FastlaneCore
   class KeychainImporter
@@ -20,9 +21,17 @@ module FastlaneCore
         command << " -S apple-tool:,apple:"
         command << " -k #{keychain_password.to_s.shellescape}"
         command << " #{keychain_path.shellescape}"
-        command << " &> /dev/null" unless output
 
-        Helper.backticks(command, print: output)
+        Open3.popen3(command) do |stdin, stdout, stderr, thrd|
+          if output
+            UI.command(command)
+            UI.command_output(stdout.read)
+          end
+
+          unless thrd.value.success?
+            UI.user_error!("Could not configure key to bypass permission popup:\n#{stderr.read}")
+          end
+        end
       end
     end
   end
