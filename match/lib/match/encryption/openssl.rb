@@ -110,7 +110,7 @@ module Match
       def encrypt_specific_file(path: nil, password: nil)
         UI.user_error!("No password supplied") if password.to_s.strip.length == 0
 
-        data_to_encrypt = File.read(path)
+        data_to_encrypt = File.binread(path)
         salt = SecureRandom.random_bytes(8)
 
         # The :: is important, as there is a name clash
