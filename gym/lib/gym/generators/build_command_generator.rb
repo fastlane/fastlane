@@ -87,7 +87,6 @@ module Gym
             pipe << report_output_json.shellescape
           end
         end
-        pipe << "> /dev/null" if Gym.config[:suppress_xcode_output]
         pipe
       end
 

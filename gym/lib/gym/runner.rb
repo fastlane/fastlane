@@ -83,16 +83,24 @@ module Gym
 
     def mark_archive_as_built_by_gym(archive_path)
       escaped_archive_path = archive_path.shellescape
-      system("xattr -w info.fastlane.generated_by_gym 1 #{escaped_archive_path}")
+      system("xattr -w info.fastlane.generated_by_gym 1 #{escaped_archive_path} > /dev/null 2>&1")
     end
 
     # Builds the app and prepares the archive
     def build_app
       command = BuildCommandGenerator.generate
       print_command(command, "Generated Build Command") if FastlaneCore::Globals.verbose?
+
+      command_output = Gym.config[:enabled_xcode_output].map(&:to_sym)
+      command_output = [:command] if Gym.config[:suppress_xcode_output]
+      command_output = [] if Gym.config[:silent]
+
       FastlaneCore::CommandExecutor.execute(command: command,
-                                          print_all: true,
-                                      print_command: !Gym.config[:silent],
+                                          print_all: command_output.include?(:output),
+                                      print_command: command_output.include?(:command),
+                                            loading: "Loading...",
+                                    suppress_output: !command_output.include?(:output),
+                              suppress_error_output: !command_output.include?(:error),
                                               error: proc do |output|
                                                 ErrorHandler.handle_build_error(output)
                                               end)
