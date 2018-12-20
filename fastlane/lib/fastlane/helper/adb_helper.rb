@@ -26,7 +26,7 @@ module Fastlane
       # Run a certain action
       def trigger(command: nil, serial: nil)
         android_serial = serial != "" ? "ANDROID_SERIAL=#{serial}" : nil
-        command = [android_serial, adb_path.shellescape, command].join(" ").strip!
+        command = [android_serial, adb_path.shellescape, command].join(" ").strip
         Action.sh(command)
       end
 
