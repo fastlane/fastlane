@@ -230,14 +230,14 @@ module Spaceship
     #####################################################
 
     # The logger in which all requests are logged
-    # /tmp/spaceship[time]_[pid].log by default
+    # /tmp/spaceship[time]_[pid]_["threadid"].log by default
     def logger
       unless @logger
         if ENV["VERBOSE"]
           @logger = Logger.new(STDOUT)
         else
           # Log to file by default
-          path = "/tmp/spaceship#{Time.now.to_i}_#{Process.pid}.log"
+          path = "/tmp/spaceship#{Time.now.to_i}_#{Process.pid}_#{Thread.current.object_id}.log"
           @logger = Logger.new(path)
         end
 
