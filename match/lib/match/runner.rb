@@ -233,11 +233,13 @@ module Match
 
       if profile.nil? || params[:force]
         if params[:readonly]
-          all_profiles = Dir.entries(base_dir).reject { |f| f.start_with?(".") }
           UI.error("No matching provisioning profiles found for '#{profile_name}'")
           UI.error("A new one cannot be created because you enabled `readonly`")
-          UI.error("Provisioning profiles in your repo for type `#{prov_type}`:")
-          all_profiles.each { |p| UI.error("- '#{p}'") }
+          if Dir.exist?(base_dir)
+            all_profiles = Dir.entries(base_dir).reject { |f| f.start_with?(".") }
+            UI.error("Provisioning profiles in your repo for type `#{prov_type}`:")
+            all_profiles.each { |p| UI.error("- '#{p}'") }
+          end
           UI.error("If you are certain that a profile should exist, double-check the recent changes to your match repository")
           UI.user_error!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`. Check the output above for more information.")
         end
