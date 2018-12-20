@@ -3,6 +3,7 @@ require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Scan
+  # rubocop:disable Metrics/ClassLength
   class Options
     def self.verify_type(item_name, acceptable_types, value)
       type_ok = [Array, String].any? { |type| value.kind_of?(type) }
@@ -193,9 +194,18 @@ module Scan
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :suppress_xcode_output,
                                      env_name: "SCAN_SUPPRESS_XCODE_OUTPUT",
-                                     description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
+                                     description: "Suppress the output of xcodebuild to stdout. Takes precedence over `enabled_xcode_output`. Output is still saved in buildlog_path",
                                      optional: true,
                                      is_string: false),
+        FastlaneCore::ConfigItem.new(key: :enabled_xcode_output,
+                                     env_name: "SCAN_ENABLED_XCODE_OUTPUT",
+                                     type: Array,
+                                     description: "List of what parts of xcodebuild output should be printed. Valid values are: 'command' (print xcodebuild spell), 'output' (print real-time output), 'error' (print raw output if the tests fail). Output is still always saved in buildlog_path",
+                                     optional: true,
+                                     default_value: [:command, :output],
+                                     verify_block: proc do |values|
+                                       values.each { |value| UI.user_error!("Invalid output type '#{value}'.") unless %w(command output error).include?(value.to_s) }
+                                     end),
         FastlaneCore::ConfigItem.new(key: :formatter,
                                      short_option: "-n",
                                      env_name: "SCAN_FORMATTER",
@@ -342,4 +352,5 @@ module Scan
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

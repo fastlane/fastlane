@@ -49,12 +49,16 @@ module Scan
         end
       end
 
+      command_output = Scan.config[:enabled_xcode_output].map(&:to_sym)
+      command_output = [:command] if Scan.config[:suppress_xcode_output]
+
       FastlaneCore::CommandExecutor.execute(command: command,
-                                          print_all: true,
-                                      print_command: true,
+                                          print_all: command_output.include?(:output),
+                                      print_command: command_output.include?(:command),
                                              prefix: prefix_hash,
                                             loading: "Loading...",
-                                    suppress_output: Scan.config[:suppress_xcode_output],
+                                    suppress_output: !command_output.include?(:output),
+                              suppress_error_output: !command_output.include?(:error),
                                               error: proc do |error_output|
                                                 begin
                                                   exit_status = $?.exitstatus
