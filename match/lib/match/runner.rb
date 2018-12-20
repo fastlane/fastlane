@@ -46,6 +46,10 @@ module Match
         google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
         google_cloud_keys_file: params[:google_cloud_keys_file].to_s
       })
+
+      UI.message("====================================")
+      UI.message("       Download from Storage        ")
+      UI.message("====================================")
       storage.download
 
       # Init the encryption only after the `storage.download` was called to have the right working directory
@@ -53,6 +57,9 @@ module Match
         git_url: params[:git_url],
         working_directory: storage.working_directory
       })
+      UI.message("====================================") if encryption
+      UI.message("           Decrypt files            ") if encryption
+      UI.message("====================================") if encryption
       encryption.decrypt_files if encryption
 
       if params[:readonly]
@@ -85,10 +92,17 @@ module Match
         end
       end
 
+      UI.message("====================================")
+      UI.message("           Certificate(s)           ")
+      UI.message("====================================")
+
       # Certificate
       cert_id = fetch_certificate(params: params, working_directory: storage.working_directory)
       spaceship.certificate_exists(username: params[:username], certificate_id: cert_id) if spaceship
 
+      UI.message("====================================")
+      UI.message("       Provisioning Profile(s)      ")
+      UI.message("====================================")
       # Provisioning Profiles
       app_identifiers.each do |app_identifier|
         loop do
@@ -100,7 +114,13 @@ module Match
       end
 
       if self.files_to_commit.count > 0 && !params[:readonly]
+        UI.message("====================================") if encryption
+        UI.message("             Encrypt files          ") if encryption
+        UI.message("====================================") if encryption
         encryption.encrypt_files if encryption
+        UI.message("====================================")
+        UI.message("            Upload changes          ")
+        UI.message("====================================")
         storage.save_changes!(files_to_commit: self.files_to_commit)
       end
 
