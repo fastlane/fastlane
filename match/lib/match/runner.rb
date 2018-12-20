@@ -185,7 +185,6 @@ module Match
           Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
         else
           UI.message("Skipping installation of certificate as it would not work on this operating system.")
-          # TODO move table from below in here, so it better reflects that cert was not installed but downloaded (and copied to x)
         end
 
         if params[:export_path]
@@ -253,8 +252,6 @@ module Match
 
       if Helper.mac?
         installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
-      else
-        # TODO move table from below in here, so it better reflects that cert was not installed but downloaded (and copied to x)
       end
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       uuid = parsed["UUID"]
