@@ -22,15 +22,14 @@ module FastlaneCore
         command << " -l 'Imported Private Key'"
         command << " -k #{keychain_password.to_s.shellescape}"
         command << " #{keychain_path.shellescape}"
+        command << " 1> /dev/null" # always disable stdout. This can be very verbose, and leak potentially sensitive info
 
+        UI.command(command) if output
         Open3.popen3(command) do |stdin, stdout, stderr, thrd|
-          if output
-            UI.command(command)
-            UI.command_output(stdout.read)
-          end
-
           unless thrd.value.success?
-            UI.user_error!("Could not configure key to bypass permission popup:\n#{stderr.read}")
+            UI.user_error!("Could not configure key to bypass permission popup.\n" \
+                           "Check if you supplied the correct `keychain_password` for keychain: `#{keychain_path}`\n" \
+                           "#{stderr.read}")
           end
         end
       end
