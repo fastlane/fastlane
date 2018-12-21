@@ -24,8 +24,10 @@ module FastlaneCore
 
         Open3.popen3(command) do |stdin, stdout, stderr, thrd|
           if output
+            Helper.show_loading_indicator("Importing keys...")
             UI.command(command)
             UI.command_output(stdout.read)
+            Helper.hide_loading_indicator
           end
 
           unless thrd.value.success?
