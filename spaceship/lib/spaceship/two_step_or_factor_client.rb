@@ -48,7 +48,7 @@ module Spaceship
       Tunes::RecoveryDevice.client = old_client
 
       puts("Two-step Verification (4 digits code) is enabled for account '#{self.user}'")
-      puts("Please select a device to verify your identity")
+      puts("Please select a trusted device to verify your identity")
       available = devices.collect do |c|
         "#{c.name}\t#{c.model_name || 'SMS'}\t(#{c.device_id})"
       end
