@@ -24,8 +24,8 @@ module FastlaneCore
         command << " #{keychain_path.shellescape}"
 
         Open3.popen3(command) do |stdin, stdout, stderr, thrd|
-          # Need to read stdout even if not showing using UI.command_output
-          # The execution would sometimes hang for large keychain item list if the output of security `set-key-partition-list` not read
+          # The execution would sometimes hang for keychains with a large list of items if not read
+          # Always need to read stdout for `security set-key-partition-list` (even if not showing output using UI.command_output) 
           command_output = stdout.read
 
           if output
