@@ -5,6 +5,7 @@ require_relative 'tunes/recovery_device'
 module Spaceship
   class Client
     def handle_two_step_or_factor(response)
+      # extract `x-apple-id-session-id` and `scnt` from response, to be used by `update_request_headers`
       @x_apple_id_session_id = response["x-apple-id-session-id"]
       @scnt = response["scnt"]
 
@@ -14,6 +15,7 @@ module Spaceship
       puts("More information about Two-factor Authentication (6 digits code): https://support.apple.com/en-us/HT204915")
       puts("")
 
+      # get authentication options
       r = request(:get) do |req|
         req.url("https://idmsa.apple.com/appleauth/auth")
         update_request_headers(req)
@@ -33,6 +35,7 @@ module Spaceship
         raise Tunes::Error.new, "Too many verification codes have been sent. Enter the last code you received, use one of your devices, or try again later."
       end
 
+      # turn `trustedDevices` into handy array of objects
       old_client = (begin
                       Tunes::RecoveryDevice.client
                     rescue
@@ -56,7 +59,7 @@ module Spaceship
 
     # this is extracted into its own method so it can be called multiple times (see end)
     def select_device(r, device_id)
-      # Request Token
+      # Request token to device
       r = request(:put) do |req|
         req.url("https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode")
         update_request_headers(req)
@@ -70,7 +73,7 @@ module Spaceship
       code = ask("Please enter the 4 digit code: ")
       puts("Requesting session...")
 
-      # Send token back to server to get a valid session
+      # Send token to server to get a valid session
       r = request(:post) do |req|
         req.url("https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode")
         req.headers['Content-Type'] = 'application/json'
@@ -129,7 +132,7 @@ module Spaceship
       code = ask("Please enter the #{code_length} digit code: ")
       puts("Requesting session...")
 
-      # Send securityCode back to server to get a valid session
+      # Send "verification code" back to server to get a valid session
       r = request(:post) do |req|
         req.url("https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode")
         req.headers['Content-Type'] = 'application/json'
@@ -162,7 +165,6 @@ module Spaceship
 
       request(:get) do |req|
         req.url("https://idmsa.apple.com/appleauth/auth/2sv/trust")
-
         update_request_headers(req)
       end
       # This request will fail if the user isn't added to a team on iTC
