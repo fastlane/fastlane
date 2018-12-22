@@ -123,11 +123,12 @@ module Spaceship
       puts("check out #{two_factor_url}")
 
       security_code = response.body["securityCode"]
-      # securityCode =
-      # {"length"=>6,
-      #  "tooManyCodesSent"=>false,
-      #  "tooManyCodesValidated"=>false,
-      #  "securityCodeLocked"=>false}
+      # "securityCode": {
+      # 	"length": 6,
+      # 	"tooManyCodesSent": false,
+      # 	"tooManyCodesValidated": false,
+      # 	"securityCodeLocked": false
+      # },
       code_length = security_code["length"]
       code = ask("Please enter the #{code_length} digit code: ")
       puts("Requesting session...")
