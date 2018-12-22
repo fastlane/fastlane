@@ -8,7 +8,7 @@ module FastlaneCore
 
       command = "security import #{path.shellescape} -k '#{keychain_path.shellescape}'"
       command << " -P #{certificate_password.shellescape}"
-      command << " -T /usr/bin/codesign" # to not be asked for permission when running a tool like `gym`
+      command << " -T /usr/bin/codesign" # to not be asked for permission when running a tool like `gym` (before Sierra)
       command << " -T /usr/bin/security"
       command << " &> /dev/null" unless output
 
@@ -16,6 +16,7 @@ module FastlaneCore
 
       # When security supports partition lists, also add the partition IDs
       # See https://openradar.appspot.com/28524119
+      UI.important("🐌 Configuring imported item for code signing (this could take a while if you have a lot of items in your keychain)...")
       if Helper.backticks('security -h | grep set-key-partition-list', print: false).length > 0
         command = "security set-key-partition-list"
         command << " -S apple-tool:,apple:"
@@ -23,13 +24,21 @@ module FastlaneCore
         command << " #{keychain_path.shellescape}"
 
         Open3.popen3(command) do |stdin, stdout, stderr, thrd|
+          # Need to read stdout even if not showing using UI.command_output
+          # The execution would sometimes hang for large keychain item list if the output of security `set-key-partition-list` not read
+          command_output = stdout.read
+
           if output
             UI.command(command)
-            UI.command_output(stdout.read)
+            UI.command_output(command_output)
           end
 
           unless thrd.value.success?
-            UI.user_error!("Could not configure key to bypass permission popup:\n#{stderr.read}")
+            UI.error("Could not configure imported keychain item (certificate) to prevent UI permission popup when signing:\n#{stderr.read.to_s.strip}")
+            UI.error("This was most likely caused by not providing a keychain password (or a correct keychain password)")
+            UI.error("Please look at the following docs to see how to set a keychain password:")
+            UI.error(" - https://docs.fastlane.tools/actions/sync_code_signing")
+            UI.error(" - https://docs.fastlane.tools/actions/get_certificates")
           end
         end
       end
