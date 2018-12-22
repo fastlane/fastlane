@@ -25,7 +25,7 @@ module FastlaneCore
 
         Open3.popen3(command) do |stdin, stdout, stderr, thrd|
           # The execution would sometimes hang for keychains with a large list of items if not read
-          # Always need to read stdout for `security set-key-partition-list` (even if not showing output using UI.command_output) 
+          # Always need to read stdout for `security set-key-partition-list` (even if not showing output using UI.command_output)
           command_output = stdout.read
 
           if output
@@ -34,6 +34,7 @@ module FastlaneCore
           end
 
           unless thrd.value.success?
+            UI.error("")
             UI.error("Could not configure imported keychain item (certificate) to prevent UI permission popup when signing:\n#{stderr.read.to_s.strip}")
             UI.error("This was most likely caused by not providing a keychain password (or a correct keychain password)")
             UI.error("Please look at the following docs to see how to set a keychain password:")
