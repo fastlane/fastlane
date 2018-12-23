@@ -22,7 +22,7 @@ module FastlaneCore
         command << " -l 'Imported Private Key'"
         command << " -k #{keychain_password.to_s.shellescape}"
         command << " #{keychain_path.shellescape}"
-        command << " 1> /dev/null" # always disable stdout. This can be very verbose, and leak potentially sensitive info
+        command << " &> /dev/null" # always disable stdout. This can be very verbose, and leak potentially sensitive info
 
         UI.command(command) if output
         Open3.popen3(command) do |stdin, stdout, stderr, thrd|
