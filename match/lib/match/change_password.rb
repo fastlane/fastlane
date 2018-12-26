@@ -7,6 +7,13 @@ module Match
   # These functions should only be used while in (UI.) interactive mode
   class ChangePassword
     def self.update(params: nil)
+      if params[:storage_mode] != "git"
+        # Only git supports changing the password
+        # All other storage options will most likely use more advanced
+        # ways to encrypt files
+        UI.user_error!("Only git-based match allows you to change your password, current `storage_mode` is #{params[:storage_mode]}")
+      end
+
       ensure_ui_interactive
 
       to = ChangePassword.ask_password(message: "New passphrase for Git Repo: ", confirm: true)

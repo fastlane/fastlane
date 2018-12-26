@@ -225,7 +225,7 @@ module Spaceship
         elsif errors.count == 1 && errors.first.include?("try again later")
           raise ITunesConnectTemporaryError.new, errors.first
         elsif errors.count == 1 && errors.first.include?("Forbidden")
-          raise_insuffient_permission_error!
+          raise_insufficient_permission_error!
         elsif flaky_api_call
           raise ITunesConnectPotentialServerError.new, errors.join(' ')
         else
@@ -1147,6 +1147,24 @@ module Spaceship
     end
 
     #####################################################
+    # @!group release to all users
+    #####################################################
+
+    def release_to_all_users!(app_id, version)
+      raise "app_id is required" unless app_id
+      raise "version is required" unless version
+
+      r = request(:post) do |req|
+        req.url("ra/apps/#{app_id}/versions/#{version}/phasedRelease/state/COMPLETE")
+        req.headers['Content-Type'] = 'application/json'
+        req.body = app_id.to_s
+      end
+
+      handle_itc_response(r.body)
+      parse_response(r, 'data')
+    end
+
+    #####################################################
     # @!group in-app-purchases
     #####################################################
 
@@ -1435,20 +1453,22 @@ module Spaceship
     def with_tunes_retry(tries = 5, potential_server_error_tries = 3, &_block)
       return yield
     rescue Spaceship::TunesClient::ITunesConnectTemporaryError => ex
+      seconds_to_sleep = 60
       unless (tries -= 1).zero?
-        msg = "App Store Connect temporary error received: '#{ex.message}'. Retrying after 60 seconds (remaining: #{tries})..."
+        msg = "App Store Connect temporary error received: '#{ex.message}'. Retrying after #{seconds_to_sleep} seconds (remaining: #{tries})..."
         puts(msg)
         logger.warn(msg)
-        sleep(60) unless Object.const_defined?("SpecHelper")
+        sleep(seconds_to_sleep) unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex # re-raise the exception
     rescue Spaceship::TunesClient::ITunesConnectPotentialServerError => ex
+      seconds_to_sleep = 10
       unless (potential_server_error_tries -= 1).zero?
-        msg = "Potential server error received: '#{ex.message}'. Retrying after 10 seconds (remaining: #{tries})..."
+        msg = "Potential server error received: '#{ex.message}'. Retrying after 10 seconds (remaining: #{potential_server_error_tries})..."
         puts(msg)
         logger.warn(msg)
-        sleep(10) unless Object.const_defined?("SpecHelper")
+        sleep(seconds_to_sleep) unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex

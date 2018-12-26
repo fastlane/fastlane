@@ -21,6 +21,8 @@ protocol MatchfileProtocol: class {
   var skipDocs: Bool { get }
   var platform: String { get }
   var templateName: String? { get }
+  var googleCloudBucketName: String? { get }
+  var googleCloudKeysFile: String? { get }
 }
 
 extension MatchfileProtocol {
@@ -46,8 +48,10 @@ extension MatchfileProtocol {
   var skipDocs: Bool { return false }
   var platform: String { return "ios" }
   var templateName: String? { return nil }
+  var googleCloudBucketName: String? { return nil }
+  var googleCloudKeysFile: String? { return nil }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.2]
+// FastlaneRunnerAPIVersion [0.9.3]
