@@ -49,6 +49,8 @@ module Frameit
     end
 
     def should_skip?
+      # TODO: Refacto to reuse the fetch_text method OR extract a common method out to be used here and there.
+      # TODO: Check for strings file also
       if !should_add_title?
         return false
       end
