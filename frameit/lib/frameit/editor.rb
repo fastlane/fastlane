@@ -18,8 +18,13 @@ module Frameit
 
     def frame!(screenshot)
       self.screenshot = screenshot
-      require 'pry-byebug'; binding.pry
-      t1 = Time.now()
+
+      if should_skip? 
+        Helper.hide_loading_indicator
+        UI.message("Skipping framing of screenshot  #{screenshot.path}")
+        return
+      end
+
       prepare_image
 
       frame = load_frame
@@ -35,15 +40,25 @@ module Frameit
 
       if should_add_title?
         @image = complex_framing
-        t2 = Time.now()
-        UI.success(t2-t1)
       else
-
         # easy mode from 1.0 - no title or background
         put_into_frame # put it in the frame
       end
 
       store_result # write to file system
+    end
+
+    def should_skip?
+      if !should_add_title?
+        return false
+      end
+
+      type = :title
+      text = fetch_config[type.to_s]['text'] if fetch_config[type.to_s] && fetch_config[type.to_s]['text'] && fetch_config[type.to_s]['text'].length > 0 # Ignore empty string
+      if type == :title && !text
+        return true
+      end
+      return false
     end
 
     def load_frame
