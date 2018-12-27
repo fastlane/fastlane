@@ -116,6 +116,5 @@ module Frameit
     def to_s
       self.path
     end
-
   end
 end

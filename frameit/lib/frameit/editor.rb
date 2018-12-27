@@ -44,8 +44,6 @@ module Frameit
       store_result # write to file system
     end
 
-   
-
     def load_frame
       color = fetch_frame_color
       if color

@@ -35,7 +35,6 @@ module Frameit
             next # we don't care about watches right now
           end
 
-
           begin
             screenshot = Screenshot.new(full_path, color)
             editor = screenshot.mac? ? MacEditor.new(screenshot) : Editor.new(screenshot)
