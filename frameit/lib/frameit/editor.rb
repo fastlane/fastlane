@@ -65,16 +65,7 @@ module Frameit
     end
 
     def should_skip?
-      # TODO: Refacto to reuse the fetch_text method OR extract a common method out to be used here and there.
-      # TODO: Check for strings file also
-      if !should_add_title?
-        return false
-      end
-      
-      type = :title
-      config = fetch_config
-      text = config[type.to_s]['text'] if config[type.to_s] && config[type.to_s]['text'] && config[type.to_s]['text'].length > 0 # Ignore empty string
-      return !text
+      return should_add_title? && !fetch_text(:title)
     end
 
     private
@@ -502,12 +493,6 @@ module Frameit
 
       # No string files, fallback to Framefile config
       text = fetch_config[type.to_s]['text'] if fetch_config[type.to_s] && fetch_config[type.to_s]['text'] && fetch_config[type.to_s]['text'].length > 0 # Ignore empty string
-
-      if type == :title && !text
-        # title is mandatory
-        UI.user_error!("Could not get title for screenshot #{screenshot.path}. Please provide one in your Framefile.json or title.strings")
-      end
-
       return text
     end
 

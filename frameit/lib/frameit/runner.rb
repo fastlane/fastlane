@@ -44,7 +44,7 @@ module Frameit
               editor = Editor.new(screenshot)
             end
             if editor.should_skip?
-              UI.message("Skipping framing of screenshot  #{screenshot.path}")
+              UI.message("Skipping framing of screenshot #{screenshot.path}.  No title provided in your Framefile.json or title.strings.")
             else
               Helper.show_loading_indicator("Framing screenshot '#{full_path}'")
               editor.frame!
