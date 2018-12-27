@@ -16,15 +16,11 @@ module Frameit
     attr_accessor :image # the current image used for editing
     attr_accessor :space_to_device
 
-    def frame!(screenshot)
-      self.screenshot = screenshot
+    def initialize(screenshot)
+      @screenshot = screenshot
+    end
 
-      if should_skip? 
-        Helper.hide_loading_indicator
-        UI.message("Skipping framing of screenshot  #{screenshot.path}")
-        return
-      end
-
+    def frame!
       prepare_image
 
       frame = load_frame
@@ -48,20 +44,7 @@ module Frameit
       store_result # write to file system
     end
 
-    def should_skip?
-      # TODO: Refacto to reuse the fetch_text method OR extract a common method out to be used here and there.
-      # TODO: Check for strings file also
-      if !should_add_title?
-        return false
-      end
-
-      type = :title
-      text = fetch_config[type.to_s]['text'] if fetch_config[type.to_s] && fetch_config[type.to_s]['text'] && fetch_config[type.to_s]['text'].length > 0 # Ignore empty string
-      if type == :title && !text
-        return true
-      end
-      return false
-    end
+   
 
     def load_frame
       color = fetch_frame_color
@@ -79,6 +62,19 @@ module Frameit
       return 90 if self.screenshot.landscape_right?
       return -90 if self.screenshot.landscape_left?
       return 0
+    end
+
+    def should_skip?
+      # TODO: Refacto to reuse the fetch_text method OR extract a common method out to be used here and there.
+      # TODO: Check for strings file also
+      if !should_add_title?
+        return false
+      end
+      
+      type = :title
+      config = fetch_config
+      text = config[type.to_s]['text'] if config[type.to_s] && config[type.to_s]['text'] && config[type.to_s]['text'].length > 0 # Ignore empty string
+      return !text
     end
 
     private
