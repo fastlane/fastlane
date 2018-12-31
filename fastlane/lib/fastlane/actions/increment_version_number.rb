@@ -36,12 +36,8 @@ module Fastlane
           # Specific version
           next_version_number = params[:version_number]
         else
-          if Helper.test?
-            version_array = [1, 0, 0]
-          else
-            UI.user_error!("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ version_regex
-            version_array = current_version.split(".").map(&:to_i)
-          end
+          UI.user_error!("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ version_regex
+          version_array = current_version.split(".").map(&:to_i)
 
           case params[:bump_type]
           when "patch"
