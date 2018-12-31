@@ -23,7 +23,11 @@ module Fastlane
           '&&'
         ].join(' ')
 
-        current_version = `#{command_prefix} agvtool what-marketing-version -terse1`.split("\n").last || ''
+        current_version = Actions.sh(
+          "#{command_prefix} agvtool what-marketing-version -terse1",
+          log: FastlaneCore::Globals.verbose?,
+          error_callback: ->(result) { current_version = '' }
+        ).split("\n").last
 
         version_regex = /^\d+.\d+.\d+$/
         if params[:version_number]
