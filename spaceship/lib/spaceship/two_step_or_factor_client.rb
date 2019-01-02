@@ -1,6 +1,5 @@
 require_relative 'globals'
 require_relative 'tunes/tunes_client'
-require_relative 'tunes/recovery_device'
 
 module Spaceship
   class Client
@@ -24,29 +23,18 @@ module Spaceship
       end
     end
 
-    def handle_two_step(r)
-      if r.body.fetch("securityCode", {})["tooManyCodesLock"].to_s.length > 0
+    def handle_two_step(response)
+      if response.body.fetch("securityCode", {})["tooManyCodesLock"].to_s.length > 0
         raise Tunes::Error.new, "Too many verification codes have been sent. Enter the last code you received, use one of your devices, or try again later."
       end
-
-      # turn `trustedDevices` into handy array of objects
-      old_client = (begin
-                      Tunes::RecoveryDevice.client
-                    rescue
-                      nil # since client might be nil, which raises an exception
-                    end)
-      Tunes::RecoveryDevice.client = self # temporary set it as it's required by the factory method
-      devices = r.body["trustedDevices"].collect do |current|
-        Tunes::RecoveryDevice.factory(current)
-      end
-      Tunes::RecoveryDevice.client = old_client
 
       puts("Two-step Verification (4 digits code) is enabled for account '#{self.user}'")
       puts("More information about Two-step Verification: https://support.apple.com/en-us/HT204152")
       puts("")
+
       puts("Please select a trusted device to verify your identity")
-      available = devices.collect do |c|
-        "#{c.name}\t#{c.model_name || 'SMS'}\t(#{c.device_id})"
+      available = response.body["trustedDevices"].collect do |current|
+        "#{current['name']}\t#{current['modelName'] || 'SMS'}\t(#{current['id']})"
       end
       result = choose(*available)
       device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
