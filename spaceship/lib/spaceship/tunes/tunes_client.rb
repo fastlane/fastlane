@@ -163,14 +163,13 @@ module Spaceship
       return unless raw.kind_of?(Hash)
 
       data = raw['data'] || raw # sometimes it's with data, sometimes it isn't
-      error_keys_to_check = [
-        "sectionErrorKeys",
-        "sectionInfoKeys",
-        "sectionWarningKeys",
-        "validationErrors"
-      ]
-      errors_in_data = fetch_errors_in_data(data_section: data, keys: error_keys_to_check)
-      errors_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: error_keys_to_check)
+
+      error_keys = ["sectionErrorKeys", "validationErrors", "serviceErrors"]
+      info_keys = ["sectionInfoKeys", "sectionWarningKeys"]
+      error_and_info_keys_to_check = error_keys + info_keys
+      
+      errors_in_data = fetch_errors_in_data(data_section: data, keys: error_and_info_keys_to_check)
+      errors_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: error_and_info_keys_to_check)
 
       # If we have any errors or "info" we need to treat them as warnings or errors
       if errors_in_data.count == 0 && errors_in_version_info.count == 0
@@ -205,7 +204,6 @@ module Spaceship
       errors = handle_response_hash.call(data)
 
       # Search at data level, as well as "versionInfo" level for errors
-      error_keys = ["sectionErrorKeys", "validationErrors"]
       errors_in_data = fetch_errors_in_data(data_section: data, keys: error_keys)
       errors_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: error_keys)
 
@@ -234,7 +232,6 @@ module Spaceship
       end
 
       # Search at data level, as well as "versionInfo" level for info and warnings
-      info_keys = ["sectionInfoKeys", "sectionWarningKeys"]
       info_in_data = fetch_errors_in_data(data_section: data, keys: info_keys)
       info_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: info_keys)
 
