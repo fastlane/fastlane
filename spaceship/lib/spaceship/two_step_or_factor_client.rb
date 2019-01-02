@@ -144,7 +144,6 @@ module Spaceship
       end
 
       begin
-        puts r.body
         # we use `Spaceship::TunesClient.new.handle_itc_response`
         # since this might be from the Dev Portal, but for 2 factor
         Spaceship::TunesClient.new.handle_itc_response(r.body) # this will fail if the code is invalid
