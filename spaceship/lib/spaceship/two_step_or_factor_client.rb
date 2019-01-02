@@ -121,19 +121,25 @@ module Spaceship
       # 	"securityCodeLocked": false
       # },
       code_length = security_code["length"]
+
       puts("")
       puts("(Input `sms` to escape this prompt and select a trusted phone number to send the code as a text message)")
+      code_type = 'trusteddevice'
       code = ask("Please enter the #{code_length} digit code:")
+      body = { "securityCode" => { "code" => code.to_s } }.to_json
+
       if(code == 'sms')
-        code = request_two_factor_code_from_phone(response.body["trustedPhoneNumbers"], code_length)
+        code_type = 'phone'
+        body = request_two_factor_code_from_phone(response.body["trustedPhoneNumbers"], code_length)
       end
+
       puts("Requesting session...")
 
       # Send "verification code" back to server to get a valid session
       r = request(:post) do |req|
-        req.url("https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode")
+        req.url("https://idmsa.apple.com/appleauth/auth/verify/#{code_type}/securitycode")
         req.headers['Content-Type'] = 'application/json'
-        req.body = { "securityCode" => { "code" => code.to_s } }.to_json
+        req.body = body
         update_request_headers(req)
       end
 
@@ -198,7 +204,8 @@ module Spaceship
 
       puts("Successfully requested text message")
 
-      ask("Please enter the #{code_length} digit code you received at #{result}:")
+      code = ask("Please enter the #{code_length} digit code you received at #{result}:")
+      { "securityCode" => { "code" => code.to_s }, "phoneNumber" => { "id" => phone_id }, "mode" => "sms" }.to_json
     end
 
     def store_session
