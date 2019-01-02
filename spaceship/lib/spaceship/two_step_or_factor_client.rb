@@ -9,12 +9,6 @@ module Spaceship
       @x_apple_id_session_id = response["x-apple-id-session-id"]
       @scnt = response["scnt"]
 
-      puts("")
-      puts("Two-step Verification (4 digits code) or Two-factor Authentication (6 digits code) is enabled for account '#{self.user}'")
-      puts("More information about Two-step Verification (4 digits code): https://support.apple.com/en-us/HT204152")
-      puts("More information about Two-factor Authentication (6 digits code): https://support.apple.com/en-us/HT204915")
-      puts("")
-
       # get authentication options
       r = request(:get) do |req|
         req.url("https://idmsa.apple.com/appleauth/auth")
@@ -48,6 +42,8 @@ module Spaceship
       Tunes::RecoveryDevice.client = old_client
 
       puts("Two-step Verification (4 digits code) is enabled for account '#{self.user}'")
+      puts("More information about Two-step Verification: https://support.apple.com/en-us/HT204152")
+      puts("")
       puts("Please select a trusted device to verify your identity")
       available = devices.collect do |c|
         "#{c.name}\t#{c.model_name || 'SMS'}\t(#{c.device_id})"
@@ -118,6 +114,8 @@ module Spaceship
     def handle_two_factor(response, depth = 0)
       if depth == 0
         puts("Two-factor Authentication (6 digits code) is enabled for account '#{self.user}'")
+        puts("More information about Two-factor Authentication: https://support.apple.com/en-us/HT204915")
+        puts("")
 
         two_factor_url = "https://github.com/fastlane/fastlane/tree/master/spaceship#2-step-verification"
         puts("If you're running this in a non-interactive session (e.g. server or CI)")
