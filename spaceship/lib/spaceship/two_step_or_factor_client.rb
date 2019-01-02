@@ -135,7 +135,11 @@ module Spaceship
       # },
       code_length = security_code["length"]
       puts("")
+      puts("(Input `sms` to escape this prompt and select a trusted phone number to send the code as a text message)")
       code = ask("Please enter the #{code_length} digit code:")
+      if(code == 'sms')
+        code = request_two_factor_code_from_phone(response.body["trustedPhoneNumbers"], code_length)
+      end
       puts("Requesting session...")
 
       # Send "verification code" back to server to get a valid session
