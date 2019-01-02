@@ -89,7 +89,7 @@ module Spaceship
         # }
         if ex.to_s.include?("verification code") # to have a nicer output
           puts("Error: Incorrect verification code")
-          return handle_two_step_for_device(r, device_id)
+          return handle_two_step_for_device(device_id)
         end
 
         raise ex
@@ -161,7 +161,7 @@ module Spaceship
 
         if ex.to_s.include?("verification code") # to have a nicer output
           puts("Error: Incorrect verification code")
-          depth = depth+1 # TODO check if works
+          depth = depth+1
           return handle_two_factor(response, depth)
         end
 
