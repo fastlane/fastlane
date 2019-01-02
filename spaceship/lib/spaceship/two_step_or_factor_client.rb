@@ -128,7 +128,7 @@ module Spaceship
       code = ask("Please enter the #{code_length} digit code:")
       body = { "securityCode" => { "code" => code.to_s } }.to_json
 
-      if (code == 'sms')
+      if code == 'sms'
         code_type = 'phone'
         body = request_two_factor_code_from_phone(response.body["trustedPhoneNumbers"], code_length)
       end
@@ -160,7 +160,7 @@ module Spaceship
 
         if ex.to_s.include?("verification code") # to have a nicer output
           puts("Error: Incorrect verification code")
-          depth = depth + 1
+          depth += 1
           return handle_two_factor(response, depth)
         end
 
