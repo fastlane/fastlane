@@ -128,7 +128,7 @@ module Spaceship
       code = ask("Please enter the #{code_length} digit code:")
       body = { "securityCode" => { "code" => code.to_s } }.to_json
 
-      if(code == 'sms')
+      if (code == 'sms')
         code_type = 'phone'
         body = request_two_factor_code_from_phone(response.body["trustedPhoneNumbers"], code_length)
       end
@@ -160,7 +160,7 @@ module Spaceship
 
         if ex.to_s.include?("verification code") # to have a nicer output
           puts("Error: Incorrect verification code")
-          depth = depth+1
+          depth = depth + 1
           return handle_two_factor(response, depth)
         end
 
@@ -172,22 +172,22 @@ module Spaceship
       return true
     end
 
-    def get_id_for_number(trustedPhoneNumbers, result)
-      trustedPhoneNumbers.each do |phone|
+    def get_id_for_number(phone_numbers, result)
+      phone_numbers.each do |phone|
         phone_id = phone['id']
-        return phone_id if phone['numberWithDialCode'] == result 
-      end     
+        return phone_id if phone['numberWithDialCode'] == result
+      end
     end
 
-    def request_two_factor_code_from_phone(trustedPhoneNumbers, code_length)
+    def request_two_factor_code_from_phone(phone_numbers, code_length)
       puts("Please select a trusted phone number to send code to:")
 
-      available = trustedPhoneNumbers.collect do |current|
+      available = phone_numbers.collect do |current|
         current['numberWithDialCode']
       end
       result = choose(*available)
 
-      phone_id = get_id_for_number(trustedPhoneNumbers, result)
+      phone_id = get_id_for_number(phone_numbers, result)
 
       # Request code
       r = request(:put) do |req|

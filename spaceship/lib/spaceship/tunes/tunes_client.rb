@@ -167,7 +167,7 @@ module Spaceship
       error_keys = ["sectionErrorKeys", "validationErrors", "serviceErrors"]
       info_keys = ["sectionInfoKeys", "sectionWarningKeys"]
       error_and_info_keys_to_check = error_keys + info_keys
-      
+
       errors_in_data = fetch_errors_in_data(data_section: data, keys: error_and_info_keys_to_check)
       errors_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: error_and_info_keys_to_check)
 
