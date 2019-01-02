@@ -220,7 +220,7 @@ module Spaceship
         end
 
         if ENV["DEBUG"]
-          puts("To run _spaceship_ through a local proxy, use SPACESHIP_DEBUG")
+          puts("To run spaceship through a local proxy, use SPACESHIP_DEBUG")
         end
       end
     end
@@ -393,7 +393,7 @@ module Spaceship
     end
 
     # This method is used for both the Apple Dev Portal and App Store Connect
-    # This will also handle 2 step verification
+    # This will also handle 2 step verification and 2 factor authentication
     #
     # It is called in `send_login_request` of sub classes (which the method `login`, above, transferred over to via `do_login`)
     def send_shared_login_request(user, password)
