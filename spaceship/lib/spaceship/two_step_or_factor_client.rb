@@ -54,11 +54,11 @@ module Spaceship
       end
       result = choose(*available)
       device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
-      select_device(r, device_id)
+      handle_two_step_for_device(r, device_id)
     end
 
     # this is extracted into its own method so it can be called multiple times (see end)
-    def select_device(r, device_id)
+    def handle_two_step_for_device(r, device_id)
       # Request token to device
       r = request(:put) do |req|
         req.url("https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode")
@@ -104,7 +104,7 @@ module Spaceship
         # }
         if ex.to_s.include?("verification code") # to have a nicer output
           puts("Error: Incorrect verification code")
-          return select_device(r, device_id)
+          return handle_two_step_for_device(r, device_id)
         end
 
         raise ex
