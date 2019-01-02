@@ -37,12 +37,13 @@ module Spaceship
         "#{current['name']}\t#{current['modelName'] || 'SMS'}\t(#{current['id']})"
       end
       result = choose(*available)
+
       device_id = result.match(/.*\t.*\t\((.*)\)/)[1]
-      handle_two_step_for_device(r, device_id)
+      handle_two_step_for_device(device_id)
     end
 
     # this is extracted into its own method so it can be called multiple times (see end)
-    def handle_two_step_for_device(r, device_id)
+    def handle_two_step_for_device(device_id)
       # Request token to device
       r = request(:put) do |req|
         req.url("https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode")
