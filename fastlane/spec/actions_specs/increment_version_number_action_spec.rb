@@ -93,12 +93,12 @@ describe Fastlane do
         expect(Fastlane::Actions).to receive(:sh)
           .with(/agvtool what-marketing-version/, any_args)
           .once
-          .and_return("1.0.2-alpha")
+          .and_return("00000")
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             increment_version_number
           end").runner.execute(:test)
-        end.to raise_error("Your current version (1.0.2-alpha) does not respect the format A.B.C")
+        end.to raise_error("Your current version (00000) does not respect the format A.B.C")
       end
     end
   end

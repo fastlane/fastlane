@@ -29,7 +29,7 @@ module Fastlane
           error_callback: ->(result) { current_version = '' }
         ).split("\n").last
 
-        version_regex = /^\d+.\d+.\d+$/
+        version_regex = /^\d+\.\d+\.\d+$/
         if params[:version_number]
           UI.verbose("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ version_regex
 
