@@ -174,9 +174,9 @@ module Match
                                      description: "The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. \"Apple Pay Pass Suppression Development\")",
                                      optional: true,
                                      default_value: nil),
-        FastlaneCore::ConfigItem.new(key: :export_path,
-                                     env_name: "MATCH_EXPORT_PATH",
-                                     description: "Path to export certificates, key and profile",
+        FastlaneCore::ConfigItem.new(key: :output_path,
+                                     env_name: "MATCH_OUTPUT_PATH",
+                                     description: "Path in which to export certificates, key and profile",
                                      optional: true),
 
         # other
