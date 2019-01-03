@@ -17,7 +17,7 @@ describe Fastlane::Actions do
       FileUtils.mkdir_p(path)
 
       paths = Fastlane::Helper::XcodeprojHelper.find(dir)
-      expect(paths).to eq([path])
+      expect(paths).to contain_exactly(path)
     end
 
     it 'finds multiple nested' do
@@ -28,10 +28,10 @@ describe Fastlane::Actions do
       FileUtils.mkdir_p(secondary_path)
 
       paths = Fastlane::Helper::XcodeprojHelper.find(dir)
-      expect(paths).to eq([path, secondary_path])
+      expect(paths).to contain_exactly(path, secondary_path)
     end
 
-    it 'finds one, ignoring dependencies' do
+    it 'finds multiple nested, ignoring dependencies' do
       path = File.join(dir, PATH)
       FileUtils.mkdir_p(path)
 
@@ -44,7 +44,7 @@ describe Fastlane::Actions do
       FileUtils.mkdir_p(File.join(dir, CARTHAGE_FRAMEWORK_EXAMPLE_PATH))
 
       paths = Fastlane::Helper::XcodeprojHelper.find(dir)
-      expect(paths).to eq([path, secondary_path])
+      expect(paths).to contain_exactly(path, secondary_path)
     end
 
     after do
