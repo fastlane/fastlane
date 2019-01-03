@@ -24,7 +24,7 @@ module Match
 
     def run(params)
       self.files_to_commit = []
-      
+
       FileUtils.mkdir_p(params[:output_path]) if params[:output_path]
 
       FastlaneCore::PrintTable.print_values(config: params,
