@@ -189,9 +189,9 @@ module Match
           UI.message("Skipping installation of certificate as it would not work on this operating system.")
         end
 
-        if params[:export_path]
-          FileUtils.cp(cert_path, params[:export_path])
-          FileUtils.cp(keys.last, params[:export_path])
+        if params[:output_path]
+          FileUtils.cp(cert_path, params[:output_path])
+          FileUtils.cp(keys.last, params[:output_path])
         end
 
         # Get and print info of certificate
@@ -258,8 +258,8 @@ module Match
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       uuid = parsed["UUID"]
 
-      if params[:export_path]
-        FileUtils.cp(profile, params[:export_path])
+      if params[:output_path]
+        FileUtils.cp(profile, params[:output_path])
       end
 
       if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
