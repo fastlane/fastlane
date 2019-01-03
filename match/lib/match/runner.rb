@@ -234,7 +234,7 @@ module Match
         if params[:readonly]
           UI.error("No matching provisioning profiles found for '#{profile_name}'")
           UI.error("A new one cannot be created because you enabled `readonly`")
-          if Dir.exist?(base_dir)
+          if Dir.exist?(base_dir) # folder for `prov_type` does not exist on first match use for that type
             all_profiles = Dir.entries(base_dir).reject { |f| f.start_with?(".") }
             UI.error("Provisioning profiles in your repo for type `#{prov_type}`:")
             all_profiles.each { |p| UI.error("- '#{p}'") }
