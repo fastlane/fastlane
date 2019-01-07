@@ -377,6 +377,10 @@ module Spaceship
 
         r = request(:get, rating_url)
         all_reviews.concat(parse_response(r, 'data')['reviews'])
+
+        # The following lines throw errors when there are no reviews so exit out of the loop before them if the app has no reviews
+        break if all_reviews.count == 0
+
         last_review_date = Time.at(all_reviews[-1]['value']['lastModified'] / 1000)
 
         if upto_date && last_review_date < upto_date
