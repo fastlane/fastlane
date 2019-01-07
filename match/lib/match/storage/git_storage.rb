@@ -125,6 +125,13 @@ module Match
         ].join(" ")
       end
 
+      def generate_matchfile_content
+        UI.important("Please create a new, private git repository to store the certificates and profiles there")
+        url = UI.input("URL of the Git Repo: ")
+
+        return "git_url(\"#{url}\")"
+      end
+
       private
 
       # Create and checkout an specific branch in the git repo
