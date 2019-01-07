@@ -230,7 +230,7 @@ This lets developers on your team use [Application Default Credentials](https://
 ```no-highlight
 gcloud auth application-default login
 ```
-... and log in with their Google account. Then, when they run `fastlane match`, `match` will use these credentials to read from and write to the storage bucket.
+... and log in with their Google account. Then, when they run `fastlane match`, _match_ will use these credentials to read from and write to the storage bucket.
 
 #### New machine
 
