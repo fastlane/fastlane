@@ -418,6 +418,7 @@ module Spaceship
         setup_large_app_icon
         setup_watch_app_icon
         setup_transit_app_file if supports_app_transit?
+        setup_scaling
         setup_screenshots
         setup_trailers
       end
@@ -597,6 +598,10 @@ module Spaceship
             }
           }
 
+          # We disable "scaling" for this device type / language combination now that there is at least a trailer
+          scaled_details = container_data_for_language_and_device("scaled", language, device)
+          scaled_details["value"] = false
+
           if existing_sort_orders.include?(sort_order) # replace
             device_lang_trailers[existing_sort_orders.index(sort_order)] = new_trailer
           else # add
@@ -707,24 +712,27 @@ module Spaceship
         raise "App Store Connect error: #{ex}"
       end
 
-      def setup_screenshots
-        # Enable Scaling for all screen sizes that don't have at least one screenshot
-        # We automatically disable scaling once we upload at least one screenshot
-        language_details = raw_data_details.each do |current_language|
+      def setup_scaling
+        # Enable Scaling for all screen sizes that don't have at least one screenshot or trailer
+        # We automatically disable scaling once we upload at least one screenshot or trailer
+        raw_data_details.each do |current_language|
           language_details = (current_language["displayFamilies"] || {})["value"]
           (language_details || []).each do |device_language_details|
             next if device_language_details["screenshots"].nil?
             next if device_language_details["screenshots"]["value"].count > 0
+            next if !device_language_details["trailers"].nil? && device_language_details["trailers"]["value"].count > 0
 
             # The current row includes screenshots for all device types
             # so we need to enable scaling for both iOS and watchOS apps
             device_language_details["scaled"]["value"] = true if device_language_details["scaled"]
             device_language_details["messagesScaled"]["value"] = true if device_language_details["messagesScaled"]
             # we unset `scaled` or `messagesScaled` as soon as we upload a
-            # screenshot for this device/language combination
+            # screenshot or trailer for this device/language combination
           end
         end
+      end
 
+      def setup_screenshots
         @screenshots = {}
         raw_data_details.each do |row|
           # Now that's one language right here
