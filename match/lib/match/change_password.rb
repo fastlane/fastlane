@@ -40,8 +40,8 @@ module Match
       encryption.store_password(to)
 
       message = "[fastlane] Changed passphrase"
-      encryption.encrypt_files
-      storage.save_changes!(custom_message: message)
+      files_to_commit = encryption.encrypt_files
+      storage.save_changes!(files_to_commit: files_to_commit, custom_message: message)
     end
 
     # This method is called from both here, and from `openssl.rb`
