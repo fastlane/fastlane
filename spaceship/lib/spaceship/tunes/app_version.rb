@@ -515,10 +515,9 @@ module Spaceship
           # We only set this, if we actually successfully uploaded a new screenshot
           # for this device / language combination
           # if this value is not set, iTC will fallback to another device type for screenshots
-          language_details = raw_data_details.find { |d| d["language"] == language }["displayFamilies"]["value"]
-          device_language_details = language_details.find { |display_family| display_family['name'] == device }
           scaled_key = is_messages ? "messagesScaled" : "scaled"
-          device_language_details[scaled_key]["value"] = false
+          scaled_details = container_data_for_language_and_device(scaled_key, language, device)
+          scaled_details["value"] = false
 
           if existing_sort_orders.include?(sort_order) # replace
             device_lang_screenshots[existing_sort_orders.index(sort_order)] = new_screenshot
