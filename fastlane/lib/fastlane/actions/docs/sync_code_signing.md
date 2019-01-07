@@ -201,13 +201,36 @@ fastlane match migrate
 
 After a successful migration you can safely delete your git repo.
 
-#### Google Cloud `gc_keys.json`
+#### Google Cloud access control
 
 *Google Cloud Storage only*
 
-When running `fastlane match init` the first time, the setup process will help you create your `gc_keys.json` file. This file contains the auth credentials needed to access your Google Cloud storage bucket. Make sure to keep that file secret and never add it to version control.
+There are two cases for reading and writing certificates stored in a Google Cloud storage bucket:
 
-We recommend adding `gc_keys.json` to your `.gitignore` and manually add the file to all your work machines. Every developer should create their own `gc_keys.json` file, which will give the admin full control over who has read/write access to the given Storage bucket. At the same time it allows your team to revoke a single key if a file gets compromised.
+1. Continuous integration jobs. These will authenticate to your Google Cloud project via a service account, and use a `gc_keys.json` file as credentials.
+1. Developers on a local workstation. In this case, you should choose whether everyone on your team will create their own `gc_keys.json` file, or whether you want to manage access to the bucket directly using your developers' Google accounts.
+
+When running `fastlane match init` the first time, the setup process will give you the option to create your `gc_keys.json` file. This file contains the auth credentials needed to access your Google Cloud storage bucket. Make sure to keep that file secret and never add it to version control. We recommend adding `gc_keys.json` to your `.gitignore`
+
+##### Managing developer access via keys
+If you want to manage developer access to your certificates via authentication keys, every developer should create their own `gc_keys.json` and add the file to all their work machines. This will give the admin full control over who has read/write access to the given Storage bucket. At the same time it allows your team to revoke a single key if a file gets compromised.
+
+##### Managing developer acess via Google accounts
+If your developers already have Google accounts and access to your Google Cloud project, you can also manage access to the storage bucket via [Cloud Identity and Access Management (IAM)](https://cloud.google.com/storage/docs/access-control/iam). Just [set up](https://cloud.google.com/storage/docs/access-control/lists) individual developer accounts or an entire Google Group containing your team as readers and writers on your storage bucket.
+
+You can then specify the Google Cloud project id containing your storage bucket in your `Matchfile`:
+
+```ruby-skip-tests
+storage_mode("google_cloud")
+google_cloud_bucket_name("my-app-certificates")
+google_cloud_project_id("my-app-project")
+```
+
+This lets developers on your team use [Application Default Credentials](https://cloud.google.com/docs/authentication/production) when accessing your storage bucket. After installing the [Google Cloud SDK](https://cloud.google.com/sdk/), they only need to run the following command once:
+```no-highlight
+gcloud auth application-default login
+```
+... and log in with their Google account. Then, when they run `fastlane match`, `match` will use these credentials to read from and write to the storage bucket.
 
 #### New machine
 
