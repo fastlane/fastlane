@@ -34,8 +34,9 @@ module FastlaneCore
       # @param error [Block] A block that's called if an error occurs
       # @param prefix [Array] An array containing a prefix + block which might get applied to the output
       # @param loading [String] A loading string that is shown before the first output
+      # @param suppress_output [Boolean] Should we print the command's output?
       # @return [String] All the output as string
-      def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil)
+      def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil, suppress_output: false)
         print_all = true if FastlaneCore::Globals.verbose?
         prefix ||= {}
 
@@ -60,7 +61,7 @@ module FastlaneCore
                 line = element[:prefix] + line if element[:block] && element[:block].call(line)
               end
 
-              UI.command_output(line)
+              UI.command_output(line) unless suppress_output
             end
           end
         rescue => ex
@@ -82,7 +83,7 @@ module FastlaneCore
         # Exit status for build command, should be 0 if build succeeded
         if status != 0
           o = output.join("\n")
-          puts(o) # the user has the right to see the raw output
+          puts(o) unless suppress_output # the user has the right to see the raw output
           UI.error("Exit status: #{status}")
           if error
             error.call(o, status)

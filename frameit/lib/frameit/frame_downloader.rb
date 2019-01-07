@@ -21,7 +21,7 @@ module Frameit
       files = JSON.parse(download_file("files.json"))
       files.each_with_index do |current, index|
         content = download_file(current, txt: "#{index + 1} of #{files.count} files")
-        File.write(File.join(templates_path, current), content)
+        File.binwrite(File.join(templates_path, current), content)
       end
       File.write(File.join(templates_path, "offsets.json"), download_file("offsets.json"))
 

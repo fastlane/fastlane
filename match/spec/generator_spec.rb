@@ -10,7 +10,10 @@ describe Match::Generator do
         username: 'username',
         team_id: 'team_id',
         keychain_path: FastlaneCore::Helper.keychain_path("login.keychain"),
-        keychain_password: 'password'
+        keychain_password: 'password',
+        platform: "ios",
+        filename: nil,
+        team_name: nil
       })
 
       # This is the important part. We need to see the right configuration come through
@@ -32,7 +35,7 @@ describe Match::Generator do
         keychain_password: 'password'
       }
 
-      Match::Generator.generate_certificate(params, 'development')
+      Match::Generator.generate_certificate(params, 'development', "workspace")
     end
 
     it 'configures sigh correctly for nested execution' do
@@ -69,7 +72,7 @@ describe Match::Generator do
         platform: :ios,
         template_name: 'template_name'
       }
-      Match::Generator.generate_provisioning_profile(params: params, prov_type: :development, certificate_id: 'fake_cert_id', app_identifier: params[:app_identifier])
+      Match::Generator.generate_provisioning_profile(params: params, prov_type: :development, certificate_id: 'fake_cert_id', app_identifier: params[:app_identifier], working_directory: "workspace")
     end
   end
 end

@@ -34,9 +34,12 @@ module Spaceship
             'iphone6' => [1334, 750],
             'iphone6Plus' => [2208, 1242],
             'iphone58' => [2436, 1125],
+            'iphone65' => [2688, 1242],
             'ipad' => [1024, 768],
             'ipad105' => [2224, 1668],
-            'ipadPro' => [2732, 2048]
+            'ipadPro' => [2732, 2048],
+            'iPadPro11' => [2388, 1668],
+            'iPadPro129' => [2732, 2048]
         }
 
         r = resolutions[device]
@@ -222,7 +225,7 @@ module Spaceship
         elsif errors.count == 1 && errors.first.include?("try again later")
           raise ITunesConnectTemporaryError.new, errors.first
         elsif errors.count == 1 && errors.first.include?("Forbidden")
-          raise_insuffient_permission_error!
+          raise_insufficient_permission_error!
         elsif flaky_api_call
           raise ITunesConnectPotentialServerError.new, errors.join(' ')
         else
@@ -1108,14 +1111,14 @@ module Spaceship
       handle_itc_response(r.body)
 
       # App Store Connect still returns a success status code even the submission
-      # was failed because of Ad ID Info / Export Complicance. This checks for any section error
+      # was failed because of Ad ID Info / Export Compliance. This checks for any section error
       # keys in returned adIdInfo / exportCompliance and prints them out.
       ad_id_error_keys = r.body.fetch('data').fetch('adIdInfo').fetch('sectionErrorKeys')
       export_error_keys = r.body.fetch('data').fetch('exportCompliance').fetch('sectionErrorKeys')
       if ad_id_error_keys.any?
         raise "Something wrong with your Ad ID information: #{ad_id_error_keys}."
       elsif export_error_keys.any?
-        raise "Something wrong with your Export Complicance: #{export_error_keys}"
+        raise "Something wrong with your Export Compliance: #{export_error_keys}"
       elsif r.body.fetch('messages').fetch('info').last == "Successful POST"
         # success
       else
@@ -1135,6 +1138,24 @@ module Spaceship
 
       r = request(:post) do |req|
         req.url("ra/apps/#{app_id}/versions/#{version}/releaseToStore")
+        req.headers['Content-Type'] = 'application/json'
+        req.body = app_id.to_s
+      end
+
+      handle_itc_response(r.body)
+      parse_response(r, 'data')
+    end
+
+    #####################################################
+    # @!group release to all users
+    #####################################################
+
+    def release_to_all_users!(app_id, version)
+      raise "app_id is required" unless app_id
+      raise "version is required" unless version
+
+      r = request(:post) do |req|
+        req.url("ra/apps/#{app_id}/versions/#{version}/phasedRelease/state/COMPLETE")
         req.headers['Content-Type'] = 'application/json'
         req.body = app_id.to_s
       end
@@ -1432,20 +1453,22 @@ module Spaceship
     def with_tunes_retry(tries = 5, potential_server_error_tries = 3, &_block)
       return yield
     rescue Spaceship::TunesClient::ITunesConnectTemporaryError => ex
+      seconds_to_sleep = 60
       unless (tries -= 1).zero?
-        msg = "App Store Connect temporary error received: '#{ex.message}'. Retrying after 60 seconds (remaining: #{tries})..."
+        msg = "App Store Connect temporary error received: '#{ex.message}'. Retrying after #{seconds_to_sleep} seconds (remaining: #{tries})..."
         puts(msg)
         logger.warn(msg)
-        sleep(60) unless Object.const_defined?("SpecHelper")
+        sleep(seconds_to_sleep) unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex # re-raise the exception
     rescue Spaceship::TunesClient::ITunesConnectPotentialServerError => ex
+      seconds_to_sleep = 10
       unless (potential_server_error_tries -= 1).zero?
-        msg = "Potential server error received: '#{ex.message}'. Retrying after 10 seconds (remaining: #{tries})..."
+        msg = "Potential server error received: '#{ex.message}'. Retrying after 10 seconds (remaining: #{potential_server_error_tries})..."
         puts(msg)
         logger.warn(msg)
-        sleep(10) unless Object.const_defined?("SpecHelper")
+        sleep(seconds_to_sleep) unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex

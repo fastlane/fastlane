@@ -1,0 +1,25 @@
+{
+  "creationTimestamp": "2018-09-28T14:05:17Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": "8286b5c1-ed85-4bf5-y65b-0cd7910f1d67",
+  "requestUrl": "https://developer.apple.com:443/services-account/QH65B2/account/ios/device/addDevices.action?content-type=text/x-url-arguments&accept=application/json&requestId=8286b5c1-ed85-4bf5-y65b-0cd7910f1d67&userLocale=en_US&teamId=47C5778P4P",
+  "responseId": "9bc3b97b-7ce1-46d9-9de6-23b4630b9525",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": true,
+  "devices": [
+
+  ],
+  "failedDevices": [
+     "Demo Device"
+  ],
+  "validationMessages": [
+    {
+      "validationKey": "deviceNumber",
+      "validationUserMessage": "An invalid value '1234' was provided for the parameter 'deviceNumber'."
+    }
+  ],
+  "nextDeviceResetDate": null
+}

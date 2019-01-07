@@ -162,15 +162,24 @@ module Fastlane
       def self.details
         [
           "Additionally, you can specify `notes`, `emails`, `groups` and `notifications`.",
-          "Distributing to Groups: When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog by clicking the 'Manage Groups' button."
+          "Distributing to Groups: When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog by clicking the 'Manage Groups' button.",
+          "This action uses the `submit` binary provided by the Crashlytics framework. If the binary is not found in its usual path, you'll need to specify the path manually by using the `crashlytics_path` option."
         ].join("\n")
       end
 
       def self.example_code
         [
           'crashlytics',
-          'crashlytics(
-            crashlytics_path: "./Pods/Crashlytics/", # path to your Crashlytics submit binary.
+          '# If you installed Crashlytics via CocoaPods
+          crashlytics(
+            crashlytics_path: "./Pods/Crashlytics/submit", # path to your Crashlytics submit binary.
+            api_token: "...",
+            build_secret: "...",
+            ipa_path: "./app.ipa"
+          )',
+          '# If you installed Crashlytics via Carthage for iOS platform
+          crashlytics(
+            crashlytics_path: "./Carthage/Build/iOS/Crashlytics.framework/submit", # path to your Crashlytics submit binary.
             api_token: "...",
             build_secret: "...",
             ipa_path: "./app.ipa"
