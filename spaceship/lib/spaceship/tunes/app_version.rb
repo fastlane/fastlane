@@ -481,7 +481,7 @@ module Spaceship
       end
 
       # Uploads or removes a screenshot
-      # @param icon_path (String): The path to the screenshot. Use nil to remove it
+      # @param screenshot_path (String): The path to the screenshot. Use nil to remove it
       # @param sort_order (Fixnum): The sort_order, from 1 to 5
       # @param language (String): The language for this screenshot
       # @param device (string): The device for this screenshot
