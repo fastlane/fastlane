@@ -28,6 +28,7 @@ module Fastlane
                             .sh("#{command_prefix} agvtool what-marketing-version -terse1", log: FastlaneCore::Globals.verbose?)
                             .split("\n")
                             .last
+                            .strip
         rescue
           current_version = ''
         end
