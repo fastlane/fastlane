@@ -340,5 +340,24 @@ describe Supply do
         Supply::Uploader.new.check_superseded_tracks([106])
       end
     end
+
+    describe '#perform_upload with version_codes_to_retain' do
+      let(:client) { double('client') }
+      let(:config) { { apk: 'some/path/app.apk', version_codes_to_retain: [2, 3] } }
+
+      before do
+        Supply.config = config
+        allow(Supply::Client).to receive(:make_from_config).and_return(client)
+        allow(client).to receive(:upload_apk).with(config[:apk]).and_return(1) # newly uploaded version code
+        allow(client).to receive(:begin_edit).and_return(nil)
+        allow(client).to receive(:commit_current_edit!).and_return(nil)
+      end
+
+      it 'should update track with correct version codes' do
+        uploader = Supply::Uploader.new
+        expect(uploader).to receive(:update_track).with([1, 2, 3]).once
+        uploader.perform_upload
+      end
+    end
   end
 end

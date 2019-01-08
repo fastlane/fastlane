@@ -228,7 +228,17 @@ module Supply
                                      optional: true,
                                      description: "When promoting to a new track, deactivate the binary in the origin track",
                                      is_string: false,
-                                     default_value: true)
+                                     default_value: true),
+        FastlaneCore::ConfigItem.new(key: :version_codes_to_retain,
+                                     optional: true,
+                                     type: Array,
+                                     description: "An array of version codes to retain when publishing a new APK",
+                                     verify_block: proc do |version_codes|
+                                       UI.user_error!("Could not evaluate array from '#{version_codes}'") unless version_codes.kind_of?(Array)
+                                       version_codes.each do |version_code|
+                                         UI.user_error!("Version code '#{version_code}' is not an integer") unless version_code.kind_of?(Integer)
+                                       end
+                                     end)
       ]
     end
     # rubocop:enable Metrics/PerceivedComplexity
