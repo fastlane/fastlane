@@ -16,8 +16,8 @@ jobs:
           key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
       - restore_cache:
           keys:
-            - v3-homebrew-{{ epoch }}
-            - v3-homebrew
+            - v4-homebrew-{{ epoch }}
+            - v4-homebrew
       - run:
           name: Setup Build
           command: |
@@ -28,7 +28,7 @@ jobs:
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
 
       - save_cache:
-          key: v3-homebrew-{{ epoch }}
+          key: v4-homebrew-{{ epoch }}
           paths:
             - /usr/local/Homebrew
       - save_cache:
