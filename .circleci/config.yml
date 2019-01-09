@@ -5,6 +5,7 @@ jobs:
     macos:
       xcode: "9.0.0"
     environment:
+      HOMEBREW_LOGS: ~/homebrew-logs
       CIRCLE_TEST_REPORTS: ~/test-reports
       LC_ALL: en_US.UTF-8
       LANG: en_US.UTF-8
