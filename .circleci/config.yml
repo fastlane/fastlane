@@ -5,7 +5,6 @@ jobs:
     macos:
       xcode: "9.0.0"
     environment:
-      HOMEBREW_LOGS: ~/homebrew-logs
       CIRCLE_TEST_REPORTS: ~/test-reports
       LC_ALL: en_US.UTF-8
       LANG: en_US.UTF-8
@@ -17,8 +16,8 @@ jobs:
           key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
       - restore_cache:
           keys:
-            - v4-homebrew-{{ epoch }}
-            - v4-homebrew
+            - v5-homebrew-{{ epoch }}
+            - v5-homebrew
       - run:
           name: Setup Build
           command: |
@@ -29,7 +28,7 @@ jobs:
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
 
       - save_cache:
-          key: v4-homebrew-{{ epoch }}
+          key: v5-homebrew-{{ epoch }}
           paths:
             - /usr/local/Homebrew
       - save_cache:
