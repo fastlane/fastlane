@@ -12,22 +12,25 @@ module Fastlane
         if params[:notes]
           UI.error("Overwriting :notes_path, because you specified :notes") if params[:notes_path]
 
-          tempfiles << Helper::CrashlyticsHelper.write_to_tempfile(params[:notes], 'changelog')
-          params[:notes_path] = tempfiles.last.path
+          changelog = Helper::CrashlyticsHelper.write_to_tempfile(params[:notes], 'changelog')
+          tempfiles << changelog
+          params[:notes_path] = changelog.path
         elsif Actions.lane_context[SharedValues::FL_CHANGELOG] && !params[:notes_path]
           UI.message("Sending FL_CHANGELOG as release notes to Beta by Crashlytics")
 
-          tempfiles << Helper::CrashlyticsHelper.write_to_tempfile(
+          changelog = Helper::CrashlyticsHelper.write_to_tempfile(
             Actions.lane_context[SharedValues::FL_CHANGELOG], 'changelog'
           )
-          params[:notes_path] = tempfiles.last.path
+          tempfiles << changelog
+          params[:notes_path] = changelog.path
         end
 
         if params[:ipa_path]
           command = Helper::CrashlyticsHelper.generate_ios_command(params)
         elsif params[:apk_path]
-          tempfiles << Helper::CrashlyticsHelper.generate_android_manifest_tempfile
-          command = Helper::CrashlyticsHelper.generate_android_command(params, tempfiles.last.path)
+          android_manifest = Helper::CrashlyticsHelper.generate_android_manifest_tempfile
+          tempfiles << android_manifest
+          command = Helper::CrashlyticsHelper.generate_android_command(params, android_manifest.path)
         else
           UI.user_error!("You have to either pass an ipa or an apk file to the Crashlytics action")
         end
