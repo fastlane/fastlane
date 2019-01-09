@@ -23,6 +23,8 @@ jobs:
           command: |
             mkdir -p ~/test-reports
             echo "2.3" > .ruby-version
+            brew config
+            brew doctor
             gem update --system
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
