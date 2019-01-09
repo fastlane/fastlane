@@ -26,12 +26,8 @@ module Fastlane
         if params[:ipa_path]
           command = Helper::CrashlyticsHelper.generate_ios_command(params)
         elsif params[:apk_path]
-          command = Helper::CrashlyticsHelper.generate_android_command(params)
-          # We have to generate an empty XML file to make the crashlytics CLI happy :)
-          tempfiles << Helper::CrashlyticsHelper.write_to_tempfile(
-            '<?xml version="1.0" encoding="utf-8"?><manifest></manifest>', 'xml'
-          )
-          command << "-androidManifest #{tempfiles.last.path.shellescape}"
+          tempfiles << Helper::CrashlyticsHelper.generate_android_manifest_tempfile
+          command = Helper::CrashlyticsHelper.generate_android_command(params, tempfiles.last.path)
         else
           UI.user_error!("You have to either pass an ipa or an apk file to the Crashlytics action")
         end
