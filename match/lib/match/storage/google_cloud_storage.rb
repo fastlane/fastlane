@@ -55,6 +55,9 @@ module Match
           # Extract the Project ID from the `JSON` file
           # so the user doesn't have to provide it manually
           keys_file_content = JSON.parse(File.read(self.google_cloud_keys_file))
+          if google_cloud_project_id && google_cloud_project_id != keys_file_content["project_id"]
+            UI.important("The google_cloud_keys_file's project ID ('#{keys_file_content['project_id']}') doesn't match the google_cloud_project_id ('#{google_cloud_project_id}'). This may be the wrong keys file.")
+          end
           @google_cloud_project_id = keys_file_content["project_id"]
           if self.google_cloud_project_id.to_s.length == 0
             UI.user_error!("Provided keys file on path #{File.expand_path(self.google_cloud_keys_file)} doesn't include required value for `project_id`")
@@ -170,11 +173,20 @@ module Match
 
         if google_cloud_project_id.to_s.length > 0
           # Check to see if this system has application default keys installed.
+          # These are the default keys that the Google Cloud APIs use when no other keys are specified.
+          # Users with the Google Cloud SDK installed can generate them by running...
+          # `gcloud auth application-default login`
+          # ...and then they'll be automatically available.
+          # The nice thing about these keys is they can be associated with the user's login in GCP
+          # (e.g. my_account@gmail.com), so teams can control access to the certificate bucket
+          # using a mailing list of developer logins instead of generating service accounts
+          # and keys.
           application_default_keys = nil
           begin
             application_default_keys = Google::Auth.get_application_default
           rescue
-            # This is fine.
+            # This means no application default keys have been installed. That's perfectly OK,
+            # we can continue and ask the user if they want to use a keys file.
           end
 
           if application_default_keys && UI.confirm("Do you want to use this system's application default keys?")
