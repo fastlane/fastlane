@@ -73,17 +73,16 @@ module Sigh
 
       puts(command.magenta)
       puts(`#{command}`)
-      command_return_value = $?.to_i
 
-      `security list-keychains -s #{previous_keychains}` if previous_keychains
-
-      if command_return_value == 0
+      if $?.to_i == 0
         UI.success("Successfully signed #{ipa}!")
         true
       else
         UI.error("Something went wrong while code signing #{ipa}")
         false
       end
+    ensure
+      `security list-keychains -s #{previous_keychains}` if previous_keychains
     end
 
     def get_inputs(options, args)
