@@ -1161,6 +1161,7 @@ func createPullRequest(apiToken: String,
                        repo: String,
                        title: String,
                        body: String? = nil,
+                       labels: [String]? = nil,
                        head: String? = nil,
                        base: String = "master",
                        apiUrl: String = "https://api.github.com") {
@@ -1168,6 +1169,7 @@ func createPullRequest(apiToken: String,
                                                                                                      RubyCommand.Argument(name: "repo", value: repo),
                                                                                                      RubyCommand.Argument(name: "title", value: title),
                                                                                                      RubyCommand.Argument(name: "body", value: body),
+                                                                                                     RubyCommand.Argument(name: "labels", value: labels),
                                                                                                      RubyCommand.Argument(name: "head", value: head),
                                                                                                      RubyCommand.Argument(name: "base", value: base),
                                                                                                      RubyCommand.Argument(name: "api_url", value: apiUrl)])
@@ -1399,6 +1401,10 @@ func echo(message: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "echo", className: nil, args: [RubyCommand.Argument(name: "message", value: message)])
   _ = runner.executeCommand(command)
 }
+func ensureBundleExec() {
+  let command = RubyCommand(commandID: "", methodName: "ensure_bundle_exec", className: nil, args: [])
+  _ = runner.executeCommand(command)
+}
 func ensureGitBranch(branch: String = "master") {
   let command = RubyCommand(commandID: "", methodName: "ensure_git_branch", className: nil, args: [RubyCommand.Argument(name: "branch", value: branch)])
   _ = runner.executeCommand(command)
@@ -1455,10 +1461,10 @@ func flock(message: String,
                                                                                        RubyCommand.Argument(name: "base_url", value: baseUrl)])
   _ = runner.executeCommand(command)
 }
-func frameScreenshots(white: String? = nil,
-                      silver: String? = nil,
-                      roseGold: String? = nil,
-                      gold: String? = nil,
+func frameScreenshots(white: Bool? = nil,
+                      silver: Bool? = nil,
+                      roseGold: Bool? = nil,
+                      gold: Bool? = nil,
                       forceDeviceType: String? = nil,
                       useLegacyIphone5s: Bool = false,
                       useLegacyIphone6s: Bool = false,
@@ -1475,10 +1481,10 @@ func frameScreenshots(white: String? = nil,
                                                                                                    RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
 }
-func frameit(white: String? = nil,
-             silver: String? = nil,
-             roseGold: String? = nil,
-             gold: String? = nil,
+func frameit(white: Bool? = nil,
+             silver: Bool? = nil,
+             roseGold: Bool? = nil,
+             gold: Bool? = nil,
              forceDeviceType: String? = nil,
              useLegacyIphone5s: Bool = false,
              useLegacyIphone6s: Bool = false,
@@ -2119,54 +2125,54 @@ func makeChangelogFromJenkins(fallbackChangelog: String = "",
                                                                                                              RubyCommand.Argument(name: "include_commit_body", value: includeCommitBody)])
   _ = runner.executeCommand(command)
 }
-func match(gitUrl: String = matchfile.gitUrl,
-           gitBranch: String = matchfile.gitBranch,
-           type: String = matchfile.type,
-           storageMode: String = matchfile.storageMode,
+func match(type: String = matchfile.type,
+           readonly: Bool = matchfile.readonly,
            appIdentifier: [String] = matchfile.appIdentifier,
            username: String = matchfile.username,
-           keychainName: String = matchfile.keychainName,
-           keychainPassword: String? = matchfile.keychainPassword,
-           readonly: Bool = matchfile.readonly,
            teamId: String? = matchfile.teamId,
+           teamName: String? = matchfile.teamName,
+           storageMode: String = matchfile.storageMode,
+           gitUrl: String = matchfile.gitUrl,
+           gitBranch: String = matchfile.gitBranch,
            gitFullName: String? = matchfile.gitFullName,
            gitUserEmail: String? = matchfile.gitUserEmail,
-           teamName: String? = matchfile.teamName,
-           verbose: Bool = matchfile.verbose,
-           force: Bool = matchfile.force,
-           skipConfirmation: Bool = matchfile.skipConfirmation,
            shallowClone: Bool = matchfile.shallowClone,
            cloneBranchDirectly: Bool = matchfile.cloneBranchDirectly,
+           googleCloudBucketName: String? = matchfile.googleCloudBucketName,
+           googleCloudKeysFile: String? = matchfile.googleCloudKeysFile,
+           keychainName: String = matchfile.keychainName,
+           keychainPassword: String? = matchfile.keychainPassword,
+           force: Bool = matchfile.force,
            forceForNewDevices: Bool = matchfile.forceForNewDevices,
+           skipConfirmation: Bool = matchfile.skipConfirmation,
            skipDocs: Bool = matchfile.skipDocs,
            platform: String = matchfile.platform,
            templateName: String? = matchfile.templateName,
-           googleCloudBucketName: String? = matchfile.googleCloudBucketName,
-           googleCloudKeysFile: String? = matchfile.googleCloudKeysFile) {
-  let command = RubyCommand(commandID: "", methodName: "match", className: nil, args: [RubyCommand.Argument(name: "git_url", value: gitUrl),
-                                                                                       RubyCommand.Argument(name: "git_branch", value: gitBranch),
-                                                                                       RubyCommand.Argument(name: "type", value: type),
-                                                                                       RubyCommand.Argument(name: "storage_mode", value: storageMode),
+           verbose: Bool = matchfile.verbose) {
+  let command = RubyCommand(commandID: "", methodName: "match", className: nil, args: [RubyCommand.Argument(name: "type", value: type),
+                                                                                       RubyCommand.Argument(name: "readonly", value: readonly),
                                                                                        RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                        RubyCommand.Argument(name: "username", value: username),
-                                                                                       RubyCommand.Argument(name: "keychain_name", value: keychainName),
-                                                                                       RubyCommand.Argument(name: "keychain_password", value: keychainPassword),
-                                                                                       RubyCommand.Argument(name: "readonly", value: readonly),
                                                                                        RubyCommand.Argument(name: "team_id", value: teamId),
+                                                                                       RubyCommand.Argument(name: "team_name", value: teamName),
+                                                                                       RubyCommand.Argument(name: "storage_mode", value: storageMode),
+                                                                                       RubyCommand.Argument(name: "git_url", value: gitUrl),
+                                                                                       RubyCommand.Argument(name: "git_branch", value: gitBranch),
                                                                                        RubyCommand.Argument(name: "git_full_name", value: gitFullName),
                                                                                        RubyCommand.Argument(name: "git_user_email", value: gitUserEmail),
-                                                                                       RubyCommand.Argument(name: "team_name", value: teamName),
-                                                                                       RubyCommand.Argument(name: "verbose", value: verbose),
-                                                                                       RubyCommand.Argument(name: "force", value: force),
-                                                                                       RubyCommand.Argument(name: "skip_confirmation", value: skipConfirmation),
                                                                                        RubyCommand.Argument(name: "shallow_clone", value: shallowClone),
                                                                                        RubyCommand.Argument(name: "clone_branch_directly", value: cloneBranchDirectly),
+                                                                                       RubyCommand.Argument(name: "google_cloud_bucket_name", value: googleCloudBucketName),
+                                                                                       RubyCommand.Argument(name: "google_cloud_keys_file", value: googleCloudKeysFile),
+                                                                                       RubyCommand.Argument(name: "keychain_name", value: keychainName),
+                                                                                       RubyCommand.Argument(name: "keychain_password", value: keychainPassword),
+                                                                                       RubyCommand.Argument(name: "force", value: force),
                                                                                        RubyCommand.Argument(name: "force_for_new_devices", value: forceForNewDevices),
+                                                                                       RubyCommand.Argument(name: "skip_confirmation", value: skipConfirmation),
                                                                                        RubyCommand.Argument(name: "skip_docs", value: skipDocs),
                                                                                        RubyCommand.Argument(name: "platform", value: platform),
                                                                                        RubyCommand.Argument(name: "template_name", value: templateName),
-                                                                                       RubyCommand.Argument(name: "google_cloud_bucket_name", value: googleCloudBucketName),
-                                                                                       RubyCommand.Argument(name: "google_cloud_keys_file", value: googleCloudKeysFile)])
+                                                                                       RubyCommand.Argument(name: "verbose", value: verbose)])
   _ = runner.executeCommand(command)
 }
 func minFastlaneVersion() {
@@ -3409,54 +3415,54 @@ func swiftlint(mode: String = "lint",
                                                                                            RubyCommand.Argument(name: "executable", value: executable)])
   _ = runner.executeCommand(command)
 }
-func syncCodeSigning(gitUrl: String,
-                     gitBranch: String = "master",
-                     type: String = "development",
-                     storageMode: String = "git",
+func syncCodeSigning(type: String = "development",
+                     readonly: Bool = false,
                      appIdentifier: [String],
                      username: String,
-                     keychainName: String = "login.keychain",
-                     keychainPassword: String? = nil,
-                     readonly: Bool = false,
                      teamId: String? = nil,
+                     teamName: String? = nil,
+                     storageMode: String = "git",
+                     gitUrl: String,
+                     gitBranch: String = "master",
                      gitFullName: String? = nil,
                      gitUserEmail: String? = nil,
-                     teamName: String? = nil,
-                     verbose: Bool = false,
-                     force: Bool = false,
-                     skipConfirmation: Bool = false,
                      shallowClone: Bool = false,
                      cloneBranchDirectly: Bool = false,
+                     googleCloudBucketName: String? = nil,
+                     googleCloudKeysFile: String? = nil,
+                     keychainName: String = "login.keychain",
+                     keychainPassword: String? = nil,
+                     force: Bool = false,
                      forceForNewDevices: Bool = false,
+                     skipConfirmation: Bool = false,
                      skipDocs: Bool = false,
                      platform: String = "ios",
                      templateName: String? = nil,
-                     googleCloudBucketName: String? = nil,
-                     googleCloudKeysFile: String? = nil) {
-  let command = RubyCommand(commandID: "", methodName: "sync_code_signing", className: nil, args: [RubyCommand.Argument(name: "git_url", value: gitUrl),
-                                                                                                   RubyCommand.Argument(name: "git_branch", value: gitBranch),
-                                                                                                   RubyCommand.Argument(name: "type", value: type),
-                                                                                                   RubyCommand.Argument(name: "storage_mode", value: storageMode),
+                     verbose: Bool = false) {
+  let command = RubyCommand(commandID: "", methodName: "sync_code_signing", className: nil, args: [RubyCommand.Argument(name: "type", value: type),
+                                                                                                   RubyCommand.Argument(name: "readonly", value: readonly),
                                                                                                    RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                    RubyCommand.Argument(name: "username", value: username),
-                                                                                                   RubyCommand.Argument(name: "keychain_name", value: keychainName),
-                                                                                                   RubyCommand.Argument(name: "keychain_password", value: keychainPassword),
-                                                                                                   RubyCommand.Argument(name: "readonly", value: readonly),
                                                                                                    RubyCommand.Argument(name: "team_id", value: teamId),
+                                                                                                   RubyCommand.Argument(name: "team_name", value: teamName),
+                                                                                                   RubyCommand.Argument(name: "storage_mode", value: storageMode),
+                                                                                                   RubyCommand.Argument(name: "git_url", value: gitUrl),
+                                                                                                   RubyCommand.Argument(name: "git_branch", value: gitBranch),
                                                                                                    RubyCommand.Argument(name: "git_full_name", value: gitFullName),
                                                                                                    RubyCommand.Argument(name: "git_user_email", value: gitUserEmail),
-                                                                                                   RubyCommand.Argument(name: "team_name", value: teamName),
-                                                                                                   RubyCommand.Argument(name: "verbose", value: verbose),
-                                                                                                   RubyCommand.Argument(name: "force", value: force),
-                                                                                                   RubyCommand.Argument(name: "skip_confirmation", value: skipConfirmation),
                                                                                                    RubyCommand.Argument(name: "shallow_clone", value: shallowClone),
                                                                                                    RubyCommand.Argument(name: "clone_branch_directly", value: cloneBranchDirectly),
+                                                                                                   RubyCommand.Argument(name: "google_cloud_bucket_name", value: googleCloudBucketName),
+                                                                                                   RubyCommand.Argument(name: "google_cloud_keys_file", value: googleCloudKeysFile),
+                                                                                                   RubyCommand.Argument(name: "keychain_name", value: keychainName),
+                                                                                                   RubyCommand.Argument(name: "keychain_password", value: keychainPassword),
+                                                                                                   RubyCommand.Argument(name: "force", value: force),
                                                                                                    RubyCommand.Argument(name: "force_for_new_devices", value: forceForNewDevices),
+                                                                                                   RubyCommand.Argument(name: "skip_confirmation", value: skipConfirmation),
                                                                                                    RubyCommand.Argument(name: "skip_docs", value: skipDocs),
                                                                                                    RubyCommand.Argument(name: "platform", value: platform),
                                                                                                    RubyCommand.Argument(name: "template_name", value: templateName),
-                                                                                                   RubyCommand.Argument(name: "google_cloud_bucket_name", value: googleCloudBucketName),
-                                                                                                   RubyCommand.Argument(name: "google_cloud_keys_file", value: googleCloudKeysFile)])
+                                                                                                   RubyCommand.Argument(name: "verbose", value: verbose)])
   _ = runner.executeCommand(command)
 }
 func teamId() {
@@ -4108,11 +4114,13 @@ func xcversion(version: String) {
 @discardableResult func zip(path: String,
                             outputPath: String? = nil,
                             verbose: Bool = true,
-                            password: String? = nil) -> String {
+                            password: String? = nil,
+                            symlinks: Bool = false) -> String {
   let command = RubyCommand(commandID: "", methodName: "zip", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
                                                                                      RubyCommand.Argument(name: "output_path", value: outputPath),
                                                                                      RubyCommand.Argument(name: "verbose", value: verbose),
-                                                                                     RubyCommand.Argument(name: "password", value: password)])
+                                                                                     RubyCommand.Argument(name: "password", value: password),
+                                                                                     RubyCommand.Argument(name: "symlinks", value: symlinks)])
   return runner.executeCommand(command)
 }
 
@@ -4169,4 +4177,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.35]
+// FastlaneRunnerAPIVersion [0.9.38]

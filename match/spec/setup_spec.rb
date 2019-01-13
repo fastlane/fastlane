@@ -1,8 +1,10 @@
 describe Match do
   describe Match::Setup do
-    it "works" do
+    it "creates a new Matchfile, containing the git_url" do
       git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
-      allow(FastlaneCore::UI).to receive(:input).and_return(git_url.to_s)
+
+      expect(FastlaneCore::UI.ui_object).to receive(:select).and_return("git")
+      expect(FastlaneCore::UI.ui_object).to receive(:input).and_return(git_url)
 
       path = File.join(Dir.mktmpdir, "Matchfile")
       Match::Setup.new.run(path)

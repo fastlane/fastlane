@@ -96,6 +96,10 @@ module Match
         checkout_branch unless self.branch == "master"
       end
 
+      def human_readable_description
+        "Git Repo [#{self.git_url}]"
+      end
+
       def delete_files(files_to_delete: [], custom_message: nil)
         # No specific list given, e.g. this happens on `fastlane match nuke`
         # We just want to run `git add -A` to commit everything
@@ -119,6 +123,13 @@ module Match
           "and platform",
           self.platform
         ].join(" ")
+      end
+
+      def generate_matchfile_content
+        UI.important("Please create a new, private git repository to store the certificates and profiles there")
+        url = UI.input("URL of the Git Repo: ")
+
+        return "git_url(\"#{url}\")"
       end
 
       private

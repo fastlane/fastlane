@@ -1,13 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 28
 
     defaultConfig {
         applicationId "tools.fastlane.localetester"
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
 
@@ -28,18 +27,15 @@ android {
     }
 }
 
-def supportLibVersion = '25.1.0'
-
 dependencies {
-    compile "com.android.support:appcompat-v7:${supportLibVersion}"
-    compile "com.android.support:design:${supportLibVersion}"
+    implementation "com.android.support:appcompat-v7:28.0.0"
+    implementation "com.android.support:design:28.0.0"
 
-    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
 
-    androidTestCompile "com.android.support:support-annotations:${supportLibVersion}"
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'com.android.support.test:rules:0.5'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
-    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
-    androidTestCompile project(':screengrab-lib')
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'org.hamcrest:hamcrest-library:1.3'
+    androidTestImplementation project(':screengrab-lib')
 }

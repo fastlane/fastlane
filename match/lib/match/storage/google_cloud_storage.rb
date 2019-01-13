@@ -98,7 +98,10 @@ module Match
           UI.message("Deleting '#{target_path}' from Google Cloud Storage bucket '#{self.bucket_name}'...")
           file.delete
         end
-        finished_pushing_message
+      end
+
+      def human_readable_description
+        "Google Cloud Bucket [#{self.project_id}/#{self.bucket_name}]"
       end
 
       def upload_files(files_to_upload: [], custom_message: nil)
@@ -118,18 +121,17 @@ module Match
           UI.verbose("Uploading '#{target_path}' to Google Cloud Storage...")
           bucket.create_file(current_file, target_path)
         end
-        finished_pushing_message
       end
 
       def skip_docs
         false
       end
 
-      private
-
-      def finished_pushing_message
-        UI.success("Finished applying changes up to Google Cloud Storage on bucket '#{self.bucket_name}'")
+      def generate_matchfile_content
+        return "bucket_name(\"#{self.bucket_name}\")"
       end
+
+      private
 
       def bucket
         @_bucket ||= self.gc_storage.bucket(self.bucket_name)
@@ -152,9 +154,10 @@ module Match
           return google_cloud_keys_file
         end
 
-        if File.exist?(DEFAULT_KEYS_FILE_NAME)
-          return DEFAULT_KEYS_FILE_NAME
-        end
+        return DEFAULT_KEYS_FILE_NAME if File.exist?(DEFAULT_KEYS_FILE_NAME)
+
+        fastlane_folder_gc_keys_path = File.join(FastlaneCore::FastlaneFolder.path, DEFAULT_KEYS_FILE_NAME)
+        return fastlane_folder_gc_keys_path if File.exist?(fastlane_folder_gc_keys_path)
 
         # User doesn't seem to have provided a keys file
         UI.message("Looks like you don't have a Google Cloud #{DEFAULT_KEYS_FILE_NAME.cyan} file yet")
@@ -197,6 +200,10 @@ module Match
           UI.input("Confirm with enter")
         end
 
+        UI.important("Please never add the #{DEFAULT_KEYS_FILE_NAME.cyan} file in version control.")
+        UI.important("Instead please add the file to your .gitignore")
+        UI.input("Confirm with enter")
+
         return DEFAULT_KEYS_FILE_NAME
       end
 
@@ -208,7 +215,7 @@ module Match
           # This can only happen after we went through auth of Google Cloud
           available_bucket_identifiers = self.gc_storage.buckets.collect(&:id)
           if available_bucket_identifiers.count > 0
-            @bucket_name = UI.select("What Google Cloud Storage bucket do you want to use?", available_bucket_identifiers)
+            @bucket_name = UI.select("What Google Cloud Storage bucket do you want to use? (you can define it using the `google_cloud_bucket_name` key)", available_bucket_identifiers)
           else
             UI.error("Looks like your Google Cloud account for the project ID '#{self.project_id}' doesn't")
             UI.error("have any available storage buckets yet. Please visit the following URL")
