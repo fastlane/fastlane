@@ -40,7 +40,11 @@ module Scan
       ]
       exit_status = 0
 
-      if Scan.config[:reinstall_app]
+      if Scan.config[:reset_simulator]
+        Scan.devices.each do |device|
+          FastlaneCore::Simulator.reset(udid: device.udid)
+        end
+      elsif Scan.config[:reinstall_app]
         app_identifier = Scan.config[:app_identifier]
         app_identifier ||= UI.input("App Identifier: ")
 
