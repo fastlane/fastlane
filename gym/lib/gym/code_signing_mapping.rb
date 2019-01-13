@@ -91,9 +91,30 @@ module Gym
       return destination_sdkroot.include?(sdkroot)
     end
 
+    def detect_configuration_for_archive
+      extract_from_scheme = lambda do
+        if self.project.workspace?
+          available_schemes = self.project.workspace.schemes.reject { |k, v| v.include?("Pods/Pods.xcodeproj") }
+          project_path = available_schemes[Gym.config[:scheme]]
+        else
+          project_path = self.project.path
+        end
+
+        if project_path
+          scheme_path = File.join(project_path, "xcshareddata", "xcschemes", "#{Gym.config[:scheme]}.xcscheme")
+          Xcodeproj::XCScheme.new(scheme_path).archive_action.build_configuration if File.exist?(scheme_path)
+        end
+      end
+
+      configuration = Gym.config[:configuration]
+      configuration ||= extract_from_scheme.call if Gym.config[:scheme]
+      configuration ||= self.project.default_build_settings(key: "CONFIGURATION")
+      configuration
+    end
+
     def detect_project_profile_mapping
       provisioning_profile_mapping = {}
-      specified_configuration = Gym.config[:configuration] || Gym.project.default_build_settings(key: "CONFIGURATION")
+      specified_configuration = detect_configuration_for_archive
 
       self.project.project_paths.each do |project_path|
         UI.verbose("Parsing project file '#{project_path}' to find selected provisioning profiles")
