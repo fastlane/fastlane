@@ -167,10 +167,6 @@ module Match
         fastlane_folder_gc_keys_path = File.join(FastlaneCore::FastlaneFolder.path, DEFAULT_KEYS_FILE_NAME)
         return fastlane_folder_gc_keys_path if File.exist?(fastlane_folder_gc_keys_path)
 
-        # User doesn't seem to have provided a keys file.
-        UI.message("Looks like you don't have a Google Cloud #{DEFAULT_KEYS_FILE_NAME.cyan} file")
-        UI.message("If you have one, make sure to put it into the '#{Dir.pwd}' directory and call it '#{DEFAULT_KEYS_FILE_NAME.cyan}'")
-
         if google_cloud_project_id.to_s.length > 0
           # Check to see if this system has application default keys installed.
           # These are the default keys that the Google Cloud APIs use when no other keys are specified.
@@ -189,10 +185,14 @@ module Match
             # we can continue and ask the user if they want to use a keys file.
           end
 
-          if application_default_keys && UI.confirm("Do you want to use this system's application default keys?")
+          if application_default_keys && UI.confirm("Do you want to use this system's Google Cloud application default keys?")
             return nil
           end
         end
+
+        # User doesn't seem to have provided a keys file.
+        UI.message("Looks like you don't have a Google Cloud #{DEFAULT_KEYS_FILE_NAME.cyan} file")
+        UI.message("If you have one, make sure to put it into the '#{Dir.pwd}' directory and call it '#{DEFAULT_KEYS_FILE_NAME.cyan}'")
         unless UI.confirm("Do you want fastlane to help you to create a #{DEFAULT_KEYS_FILE_NAME} file?")
           UI.user_error!("Process stopped, run fastlane again to start things up again")
         end
