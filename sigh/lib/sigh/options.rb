@@ -20,7 +20,7 @@ module Sigh
                                      end),
         FastlaneCore::ConfigItem.new(key: :developer_id,
                                      env_name: "SIGH_DEVELOPER_ID",
-                                     description: "Setting his flag will generate Developer ID profiles instead of App Store Profiles",
+                                     description: "Setting this flag will generate Developer ID profiles instead of App Store Profiles",
                                      is_string: false,
                                      default_value: false,
                                      conflicting_options: [:adhoc, :development],

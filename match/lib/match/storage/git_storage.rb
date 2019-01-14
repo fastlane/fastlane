@@ -55,7 +55,7 @@ module Match
 
       def download
         # Check if we already have a functional working_directory
-        return self.working_directory if @working_directory
+        return if @working_directory
 
         # No existing working directory, creating a new one now
         self.working_directory = Dir.mktmpdir
@@ -96,6 +96,10 @@ module Match
         checkout_branch unless self.branch == "master"
       end
 
+      def human_readable_description
+        "Git Repo [#{self.git_url}]"
+      end
+
       def delete_files(files_to_delete: [], custom_message: nil)
         # No specific list given, e.g. this happens on `fastlane match nuke`
         # We just want to run `git add -A` to commit everything
@@ -110,13 +114,6 @@ module Match
         git_push(commands: commands, commit_message: custom_message)
       end
 
-      def clear_changes
-        return unless @working_directory
-
-        FileUtils.rm_rf(self.working_directory)
-        self.working_directory = nil
-      end
-
       # Generate the commit message based on the user's parameters
       def generate_commit_message
         [
@@ -126,6 +123,13 @@ module Match
           "and platform",
           self.platform
         ].join(" ")
+      end
+
+      def generate_matchfile_content
+        UI.important("Please create a new, private git repository to store the certificates and profiles there")
+        url = UI.input("URL of the Git Repo: ")
+
+        return "git_url(\"#{url}\")"
       end
 
       private
@@ -185,8 +189,6 @@ module Match
           end
         end
       end
-
-      private # rubocop:disable Lint/UselessAccessModifier
 
       def git_push(commands: [], commit_message: nil)
         commit_message ||= generate_commit_message

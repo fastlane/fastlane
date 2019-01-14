@@ -184,7 +184,7 @@ module Deliver
                                      end),
         FastlaneCore::ConfigItem.new(key: :submission_information,
                                      short_option: "-b",
-                                     description: "Extra information for the submission (e.g. third party content)",
+                                     description: "Extra information for the submission (e.g. compliance specifications, IDFA settings)",
                                      is_string: false,
                                      optional: true),
 

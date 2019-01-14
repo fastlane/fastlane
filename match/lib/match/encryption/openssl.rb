@@ -4,8 +4,8 @@ require 'securerandom'
 require 'security'
 require 'shellwords'
 
-require_relative '../module'
 require_relative '../change_password'
+require_relative '../module'
 
 module Match
   module Encryption
@@ -29,15 +29,20 @@ module Match
       end
 
       def encrypt_files
+        files = []
         iterate(self.working_directory) do |current|
+          files << current
           encrypt_specific_file(path: current, password: password)
           UI.success("🔒  Encrypted '#{File.basename(current)}'") if FastlaneCore::Globals.verbose?
         end
         UI.success("🔒  Successfully encrypted certificates repo")
+        return files
       end
 
       def decrypt_files
+        files = []
         iterate(self.working_directory) do |current|
+          files << current
           begin
             decrypt_specific_file(path: current, password: password)
           rescue => ex
@@ -51,6 +56,7 @@ module Match
           UI.success("🔓  Decrypted '#{File.basename(current)}'") if FastlaneCore::Globals.verbose?
         end
         UI.success("🔓  Successfully decrypted certificates repo")
+        return files
       end
 
       def store_password(password)
@@ -144,7 +150,7 @@ module Match
       rescue => error
         fallback_hash_algorithm = "SHA256"
         if hash_algorithm != fallback_hash_algorithm
-          decrypt_specific_file(path, password, fallback_hash_algorithm)
+          decrypt_specific_file(path: path, password: password, hash_algorithm: fallback_hash_algorithm)
         else
           UI.error(error.to_s)
           UI.crash!("Error decrypting '#{path}'")

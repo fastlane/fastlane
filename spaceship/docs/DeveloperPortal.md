@@ -256,11 +256,6 @@ profiles = Spaceship::Portal.provisioning_profile.all
 profiles_appstore_adhoc = Spaceship::Portal.provisioning_profile.app_store.all
 profiles_appstore_adhoc = Spaceship::Portal.provisioning_profile.ad_hoc.all
 
-# To distinguish between App Store and Ad Hoc profiles use
-adhoc_only = profiles_appstore_adhoc.find_all do |current_profile|
-  current_profile.is_adhoc?
-end
-
 # Get all Development profiles
 profiles_dev = Spaceship::Portal.provisioning_profile.development.all
 

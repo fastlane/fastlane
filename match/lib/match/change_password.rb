@@ -7,6 +7,13 @@ module Match
   # These functions should only be used while in (UI.) interactive mode
   class ChangePassword
     def self.update(params: nil)
+      if params[:storage_mode] != "git"
+        # Only git supports changing the password
+        # All other storage options will most likely use more advanced
+        # ways to encrypt files
+        UI.user_error!("Only git-based match allows you to change your password, current `storage_mode` is #{params[:storage_mode]}")
+      end
+
       ensure_ui_interactive
 
       to = ChangePassword.ask_password(message: "New passphrase for Git Repo: ", confirm: true)
@@ -33,8 +40,8 @@ module Match
       encryption.store_password(to)
 
       message = "[fastlane] Changed passphrase"
-      encryption.encrypt_files
-      storage.save_changes!(custom_message: message)
+      files_to_commit = encryption.encrypt_files
+      storage.save_changes!(files_to_commit: files_to_commit, custom_message: message)
     end
 
     # This method is called from both here, and from `openssl.rb`
