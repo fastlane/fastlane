@@ -23,15 +23,11 @@ module FastlaneCore
         command << " #{keychain_path.shellescape}"
         command << " 1> /dev/null" # always disable stdout. This can be very verbose, and leak potentially sensitive info
 
+        # Showing loading indicator as this can take some time if a lot of keys installed
+        Helper.show_loading_indicator("Setting key partition list... (this can take a minute if there are a lot of keys installed)")
+
         UI.command(command) if output
         Open3.popen3(command) do |stdin, stdout, stderr, thrd|
-          if output
-            Helper.show_loading_indicator("Importing keys...")
-            UI.command(command)
-            UI.command_output(stdout.read)
-            Helper.hide_loading_indicator
-          end
-
           unless thrd.value.success?
             err = stderr.read.to_s.strip
 
@@ -50,6 +46,10 @@ module FastlaneCore
             end
           end
         end
+
+        # Hiding after Open3 finishes
+        Helper.hide_loading_indicator
+
       end
     end
   end
