@@ -25,6 +25,7 @@ module Fastlane
         build_number = params[:build_number]
         platform = params[:platform]
         output_directory = params[:output_directory]
+        min_version = Gem::Version.new(params[:min_version])
 
         # Set version if it is latest
         if version == 'latest'
@@ -56,6 +57,12 @@ module Fastlane
             UI.verbose("Version #{version} doesn't match: #{train.version_string}")
             next
           end
+
+          if min_version && min_version > Gem::Version.new(train.version_string)
+            UI.verbose("Min version #{min_version} not reached: #{train.version_string}")
+            next
+          end
+
           app.tunes_all_builds_for_train(train: train.version_string, platform: platform).each do |build|
             UI.verbose("Found build version: #{build.build_version}, comparing to supplied build_number: #{build_number}")
             if build_number && build.build_version != build_number
@@ -207,6 +214,11 @@ module Fastlane
                                        env_name: "DOWNLOAD_DSYMS_BUILD_NUMBER",
                                        description: "The app build_number for dSYMs you wish to download",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :min_version,
+                                       short_option: "-m",
+                                       env_name: "DOWNLOAD_DSYMS_MIN_VERSION",
+                                       description: "The minimum app version for dSYMs you wish to download",
+                                       optional: true), 
           FastlaneCore::ConfigItem.new(key: :output_directory,
                                        short_option: "-s",
                                        env_name: "DOWNLOAD_DSYMS_OUTPUT_DIRECTORY",
@@ -236,7 +248,8 @@ module Fastlane
       def self.example_code
         [
           'download_dsyms',
-          'download_dsyms(version: "1.0.0", build_number: "345")'
+          'download_dsyms(version: "1.0.0", build_number: "345")',
+          'download_dsyms(min_version: "1.2.3")'
         ]
       end
 
