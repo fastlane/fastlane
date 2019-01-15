@@ -63,6 +63,20 @@ describe Fastlane do
           end").runner.execute(:test)
         end
       end
+
+      context 'when min_version is set' do
+        it 'downloads only dsyms of trains newer than or equal min_version' do
+          expect(app).to receive(:tunes_all_builds_for_train).and_return([build, build2])
+          expect(app).to receive(:tunes_build_details).with(train: '2.0.0', build_number: '1', platform: :ios).and_return(build_detail)
+          expect(app).to receive(:tunes_build_details).with(train: '2.0.0', build_number: '2', platform: :ios).and_return(build_detail)
+          expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, app.bundle_id, train2.version_string, build.build_version, nil)
+          expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, app.bundle_id, train2.version_string, build2.build_version, nil)
+
+          Fastlane::FastFile.new.parse("lane :test do
+              download_dsyms(username: 'user@fastlane.tools', app_identifier: 'tools.fastlane.myapp', min_version: '2.0.0')
+          end").runner.execute(:test)
+        end
+      end
     end
   end
 end
