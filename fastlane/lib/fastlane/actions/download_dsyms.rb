@@ -25,7 +25,7 @@ module Fastlane
         build_number = params[:build_number]
         platform = params[:platform]
         output_directory = params[:output_directory]
-        min_version = Gem::Version.new(params[:min_version])
+        min_version = Gem::Version.new(params[:min_version]) if params[:min_version]
 
         # Set version if it is latest
         if version == 'latest'
