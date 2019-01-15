@@ -24,7 +24,7 @@ describe Fastlane do
         allow(train2).to receive(:version_string).and_return('2.0.0')
         allow(build).to receive(:build_version).and_return('1')
         allow(build2).to receive(:build_version).and_return('2')
-        allow(Fastlane::Actions::DownloadDsymsAction).to receive(:download)       
+        allow(Fastlane::Actions::DownloadDsymsAction).to receive(:download)
       end
 
       context 'with no special options' do
