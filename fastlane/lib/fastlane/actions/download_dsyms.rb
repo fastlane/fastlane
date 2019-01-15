@@ -52,7 +52,11 @@ module Fastlane
         UI.message(message.join(" "))
 
         app.tunes_all_build_trains(platform: platform).each do |train|
-          UI.verbose("Found train: #{train.version_string}, comparing to supplied version: #{version}")
+          message = []
+          message << "Found train (version): #{train.version_string}"
+          message << ", comparing to supplied version: #{version}" if version
+          UI.verbose(message.join(" "))
+
           if version && version != train.version_string
             UI.verbose("Version #{version} doesn't match: #{train.version_string}")
             next
@@ -64,14 +68,19 @@ module Fastlane
           end
 
           app.tunes_all_builds_for_train(train: train.version_string, platform: platform).each do |build|
-            UI.verbose("Found build version: #{build.build_version}, comparing to supplied build_number: #{build_number}")
+            message = []
+            message << "Found build version: #{build.build_version}"
+            message << ", comparing to supplied build_number: #{build_number}" if build_number
+            UI.verbose(message.join(" "))
+
             if build_number && build.build_version != build_number
               UI.verbose("build_version: #{build.build_version} doesn't match: #{build_number}")
               next
             end
 
             begin
-              UI.verbose("Build_version: #{build.build_version} matches #{build_number}, grabbing dsym_url")
+              UI.verbose("Build_version: #{build.build_version} matches #{build_number}, grabbing dsym_url") if build_number
+
               build_details = app.tunes_build_details(train: train.version_string, build_number: build.build_version, platform: platform)
               download_url = build_details.dsym_url
               UI.verbose("dsym_url: #{download_url}")
@@ -217,7 +226,7 @@ module Fastlane
                                        short_option: "-m",
                                        env_name: "DOWNLOAD_DSYMS_MIN_VERSION",
                                        description: "The minimum app version for dSYMs you wish to download",
-                                       optional: true), 
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :output_directory,
                                        short_option: "-s",
                                        env_name: "DOWNLOAD_DSYMS_OUTPUT_DIRECTORY",
