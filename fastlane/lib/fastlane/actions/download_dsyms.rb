@@ -71,7 +71,6 @@ module Fastlane
             end
 
             begin
-              # need to call reload here or dsym_url is nil
               UI.verbose("Build_version: #{build.build_version} matches #{build_number}, grabbing dsym_url")
               build_details = app.tunes_build_details(train: train.version_string, build_number: build.build_version, platform: platform)
               download_url = build_details.dsym_url
