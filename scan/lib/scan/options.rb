@@ -74,7 +74,7 @@ module Scan
                                      env_name: 'SCAN_RESET_SIMULATOR',
                                      description: "Enabling this option will automatically erase the simulator before running the application",
                                      default_value: false,
-                                     is_string: false),
+                                     type: Boolean),
 
         # reinstall app
         FastlaneCore::ConfigItem.new(key: :reinstall_app,
