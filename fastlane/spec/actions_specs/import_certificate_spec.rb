@@ -14,7 +14,7 @@ describe Fastlane do
         expected_command = "security import #{cert_name} -k '#{keychain_path}' -P #{password} -T /usr/bin/codesign -T /usr/bin/security &> /dev/null"
 
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
-        allowed_command = "security set-key-partition-list -S apple-tool:,apple: -k #{''.shellescape} #{keychain_path.shellescape}"
+        allowed_command = "security set-key-partition-list -S apple-tool:,apple: -l 'Imported Private Key' -k #{''.shellescape} #{keychain_path.shellescape} &> /dev/null"
 
         allow(File).to receive(:file?).and_return(false)
         allow(File).to receive(:file?).with(keychain_path).and_return(true)
@@ -41,7 +41,7 @@ describe Fastlane do
         expected_security_import_command = "security import #{cert_name.shellescape} -k '#{keychain_path.shellescape}' -P #{password.shellescape} -T /usr/bin/codesign -T /usr/bin/security &> /dev/null"
 
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
-        expected_set_key_partition_list_command = "security set-key-partition-list -S apple-tool:,apple: -k #{password.shellescape} #{keychain_path.shellescape}"
+        expected_set_key_partition_list_command = "security set-key-partition-list -S apple-tool:,apple: -l 'Imported Private Key' -k #{password.shellescape} #{keychain_path.shellescape} &> /dev/null"
 
         allow(File).to receive(:file?).and_return(false)
         allow(File).to receive(:file?).with(keychain_path).and_return(true)
@@ -69,7 +69,7 @@ describe Fastlane do
         expected_command = "security import #{cert_name} -k '#{keychain_path}' -P #{password} -T /usr/bin/codesign -T /usr/bin/security"
 
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
-        allowed_command = "security set-key-partition-list -S apple-tool:,apple: -k #{''.shellescape} #{keychain_path.shellescape}"
+        allowed_command = "security set-key-partition-list -S apple-tool:,apple: -l 'Imported Private Key' -k #{''.shellescape} #{keychain_path.shellescape} &> /dev/null"
 
         allow(File).to receive(:file?).and_return(false)
         allow(File).to receive(:file?).with(keychain_path).and_return(true)

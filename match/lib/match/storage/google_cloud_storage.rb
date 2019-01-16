@@ -127,6 +127,10 @@ module Match
         false
       end
 
+      def generate_matchfile_content
+        return "bucket_name(\"#{self.bucket_name}\")"
+      end
+
       private
 
       def bucket
