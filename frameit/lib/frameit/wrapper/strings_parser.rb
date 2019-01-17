@@ -1,4 +1,4 @@
-require_relative 'module'
+require_relative '../module'
 
 module Frameit
   # This class will parse the .string files

@@ -1,4 +1,4 @@
-require_relative 'module'
+require_relative '../module'
 
 module Frameit
   # Represents the MiniMagick trim bounding box for cropping a text image
