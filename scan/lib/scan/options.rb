@@ -327,7 +327,7 @@ module Scan
                                      env_name: "SCAN_SLACK_USE_WEBHOOK_CONFIGURED_USERNAME_AND_ICON",
                                      description: "Use webhook's default username and icon settings? (true/false)",
                                      default_value: false,
-                                     is_string: false,
+                                     type: Boolean,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :slack_username,
                                      env_name: "SCAN_SLACK_USERNAME",
