@@ -13,7 +13,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             spm(command: 'invalid_command')
           end").runner.execute(:test)
-        end.to raise_error("Please pass a valid command. Use one of the following: build, test, clean, reset, update")
+        end.to raise_error("Please pass a valid command. Use one of the following: build, test, clean, reset, update, resolve, generate-xcodeproj, init")
       end
 
       # Commands
@@ -64,6 +64,22 @@ describe Fastlane do
           end").runner.execute(:test)
 
         expect(result).to eq("swift package reset")
+      end
+
+      it "sets the command to generate-xcodeproj" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          spm(command: 'generate-xcodeproj')
+        end").runner.execute(:test)
+
+        expect(result).to eq("swift package generate-xcodeproj")
+      end
+
+      it "sets the command to resolve" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          spm(command: 'resolve')
+        end").runner.execute(:test)
+
+        expect(result).to eq("swift package resolve")
       end
 
       # Arguments
@@ -195,7 +211,7 @@ describe Fastlane do
           end.to raise_error("Please pass a valid configuration: (debug|release)")
         end
 
-        it "raises an error if xcpretty output tyep is invalid" do
+        it "raises an error if xcpretty output type is invalid" do
           expect do
             Fastlane::FastFile.new.parse("lane :test do
               spm(
@@ -214,18 +230,33 @@ describe Fastlane do
               )
             end").runner.execute(:test)
 
-          expect(result).to match(/^set -o pipefail && swift /)
+          expect(result).to eq("set -o pipefail && swift package #{command} 2>&1 | xcpretty --simple")
+        end
+      end
+
+      context "when command is generate-xcodeproj" do
+        it "adds xcconfig-overrides with :xcconfig is set and command is package command" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            spm(
+              command: 'generate-xcodeproj',
+              xcconfig: 'Package.xcconfig',
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swift package generate-xcodeproj --xcconfig-overrides Package.xcconfig")
         end
 
-        it "use xcpretty if xcpretty_output is specified" do
+        it "adds --verbose and xcpretty options correctly as well" do
           result = Fastlane::FastFile.new.parse("lane :test do
-              spm(
-                command: '#{command}',
-                xcpretty_output: 'simple'
-              )
-            end").runner.execute(:test)
+            spm(
+              command: 'generate-xcodeproj',
+              xcconfig: 'Package.xcconfig',
+              verbose: true,
+              xcpretty_output: 'simple'
+            )
+          end").runner.execute(:test)
 
-          expect(result).to match(/2>&1 | xcpretty --simple$/)
+          expect(result).to eq("set -o pipefail && swift package --verbose generate-xcodeproj --xcconfig-overrides Package.xcconfig 2>&1 | xcpretty --simple")
         end
       end
     end

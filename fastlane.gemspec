@@ -15,26 +15,26 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Stefan Natchev",
-                        "Jan Piotrowski",
-                        "Andrew McBurney",
+  spec.authors       = ["Danielle Tomlinson",
                         "Helmut Januschka",
-                        "Joshua Liebowitz",
-                        "Jorge Revuelta H",
-                        "Felix Krause",
-                        "Olivier Halligon",
                         "Manu Wallner",
-                        "Danielle Tomlinson",
-                        "Kohki Miki",
-                        "Maksym Grebenets",
-                        "Jérôme Lacoste",
-                        "Josh Holtz",
-                        "Fumiya Nakamura",
-                        "Matthew Ellis",
-                        "Aaron Brager",
+                        "Andrew McBurney",
                         "Luka Mirosevic",
+                        "Matthew Ellis",
                         "Iulian Onofrei",
-                        "Jimmy Dee"]
+                        "Stefan Natchev",
+                        "Jimmy Dee",
+                        "Jorge Revuelta H",
+                        "Kohki Miki",
+                        "Jan Piotrowski",
+                        "Jérôme Lacoste",
+                        "Olivier Halligon",
+                        "Joshua Liebowitz",
+                        "Aaron Brager",
+                        "Josh Holtz",
+                        "Felix Krause",
+                        "Fumiya Nakamura",
+                        "Maksym Grebenets"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -97,7 +97,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('google-api-client', '>= 0.21.2', '< 0.24.0') # Google API Client to access Play Publishing API
   spec.add_dependency('google-cloud-storage', '>= 1.15.0', '< 2.0.0') # Access Google Cloud Storage for match
 
-  spec.add_dependency('emoji_regex', '~> 0.1') # Used to scan for Emoji in the changelog
+  spec.add_dependency('emoji_regex', '>= 0.1', '< 2.0') # Used to scan for Emoji in the changelog
 
   # Development only
   spec.add_development_dependency('rake', '< 12')

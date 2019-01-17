@@ -16,6 +16,10 @@ module Fastlane
         ARGV.include?("init")
       end
 
+      def utf8_locale?
+        (ENV['LANG'] || "").end_with?("UTF-8", "utf8") || (ENV['LC_ALL'] || "").end_with?("UTF-8", "utf8") || (FastlaneCore::CommandExecutor.which('locale') && `locale charmap`.strip == "UTF-8")
+      end
+
       def take_off
         before_import_time = Time.now
 
@@ -45,7 +49,8 @@ module Fastlane
           print_bundle_exec_warning(is_slow: (Time.now - before_import_time > 3))
         end
 
-        unless (ENV['LANG'] || "").end_with?("UTF-8") || (ENV['LC_ALL'] || "").end_with?("UTF-8")
+        # Try to check UTF-8 with `locale`, fallback to environment variables
+        unless utf8_locale?
           warn = "WARNING: fastlane requires your locale to be set to UTF-8. To learn more go to https://docs.fastlane.tools/getting-started/ios/setup/#set-up-environment-variables"
           UI.error(warn)
           at_exit do

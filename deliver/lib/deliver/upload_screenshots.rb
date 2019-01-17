@@ -1,4 +1,5 @@
 require 'spaceship/tunes/tunes'
+require 'spaceship/tunes/device_type'
 
 require_relative 'app_screenshot'
 require_relative 'module'
@@ -126,6 +127,21 @@ module Deliver
 
           screenshots << AppScreenshot.new(file_path, language)
         end
+      end
+
+      # Checking if the device type exists in spaceship
+      # Ex: iPhone 6.1 inch isn't supported in App Store Connect but need
+      # to have it in there for frameit support
+      unaccepted_device_shown = false
+      screenshots.select! do |screenshot|
+        exists = Spaceship::Tunes::DeviceType.exists?(screenshot.device_type)
+        unless exists
+          UI.important("Unaccepted device screenshots are detected! 🚫 Screenshot file will be skipped. 🏃") unless unaccepted_device_shown
+          unaccepted_device_shown = true
+
+          UI.important("🏃 Skipping screenshot file: #{screenshot.path} - Not an accepted App Store Connect device...")
+        end
+        exists
       end
 
       return screenshots
