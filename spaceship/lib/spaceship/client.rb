@@ -53,6 +53,7 @@ module Spaceship
     UnauthorizedAccessError = Spaceship::UnauthorizedAccessError
     GatewayTimeoutError = Spaceship::GatewayTimeoutError
     InternalServerError = Spaceship::InternalServerError
+    BadGatewayError = Spaceship::BadGatewayError
 
     def self.hostname
       raise "You must implement self.hostname"
@@ -603,6 +604,7 @@ module Spaceship
     rescue \
         Faraday::Error::ConnectionFailed,
         Faraday::Error::TimeoutError, # New Faraday version: Faraday::TimeoutError => ex
+        BadGatewayError,
         AppleTimeoutError,
         GatewayTimeoutError => ex
       tries -= 1
@@ -827,6 +829,10 @@ module Spaceship
 
         if response.body.to_s.include?("<title>302 Found</title>")
           raise AppleTimeoutError.new, "Apple 302 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
+        end
+
+        if response.body.to_s.include?("<h3>Bad Gateway</h3>")
+          raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
         end
 
         return response
