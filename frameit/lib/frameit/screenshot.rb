@@ -4,6 +4,7 @@ require_relative 'editor'
 require_relative 'mac_editor'
 require_relative 'device_types'
 require_relative 'module'
+require_relative 'wrapper/wrapper'
 
 module Frameit
   # Represents one screenshot
@@ -121,6 +122,23 @@ module Frameit
 
     def to_s
       self.path
+    end
+
+    # Add the device frame, this will also call the method that adds the background + title
+    def frame!(config)
+      if self.mac?
+        MacEditor.new.frame!(self, config)
+      else
+        Editor.new.frame!(self, config)
+      end
+    end
+
+    def wrap!(config)
+      if self.mac?
+        MacWrapper.new.wrap!(self, config)
+      else
+        Wrapper.new.wrap!(self, config)
+      end
     end
   end
 end

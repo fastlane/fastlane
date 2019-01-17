@@ -29,12 +29,12 @@ module Frameit
           next if full_path.include?("_framed.png")
           next if full_path.include?(".itmsp/") # a package file, we don't want to modify that
           next if full_path.include?("device_frames/") # these are the device frames the user is using
-          device = full_path.rpartition('/').last.partition('-').first # extract device name
-          if device.downcase.include?("watch")
+          if apple_watch_screenshot?(full_path)
             UI.error("Apple Watch screenshots are not framed: '#{full_path}'")
             next # we don't care about watches right now
           end
 
+          #new
           begin
             screenshot = Screenshot.new(full_path, color)
             if screenshot.mac?
@@ -48,6 +48,17 @@ module Frameit
               Helper.show_loading_indicator("Framing screenshot '#{full_path}'")
               editor.frame!
             end
+            #/new
+           #old 
+          Helper.show_loading_indicator("Framing screenshot '#{full_path}'")
+
+          config = fetch_config(full_path)
+          
+          begin
+            screenshot = Screenshot.new(full_path, color)
+            screenshot.frame!(config)
+            screenshot.wrap!(config)
+          #old
           rescue => ex
             UI.error(ex.to_s)
             UI.error("Backtrace:\n\t#{ex.backtrace.join("\n\t")}") if FastlaneCore::Globals.verbose?
@@ -56,6 +67,23 @@ module Frameit
       else
         UI.error("Could not find screenshots in current directory: '#{File.expand_path(path)}'")
       end
+    end
+
+    def apple_watch_screenshot?(full_path)
+      device = full_path.rpartition('/').last.partition('-').first # extract device name
+      device.downcase.include?("watch")
+    end 
+
+    # Loads the config (colors, background, texts, etc.)
+    # Don't use this method to access the actual text and use `fetch_texts` instead
+    def fetch_config(path)
+      return @config[path] if @config && @config[path]
+
+      config_path = File.join(File.expand_path("..", path), "Framefile.json")
+      config_path = File.join(File.expand_path("../..", path), "Framefile.json") unless File.exist?(config_path)
+      file = ConfigParser.new.load(config_path)
+      return {} unless file # no config file at all
+      @config[path] = file.fetch_value(path)
     end
   end
 end
