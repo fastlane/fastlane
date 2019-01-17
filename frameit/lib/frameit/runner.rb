@@ -61,6 +61,9 @@ module Frameit
             screenshot.frame!(config)
             screenshot.wrap!(config)
           #old
+            #old2
+            screenshot.wrap!(config, size) # TODO where do we get a size from?
+            #/old2
           rescue => ex
             UI.error(ex.to_s)
             UI.error("Backtrace:\n\t#{ex.backtrace.join("\n\t")}") if FastlaneCore::Globals.verbose?

@@ -13,7 +13,7 @@ module Frameit
     attr_accessor :space_to_device
     attr_accessor :config # Framefile
 
-    def wrap!(screenshot, config)
+    def wrap!(screenshot, config, size)
       self.screenshot = screenshot
       self.config = config
 
@@ -21,7 +21,7 @@ module Frameit
       
       prepare_image
 
-      @image = wrap_it
+      @image = wrap_it(size)
 
       store_result # write to file system
     end
@@ -71,7 +71,7 @@ module Frameit
     end
 
     # more complex mode: background, frame and title
-    def wrap_it
+    def wrap_it(size)
       background = generate_background
 
       self.space_to_device = vertical_frame_padding
