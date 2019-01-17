@@ -1,5 +1,3 @@
-require 'fastimage'
-
 require_relative 'frame_downloader'
 require_relative 'module'
 require_relative 'screenshot'

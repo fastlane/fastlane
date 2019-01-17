@@ -1,4 +1,5 @@
 require 'deliver/app_screenshot'
+require 'fastimage'
 
 require_relative 'editor'
 require_relative 'mac_editor'
