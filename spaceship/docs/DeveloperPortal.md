@@ -62,6 +62,7 @@ App Services are part of the application, however, they are one of the few thing
 Currently available services include (all require the `Spaceship::Portal.app_service.` prefix)
 
 ```
+access_wifi.(on|off)
 app_group.(on|off)
 apple_pay.(on|off)
 associated_domains.(on|off)
