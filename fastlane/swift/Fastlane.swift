@@ -1360,6 +1360,7 @@ func downloadDsyms(username: String,
                    platform: String = "ios",
                    version: String? = nil,
                    buildNumber: String? = nil,
+                   minVersion: String? = nil,
                    outputDirectory: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "download_dsyms", className: nil, args: [RubyCommand.Argument(name: "username", value: username),
                                                                                                 RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
@@ -1368,6 +1369,7 @@ func downloadDsyms(username: String,
                                                                                                 RubyCommand.Argument(name: "platform", value: platform),
                                                                                                 RubyCommand.Argument(name: "version", value: version),
                                                                                                 RubyCommand.Argument(name: "build_number", value: buildNumber),
+                                                                                                RubyCommand.Argument(name: "min_version", value: minVersion),
                                                                                                 RubyCommand.Argument(name: "output_directory", value: outputDirectory)])
   _ = runner.executeCommand(command)
 }
@@ -1468,6 +1470,7 @@ func frameScreenshots(white: Bool? = nil,
                       forceDeviceType: String? = nil,
                       useLegacyIphone5s: Bool = false,
                       useLegacyIphone6s: Bool = false,
+                      useLegacyIphonex: Bool = false,
                       forceOrientationBlock: String? = nil,
                       path: String = "./") {
   let command = RubyCommand(commandID: "", methodName: "frame_screenshots", className: nil, args: [RubyCommand.Argument(name: "white", value: white),
@@ -1477,6 +1480,7 @@ func frameScreenshots(white: Bool? = nil,
                                                                                                    RubyCommand.Argument(name: "force_device_type", value: forceDeviceType),
                                                                                                    RubyCommand.Argument(name: "use_legacy_iphone5s", value: useLegacyIphone5s),
                                                                                                    RubyCommand.Argument(name: "use_legacy_iphone6s", value: useLegacyIphone6s),
+                                                                                                   RubyCommand.Argument(name: "use_legacy_iphonex", value: useLegacyIphonex),
                                                                                                    RubyCommand.Argument(name: "force_orientation_block", value: forceOrientationBlock),
                                                                                                    RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
@@ -1488,6 +1492,7 @@ func frameit(white: Bool? = nil,
              forceDeviceType: String? = nil,
              useLegacyIphone5s: Bool = false,
              useLegacyIphone6s: Bool = false,
+             useLegacyIphonex: Bool = false,
              forceOrientationBlock: String? = nil,
              path: String = "./") {
   let command = RubyCommand(commandID: "", methodName: "frameit", className: nil, args: [RubyCommand.Argument(name: "white", value: white),
@@ -1497,6 +1502,7 @@ func frameit(white: Bool? = nil,
                                                                                          RubyCommand.Argument(name: "force_device_type", value: forceDeviceType),
                                                                                          RubyCommand.Argument(name: "use_legacy_iphone5s", value: useLegacyIphone5s),
                                                                                          RubyCommand.Argument(name: "use_legacy_iphone6s", value: useLegacyIphone6s),
+                                                                                         RubyCommand.Argument(name: "use_legacy_iphonex", value: useLegacyIphonex),
                                                                                          RubyCommand.Argument(name: "force_orientation_block", value: forceOrientationBlock),
                                                                                          RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
@@ -2665,6 +2671,7 @@ func runTests(workspace: String? = nil,
               device: String? = nil,
               devices: [String]? = nil,
               skipDetectDevices: Bool = false,
+              resetSimulator: Bool = false,
               reinstallApp: Bool = false,
               appIdentifier: String? = nil,
               onlyTesting: String? = nil,
@@ -2712,6 +2719,7 @@ func runTests(workspace: String? = nil,
                                                                                            RubyCommand.Argument(name: "device", value: device),
                                                                                            RubyCommand.Argument(name: "devices", value: devices),
                                                                                            RubyCommand.Argument(name: "skip_detect_devices", value: skipDetectDevices),
+                                                                                           RubyCommand.Argument(name: "reset_simulator", value: resetSimulator),
                                                                                            RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                            RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                            RubyCommand.Argument(name: "only_testing", value: onlyTesting),
@@ -2801,6 +2809,7 @@ func scan(workspace: String? = scanfile.workspace,
           device: String? = scanfile.device,
           devices: [String]? = scanfile.devices,
           skipDetectDevices: Bool = scanfile.skipDetectDevices,
+          resetSimulator: Bool = scanfile.resetSimulator,
           reinstallApp: Bool = scanfile.reinstallApp,
           appIdentifier: String? = scanfile.appIdentifier,
           onlyTesting: String? = scanfile.onlyTesting,
@@ -2848,6 +2857,7 @@ func scan(workspace: String? = scanfile.workspace,
                                                                                       RubyCommand.Argument(name: "device", value: device),
                                                                                       RubyCommand.Argument(name: "devices", value: devices),
                                                                                       RubyCommand.Argument(name: "skip_detect_devices", value: skipDetectDevices),
+                                                                                      RubyCommand.Argument(name: "reset_simulator", value: resetSimulator),
                                                                                       RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                       RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                       RubyCommand.Argument(name: "only_testing", value: onlyTesting),
@@ -3316,12 +3326,14 @@ func splunkmint(dsym: String? = nil,
 func spm(command: String = "build",
          buildPath: String? = nil,
          packagePath: String? = nil,
+         xcconfig: String? = nil,
          configuration: String? = nil,
          xcprettyOutput: String? = nil,
          verbose: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "spm", className: nil, args: [RubyCommand.Argument(name: "command", value: command),
                                                                                      RubyCommand.Argument(name: "build_path", value: buildPath),
                                                                                      RubyCommand.Argument(name: "package_path", value: packagePath),
+                                                                                     RubyCommand.Argument(name: "xcconfig", value: xcconfig),
                                                                                      RubyCommand.Argument(name: "configuration", value: configuration),
                                                                                      RubyCommand.Argument(name: "xcpretty_output", value: xcprettyOutput),
                                                                                      RubyCommand.Argument(name: "verbose", value: verbose)])
@@ -3365,7 +3377,8 @@ func supply(packageName: String,
             rootUrl: String? = nil,
             checkSupersededTracks: Bool = false,
             timeout: Int = 300,
-            deactivateOnPromote: Bool = true) {
+            deactivateOnPromote: Bool = true,
+            versionCodesToRetain: [String]? = nil) {
   let command = RubyCommand(commandID: "", methodName: "supply", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
                                                                                         RubyCommand.Argument(name: "track", value: track),
                                                                                         RubyCommand.Argument(name: "rollout", value: rollout),
@@ -3390,7 +3403,8 @@ func supply(packageName: String,
                                                                                         RubyCommand.Argument(name: "root_url", value: rootUrl),
                                                                                         RubyCommand.Argument(name: "check_superseded_tracks", value: checkSupersededTracks),
                                                                                         RubyCommand.Argument(name: "timeout", value: timeout),
-                                                                                        RubyCommand.Argument(name: "deactivate_on_promote", value: deactivateOnPromote)])
+                                                                                        RubyCommand.Argument(name: "deactivate_on_promote", value: deactivateOnPromote),
+                                                                                        RubyCommand.Argument(name: "version_codes_to_retain", value: versionCodesToRetain)])
   _ = runner.executeCommand(command)
 }
 func swiftlint(mode: String = "lint",
@@ -3865,7 +3879,8 @@ func uploadToPlayStore(packageName: String,
                        rootUrl: String? = nil,
                        checkSupersededTracks: Bool = false,
                        timeout: Int = 300,
-                       deactivateOnPromote: Bool = true) {
+                       deactivateOnPromote: Bool = true,
+                       versionCodesToRetain: [String]? = nil) {
   let command = RubyCommand(commandID: "", methodName: "upload_to_play_store", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
                                                                                                       RubyCommand.Argument(name: "track", value: track),
                                                                                                       RubyCommand.Argument(name: "rollout", value: rollout),
@@ -3890,7 +3905,8 @@ func uploadToPlayStore(packageName: String,
                                                                                                       RubyCommand.Argument(name: "root_url", value: rootUrl),
                                                                                                       RubyCommand.Argument(name: "check_superseded_tracks", value: checkSupersededTracks),
                                                                                                       RubyCommand.Argument(name: "timeout", value: timeout),
-                                                                                                      RubyCommand.Argument(name: "deactivate_on_promote", value: deactivateOnPromote)])
+                                                                                                      RubyCommand.Argument(name: "deactivate_on_promote", value: deactivateOnPromote),
+                                                                                                      RubyCommand.Argument(name: "version_codes_to_retain", value: versionCodesToRetain)])
   _ = runner.executeCommand(command)
 }
 func uploadToTestflight(username: String,
@@ -4177,4 +4193,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.38]
+// FastlaneRunnerAPIVersion [0.9.39]
