@@ -64,6 +64,8 @@ module Frameit
           rescue => ex
             UI.error(ex.to_s)
             UI.error("Backtrace:\n\t#{ex.backtrace.join("\n\t")}") if FastlaneCore::Globals.verbose?
+          ensure
+            Helper.error_loading_indicator # If the spinner is still running, make sure it indicates and error
           end
         end
       else

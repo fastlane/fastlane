@@ -343,6 +343,12 @@ module FastlaneCore
       end
     end
 
+    def self.error_loading_indicator
+      if self.should_show_loading_indicator? && @require_fastlane_spinner
+        @require_fastlane_spinner.error
+      end
+    end
+
     # files
     #
 
