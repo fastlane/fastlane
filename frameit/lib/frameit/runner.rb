@@ -15,6 +15,8 @@ module Frameit
     end
 
     def run(path, color = nil)
+
+      # color config (unless specified via CLI)
       unless color
         color = Frameit::Color::BLACK
         color = Frameit::Color::SILVER if Frameit.config[:white] || Frameit.config[:silver]
@@ -26,12 +28,14 @@ module Frameit
 
       if screenshots.count > 0
         screenshots.each do |full_path|
+          # skip screenshots we are not interested in
           next if full_path.include?("_framed.png")
           next if full_path.include?(".itmsp/") # a package file, we don't want to modify that
           next if full_path.include?("device_frames/") # these are the device frames the user is using
+          # skip all Apple Watch screenshots: we don't care about watches right now
           if apple_watch_screenshot?(full_path)
             UI.error("Apple Watch screenshots are not framed: '#{full_path}'")
-            next # we don't care about watches right now
+            next
           end
 
           #new

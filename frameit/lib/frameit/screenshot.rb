@@ -18,14 +18,17 @@ module Frameit
     # color: Color to use for the frame
     def initialize(path, color)
       UI.user_error!("Couldn't find file at path '#{path}'") unless File.exist?(path)
-      @color = color
+      @color = color # TODO remove color, has nothing to do with actual screenshot
       @path = path
       @size = FastImage.size(path)
 
+      # 
       @screen_size = ENV["FRAMEIT_FORCE_DEVICE_TYPE"] || Deliver::AppScreenshot.calculate_screen_size(path)
     end
 
     # Device name for a given screen size. Used to use the correct template
+    # TODO move to Deliver as well similar to `calculate_screen_size`
+    # TODO also save this as @device_name in initialize instead of using this method all throughout the code
     def device_name
       # rubocop:disable Require/MissingRequireStatement
       sizes = Deliver::AppScreenshot::ScreenSize
@@ -56,6 +59,7 @@ module Frameit
       # rubocop:enable Require/MissingRequireStatement
     end
 
+    # TODO move to Deliver as well similar to `calculate_screen_size`
     def color
       if !Frameit.config[:use_legacy_iphone6s] && @color == Frameit::Color::BLACK
         if @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_47
@@ -67,16 +71,19 @@ module Frameit
       return @color
     end
 
+    # TODO move to Deliver as well similar to `calculate_screen_size`
     # Is the device a 3x device? (e.g. iPhone 6 Plus, iPhone X)
     def triple_density?
       (screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || screen_size == Deliver::AppScreenshot::ScreenSize::IOS_58 || screen_size == Deliver::AppScreenshot::ScreenSize::IOS_65)
     end
 
+    # TODO move to Deliver as well similar to `calculate_screen_size`
     # Super old devices (iPhone 4)
     def mini?
       (screen_size == Deliver::AppScreenshot::ScreenSize::IOS_35)
     end
 
+    # TODO move to Deliver as well similar to `calculate_screen_size`
     def mac?
       return device_name == 'MacBook'
     end
@@ -87,16 +94,16 @@ module Frameit
       return Orientation::LANDSCAPE
     end
 
+    # TODO is this really the _frame_ orientation? If yes, remove it from here as it is not really about the screenshot
     def frame_orientation
       filename = File.basename(self.path, ".*")
-      block = Frameit.config[:force_orientation_block]
 
+      block = Frameit.config[:force_orientation_block]
       unless block.nil?
         orientation = block.call(filename)
         valid = [:landscape_left, :landscape_right, :portrait, nil]
         UI.user_error("orientation_block must return #{valid[0..-2].join(', ')} or nil") unless valid.include?(orientation)
       end
-
       puts("Forced orientation: #{orientation}") unless orientation.nil?
 
       return orientation unless orientation.nil?
