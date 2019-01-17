@@ -87,6 +87,7 @@ module Frameit
       config_path = File.join(File.expand_path("../..", path), "Framefile.json") unless File.exist?(config_path)
       file = ConfigParser.new.load(config_path)
       return {} unless file # no config file at all
+      @config = {} if !@config
       @config[path] = file.fetch_value(path)
     end
   end
