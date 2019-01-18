@@ -34,7 +34,7 @@ module Frameit
         return
       end
 
-      if should_add_title?
+      if is_complex_framing_mode?
         @image = complex_framing
       else
         # easy mode from 1.0 - no title or background
@@ -63,7 +63,7 @@ module Frameit
     end
 
     def should_skip?
-      return should_add_title? && !fetch_text(:title)
+      return is_complex_framing_mode? && !fetch_text(:title)
     end
 
     private
@@ -124,7 +124,7 @@ module Frameit
     end
 
     # Do we add a background and title as well?
-    def should_add_title?
+    def is_complex_framing_mode?
       return (fetch_config['background'] and (fetch_config['title'] or fetch_config['keyword']))
     end
 
