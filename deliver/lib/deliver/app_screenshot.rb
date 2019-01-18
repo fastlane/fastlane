@@ -216,6 +216,7 @@ module Deliver
       }
     end
 
+    # reference: https://help.apple.com/app-store-connect/#/devd274dd925
     def self.devices
       return {
         ScreenSize::IOS_65 => [
@@ -237,21 +238,21 @@ module Deliver
         ScreenSize::IOS_40 => [
           [640, 1136],
           [640, 1096],
-          [1136, 600] # landscape status bar is smaller
+          [1136, 600] # landscape without status bar
         ],
         ScreenSize::IOS_35 => [
           [640, 960],
           [640, 920],
-          [960, 600] # landscape status bar is smaller
+          [960, 600] # landscape without status bar
         ],
-        ScreenSize::IOS_IPAD => [
+        ScreenSize::IOS_IPAD => [ # 9.7 inch
           [1024, 748],
           [1024, 768],
           [2048, 1496],
           [2048, 1536],
-          [768, 1004],
+          [768, 1004], # portrait without status bar
           [768, 1024],
-          [1536, 2008],
+          [1536, 2008], # portrait without status bar
           [1536, 2048]
         ],
         ScreenSize::IOS_IPAD_10_5 => [
@@ -269,8 +270,8 @@ module Deliver
         ScreenSize::MAC => [
           [1280, 800],
           [1440, 900],
-          [2880, 1800],
-          [2560, 1600]
+          [2560, 1600],
+          [2880, 1800]
         ],
         ScreenSize::IOS_APPLE_WATCH => [
           [312, 390]
@@ -279,7 +280,8 @@ module Deliver
           [368, 448]
         ],
         ScreenSize::APPLE_TV => [
-          [1920, 1080]
+          [1920, 1080],
+          [3840, 2160]
         ]
       }
     end
