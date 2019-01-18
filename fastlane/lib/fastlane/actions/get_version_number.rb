@@ -106,14 +106,17 @@ module Fastlane
       end
 
       def self.details
-        "This action will return the current version number set on your project."
+        [
+          "This action will return the current version number set on your project.",
+          "Make sure that any frameworks or test targets don't have different version numbers from the main project, as it can cause the wrong version number to be returned. Note that some references to the version may not show within the Xcode UI, so worth checking the project file XML and Info.plist files to be sure too."
+        ].join("\n")
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
                              env_name: "FL_VERSION_NUMBER_PROJECT",
-                             description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
+                             description: "Path to the main Xcode project to read version number from, optional. By default will use the first Xcode project found within the project root directory",
                              optional: true,
                              verify_block: proc do |value|
                                UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
@@ -121,11 +124,11 @@ module Fastlane
                              end),
           FastlaneCore::ConfigItem.new(key: :target,
                              env_name: "FL_VERSION_NUMBER_TARGET",
-                             description: "Specify a specific target if you have multiple per project, optional",
+                             description: "Target name, optional. Will be needed if you have more than one non-test target, to avoid being prompted to select one",
                              optional: true),
           FastlaneCore::ConfigItem.new(key: :configuration,
                              env_name: "FL_VERSION_NUMBER_CONFIGURATION",
-                             description: "Specify a specific configuration if you have multiple per target, optional",
+                             description: "Configuration name, optional. Will be needed if you have altered the configurations from the default or your version number depends on the configuration selected",
                              optional: true)
         ]
       end
@@ -146,7 +149,11 @@ module Fastlane
 
       def self.example_code
         [
-          'version = get_version_number(xcodeproj: "Project.xcodeproj")'
+          'version = get_version_number(xcodeproj: "Project.xcodeproj")',
+          'version = get_version_number(
+            xcodeproj: "Project.xcodeproj",
+            target: "App"
+          )'
         ]
       end
 
