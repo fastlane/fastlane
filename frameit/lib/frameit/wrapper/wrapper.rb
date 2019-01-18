@@ -195,10 +195,11 @@ module Frameit
     # Puts @image centered into the background
     def put_device_into_background(background)
       left_space = (background.width / 2.0 - image.width / 2.0).round
+      top_space = device_top(background)
 
       @image = background.composite(image, "png") do |c|
         c.compose("Over")
-        c.geometry("+#{left_space}+#{device_top(background)}")
+        c.geometry("+#{left_space}+#{top_space}")
       end
 
       return image
