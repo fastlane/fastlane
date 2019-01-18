@@ -24,7 +24,7 @@ module Snapshot
             @data_by_language[language] ||= {}
             @data_by_language[language][output_name] ||= []
 
-            screen_name = file_name.sub(key_name+'-', '').sub('.png', '')
+            screen_name = file_name.sub(key_name + '-', '').sub('.png', '')
             @data_by_screen[screen_name] ||= {}
             @data_by_screen[screen_name][output_name] ||= {}
 
