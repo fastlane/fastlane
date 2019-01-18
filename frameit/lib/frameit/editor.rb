@@ -11,9 +11,10 @@ module Frameit
     attr_accessor :screenshot # reference to the screenshot object to fetch the path, title, etc.
     attr_accessor :debug_mode
     attr_accessor :frame_path
+    attr_accessor :config # Framefile
     attr_accessor :frame # the frame of the device
     attr_accessor :image # the current image used for editing
-    attr_accessor :config # Framefile
+    
 
     def initialize(screenshot, debug_mode = false)
       @screenshot = screenshot
@@ -35,6 +36,8 @@ module Frameit
         # Couldn't find device frame (probably an iPhone 4, for which there are no images available any more)
         # Message is already shown elsewhere
         return
+      else
+        # Mac doesn't need a frame
       end
 
       if is_complex_framing_mode?
