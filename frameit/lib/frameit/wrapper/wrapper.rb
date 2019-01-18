@@ -164,7 +164,7 @@ module Frameit
     # TODO
     def device_top(background)
       @device_top ||= begin
-        if title_below_image
+        if title_below_image?
           background.height - effective_text_height - image.height
         else
           effective_text_height
@@ -172,8 +172,8 @@ module Frameit
       end
     end
 
-    def title_below_image
     # text below image? (default: false)
+    def title_below_image?
       @title_below_image ||= self.config['title_below_image']
     end
 
@@ -244,7 +244,7 @@ module Frameit
 
       self.space_to_device += title.height + keyword.height + spacing_between_title_and_keyword + vertical_padding
 
-      if title_below_image
+      if title_below_image?
         keyword_top = background.height - effective_text_height / 2 - (keyword.height + spacing_between_title_and_keyword + title.height) / 2
       else
         keyword_top = device_top(background) / 2 - spacing_between_title_and_keyword / 2 - keyword.height
@@ -279,8 +279,6 @@ module Frameit
       sum_width = title.width
       sum_width += keyword.width + keyword_padding if keyword
 
-      title_below_image = self.config['title_below_image']
-
       # Resize the 2 labels if they exceed the available space either horizontally or vertically:
       image_scale_factor = 1.0 # default
       ratio_horizontal = sum_width / (image.width.to_f - horizontal_frame_padding * 2) # The fraction of the text images compared to the left and right padding
@@ -301,7 +299,7 @@ module Frameit
 
       self.space_to_device += actual_font_size + vertical_padding
 
-      if title_below_image
+      if title_below_image?
         title_top = background.height - effective_text_height / 2 - title.height / 2
       else
         title_top = device_top(background) / 2 - title.height / 2
