@@ -10,7 +10,6 @@ module Frameit
   class Wrapper
     attr_accessor :screenshot # reference to the image object (screenshot or framed screenshot) to fetch the path, title, etc.
     attr_accessor :image # the current image used for editing
-    attr_accessor :space_to_device
     attr_accessor :config # Framefile
 
     def wrap!(screenshot, config, size)
@@ -68,7 +67,7 @@ module Frameit
       # 1: create background with correct size
       background = generate_background
 
-      self.space_to_device = vertical_frame_padding
+      @space_to_device = vertical_frame_padding
 
       if self.config['title']
         # 2: put text onto background
@@ -110,7 +109,7 @@ module Frameit
     # Padding around Frame
     #
 
-    # Horizontal adding around the frames
+    # Horizontal padding around the frames
     def horizontal_frame_padding
       padding = self.config['padding']
       if padding.kind_of?(String) && padding.split('x').length == 2
@@ -119,7 +118,7 @@ module Frameit
       return scale_padding(padding)
     end
 
-    # Vertical adding around the frames
+    # Vertical padding around the frames
     def vertical_frame_padding
       padding = self.config['padding']
 
@@ -154,7 +153,7 @@ module Frameit
     end
 
     def effective_text_height
-      [space_to_device, title_min_height].max
+      [@space_to_device, title_min_height].max
     end
 
     #
@@ -243,7 +242,7 @@ module Frameit
       title_left_space = (background.width / 2.0 - title.width / 2.0).round
       keyword_left_space = (background.width / 2.0 - keyword.width / 2.0).round
 
-      self.space_to_device += title.height + keyword.height + spacing_between_title_and_keyword + vertical_padding
+      @space_to_device += title.height + keyword.height + spacing_between_title_and_keyword + vertical_padding
 
       if title_below_image?
         keyword_top = background.height - effective_text_height / 2 - (keyword.height + spacing_between_title_and_keyword + title.height) / 2
@@ -298,7 +297,7 @@ module Frameit
       vertical_padding = vertical_frame_padding # assign padding to variable
       left_space = (background.width / 2.0 - sum_width / 2.0).round
 
-      self.space_to_device += actual_font_size + vertical_padding
+      @space_to_device += actual_font_size + vertical_padding
 
       if title_below_image?
         title_top = background.height - effective_text_height / 2 - title.height / 2
