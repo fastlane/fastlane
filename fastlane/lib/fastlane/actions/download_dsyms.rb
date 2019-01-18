@@ -113,7 +113,7 @@ module Fastlane
       end
 
       def self.get_version(latest_version)
-        candidate_build = latest_version.candidate_builds.first
+        candidate_build = latest_version.candidate_builds.max_by(&:upload_date)
         if candidate_build.nil?
           latest_version.version
         else
