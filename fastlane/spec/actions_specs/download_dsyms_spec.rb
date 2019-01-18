@@ -51,11 +51,11 @@ describe Fastlane do
           # latest
           allow(app).to receive(:edit_version).and_return(version)
           allow(version).to receive(:version).and_return('2.0.0')
-          allow(version).to receive(:build_version).and_return('2')
           allow(version).to receive(:candidate_builds).and_return([build2, build3])
           allow(build2).to receive(:train_version).and_return('2.0.0')
           allow(build2).to receive(:upload_date).and_return(1_547_145_145_000)
           allow(build3).to receive(:train_version).and_return('2.0.0')
+          allow(build3).to receive(:build_version).and_return('2')
           allow(build3).to receive(:upload_date).and_return(1_547_196_482_000)
         end
         it 'downloads only dsyms of latest build in latest train' do

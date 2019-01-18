@@ -35,8 +35,15 @@ module Fastlane
 
           UI.user_error!("Could not find latest version for your app, please try setting a specific version") if latest_version.version.nil?
 
-          version = get_version(latest_version)
-          build_number = latest_version.build_version
+          latest_candidate_build = latest_version.candidate_builds.max_by(&:upload_date)
+          if latest_candidate_build.nil?
+            version = latest_version.version
+            build_number = latest_version.build_version
+          else
+            # The build_version of a candidate build does not always match the one in latest_version so get the version and build number from the same place.
+            version = latest_candidate_build.train_version
+            build_number = latest_candidate_build.build_version
+          end
         end
 
         # Make sure output_directory has a slash on the end
@@ -111,16 +118,6 @@ module Fastlane
         Actions.lane_context[SharedValues::DSYM_PATHS] ||= []
         Actions.lane_context[SharedValues::DSYM_PATHS] << File.expand_path(path)
       end
-
-      def self.get_version(latest_version)
-        candidate_build = latest_version.candidate_builds.max_by(&:upload_date)
-        if candidate_build.nil?
-          latest_version.version
-        else
-          candidate_build.train_version
-        end
-      end
-      private_class_method :get_version
 
       def self.write_dsym(data, bundle_id, train_number, build_number, output_directory)
         file_name = "#{bundle_id}-#{train_number}-#{build_number}.dSYM.zip"
