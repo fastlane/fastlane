@@ -65,14 +65,17 @@ module Frameit
 
     # more complex mode: background, frame and title
     def wrap_it(size)
+      # 1: create background with correct size
       background = generate_background
 
       self.space_to_device = vertical_frame_padding
 
       if self.config['title']
+        # 2: put text onto background
         background = put_title_into_background(background, self.config['stack_title'])
       end
 
+      # 3: do stuff to frame/@image ???
       #if self.frame # we have no frame on le mac
         resize_frame!
         #put_into_frame
@@ -96,10 +99,16 @@ module Frameit
         end
       #end
 
+      # 4: put "device" (frame + screenshot I guess??) onto background
       @image = put_device_into_background(background)
 
       image
     end
+
+
+    #
+    # Padding around Frame
+    #
 
     # Horizontal adding around the frames
     def horizontal_frame_padding
@@ -113,11 +122,25 @@ module Frameit
     # Vertical adding around the frames
     def vertical_frame_padding
       padding = self.config['padding']
+
       if padding.kind_of?(String) && padding.split('x').length == 2
         padding = padding.split('x')[1].to_i
       end
       return scale_padding(padding)
     end
+
+    def scale_padding(padding)
+      if padding.kind_of?(String) && padding.end_with?('%')
+        padding = ([image.width, image.height].min * padding.to_f * 0.01).ceil
+      end
+      multi = 1.0
+      multi = 1.7 if self.screenshot.triple_density? # TODO magic number?
+      return padding * multi
+    end
+
+    #
+    # Text height
+    #
 
     # Minimum height for the title
     def title_min_height
@@ -130,19 +153,15 @@ module Frameit
       end
     end
 
-    def scale_padding(padding)
-      if padding.kind_of?(String) && padding.end_with?('%')
-        padding = ([image.width, image.height].min * padding.to_f * 0.01).ceil
-      end
-      multi = 1.0
-      multi = 1.7 if self.screenshot.triple_density?
-      return padding * multi
-    end
-
     def effective_text_height
       [space_to_device, title_min_height].max
     end
 
+    #
+    # TODO
+    #
+
+    # TODO
     def device_top(background)
       @device_top ||= begin
         if title_below_image
@@ -154,8 +173,13 @@ module Frameit
     end
 
     def title_below_image
+    # text below image? (default: false)
       @title_below_image ||= self.config['title_below_image']
     end
+
+    #
+    # Background
+    #
 
     # Returns a correctly sized background image
     def generate_background
@@ -168,6 +192,7 @@ module Frameit
       background
     end
 
+    # Puts @image centered into the background
     def put_device_into_background(background)
       left_space = (background.width / 2.0 - image.width / 2.0).round
 
@@ -179,6 +204,10 @@ module Frameit
       return image
     end
 
+    #
+    # TODO
+    #
+
     # Resize the frame as it's too low quality by default
     # TODO What does that mean?
     def resize_frame!
@@ -189,6 +218,10 @@ module Frameit
       frame.resize("#{new_frame_width.round}x") # resize it to the calculated width
       modify_offset(multiplicator) # modify the offset to properly insert the screenshot into the frame later
     end
+
+    #
+    # Text
+    #
 
     def resize_text(text)
       width = text.width
@@ -305,7 +338,7 @@ module Frameit
 
     # This will build up to 2 individual images with the title and optional keyword, which will then be added to the real image
     def build_text_images(max_width, max_height, stack_title)
-      words = [:keyword, :title].keep_if { |a| fetch_text(a) } # optional keyword/title
+      words = [:keyword, :title].keep_if { |a| fetch_text(a) } # optional keyword/title # TODO move this outside and supply the `words` has as a param to the method
       results = {}
       trim_boxes = {}
       top_vertical_trim_offset = Float::INFINITY # Init at a large value, as the code will search for a minimal value.
@@ -399,9 +432,8 @@ module Frameit
       results
     end
 
-    
-
     # Fetches the title + keyword for this particular screenshot
+    # from *.strings or Framefile.json as fallback
     def fetch_text(type)
       UI.user_error!("Valid parameters :keyword, :title") unless [:keyword, :title].include?(type)
 
