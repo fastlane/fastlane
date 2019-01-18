@@ -59,11 +59,17 @@ module Frameit
           begin
             screenshot = Screenshot.new(full_path, color)
             screenshot.frame!(config)
+<<<<<<< HEAD
             screenshot.wrap!(config)
           #old
             #old2
             screenshot.wrap!(config, size) # TODO where do we get a size from?
             #/old2
+=======
+            #old3
+            screenshot.wrap!(config, size) if is_complex_framing?(config) # TODO where do we get a size from?
+            #/old3
+>>>>>>> move decision if to call wrapper/complex to runner
           rescue => ex
             UI.error(ex.to_s)
             UI.error("Backtrace:\n\t#{ex.backtrace.join("\n\t")}") if FastlaneCore::Globals.verbose?
@@ -80,6 +86,11 @@ module Frameit
       device = full_path.rpartition('/').last.partition('-').first # extract device name
       device.downcase.include?("watch")
     end 
+
+    # Do we add a background and title as well?
+    def is_complex_framing?(config)
+      return (config['background'] and (config['title'] or config['keyword']))
+    end
 
     # Loads the config (colors, background, texts, etc.)
     # Don't use this method to access the actual text and use `fetch_texts` instead

@@ -16,8 +16,6 @@ module Frameit
     def wrap!(screenshot, config, size)
       self.screenshot = screenshot
       self.config = config
-
-      return if !should_add_title?
       
       prepare_image
 
@@ -27,11 +25,6 @@ module Frameit
     end
 
     private
-
-    # Do we add a background and title as well?
-    def should_add_title?
-      return (self.config['background'] and (self.config['title'] or self.config['keyword']))
-    end
 
     def prepare_image
       @image = MiniMagick::Image.open(screenshot.path)
