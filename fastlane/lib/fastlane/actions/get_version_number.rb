@@ -108,7 +108,7 @@ module Fastlane
       def self.details
         [
           "This action will return the current version number set on your project.",
-          "Make sure that any frameworks or test targets don't have different version numbers from the main project, as it can cause the wrong version number to be returned. Note that some references to the version may not show within the Xcode UI, so worth checking the project file XML and Info.plist files to be sure too."
+          "Make sure that any frameworks or test targets don't have different version numbers from the main project to prevent the wrong version number to be returned. Note that some references to the version may not show within the Xcode UI but are viewable in project file XML and Info.plist files."
         ].join("\n")
       end
 
@@ -124,7 +124,7 @@ module Fastlane
                              end),
           FastlaneCore::ConfigItem.new(key: :target,
                              env_name: "FL_VERSION_NUMBER_TARGET",
-                             description: "Target name, optional. Will be needed if you have more than one non-test target, to avoid being prompted to select one",
+                             description: "Target name, optional. Will be needed if you have more than one non-test target to avoid being prompted to select one",
                              optional: true),
           FastlaneCore::ConfigItem.new(key: :configuration,
                              env_name: "FL_VERSION_NUMBER_CONFIGURATION",
