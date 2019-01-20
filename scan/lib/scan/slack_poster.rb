@@ -15,6 +15,8 @@ module Scan
         channel = ('#' + channel) unless ['#', '@'].include?(channel[0]) # send message to channel by default
       end
 
+      username = Scan.config[:slack_use_webhook_configured_username_and_icon] ? nil : Scan.config[:slack_username]
+      icon_url = Scan.config[:slack_use_webhook_configured_username_and_icon] ? nil : Scan.config[:slack_icon_url]
       fields = []
 
       if results[:build_errors]
@@ -46,8 +48,8 @@ module Scan
         channel: channel,
         slack_url: Scan.config[:slack_url].to_s,
         success: results[:build_errors].to_i == 0 && results[:failures].to_i == 0,
-        username: 'fastlane',
-        icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
+        username: username,
+        icon_url: icon_url,
         payload: {},
         attachment_properties: {
           fields: fields
