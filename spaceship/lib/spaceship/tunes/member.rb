@@ -57,7 +57,6 @@ module Spaceship
       def selected_apps
         parsed_apps = []
         all_apps = Application.all
-        $logger.info("[Fastlane/Spaceship] Found #{all_apps.count} apps")
         raw_data["userSoftwares"]["value"]["grantedSoftwareAdamIds"].each do |app_id|
           parsed_apps << all_apps.select { |app| !app.apple_id.nil? && app.apple_id == app_id }
         end
