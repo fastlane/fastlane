@@ -199,13 +199,16 @@ module Sigh
         true
       end
 
-      unless Sigh.config[:skip_certificate_verification]
-        certificates = certificates.find_all do |c|
-          file = Tempfile.new('cert')
-          file.write(c.download_raw)
-          file.close
+      # verify certificates
+      if Helper.mac?
+        unless Sigh.config[:skip_certificate_verification]
+          certificates = certificates.find_all do |c|
+            file = Tempfile.new('cert')
+            file.write(c.download_raw)
+            file.close
 
-          FastlaneCore::CertChecker.installed?(file.path)
+            FastlaneCore::CertChecker.installed?(file.path)
+          end
         end
       end
 
