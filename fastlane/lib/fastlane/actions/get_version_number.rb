@@ -106,10 +106,7 @@ module Fastlane
       end
 
       def self.details
-        [
-          "This action will return the current version number set on your project.",
-          "Make sure that any frameworks or test targets don't have different version numbers from the main project to prevent the wrong version number to be returned. Note that some references to the version may not show within the Xcode UI but are viewable in project file XML and Info.plist files."
-        ].join("\n")
+        "This action will return the current version number set on your project."
       end
 
       def self.available_options
