@@ -9,8 +9,9 @@ require_relative '../config_parser'
 module Frameit
   class Wrapper
     attr_accessor :screenshot # reference to the image object (screenshot or framed screenshot) to fetch the path, title, etc.
-    attr_accessor :image # the current image used for editing
+    
     attr_accessor :config # Framefile
+    attr_accessor :image # the current image used for editing
 
     def wrap!(screenshot, config, size)
       self.screenshot = screenshot

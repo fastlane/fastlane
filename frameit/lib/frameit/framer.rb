@@ -81,6 +81,7 @@ module Frameit
       image.write(output_path)
       Helper.hide_loading_indicator
       UI.success("Added frame: '#{File.expand_path(output_path)}'")
+      return output_path
     end
 
     def put_into_frame

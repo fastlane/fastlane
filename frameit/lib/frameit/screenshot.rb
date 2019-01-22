@@ -1,11 +1,8 @@
 require 'deliver/app_screenshot'
 require 'fastimage'
 
-require_relative 'editor'
-require_relative 'mac_editor'
 require_relative 'device_types'
 require_relative 'module'
-require_relative 'wrapper/wrapper'
 
 module Frameit
   # Represents one screenshot
@@ -13,13 +10,10 @@ module Frameit
     attr_accessor :path # path to the screenshot
     attr_accessor :size # size in px array of 2 elements: height and width
     attr_accessor :screen_size # deliver screen size type, is unique per device type, used in device_name
-    attr_accessor :color # the color to use for the frame (from Frameit::Color) # TODO remove, see below
 
     # path: Path to screenshot
-    # color: Color to use for the frame
-    def initialize(path, color)
+    def initialize(path)
       UI.user_error!("Couldn't find file at path '#{path}'") unless File.exist?(path)
-      @color = color # TODO remove color, has nothing to do with actual screenshot
       @path = path
       @size = FastImage.size(path)
 
@@ -61,33 +55,21 @@ module Frameit
     end
 
     # TODO move to Deliver as well similar to `calculate_screen_size`
-    def color
-      if !Frameit.config[:use_legacy_iphone6s] && @color == Frameit::Color::BLACK
-        if @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_47
-          return "Matte Black" # RIP space gray
-        elsif @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_61
-          return "Black"
-        end
-      end
-      return @color
-    end
-
-    # TODO move to Deliver as well similar to `calculate_screen_size`
     # Is the device a 3x device? (e.g. iPhone 6 Plus, iPhone X)
+    # used in wrapper
     def triple_density?
       (screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || screen_size == Deliver::AppScreenshot::ScreenSize::IOS_58 || screen_size == Deliver::AppScreenshot::ScreenSize::IOS_65)
     end
 
     # TODO move to Deliver as well similar to `calculate_screen_size`
-    # Super old devices (iPhone 4)
-    def mini?
-      (screen_size == Deliver::AppScreenshot::ScreenSize::IOS_35)
-    end
-
-    # TODO move to Deliver as well similar to `calculate_screen_size`
+    # used in runner
     def mac?
       return device_name == 'MacBook'
     end
+
+    #
+    # Screenshot orientation
+    #
 
     # The name of the orientation of a screenshot. Used to find the correct template
     def orientation_name
@@ -130,23 +112,6 @@ module Frameit
 
     def to_s
       self.path
-    end
-
-    # Add the device frame, this will also call the method that adds the background + title
-    def frame!(config)
-      if self.mac?
-        MacEditor.new.frame!(self, config)
-      else
-        Editor.new.frame!(self, config)
-      end
-    end
-
-    def wrap!(config)
-      if self.mac?
-        MacWrapper.new.wrap!(self, config)
-      else
-        Wrapper.new.wrap!(self, config)
-      end
     end
   end
 end

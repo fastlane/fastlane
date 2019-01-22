@@ -1,7 +1,10 @@
 require_relative 'frame_downloader'
 require_relative 'module'
+require_relative 'device_types' # color + orientation
 require_relative 'screenshot'
-require_relative 'device_types'
+require_relative 'frame'
+require_relative 'framer'
+require_relative 'wrapper'
 
 module Frameit
   class Runner
@@ -57,19 +60,37 @@ module Frameit
           config = fetch_config(full_path)
           
           begin
+
             screenshot = Screenshot.new(full_path, color)
             screenshot.frame!(config)
-<<<<<<< HEAD
+
             screenshot.wrap!(config)
           #old
             #old2
             screenshot.wrap!(config, size) # TODO where do we get a size from?
             #/old2
-=======
+
             #old3
             screenshot.wrap!(config, size) if is_complex_framing?(config) # TODO where do we get a size from?
             #/old3
->>>>>>> move decision if to call wrapper/complex to runner
+            
+            #merge4
+            # Start with plain screenshot
+            screenshot = Screenshot.new(full_path)
+
+            # Add the frame
+            frame = Frame.new(config, color)
+            framed_screenshot = Framer.new.frame!(screenshot, frame, config)
+            
+            # And optionally wrap it
+            if is_complex_framing?(config) # TODO where do we get a size from?
+              if self.mac?
+                wrapped_screenshot = MacWrapper.new.frame!(framed_screenshot, config, screenshot.size)
+              else
+                wrapped_screenshot = Wrapper.new.wrap!(framed_screenshot, config, screenshot.size)
+              end
+            end
+            #/merge4
           rescue => ex
             UI.error(ex.to_s)
             UI.error("Backtrace:\n\t#{ex.backtrace.join("\n\t")}") if FastlaneCore::Globals.verbose?

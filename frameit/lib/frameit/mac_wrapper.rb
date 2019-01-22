@@ -1,9 +1,9 @@
 require 'mini_magick'
-require_relative 'editor'
+require_relative 'wrapper'
 
 module Frameit
   # Responsible for framing Mac Screenshots
-  class MacEditor < Editor
+  class MacEditor < Wrapper
     def prepare_image
       image = super
       image.resize("#{offset['width']}x") if offset['width']
