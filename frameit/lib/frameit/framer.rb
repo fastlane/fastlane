@@ -4,10 +4,10 @@ require_relative 'template_finder'
 require_relative 'module'
 require_relative 'offsets'
 require_relative 'config_parser'
-require_relative 'device_types'
+require_relative 'device_types'  # color + orientation
 
 module Frameit
-  class Editor
+  class Framer
     attr_accessor :screenshot # reference to the screenshot object to fetch the path, title, etc.
     attr_accessor :debug_mode
     attr_accessor :frame_path
@@ -21,7 +21,8 @@ module Frameit
       self.debug_mode = debug_mode
     end
     
-    def frame!(screenshot, config)
+    #def frame!(screenshot, config)
+    def frame!(screenshot, frame, config)
       self.screenshot = screenshot
       self.config = config
       
@@ -32,7 +33,7 @@ module Frameit
         self.frame = MiniMagick::Image.open(@frame_path)
         # Rotate the frame according to the device orientation
         self.frame.rotate(self.rotation_for_device_orientation)
-      elsif self.class == Editor
+      elsif self.class == Framer
         # Couldn't find device frame (probably an iPhone 4, for which there are no images available any more)
         # Message is already shown elsewhere
         return

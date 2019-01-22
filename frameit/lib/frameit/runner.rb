@@ -4,7 +4,8 @@ require_relative 'device_types' # color + orientation
 require_relative 'screenshot'
 require_relative 'frame'
 require_relative 'framer'
-require_relative 'wrapper'
+require_relative 'wrapper/wrapper'
+require_relative 'wrapper/mac_wrapper'
 
 module Frameit
   class Runner

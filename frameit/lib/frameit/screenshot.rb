@@ -1,7 +1,7 @@
 require 'deliver/app_screenshot'
 require 'fastimage'
 
-require_relative 'device_types'
+require_relative 'device_types' # color + orientation
 require_relative 'module'
 
 module Frameit
