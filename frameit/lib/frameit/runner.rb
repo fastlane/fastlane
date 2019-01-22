@@ -20,6 +20,7 @@ module Frameit
       # color config (unless specified via CLI)
       unless color
         color = Frameit::Color::BLACK
+        # TODO remove these options and introduce a new `color` option
         color = Frameit::Color::SILVER if Frameit.config[:white] || Frameit.config[:silver]
         color = Frameit::Color::GOLD if Frameit.config[:gold]
         color = Frameit::Color::ROSE_GOLD if Frameit.config[:rose_gold]
