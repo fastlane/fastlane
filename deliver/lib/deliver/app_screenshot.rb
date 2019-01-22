@@ -6,6 +6,7 @@ module Deliver
   # AppScreenshot represents one screenshots for one specific locale and
   # device type.
   class AppScreenshot
+    #
     module ScreenSize
       # iPhone 4
       IOS_35 = "iOS-3.5-in"
@@ -21,6 +22,7 @@ module Deliver
       IOS_61 = "iOS-6.1-in"
       # iPhone XS Max
       IOS_65 = "iOS-6.5-in"
+
       # iPad
       IOS_IPAD = "iOS-iPad"
       # iPad 10.5
@@ -29,6 +31,7 @@ module Deliver
       IOS_IPAD_11 = "iOS-iPad-11"
       # iPad Pro
       IOS_IPAD_PRO = "iOS-iPad-Pro"
+
       # iPhone 5 iMessage
       IOS_40_MESSAGES = "iOS-4-in-messages"
       # iPhone 6 iMessage
@@ -41,6 +44,7 @@ module Deliver
       IOS_61_MESSAGES = "iOS-6.1-in-messages"
       # iPhone XS Max iMessage
       IOS_65_MESSAGES = "iOS-6.5-in-messages"
+
       # iPad iMessage
       IOS_IPAD_MESSAGES = "iOS-iPad-messages"
       # iPad 10.5 iMessage
@@ -49,14 +53,17 @@ module Deliver
       IOS_IPAD_11_MESSAGES = "iOS-11-messages"
       # iPad Pro iMessage
       IOS_IPAD_PRO_MESSAGES = "iOS-iPad-Pro-messages"
+
       # Apple Watch
       IOS_APPLE_WATCH = "iOS-Apple-Watch"
       # Apple Watch Series 4
       IOS_APPLE_WATCH_SERIES4 = "iOS-Apple-Watch-Series4"
-      # Mac
-      MAC = "Mac"
+
       # Apple TV
       APPLE_TV = "Apple-TV"
+
+      # Mac
+      MAC = "Mac"
     end
 
     # @return [Deliver::ScreenSize] the screen size (device type)
@@ -68,7 +75,7 @@ module Deliver
     attr_accessor :language
 
     # @param path (String) path to the screenshot file
-    # @param path (String) Language of this screenshot (e.g. English)
+    # @param language (String) Language of this screenshot (e.g. English)
     # @param screen_size (Deliver::AppScreenshot::ScreenSize) the screen size, which
     #  will automatically be calculated when you don't set it.
     def initialize(path, language, screen_size = nil)
