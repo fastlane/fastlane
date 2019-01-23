@@ -16,8 +16,11 @@ module Frameit
     attr_accessor :image # the current image used for editing
     attr_accessor :space_to_device
 
-    def frame!(screenshot)
-      self.screenshot = screenshot
+    def initialize(screenshot)
+      @screenshot = screenshot
+    end
+
+    def frame!
       prepare_image
 
       frame = load_frame
@@ -31,7 +34,7 @@ module Frameit
         return
       end
 
-      if should_add_title?
+      if is_complex_framing_mode?
         @image = complex_framing
       else
         # easy mode from 1.0 - no title or background
@@ -57,6 +60,10 @@ module Frameit
       return 90 if self.screenshot.landscape_right?
       return -90 if self.screenshot.landscape_left?
       return 0
+    end
+
+    def should_skip?
+      return is_complex_framing_mode? && !fetch_text(:title)
     end
 
     private
@@ -117,7 +124,7 @@ module Frameit
     end
 
     # Do we add a background and title as well?
-    def should_add_title?
+    def is_complex_framing_mode?
       return (fetch_config['background'] and (fetch_config['title'] or fetch_config['keyword']))
     end
 
@@ -484,12 +491,6 @@ module Frameit
 
       # No string files, fallback to Framefile config
       text = fetch_config[type.to_s]['text'] if fetch_config[type.to_s] && fetch_config[type.to_s]['text'] && fetch_config[type.to_s]['text'].length > 0 # Ignore empty string
-
-      if type == :title && !text
-        # title is mandatory
-        UI.user_error!("Could not get title for screenshot #{screenshot.path}. Please provide one in your Framefile.json or title.strings")
-      end
-
       return text
     end
 
