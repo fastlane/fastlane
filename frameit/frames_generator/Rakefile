@@ -64,7 +64,7 @@ end
 
 def confirm
   puts("Press any key when you're ready to continue".yellow)
-  gets
+  STDIN.gets
 end
 
 def sanitize_filename(filename)
