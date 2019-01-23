@@ -57,7 +57,7 @@ module Fastlane
                                        is_string: false,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :podspec,
-                                       description: "pod lib lint podspec name",
+                                       description: "Path of spec to lint",
                                        optional: true,
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :verbose,
