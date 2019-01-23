@@ -122,14 +122,5 @@ module Frameit
     def to_s
       self.path
     end
-
-    # Add the device frame, this will also call the method that adds the background + title
-    def frame!
-      if self.mac?
-        MacEditor.new.frame!(self)
-      else
-        Editor.new.frame!(self)
-      end
-    end
   end
 end
