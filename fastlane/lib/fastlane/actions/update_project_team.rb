@@ -6,17 +6,42 @@ module Fastlane
     class UpdateProjectTeamAction < Action
       def self.run(params)
         path = params[:path]
-        path = File.join(path, "project.pbxproj")
-        UI.user_error!("Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!") unless File.exist?(path)
 
-        UI.message("Updating development team (#{params[:teamid]}) for the given project '#{path}'")
+        # If a target is passed in then update it using the xcodeproj, else use simple regex
+        if params[:target]
+          UI.user_error!("Could not find path to xcodeproj '#{path}'. Pass the path to your project (not workspace)!") unless File.exist?(project_path)
+          target_name = params[:target]
 
-        p = File.read(path)
-        p.gsub!(/DevelopmentTeam = .*;/, "DevelopmentTeam = #{params[:teamid]};")
-        p.gsub!(/DEVELOPMENT_TEAM = .*;/, "DEVELOPMENT_TEAM = #{params[:teamid]};")
-        File.write(path, p)
+          # Load .xcodeproj
+          project = Xcodeproj::Project.open(project_path)
 
-        UI.success("Successfully updated project settings to use Developer Team ID '#{params[:teamid]}'")
+          # Fetch target
+          target = project.native_targets.find { |target| target.name == target_name }
+          UI.user_error!("Could not find target `#{target_name}` in the project `#{project_path}`") if target.nil?
+
+          UI.message("Updating development team (#{params[:teamid]}) for target `#{target_name}` in the project '#{project_path}'")
+          # Update the build settings
+          target.build_configurations.each do |configuration|
+            configuration.build_settings['DEVELOPMENT_TEAM'] = params[:teamid]
+          end
+
+          project.save
+
+          UI.success("Successfully updated project settings to use Developer Team ID '#{params[:teamid]}' for target `#{target_name}`")
+
+        else
+          project_path = File.join(path, "project.pbxproj")
+          UI.user_error!("Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!") unless File.exist?(project_path)
+
+          UI.message("Updating development team (#{params[:teamid]}) for the given project '#{project_path}'")
+
+          p = File.read(project_path)
+          p.gsub!(/DevelopmentTeam = .*;/, "DevelopmentTeam = #{params[:teamid]};")
+          p.gsub!(/DEVELOPMENT_TEAM = .*;/, "DEVELOPMENT_TEAM = #{params[:teamid]};")
+          File.write(project_path, p)
+
+          UI.success("Successfully updated project settings to use Developer Team ID '#{params[:teamid]}'")
+        end
       end
 
       def self.description
@@ -37,6 +62,10 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Path is invalid") unless File.exist?(value)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :target,
+                                       env_name: "FL_PROJECT_TARGET",
+                                       description: "Name of the target you want to update",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :teamid,
                                        env_name: "FL_PROJECT_TEAM_ID",
                                        description: "The Team ID you want to use",
