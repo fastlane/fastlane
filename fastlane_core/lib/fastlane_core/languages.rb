@@ -8,8 +8,8 @@ module FastlaneCore
     # The new format used from September 2015 on
     # This was generated from `Spaceship::Tunes.client.available_languages.sort`
     # Updates should also be made to:
-    #  - produce/lib/produce/available_default_languages.rb
-    #  -  spaceship/lib/assets/languageMapping.json
+    # - produce/lib/produce/available_default_languages.rb
+    # - spaceship/lib/assets/languageMapping.json
     # See pull request for example: https://github.com/fastlane/fastlane/pull/14110
     ALL_LANGUAGES = ["ca", "cs", "da", "de-DE", "el", "en-AU", "en-CA", "en-GB", "en-US", "es-ES", "es-MX", "fi", "fr-CA", "fr-FR", "hi", "hr", "hu", "id", "it", "ja", "ko", "ms", "nl-NL", "no", "pl", "pt-BR", "pt-PT", "ro", "ru", "sk", "sv", "th", "tr", "uk", "vi", "zh-Hans", "zh-Hant"]
   end
