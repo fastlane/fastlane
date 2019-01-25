@@ -55,7 +55,7 @@ module Match
           # Extract the Project ID from the `JSON` file
           # so the user doesn't have to provide it manually
           keys_file_content = JSON.parse(File.read(self.google_cloud_keys_file))
-          if google_cloud_project_id && google_cloud_project_id != keys_file_content["project_id"]
+          if google_cloud_project_id.to_s.length > 0 && google_cloud_project_id != keys_file_content["project_id"]
             UI.important("The google_cloud_keys_file's project ID ('#{keys_file_content['project_id']}') doesn't match the google_cloud_project_id ('#{google_cloud_project_id}'). This may be the wrong keys file.")
           end
           @google_cloud_project_id = keys_file_content["project_id"]
