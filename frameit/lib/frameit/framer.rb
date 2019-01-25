@@ -22,8 +22,8 @@ module Frameit
       @screenshot = screenshot
       self.debug_mode = debug_mode
     end
-            
-    def frame!(screenshot, frame, config, self.debug_mode = debug_mode)
+
+    def frame!(screenshot, frame, config, debug_mode = false)
       self.screenshot = screenshot
       self.config = config
       self.debug_mode = debug_mode
