@@ -40,7 +40,7 @@ module Frameit
             if screenshot.mac?
               editor = MacEditor.new(screenshot)
             else
-              editor = Editor.new(screenshot)
+              editor = Editor.new(screenshot, Frameit.config[:debug_mode])
             end
             if editor.should_skip?
               UI.message("Skipping framing of screenshot #{screenshot.path}.  No title provided in your Framefile.json or title.strings.")
