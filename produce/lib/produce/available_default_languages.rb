@@ -1,5 +1,9 @@
 module Produce
   class AvailableDefaultLanguages
+    # If you update this list, you probably also have to update these files:
+    # - fastlane_core/lib/fastlane_core/languages.rb
+    # - spaceship/lib/assets/languageMapping.json
+    # See this pull request for example: https://github.com/fastlane/fastlane/pull/14110
     def self.all_languages
       [
         "Catalan",
