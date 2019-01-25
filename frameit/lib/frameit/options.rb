@@ -70,7 +70,7 @@ module Frameit
                                      env_name: "FRAMEIT_DEBUG_MODE",
                                      description: "Output debug information in framed screenshots",
                                      default_value: false,
-                                     type: Boolean),
+                                     type: Boolean)
       ]
     end
   end

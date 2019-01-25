@@ -91,20 +91,20 @@ module Frameit
       # Debug Mode: Add filename to frame
       if self.debug_mode
         filename = File.basename(@frame_path, ".*")
-        filename.sub! 'Apple', '' # remove 'Apple'
+        filename.sub!('Apple', '') # remove 'Apple'
 
         width = screenshot.size[0]
-        font_size = width/20 # magic number that works well
+        font_size = width / 20 # magic number that works well
 
         offset_top = offset['offset'].split("+")[2].to_f
         annotate_offset = "+0+#{offset_top}" # magic number that works semi well
 
         frame.combine_options do |c|
-          c.gravity 'North'
-          c.undercolor '#00000080'
-          c.fill 'white'
-          c.pointsize font_size
-          c.annotate "#{annotate_offset}", "#{filename}"
+          c.gravity('North')
+          c.undercolor('#00000080')
+          c.fill('white')
+          c.pointsize(font_size)
+          c.annotate(annotate_offset.to_s, filename.to_s)
         end
       end
 
