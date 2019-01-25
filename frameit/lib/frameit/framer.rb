@@ -12,6 +12,8 @@ module Frameit
     attr_accessor :debug_mode
     attr_accessor :frame_path
     attr_accessor :config # Framefile
+    attr_accessor :debug_mode
+    attr_accessor :frame_path
     attr_accessor :frame # the frame of the device
     attr_accessor :image # the current image used for editing
     
@@ -20,11 +22,11 @@ module Frameit
       @screenshot = screenshot
       self.debug_mode = debug_mode
     end
-    
-    #def frame!(screenshot, config)
-    def frame!(screenshot, frame, config)
+            
+    def frame!(screenshot, frame, config, self.debug_mode = debug_mode)
       self.screenshot = screenshot
       self.config = config
+      self.debug_mode = debug_mode
       
       prepare_image
 
