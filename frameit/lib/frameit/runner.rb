@@ -76,7 +76,7 @@ module Frameit
               Helper.show_loading_indicator("Framing screenshot '#{full_path}'")
 
               # Add the frame
-              framed_screenshot = Framer.new.frame!(screenshot, frame, config)
+              framed_screenshot = Framer.new.frame!(screenshot, frame, config, Frameit.config[:debug_mode])
               
               # And optionally wrap it
               if is_complex_framing?(config)
