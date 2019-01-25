@@ -44,6 +44,7 @@ module Fastlane
 
       def self.services_mapping
         {
+            access_wifi: 'access_wifi',
             app_group: 'app_group',
             apple_pay: 'apple_pay',
             associated_domains: 'associated_domains',
