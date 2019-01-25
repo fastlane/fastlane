@@ -11,6 +11,7 @@ module Frameit
     def self.get_template(screenshot)
       return nil if screenshot.mac?
 
+      # TODO undo color hackfix
       filename = "Apple #{screenshot.device_name} Space Gray" #{screenshot.color}"
 
       templates = Dir["#{FrameDownloader.templates_path}/#{filename}.{png,jpg}"] # ~/.frameit folder
