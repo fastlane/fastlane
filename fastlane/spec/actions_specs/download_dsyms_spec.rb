@@ -20,12 +20,14 @@ describe Fastlane do
         allow(app).to receive(:tunes_all_build_trains).and_return([train, train2])
         # build_detail + download
         allow(build_detail).to receive(:dsym_url).and_return(download_url)
+        allow(app).to receive(:apple_id).and_return('123')
         allow(app).to receive(:bundle_id).and_return('tools.fastlane.myapp')
         allow(train).to receive(:version_string).and_return('1.0.0')
         allow(train2).to receive(:version_string).and_return('2.0.0')
         allow(build).to receive(:build_version).and_return('1')
         allow(build2).to receive(:build_version).and_return('2')
         allow(Fastlane::Actions::DownloadDsymsAction).to receive(:download)
+        allow(FastlaneCore::BuildWatcher).to receive(:wait_for_build_processing_to_be_complete)
       end
 
       context 'with no special options' do
