@@ -60,40 +60,33 @@ module Frameit
            #old 
           Helper.show_loading_indicator("Framing screenshot '#{full_path}'")
 
+          # Get the config from Framefile.json etc
           config = fetch_config(full_path)
           
           begin
-
-            screenshot = Screenshot.new(full_path, color)
-            screenshot.frame!(config)
-
-            screenshot.wrap!(config)
-          #old
-            #old2
-            screenshot.wrap!(config, size) # TODO where do we get a size from?
-            #/old2
-
-            #old3
-            screenshot.wrap!(config, size) if is_complex_framing?(config) # TODO where do we get a size from?
-            #/old3
-            
-            #merge4
             # Start with plain screenshot
             screenshot = Screenshot.new(full_path)
 
-            # Add the frame
+            # Get the frame
             frame = Frame.new(config, color)
-            framed_screenshot = Framer.new.frame!(screenshot, frame, config)
-            
-            # And optionally wrap it
-            if is_complex_framing?(config) # TODO where do we get a size from?
-              if self.mac?
-                wrapped_screenshot = MacWrapper.new.frame!(framed_screenshot, config, screenshot.size)
-              else
-                wrapped_screenshot = Wrapper.new.wrap!(framed_screenshot, config, screenshot.size)
+
+            if should_skip?
+              UI.message("Skipping framing of screenshot #{screenshot.path}. No title provided in your Framefile.json or title.strings.")
+            else
+              Helper.show_loading_indicator("Framing screenshot '#{full_path}'")
+
+              # Add the frame
+              framed_screenshot = Framer.new.frame!(screenshot, frame, config)
+              
+              # And optionally wrap it
+              if is_complex_framing?(config)
+                if self.mac?
+                  wrapped_screenshot = MacWrapper.new.frame!(framed_screenshot, config, screenshot.size)
+                else
+                  wrapped_screenshot = Wrapper.new.wrap!(framed_screenshot, config, screenshot.size)
+                end
               end
             end
-            #/merge4
           rescue => ex
             UI.error(ex.to_s)
             UI.error("Backtrace:\n\t#{ex.backtrace.join("\n\t")}") if FastlaneCore::Globals.verbose?
@@ -110,6 +103,10 @@ module Frameit
       device = full_path.rpartition('/').last.partition('-').first # extract device name
       device.downcase.include?("watch")
     end 
+
+    def should_skip?
+      return is_complex_framing? && !config['title']
+    end
 
     # Do we add a background and title as well?
     def is_complex_framing?(config)
