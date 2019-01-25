@@ -18,7 +18,7 @@ module Frameit
     attr_accessor :image # the current image used for editing
     attr_accessor :space_to_device
 
-    def initialize(screenshot, debug_mode)
+    def initialize(screenshot, debug_mode = false)
       @screenshot = screenshot
       self.debug_mode = debug_mode
     end
