@@ -27,11 +27,11 @@ module Frameit
       self.screenshot = screenshot
       self.config = config
       self.debug_mode = debug_mode
-      
+
       prepare_image
 
       @frame_path = load_frame
-      if @frame_path # Mac doesn't need a frame
+      if @frame_path 
         self.frame = MiniMagick::Image.open(@frame_path)
         # Rotate the frame according to the device orientation
         self.frame.rotate(self.rotation_for_device_orientation)
@@ -43,13 +43,7 @@ module Frameit
         # Mac doesn't need a frame
       end
 
-      if is_complex_framing_mode?
-        @image = complex_framing
-      else
-        # easy mode from 1.0 - no title or background
-        put_into_frame # put it in the frame
-      end
-      # put_into_frame # put it in the frame
+      put_into_frame # put it in the frame
 
       store_result # write to file system
     end
