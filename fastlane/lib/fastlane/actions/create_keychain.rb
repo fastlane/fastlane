@@ -63,7 +63,7 @@ module Fastlane
       def self.exists?(keychain_path)
         keychain_path = File.expand_path(keychain_path)
 
-        # Creating Keycahins using the security
+        # Creating Keychains using the security
         # CLI appends `-db` to the file name.
         File.exist?("#{keychain_path}-db") || File.exist?(keychain_path)
       end
