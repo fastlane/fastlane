@@ -31,6 +31,7 @@ protocol DeliverfileProtocol: class {
   var itcProvider: String? { get }
   var runPrecheckBeforeSubmit: Bool { get }
   var precheckDefaultRuleLevel: String { get }
+  var individualMetadataItems: [String] { get }
   var appIcon: String? { get }
   var appleWatchAppIcon: String? { get }
   var copyright: String? { get }
@@ -90,6 +91,7 @@ extension DeliverfileProtocol {
   var itcProvider: String? { return nil }
   var runPrecheckBeforeSubmit: Bool { return true }
   var precheckDefaultRuleLevel: String { return "warn" }
+  var individualMetadataItems: [String] { return [] }
   var appIcon: String? { return nil }
   var appleWatchAppIcon: String? { return nil }
   var copyright: String? { return nil }
@@ -118,4 +120,4 @@ extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.4]
+// FastlaneRunnerAPIVersion [0.9.5]
