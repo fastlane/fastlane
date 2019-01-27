@@ -17,7 +17,7 @@ module Match
       attr_reader :platform
       attr_reader :bucket_name
       attr_reader :google_cloud_keys_file
-      attr_reader :project_id
+      attr_reader :google_cloud_project_id
 
       # Managed values
       attr_accessor :gc_storage
@@ -34,26 +34,34 @@ module Match
           type: params[:type].to_s,
           platform: params[:platform].to_s,
           google_cloud_bucket_name: params[:google_cloud_bucket_name],
-          google_cloud_keys_file: params[:google_cloud_keys_file]
+          google_cloud_keys_file: params[:google_cloud_keys_file],
+          google_cloud_project_id: params[:google_cloud_project_id]
         )
       end
 
       def initialize(type: nil,
                      platform: nil,
                      google_cloud_bucket_name: nil,
-                     google_cloud_keys_file: nil)
+                     google_cloud_keys_file: nil,
+                     google_cloud_project_id: nil)
         @type = type if type
         @platform = platform if platform
+        @google_cloud_project_id = google_cloud_project_id if google_cloud_project_id
         @bucket_name = google_cloud_bucket_name
 
-        @google_cloud_keys_file = ensure_keys_file_exists(google_cloud_keys_file)
+        @google_cloud_keys_file = ensure_keys_file_exists(google_cloud_keys_file, google_cloud_project_id)
 
-        # Extract the Project ID from the `JSON` file
-        # so the user doesn't have to provide it manually
-        keys_file_content = JSON.parse(File.read(self.google_cloud_keys_file))
-        @project_id = keys_file_content["project_id"]
-        if self.project_id.to_s.length == 0
-          UI.user_error!("Provided keys file on path #{File.expand_path(self.google_cloud_keys_file)} doesn't include required value for `project_id`")
+        if self.google_cloud_keys_file.to_s.length > 0
+          # Extract the Project ID from the `JSON` file
+          # so the user doesn't have to provide it manually
+          keys_file_content = JSON.parse(File.read(self.google_cloud_keys_file))
+          if google_cloud_project_id.to_s.length > 0 && google_cloud_project_id != keys_file_content["project_id"]
+            UI.important("The google_cloud_keys_file's project ID ('#{keys_file_content['project_id']}') doesn't match the google_cloud_project_id ('#{google_cloud_project_id}'). This may be the wrong keys file.")
+          end
+          @google_cloud_project_id = keys_file_content["project_id"]
+          if self.google_cloud_project_id.to_s.length == 0
+            UI.user_error!("Provided keys file on path #{File.expand_path(self.google_cloud_keys_file)} doesn't include required value for `project_id`")
+          end
         end
 
         # Create the Google Cloud Storage client
@@ -62,7 +70,7 @@ module Match
         begin
           self.gc_storage = Google::Cloud::Storage.new(
             credentials: self.google_cloud_keys_file,
-            project_id: self.project_id
+            project_id: self.google_cloud_project_id
           )
         rescue => ex
           UI.error(ex)
@@ -101,7 +109,7 @@ module Match
       end
 
       def human_readable_description
-        "Google Cloud Bucket [#{self.project_id}/#{self.bucket_name}]"
+        "Google Cloud Bucket [#{self.google_cloud_project_id}/#{self.bucket_name}]"
       end
 
       def upload_files(files_to_upload: [], custom_message: nil)
@@ -149,7 +157,7 @@ module Match
 
       # This method will make sure the keys file exists
       # If it's missing, it will help the user set things up
-      def ensure_keys_file_exists(google_cloud_keys_file)
+      def ensure_keys_file_exists(google_cloud_keys_file, google_cloud_project_id)
         if google_cloud_keys_file && File.exist?(google_cloud_keys_file)
           return google_cloud_keys_file
         end
@@ -159,8 +167,31 @@ module Match
         fastlane_folder_gc_keys_path = File.join(FastlaneCore::FastlaneFolder.path, DEFAULT_KEYS_FILE_NAME)
         return fastlane_folder_gc_keys_path if File.exist?(fastlane_folder_gc_keys_path)
 
-        # User doesn't seem to have provided a keys file
-        UI.message("Looks like you don't have a Google Cloud #{DEFAULT_KEYS_FILE_NAME.cyan} file yet")
+        if google_cloud_project_id.to_s.length > 0
+          # Check to see if this system has application default keys installed.
+          # These are the default keys that the Google Cloud APIs use when no other keys are specified.
+          # Users with the Google Cloud SDK installed can generate them by running...
+          # `gcloud auth application-default login`
+          # ...and then they'll be automatically available.
+          # The nice thing about these keys is they can be associated with the user's login in GCP
+          # (e.g. my_account@gmail.com), so teams can control access to the certificate bucket
+          # using a mailing list of developer logins instead of generating service accounts
+          # and keys.
+          application_default_keys = nil
+          begin
+            application_default_keys = Google::Auth.get_application_default
+          rescue
+            # This means no application default keys have been installed. That's perfectly OK,
+            # we can continue and ask the user if they want to use a keys file.
+          end
+
+          if application_default_keys && UI.confirm("Do you want to use this system's Google Cloud application default keys?")
+            return nil
+          end
+        end
+
+        # User doesn't seem to have provided a keys file.
+        UI.message("Looks like you don't have a Google Cloud #{DEFAULT_KEYS_FILE_NAME.cyan} file")
         UI.message("If you have one, make sure to put it into the '#{Dir.pwd}' directory and call it '#{DEFAULT_KEYS_FILE_NAME.cyan}'")
         unless UI.confirm("Do you want fastlane to help you to create a #{DEFAULT_KEYS_FILE_NAME} file?")
           UI.user_error!("Process stopped, run fastlane again to start things up again")
@@ -217,7 +248,7 @@ module Match
           if available_bucket_identifiers.count > 0
             @bucket_name = UI.select("What Google Cloud Storage bucket do you want to use? (you can define it using the `google_cloud_bucket_name` key)", available_bucket_identifiers)
           else
-            UI.error("Looks like your Google Cloud account for the project ID '#{self.project_id}' doesn't")
+            UI.error("Looks like your Google Cloud account for the project ID '#{self.google_cloud_project_id}' doesn't")
             UI.error("have any available storage buckets yet. Please visit the following URL")
             UI.message("")
             UI.message("\t\thttps://console.cloud.google.com/storage/browser".cyan)
