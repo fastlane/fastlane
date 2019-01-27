@@ -37,7 +37,8 @@ describe Match do
         type: config[:type],
         platform: config[:platform],
         google_cloud_bucket_name: "",
-        google_cloud_keys_file: ""
+        google_cloud_keys_file: "",
+        google_cloud_project_id: ""
       ).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download).and_return(nil)
@@ -104,7 +105,8 @@ describe Match do
         type: config[:type],
         platform: config[:platform],
         google_cloud_bucket_name: "",
-        google_cloud_keys_file: ""
+        google_cloud_keys_file: "",
+        google_cloud_project_id: ""
       ).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download).and_return(nil)

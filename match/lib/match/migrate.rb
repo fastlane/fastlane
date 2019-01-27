@@ -17,7 +17,8 @@ module Match
       # to ask for all the missing inputs *before* cloning the git repo
       google_cloud_storage = Storage.for_mode("google_cloud", {
         google_cloud_bucket_name: params[:google_cloud_bucket_name],
-        google_cloud_keys_file: params[:google_cloud_keys_file]
+        google_cloud_keys_file: params[:google_cloud_keys_file],
+        google_cloud_project_id: params[:google_cloud_project_id]
       })
 
       git_storage = Storage.for_mode("git", {
