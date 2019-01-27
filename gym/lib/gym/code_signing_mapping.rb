@@ -109,7 +109,7 @@ module Gym
       configuration = Gym.config[:configuration]
       configuration ||= extract_from_scheme.call if Gym.config[:scheme]
       configuration ||= self.project.default_build_settings(key: "CONFIGURATION")
-      configuration
+      return configuration
     end
 
     def detect_project_profile_mapping
