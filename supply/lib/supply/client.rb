@@ -13,12 +13,12 @@ module Supply
     attr_accessor :client
 
     def self.make_from_config(params: nil)
-      kei_io = service_account_authentication(params)
+      kei_io = service_account_authentication(params: params)
       return self.new(service_account_json: kei_io, params: params)
     end
 
     # Supply authentication file
-    def self.service_account_authentication(params = nil)
+    def self.service_account_authentication(params: nil)
       if params.nil?
         params = Supply.config
       end
@@ -100,7 +100,7 @@ module Supply
     # @!group Login
     #####################################################
 
-    def self.service_account_authentication(params = nil)
+    def self.service_account_authentication(params: nil)
       if params.nil?
         params = Supply.config
       end
