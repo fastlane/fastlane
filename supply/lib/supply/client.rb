@@ -108,10 +108,10 @@ module Supply
       if params[:json_key] || params[:json_key_data]
         super(params)
       else
-        if params[:path_to_key] && params[:issuer]
+        if params[:key] && params[:issuer]
           require 'google/api_client/auth/key_utils'
           UI.important("This type of authentication is deprecated. Please consider using JSON authentication instead")
-          key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(parms[:path_to_key]), 'notasecret')
+          key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(parms[:key]), 'notasecret')
           cred_json = {
             private_key: key.to_s,
             client_email: params[:issuer]
