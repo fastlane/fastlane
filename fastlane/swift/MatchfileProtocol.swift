@@ -14,6 +14,7 @@ protocol MatchfileProtocol: class {
   var cloneBranchDirectly: Bool { get }
   var googleCloudBucketName: String? { get }
   var googleCloudKeysFile: String? { get }
+  var googleCloudProjectId: String? { get }
   var keychainName: String { get }
   var keychainPassword: String? { get }
   var force: Bool { get }
@@ -22,6 +23,7 @@ protocol MatchfileProtocol: class {
   var skipDocs: Bool { get }
   var platform: String { get }
   var templateName: String? { get }
+  var outputPath: String? { get }
   var verbose: Bool { get }
 }
 
@@ -41,6 +43,7 @@ extension MatchfileProtocol {
   var cloneBranchDirectly: Bool { return false }
   var googleCloudBucketName: String? { return nil }
   var googleCloudKeysFile: String? { return nil }
+  var googleCloudProjectId: String? { return nil }
   var keychainName: String { return "login.keychain" }
   var keychainPassword: String? { return nil }
   var force: Bool { return false }
@@ -49,9 +52,10 @@ extension MatchfileProtocol {
   var skipDocs: Bool { return false }
   var platform: String { return "ios" }
   var templateName: String? { return nil }
+  var outputPath: String? { return nil }
   var verbose: Bool { return false }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.4]
+// FastlaneRunnerAPIVersion [0.9.5]
