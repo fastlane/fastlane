@@ -600,7 +600,7 @@ module Spaceship
       all_messages = []
 
       messages_request = request(:get, "https://olympus.itunes.apple.com/v1/contractMessages")
-      body = messagesRequest.body
+      body = messages_request.body
       if body
         body = JSON.parse(body) if body.kind_of?(String)
         body.map do |messages|
