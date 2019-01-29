@@ -13,6 +13,10 @@ module Supply
     attr_accessor :client
 
     def self.make_from_config(params: nil)
+      if params.nil?
+        params = Supply.config
+      end
+      
       kei_io = service_account_authentication(params: params)
       return self.new(service_account_json: kei_io, params: params)
     end
