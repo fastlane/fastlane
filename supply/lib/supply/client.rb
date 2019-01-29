@@ -19,10 +19,6 @@ module Supply
 
     # Supply authentication file
     def self.service_account_authentication(params: nil)
-      if params.nil?
-        params = Supply.config
-      end
-
       unless params[:json_key] || params[:json_key_data]
         if UI.interactive?
           UI.important("To not be asked about this value, you can specify it using 'json_key'")
@@ -101,10 +97,6 @@ module Supply
     #####################################################
 
     def self.service_account_authentication(params: nil)
-      if params.nil?
-        params = Supply.config
-      end
-
       if params[:json_key] || params[:json_key_data]
         super(params)
       else
