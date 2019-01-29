@@ -596,11 +596,10 @@ module Spaceship
     end
 
     # Get contract messages from App Store Connect's "olympus" endpoint
-    def fetch_program_license_agreement_messages()
-
+    def fetch_program_license_agreement_messages
       all_messages = []
 
-      messagesRequest = request(:get, "https://olympus.itunes.apple.com/v1/contractMessages")
+      messages_request = request(:get, "https://olympus.itunes.apple.com/v1/contractMessages")
       body = messagesRequest.body
       if body
         body = JSON.parse(body) if body.kind_of?(String)
