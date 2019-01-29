@@ -16,7 +16,7 @@ module Fastlane
           project = Xcodeproj::Project.open(project_path)
 
           # Fetch target
-          target = project.native_targets.find { |target| target.name == target_name }
+          target = project.native_targets.find { |native_target| native_target.name == target_name }
           UI.user_error!("Could not find target `#{target_name}` in the project `#{project_path}`") if target.nil?
 
           UI.message("Updating development team (#{params[:teamid]}) for target `#{target_name}` in the project '#{project_path}'")
