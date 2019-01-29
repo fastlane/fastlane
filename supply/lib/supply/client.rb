@@ -16,7 +16,6 @@ module Supply
       if params.nil?
         params = Supply.config
       end
-      
       kei_io = service_account_authentication(params: params)
       return self.new(service_account_json: kei_io, params: params)
     end
