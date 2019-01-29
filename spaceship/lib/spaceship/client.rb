@@ -595,6 +595,23 @@ module Spaceship
       ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
     end
 
+    # Get contract messages from App Store Connect's "olympus" endpoint
+    def fetch_program_license_agreement_messages()
+
+      all_messages = []
+
+      messagesRequest = request(:get, "https://olympus.itunes.apple.com/v1/contractMessages")
+      body = messagesRequest.body
+      if body
+        body = JSON.parse(body) if body.kind_of?(String)
+        body.map do |messages|
+          all_messages.push(messages["message"])
+        end
+      end
+
+      return all_messages
+    end
+
     #####################################################
     # @!group Helpers
     #####################################################
