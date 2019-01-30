@@ -215,6 +215,46 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 - These `.strings` files **MUST** be utf-8 (UTF-8) or utf-16 encoded (UTF-16 BE with BOM). They also must begin with an empty line. If you are having trouble see [issue #1740](https://github.com/fastlane/fastlane/issues/1740)
 - You **MUST** provide a background if you want titles. _frameit_ will not add the tiles if a background is not specified.
 
+### Screenshot orientation
+
+By default `frameit` adds a frame to your screenshot based on an orientation you took it. For a portrait (vertical orientation) it is going to add portrait frame and for a landscape (horizontal orientation) - landscape left.
+
+If you'd like to get a frame in a landscape right for your horizontal screenshots, you need to add `force_landscaperight` at the end of your screenshot's filename. 
+
+### `force_orientation_block`
+
+In a case you don't want to rename your screenshots or default behaviour does not meet your requirements, there's a way to customise it. In order to do so, you need to set `force_orientation_block` parameter.
+
+### Examples
+
+```ruby
+frameit(
+  path: "./fastlane/screenshots",
+  force_orientation_block: proc do |filename|
+    case filename
+      when "1Login" 
+        :landscape_left
+      when "2Profile"
+        :landscape_right
+      # and so on
+    end
+  end
+)
+```
+
+```ruby
+frameit(
+  silver: true,
+  path: "./fastlane/screenshots",
+  force_orientation_block: proc do |filename|
+    f = filename.downcase
+    if f.include?("landscape")
+      :landscape_right
+    end
+  end
+)
+```
+
 # Mac
 
 With _frameit_ it's possible to also frame macOS Application screenshots. You have to provide the following:
