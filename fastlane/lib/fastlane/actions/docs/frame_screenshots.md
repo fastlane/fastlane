@@ -217,7 +217,7 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 
 ### Screenshot orientation
 
-By default `frameit` adds a frame to your screenshot based on an orientation you took it. For a portrait (vertical orientation) it is going to add portrait frame and for a landscape (horizontal orientation) - landscape left.
+By default _frameit_ adds a frame to your screenshot based on an orientation you took it. For a portrait (vertical orientation) it is going to add portrait frame and for a landscape (horizontal orientation) - landscape left.
 
 If you'd like to get a frame in a landscape right for your horizontal screenshots, you need to add `force_landscaperight` at the end of your screenshot's filename. 
 
