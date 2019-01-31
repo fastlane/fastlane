@@ -16,16 +16,7 @@ module Frameit
       end
     end
 
-    def run(path, color = nil)
-
-      # color config (unless specified via CLI)
-      unless color
-        color = Frameit::Color::BLACK
-        # TODO remove these options and introduce a new `color` option
-        color = Frameit::Color::SILVER if Frameit.config[:white] || Frameit.config[:silver]
-        color = Frameit::Color::GOLD if Frameit.config[:gold]
-        color = Frameit::Color::ROSE_GOLD if Frameit.config[:rose_gold]
-      end
+    def run(path, cli_color = nil)
 
       screenshots = Dir.glob("#{path}/**/*.{png,PNG}").uniq # uniq because thanks to {png,PNG} there are duplicates
 
@@ -44,29 +35,30 @@ module Frameit
           end
 
           # Get the config from Framefile.json etc
-          config = fetch_config(full_path)
+          framefile_config = fetch_framefile_config_for_screenshot(full_path)
           
           begin
             # Start with plain screenshot
             screenshot = Screenshot.new(full_path)
 
-            # Get the frame
-            frame = Frame.new(screenshot, config, color)
+            # Get the correct frame for this screenshot (in the specified or configured color)
+            frame = Frame.new(screenshot, cli_color, framefile_config)
 
-            if should_skip?(config)
+            if should_skip?(framefile_config)
               UI.message("Skipping framing of screenshot #{screenshot.path}. No title provided in your Framefile.json or title.strings.")
             else
               Helper.show_loading_indicator("Framing screenshot '#{full_path}'")
 
               # Add the frame
-              framed_screenshot = Framer.new.frame!(screenshot, frame, config, Frameit.config[:debug_mode])
+              framed_screenshot = Framer.new.frame!(screenshot, frame, framefile_config) if frame
+              framed_screenshot = screenshot unless frame # Mac screenshots don't get a frame
 
               # And optionally wrap it
-              if is_complex_framing?(config)
+              if is_complex_framing?(framefile_config)
                 if self.mac?
-                  wrapped_screenshot = MacWrapper.new.frame!(framed_screenshot, config, screenshot.size)
+                  wrapped_screenshot = MacWrapper.new.frame!(framed_screenshot, framefile_config, screenshot.size)
                 else
-                  wrapped_screenshot = Wrapper.new.wrap!(framed_screenshot, config, screenshot.size)
+                  wrapped_screenshot = Wrapper.new.wrap!(framed_screenshot, framefile_config, screenshot.size)
                 end
               end
             end
@@ -87,26 +79,28 @@ module Frameit
       device.downcase.include?("watch")
     end 
 
-    def should_skip?(config)
-      return is_complex_framing?(config) && !config['title']
+    def should_skip?(framefile_config)
+      return is_complex_framing?(framefile_config) && !framefile_config['title']
     end
 
     # Do we add a background and title as well?
-    def is_complex_framing?(config)
-      return (config['background'] and (config['title'] or config['keyword']))
+    def is_complex_framing?(framefile_config)
+      return (framefile_config['background'] and (framefile_config['title'] or framefile_config['keyword']))
     end
 
     # Loads the config (colors, background, texts, etc.)
     # Don't use this method to access the actual text and use `fetch_texts` instead
-    def fetch_config(path)
-      return @config[path] if @config && @config[path]
+    def fetch_framefile_config_for_screenshot(screenshot_path)
+      return @framefile_config_cache[screenshot_path] if @framefile_config_cache && @framefile_config_cache[screenshot_path]
 
-      config_path = File.join(File.expand_path("..", path), "Framefile.json")
-      config_path = File.join(File.expand_path("../..", path), "Framefile.json") unless File.exist?(config_path)
+      config_path = File.join(File.expand_path("..", screenshot_path), "Framefile.json")
+      config_path = File.join(File.expand_path("../..", screenshot_path), "Framefile.json") unless File.exist?(config_path)
       file = ConfigParser.new.load(config_path)
+      
       return {} unless file # no config file at all
-      @config = {} if !@config
-      @config[path] = file.fetch_value(path)
+
+      @framefile_config_cache = {} if !@framefile_config_cache # initialize empty hash if doesn't exist yet
+      @framefile_config_cache[screenshot_path] = file.fetch_value(screenshot_path)
     end
   end
 end

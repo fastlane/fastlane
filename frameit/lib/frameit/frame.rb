@@ -7,72 +7,55 @@ require_relative 'module'
 module Frameit
   # Represents the frame to be used
   class Frame
-    attr_accessor :screenshot
-    attr_accessor :color # the color to use for the frame (from Frameit::Color) # TODO remove, see below
-    attr_accessor :config 
+    attr_accessor :color
+    attr_accessor :path
+    attr_accessor :offset
 
-    # path: Path to screenshot
-    # color: Color to use for the frame
-    def initialize(screenshot, config, color)
-      @screenshot = screenshot
-      self.config = config
-      @color = color
+    # screenshot: screenshot object
+    # cli_color: Color specified via CLI
+    # framefile_config: Configuration in Framefile.json for this screenshot
+    def initialize(screenshot, cli_color, framefile_config)
+      @color = find_color(cli_color, framefile_config)
+      @path = load_frame(screenshot, @color)
     end
 
-    # TODO move to Deliver as well similar to `calculate_screen_size`
-    def color
-      if !Frameit.config[:use_legacy_iphone6s] && @color == Frameit::Color::BLACK
-        if @screenshot.screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || @screenshot.screen_size == Deliver::AppScreenshot::ScreenSize::IOS_47
-          return "Matte Black" # RIP space gray
-        elsif @screenshot.screen_size == Deliver::AppScreenshot::ScreenSize::IOS_61
-          return "Black"
-        end
+    def find_color(cli_color, framefile_config)
+      # `frame` in Framefile.json
+      framefile_override_color = fetch_framefile_config_color(framefile_config)
+      return framefile_override_color if framefile_override_color
+
+      # color param in CLI
+      return cli_color if cli_color
+
+      # options of action
+      # TODO remove these options and introduce a new `color` option
+      return Frameit::Color::SILVER if Frameit.config[:white] || Frameit.config[:silver]
+      return Frameit::Color::GOLD if Frameit.config[:gold]
+      return Frameit::Color::ROSE_GOLD if Frameit.config[:rose_gold]
+
+      # default
+      return Frameit::Color::BLACK 
+    end
+
+    def fetch_framefile_config_color(framefile_config)
+      override_color = framefile_config['frame']
+      if override_color == "BLACK"
+        return Frameit::Color::BLACK
+      elsif override_color == "WHITE"
+        return Frameit::Color::SILVER
+      elsif override_color == "GOLD"
+        return Frameit::Color::GOLD
+      elsif override_color == "ROSE_GOLD"
+        return Frameit::Color::ROSE_GOLD
       end
-      return @color
+      return nil
     end
 
-
-    # The name of the orientation of a screenshot. Used to find the correct template
-    def orientation_name
-      return Orientation::PORTRAIT if size[0] < size[1]
-      return Orientation::LANDSCAPE
-    end
-
-    # TODO is this really the _frame_ orientation? If yes, remove it from here as it is not really about the screenshot
-    def frame_orientation
-      filename = File.basename(self.path, ".*")
-
-      block = Frameit.config[:force_orientation_block]
-      unless block.nil?
-        orientation = block.call(filename)
-        valid = [:landscape_left, :landscape_right, :portrait, nil]
-        UI.user_error("orientation_block must return #{valid[0..-2].join(', ')} or nil") unless valid.include?(orientation)
-      end
-      puts("Forced orientation: #{orientation}") unless orientation.nil?
-
-      return orientation unless orientation.nil?
-      return :portrait if self.orientation_name == Orientation::PORTRAIT
-      return :landscape_right # Default landscape orientation
-    end
-
-    def portrait?
-      return (frame_orientation == :portrait)
-    end
-
-    def landscape_left?
-      return (frame_orientation == :landscape_left)
-    end
-
-    def landscape_right?
-      return (frame_orientation == :landscape_right)
-    end
-
-    def landscape?
-      return self.landscape_left? || self.landscape_right
-    end
-
-    def to_s
-      self.path
+    def load_frame(screenshot, color)
+      override_color = fetch_framefile_config_color(framefile_config)
+      frame_path = TemplateFinder.get_template(screenshot, color)
+      UI.message("found frame: #{frame_path}") # TODO remove
+      return frame_path
     end
   end
 end

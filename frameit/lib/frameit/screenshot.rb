@@ -71,6 +71,12 @@ module Frameit
     # Screenshot orientation
     #
 
+    def rotation_for_device_orientation
+      return 90 if self.landscape_right?
+      return -90 if self.landscape_left?
+      return 0
+    end
+
     # The name of the orientation of a screenshot. Used to find the correct template
     def orientation_name
       return Orientation::PORTRAIT if size[0] < size[1]
