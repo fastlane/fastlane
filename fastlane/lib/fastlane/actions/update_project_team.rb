@@ -6,7 +6,7 @@ module Fastlane
     class UpdateProjectTeamAction < Action
       def self.run(params)
         project_path = params[:path]
-        target_name = params[:target]
+        selected_targets = params[:targets]
 
         UI.user_error!("Could not find path to xcodeproj '#{project_path}'. Pass the path to your project (not workspace)!") unless File.exist?(project_path)
 
@@ -15,13 +15,17 @@ module Fastlane
 
         # Fetch target
         targets = project.native_targets
-        if params[:target]
-          targets.select! { |native_target| native_target.name == target_name }
-        end
-        targets.each do |target|
-          UI.user_error!("Could not find target `#{target_name}` in the project `#{project_path}`") if target.nil?
+        if selected_targets
+          # Error to user if invalid target
+          diff_targets = selected_targets - targets.map(&:name)
+          UI.user_error!("Could not find target(s) in the project '#{project_path}' - #{diff_targets.join(',')}") unless diff_targets.empty?
 
-          UI.message("Updating development team (#{params[:teamid]}) for target `#{target_name}` in the project '#{project_path}'")
+          targets.select! { |native_target| selected_targets.include?(native_target.name) }
+        end
+
+        # Set teamid in target
+        targets.each do |target|
+          UI.message("Updating development team (#{params[:teamid]}) for target `#{target.name}` in the project '#{project_path}'")
           # Update the build settings
           target.build_configurations.each do |configuration|
             configuration.build_settings['DEVELOPMENT_TEAM'] = params[:teamid]
@@ -29,7 +33,7 @@ module Fastlane
 
           project.save
 
-          UI.success("Successfully updated project settings to use Developer Team ID '#{params[:teamid]}' for target `#{target_name}`")
+          UI.success("Successfully updated project settings to use Developer Team ID '#{params[:teamid]}' for target `#{target.name}`")
         end
       end
 
@@ -51,9 +55,10 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Path is invalid") unless File.exist?(value)
                                        end),
-          FastlaneCore::ConfigItem.new(key: :target,
+          FastlaneCore::ConfigItem.new(key: :targets,
                                        env_name: "FL_PROJECT_TARGET",
-                                       description: "Name of the target you want to update",
+                                       description: "Name of the targets you want to update",
+                                       type: Array,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :teamid,
                                        env_name: "FL_PROJECT_TEAM_ID",
