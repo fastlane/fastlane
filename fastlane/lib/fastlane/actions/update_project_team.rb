@@ -5,18 +5,20 @@ module Fastlane
 
     class UpdateProjectTeamAction < Action
       def self.run(params)
-        path = params[:path]
+        project_path = params[:path]
+        target_name = params[:target]
 
-        # If a target is passed in then update it using the xcodeproj, else use simple regex
+        UI.user_error!("Could not find path to xcodeproj '#{project_path}'. Pass the path to your project (not workspace)!") unless File.exist?(project_path)
+
+        # Load .xcodeproj
+        project = Xcodeproj::Project.open(project_path)
+
+        # Fetch target
+        targets = project.native_targets
         if params[:target]
-          UI.user_error!("Could not find path to xcodeproj '#{path}'. Pass the path to your project (not workspace)!") unless File.exist?(project_path)
-          target_name = params[:target]
-
-          # Load .xcodeproj
-          project = Xcodeproj::Project.open(project_path)
-
-          # Fetch target
-          target = project.native_targets.find { |native_target| native_target.name == target_name }
+          targets.select! { |native_target| native_target.name == target_name }
+        end
+        targets.each do |target|
           UI.user_error!("Could not find target `#{target_name}` in the project `#{project_path}`") if target.nil?
 
           UI.message("Updating development team (#{params[:teamid]}) for target `#{target_name}` in the project '#{project_path}'")
@@ -28,19 +30,6 @@ module Fastlane
           project.save
 
           UI.success("Successfully updated project settings to use Developer Team ID '#{params[:teamid]}' for target `#{target_name}`")
-
-        else
-          project_path = File.join(path, "project.pbxproj")
-          UI.user_error!("Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!") unless File.exist?(project_path)
-
-          UI.message("Updating development team (#{params[:teamid]}) for the given project '#{project_path}'")
-
-          p = File.read(project_path)
-          p.gsub!(/DevelopmentTeam = .*;/, "DevelopmentTeam = #{params[:teamid]};")
-          p.gsub!(/DEVELOPMENT_TEAM = .*;/, "DEVELOPMENT_TEAM = #{params[:teamid]};")
-          File.write(project_path, p)
-
-          UI.success("Successfully updated project settings to use Developer Team ID '#{params[:teamid]}'")
         end
       end
 
