@@ -323,7 +323,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :timeout,
                                       env_name: "FL_HOCKEY_TIMEOUT",
                                       description: "Request timeout in seconds",
-                                      is_string: false,
+                                      type: Integer,
                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :bypass_cdn,
                                       env_name: "FL_HOCKEY_BYPASS_CDN",

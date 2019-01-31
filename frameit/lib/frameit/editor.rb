@@ -6,21 +6,29 @@ require_relative 'module'
 require_relative 'offsets'
 require_relative 'config_parser'
 require_relative 'strings_parser'
+require_relative 'device_types'
 
 module Frameit
   # Currently the class is 2 lines too long. Reevaluate refactoring when it's length changes significantly
   class Editor # rubocop:disable Metrics/ClassLength
     attr_accessor :screenshot # reference to the screenshot object to fetch the path, title, etc.
+    attr_accessor :debug_mode
+    attr_accessor :frame_path
     attr_accessor :frame # the frame of the device
     attr_accessor :image # the current image used for editing
     attr_accessor :space_to_device
 
-    def frame!(screenshot)
-      self.screenshot = screenshot
+    def initialize(screenshot, debug_mode = false)
+      @screenshot = screenshot
+      self.debug_mode = debug_mode
+    end
+
+    def frame!
       prepare_image
 
-      if load_frame # Mac doesn't need a frame
-        self.frame = MiniMagick::Image.open(load_frame)
+      @frame_path = load_frame
+      if @frame_path # Mac doesn't need a frame
+        self.frame = MiniMagick::Image.open(@frame_path)
         # Rotate the frame according to the device orientation
         self.frame.rotate(self.rotation_for_device_orientation)
       elsif self.class == Editor
@@ -29,7 +37,7 @@ module Frameit
         return
       end
 
-      if should_add_title?
+      if is_complex_framing_mode?
         @image = complex_framing
       else
         # easy mode from 1.0 - no title or background
@@ -40,6 +48,10 @@ module Frameit
     end
 
     def load_frame
+      color = fetch_frame_color
+      if color
+        screenshot.color = color
+      end
       TemplateFinder.get_template(screenshot)
     end
 
@@ -51,6 +63,10 @@ module Frameit
       return 90 if self.screenshot.landscape_right?
       return -90 if self.screenshot.landscape_left?
       return 0
+    end
+
+    def should_skip?
+      return is_complex_framing_mode? && !fetch_text(:title)
     end
 
     private
@@ -71,6 +87,26 @@ module Frameit
       rotation = self.rotation_for_device_orientation
       frame.rotate(-rotation)
       @image.rotate(-rotation)
+
+      # Debug Mode: Add filename to frame
+      if self.debug_mode
+        filename = File.basename(@frame_path, ".*")
+        filename.sub!('Apple', '') # remove 'Apple'
+
+        width = screenshot.size[0]
+        font_size = width / 20 # magic number that works well
+
+        offset_top = offset['offset'].split("+")[2].to_f
+        annotate_offset = "+0+#{offset_top}" # magic number that works semi well
+
+        frame.combine_options do |c|
+          c.gravity('North')
+          c.undercolor('#00000080')
+          c.fill('white')
+          c.pointsize(font_size)
+          c.annotate(annotate_offset.to_s, filename.to_s)
+        end
+      end
 
       @image = frame.composite(image, "png") do |c|
         c.compose("DstOver")
@@ -111,7 +147,7 @@ module Frameit
     end
 
     # Do we add a background and title as well?
-    def should_add_title?
+    def is_complex_framing_mode?
       return (fetch_config['background'] and (fetch_config['title'] or fetch_config['keyword']))
     end
 
@@ -131,7 +167,7 @@ module Frameit
 
         # Decrease the size of the framed screenshot to fit into the defined padding + background
         frame_width = background.width - horizontal_frame_padding * 2
-        frame_height = background.height - space_to_device - vertical_frame_padding
+        frame_height = background.height - effective_text_height - vertical_frame_padding
 
         if fetch_config['show_complete_frame']
           # calculate the final size of the screenshot to resize in one go
@@ -171,6 +207,17 @@ module Frameit
       return scale_padding(padding)
     end
 
+    # Minimum height for the title
+    def title_min_height
+      @title_min_height ||= begin
+        height = fetch_config['title_min_height'] || 0
+        if height.kind_of?(String) && height.end_with?('%')
+          height = ([image.width, image.height].min * height.to_f * 0.01).ceil
+        end
+        height
+      end
+    end
+
     def scale_padding(padding)
       if padding.kind_of?(String) && padding.end_with?('%')
         padding = ([image.width, image.height].min * padding.to_f * 0.01).ceil
@@ -178,6 +225,24 @@ module Frameit
       multi = 1.0
       multi = 1.7 if self.screenshot.triple_density?
       return padding * multi
+    end
+
+    def effective_text_height
+      [space_to_device, title_min_height].max
+    end
+
+    def device_top(background)
+      @device_top ||= begin
+        if title_below_image
+          background.height - effective_text_height - image.height
+        else
+          effective_text_height
+        end
+      end
+    end
+
+    def title_below_image
+      @title_below_image ||= fetch_config['title_below_image']
     end
 
     # Returns a correctly sized background image
@@ -193,17 +258,10 @@ module Frameit
 
     def put_device_into_background(background)
       left_space = (background.width / 2.0 - image.width / 2.0).round
-      title_below_image = fetch_config['title_below_image']
 
       @image = background.composite(image, "png") do |c|
         c.compose("Over")
-        if title_below_image
-          show_complete_frame = fetch_config['show_complete_frame']
-          c.geometry("+#{left_space}+#{background.height - image.height - space_to_device}") unless show_complete_frame
-          c.geometry("+#{left_space}+#{vertical_frame_padding}") if show_complete_frame
-        else
-          c.geometry("+#{left_space}+#{space_to_device}")
-        end
+        c.geometry("+#{left_space}+#{device_top(background)}")
       end
 
       return image
@@ -234,25 +292,28 @@ module Frameit
       resize_text(keyword)
 
       vertical_padding = vertical_frame_padding # assign padding to variable
-      keyword_top_space = vertical_padding
       spacing_between_title_and_keyword = (actual_font_size / 2)
-      title_top_space = vertical_padding + keyword.height + spacing_between_title_and_keyword
       title_left_space = (background.width / 2.0 - title.width / 2.0).round
       keyword_left_space = (background.width / 2.0 - keyword.width / 2.0).round
 
       self.space_to_device += title.height + keyword.height + spacing_between_title_and_keyword + vertical_padding
-      title_below_image = fetch_config['title_below_image']
+
+      if title_below_image
+        keyword_top = background.height - effective_text_height / 2 - (keyword.height + spacing_between_title_and_keyword + title.height) / 2
+      else
+        keyword_top = device_top(background) / 2 - spacing_between_title_and_keyword / 2 - keyword.height
+      end
+      title_top = keyword_top + keyword.height + spacing_between_title_and_keyword
+
       # keyword
       background = background.composite(keyword, "png") do |c|
         c.compose("Over")
-        c.geometry("+#{keyword_left_space}+#{keyword_top_space}") unless title_below_image
-        c.geometry("+#{keyword_left_space}+#{background.height - space_to_device + keyword_top_space}") if title_below_image
+        c.geometry("+#{keyword_left_space}+#{keyword_top}")
       end
       # Place the title below the keyword
       background = background.composite(title, "png") do |c|
         c.compose("Over")
-        c.geometry("+#{title_left_space}+#{title_top_space}") unless title_below_image
-        c.geometry("+#{title_left_space}+#{background.height - space_to_device + title_top_space}") if title_below_image
+        c.geometry("+#{title_left_space}+#{title_top}")
       end
       background
     end
@@ -290,17 +351,21 @@ module Frameit
       end
 
       vertical_padding = vertical_frame_padding # assign padding to variable
-      top_space = vertical_padding + (actual_font_size - title.height) / 2
       left_space = (background.width / 2.0 - sum_width / 2.0).round
 
       self.space_to_device += actual_font_size + vertical_padding
+
+      if title_below_image
+        title_top = background.height - effective_text_height / 2 - title.height / 2
+      else
+        title_top = device_top(background) / 2 - title.height / 2
+      end
 
       # First, put the keyword on top of the screenshot, if we have one
       if keyword
         background = background.composite(keyword, "png") do |c|
           c.compose("Over")
-          c.geometry("+#{left_space}+#{top_space}") unless title_below_image
-          c.geometry("+#{left_space}+#{background.height - space_to_device + top_space}") if title_below_image
+          c.geometry("+#{left_space}+#{title_top}")
         end
 
         left_space += keyword.width + (keyword_padding * image_scale_factor)
@@ -309,8 +374,7 @@ module Frameit
       # Then, put the title on top of the screenshot next to the keyword
       background = background.composite(title, "png") do |c|
         c.compose("Over")
-        c.geometry("+#{left_space}+#{top_space}") unless title_below_image
-        c.geometry("+#{left_space}+#{background.height - space_to_device + top_space}") if title_below_image
+        c.geometry("+#{left_space}+#{title_top}")
       end
       background
     end
@@ -450,13 +514,22 @@ module Frameit
 
       # No string files, fallback to Framefile config
       text = fetch_config[type.to_s]['text'] if fetch_config[type.to_s] && fetch_config[type.to_s]['text'] && fetch_config[type.to_s]['text'].length > 0 # Ignore empty string
+      return text
+    end
 
-      if type == :title && !text
-        # title is mandatory
-        UI.user_error!("Could not get title for screenshot #{screenshot.path}. Please provide one in your Framefile.json or title.strings")
+    def fetch_frame_color
+      color = fetch_config['frame']
+      if color == "BLACK"
+        return Frameit::Color::BLACK
+      elsif color == "WHITE"
+        return Frameit::Color::SILVER
+      elsif color == "GOLD"
+        return Frameit::Color::GOLD
+      elsif color == "ROSE_GOLD"
+        return Frameit::Color::ROSE_GOLD
       end
 
-      return text
+      return nil
     end
 
     # The font we want to use

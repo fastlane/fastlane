@@ -3,8 +3,6 @@ require 'credentials_manager'
 module Fastlane
   module Actions
     class RegisterDeviceAction < Action
-      UDID_REGEXP = /^\h{40}$/
-
       def self.is_supported?(platform)
         platform == :ios
       end
@@ -19,8 +17,12 @@ module Fastlane
         Spaceship.login(credentials.user, credentials.password)
         Spaceship.select_team
 
-        UI.user_error!("Passed invalid UDID: #{udid} for device: #{name}") unless UDID_REGEXP =~ udid
-        Spaceship::Device.create!(name: name, udid: udid)
+        begin
+          Spaceship::Device.create!(name: name, udid: udid)
+        rescue => ex
+          UI.error(ex.to_s)
+          UI.crash!("Failed to register new device (name: #{name}, UDID: #{udid})")
+        end
 
         UI.success("Successfully registered new device")
         return udid

@@ -148,13 +148,25 @@ describe Spaceship::AppVersion, all: true do
       end
     end
 
+    describe "release an app version in phased release to all users" do
+      it "allows releasing the live version to all users" do
+        version = app.live_version
+
+        version.raw_status = 'readyForSale'
+
+        status = version.release_to_all_users!
+
+        expect(version.raw_status).to eq('readyForSale')
+      end
+    end
+
     describe "#url" do
       it "live version" do
-        expect(app.live_version.url).to eq("https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app.apple_id}/#{app.platform}/versioninfo/deliverable")
+        expect(app.live_version.url).to eq("https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app.apple_id}/#{app.platform}/versioninfo/deliverable")
       end
 
       it "edit version" do
-        expect(app.edit_version.url).to eq("https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app.apple_id}/#{app.platform}/versioninfo/")
+        expect(app.edit_version.url).to eq("https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{app.apple_id}/#{app.platform}/versioninfo/")
       end
     end
 

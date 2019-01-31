@@ -24,7 +24,7 @@ To automate iOS Provisioning profiles you can use [_match_](https://docs.fastlan
 
 -------
 
-<h5 align="center"><code>pem</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
+<h5 align="center"><em>pem</em> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # Features
 Well, it's actually just one: Generate the _pem_ file for your server.

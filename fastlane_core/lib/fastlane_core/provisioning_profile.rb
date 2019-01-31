@@ -44,6 +44,19 @@ module FastlaneCore
         parse(path, keychain_path).fetch("Name")
       end
 
+      def mac?(path, keychain_path = nil)
+        parse(path, keychain_path).fetch("Platform", []).include?('OSX')
+      end
+
+      def profile_filename(path, keychain_path = nil)
+        basename = uuid(path, keychain_path)
+        if mac?(path, keychain_path)
+          basename + ".provisionprofile"
+        else
+          basename + ".mobileprovision"
+        end
+      end
+
       def profiles_path
         path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
         # If the directory doesn't exist, create it first
@@ -57,8 +70,7 @@ module FastlaneCore
       # Installs a provisioning profile for Xcode to use
       def install(path, keychain_path = nil)
         UI.message("Installing provisioning profile...")
-        profile_filename = uuid(path, keychain_path) + ".mobileprovision"
-        destination = File.join(profiles_path, profile_filename)
+        destination = File.join(profiles_path, profile_filename(path, keychain_path))
 
         if path != destination
           # copy to Xcode provisioning profile directory
@@ -79,10 +91,16 @@ module FastlaneCore
           err = "#{dir}/cms.err"
           # we want to prevent the error output to mix up with the standard output because of
           # /dev/null: https://github.com/fastlane/fastlane/issues/6387
-          if keychain_path.nil?
-            decoded = `security cms -D -i "#{path}" 2> #{err}`
+          if Helper.mac?
+            if keychain_path.nil?
+              decoded = `security cms -D -i "#{path}" 2> #{err}`
+            else
+              decoded = `security cms -D -i "#{path}" -k "#{keychain_path.shellescape}" 2> #{err}`
+            end
           else
-            decoded = `security cms -D -i "#{path}" -k "#{keychain_path.shellescape}" 2> #{err}`
+            # `security` only works on Mac, fallback to `openssl`
+            # via https://stackoverflow.com/a/14379814/252627
+            decoded = `openssl smime -inform der -verify -noverify -in #{path} 2> #{err}`
           end
           UI.error("Failure to decode #{path}. Exit: #{$?.exitstatus}: #{File.read(err)}") if $?.exitstatus != 0
           decoded

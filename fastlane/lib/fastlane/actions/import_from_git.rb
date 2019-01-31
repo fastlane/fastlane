@@ -33,6 +33,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        description: "The version to checkout on the respository. Optimistic match operator or multiple conditions can be used to select the latest version within constraints",
                                        default_value: nil,
+                                       is_string: false,
                                        optional: true)
         ]
       end

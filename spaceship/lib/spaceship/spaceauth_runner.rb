@@ -23,7 +23,7 @@ module Spaceship
         puts("Please check your credentials and try again.".yellow)
         puts("This could be an issue with App Store Connect,".yellow)
         puts("Please try unsetting the FASTLANE_SESSION environment variable".yellow)
-        puts("and re-run `fastlane spaceauth`".yellow)
+        puts("(if it is set) and re-run `fastlane spaceauth`".yellow)
         raise "Problem connecting to App Store Connect"
       end
 
@@ -44,7 +44,7 @@ module Spaceship
 
       # We remove all the un-needed cookies
       cookies.select! do |cookie|
-        cookie.name.start_with?("DES5") || cookie.name == 'dqsid'
+        cookie.name.start_with?("myacinfo") || cookie.name == 'dqsid'
       end
 
       yaml = cookies.to_yaml.gsub("\n", "\\n")
@@ -57,6 +57,16 @@ module Spaceship
       puts("")
       puts("Example:")
       puts("export FASTLANE_SESSION='#{yaml}'".cyan.underline)
+
+      if mac? && Spaceship::Client::UserInterface.interactive? && agree("🙄 Should fastlane copy the cookie into your clipboard, so you can easily paste it? (y/n)", true)
+        require 'open3'
+        Open3.popen3('pbcopy') { |input, _, _| input << yaml }
+        puts("Successfully copied text into your clipboard 🎨".green)
+      end
+    end
+
+    def mac?
+      (/darwin/ =~ RUBY_PLATFORM) != nil
     end
   end
 end

@@ -40,7 +40,7 @@ module Spaceship
     # @param video_path (String) the path to the video file
     # @param timestamp (String) the `ffmpeg` timestamp format (e.g. 00.00)
     # @param dimensions (Array) the dimension of the screenshot to generate
-    # @return the path to the TempFile containing the generated screenshot
+    # @return the TempFile containing the generated screenshot
     def grab_video_preview(video_path, timestamp, dimensions)
       width, height = dimensions
       require 'tempfile'
@@ -50,7 +50,7 @@ module Spaceship
       # puts "COMMAND: #{command}"
       `#{command}`
       raise "Failed to grab screenshot at #{timestamp} from #{video_path} (using #{command})" unless $CHILD_STATUS.to_i == 0
-      tmp.path
+      tmp
     end
 
     # identifies the resolution of a video using `ffmpeg`

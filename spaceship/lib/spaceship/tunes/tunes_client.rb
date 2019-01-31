@@ -34,9 +34,12 @@ module Spaceship
             'iphone6' => [1334, 750],
             'iphone6Plus' => [2208, 1242],
             'iphone58' => [2436, 1125],
+            'iphone65' => [2688, 1242],
             'ipad' => [1024, 768],
             'ipad105' => [2224, 1668],
-            'ipadPro' => [2732, 2048]
+            'ipadPro' => [2732, 2048],
+            'iPadPro11' => [2388, 1668],
+            'iPadPro129' => [2732, 2048]
         }
 
         r = resolutions[device]
@@ -50,7 +53,7 @@ module Spaceship
     #####################################################
 
     def self.hostname
-      "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/"
+      "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/"
     end
 
     # Shows a team selection for the user in the terminal. This should not be
@@ -160,14 +163,13 @@ module Spaceship
       return unless raw.kind_of?(Hash)
 
       data = raw['data'] || raw # sometimes it's with data, sometimes it isn't
-      error_keys_to_check = [
-        "sectionErrorKeys",
-        "sectionInfoKeys",
-        "sectionWarningKeys",
-        "validationErrors"
-      ]
-      errors_in_data = fetch_errors_in_data(data_section: data, keys: error_keys_to_check)
-      errors_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: error_keys_to_check)
+
+      error_keys = ["sectionErrorKeys", "validationErrors", "serviceErrors"]
+      info_keys = ["sectionInfoKeys", "sectionWarningKeys"]
+      error_and_info_keys_to_check = error_keys + info_keys
+
+      errors_in_data = fetch_errors_in_data(data_section: data, keys: error_and_info_keys_to_check)
+      errors_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: error_and_info_keys_to_check)
 
       # If we have any errors or "info" we need to treat them as warnings or errors
       if errors_in_data.count == 0 && errors_in_version_info.count == 0
@@ -202,7 +204,6 @@ module Spaceship
       errors = handle_response_hash.call(data)
 
       # Search at data level, as well as "versionInfo" level for errors
-      error_keys = ["sectionErrorKeys", "validationErrors"]
       errors_in_data = fetch_errors_in_data(data_section: data, keys: error_keys)
       errors_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: error_keys)
 
@@ -222,7 +223,7 @@ module Spaceship
         elsif errors.count == 1 && errors.first.include?("try again later")
           raise ITunesConnectTemporaryError.new, errors.first
         elsif errors.count == 1 && errors.first.include?("Forbidden")
-          raise_insuffient_permission_error!
+          raise_insufficient_permission_error!
         elsif flaky_api_call
           raise ITunesConnectPotentialServerError.new, errors.join(' ')
         else
@@ -231,7 +232,6 @@ module Spaceship
       end
 
       # Search at data level, as well as "versionInfo" level for info and warnings
-      info_keys = ["sectionInfoKeys", "sectionWarningKeys"]
       info_in_data = fetch_errors_in_data(data_section: data, keys: info_keys)
       info_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: info_keys)
 
@@ -358,10 +358,13 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def get_reviews(app_id, platform, storefront, version_id)
+    def get_reviews(app_id, platform, storefront, version_id, upto_date = nil)
       index = 0
       per_page = 100 # apple default
       all_reviews = []
+
+      upto_date = Time.parse(upto_date) unless upto_date.nil?
+
       loop do
         rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews?"
         rating_url << "sort=REVIEW_SORT_ORDER_MOST_RECENT"
@@ -371,12 +374,24 @@ module Spaceship
 
         r = request(:get, rating_url)
         all_reviews.concat(parse_response(r, 'data')['reviews'])
+
+        # The following lines throw errors when there are no reviews so exit out of the loop before them if the app has no reviews
+        break if all_reviews.count == 0
+
+        last_review_date = Time.at(all_reviews[-1]['value']['lastModified'] / 1000)
+
+        if upto_date && last_review_date < upto_date
+          all_reviews = all_reviews.select { |review| Time.at(review['value']['lastModified'] / 1000) > upto_date }
+          break
+        end
+
         if all_reviews.count < parse_response(r, 'data')['reviewCount']
           index += per_page
         else
           break
         end
       end
+
       all_reviews
     end
 
@@ -1097,14 +1112,14 @@ module Spaceship
       handle_itc_response(r.body)
 
       # App Store Connect still returns a success status code even the submission
-      # was failed because of Ad ID Info / Export Complicance. This checks for any section error
+      # was failed because of Ad ID Info / Export Compliance. This checks for any section error
       # keys in returned adIdInfo / exportCompliance and prints them out.
       ad_id_error_keys = r.body.fetch('data').fetch('adIdInfo').fetch('sectionErrorKeys')
       export_error_keys = r.body.fetch('data').fetch('exportCompliance').fetch('sectionErrorKeys')
       if ad_id_error_keys.any?
         raise "Something wrong with your Ad ID information: #{ad_id_error_keys}."
       elsif export_error_keys.any?
-        raise "Something wrong with your Export Complicance: #{export_error_keys}"
+        raise "Something wrong with your Export Compliance: #{export_error_keys}"
       elsif r.body.fetch('messages').fetch('info').last == "Successful POST"
         # success
       else
@@ -1124,6 +1139,24 @@ module Spaceship
 
       r = request(:post) do |req|
         req.url("ra/apps/#{app_id}/versions/#{version}/releaseToStore")
+        req.headers['Content-Type'] = 'application/json'
+        req.body = app_id.to_s
+      end
+
+      handle_itc_response(r.body)
+      parse_response(r, 'data')
+    end
+
+    #####################################################
+    # @!group release to all users
+    #####################################################
+
+    def release_to_all_users!(app_id, version)
+      raise "app_id is required" unless app_id
+      raise "version is required" unless version
+
+      r = request(:post) do |req|
+        req.url("ra/apps/#{app_id}/versions/#{version}/phasedRelease/state/COMPLETE")
         req.headers['Content-Type'] = 'application/json'
         req.body = app_id.to_s
       end
@@ -1421,20 +1454,22 @@ module Spaceship
     def with_tunes_retry(tries = 5, potential_server_error_tries = 3, &_block)
       return yield
     rescue Spaceship::TunesClient::ITunesConnectTemporaryError => ex
+      seconds_to_sleep = 60
       unless (tries -= 1).zero?
-        msg = "App Store Connect temporary error received: '#{ex.message}'. Retrying after 60 seconds (remaining: #{tries})..."
+        msg = "App Store Connect temporary error received: '#{ex.message}'. Retrying after #{seconds_to_sleep} seconds (remaining: #{tries})..."
         puts(msg)
         logger.warn(msg)
-        sleep(60) unless Object.const_defined?("SpecHelper")
+        sleep(seconds_to_sleep) unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex # re-raise the exception
     rescue Spaceship::TunesClient::ITunesConnectPotentialServerError => ex
+      seconds_to_sleep = 10
       unless (potential_server_error_tries -= 1).zero?
-        msg = "Potential server error received: '#{ex.message}'. Retrying after 10 seconds (remaining: #{tries})..."
+        msg = "Potential server error received: '#{ex.message}'. Retrying after 10 seconds (remaining: #{potential_server_error_tries})..."
         puts(msg)
         logger.warn(msg)
-        sleep(10) unless Object.const_defined?("SpecHelper")
+        sleep(seconds_to_sleep) unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex

@@ -21,6 +21,19 @@ module Sigh
 
     def resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path)
       resign_path = find_resign_path
+
+      if keychain_path
+        keychain_path_absolute = File.expand_path(keychain_path)
+
+        current_keychains = `security list-keychains`
+        current_keychains.delete!("\n")
+
+        unless current_keychains.include?(keychain_path_absolute)
+          previous_keychains = current_keychains
+          `security list-keychains -s #{current_keychains} '#{keychain_path_absolute}'`
+        end
+      end
+
       signing_identity = find_signing_identity(signing_identity)
 
       unless provisioning_profiles.kind_of?(Enumerable)
@@ -68,6 +81,8 @@ module Sigh
         UI.error("Something went wrong while code signing #{ipa}")
         false
       end
+    ensure
+      `security list-keychains -s #{previous_keychains}` if previous_keychains
     end
 
     def get_inputs(options, args)
@@ -103,9 +118,10 @@ module Sigh
     end
 
     def find_signing_identity(signing_identity)
-      until (signing_identity = sha1_for_signing_identity(signing_identity))
-        UI.error("Couldn't find signing identity '#{signing_identity}'.")
-        signing_identity = ask_for_signing_identity
+      signing_identity_input = signing_identity
+      until (signing_identity = sha1_for_signing_identity(signing_identity_input))
+        UI.error("Couldn't find signing identity '#{signing_identity_input}'.")
+        signing_identity_input = ask_for_signing_identity
       end
 
       signing_identity

@@ -47,8 +47,8 @@ module Scan
 
       # detect_values will ensure that these values are present as Arrays if
       # they are present at all
-      options += config[:only_testing].map { |test_id| "-only-testing:#{test_id}" } if config[:only_testing]
-      options += config[:skip_testing].map { |test_id| "-skip-testing:#{test_id}" } if config[:skip_testing]
+      options += config[:only_testing].map { |test_id| "-only-testing:#{test_id.shellescape}" } if config[:only_testing]
+      options += config[:skip_testing].map { |test_id| "-skip-testing:#{test_id.shellescape}" } if config[:skip_testing]
 
       options
     end
@@ -111,9 +111,11 @@ module Scan
                                                                          Scan.config[:output_types],
                                                                          Scan.config[:output_files] || Scan.config[:custom_report_file_name],
                                                                          Scan.config[:output_directory],
-                                                                         Scan.config[:use_clang_report_name])
+                                                                         Scan.config[:use_clang_report_name],
+                                                                         Scan.config[:xcpretty_args])
       reporter_options = @reporter_options_generator.generate_reporter_options
-      return pipe << "| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')}"
+      reporter_xcpretty_args = @reporter_options_generator.generate_xcpretty_args_options
+      return pipe << "| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')} #{reporter_xcpretty_args}"
     end
 
     # Store the raw file

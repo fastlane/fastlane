@@ -58,6 +58,13 @@ describe Supply do
         subject.verify_config!
       end
 
+      it "does not raise error if only aab_paths" do
+        Supply.config = {
+          aab_paths: ['some/path/app1.aab', 'some/path/app2.aab']
+        }
+        subject.verify_config!
+      end
+
       it "does not raise error if only track and track_promote_to" do
         Supply.config = {
           track: 'alpha',
@@ -153,6 +160,42 @@ describe Supply do
 
         only_directories = Supply::Uploader.new.all_languages
         expect(only_directories).to eq(['en-US', 'fr-FR', 'ja-JP'])
+      end
+    end
+
+    describe 'promote_track' do
+      subject { Supply::Uploader.new.promote_track }
+
+      let(:client) { double('client') }
+      let(:version_codes) { [1, 2, 3] }
+      let(:config) { { track: 'alpha', track_promote_to: 'beta' } }
+
+      before do
+        Supply.config = config
+        allow(Supply::Client).to receive(:make_from_config).and_return(client)
+        allow(client).to receive(:track_version_codes).and_return(version_codes)
+        allow(client).to receive(:update_track).with(config[:track], 0.1, nil)
+        allow(client).to receive(:update_track).with(config[:track_promote_to], 0.1, version_codes)
+      end
+
+      context 'when deactivate_on_promote is true' do
+        it 'should update track multiple times' do
+          Supply.config[:deactivate_on_promote] = true
+
+          expect(client).to receive(:update_track).with(config[:track], 0.1, nil).once
+          expect(client).to receive(:update_track).with(config[:track_promote_to], 0.1, version_codes).once
+          subject
+        end
+      end
+
+      context 'when deactivate_on_promote is false' do
+        it 'should only update track once' do
+          Supply.config[:deactivate_on_promote] = false
+
+          expect(client).not_to(receive(:update_track).with(config[:track], 0.1, nil))
+          expect(client).to receive(:update_track).with(config[:track_promote_to], 0.1, version_codes).once
+          subject
+        end
       end
     end
 
@@ -295,6 +338,25 @@ describe Supply do
           track: 'custom'
         }
         Supply::Uploader.new.check_superseded_tracks([106])
+      end
+    end
+
+    describe '#perform_upload with version_codes_to_retain' do
+      let(:client) { double('client') }
+      let(:config) { { apk: 'some/path/app.apk', version_codes_to_retain: [2, 3] } }
+
+      before do
+        Supply.config = config
+        allow(Supply::Client).to receive(:make_from_config).and_return(client)
+        allow(client).to receive(:upload_apk).with(config[:apk]).and_return(1) # newly uploaded version code
+        allow(client).to receive(:begin_edit).and_return(nil)
+        allow(client).to receive(:commit_current_edit!).and_return(nil)
+      end
+
+      it 'should update track with correct version codes' do
+        uploader = Supply::Uploader.new
+        expect(uploader).to receive(:update_track).with([1, 2, 3]).once
+        uploader.perform_upload
       end
     end
   end

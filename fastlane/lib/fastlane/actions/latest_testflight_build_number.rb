@@ -133,7 +133,7 @@ module Fastlane
       end
 
       def self.category
-        :misc
+        :app_store_connect
       end
     end
   end

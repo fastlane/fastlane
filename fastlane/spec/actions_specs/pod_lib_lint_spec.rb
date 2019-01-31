@@ -60,6 +60,22 @@ describe Fastlane do
 
         expect(result).to eq("bundle exec pod lib lint --use-libraries")
       end
+
+      it "generates the correct pod lib lint command with swift-version parameter" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_lib_lint(swift_version: '4.2')
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod lib lint --swift-version=4.2")
+      end
+
+      it "generates the correct pod lib lint command with podspec parameter" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_lib_lint(podspec: 'fastlane')
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod lib lint fastlane")
+      end
     end
   end
 end

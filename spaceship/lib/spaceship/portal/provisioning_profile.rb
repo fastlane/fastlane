@@ -193,12 +193,14 @@ module Spaceship
         # Create a new object based on a hash.
         # This is used to create a new object based on the server response.
         def factory(attrs)
-          # available values of `distributionMethod` at this point: ['adhoc', 'store', 'limited', 'direct']
+          # available values of `distributionMethod` at this point: ['adhoc', 'store', 'limited', 'direct', 'inhouse']
           klass = case attrs['distributionMethod']
                   when 'limited'
                     Development
                   when 'store'
                     AppStore
+                  when 'adhoc'
+                    AdHoc
                   when 'inhouse'
                     InHouse
                   when 'direct'
@@ -326,22 +328,7 @@ module Spaceship
           end
 
           return profiles if self == ProvisioningProfile
-
-          # To distinguish between AppStore and AdHoc profiles, we need to send
-          # a details request (see `profile_details`). This is an expensive operation
-          # which we can't do for every single provisioning profile
-          # Instead we'll treat App Store profiles the same way as Ad Hoc profiles
-          # Spaceship::Portal::ProvisioningProfile::AdHoc.all will return the same array as
-          # Spaceship::Portal::ProvisioningProfile::AppStore.all, containing only AppStore
-          # profiles. To determine if it's an Ad Hoc profile, you can use the
-          # is_adhoc? method on the profile.
-          klass = self
-          klass = AppStore if self == AdHoc
-
-          # only return the profiles that match the class
-          return profiles.select do |profile|
-            profile.class == klass
-          end
+          return profiles.select { |profile| profile.class == self }
         end
 
         # @return (Array) Returns all profiles registered for this account
@@ -445,7 +432,7 @@ module Spaceship
             if self.kind_of?(Development)
               self.certificates = [Spaceship::Portal::Certificate::MacDevelopment.all.first]
             elsif self.kind_of?(Direct)
-              self.certificates = [Spaceship::Portal::Certificate::DeveloperIDApplication.all.first]
+              self.certificates = [Spaceship::Portal::Certificate::DeveloperIdApplication.all.first]
             else
               self.certificates = [Spaceship::Portal::Certificate::MacAppDistribution.all.first]
             end
@@ -543,14 +530,6 @@ module Spaceship
         end
 
         App.set_client(client).new(app_attributes)
-      end
-
-      # @return (Bool) Is this current provisioning profile adhoc?
-      #                AppStore and AdHoc profiles are the same except that AdHoc has devices
-      def is_adhoc?
-        return false unless self.kind_of?(AppStore) || self.kind_of?(AdHoc)
-
-        return devices.count > 0
       end
 
       # This is an expensive operation as it triggers a new request

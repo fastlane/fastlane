@@ -18,7 +18,7 @@ module Pilot
 
       if options[:changelog].nil? && options[:distribute_external] == true
         if UI.interactive?
-          options[:changelog] = UI.input("No changelog provided for new build. Please provide a changelog. You can also provide a changelog using the `changelog` option")
+          options[:changelog] = UI.input("No changelog provided for new build. You can provide a changelog using the `changelog` option. For now, please provide a changelog here:")
         else
           UI.user_error!("No changelog provided for new build. Please either disable `distribute_external` or provide a changelog using the `changelog` option")
         end

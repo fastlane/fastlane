@@ -215,7 +215,7 @@ module Fastlane
       end
     end
 
-    def execute_action(method_sym, class_ref, arguments, custom_dir: nil, from_action: false, configuration_language: nil)
+    def execute_action(method_sym, class_ref, arguments, custom_dir: nil, from_action: false)
       if custom_dir.nil?
         custom_dir ||= "." if Helper.test?
         custom_dir ||= ".."

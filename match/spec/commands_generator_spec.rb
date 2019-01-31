@@ -72,7 +72,19 @@ describe Match::CommandsGenerator do
 
   describe ":decrypt option handling" do
     def expect_githelper_clone_with(git_url, shallow_clone, git_branch)
-      expect(Match::GitHelper).to receive(:clone).with(git_url, shallow_clone, git_branch)
+      fake_storage = "fake_storage"
+      expect(Match::Storage::GitStorage).to receive(:configure).with({
+        git_url: git_url,
+        shallow_clone: shallow_clone,
+        git_branch: git_branch[:branch],
+        clone_branch_directly: git_branch[:clone_branch_directly]
+      }).and_return(fake_storage)
+
+      expect(fake_storage).to receive(:download)
+      allow(fake_storage).to receive(:working_directory).and_return("yolo_path")
+      allow(fake_storage).to receive(:keychain_name).and_return("https://github.com/fastlane/certs")
+
+      expect(FastlaneCore::UI).to receive(:success).with(/Successfully decrypted certificates/)
       expect(FastlaneCore::UI).to receive(:success).with(/Repo is at/)
     end
 

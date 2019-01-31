@@ -2,6 +2,7 @@ require_relative '../client'
 
 require_relative 'app'
 require_relative 'app_group'
+require_relative 'cloud_container'
 require_relative 'device'
 require_relative 'merchant'
 require_relative 'passbook'
@@ -144,6 +145,18 @@ module Spaceship
         appIdId: app.app_id,
         displayId: app.app_id,
         applicationGroups: groups.map(&:app_group_id)
+      })
+
+      details_for_app(app)
+    end
+
+    def associate_cloud_containers_with_app(app, containers)
+      ensure_csrf(Spaceship::Portal::CloudContainer)
+
+      request(:post, 'account/ios/identifiers/assignCloudContainerToAppId.action', {
+          teamId: team_id,
+          appIdId: app.app_id,
+          cloudContainers: containers.map(&:cloud_container)
       })
 
       details_for_app(app)
@@ -376,6 +389,37 @@ module Spaceship
     end
 
     #####################################################
+    # @!group Cloud Containers
+    #####################################################
+
+    def cloud_containers
+      paging do |page_number|
+        r = request(:post, 'account/cloudContainer/listCloudContainers.action', {
+            teamId: team_id,
+            pageNumber: page_number,
+            pageSize: page_size,
+            sort: 'name=asc'
+        })
+        result = parse_response(r, 'cloudContainerList')
+
+        csrf_cache[Spaceship::Portal::CloudContainer] = self.csrf_tokens
+
+        result
+      end
+    end
+
+    def create_cloud_container!(name, identifier)
+      ensure_csrf(Spaceship::Portal::CloudContainer)
+
+      r = request(:post, 'account/cloudContainer/addCloudContainer.action', {
+          name: valid_name_for(name),
+          identifier: identifier,
+          teamId: team_id
+      })
+      parse_response(r, 'cloudContainer')
+    end
+
+    #####################################################
     # @!group Team
     #####################################################
     def team_members
@@ -488,7 +532,13 @@ module Spaceship
         register: 'single'
       })
 
-      parse_response(req, 'devices').first
+      devices = parse_response(req, 'devices')
+      return devices.first unless devices.empty?
+
+      validation_messages = parse_response(req, 'validationMessages').map { |message| message["validationUserMessage"] }.compact.uniq
+
+      raise UnexpectedResponse.new, validation_messages.join('\n') unless validation_messages.empty?
+      raise UnexpectedResponse.new, "Couldn't register new device, got this: #{parse_response(req)}"
     end
 
     def disable_device!(device_id, device_udid, mac: false)
@@ -656,10 +706,7 @@ module Spaceship
     end
 
     def delete_provisioning_profile!(profile_id, mac: false)
-      ensure_csrf(Spaceship::Portal::ProvisioningProfile) do
-        fetch_csrf_token_for_provisioning
-      end
-
+      fetch_csrf_token_for_provisioning
       r = request(:post, "account/#{platform_slug(mac)}/profile/deleteProvisioningProfile.action", {
         teamId: team_id,
         provisioningProfileId: profile_id
@@ -716,6 +763,8 @@ module Spaceship
     end
 
     def create_key!(name: nil, service_configs: nil)
+      fetch_csrf_token_for_keys
+
       params = {
         name: name,
         serviceConfigurations: service_configs,
@@ -732,6 +781,7 @@ module Spaceship
     end
 
     def revoke_key!(id: nil)
+      fetch_csrf_token_for_keys
       response = request(:post, 'account/auth/key/revoke', { teamId: team_id, keyId: id })
       parse_response(response)
     end
@@ -770,14 +820,26 @@ module Spaceship
     # profiles.
     # Source https://github.com/fastlane/fastlane/issues/5903
     def fetch_csrf_token_for_provisioning(mac: false)
-      req = request(:post, "account/#{platform_slug(mac)}/profile/listProvisioningProfiles.action", {
+      response = request(:post, "account/#{platform_slug(mac)}/profile/listProvisioningProfiles.action", {
          teamId: team_id,
          pageNumber: 1,
          pageSize: 1,
          sort: 'name=asc'
        })
 
-      parse_response(req, 'provisioningProfiles')
+      parse_response(response, 'provisioningProfiles')
+      return nil
+    end
+
+    def fetch_csrf_token_for_keys
+      response = request(:post, 'account/auth/key/list', {
+         teamId: team_id,
+         pageNumber: 1,
+         pageSize: 1,
+         sort: 'name=asc'
+       })
+
+      parse_response(response, 'keys')
       return nil
     end
   end

@@ -28,45 +28,11 @@ DEBUG=1 bundle exec rspec
 You will then jump into an interactive debugger that allows you to print out variables, call methods and [much more](https://github.com/pry/pry/wiki).
 To continue running the original script use `control` + `d`
 
-## Debugging and patching [_spaceship_](https://spaceship.airforce) issues
+## Debugging and patching [_spaceship_](https://github.com/fastlane/fastlane/tree/master/spaceship) problems
 
 ### Introduction to _spaceship_
 
-_spaceship_ uses [Faraday](https://github.com/lostisland/faraday) to interact with multiple Apple API endpoints:
-
-- `https://idmsa.apple.com`: Used to authenticate to get a valid session
-- `https://developerservices2.apple.com`: For provisioning profiles and devices
-  - List provisioning profiles
-  - Register new devices
-- `https://developer.apple.com`:
-  - List all devices, certificates, apps and app groups
-  - Create new certificates, provisioning profiles and apps
-  - Disable/enable services on apps and assign them to app groups
-  - Delete certificates and apps
-  - Repair provisioning profiles
-  - Download provisioning profiles
-  - Team selection
-- `https://itunesconnect.apple.com`:
-  - Managing apps
-  - Managing beta testers
-  - Submitting updates to review
-  - Managing app metadata
-- `https://du-itc.itunesconnect.apple.com`:
-  - Upload icons, screenshots, trailers ...
-
-_spaceship_ is split into 3 layers:
-
-- `client.rb` which is the client superclass that contains all shared code between App Store Connect the Developer Portal
-- `tunes_client.rb` and `portal_client.rb` which are the implementations for both App Store Connect and Developer Portal. Those classes include the actual HTTP requests that are being sent:
-```ruby
-def app_version_data(app_id, version_platform: nil, version_id: nil)
-  r = request(:get, "ra/apps/#{app_id}/platforms/#{version_platform}/versions/#{version_id}")
-  parse_response(r, 'data')
-end
-```
-- _spaceship_ classes, e.g. `app_version.rb` which contain the API the user works with. These classes usually have some logic on how to handle responses.
-
-Don’t use any custom HTML parsing in _spaceship_, instead try to only use JSON and XML APIs.
+[_spaceship_](https://github.com/fastlane/fastlane/tree/master/spaceship) is fastlane's connection to Apple service. It is a Ruby library that exposes the Apple Developer Center and App Store Connect API. It’s super fast, well tested and supports all of the operations you can do via the browser. Scripting your Developer Center workflow has never been easier! 
 
 ### Verify the website works
 
@@ -77,13 +43,13 @@ If it is a server issue, it’s best to [file a radar](https://bugreport.apple.c
 
 <img src=".assets/ToolingCharlesEnableSSL.png" align="right" width="180" />
 
-This section explains how you can set up [Charles Proxy](https://www.charlesproxy.com/) to track local https traffic and inspect the requests and their responses. Charles is a paid application with a free option that’s usually good enough for a quick debugging session limited to 15 minutes. If you prefer a free open source alternative, check out [mitmproxy](https://mitmproxy.org/).
+This section explains how you can set up [Charles Proxy](https://www.charlesproxy.com/) to track local https traffic and inspect the requests and their responses. Charles is a paid application with a free option that’s usually good enough for a quick debugging session limited to 30 minutes. If you prefer a free open source alternative, check out [mitmproxy](https://mitmproxy.org/).
 
 First, download and install the latest version of [Charles Proxy](https://www.charlesproxy.com/). After the first launch, you’ll have to install its [Root Certificate](https://www.charlesproxy.com/documentation/using-charles/ssl-certificates/).
 
 > In Charles go to the Help menu and choose "SSL Proxying > Install Charles Root Certificate". Keychain Access will open, and prompt you about the certificate. Click the "Always Trust" button. You will then be prompted for your Administrator password to update the system trust settings.
 
-You might have to restart your Mac for the changes to be applied. To see if it works, relaunch Charles and Chrome/Safari and try opening [App Store Connect](https://itunesconnect.apple.com).
+You might have to restart your Mac for the changes to be applied. To see if it works, relaunch Charles and Chrome/Safari and try opening [App Store Connect](https://appstoreconnect.apple.com).
 
 If everything worked, you’ll already see a list of requests in the sidebar of Charles. Take a look at the above list of used API endpoints, and enable `SSL Proxying` and `Focus` on all endpoints you are interested in.
 After doing so, refresh the App Store Connect page. You should be able to see all web requests with their responses.
@@ -98,7 +64,7 @@ They key is to do the same action you want to test on both the website, and in _
 
 To pipe _spaceship_ requests through your local proxy, you need to set an environment variable:
 ```
-SPACESHIP_DEBUG=1 bundle exec fastlane spaceship
+SPACESHIP_DEBUG=1 bundle exec fastlane your_normal_command
 ```
 
 To make it easier to run the same script again, you can temporarily edit the `Rakefile` to look like this:

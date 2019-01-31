@@ -15,7 +15,7 @@ module Spaceship
       # Each request method should make only one request. For more high-level logic, put code in the data models.
 
       def self.hostname
-        'https://itunesconnect.apple.com/testflight/v2/'
+        'https://appstoreconnect.apple.com/testflight/v2/'
       end
 
       ##
@@ -55,17 +55,6 @@ module Spaceship
 
         response = request(:put) do |req|
           req.url("providers/#{team_id}/apps/#{app_id}/builds/#{build_id}")
-          req.body = build.to_json
-          req.headers['Content-Type'] = 'application/json'
-        end
-        handle_response(response)
-      end
-
-      def post_for_testflight_review(app_id: nil, build_id: nil, build: nil)
-        assert_required_params(__method__, binding)
-
-        response = request(:post) do |req|
-          req.url("providers/#{team_id}/apps/#{app_id}/builds/#{build_id}/review")
           req.body = build.to_json
           req.headers['Content-Type'] = 'application/json'
         end
@@ -112,6 +101,10 @@ module Spaceship
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
+
+        # This is invalid now.
+        @cached_groups.delete(app_id) if @cached_groups
+
         handle_response(response)
       end
 
@@ -183,7 +176,9 @@ module Spaceship
         assert_required_params(__method__, binding)
         page_size = 40 # that's enforced by the iTC servers
         resulting_array = []
-        initial_url = "providers/#{team_id}/apps/#{app_id}/testers?limit=#{page_size}&sort=email&order=asc"
+        # Sort order is set to `default` instead of `email`, because any other sort order breaks pagination
+        # when dealing with lots of anonymous (public link) testers: https://github.com/fastlane/fastlane/pull/13778
+        initial_url = "providers/#{team_id}/apps/#{app_id}/testers?limit=#{page_size}&sort=default&order=asc"
         response = request(:get, initial_url)
         link_from_response = proc do |r|
           # I weep for Swift nil chaining

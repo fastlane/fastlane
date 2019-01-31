@@ -31,7 +31,7 @@ describe Fastlane do
         let(:path) { "my file.txt" }
 
         it "executes the correct git command" do
-          allow(Fastlane::Actions).to receive(:sh).with("git add my\\ file.txt", anything).and_return("")
+          allow(Fastlane::Actions).to receive(:sh).with("git add #{path.shellescape}", anything).and_return("")
           result = Fastlane::FastFile.new.parse("lane :test do
             git_add(path: '#{path}')
           end").runner.execute(:test)
@@ -42,7 +42,7 @@ describe Fastlane do
         let(:path) { ["my file.txt", "some dir/your file.txt"] }
 
         it "executes the correct git command" do
-          allow(Fastlane::Actions).to receive(:sh).with("git add my\\ file.txt some\\ dir/your\\ file.txt", anything).and_return("")
+          allow(Fastlane::Actions).to receive(:sh).with("git add #{path[0].shellescape} #{path[1].shellescape}", anything).and_return("")
           result = Fastlane::FastFile.new.parse("lane :test do
             git_add(path: #{path})
           end").runner.execute(:test)

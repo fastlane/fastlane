@@ -70,7 +70,7 @@ module Fastlane
     end
 
     def run(action_named: nil, action_class_ref: nil, parameter_map: nil)
-      action_return = runner.execute_action(action_named, action_class_ref, [parameter_map], custom_dir: '.', configuration_language: "swift")
+      action_return = runner.execute_action(action_named, action_class_ref, [parameter_map], custom_dir: '.')
       return action_return
     end
 

@@ -34,6 +34,7 @@ module Fastlane
           workspace: '--workspace',
           binary_file: '--binary-file',
           binary_basename: '--binary-basename',
+          arch: '--arch',
           source_files: '--source-files',
           decimals: '--decimals'
       }.freeze
@@ -257,6 +258,10 @@ module Fastlane
                                        description: "Binary file name to be used for code coverage",
                                        is_string: false,
                                        default_value: false),
+          FastlaneCore::ConfigItem.new(key: :arch,
+                                       env_name: "FL_SLATHER_ARCH",
+                                       description: "Specify which architecture the binary file is in. Needed for universal binaries",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :source_files,
                                        env_name: "FL_SLATHER_SOURCE_FILES",
                                        description: "A Dir.glob compatible pattern used to limit the lookup to specific source files. Ignored in gcov mode",
