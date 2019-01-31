@@ -17,7 +17,7 @@ module Spaceship
         start_t, end_t = time_last_7_days
 
         app_impressions_interval(start_t, end_t)
-      end 
+      end
 
       # App Store / Product Page Views Unique Devices
       def app_views
@@ -47,7 +47,7 @@ module Spaceship
         app_sales_interval(start_t, end_t)
       end
 
-      # Sales / Paying Users 
+      # Sales / Paying Users
       def app_paying_users
         start_t, end_t = time_last_7_days
 
@@ -92,10 +92,10 @@ module Spaceship
       def app_measure_interval(start_t, end_t, measure, view_by = nil)
         client.time_series_analytics([apple_id], [measure], start_t, end_t, "DAY", view_by)
       end
-      
+
       def app_impressions_interval(start_t, end_t, view_by = nil)
         client.time_series_analytics([apple_id], ['impressionsTotal'], start_t, end_t, "DAY", view_by)
-      end 
+      end
 
       def app_units_interval(start_t, end_t, view_by = nil)
         client.time_series_analytics([apple_id], ['units'], start_t, end_t, "DAY", view_by)
