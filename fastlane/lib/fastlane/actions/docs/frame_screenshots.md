@@ -217,13 +217,13 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 
 ### Screenshot orientation
 
-By default _frameit_ adds a frame to your screenshot based on an orientation you took it. For a portrait (vertical orientation) it is going to add portrait frame and for a landscape (horizontal orientation) - landscape left.
+By default _frameit_ adds a frame to your screenshot based on an orientation you took it. For a portrait (vertical orientation) it is going to add portrait frame and for a landscape (horizontal orientation) - landscape left (= [Home button on the left side](https://developer.apple.com/documentation/uikit/uiinterfaceorientation/landscapeleft)).
 
-If you'd like to get a frame in a landscape right for your horizontal screenshots, you need to add `force_landscaperight` at the end of your screenshot's filename. 
+One way to override the default behavior is editing the file name by adding `force_landscaperight` to the end.
 
 ### `force_orientation_block`
 
-In a case you don't want to rename your screenshots or default behaviour does not meet your requirements, there's a way to customise it. In order to do so, you need to set `force_orientation_block` parameter.
+If the default behavior doesn't fit your needs and you don't want or can't rename your screenshots, you can customize _frameit_'s orientation behavior by setting a `force_orientation_block` parameter. The valid values are: `landscape_left` (home button on the left side), `:landscape_right` (home button on the right side), `:portrait` (home button on the bottom), `nil` (home button on the right side).
 
 ### Examples
 
@@ -232,10 +232,10 @@ frameit(
   path: "./fastlane/screenshots",
   force_orientation_block: proc do |filename|
     case filename
-      when "1Login" 
-        :landscape_left
-      when "2Profile"
+      when "iPad Pro (12.9-inch)-01LoginScreen" 
         :landscape_right
+      when "iPhone 6 Plus-01LoginScreen"
+        : portrait
       # and so on
     end
   end
