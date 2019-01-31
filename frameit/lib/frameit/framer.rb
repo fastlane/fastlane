@@ -69,7 +69,9 @@ module Frameit
       if color
         screenshot.color = color
       end
-      TemplateFinder.get_template(screenshot)
+      frame = TemplateFinder.get_template(screenshot)
+      UI.message("found frame: #{frame}")
+      return frame
     end
 
     def store_result
