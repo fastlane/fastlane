@@ -228,6 +228,7 @@ If the default behavior doesn't fit your needs and you don't want or can't renam
 ### Examples
 
 ```ruby
+# It matches the filename to the framed device orientation
 frameit(
   path: "./fastlane/screenshots",
   force_orientation_block: proc do |filename|
@@ -243,6 +244,7 @@ frameit(
 ```
 
 ```ruby
+# It frames the screenshots in landscape right whenever the filename contains `landscape` word
 frameit(
   silver: true,
   path: "./fastlane/screenshots",
