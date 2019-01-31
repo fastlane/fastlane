@@ -129,7 +129,7 @@ The general parameters are defined in the `default` key and can be:
 | `padding` | The content of the framed screenshot will be resized to match the specified `padding` around all edges. The vertical padding is also applied between the text and the top or bottom (depending on `title_below_image`) of the device frame. <p> There are 3 different options of specyfying the padding: <p> 1. Default: An integer value that defines both horizontal and vertical padding in pixels. <br> 2. A string that defines (different) padding values in pixels for horizontal and vertical padding. The syntax is `"<horizontal>x<vertical>"`, e.g. `"30x60"`. <br> 3. A string that defines (different) padding values in percentage for horizontal and vertical padding. The syntax is `"<horizontal>%x<vertical>%"`, e.g. `"5%x10%"`. <br> **Note:** The percentage is calculated from the smallest image dimension (height or width). <p> A combination of option 2 and 3 is possible, e.g. `"5%x40"`. | `50` |
 | `interline_spacing` | Specifies whether _frameit_ should add or subtract this many pixels between the individual lines of text. This only applies to a multi-line `title` and/or `keyword` to expand or squash together the individual lines of text. | `0` |
 | `font_scale_factor` | Specifies whether _frameit_ should increase or decrease the font size of the text. | `0.1` |
-| `frame` | Specifies the color of the frame to be used. (Valid values are `BLACK, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
+| `frame` | Overrides the color of the frame to be used. (Valid values are `BLACK, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
 
 ### Specific parameters
 
@@ -141,7 +141,7 @@ These are defined in the `data` key. This is an array with the following keys fo
 | `filter` | This is mandatory to link the individual configuration to the screenshot, based on part of the file name. <p>Example:<br>If a screenshot is named `iPhone 8-Brainstorming.png` you can use value `Brainstorming` for `filter`.  If there are more than one `filter` matching an entry, they will all be applied in order (which means that the last one has the highest precedence). All other keys from that array element will only be applied on this specific screenshot. |
 | `keyword` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
 | `title` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
-| `frame` | Specifies the color of the frame to be used. (Valid values are `BLACK, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
+| `frame` | Overrides the color of the frame to be used. (Valid values are `BLACK, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
 
 ### <a name="keyword-and-title-parameters"></a>Framefile `keyword` and `title` parameters
 
