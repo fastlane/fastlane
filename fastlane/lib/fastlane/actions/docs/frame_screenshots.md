@@ -235,7 +235,7 @@ frameit(
       when "iPad Pro (12.9-inch)-01LoginScreen" 
         :landscape_right
       when "iPhone 6 Plus-01LoginScreen"
-        : portrait
+        :portrait
       # and so on
     end
   end
