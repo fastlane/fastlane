@@ -31,6 +31,7 @@ module Frameit
 
       if screenshots.count > 0
         screenshots.each do |full_path|
+
           # skip screenshots we are not interested in
           next if full_path.include?("_framed.png")
           next if full_path.include?("_wrapped.png")
@@ -41,24 +42,6 @@ module Frameit
             UI.error("Apple Watch screenshots are not framed: '#{full_path}'")
             next
           end
-
-          #new
-          begin
-            screenshot = Screenshot.new(full_path, color)
-            if screenshot.mac?
-              editor = MacEditor.new(screenshot)
-            else
-              editor = Editor.new(screenshot, Frameit.config[:debug_mode])
-            end
-            if editor.should_skip?
-              UI.message("Skipping framing of screenshot #{screenshot.path}.  No title provided in your Framefile.json or title.strings.")
-            else
-              Helper.show_loading_indicator("Framing screenshot '#{full_path}'")
-              editor.frame!
-            end
-            #/new
-           #old 
-          Helper.show_loading_indicator("Framing screenshot '#{full_path}'")
 
           # Get the config from Framefile.json etc
           config = fetch_config(full_path)
@@ -77,7 +60,7 @@ module Frameit
 
               # Add the frame
               framed_screenshot = Framer.new.frame!(screenshot, frame, config, Frameit.config[:debug_mode])
-              
+
               # And optionally wrap it
               if is_complex_framing?(config)
                 if self.mac?

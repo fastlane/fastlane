@@ -17,18 +17,14 @@ module Frameit
     attr_accessor :frame # the frame of the device
     attr_accessor :image # the current image used for editing
     
-
-    def initialize(screenshot, debug_mode = false)
-      @screenshot = screenshot
-      self.debug_mode = debug_mode
-    end
+    # TODO Clean up @ vs. self.
 
     def frame!(screenshot, frame, config, debug_mode = false)
       self.screenshot = screenshot
       self.config = config
       self.debug_mode = debug_mode
 
-      prepare_image
+      @image = MiniMagick::Image.open(screenshot.path)
 
       @frame_path = load_frame
       if @frame_path 
@@ -60,10 +56,6 @@ module Frameit
 
     private
 
-    def prepare_image
-      @image = MiniMagick::Image.open(screenshot.path)
-    end
-
     def load_frame
       color = fetch_frame_color
       if color
@@ -72,15 +64,6 @@ module Frameit
       frame = TemplateFinder.get_template(screenshot)
       UI.message("found frame: #{frame}")
       return frame
-    end
-
-    def store_result
-      output_path = screenshot.path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
-      image.format("png")
-      image.write(output_path)
-      Helper.hide_loading_indicator
-      UI.success("Added frame: '#{File.expand_path(output_path)}'")
-      return output_path
     end
 
     def put_into_frame
@@ -111,7 +94,7 @@ module Frameit
         end
       end
 
-      @image = frame.composite(image, "png") do |c|
+      @image = frame.composite(@image, "png") do |c|
         c.compose("DstOver")
         c.geometry(offset['offset'])
       end
@@ -119,6 +102,15 @@ module Frameit
       # Revert the rotation from above
       frame.rotate(rotation)
       @image.rotate(rotation)
+    end
+
+    def store_result
+      output_path = screenshot.path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
+      @image.format("png")
+      @image.write(output_path)
+      Helper.hide_loading_indicator
+      UI.success("Added frame: '#{File.expand_path(output_path)}'")
+      return output_path
     end
 
     # TODO duplicated between editor and wrapper
