@@ -7,12 +7,14 @@ require_relative 'module'
 module Frameit
   # Represents the frame to be used
   class Frame
+    attr_accessor :screenshot
     attr_accessor :color # the color to use for the frame (from Frameit::Color) # TODO remove, see below
     attr_accessor :config 
 
     # path: Path to screenshot
     # color: Color to use for the frame
-    def initialize( config, color)
+    def initialize(screenshot, config, color)
+      @screenshot = screenshot
       self.config = config
       @color = color
     end
@@ -20,9 +22,9 @@ module Frameit
     # TODO move to Deliver as well similar to `calculate_screen_size`
     def color
       if !Frameit.config[:use_legacy_iphone6s] && @color == Frameit::Color::BLACK
-        if @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_47
+        if @screenshot.screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || @screenshot.screen_size == Deliver::AppScreenshot::ScreenSize::IOS_47
           return "Matte Black" # RIP space gray
-        elsif @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_61
+        elsif @screenshot.screen_size == Deliver::AppScreenshot::ScreenSize::IOS_61
           return "Black"
         end
       end

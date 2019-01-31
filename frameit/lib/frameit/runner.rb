@@ -51,7 +51,7 @@ module Frameit
             screenshot = Screenshot.new(full_path)
 
             # Get the frame
-            frame = Frame.new(config, color)
+            frame = Frame.new(screenshot, config, color)
 
             if should_skip?(config)
               UI.message("Skipping framing of screenshot #{screenshot.path}. No title provided in your Framefile.json or title.strings.")
