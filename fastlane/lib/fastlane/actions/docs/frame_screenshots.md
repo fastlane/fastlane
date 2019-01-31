@@ -264,10 +264,6 @@ Check out [_snapshot_](https://docs.fastlane.tools/actions/snapshot/) to automat
 
 Use [_deliver_](https://docs.fastlane.tools/actions/deliver/) to upload iOS screenshots to App Store Connect, or [_supply_](https://docs.fastlane.tools/actions/supply/) to upload Android screenshots to Play Store completely automatically 🚀
 
-## Alternative location to store device_frames
-
-Device frames can also be stored in a `./fastlane/screenshots/devices_frames` directory if you prefer rather than in the `~/.frameit/device_frames` directory. (If doing so please be aware that Apple's images are copyrighted and should not be redistributed as part of a repository so you may want to include them in your `.gitignore` file.)
-
 ## Use a clean status bar
 
 You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
