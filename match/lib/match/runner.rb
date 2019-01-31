@@ -169,6 +169,7 @@ module Match
         self.files_to_commit << private_key_path
       else
         cert_path = certs.last
+        Utils.check_cert_validity(cert_path)
 
         if Helper.mac?
           UI.message("Installing certificate...")
