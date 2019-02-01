@@ -23,7 +23,7 @@ module FastlaneCore
           # Output verbose if file is already installed since not an error otherwise we will show the whole error
           err = stderr.read.to_s.strip
           if err.include?("SecKeychainItemImport") && err.include?("The specified item already exists in the keychain")
-            type = File.extname(".p12") ? "Key" : "Certificate"
+            type = File.extname(path) == ".p12" ? "Key" : "Certificate"
             UI.verbose("#{type} '#{File.basename(path)}' is already installed on this machine")
           else
             UI.error(err)
