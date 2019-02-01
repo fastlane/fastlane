@@ -223,7 +223,7 @@ One way to override the default behavior is editing the file name by adding `for
 
 ### `force_orientation_block`
 
-If the default behavior doesn't fit your needs and you don't want or can't rename your screenshots, you can customize _frameit_'s orientation behavior by setting a `force_orientation_block` parameter. The valid values are: `landscape_left` (home button on the left side), `:landscape_right` (home button on the right side), `:portrait` (home button on the bottom), `nil` (home button on the right side).
+If the default behavior doesn't fit your needs and you don't want or can't rename your screenshots, you can customize _frameit_'s orientation behavior by setting a `force_orientation_block` parameter. The valid values are: `:landscape_left` (home button on the left side), `:landscape_right` (home button on the right side), `:portrait` (home button on the bottom), `nil` (home button on the right side).
 
 ### Examples
 
