@@ -219,6 +219,48 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 - These `.strings` files **MUST** be utf-8 (UTF-8) or utf-16 encoded (UTF-16 BE with BOM). They also must begin with an empty line. If you are having trouble see [issue #1740](https://github.com/fastlane/fastlane/issues/1740)
 - You **MUST** provide a background if you want titles. _frameit_ will not add the tiles if a background is not specified.
 
+### Screenshot orientation
+
+By default _frameit_ adds a frame to your screenshot based on an orientation you took it. For a portrait (vertical orientation) it is going to add portrait frame and for a landscape (horizontal orientation) - landscape left (= [Home button on the left side](https://developer.apple.com/documentation/uikit/uiinterfaceorientation/landscapeleft)).
+
+One way to override the default behavior is editing the file name by adding `force_landscaperight` to the end.
+
+### `force_orientation_block`
+
+If the default behavior doesn't fit your needs and you don't want or can't rename your screenshots, you can customize _frameit_'s orientation behavior by setting a `force_orientation_block` parameter. The valid values are: `:landscape_left` (home button on the left side), `:landscape_right` (home button on the right side), `:portrait` (home button on the bottom), `nil` (home button on the right side).
+
+### Examples
+
+```ruby
+# It matches the filename to the framed device orientation
+frameit(
+  path: "./fastlane/screenshots",
+  force_orientation_block: proc do |filename|
+    case filename
+      when "iPad Pro (12.9-inch)-01LoginScreen" 
+        :landscape_right
+      when "iPhone 6 Plus-01LoginScreen"
+        :portrait
+      # and so on
+    end
+  end
+)
+```
+
+```ruby
+# It frames the screenshots in landscape right whenever the filename contains `landscape` word
+frameit(
+  silver: true,
+  path: "./fastlane/screenshots",
+  force_orientation_block: proc do |filename|
+    f = filename.downcase
+    if f.include?("landscape")
+      :landscape_right
+    end
+  end
+)
+```
+
 # Mac
 
 With _frameit_ it's possible to also frame macOS Application screenshots. You have to provide the following:
