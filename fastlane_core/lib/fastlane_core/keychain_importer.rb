@@ -18,7 +18,7 @@ module FastlaneCore
 
         # Set partition list only if success since it can be a time consuming process if a lot of keys are installed
         if thrd.value.success?
-          set_partition_list(path, keychain_path, keychain_password: keychain_password, certificate_password: certificate_password, output: output)
+          set_partition_list(path, keychain_path, keychain_password: keychain_password, output: output)
         else
           # Output verbose if file is already installed since not an error otherwise we will show the whole error
           err = stderr.read.to_s.strip
