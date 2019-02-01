@@ -58,14 +58,10 @@ module Match
       return {}
     end
 
-    def self.check_cert_validity(cer_certificate_path)
+    def self.is_cert_valid?(cer_certificate_path)
       cert = OpenSSL::X509::Certificate.new(File.binread(cer_certificate_path))
       now = Time.now.utc
-      if (cert.not_before <=> now) * (now <=> cert.not_after) < 1
-        UI.error("Your certificate '#{File.basename(cer_certificate_path)}' is not valid, please check start and end datetime")
-      else
-        UI.message("Your certificate '#{File.basename(cer_certificate_path)}' is valid")
-      end
+      return (now <=> cert.not_after) == -1
     end
 
     def self.base_environment_variable_name(app_identifier: nil, type: nil, platform: :ios)

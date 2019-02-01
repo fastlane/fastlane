@@ -169,7 +169,12 @@ module Match
         self.files_to_commit << private_key_path
       else
         cert_path = certs.last
-        Utils.check_cert_validity(cert_path)
+        # Check validity of certificate
+        if Utils.is_cert_valid?(cert_path)
+          UI.verbose("Your certificate '#{File.basename(cert_path)}' is valid")
+        else
+          UI.user_error!("Your certificate '#{File.basename(cert_path)}' is not valid, please check end date and renew it if necessary")
+        end
 
         if Helper.mac?
           UI.message("Installing certificate...")
