@@ -16,8 +16,8 @@ describe Match do
         allow(File).to receive(:exist?).and_return(false)
         expect(File).to receive(:exist?).with('item.path').and_return(true)
 
+        allow(Open3).to receive(:popen3).with(expected_command)
         allow(Open3).to receive(:popen3).with(allowed_command)
-        expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: FastlaneCore::Globals.verbose?)
 
         Match::Utils.import('item.path', 'login.keychain')
       end
@@ -35,8 +35,8 @@ describe Match do
         allow(File).to receive(:exist?).and_return(false)
         expect(File).to receive(:exist?).with('item.path').and_return(true)
 
+        allow(Open3).to receive(:popen3).with(expected_command)
         allow(Open3).to receive(:popen3).with(allowed_command)
-        expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: FastlaneCore::Globals.verbose?)
 
         Match::Utils.import('item.path', keychain)
       end
@@ -60,8 +60,8 @@ describe Match do
         allow(File).to receive(:exist?).and_return(false)
         expect(File).to receive(:exist?).with("item.path").and_return(true)
 
+        allow(Open3).to receive(:popen3).with(expected_command)
         allow(Open3).to receive(:popen3).with(allowed_command)
-        expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: FastlaneCore::Globals.verbose?)
 
         Match::Utils.import('item.path', "login.keychain")
       end
