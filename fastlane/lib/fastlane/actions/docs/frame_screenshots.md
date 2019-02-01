@@ -87,7 +87,7 @@ To download the latest frames
 fastlane frameit download_frames
 ```
 
-When using _frameit_ without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store.
+Note: When using _frameit_ without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store.
 
 ## Advanced Usage (optional)
 
@@ -100,7 +100,7 @@ A working example can be found in the [fastlane examples](https://github.com/fas
 ### `Framefile.json`
 
 The Framefile allows to define general and screenshot specific information.
-It has the following JSON structure:
+It has the following general JSON structure:
 
 ```json
 {
@@ -120,7 +120,7 @@ The general parameters are defined in the `default` key and can be:
 
 | Key | Description | Default value |
 |-----|-------------|---------------|
-| `background` | The background that should be used for the framed screenshot. Specify the (relative) path to the image file (e.g. *.jpg). This parameter is mandatory. | NA |
+| `background` | The background that should be used for the framed screenshot. Specify the (relative) path to the image file (e.g. `*.jpg`). This parameter is mandatory. | NA |
 | `keyword` | An object that contains up to 3 keys to describe the optional keyword. See [table](#keyword-and-title-parameters) below. | NA |
 | `title` | An object that contains up to 3 keys to describe the mandatory title. See [table](#keyword-and-title-parameters) below. | NA |
 | `stack_title` | Specifies whether _frameit_ should display the keyword above the title when both keyword and title are defined. If it is false, the title and keyword will be displayed side by side when both keyword and title are defined. | `false` |
@@ -129,6 +129,7 @@ The general parameters are defined in the `default` key and can be:
 | `padding` | The content of the framed screenshot will be resized to match the specified `padding` around all edges. The vertical padding is also applied between the text and the top or bottom (depending on `title_below_image`) of the device frame. <p> There are 3 different options of specyfying the padding: <p> 1. Default: An integer value that defines both horizontal and vertical padding in pixels. <br> 2. A string that defines (different) padding values in pixels for horizontal and vertical padding. The syntax is `"<horizontal>x<vertical>"`, e.g. `"30x60"`. <br> 3. A string that defines (different) padding values in percentage for horizontal and vertical padding. The syntax is `"<horizontal>%x<vertical>%"`, e.g. `"5%x10%"`. <br> **Note:** The percentage is calculated from the smallest image dimension (height or width). <p> A combination of option 2 and 3 is possible, e.g. `"5%x40"`. | `50` |
 | `interline_spacing` | Specifies whether _frameit_ should add or subtract this many pixels between the individual lines of text. This only applies to a multi-line `title` and/or `keyword` to expand or squash together the individual lines of text. | `0` |
 | `font_scale_factor` | Specifies whether _frameit_ should increase or decrease the font size of the text. | `0.1` |
+| `frame` | Overrides the color of the frame to be used. (Valid values are `BLACK, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
 
 ### Specific parameters
 
@@ -140,6 +141,7 @@ These are defined in the `data` key. This is an array with the following keys fo
 | `filter` | This is mandatory to link the individual configuration to the screenshot, based on part of the file name. <p>Example:<br>If a screenshot is named `iPhone 8-Brainstorming.png` you can use value `Brainstorming` for `filter`.  If there are more than one `filter` matching an entry, they will all be applied in order (which means that the last one has the highest precedence). All other keys from that array element will only be applied on this specific screenshot. |
 | `keyword` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
 | `title` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
+| `frame` | Overrides the color of the frame to be used. (Valid values are `BLACK, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
 
 ### <a name="keyword-and-title-parameters"></a>Framefile `keyword` and `title` parameters
 
@@ -168,7 +170,8 @@ The `keyword` and `title` parameters are both used in `default` and `data`. They
     "padding": 50,
     "show_complete_frame": false,
     "stack_title" : false,
-    "title_below_image": true
+    "title_below_image": true,
+    "frame": "WHITE"
   },
 
   "data": [
@@ -182,7 +185,8 @@ The `keyword` and `title` parameters are both used in `default` and `data`. They
       "filter": "Organizing",
       "keyword": {
         "color": "#feb909"
-      }
+      },
+      "frame": "ROSE_GOLD"
     },
     {
       "filter": "Sharing",
@@ -259,14 +263,6 @@ Check out [_snapshot_](https://docs.fastlane.tools/actions/snapshot/) to automat
 ## Upload screenshots
 
 Use [_deliver_](https://docs.fastlane.tools/actions/deliver/) to upload iOS screenshots to App Store Connect, or [_supply_](https://docs.fastlane.tools/actions/supply/) to upload Android screenshots to Play Store completely automatically 🚀
-
-## Alternative location to store device_frames
-
-Device frames can also be stored in a ```./fastlane/screenshots/devices_frames``` directory if you prefer rather than in the ```~/.frameit/device_frames``` directory. If doing so please be aware that Apple's images are copyrighted and should not be redistributed as part of a repository so you may want to include them in your .gitignore file.
-
-## White background of frames
-
-Some stock images provided by Apple still have a white background instead of a transparent one. You'll have to edit the Photoshop file to remove the white background, delete the generated `.png` file and run `fastlane frameit` again.
 
 ## Use a clean status bar
 
