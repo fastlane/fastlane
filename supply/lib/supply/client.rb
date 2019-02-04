@@ -31,7 +31,7 @@ module Supply
           UI.user_error!("Could not find service account json file at path '#{json_key_path}'") unless File.exist?(json_key_path)
           params[:json_key] = json_key_path
         else
-          UI.user_error!("Could not load authentication file. Make sure it has been added as an enviroment variable as 'json_key' or 'json_key_data' for raw data")
+          UI.user_error!("Could not load Google authentication. Make sure it has been added as an environment variable in 'json_key' or 'json_key_data'")
         end
       end
 
