@@ -23,7 +23,7 @@ describe Fastlane do
             Fastlane::FastFile.new.parse("lane :test do
               create_app_on_managed_play_store()
             end").runner.execute(:test)
-          end.to raise_error(FastlaneCore::Interface::FastlaneError, /Could not load authentication file. Make sure it has been added as an enviroment variable as 'json_key' or 'json_key_data' for raw data/)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not load Google authentication. Make sure it has been added as an environment variable in 'json_key' or 'json_key_data'")
         end
       end
 

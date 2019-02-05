@@ -13,11 +13,9 @@ module Supply
     attr_accessor :client
 
     def self.make_from_config(params: nil)
-      if params.nil?
-        params = Supply.config
-      end
-      kei_io = service_account_authentication(params: params)
-      return self.new(service_account_json: kei_io, params: params)
+      params ||= Supply.config
+      service_account_data = service_account_authentication(params: params)
+      return self.new(service_account_json: service_account_data, params: params)
     end
 
     # Supply authentication file
@@ -102,20 +100,18 @@ module Supply
     def self.service_account_authentication(params: nil)
       if params[:json_key] || params[:json_key_data]
         super(params)
+      elsif params[:key] && params[:issuer]
+        require 'google/api_client/auth/key_utils'
+        UI.important("This type of authentication is deprecated. Please consider using JSON authentication instead")
+        key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(params[:key]), 'notasecret')
+        cred_json = {
+          private_key: key.to_s,
+          client_email: params[:issuer]
+        }
+        service_account_json = StringIO.new(MultiJson.dump(cred_json))
+        service_account_json
       else
-        if params[:key] && params[:issuer]
-          require 'google/api_client/auth/key_utils'
-          UI.important("This type of authentication is deprecated. Please consider using JSON authentication instead")
-          key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(params[:key]), 'notasecret')
-          cred_json = {
-            private_key: key.to_s,
-            client_email: params[:issuer]
-          }
-          service_account_json = StringIO.new(MultiJson.dump(cred_json))
-          service_account_json
-        else
-          UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
-        end
+        UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
       end
     end
 
