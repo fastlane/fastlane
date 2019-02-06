@@ -3716,8 +3716,10 @@ func updateProjectProvisioning(xcodeproj: String? = nil,
   _ = runner.executeCommand(command)
 }
 func updateProjectTeam(path: String,
+                       targets: [String]? = nil,
                        teamid: String) {
   let command = RubyCommand(commandID: "", methodName: "update_project_team", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
+                                                                                                     RubyCommand.Argument(name: "targets", value: targets),
                                                                                                      RubyCommand.Argument(name: "teamid", value: teamid)])
   _ = runner.executeCommand(command)
 }
@@ -4229,4 +4231,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.40]
+// FastlaneRunnerAPIVersion [0.9.41]
