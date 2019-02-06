@@ -75,7 +75,10 @@ end
 def convert_image_resource(path)
   puts("Updating and trimming image file '#{path}'")
   image = MiniMagick::Image.open(path)
-  image.trim
+  image.combine_options do |co|
+    co.fuzz("90%")
+    co.trim("+repage")
+  end
   image.write(path)
 end
 
