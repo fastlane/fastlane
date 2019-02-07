@@ -52,14 +52,14 @@ task(:generate_device_frames) do
 
     cp(current_raw, output)
     output_file_path = File.join(output, basename)
-    sanitaized_basename = sanitize_filename(basename)
-    sanitaized_file_path = File.join(output, sanitaized_basename)
-    mv(output_file_path, sanitaized_file_path) unless output_file_path == sanitaized_file_path
-    convert_image_resource(sanitaized_file_path)
-    image_assets << sanitaized_basename
+    sanitized_basename = sanitize_filename(basename)
+    sanitized_file_path = File.join(output, sanitized_basename)
+    mv(output_file_path, sanitized_file_path) unless output_file_path == sanitized_file_path
+    convert_image_resource(sanitized_file_path)
+    image_assets << sanitized_basename
 
-    x, y, width = measure_slot(sanitaized_file_path)
-    device_name = sanitize_device_name(sanitaized_basename)
+    x, y, width = measure_slot(sanitized_file_path)
+    device_name = sanitize_device_name(sanitized_basename)
     offsets[device_name.to_s] = { 'offset' => "+#{x}+#{y}", 'width' => width }
   end
 
