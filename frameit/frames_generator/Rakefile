@@ -105,16 +105,29 @@ def measure_slot(path)
 
   convert = MiniMagick::Tool::Convert.new
   convert << path
-  convert.negate
-  convert.define("connected-components:verbose=true")
-  convert.define("connected-components:area-threshold=100")
-  convert.connected_components("8")
+  convert.negate # it makes white, black and black, white, adjusting all the colors to match
+  # connected-component analysis uniquely labels connected components in an image
+  convert.define("connected-components:verbose=true") # it enables a verbose output to the shell console
+  convert.define("connected-components:area-threshold=100") # it eliminates small objects by merging them with their larger neighbors
+  convert.connected_components("8") # it visits 8 neighbors
   convert.auto_level
   convert << tmp_output
   command_output = convert.call
 
   sh("rm #{tmp_output}", verbose: false)
 
+  # The example of the command ouput:
+  #
+  # Objects (id: bounding-box centroid area mean-color):
+  #   494: 640x1136+67+239 386.5,806.5 727040 srgb(255,255,255)
+  #   4: 767x1605+0+0 385.4,801.2 478199 srgb(0,0,0)
+  #   522: 115x1004+0+601 12.1,1244.6 10023 srgb(255,255,255)
+  #   0: 517x232+0+0 125.3,36.3 8303 srgb(255,255,255)
+  #   8: 131x115+636+0 731.1,26.2 3908 srgb(255,255,255)
+  #   561: 108x108+659+1497 740.4,1578.0 2954 srgb(255,255,255)
+  #   500: 7x48+0+301 3.0,323.7 325 srgb(255,255,255)
+  #   511: 7x42+0+454 3.0,473.7 283 srgb(255,255,255)
+  #
   raw_dimensions = command_output.split("\n")[1].strip
   dimensions = /(\d+)x(\d+)\+(\d+)\+(\d+)/.match(raw_dimensions)
   x = dimensions[3]
