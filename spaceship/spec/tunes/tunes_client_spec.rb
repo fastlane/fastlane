@@ -128,7 +128,7 @@ describe Spaceship::TunesClient do
     describe "in-app-purchase methods" do
       before do
         stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/123/iaps/abc/submission")
-          .and_return(status: 200, body: TunesStubbing.itc_read_fixture_file("iap_submission.json"), headers: {"Content-Type" => "application/json"})
+          .and_return(status: 200, body: TunesStubbing.itc_read_fixture_file("iap_submission.json"), headers: { "Content-Type" => "application/json" })
       end
 
       it "submits an in-app-purchase for review" do
