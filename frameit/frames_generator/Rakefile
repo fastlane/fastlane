@@ -82,9 +82,11 @@ task(:generate_device_frames) do
   # Check if the offsets for a device are identical for all colors
   devices.each do |device, models|
     next if models.all? { |m| m[:x] == (models[0][:x]) && m[:y] == (models[0][:y]) && m[:width] == (models[0][:width]) }
-    puts("The offsets for #{device} are not identical for all colors:".yellow)
+    puts
+    puts("The offsets for #{device} are not identical for all colors:".red)
     models.each { |m| puts("#{m[:filename]} +#{m[:x]}+#{m[:y]}, #{m[:width]}") }
     puts("You can either keep the value in `offset.json` or replace it with a more appropriate value from above.")
+    puts
   end
 
   cp_r(output, "output/latest")
