@@ -58,6 +58,12 @@ module Match
       return {}
     end
 
+    def self.is_cert_valid?(cer_certificate_path)
+      cert = OpenSSL::X509::Certificate.new(File.binread(cer_certificate_path))
+      now = Time.now.utc
+      return (now <=> cert.not_after) == -1
+    end
+
     def self.base_environment_variable_name(app_identifier: nil, type: nil, platform: :ios)
       if platform.to_s == :ios.to_s
         ["sigh", app_identifier, type] # We keep the ios profiles without the platform for backwards compatibility
