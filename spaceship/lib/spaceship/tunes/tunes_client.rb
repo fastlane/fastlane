@@ -1193,6 +1193,12 @@ module Spaceship
       parse_response(r, 'data')
     end
 
+    # Submit the In-App-Purchase for review
+    def submit_iap!(app_id: nil, purchase_id: nil)
+      r = request(:post, "ra/apps/#{app_id}/iaps/#{purchase_id}/submission")
+      handle_itc_response(r)
+    end
+
     # Loads the full In-App-Purchases-Family
     def load_iap_family(app_id: nil, family_id: nil)
       r = request(:get, "ra/apps/#{app_id}/iaps/family/#{family_id}")

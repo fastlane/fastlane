@@ -124,6 +124,19 @@ describe Spaceship::TunesClient do
         expect(subject.select_team).to eq('5678')
       end
     end
+
+    describe "in-app-purchase methods" do
+      before do
+        stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/123/iaps/abc/submission")
+          .and_return(status: 200, body: TunesStubbing.itc_read_fixture_file("iap_submission.json"), headers: { "Content-Type" => "application/json" })
+      end
+
+      it "submits an in-app-purchase for review" do
+        response = subject.submit_iap!(app_id: "123", purchase_id: "abc")
+        # the response does not include any data when it is successful.
+        expect(response).to eq(nil)
+      end
+    end
   end
 
   describe "CI" do
