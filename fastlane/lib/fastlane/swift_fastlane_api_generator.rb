@@ -191,12 +191,12 @@ func parseDictionaryHelper(fromString: String, function: String = #function) -> 
 
 func parseBool(fromString: String, function: String = #function) -> Bool {
   verbose(message: "parsing a Bool from data: \(fromString), from function: \(function)")
-  return NSString(string: fromString).boolValue
+  return NSString(string: fromString.trimmingCharacters(in: .punctuationCharacters)).boolValue
 }
 
 func parseInt(fromString: String, function: String = #function) -> Int {
-  verbose(message: "parsing a Bool from data: \(fromString), from function: \(function)")
-  return NSString(string: fromString).integerValue
+  verbose(message: "parsing an Int from data: \(fromString), from function: \(function)")
+  return NSString(string: fromString.trimmingCharacters(in: .punctuationCharacters)).integerValue
 }
       '
       return parsing_functions

@@ -17,22 +17,6 @@ module Fastlane
         "Codesign an existing ipa file"
       end
 
-      def self.details
-        sample = <<-SAMPLE.markdown_sample
-          ```ruby
-          resign(ipa: "path", signing_identity: "identity", provisioning_profile: {
-            "com.example.awesome-app" => "App.mobileprovision",
-            "com.example.awesome-app.app-extension" => "Extension.mobileprovision"
-          })
-          ```
-        SAMPLE
-
-        [
-          "You may provide multiple provisioning profiles if the application contains nested applications or app extensions, which need their own provisioning profile. You can do so by passing an array of provisiong profile strings or a hash that associates provisioning profile values to bundle identifier keys.".markdown_preserve_newlines,
-          sample
-        ].join("\n")
-      end
-
       def self.example_code
         [
           'resign(
@@ -40,7 +24,11 @@ module Fastlane
             signing_identity: "iPhone Distribution: Luka Mirosevic (0123456789)",
             provisioning_profile: "path/to/profile", # can omit if using the _sigh_ action
           )',
-          'resign(
+          '# You may provide multiple provisioning profiles if the application contains nested
+          # applications or app extensions, which need their own provisioning profile.
+          # You can do so by passing an array of provisiong profile strings or a hash
+          # that associates provisioning profile values to bundle identifier keys.
+          resign(
             ipa: "path/to/ipa", # can omit if using the `ipa` action
             signing_identity: "iPhone Distribution: Luka Mirosevic (0123456789)",
             provisioning_profile: {
