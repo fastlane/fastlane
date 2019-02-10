@@ -93,6 +93,7 @@ module Scan
       puts("")
 
       copy_simulator_logs
+      zip_build_products
 
       if result[:failures] > 0
         open_report
@@ -104,7 +105,6 @@ module Scan
         UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
       end
 
-      zip_build_products
       open_report
     end
 
