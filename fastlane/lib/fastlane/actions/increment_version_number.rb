@@ -23,20 +23,25 @@ module Fastlane
           '&&'
         ].join(' ')
 
-        current_version = `#{command_prefix} agvtool what-marketing-version -terse1`.split("\n").last || ''
+        begin
+          current_version = Actions
+                            .sh("#{command_prefix} agvtool what-marketing-version -terse1", log: FastlaneCore::Globals.verbose?)
+                            .split("\n")
+                            .last
+                            .strip
+        rescue
+          current_version = ''
+        end
 
+        version_regex = /^\d+\.\d+\.\d+$/
         if params[:version_number]
-          UI.verbose("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ /\d.\d.\d/
+          UI.verbose("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ version_regex
 
           # Specific version
           next_version_number = params[:version_number]
         else
-          if Helper.test?
-            version_array = [1, 0, 0]
-          else
-            UI.user_error!("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ /\d+.\d+.\d+/
-            version_array = current_version.split(".").map(&:to_i)
-          end
+          UI.user_error!("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ version_regex
+          version_array = current_version.split(".").map(&:to_i)
 
           case params[:bump_type]
           when "patch"

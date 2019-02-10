@@ -567,7 +567,10 @@ module Spaceship
           else
             # IDEA: optimization, we could avoid fetching the screenshot if the timestamp hasn't changed
             video_preview_resolution = video_preview_resolution_for(device, trailer_path)
-            video_preview_path = Utilities.grab_video_preview(trailer_path, timestamp, video_preview_resolution)
+
+            # Keep a reference of the video_preview here to avoid Ruby getting rid of the Tempfile in the meanwhile
+            video_preview = Utilities.grab_video_preview(trailer_path, timestamp, video_preview_resolution)
+            video_preview_path = video_preview.path
           end
           video_preview_file = UploadFile.from_path(video_preview_path)
           video_preview_data = client.upload_trailer_preview(self, video_preview_file, device)
@@ -622,6 +625,10 @@ module Spaceship
 
       def release!
         client.release!(self.application.apple_id, self.version_id)
+      end
+
+      def release_to_all_users!
+        client.release_to_all_users!(self.application.apple_id, self.version_id)
       end
 
       #####################################################

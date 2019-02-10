@@ -107,7 +107,7 @@ fastlane produce associate_group -a com.krausefx.app group.krausefx
 If you want to create a new iCloud Container:
 
 ```no-highlight
-fastlane produce cloud_container -ci iCloud.com.krausefx.app -n "Example iCloud Container"
+fastlane produce cloud_container -g iCloud.com.krausefx.app -n "Example iCloud Container"
 ```
 
 If you want to associate an app with an iCloud Container:

@@ -35,11 +35,19 @@ module Frameit
             next # we don't care about watches right now
           end
 
-          Helper.show_loading_indicator("Framing screenshot '#{full_path}'")
-
           begin
             screenshot = Screenshot.new(full_path, color)
-            screenshot.frame!
+            if screenshot.mac?
+              editor = MacEditor.new(screenshot)
+            else
+              editor = Editor.new(screenshot, Frameit.config[:debug_mode])
+            end
+            if editor.should_skip?
+              UI.message("Skipping framing of screenshot #{screenshot.path}.  No title provided in your Framefile.json or title.strings.")
+            else
+              Helper.show_loading_indicator("Framing screenshot '#{full_path}'")
+              editor.frame!
+            end
           rescue => ex
             UI.error(ex.to_s)
             UI.error("Backtrace:\n\t#{ex.backtrace.join("\n\t")}") if FastlaneCore::Globals.verbose?

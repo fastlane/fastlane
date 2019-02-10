@@ -32,6 +32,7 @@ module Fastlane
       def self.details
         [
           "Specify the URL to download and get the content as a return value.",
+          "Automatically parses JSON into a Ruby data structure.",
           "For more advanced networking code, use the Ruby functions instead: [http://docs.ruby-lang.org/en/2.0.0/Net/HTTP.html](http://docs.ruby-lang.org/en/2.0.0/Net/HTTP.html)."
         ].join("\n")
       end

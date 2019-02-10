@@ -249,6 +249,7 @@ AllCops:
     - '**/lib/assets/custom_action_template.rb'
     - './vendor/**/*'
     - '**/lib/assets/DefaultFastfileTemplate'
+    - '**/lib/assets/MatchfileTemplate'
     - '**/spec/fixtures/broken_files/broken_file.rb'
 
 # They have not to be snake_case

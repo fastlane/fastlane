@@ -40,7 +40,7 @@ module Spaceship
         return m
       end
 
-      AccessWiFi = AppService.new_service("AWEQ28MY3E")
+      AccessWifi = AppService.new_service("AWEQ28MY3E")
       AppGroup = AppService.new_service("APG3427HIY")
       ApplePay = AppService.new_service("OM633U5T5G")
       AssociatedDomains = AppService.new_service("SKC3T5S89Y")

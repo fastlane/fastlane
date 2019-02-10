@@ -15,26 +15,26 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Stefan Natchev",
-                        "Luka Mirosevic",
-                        "Danielle Tomlinson",
-                        "Fumiya Nakamura",
-                        "Aaron Brager",
-                        "Jan Piotrowski",
-                        "Jérôme Lacoste",
-                        "Olivier Halligon",
-                        "Felix Krause",
-                        "Manu Wallner",
-                        "Iulian Onofrei",
+  spec.authors       = ["Olivier Halligon",
                         "Matthew Ellis",
-                        "Jorge Revuelta H",
-                        "Kohki Miki",
                         "Jimmy Dee",
-                        "Maksym Grebenets",
-                        "Andrew McBurney",
-                        "Joshua Liebowitz",
+                        "Aaron Brager",
                         "Helmut Januschka",
-                        "Josh Holtz"]
+                        "Jorge Revuelta H",
+                        "Iulian Onofrei",
+                        "Josh Holtz",
+                        "Jan Piotrowski",
+                        "Kohki Miki",
+                        "Luka Mirosevic",
+                        "Stefan Natchev",
+                        "Maksym Grebenets",
+                        "Manu Wallner",
+                        "Danielle Tomlinson",
+                        "Andrew McBurney",
+                        "Felix Krause",
+                        "Jérôme Lacoste",
+                        "Joshua Liebowitz",
+                        "Fumiya Nakamura"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -87,7 +87,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
   spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3')
   spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
-  spec.add_dependency('bundler', '>= 1.12.0', '< 2.0.0') # Used for fastlane plugins
+  spec.add_dependency('bundler', '>= 1.12.0', '< 3.0.0') # Used for fastlane plugins
   spec.add_dependency('faraday', '~> 0.9') # Used for deploygate, hockey and testfairy actions
   spec.add_dependency('faraday_middleware', '~> 0.9') # same as faraday
   spec.add_dependency('simctl', '~> 1.6.3') # Used for querying and interacting with iOS simulators
@@ -95,8 +95,9 @@ Gem::Specification.new do |spec|
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.
   spec.add_dependency('google-api-client', '>= 0.21.2', '< 0.24.0') # Google API Client to access Play Publishing API
+  spec.add_dependency('google-cloud-storage', '>= 1.15.0', '< 2.0.0') # Access Google Cloud Storage for match
 
-  spec.add_dependency('emoji_regex', '~> 0.1') # Used to scan for Emoji in the changelog
+  spec.add_dependency('emoji_regex', '>= 0.1', '< 2.0') # Used to scan for Emoji in the changelog
 
   # Development only
   spec.add_development_dependency('rake', '< 12')

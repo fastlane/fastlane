@@ -1,26 +1,21 @@
-Testing `Spaceship::TestFlight`
-===================
+# Testing `Spaceship::TestFlight`
+
 (But we would love for all of the _spaceship_ tests to be like this 😀)
 
 ## Usage
+
 To run the tests, in your terminal run:
 
-```
+```shell
 bundle exec rspec spaceship/spec
 ```
 
 ## Overview
 
-Spaceship wraps various APIs using the following pattern:
-
-A simple `client` and various data models, usually subclassed from a `Base` model (e.g. Spaceship::TestFlight::Base)
-The `client` is responsible for making HTTP requests for a given API or domain. It should be very simple and have no logic.
-It is only responsible for creating the request and parsing the response. The best practice is for each method to have a single request and return the data from the response.
-
-The data models generally map to a REST resource or some logical grouping of data. Each data model has an instance of `client` which it can use to put or get data. It should encapsulate all interactions with the API, so other _fastlane_ tools interface with the data models, and not the `client` directly.
-
+See [Architecture.md](Architecture.md).
 
 ## Adding Tests
+
 ### Models
 
 Since the data models expect the client to return JSON data as a Ruby hash, we can reasonably mock the client response using RSpec doubles. We should *not* rely on HTTP fixtures because they are brittle, introduce global state, are not easily decomposable and are difficult to maintain. Instead, use the helper method `mock_client_response` to set up the expected data returned by the API. This design also leads the client to be as thin and logic-free as possible.
@@ -40,6 +35,7 @@ describe Spaceship::TestFlight::Tester do
   end
 end
 ```
+
 Now, anytime we use a data model that is a subclass of `Spaceship::TestFlight::Base`, it has a `client` that is our mock.
 
 We then configure the response for a given client method using the `mock_client_response` method defined in `spaceship/spec/spec_helper.rb` which can be required by `require 'spec_helper`. This method is defined within an RSpec configuration block:
@@ -68,7 +64,7 @@ end
 
 Collection methods:
 
-```
+```ruby
 context '.all' do
   it 'contains all of the builds across all build trains' do
     builds = Spaceship::TestFlight::Build.all(app_id: 10, platform: 'ios')
@@ -81,7 +77,7 @@ end
 
 Instance methods:
 
-```
+```ruby
 context '#upload_date' do
   it 'parses the string value' do
     expect(build.upload_date).to eq(Time.utc(2017, 1, 1, 12))
@@ -90,11 +86,12 @@ end
 ```
 
 ### Client
+
 **Examples:**
 
 GET:
 
-```
+```ruby
 context '#get_build_trains' do
   it 'executes the request' do
     MockAPI::TestFlightServer.get('/testflight/v2/providers/fake-team-id/apps/some-app-id/platforms/ios/trains') {}
@@ -106,7 +103,7 @@ end
 
 PUT:
 
-```
+```ruby
 context '#add_group_to_build' do
   it 'executes the request' do
     MockAPI::TestFlightServer.put('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/builds/fake-build-id') {}
@@ -117,4 +114,5 @@ end
 ```
 
 #### How client tests work
+
 The client adds routes to a [sinatra](http://www.sinatrarb.com/) server to receive and mock the responses that will be handled by `handle_response`.
