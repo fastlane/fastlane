@@ -14,7 +14,7 @@ module Supply
 
     def self.make_from_config(params: nil)
       params ||= Supply.config
-      service_account_data = service_account_authentication(params: params)
+      service_account_data = AbstractGoogleServiceClient.service_account_authentication(params: params)
       return self.new(service_account_json: service_account_data, params: params)
     end
 
