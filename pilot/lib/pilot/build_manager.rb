@@ -72,6 +72,11 @@ module Pilot
         UI.user_error!("No build to distribute!")
       end
 
+      # Setting account required wth AppStore Connect API
+      puts "we here???"
+      update_review_detail(app.apple_id, {demo_account_required: options[:demo_account_required]})
+      update_review_detail(app.apple_id, options[:beta_app_review_info])
+
       if should_update_app_test_information?(options)
         app_test_info = Spaceship::TestFlight::AppTestInfo.find(app_id: build.app_id)
         app_test_info.test_info.feedback_email = options[:beta_app_feedback_email] if options[:beta_app_feedback_email]
@@ -178,7 +183,6 @@ module Pilot
       uploaded_build.export_compliance.encryption_updated = false
 
       if options[:groups] || options[:distribute_external]
-        uploaded_build.beta_review_info.demo_account_required = options[:demo_account_required] # this needs to be set for iTC to continue
         begin
           uploaded_build.submit_for_testflight_review!
         rescue => ex
@@ -215,6 +219,32 @@ module Pilot
       end
 
       true
+    end
+
+    def update_review_detail(app_id, beta_app_review_info)
+      beta_app_review_info = Hash[beta_app_review_info.map{ |k, v| [k.to_sym, v] }]
+
+      attributes = {}
+      attributes["contactEmail"] = beta_app_review_info[:contact_email] if beta_app_review_info.has_key?(:contact_email)
+      attributes["contactFirstName"] = beta_app_review_info[:contact_first_name] if beta_app_review_info.has_key?(:contact_first_name)
+      attributes["contactLastName"] = beta_app_review_info[:contact_last_name] if beta_app_review_info.has_key?(:contact_last_name)
+      attributes["contactPhone"] = beta_app_review_info[:contact_phone] if beta_app_review_info.has_key?(:contact_phone)
+      attributes["demoAccountName"] = beta_app_review_info[:demo_account_name] if beta_app_review_info.has_key?(:demo_account_name)
+      attributes["demoAccountPassword"] = beta_app_review_info[:demo_account_password] if beta_app_review_info.has_key?(:demo_account_password)
+      attributes["demoAccountRequired"] = beta_app_review_info[:demo_account_required] if beta_app_review_info.has_key?(:demo_account_required)
+
+      puts "attributes: #{attributes}"
+
+      client = Spaceship::ConnectAPI::Base.client
+      client.patch_beta_app_review_detail(app_id: app_id, attributes: attributes)
+    end
+
+    def update_app_review(app_id)
+
+    end
+
+    def update_build_review(build_id)
+
     end
   end
 end

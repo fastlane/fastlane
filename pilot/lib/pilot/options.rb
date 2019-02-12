@@ -100,10 +100,19 @@ module Pilot
                                     description: "Should notify external testers?",
                                     default_value: true),
         FastlaneCore::ConfigItem.new(key: :demo_account_required,
-                                     is_string: false,
+                                     type: Boolean,
                                      env_name: "DEMO_ACCOUNT_REQUIRED",
                                      description: "Do you need a demo account when Apple does review?",
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :beta_app_review_info,
+                                     type: Hash,
+                                     env_name: "PILOT_BETA_APP_REVIEW_INFO",
+                                     description: "Beta app review information for contact info and demo account",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       valid_keys = %w(contact_email contact_first_name contact_last_name contact_phone demo_account_name demo_account_password)
+                                       values.keys.each { |value| UI.user_error!("Invalid key '#{value}'.") unless valid_keys.include?(value.to_s) }
+                                     end),
         FastlaneCore::ConfigItem.new(key: :first_name,
                                      short_option: "-f",
                                      env_name: "PILOT_TESTER_FIRST_NAME",
