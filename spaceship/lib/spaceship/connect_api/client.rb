@@ -19,13 +19,147 @@ module Spaceship
       end
 
       def build_url(path: nil, filter: nil, includes: nil, limit: nil, sort: nil)
-        filters = filter.keys.map do |key|
-          "&filter[#{key}]=#{filter[key]}"
-        end.join("")
-        return "#{path}?&include=#{includes}&limit=#{limit}&sort=#{sort}#{filters}"
+        params = {}
+
+        if filter
+          filter.keys.each do |key|
+            params["filter[#{key}]"] = filter[key]
+          end
+        end
+
+        params["include"] = includes if includes
+        params["limit"] = limit if limit
+        params["sort"] = sort if sort
+
+        query_params = params.map do |k, v|
+          "#{k}=#{v}"
+        end.join("&")
+
+        url = "#{path}?#{query_params}"
+        puts("URL: #{url}")
+        return url
+      end
+
+      def get_beta_app_review_detail(filter: {}, includes: nil, limit: nil, sort: nil)
+        # assert_required_params(__method__, binding)
+
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/betaAppReviewDetails?filter[app]=<app_id>
+        path = "betaAppReviewDetails"
+        url = build_url(path: path, filter: filter, includes: includes, limit: limit, sort: sort)
+
+        response = request(:get, url)
+        handle_response(response)
+      end
+
+      def patch_beta_app_review_detail(app_id: nil, feedbackEmail: nil, attributes: {})
+        # assert_required_params(__method__, binding)
+
+        # PATCH
+        # https://appstoreconnect.apple.com/iris/v1/apps/<app_id>/betaAppReviewDetails
+        path = "betaAppReviewDetails/#{app_id}"
+        url = build_url(path: path, filter: nil, includes: nil, limit: nil, sort: nil)
+
+        body = {
+          data: {
+            attributes: attributes,
+            id: app_id,
+            type: "betaAppReviewDetails"
+          }
+        }
+
+        response = request(:patch) do |req|
+          req.url(url)
+          req.body = body.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_response(response)
+      end
+
+      def get_beta_app_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
+        # assert_required_params(__method__, binding)
+
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/betaAppLocalizations?filter[app]=<app_id>
+        path = "betaAppLocalizations"
+        url = build_url(path: path, filter: filter, includes: includes, limit: limit, sort: sort)
+
+        response = request(:get, url)
+        handle_response(response)
+      end
+
+      def get_beta_build_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
+        # assert_required_params(__method__, binding)
+
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations?filter[build]=<build_id>
+        path = "betaBuildLocalizations"
+        url = build_url(path: path, filter: filter, includes: includes, limit: limit, sort: sort)
+
+        response = request(:get, url)
+        handle_response(response)
+      end
+
+      def patch_beta_app_localizations(localization_id: nil, feedbackEmail: nil, attributes: {})
+        # assert_required_params(__method__, binding)
+
+        # PATCH
+        # https://appstoreconnect.apple.com/iris/v1/apps/<app_id>/betaAppLocalizations
+        path = "betaAppLocalizations/#{localization_id}"
+        url = build_url(path: path, filter: nil, includes: nil, limit: nil, sort: nil)
+
+        body = {
+          data: {
+            attributes: attributes,
+            id: localization_id,
+            type: "betaAppLocalizations"
+          }
+        }
+
+        response = request(:patch) do |req|
+          req.url(url)
+          req.body = body.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_response(response)
+      end
+
+      def patch_beta_build_localizations(localization_id: nil, feedbackEmail: nil, attributes: {})
+        # assert_required_params(__method__, binding)
+
+        # PATCH
+        # https://appstoreconnect.apple.com/iris/v1/apps/<app_id>/betaBuildLocalizations
+        path = "betaBuildLocalizations/#{localization_id}"
+        url = build_url(path: path, filter: nil, includes: nil, limit: nil, sort: nil)
+
+        body = {
+          data: {
+            attributes: attributes,
+            id: localization_id,
+            type: "betaBuildLocalizations"
+          }
+        }
+
+        response = request(:patch) do |req|
+          req.url(url)
+          req.body = body.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_response(response)
       end
 
       def get_builds(filter: {}, includes: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate")
+        assert_required_params(__method__, binding)
+
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/builds
+        url = build_url(path: "builds", filter: filter, includes: includes, limit: limit, sort: sort)
+
+        response = request(:get, url)
+        handle_response(response)
+      end
+
+      def get_prerelease_versions(filter: {}, includes: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate")
         assert_required_params(__method__, binding)
 
         # GET
