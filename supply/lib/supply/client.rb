@@ -14,7 +14,7 @@ module Supply
 
     def self.make_from_config(params: nil)
       params ||= Supply.config
-      service_account_data = AbstractGoogleServiceClient.service_account_authentication(params: params)
+      service_account_data = self.service_account_authentication(params: params)
       return self.new(service_account_json: service_account_data, params: params)
     end
 
@@ -24,7 +24,7 @@ module Supply
         if UI.interactive?
           UI.important("To not be asked about this value, you can specify it using 'json_key'")
           json_key_path = UI.input("The service account json file used to authenticate with Google: ")
-          json_key_path = File.expand_path(json_key_path)
+          json_key_path = File.expand_path(json_key_ºpath)
 
           UI.user_error!("Could not find service account json file at path '#{json_key_path}'") unless File.exist?(json_key_path)
           params[:json_key] = json_key_path
