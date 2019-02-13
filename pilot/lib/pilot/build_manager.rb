@@ -43,7 +43,7 @@ module Pilot
 
       UI.success("Successfully uploaded the new binary to App Store Connect")
 
-      if not config[:skip_waiting_for_build_processing]
+      unless config[:skip_waiting_for_build_processing]
         UI.important("Uploading and verifying submissions to TestFlight can take sometime, it may use up unexpected minutes in your allotted CI plans. Use skip_waiting_for_build_processing: true to reduce used minutes.")
         return
       end
