@@ -102,6 +102,12 @@ module Fastlane
             # When we launch this feature, this should never be the case
             abort("#{tool_name} can't be called via `fastlane #{tool_name}`, run '#{tool_name}' directly instead".red)
           end
+
+          # Some of the tools use other actions so need to load all
+          # actions before we start the tool generator
+          # Example: scan uses slack
+          Fastlane.load_actions
+
           commands_generator.start
         elsif tool_name == "fastlane-credentials"
           require 'credentials_manager'
