@@ -12,7 +12,7 @@ module Fastlane
           require 'produce/service'
           services = params[:services]
 
-          enabled_services = services.select { |_k, v| v == :on || v == 'on' || v == true }.map { |k, v| [k, 'on'] }.to_h
+          enabled_services = services.select { |_k, v| v.to_sym == :on || v == true }.map { |k, v| [k, 'on'] }.to_h
           disabled_services = services.reject { |_k, v| v.to_sym == :on || v == true }.map { |k, v| [k, 'off'] }.to_h
 
           enabled_services_object = self.service_object
