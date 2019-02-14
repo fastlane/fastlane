@@ -71,7 +71,7 @@ module Spaceship
           # This is especially important as Developer Portal team IDs are deprecated and should be replaced with App Store Connect teamIDs
           # "Access Unavailable - You currently don't have access to this membership resource. Contact your team's Account Holder, Josh Holtz, or an Admin."
           # https://github.com/fastlane/fastlane/issues/14228
-          puts "Couldn't find team with ID '#{team_id}'. Make sure your are using the correct App Store Connect team ID and have the proper permissions for this team"
+          puts("Couldn't find team with ID '#{team_id}'. Make sure your are using the correct App Store Connect team ID and have the proper permissions for this team")
         end
 
         if team_name.length > 0
