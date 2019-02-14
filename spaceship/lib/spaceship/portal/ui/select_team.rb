@@ -82,7 +82,7 @@ module Spaceship
           # Better message to inform user of misconfiguration as Apple now provides less friendly error as of 2019-02-12
           # "Access Unavailable - You currently don't have access to this membership resource. Contact your team's Account Holder, Josh Holtz, or an Admin."
           # https://github.com/fastlane/fastlane/issues/14228
-          puts "Couldn't find team with Name '#{team_name}. Make sure you have the proper permissions for this team'"
+          puts("Couldn't find team with Name '#{team_name}. Make sure you have the proper permissions for this team'")
         end
 
         return teams[0]['teamId'] if teams.count == 1 # user is just in one team
