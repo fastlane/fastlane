@@ -118,16 +118,22 @@ end
 def measure_slot(path)
   tmp_output = Time.now.to_i.to_s + ".png"
 
-  convert = MiniMagick::Tool::Convert.new
-  convert << path
-  convert.negate # it makes white, black and black, white, adjusting all the colors to match
-  # connected-component analysis uniquely labels connected components in an image
-  convert.define("connected-components:verbose=true") # it enables a verbose output to the shell console
-  convert.define("connected-components:area-threshold=100") # it eliminates small objects by merging them with their larger neighbors
-  convert.connected_components("8") # it visits 8 neighbors
-  convert.auto_level
-  convert << tmp_output
-  command_output = convert.call
+  begin
+    command_output = MiniMagick::Tool::Magick.new do |magick|
+      magick << path
+      magick.negate # it makes white, black and black, white, adjusting all the colors to match
+      # connected-component analysis uniquely labels connected components in an image
+      magick.define("connected-components:verbose=true") # it enables a verbose output to the shell console
+      magick.define("connected-components:area-threshold=100") # it eliminates small objects by merging them with their larger neighbors
+      magick.connected_components("8") # it visits 8 neighbors
+      magick.auto_level
+      magick << tmp_output
+    end
+  rescue StandardError => e
+    puts(e)
+    puts("The functionality of slot measurements does not work with ImageMagick older than 7.x".red)
+    exit!
+  end
 
   sh("rm #{tmp_output}", verbose: false)
 
