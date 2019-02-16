@@ -76,10 +76,13 @@ module Pilot
       update_review_detail(build.app_id, {demo_account_required: options[:demo_account_required]})
       update_review_detail(build.app_id, options[:beta_app_review_info])
 
-      if should_update_app_test_information?(options)
+      if should_update_localized_app_test_information?(options)
+        update_localized_app_review(build.app_id, options[:localized_test_info])
+      elsif should_update_app_test_information?(options)
         app_test_info = Spaceship::TestFlight::AppTestInfo.find(app_id: build.app_id)
         app_test_info.test_info.feedback_email = options[:beta_app_feedback_email] if options[:beta_app_feedback_email]
         app_test_info.test_info.description = options[:beta_app_description] if options[:beta_app_description]
+
         begin
           app_test_info.save_for_app!(app_id: build.app_id)
           UI.success("Successfully set the beta_app_feedback_email and/or beta_app_description")
@@ -175,6 +178,10 @@ module Pilot
       options[:beta_app_description].to_s.length > 0 || options[:beta_app_feedback_email].to_s.length > 0
     end
 
+    def should_update_localized_app_test_information?(options)
+      !options[:localized_test_info].nil?
+    end
+
     def distribute_build(uploaded_build, options)
       UI.message("Distributing new build to testers: #{uploaded_build.train_version} - #{uploaded_build.build_version}")
 
@@ -220,24 +227,62 @@ module Pilot
       true
     end
 
-    def update_review_detail(app_id, beta_app_review_info)
-      beta_app_review_info = beta_app_review_info.collect{|k,v| [k.to_sym, v]}.to_h
+    def update_review_detail(app_id, info)
+      info = info.collect{|k,v| [k.to_sym, v]}.to_h
 
       attributes = {}
-      attributes[:contactEmail] = beta_app_review_info[:contact_email] if beta_app_review_info.has_key?(:contact_email)
-      attributes[:contactFirstName] = beta_app_review_info[:contact_first_name] if beta_app_review_info.has_key?(:contact_first_name)
-      attributes[:contactLastName] = beta_app_review_info[:contact_last_name] if beta_app_review_info.has_key?(:contact_last_name)
-      attributes[:contactPhone] = beta_app_review_info[:contact_phone] if beta_app_review_info.has_key?(:contact_phone)
-      attributes[:demoAccountName] = beta_app_review_info[:demo_account_name] if beta_app_review_info.has_key?(:demo_account_name)
-      attributes[:demoAccountPassword] = beta_app_review_info[:demo_account_password] if beta_app_review_info.has_key?(:demo_account_password)
-      attributes[:demoAccountRequired] = beta_app_review_info[:demo_account_required] if beta_app_review_info.has_key?(:demo_account_required)
+      attributes[:contactEmail] = info[:contact_email] if info.has_key?(:contact_email)
+      attributes[:contactFirstName] = info[:contact_first_name] if info.has_key?(:contact_first_name)
+      attributes[:contactLastName] = info[:contact_last_name] if info.has_key?(:contact_last_name)
+      attributes[:contactPhone] = info[:contact_phone] if info.has_key?(:contact_phone)
+      attributes[:demoAccountName] = info[:demo_account_name] if info.has_key?(:demo_account_name)
+      attributes[:demoAccountPassword] = info[:demo_account_password] if info.has_key?(:demo_account_password)
+      attributes[:demoAccountRequired] = info[:demo_account_required] if info.has_key?(:demo_account_required)
 
       client = Spaceship::ConnectAPI::Base.client
       client.patch_beta_app_review_detail(app_id: app_id, attributes: attributes)
     end
 
-    def update_app_review(app_id)
+    def update_localized_app_review(app_id, info_by_lang)
+      info_by_lang = info_by_lang.collect{|k,v| [k.to_sym, v]}.to_h
 
+      # Initialize hash of lang codes
+      lang_codes = info_by_lang.keys
+      langs_localization_ids = Hash[lang_codes.product([nil])]
+
+      # Validate locales exist
+      client = Spaceship::ConnectAPI::Base.client
+      localizations = client.get_beta_app_localizations(filter: {app: app_id, locale: lang_codes.join(",")})
+      localizations.each do |localization|
+        localization_id = localization["id"]
+        attributes = localization["attributes"]
+        locale = attributes["locale"]
+
+        langs_localization_ids[locale.to_sym] = localization_id
+      end
+
+      langs_localization_ids.each do |lang_code, localization_id|
+        info = info_by_lang[lang_code]
+        update_localized_app_review_for_lang(app_id, localization_id, lang_code, info) 
+      end
+
+    end
+
+    def update_localized_app_review_for_lang(app_id, localization_id, locale, info)
+      attributes = {}
+      attributes[:feedbackEmail] = info[:feedback_email] if info.has_key?(:feedback_email)
+      attributes[:marketingUrl] = info[:marketing_url] if info.has_key?(:marketing_url)
+      attributes[:privacyPolicyUrl] = info[:privacy_policy_url] if info.has_key?(:privacy_policy_url)
+      attributes[:tvOsPrivacyPolicy] = info[:tv_os_privacy_policy_url] if info.has_key?(:tv_os_privacy_policy_url)
+      attributes[:description] = info[:description] if info.has_key?(:description)
+
+      client = Spaceship::ConnectAPI::Base.client
+      if localization_id
+        client.patch_beta_app_localizations(localization_id: localization_id, attributes: attributes)
+      else
+        attributes[:locale] = locale if locale
+        client.post_beta_app_localizations(app_id: app_id, attributes: attributes)
+      end
     end
 
     def update_build_review(build_id)
