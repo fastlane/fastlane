@@ -36,7 +36,6 @@ module Spaceship
         end.join("&")
 
         url = "#{path}?#{query_params}"
-        puts("URL: #{url}")
         return url
       end
 
