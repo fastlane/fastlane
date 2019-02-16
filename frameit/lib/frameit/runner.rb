@@ -50,8 +50,8 @@ module Frameit
               Helper.show_loading_indicator("Framing screenshot '#{full_path}'")
 
               # Add the frame
-              framed_screenshot = Framer.new.frame!(screenshot, frame, framefile_config) if frame
-              framed_screenshot = screenshot unless frame # Mac screenshots don't get a frame
+              framed_screenshot = Framer.new.frame!(screenshot, frame) if frame
+              framed_screenshot = screenshot unless frame # e.g. Mac screenshots don't get a frame
 
               # And optionally wrap it
               if is_complex_framing?(framefile_config)

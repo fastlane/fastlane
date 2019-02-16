@@ -38,31 +38,6 @@ module Frameit
       UI.success("Added frame: '#{File.expand_path(output_path)}'")
     end
 
-    # TODO duplicated between editor and wrapper
-    def offset
-      return @offset_information if @offset_information
-
-      @offset_information = self.config['offset'] || Offsets.image_offset(screenshot).dup
-
-      if @offset_information && (@offset_information['offset'] || @offset_information['offset'])
-        return @offset_information
-      end
-      UI.user_error!("Could not find offset_information for '#{screenshot}'")
-    end
-
-    # this is used to correct the 1:1 offset information
-    # the offset information is stored to work for the template images
-    # since we resize the template images to have higher quality screenshots
-    # we need to modify the offset information by a certain factor
-    def modify_offset(multiplicator)
-      # Format: "+133+50"
-      hash = offset['offset']
-      x = hash.split("+")[1].to_f * multiplicator
-      y = hash.split("+")[2].to_f * multiplicator
-      new_offset = "+#{x.round}+#{y.round}"
-      @offset_information['offset'] = new_offset
-    end
-
     # more complex mode: background, frame and title
     def wrap_it(size)
       # 1: create background with correct size
@@ -208,6 +183,31 @@ module Frameit
     #
     # TODO
     #
+
+    # TODO duplicated between editor and wrapper
+    def offset
+      return @offset_information if @offset_information
+
+      @offset_information = self.config['offset'] || Offsets.image_offset(screenshot).dup
+
+      if @offset_information && (@offset_information['offset'] || @offset_information['offset'])
+        return @offset_information
+      end
+      UI.user_error!("Could not find offset_information for '#{screenshot}'")
+    end
+
+    # this is used to correct the 1:1 offset information
+    # the offset information is stored to work for the template images
+    # since we resize the template images to have higher quality screenshots
+    # we need to modify the offset information by a certain factor
+    def modify_offset(multiplicator)
+      # Format: "+133+50"
+      hash = offset['offset']
+      x = hash.split("+")[1].to_f * multiplicator
+      y = hash.split("+")[2].to_f * multiplicator
+      new_offset = "+#{x.round}+#{y.round}"
+      @offset_information['offset'] = new_offset
+    end
 
     # Resize the frame as it's too low quality by default
     # TODO What does that mean?

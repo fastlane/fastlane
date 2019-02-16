@@ -3,6 +3,7 @@ require 'fastimage'
 
 require_relative 'device_types' # color + orientation
 require_relative 'module'
+require_relative 'offsets'
 
 module Frameit
   # Represents the frame to be used
@@ -17,6 +18,7 @@ module Frameit
     def initialize(screenshot, cli_color, framefile_config)
       @color = find_color(cli_color, framefile_config)
       @path = load_frame(screenshot, @color)
+      @offset = find_offset(screenshot, framefile_config)
     end
 
     def find_color(cli_color, framefile_config)
@@ -52,10 +54,19 @@ module Frameit
     end
 
     def load_frame(screenshot, color)
-      override_color = fetch_framefile_config_color(framefile_config)
       frame_path = TemplateFinder.get_template(screenshot, color)
       UI.message("found frame: #{frame_path}") # TODO remove
       return frame_path
+    end
+
+    def find_offset(screenshot, framefile_config)
+      #                  Mac only configuration       ||           offsets.json
+      offset_information = framefile_config['offset'] || Offsets.image_offset(screenshot).dup
+
+      if offset_information && offset_information['offset']
+        return offset_information
+      end
+      UI.user_error!("Could not find offset information for '#{screenshot}'")
     end
   end
 end
