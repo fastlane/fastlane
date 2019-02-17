@@ -154,6 +154,37 @@ module Spaceship
         handle_response(response)
       end
 
+      def post_beta_build_localizations(build_id: nil, attributes: {})
+        # assert_required_params(__method__, binding)
+
+        # POST
+        # https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations
+        path = "betaBuildLocalizations"
+        url = build_url(path: path, filter: nil, includes: nil, limit: nil, sort: nil)
+
+        body = {
+          data: {
+            attributes: attributes,
+            type: "betaBuildLocalizations",
+            relationships: {
+              build: {
+                data: {
+                  type: "builds",
+                  id: build_id
+                }
+              }
+            }
+          }
+        }
+
+        response = request(:post) do |req|
+          req.url(url)
+          req.body = body.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_response(response)
+      end
+
       def patch_beta_build_localizations(localization_id: nil, feedbackEmail: nil, attributes: {})
         # assert_required_params(__method__, binding)
 

@@ -58,9 +58,9 @@ module Pilot
                                      end),
 
         # app detail
-        FastlaneCore::ConfigItem.new(key: :localized_test_info,
+        FastlaneCore::ConfigItem.new(key: :localized_app_info,
                                      type: Hash,
-                                     env_name: "PILOT_LOCALIZED_TEST_INFO",
+                                     env_name: "PILOT_LOCALIZED_APP_INFO",
                                      description: "Localized beta app test info for description, feedback email, marketing url, and privacy policy",
                                      optional: true,
                                      verify_block: proc do |value|
@@ -98,6 +98,7 @@ module Pilot
 
         # build review info
         FastlaneCore::ConfigItem.new(key: :changelog,
+                                     deprecated: true,
                                      short_option: "-w",
                                      optional: true,
                                      env_name: "PILOT_CHANGELOG",
