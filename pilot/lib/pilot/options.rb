@@ -72,7 +72,7 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :skip_waiting_for_build_processing,
                                      short_option: "-z",
                                      env_name: "PILOT_SKIP_WAITING_FOR_BUILD_PROCESSING",
-                                     description: "Don't wait for the build to process. If set to true, the changelog won't be set, `distribute_external` option won't work and no build will be distributed to testers. \n Uploading and verifying submissions to TestFlight can take sometime, it may use up unexpected minutes in your allotted CI plans. Use skip_waiting_for_build_processing: true to reduce used minutes.",
+                                     description: "Don't wait for the build to process. If set to true, the changelog won't be set, `distribute_external` option won't work and no build will be distributed to testers. \n Uploading and verifying submissions to TestFlight can take sometime, it may use up unexpected minutes.",
                                      is_string: false,
                                      default_value: false),
         # rubocop:enable Metrics/LineLength
