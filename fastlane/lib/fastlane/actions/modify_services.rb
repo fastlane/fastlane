@@ -4,16 +4,14 @@ module Fastlane
       def self.run(params)
         require 'produce'
 
-        return if Helper.test?
-
         Produce.config = params
 
         Dir.chdir(FastlaneCore::FastlaneFolder.path || Dir.pwd) do
           require 'produce/service'
           services = params[:services]
 
-          enabled_services = services.select { |_k, v| v.to_sym == :on || v == true }.map { |k, v| [k, 'on'] }.to_h
-          disabled_services = services.reject { |_k, v| v.to_sym == :on || v == true }.map { |k, v| [k, 'off'] }.to_h
+          enabled_services = services.select { |_k, v| v == true || v.to_s == 'on' }.map { |k, v| [k, 'on'] }.to_h
+          disabled_services = services.reject { |_k, v| v == true || v.to_s == 'on' }.map { |k, v| [k, 'off'] }.to_h
 
           enabled_services_object = self.service_object
           enabled_services.each do |k, v|
