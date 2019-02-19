@@ -88,6 +88,7 @@ describe "Build Manager" do
       allow(Spaceship::TestFlight::Group).to receive(:default_external_group).and_return(mock_default_external_group)
       allow(Spaceship::ConnectAPI::Base).to receive(:client).and_return(mock_base_api_client)
       allow(mock_base_api_client).to receive(:get_builds).and_return(mock_api_client_builds)
+      allow(mock_base_api_client).to receive(:patch_beta_app_review_detail).and_return(mock_api_client_builds)
       # used to return the approved build if we recover from the 504
     end
     it "doesnt recover if there is a 504 and the build is not approved" do

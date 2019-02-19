@@ -57,29 +57,6 @@ module Pilot
                                        UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with?(".ipa")
                                      end),
 
-        # app detail
-        FastlaneCore::ConfigItem.new(key: :localized_app_info,
-                                     type: Hash,
-                                     env_name: "PILOT_LOCALIZED_APP_INFO",
-                                     description: "Localized beta app test info for description, feedback email, marketing url, and privacy policy",
-                                     optional: true,
-                                     verify_block: proc do |value|
-#                                       valid_keys = %w(contact_email contact_first_name contact_last_name contact_phone demo_account_name demo_account_password)
-#                                       values.keys.each { |value| UI.user_error!("Invalid key '#{value}'.") unless valid_keys.include?(value.to_s) }
-                                     end),
-        FastlaneCore::ConfigItem.new(key: :beta_app_description,
-                                     deprecated: true,
-                                     short_option: "-d",
-                                     optional: true,
-                                     env_name: "PILOT_BETA_APP_DESCRIPTION",
-                                     description: "Provide the 'Beta App Description' when uploading a new build"),
-        FastlaneCore::ConfigItem.new(key: :beta_app_feedback_email,
-                                     deprecated: true,
-                                     short_option: "-n",
-                                     optional: true,
-                                     env_name: "PILOT_BETA_APP_FEEDBACK",
-                                     description: "Provide the beta app email when uploading a new build"),
-
         # app review info
         FastlaneCore::ConfigItem.new(key: :demo_account_required,
                                      type: Boolean,
@@ -91,14 +68,46 @@ module Pilot
                                      env_name: "PILOT_BETA_APP_REVIEW_INFO",
                                      description: "Beta app review information for contact info and demo account",
                                      optional: true,
-                                     verify_block: proc do |value|
-                                       valid_keys = %w(contact_email contact_first_name contact_last_name contact_phone demo_account_name demo_account_password)
+                                     verify_block: proc do |values|
+                                       valid_keys = %w(contact_email contact_first_name contact_last_name contact_phone demo_account_name demo_account_password notes)
                                        values.keys.each { |value| UI.user_error!("Invalid key '#{value}'.") unless valid_keys.include?(value.to_s) }
                                      end),
 
+        # app detail
+        FastlaneCore::ConfigItem.new(key: :localized_app_info,
+                                     type: Hash,
+                                     env_name: "PILOT_LOCALIZED_APP_INFO",
+                                     description: "Localized beta app test info for description, feedback email, marketing url, and privacy policy",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       #                                       valid_keys = %w(contact_email contact_first_name contact_last_name contact_phone demo_account_name demo_account_password)
+                                       #                                       values.keys.each { |value| UI.user_error!("Invalid key '#{value}'.") unless valid_keys.include?(value.to_s) }
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :beta_app_description,
+                                     deprecated: "Use :localized_app_info if possible. This will continue working but will set this value for all locales",
+                                     short_option: "-d",
+                                     optional: true,
+                                     env_name: "PILOT_BETA_APP_DESCRIPTION",
+                                     description: "Provide the 'Beta App Description' when uploading a new build"),
+        FastlaneCore::ConfigItem.new(key: :beta_app_feedback_email,
+                                     deprecated: "Use :localized_app_info if possible. This will continue working but will set this value for all locales",
+                                     short_option: "-n",
+                                     optional: true,
+                                     env_name: "PILOT_BETA_APP_FEEDBACK",
+                                     description: "Provide the beta app email when uploading a new build"),
+
         # build review info
+        FastlaneCore::ConfigItem.new(key: :localized_build_info,
+                                     type: Hash,
+                                     env_name: "PILOT_LOCALIZED_BUILD_INFO",
+                                     description: "Localized beta app test info for what's new",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       #                                       valid_keys = %w(contact_email contact_first_name contact_last_name contact_phone demo_account_name demo_account_password)
+                                       #                                       values.keys.each { |value| UI.user_error!("Invalid key '#{value}'.") unless valid_keys.include?(value.to_s) }
+                                     end),
         FastlaneCore::ConfigItem.new(key: :changelog,
-                                     deprecated: true,
+                                     deprecated: "Use :localized_build_info if possible. This will continue working but will set this value for all locales",
                                      short_option: "-w",
                                      optional: true,
                                      env_name: "PILOT_CHANGELOG",
