@@ -51,7 +51,7 @@ module Pilot
                                      short_option: "-w",
                                      optional: true,
                                      env_name: "PILOT_CHANGELOG",
-                                     description: "Provide the 'What to Test' text when uploading a new build. `skip_waiting_for_build_processing: false` is required to set the changelog."),
+                                     description: "Provide the 'What to Test' text when uploading a new build. `skip_waiting_for_build_processing: false` is required to set the changelog"),
         FastlaneCore::ConfigItem.new(key: :beta_app_description,
                                      short_option: "-d",
                                      optional: true,
