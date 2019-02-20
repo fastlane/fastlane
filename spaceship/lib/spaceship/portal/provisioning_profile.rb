@@ -457,7 +457,7 @@ module Spaceship
             devices.map(&:id),
             mac: mac?,
             sub_platform: tvos? ? 'tvOS' : nil,
-            template_name: template_name
+            template_name: is_template_profile ? template.purpose_name : nil
           )
         end
 
