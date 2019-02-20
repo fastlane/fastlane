@@ -196,7 +196,21 @@ module Pilot
                                      env_name: "PILOT_REJECT_PREVIOUS_BUILD",
                                      description: "Expire previous if it's 'waiting for review'",
                                      is_string: false,
-                                     default_value: false)
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :api_issuer,
+                                     env_name: "PILOT_API_ISSUER",
+                                     description: "Your App Store Connect Issuer ID if using API keys with the uploader",
+                                     is_string: true,
+                                     optional: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:api_issuer),
+                                     default_value_dynamic: true),
+        FastlaneCore::ConfigItem.new(key: :api_key,
+                                     env_name: "PILOT_API_KEY",
+                                     description: "Your App Store Connect API Key ID if using API keys with the uploader",
+                                     is_string: true,
+                                     optional: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:api_issuer),
+                                     default_value_dynamic: true)
       ]
     end
   end

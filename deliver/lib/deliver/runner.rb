@@ -155,8 +155,15 @@ module Deliver
           platform: options[:platform]
         )
       end
-
-      transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
+      using_api_key = false
+      username = options[:username]
+      password = nil
+      unless options[:api_key].nil? || options[:api_issuer].nil?
+        using_api_key = true
+        username = options[:api_issuer]
+        password = options[:api_key]
+      end
+      transporter = FastlaneCore::ItunesTransporter.new(username, password, false, options[:itc_provider], using_api_key)
       result = transporter.upload(options[:app].apple_id, package_path)
       UI.user_error!("Could not upload binary to App Store Connect. Check out the error above", show_github_issues: true) unless result
     end

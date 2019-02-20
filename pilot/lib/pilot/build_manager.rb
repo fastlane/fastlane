@@ -34,7 +34,15 @@ module Pilot
                                                                   package_path: dir,
                                                                       platform: platform)
 
-      transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
+      using_api_key = false
+      username = options[:username]
+      password = nil
+      unless options[:api_key].nil? || options[:api_issuer].nil?
+        using_api_key = true
+        username = options[:api_issuer]
+        password = options[:api_key]
+      end
+      transporter = FastlaneCore::ItunesTransporter.new(username, password, false, options[:itc_provider], using_api_key)
       result = transporter.upload(app.apple_id, package_path)
 
       unless result
