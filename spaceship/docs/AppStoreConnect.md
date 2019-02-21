@@ -11,6 +11,7 @@
   * [Submit app for App Store Review](#submit-app-for-app-store-review)
   * [Testers](#testers)
   * [App ratings & reviews](#app-ratings--reviews)
+  * [App Analytics](#app-analytics)
 - [License](#license)
 
 ## Usage
@@ -333,6 +334,46 @@ average_rating = app.ratings(storefront: "US").average_rating
 # Get reviews for a given store front
 reviews = ratings.reviews("US") # => Array of hashes representing review data
 
+```
+
+### App Analytics
+
+```ruby
+# Start app analytics
+analytics = app.analytics                # => Spaceship::Tunes::AppAnalytics
+
+# Get all the different metrics from App Analytics
+# By default covering the last 7 days
+
+# Get app units
+units = analytics.app_units              # => Array of dates representing raw data for each day
+
+# Get app store page views
+views = analytics.app_views              # => Array of dates representing raw data for each day
+
+# Get impressions metrics
+impressions = analytics.app_impressions  # => Array of dates representing raw data for each day
+
+# Get app sales
+sales = analytics.app_sales              # => Array of dates representing raw data for each day
+
+# Get paying users
+users = analytics.paying_users           # => Array of dates representing raw data for each day
+
+# Get in app purchases
+iap = analytics.app_in_app_purchases     # => Array of dates representing raw data for each day
+
+# Get app installs
+installs = analytics.app_installs        # => Array of dates representing raw data for each day
+
+# Get app sessions
+sessions = analytics.app_sessions        # => Array of dates representing raw data for each day
+
+# Get active devices
+devices = analytics.app_active_devices   # => Array of dates representing raw data for each day
+
+# Get crashes
+crashes = analytics.app_crashes          # => Array of dates representing raw data for each day
 ```
 
 ## License
