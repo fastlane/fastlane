@@ -43,9 +43,10 @@ module Pilot
     ################
 
     # this exists so there is a way to get the apple_id without using spaceship if the config value exists
-    def fetch_only_apple_id 
+    def fetch_only_apple_id
       apple_id = config[:apple_id]
       apple_id ||= app.apple_id
+      return apple_id
     end
 
     def fetch_apple_id
