@@ -10,7 +10,7 @@ require_relative 'manager'
 module Pilot
   class BuildManager < Manager
     def upload(options)
-      start(options)
+      start(options) unless config[:skip_waiting_for_build_processing] && config[:apple_id]
 
       options[:changelog] = self.class.sanitize_changelog(options[:changelog]) if options[:changelog]
 
@@ -24,18 +24,18 @@ module Pilot
         end
       end
 
-      UI.success("Ready to upload new build to TestFlight (App: #{app.apple_id})...")
+      UI.success("Ready to upload new build to TestFlight (App: #{fetch_only_apple_id})...")
 
       dir = Dir.mktmpdir
 
       platform = fetch_app_platform
-      package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: app.apple_id,
+      package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: fetch_only_apple_id,
                                                                       ipa_path: config[:ipa],
                                                                   package_path: dir,
                                                                       platform: platform)
 
       transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
-      result = transporter.upload(app.apple_id, package_path)
+      result = transporter.upload(fetch_only_apple_id, package_path)
 
       unless result
         UI.user_error!("Error uploading ipa file, for more information see above")
