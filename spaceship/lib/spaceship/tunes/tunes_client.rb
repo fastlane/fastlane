@@ -260,6 +260,11 @@ module Spaceship
       r = request(:get, "ra/apps/#{app_id}/details")
       parse_response(r, 'data')
     end
+    
+    def bundle_details(app_id)
+      r = request(:get, "ra/appbundles/metadetail/#{app_id}")
+      parse_response(r, 'data')
+    end
 
     def update_app_details!(app_id, data)
       r = request(:post) do |req|
