@@ -166,6 +166,11 @@ module Deliver
                                      optional: true,
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :reset_ratings,
+                                    description: "Reset the summary rating when you release a new version of the application",
+                                    optional: true,
+                                    is_string: false,
+                                    default_value: false),
 
         # other app configuration
         FastlaneCore::ConfigItem.new(key: :price_tier,
