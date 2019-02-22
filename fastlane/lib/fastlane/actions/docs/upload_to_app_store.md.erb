@@ -266,6 +266,16 @@ phased_release(true)
 phased_release(false)
 ```
 
+##### reset_ratings
+
+Reset your app's summary rating for all territories. If set to `true`, it will reset rating when this version is released. Default behavior is to keep existing rating.
+
+```ruby-skip-tests
+reset_ratings(true)
+# or
+reset_ratings(false)
+```
+
 ##### app_rating_config_path
 You can set the app age ratings using _deliver_. You'll have to create and store a `JSON` configuration file. Copy the [template](https://github.com/fastlane/fastlane/blob/master/deliver/assets/example_rating_config.json) to your project folder and pass the path to the `JSON` file using the `app_rating_config_path` option.
 

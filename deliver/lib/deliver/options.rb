@@ -167,7 +167,7 @@ module Deliver
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :reset_ratings,
-                                    description: "Reset the summary rating when you release a new verion of the application",
+                                    description: "Reset the summary rating when you release a new version of the application",
                                     optional: true,
                                     is_string: false,
                                     default_value: false),
