@@ -115,7 +115,7 @@ open class Snapshot: NSObject {
             print("Couldn't detect/set locale...")
         }
         
-        if locale.isEmpty {
+        if locale.isEmpty && !deviceLanguage.isEmpty {
             locale = Locale(identifier: deviceLanguage).identifier
         }
         
@@ -277,4 +277,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.13]
+// SnapshotHelperVersion [1.14]
