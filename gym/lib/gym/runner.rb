@@ -83,7 +83,7 @@ module Gym
 
     def mark_archive_as_built_by_gym(archive_path)
       escaped_archive_path = archive_path.shellescape
-      system("xattr -w info.fastlane.generated_by_gym 1 #{escaped_archive_path} > /dev/null 2>&1")
+      system("xattr -w info.fastlane.generated_by_gym 1 #{escaped_archive_path}")
     end
 
     # Builds the app and prepares the archive
