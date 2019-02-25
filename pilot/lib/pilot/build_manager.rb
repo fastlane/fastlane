@@ -77,10 +77,8 @@ module Pilot
       # 2. App info
       # 3. Localized app  info
       # 4. Localized build info
+      # 5. Auto notify enabled with config[:notify_external_testers]
       update_beta_app_meta(options, build)
-
-      # TODO: Need to replaceyet
-      #build.auto_notify_enabled = config[:notify_external_testers]
 
       return if config[:skip_submission]
       if options[:reject_build_waiting_for_review]
@@ -127,12 +125,11 @@ module Pilot
       if should_update_localized_app_information?(options)
         update_localized_app_review(build.app_id, options[:localized_app_info])
       elsif should_update_app_test_information?(options)
-        app_test_info = Spaceship::TestFlight::AppTestInfo.find(app_id: build.app_id)
-        app_test_info.test_info.feedback_email = options[:beta_app_feedback_email] if options[:beta_app_feedback_email]
-        app_test_info.test_info.description = options[:beta_app_description] if options[:beta_app_description]
-
+        default_info = {}
+        default_info[:feedback_email] = options[:beta_app_feedback_email] if options[:beta_app_feedback_email]
+        default_info[:description] = options[:beta_app_description] if options[:beta_app_description]
         begin
-          app_test_info.save_for_app!(app_id: build.app_id)
+          update_localized_app_review(build.app_id, {}, default_info: default_info)
           UI.success("Successfully set the beta_app_feedback_email and/or beta_app_description")
         rescue => ex
           UI.user_error!("Could not set beta_app_feedback_email and/or beta_app_description: #{ex}")
@@ -143,12 +140,16 @@ module Pilot
         update_localized_build_review(build, options[:localized_build_info])
       elsif should_update_build_information?(options)
         begin
-          build.update_build_information!(whats_new: options[:changelog])
+          update_localized_build_review(build, {}, default_info: {whats_new: options[:changelog]})
           UI.success("Successfully set the changelog for build")
         rescue => ex
           UI.user_error!("Could not set changelog: #{ex}")
         end
       end
+
+      update_build_beta_details(build, {
+        auto_notify_enabled: options[:notify_external_testers]
+      })
     end
 
     def self.truncate_changelog(changelog)
@@ -267,16 +268,22 @@ module Pilot
       client.patch_beta_app_review_detail(app_id: app_id, attributes: attributes)
     end
 
-    def update_localized_app_review(app_id, info_by_lang)
+    def update_localized_app_review(app_id, info_by_lang, default_info: nil)
       info_by_lang = info_by_lang.collect { |k, v| [k.to_sym, v] }.to_h
+
+      if default_info
+        info_by_lang.delete(:default)
+      else
+        default_info = info_by_lang.delete(:default)
+      end
 
       # Initialize hash of lang codes
       lang_codes = info_by_lang.keys
-      langs_localization_ids = Hash[lang_codes.product([nil])]
+      langs_localization_ids = {}
 
       # Validate locales exist
       client = Spaceship::ConnectAPI::Base.client
-      localizations = client.get_beta_app_localizations(filter: { app: app_id, locale: lang_codes.join(",") })
+      localizations = client.get_beta_app_localizations(filter: { app: app_id })
       localizations.each do |localization|
         localization_id = localization["id"]
         attributes = localization["attributes"]
@@ -288,7 +295,9 @@ module Pilot
       # Create or update localized app review info
       langs_localization_ids.each do |lang_code, localization_id|
         info = info_by_lang[lang_code]
-        update_localized_app_review_for_lang(app_id, localization_id, lang_code, info)
+
+        info = default_info unless info
+        update_localized_app_review_for_lang(app_id, localization_id, lang_code, info) if info
       end
     end
 
@@ -309,19 +318,25 @@ module Pilot
       end
     end
 
-    def update_localized_build_review(build, info_by_lang)
+    def update_localized_build_review(build, info_by_lang, default_info: nil)
       resp = Spaceship::ConnectAPI::Base.client.get_builds(filter: { expired: false, processingState: "PROCESSING,VALID", version: build.build_version })
       build_id = resp.first["id"]
 
       info_by_lang = info_by_lang.collect { |k, v| [k.to_sym, v] }.to_h
 
+      if default_info
+        info_by_lang.delete(:default)
+      else
+        default_info = info_by_lang.delete(:default)
+      end
+
       # Initialize hash of lang codes
       lang_codes = info_by_lang.keys
-      langs_localization_ids = Hash[lang_codes.product([nil])]
+      langs_localization_ids = {}
 
       # Validate locales exist
       client = Spaceship::ConnectAPI::Base.client
-      localizations = client.get_beta_build_localizations(filter: { build: build_id, locale: lang_codes.join(",") })
+      localizations = client.get_beta_build_localizations(filter: { build: build_id })
       localizations.each do |localization|
         localization_id = localization["id"]
         attributes = localization["attributes"]
@@ -331,10 +346,11 @@ module Pilot
       end
 
       # Create or update localized app review info
-      puts("langs_localization_ids: #{langs_localization_ids}")
       langs_localization_ids.each do |lang_code, localization_id|
         info = info_by_lang[lang_code]
-        update_localized_build_review_for_lang(build_id, localization_id, lang_code, info)
+
+        info = default_info unless info
+        update_localized_build_review_for_lang(build_id, localization_id, lang_code, info) if info
       end
     end
 
@@ -349,6 +365,23 @@ module Pilot
         attributes[:locale] = locale if locale
         client.post_beta_build_localizations(build_id: build_id, attributes: attributes)
       end
+    end
+
+    def update_build_beta_details(build, info)
+      client = Spaceship::ConnectAPI::Base.client
+
+      resp = client.get_builds(filter: { expired: false, processingState: "PROCESSING,VALID", version: build.build_version })
+      build_id = resp.first["id"]
+
+      resp = client.get_build_beta_details(filter: { build: build_id })
+      build_beta_details_id = resp.first["id"]
+
+      attributes = {}
+      attributes[:autoNotifyEnabled] = info[:auto_notify_enabled] if info.key?(:auto_notify_enabled)
+
+      puts "patching build details with: #{attributes}"
+
+      client.patch_build_beta_details(build_beta_details_id: build_beta_details_id, attributes: attributes)
     end
   end
 end

@@ -84,13 +84,11 @@ module Pilot
                                        #                                       values.keys.each { |value| UI.user_error!("Invalid key '#{value}'.") unless valid_keys.include?(value.to_s) }
                                      end),
         FastlaneCore::ConfigItem.new(key: :beta_app_description,
-                                     deprecated: "Use :localized_app_info if possible. This will continue working but will set this value for all locales",
                                      short_option: "-d",
                                      optional: true,
                                      env_name: "PILOT_BETA_APP_DESCRIPTION",
                                      description: "Provide the 'Beta App Description' when uploading a new build"),
         FastlaneCore::ConfigItem.new(key: :beta_app_feedback_email,
-                                     deprecated: "Use :localized_app_info if possible. This will continue working but will set this value for all locales",
                                      short_option: "-n",
                                      optional: true,
                                      env_name: "PILOT_BETA_APP_FEEDBACK",
@@ -107,7 +105,6 @@ module Pilot
                                        #                                       values.keys.each { |value| UI.user_error!("Invalid key '#{value}'.") unless valid_keys.include?(value.to_s) }
                                      end),
         FastlaneCore::ConfigItem.new(key: :changelog,
-                                     deprecated: "Use :localized_build_info if possible. This will continue working but will set this value for all locales",
                                      short_option: "-w",
                                      optional: true,
                                      env_name: "PILOT_CHANGELOG",

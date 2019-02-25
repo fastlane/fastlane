@@ -209,6 +209,41 @@ module Spaceship
         handle_response(response)
       end
 
+      def get_build_beta_details(filter: {}, includes: nil, limit: 10, sort: nil)
+        #assert_required_params(__method__, binding)
+
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/buildBetaDetails
+        url = build_url(path: "buildBetaDetails", filter: filter, includes: includes, limit: limit, sort: sort)
+
+        response = request(:get, url)
+        handle_response(response)
+      end
+      
+      def patch_build_beta_details(build_beta_details_id: nil, attributes: {})
+        # assert_required_params(__method__, binding)
+
+        # PATCH
+        # https://appstoreconnect.apple.com/iris/v1/buildBetaDetails/<build_beta_details_id>
+        path = "buildBetaDetails/#{build_beta_details_id}"
+        url = build_url(path: path, filter: nil, includes: nil, limit: nil, sort: nil)
+
+        body = {
+          data: {
+            attributes: attributes,
+            id: build_beta_details_id,
+            type: "buildBetaDetails"
+          }
+        }
+
+        response = request(:patch) do |req|
+          req.url(url)
+          req.body = body.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_response(response)
+      end
+
       def get_builds(filter: {}, includes: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate")
         assert_required_params(__method__, binding)
 
