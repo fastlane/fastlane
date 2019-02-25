@@ -43,6 +43,10 @@ module Gym
       config[:output_name].gsub!(".ipa", "")
       config[:output_name].gsub!(File::SEPARATOR, "_")
 
+      config[:enabled_xcode_output] = config[:enabled_xcode_output].map(&:to_sym)
+      config[:enabled_xcode_output] = [:command] if config[:suppress_xcode_output]
+      config[:enabled_xcode_output] = [] if config[:silent]
+
       return config
     end
 
