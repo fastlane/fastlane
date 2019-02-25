@@ -72,6 +72,23 @@ module Gym
 
     private
 
+    def execute_xcode_command(command, error: nil)
+      FastlaneCore::CommandExecutor.execute(command: command,
+                                          print_all: Gym.config[:enabled_xcode_output].include?(:output),
+                                      print_command: Gym.config[:enabled_xcode_output].include?(:command),
+                                    suppress_output: !Gym.config[:enabled_xcode_output].include?(:output),
+                              suppress_error_output: !Gym.config[:enabled_xcode_output].include?(:error),
+                                              error: error)
+    end
+
+    def execute_other_command(command)
+      FastlaneCore::CommandExecutor.execute(command: command,
+                                          print_all: !Gym.config[:silent],
+                                      print_command: !Gym.config[:silent],
+                                    suppress_output: Gym.config[:silent],
+                              suppress_error_output: Gym.config[:silent])
+    end
+
     #####################################################
     # @!group The individual steps
     #####################################################
@@ -90,20 +107,9 @@ module Gym
     def build_app
       command = BuildCommandGenerator.generate
       print_command(command, "Generated Build Command") if FastlaneCore::Globals.verbose?
-
-      command_output = Gym.config[:enabled_xcode_output].map(&:to_sym)
-      command_output = [:command] if Gym.config[:suppress_xcode_output]
-      command_output = [] if Gym.config[:silent]
-
-      FastlaneCore::CommandExecutor.execute(command: command,
-                                          print_all: command_output.include?(:output),
-                                      print_command: command_output.include?(:command),
-                                            loading: "Loading...",
-                                    suppress_output: !command_output.include?(:output),
-                              suppress_error_output: !command_output.include?(:error),
-                                              error: proc do |output|
-                                                ErrorHandler.handle_build_error(output)
-                                              end)
+      execute_command(command, error: proc do |output|
+        ErrorHandler.handle_build_error(output)
+      end)
 
       mark_archive_as_built_by_gym(BuildCommandGenerator.archive_path)
       UI.success("Successfully stored the archive. You can find it in the Xcode Organizer.") unless Gym.config[:archive_path].nil?
@@ -115,16 +121,10 @@ module Gym
     # Post-processing of build_app
     def post_build_app
       command = BuildCommandGenerator.post_build
-
       return if command.empty?
 
       print_command(command, "Generated Post-Build Command") if FastlaneCore::Globals.verbose?
-      FastlaneCore::CommandExecutor.execute(command: command,
-                                          print_all: true,
-                                      print_command: !Gym.config[:silent],
-                                              error: proc do |output|
-                                                ErrorHandler.handle_build_error(output)
-                                              end)
+      execute_xcode_command(command, error: proc { |output| ErrorHandler.handle_build_error(output) })
     end
 
     # Makes sure the archive is there and valid
@@ -138,13 +138,7 @@ module Gym
     def package_app
       command = PackageCommandGenerator.generate
       print_command(command, "Generated Package Command") if FastlaneCore::Globals.verbose?
-
-      FastlaneCore::CommandExecutor.execute(command: command,
-                                          print_all: false,
-                                      print_command: !Gym.config[:silent],
-                                              error: proc do |output|
-                                                ErrorHandler.handle_package_error(output)
-                                              end)
+      execute_xcode_command(command, error: proc { |output| ErrorHandler.handle_package_error(output) })
     end
 
     def compress_and_move_dsym
@@ -162,7 +156,7 @@ module Gym
           command << "dsymutil"
           command << "--symbol-map #{bcsymbolmaps_directory.shellescape}"
           command << dsym.shellescape
-          Helper.backticks(command.join(" "), print: !Gym.config[:silent])
+          execute_other_command(command.join(" "))
         end
       end
 
@@ -170,8 +164,7 @@ module Gym
 
       output_path = File.expand_path(File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".app.dSYM.zip"))
       command = "cd '#{containing_directory}' && zip -r '#{output_path}' *.dSYM"
-      Helper.backticks(command, print: !Gym.config[:silent])
-      puts("") # new line
+      execute_other_command(command)
 
       UI.success("Successfully exported and compressed dSYM file")
     end
