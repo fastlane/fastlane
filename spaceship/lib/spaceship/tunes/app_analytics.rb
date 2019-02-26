@@ -12,60 +12,77 @@ module Spaceship
         end
       end
 
-      def app_units
+      # App Store / Impressions Unique Devices
+      def app_impressions
         start_t, end_t = time_last_7_days
 
-        app_units_interval(start_t, end_t)
+        app_impressions_interval(start_t, end_t)
       end
 
+      # App Store / Product Page Views Unique Devices
       def app_views
         start_t, end_t = time_last_7_days
 
         app_views_interval(start_t, end_t)
       end
 
+      # Sales / App Units
+      def app_units
+        start_t, end_t = time_last_7_days
+
+        app_units_interval(start_t, end_t)
+      end
+
+      # Sales / In-App Purchases
       def app_in_app_purchases
         start_t, end_t = time_last_7_days
 
         app_in_app_purchases_interval(start_t, end_t)
       end
 
+      # Sales / Sales
       def app_sales
         start_t, end_t = time_last_7_days
 
         app_sales_interval(start_t, end_t)
       end
 
+      # Sales / Paying Users
       def app_paying_users
         start_t, end_t = time_last_7_days
 
         app_paying_users_interval(start_t, end_t)
       end
 
+      # Usage / Installations
       def app_installs
         start_t, end_t = time_last_7_days
 
         app_installs_interval(start_t, end_t)
       end
 
+      # Usage / Sessions
       def app_sessions
         start_t, end_t = time_last_7_days
 
         app_sessions_interval(start_t, end_t)
       end
 
+      # Usage / Active Devices
       def app_active_devices
         start_t, end_t = time_last_7_days
 
         app_active_devices_interval(start_t, end_t)
       end
 
+      # Usage / Active Devices 30 Days
       def app_active_last_30_days
         start_t, end_t = time_last_7_days
 
         app_active_last_30_days_interval(start_t, end_t)
       end
 
+      # Usage / Crashes
       def app_crashes
         start_t, end_t = time_last_7_days
 
@@ -74,6 +91,10 @@ module Spaceship
 
       def app_measure_interval(start_t, end_t, measure, view_by = nil)
         client.time_series_analytics([apple_id], [measure], start_t, end_t, "DAY", view_by)
+      end
+
+      def app_impressions_interval(start_t, end_t, view_by = nil)
+        client.time_series_analytics([apple_id], ['impressionsTotal'], start_t, end_t, "DAY", view_by)
       end
 
       def app_units_interval(start_t, end_t, view_by = nil)

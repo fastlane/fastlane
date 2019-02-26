@@ -13,13 +13,24 @@ module Supply
     attr_accessor :client
 
     def self.make_from_config(params: nil)
-      unless params[:json_key] || params[:json_key_data]
-        UI.important("To not be asked about this value, you can specify it using 'json_key'")
-        json_key_path = UI.input("The service account json file used to authenticate with Google: ")
-        json_key_path = File.expand_path(json_key_path)
+      params ||= Supply.config
+      service_account_data = self.service_account_authentication(params: params)
+      return self.new(service_account_json: service_account_data, params: params)
+    end
 
-        UI.user_error!("Could not find service account json file at path '#{json_key_path}'") unless File.exist?(json_key_path)
-        params[:json_key] = json_key_path
+    # Supply authentication file
+    def self.service_account_authentication(params: nil)
+      unless params[:json_key] || params[:json_key_data]
+        if UI.interactive?
+          UI.important("To not be asked about this value, you can specify it using 'json_key'")
+          json_key_path = UI.input("The service account json file used to authenticate with Google: ")
+          json_key_path = File.expand_path(json_key_path)
+
+          UI.user_error!("Could not find service account json file at path '#{json_key_path}'") unless File.exist?(json_key_path)
+          params[:json_key] = json_key_path
+        else
+          UI.user_error!("Could not load Google authentication. Make sure it has been added as an environment variable in 'json_key' or 'json_key_data'")
+        end
       end
 
       if params[:json_key]
@@ -28,7 +39,7 @@ module Supply
         service_account_json = StringIO.new(params[:json_key_data])
       end
 
-      return self.new(service_account_json: service_account_json, params: params)
+      service_account_json
     end
 
     # Initializes the service and its auth_client using the specified information
@@ -86,40 +97,22 @@ module Supply
     # @!group Login
     #####################################################
 
-    # instantiate a client given the supplied configuration
-    def self.make_from_config(params: nil)
-      if params.nil?
-        params = Supply.config
-      end
-
-      # first consider deprecated params
-      unless params[:json_key] || params[:json_key_data] || (params[:key] && params[:issuer])
-        UI.important("To not be asked about this value, you can specify it using 'json_key'")
-        params[:json_key] = UI.input("The service account json file used to authenticate with Google: ")
-      end
-
-      super(params: params)
-    end
-
-    # Initializes the client and its auth_client using the specified information
-    # @param service_account_json: The raw service account Json data
-    # @param path_to_key: The path to your p12 file (@deprecated)
-    # @param issuer: Email address for oauth (@deprecated)
-    def initialize(path_to_key: nil, issuer: nil, service_account_json: nil, params: nil)
-      if service_account_json
-        key_io = service_account_json
-      else
-        # deprecated
+    def self.service_account_authentication(params: nil)
+      if params[:json_key] || params[:json_key_data]
+        super(params: params)
+      elsif params[:key] && params[:issuer]
         require 'google/api_client/auth/key_utils'
-        key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(path_to_key), 'notasecret')
+        UI.important("This type of authentication is deprecated. Please consider using JSON authentication instead")
+        key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(params[:key]), 'notasecret')
         cred_json = {
           private_key: key.to_s,
-          client_email: issuer
+          client_email: params[:issuer]
         }
-        key_io = StringIO.new(MultiJson.dump(cred_json))
+        service_account_json = StringIO.new(MultiJson.dump(cred_json))
+        service_account_json
+      else
+        UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
       end
-
-      super(service_account_json: key_io, params: params)
     end
 
     #####################################################

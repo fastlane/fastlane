@@ -141,6 +141,30 @@ describe Fastlane do
         expect(fields[1][:title]).to eq('Result')
         expect(fields[1][:value]).to eq('Error')
       end
+
+      # https://github.com/fastlane/fastlane/issues/14234
+      it "parses default_payloads without adding extra fields for git" do
+        channel = "#myChannel"
+        message = "Custom Message"
+
+        require 'fastlane/actions/slack'
+        arguments = Fastlane::ConfigurationHelper.parse(Fastlane::Actions::SlackAction, {
+          slack_url: 'https://127.0.0.1',
+          message: message,
+          success: false,
+          channel: channel,
+          default_payloads: [:git_branch, :last_git_commit_hash]
+        })
+
+        notifier, attachments = Fastlane::Actions::SlackAction.run(arguments)
+
+        fields = attachments[:fields]
+
+        expect(fields.count).to eq(2)
+
+        expect(fields[0][:title]).to eq('Git Branch')
+        expect(fields[1][:title]).to eq('Git Commit Hash')
+      end
     end
   end
 end

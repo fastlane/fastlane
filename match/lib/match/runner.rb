@@ -46,7 +46,8 @@ module Match
         type: params[:type].to_s,
         platform: params[:platform].to_s,
         google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
-        google_cloud_keys_file: params[:google_cloud_keys_file].to_s
+        google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
+        google_cloud_project_id: params[:google_cloud_project_id].to_s
       })
       storage.download
 
@@ -169,6 +170,13 @@ module Match
       else
         cert_path = certs.last
 
+        # Check validity of certificate
+        if Utils.is_cert_valid?(cert_path)
+          UI.verbose("Your certificate '#{File.basename(cert_path)}' is valid")
+        else
+          UI.user_error!("Your certificate '#{File.basename(cert_path)}' is not valid, please check end date and renew it if necessary")
+        end
+
         if Helper.mac?
           UI.message("Installing certificate...")
 
@@ -184,6 +192,7 @@ module Match
 
           # Import the private key
           # there seems to be no good way to check if it's already installed - so just install it
+          # Key will only be added to the partition list if it isn't already installed
           Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
         else
           UI.message("Skipping installation of certificate as it would not work on this operating system.")
