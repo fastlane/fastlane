@@ -210,7 +210,7 @@ module Spaceship
       end
 
       def get_build_beta_details(filter: {}, includes: nil, limit: 10, sort: nil)
-        #assert_required_params(__method__, binding)
+        # assert_required_params(__method__, binding)
 
         # GET
         # https://appstoreconnect.apple.com/iris/v1/buildBetaDetails
@@ -219,7 +219,7 @@ module Spaceship
         response = request(:get, url)
         handle_response(response)
       end
-      
+
       def patch_build_beta_details(build_beta_details_id: nil, attributes: {})
         # assert_required_params(__method__, binding)
 

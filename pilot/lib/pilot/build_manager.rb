@@ -140,7 +140,7 @@ module Pilot
         update_localized_build_review(build, options[:localized_build_info])
       elsif should_update_build_information?(options)
         begin
-          update_localized_build_review(build, {}, default_info: {whats_new: options[:changelog]})
+          update_localized_build_review(build, {}, default_info: { whats_new: options[:changelog] })
           UI.success("Successfully set the changelog for build")
         rescue => ex
           UI.user_error!("Could not set changelog: #{ex}")
@@ -278,7 +278,6 @@ module Pilot
       end
 
       # Initialize hash of lang codes
-      lang_codes = info_by_lang.keys
       langs_localization_ids = {}
 
       # Validate locales exist
@@ -331,7 +330,6 @@ module Pilot
       end
 
       # Initialize hash of lang codes
-      lang_codes = info_by_lang.keys
       langs_localization_ids = {}
 
       # Validate locales exist
@@ -379,7 +377,7 @@ module Pilot
       attributes = {}
       attributes[:autoNotifyEnabled] = info[:auto_notify_enabled] if info.key?(:auto_notify_enabled)
 
-      puts "patching build details with: #{attributes}"
+      puts("patching build details with: #{attributes}")
 
       client.patch_build_beta_details(build_beta_details_id: build_beta_details_id, attributes: attributes)
     end
