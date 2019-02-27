@@ -41,7 +41,7 @@ module Supply
 
     def download_images(listing, image_format = "png", remove_alpha = "false")
       UI.message("🖼️  Downloading images (#{listing.language})")
-      
+
       require 'net/http'
 
       allowed_imagetypes = [Supply::IMAGES_TYPES, Supply::SCREENSHOT_TYPES].flatten
@@ -50,15 +50,15 @@ module Supply
         begin
           UI.message("Downloading `#{image_type}` for #{listing.language}...")
 
-          urls= client.fetch_images(image_type: image_type, language: listing.language)
+          urls = client.fetch_images(image_type: image_type, language: listing.language)
           next unless urls
 
-          if(urls.length > 0)
+          if urls.length > 0
             image_counter = 1
             urls.each do |url|
               url = "#{url}=w6000-h6000" # blowing up the sizes intentionally. So, Google would return the original image sizes as they are uploaded.
               path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type, "#{image_counter}_#{listing.language}.#{image_format}")
-              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.#{image_format}") if(IMAGES_TYPES.include?(image_type))
+              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.#{image_format}") if IMAGES_TYPES.include?(image_type)
 
               p = Pathname.new(path)
               FileUtils.mkdir_p(p.dirname.to_s)
@@ -67,16 +67,16 @@ module Supply
 
               image = MiniMagick::Image.open(path)
               image_details = JSON.parse(image.details.to_json, symbolize_names: true)
-              
+
               is_alpha_present = image_details.keys.any? { |k| k == :Alpha }
               image.alpha('remove') if is_alpha_present && remove_alpha
-              
+
               image.format(image_format) # Properly formatting the final image. Sometimes "jpg" or "webp" or "png" formats are returned by Google.
               image.write(path) # Properly formatted file is written to `final_path`
               UI.message("\tDownloaded  - #{path}")
               UI.message("\t\tAlpha removed") if is_alpha_present && remove_alpha
 
-              image_counter = image_counter + 1
+              image_counter += 1
             end # urls.each do |url|
           else
             UI.message("\tNo images found, nothing to download.")
