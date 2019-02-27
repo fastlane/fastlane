@@ -56,11 +56,10 @@ module Spaceship
 
       def selected_apps
         parsed_apps = []
-        all_apps = Application.all
         raw_data["userSoftwares"]["value"]["grantedSoftwareAdamIds"].each do |app_id|
-          parsed_apps << all_apps.select { |app| !app.apple_id.nil? && app.apple_id == app_id }
+           parsed_apps << Application.find(app_id)
         end
-        return parsed_apps.flatten
+        return parsed_apps
       end
 
       def not_accepted_invitation
