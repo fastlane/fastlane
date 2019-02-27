@@ -57,7 +57,7 @@ module Spaceship
       def selected_apps
         parsed_apps = []
         raw_data["userSoftwares"]["value"]["grantedSoftwareAdamIds"].each do |app_id|
-           parsed_apps << Application.find(app_id)
+          parsed_apps << Application.find(app_id)
         end
         return parsed_apps
       end
