@@ -1,6 +1,6 @@
 module Supply
   class Setup
-    def perform_download
+    def perform_download(image_format = "png", remove_alpha = "false")
       UI.message("🕗  Downloading metadata, images, screenshots...")
 
       if File.exist?(metadata_path)
@@ -12,8 +12,7 @@ module Supply
 
       client.listings.each do |listing|
         store_metadata(listing)
-        create_screenshots_folder(listing)
-        download_images(listing)
+        download_images(listing, image_format, remove_alpha)
       end
 
       client.apks_version_codes.each do |apk_version_code|
@@ -40,34 +39,58 @@ module Supply
       end
     end
 
-    def download_images(listing)
+    def download_images(listing, image_format = "png", remove_alpha = "false")
       UI.message("🖼️  Downloading images (#{listing.language})")
-
-      # We cannot download existing screenshots as they are compressed
-      # But we can at least download the images
+      
       require 'net/http'
 
-      IMAGES_TYPES.each do |image_type|
-        if ['featureGraphic'].include?(image_type)
-          # we don't get all files in full resolution :(
-          UI.message("📵  Due to a limitation of the Google Play API, there is no way for `supply` to download your existing feature graphic. Please copy your feature graphic to `metadata/android/#{listing.language}/images/featureGraphic.png`")
-          next
-        end
+      allowed_imagetypes = [Supply::IMAGES_TYPES, Supply::SCREENSHOT_TYPES].flatten
 
+      allowed_imagetypes.each do |image_type|
         begin
           UI.message("Downloading `#{image_type}` for #{listing.language}...")
 
-          url = client.fetch_images(image_type: image_type, language: listing.language).last
-          next unless url
+          urls= client.fetch_images(image_type: image_type, language: listing.language)
+          next unless urls
 
-          path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.png")
-          File.write(path, Net::HTTP.get(URI.parse(url)))
+          if(urls.length > 0)
+            image_counter = 1
+            urls.each do |url|
+              url = "#{url}=w6000-h6000" # blowing up the sizes intentionally. So, Google would return the original image sizes as they are uploaded.
+              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type, "#{image_counter}_#{listing.language}.#{image_format}")
+              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.#{image_format}") if(IMAGES_TYPES.include?(image_type))
+
+              p = Pathname.new(path)
+              FileUtils.mkdir_p(p.dirname.to_s)
+
+              File.write(path, Net::HTTP.get(URI.parse(url))) # Write to tmp `path`
+
+              image = MiniMagick::Image.open(path)
+              image_details = JSON.parse(image.details.to_json, symbolize_names: true)
+              
+              is_alpha_present = image_details.keys.any? { |k| k == :Alpha }
+              image.alpha('remove') if is_alpha_present && remove_alpha
+              
+              image.format(image_format) # Properly formatting the final image. Sometimes "jpg" or "webp" or "png" formats are returned by Google.
+              image.write(path) # Properly formatted file is written to `final_path`
+              UI.message("\tDownloaded  - #{path}")
+              UI.message("\t\tAlpha removed") if is_alpha_present && remove_alpha
+
+              image_counter = image_counter + 1
+            end # urls.each do |url|
+          else
+            UI.message("\tNo images found, nothing to download.")
+          end # if(urls.length > 0)
         rescue => ex
           UI.error(ex.to_s)
           UI.error("Error downloading '#{image_type}' for #{listing.language}...")
         end
+      end # allowed_imagetypes.each do |image_type|
+
+      3.times do
+        UI.message("")
       end
-    end
+    end # def download_images(listing)
 
     def create_screenshots_folder(listing)
       UI.message("📱  Downloading screenshots (#{listing.language})")

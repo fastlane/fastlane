@@ -1,3 +1,5 @@
+require 'mini_magick'
+
 require 'json'
 require 'supply/options'
 require 'supply/client'
