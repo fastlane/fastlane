@@ -183,7 +183,7 @@ module Fastlane
       end
 
       def self.description
-        "Upload a new build to [HockeyApp](https://hockeyapp.net/)"
+        "Refer to [this](https://github.com/Microsoft/fastlane-plugin-appcenter/)"
       end
 
       def self.available_options
