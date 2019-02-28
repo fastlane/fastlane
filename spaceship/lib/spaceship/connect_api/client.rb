@@ -35,7 +35,12 @@ module Spaceship
           "#{k}=#{v}"
         end.join("&")
 
-        url = "#{path}?#{query_params}"
+        if query_params.empty?
+          url = path
+        else
+          url = "#{path}?#{query_params}"
+        end
+
         return url
       end
 
@@ -51,7 +56,7 @@ module Spaceship
         handle_response(response)
       end
 
-      def patch_beta_app_review_detail(app_id: nil, feedbackEmail: nil, attributes: {})
+      def patch_beta_app_review_detail(app_id: nil, attributes: {})
         # assert_required_params(__method__, binding)
 
         # PATCH
@@ -209,7 +214,7 @@ module Spaceship
         handle_response(response)
       end
 
-      def get_build_beta_details(filter: {}, includes: nil, limit: 10, sort: nil)
+      def get_build_beta_details(filter: {}, includes: nil, limit: nil, sort: nil)
         # assert_required_params(__method__, binding)
 
         # GET
@@ -255,18 +260,7 @@ module Spaceship
         handle_response(response)
       end
 
-      def get_prerelease_versions(filter: {}, includes: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate")
-        assert_required_params(__method__, binding)
-
-        # GET
-        # https://appstoreconnect.apple.com/iris/v1/builds
-        url = build_url(path: "builds", filter: filter, includes: includes, limit: limit, sort: sort)
-
-        response = request(:get, url)
-        handle_response(response)
-      end
-
-      def post_for_testflight_review(build_id: nil)
+      def post_beta_app_review_submissions(build_id: nil)
         assert_required_params(__method__, binding)
 
         # POST
