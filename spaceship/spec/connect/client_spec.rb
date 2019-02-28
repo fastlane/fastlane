@@ -319,7 +319,5 @@ describe Spaceship::ConnectAPI::Client do
         client.post_beta_app_review_submissions(build_id: build_id)
       end
     end
-
-    #    def post_for_testflight_review(build_id: nil)
   end
 end
