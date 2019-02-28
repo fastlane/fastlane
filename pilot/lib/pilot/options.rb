@@ -69,7 +69,7 @@ module Pilot
                                      description: "Beta app review information for contact info and demo account",
                                      optional: true,
                                      verify_block: proc do |values|
-                                       valid_keys = %w(contact_email contact_first_name contact_last_name contact_phone demo_account_name demo_account_password notes)
+                                       valid_keys = %w(contact_email contact_first_name contact_last_name contact_phone demo_account_required demo_account_name demo_account_password notes)
                                        values.keys.each { |value| UI.user_error!("Invalid key '#{value}'.") unless valid_keys.include?(value.to_s) }
                                      end),
 

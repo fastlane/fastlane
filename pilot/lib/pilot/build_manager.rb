@@ -377,8 +377,6 @@ module Pilot
       attributes = {}
       attributes[:autoNotifyEnabled] = info[:auto_notify_enabled] if info.key?(:auto_notify_enabled)
 
-      puts("patching build details with: #{attributes}")
-
       client.patch_build_beta_details(build_beta_details_id: build_beta_details_id, attributes: attributes)
     end
   end
