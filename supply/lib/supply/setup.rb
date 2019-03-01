@@ -72,7 +72,7 @@ module Supply
               image.alpha('remove') if is_alpha_present && remove_alpha
 
               image.format(image_format) # Properly formatting the final image. Sometimes "jpg" or "webp" or "png" formats are returned by Google.
-              image.write(path) # Properly formatted file is written to `final_path`
+              image.write(path) # Properly formatted file is written to disk
               UI.message("\tDownloaded  - #{path}")
               UI.message("\t\tAlpha removed") if is_alpha_present && remove_alpha
 
