@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="/img/actions/supply.png" width="250">
+  <img src="assets/supply.png" width="250">
 </p>
 
 ###### Command line tool for updating Android apps and their metadata on the Google Play Store
@@ -31,7 +31,7 @@ _supply_ uploads app metadata, screenshots, binaries, and app bundles to Google 
 
 ## Setup
 
-Setup consists of setting up your Google Developers Service Account
+Setup consists of setting up your Google Developers Service Account - https://docs.fastlane.tools/actions/supply/#setup
 
 {!docs/includes/google-credentials.md!}
 
