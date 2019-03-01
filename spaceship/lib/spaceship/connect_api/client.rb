@@ -18,51 +18,33 @@ module Spaceship
         'https://appstoreconnect.apple.com/iris/v1/'
       end
 
-      def build_url(path: nil, filter: nil, includes: nil, limit: nil, sort: nil)
+      def build_params(filter: nil, includes: nil, limit: nil, sort: nil)
         params = {}
 
-        if filter
-          filter.keys.each do |key|
-            params["filter[#{key}]"] = filter[key]
-          end
-        end
+        params[:filter] = filter if filter && !filter.empty?
+        params[:include] = includes if includes
+        params[:limit] = limit if limit
+        params[:sort] = sort if sort
 
-        params["include"] = includes if includes
-        params["limit"] = limit if limit
-        params["sort"] = sort if sort
-
-        query_params = params.map do |k, v|
-          "#{k}=#{v}"
-        end.join("&")
-
-        if query_params.empty?
-          url = path
-        else
-          url = "#{path}?#{query_params}"
-        end
-
-        return url
+        return params
       end
 
       def get_beta_app_review_detail(filter: {}, includes: nil, limit: nil, sort: nil)
-        # assert_required_params(__method__, binding)
-
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaAppReviewDetails?filter[app]=<app_id>
-        path = "betaAppReviewDetails"
-        url = build_url(path: path, filter: filter, includes: includes, limit: limit, sort: sort)
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
 
-        response = request(:get, url)
+        response = request(:get, "betaAppReviewDetails") do |req|
+          req.options.params_encoder = Faraday::NestedParamsEncoder
+          req.params = params
+        end
         handle_response(response)
       end
 
       def patch_beta_app_review_detail(app_id: nil, attributes: {})
-        # assert_required_params(__method__, binding)
-
         # PATCH
         # https://appstoreconnect.apple.com/iris/v1/apps/<app_id>/betaAppReviewDetails
         path = "betaAppReviewDetails/#{app_id}"
-        url = build_url(path: path, filter: nil, includes: nil, limit: nil, sort: nil)
 
         body = {
           data: {
@@ -73,7 +55,7 @@ module Spaceship
         }
 
         response = request(:patch) do |req|
-          req.url(url)
+          req.url(path)
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
@@ -81,36 +63,34 @@ module Spaceship
       end
 
       def get_beta_app_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
-        # assert_required_params(__method__, binding)
-
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaAppLocalizations?filter[app]=<app_id>
-        path = "betaAppLocalizations"
-        url = build_url(path: path, filter: filter, includes: includes, limit: limit, sort: sort)
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
 
-        response = request(:get, url)
+        response = request(:get, "betaAppLocalizations") do |req|
+          req.options.params_encoder = Faraday::NestedParamsEncoder
+          req.params = params
+        end
         handle_response(response)
       end
 
       def get_beta_build_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
-        # assert_required_params(__method__, binding)
-
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations?filter[build]=<build_id>
         path = "betaBuildLocalizations"
-        url = build_url(path: path, filter: filter, includes: includes, limit: limit, sort: sort)
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
 
-        response = request(:get, url)
+        response = request(:get, path) do |req|
+          req.options.params_encoder = Faraday::NestedParamsEncoder
+          req.params = params
+        end
         handle_response(response)
       end
 
       def post_beta_app_localizations(app_id: nil, attributes: {})
-        # assert_required_params(__method__, binding)
-
         # POST
         # https://appstoreconnect.apple.com/iris/v1/betaAppLocalizations
         path = "betaAppLocalizations"
-        url = build_url(path: path, filter: nil, includes: nil, limit: nil, sort: nil)
 
         body = {
           data: {
@@ -128,7 +108,7 @@ module Spaceship
         }
 
         response = request(:post) do |req|
-          req.url(url)
+          req.url(path)
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
@@ -136,12 +116,9 @@ module Spaceship
       end
 
       def patch_beta_app_localizations(localization_id: nil, attributes: {})
-        # assert_required_params(__method__, binding)
-
         # PATCH
         # https://appstoreconnect.apple.com/iris/v1/apps/<app_id>/betaAppLocalizations/<localization_id>
         path = "betaAppLocalizations/#{localization_id}"
-        url = build_url(path: path, filter: nil, includes: nil, limit: nil, sort: nil)
 
         body = {
           data: {
@@ -152,7 +129,7 @@ module Spaceship
         }
 
         response = request(:patch) do |req|
-          req.url(url)
+          req.url(path)
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
@@ -160,12 +137,9 @@ module Spaceship
       end
 
       def post_beta_build_localizations(build_id: nil, attributes: {})
-        # assert_required_params(__method__, binding)
-
         # POST
         # https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations
         path = "betaBuildLocalizations"
-        url = build_url(path: path, filter: nil, includes: nil, limit: nil, sort: nil)
 
         body = {
           data: {
@@ -183,7 +157,7 @@ module Spaceship
         }
 
         response = request(:post) do |req|
-          req.url(url)
+          req.url(path)
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
@@ -191,12 +165,9 @@ module Spaceship
       end
 
       def patch_beta_build_localizations(localization_id: nil, feedbackEmail: nil, attributes: {})
-        # assert_required_params(__method__, binding)
-
         # PATCH
         # https://appstoreconnect.apple.com/iris/v1/apps/<app_id>/betaBuildLocalizations
         path = "betaBuildLocalizations/#{localization_id}"
-        url = build_url(path: path, filter: nil, includes: nil, limit: nil, sort: nil)
 
         body = {
           data: {
@@ -207,7 +178,7 @@ module Spaceship
         }
 
         response = request(:patch) do |req|
-          req.url(url)
+          req.url(path)
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
@@ -215,23 +186,21 @@ module Spaceship
       end
 
       def get_build_beta_details(filter: {}, includes: nil, limit: nil, sort: nil)
-        # assert_required_params(__method__, binding)
-
         # GET
         # https://appstoreconnect.apple.com/iris/v1/buildBetaDetails
-        url = build_url(path: "buildBetaDetails", filter: filter, includes: includes, limit: limit, sort: sort)
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
 
-        response = request(:get, url)
+        response = request(:get, "buildBetaDetails") do |req|
+          req.options.params_encoder = Faraday::NestedParamsEncoder
+          req.params = params
+        end
         handle_response(response)
       end
 
       def patch_build_beta_details(build_beta_details_id: nil, attributes: {})
-        # assert_required_params(__method__, binding)
-
         # PATCH
         # https://appstoreconnect.apple.com/iris/v1/buildBetaDetails/<build_beta_details_id>
         path = "buildBetaDetails/#{build_beta_details_id}"
-        url = build_url(path: path, filter: nil, includes: nil, limit: nil, sort: nil)
 
         body = {
           data: {
@@ -242,7 +211,7 @@ module Spaceship
         }
 
         response = request(:patch) do |req|
-          req.url(url)
+          req.url(path)
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
@@ -250,23 +219,20 @@ module Spaceship
       end
 
       def get_builds(filter: {}, includes: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate")
-        assert_required_params(__method__, binding)
-
         # GET
         # https://appstoreconnect.apple.com/iris/v1/builds
-        url = build_url(path: "builds", filter: filter, includes: includes, limit: limit, sort: sort)
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
 
-        response = request(:get, url)
+        response = request(:get, "builds") do |req|
+          req.options.params_encoder = Faraday::NestedParamsEncoder
+          req.params = params
+        end
         handle_response(response)
       end
 
       def post_beta_app_review_submissions(build_id: nil)
-        assert_required_params(__method__, binding)
-
         # POST
         # https://appstoreconnect.apple.com/iris/v1/betaAppReviewSubmissions
-        #
-        # {"data":{"type":"betaAppReviewSubmissions","relationships":{"build":{"data":{"type":"builds","id":"6f90f04a-3b48-4d4a-9bbd-9475c294a579"}}}}}
 
         body = {
           data: {

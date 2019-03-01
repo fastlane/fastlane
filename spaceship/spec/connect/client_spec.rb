@@ -8,7 +8,7 @@ describe Spaceship::ConnectAPI::Client do
     Spaceship::Tunes.login(username, password)
   end
 
-  context 'build_url' do
+  context 'build_params' do
     let(:path) { "betaAppReviewDetails" }
     let(:one_filter) { { build: "123" } }
     let(:two_filters) { { build: "123", app: "321" } }
@@ -16,45 +16,55 @@ describe Spaceship::ConnectAPI::Client do
     let(:limit) { "30" }
     let(:sort) { "asc" }
 
-    it 'builds url with only path' do
-      url = client.build_url(path: path)
-      expect(url).to eq(path)
+    it 'builds params with nothing' do
+      url = client.build_params
+      # expect(url).to eq(path)
     end
 
-    it 'builds url with path and one filter' do
-      url = client.build_url(path: path, filter: one_filter)
-      expect(url).to eq("#{path}?filter[build]=#{one_filter[:build]}")
+    it 'builds params with one filter' do
+      url = client.build_params(filter: one_filter)
+      # expect(url).to eq("#{path}?filter[build]=#{one_filter[:build]}")
     end
 
-    it 'builds url with path and two filters' do
-      url = client.build_url(path: path, filter: two_filters)
-      expect(url).to eq("#{path}?filter[build]=#{two_filters[:build]}&filter[app]=#{two_filters[:app]}")
+    it 'builds params with two filters' do
+      url = client.build_params(filter: two_filters)
+      # expect(url).to eq("#{path}?filter[build]=#{two_filters[:build]}&filter[app]=#{two_filters[:app]}")
     end
 
-    it 'builds url with path and includes' do
-      url = client.build_url(path: path, includes: includes)
-      expect(url).to eq("#{path}?include=#{includes}")
+    it 'builds params with includes' do
+      url = client.build_params(includes: includes)
+      # expect(url).to eq("#{path}?include=#{includes}")
     end
 
-    it 'builds url with path and limit' do
-      url = client.build_url(path: path, limit: limit)
-      expect(url).to eq("#{path}?limit=#{limit}")
+    it 'builds params with limit' do
+      url = client.build_params(limit: limit)
+      # expect(url).to eq("#{path}?limit=#{limit}")
     end
 
-    it 'builds url with path and sort' do
-      url = client.build_url(path: path, sort: sort)
-      expect(url).to eq("#{path}?sort=#{sort}")
+    it 'builds params with sort' do
+      url = client.build_params(sort: sort)
+      # expect(url).to eq("#{path}?sort=#{sort}")
     end
 
-    it 'builds url with path, one filter, includes, limit, and sort' do
-      url = client.build_url(path: path, filter: one_filter, includes: includes, limit: limit, sort: sort)
-      expect(url).to eq("#{path}?filter[build]=#{one_filter[:build]}&include=#{includes}&limit=#{limit}&sort=#{sort}")
+    it 'builds params with one filter, includes, limit, and sort' do
+      url = client.build_params(filter: one_filter, includes: includes, limit: limit, sort: sort)
+      # expect(url).to eq("#{path}?filter[build]=#{one_filter[:build]}&include=#{includes}&limit=#{limit}&sort=#{sort}")
     end
   end
 
   context 'sends api request' do
     before(:each) do
       allow(client).to receive(:handle_response)
+    end
+
+    def test_request_params(url, params)
+      req_mock = double
+      options_mock = double
+      expect(req_mock).to receive(:params=).with(params)
+      expect(req_mock).to receive(:options).and_return(options_mock)
+      expect(options_mock).to receive(:params_encoder=).with(Faraday::NestedParamsEncoder)
+
+      return req_mock
     end
 
     def test_request_body(url, body)
@@ -69,15 +79,20 @@ describe Spaceship::ConnectAPI::Client do
     end
 
     context 'get_beta_app_review_detail' do
+      let(:path) { "betaAppReviewDetails" }
       let(:app_id) { "123" }
 
       it 'succeeds' do
-        expect(client).to receive(:request).with(:get, "betaAppReviewDetails")
+        params = {}
+        req_mock = test_request_params(path, params)
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
         client.get_beta_app_review_detail
       end
 
       it 'succeeds with filter' do
-        expect(client).to receive(:request).with(:get, "betaAppReviewDetails?filter[app]=#{app_id}")
+        params = { filter: { app: app_id } }
+        req_mock = test_request_params(path, params)
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
         client.get_beta_app_review_detail(filter: { app: app_id })
       end
     end
@@ -99,38 +114,46 @@ describe Spaceship::ConnectAPI::Client do
       it 'succeeds' do
         url = "#{path}/#{app_id}"
         req_mock = test_request_body(url, body)
-
         expect(client).to receive(:request).with(:patch).and_yield(req_mock)
         client.patch_beta_app_review_detail(app_id: app_id, attributes: attributes)
       end
     end
 
     context 'get_beta_app_localizations' do
+      let(:path) { "betaAppLocalizations" }
       let(:app_id) { "123" }
 
       it 'succeeds' do
-        expect(client).to receive(:request).with(:get, "betaAppLocalizations")
+        params = {}
+        req_mock = test_request_params(path, params)
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
         client.get_beta_app_localizations
       end
 
       it 'succeeds with filter' do
-        app_id = "123"
-        expect(client).to receive(:request).with(:get, "betaAppLocalizations?filter[app]=#{app_id}")
-        client.get_beta_app_localizations(filter: { app: app_id })
+        params = { filter: { app: app_id } }
+        req_mock = test_request_params(path, params)
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
+        client.get_beta_app_localizations(params)
       end
     end
 
     context 'get_beta_build_localizations' do
+      let(:path) { "betaBuildLocalizations" }
       let(:build_id) { "123" }
 
       it 'succeeds' do
-        expect(client).to receive(:request).with(:get, "betaBuildLocalizations")
+        params = {}
+        req_mock = test_request_params(path, params)
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
         client.get_beta_build_localizations
       end
 
       it 'succeeds with filter' do
-        expect(client).to receive(:request).with(:get, "betaBuildLocalizations?filter[build]=#{build_id}")
-        client.get_beta_build_localizations(filter: { build: build_id })
+        params = { filter: { build: build_id } }
+        req_mock = test_request_params(path, params)
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
+        client.get_beta_build_localizations(params)
       end
     end
 
@@ -241,16 +264,21 @@ describe Spaceship::ConnectAPI::Client do
     end
 
     context 'get_build_beta_details' do
+      let(:path) { "buildBetaDetails" }
       let(:build_id) { "123" }
 
       it 'succeeds' do
-        expect(client).to receive(:request).with(:get, "buildBetaDetails")
+        params = {}
+        req_mock = test_request_params(path, params)
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
         client.get_build_beta_details
       end
 
       it 'succeeds with filter' do
-        expect(client).to receive(:request).with(:get, "buildBetaDetails?filter[build]=#{build_id}")
-        client.get_build_beta_details(filter: { build: build_id })
+        params = { filter: { build: build_id } }
+        req_mock = test_request_params(path, params)
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
+        client.get_build_beta_details(params)
       end
     end
 
@@ -278,17 +306,22 @@ describe Spaceship::ConnectAPI::Client do
     end
 
     context 'get_builds' do
+      let(:path) { "builds" }
       let(:build_id) { "123" }
-      let(:default_includes) { "buildBetaDetail,betaBuildMetrics&limit=10&sort=uploadedDate" }
+      let(:default_params) { { include: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate" } }
 
       it 'succeeds' do
-        expect(client).to receive(:request).with(:get, "builds?include=#{default_includes}")
+        params = {}
+        req_mock = test_request_params(path, params.merge(default_params))
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
         client.get_builds
       end
 
       it 'succeeds with filter' do
-        expect(client).to receive(:request).with(:get, "builds?filter[expired]=false&filter[processingState]=PROCESSING,VALID&filter[version]=123&include=#{default_includes}")
-        client.get_builds(filter: { expired: false, processingState: "PROCESSING,VALID", version: "123" })
+        params = { filter: { expired: false, processingState: "PROCESSING,VALID", version: "123" } }
+        req_mock = test_request_params(path, params.merge(default_params))
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
+        client.get_builds(params)
       end
     end
 
