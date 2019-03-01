@@ -70,7 +70,7 @@ module Pilot
                                      optional: true,
                                      verify_block: proc do |values|
                                        valid_keys = %w(contact_email contact_first_name contact_last_name contact_phone demo_account_required demo_account_name demo_account_password notes)
-                                       values.keys.each { |value| UI.user_error!("Invalid key '#{value}'.") unless valid_keys.include?(value.to_s) }
+                                       values.keys.each { |value| UI.user_error!("Invalid key '#{value}'") unless valid_keys.include?(value.to_s) }
                                      end),
 
         # app detail
@@ -79,9 +79,11 @@ module Pilot
                                      env_name: "PILOT_LOCALIZED_APP_INFO",
                                      description: "Localized beta app test info for description, feedback email, marketing url, and privacy policy",
                                      optional: true,
-                                     verify_block: proc do |value|
-                                       #                                       valid_keys = %w(contact_email contact_first_name contact_last_name contact_phone demo_account_name demo_account_password)
-                                       #                                       values.keys.each { |value| UI.user_error!("Invalid key '#{value}'.") unless valid_keys.include?(value.to_s) }
+                                     verify_block: proc do |lang_values|
+                                       valid_keys = %w(feedback_email marketing_url privacy_policy_url tv_os_privacy_policy_url description)
+                                       lang_values.values.each do |values|
+                                         values.keys.each { |value| UI.user_error!("Invalid key '#{value}'") unless valid_keys.include?(value.to_s) }
+                                       end
                                      end),
         FastlaneCore::ConfigItem.new(key: :beta_app_description,
                                      short_option: "-d",
@@ -100,9 +102,11 @@ module Pilot
                                      env_name: "PILOT_LOCALIZED_BUILD_INFO",
                                      description: "Localized beta app test info for what's new",
                                      optional: true,
-                                     verify_block: proc do |value|
-                                       #                                       valid_keys = %w(contact_email contact_first_name contact_last_name contact_phone demo_account_name demo_account_password)
-                                       #                                       values.keys.each { |value| UI.user_error!("Invalid key '#{value}'.") unless valid_keys.include?(value.to_s) }
+                                     verify_block: proc do |lang_values|
+                                       valid_keys = %w(whats_new)
+                                       lang_values.values.each do |values|
+                                         values.keys.each { |value| UI.user_error!("Invalid key '#{value}'") unless valid_keys.include?(value.to_s) }
+                                       end
                                      end),
         FastlaneCore::ConfigItem.new(key: :changelog,
                                      short_option: "-w",
