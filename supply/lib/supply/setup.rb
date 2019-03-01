@@ -56,7 +56,7 @@ module Supply
           if urls.length > 0
             image_counter = 1
             urls.each do |url|
-              url = "#{url}=w6000-h6000" # blowing up the sizes intentionally. So, Google would return the original image sizes as they are uploaded.
+              url = "#{url}=w6000-h6000" # using huge dimentions intentionally so Google returns the images in their original size they were uploaded
               path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type, "#{image_counter}_#{listing.language}.#{image_format}")
               path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.#{image_format}") if IMAGES_TYPES.include?(image_type)
 
