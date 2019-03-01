@@ -220,7 +220,7 @@ module Spaceship
         resp = Spaceship::ConnectAPI::Base.client.get_builds(filter: { expired: false, processingState: "PROCESSING,VALID", version: self.build_version })
         build = resp.first
 
-        Spaceship::ConnectAPI::Base.client.post_for_testflight_review(build_id: build["id"])
+        Spaceship::ConnectAPI::Base.client.post_beta_app_review_submissions(build_id: build["id"])
       end
 
       def expire!
