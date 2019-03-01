@@ -110,7 +110,7 @@ describe "Build Manager" do
       end
 
       it "doesnt recover if there is a 504 and the build is not approved" do
-        allow(mock_base_api_client).to receive(:post_for_testflight_review).and_raise(Spaceship::Client::InternalServerError, "Server error got 504")
+        allow(mock_base_api_client).to receive(:post_beta_app_review_submissions).and_raise(Spaceship::Client::InternalServerError, "Server error got 504")
         allow(Spaceship::TestFlight::Build).to receive(:find).and_return(ready_to_submit_mock_build)
         expect(FastlaneCore::UI).to receive(:message).with('Distributing new build to testers:  - ')
         expect(FastlaneCore::UI).to receive(:message).with('Submitting the build for review timed out, trying to recover.')
@@ -118,7 +118,7 @@ describe "Build Manager" do
       end
 
       it "recovers if there is a 504 and the build is approved" do
-        allow(mock_base_api_client).to receive(:post_for_testflight_review).and_raise(Spaceship::Client::InternalServerError, "Server error got 504")
+        allow(mock_base_api_client).to receive(:post_beta_app_review_submissions).and_raise(Spaceship::Client::InternalServerError, "Server error got 504")
         allow(Spaceship::TestFlight::Build).to receive(:find).and_return(approved_mock_build)
         expect(FastlaneCore::UI).to receive(:message).with('Distributing new build to testers:  - ')
         expect(FastlaneCore::UI).to receive(:message).with('Submitting the build for review timed out, trying to recover.')
@@ -126,12 +126,12 @@ describe "Build Manager" do
       end
 
       it "throws if there is a different error than 504" do
-        allow(mock_base_api_client).to receive(:post_for_testflight_review).and_raise(Spaceship::Client::InternalServerError, "Server error got 500")
+        allow(mock_base_api_client).to receive(:post_beta_app_review_submissions).and_raise(Spaceship::Client::InternalServerError, "Server error got 500")
         expect { fake_build_manager.distribute(distribute_options, build: ready_to_submit_mock_build) }.to raise_error(Spaceship::Client::InternalServerError, "Server error got 500")
       end
 
       it "doesnt try to recover if no 504" do
-        allow(mock_base_api_client).to receive(:post_for_testflight_review) # pretend it worked.
+        allow(mock_base_api_client).to receive(:post_beta_app_review_submissions) # pretend it worked.
         expect(FastlaneCore::UI).not_to(receive(:message).with('Submitting the build for review timed out, trying to recover.'))
         fake_build_manager.distribute(distribute_options, build: ready_to_submit_mock_build)
       end
@@ -160,7 +160,7 @@ describe "Build Manager" do
         allow(mock_base_client).to receive(:add_group_to_build)
         allow(Spaceship::TestFlight::Group).to receive(:default_external_group).and_return(mock_default_external_group)
 
-        allow(mock_base_api_client).to receive(:post_for_testflight_review) # pretend it worked.
+        allow(mock_base_api_client).to receive(:post_beta_app_review_submissions) # pretend it worked.
         allow(Spaceship::ConnectAPI::Base).to receive(:client).and_return(mock_base_api_client)
       end
 
