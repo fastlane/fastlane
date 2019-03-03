@@ -383,7 +383,7 @@ module Fastlane
             ipa: "./app.ipa",
             notes: "Changelog",
             bypass_cdn: true
-          )
+          )'
         ]
       end
 
