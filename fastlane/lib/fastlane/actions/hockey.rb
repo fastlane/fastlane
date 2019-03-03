@@ -376,6 +376,13 @@ module Fastlane
             bundle_version: "1.0.2.145",
             ipa: "./my.msi",
             notes: "Changelog"
+          )',
+          '# You can bypass the CDN if you are uploading to Hockey and receive an SSL error (which can happen on corporate firewalls)
+          hockey(
+            api_token: "...",
+            ipa: "./app.ipa",
+            notes: "Changelog",
+            bypass_cdn: true
           )'
         ]
       end
