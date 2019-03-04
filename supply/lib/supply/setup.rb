@@ -1,6 +1,6 @@
 module Supply
   class Setup
-    def perform_download(image_format = "png", remove_alpha = "false")
+    def perform_download(image_format = "png", remove_alpha = false)
       UI.message("🕗  Downloading metadata, images, screenshots...")
 
       if File.exist?(metadata_path)
@@ -39,7 +39,7 @@ module Supply
       end
     end
 
-    def download_images(listing, image_format = "png", remove_alpha = "false")
+    def download_images(listing, image_format = "png", remove_alpha = false)
       UI.message("🖼️  Downloading images (#{listing.language})")
 
       require 'net/http'
