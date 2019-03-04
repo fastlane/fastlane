@@ -53,33 +53,29 @@ module Supply
           urls = client.fetch_images(image_type: image_type, language: listing.language)
           next if urls.nil? || urls.empty?
 
-          if urls.length > 0
-            image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
-            urls.each do |url|
-              url = "#{url}=w6000-h6000" # using huge dimentions intentionally so Google returns the images in their original size they were uploaded
-              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type, "#{image_counter}_#{listing.language}.#{image_format}")
-              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.#{image_format}") if IMAGES_TYPES.include?(image_type)
+          image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
+          urls.each do |url|
+            url = "#{url}=w6000-h6000" # using huge dimentions intentionally so Google returns the images in their original size they were uploaded
+            path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type, "#{image_counter}_#{listing.language}.#{image_format}")
+            path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.#{image_format}") if IMAGES_TYPES.include?(image_type)
 
-              p = Pathname.new(path)
-              FileUtils.mkdir_p(p.dirname.to_s)
+            p = Pathname.new(path)
+            FileUtils.mkdir_p(p.dirname.to_s)
 
-              File.write(path, Net::HTTP.get(URI.parse(url))) # Write to tmp `path`
+            File.write(path, Net::HTTP.get(URI.parse(url))) # Write to tmp `path`
 
-              image = MiniMagick::Image.open(path)
-              image_details = JSON.parse(image.details.to_json, symbolize_names: true)
+            image = MiniMagick::Image.open(path)
+            image_details = JSON.parse(image.details.to_json, symbolize_names: true)
 
-              is_alpha_present = image_details.keys.any? { |k| k == :Alpha }
-              image.alpha('remove') if is_alpha_present && remove_alpha
+            is_alpha_present = image_details.keys.any? { |k| k == :Alpha }
+            image.alpha('remove') if is_alpha_present && remove_alpha
 
-              image.format(image_format) # Properly formatting the final image. Sometimes "jpg" or "webp" or "png" formats are returned by Google.
-              image.write(path) # Properly formatted file is written to disk
-              UI.message("\tDownloaded  - #{path}")
-              UI.message("\t\tAlpha removed") if is_alpha_present && remove_alpha
+            image.format(image_format) # Properly formatting the final image. Sometimes "jpg" or "webp" or "png" formats are returned by Google.
+            image.write(path) # Properly formatted file is written to disk
+            UI.message("\tDownloaded  - #{path}")
+            UI.message("\t\tAlpha removed") if is_alpha_present && remove_alpha
 
-              image_counter += 1
-            end 
-          else
-            UI.message("\tNo images found, nothing to download.")
+            image_counter += 1
           end
         rescue => ex
           UI.error(ex.to_s)
