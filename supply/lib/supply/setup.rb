@@ -51,7 +51,7 @@ module Supply
           UI.message("Downloading `#{image_type}` for #{listing.language}...")
 
           urls = client.fetch_images(image_type: image_type, language: listing.language)
-          next unless urls
+          next if urls.nil? || urls.empty?
 
           if urls.length > 0
             image_counter = 1
