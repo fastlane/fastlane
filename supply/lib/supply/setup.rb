@@ -85,7 +85,7 @@ module Supply
           UI.error(ex.to_s)
           UI.error("Error downloading '#{image_type}' for #{listing.language}...")
         end
-      end # allowed_imagetypes.each do |image_type|
+      end
 
       3.times do
         UI.message("")
