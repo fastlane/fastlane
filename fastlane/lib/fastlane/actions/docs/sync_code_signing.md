@@ -193,7 +193,7 @@ _match_ will reuse certificates and will create separate provisioning profiles f
 
 When running _match_ for the first time on a new machine, it will ask you for the passphrase for the Git repository. This is an additional layer of security: each of the files will be encrypted using `openssl`. Make sure to remember the password, as you'll need it when you run match on a different machine.
 
-To set the passphrase to decrypt your profiles using an environment variable, and avoid the prompt, use `MATCH_PASSWORD`.
+To set the passphrase to decrypt your profiles using an environment variable (and avoid the prompt) use `MATCH_PASSWORD`.
 
 #### Migrate from Git Repo to Google Cloud
 
