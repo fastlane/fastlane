@@ -86,10 +86,6 @@ module Supply
           UI.error("Error downloading '#{image_type}' for #{listing.language}...")
         end
       end
-
-      3.times do
-        UI.message("")
-      end
     end
 
     def create_screenshots_folder(listing)
