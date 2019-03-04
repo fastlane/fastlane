@@ -54,7 +54,7 @@ module Supply
           next if urls.nil? || urls.empty?
 
           if urls.length > 0
-            image_counter = 1
+            image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
             urls.each do |url|
               url = "#{url}=w6000-h6000" # using huge dimentions intentionally so Google returns the images in their original size they were uploaded
               path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type, "#{image_counter}_#{listing.language}.#{image_format}")
