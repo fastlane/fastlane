@@ -90,7 +90,7 @@ module Supply
       3.times do
         UI.message("")
       end
-    end # def download_images(listing)
+    end
 
     def create_screenshots_folder(listing)
       UI.message("📱  Downloading screenshots (#{listing.language})")
