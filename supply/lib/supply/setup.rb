@@ -77,7 +77,7 @@ module Supply
               UI.message("\t\tAlpha removed") if is_alpha_present && remove_alpha
 
               image_counter += 1
-            end # urls.each do |url|
+            end 
           else
             UI.message("\tNo images found, nothing to download.")
           end # if(urls.length > 0)
