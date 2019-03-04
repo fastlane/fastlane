@@ -80,7 +80,7 @@ module Supply
             end 
           else
             UI.message("\tNo images found, nothing to download.")
-          end # if(urls.length > 0)
+          end
         rescue => ex
           UI.error(ex.to_s)
           UI.error("Error downloading '#{image_type}' for #{listing.language}...")
