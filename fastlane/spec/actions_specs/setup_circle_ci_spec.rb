@@ -21,65 +21,57 @@ describe Fastlane do
       end
     end
 
-    describe "#should_run" do
-      context "when running on CI" do
-        before do
-          expect(Fastlane::Helper).to receive(:ci?).and_return(true)
-        end
+    describe "Setup CircleCi Integration" do
+      let(:tmp_keychain_name) { "fastlane_tmp_keychain" }
+      it "doesn't work outside CI" do
+        stub_const("ENV", {})
 
-        it "returns true when :force is true" do
-          expect(described_class.should_run?({ force: true })).to eql(true)
-        end
+        expect(UI).to receive(:message).with("Not running on CI, skipping `setup_circle_ci`")
 
-        it "returns true when :force is false" do
-          expect(described_class.should_run?({ force: false })).to eql(true)
-        end
+        Fastlane::FastFile.new.parse("lane :test do
+          setup_circle_ci
+        end").runner.execute(:test)
+
+        expect(ENV["MATCH_KEYCHAIN_NAME"]).to be_nil
+        expect(ENV["MATCH_KEYCHAIN_PASSWORD"]).to be_nil
+        expect(ENV["MATCH_READONLY"]).to be_nil
       end
 
-      context "when not running on CI" do
-        before do
-          expect(Fastlane::Helper).to receive(:ci?).and_return(false)
-        end
+      it "works when forced" do
+        stub_const("ENV", {})
 
-        it "returns false when :force is not set" do
-          expect(described_class.should_run?({ force: false })).to eql(false)
-        end
+        Fastlane::FastFile.new.parse("lane :test do
+          setup_circle_ci(
+            force: true
+          )
+        end").runner.execute(:test)
 
-        it "returns true when :force is set" do
-          expect(described_class.should_run?({ force: true })).to eql(true)
-        end
-      end
-    end
-
-    describe "#setup_keychain" do
-      context "when MATCH_KEYCHAIN_NAME is set" do
-        it "skips the setup process" do
-          stub_const("ENV", { "MATCH_KEYCHAIN_NAME" => "anything" })
-          expect(Fastlane::UI).to receive(:message).with("Skipping Keychain setup as a keychain was already specified")
-          described_class.setup_keychain
-        end
+        expect(ENV["MATCH_KEYCHAIN_NAME"]).to eq(tmp_keychain_name)
+        expect(ENV["MATCH_KEYCHAIN_PASSWORD"]).to eq("")
+        expect(ENV["MATCH_READONLY"]).to eq("true")
       end
 
-      describe "Setting up the environment" do
-        before do
-          stub_const("ENV", {})
-          allow(Fastlane::Actions::CreateKeychainAction).to receive(:run).and_return(nil)
-        end
+      it "works inside CI" do
+        expect(Fastlane::Actions::CreateKeychainAction).to receive(:run).with(
+          {
+            name: tmp_keychain_name,
+            default_keychain: true,
+            unlock: true,
+            timeout: 3600,
+            lock_when_sleeps: true,
+            password: ""
+          }
+        )
 
-        it "sets the MATCH_KEYCHAIN_NAME env var" do
-          described_class.setup_keychain
-          expect(ENV["MATCH_KEYCHAIN_NAME"]).to eql("fastlane_tmp_keychain")
-        end
+        stub_const("ENV", { "FL_SETUP_CIRCLECI_FORCE" => "true" })
 
-        it "sets the MATCH_KEYCHAIN_PASSWORD env var" do
-          described_class.setup_keychain
-          expect(ENV["MATCH_KEYCHAIN_PASSWORD"]).to eql("")
-        end
+        Fastlane::FastFile.new.parse("lane :test do
+          setup_circle_ci
+        end").runner.execute(:test)
 
-        it "sets the MATCH_READONLY env var" do
-          described_class.setup_keychain
-          expect(ENV["MATCH_READONLY"]).to eql("true")
-        end
+        expect(ENV["MATCH_KEYCHAIN_NAME"]).to eq(tmp_keychain_name)
+        expect(ENV["MATCH_KEYCHAIN_PASSWORD"]).to eq("")
+        expect(ENV["MATCH_READONLY"]).to eq("true")
       end
     end
   end
