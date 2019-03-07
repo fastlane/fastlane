@@ -4,7 +4,7 @@ module Fastlane
   module Actions
     # Execute a shell command. This method will output the string and execute it.
     #
-    # The `log` argument accepts either a boolean or an aray of symbols
+    # The `log` argument accepts either a boolean or an array of symbols
     # determining what should be printed and what should be suppressed:
     #
     # ```
