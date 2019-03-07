@@ -1,4 +1,6 @@
+source('https://rubygems.org')
+
 gem 'colored'
-gem 'mini_magick', '~> 4.5.1' # To open, edit and export PSD files
+gem 'mini_magick', '~> 4.9.0' # To open, edit and export PSD files and support ImageMagick 7
 gem 'pry'
 gem 'rake'

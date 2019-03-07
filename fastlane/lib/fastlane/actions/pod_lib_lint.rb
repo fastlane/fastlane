@@ -12,6 +12,8 @@ module Fastlane
           command << "--verbose"
         end
 
+        command << params[:podspec] if params[:podspec]
+
         if params[:sources]
           sources = params[:sources].join(",")
           command << "--sources='#{sources}'"
@@ -54,6 +56,10 @@ module Fastlane
                                        description: "Use bundle exec when there is a Gemfile presented",
                                        is_string: false,
                                        default_value: true),
+          FastlaneCore::ConfigItem.new(key: :podspec,
+                                       description: "Path of spec to lint",
+                                       optional: true,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        description: "Allow output detail in console",
                                        optional: true,

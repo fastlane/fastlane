@@ -17,7 +17,6 @@ module Snapshot
         language = File.basename(language_folder)
         Dir[File.join(language_folder, '*.png')].sort.each do |screenshot|
           file_name = File.basename(screenshot)
-          screen_name = file_name[/#{Regexp.escape("-")}(.*?)#{Regexp.escape(".png")}/m, 1]
           available_devices.each do |key_name, output_name|
             next unless file_name.include?(key_name)
             # This screenshot is from this device
@@ -25,6 +24,7 @@ module Snapshot
             @data_by_language[language] ||= {}
             @data_by_language[language][output_name] ||= []
 
+            screen_name = file_name.sub(key_name + '-', '').sub('.png', '')
             @data_by_screen[screen_name] ||= {}
             @data_by_screen[screen_name][output_name] ||= {}
 

@@ -2,9 +2,10 @@ describe Match do
   describe Match::Encryption::OpenSSL do
     before do
       @directory = Dir.mktmpdir
-      @content = "#{Time.now.to_i} so random"
-      @full_path = File.join(@directory, "randomFile.mobileprovision")
-      File.write(@full_path, @content)
+      profile_path = "./match/spec/fixtures/test.mobileprovision"
+      FileUtils.cp(profile_path, @directory)
+      @full_path = File.join(@directory, "test.mobileprovision")
+      @content = File.binread(@full_path)
       @git_url = "https://github.com/fastlane/fastlane/tree/master/so_random"
       allow(Dir).to receive(:mktmpdir).and_return(@directory)
       ENV["MATCH_PASSWORD"] = '2"QAHg@v(Qp{=*n^'
@@ -15,12 +16,12 @@ describe Match do
       )
     end
 
-    it "encrypt" do
+    it "first encrypt, different content, then decrypt, initial content again" do
       @e.encrypt_files
-      expect(File.read(@full_path)).to_not(eq(@content))
+      expect(File.binread(@full_path)).to_not(eq(@content))
 
       @e.decrypt_files
-      expect(File.read(@full_path)).to eq(@content)
+      expect(File.binread(@full_path)).to eq(@content)
     end
 
     it "raises an exception if invalid password is passed" do

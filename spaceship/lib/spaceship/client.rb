@@ -53,6 +53,7 @@ module Spaceship
     UnauthorizedAccessError = Spaceship::UnauthorizedAccessError
     GatewayTimeoutError = Spaceship::GatewayTimeoutError
     InternalServerError = Spaceship::InternalServerError
+    BadGatewayError = Spaceship::BadGatewayError
 
     def self.hostname
       raise "You must implement self.hostname"
@@ -212,15 +213,15 @@ module Spaceship
         if ENV['SPACESHIP_DEBUG']
           # for debugging only
           # This enables tracking of networking requests using Charles Web Proxy
-          c.proxy("https://127.0.0.1:8888")
+          c.proxy = "https://127.0.0.1:8888"
           c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
         elsif ENV["SPACESHIP_PROXY"]
-          c.proxy(ENV["SPACESHIP_PROXY"])
+          c.proxy = ENV["SPACESHIP_PROXY"]
           c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
         end
 
         if ENV["DEBUG"]
-          puts("To run _spaceship_ through a local proxy, use SPACESHIP_DEBUG")
+          puts("To run spaceship through a local proxy, use SPACESHIP_DEBUG")
         end
       end
     end
@@ -393,7 +394,7 @@ module Spaceship
     end
 
     # This method is used for both the Apple Dev Portal and App Store Connect
-    # This will also handle 2 step verification
+    # This will also handle 2 step verification and 2 factor authentication
     #
     # It is called in `send_login_request` of sub classes (which the method `login`, above, transferred over to via `do_login`)
     def send_shared_login_request(user, password)
@@ -594,6 +595,22 @@ module Spaceship
       ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
     end
 
+    # Get contract messages from App Store Connect's "olympus" endpoint
+    def fetch_program_license_agreement_messages
+      all_messages = []
+
+      messages_request = request(:get, "https://olympus.itunes.apple.com/v1/contractMessages")
+      body = messages_request.body
+      if body
+        body = JSON.parse(body) if body.kind_of?(String)
+        body.map do |messages|
+          all_messages.push(messages["message"])
+        end
+      end
+
+      return all_messages
+    end
+
     #####################################################
     # @!group Helpers
     #####################################################
@@ -603,6 +620,7 @@ module Spaceship
     rescue \
         Faraday::Error::ConnectionFailed,
         Faraday::Error::TimeoutError, # New Faraday version: Faraday::TimeoutError => ex
+        BadGatewayError,
         AppleTimeoutError,
         GatewayTimeoutError => ex
       tries -= 1
@@ -797,11 +815,19 @@ module Spaceship
       if block_given?
         obj = Object.new
         class << obj
-          attr_accessor :body, :headers, :params, :url
+          attr_accessor :body, :headers, :params, :url, :options
           # rubocop: disable Style/TrivialAccessors
           # the block calls `url` (not `url=`) so need to define `url` method
           def url(url)
             @url = url
+          end
+
+          def options
+            options_obj = Object.new
+            class << options_obj
+              attr_accessor :params_encoder
+            end
+            options_obj
           end
           # rubocop: enable Style/TrivialAccessors
         end
@@ -827,6 +853,10 @@ module Spaceship
 
         if response.body.to_s.include?("<title>302 Found</title>")
           raise AppleTimeoutError.new, "Apple 302 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
+        end
+
+        if response.body.to_s.include?("<h3>Bad Gateway</h3>")
+          raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
         end
 
         return response

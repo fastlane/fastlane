@@ -56,13 +56,7 @@ module Fastlane
           return command
         end
 
-        def generate_android_command(params)
-          # We have to generate an empty XML file to make the crashlytics CLI happy :)
-          require 'tempfile'
-          xml = Tempfile.new('xml')
-          xml.write('<?xml version="1.0" encoding="utf-8"?><manifest></manifest>')
-          xml.close
-
+        def generate_android_command(params, android_manifest_path)
           params[:crashlytics_path] = download_android_tools unless params[:crashlytics_path]
 
           UI.user_error!("The `crashlytics_path` must be a jar file for Android") unless params[:crashlytics_path].end_with?(".jar") || Helper.test?
@@ -77,7 +71,7 @@ module Fastlane
           command << "-apiKey #{params[:api_token]}"
           command << "-apiSecret #{params[:build_secret]}"
           command << "-uploadDist #{File.expand_path(params[:apk_path]).shellescape}"
-          command << "-androidManifest #{xml.path.shellescape}"
+          command << "-androidManifest #{File.expand_path(android_manifest_path).shellescape}"
 
           # Optional
           command << "-betaDistributionEmails #{params[:emails].shellescape}" if params[:emails]
@@ -122,6 +116,11 @@ module Fastlane
           end
 
           return jar_path
+        end
+
+        def generate_android_manifest_tempfile
+          # We have to generate an empty XML file to make the crashlytics CLI happy :)
+          write_to_tempfile('<?xml version="1.0" encoding="utf-8"?><manifest></manifest>', 'xml')
         end
 
         def write_to_tempfile(value, tempfilename)

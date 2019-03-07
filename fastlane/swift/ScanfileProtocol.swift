@@ -5,6 +5,7 @@ protocol ScanfileProtocol: class {
   var device: String? { get }
   var devices: [String]? { get }
   var skipDetectDevices: Bool { get }
+  var resetSimulator: Bool { get }
   var reinstallApp: Bool { get }
   var appIdentifier: String? { get }
   var onlyTesting: String? { get }
@@ -41,6 +42,9 @@ protocol ScanfileProtocol: class {
   var slackUrl: String? { get }
   var slackChannel: String? { get }
   var slackMessage: String? { get }
+  var slackUseWebhookConfiguredUsernameAndIcon: Bool { get }
+  var slackUsername: String { get }
+  var slackIconUrl: String { get }
   var skipSlack: Bool { get }
   var slackOnlyOnFailure: Bool { get }
   var destination: String? { get }
@@ -55,6 +59,7 @@ extension ScanfileProtocol {
   var device: String? { return nil }
   var devices: [String]? { return nil }
   var skipDetectDevices: Bool { return false }
+  var resetSimulator: Bool { return false }
   var reinstallApp: Bool { return false }
   var appIdentifier: String? { return nil }
   var onlyTesting: String? { return nil }
@@ -91,6 +96,9 @@ extension ScanfileProtocol {
   var slackUrl: String? { return nil }
   var slackChannel: String? { return nil }
   var slackMessage: String? { return nil }
+  var slackUseWebhookConfiguredUsernameAndIcon: Bool { return false }
+  var slackUsername: String { return "fastlane" }
+  var slackIconUrl: String { return "https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png" }
   var skipSlack: Bool { return false }
   var slackOnlyOnFailure: Bool { return false }
   var destination: String? { return nil }
@@ -100,4 +108,4 @@ extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.7]
+// FastlaneRunnerAPIVersion [0.9.9]

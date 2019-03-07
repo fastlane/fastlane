@@ -24,7 +24,7 @@ module Frameit
       nil # Macs don't need frames - backgrounds only
     end
 
-    def should_add_title?
+    def is_complex_framing_mode?
       true # Mac screenshots always need a background
     end
 
