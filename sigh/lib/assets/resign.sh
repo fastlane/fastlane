@@ -66,6 +66,9 @@
 # new features January 2019
 # 1. fixed bug where the com.apple.icloud-container-environment entitlement was being assigned an incorrect value
 #
+# new features March 2019
+# 1. two more fixes for only creating the archived-expanded-entitlements.xcent file if the version of Xcode < 9.3 as Xcode 10 does not create it.
+#
 
 # Logging functions
 
