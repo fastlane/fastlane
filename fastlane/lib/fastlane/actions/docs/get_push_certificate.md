@@ -68,6 +68,12 @@ If you want to generate a development certificate instead:
 fastlane pem --development
 ```
 
+If you want to generate a Website Push certificate:
+
+```no-highlight
+fastlane pem --website_push
+```
+
 Set a password for your `p12` file:
 
 ```no-highlight
