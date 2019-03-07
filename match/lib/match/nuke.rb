@@ -36,7 +36,8 @@ module Match
         git_user_email: params[:git_user_email],
         clone_branch_directly: params[:clone_branch_directly],
         google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
-        google_cloud_keys_file: params[:google_cloud_keys_file].to_s
+        google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
+        google_cloud_project_id: params[:google_cloud_project_id].to_s
       })
       self.storage.download
 

@@ -73,6 +73,16 @@ describe Fastlane do
 
         expect(result).to eq("git push not_github master:master --tags")
       end
+
+      it "runs git push with no_verify:true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            push_to_git_remote(
+              no_verify: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("git push origin master:master --tags --no-verify")
+      end
     end
   end
 end

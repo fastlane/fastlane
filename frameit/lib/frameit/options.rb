@@ -47,6 +47,11 @@ module Frameit
                                      description: "Use iPhone 6s frames instead of iPhone 7 frames",
                                      default_value: false,
                                      type: Boolean),
+        FastlaneCore::ConfigItem.new(key: :use_legacy_iphonex,
+                                     env_name: "FRAMEIT_USE_LEGACY_IPHONE_X",
+                                     description: "Use iPhone X instead of iPhone XS frames",
+                                     default_value: false,
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :force_orientation_block,
                                      type: :string_callback,
                                      description: "[Advanced] A block to customize your screenshots' device orientation",
@@ -60,7 +65,12 @@ module Frameit
                                          :landscape_right
                                        end
                                      end,
-                                     default_value_dynamic: true)
+                                     default_value_dynamic: true),
+        FastlaneCore::ConfigItem.new(key: :debug_mode,
+                                     env_name: "FRAMEIT_DEBUG_MODE",
+                                     description: "Output debug information in framed screenshots",
+                                     default_value: false,
+                                     type: Boolean)
       ]
     end
   end

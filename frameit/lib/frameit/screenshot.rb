@@ -29,8 +29,12 @@ module Frameit
       # rubocop:disable Require/MissingRequireStatement
       sizes = Deliver::AppScreenshot::ScreenSize
       case @screen_size
+      when sizes::IOS_65
+        return 'iPhone XS Max'
+      when sizes::IOS_61
+        return 'iPhone XR'
       when sizes::IOS_58
-        return 'iPhone X'
+        return Frameit.config[:use_legacy_iphonex] ? 'iPhone X' : 'iPhone XS'
       when sizes::IOS_55
         return Frameit.config[:use_legacy_iphone6s] ? 'iPhone 6s Plus' : 'iPhone 7 Plus'
       when sizes::IOS_47
@@ -55,6 +59,8 @@ module Frameit
       if !Frameit.config[:use_legacy_iphone6s] && @color == Frameit::Color::BLACK
         if @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_47
           return "Matte Black" # RIP space gray
+        elsif @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_61
+          return "Black"
         end
       end
       return @color
@@ -62,7 +68,7 @@ module Frameit
 
     # Is the device a 3x device? (e.g. iPhone 6 Plus, iPhone X)
     def triple_density?
-      (screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || screen_size == Deliver::AppScreenshot::ScreenSize::IOS_58)
+      (screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || screen_size == Deliver::AppScreenshot::ScreenSize::IOS_58 || screen_size == Deliver::AppScreenshot::ScreenSize::IOS_65)
     end
 
     # Super old devices (iPhone 4)
@@ -115,15 +121,6 @@ module Frameit
 
     def to_s
       self.path
-    end
-
-    # Add the device frame, this will also call the method that adds the background + title
-    def frame!
-      if self.mac?
-        MacEditor.new.frame!(self)
-      else
-        Editor.new.frame!(self)
-      end
     end
   end
 end

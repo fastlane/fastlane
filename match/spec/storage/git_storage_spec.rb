@@ -17,7 +17,7 @@ describe Match do
         expect(Dir).to receive(:mktmpdir).and_return(path)
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         shallow_clone = true
-        command = "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}' --depth 1 --no-single-branch"
+        command = "git clone #{git_url.shellescape} #{path.shellescape} --depth 1 --no-single-branch"
         to_params = {
           command: command,
           print_all: nil,
@@ -44,7 +44,7 @@ describe Match do
         expect(Dir).to receive(:mktmpdir).and_return(path)
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         shallow_clone = false
-        command = "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}'"
+        command = "git clone #{git_url.shellescape} #{path.shellescape}"
         to_params = {
           command: command,
           print_all: nil,
@@ -74,7 +74,7 @@ describe Match do
         shallow_clone = false
 
         expected_commands = [
-          "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}'",
+          "git clone #{git_url.shellescape} #{path.shellescape}",
           "git --no-pager branch --list origin/#{git_branch} --no-color -r",
           "git checkout --orphan #{git_branch}",
           "git reset --hard"
@@ -118,8 +118,8 @@ describe Match do
           "git add #{random_file}",
           "git add match_version.txt",
           "git commit -m " + '[fastlane] Updated appstore and platform ios'.shellescape,
-          "GIT_TERMINAL_PROMPT=0 git push origin master",
-          "GIT_TERMINAL_PROMPT=0 git clone '#{git_url}' '#{path}'"
+          "git push origin master",
+          "git clone #{git_url.shellescape} #{path.shellescape}"
         ]
 
         expected_commands.each do |command|

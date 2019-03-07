@@ -44,6 +44,14 @@ describe Fastlane do
         end").runner.execute(:test)
         expect(result).to eq("git commit -m #{message.shellescape} ./fastlane/README.md")
       end
+
+      it "generates the correct git command when configured to skip git hooks" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          git_commit(path: './fastlane/README.md', message: 'message', skip_git_hooks: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("git commit -m message ./fastlane/README.md --no-verify")
+      end
     end
   end
 end

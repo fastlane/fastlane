@@ -266,6 +266,16 @@ phased_release(true)
 phased_release(false)
 ```
 
+##### reset_ratings
+
+Reset your app's summary rating for all territories. If set to `true`, it will reset rating when this version is released. Default behavior is to keep existing rating.
+
+```ruby-skip-tests
+reset_ratings(true)
+# or
+reset_ratings(false)
+```
+
 ##### app_rating_config_path
 You can set the app age ratings using _deliver_. You'll have to create and store a `JSON` configuration file. Copy the [template](https://github.com/fastlane/fastlane/blob/master/deliver/assets/example_rating_config.json) to your project folder and pass the path to the `JSON` file using the `app_rating_config_path` option.
 
@@ -412,6 +422,9 @@ end
 
 Omit `build_number` to let _fastlane_ automatically select the latest build number for the current version being edited for release from App Store Connect.
 
+### Compliance and IDFA settings
+
+Use the `submission_information` parameter for additional submission specifiers, including compliance and IDFA settings. Look at the Spaceship's [`app_submission.rb`](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/tunes/app_submission.rb) file for options. See [this example](https://github.com/artsy/eigen/blob/faa02e2746194d8d7c11899474de9c517435eca4/fastlane/Fastfile#L131-L149).
 
 # Credentials
 

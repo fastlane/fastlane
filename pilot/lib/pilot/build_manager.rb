@@ -72,28 +72,13 @@ module Pilot
         UI.user_error!("No build to distribute!")
       end
 
-      if should_update_app_test_information?(options)
-        app_test_info = Spaceship::TestFlight::AppTestInfo.find(app_id: build.app_id)
-        app_test_info.test_info.feedback_email = options[:beta_app_feedback_email] if options[:beta_app_feedback_email]
-        app_test_info.test_info.description = options[:beta_app_description] if options[:beta_app_description]
-        begin
-          app_test_info.save_for_app!(app_id: build.app_id)
-          UI.success("Successfully set the beta_app_feedback_email and/or beta_app_description")
-        rescue => ex
-          UI.user_error!("Could not set beta_app_feedback_email and/or beta_app_description: #{ex}")
-        end
-      end
-
-      if should_update_build_information?(options)
-        begin
-          build.update_build_information!(whats_new: options[:changelog])
-          UI.success("Successfully set the changelog for build")
-        rescue => ex
-          UI.user_error!("Could not set changelog: #{ex}")
-        end
-      end
-
-      build.auto_notify_enabled = config[:notify_external_testers]
+      # Update beta app meta info
+      # 1. Demo account required
+      # 2. App info
+      # 3. Localized app  info
+      # 4. Localized build info
+      # 5. Auto notify enabled with config[:notify_external_testers]
+      update_beta_app_meta(options, build)
 
       return if config[:skip_submission]
       if options[:reject_build_waiting_for_review]
@@ -127,6 +112,44 @@ module Pilot
              headings: ["Version #", "Build #", "Installs"],
              rows: FastlaneCore::PrintTable.transform_output(rows)
       ))
+    end
+
+    def update_beta_app_meta(options, build)
+      # Setting account required wth AppStore Connect API
+      update_review_detail(build.app_id, { demo_account_required: options[:demo_account_required] })
+
+      if should_update_beta_app_review_info(options)
+        update_review_detail(build.app_id, options[:beta_app_review_info])
+      end
+
+      if should_update_localized_app_information?(options)
+        update_localized_app_review(build.app_id, options[:localized_app_info])
+      elsif should_update_app_test_information?(options)
+        default_info = {}
+        default_info[:feedback_email] = options[:beta_app_feedback_email] if options[:beta_app_feedback_email]
+        default_info[:description] = options[:beta_app_description] if options[:beta_app_description]
+        begin
+          update_localized_app_review(build.app_id, {}, default_info: default_info)
+          UI.success("Successfully set the beta_app_feedback_email and/or beta_app_description")
+        rescue => ex
+          UI.user_error!("Could not set beta_app_feedback_email and/or beta_app_description: #{ex}")
+        end
+      end
+
+      if should_update_localized_build_information?(options)
+        update_localized_build_review(build, options[:localized_build_info])
+      elsif should_update_build_information?(options)
+        begin
+          update_localized_build_review(build, {}, default_info: { whats_new: options[:changelog] })
+          UI.success("Successfully set the changelog for build")
+        rescue => ex
+          UI.user_error!("Could not set changelog: #{ex}")
+        end
+      end
+
+      update_build_beta_details(build, {
+        auto_notify_enabled: options[:notify_external_testers]
+      })
     end
 
     def self.truncate_changelog(changelog)
@@ -163,12 +186,24 @@ module Pilot
       return row
     end
 
+    def should_update_beta_app_review_info(options)
+      !options[:beta_app_review_info].nil?
+    end
+
     def should_update_build_information?(options)
       options[:changelog].to_s.length > 0
     end
 
     def should_update_app_test_information?(options)
       options[:beta_app_description].to_s.length > 0 || options[:beta_app_feedback_email].to_s.length > 0
+    end
+
+    def should_update_localized_app_information?(options)
+      !options[:localized_app_info].nil?
+    end
+
+    def should_update_localized_build_information?(options)
+      !options[:localized_build_info].nil?
     end
 
     # If itc_provider was explicitly specified, use it.
@@ -197,7 +232,6 @@ module Pilot
       uploaded_build.export_compliance.encryption_updated = false
 
       if options[:groups] || options[:distribute_external]
-        uploaded_build.beta_review_info.demo_account_required = options[:demo_account_required] # this needs to be set for iTC to continue
         begin
           uploaded_build.submit_for_testflight_review!
         rescue => ex
@@ -234,6 +268,135 @@ module Pilot
       end
 
       true
+    end
+
+    def update_review_detail(app_id, info)
+      info = info.collect { |k, v| [k.to_sym, v] }.to_h
+
+      attributes = {}
+      attributes[:contactEmail] = info[:contact_email] if info.key?(:contact_email)
+      attributes[:contactFirstName] = info[:contact_first_name] if info.key?(:contact_first_name)
+      attributes[:contactLastName] = info[:contact_last_name] if info.key?(:contact_last_name)
+      attributes[:contactPhone] = info[:contact_phone] if info.key?(:contact_phone)
+      attributes[:demoAccountName] = info[:demo_account_name] if info.key?(:demo_account_name)
+      attributes[:demoAccountPassword] = info[:demo_account_password] if info.key?(:demo_account_password)
+      attributes[:demoAccountRequired] = info[:demo_account_required] if info.key?(:demo_account_required)
+      attributes[:notes] = info[:notes] if info.key?(:notes)
+
+      client = Spaceship::ConnectAPI::Base.client
+      client.patch_beta_app_review_detail(app_id: app_id, attributes: attributes)
+    end
+
+    def update_localized_app_review(app_id, info_by_lang, default_info: nil)
+      info_by_lang = info_by_lang.collect { |k, v| [k.to_sym, v] }.to_h
+
+      if default_info
+        info_by_lang.delete(:default)
+      else
+        default_info = info_by_lang.delete(:default)
+      end
+
+      # Initialize hash of lang codes
+      langs_localization_ids = {}
+
+      # Validate locales exist
+      client = Spaceship::ConnectAPI::Base.client
+      localizations = client.get_beta_app_localizations(filter: { app: app_id })
+      localizations.each do |localization|
+        localization_id = localization["id"]
+        attributes = localization["attributes"]
+        locale = attributes["locale"]
+
+        langs_localization_ids[locale.to_sym] = localization_id
+      end
+
+      # Create or update localized app review info
+      langs_localization_ids.each do |lang_code, localization_id|
+        info = info_by_lang[lang_code]
+
+        info = default_info unless info
+        update_localized_app_review_for_lang(app_id, localization_id, lang_code, info) if info
+      end
+    end
+
+    def update_localized_app_review_for_lang(app_id, localization_id, locale, info)
+      attributes = {}
+      attributes[:feedbackEmail] = info[:feedback_email] if info.key?(:feedback_email)
+      attributes[:marketingUrl] = info[:marketing_url] if info.key?(:marketing_url)
+      attributes[:privacyPolicyUrl] = info[:privacy_policy_url] if info.key?(:privacy_policy_url)
+      attributes[:tvOsPrivacyPolicy] = info[:tv_os_privacy_policy_url] if info.key?(:tv_os_privacy_policy_url)
+      attributes[:description] = info[:description] if info.key?(:description)
+
+      client = Spaceship::ConnectAPI::Base.client
+      if localization_id
+        client.patch_beta_app_localizations(localization_id: localization_id, attributes: attributes)
+      else
+        attributes[:locale] = locale if locale
+        client.post_beta_app_localizations(app_id: app_id, attributes: attributes)
+      end
+    end
+
+    def update_localized_build_review(build, info_by_lang, default_info: nil)
+      resp = Spaceship::ConnectAPI::Base.client.get_builds(filter: { expired: false, processingState: "PROCESSING,VALID", version: build.build_version })
+      build_id = resp.first["id"]
+
+      info_by_lang = info_by_lang.collect { |k, v| [k.to_sym, v] }.to_h
+
+      if default_info
+        info_by_lang.delete(:default)
+      else
+        default_info = info_by_lang.delete(:default)
+      end
+
+      # Initialize hash of lang codes
+      langs_localization_ids = {}
+
+      # Validate locales exist
+      client = Spaceship::ConnectAPI::Base.client
+      localizations = client.get_beta_build_localizations(filter: { build: build_id })
+      localizations.each do |localization|
+        localization_id = localization["id"]
+        attributes = localization["attributes"]
+        locale = attributes["locale"]
+
+        langs_localization_ids[locale.to_sym] = localization_id
+      end
+
+      # Create or update localized app review info
+      langs_localization_ids.each do |lang_code, localization_id|
+        info = info_by_lang[lang_code]
+
+        info = default_info unless info
+        update_localized_build_review_for_lang(build_id, localization_id, lang_code, info) if info
+      end
+    end
+
+    def update_localized_build_review_for_lang(build_id, localization_id, locale, info)
+      attributes = {}
+      attributes[:whatsNew] = info[:whats_new] if info.key?(:whats_new)
+
+      client = Spaceship::ConnectAPI::Base.client
+      if localization_id
+        client.patch_beta_build_localizations(localization_id: localization_id, attributes: attributes)
+      else
+        attributes[:locale] = locale if locale
+        client.post_beta_build_localizations(build_id: build_id, attributes: attributes)
+      end
+    end
+
+    def update_build_beta_details(build, info)
+      client = Spaceship::ConnectAPI::Base.client
+
+      resp = client.get_builds(filter: { expired: false, processingState: "PROCESSING,VALID", version: build.build_version })
+      build_id = resp.first["id"]
+
+      resp = client.get_build_beta_details(filter: { build: build_id })
+      build_beta_details_id = resp.first["id"]
+
+      attributes = {}
+      attributes[:autoNotifyEnabled] = info[:auto_notify_enabled] if info.key?(:auto_notify_enabled)
+
+      client.patch_build_beta_details(build_beta_details_id: build_beta_details_id, attributes: attributes)
     end
   end
 end

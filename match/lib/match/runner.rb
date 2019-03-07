@@ -25,6 +25,8 @@ module Match
     def run(params)
       self.files_to_commit = []
 
+      FileUtils.mkdir_p(params[:output_path]) if params[:output_path]
+
       FastlaneCore::PrintTable.print_values(config: params,
                                              title: "Summary for match #{Fastlane::VERSION}")
 
@@ -44,7 +46,8 @@ module Match
         type: params[:type].to_s,
         platform: params[:platform].to_s,
         google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
-        google_cloud_keys_file: params[:google_cloud_keys_file].to_s
+        google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
+        google_cloud_project_id: params[:google_cloud_project_id].to_s
       })
       storage.download
 
@@ -166,21 +169,39 @@ module Match
         self.files_to_commit << private_key_path
       else
         cert_path = certs.last
-        UI.message("Installing certificate...")
 
-        # Only looking for cert in "custom" (non login.keychain) keychain
-        # Doing this for backwards compatability
-        keychain_name = params[:keychain_name] == "login.keychain" ? nil : params[:keychain_name]
-
-        if FastlaneCore::CertChecker.installed?(cert_path, in_keychain: keychain_name)
-          UI.verbose("Certificate '#{File.basename(cert_path)}' is already installed on this machine")
+        # Check validity of certificate
+        if Utils.is_cert_valid?(cert_path)
+          UI.verbose("Your certificate '#{File.basename(cert_path)}' is valid")
         else
-          Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
+          UI.user_error!("Your certificate '#{File.basename(cert_path)}' is not valid, please check end date and renew it if necessary")
         end
 
-        # Import the private key
-        # there seems to be no good way to check if it's already installed - so just install it
-        Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
+        if Helper.mac?
+          UI.message("Installing certificate...")
+
+          # Only looking for cert in "custom" (non login.keychain) keychain
+          # Doing this for backwards compatability
+          keychain_name = params[:keychain_name] == "login.keychain" ? nil : params[:keychain_name]
+
+          if FastlaneCore::CertChecker.installed?(cert_path, in_keychain: keychain_name)
+            UI.verbose("Certificate '#{File.basename(cert_path)}' is already installed on this machine")
+          else
+            Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
+          end
+
+          # Import the private key
+          # there seems to be no good way to check if it's already installed - so just install it
+          # Key will only be added to the partition list if it isn't already installed
+          Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
+        else
+          UI.message("Skipping installation of certificate as it would not work on this operating system.")
+        end
+
+        if params[:output_path]
+          FileUtils.cp(cert_path, params[:output_path])
+          FileUtils.cp(keys.last, params[:output_path])
+        end
 
         # Get and print info of certificate
         info = Utils.get_cert_info(cert_path)
@@ -202,7 +223,9 @@ module Match
       profile_name = names.join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
       base_dir = File.join(prefixed_working_directory(working_directory), "profiles", prov_type.to_s)
       profiles = Dir[File.join(base_dir, "#{profile_name}.mobileprovision")]
-      keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
+      if Helper.mac?
+        keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
+      end
 
       # Install the provisioning profiles
       profile = profiles.last
@@ -220,11 +243,13 @@ module Match
 
       if profile.nil? || params[:force]
         if params[:readonly]
-          all_profiles = Dir.entries(base_dir).reject { |f| f.start_with?(".") }
           UI.error("No matching provisioning profiles found for '#{profile_name}'")
           UI.error("A new one cannot be created because you enabled `readonly`")
-          UI.error("Provisioning profiles in your repo for type `#{prov_type}`:")
-          all_profiles.each { |p| UI.error("- '#{p}'") }
+          if Dir.exist?(base_dir) # folder for `prov_type` does not exist on first match use for that type
+            all_profiles = Dir.entries(base_dir).reject { |f| f.start_with?(".") }
+            UI.error("Provisioning profiles in your repo for type `#{prov_type}`:")
+            all_profiles.each { |p| UI.error("- '#{p}'") }
+          end
           UI.error("If you are certain that a profile should exist, double-check the recent changes to your match repository")
           UI.user_error!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`. Check the output above for more information.")
         end
@@ -236,9 +261,15 @@ module Match
         self.files_to_commit << profile
       end
 
-      installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
+      if Helper.mac?
+        installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
+      end
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       uuid = parsed["UUID"]
+
+      if params[:output_path]
+        FileUtils.cp(profile, params[:output_path])
+      end
 
       if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
         # This profile is invalid, let's remove the local file and generate a new one

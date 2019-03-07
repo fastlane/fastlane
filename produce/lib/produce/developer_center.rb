@@ -12,6 +12,7 @@ module Produce
     SERVICE_CLOUDKIT = "cloudkit"
 
     ALLOWED_SERVICES = {
+      access_wifi: [SERVICE_ON, SERVICE_OFF],
       app_group: [SERVICE_ON, SERVICE_OFF],
       apple_pay: [SERVICE_ON, SERVICE_OFF],
       associated_domains: [SERVICE_ON, SERVICE_OFF],

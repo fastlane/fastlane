@@ -26,6 +26,9 @@ module Fastlane
         # optionally add the force component
         command << '--force-with-lease' if params[:force_with_lease]
 
+        # optionally add the no-verify component
+        command << '--no-verify' if params[:no_verify]
+
         # execute our command
         Actions.sh('pwd')
         return command.join(' ') if Helper.test?
@@ -68,7 +71,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :remote,
                                        env_name: "FL_GIT_PUSH_REMOTE",
                                        description: "The remote to push to",
-                                       default_value: 'origin')
+                                       default_value: 'origin'),
+          FastlaneCore::ConfigItem.new(key: :no_verify,
+                                       env_name: "FL_GIT_PUSH_USE_NO_VERIFY",
+                                       description: "Whether or not to use --no-verify",
+                                       type: Boolean,
+                                       default_value: false)
         ]
       end
 
@@ -93,7 +101,8 @@ module Fastlane
             remote_branch: "develop", # optional, default is set to local_branch
             force: true,              # optional, default: false
             force_with_lease: true,   # optional, default: false
-            tags: false               # optional, default: true
+            tags: false,              # optional, default: true
+            no_verify: true           # optional, default: false
           )'
         ]
       end

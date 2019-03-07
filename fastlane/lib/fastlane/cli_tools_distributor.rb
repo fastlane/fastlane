@@ -16,6 +16,10 @@ module Fastlane
         ARGV.include?("init")
       end
 
+      def utf8_locale?
+        (ENV['LANG'] || "").end_with?("UTF-8", "utf8") || (ENV['LC_ALL'] || "").end_with?("UTF-8", "utf8") || (FastlaneCore::CommandExecutor.which('locale') && `locale charmap`.strip == "UTF-8")
+      end
+
       def take_off
         before_import_time = Time.now
 
@@ -45,7 +49,8 @@ module Fastlane
           print_bundle_exec_warning(is_slow: (Time.now - before_import_time > 3))
         end
 
-        unless (ENV['LANG'] || "").end_with?("UTF-8") || (ENV['LC_ALL'] || "").end_with?("UTF-8")
+        # Try to check UTF-8 with `locale`, fallback to environment variables
+        unless utf8_locale?
           warn = "WARNING: fastlane requires your locale to be set to UTF-8. To learn more go to https://docs.fastlane.tools/getting-started/ios/setup/#set-up-environment-variables"
           UI.error(warn)
           at_exit do
@@ -97,6 +102,12 @@ module Fastlane
             # When we launch this feature, this should never be the case
             abort("#{tool_name} can't be called via `fastlane #{tool_name}`, run '#{tool_name}' directly instead".red)
           end
+
+          # Some of the tools use other actions so need to load all
+          # actions before we start the tool generator
+          # Example: scan uses slack
+          Fastlane.load_actions
+
           commands_generator.start
         elsif tool_name == "fastlane-credentials"
           require 'credentials_manager'

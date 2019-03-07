@@ -22,7 +22,15 @@ module Fastlane
         end
 
         commands = []
-        commands << Fastlane::Actions.sh("security create-keychain -p #{escaped_password} #{keychain_path}", log: false)
+
+        if !exists?(keychain_path)
+          commands << Fastlane::Actions.sh("security create-keychain -p #{escaped_password} #{keychain_path}", log: false)
+        elsif params[:require_create]
+          UI.abort_with_message!("`require_create` option passed, but found keychain '#{keychain_path}', failing create_keychain action")
+        else
+          UI.important("Found keychain '#{keychain_path}', creation skipped")
+          UI.important("If creating a new Keychain DB is required please set the `require_create` option true to cause the action to fail")
+        end
 
         if params[:default_keychain]
           # if there is no default keychain - setting the original will fail - silent this error
@@ -50,6 +58,14 @@ module Fastlane
         end
 
         commands
+      end
+
+      def self.exists?(keychain_path)
+        keychain_path = File.expand_path(keychain_path)
+
+        # Creating Keychains using the security
+        # CLI appends `-db` to the file name.
+        File.exist?("#{keychain_path}-db") || File.exist?(keychain_path)
       end
 
       def self.description
@@ -98,7 +114,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :add_to_search_list,
                                        description: 'Add keychain to search list',
                                        is_string: false,
-                                       default_value: true)
+                                       default_value: true),
+          FastlaneCore::ConfigItem.new(key: :require_create,
+                                       description: 'Fail the action if the Keychain already exists',
+                                       is_string: false,
+                                       default_value: false)
         ]
       end
 

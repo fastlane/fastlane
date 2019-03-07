@@ -581,7 +581,8 @@ module Spaceship
         teamId: team_id,
         type: type,
         csrContent: csr,
-        appIdId: app_id # optional
+        appIdId: app_id, # optional
+        specialIdentifierDisplayId: app_id, # For requesting Web Push certificates
       })
       parse_response(r, 'certRequest')
     end
@@ -763,6 +764,8 @@ module Spaceship
     end
 
     def create_key!(name: nil, service_configs: nil)
+      fetch_csrf_token_for_keys
+
       params = {
         name: name,
         serviceConfigurations: service_configs,
@@ -779,6 +782,7 @@ module Spaceship
     end
 
     def revoke_key!(id: nil)
+      fetch_csrf_token_for_keys
       response = request(:post, 'account/auth/key/revoke', { teamId: team_id, keyId: id })
       parse_response(response)
     end
@@ -817,14 +821,26 @@ module Spaceship
     # profiles.
     # Source https://github.com/fastlane/fastlane/issues/5903
     def fetch_csrf_token_for_provisioning(mac: false)
-      req = request(:post, "account/#{platform_slug(mac)}/profile/listProvisioningProfiles.action", {
+      response = request(:post, "account/#{platform_slug(mac)}/profile/listProvisioningProfiles.action", {
          teamId: team_id,
          pageNumber: 1,
          pageSize: 1,
          sort: 'name=asc'
        })
 
-      parse_response(req, 'provisioningProfiles')
+      parse_response(response, 'provisioningProfiles')
+      return nil
+    end
+
+    def fetch_csrf_token_for_keys
+      response = request(:post, 'account/auth/key/list', {
+         teamId: team_id,
+         pageNumber: 1,
+         pageSize: 1,
+         sort: 'name=asc'
+       })
+
+      parse_response(response, 'keys')
       return nil
     end
   end
