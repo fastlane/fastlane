@@ -14,7 +14,7 @@
         <key>type</key>
         <string>iOS Distribution</string>
         <key>distributionMethod</key>
-        <string>store</string>
+        <string>adhoc</string>
         <key>proProPlatform</key>
         <string>ios</string>
         <key>UUID</key>

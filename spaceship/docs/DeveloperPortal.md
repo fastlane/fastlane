@@ -62,6 +62,7 @@ App Services are part of the application, however, they are one of the few thing
 Currently available services include (all require the `Spaceship::Portal.app_service.` prefix)
 
 ```
+access_wifi.(on|off)
 app_group.(on|off)
 apple_pay.(on|off)
 associated_domains.(on|off)
@@ -255,11 +256,6 @@ profiles = Spaceship::Portal.provisioning_profile.all
 # and there is no fast way to get the type when fetching the profiles
 profiles_appstore_adhoc = Spaceship::Portal.provisioning_profile.app_store.all
 profiles_appstore_adhoc = Spaceship::Portal.provisioning_profile.ad_hoc.all
-
-# To distinguish between App Store and Ad Hoc profiles use
-adhoc_only = profiles_appstore_adhoc.find_all do |current_profile|
-  current_profile.is_adhoc?
-end
 
 # Get all Development profiles
 profiles_dev = Spaceship::Portal.provisioning_profile.development.all

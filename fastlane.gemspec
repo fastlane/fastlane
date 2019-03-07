@@ -15,26 +15,26 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Matthew Ellis",
-                        "Helmut Januschka",
-                        "Jimmy Dee",
-                        "Danielle Tomlinson",
-                        "Kohki Miki",
-                        "Manu Wallner",
-                        "Andrew McBurney",
+  spec.authors       = ["Jimmy Dee",
                         "Josh Holtz",
-                        "Joshua Liebowitz",
-                        "Jorge Revuelta H",
-                        "Aaron Brager",
-                        "Felix Krause",
-                        "Jan Piotrowski",
-                        "Jérôme Lacoste",
-                        "Luka Mirosevic",
-                        "Iulian Onofrei",
+                        "Danielle Tomlinson",
                         "Olivier Halligon",
-                        "Stefan Natchev",
+                        "Jorge Revuelta H",
                         "Maksym Grebenets",
-                        "Fumiya Nakamura"]
+                        "Aaron Brager",
+                        "Joshua Liebowitz",
+                        "Jérôme Lacoste",
+                        "Iulian Onofrei",
+                        "Kohki Miki",
+                        "Jan Piotrowski",
+                        "Felix Krause",
+                        "Matthew Ellis",
+                        "Luka Mirosevic",
+                        "Fumiya Nakamura",
+                        "Helmut Januschka",
+                        "Andrew McBurney",
+                        "Manu Wallner",
+                        "Stefan Natchev"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -55,7 +55,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = Dir["*/lib"]
 
   spec.add_dependency('slack-notifier', '>= 2.0.0', '< 3.0.0') # Slack notifications
-  spec.add_dependency('xcodeproj', '>= 1.6.0', '< 2.0.0') # Modify Xcode projects
+  spec.add_dependency('xcodeproj', '>= 1.8.1', '< 2.0.0') # Modify Xcode projects
   spec.add_dependency('xcpretty', '~> 0.3.0') # prettify xcodebuild output
   spec.add_dependency('terminal-notifier', '>= 1.6.2', '< 2.0.0') # macOS notifications
   spec.add_dependency('terminal-table', '>= 1.4.5', '< 2.0.0') # Actions documentation
@@ -87,7 +87,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
   spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3')
   spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
-  spec.add_dependency('bundler', '>= 1.12.0', '< 2.0.0') # Used for fastlane plugins
+  spec.add_dependency('bundler', '>= 1.12.0', '< 3.0.0') # Used for fastlane plugins
   spec.add_dependency('faraday', '~> 0.9') # Used for deploygate, hockey and testfairy actions
   spec.add_dependency('faraday_middleware', '~> 0.9') # same as faraday
   spec.add_dependency('simctl', '~> 1.6.3') # Used for querying and interacting with iOS simulators
@@ -95,8 +95,9 @@ Gem::Specification.new do |spec|
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.
   spec.add_dependency('google-api-client', '>= 0.21.2', '< 0.24.0') # Google API Client to access Play Publishing API
+  spec.add_dependency('google-cloud-storage', '>= 1.15.0', '< 2.0.0') # Access Google Cloud Storage for match
 
-  spec.add_dependency('emoji_regex', '~> 0.1') # Used to scan for Emoji in the changelog
+  spec.add_dependency('emoji_regex', '>= 0.1', '< 2.0') # Used to scan for Emoji in the changelog
 
   # Development only
   spec.add_development_dependency('rake', '< 12')

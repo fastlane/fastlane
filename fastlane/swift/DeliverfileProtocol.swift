@@ -21,6 +21,7 @@ protocol DeliverfileProtocol: class {
   var automaticRelease: Bool { get }
   var autoReleaseDate: String? { get }
   var phasedRelease: Bool { get }
+  var resetRatings: Bool { get }
   var priceTier: String? { get }
   var appRatingConfigPath: String? { get }
   var submissionInformation: String? { get }
@@ -31,6 +32,7 @@ protocol DeliverfileProtocol: class {
   var itcProvider: String? { get }
   var runPrecheckBeforeSubmit: Bool { get }
   var precheckDefaultRuleLevel: String { get }
+  var individualMetadataItems: [String] { get }
   var appIcon: String? { get }
   var appleWatchAppIcon: String? { get }
   var copyright: String? { get }
@@ -80,6 +82,7 @@ extension DeliverfileProtocol {
   var automaticRelease: Bool { return false }
   var autoReleaseDate: String? { return nil }
   var phasedRelease: Bool { return false }
+  var resetRatings: Bool { return false }
   var priceTier: String? { return nil }
   var appRatingConfigPath: String? { return nil }
   var submissionInformation: String? { return nil }
@@ -90,6 +93,7 @@ extension DeliverfileProtocol {
   var itcProvider: String? { return nil }
   var runPrecheckBeforeSubmit: Bool { return true }
   var precheckDefaultRuleLevel: String { return "warn" }
+  var individualMetadataItems: [String] { return [] }
   var appIcon: String? { return nil }
   var appleWatchAppIcon: String? { return nil }
   var copyright: String? { return nil }
@@ -118,4 +122,4 @@ extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.4]
+// FastlaneRunnerAPIVersion [0.9.6]

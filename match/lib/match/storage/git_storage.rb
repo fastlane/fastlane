@@ -55,12 +55,12 @@ module Match
 
       def download
         # Check if we already have a functional working_directory
-        return self.working_directory if @working_directory
+        return if @working_directory
 
         # No existing working directory, creating a new one now
         self.working_directory = Dir.mktmpdir
 
-        command = "git clone '#{self.git_url}' '#{self.working_directory}'"
+        command = "git clone #{self.git_url.shellescape} #{self.working_directory.shellescape}"
         if self.shallow_clone
           command << " --depth 1 --no-single-branch"
         elsif self.clone_branch_directly
@@ -74,9 +74,11 @@ module Match
 
         begin
           # GIT_TERMINAL_PROMPT will fail the `git clone` command if user credentials are missing
-          FastlaneCore::CommandExecutor.execute(command: "GIT_TERMINAL_PROMPT=0 #{command}",
-                                              print_all: FastlaneCore::Globals.verbose?,
-                                          print_command: FastlaneCore::Globals.verbose?)
+          Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
+            FastlaneCore::CommandExecutor.execute(command: command,
+                                                print_all: FastlaneCore::Globals.verbose?,
+                                            print_command: FastlaneCore::Globals.verbose?)
+          end
         rescue
           UI.error("Error cloning certificates repo, please make sure you have read access to the repository you want to use")
           if self.branch && self.clone_branch_directly
@@ -96,6 +98,10 @@ module Match
         checkout_branch unless self.branch == "master"
       end
 
+      def human_readable_description
+        "Git Repo [#{self.git_url}]"
+      end
+
       def delete_files(files_to_delete: [], custom_message: nil)
         # No specific list given, e.g. this happens on `fastlane match nuke`
         # We just want to run `git add -A` to commit everything
@@ -110,13 +116,6 @@ module Match
         git_push(commands: commands, commit_message: custom_message)
       end
 
-      def clear_changes
-        return unless @working_directory
-
-        FileUtils.rm_rf(self.working_directory)
-        self.working_directory = nil
-      end
-
       # Generate the commit message based on the user's parameters
       def generate_commit_message
         [
@@ -126,6 +125,13 @@ module Match
           "and platform",
           self.platform
         ].join(" ")
+      end
+
+      def generate_matchfile_content
+        UI.important("Please create a new, private git repository to store the certificates and profiles there")
+        url = UI.input("URL of the Git Repo: ")
+
+        return "git_url(\"#{url}\")"
       end
 
       private
@@ -186,21 +192,19 @@ module Match
         end
       end
 
-      private # rubocop:disable Lint/UselessAccessModifier
-
       def git_push(commands: [], commit_message: nil)
         commit_message ||= generate_commit_message
         commands << "git commit -m #{commit_message.shellescape}"
-        commands << "GIT_TERMINAL_PROMPT=0 git push origin #{self.branch.shellescape}"
+        commands << "git push origin #{self.branch.shellescape}"
 
         UI.message("Pushing changes to remote git repo...")
-        commands.each do |command|
-          FastlaneCore::CommandExecutor.execute(command: command,
+        Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
+          commands.each do |command|
+            FastlaneCore::CommandExecutor.execute(command: command,
                                                 print_all: FastlaneCore::Globals.verbose?,
-                                                print_command: FastlaneCore::Globals.verbose?)
+                                            print_command: FastlaneCore::Globals.verbose?)
+          end
         end
-
-        self.clear_changes
       rescue => ex
         UI.error("Couldn't commit or push changes back to git...")
         UI.error(ex)

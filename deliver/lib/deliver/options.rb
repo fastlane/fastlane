@@ -166,6 +166,11 @@ module Deliver
                                      optional: true,
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :reset_ratings,
+                                    description: "Reset the summary rating when you release a new version of the application",
+                                    optional: true,
+                                    is_string: false,
+                                    default_value: false),
 
         # other app configuration
         FastlaneCore::ConfigItem.new(key: :price_tier,
@@ -184,7 +189,7 @@ module Deliver
                                      end),
         FastlaneCore::ConfigItem.new(key: :submission_information,
                                      short_option: "-b",
-                                     description: "Extra information for the submission (e.g. third party content)",
+                                     description: "Extra information for the submission (e.g. compliance specifications, IDFA settings)",
                                      is_string: false,
                                      optional: true),
 
@@ -257,6 +262,13 @@ module Deliver
                                      default_value: :warn),
 
         # App Metadata
+        FastlaneCore::ConfigItem.new(key: :individual_metadata_items,
+                                     env_name: "DELIVER_INDIVUDAL_METADATA_ITEMS",
+                                     description: "An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow",
+                                     is_string: false,
+                                     type: Array,
+                                     default_value: []),
+
         # Non Localised
         FastlaneCore::ConfigItem.new(key: :app_icon,
                                      description: "Metadata: The path to the app icon",

@@ -78,10 +78,24 @@ To gradually roll out a new build use
 fastlane supply --apk path/app.apk --track rollout --rollout 0.5
 ```
 
+### Expansion files (`.obb`)
+
 Expansion files (obbs) found under the same directory as your APK will also be uploaded together with your APK as long as:
 
 - they are identified as type 'main' or 'patch' (by containing 'main' or 'patch' in their file name)
 - you have at most one of each type
+
+If you only want to update the APK, but keep the expansion files from the previous version on Google Play use
+
+```no-highlight
+fastlane supply --apk path/app.apk --obb_main_references_version 21 --obb_main_file_size 666154207
+```
+
+or
+
+```no-highlight
+fastlane supply --apk path/app.apk --obb_patch_references_version 21 --obb_patch_file_size 666154207
+```
 
 ## Uploading an AAB
 
@@ -122,7 +136,7 @@ Note that these will replace the current images and screenshots on the play stor
 
 ## Changelogs (What's new)
 
-You can add changelog files under the `changelogs/` directory for each locale. The filename should exactly match the version code of the APK that it represents. `fastlane supply init` will populate changelog files from existing data on Google Play if no `metadata/` directory exists when it is run.
+You can add changelog files under the `changelogs/` directory for each locale. The filename should exactly match the [version code](https://developer.android.com/studio/publish/versioning#appversioning) of the APK that it represents. `fastlane supply init` will populate changelog files from existing data on Google Play if no `metadata/` directory exists when it is run.
 
 ```no-highlight
 └── fastlane

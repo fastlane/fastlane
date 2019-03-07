@@ -12,17 +12,23 @@ module Frameit
   # Currently the class is 2 lines too long. Reevaluate refactoring when it's length changes significantly
   class Editor # rubocop:disable Metrics/ClassLength
     attr_accessor :screenshot # reference to the screenshot object to fetch the path, title, etc.
+    attr_accessor :debug_mode
+    attr_accessor :frame_path
     attr_accessor :frame # the frame of the device
     attr_accessor :image # the current image used for editing
     attr_accessor :space_to_device
 
-    def frame!(screenshot)
-      self.screenshot = screenshot
+    def initialize(screenshot, debug_mode = false)
+      @screenshot = screenshot
+      self.debug_mode = debug_mode
+    end
+
+    def frame!
       prepare_image
 
-      frame = load_frame
-      if frame # Mac doesn't need a frame
-        self.frame = MiniMagick::Image.open(frame)
+      @frame_path = load_frame
+      if @frame_path # Mac doesn't need a frame
+        self.frame = MiniMagick::Image.open(@frame_path)
         # Rotate the frame according to the device orientation
         self.frame.rotate(self.rotation_for_device_orientation)
       elsif self.class == Editor
@@ -31,7 +37,7 @@ module Frameit
         return
       end
 
-      if should_add_title?
+      if is_complex_framing_mode?
         @image = complex_framing
       else
         # easy mode from 1.0 - no title or background
@@ -59,6 +65,10 @@ module Frameit
       return 0
     end
 
+    def should_skip?
+      return is_complex_framing_mode? && !fetch_text(:title)
+    end
+
     private
 
     def store_result
@@ -77,6 +87,26 @@ module Frameit
       rotation = self.rotation_for_device_orientation
       frame.rotate(-rotation)
       @image.rotate(-rotation)
+
+      # Debug Mode: Add filename to frame
+      if self.debug_mode
+        filename = File.basename(@frame_path, ".*")
+        filename.sub!('Apple', '') # remove 'Apple'
+
+        width = screenshot.size[0]
+        font_size = width / 20 # magic number that works well
+
+        offset_top = offset['offset'].split("+")[2].to_f
+        annotate_offset = "+0+#{offset_top}" # magic number that works semi well
+
+        frame.combine_options do |c|
+          c.gravity('North')
+          c.undercolor('#00000080')
+          c.fill('white')
+          c.pointsize(font_size)
+          c.annotate(annotate_offset.to_s, filename.to_s)
+        end
+      end
 
       @image = frame.composite(image, "png") do |c|
         c.compose("DstOver")
@@ -117,7 +147,7 @@ module Frameit
     end
 
     # Do we add a background and title as well?
-    def should_add_title?
+    def is_complex_framing_mode?
       return (fetch_config['background'] and (fetch_config['title'] or fetch_config['keyword']))
     end
 
@@ -484,12 +514,6 @@ module Frameit
 
       # No string files, fallback to Framefile config
       text = fetch_config[type.to_s]['text'] if fetch_config[type.to_s] && fetch_config[type.to_s]['text'] && fetch_config[type.to_s]['text'].length > 0 # Ignore empty string
-
-      if type == :title && !text
-        # title is mandatory
-        UI.user_error!("Could not get title for screenshot #{screenshot.path}. Please provide one in your Framefile.json or title.strings")
-      end
-
       return text
     end
 

@@ -25,7 +25,7 @@ module Spaceship
       #   "Spaceship App"
       attr_accessor :name
 
-      # @return (String) The Vendor ID provided by App Store Connect
+      # @return (String) The SKU (Stock keeping unit) you provided for this app for internal tracking
       # @example
       #   "1435592086"
       attr_accessor :vendor_id
@@ -388,6 +388,18 @@ module Spaceship
           raise "Could not find a valid version to release"
         end
         version.release!
+      end
+
+      #####################################################
+      # @!group release to all users
+      #####################################################
+
+      def release_to_all_users!
+        version = self.live_version
+        if version.nil?
+          raise "Could not find a valid version to release"
+        end
+        version.release_to_all_users!
       end
 
       #####################################################

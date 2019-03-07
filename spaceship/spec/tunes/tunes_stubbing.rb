@@ -293,6 +293,13 @@ class TunesStubbing
                   headers: { "Content-Type" => "application/json" })
     end
 
+    def itc_stub_release_to_all_users
+      stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/812106519/phasedRelease/state/COMPLETE").
+        with(body: "898536088").
+        to_return(status: 200, body: itc_read_fixture_file("update_app_version_success.json"),
+                  headers: { "Content-Type" => "application/json" })
+    end
+
     def itc_stub_promocodes
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/promocodes/versions").
         to_return(status: 200, body: itc_read_fixture_file("promocodes.json"),
