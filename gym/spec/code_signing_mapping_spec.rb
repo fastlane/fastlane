@@ -43,7 +43,6 @@ describe Gym::CodeSigningMapping do
       expect(csm.detect_project_profile_mapping).to eq({ "family.wwdc.app" => "match Development family.wwdc.app", "family.wwdc.app.watchkitapp" => "match Development family.wwdc.app.watchkitapp", "family.wwdc.app.watchkitapp.watchkitextension" => "match Development family.wwdc.app.watchkitappextension" })
     end
 
-
     it "detects the build configuration from selected scheme of a project based on inheritance for resolve xcconfigs", requires_xcode: true do
       workspace_path = "gym/spec/fixtures/projects/projectBasedOnInheritance/ExampleWithInheritedXcconfig.xcworkspace"
       project = FastlaneCore::Project.new({ workspace: workspace_path })
