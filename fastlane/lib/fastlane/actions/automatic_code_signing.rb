@@ -20,6 +20,7 @@ module Fastlane
         target_attributes = project.root_object.attributes["TargetAttributes"]
         changed_targets = []
 
+        # make sure TargetAttributes exist for all targets
         target_dictionary.each do |props|
           unless target_attributes.key?(props[:uuid])
             target_attributes[props[:uuid]] = {}
