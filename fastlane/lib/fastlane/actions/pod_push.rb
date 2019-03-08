@@ -35,6 +35,14 @@ module Fastlane
           command << "--use-libraries"
         end
 
+        if params[:skip_import_validation]
+          command << "--skip-import-validation"
+        end
+
+        if params[:skip_tests]
+          command << "--skip-tests"
+        end
+
         if params[:verbose]
           command << "--verbose"
         end
@@ -88,6 +96,14 @@ module Fastlane
                                        description: "The SWIFT_VERSION that should be used to lint the spec. This takes precedence over a .swift-version file",
                                        optional: true,
                                        is_string: true),
+          FastlaneCore::ConfigItem.new(key: :skip_import_validation,
+                                       description: "Lint skips validating that the pod can be imported",
+                                       optional: true,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :skip_tests,
+                                       description: "Lint skips building and running tests during validation",
+                                       optional: true,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        description: "Show more debugging information",
                                        optional: true,
