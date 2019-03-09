@@ -62,7 +62,7 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
 
 @objcMembers
 open class Snapshot: NSObject {
-    static var app: XCUIApplication?
+    static var app: XCUIApplication!
     static var cacheDirectory: URL?
     static var screenshotsDirectory: URL? {
         return cacheDirectory?.appendingPathComponent("screenshots", isDirectory: true)
@@ -277,4 +277,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.13]
+// SnapshotHelperVersion [1.14]
