@@ -1,15 +1,13 @@
-require 'fastlane/ci'
-
 module Fastlane
   module Actions
     class SetupCircleCiAction < Action
       def self.run(params)
-        unless Ci.should_run?(force: params[:force])
+        unless Helper::CI.should_run?(force: params[:force])
           UI.message("Not running on CI, skipping `setup_circle_ci`")
           return
         end
 
-        Ci.setup_keychain
+        Helper::CI.setup_keychain
         setup_output_paths(params)
       end
 

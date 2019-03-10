@@ -1,5 +1,5 @@
 describe Fastlane do
-  describe Fastlane::Ci do
+  describe Fastlane::Helper::CI do
     describe "#should_run" do
       context "when running on CI" do
         before do
