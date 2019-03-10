@@ -183,7 +183,7 @@ module Fastlane
       end
 
       def self.description
-        "Refer to [this](https://github.com/Microsoft/fastlane-plugin-appcenter/)"
+        "Deprecated and will be no longer supported on November 16, 2019. Refer to [App Center](https://github.com/Microsoft/fastlane-plugin-appcenter/)"
       end
 
       def self.available_options
@@ -381,7 +381,14 @@ module Fastlane
       end
 
       def self.category
-        :beta
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        [
+          "HockeyApp will be no longer supported and transitioned into App Center on November 16, 2019.",
+          "Please migrate over to [App Center](https://github.com/Microsoft/fastlane-plugin-appcenter/)"
+        ].join("\n")
       end
     end
     # rubocop:enable Metrics/ClassLength
