@@ -21,7 +21,7 @@ module Fastlane
         end
 
         if action < Action
-          current << action.description if action.description
+          current << action.description.to_s.remove_markdown if action.description
 
           authors = Array(action.author || action.authors)
           current << authors.first.green if authors.count == 1
@@ -64,7 +64,7 @@ module Fastlane
         if Fastlane::Actions.is_deprecated?(action)
           puts("==========================================".deprecated)
           puts("This action (#{filter}) is deprecated".deprecated)
-          puts(action.deprecated_notes.to_s.deprecated) if action.deprecated_notes
+          puts(action.deprecated_notes.to_s.remove_markdown.deprecated) if action.deprecated_notes
           puts("==========================================\n".deprecated)
         end
 
@@ -107,16 +107,13 @@ module Fastlane
       rows = []
 
       if action.description
-        rows << [action.description]
+        description = action.description.to_s.remove_markdown
+        rows << [description]
         rows << [' ']
       end
 
       if action.details
-        details = action.details
-        details.gsub!(/^>/, "") # remove Markdown quotes
-        details.gsub!(/\[http[^\]]+\]\(([^)]+)\)/, '\1 🔗') # remove Markdown links
-        details.gsub!(/\[([^\]]+)\]\(([^\)]+)\)/, '"\1" (\2 🔗)') # remove Markdown links with custom text
-        details.gsub!("|", "") # remove new line preserve markers
+        details = action.details.to_s.remove_markdown
         details.split("\n").each do |detail|
           row = detail.empty? ? ' ' : detail
           rows << [row]
