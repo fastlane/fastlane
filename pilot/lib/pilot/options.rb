@@ -199,18 +199,24 @@ module Pilot
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :api_issuer,
                                      env_name: "PILOT_API_ISSUER",
-                                     description: "Your App Store Connect Issuer ID if using API keys with the uploader",
+                                     description: "Your App Store Connect Issuer ID if using API keys with the uploader. Available since Xcode 10",
                                      is_string: true,
                                      optional: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:api_issuer),
-                                     default_value_dynamic: true),
+                                     default_value_dynamic: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Xcode 10 is required to use this option") unless Helper.xcode_at_least?("10.0")
+                                     end),
         FastlaneCore::ConfigItem.new(key: :api_key,
                                      env_name: "PILOT_API_KEY",
-                                     description: "Your App Store Connect API Key ID if using API keys with the uploader",
+                                     description: "Your App Store Connect API Key ID if using API keys with the uploader. Available since Xcode 10",
                                      is_string: true,
                                      optional: true,
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:api_issuer),
-                                     default_value_dynamic: true)
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:api_key),
+                                     default_value_dynamic: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Xcode 10 is required to use this option") unless Helper.xcode_at_least?("10.0")
+                                     end)
       ]
     end
   end
