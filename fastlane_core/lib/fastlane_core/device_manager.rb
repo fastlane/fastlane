@@ -40,6 +40,7 @@ module FastlaneCore
         end
 
         output.split(/\n/).each do |line|
+          break if line =~ /^-- Unavailable/
           next if line =~ /unavailable/
           next if line =~ /^== /
           if line =~ /^-- /
