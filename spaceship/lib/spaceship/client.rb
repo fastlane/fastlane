@@ -484,8 +484,6 @@ module Spaceship
       # Now we know if the login is successful or if we need to do 2 factor
 
       case response.status
-      when 403
-        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       when 200
         fetch_olympus_session
         return response
@@ -496,7 +494,11 @@ module Spaceship
         fetch_olympus_session
         return true
       else
-        if (response.body || "").include?('invalid="true"')
+        if (response.status == 401 && (response.body).include?("locked"))
+          raise InvalidUserCredentialsError.new, "This Apple ID has been locked for security reasons. Visit iForgot to reset your account (https://iforgot.apple.com)."
+        elsif (response.status == 401)
+          raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
+        elsif (response.body || "").include?('invalid="true"')
           # User Credentials are wrong
           raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
         elsif response.status == 412 && AUTH_TYPES.include?(response.body["authType"])
