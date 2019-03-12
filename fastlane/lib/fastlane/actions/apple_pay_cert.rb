@@ -31,7 +31,7 @@ module Fastlane
         end
 
         x509_certificate = cert.download
-        filename_base = params[:merchant_bundle_id] # PEM.config[:pem_name] || "#{PEM.config[:app_identifier]}"
+        filename_base = params[:merchant_bundle_id]
         filename_base = File.basename(filename_base, ".pem") # strip off the .pem if it was provided.
 
         output_path = File.expand_path('.')
@@ -133,7 +133,8 @@ module Fastlane
       def self.example_code
         [
           'apple_pay_cert(
-      			merchant_bundle_id: "merchant.com.rtayal.app",
+      			username: "test@example.com",
+            merchant_bundle_id: "merchant.com.rtayal.app",
       			p12_password: "test"
       		)',
           'apple_pay_cert(
