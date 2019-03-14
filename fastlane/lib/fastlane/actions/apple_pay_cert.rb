@@ -95,12 +95,6 @@ module Fastlane
                                  verify_block: proc do |value|
                                    ENV["FASTLANE_TEAM_ID"] = value.to_s
                                  end),
-          FastlaneCore::ConfigItem.new(key: :p12_password,
-                                     short_option: "-p",
-                                     env_name: "APPLE_PAY_CERT_P12_PASSWORD",
-                                     sensitive: true,
-                                     description: "The password that is used for your p12 file",
-                                     default_value: ""),
           FastlaneCore::ConfigItem.new(key: :team_name,
                                        short_option: "-l",
                                        env_name: "APPLE_PAY_CERT_TEAM_NAME",
@@ -112,6 +106,12 @@ module Fastlane
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                        end),
+          FastlaneCore::ConfigItem.new(key: :p12_password,
+                                     short_option: "-p",
+                                     env_name: "APPLE_PAY_CERT_P12_PASSWORD",
+                                     sensitive: true,
+                                     description: "The password that is used for your p12 file",
+                                     default_value: ""),
           FastlaneCore::ConfigItem.new(key: :generate_p12,
                                      env_name: "APPLE_PAY_CERT_GENERATE_P12_FILE",
                                      description: "Generate a p12 file additionally to the PEM file",
