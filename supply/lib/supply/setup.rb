@@ -1,6 +1,6 @@
 module Supply
   class Setup
-    def perform_download(image_format = "png", remove_alpha = false)
+    def perform_download()
       UI.message("🕗  Downloading metadata, images, screenshots...")
 
       if File.exist?(metadata_path)
