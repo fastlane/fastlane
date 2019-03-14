@@ -84,19 +84,6 @@ module Supply
       end
     end
 
-    def create_screenshots_folder(listing)
-      UI.message("📱  Downloading screenshots (#{listing.language})")
-
-      containing = File.join(metadata_path, listing.language)
-
-      FileUtils.mkdir_p(File.join(containing, IMAGES_FOLDER_NAME))
-      Supply::SCREENSHOT_TYPES.each do |screenshot_type|
-        FileUtils.mkdir_p(File.join(containing, IMAGES_FOLDER_NAME, screenshot_type))
-      end
-
-      UI.message("📵  Due to a limitation of the Google Play API, there is no way for `supply` to download your existing screenshots. Please copy your screenshots into `metadata/android/#{listing.language}/images/`")
-    end
-
     def store_apk_listing(apk_listing)
       UI.message("🔨  Downloading changelogs (#{apk_listing.language}, #{apk_listing.apk_version_code})")
 
