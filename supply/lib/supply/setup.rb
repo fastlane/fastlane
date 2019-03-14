@@ -67,6 +67,7 @@ module Supply
             image = MiniMagick::Image.open(path)
             image_details = JSON.parse(image.details.to_json, symbolize_names: true)
 
+            # remove alpha
             is_alpha_present = image_details.keys.any? { |k| k == :Alpha }
             image.alpha('remove') if is_alpha_present && remove_alpha
 
