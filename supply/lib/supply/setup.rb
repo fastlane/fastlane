@@ -73,7 +73,6 @@ module Supply
             image.write(path) # Properly formatted file is written to disk
 
             UI.message("\tDownloaded  - #{path}")
-            UI.message("\t\tAlpha removed") if is_alpha_present && remove_alpha
 
             image_counter += 1
           end
