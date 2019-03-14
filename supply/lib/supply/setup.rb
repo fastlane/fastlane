@@ -58,7 +58,7 @@ module Supply
             url = "#{url}=w6000-h6000" # using huge dimentions intentionally so Google returns the images in their original size they were uploaded
             
             if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images location
-              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.#{image_format}") 
+              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.#{image_format}")
             else # all other screenshot types goes under their respective folders.
               path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type, "#{image_counter}_#{listing.language}.#{image_format}")
             end
