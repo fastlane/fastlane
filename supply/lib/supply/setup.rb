@@ -56,8 +56,12 @@ module Supply
           image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
           urls.each do |url|
             url = "#{url}=w6000-h6000" # using huge dimentions intentionally so Google returns the images in their original size they were uploaded
-            path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type, "#{image_counter}_#{listing.language}.#{image_format}")
-            path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.#{image_format}") if IMAGES_TYPES.include?(image_type)
+            
+            if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images location
+              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.#{image_format}") 
+            else # all other screenshot types goes under their respective folders.
+              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type, "#{image_counter}_#{listing.language}.#{image_format}")
+            end
 
             p = Pathname.new(path)
             FileUtils.mkdir_p(p.dirname.to_s)
