@@ -323,6 +323,7 @@ module Spaceship
               app = portal_type.set_client(client).find(bundle_id)
               raise "Could not find app with bundle id '#{bundle_id}'" unless app
               app_id = app.app_id
+            end
           end
 
           # ensure csr is a OpenSSL::X509::Request
