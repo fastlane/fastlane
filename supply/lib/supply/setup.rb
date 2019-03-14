@@ -71,11 +71,13 @@ module Supply
             image = MiniMagick::Image.open(path)
             image_details = JSON.parse(image.details.to_json, symbolize_names: true)
 
+            # remove alpha
             is_alpha_present = image_details.keys.any? { |k| k == :Alpha }
             image.alpha('remove') if is_alpha_present && remove_alpha
 
             image.format(image_format) # Properly formatting the final image. Sometimes "jpg" or "webp" or "png" formats are returned by Google.
             image.write(path) # Properly formatted file is written to disk
+
             UI.message("\tDownloaded  - #{path}")
             UI.message("\t\tAlpha removed") if is_alpha_present && remove_alpha
 
