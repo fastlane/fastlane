@@ -134,7 +134,7 @@ module Fastlane
         [
           'apple_pay_cert(
       			username: "test@example.com",
-            merchant_bundle_id: "merchant.com.rtayal.app",
+     			merchant_bundle_id: "merchant.com.rtayal.app",
       			p12_password: "test"
       		)',
           'apple_pay_cert(
