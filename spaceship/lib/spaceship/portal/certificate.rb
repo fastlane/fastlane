@@ -330,7 +330,7 @@ module Spaceship
           csr = OpenSSL::X509::Request.new(csr) if csr.kind_of?(String)
 
           # if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
-          if type == '4APLUP237T'
+          if type == '4APLUP237T' # = ApplePayCertificate
             response = client.create_certificate_apple_pay!(type, csr.to_pem, merchant_id, mac)
           else
             response = client.create_certificate!(type, csr.to_pem, app_id, mac)
