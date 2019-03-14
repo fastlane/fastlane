@@ -57,9 +57,9 @@ module Supply
           urls.each do |url|
             url = url.gsub("-rw", "") # Remove "-rw" (if present) so the url will become either 'jpg' or 'png' (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473017130)
             url = "#{url}=s0" # '=s0' param ensures full image size is returned (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473012462)
-            
+
             if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images location
-              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}")
+              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type.to_s)
             else # All other screenshot types goes under their respective folders.
               path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type, "#{image_counter}_#{listing.language}")
             end
@@ -67,7 +67,7 @@ module Supply
             p = Pathname.new(path)
             FileUtils.mkdir_p(p.dirname.to_s)
 
-            path = "#{path}.#{FastImage.type(url).to_s}"
+            path = "#{path}.#{FastImage.type(url)}"
             File.write(path, Net::HTTP.get(URI.parse(url)))
 
             UI.message("\tDownloaded - #{path}")
