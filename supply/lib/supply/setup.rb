@@ -12,7 +12,7 @@ module Supply
 
       client.listings.each do |listing|
         store_metadata(listing)
-        download_images(listing, image_format, remove_alpha)
+        download_images(listing)
       end
 
       client.apks_version_codes.each do |apk_version_code|
@@ -39,7 +39,7 @@ module Supply
       end
     end
 
-    def download_images(listing, image_format = "png", remove_alpha = false)
+    def download_images(listing)
       UI.message("🖼️  Downloading images (#{listing.language})")
 
       require 'net/http'
@@ -55,23 +55,22 @@ module Supply
 
           image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
           urls.each do |url|
-            url = "#{url}=w6000-h6000" # using huge dimentions intentionally so Google returns the images in their original size they were uploaded
+            url = url.gsub("-rw", "") # Remove "-rw" (if present) so the url will become either 'jpg' or 'png' (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473017130)
+            url = "#{url}=s0" # '=s0' param ensures full image size is returned (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473012462)
+            
             if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images location
-              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.#{image_format}")
-            else # all other screenshot types goes under their respective folders.
-              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type, "#{image_counter}_#{listing.language}.#{image_format}")
+              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}")
+            else # All other screenshot types goes under their respective folders.
+              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type, "#{image_counter}_#{listing.language}")
             end
 
             p = Pathname.new(path)
             FileUtils.mkdir_p(p.dirname.to_s)
 
-            File.write(path, Net::HTTP.get(URI.parse(url))) # Write to tmp `path`
+            path = "#{path}.#{FastImage.type(url).to_s}"
+            File.write(path, Net::HTTP.get(URI.parse(url)))
 
-            image = MiniMagick::Image.open(path)
-            image.format(image_format) # Properly formatting the final image. Sometimes "jpg" or "webp" or "png" formats are returned by Google.
-            image.write(path) # Properly formatted file is written to disk
-
-            UI.message("\tDownloaded  - #{path}")
+            UI.message("\tDownloaded - #{path}")
 
             image_counter += 1
           end
