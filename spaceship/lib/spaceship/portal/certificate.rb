@@ -143,6 +143,9 @@ module Spaceship
       # ApplePay certificate
       class ApplePayCertificate < Certificate; end
 
+      # ApplePay certificate for backward compatibility
+      class ApplePay < ApplePayCertificate; end
+
       # ApplePayMerchantIdentity certificate
       class ApplePayMerchantIdentity < Certificate; end
 
