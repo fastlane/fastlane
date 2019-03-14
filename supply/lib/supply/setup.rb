@@ -75,6 +75,7 @@ module Supply
             is_alpha_present = image_details.keys.any? { |k| k == :Alpha }
             image.alpha('remove') if is_alpha_present && remove_alpha
 
+            # convert image
             image.format(image_format) # Properly formatting the final image. Sometimes "jpg" or "webp" or "png" formats are returned by Google.
             image.write(path) # Properly formatted file is written to disk
 
