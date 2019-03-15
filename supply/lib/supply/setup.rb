@@ -57,14 +57,13 @@ module Supply
           urls.each do |url|
             url_params = url.match("=.*")
             if (url_params.nil? && url_params.length == 1)
+              UI.verbose("Initial URL received: '#{url}'")
               url = url.gsub(url_params.to_s, "") # Remove everything after '=' (if present). This ensures webp is converted to png/jpg as well.
               UI.verbose("Removed params ('#{url_params.to_s}') from the URL")
+              UI.verbose("URL after removing params: '#{url}'")
             end
 
-            UI.verbose("Initial URL received: '#{url}'")
-            UI.verbose("Adding '=s0' param to download the full size image")
             url = "#{url}=s0" # '=s0' param ensures full image size is returned (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473012462)
-            UI.verbose("URL to download: '#{url}'")
 
             if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images location
               path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type.to_s)
