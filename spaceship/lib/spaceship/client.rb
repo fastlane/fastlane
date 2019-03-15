@@ -487,6 +487,17 @@ module Spaceship
       when 200
         fetch_olympus_session
         return response
+      when 401
+        # Unauthorized
+        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
+      when 403
+        # Forbidden
+        if response.body["serviceErrors"][0]["code"] == "-20209"
+          # Apple ID got locked by Apple for security reasons
+          raise InvalidUserCredentialsError.new, "This Apple ID has been locked for security reasons. Visit iForgot to reset your account (https://iforgot.apple.com)."
+        else
+          raise InvalidUserCredentialsError.new, "Login worked, but Apple reported that something was wrong anyway. Historically this has happened when an Apple ID got lost on Apple's end. See https://github.com/fastlane/fastlane/issues/14398"
+        end
       when 409
         # 2 step/factor is enabled for this account, first handle that
         handle_two_step_or_factor(response)
@@ -494,11 +505,7 @@ module Spaceship
         fetch_olympus_session
         return true
       else
-        if (response.status == 401 && (response.body).include?("locked"))
-          raise InvalidUserCredentialsError.new, "This Apple ID has been locked for security reasons. Visit iForgot to reset your account (https://iforgot.apple.com)."
-        elsif (response.status == 401)
-          raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
-        elsif (response.body || "").include?('invalid="true"')
+        if (response.body || "").include?('invalid="true"')
           # User Credentials are wrong
           raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
         elsif response.status == 412 && AUTH_TYPES.include?(response.body["authType"])
