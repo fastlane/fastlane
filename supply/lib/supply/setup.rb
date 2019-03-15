@@ -55,9 +55,13 @@ module Supply
 
           image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
           urls.each do |url|
-            UI.verbose("Removing params from the URL if any present")
-            url = url.gsub(url.match("=.*").to_s, "") # Remove everything after '=' (if present). This ensures webp is converted to png/jpg as well.
+            url_params = url.match("=.*")
+            if (url_params.nil? && url_params.length == 1)
+              url = url.gsub(url_params.to_s, "") # Remove everything after '=' (if present). This ensures webp is converted to png/jpg as well.
+              UI.verbose("Removed params ('#{url_params.to_s}') from the URL")
+            end
 
+            UI.verbose("Initial URL received: '#{url}'")
             UI.verbose("Adding '=s0' param to download the full size image")
             url = "#{url}=s0" # '=s0' param ensures full image size is returned (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473012462)
             UI.verbose("URL to download: '#{url}'")
