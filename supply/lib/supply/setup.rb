@@ -55,9 +55,12 @@ module Supply
 
           image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
           urls.each do |url|
-            url = url.gsub(url.match("=.*").to_s, "") # Remove everything after '=' (if present)
-            url = url.gsub("-rw", "") # Remove "-rw" (if present) so the url will become either 'jpg' or 'png' (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473017130)
+            UI.verbose("Removing params from the URL if any present")
+            url = url.gsub(url.match("=.*").to_s, "") # Remove everything after '=' (if present). This ensures webp is converted to png/jpg as well.
+
+            UI.verbose("Adding '=s0' param to download the full size image")
             url = "#{url}=s0" # '=s0' param ensures full image size is returned (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473012462)
+            UI.verbose("URL to download: '#{url}'")
 
             if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images location
               path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type.to_s)
