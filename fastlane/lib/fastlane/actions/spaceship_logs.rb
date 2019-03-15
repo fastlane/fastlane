@@ -11,6 +11,11 @@ module Fastlane
         # Get log files
         files = Dir.glob("/tmp/spaceship*.log").sort_by { |f| File.mtime(f) }.reverse
 
+        if files.size == 0
+          UI.message("No Spaceship log files found")
+          return []
+        end
+
         # Filter to latest
         if latest
           files = [files.first]
@@ -51,9 +56,7 @@ module Fastlane
         # Copy contents to clipboard
         if copy_to_clipboard
           string = files.map { |file| File.read(file) }.join("\n")
-          require 'open3'
-          Open3.popen3('pbcopy') { |input, _, _| input << string }
-          UI.message("📎 Copied to clipboard!")
+          ClipboardAction.run(value: string)
         end
 
         return files
