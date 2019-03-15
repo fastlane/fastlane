@@ -217,9 +217,7 @@ module Spaceship
         return if ready_to_test?
         return if approved?
 
-        resp = Spaceship::ConnectAPI::Base.client.get_builds(filter: { expired: false, processingState: "PROCESSING,VALID", version: self.build_version })
-        build = resp.first
-
+        build = get_app_store_connect_build
         Spaceship::ConnectAPI::Base.client.post_beta_app_review_submissions(build_id: build["id"])
       end
 
@@ -229,6 +227,12 @@ module Spaceship
 
       def add_group!(group)
         client.add_group_to_build(app_id: app_id, group_id: group.id, build_id: id)
+      end
+
+      # Bridges the TestFlight::Build to the App Store Connect API build
+      def get_app_store_connect_build
+        resp = Spaceship::ConnectAPI::Base.client.get_builds(filter: { expired: false, processingState: "PROCESSING,VALID", version: self.build_version })
+        resp.first
       end
     end
   end

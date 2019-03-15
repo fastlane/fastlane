@@ -210,7 +210,7 @@ module Pilot
       UI.message("Distributing new build to testers: #{uploaded_build.train_version} - #{uploaded_build.build_version}")
 
       # This is where we could add a check to see if encryption is required and has been updated
-      uploaded_build.export_compliance.encryption_updated = false
+      check_export_compliance(uploaded_build)
 
       if options[:groups] || options[:distribute_external]
         begin
@@ -249,6 +249,25 @@ module Pilot
       end
 
       true
+    end
+
+    def check_export_compliance(uploaded_build)
+      build = uploaded_build.get_app_store_connect_build
+      puts "cec: #{build}"
+      if build["usesNonExemptEncryption"].nil?
+        attributes = {usesNonExemptEncryption: false}
+
+        puts "about to send to patch build: #{attributes}"
+        client = Spaceship::ConnectAPI::Base.client
+        resp = client.patch_builds(build_id: build["id"], attributes: attributes)
+        puts "resp: #{resp}"
+
+        UI.message("Waiting for this to process again")
+        platform = fetch_app_platform
+        app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
+        app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
+        latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, train_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval], strict_build_watch: config[:wait_for_uploaded_build])
+      end
     end
 
     def update_review_detail(app_id, info)
