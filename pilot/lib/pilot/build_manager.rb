@@ -50,6 +50,12 @@ module Pilot
       end
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
+      latest_build = wait_for_build_processing_to_be_complete
+      distribute(options, build: latest_build)
+    end
+
+    def wait_for_build_processing_to_be_complete
+      platform = fetch_app_platform
       app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
       app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
       latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, train_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval], strict_build_watch: config[:wait_for_uploaded_build])
@@ -58,7 +64,7 @@ module Pilot
         UI.important("Uploaded app #{app_version} - #{app_build}, but received build #{latest_build.train_version} - #{latest_build.build_version}. If you want to wait for uploaded build to be finished processing, use the `wait_for_uploaded_build` option")
       end
 
-      distribute(options, build: latest_build)
+      return latest_build
     end
 
     def distribute(options, build: nil)
@@ -210,7 +216,7 @@ module Pilot
       UI.message("Distributing new build to testers: #{uploaded_build.train_version} - #{uploaded_build.build_version}")
 
       # This is where we could add a check to see if encryption is required and has been updated
-      check_export_compliance(uploaded_build)
+      set_export_compliance_if_needed(uploaded_build, options)
 
       if options[:groups] || options[:distribute_external]
         begin
@@ -241,32 +247,24 @@ module Pilot
         if external_group.nil? && options[:groups].nil?
           UI.user_error!("You must specify at least one group using the `:groups` option to distribute externally")
         end
-      else # distribute internally
-        # in case any changes to export_compliance are required
-        if uploaded_build.export_compliance_missing?
-          uploaded_build.save!
-        end
       end
 
       true
     end
 
-    def check_export_compliance(uploaded_build)
-      build = uploaded_build.get_app_store_connect_build
-      puts "cec: #{build}"
-      if build["usesNonExemptEncryption"].nil?
-        attributes = {usesNonExemptEncryption: false}
+    def set_export_compliance_if_needed(uploaded_build, options)
+      build = uploaded_build.find_app_store_connect_build
+      build_attributes = build["attributes"] || {}
+      if build_attributes["usesNonExemptEncryption"].nil?
+        uses_non_exempt_encryption = options[:uses_non_exempt_encryption]
+        attributes = { usesNonExemptEncryption: uses_non_exempt_encryption }
 
-        puts "about to send to patch build: #{attributes}"
         client = Spaceship::ConnectAPI::Base.client
-        resp = client.patch_builds(build_id: build["id"], attributes: attributes)
-        puts "resp: #{resp}"
+        client.patch_builds(build_id: build["id"], attributes: attributes)
 
-        UI.message("Waiting for this to process again")
-        platform = fetch_app_platform
-        app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
-        app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
-        latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, train_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval], strict_build_watch: config[:wait_for_uploaded_build])
+        UI.important("Export comlpiance has been set to '#{uses_non_exempt_encryption}'. Need to wait for build to finishing processing again...")
+        UI.important("Set 'ITSAppUsesNonExemptEncryption' in the 'Info.plist' to skip this step and speed up the submission")
+        wait_for_build_processing_to_be_complete
       end
     end
 
