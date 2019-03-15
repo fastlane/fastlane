@@ -40,12 +40,12 @@ module FastlaneCore
         end
 
         output.split(/\n/).each do |line|
-          break if line =~ /^-- Unavailable/
           next if line =~ /unavailable/
           next if line =~ /^== /
           if line =~ /^-- /
             (os_type, os_version) = line.gsub(/-- (.*) --/, '\1').split
           else
+            next if os_type =~ /^Unavailable/
 
             # "    iPad (5th generation) (852A5796-63C3-4641-9825-65EBDC5C4259) (Shutdown)"
             # This line will turn the above string into

@@ -248,7 +248,7 @@ describe FastlaneCore do
       allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
 
       devices = FastlaneCore::DeviceManager.simulators
-      expect(devices.count).to eq(2)
+      expect(devices.count).to eq(3)
 
       expect(devices[0]).to have_attributes(
         name: "iPhone 5s", os_type: "iOS", os_version: "12.0",
@@ -259,6 +259,12 @@ describe FastlaneCore do
       expect(devices[1]).to have_attributes(
         name: "iPhone 6", os_type: "iOS", os_version: "12.0",
         udid: "C68031AE-E525-4065-9DB6-0D4450326BDA",
+        state: "Shutdown",
+        is_simulator: true
+      )
+      expect(devices[2]).to have_attributes(
+        name: "Apple Watch Series 2 - 38mm", os_type: "watchOS", os_version: "5.0",
+        udid: "34144812-F701-4A49-9210-4A226FE5E0A9",
         state: "Shutdown",
         is_simulator: true
       )
