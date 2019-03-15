@@ -56,7 +56,7 @@ module Supply
           image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
           urls.each do |url|
             url_params = url.match("=.*")
-            if (url_params.nil? && url_params.length == 1)
+            if (!url_params.nil? && url_params.length == 1)
               UI.verbose("Initial URL received: '#{url}'")
               url = url.gsub(url_params.to_s, "") # Remove everything after '=' (if present). This ensures webp is converted to png/jpg as well.
               UI.verbose("Removed params ('#{url_params.to_s}') from the URL")
