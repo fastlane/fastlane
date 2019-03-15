@@ -77,6 +77,9 @@ describe "Build Manager" do
       })
     end
     let(:mock_api_client_builds) do
+      [{ "id" => "123", "attributes" => { "usesNonExemptEncryption" => true } }]
+    end
+    let(:mock_api_client_builds_with_nil_encryption) do
       [{ "id" => "123" }]
     end
     let(:mock_api_client_build_beta_details) do
@@ -147,7 +150,8 @@ describe "Build Manager" do
           demo_account_required: true,
           notify_external_testers: true,
           beta_app_feedback_email: "josh+oldfeedback@rokkincat.com",
-          beta_app_description: "old description for all the things"
+          beta_app_description: "old description for all the things",
+          uses_non_exempt_encryption: false
         }
       end
 
@@ -166,10 +170,14 @@ describe "Build Manager" do
 
       it "updates non-localized  demo_account_required, notify_external_testers, beta_app_feedback_email, and beta_app_description" do
         options = distribute_options_non_localized
+        builds = mock_api_client_builds_with_nil_encryption
 
+        # Receive 1: finding build for patching review information
+        # Receive 2: finding build for patching uses non-exempt encryption
+        # Receive 3: finding build for submitting for review
         expect(mock_base_api_client).to receive(:get_builds).with({
           filter: { expired: false, processingState: "PROCESSING,VALID", version: ready_to_submit_mock_build.build_version }
-        }).and_return(mock_api_client_builds)
+        }).and_return(builds).exactly(3).times
 
         # Demo account
         expect(mock_base_api_client).to receive(:patch_beta_app_review_detail).with({
@@ -179,7 +187,7 @@ describe "Build Manager" do
 
         # Auto notify
         expect(mock_base_api_client).to receive(:get_build_beta_details).with({
-          filter: { build: mock_api_client_builds.first['id'] }
+          filter: { build: builds.first['id'] }
         }).and_return(mock_api_client_build_beta_details)
         expect(mock_base_api_client).to receive(:patch_build_beta_details).with({
           build_beta_details_id: mock_api_client_build_beta_details.first['id'],
@@ -201,7 +209,12 @@ describe "Build Manager" do
         end
         expect(FastlaneCore::UI).to receive(:success).with("Successfully set the beta_app_feedback_email and/or beta_app_description")
 
-        expect(fake_build_manager).to receive(:distribute_build)
+        expect(FastlaneCore::UI).to receive(:message).with(/Distributing new build to testers/)
+        expect(mock_base_api_client).to receive(:patch_builds).with({
+          build_id: builds.first["id"], attributes: { usesNonExemptEncryption: false }
+        }).and_return(mock_api_client_beta_app_localizations)
+        expect(fake_build_manager).to receive(:wait_for_build_processing_to_be_complete)
+
         expect(FastlaneCore::UI).to receive(:success).with(/Successfully distributed build to/)
 
         fake_build_manager.distribute(options, build: ready_to_submit_mock_build)

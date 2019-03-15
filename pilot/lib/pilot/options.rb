@@ -134,6 +134,12 @@ module Pilot
                                      default_value: false),
 
         # distribution
+        FastlaneCore::ConfigItem.new(key: :uses_non_exempt_encryption,
+                                     short_option: "-X",
+                                     env_name: "PILOT_USES_NON_EXEMPT_ENCRYPTION",
+                                     description: "Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist",
+                                     default_value: false,
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :distribute_external,
                                      is_string: false,
                                      env_name: "PILOT_DISTRIBUTE_EXTERNAL",

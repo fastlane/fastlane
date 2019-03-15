@@ -230,6 +230,27 @@ module Spaceship
         handle_response(response)
       end
 
+      def patch_builds(build_id: nil, attributes: {})
+        # PATCH
+        # https://appstoreconnect.apple.com/iris/v1/builds/<build_id>
+        path = "builds/#{build_id}"
+
+        body = {
+          data: {
+            attributes: attributes,
+            id: build_id,
+            type: "builds"
+          }
+        }
+
+        response = request(:patch) do |req|
+          req.url(path)
+          req.body = body.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_response(response)
+      end
+
       def post_beta_app_review_submissions(build_id: nil)
         # POST
         # https://appstoreconnect.apple.com/iris/v1/betaAppReviewSubmissions
