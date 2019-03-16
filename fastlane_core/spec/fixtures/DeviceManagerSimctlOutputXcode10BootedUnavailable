@@ -1,0 +1,10 @@
+== Devices ==
+-- iOS 12.0 --
+    iPhone 5s (238C6D64-8720-4BFF-9DE9-FFBB9A1375D4) (Shutdown) 
+    iPhone 6 (C68031AE-E525-4065-9DB6-0D4450326BDA) (Shutdown) 
+-- Unavailable: com.apple.CoreSimulator.SimRuntime.iOS-12-1 --
+    iPhone XR (8350A403-0E68-4F48-8ABA-C392F9CB8D7C) (Booted) 
+    iPhone 5s (2721F3DC-A96B-4CA4-A9BD-B7CE3595BC82) (Shutdown) (unavailable, runtime profile not found)
+-- watchOS 5.0 --
+    Apple Watch - 42mm (3BE7BCB8-BCDB-45A2-8569-48B657BDD44E) (Shutdown) (unavailable, device type not supported by runtime)
+    Apple Watch Series 2 - 38mm (34144812-F701-4A49-9210-4A226FE5E0A9) (Shutdown) 
