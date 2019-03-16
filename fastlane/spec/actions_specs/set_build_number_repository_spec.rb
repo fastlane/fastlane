@@ -11,10 +11,6 @@ describe Fastlane do
           .with(/agvtool new[-]version [-]all asd123 && cd [-]/)
           .and_return("")
 
-        expect(Fastlane::Actions).to receive(:sh)
-          .with(/agvtool what[-]version/, log: false)
-          .and_return("Current version of project Test is:\nasd123")
-
         result = Fastlane::FastFile.new.parse("lane :test do
             set_build_number_repository
         end").runner.execute(:test)
@@ -26,10 +22,6 @@ describe Fastlane do
         expect(Fastlane::Actions).to receive(:sh)
           .with(/agvtool new[-]version [-]all asd123 && cd [-]/)
           .and_return("")
-
-        expect(Fastlane::Actions).to receive(:sh)
-          .with(/agvtool what[-]version/, log: false)
-          .and_return("Current version of project Test is:\nasd123")
 
         result = Fastlane::FastFile.new.parse("lane :test do
             set_build_number_repository(
@@ -44,10 +36,6 @@ describe Fastlane do
         expect(Fastlane::Actions).to receive(:sh)
           .with(/agvtool new[-]version [-]all asd123 && cd [-]/)
           .and_return("")
-
-        expect(Fastlane::Actions).to receive(:sh)
-          .with(/agvtool what[-]version/, log: false)
-          .and_return("Current version of project Test is:\nasd123")
 
         result = Fastlane::FastFile.new.parse("lane :test do
             set_build_number_repository(
