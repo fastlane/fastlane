@@ -45,6 +45,10 @@ module Spaceship
       upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: screenshot_picture_type(device, nil))
     end
 
+    def upload_app_review_attachment(app_version, upload_file, content_provider_id, sso_token_for_image)
+      upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/app-resolution-file', content_provider_id: content_provider_id, sso_token: sso_token_for_image)
+    end
+
     def get_picture_type(upload_file)
       resolution = Utilities.resolution(upload_file.file_path)
       result = device_resolution_map.find do |key, resolutions|
