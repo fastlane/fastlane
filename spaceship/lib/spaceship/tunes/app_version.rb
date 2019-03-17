@@ -638,7 +638,7 @@ module Spaceship
       #
       # @param review_attachment_path (String): The path to the attachment file
       def upload_review_attachment!(review_attachment_path)
-        raise 'cannot upload review attachment for live edition.' if self.is_live? 
+        raise 'cannot upload review attachment for live edition.' if self.is_live?
 
         unless review_attachment_path
           @review_attachment_file.reset!
@@ -720,7 +720,7 @@ module Spaceship
       end
 
       def supports_review_attachment_file?
-        !(raw_data["appReviewInfo"]["attachmentFiles"] == nil || raw_data["appReviewInfo"]["attachmentFiles"]["value"] == nil)
+        raw_data["appReviewInfo"]["attachmentFiles"] && raw_data["appReviewInfo"]["attachmentFiles"]["value"]
       end
 
       def supports_app_transit?
@@ -732,7 +732,7 @@ module Spaceship
         @transit_app_file = nil
         @transit_app_file = Tunes::TransitAppFile.factory(transit_app_file) if transit_app_file
       end
-      
+
       def screenshots_data_for_language_and_device(language, device, is_messages)
         data_field = is_messages ? "messagesScreenshots" : "screenshots"
         container_data_for_language_and_device(data_field, language, device)
