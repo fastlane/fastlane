@@ -57,7 +57,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('slack-notifier', '>= 2.0.0', '< 3.0.0') # Slack notifications
   spec.add_dependency('xcodeproj', '>= 1.8.1', '< 2.0.0') # Modify Xcode projects
   spec.add_dependency('xcpretty', '~> 0.3.0') # prettify xcodebuild output
-  spec.add_dependency('terminal-notifier', '>= 1.6.2', '< 2.0.0') # macOS notifications
+  spec.add_dependency('terminal-notifier', '>= 2.0.0', '< 3.0.0') # macOS notifications
   spec.add_dependency('terminal-table', '>= 1.4.5', '< 2.0.0') # Actions documentation
   spec.add_dependency('plist', '>= 3.1.0', '< 4.0.0') # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency('CFPropertyList', '>= 2.3', '< 4.0.0') # Needed to be able to read binary plist format
