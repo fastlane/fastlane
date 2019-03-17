@@ -720,7 +720,7 @@ module Spaceship
       end
 
       def supports_review_attachment_file?
-        raw_data["appReviewInfo"]["attachmentFiles"]["value"] != nil
+        !(raw_data["appReviewInfo"]["attachmentFiles"] == nil || raw_data["appReviewInfo"]["attachmentFiles"]["value"] == nil)
       end
 
       def supports_app_transit?
