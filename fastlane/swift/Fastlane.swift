@@ -1628,6 +1628,7 @@ func getProvisioningProfile(adhoc: Bool = false,
   _ = runner.executeCommand(command)
 }
 func getPushCertificate(development: Bool = false,
+                        websitePush: Bool = false,
                         generateP12: Bool = true,
                         activeDaysLimit: Int = 30,
                         force: Bool = false,
@@ -1641,6 +1642,7 @@ func getPushCertificate(development: Bool = false,
                         outputPath: String = ".",
                         newProfile: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "get_push_certificate", className: nil, args: [RubyCommand.Argument(name: "development", value: development),
+                                                                                                      RubyCommand.Argument(name: "website_push", value: websitePush),
                                                                                                       RubyCommand.Argument(name: "generate_p12", value: generateP12),
                                                                                                       RubyCommand.Argument(name: "active_days_limit", value: activeDaysLimit),
                                                                                                       RubyCommand.Argument(name: "force", value: force),
@@ -1961,17 +1963,17 @@ func ifttt(apiKey: String,
                                                                                        RubyCommand.Argument(name: "value3", value: value3)])
   _ = runner.executeCommand(command)
 }
-func importCertificate(keychainName: String,
+func importCertificate(certificatePath: String,
+                       certificatePassword: String? = nil,
+                       keychainName: String,
                        keychainPath: String? = nil,
                        keychainPassword: String? = nil,
-                       certificatePath: String,
-                       certificatePassword: String? = nil,
                        logOutput: Bool = false) {
-  let command = RubyCommand(commandID: "", methodName: "import_certificate", className: nil, args: [RubyCommand.Argument(name: "keychain_name", value: keychainName),
+  let command = RubyCommand(commandID: "", methodName: "import_certificate", className: nil, args: [RubyCommand.Argument(name: "certificate_path", value: certificatePath),
+                                                                                                    RubyCommand.Argument(name: "certificate_password", value: certificatePassword),
+                                                                                                    RubyCommand.Argument(name: "keychain_name", value: keychainName),
                                                                                                     RubyCommand.Argument(name: "keychain_path", value: keychainPath),
                                                                                                     RubyCommand.Argument(name: "keychain_password", value: keychainPassword),
-                                                                                                    RubyCommand.Argument(name: "certificate_path", value: certificatePath),
-                                                                                                    RubyCommand.Argument(name: "certificate_password", value: certificatePassword),
                                                                                                     RubyCommand.Argument(name: "log_output", value: logOutput)])
   _ = runner.executeCommand(command)
 }
@@ -2344,6 +2346,7 @@ func optOutUsage() {
   _ = runner.executeCommand(command)
 }
 func pem(development: Bool = false,
+         websitePush: Bool = false,
          generateP12: Bool = true,
          activeDaysLimit: Int = 30,
          force: Bool = false,
@@ -2357,6 +2360,7 @@ func pem(development: Bool = false,
          outputPath: String = ".",
          newProfile: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "pem", className: nil, args: [RubyCommand.Argument(name: "development", value: development),
+                                                                                     RubyCommand.Argument(name: "website_push", value: websitePush),
                                                                                      RubyCommand.Argument(name: "generate_p12", value: generateP12),
                                                                                      RubyCommand.Argument(name: "active_days_limit", value: activeDaysLimit),
                                                                                      RubyCommand.Argument(name: "force", value: force),
@@ -2386,6 +2390,7 @@ func pilot(username: String,
            skipSubmission: Bool = false,
            skipWaitingForBuildProcessing: Bool = false,
            updateBuildInfoOnUpload: Bool = false,
+           usesNonExemptEncryption: Bool = false,
            distributeExternal: Bool = false,
            notifyExternalTesters: Bool = true,
            firstName: String? = nil,
@@ -2415,6 +2420,7 @@ func pilot(username: String,
                                                                                        RubyCommand.Argument(name: "skip_submission", value: skipSubmission),
                                                                                        RubyCommand.Argument(name: "skip_waiting_for_build_processing", value: skipWaitingForBuildProcessing),
                                                                                        RubyCommand.Argument(name: "update_build_info_on_upload", value: updateBuildInfoOnUpload),
+                                                                                       RubyCommand.Argument(name: "uses_non_exempt_encryption", value: usesNonExemptEncryption),
                                                                                        RubyCommand.Argument(name: "distribute_external", value: distributeExternal),
                                                                                        RubyCommand.Argument(name: "notify_external_testers", value: notifyExternalTesters),
                                                                                        RubyCommand.Argument(name: "first_name", value: firstName),
@@ -2464,10 +2470,12 @@ func podLibLint(useBundleExec: Bool = true,
 func podPush(useBundleExec: Bool = false,
              path: String? = nil,
              repo: String? = nil,
-             allowWarnings: String? = nil,
-             useLibraries: String? = nil,
+             allowWarnings: Bool? = nil,
+             useLibraries: Bool? = nil,
              sources: [String]? = nil,
              swiftVersion: String? = nil,
+             skipImportValidation: Bool? = nil,
+             skipTests: Bool? = nil,
              verbose: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "pod_push", className: nil, args: [RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec),
                                                                                           RubyCommand.Argument(name: "path", value: path),
@@ -2476,6 +2484,8 @@ func podPush(useBundleExec: Bool = false,
                                                                                           RubyCommand.Argument(name: "use_libraries", value: useLibraries),
                                                                                           RubyCommand.Argument(name: "sources", value: sources),
                                                                                           RubyCommand.Argument(name: "swift_version", value: swiftVersion),
+                                                                                          RubyCommand.Argument(name: "skip_import_validation", value: skipImportValidation),
+                                                                                          RubyCommand.Argument(name: "skip_tests", value: skipTests),
                                                                                           RubyCommand.Argument(name: "verbose", value: verbose)])
   _ = runner.executeCommand(command)
 }
@@ -2578,13 +2588,15 @@ func pushToGitRemote(localBranch: String? = nil,
                      force: Bool = false,
                      forceWithLease: Bool = false,
                      tags: Bool = true,
-                     remote: String = "origin") {
+                     remote: String = "origin",
+                     noVerify: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "push_to_git_remote", className: nil, args: [RubyCommand.Argument(name: "local_branch", value: localBranch),
                                                                                                     RubyCommand.Argument(name: "remote_branch", value: remoteBranch),
                                                                                                     RubyCommand.Argument(name: "force", value: force),
                                                                                                     RubyCommand.Argument(name: "force_with_lease", value: forceWithLease),
                                                                                                     RubyCommand.Argument(name: "tags", value: tags),
-                                                                                                    RubyCommand.Argument(name: "remote", value: remote)])
+                                                                                                    RubyCommand.Argument(name: "remote", value: remote),
+                                                                                                    RubyCommand.Argument(name: "no_verify", value: noVerify)])
   _ = runner.executeCommand(command)
 }
 func puts(message: String? = nil) {
@@ -3343,6 +3355,18 @@ func sonar(projectConfigurationPath: String? = nil,
                                                                                        RubyCommand.Argument(name: "sonar_url", value: sonarUrl)])
   _ = runner.executeCommand(command)
 }
+func spaceshipLogs(latest: Bool = true,
+                   printContents: Bool = false,
+                   printPaths: Bool = false,
+                   copyToPath: String? = nil,
+                   copyToClipboard: Bool = false) {
+  let command = RubyCommand(commandID: "", methodName: "spaceship_logs", className: nil, args: [RubyCommand.Argument(name: "latest", value: latest),
+                                                                                                RubyCommand.Argument(name: "print_contents", value: printContents),
+                                                                                                RubyCommand.Argument(name: "print_paths", value: printPaths),
+                                                                                                RubyCommand.Argument(name: "copy_to_path", value: copyToPath),
+                                                                                                RubyCommand.Argument(name: "copy_to_clipboard", value: copyToClipboard)])
+  _ = runner.executeCommand(command)
+}
 func splunkmint(dsym: String? = nil,
                 apiKey: String,
                 apiToken: String,
@@ -3418,7 +3442,11 @@ func supply(packageName: String,
             checkSupersededTracks: Bool = false,
             timeout: Int = 300,
             deactivateOnPromote: Bool = true,
-            versionCodesToRetain: [String]? = nil) {
+            versionCodesToRetain: [String]? = nil,
+            obbMainReferencesVersion: String? = nil,
+            obbMainFileSize: String? = nil,
+            obbPatchReferencesVersion: String? = nil,
+            obbPatchFileSize: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "supply", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
                                                                                         RubyCommand.Argument(name: "track", value: track),
                                                                                         RubyCommand.Argument(name: "rollout", value: rollout),
@@ -3444,7 +3472,11 @@ func supply(packageName: String,
                                                                                         RubyCommand.Argument(name: "check_superseded_tracks", value: checkSupersededTracks),
                                                                                         RubyCommand.Argument(name: "timeout", value: timeout),
                                                                                         RubyCommand.Argument(name: "deactivate_on_promote", value: deactivateOnPromote),
-                                                                                        RubyCommand.Argument(name: "version_codes_to_retain", value: versionCodesToRetain)])
+                                                                                        RubyCommand.Argument(name: "version_codes_to_retain", value: versionCodesToRetain),
+                                                                                        RubyCommand.Argument(name: "obb_main_references_version", value: obbMainReferencesVersion),
+                                                                                        RubyCommand.Argument(name: "obb_main_file_size", value: obbMainFileSize),
+                                                                                        RubyCommand.Argument(name: "obb_patch_references_version", value: obbPatchReferencesVersion),
+                                                                                        RubyCommand.Argument(name: "obb_patch_file_size", value: obbPatchFileSize)])
   _ = runner.executeCommand(command)
 }
 func swiftlint(mode: String = "lint",
@@ -3572,6 +3604,7 @@ func testflight(username: String,
                 skipSubmission: Bool = false,
                 skipWaitingForBuildProcessing: Bool = false,
                 updateBuildInfoOnUpload: Bool = false,
+                usesNonExemptEncryption: Bool = false,
                 distributeExternal: Bool = false,
                 notifyExternalTesters: Bool = true,
                 firstName: String? = nil,
@@ -3601,6 +3634,7 @@ func testflight(username: String,
                                                                                             RubyCommand.Argument(name: "skip_submission", value: skipSubmission),
                                                                                             RubyCommand.Argument(name: "skip_waiting_for_build_processing", value: skipWaitingForBuildProcessing),
                                                                                             RubyCommand.Argument(name: "update_build_info_on_upload", value: updateBuildInfoOnUpload),
+                                                                                            RubyCommand.Argument(name: "uses_non_exempt_encryption", value: usesNonExemptEncryption),
                                                                                             RubyCommand.Argument(name: "distribute_external", value: distributeExternal),
                                                                                             RubyCommand.Argument(name: "notify_external_testers", value: notifyExternalTesters),
                                                                                             RubyCommand.Argument(name: "first_name", value: firstName),
@@ -3936,7 +3970,11 @@ func uploadToPlayStore(packageName: String,
                        checkSupersededTracks: Bool = false,
                        timeout: Int = 300,
                        deactivateOnPromote: Bool = true,
-                       versionCodesToRetain: [String]? = nil) {
+                       versionCodesToRetain: [String]? = nil,
+                       obbMainReferencesVersion: String? = nil,
+                       obbMainFileSize: String? = nil,
+                       obbPatchReferencesVersion: String? = nil,
+                       obbPatchFileSize: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "upload_to_play_store", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
                                                                                                       RubyCommand.Argument(name: "track", value: track),
                                                                                                       RubyCommand.Argument(name: "rollout", value: rollout),
@@ -3962,7 +4000,11 @@ func uploadToPlayStore(packageName: String,
                                                                                                       RubyCommand.Argument(name: "check_superseded_tracks", value: checkSupersededTracks),
                                                                                                       RubyCommand.Argument(name: "timeout", value: timeout),
                                                                                                       RubyCommand.Argument(name: "deactivate_on_promote", value: deactivateOnPromote),
-                                                                                                      RubyCommand.Argument(name: "version_codes_to_retain", value: versionCodesToRetain)])
+                                                                                                      RubyCommand.Argument(name: "version_codes_to_retain", value: versionCodesToRetain),
+                                                                                                      RubyCommand.Argument(name: "obb_main_references_version", value: obbMainReferencesVersion),
+                                                                                                      RubyCommand.Argument(name: "obb_main_file_size", value: obbMainFileSize),
+                                                                                                      RubyCommand.Argument(name: "obb_patch_references_version", value: obbPatchReferencesVersion),
+                                                                                                      RubyCommand.Argument(name: "obb_patch_file_size", value: obbPatchFileSize)])
   _ = runner.executeCommand(command)
 }
 func uploadToTestflight(username: String,
@@ -3980,6 +4022,7 @@ func uploadToTestflight(username: String,
                         skipSubmission: Bool = false,
                         skipWaitingForBuildProcessing: Bool = false,
                         updateBuildInfoOnUpload: Bool = false,
+                        usesNonExemptEncryption: Bool = false,
                         distributeExternal: Bool = false,
                         notifyExternalTesters: Bool = true,
                         firstName: String? = nil,
@@ -4009,6 +4052,7 @@ func uploadToTestflight(username: String,
                                                                                                       RubyCommand.Argument(name: "skip_submission", value: skipSubmission),
                                                                                                       RubyCommand.Argument(name: "skip_waiting_for_build_processing", value: skipWaitingForBuildProcessing),
                                                                                                       RubyCommand.Argument(name: "update_build_info_on_upload", value: updateBuildInfoOnUpload),
+                                                                                                      RubyCommand.Argument(name: "uses_non_exempt_encryption", value: usesNonExemptEncryption),
                                                                                                       RubyCommand.Argument(name: "distribute_external", value: distributeExternal),
                                                                                                       RubyCommand.Argument(name: "notify_external_testers", value: notifyExternalTesters),
                                                                                                       RubyCommand.Argument(name: "first_name", value: firstName),
@@ -4255,4 +4299,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.42]
+// FastlaneRunnerAPIVersion [0.9.43]
