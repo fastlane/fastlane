@@ -6,7 +6,7 @@ module FastlaneCore
     def self.import_file(path, keychain_path, keychain_password: "", certificate_password: "", output: FastlaneCore::Globals.verbose?)
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
-      command = "security import #{path.shellescape} -k #{keychain_path.shellescape}"
+      command = "security import #{path.shellescape} -k '#{keychain_path.shellescape}'"
       command << " -P #{certificate_password.shellescape}"
       command << " -T /usr/bin/codesign" # to not be asked for permission when running a tool like `gym` (before Sierra)
       command << " -T /usr/bin/security"
