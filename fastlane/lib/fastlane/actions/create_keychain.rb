@@ -11,7 +11,7 @@ module Fastlane
         escaped_password = params[:password].shellescape
 
         if params[:name]
-          keychain_path = "~/Library/Keychains/#{params[:name]}"
+          keychain_path = "#{ENV['HOME']}/Library/Keychains/#{params[:name]}"
         else
           keychain_path = params[:path]
         end
