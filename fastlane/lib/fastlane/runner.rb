@@ -228,7 +228,11 @@ module Fastlane
           # If another action is calling this action, we shouldn't show it in the summary
           # (see https://github.com/fastlane/fastlane/issues/4546)
 
-          action_name = from_action ? nil : class_ref.step_text
+          if arguments.kind_of? Array and arguments.first.is_a?(Hash)
+            step_name_override = arguments.first[:step_name]
+            arguments.first.delete(:step_name)
+          end
+          action_name = from_action ? nil : (step_name_override || class_ref.step_text)
           Actions.execute_action(action_name) do
             # arguments is an array by default, containing an hash with the actual parameters
             # Since we usually just need the passed hash, we'll just use the first object if there is only one
