@@ -17,6 +17,18 @@ module Spaceship
       return 'video/mp4' if path.end_with?('.m4v')
       return 'video/mp4' if path.end_with?('.mp4')
       return 'text/plain' if path.end_with?('.txt')
+      return 'application/pdf' if path.end_with?('.pdf')
+      return 'application/msword' if path.end_with?('.doc')
+      return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' if path.end_with?('.docx')
+      return 'application/rtf' if path.end_with?('.rtf')
+      return 'application/x-iwork-pages-sffpages' if path.end_with?('.pages')
+      return 'application/vnd.ms-excel' if path.end_with?('.xls')
+      return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' if path.end_with?('.xlsx')
+      return 'application/x-iwork-numbers-sffnumbers' if path.end_with?('.numbers')
+      return 'application/x-rar-compressed' if path.end_with?('.rar')
+      return 'application/xml' if path.end_with?('.plist')
+      return 'text/x-apport' if path.end_with?('.crash')
+      return 'video/x-msvideo' if path.end_with?('.avi')
       return 'application/zip' if path.end_with?('.zip')
       raise "Unknown content-type for file #{path}"
     end
