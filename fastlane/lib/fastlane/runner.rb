@@ -228,7 +228,7 @@ module Fastlane
           # If another action is calling this action, we shouldn't show it in the summary
           # (see https://github.com/fastlane/fastlane/issues/4546)
 
-          if arguments.kind_of? Array and arguments.first.is_a?(Hash)
+          if arguments.kind_of?(Array) && arguments.first.kind_of?(Hash)
             step_name_override = arguments.first[:step_name]
             arguments.first.delete(:step_name)
           end

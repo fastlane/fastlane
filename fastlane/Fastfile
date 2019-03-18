@@ -35,7 +35,7 @@ lane :lint_source do
   ensure_no_debug_code(text: " UI\\.", path: "spaceship/lib", extension: ".rb", exclude_dirs: ["\.bundle"])
   ensure_no_debug_code(text: " UI\\.", path: "credentials_manager/lib", extension: ".rb", exclude_dirs: ["\.bundle"])
 
-  rubocop
+  rubocop(step_name: 'policekeeping_the_code_with_rubocop')
 
   Dir.chdir("..") do
     # Verify shell code style
