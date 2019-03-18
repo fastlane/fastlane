@@ -6,6 +6,7 @@ require_relative 'upload_assets'
 
 module Deliver
   # rubocop:disable Metrics/ClassLength
+  # rubocop:disable Metrics/PerceivedComplexity
   class Options
     def self.available_options
       user = CredentialsManager::AppfileConfig.try_fetch_value(:itunes_connect_id)
