@@ -60,7 +60,7 @@ module Fastlane
               contact_email: "email@email.com",
               contact_first_name: "Connect",
               contact_last_name: "API",
-              contact_phone: "5558675309}",
+              contact_phone: "5558675309",
               demo_account_name: "demo@email.com",
               demo_account_password: "connectapi",
               notes: "this is review note for the reviewer <3 thank you for reviewing"
