@@ -630,10 +630,12 @@ module Spaceship
       #
       # while submitting for review, ITC allow developers to attach file.
       #
+      # Following list can be found at https://appstoreconnect.apple.com
+      # on iOS app edit version, above the attachment label/button there is
+      # a question mark if it is press the a dialog is shown which has the list.
+      #
       # File types allowed by Apple are: pdf, doc, docx, rtf, pages, xls, xlsx, numbers
       # zip, rar, plist, crash, jpg, png, mp4 or avi.
-      #
-      # As of now fastlane support mp4, jpg, png and zip
       #
       #
       # @param review_attachment_path (String): The path to the attachment file
