@@ -122,8 +122,14 @@ module Spaceship
       # },
       code_length = security_code["length"]
 
-      unless(ENV["SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER"])
-        puts("")
+      puts("")
+      if ENV["SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER"]
+        puts("Environment variable `SPACESHIP_2FA_DEFAULT_PHONE_NUMBER` is set, automatically requesting 2FA token via SMS to that number")
+        puts("SPACESHIP_2FA_DEFAULT_PHONE_NUMBER = #{ENV['SPACESHIP_2FA_DEFAULT_PHONE_NUMBER']}")
+        phone_number = ENV["SPACESHIP_2FA_DEFAULT_PHONE_NUMBER"]
+        phone_id = phone_id_from_number(response.body["trustedPhoneNumbers"], phone_number)
+        body = request_two_factor_code_from_phone(phone_id, phone_number, code_length)
+      else
         puts("(Input `sms` to escape this prompt and select a trusted phone number to send the code as a text message)")
         code_type = 'trusteddevice'
         code = ask("Please enter the #{code_length} digit code:")
@@ -134,13 +140,6 @@ module Spaceship
           code_type = 'phone'
           body = request_two_factor_code_from_phone_choose(response.body["trustedPhoneNumbers"], code_length)
         end
-      else
-        puts("")
-        puts("Environment variable `SPACESHIP_2FA_DEFAULT_PHONE_NUMBER` is set, automatically requesting 2FA token via SMS to that number")
-        puts("SPACESHIP_2FA_DEFAULT_PHONE_NUMBER = #{ENV['SPACESHIP_2FA_DEFAULT_PHONE_NUMBER']}")
-        phone_number = ENV["SPACESHIP_2FA_DEFAULT_PHONE_NUMBER"]
-        phone_id = phone_id_from_number(response.body["trustedPhoneNumbers"], phone_number)
-        body = request_two_factor_code_from_phone(phone_id, phone_number, code_length)
       end
 
       puts("Requesting session...")
@@ -190,32 +189,33 @@ module Spaceship
       # cleaned: +491621234585 or +11234567866
 
       phone_numbers.each do |phone|
+        # rubocop:disable Style/AsciiComments
         # start with: +49 •••• •••••85 or +1 (•••) •••-••66
-        numberWithDialCodeMasked = phone['numberWithDialCode'].tr(characters_to_remove_from_phone_numbers, '')
+        number_with_dialcode_masked = phone['numberWithDialCode'].tr(characters_to_remove_from_phone_numbers, '')
         # cleaned: +49•••••••••85 or +1••••••••66
+        # rubocop:enable Style/AsciiComments
 
-        maskings_count = numberWithDialCodeMasked.count('•') # => 9 or 8
+        maskings_count = number_with_dialcode_masked.count('•') # => 9 or 8
         pattern = /^([0-9+]{2,3})([•]{#{maskings_count}})([0-9]{2})$/
-        replacement = "\\1([0-9]{#{maskings_count-1},#{maskings_count}})\\3"
-        numberWithDialCodeRegexPart = numberWithDialCodeMasked.gsub(pattern, replacement)
+        replacement = "\\1([0-9]{#{maskings_count - 1},#{maskings_count}})\\3"
+        number_with_dialcode_regex_part = number_with_dialcode_masked.gsub(pattern, replacement)
         # => +49([0-9]{8,9})85 or +1([0-9]{7,8})66
-               
+
         backslash = '\\'
-        numberWithDialCodeRegexPart = backslash + numberWithDialCodeRegexPart
-        numberWithDialCodeRegex = /^#{numberWithDialCodeRegexPart}$/
+        number_with_dialcode_regex_part = backslash + number_with_dialcode_regex_part
+        number_with_dialcode_regex = /^#{number_with_dialcode_regex_part}$/
         # => /^\+49([0-9]{8})85$/ or /^\+1([0-9]{7,8})66$/
-        
-        return phone['id'] if phone_number.match?(numberWithDialCodeRegex)
+
+        return phone['id'] if phone_number.match?(number_with_dialcode_regex)
         # +491621234585 matches /^\+49([0-9]{8})85$/
       end
 
       # Handle case of phone_number not existing in phone_numbers because ENV var is wrong or matcher is broken
-      raise Tunes::Error.new, %Q(
+      raise Tunes::Error.new, %(
 Could not find a matching phone number to #{phone_number} in #{phone_numbers}.
 Make sure your environment variable is set to the correct phone number.
 If it is, please open an issue at https://github.com/fastlane/fastlane/issues/new and include this output so we can fix our matcher. Thanks.
 )
-      
     end
 
     def phone_id_from_masked_number(phone_numbers, masked_number)
@@ -235,10 +235,9 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
 
       request_two_factor_code_from_phone(phone_id, chosen, code_length)
     end
-    
+
     # this is used in two places: after choosing a phone number and when a phone number is set via ENV var
     def request_two_factor_code_from_phone(phone_id, phone_number, code_length)
-
       # Request code
       r = request(:put) do |req|
         req.url("https://idmsa.apple.com/appleauth/auth/verify/phone")
@@ -254,7 +253,7 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
       puts("Successfully requested text message to #{phone_number}")
 
       code = ask("Please enter the #{code_length} digit code you received at #{phone_number}:")
-      
+
       return { "securityCode" => { "code" => code.to_s }, "phoneNumber" => { "id" => phone_id }, "mode" => "sms" }.to_json
     end
 
