@@ -206,7 +206,7 @@ module Spaceship
         number_with_dialcode_regex = /^#{number_with_dialcode_regex_part}$/
         # => /^\+49([0-9]{8})85$/ or /^\+1([0-9]{7,8})66$/
 
-        return phone['id'] if phone_number.match?(number_with_dialcode_regex)
+        return phone['id'] if phone_number =~ number_with_dialcode_regex
         # +491621234585 matches /^\+49([0-9]{8})85$/
       end
 
