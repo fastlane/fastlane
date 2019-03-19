@@ -4,7 +4,7 @@ describe Fastlane do
       it "works with name and password" do
         keychain_password = "testpassword"
         keychain_name = "test.keychain"
-        keychain_path = "#{ENV['HOME']}/Library/Keychains/#{keychain_name}"
+        keychain_path = Dir.home + "/Library/Keychains/#{keychain_name}"
         result = Fastlane::FastFile.new.parse("lane :test do
           create_keychain ({
             name: '#{keychain_name}',
@@ -26,7 +26,7 @@ describe Fastlane do
       it "works with name and password that contain spaces or `\"`" do
         keychain_password = "\"test password\""
         keychain_name = "test.keychain"
-        keychain_path = "#{ENV['HOME']}/Library/Keychains/#{keychain_name}"
+        keychain_path = Dir.home + "/Library/Keychains/#{keychain_name}"
         result = Fastlane::FastFile.new.parse("lane :test do
           create_keychain ({
             name: '#{keychain_name}',
@@ -41,7 +41,7 @@ describe Fastlane do
       it "works with keychain-settings and name and password" do
         keychain_password = "testpassword"
         keychain_name = "test.keychain"
-        keychain_path = "#{ENV['HOME']}/Library/Keychains/#{keychain_name}"
+        keychain_path = Dir.home + "/Library/Keychains/#{keychain_name}"
         result = Fastlane::FastFile.new.parse("lane :test do
           create_keychain ({
             name: '#{keychain_name}',
@@ -65,7 +65,7 @@ describe Fastlane do
       it "works with default_keychain and name and password" do
         keychain_password = "testpassword"
         keychain_name = "test.keychain"
-        keychain_path = "#{ENV['HOME']}/Library/Keychains/#{keychain_name}"
+        keychain_path = Dir.home + "/Library/Keychains/#{keychain_name}"
         result = Fastlane::FastFile.new.parse("lane :test do
           create_keychain ({
             name: '#{keychain_name}',
@@ -89,7 +89,7 @@ describe Fastlane do
       it "works with unlock and name and password" do
         keychain_password = "testpassword"
         keychain_name = "test.keychain"
-        keychain_path = "#{ENV['HOME']}/Library/Keychains/#{keychain_name}"
+        keychain_path = Dir.home + "/Library/Keychains/#{keychain_name}"
         result = Fastlane::FastFile.new.parse("lane :test do
           create_keychain ({
             name: '#{keychain_name}',
@@ -142,7 +142,7 @@ describe Fastlane do
       it "works with all params" do
         keychain_password = "testpassword"
         keychain_name = "test.keychain"
-        keychain_path = "#{ENV['HOME']}/Library/Keychains/#{keychain_name}"
+        keychain_path = Dir.home + "/Library/Keychains/#{keychain_name}"
         result = Fastlane::FastFile.new.parse("lane :test do
           create_keychain ({
             name: '#{keychain_name}',
