@@ -108,6 +108,19 @@ describe Fastlane do
           expect(lanes[:ios][:apple].description).to eq([])
           expect(lanes[:android][:robot].description).to eq([])
         end
+
+        it "Does output a summary table when FASTLANE_SKIP_ACTION_SUMMARY ENV variable is not set" do
+          ENV["FASTLANE_SKIP_ACTION_SUMMARY"] = nil
+          expect(Terminal::Table).to(receive(:new).with(title: "fastlane summary".green, headings: anything, rows: anything))
+          ff = Fastlane::LaneManager.cruise_lane(nil, 'test')
+        end
+
+        it "Does not output summary table when FASTLANE_SKIP_ACTION_SUMMARY ENV variable is set" do
+          ENV["FASTLANE_SKIP_ACTION_SUMMARY"] = "true"
+          expect(Terminal::Table).to_not(receive(:new).with(title: "fastlane summary".green, headings: anything, rows: anything))
+          ff = Fastlane::LaneManager.cruise_lane(nil, 'test')
+          ENV["FASTLANE_SKIP_ACTION_SUMMARY"] = nil
+        end
       end
     end
   end
