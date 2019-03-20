@@ -4,33 +4,37 @@ require "English"
 module Spaceship
   # Set of utility methods useful to work with media files
   module Utilities #:nodoc:
+
     # Identifies the content_type of a file based on its file name extension.
     # Supports all formats required by DU-UTC right now (video, images and json)
     # @param path (String) the path to the file
-    # rubocop:disable Metrics/PerceivedComplexity
     def content_type(path)
-      path = path.downcase
-      return 'image/jpeg' if path.end_with?('.jpg')
-      return 'image/jpeg' if path.end_with?('.jpeg')
-      return 'image/png' if path.end_with?('.png')
-      return 'application/json' if path.end_with?('.geojson')
-      return 'video/quicktime' if path.end_with?('.mov')
-      return 'video/mp4' if path.end_with?('.m4v')
-      return 'video/mp4' if path.end_with?('.mp4')
-      return 'text/plain' if path.end_with?('.txt')
-      return 'application/pdf' if path.end_with?('.pdf')
-      return 'application/msword' if path.end_with?('.doc')
-      return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' if path.end_with?('.docx')
-      return 'application/rtf' if path.end_with?('.rtf')
-      return 'application/x-iwork-pages-sffpages' if path.end_with?('.pages')
-      return 'application/vnd.ms-excel' if path.end_with?('.xls')
-      return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' if path.end_with?('.xlsx')
-      return 'application/x-iwork-numbers-sffnumbers' if path.end_with?('.numbers')
-      return 'application/x-rar-compressed' if path.end_with?('.rar')
-      return 'application/xml' if path.end_with?('.plist')
-      return 'text/x-apport' if path.end_with?('.crash')
-      return 'video/x-msvideo' if path.end_with?('.avi')
-      return 'application/zip' if path.end_with?('.zip')
+      SUPPORTED_MIME_TYPES = {
+        '.jpg' => 'image/jpeg',
+        '.jpeg' => 'image/jpeg',
+        '.png' => 'image/png',
+        '.geojson' => 'application/json',
+        '.mov' => 'video/quicktime',
+        '.m4v' => 'video/mp4',
+        '.mp4' => 'video/mp4',
+        '.txt' => 'text/plain',
+        '.pdf' => 'application/pdf',
+        '.doc' => 'application/msword',
+        '.docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        '.rtf' => 'application/rtf',
+        '.pages' => 'application/x-iwork-pages-sffpages',
+        '.xls' => 'application/vnd.ms-excel',
+        '.xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        '.numbers' => 'application/x-iwork-numbers-sffnumbers',
+        '.rar' => 'application/x-rar-compressed',
+        '.plist' => 'application/xml',
+        '.crash' => 'text/x-apport',
+        '.avi' => 'video/x-msvideo',
+        '.zip' => 'application/zip'
+      }
+
+      extension = File.extname(path.downcase)
+      return SUPPORTED_MIME_TYPES[extension] if SUPPORTED_MIME_TYPES[extension]
       raise "Unknown content-type for file #{path}"
     end
 
