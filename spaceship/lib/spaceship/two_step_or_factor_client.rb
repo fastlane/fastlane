@@ -131,6 +131,7 @@ module Spaceship
         body = request_two_factor_code_from_phone(phone_id, phone_number, code_length)
       else
         puts("(Input `sms` to escape this prompt and select a trusted phone number to send the code as a text message)")
+        puts("(You can also set the environment variable `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER` to automate this)")
         code_type = 'trusteddevice'
         code = ask("Please enter the #{code_length} digit code:")
         body = { "securityCode" => { "code" => code.to_s } }.to_json
