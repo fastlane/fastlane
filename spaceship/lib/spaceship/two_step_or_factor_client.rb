@@ -184,7 +184,7 @@ module Spaceship
     end
 
     def phone_id_from_number(phone_numbers, phone_number)
-      characters_to_remove_from_phone_numbers = ' \-()'
+      characters_to_remove_from_phone_numbers = ' \-()"'
 
       # start with e.g. +49 162 1234585 or +1-123-456-7866
       phone_number = phone_number.tr(characters_to_remove_from_phone_numbers, '')
