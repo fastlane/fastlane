@@ -196,7 +196,7 @@ module Spaceship
         # rubocop:enable Style/AsciiComments
 
         maskings_count = number_with_dialcode_masked.count('•') # => 9 or 8
-        pattern = /^([0-9+]{2,3})([•]{#{maskings_count}})([0-9]{2})$/
+        pattern = /^([0-9+]{2,4})([•]{#{maskings_count}})([0-9]{2})$/
         replacement = "\\1([0-9]{#{maskings_count - 1},#{maskings_count}})\\3"
         number_with_dialcode_regex_part = number_with_dialcode_masked.gsub(pattern, replacement)
         # => +49([0-9]{8,9})85 or +1([0-9]{7,8})66
