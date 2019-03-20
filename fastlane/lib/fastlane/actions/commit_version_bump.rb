@@ -130,7 +130,16 @@ module Fastlane
 
           params[:message] ||= (build_number ? "Version Bump to #{build_number}" : "Version Bump")
 
-          Actions.sh("git commit -m '#{params[:message]}'")
+          command = [
+            'git',
+            'commit',
+            '-m',
+            "'#{params[:message]}'"
+          ]
+
+          command << '--no-verify' if params[:no_verify]
+
+          Actions.sh(command.join(' '))
 
           UI.success("Committed \"#{params[:message]}\" 💾.")
         rescue => ex
@@ -178,7 +187,12 @@ module Fastlane
                                        description: "A list of extra files to be included in the version bump (string array or comma-separated string)",
                                        optional: true,
                                        default_value: [],
-                                       type: Array)
+                                       type: Array),
+          FastlaneCore::ConfigItem.new(key: :no_verify,
+                                      env_name: "FL_GIT_PUSH_USE_NO_VERIFY",
+                                      description: "Whether or not to use --no-verify",
+                                      type: Boolean,
+                                      default_value: false)
         ]
       end
 
@@ -227,6 +241,9 @@ module Fastlane
           )',
           'commit_version_bump(
             ignore: /OtherProject/ # ignore files matching a regular expression
+          )',
+          'commit_version_bump(
+            no_verify: true           # optional, default: false
           )'
         ]
       end
