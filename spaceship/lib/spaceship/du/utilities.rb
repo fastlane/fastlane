@@ -9,7 +9,7 @@ module Spaceship
     # Supports all formats required by DU-UTC right now (video, images and json)
     # @param path (String) the path to the file
     def content_type(path)
-      SUPPORTED_MIME_TYPES = {
+      supported_file_types = {
         '.jpg' => 'image/jpeg',
         '.jpeg' => 'image/jpeg',
         '.png' => 'image/png',
@@ -34,7 +34,7 @@ module Spaceship
       }
 
       extension = File.extname(path.downcase)
-      return SUPPORTED_MIME_TYPES[extension] if SUPPORTED_MIME_TYPES[extension]
+      return supported_file_types[extension] if supported_file_types[extension]
       raise "Unknown content-type for file #{path}"
     end
 
