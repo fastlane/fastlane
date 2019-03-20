@@ -128,6 +128,7 @@ module Spaceship
         puts("SPACESHIP_2FA_DEFAULT_PHONE_NUMBER = #{ENV['SPACESHIP_2FA_DEFAULT_PHONE_NUMBER']}")
         phone_number = ENV["SPACESHIP_2FA_DEFAULT_PHONE_NUMBER"]
         phone_id = phone_id_from_number(response.body["trustedPhoneNumbers"], phone_number)
+        code_type = 'phone'
         body = request_two_factor_code_from_phone(phone_id, phone_number, code_length)
       else
         puts("(Input `sms` to escape this prompt and select a trusted phone number to send the code as a text message)")
