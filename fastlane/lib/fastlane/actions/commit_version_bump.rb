@@ -130,16 +130,9 @@ module Fastlane
 
           params[:message] ||= (build_number ? "Version Bump to #{build_number}" : "Version Bump")
 
-          command = [
-            'git',
-            'commit',
-            '-m',
-            "'#{params[:message]}'"
-          ]
+          command = build_git_command(params)
 
-          command << '--no-verify' if params[:no_verify]
-
-          Actions.sh(command.join(' '))
+          Actions.sh(command)
 
           UI.success("Committed \"#{params[:message]}\" 💾.")
         rescue => ex
@@ -282,6 +275,19 @@ module Fastlane
             Pathname.new(path).relative_path_from(root_pathname).to_s
           end
           return all_modified_files.uniq
+        end
+
+        def build_git_command(params)
+          command = [
+            'git',
+            'commit',
+            '-m',
+            "'#{params[:message]}'"
+          ]
+
+          command << '--no-verify' if params[:no_verify]
+
+          return command.join(' ')
         end
       end
     end

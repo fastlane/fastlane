@@ -73,4 +73,18 @@ describe Fastlane::Actions::CommitVersionBumpAction do
       expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::MODIFIED_FILES]).to eq(expected)
     end
   end
+
+  describe 'build_git_command' do
+    it 'creates a git commit with the provided message' do
+      command = action.build_git_command(message: "my commit message")
+
+      expect(command).to eq "git commit -m 'my commit message'"
+    end
+
+    it 'appends the --no-verify if required' do
+      command = action.build_git_command(message: "my commit message", no_verify: true)
+
+      expect(command).to eq "git commit -m 'my commit message' --no-verify"
+    end
+  end
 end
