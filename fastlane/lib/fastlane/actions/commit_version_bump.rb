@@ -126,7 +126,6 @@ module Fastlane
         Actions.sh("git add #{git_add_paths.map(&:shellescape).join(' ')}")
 
         begin
-
           command = build_git_command(params)
 
           Actions.sh(command)

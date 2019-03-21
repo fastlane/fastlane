@@ -78,26 +78,26 @@ describe Fastlane::Actions::CommitVersionBumpAction do
     it 'creates a git commit with the provided message' do
       command = action.build_git_command(message: "my commit message")
 
-      expect(command).to eq "git commit -m 'my commit message'"
+      expect(command).to eq("git commit -m 'my commit message'")
     end
 
     it 'creates a commit message containing the build number if no message is provided' do
       Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER] = "123"
       command = action.build_git_command(no_verify: false)
 
-      expect(command).to eq "git commit -m 'Version Bump to 123'"
+      expect(command).to eq("git commit -m 'Version Bump to 123'")
     end
 
     it 'creates a default commit message if no message or build number is provided' do
       command = action.build_git_command(no_verify: false)
 
-      expect(command).to eq "git commit -m 'Version Bump'"
+      expect(command).to eq("git commit -m 'Version Bump'")
     end
 
     it 'appends the --no-verify if required' do
       command = action.build_git_command(message: "my commit message", no_verify: true)
 
-      expect(command).to eq "git commit -m 'my commit message' --no-verify"
+      expect(command).to eq("git commit -m 'my commit message' --no-verify")
     end
   end
 end
