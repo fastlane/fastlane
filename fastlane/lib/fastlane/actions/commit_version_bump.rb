@@ -126,9 +126,6 @@ module Fastlane
         Actions.sh("git add #{git_add_paths.map(&:shellescape).join(' ')}")
 
         begin
-          build_number = Actions.lane_context[Actions::SharedValues::BUILD_NUMBER]
-
-          params[:message] ||= (build_number ? "Version Bump to #{build_number}" : "Version Bump")
 
           command = build_git_command(params)
 
@@ -278,6 +275,10 @@ module Fastlane
         end
 
         def build_git_command(params)
+          build_number = Actions.lane_context[Actions::SharedValues::BUILD_NUMBER]
+
+          params[:message] ||= (build_number ? "Version Bump to #{build_number}" : "Version Bump")
+
           command = [
             'git',
             'commit',
