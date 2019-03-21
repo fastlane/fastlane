@@ -134,7 +134,7 @@ module Spaceship
         puts("(Input `sms` to escape this prompt and select a trusted phone number to send the code as a text message)")
         puts("(You can also set the environment variable `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER` to automate this)")
         code_type = 'trusteddevice'
-        code = ask("Please enter the #{code_length} digit code:")
+        code = ask_for_2fa_code("Please enter the #{code_length} digit code:")
         body = { "securityCode" => { "code" => code.to_s } }.to_json
 
         # User exited by entering `sms` and wants to choose phone number for SMS
@@ -181,6 +181,11 @@ module Spaceship
       store_session
 
       return true
+    end
+
+    # extracted into its own method for testing
+    def ask_for_2fa_code(text)
+      ask(text)
     end
 
     def phone_id_from_number(phone_numbers, phone_number)
@@ -254,7 +259,7 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
 
       puts("Successfully requested text message to #{phone_number}")
 
-      code = ask("Please enter the #{code_length} digit code you received at #{phone_number}:")
+      code = ask_for_2fa_code("Please enter the #{code_length} digit code you received at #{phone_number}:")
 
       return { "securityCode" => { "code" => code.to_s }, "phoneNumber" => { "id" => phone_id }, "mode" => "sms" }.to_json
     end
