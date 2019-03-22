@@ -137,6 +137,19 @@ describe Spaceship::TunesClient do
         expect(response).to eq(nil)
       end
     end
+
+    describe "iOS app bundle methods" do
+      before do
+        stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/appbundles/metadetail/1234567890")
+          .and_return(status: 200, body: TunesStubbing.itc_read_fixture_file("bundle_details.json"), headers: { "Content-Type" => "application/json" })
+      end
+
+      it "requests iOS app bundle details" do
+        response = subject.bundle_details(1_234_567_890)
+        expect(response["adamId"]).to eq(1_234_567_890)
+        expect(response["details"][0]["name"]).to eq("Fancy Bundle")
+      end
+    end
   end
 
   describe "CI" do
