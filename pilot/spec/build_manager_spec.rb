@@ -11,6 +11,7 @@ describe "Build Manager" do
       expect(changelog).to eq("1234")
     end
   end
+
   describe ".sanitize_changelog" do
     it "removes emoji" do
       changelog = "I'm 🦇B🏧an!"
@@ -24,7 +25,8 @@ describe "Build Manager" do
       expect(changelog).to eq(File.read("./pilot/spec/fixtures/build_manager/changelog_long_truncated"))
     end
   end
-  describe "distribute submits the build for review" do
+
+  describe "#distribute submits the build for review" do
     let(:mock_base_client) { "fake testflight base client" }
     let(:mock_base_api_client) { "fake api base client" }
     let(:fake_build_manager) { Pilot::BuildManager.new }
