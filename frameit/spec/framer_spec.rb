@@ -1,5 +1,5 @@
 describe Frameit do
-  describe Frameit::Editor do
+  describe Frameit::Framer do
     describe "frame!" do
       before do
         allow_any_instance_of(MiniMagick::Tool::Mogrify).to receive(:call) { '' }
