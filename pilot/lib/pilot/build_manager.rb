@@ -55,7 +55,7 @@ module Pilot
       distribute(options, build: latest_build)
     end
 
-    def wait_for_build_processing_to_be_complete
+    def wait_for_build_processing_to_be_complete(options)
       platform = fetch_app_platform
       app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(options[:ipa])
       app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(options[:ipa])
