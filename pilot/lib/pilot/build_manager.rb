@@ -11,6 +11,7 @@ module Pilot
   class BuildManager < Manager
     def upload(options)
       start(options) unless options[:skip_waiting_for_build_processing] && options[:apple_id]
+      @config = options if options[:skip_waiting_for_build_processing] && options[:apple_id] # ugly as hell, we want to do that differently
 
       options[:changelog] = self.class.sanitize_changelog(options[:changelog]) if options[:changelog]
 
