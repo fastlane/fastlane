@@ -222,3 +222,7 @@ If your password contains special characters, _pilot_ may throw a confusing erro
 ## How is my password stored?
 
 _pilot_ uses the [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from _fastlane_.
+
+## Use an Application Specific Password to upload
+
+_pilot_/`upload_to_testflight` can use an [Application Specific Password via the `FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD` envirionment variable](https://docs.fastlane.tools/best-practices/continuous-integration/#application-specific-passwords) to upload a binary if both the `skip_waiting_for_build_processing` and `apple_id` options are set. (If any of those are not set, it will use the normal Apple login process that might require 2FA authentication.)
