@@ -13,7 +13,7 @@ module Deliver
       # iPhone 5
       IOS_40 = "iOS-4-in"
       # iPhone 6 & 7
-      IOS_47 = "iOS-4.7-in" 
+      IOS_47 = "iOS-4.7-in"
       # iPhone 6 Plus & 7 Plus
       IOS_55 = "iOS-5.5-in"
       # iPhone XS
