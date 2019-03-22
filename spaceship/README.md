@@ -123,15 +123,6 @@ This will authenticate you and provide a string that can be transferred to your 
 export FASTLANE_SESSION='---\n- !ruby/object:HTTP::Cookie\n  name: DES5c148586dfd451e55afbaaa5f62418f91\n  value: HSARMTKNSRVTWFla1+yO4gVPowH17VaaaxPFnUdMUegQZxqy1Ie1c2v6bM1vSOzIbuOmrl/FNenlScsd/NbF7/Lw4cpnL15jsyg0TOJwP32tC/NguPiyOaaaU+jrj4tf4uKdIywVaaaFSRVT\n  domain: idmsa.apple.com\n  for_domain: true\n  path: "/"\n  secure: true\n  httponly: true\n  expires: 2016-04-27 23:55:56.000000000 Z\n  max_age: \n  created_at: 2016-03-28 16:55:57.032086000 -07:00\n  accessed_at: 2016-03-28 19:11:17.828141000 -07:00\n'
 ```
 
-#### Bypass trusted device and use SMS for verification
-
-If you have a trusted device configured, Apple will not send a SMS code to your phone for your Apple account when you try to generate a web session with _fastlane_. Instead, a code will be displayed on one of your account's trusted devices. This can be problematic if you are trying to authenticate but don't have access to a trusted device. Take the following steps to circumvent the device and use SMS instead:
-
-- Attempt to generate a web session with `fastlane spaceauth -u [email]` and wait for security code prompt to appear
-- Open a browser to [appleid.apple.com](https://appleid.apple.com) or an address that requires you to login with your Apple ID, and logout of any previous session
-- Login with your Apple ID and request a code be sent to the desired phone when prompted for a security code
-- Use the code sent to phone with _fastlane_ instead of with the browser
-
 #### Transporter
 
 If you want to upload builds to TestFlight/App Store Connect from your CI, you have to generate and use an application specific password:
