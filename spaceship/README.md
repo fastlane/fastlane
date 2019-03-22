@@ -97,11 +97,11 @@ This requires you to install `pry` using `sudo gem install pry`. `pry` is not in
 
 ## Apple Developer Portal API
 
-##### Open [DeveloperPortal.md](docs/DeveloperPortal.md) for code samples
+Open [DeveloperPortal.md](docs/DeveloperPortal.md) for code samples
 
 ## App Store Connect API
 
-##### Open [AppStoreConnect.md](docs/AppStoreConnect.md) for code samples
+Open [AppStoreConnect.md](docs/AppStoreConnect.md) for code samples
 
 ## 2 Step Verification
 
@@ -125,13 +125,7 @@ export FASTLANE_SESSION='---\n- !ruby/object:HTTP::Cookie\n  name: DES5c148586df
 
 #### Transporter
 
-If you want to upload builds to TestFlight/App Store Connect from your CI, you have to generate and use an application specific password:
-
-1. Visit [appleid.apple.com/account/manage](https://appleid.apple.com/account/manage)
-1. Generate a new application specific password
-1. Provide the application specific password using an environment variable `FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD`.
-
-Alternatively you can enter the application specific password when you're asked the first time _fastlane_ uploads a build.
+See [Continuous Integration > Authentication with Apple services > Application specific passwords](https://docs.fastlane.tools/best-practices/continuous-integration/#application-specific-passwords)
 
 ## _spaceship_ in use
 
