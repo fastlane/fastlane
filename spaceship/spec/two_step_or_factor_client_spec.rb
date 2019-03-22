@@ -14,6 +14,8 @@ describe Spaceship::Client do
       true
     end
 
+    # these tests actually "send requests" - and `update_request_headers` would otherwise 
+    # add data to the headers that does not exist / is empty which will crash faraday later
     def update_request_headers(req)
       req
     end
@@ -87,7 +89,7 @@ describe Spaceship::Client do
       it 'to a unknown phone number throws an exception' do
         phone_number = '+49 123 4567800'
         ENV['SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER'] = phone_number
-        
+
         expect do
           bool = subject.handle_two_factor(response)
         end.to raise_error(Spaceship::Tunes::Error)
