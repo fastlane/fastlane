@@ -51,7 +51,7 @@ module Pilot
       end
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      latest_build = wait_for_build_processing_to_be_complete
+      latest_build = wait_for_build_processing_to_be_complete(options)
       distribute(options, build: latest_build)
     end
 
