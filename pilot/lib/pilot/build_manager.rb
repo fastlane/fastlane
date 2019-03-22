@@ -10,11 +10,11 @@ require_relative 'manager'
 module Pilot
   class BuildManager < Manager
     def upload(options)
-      start(options) unless config[:skip_waiting_for_build_processing] && config[:apple_id]
+      start(options) unless options[:skip_waiting_for_build_processing] && options[:apple_id]
 
       options[:changelog] = self.class.sanitize_changelog(options[:changelog]) if options[:changelog]
 
-      UI.user_error!("No ipa file given") unless config[:ipa]
+      UI.user_error!("No ipa file given") unless options[:ipa]
 
       if options[:changelog].nil? && options[:distribute_external] == true
         if UI.interactive?
@@ -30,7 +30,7 @@ module Pilot
 
       platform = fetch_app_platform
       package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: fetch_only_apple_id,
-                                                                      ipa_path: config[:ipa],
+                                                                      ipa_path: options[:ipa],
                                                                   package_path: dir,
                                                                       platform: platform)
 
@@ -56,8 +56,8 @@ module Pilot
 
     def wait_for_build_processing_to_be_complete
       platform = fetch_app_platform
-      app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
-      app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
+      app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(options[:ipa])
+      app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(options[:ipa])
       latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, train_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval])
 
       unless latest_build.train_version == app_version && latest_build.build_version == app_build
