@@ -1,7 +1,33 @@
 module Spaceship
   module Tunes
-    class DeviceType
-      @types = ['iphone35', 'iphone4', 'iphone6', 'iphone6Plus', 'iphone58', 'iphone65', 'ipad', 'ipad105', 'ipadPro', 'ipadPro11', 'ipadPro129', 'watch', 'watchSeries4', 'appleTV', 'desktop']
+    # identifiers of devices that App Store Connect accepts screenshots for
+    class DeviceType # TODO rename class
+      @types = [
+        # iPhone
+        'iphone35', 
+        'iphone4', 
+        'iphone6', # 4.7-inch Display
+        'iphone6Plus', # 5.5-inch Display
+        'iphone58', # iPhone XS
+        'iphone65', # iPhone XS Max
+
+        # iPad
+        'ipad', # 9.7-inch Display
+        'ipad105', 
+        'ipadPro', 
+        'ipadPro11', 
+        'ipadPro129', 
+
+        # Apple Watch
+        'watch', # series 3
+        'watchSeries4',
+
+        # Apple TV 
+        'appleTV',
+
+        # Mac 
+        'desktop'
+      ]
       class << self
         attr_accessor :types
 
