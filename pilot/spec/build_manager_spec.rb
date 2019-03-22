@@ -116,4 +116,61 @@ describe "Build Manager" do
       fake_build_manager.distribute(distribute_options, build: ready_to_submit_mock_build)
     end
   end
+
+  describe "#upload" do
+    describe "spaceship login (via Manager.login)" do
+
+      let(:fake_build_manager) { Pilot::BuildManager.new }
+      let(:upload_options) do 
+        {
+          apple_id: 'mock_apple_id',
+          skip_waiting_for_build_processing: true,
+          ipa: 'foo'
+        }
+      end
+
+      before(:each) do
+        allow(fake_build_manager).to receive(:fetch_app_platform).and_return('ios')
+        
+        fake_ipauploadpackagebuilder = double()
+        allow(fake_ipauploadpackagebuilder).to receive(:generate).and_return(true)
+        allow(FastlaneCore::IpaUploadPackageBuilder).to receive(:new).and_return(fake_ipauploadpackagebuilder)
+        
+        fake_itunestransporter = double()
+        allow(fake_itunestransporter).to receive(:upload).and_return(true)
+        allow(FastlaneCore::ItunesTransporter).to receive(:new).and_return(fake_itunestransporter)
+      end
+
+      it "is not executed when skip_waiting_for_build_processing and apple_id are set" do
+        fake_build_manager.upload(upload_options)
+      end
+
+      it "is executed when skip_waiting_for_build_processing and apple_id are not set" do
+        # clean options
+        upload_options.delete(:apple_id)
+        upload_options.delete(:skip_waiting_for_build_processing)
+        
+        # allow the spaceship login method this time
+        allow(fake_build_manager).to receive(:login)
+        
+        fake_app = double()
+        allow(fake_app).to receive(:apple_id).and_return(123)
+        allow(fake_build_manager).to receive(:app).and_return(fake_app)
+        
+        allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_version)
+        allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_build)
+        
+        fake_build = double()
+        allow(fake_build).to receive(:train_version)
+        allow(fake_build).to receive(:build_version)
+        allow(FastlaneCore::BuildWatcher).to receive(:wait_for_build_processing_to_be_complete).and_return(fake_build)
+
+        allow(fake_build_manager).to receive(:distribute)
+
+        fake_build_manager.upload(upload_options)
+      end
+
+    end
+  end
+
 end
