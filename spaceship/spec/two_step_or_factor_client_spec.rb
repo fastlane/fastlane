@@ -13,6 +13,10 @@ describe Spaceship::Client do
     def store_cookie(path: nil)
       true
     end
+
+    def update_request_headers(req)
+      req
+    end
   end
 
   let(:subject) { TwoStepOrFactorClient.new }
