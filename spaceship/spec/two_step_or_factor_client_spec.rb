@@ -65,11 +65,11 @@ describe Spaceship::Client do
       response.body = JSON.parse(response_fixture)
     end
 
-    after do
-      ENV.delete('SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER')
-    end
-
     describe 'with SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER set' do
+      after do
+        ENV.delete('SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER')
+      end
+
       it 'to a known phone number returns true (and sends the correct requests)' do
         phone_number = '+49 123 4567885'
         ENV['SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER'] = phone_number
@@ -94,6 +94,11 @@ describe Spaceship::Client do
           bool = subject.handle_two_factor(response)
         end.to raise_error(Spaceship::Tunes::Error)
       end
+    end
+
+    describe 'with SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER not set' do
+      # 1. input of pushed code
+      # 2. input of `sms`, then selection of phone, then input of sms-ed code
     end
   end
 end
