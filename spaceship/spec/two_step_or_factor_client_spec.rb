@@ -14,7 +14,7 @@ describe Spaceship::Client do
       true
     end
 
-    # these tests actually "send requests" - and `update_request_headers` would otherwise 
+    # these tests actually "send requests" - and `update_request_headers` would otherwise
     # add data to the headers that does not exist / is empty which will crash faraday later
     def update_request_headers(req)
       req
