@@ -1,7 +1,7 @@
 module Spaceship
   module Tunes
     # identifiers of devices that App Store Connect accepts screenshots for
-    class DeviceType # TODO rename class
+    class DeviceType
       @types = [
         # iPhone
         'iphone35', 
