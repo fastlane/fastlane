@@ -137,7 +137,8 @@ All [fastlane tools](https://fastlane.tools) that communicate with Apple's web s
 
 Overview of the used API endpoints
 
-- `https://idmsa.apple.com`: Used to authenticate to get a valid session
+- `https://idmsa.apple.com`: 
+  - Used to authenticate to get a valid session
 - `https://developerservices2.apple.com`:
   - Get a list of all available provisioning profiles
   - Register new devices
