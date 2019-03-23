@@ -132,6 +132,8 @@ module Deliver
       set_app_rating(v, options)
       v.ratings_reset = options[:reset_ratings]
 
+      set_review_attachment_file(v, option)
+
       Helper.show_loading_indicator("Uploading metadata to App Store Connect")
       v.save!
       Helper.hide_loading_indicator
@@ -366,6 +368,12 @@ module Deliver
       end
       v.review_user_needed = (v.review_demo_user.to_s.chomp + v.review_demo_password.to_s.chomp).length > 0
     end
+
+    def set_review_attachment_file(v, option)
+      return unless options[:app_review_attachment_file]
+      UI.user_error!('On live version, can not add app review attachment file.') if options[:edit_live]
+      v.upload_review_attachment(options[:app_review_attachment_file])
+    end    
 
     def set_app_rating(v, options)
       return unless options[:app_rating_config_path]
