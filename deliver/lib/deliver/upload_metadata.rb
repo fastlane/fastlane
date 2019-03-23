@@ -373,7 +373,7 @@ module Deliver
       return unless options[:app_review_attachment_file]
       UI.user_error!('On live version, can not add app review attachment file.') if options[:edit_live]
       v.upload_review_attachment(options[:app_review_attachment_file])
-    end    
+    end
 
     def set_app_rating(v, options)
       return unless options[:app_rating_config_path]
