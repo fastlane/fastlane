@@ -75,7 +75,7 @@ module Supply
             FileUtils.mkdir_p(p.dirname.to_s)
 
             path = "#{path}.#{FastImage.type(url)}"
-            File.write(path, Net::HTTP.get(URI.parse(url)))
+            File.binwrite(path, Net::HTTP.get(URI.parse(url)))
 
             UI.message("\tDownloaded - #{path}")
 
