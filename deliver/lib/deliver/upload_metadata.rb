@@ -369,7 +369,7 @@ module Deliver
       v.review_user_needed = (v.review_demo_user.to_s.chomp + v.review_demo_password.to_s.chomp).length > 0
     end
 
-    def set_review_attachment_file(v, option)
+    def set_review_attachment_file(v, options)
       return unless options[:app_review_attachment_file]
       UI.user_error!('On live version, can not add app review attachment file.') if options[:edit_live]
       v.upload_review_attachment(options[:app_review_attachment_file])
