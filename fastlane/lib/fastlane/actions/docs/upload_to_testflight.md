@@ -222,3 +222,6 @@ If your password contains special characters, _pilot_ may throw a confusing erro
 ## How is my password stored?
 
 _pilot_ uses the [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from _fastlane_.
+
+## Provider Short Name
+If you are on multiple App Store Connect teams, iTunes Transporter may need a provider short name to know where to upload your binary. _pilot_ will try to use the long name of the selected team to detect the provider short name. To override the detected value with an explicit one, use the `itc_provider` option.
