@@ -101,7 +101,7 @@ describe Cert do
       end
 
       let(:generate) do
-        options = { output_path: temp, filename: filename }
+        options = { output_path: temp, filename: filename, keychain_path: "." }
         Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options)
         Cert::Runner.new.launch
       end
