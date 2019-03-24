@@ -370,7 +370,7 @@ module Deliver
     end
 
     def set_review_attachment_file(v, options)
-      v.upload_review_attachment(options[:app_review_attachment_file])
+      v.upload_review_attachment!(options[:app_review_attachment_file])
     end
 
     def set_app_rating(v, options)
