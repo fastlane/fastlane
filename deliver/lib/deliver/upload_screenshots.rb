@@ -104,9 +104,9 @@ module Deliver
         files = Dir.glob(File.join(lng_folder, "*.#{extensions}"), File::FNM_CASEFOLD).sort
         next if files.count == 0
 
-        prefer_framed = Dir.glob(File.join(lng_folder, "*_framed.#{extensions}"), File::FNM_CASEFOLD).count > 0
+        framed_screenshots_found = Dir.glob(File.join(lng_folder, "*_framed.#{extensions}"), File::FNM_CASEFOLD).count > 0
 
-        UI.important("Framed screenshots are detected! 🖼 Non-framed screenshot files may be skipped. 🏃") if prefer_framed
+        UI.important("Framed screenshots are detected! 🖼 Non-framed screenshot files may be skipped. 🏃") if framed_screenshots_found
 
         language_dir_name = File.basename(lng_folder)
 
@@ -120,7 +120,7 @@ module Deliver
           is_framed = file_path.downcase.include?("_framed.")
           is_watch = file_path.downcase.include?("watch")
 
-          if prefer_framed && !is_framed && !is_watch
+          if framed_screenshots_found && !is_framed && !is_watch
             UI.important("🏃 Skipping screenshot file: #{file_path}")
             next
           end
