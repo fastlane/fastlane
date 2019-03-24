@@ -33,6 +33,16 @@ describe Frameit do
             "Multiple words working" => "einlangesdeutshceswort mit Abstand"
           })
         end
+
+        it "parses a valid .strings file (utf8) with space in path" do
+          translations = Frameit::StringsParser.parse("./frameit/spec/fixtures/translations file.utf8.strings")
+
+          expect(translations).to eq({
+            "Cancel" => "Abbrechen",
+            "OK" => "OK",
+            "Multiple words working" => "einlangesdeutshceswort mit Abstand"
+          })
+        end
       end
 
       describe "failure parsing" do
