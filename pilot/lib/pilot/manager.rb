@@ -10,10 +10,10 @@ require_relative 'module'
 
 module Pilot
   class Manager
-    def start(options)
+    def start(options, should_login: true)
       return if @config # to not login multiple times
       @config = options
-      login
+      login if should_login
     end
 
     def login
@@ -42,14 +42,8 @@ module Pilot
     # Config Related
     ################
 
-    # this exists so there is a way to get the apple_id without using spaceship if the config value exists
-    def fetch_only_apple_id
-      apple_id = config[:apple_id]
-      apple_id ||= app.apple_id
-      return apple_id
-    end
-
     def fetch_apple_id
+      @apple_id ||= config[:apple_id]
       return @apple_id if @apple_id
       config[:app_identifier] = fetch_app_identifier
 
