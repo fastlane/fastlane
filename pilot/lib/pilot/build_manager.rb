@@ -10,12 +10,13 @@ require_relative 'manager'
 module Pilot
   class BuildManager < Manager
     def upload(options)
-      start(options) unless options[:skip_waiting_for_build_processing] && options[:apple_id]
-      @config = options if options[:skip_waiting_for_build_processing] && options[:apple_id] # ugly as hell, we want to do that differently
+      # Only need to login before upload if no apple_id was given
+      should_login = options[:apple_id].nil?
+      start(options, should_login: should_login)
 
       options[:changelog] = self.class.sanitize_changelog(options[:changelog]) if options[:changelog]
 
-      UI.user_error!("No ipa file given") unless options[:ipa]
+      UI.user_error!("No ipa file given") unless config[:ipa]
 
       if options[:changelog].nil? && options[:distribute_external] == true
         if UI.interactive?
@@ -25,18 +26,18 @@ module Pilot
         end
       end
 
-      UI.success("Ready to upload new build to TestFlight (App: #{fetch_only_apple_id})...")
+      UI.success("Ready to upload new build to TestFlight (App: #{fetch_apple_id})...")
 
       dir = Dir.mktmpdir
 
       platform = fetch_app_platform
-      package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: fetch_only_apple_id,
+      package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: fetch_apple_id,
                                                                       ipa_path: options[:ipa],
                                                                   package_path: dir,
                                                                       platform: platform)
 
       transporter = transporter_for_selected_team(options)
-      result = transporter.upload(fetch_only_apple_id, package_path)
+      result = transporter.upload(fetch_apple_id, package_path)
 
       unless result
         UI.user_error!("Error uploading ipa file, for more information see above")
@@ -50,16 +51,18 @@ module Pilot
         return
       end
 
+      login_if_not_logged_in
+
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      latest_build = wait_for_build_processing_to_be_complete(options)
+      latest_build = wait_for_build_processing_to_be_complete
       distribute(options, build: latest_build)
     end
 
-    def wait_for_build_processing_to_be_complete(options)
+    def wait_for_build_processing_to_be_complete
       platform = fetch_app_platform
-      app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(options[:ipa])
-      app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(options[:ipa])
-      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, train_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval])
+      app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
+      app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, train_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval], strict_build_watch: config[:wait_for_uploaded_build])
 
       unless latest_build.train_version == app_version && latest_build.build_version == app_build
         UI.important("Uploaded app #{app_version} - #{app_build}, but received build #{latest_build.train_version} - #{latest_build.build_version}.")
@@ -188,6 +191,10 @@ module Pilot
 
     private
 
+    def login_if_not_logged_in
+      login unless Spaceship::Tunes.client
+    end
+
     def describe_build(build)
       row = [build.train_version,
              build.build_version,
@@ -221,7 +228,8 @@ module Pilot
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team(options)
       generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
-      return generic_transporter unless options[:itc_provider].nil? && Spaceship::Tunes.client.teams.count > 1
+      return generic_transporter if options[:itc_provider] || Spaceship::Tunes.client.nil?
+      return generic_transporter unless Spaceship::Tunes.client.teams.count > 1
 
       begin
         team = Spaceship::Tunes.client.teams.find { |t| t['contentProvider']['contentProviderId'].to_s == Spaceship::Tunes.client.team_id }
