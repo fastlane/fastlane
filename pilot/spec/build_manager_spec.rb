@@ -263,6 +263,9 @@ describe "Build Manager" do
         allow(fake_app).to receive(:apple_id).and_return(123)
         allow(fake_build_manager).to receive(:app).and_return(fake_app)
 
+        allow(Spaceship::Tunes::Application).to receive(:find).and_return(fake_app)
+
+        allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_identifier).and_return("com.fastlane")
         allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_version)
         allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_build)
 
