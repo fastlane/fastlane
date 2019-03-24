@@ -638,14 +638,16 @@ module Spaceship
       # zip, rar, plist, crash, jpg, png, mp4 or avi.
       #
       #
-      # @param review_attachment_path (String): The path to the attachment file
+      # @param review_attachment_path (String): The path to the attachment file.
       def upload_review_attachment!(review_attachment_path)
         raise 'cannot upload review attachment for live edition.' if self.is_live?
 
-        unless review_attachment_path
+        unless review_attachment_path && review_attachment_path.size > 0
           @review_attachment_file.reset!
           return
         end
+
+        raise "cannot find file: #{review_attachment_path}." unless File.exist?(review_attachment_path)
 
         review_attachment_file = UploadFile.from_path(review_attachment_path)
         review_attachment_data = client.upload_app_review_attachment(self, review_attachment_file)
