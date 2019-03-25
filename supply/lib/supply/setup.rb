@@ -48,21 +48,21 @@ module Supply
 
       allowed_imagetypes.each do |image_type|
         begin
-          image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
-          if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images location
-            path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type.to_s)
-          else # All other screenshot types go under their respective folders.
-            path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type, "#{image_counter}_#{listing.language}")
-          end
+          path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type)
 
           p = Pathname.new(path)
-          FileUtils.mkdir_p(p.dirname.to_s)
+          if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images location
+            FileUtils.mkdir_p(p.dirname.to_s)
+          else # SCREENSHOT_TYPES go under their respective folders.
+            FileUtils.mkdir_p(p.to_s)
+          end
 
           UI.message("Downloading `#{image_type}` for #{listing.language}...")
 
           urls = client.fetch_images(image_type: image_type, language: listing.language)
           next if urls.nil? || urls.empty?
 
+          image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
           urls.each do |url|
             url_params = url.match("=.*")
             if !url_params.nil? && url_params.length == 1
@@ -74,8 +74,13 @@ module Supply
 
             url = "#{url}=s0" # '=s0' param ensures full image size is returned (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473012462)
 
-            path = "#{path}.#{FastImage.type(url)}"
-            File.binwrite(path, Net::HTTP.get(URI.parse(url)))
+            if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images location
+              file_path = "#{path}.#{FastImage.type(url)}"
+            else # SCREENSHOT_TYPES go under their respective folders.
+              file_path = "#{path}/#{image_counter}_#{listing.language}.#{FastImage.type(url)}"
+            end
+
+            File.binwrite(file_path, Net::HTTP.get(URI.parse(url)))
 
             UI.message("\tDownloaded - #{path}")
 
