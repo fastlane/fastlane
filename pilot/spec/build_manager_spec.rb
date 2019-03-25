@@ -176,7 +176,7 @@ describe "Build Manager" do
         # Receive 2: finding build for patching uses non-exempt encryption
         # Receive 3: finding build for submitting for review
         expect(mock_base_api_client).to receive(:get_builds).with({
-          filter: { expired: false, processingState: "PROCESSING,VALID", version: ready_to_submit_mock_build.build_version }
+          filter: { expired: false, processingState: "PROCESSING,VALID", version: ready_to_submit_mock_build.build_version, app: ready_to_submit_mock_build.app_id }
         }).and_return(builds).exactly(3).times
 
         # Demo account
