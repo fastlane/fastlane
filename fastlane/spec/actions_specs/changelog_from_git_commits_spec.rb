@@ -43,7 +43,6 @@ describe Fastlane do
         expect(result).to eq(pseudocommand)
       end
 
-
       it "Does not match lightweight tags when searching for the last one if so requested" do
         result = Fastlane::FastFile.new.parse("lane :test do
           changelog_from_git_commits(match_lightweight_tag: false)
