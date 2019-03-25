@@ -48,31 +48,31 @@ module Supply
 
       allowed_imagetypes.each do |image_type|
         begin
+          image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
+          if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images location
+            path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type.to_s)
+          else # All other screenshot types go under their respective folders.
+            path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type, "#{image_counter}_#{listing.language}")
+          end
+
+          p = Pathname.new(path)
+          FileUtils.mkdir_p(p.dirname.to_s)
+
           UI.message("Downloading `#{image_type}` for #{listing.language}...")
 
           urls = client.fetch_images(image_type: image_type, language: listing.language)
           next if urls.nil? || urls.empty?
 
-          image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
           urls.each do |url|
             url_params = url.match("=.*")
             if !url_params.nil? && url_params.length == 1
               UI.verbose("Initial URL received: '#{url}'")
-              url = url.gsub(url_params.to_s, "") # Remove everything after '=' (if present). This ensures webp is converted to png/jpg as well.
+              url = url.gsub(url_params.to_s, "") # Remove everything after '=' (if present). This ensures webp is converted to png/jpg (https://www.howtogeek.com/325864/how-to-save-googles-webp-images-as-jpeg-or-png/)
               UI.verbose("Removed params ('#{url_params}') from the URL")
               UI.verbose("URL after removing params: '#{url}'")
             end
 
             url = "#{url}=s0" # '=s0' param ensures full image size is returned (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473012462)
-
-            if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images location
-              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type.to_s)
-            else # All other screenshot types goes under their respective folders.
-              path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type, "#{image_counter}_#{listing.language}")
-            end
-
-            p = Pathname.new(path)
-            FileUtils.mkdir_p(p.dirname.to_s)
 
             path = "#{path}.#{FastImage.type(url)}"
             File.binwrite(path, Net::HTTP.get(URI.parse(url)))
