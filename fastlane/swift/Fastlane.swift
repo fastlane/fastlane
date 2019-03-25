@@ -1042,13 +1042,15 @@ func commitVersionBump(message: String? = nil,
                        force: Bool = false,
                        settings: Bool = false,
                        ignore: String? = nil,
-                       include: [String] = []) {
+                       include: [String] = [],
+                       noVerify: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "commit_version_bump", className: nil, args: [RubyCommand.Argument(name: "message", value: message),
                                                                                                      RubyCommand.Argument(name: "xcodeproj", value: xcodeproj),
                                                                                                      RubyCommand.Argument(name: "force", value: force),
                                                                                                      RubyCommand.Argument(name: "settings", value: settings),
                                                                                                      RubyCommand.Argument(name: "ignore", value: ignore),
-                                                                                                     RubyCommand.Argument(name: "include", value: include)])
+                                                                                                     RubyCommand.Argument(name: "include", value: include),
+                                                                                                     RubyCommand.Argument(name: "no_verify", value: noVerify)])
   _ = runner.executeCommand(command)
 }
 func copyArtifacts(keepOriginal: Bool = true,
@@ -4299,4 +4301,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.43]
+// FastlaneRunnerAPIVersion [0.9.44]
