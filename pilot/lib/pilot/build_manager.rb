@@ -404,8 +404,8 @@ module Pilot
     def update_build_beta_details(build, info)
       client = Spaceship::ConnectAPI::Base.client
 
-      resp = client.get_builds(filter: { expired: false, processingState: "PROCESSING,VALID", version: build.build_version })
-      build_id = resp.first["id"]
+      build = build.find_app_store_connect_build
+      build_id = build["id"]
 
       resp = client.get_build_beta_details(filter: { build: build_id })
       build_beta_details_id = resp.first["id"]
