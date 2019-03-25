@@ -40,7 +40,7 @@ module Frameit
     end
 
     def self.encoding_type(path)
-      `file --mime-encoding #{path}`.downcase
+      Helper.backticks("file --mime-encoding #{path.shellescape}", print: false).downcase
     end
   end
 end

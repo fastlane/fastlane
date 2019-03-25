@@ -101,6 +101,7 @@ module Fastlane
       end
 
       def self.find_api_token(params)
+        return if params[:gsp_path]
         unless params[:api_token].to_s.length > 0
           Dir["./**/Info.plist"].each do |current|
             result = Actions::GetInfoPlistValueAction.run(path: current, key: "Fabric")

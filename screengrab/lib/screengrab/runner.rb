@@ -195,15 +195,21 @@ module Screengrab
     end
 
     def uninstall_apks(device_serial, app_package_name, tests_package_name)
-      UI.message('Uninstalling app APK')
-      run_adb_command("adb -s #{device_serial} uninstall #{app_package_name}",
-                      print_all: true,
-                      print_command: true)
+      packages = installed_packages(device_serial)
 
-      UI.message('Uninstalling tests APK')
-      run_adb_command("adb -s #{device_serial} uninstall #{tests_package_name}",
-                      print_all: true,
-                      print_command: true)
+      if packages.include?(app_package_name.to_s)
+        UI.message('Uninstalling app APK')
+        run_adb_command("adb -s #{device_serial} uninstall #{app_package_name}",
+                        print_all: true,
+                        print_command: true)
+      end
+
+      if packages.include?(tests_package_name.to_s)
+        UI.message('Uninstalling tests APK')
+        run_adb_command("adb -s #{device_serial} uninstall #{tests_package_name}",
+                        print_all: true,
+                        print_command: true)
+      end
     end
 
     def grant_permissions(device_serial)
@@ -349,6 +355,14 @@ module Screengrab
     rescue
       # Some versions of ADB will have a non-zero exit status for this, which will cause the executor to raise.
       # We can safely ignore that and treat it as if it returned 'No such file'
+    end
+
+    # Return an array of packages that are installed on the device
+    def installed_packages(device_serial)
+      packages = run_adb_command("adb -s #{device_serial} shell pm list packages",
+                                 print_all: true,
+                                 print_command: true)
+      packages.split("\n").map { |package| package.gsub("package:", "") }
     end
 
     def run_adb_command(command, print_all: false, print_command: false)
