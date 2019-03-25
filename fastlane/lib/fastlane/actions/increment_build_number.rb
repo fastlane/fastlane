@@ -62,7 +62,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :build_number,
                                        env_name: "FL_BUILD_NUMBER_BUILD_NUMBER",
-                                       description: "Change to a specific version. When you provide this parameter, enabled Apple Generic Versioning is not required",
+                                       description: "Change to a specific version. When you provide this parameter, Apple Generic Versioning does not have to be enabled",
                                        optional: true,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
