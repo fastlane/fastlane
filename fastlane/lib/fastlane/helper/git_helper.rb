@@ -26,14 +26,23 @@ module Fastlane
       nil
     end
 
-    def self.last_git_tag_name(match_lightweight = true, tag_match_pattern = nil)
+    def self.last_git_tag_hash(tag_match_pattern = nil)
       tag_pattern_param = tag_match_pattern ? "=#{tag_match_pattern}" : ''
-      tag_name = Actions.sh('git', 'rev-list', "--tags#{tag_pattern_param}",
-                            '--max-count=1').chomp
+      Actions.sh('git', 'rev-list', "--tags#{tag_pattern_param}", '--max-count=1').chomp
+    rescue
+      nil
+    end
+
+    def self.last_git_tag_name(match_lightweight = true, tag_match_pattern = nil)
+      hash = last_git_tag_hash(tag_match_pattern)
+      # If hash is nil (command fails), "git describe" command below will still
+      # run and provide some output, although it's definitely not going to be
+      # anything reasonably expected. Bail out early.
+      return unless hash
 
       command = %w(git describe)
       command << '--tags' if match_lightweight
-      command << tag_name
+      command << hash
       Actions.sh(*command.compact, log: false).chomp
     rescue
       nil
