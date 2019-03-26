@@ -226,9 +226,8 @@ module Fastlane
       begin
         Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
           # If another action is calling this action, we shouldn't show it in the summary
-          # (see https://github.com/fastlane/fastlane/issues/4546)
 
-          unless from_action # see https://github.com/fastlane/fastlane/issues/4546
+          unless from_action
             args = arguments.kind_of?(Array) && arguments.first.kind_of?(Hash) ? arguments.first : {}
             action_name = args[:step_name] || class_ref.step_text
             args.delete(:step_name)
