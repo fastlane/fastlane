@@ -189,7 +189,6 @@ describe Fastlane do
 
         expect(notifier.config.defaults[:username]).to eq('fastlane')
         expect(notifier.config.defaults[:channel]).to eq(channel)
-        # binding.pry
 
         expect(attachments[:color]).to eq('danger')
         expect(attachments[:text]).to eq(expected_message)
