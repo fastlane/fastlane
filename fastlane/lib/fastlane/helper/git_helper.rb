@@ -9,6 +9,8 @@ module Fastlane
       command << '--ancestry-path' if ancestry_path
       command << "#{from}...#{to}"
       command << git_log_merge_commit_filtering_option(merge_commit_filtering)
+      # "*command" syntax expands "command" array into variable arguments, which
+      # will then be individually shell-escaped by Actions.sh.
       Actions.sh(*command.compact, log: false).chomp
     rescue
       nil
