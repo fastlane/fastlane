@@ -101,6 +101,7 @@ Gem::Specification.new do |spec|
 
   # Development only
   spec.add_development_dependency('rake', '< 12')
+  spec.add_development_dependency('activesupport', '~> 5.2.2')
   spec.add_development_dependency('rspec', '~> 3.5.0')
   spec.add_development_dependency('rspec_junit_formatter', '~> 0.2.3')
   spec.add_development_dependency('pry')
