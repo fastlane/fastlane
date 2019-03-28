@@ -6,9 +6,9 @@ describe "Build Manager" do
       expect(changelog).to eq(File.read("./pilot/spec/fixtures/build_manager/changelog_long_truncated"))
     end
     it "Truncates Changelog if it exceeds byte size" do
-      changelog = File.read("./pilot/spec/fixtures/build_manager/changelog_bytes_long")
+      changelog = File.binread("./pilot/spec/fixtures/build_manager/changelog_bytes_long").force_encoding("UTF-8")
       changelog = Pilot::BuildManager.truncate_changelog(changelog)
-      expect(changelog).to eq(File.read("./pilot/spec/fixtures/build_manager/changelog_bytes_long_truncated"))
+      expect(changelog).to eq(File.binread("./pilot/spec/fixtures/build_manager/changelog_bytes_long_truncated").force_encoding("UTF-8"))
     end
     it "Keeps changelog if short enough" do
       changelog = "1234"
