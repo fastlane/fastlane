@@ -2,15 +2,16 @@ module Fastlane
   module Actions
     class TypetalkAction < Action
       def self.run(params)
-        options = {
+        options =
+          {
             message: nil,
             note_path: nil,
             success: true,
             topic_id: nil,
             typetalk_token: nil
-        }.merge(params || {})
+          }.merge(params || {})
 
-        [:message, :topic_id, :typetalk_token].each do |key|
+        %i[message topic_id typetalk_token].each do |key|
           UI.user_error!("No #{key} given.") unless options[key]
         end
 
@@ -36,8 +37,11 @@ module Fastlane
         require 'uri'
 
         uri = URI.parse("https://typetalk.in/api/v1/topics/#{topic_id}")
-        response = Net::HTTP.post_form(uri, { 'message' => message,
-                                             'typetalkToken' => typetalk_token })
+        response =
+          Net::HTTP.post_form(
+            uri,
+            { 'message' => message, 'typetalkToken' => typetalk_token }
+          )
 
         self.check_response(response)
       end
@@ -47,12 +51,12 @@ module Fastlane
         when 200, 204
           true
         else
-          UI.user_error!("Could not sent Typetalk notification")
+          UI.user_error!('Could not sent Typetalk notification')
         end
       end
 
       def self.description
-        "Post a message to [Typetalk](https://www.typetalk.com/)"
+        'Post a message to [Typetalk](https://www.typetalk.com/)'
       end
 
       def self.available_options
@@ -66,7 +70,7 @@ module Fastlane
       end
 
       def self.author
-        "Nulab Inc."
+        'Nulab Inc.'
       end
 
       def self.is_supported?(platform)

@@ -3,15 +3,15 @@ describe Spaceship::Tunes::PricingTier do
 
   let(:client) { Spaceship::AppVersion.client }
 
-  describe "Pricing Tiers" do
-    it "inspect works" do
+  describe 'Pricing Tiers' do
+    it 'inspect works' do
       pricing_tiers = client.pricing_tiers
 
-      expect(pricing_tiers.inspect).to include("Tunes::PricingTier")
-      expect(pricing_tiers.inspect).to include("Tunes::PricingInfo")
+      expect(pricing_tiers.inspect).to include('Tunes::PricingTier')
+      expect(pricing_tiers.inspect).to include('Tunes::PricingInfo')
     end
 
-    it "correctly creates all pricing tiers including pricing infos" do
+    it 'correctly creates all pricing tiers including pricing infos' do
       pricing_tiers = client.pricing_tiers
       tier_1 = client.pricing_tiers[1]
 
@@ -19,7 +19,7 @@ describe Spaceship::Tunes::PricingTier do
       expect(tier_1.pricing_info.length).to eq(48)
     end
 
-    it "correctly parses the pricing tiers" do
+    it 'correctly parses the pricing tiers' do
       tier_1 = client.pricing_tiers[1]
 
       expect(tier_1).not_to(be_nil)
@@ -28,7 +28,7 @@ describe Spaceship::Tunes::PricingTier do
       expect(tier_1.pricing_info).not_to(be_empty)
     end
 
-    it "correctly parses the pricing information" do
+    it 'correctly parses the pricing information' do
       tier_1_first_pricing_info = client.pricing_tiers[1].pricing_info[0]
 
       expect(tier_1_first_pricing_info.country).to eq('United States')

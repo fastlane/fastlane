@@ -10,7 +10,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Get the most recent git tag"
+        'Get the most recent git tag'
       end
 
       def self.available_options
@@ -26,7 +26,7 @@ module Fastlane
       end
 
       def self.authors
-        ["KrauseFx"]
+        %w[KrauseFx]
       end
 
       def self.is_supported?(platform)
@@ -38,9 +38,7 @@ module Fastlane
       end
 
       def self.example_code
-        [
-          'last_git_tag'
-        ]
+        %w[last_git_tag]
       end
 
       def self.category

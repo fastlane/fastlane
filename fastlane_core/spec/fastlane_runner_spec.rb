@@ -23,9 +23,7 @@ describe Commander::Runner do
         global_option('--out', String)
 
         command :run do |c|
-          c.action do |args, options|
-            raise @raise_error if @raise_error
-          end
+          c.action { |args, options| raise @raise_error if @raise_error }
         end
 
         default_command(:run)
@@ -50,23 +48,27 @@ describe Commander::Runner do
 
     it 'should reraise errors that are not of special interest' do
       expect do
-        Commander::Runner.new.handle_unknown_error!(StandardError.new('my message'))
+        Commander::Runner.new.handle_unknown_error!(
+          StandardError.new('my message')
+        )
       end.to raise_error(StandardError, '[!] my message'.red)
     end
 
     it 'should reraise errors that return nil from #preferred_error_info' do
       expect do
-        Commander::Runner.new.handle_unknown_error!(NilReturningError.new('my message'))
+        Commander::Runner.new.handle_unknown_error!(
+          NilReturningError.new('my message')
+        )
       end.to raise_error(StandardError, '[!] my message'.red)
     end
 
     it 'should abort and show custom info for errors that have the Apple error info provider method with FastlaneCore::Globals.verbose?=false' do
       runner = Commander::Runner.new
-      expect(runner).to receive(:abort).with("\n[!] Title\n\tLine 1\n\tLine 2".red)
+      expect(runner).to receive(:abort).with(
+                  "\n[!] Title\n\tLine 1\n\tLine 2".red
+                )
 
-      with_verbose(false) do
-        runner.handle_unknown_error!(CustomError.new)
-      end
+      with_verbose(false) { runner.handle_unknown_error!(CustomError.new) }
     end
 
     it 'should reraise and show custom info for errors that have the Apple error info provider method with FastlaneCore::Globals.verbose?=true' do

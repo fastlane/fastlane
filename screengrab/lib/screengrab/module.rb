@@ -13,12 +13,13 @@ module Screengrab
     end
 
     def screengrabfile_name
-      "Screengrabfile"
+      'Screengrabfile'
     end
   end
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
   ROOT = Pathname.new(File.expand_path('../../..', __FILE__))
-  DESCRIPTION = "Automated localized screenshots of your Android app on every device".freeze
+  DESCRIPTION =
+    'Automated localized screenshots of your Android app on every device'.freeze
 end

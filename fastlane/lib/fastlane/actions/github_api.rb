@@ -18,43 +18,41 @@ module Fastlane
           error_handlers = params[:error_handlers] || {}
           secure = params[:secure]
 
-          response = call_endpoint(
-            url,
-            http_method,
-            headers,
-            payload,
-            secure
-          )
+          response = call_endpoint(url, http_method, headers, payload, secure)
 
           status_code = response[:status]
           result = {
             status: status_code,
-            body: response.body || "",
+            body: response.body || '',
             json: parse_json(response.body) || {}
           }
 
           if status_code.between?(200, 299)
-            UI.verbose("Response:")
+            UI.verbose('Response:')
             UI.verbose(response.body)
-            UI.verbose("---")
+            UI.verbose('---')
             yield(result) if block_given?
           else
             handled_error = error_handlers[status_code] || error_handlers['*']
             if handled_error
               handled_error.call(result)
             else
-              UI.error("---")
+              UI.error('---')
               UI.error("Request failed:\n#{http_method}: #{url}")
               UI.error("Headers:\n#{headers}")
-              UI.error("---")
-              UI.error("Response:")
+              UI.error('---')
+              UI.error('Response:')
               UI.error(response.body)
-              UI.user_error!("GitHub responded with #{status_code}\n---\n#{response.body}")
+              UI.user_error!(
+                "GitHub responded with #{status_code}\n---\n#{response.body}"
+              )
             end
           end
 
-          Actions.lane_context[SharedValues::GITHUB_API_STATUS_CODE] = result[:status]
-          Actions.lane_context[SharedValues::GITHUB_API_RESPONSE] = result[:body]
+          Actions.lane_context[SharedValues::GITHUB_API_STATUS_CODE] =
+            result[:status]
+          Actions.lane_context[SharedValues::GITHUB_API_RESPONSE] =
+            result[:body]
           Actions.lane_context[SharedValues::GITHUB_API_JSON] = result[:json]
 
           return result
@@ -65,101 +63,144 @@ module Fastlane
         #####################################################
 
         def description
-          "Call a GitHub API endpoint and get the resulting JSON response"
+          'Call a GitHub API endpoint and get the resulting JSON response'
         end
 
         def details
           [
-            "Calls any GitHub API endpoint. You must provide your GitHub Personal token (get one from [https://github.com/settings/tokens/new](https://github.com/settings/tokens/new)).",
-            "Out parameters provide the status code and the full response JSON if valid, otherwise the raw response body.",
-            "Documentation: [https://developer.github.com/v3](https://developer.github.com/v3)."
+            'Calls any GitHub API endpoint. You must provide your GitHub Personal token (get one from [https://github.com/settings/tokens/new](https://github.com/settings/tokens/new)).',
+            'Out parameters provide the status code and the full response JSON if valid, otherwise the raw response body.',
+            'Documentation: [https://developer.github.com/v3](https://developer.github.com/v3).'
           ].join("\n")
         end
 
         def available_options
           [
-            FastlaneCore::ConfigItem.new(key: :server_url,
-                                         env_name: "FL_GITHUB_API_SERVER_URL",
-                                         description: "The server url. e.g. 'https://your.internal.github.host/api/v3' (Default: 'https://api.github.com')",
-                                         default_value: "https://api.github.com",
-                                         optional: true,
-                                         verify_block: proc do |value|
-                                           UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server/api/v3") unless value.include?("//")
-                                         end),
-            FastlaneCore::ConfigItem.new(key: :api_token,
-                                         env_name: "FL_GITHUB_API_TOKEN",
-                                         description: "Personal API Token for GitHub - generate one at https://github.com/settings/tokens",
-                                         sensitive: true,
-                                         code_gen_sensitive: true,
-                                         is_string: true,
-                                         default_value: ENV["GITHUB_API_TOKEN"],
-                                         default_value_dynamic: true,
-                                         optional: false),
-            FastlaneCore::ConfigItem.new(key: :http_method,
-                                         env_name: "FL_GITHUB_API_HTTP_METHOD",
-                                         description: "The HTTP method. e.g. GET / POST",
-                                         default_value: "GET",
-                                         optional: true,
-                                         verify_block: proc do |value|
-                                           unless %w(GET POST PUT DELETE HEAD CONNECT PATCH).include?(value.to_s.upcase)
-                                             UI.user_error!("Unrecognised HTTP method")
-                                           end
-                                         end),
-            FastlaneCore::ConfigItem.new(key: :body,
-                                         env_name: "FL_GITHUB_API_REQUEST_BODY",
-                                         description: "The request body in JSON or hash format",
-                                         is_string: false,
-                                         default_value: {},
-                                         optional: true),
-            FastlaneCore::ConfigItem.new(key: :raw_body,
-                                         env_name: "FL_GITHUB_API_REQUEST_RAW_BODY",
-                                         description: "The request body taken vertabim instead of as JSON, useful for file uploads",
-                                         is_string: true,
-                                         optional: true),
-            FastlaneCore::ConfigItem.new(key: :path,
-                                         env_name: "FL_GITHUB_API_PATH",
-                                         description: "The endpoint path. e.g. '/repos/:owner/:repo/readme'",
-                                         optional: true),
-            FastlaneCore::ConfigItem.new(key: :url,
-                                         env_name: "FL_GITHUB_API_URL",
-                                         description: "The complete full url - used instead of path. e.g. 'https://uploads.github.com/repos/fastlane...'",
-                                         optional: true,
-                                         verify_block: proc do |value|
-                                           UI.user_error!("Please include the protocol in the url, e.g. https://uploads.github.com") unless value.include?("//")
-                                         end),
-            FastlaneCore::ConfigItem.new(key: :error_handlers,
-                                         description: "Optional error handling hash based on status code, or pass '*' to handle all errors",
-                                         is_string: false,
-                                         default_value: {},
-                                         optional: true),
-            FastlaneCore::ConfigItem.new(key: :headers,
-                                         description: "Optional headers to apply",
-                                         is_string: false,
-                                         default_value: {},
-                                         optional: true),
-            FastlaneCore::ConfigItem.new(key: :secure,
-                                         env_name: "FL_GITHUB_API_SECURE",
-                                         description: "Optionally disable secure requests (ssl_verify_peer)",
-                                         type: Boolean,
-                                         default_value: true,
-                                         optional: true)
+            FastlaneCore::ConfigItem.new(
+              key: :server_url,
+              env_name: 'FL_GITHUB_API_SERVER_URL',
+              description:
+                "The server url. e.g. 'https://your.internal.github.host/api/v3' (Default: 'https://api.github.com')",
+              default_value: 'https://api.github.com',
+              optional: true,
+              verify_block:
+                proc do |value|
+                  unless value.include?('//')
+                    UI.user_error!(
+                      'Please include the protocol in the server url, e.g. https://your.github.server/api/v3'
+                    )
+                  end
+                end
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :api_token,
+              env_name: 'FL_GITHUB_API_TOKEN',
+              description:
+                'Personal API Token for GitHub - generate one at https://github.com/settings/tokens',
+              sensitive: true,
+              code_gen_sensitive: true,
+              is_string: true,
+              default_value: ENV['GITHUB_API_TOKEN'],
+              default_value_dynamic: true,
+              optional: false
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :http_method,
+              env_name: 'FL_GITHUB_API_HTTP_METHOD',
+              description: 'The HTTP method. e.g. GET / POST',
+              default_value: 'GET',
+              optional: true,
+              verify_block:
+                proc do |value|
+                  unless %w[GET POST PUT DELETE HEAD CONNECT PATCH].include?(
+                         value.to_s.upcase
+                       )
+                    UI.user_error!('Unrecognised HTTP method')
+                  end
+                end
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :body,
+              env_name: 'FL_GITHUB_API_REQUEST_BODY',
+              description: 'The request body in JSON or hash format',
+              is_string: false,
+              default_value: {},
+              optional: true
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :raw_body,
+              env_name: 'FL_GITHUB_API_REQUEST_RAW_BODY',
+              description:
+                'The request body taken vertabim instead of as JSON, useful for file uploads',
+              is_string: true,
+              optional: true
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :path,
+              env_name: 'FL_GITHUB_API_PATH',
+              description:
+                "The endpoint path. e.g. '/repos/:owner/:repo/readme'",
+              optional: true
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :url,
+              env_name: 'FL_GITHUB_API_URL',
+              description:
+                "The complete full url - used instead of path. e.g. 'https://uploads.github.com/repos/fastlane...'",
+              optional: true,
+              verify_block:
+                proc do |value|
+                  unless value.include?('//')
+                    UI.user_error!(
+                      'Please include the protocol in the url, e.g. https://uploads.github.com'
+                    )
+                  end
+                end
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :error_handlers,
+              description:
+                "Optional error handling hash based on status code, or pass '*' to handle all errors",
+              is_string: false,
+              default_value: {},
+              optional: true
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :headers,
+              description: 'Optional headers to apply',
+              is_string: false,
+              default_value: {},
+              optional: true
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :secure,
+              env_name: 'FL_GITHUB_API_SECURE',
+              description:
+                'Optionally disable secure requests (ssl_verify_peer)',
+              type: Boolean,
+              default_value: true,
+              optional: true
+            )
           ]
         end
 
         def output
           [
-            ['GITHUB_API_STATUS_CODE', 'The status code returned from the request'],
+            [
+              'GITHUB_API_STATUS_CODE',
+              'The status code returned from the request'
+            ],
             ['GITHUB_API_RESPONSE', 'The full response body'],
             ['GITHUB_API_JSON', 'The parsed json returned from GitHub']
           ]
         end
 
         def return_value
-          "A hash including the HTTP status code (:status), the response body (:body), and if valid JSON has been returned the parsed JSON (:json)."
+          'A hash including the HTTP status code (:status), the response body (:body), and if valid JSON has been returned the parsed JSON (:json).'
         end
 
         def authors
-          ["tommeier"]
+          %w[tommeier]
         end
 
         def example_code
@@ -179,9 +220,9 @@ module Fastlane
               path: "/repos/:owner/:repo/readme",
               error_handlers: {
                 404 => proc do |result|
-                  UI.message("Something went wrong - I couldn\'t find it...")
+                  UI.message("Something went wrong - I couldn't find it...")
                 end,
-                \'*\' => proc do |result|
+                '*' => proc do |result|
                   UI.message("Handle all error codes other than 404")
                 end
               }
@@ -205,14 +246,21 @@ module Fastlane
         def construct_headers(api_token, overrides)
           require 'base64'
           headers = { 'User-Agent' => 'fastlane-github_api' }
-          headers['Authorization'] = "Basic #{Base64.strict_encode64(api_token)}" if api_token
+          if api_token
+            headers['Authorization'] =
+              "Basic #{Base64.strict_encode64(api_token)}"
+          end
           headers.merge(overrides || {})
         end
 
         def construct_url(server_url, path, url)
           return_url = (server_url && path) ? File.join(server_url, path) : url
 
-          UI.user_error!("Please provide either `server_url` (e.g. https://api.github.com) and 'path' or full 'url' for GitHub API endpoint") unless return_url
+          unless return_url
+            UI.user_error!(
+              "Please provide either `server_url` (e.g. https://api.github.com) and 'path' or full 'url' for GitHub API endpoint"
+            )
+          end
 
           return_url
         end
@@ -227,7 +275,11 @@ module Fastlane
           elsif body.kind_of?(Array)
             body.to_json
           else
-            UI.user_error!("Please provide valid JSON, or a hash as request body") unless parse_json(body)
+            unless parse_json(body)
+              UI.user_error!(
+                'Please provide valid JSON, or a hash as request body'
+              )
+            end
             body
           end
         end
@@ -242,7 +294,8 @@ module Fastlane
           require 'excon'
 
           Excon.defaults[:ssl_verify_peer] = secure
-          middlewares = Excon.defaults[:middlewares] + [Excon::Middleware::RedirectFollower] # allow redirect in case of repo renames
+          middlewares =
+            Excon.defaults[:middlewares] + [Excon::Middleware::RedirectFollower] # allow redirect in case of repo renames
 
           UI.verbose("#{http_method} : #{url}")
 

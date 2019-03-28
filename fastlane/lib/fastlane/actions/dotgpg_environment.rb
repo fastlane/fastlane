@@ -1,7 +1,6 @@
 module Fastlane
   module Actions
-    module SharedValues
-    end
+    module SharedValues; end
 
     class DotgpgEnvironmentAction < Action
       def self.run(options)
@@ -13,36 +12,41 @@ module Fastlane
       end
 
       def self.description
-        "Reads in production secrets set in a dotgpg file and puts them in ENV"
+        'Reads in production secrets set in a dotgpg file and puts them in ENV'
       end
 
       def self.details
-        "More information about dotgpg can be found at [https://github.com/ConradIrwin/dotgpg](https://github.com/ConradIrwin/dotgpg)."
+        'More information about dotgpg can be found at [https://github.com/ConradIrwin/dotgpg](https://github.com/ConradIrwin/dotgpg).'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :dotgpg_file,
-                                       env_name: "DOTGPG_FILE",
-                                       description: "Path to your gpg file",
-                                       code_gen_sensitive: true,
-                                       default_value: Dir["dotgpg/*.gpg"].last,
-                                       default_value_dynamic: true,
-                                       optional: false,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Dotgpg file '#{File.expand_path(value)}' not found") unless File.exist?(value)
-                                       end)
+          FastlaneCore::ConfigItem.new(
+            key: :dotgpg_file,
+            env_name: 'DOTGPG_FILE',
+            description: 'Path to your gpg file',
+            code_gen_sensitive: true,
+            default_value: Dir['dotgpg/*.gpg'].last,
+            default_value_dynamic: true,
+            optional: false,
+            verify_block:
+              proc do |value|
+                unless File.exist?(value)
+                  UI.user_error!(
+                    "Dotgpg file '#{File.expand_path(value)}' not found"
+                  )
+                end
+              end
+          )
         ]
       end
 
       def self.authors
-        ["simonlevy5"]
+        %w[simonlevy5]
       end
 
       def self.example_code
-        [
-          "dotgpg_environment(dotgpg_file: './path/to/gpgfile')"
-        ]
+        ["dotgpg_environment(dotgpg_file: './path/to/gpgfile')"]
       end
 
       def self.category

@@ -40,8 +40,13 @@ module FastlaneCore
       $?.exitstatus
     rescue LoadError
       require 'open3'
-      Open3.popen2e(command) do |command_stdin, command_stdout, p| # note the inversion
-        yield(command_stdout, command_stdin, p.value.pid)
+      Open3.popen2e(command) do |command_stdin, command_stdout, p|
+        yield(
+          # note the inversion
+          command_stdout,
+          command_stdin,
+          p.value.pid
+        )
 
         command_stdin.close
         command_stdout.close

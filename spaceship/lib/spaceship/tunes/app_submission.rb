@@ -75,43 +75,47 @@ module Spaceship
       # @return (String) Export Compliance - Platform
       attr_accessor :export_compliance_platform
 
-      attr_mapping({
-        # Ad ID Info Section
-        'adIdInfo.servesAds.value' => :add_id_info_serves_ads,
-        'adIdInfo.tracksAction.value' => :add_id_info_tracks_action,
-        'adIdInfo.tracksInstall.value' => :add_id_info_tracks_install,
-        'adIdInfo.usesIdfa.value' => :add_id_info_uses_idfa,
-
-        # Content Rights Section
-        'contentRights.containsThirdPartyContent.value' => :content_rights_contains_third_party_content,
-        'contentRights.hasRights.value' => :content_rights_has_rights,
-
-        # Export Compliance Section
-        'exportCompliance.availableOnFrenchStore.value' => :export_compliance_available_on_french_store,
-        'exportCompliance.ccatFile.value' => :export_compliance_ccat_file,
-        'exportCompliance.containsProprietaryCryptography.value' => :export_compliance_contains_proprietary_cryptography,
-        'exportCompliance.containsThirdPartyCryptography.value' => :export_compliance_contains_third_party_cryptography,
-        'exportCompliance.isExempt.value' => :export_compliance_is_exempt,
-        'exportCompliance.usesEncryption.value' => :export_compliance_uses_encryption,
-        'exportCompliance.appType' => :export_compliance_app_type,
-        'exportCompliance.encryptionUpdated.value' => :export_compliance_encryption_updated,
-        'exportCompliance.exportComplianceRequired' => :export_compliance_compliance_required,
-        'exportCompliance.platform' => :export_compliance_platform
-      })
+      attr_mapping(
+        {
+          # Ad ID Info Section
+          'adIdInfo.servesAds.value' =>
+            :add_id_info_serves_ads,
+          'adIdInfo.tracksAction.value' => :add_id_info_tracks_action,
+          'adIdInfo.tracksInstall.value' => :add_id_info_tracks_install,
+          'adIdInfo.usesIdfa.value' => :add_id_info_uses_idfa,
+          # Content Rights Section
+          'contentRights.containsThirdPartyContent.value' =>
+            :content_rights_contains_third_party_content,
+          'contentRights.hasRights.value' => :content_rights_has_rights,
+          # Export Compliance Section
+          'exportCompliance.availableOnFrenchStore.value' =>
+            :export_compliance_available_on_french_store,
+          'exportCompliance.ccatFile.value' => :export_compliance_ccat_file,
+          'exportCompliance.containsProprietaryCryptography.value' =>
+            :export_compliance_contains_proprietary_cryptography,
+          'exportCompliance.containsThirdPartyCryptography.value' =>
+            :export_compliance_contains_third_party_cryptography,
+          'exportCompliance.isExempt.value' => :export_compliance_is_exempt,
+          'exportCompliance.usesEncryption.value' =>
+            :export_compliance_uses_encryption,
+          'exportCompliance.appType' => :export_compliance_app_type,
+          'exportCompliance.encryptionUpdated.value' =>
+            :export_compliance_encryption_updated,
+          'exportCompliance.exportComplianceRequired' =>
+            :export_compliance_compliance_required,
+          'exportCompliance.platform' => :export_compliance_platform
+        }
+      )
 
       class << self
         # Create a new object based on a hash.
         # This is used to create a new object based on the server response.
         def factory(attrs)
           # fill content rights section if iTC returns nil
-          if attrs["contentRights"].nil?
-            attrs["contentRights"] = {
-              "containsThirdPartyContent" => {
-                "value" => nil
-              },
-              "hasRights" => {
-                "value" => nil
-              }
+          if attrs['contentRights'].nil?
+            attrs['contentRights'] = {
+              'containsThirdPartyContent' => { 'value' => nil },
+              'hasRights' => { 'value' => nil }
             }
           end
 
@@ -121,7 +125,11 @@ module Spaceship
 
         # @param application (Spaceship::Tunes::Application) The app this submission is for
         def create(application, version, platform: nil)
-          attrs = client.prepare_app_submissions(application.apple_id, application.edit_version(platform: platform).version_id)
+          attrs =
+            client.prepare_app_submissions(
+              application.apple_id,
+              application.edit_version(platform: platform).version_id
+            )
           attrs[:application] = application
           attrs[:version] = version
           attrs[:platform] = platform
@@ -133,23 +141,26 @@ module Spaceship
       # Save and complete the app submission
       def complete!
         raw_data_clone = raw_data.dup
-        if self.content_rights_has_rights.nil? || self.content_rights_contains_third_party_content.nil?
-          raw_data_clone.set(["contentRights"], nil)
+        if self.content_rights_has_rights.nil? ||
+           self.content_rights_contains_third_party_content.nil?
+          raw_data_clone.set(%w[contentRights], nil)
         end
         raw_data_clone.delete(:version)
         raw_data_clone.delete(:application)
 
         # Check whether the application makes use of IDFA or not
         # and automatically set the mandatory limitsTracking value in the request JSON accordingly.
-        if !self.add_id_info_uses_idfa.nil? && self.add_id_info_uses_idfa == true
+        if !self.add_id_info_uses_idfa.nil? &&
+           self.add_id_info_uses_idfa == true
           # Application uses IDFA, before sending for submission limitsTracking key in the request JSON must be set to true (agreement).
-          raw_data_clone.set(
-            ["adIdInfo", "limitsTracking", "value"],
-            true
-          )
+          raw_data_clone.set(%w[adIdInfo limitsTracking value], true)
         end
 
-        client.send_app_submission(application.apple_id, application.edit_version(platform: platform).version_id, raw_data_clone)
+        client.send_app_submission(
+          application.apple_id,
+          application.edit_version(platform: platform).version_id,
+          raw_data_clone
+        )
         @submitted_for_review = true
       end
 

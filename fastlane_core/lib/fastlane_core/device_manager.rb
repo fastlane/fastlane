@@ -7,25 +7,31 @@ require_relative 'helper'
 module FastlaneCore
   class DeviceManager
     class << self
-      def all(requested_os_type = "")
-        return connected_devices(requested_os_type) + simulators(requested_os_type)
+      def all(requested_os_type = '')
+        return connected_devices(requested_os_type) +
+          simulators(requested_os_type)
       end
 
-      def simulators(requested_os_type = "")
-        UI.verbose("Fetching available simulator devices")
+      def simulators(requested_os_type = '')
+        UI.verbose('Fetching available simulator devices')
 
         @devices = []
         os_type = 'unknown'
         os_version = 'unknown'
         output = ''
-        Open3.popen3('xcrun simctl list devices') do |stdin, stdout, stderr, wait_thr|
-          output = stdout.read
-        end
+        Open3.popen3(
+          'xcrun simctl list devices'
+        ) { |stdin, stdout, stderr, wait_thr| output = stdout.read }
 
         runtime_info = ''
-        Open3.popen3('xcrun simctl list runtimes') do |stdin, stdout, stderr, wait_thr|
+        Open3.popen3(
+          'xcrun simctl list runtimes'
+        ) do |stdin, stdout, stderr, wait_thr|
           # This regex outputs the version info in the format "<platform> <version><exact version>"
-          runtime_info = stdout.read.lines.map { |v| v.sub(/(\w+ \S+)\s*\((\S+)\s[\S\s]*/, "\\1 \\2") }.drop(1)
+          runtime_info =
+            stdout.read.lines.map do |v|
+              v.sub(/(\w+ \S+)\s*\((\S+)\s[\S\s]*/, "\\1 \\2")
+            end.drop(1)
         end
         exact_versions = Hash.new({})
         runtime_info.each do |r|
@@ -34,30 +40,43 @@ module FastlaneCore
           exact_versions[platform][general] = exact
         end
 
-        unless output.include?("== Devices ==")
-          UI.error("xcrun simctl CLI broken, run `xcrun simctl list devices` and make sure it works")
-          UI.user_error!("xcrun simctl not working.")
+        unless output.include?('== Devices ==')
+          UI.error(
+            'xcrun simctl CLI broken, run `xcrun simctl list devices` and make sure it works'
+          )
+          UI.user_error!('xcrun simctl not working.')
         end
 
         output.split(/\n/).each do |line|
           next if line =~ /unavailable/
           next if line =~ /^== /
           if line =~ /^-- /
-            (os_type, os_version) = line.gsub(/-- (.*) --/, '\1').split
+            os_type, os_version = line.gsub(/-- (.*) --/, '\1').split
           else
             next if os_type =~ /^Unavailable/
 
             # "    iPad (5th generation) (852A5796-63C3-4641-9825-65EBDC5C4259) (Shutdown)"
             # This line will turn the above string into
             # ["iPad", "(5th generation)", "(852A5796-63C3-4641-9825-65EBDC5C4259)", "(Shutdown)"]
-            matches = line.strip.scan(/(.*?) (\(.*?\))/).flatten.reject(&:empty?)
+            matches =
+              line.strip.scan(/(.*?) (\(.*?\))/).flatten.reject(&:empty?)
             state = matches.pop.to_s.delete('(').delete(')')
             udid = matches.pop.to_s.delete('(').delete(')')
             name = matches.join(' ')
 
-            if matches.count && (os_type == requested_os_type || requested_os_type == "")
+            if matches.count &&
+               (os_type == requested_os_type || requested_os_type == '')
               # This is disabled here because the Device is defined later in the file, and that's a problem for the cop
-              @devices << Device.new(name: name, os_type: os_type, os_version: (exact_versions[os_type][os_version] || os_version), udid: udid, state: state, is_simulator: true)
+              @devices <<
+                Device.new(
+                  name: name,
+                  os_type: os_type,
+                  os_version:
+                    (exact_versions[os_type][os_version] || os_version),
+                  udid: udid,
+                  state: state,
+                  is_simulator: true
+                )
             end
           end
         end
@@ -66,25 +85,24 @@ module FastlaneCore
       end
 
       def connected_devices(requested_os_type)
-        UI.verbose("Fetching available connected devices")
+        UI.verbose('Fetching available connected devices')
 
-        device_types = if requested_os_type == "tvOS"
-                         ["AppleTV"]
-                       elsif requested_os_type == "iOS"
-                         ["iPhone", "iPad", "iPod"]
-                       else
-                         []
-                       end
+        device_types =
+          if requested_os_type == 'tvOS'
+            %w[AppleTV]
+          elsif requested_os_type == 'iOS'
+            %w[iPhone iPad iPod]
+          else
+            []
+          end
 
         devices = [] # Return early if no supported devices are being searched for
-        if device_types.count == 0
-          return devices
-        end
+        return devices if device_types.count == 0
 
         usb_devices_output = ''
-        Open3.popen3("system_profiler SPUSBDataType -xml") do |stdin, stdout, stderr, wait_thr|
-          usb_devices_output = stdout.read
-        end
+        Open3.popen3(
+          'system_profiler SPUSBDataType -xml'
+        ) { |stdin, stdout, stderr, wait_thr| usb_devices_output = stdout.read }
 
         device_uuids = []
         result = Plist.parse_xml(usb_devices_output)
@@ -93,16 +111,33 @@ module FastlaneCore
 
         if device_uuids.count > 0 # instruments takes a little while to return so skip it if we have no devices
           instruments_devices_output = ''
-          Open3.popen3("instruments -s devices") do |stdin, stdout, stderr, wait_thr|
+          Open3.popen3(
+            'instruments -s devices'
+          ) do |stdin, stdout, stderr, wait_thr|
             instruments_devices_output = stdout.read
           end
 
           instruments_devices_output.split(/\n/).each do |instruments_device|
             device_uuids.each do |device_uuid|
-              match = instruments_device.match(/(.+) \(([0-9.]+)\) \[(\h{40}|\h{8}-\h{16})\]?/)
-              if match && match[3].delete("-") == device_uuid
-                devices << Device.new(name: match[1], udid: match[3], os_type: requested_os_type, os_version: match[2], state: "Booted", is_simulator: false)
-                UI.verbose("USB Device Found - \"" + match[1] + "\" (" + match[2] + ") UUID:" + match[3])
+              match =
+                instruments_device.match(
+                  /(.+) \(([0-9.]+)\) \[(\h{40}|\h{8}-\h{16})\]?/
+                )
+              if match && match[3].delete('-') == device_uuid
+                devices <<
+                  Device.new(
+                    name: match[1],
+                    udid: match[3],
+                    os_type: requested_os_type,
+                    os_version: match[2],
+                    state: 'Booted',
+                    is_simulator: false
+                  )
+                UI.verbose(
+                  'USB Device Found - \"' + match[1] + '\" (' + match[2] +
+                    ') UUID:' +
+                    match[3]
+                )
               end
             end
           end
@@ -118,7 +153,8 @@ module FastlaneCore
           discover_devices(child_item, device_types, discovered_device_udids)
         end
 
-        is_supported_device = device_types.any? { |device_type| usb_item['_name'] == device_type }
+        is_supported_device =
+          device_types.any? { |device_type| usb_item['_name'] == device_type }
         serial_num = usb_item['serial_num'] || ''
         has_serial_number = serial_num.length == 40 || serial_num.length == 24
 
@@ -128,10 +164,10 @@ module FastlaneCore
       end
 
       def latest_simulator_version_for_device(device)
-        simulators.select { |s| s.name == device }
-                  .sort_by { |s| Gem::Version.create(s.os_version) }
-                  .last
-                  .os_version
+        simulators.select { |s| s.name == device }.sort_by do |s|
+          Gem::Version.create(s.os_version)
+        end.last
+          .os_version
       end
 
       # The code below works from Xcode 7 on
@@ -185,7 +221,14 @@ module FastlaneCore
       attr_accessor :state
       attr_accessor :is_simulator
 
-      def initialize(name: nil, udid: nil, os_type: nil, os_version: nil, state: nil, is_simulator: nil)
+      def initialize(
+        name: nil,
+        udid: nil,
+        os_type: nil,
+        os_version: nil,
+        state: nil,
+        is_simulator: nil
+      )
         self.name = name
         self.udid = udid
         self.os_type = os_type
@@ -201,14 +244,14 @@ module FastlaneCore
 
       def reset
         UI.message("Resetting #{self}")
-        `xcrun simctl shutdown #{self.udid}` if self.state == "Booted"
+        `xcrun simctl shutdown #{self.udid}` if self.state == 'Booted'
         `xcrun simctl erase #{self.udid}`
         return
       end
 
       def delete
         UI.message("Deleting #{self}")
-        `xcrun simctl shutdown #{self.udid}` unless self.state == "Shutdown"
+        `xcrun simctl shutdown #{self.udid}` unless self.state == 'Shutdown'
         `xcrun simctl delete #{self.udid}`
         return
       end
@@ -234,7 +277,11 @@ module FastlaneCore
       # Reset simulator by UDID or name and OS version
       # Latter is useful when combined with -destination option of xcodebuild
       def reset(udid: nil, name: nil, os_version: nil)
-        match = all.detect { |device| device.udid == udid || device.name == name && device.os_version == os_version }
+        match =
+          all.detect do |device|
+            device.udid == udid ||
+              device.name == name && device.os_version == os_version
+          end
         match.reset if match
       end
 
@@ -255,21 +302,36 @@ module FastlaneCore
       def launch(device)
         return unless device.is_simulator
 
-        simulator_path = File.join(Helper.xcode_path, 'Applications', 'Simulator.app')
+        simulator_path =
+          File.join(Helper.xcode_path, 'Applications', 'Simulator.app')
 
-        UI.verbose("Launching #{simulator_path} for device: #{device.name} (#{device.udid})")
+        UI.verbose(
+          "Launching #{simulator_path} for device: #{device.name} (#{device
+            .udid})"
+        )
 
-        Helper.backticks("open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}", print: FastlaneCore::Globals.verbose?)
+        Helper.backticks(
+          "open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}",
+          print: FastlaneCore::Globals.verbose?
+        )
       end
 
       def copy_logs(device, log_identity, logs_destination_dir)
         logs_destination_dir = File.expand_path(logs_destination_dir)
-        os_version = FastlaneCore::CommandExecutor.execute(command: 'sw_vers -productVersion', print_all: false, print_command: false)
+        os_version =
+          FastlaneCore::CommandExecutor.execute(
+            command: 'sw_vers -productVersion',
+            print_all: false,
+            print_command: false
+          )
 
-        host_computer_supports_logarchives = Gem::Version.new(os_version) >= Gem::Version.new('10.12.0')
-        device_supports_logarchives = Gem::Version.new(device.os_version) >= Gem::Version.new('10.0')
+        host_computer_supports_logarchives =
+          Gem::Version.new(os_version) >= Gem::Version.new('10.12.0')
+        device_supports_logarchives =
+          Gem::Version.new(device.os_version) >= Gem::Version.new('10.0')
 
-        are_logarchives_supported = device_supports_logarchives && host_computer_supports_logarchives
+        are_logarchives_supported =
+          device_supports_logarchives && host_computer_supports_logarchives
         if are_logarchives_supported
           copy_logarchive(device, log_identity, logs_destination_dir)
         else
@@ -278,23 +340,31 @@ module FastlaneCore
       end
 
       def uninstall_app(app_identifier, device_type, device_udid)
-        UI.verbose("Uninstalling app '#{app_identifier}' from #{device_type}...")
+        UI.verbose(
+          "Uninstalling app '#{app_identifier}' from #{device_type}..."
+        )
 
         UI.message("Launch Simulator #{device_type}")
         Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
 
         UI.message("Uninstall application #{app_identifier}")
-        Helper.backticks("xcrun simctl uninstall #{device_udid} #{app_identifier} &> /dev/null")
+        Helper.backticks(
+          "xcrun simctl uninstall #{device_udid} #{app_identifier} &> /dev/null"
+        )
       end
 
       private
 
       def copy_logfile(device, log_identity, logs_destination_dir)
-        logfile_src = File.expand_path("~/Library/Logs/CoreSimulator/#{device.udid}/system.log")
+        logfile_src =
+          File.expand_path(
+            "~/Library/Logs/CoreSimulator/#{device.udid}/system.log"
+          )
         return unless File.exist?(logfile_src)
 
         FileUtils.mkdir_p(logs_destination_dir)
-        logfile_dst = File.join(logs_destination_dir, "system-#{log_identity}.log")
+        logfile_dst =
+          File.join(logs_destination_dir, "system-#{log_identity}.log")
 
         FileUtils.rm_f(logfile_dst)
         FileUtils.cp(logfile_src, logfile_dst)
@@ -304,11 +374,20 @@ module FastlaneCore
       def copy_logarchive(device, log_identity, logs_destination_dir)
         require 'shellwords'
 
-        logarchive_dst = File.join(logs_destination_dir, "system_logs-#{log_identity}.logarchive").shellescape
+        logarchive_dst =
+          File.join(
+            logs_destination_dir,
+            "system_logs-#{log_identity}.logarchive"
+          )
+            .shellescape
         FileUtils.rm_rf(logarchive_dst)
-        FileUtils.mkdir_p(File.expand_path("..", logarchive_dst))
-        command = "xcrun simctl spawn #{device.udid} log collect --output #{logarchive_dst} 2>/dev/null"
-        FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
+        FileUtils.mkdir_p(File.expand_path('..', logarchive_dst))
+        command =
+          "xcrun simctl spawn #{device
+            .udid} log collect --output #{logarchive_dst} 2>/dev/null"
+        FastlaneCore::CommandExecutor.execute(
+          command: command, print_all: false, print_command: true
+        )
       end
     end
   end

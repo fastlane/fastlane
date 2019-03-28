@@ -74,7 +74,10 @@ module Spaceship
           privacyPolicyUrl: :privacy_url,
           privacyPolicy: :apple_tv_privacy_policy
         }.each do |json, attribute|
-          instance_variable_set("@#{attribute}".to_sym, LanguageItem.new(json, languages))
+          instance_variable_set(
+            "@#{attribute}".to_sym,
+            LanguageItem.new(json, languages)
+          )
         end
       end
 
@@ -82,7 +85,7 @@ module Spaceship
       def save!
         client.update_app_details!(application.apple_id, raw_data)
       rescue Spaceship::Tunes::Error => ex
-        if ex.to_s == "operation_failed"
+        if ex.to_s == 'operation_failed'
           # That's alright, we get this error message if nothing has changed
         else
           raise ex
@@ -135,12 +138,12 @@ module Spaceship
       private
 
       def prefix_mzgenre(value)
-        value.include?("MZGenre") ? value : "MZGenre.#{value}"
+        value.include?('MZGenre') ? value : "MZGenre.#{value}"
       end
 
       def prefix_apps(value)
-        return value unless value.include?("Stickers")
-        value.include?("Apps") ? value : "Apps.#{value}"
+        return value unless value.include?('Stickers')
+        value.include?('Apps') ? value : "Apps.#{value}"
       end
     end
   end

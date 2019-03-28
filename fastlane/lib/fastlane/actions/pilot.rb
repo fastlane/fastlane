@@ -7,7 +7,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the `upload_to_testflight` action"
+        'Alias for the `upload_to_testflight` action'
       end
     end
   end

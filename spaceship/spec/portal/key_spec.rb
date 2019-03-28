@@ -3,9 +3,7 @@ require 'spec_helper'
 describe Spaceship::Portal::Key do
   let(:mock_client) { double('MockClient') }
 
-  before do
-    Spaceship::Portal::Key.client = mock_client
-  end
+  before { Spaceship::Portal::Key.client = mock_client }
 
   describe '.all' do
     it 'uses the client to fetch all keys' do
@@ -14,15 +12,15 @@ describe Spaceship::Portal::Key do
           {
             canDownload: false,
             canRevoke: true,
-            keyId: "some-key-id",
-            keyName: "Test Key via fastlane",
+            keyId: 'some-key-id',
+            keyName: 'Test Key via fastlane',
             servicesCount: 2
           },
           {
             canDownload: true,
             canRevoke: true,
-            keyId: "B92NE4F7RG",
-            keyName: "Test Key via browser",
+            keyId: 'B92NE4F7RG',
+            keyName: 'Test Key via browser',
             servicesCount: 2
           }
         ]
@@ -36,11 +34,7 @@ describe Spaceship::Portal::Key do
 
   describe '.find' do
     it 'uses the client to get a single key' do
-      mock_client_response(:get_key) do
-        {
-          keyId: 'some-key-id'
-        }
-      end
+      mock_client_response(:get_key) { { keyId: 'some-key-id' } }
 
       key = Spaceship::Portal::Key.find('some-key-id')
       expect(key).to be_instance_of(Spaceship::Portal::Key)
@@ -51,24 +45,31 @@ describe Spaceship::Portal::Key do
   describe '.create' do
     it 'creates a key with the client' do
       expected_service_configs = {
-        "U27F4V844T" => [],
-        "DQ8HTZ7739" => [],
-        "6A7HVUVQ3M" => ["some-music-id"]
+        'U27F4V844T' => [],
+        'DQ8HTZ7739' => [],
+        '6A7HVUVQ3M' => %w[some-music-id]
       }
-      mock_client_response(:create_key!, with: { name: 'New Key', service_configs: expected_service_configs }) do
-        {
-          keyId: 'a-new-key-id'
-        }
-      end
+      mock_client_response(
+        :create_key!,
+        with: { name: 'New Key', service_configs: expected_service_configs }
+      ) { { keyId: 'a-new-key-id' } }
 
-      key = Spaceship::Portal::Key.create(name: 'New Key', apns: true, device_check: true, music_id: 'some-music-id')
+      key =
+        Spaceship::Portal::Key.create(
+          name: 'New Key',
+          apns: true,
+          device_check: true,
+          music_id: 'some-music-id'
+        )
       expect(key).to be_instance_of(Spaceship::Portal::Key)
       expect(key.id).to eq('a-new-key-id')
     end
   end
 
   describe 'instance methods' do
-    let(:key_attributes) do # these keys are intentionally strings.
+    let(:key_attributes) do
+      # these keys are intentionally strings.
+
       {
         'canDownload' => false,
         'canRevoke' => true,
@@ -76,11 +77,7 @@ describe Spaceship::Portal::Key do
         'keyName' => 'fastlane',
         'servicesCount' => 3,
         'services' => [
-          {
-            'name' => 'APNS',
-            'id' => 'U27F4V844T',
-            'configurations' => []
-          },
+          { 'name' => 'APNS', 'id' => 'U27F4V844T', 'configurations' => [] },
           {
             'name' => 'MusicKit',
             'id' => '6A7HVUVQ3M',
@@ -126,11 +123,11 @@ describe Spaceship::Portal::Key do
     describe '#download' do
       it 'returns the p8 file' do
         mock_client_response(:download_key) do
-          %{
+          '
 -----BEGIN PRIVATE KEY-----
 this is the encoded private key contents
 -----END PRIVATE KEY-----
-          }
+          '
         end
         p8_string = key.download
         expect(p8_string).to include('PRIVATE KEY')

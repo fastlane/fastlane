@@ -6,34 +6,55 @@ module Produce
     def create(options, _args)
       login
 
-      ENV["CREATED_NEW_GROUP_ID"] = Time.now.to_i.to_s
+      ENV['CREATED_NEW_GROUP_ID'] = Time.now.to_i.to_s
 
-      group_identifier = options.group_identifier || UI.input("Group identifier: ")
+      group_identifier =
+        options.group_identifier || UI.input('Group identifier: ')
 
       if app_group_exists?(group_identifier)
-        UI.success("[DevCenter] Group '#{options.group_name} (#{options.group_identifier})' already exists, nothing to do on the Dev Center")
-        ENV["CREATED_NEW_GROUP_ID"] = nil
+        UI.success(
+          "[DevCenter] Group '#{options.group_name} (#{options
+            .group_identifier})' already exists, nothing to do on the Dev Center"
+        )
+        ENV['CREATED_NEW_GROUP_ID'] = nil
         # Nothing to do here
       else
-        group_name = options.group_name || group_identifier.split(".").map(&:capitalize).reverse.join(' ')
+        group_name =
+          options.group_name ||
+            group_identifier.split('.').map(&:capitalize).reverse.join(' ')
 
-        UI.success("Creating new app group '#{group_name}' with identifier '#{group_identifier}' on the Apple Dev Center")
+        UI.success(
+          "Creating new app group '#{group_name}' with identifier '#{group_identifier}' on the Apple Dev Center"
+        )
 
-        group = Spaceship.app_group.create!(group_id: group_identifier,
-                                            name: group_name)
+        group =
+          Spaceship.app_group.create!(
+            group_id: group_identifier, name: group_name
+          )
 
         if group.name != group_name
-          UI.important("Your group name includes non-ASCII characters, which are not supported by the Apple Developer Portal.")
-          UI.important("To fix this a unique (internal) name '#{group.name}' has been created for you.")
+          UI.important(
+            'Your group name includes non-ASCII characters, which are not supported by the Apple Developer Portal.'
+          )
+          UI.important(
+            "To fix this a unique (internal) name '#{group
+              .name}' has been created for you."
+          )
         end
 
         UI.message("Created group #{group.app_group_id}")
 
-        UI.user_error!("Something went wrong when creating the new app group - it's not listed in the app groups list") unless app_group_exists?(group_identifier)
+        unless app_group_exists?(group_identifier)
+          UI.user_error!(
+            "Something went wrong when creating the new app group - it's not listed in the app groups list"
+          )
+        end
 
-        ENV["CREATED_NEW_GROUP_ID"] = Time.now.to_i.to_s
+        ENV['CREATED_NEW_GROUP_ID'] = Time.now.to_i.to_s
 
-        UI.success("Finished creating new app group '#{group_name}' on the Dev Center")
+        UI.success(
+          "Finished creating new app group '#{group_name}' on the Dev Center"
+        )
       end
 
       return true
@@ -43,18 +64,28 @@ module Produce
       login
 
       if !app_exists?
-        UI.message("[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist, nothing to associate with the groups")
+        UI.message(
+          "[DevCenter] App '#{Produce.config[
+            :app_identifier
+          ]}' does not exist, nothing to associate with the groups"
+        )
       else
         app = Spaceship.app.find(app_identifier)
-        UI.user_error!("Something went wrong when fetching the app - it's not listed in the apps list") if app.nil?
+        if app.nil?
+          UI.user_error!(
+            "Something went wrong when fetching the app - it's not listed in the apps list"
+          )
+        end
 
         new_groups = []
 
-        UI.message("Validating groups before association")
+        UI.message('Validating groups before association')
 
         args.each do |group_identifier|
           if !app_group_exists?(group_identifier)
-            UI.message("[DevCenter] App group '#{group_identifier}' does not exist, please create it first, skipping for now")
+            UI.message(
+              "[DevCenter] App group '#{group_identifier}' does not exist, please create it first, skipping for now"
+            )
           else
             new_groups.push(Spaceship.app_group.find(group_identifier))
           end
@@ -62,7 +93,7 @@ module Produce
 
         UI.message("Finalising association with #{new_groups.count} groups")
         app.associate_groups(new_groups)
-        UI.success("Done!")
+        UI.success('Done!')
       end
 
       return true
@@ -72,7 +103,7 @@ module Produce
       UI.message("Starting login with user '#{Produce.config[:username]}'")
       Spaceship.login(Produce.config[:username], nil)
       Spaceship.select_team
-      UI.message("Successfully logged in")
+      UI.message('Successfully logged in')
     end
 
     def app_identifier

@@ -48,7 +48,9 @@ module Spaceship
         # @param mac [Bool] Fetches Mac website push if true
         # @return (Array) Returns all website push available for this account
         def all(mac: false)
-          client.website_push(mac: mac).map { |website_push| self.new(website_push) }
+          client.website_push(mac: mac).map do |website_push|
+            self.new(website_push)
+          end
         end
 
         # Creates a new Website Push ID on the Apple Dev Portal
@@ -58,7 +60,8 @@ module Spaceship
         # @param mac [Bool] is this a Mac Website Push?
         # @return (Website Push) The Website Push you just created
         def create!(bundle_id: nil, name: nil, mac: false)
-          new_website_push = client.create_website_push!(name, bundle_id, mac: mac)
+          new_website_push =
+            client.create_website_push!(name, bundle_id, mac: mac)
           self.new(new_website_push)
         end
 

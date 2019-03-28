@@ -5,10 +5,10 @@ module Spaceship
     class << self
       def client
         require_relative 'spaceship'
+
         (
-          @client or
-          Spaceship::Portal.client or
-          raise "Please login using `Spaceship::Portal.login('user', 'password')`"
+          @client or Spaceship::Portal.client or
+            raise "Please login using `Spaceship::Portal.login('user', 'password')`"
         )
       end
     end

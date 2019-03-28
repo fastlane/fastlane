@@ -12,14 +12,14 @@ module Spaceship
       # @return (Intger) the Family Id
       attr_accessor :family_id
 
-      attr_mapping({
-        'id' => :family_id,
-        'name.value' => :name
-      })
+      attr_mapping({ 'id' => :family_id, 'name.value' => :name })
 
       # return a editable family object
       def edit
-        attrs = client.load_iap_family(app_id: application.apple_id, family_id: self.family_id)
+        attrs =
+          client.load_iap_family(
+            app_id: application.apple_id, family_id: self.family_id
+          )
         attrs[:application] = application
         Tunes::IAPFamilyDetails.new(attrs)
       end

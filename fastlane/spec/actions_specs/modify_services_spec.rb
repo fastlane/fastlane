@@ -2,7 +2,7 @@ require 'produce/service'
 
 describe Fastlane do
   describe Fastlane::FastFile do
-    describe "modify_services" do
+    describe 'modify_services' do
       it 'sends enable and disable with strings, symbols, and booleans' do
         allow(Produce).to receive(:config)
         expect(Produce::Service).to receive(:enable) do |options, args|
@@ -15,7 +15,8 @@ describe Fastlane do
           expect(options.apple_pay).to eq('off')
           expect(options.multipath).to eq('off')
         end
-        Fastlane::FastFile.new.parse("lane :test do
+        Fastlane::FastFile.new.parse(
+          "lane :test do
             modify_services(
               username: 'test.account@gmail.com',
               app_identifier: 'com.someorg.app',
@@ -27,7 +28,10 @@ describe Fastlane do
                 data_protection: true,
                 multipath: false
             })
-        end").runner.execute(:test)
+        end"
+        )
+          .runner
+          .execute(:test)
       end
     end
   end

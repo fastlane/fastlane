@@ -16,24 +16,27 @@ module FastlaneCore
       $stdout.sync = true
 
       if Helper.test? && !ENV.key?('DEBUG')
-        $stdout.puts("Logging disabled while running tests. Force them by setting the DEBUG environment variable")
+        $stdout.puts(
+          'Logging disabled while running tests. Force them by setting the DEBUG environment variable'
+        )
         @log ||= Logger.new(nil) # don't show any logs when running tests
       else
         @log ||= Logger.new($stdout)
       end
 
-      @log.formatter = proc do |severity, datetime, progname, msg|
-        "#{format_string(datetime, severity)}#{msg}\n"
-      end
+      @log.formatter =
+        proc do |severity, datetime, progname, msg|
+          "#{format_string(datetime, severity)}#{msg}\n"
+        end
 
       @log
     end
 
-    def format_string(datetime = Time.now, severity = "")
+    def format_string(datetime = Time.now, severity = '')
       if FastlaneCore::Globals.verbose?
         return "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%2N')}]: "
-      elsif FastlaneCore::Env.truthy?("FASTLANE_HIDE_TIMESTAMP")
-        return ""
+      elsif FastlaneCore::Env.truthy?('FASTLANE_HIDE_TIMESTAMP')
+        return ''
       else
         return "[#{datetime.strftime('%H:%M:%S')}]: "
       end
@@ -68,13 +71,13 @@ module FastlaneCore
     end
 
     def command_output(message)
-      actual = (message.split("\r").last || "") # as clearing the line will remove the `>` and the time stamp
+      actual = (message.split("\r").last || '') # as clearing the line will remove the `>` and the time stamp
       actual.split("\n").each do |msg|
-        if FastlaneCore::Env.truthy?("FASTLANE_DISABLE_OUTPUT_FORMAT")
+        if FastlaneCore::Env.truthy?('FASTLANE_DISABLE_OUTPUT_FORMAT')
           log.info(msg)
         else
-          prefix = msg.include?("▸") ? "" : "▸ "
-          log.info(prefix + "" + msg.magenta)
+          prefix = msg.include?('▸') ? '' : '▸ '
+          log.info(prefix + '' + msg.magenta)
         end
       end
     end
@@ -91,9 +94,9 @@ module FastlaneCore
       else
         i = TTY::Screen.width - format.length
       end
-      success("-" * i)
+      success('-' * i)
       success(message)
-      success("-" * i)
+      success('-' * i)
     end
 
     def content_error(content, error_line)
@@ -103,10 +106,11 @@ module FastlaneCore
       contents = content.split(/\r?\n/).map(&:chomp)
 
       start_line = error_line - 2 < 1 ? 1 : error_line - 2
-      end_line = error_line + 2 < contents.length ? error_line + 2 : contents.length
+      end_line =
+        error_line + 2 < contents.length ? error_line + 2 : contents.length
 
       Range.new(start_line, end_line).each do |line|
-        str = line == error_line ? " => " : "    "
+        str = line == error_line ? ' => ' : '    '
         str << line.to_s.rjust(Math.log10(end_line) + 1)
         str << ":\t#{contents[line - 1]}"
         error(str)
@@ -144,7 +148,7 @@ module FastlaneCore
     def password(message)
       verify_interactive!(message)
 
-      ask("#{format_string}#{message.to_s.yellow}") { |q| q.echo = "*" }
+      ask("#{format_string}#{message.to_s.yellow}") { |q| q.echo = '*' }
     end
 
     private
@@ -152,7 +156,9 @@ module FastlaneCore
     def verify_interactive!(message)
       return if interactive?
       important(message)
-      crash!("Could not retrieve response as fastlane runs in non-interactive mode")
+      crash!(
+        'Could not retrieve response as fastlane runs in non-interactive mode'
+      )
     end
   end
 end

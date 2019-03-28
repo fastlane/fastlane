@@ -10,11 +10,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Return last git commit hash, abbreviated commit hash, commit message and author"
+        'Return last git commit hash, abbreviated commit hash, commit message and author'
       end
 
       def self.return_value
-        "Returns the following dict: {commit_hash: \"commit hash\", abbreviated_commit_hash: \"abbreviated commit hash\" author: \"Author\", author_email: \"author email\", message: \"commit message\"}"
+        'Returns the following dict: {commit_hash: \"commit hash\", abbreviated_commit_hash: \"abbreviated commit hash\" author: \"Author\", author_email: \"author email\", message: \"commit message\"}'
       end
 
       def self.return_type
@@ -22,7 +22,7 @@ module Fastlane
       end
 
       def self.author
-        "ngutman"
+        'ngutman'
       end
 
       def self.is_supported?(platform)
@@ -46,11 +46,11 @@ module Fastlane
 
       def self.sample_return_value
         {
-          message: "message",
-          author: "author",
-          author_email: "author_email",
-          commit_hash: "commit_hash",
-          abbreviated_commit_hash: "short_hash"
+          message: 'message',
+          author: 'author',
+          author_email: 'author_email',
+          commit_hash: 'commit_hash',
+          abbreviated_commit_hash: 'short_hash'
         }
       end
     end

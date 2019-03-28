@@ -26,20 +26,25 @@ module FastlaneCore
       available = list_available_identities(in_keychain: in_keychain)
       # Match for this text against word boundaries to avoid edge cases around multiples of 10 identities!
       if /\b0 valid identities found\b/ =~ available
-        UI.error([
-          "There are no local code signing identities found.",
-          "You can run" << " `security find-identity -v -p codesigning #{in_keychain}".rstrip << "` to get this output.",
-          "This Stack Overflow thread has more information: https://stackoverflow.com/q/35390072/774.",
-          "(Check in Keychain Access for an expired WWDR certificate: https://stackoverflow.com/a/35409835/774 has more info.)"
-        ].join("\n"))
+        UI.error(
+          [
+            'There are no local code signing identities found.',
+            'You can run' <<
+              " `security find-identity -v -p codesigning #{in_keychain}"
+                .rstrip <<
+              '` to get this output.',
+            'This Stack Overflow thread has more information: https://stackoverflow.com/q/35390072/774.',
+            '(Check in Keychain Access for an expired WWDR certificate: https://stackoverflow.com/a/35409835/774 has more info.)'
+          ].join("\n")
+        )
       end
 
       ids = []
       available.split("\n").each do |current|
-        next if current.include?("REVOKED")
+        next if current.include?('REVOKED')
         begin
           (ids << current.match(/.*\) ([[:xdigit:]]*) \".*/)[1])
-        rescue
+        rescue StandardError
           # the last line does not match
         end
       end
@@ -54,10 +59,16 @@ module FastlaneCore
     end
 
     def self.wwdr_certificate_installed?
-      certificate_name = "Apple Worldwide Developer Relations Certification Authority"
+      certificate_name =
+        'Apple Worldwide Developer Relations Certification Authority'
       keychain = wwdr_keychain
-      response = Helper.backticks("security find-certificate -c '#{certificate_name}' #{keychain.shellescape}", print: FastlaneCore::Globals.verbose?)
-      return response.include?("attributes:")
+      response =
+        Helper.backticks(
+          "security find-certificate -c '#{certificate_name}' #{keychain
+            .shellescape}",
+          print: FastlaneCore::Globals.verbose?
+        )
+      return response.include?('attributes:')
     end
 
     def self.install_wwdr_certificate
@@ -69,7 +80,8 @@ module FastlaneCore
 
       require 'open3'
 
-      import_command = "curl -f -o #{filename} #{url} && security import #{filename} #{keychain}"
+      import_command =
+        "curl -f -o #{filename} #{url} && security import #{filename} #{keychain}"
       UI.verbose("Installing WWDR Cert: #{import_command}")
 
       stdout, stderr, _status = Open3.capture3(import_command)
@@ -79,29 +91,33 @@ module FastlaneCore
       end
 
       unless $?.success?
-        UI.verbose("Failed to install WWDR Certificate, checking output to see why")
+        UI.verbose(
+          'Failed to install WWDR Certificate, checking output to see why'
+        )
         # Check the command output, WWDR might already exist
         unless /The specified item already exists in the keychain./ =~ stderr
-          UI.user_error!("Could not install WWDR certificate")
+          UI.user_error!('Could not install WWDR certificate')
         end
-        UI.verbose("WWDR Certificate was already installed")
+        UI.verbose('WWDR Certificate was already installed')
       end
       return true
     end
 
     def self.wwdr_keychain
       priority = [
-        "security list-keychains -d user",
-        "security default-keychain -d user"
+        'security list-keychains -d user',
+        'security default-keychain -d user'
       ]
       priority.each do |command|
-        keychains = Helper.backticks(command, print: FastlaneCore::Globals.verbose?).split("\n")
+        keychains =
+          Helper.backticks(command, print: FastlaneCore::Globals.verbose?)
+            .split("\n")
         unless keychains.empty?
           # Select first keychain name from returned keychains list
           return keychains[0].strip.tr('"', '')
         end
       end
-      return ""
+      return ''
     end
 
     def self.sha1_fingerprint(path)

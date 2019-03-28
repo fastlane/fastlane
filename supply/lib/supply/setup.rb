@@ -1,7 +1,7 @@
 module Supply
   class Setup
     def perform_download
-      UI.message("🕗  Downloading metadata, images, screenshots...")
+      UI.message('🕗  Downloading metadata, images, screenshots...')
 
       if File.exist?(metadata_path)
         UI.important("Metadata already exists at path '#{metadata_path}'")
@@ -48,23 +48,38 @@ module Supply
       require 'net/http'
 
       IMAGES_TYPES.each do |image_type|
-        if ['featureGraphic'].include?(image_type)
+        if %w[featureGraphic].include?(image_type)
           # we don't get all files in full resolution :(
-          UI.message("📵  Due to a limitation of the Google Play API, there is no way for `supply` to download your existing feature graphic. Please copy your feature graphic to `metadata/android/#{listing.language}/images/featureGraphic.png`")
+          UI.message(
+            "📵  Due to a limitation of the Google Play API, there is no way for `supply` to download your existing feature graphic. Please copy your feature graphic to `metadata/android/#{listing
+              .language}/images/featureGraphic.png`"
+          )
           next
         end
 
         begin
           UI.message("Downloading `#{image_type}` for #{listing.language}...")
 
-          url = client.fetch_images(image_type: image_type, language: listing.language).last
+          url =
+            client.fetch_images(
+              image_type: image_type, language: listing.language
+            )
+              .last
           next unless url
 
-          path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.png")
+          path =
+            File.join(
+              metadata_path,
+              listing.language,
+              IMAGES_FOLDER_NAME,
+              "#{image_type}.png"
+            )
           File.write(path, Net::HTTP.get(URI.parse(url)))
         rescue => ex
           UI.error(ex.to_s)
-          UI.error("Error downloading '#{image_type}' for #{listing.language}...")
+          UI.error(
+            "Error downloading '#{image_type}' for #{listing.language}..."
+          )
         end
       end
     end
@@ -76,19 +91,26 @@ module Supply
 
       FileUtils.mkdir_p(File.join(containing, IMAGES_FOLDER_NAME))
       Supply::SCREENSHOT_TYPES.each do |screenshot_type|
-        FileUtils.mkdir_p(File.join(containing, IMAGES_FOLDER_NAME, screenshot_type))
+        FileUtils.mkdir_p(
+          File.join(containing, IMAGES_FOLDER_NAME, screenshot_type)
+        )
       end
 
-      UI.message("📵  Due to a limitation of the Google Play API, there is no way for `supply` to download your existing screenshots. Please copy your screenshots into `metadata/android/#{listing.language}/images/`")
+      UI.message(
+        "📵  Due to a limitation of the Google Play API, there is no way for `supply` to download your existing screenshots. Please copy your screenshots into `metadata/android/#{listing
+          .language}/images/`"
+      )
     end
 
     def store_apk_listing(apk_listing)
-      UI.message("🔨  Downloading changelogs (#{apk_listing.language}, #{apk_listing.apk_version_code})")
+      UI.message(
+        "🔨  Downloading changelogs (#{apk_listing.language}, #{apk_listing
+          .apk_version_code})"
+      )
 
-      containing = File.join(metadata_path, apk_listing.language, CHANGELOGS_FOLDER_NAME)
-      unless File.exist?(containing)
-        FileUtils.mkdir_p(containing)
-      end
+      containing =
+        File.join(metadata_path, apk_listing.language, CHANGELOGS_FOLDER_NAME)
+      FileUtils.mkdir_p(containing) unless File.exist?(containing)
 
       path = File.join(containing, "#{apk_listing.apk_version_code}.txt")
       UI.message("Writing to #{path}...")
@@ -99,8 +121,8 @@ module Supply
 
     def metadata_path
       @metadata_path ||= Supply.config[:metadata_path]
-      @metadata_path ||= "fastlane/metadata/android" if Helper.fastlane_enabled?
-      @metadata_path ||= "metadata" unless Helper.fastlane_enabled?
+      @metadata_path ||= 'fastlane/metadata/android' if Helper.fastlane_enabled?
+      @metadata_path ||= 'metadata' unless Helper.fastlane_enabled?
 
       return @metadata_path
     end

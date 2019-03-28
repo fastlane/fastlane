@@ -15,22 +15,27 @@ module Fastlane
       end
 
       def self.description
-        "This action speaks the given text out loud"
+        'This action speaks the given text out loud'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :text,
-                                       description: 'Text to be spoken out loud (as string or array of strings)',
-                                       optional: false,
-                                       is_string: false),
-          FastlaneCore::ConfigItem.new(key: :mute,
-                                       env_name: "SAY_MUTE",
-                                       description: 'If say should be muted with text printed out',
-                                       optional: false,
-                                       is_string: false,
-                                       type: Boolean,
-                                       default_value: false)
+          FastlaneCore::ConfigItem.new(
+            key: :text,
+            description:
+              'Text to be spoken out loud (as string or array of strings)',
+            optional: false,
+            is_string: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :mute,
+            env_name: 'SAY_MUTE',
+            description: 'If say should be muted with text printed out',
+            optional: false,
+            is_string: false,
+            type: Boolean,
+            default_value: false
+          )
         ]
       end
 
@@ -39,13 +44,11 @@ module Fastlane
       end
 
       def self.author
-        "KrauseFx"
+        'KrauseFx'
       end
 
       def self.example_code
-        [
-          'say("I can speak")'
-        ]
+        ['say("I can speak")']
       end
 
       def self.category

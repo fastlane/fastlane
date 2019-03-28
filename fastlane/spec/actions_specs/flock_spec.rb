@@ -1,12 +1,14 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    describe "Flock Action" do
+    describe 'Flock Action' do
       FLOCK_BASE_URL = Fastlane::Actions::FlockAction::BASE_URL
 
       def run_flock(**arguments)
-        parsed_arguments = Fastlane::ConfigurationHelper.parse(
-          Fastlane::Actions::FlockAction, arguments
-        )
+        parsed_arguments =
+          Fastlane::ConfigurationHelper.parse(
+            Fastlane::Actions::FlockAction,
+            arguments
+          )
 
         Fastlane::Actions::FlockAction.run(parsed_arguments)
       end
@@ -41,8 +43,7 @@ describe Fastlane do
       end
 
       it 'fails on non 200 response' do
-        stub_request(:post, "#{FLOCK_BASE_URL}/token").
-          to_return(status: 400)
+        stub_request(:post, "#{FLOCK_BASE_URL}/token").to_return(status: 400)
         expect { run_flock(message: 'message', token: 'token') }.to(
           raise_error(FastlaneCore::Interface::FastlaneError) do |error|
             expect(error.message).to match(/Error sending message to Flock/)
@@ -51,17 +52,19 @@ describe Fastlane do
       end
 
       it 'performs POST request with specified options' do
-        stub_request(:post, "#{FLOCK_BASE_URL}/token").
-          with(body: '{"text":"message"}',
-               headers: { 'Content-Type' => 'application/json' }).
-          to_return(status: 200)
+        stub_request(:post, "#{FLOCK_BASE_URL}/token").with(
+          body: '{"text":"message"}',
+          headers: { 'Content-Type' => 'application/json' }
+        )
+          .to_return(status: 200)
         run_flock(message: 'message', token: 'token')
       end
 
       it 'handles quotes in message' do
-        message = %("that's what", she said)
-        stub_request(:post, //).
-          with(body: %({"text":"\\"that's what\\", she said"}))
+        message = "\"that's what\", she said"
+        stub_request(:post, //).with(
+          body: ){"text":"\\"that's what\\", she said"})
+        )
         run_flock(message: message, token: 'xxx')
       end
     end

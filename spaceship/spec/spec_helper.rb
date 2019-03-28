@@ -6,19 +6,22 @@ require_relative 'tunes/tunes_stubbing'
 require_relative 'du/du_stubbing'
 # Ensure that no ENV vars which interfere with testing are set
 #
-set_auth_vars = [
-  'FASTLANE_SESSION',
-  'FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD',
-  'FASTLANE_PASSWORD'
-].select { |var| ENV.key?(var) }
+set_auth_vars =
+  %w[
+    FASTLANE_SESSION
+    FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD
+    FASTLANE_PASSWORD
+  ].select { |var| ENV.key?(var) }
 
 if set_auth_vars.any?
-  abort("[!] Please `unset` the following ENV vars which interfere with spaceship testing: #{set_auth_vars.join(', ')}".red)
+  abort(
+    "[!] Please `unset` the following ENV vars which interfere with spaceship testing: #{set_auth_vars
+      .join(', ')}"
+      .red
+  )
 end
 
-@cache_paths = [
-  File.expand_path("/tmp/spaceship_itc_service_key.txt")
-]
+@cache_paths = [File.expand_path('/tmp/spaceship_itc_service_key.txt')]
 
 def try_delete(path)
   FileUtils.rm_f(path) if File.exist?(path)
@@ -26,11 +29,11 @@ end
 
 def before_each_spaceship
   @cache_paths.each { |path| try_delete(path) }
-  ENV["DELIVER_USER"] = "spaceship@krausefx.com"
-  ENV["DELIVER_PASSWORD"] = "so_secret"
+  ENV['DELIVER_USER'] = 'spaceship@krausefx.com'
+  ENV['DELIVER_PASSWORD'] = 'so_secret'
   ENV['SPACESHIP_AVOID_XCODE_API'] = 'true'
 
-  ENV.delete("FASTLANE_USER")
+  ENV.delete('FASTLANE_USER')
 
   TunesStubbing.itc_stub_login
   PortalStubbing.adp_stub_login

@@ -26,7 +26,7 @@ module Spaceship
 
     def send_login_request(user, password)
       response = send_shared_login_request(user, password)
-      return response if self.cookie.include?("myacinfo")
+      return response if self.cookie.include?('myacinfo')
 
       # When the user has 2 step enabled, we might have to call this method again
       # This only occurs when the user doesn't have a team on App Store Connect
@@ -41,13 +41,11 @@ module Spaceship
     # @return (Array) A list of all available teams
     def teams
       return @teams if @teams
-      req = request(:post, "account/listTeams.action")
-      @teams = parse_response(req, 'teams').sort_by do |team|
-        [
-          team['name'],
-          team['teamId']
-        ]
-      end
+      req = request(:post, 'account/listTeams.action')
+      @teams =
+        parse_response(req, 'teams').sort_by do |team|
+          [team['name'], team['teamId']]
+        end
     end
 
     # @return (String) The currently selected Team ID
@@ -55,7 +53,10 @@ module Spaceship
       return @current_team_id if @current_team_id
 
       if teams.count > 1
-        puts("The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now.")
+        puts(
+          "The current user is in #{teams
+            .count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now."
+        )
       end
 
       if teams.count == 0
@@ -70,7 +71,8 @@ module Spaceship
     # @param team_id (String) (optional): The ID of a Developer Portal team
     # @param team_name (String) (optional): The name of a Developer Portal team
     def select_team(team_id: nil, team_name: nil)
-      @current_team_id = self.UI.select_team(team_id: team_id, team_name: team_name)
+      @current_team_id =
+        self.UI.select_team(team_id: team_id, team_name: team_name)
     end
 
     # Set a new team ID which will be used from now on
@@ -80,9 +82,7 @@ module Spaceship
 
     # @return (Hash) Fetches all information of the currently used team
     def team_information
-      teams.find do |t|
-        t['teamId'] == team_id
-      end
+      teams.find { |t| t['teamId'] == team_id }
     end
 
     # Is the current session from an Enterprise In House account?
@@ -92,11 +92,7 @@ module Spaceship
     end
 
     def platform_slug(mac)
-      if mac
-        'mac'
-      else
-        'ios'
-      end
+      mac ? 'mac' : 'ios'
     end
     private :platform_slug
 
@@ -106,33 +102,46 @@ module Spaceship
 
     def apps(mac: false)
       paging do |page_number|
-        r = request(:post, "account/#{platform_slug(mac)}/identifiers/listAppIds.action", {
-          teamId: team_id,
-          pageNumber: page_number,
-          pageSize: page_size,
-          sort: 'name=asc'
-        })
+        r =
+          request(
+            :post,
+            "account/#{platform_slug(mac)}/identifiers/listAppIds.action",
+            {
+              teamId: team_id,
+              pageNumber: page_number,
+              pageSize: page_size,
+              sort: 'name=asc'
+            }
+          )
         parse_response(r, 'appIds')
       end
     end
 
     def details_for_app(app)
-      r = request(:post, "account/#{platform_slug(app.mac?)}/identifiers/getAppIdDetail.action", {
-        teamId: team_id,
-        appIdId: app.app_id
-      })
+      r =
+        request(
+          :post,
+          "account/#{platform_slug(
+            app.mac?
+          )}/identifiers/getAppIdDetail.action",
+          { teamId: team_id, appIdId: app.app_id }
+        )
       parse_response(r, 'appId')
     end
 
     def update_service_for_app(app, service)
       ensure_csrf(Spaceship::Portal::App)
 
-      request(:post, service.service_uri, {
-        teamId: team_id,
-        displayId: app.app_id,
-        featureType: service.service_id,
-        featureValue: service.value
-      })
+      request(
+        :post,
+        service.service_uri,
+        {
+          teamId: team_id,
+          displayId: app.app_id,
+          featureType: service.service_id,
+          featureValue: service.value
+        }
+      )
 
       details_for_app(app)
     end
@@ -140,12 +149,16 @@ module Spaceship
     def associate_groups_with_app(app, groups)
       ensure_csrf(Spaceship::Portal::AppGroup)
 
-      request(:post, 'account/ios/identifiers/assignApplicationGroupToAppId.action', {
-        teamId: team_id,
-        appIdId: app.app_id,
-        displayId: app.app_id,
-        applicationGroups: groups.map(&:app_group_id)
-      })
+      request(
+        :post,
+        'account/ios/identifiers/assignApplicationGroupToAppId.action',
+        {
+          teamId: team_id,
+          appIdId: app.app_id,
+          displayId: app.app_id,
+          applicationGroups: groups.map(&:app_group_id)
+        }
+      )
 
       details_for_app(app)
     end
@@ -153,11 +166,15 @@ module Spaceship
     def associate_cloud_containers_with_app(app, containers)
       ensure_csrf(Spaceship::Portal::CloudContainer)
 
-      request(:post, 'account/ios/identifiers/assignCloudContainerToAppId.action', {
+      request(
+        :post,
+        'account/ios/identifiers/assignCloudContainerToAppId.action',
+        {
           teamId: team_id,
           appIdId: app.app_id,
           cloudContainers: containers.map(&:cloud_container)
-      })
+        }
+      )
 
       details_for_app(app)
     end
@@ -165,11 +182,15 @@ module Spaceship
     def associate_merchants_with_app(app, merchants, mac)
       ensure_csrf(Spaceship::Portal::Merchant)
 
-      request(:post, "account/#{platform_slug(mac)}/identifiers/assignOMCToAppId.action", {
-        teamId: team_id,
-        appIdId: app.app_id,
-        omcIds: merchants.map(&:merchant_id)
-      })
+      request(
+        :post,
+        "account/#{platform_slug(mac)}/identifiers/assignOMCToAppId.action",
+        {
+          teamId: team_id,
+          appIdId: app.app_id,
+          omcIds: merchants.map(&:merchant_id)
+        }
+      )
 
       details_for_app(app)
     end
@@ -180,7 +201,7 @@ module Spaceship
       # Check if the input string was modified, since it might be empty now
       # (if it only contained non-latin symbols) or the duplicate of another app
       if latinized != input
-        latinized << " "
+        latinized << ' '
         latinized << Digest::MD5.hexdigest(input)
       end
       latinized
@@ -192,51 +213,52 @@ module Spaceship
       # https://github.com/fastlane/fastlane/issues/5813
       ensure_csrf(Spaceship::Portal::App)
 
-      ident_params = case type.to_sym
-                     when :explicit
-                       {
-                         type: 'explicit',
-                         identifier: bundle_id,
-                         inAppPurchase: 'on',
-                         gameCenter: 'on'
-                       }
-                     when :wildcard
-                       {
-                         type: 'wildcard',
-                         identifier: bundle_id
-                       }
-                     end
+      ident_params =
+        case type.to_sym
+        when :explicit
+          {
+            type: 'explicit',
+            identifier: bundle_id,
+            inAppPurchase: 'on',
+            gameCenter: 'on'
+          }
+        when :wildcard
+          { type: 'wildcard', identifier: bundle_id }
+        end
 
-      params = {
-        name: valid_name_for(name),
-        teamId: team_id
-      }
+      params = { name: valid_name_for(name), teamId: team_id }
       params.merge!(ident_params)
-      enable_services.each do |k, v|
-        params[v.service_id.to_sym] = v.value
-      end
-      r = request(:post, "account/#{platform_slug(mac)}/identifiers/addAppId.action", params)
+      enable_services.each { |k, v| params[v.service_id.to_sym] = v.value }
+      r =
+        request(
+          :post,
+          "account/#{platform_slug(mac)}/identifiers/addAppId.action",
+          params
+        )
       parse_response(r, 'appId')
     end
 
     def delete_app!(app_id, mac: false)
       ensure_csrf(Spaceship::Portal::App)
 
-      r = request(:post, "account/#{platform_slug(mac)}/identifiers/deleteAppId.action", {
-        teamId: team_id,
-        appIdId: app_id
-      })
+      r =
+        request(
+          :post,
+          "account/#{platform_slug(mac)}/identifiers/deleteAppId.action",
+          { teamId: team_id, appIdId: app_id }
+        )
       parse_response(r)
     end
 
     def update_app_name!(app_id, name, mac: false)
       ensure_csrf(Spaceship::Portal::App)
 
-      r = request(:post, "account/#{platform_slug(mac)}/identifiers/updateAppIdName.action", {
-        teamId: team_id,
-        appIdId: app_id,
-        name: valid_name_for(name)
-      })
+      r =
+        request(
+          :post,
+          "account/#{platform_slug(mac)}/identifiers/updateAppIdName.action",
+          { teamId: team_id, appIdId: app_id, name: valid_name_for(name) }
+        )
       parse_response(r, 'appId')
     end
 
@@ -246,12 +268,17 @@ module Spaceship
 
     def passbooks
       paging do |page_number|
-        r = request(:post, "account/ios/identifiers/listPassTypeIds.action", {
-          teamId: team_id,
-          pageNumber: page_number,
-          pageSize: page_size,
-          sort: 'name=asc'
-        })
+        r =
+          request(
+            :post,
+            'account/ios/identifiers/listPassTypeIds.action',
+            {
+              teamId: team_id,
+              pageNumber: page_number,
+              pageSize: page_size,
+              sort: 'name=asc'
+            }
+          )
         parse_response(r, 'passTypeIdList')
       end
     end
@@ -259,21 +286,24 @@ module Spaceship
     def create_passbook!(name, bundle_id)
       ensure_csrf(Spaceship::Portal::Passbook)
 
-      r = request(:post, "account/ios/identifiers/addPassTypeId.action", {
-          name: name,
-          identifier: bundle_id,
-          teamId: team_id
-      })
+      r =
+        request(
+          :post,
+          'account/ios/identifiers/addPassTypeId.action',
+          { name: name, identifier: bundle_id, teamId: team_id }
+        )
       parse_response(r, 'passTypeId')
     end
 
     def delete_passbook!(passbook_id)
       ensure_csrf(Spaceship::Portal::Passbook)
 
-      r = request(:post, "account/ios/identifiers/deletePassTypeId.action", {
-          teamId: team_id,
-          passTypeId: passbook_id
-      })
+      r =
+        request(
+          :post,
+          'account/ios/identifiers/deletePassTypeId.action',
+          { teamId: team_id, passTypeId: passbook_id }
+        )
       parse_response(r)
     end
 
@@ -283,12 +313,19 @@ module Spaceship
 
     def website_push(mac: false)
       paging do |page_number|
-        r = request(:post, "account/#{platform_slug(mac)}/identifiers/listWebsitePushIds.action", {
-            teamId: team_id,
-            pageNumber: page_number,
-            pageSize: page_size,
-            sort: 'name=asc'
-        })
+        r =
+          request(
+            :post,
+            "account/#{platform_slug(
+              mac
+            )}/identifiers/listWebsitePushIds.action",
+            {
+              teamId: team_id,
+              pageNumber: page_number,
+              pageSize: page_size,
+              sort: 'name=asc'
+            }
+          )
         parse_response(r, 'websitePushIdList')
       end
     end
@@ -296,21 +333,26 @@ module Spaceship
     def create_website_push!(name, bundle_id, mac: false)
       ensure_csrf(Spaceship::Portal::WebsitePush)
 
-      r = request(:post, "account/#{platform_slug(mac)}/identifiers/addWebsitePushId.action", {
-          name: name,
-          identifier: bundle_id,
-          teamId: team_id
-      })
+      r =
+        request(
+          :post,
+          "account/#{platform_slug(mac)}/identifiers/addWebsitePushId.action",
+          { name: name, identifier: bundle_id, teamId: team_id }
+        )
       parse_response(r, 'websitePushId')
     end
 
     def delete_website_push!(website_id, mac: false)
       ensure_csrf(Spaceship::Portal::WebsitePush)
 
-      r = request(:post, "account/#{platform_slug(mac)}/identifiers/deleteWebsitePushId.action", {
-          teamId: team_id,
-          websitePushId: website_id
-      })
+      r =
+        request(
+          :post,
+          "account/#{platform_slug(
+            mac
+          )}/identifiers/deleteWebsitePushId.action",
+          { teamId: team_id, websitePushId: website_id }
+        )
       parse_response(r)
     end
 
@@ -320,12 +362,17 @@ module Spaceship
 
     def merchants(mac: false)
       paging do |page_number|
-        r = request(:post, "account/#{platform_slug(mac)}/identifiers/listOMCs.action", {
-            teamId: team_id,
-            pageNumber: page_number,
-            pageSize: page_size,
-            sort: 'name=asc'
-        })
+        r =
+          request(
+            :post,
+            "account/#{platform_slug(mac)}/identifiers/listOMCs.action",
+            {
+              teamId: team_id,
+              pageNumber: page_number,
+              pageSize: page_size,
+              sort: 'name=asc'
+            }
+          )
         parse_response(r, 'identifierList')
       end
     end
@@ -333,21 +380,24 @@ module Spaceship
     def create_merchant!(name, bundle_id, mac: false)
       ensure_csrf(Spaceship::Portal::Merchant)
 
-      r = request(:post, "account/#{platform_slug(mac)}/identifiers/addOMC.action", {
-          name: name,
-          identifier: bundle_id,
-          teamId: team_id
-      })
+      r =
+        request(
+          :post,
+          "account/#{platform_slug(mac)}/identifiers/addOMC.action",
+          { name: name, identifier: bundle_id, teamId: team_id }
+        )
       parse_response(r, 'omcId')
     end
 
     def delete_merchant!(merchant_id, mac: false)
       ensure_csrf(Spaceship::Portal::Merchant)
 
-      r = request(:post, "account/#{platform_slug(mac)}/identifiers/deleteOMC.action", {
-          teamId: team_id,
-          omcId: merchant_id
-      })
+      r =
+        request(
+          :post,
+          "account/#{platform_slug(mac)}/identifiers/deleteOMC.action",
+          { teamId: team_id, omcId: merchant_id }
+        )
       parse_response(r)
     end
 
@@ -357,12 +407,17 @@ module Spaceship
 
     def app_groups
       paging do |page_number|
-        r = request(:post, 'account/ios/identifiers/listApplicationGroups.action', {
-          teamId: team_id,
-          pageNumber: page_number,
-          pageSize: page_size,
-          sort: 'name=asc'
-        })
+        r =
+          request(
+            :post,
+            'account/ios/identifiers/listApplicationGroups.action',
+            {
+              teamId: team_id,
+              pageNumber: page_number,
+              pageSize: page_size,
+              sort: 'name=asc'
+            }
+          )
         parse_response(r, 'applicationGroupList')
       end
     end
@@ -370,21 +425,24 @@ module Spaceship
     def create_app_group!(name, group_id)
       ensure_csrf(Spaceship::Portal::AppGroup)
 
-      r = request(:post, 'account/ios/identifiers/addApplicationGroup.action', {
-        name: valid_name_for(name),
-        identifier: group_id,
-        teamId: team_id
-      })
+      r =
+        request(
+          :post,
+          'account/ios/identifiers/addApplicationGroup.action',
+          { name: valid_name_for(name), identifier: group_id, teamId: team_id }
+        )
       parse_response(r, 'applicationGroup')
     end
 
     def delete_app_group!(app_group_id)
       ensure_csrf(Spaceship::Portal::AppGroup)
 
-      r = request(:post, 'account/ios/identifiers/deleteApplicationGroup.action', {
-        teamId: team_id,
-        applicationGroup: app_group_id
-      })
+      r =
+        request(
+          :post,
+          'account/ios/identifiers/deleteApplicationGroup.action',
+          { teamId: team_id, applicationGroup: app_group_id }
+        )
       parse_response(r)
     end
 
@@ -394,12 +452,17 @@ module Spaceship
 
     def cloud_containers
       paging do |page_number|
-        r = request(:post, 'account/cloudContainer/listCloudContainers.action', {
-            teamId: team_id,
-            pageNumber: page_number,
-            pageSize: page_size,
-            sort: 'name=asc'
-        })
+        r =
+          request(
+            :post,
+            'account/cloudContainer/listCloudContainers.action',
+            {
+              teamId: team_id,
+              pageNumber: page_number,
+              pageSize: page_size,
+              sort: 'name=asc'
+            }
+          )
         result = parse_response(r, 'cloudContainerList')
 
         csrf_cache[Spaceship::Portal::CloudContainer] = self.csrf_tokens
@@ -411,11 +474,14 @@ module Spaceship
     def create_cloud_container!(name, identifier)
       ensure_csrf(Spaceship::Portal::CloudContainer)
 
-      r = request(:post, 'account/cloudContainer/addCloudContainer.action', {
-          name: valid_name_for(name),
-          identifier: identifier,
-          teamId: team_id
-      })
+      r =
+        request(
+          :post,
+          'account/cloudContainer/addCloudContainer.action',
+          {
+            name: valid_name_for(name), identifier: identifier, teamId: team_id
+          }
+        )
       parse_response(r, 'cloudContainer')
     end
 
@@ -423,66 +489,68 @@ module Spaceship
     # @!group Team
     #####################################################
     def team_members
-      response = request(:post) do |req|
-        req.url("/services-account/#{PROTOCOL_VERSION}/account/getTeamMembers")
-        req.body = {
-          teamId: team_id
-        }.to_json
-        req.headers['Content-Type'] = 'application/json'
-      end
+      response =
+        request(:post) do |req|
+          req.url(
+            "/services-account/#{PROTOCOL_VERSION}/account/getTeamMembers"
+          )
+          req.body = { teamId: team_id }.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
       parse_response(response)
     end
 
     def team_invited
-      response = request(:post) do |req|
-        req.url("/services-account/#{PROTOCOL_VERSION}/account/getInvites")
-        req.body = {
-          teamId: team_id
-        }.to_json
-        req.headers['Content-Type'] = 'application/json'
-      end
+      response =
+        request(:post) do |req|
+          req.url("/services-account/#{PROTOCOL_VERSION}/account/getInvites")
+          req.body = { teamId: team_id }.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
       parse_response(response)
     end
 
     def team_set_role(team_member_id, role)
       ensure_csrf(Spaceship::Portal::Persons)
-      response = request(:post) do |req|
-        req.url("/services-account/#{PROTOCOL_VERSION}/account/setTeamMemberRoles")
-        req.body = {
-          teamId: team_id,
-          role: role,
-          teamMemberIds: [team_member_id]
-        }.to_json
-        req.headers['Content-Type'] = 'application/json'
-      end
+      response =
+        request(:post) do |req|
+          req.url(
+            "/services-account/#{PROTOCOL_VERSION}/account/setTeamMemberRoles"
+          )
+          req.body = {
+            teamId: team_id, role: role, teamMemberIds: [team_member_id]
+          }.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
       parse_response(response)
     end
 
     def team_remove_member!(team_member_id)
       ensure_csrf(Spaceship::Portal::Persons)
-      response = request(:post) do |req|
-        req.url("/services-account/#{PROTOCOL_VERSION}/account/removeTeamMembers")
-        req.body = {
-          teamId: team_id,
-          teamMemberIds: [team_member_id]
-        }.to_json
-        req.headers['Content-Type'] = 'application/json'
-      end
+      response =
+        request(:post) do |req|
+          req.url(
+            "/services-account/#{PROTOCOL_VERSION}/account/removeTeamMembers"
+          )
+          req.body = {
+            teamId: team_id, teamMemberIds: [team_member_id]
+          }.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
       parse_response(response)
     end
 
     def team_invite(email, role)
       ensure_csrf(Spaceship::Portal::Persons)
-      response = request(:post) do |req|
-        req.url("/services-account/#{PROTOCOL_VERSION}/account/sendInvites")
-        req.body = {
-          invites: [
-            { recipientEmail: email, recipientRole: role }
-          ],
-          teamId: team_id
-        }.to_json
-        req.headers['Content-Type'] = 'application/json'
-      end
+      response =
+        request(:post) do |req|
+          req.url("/services-account/#{PROTOCOL_VERSION}/account/sendInvites")
+          req.body = {
+            invites: [{ recipientEmail: email, recipientRole: role }],
+            teamId: team_id
+          }.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
       parse_response(response)
     end
 
@@ -492,13 +560,18 @@ module Spaceship
 
     def devices(mac: false, include_disabled: false)
       paging do |page_number|
-        r = request(:post, "account/#{platform_slug(mac)}/device/listDevices.action", {
-          teamId: team_id,
-          pageNumber: page_number,
-          pageSize: page_size,
-          sort: 'name=asc',
-          includeRemovedDevices: include_disabled
-        })
+        r =
+          request(
+            :post,
+            "account/#{platform_slug(mac)}/device/listDevices.action",
+            {
+              teamId: team_id,
+              pageNumber: page_number,
+              pageSize: page_size,
+              sort: 'name=asc',
+              includeRemovedDevices: include_disabled
+            }
+          )
         result = parse_response(r, 'devices')
 
         csrf_cache[Spaceship::Portal::Device] = self.csrf_tokens
@@ -509,14 +582,19 @@ module Spaceship
 
     def devices_by_class(device_class, include_disabled: false)
       paging do |page_number|
-        r = request(:post, 'account/ios/device/listDevices.action', {
-          teamId: team_id,
-          pageNumber: page_number,
-          pageSize: page_size,
-          sort: 'name=asc',
-          deviceClasses: device_class,
-          includeRemovedDevices: include_disabled
-        })
+        r =
+          request(
+            :post,
+            'account/ios/device/listDevices.action',
+            {
+              teamId: team_id,
+              pageNumber: page_number,
+              pageSize: page_size,
+              sort: 'name=asc',
+              deviceClasses: device_class,
+              includeRemovedDevices: include_disabled
+            }
+          )
         parse_response(r, 'devices')
       end
     end
@@ -524,36 +602,54 @@ module Spaceship
     def create_device!(device_name, device_id, mac: false)
       ensure_csrf(Spaceship::Portal::Device)
 
-      req = request(:post, "account/#{platform_slug(mac)}/device/addDevices.action", {
-        teamId: team_id,
-        deviceClasses: mac ? 'mac' : 'iphone',
-        deviceNumbers: device_id,
-        deviceNames: device_name,
-        register: 'single'
-      })
+      req =
+        request(
+          :post,
+          "account/#{platform_slug(mac)}/device/addDevices.action",
+          {
+            teamId: team_id,
+            deviceClasses: mac ? 'mac' : 'iphone',
+            deviceNumbers: device_id,
+            deviceNames: device_name,
+            register: 'single'
+          }
+        )
 
       devices = parse_response(req, 'devices')
       return devices.first unless devices.empty?
 
-      validation_messages = parse_response(req, 'validationMessages').map { |message| message["validationUserMessage"] }.compact.uniq
+      validation_messages =
+        parse_response(req, 'validationMessages').map do |message|
+          message['validationUserMessage']
+        end.compact
+          .uniq
 
-      raise UnexpectedResponse.new, validation_messages.join('\n') unless validation_messages.empty?
-      raise UnexpectedResponse.new, "Couldn't register new device, got this: #{parse_response(req)}"
+      unless validation_messages.empty?
+        raise UnexpectedResponse.new, validation_messages.join('\n')
+      end
+      raise UnexpectedResponse.new,
+            "Couldn't register new device, got this: #{parse_response(req)}"
     end
 
     def disable_device!(device_id, device_udid, mac: false)
-      request(:post, "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/account/#{platform_slug(mac)}/device/deleteDevice.action", {
-        teamId: team_id,
-        deviceId: device_id
-      })
+      request(
+        :post,
+        "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/account/#{platform_slug(
+          mac
+        )}/device/deleteDevice.action",
+        { teamId: team_id, deviceId: device_id }
+      )
     end
 
     def enable_device!(device_id, device_udid, mac: false)
-      req = request(:post, "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/account/#{platform_slug(mac)}/device/enableDevice.action", {
-          teamId: team_id,
-          displayId: device_id,
-          deviceNumber: device_udid
-      })
+      req =
+        request(
+          :post,
+          "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/account/#{platform_slug(
+            mac
+          )}/device/enableDevice.action",
+          { teamId: team_id, displayId: device_id, deviceNumber: device_udid }
+        )
       parse_response(req, 'device')
     end
 
@@ -563,13 +659,18 @@ module Spaceship
 
     def certificates(types, mac: false)
       paging do |page_number|
-        r = request(:post, "account/#{platform_slug(mac)}/certificate/listCertRequests.action", {
-          teamId: team_id,
-          types: types.join(','),
-          pageNumber: page_number,
-          pageSize: page_size,
-          sort: 'certRequestStatusCode=asc'
-        })
+        r =
+          request(
+            :post,
+            "account/#{platform_slug(mac)}/certificate/listCertRequests.action",
+            {
+              teamId: team_id,
+              types: types.join(','),
+              pageNumber: page_number,
+              pageSize: page_size,
+              sort: 'certRequestStatusCode=asc'
+            }
+          )
         parse_response(r, 'certRequests')
       end
     end
@@ -577,40 +678,56 @@ module Spaceship
     def create_certificate!(type, csr, app_id = nil, mac = false)
       ensure_csrf(Spaceship::Portal::Certificate)
 
-      r = request(:post, "account/#{platform_slug(mac)}/certificate/submitCertificateRequest.action", {
-        teamId: team_id,
-        type: type,
-        csrContent: csr,
-        appIdId: app_id, # optional
-        specialIdentifierDisplayId: app_id, # For requesting Web Push certificates
-      })
+      r =
+        request(
+          :post,
+          "account/#{platform_slug(
+            mac
+          )}/certificate/submitCertificateRequest.action",
+          {
+            # For requesting Web Push certificates
+            teamId: team_id,
+            type: type,
+            csrContent: csr,
+            appIdId: app_id,
+            # optional
+            specialIdentifierDisplayId: app_id
+          }
+        )
       parse_response(r, 'certRequest')
     end
 
     def download_certificate(certificate_id, type, mac: false)
-      { type: type, certificate_id: certificate_id }.each { |k, v| raise "#{k} must not be nil" if v.nil? }
+      { type: type, certificate_id: certificate_id }.each do |k, v|
+        raise "#{k} must not be nil" if v.nil?
+      end
 
-      r = request(:get, "account/#{platform_slug(mac)}/certificate/downloadCertificateContent.action", {
-        teamId: team_id,
-        certificateId: certificate_id,
-        type: type
-      })
+      r =
+        request(
+          :get,
+          "account/#{platform_slug(
+            mac
+          )}/certificate/downloadCertificateContent.action",
+          { teamId: team_id, certificateId: certificate_id, type: type }
+        )
       a = parse_response(r)
-      if r.success? && a.include?("Apple Inc")
+      if r.success? && a.include?('Apple Inc')
         return a
       else
-        raise UnexpectedResponse.new, "Couldn't download certificate, got this instead: #{a}"
+        raise UnexpectedResponse.new,
+              "Couldn't download certificate, got this instead: #{a}"
       end
     end
 
     def revoke_certificate!(certificate_id, type, mac: false)
       ensure_csrf(Spaceship::Portal::Certificate)
 
-      r = request(:post, "account/#{platform_slug(mac)}/certificate/revokeCertificate.action", {
-        teamId: team_id,
-        certificateId: certificate_id,
-        type: type
-      })
+      r =
+        request(
+          :post,
+          "account/#{platform_slug(mac)}/certificate/revokeCertificate.action",
+          { teamId: team_id, certificateId: certificate_id, type: type }
+        )
       parse_response(r, 'certRequests')
     end
 
@@ -620,14 +737,21 @@ module Spaceship
 
     def provisioning_profiles(mac: false)
       paging do |page_number|
-        req = request(:post, "account/#{platform_slug(mac)}/profile/listProvisioningProfiles.action", {
-          teamId: team_id,
-          pageNumber: page_number,
-          pageSize: page_size,
-          sort: 'name=asc',
-          includeInactiveProfiles: true,
-          onlyCountLists: true
-        })
+        req =
+          request(
+            :post,
+            "account/#{platform_slug(
+              mac
+            )}/profile/listProvisioningProfiles.action",
+            {
+              teamId: team_id,
+              pageNumber: page_number,
+              pageSize: page_size,
+              sort: 'name=asc',
+              includeInactiveProfiles: true,
+              onlyCountLists: true
+            }
+          )
 
         result = parse_response(req, 'provisioningProfiles')
 
@@ -643,14 +767,17 @@ module Spaceship
     #
     # Use this method over `provisioning_profiles` if possible because no secondary API calls are necessary to populate the ProvisioningProfile data model.
     def provisioning_profiles_via_xcode_api(mac: false)
-      req = request(:post) do |r|
-        r.url("https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/listProvisioningProfiles.action")
-        r.params = {
-          teamId: team_id,
-          includeInactiveProfiles: true,
-          onlyCountLists: true
-        }
-      end
+      req =
+        request(:post) do |r|
+          r.url(
+            "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(
+              mac
+            )}/listProvisioningProfiles.action"
+          )
+          r.params = {
+            teamId: team_id, includeInactiveProfiles: true, onlyCountLists: true
+          }
+        end
 
       result = parse_response(req, 'provisioningProfiles')
 
@@ -660,14 +787,25 @@ module Spaceship
     end
 
     def provisioning_profile_details(provisioning_profile_id: nil, mac: false)
-      r = request(:post, "account/#{platform_slug(mac)}/profile/getProvisioningProfile.action", {
-        teamId: team_id,
-        provisioningProfileId: provisioning_profile_id
-      })
+      r =
+        request(
+          :post,
+          "account/#{platform_slug(mac)}/profile/getProvisioningProfile.action",
+          { teamId: team_id, provisioningProfileId: provisioning_profile_id }
+        )
       parse_response(r, 'provisioningProfile')
     end
 
-    def create_provisioning_profile!(name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil, template_name: nil)
+    def create_provisioning_profile!(
+      name,
+      distribution_method,
+      app_id,
+      certificate_ids,
+      device_ids,
+      mac: false,
+      sub_platform: nil,
+      template_name: nil
+    )
       ensure_csrf(Spaceship::Portal::ProvisioningProfile) do
         fetch_csrf_token_for_provisioning
       end
@@ -685,7 +823,14 @@ module Spaceship
       # if `template_name` is nil, Default entitlements will be used
       params[:template] = template_name if template_name
 
-      r = request(:post, "account/#{platform_slug(mac)}/profile/createProvisioningProfile.action", params)
+      r =
+        request(
+          :post,
+          "account/#{platform_slug(
+            mac
+          )}/profile/createProvisioningProfile.action",
+          params
+        )
       parse_response(r, 'provisioningProfile')
     end
 
@@ -694,44 +839,68 @@ module Spaceship
         fetch_csrf_token_for_provisioning
       end
 
-      r = request(:get, "account/#{platform_slug(mac)}/profile/downloadProfileContent", {
-        teamId: team_id,
-        provisioningProfileId: profile_id
-      })
+      r =
+        request(
+          :get,
+          "account/#{platform_slug(mac)}/profile/downloadProfileContent",
+          { teamId: team_id, provisioningProfileId: profile_id }
+        )
       a = parse_response(r)
-      if r.success? && a.include?("DOCTYPE plist PUBLIC")
+      if r.success? && a.include?('DOCTYPE plist PUBLIC')
         return a
       else
-        raise UnexpectedResponse.new, "Couldn't download provisioning profile, got this instead: #{a}"
+        raise UnexpectedResponse.new,
+              "Couldn't download provisioning profile, got this instead: #{a}"
       end
     end
 
     def delete_provisioning_profile!(profile_id, mac: false)
       fetch_csrf_token_for_provisioning
-      r = request(:post, "account/#{platform_slug(mac)}/profile/deleteProvisioningProfile.action", {
-        teamId: team_id,
-        provisioningProfileId: profile_id
-      })
+      r =
+        request(
+          :post,
+          "account/#{platform_slug(
+            mac
+          )}/profile/deleteProvisioningProfile.action",
+          { teamId: team_id, provisioningProfileId: profile_id }
+        )
       parse_response(r)
     end
 
-    def repair_provisioning_profile!(profile_id, name, distribution_method, app_id, certificate_ids, device_ids, mac: false, sub_platform: nil, template_name: nil)
+    def repair_provisioning_profile!(
+      profile_id,
+      name,
+      distribution_method,
+      app_id,
+      certificate_ids,
+      device_ids,
+      mac: false,
+      sub_platform: nil,
+      template_name: nil
+    )
       fetch_csrf_token_for_provisioning
 
       params = {
-          teamId: team_id,
-          provisioningProfileId: profile_id,
-          provisioningProfileName: name,
-          appIdId: app_id,
-          distributionType: distribution_method,
-          certificateIds: certificate_ids.join(','),
-          deviceIds: device_ids
+        teamId: team_id,
+        provisioningProfileId: profile_id,
+        provisioningProfileName: name,
+        appIdId: app_id,
+        distributionType: distribution_method,
+        certificateIds: certificate_ids.join(','),
+        deviceIds: device_ids
       }
       params[:subPlatform] = sub_platform if sub_platform
       # if `template_name` is nil, Default entitlements will be used
       params[:template] = template_name if template_name
 
-      r = request(:post, "account/#{platform_slug(mac)}/profile/regenProvisioningProfile.action", params)
+      r =
+        request(
+          :post,
+          "account/#{platform_slug(
+            mac
+          )}/profile/regenProvisioningProfile.action",
+          params
+        )
 
       parse_response(r, 'provisioningProfile')
     end
@@ -742,24 +911,35 @@ module Spaceship
 
     def list_keys
       paging do |page_number|
-        response = request(:post, 'account/auth/key/list', {
-          teamId: team_id,
-          pageNumber: page_number,
-          pageSize: page_size,
-          sort: 'name=asc'
-        })
+        response =
+          request(
+            :post,
+            'account/auth/key/list',
+            {
+              teamId: team_id,
+              pageNumber: page_number,
+              pageSize: page_size,
+              sort: 'name=asc'
+            }
+          )
         parse_response(response, 'keys')
       end
     end
 
     def get_key(id: nil)
-      response = request(:post, 'account/auth/key/get', { teamId: team_id, keyId: id })
+      response =
+        request(:post, 'account/auth/key/get', { teamId: team_id, keyId: id })
       # response contains a list of keys with 1 item
       parse_response(response, 'keys').first
     end
 
     def download_key(id: nil)
-      response = request(:get, 'account/auth/key/download', { teamId: team_id, keyId: id })
+      response =
+        request(
+          :get,
+          'account/auth/key/download',
+          { teamId: team_id, keyId: id }
+        )
       parse_response(response)
     end
 
@@ -767,15 +947,14 @@ module Spaceship
       fetch_csrf_token_for_keys
 
       params = {
-        name: name,
-        serviceConfigurations: service_configs,
-        teamId: team_id
+        name: name, serviceConfigurations: service_configs, teamId: team_id
       }
 
-      response = request(:post, 'account/auth/key/create') do |req|
-        req.headers['Content-Type'] = 'application/json'
-        req.body = params.to_json
-      end
+      response =
+        request(:post, 'account/auth/key/create') do |req|
+          req.headers['Content-Type'] = 'application/json'
+          req.body = params.to_json
+        end
 
       # response contains a list of keys with 1 item
       parse_response(response, 'keys').first
@@ -783,7 +962,12 @@ module Spaceship
 
     def revoke_key!(id: nil)
       fetch_csrf_token_for_keys
-      response = request(:post, 'account/auth/key/revoke', { teamId: team_id, keyId: id })
+      response =
+        request(
+          :post,
+          'account/auth/key/revoke',
+          { teamId: team_id, keyId: id }
+        )
       parse_response(response)
     end
 
@@ -821,24 +1005,26 @@ module Spaceship
     # profiles.
     # Source https://github.com/fastlane/fastlane/issues/5903
     def fetch_csrf_token_for_provisioning(mac: false)
-      response = request(:post, "account/#{platform_slug(mac)}/profile/listProvisioningProfiles.action", {
-         teamId: team_id,
-         pageNumber: 1,
-         pageSize: 1,
-         sort: 'name=asc'
-       })
+      response =
+        request(
+          :post,
+          "account/#{platform_slug(
+            mac
+          )}/profile/listProvisioningProfiles.action",
+          { teamId: team_id, pageNumber: 1, pageSize: 1, sort: 'name=asc' }
+        )
 
       parse_response(response, 'provisioningProfiles')
       return nil
     end
 
     def fetch_csrf_token_for_keys
-      response = request(:post, 'account/auth/key/list', {
-         teamId: team_id,
-         pageNumber: 1,
-         pageSize: 1,
-         sort: 'name=asc'
-       })
+      response =
+        request(
+          :post,
+          'account/auth/key/list',
+          { teamId: team_id, pageNumber: 1, pageSize: 1, sort: 'name=asc' }
+        )
 
       parse_response(response, 'keys')
       return nil

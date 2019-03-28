@@ -4,7 +4,9 @@ module Precheck
   class TestItemToCheck < ItemToCheck
     attr_accessor :data
 
-    def initialize(data: nil, item_name: :a, friendly_name: "none", is_optional: false)
+    def initialize(
+      data: nil, item_name: :a, friendly_name: 'none', is_optional: false
+    )
       @data = data
       super(item_name, friendly_name, is_optional)
     end
@@ -20,15 +22,15 @@ module Precheck
     end
 
     def self.env_name
-      "TEST_RULE_ENV"
+      'TEST_RULE_ENV'
     end
 
     def self.friendly_name
-      "This is a test only"
+      'This is a test only'
     end
 
     def self.description
-      "test rule"
+      'test rule'
     end
 
     def handle_item?(item)
@@ -36,21 +38,27 @@ module Precheck
     end
 
     def supported_fields_symbol_set
-      [:a, :b, :c].to_set
+      %i[a b c].to_set
     end
 
     def rule_block
-      return lambda { |item_data|
-        if item_data == "fail"
-          return RuleReturn.new(validation_state: VALIDATION_STATES[:failed], failure_data: "set failure")
+      return lambda do |item_data|
+        if item_data == 'fail'
+          return RuleReturn.new(
+            validation_state: VALIDATION_STATES[:failed],
+            failure_data: 'set failure'
+          )
         end
 
-        if item_data == "success"
+        if item_data == 'success'
           return RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
         end
 
-        return RuleReturn.new(validation_state: VALIDATION_STATES[:failed], failure_data: "I was something else")
-      }
+        return RuleReturn.new(
+          validation_state: VALIDATION_STATES[:failed],
+          failure_data: 'I was something else'
+        )
+      end
     end
   end
 
@@ -58,54 +66,54 @@ module Precheck
     describe Precheck::Rule do
       let(:rule) { TestRule.new }
 
-      it "passes" do
-        item = TestItemToCheck.new(data: "success")
+      it 'passes' do
+        item = TestItemToCheck.new(data: 'success')
         result = rule.check_item(item)
         expect(result.status).to eq(VALIDATION_STATES[:passed])
       end
 
-      it "properly returns a RuleResult with failed_data" do
-        item = TestItemToCheck.new(data: "fail")
+      it 'properly returns a RuleResult with failed_data' do
+        item = TestItemToCheck.new(data: 'fail')
         result = rule.check_item(item)
         expect(result.status).to eq(VALIDATION_STATES[:failed])
-        expect(result.rule_return.failure_data).to eq("set failure")
+        expect(result.rule_return.failure_data).to eq('set failure')
       end
 
-      it "skips items it is not explicitly support to handle via handle_item?" do
+      it 'skips items it is not explicitly support to handle via handle_item?' do
         # Note: TextItemToCheck not TestItemToCheck
-        item = TextItemToCheck.new("nothing", :description, "description")
+        item = TextItemToCheck.new('nothing', :description, 'description')
         result = rule.check_item(item)
         expect(result).to eq(nil)
       end
 
-      it "skips item names not in supported_fields_symbol_set" do
-        item = TestItemToCheck.new(data: "fail", item_name: :d)
+      it 'skips item names not in supported_fields_symbol_set' do
+        item = TestItemToCheck.new(data: 'fail', item_name: :d)
         result = rule.check_item(item)
         expect(result).to eq(nil)
       end
 
-      it "passes when items are set is_optional == true and they have nil content" do
+      it 'passes when items are set is_optional == true and they have nil content' do
         item = TestItemToCheck.new(data: nil, is_optional: true)
         result = rule.check_item(item)
         expect(result.status).to eq(VALIDATION_STATES[:passed])
       end
 
-      it "passes when items are set is_optional == true and they have empty content" do
-        item = TestItemToCheck.new(data: "", is_optional: true)
+      it 'passes when items are set is_optional == true and they have empty content' do
+        item = TestItemToCheck.new(data: '', is_optional: true)
         result = rule.check_item(item)
         expect(result.status).to eq(VALIDATION_STATES[:passed])
       end
 
-      it "includes fields from supported_fields_symbol_set" do
-        item = TestItemToCheck.new(data: "success", item_name: :a)
+      it 'includes fields from supported_fields_symbol_set' do
+        item = TestItemToCheck.new(data: 'success', item_name: :a)
         result = rule.check_item(item)
         expect(result.status).to eq(VALIDATION_STATES[:passed])
 
-        item = TestItemToCheck.new(data: "success", item_name: :b)
+        item = TestItemToCheck.new(data: 'success', item_name: :b)
         result = rule.check_item(item)
         expect(result.status).to eq(VALIDATION_STATES[:passed])
 
-        item = TestItemToCheck.new(data: "success", item_name: :c)
+        item = TestItemToCheck.new(data: 'success', item_name: :c)
         result = rule.check_item(item)
         expect(result.status).to eq(VALIDATION_STATES[:passed])
       end

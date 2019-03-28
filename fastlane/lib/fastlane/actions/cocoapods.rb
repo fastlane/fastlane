@@ -14,7 +14,9 @@ module Fastlane
           cmd << ["cd '#{podfile_folder}' &&"]
         end
 
-        cmd << ['bundle exec'] if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
+        if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
+          cmd << ['bundle exec']
+        end
         cmd << ['pod install']
 
         cmd << '--no-clean' unless params[:clean]
@@ -24,16 +26,24 @@ module Fastlane
         cmd << '--verbose' if params[:verbose]
         cmd << '--no-ansi' unless params[:ansi]
 
-        Actions.sh(cmd.join(' '), error_callback: lambda { |result|
-          if !params[:repo_update] && params[:try_repo_update_on_error]
-            cmd << '--repo-update'
-            Actions.sh(cmd.join(' '), error_callback: lambda { |retry_result|
-              call_error_callback(params, retry_result)
-            })
-          else
-            call_error_callback(params, result)
-          end
-        })
+        Actions.sh(
+          cmd.join(' '),
+          error_callback:
+            lambda do |result|
+              if !params[:repo_update] && params[:try_repo_update_on_error]
+                cmd << '--repo-update'
+                Actions.sh(
+                  cmd.join(' '),
+                  error_callback:
+                    lambda do |retry_result|
+                      call_error_callback(params, retry_result)
+                    end
+                )
+              else
+                call_error_callback(params, result)
+              end
+            end
+        )
       end
 
       def self.call_error_callback(params, result)
@@ -47,71 +57,99 @@ module Fastlane
       end
 
       def self.description
-        "Runs `pod install` for the project"
+        'Runs `pod install` for the project'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :repo_update,
-                                       env_name: "FL_COCOAPODS_REPO_UPDATE",
-                                       description: "Add `--repo-update` flag to `pod install` command",
-                                       is_string: false,
-                                       default_value: false),
-          FastlaneCore::ConfigItem.new(key: :silent,
-                                       env_name: "FL_COCOAPODS_SILENT",
-                                       description: "Execute command without logging output",
-                                       is_string: false,
-                                       default_value: false),
-          FastlaneCore::ConfigItem.new(key: :verbose,
-                                       env_name: "FL_COCOAPODS_VERBOSE",
-                                       description: "Show more debugging information",
-                                       is_string: false,
-                                       default_value: false),
-          FastlaneCore::ConfigItem.new(key: :ansi,
-                                       env_name: "FL_COCOAPODS_ANSI",
-                                       description: "Show output with ANSI codes",
-                                       is_string: false,
-                                       default_value: true),
-          FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
-                                       env_name: "FL_COCOAPODS_USE_BUNDLE_EXEC",
-                                       description: "Use bundle exec when there is a Gemfile presented",
-                                       is_string: false,
-                                       default_value: true),
-          FastlaneCore::ConfigItem.new(key: :podfile,
-                                       env_name: "FL_COCOAPODS_PODFILE",
-                                       description: "Explicitly specify the path to the Cocoapods' Podfile. You can either set it to the Podfile's path or to the folder containing the Podfile file",
-                                       optional: true,
-                                       is_string: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Could not find Podfile") unless File.exist?(value) || Helper.test?
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :error_callback,
-                                       description: 'A callback invoked with the command output if there is a non-zero exit status',
-                                       optional: true,
-                                       is_string: false,
-                                       type: :string_callback,
-                                       default_value: nil),
-          FastlaneCore::ConfigItem.new(key: :try_repo_update_on_error,
-                                       env_name: "FL_COCOAPODS_TRY_REPO_UPDATE_ON_ERROR",
-                                       description: 'Retry with --repo-update if action was finished with error',
-                                       optional: true,
-                                       is_string: false,
-                                       default_value: false,
-                                       type: Boolean),
-
+          FastlaneCore::ConfigItem.new(
+            key: :repo_update,
+            env_name: 'FL_COCOAPODS_REPO_UPDATE',
+            description: 'Add `--repo-update` flag to `pod install` command',
+            is_string: false,
+            default_value: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :silent,
+            env_name: 'FL_COCOAPODS_SILENT',
+            description: 'Execute command without logging output',
+            is_string: false,
+            default_value: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :verbose,
+            env_name: 'FL_COCOAPODS_VERBOSE',
+            description: 'Show more debugging information',
+            is_string: false,
+            default_value: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :ansi,
+            env_name: 'FL_COCOAPODS_ANSI',
+            description: 'Show output with ANSI codes',
+            is_string: false,
+            default_value: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :use_bundle_exec,
+            env_name: 'FL_COCOAPODS_USE_BUNDLE_EXEC',
+            description: 'Use bundle exec when there is a Gemfile presented',
+            is_string: false,
+            default_value: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :podfile,
+            env_name: 'FL_COCOAPODS_PODFILE',
+            description:
+              "Explicitly specify the path to the Cocoapods' Podfile. You can either set it to the Podfile's path or to the folder containing the Podfile file",
+            optional: true,
+            is_string: true,
+            verify_block:
+              proc do |value|
+                unless File.exist?(value) || Helper.test?
+                  UI.user_error!('Could not find Podfile')
+                end
+              end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :error_callback,
+            description:
+              'A callback invoked with the command output if there is a non-zero exit status',
+            optional: true,
+            is_string: false,
+            type: :string_callback,
+            default_value: nil
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :try_repo_update_on_error,
+            env_name: 'FL_COCOAPODS_TRY_REPO_UPDATE_ON_ERROR',
+            description:
+              'Retry with --repo-update if action was finished with error',
+            optional: true,
+            is_string: false,
+            default_value: false,
+            type: Boolean
+          ),
           # Deprecated
-          FastlaneCore::ConfigItem.new(key: :clean,
-                                       env_name: "FL_COCOAPODS_CLEAN",
-                                       description: "(Option removed from cocoapods) Remove SCM directories",
-                                       deprecated: true,
-                                       is_string: false,
-                                       default_value: true),
-          FastlaneCore::ConfigItem.new(key: :integrate,
-                                       env_name: "FL_COCOAPODS_INTEGRATE",
-                                       description: "(Option removed from cocoapods) Integrate the Pods libraries into the Xcode project(s)",
-                                       deprecated: true,
-                                       is_string: false,
-                                       default_value: true)
+          FastlaneCore::ConfigItem
+            .new(
+            key: :clean,
+            env_name: 'FL_COCOAPODS_CLEAN',
+            description:
+              '(Option removed from cocoapods) Remove SCM directories',
+            deprecated: true,
+            is_string: false,
+            default_value: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :integrate,
+            env_name: 'FL_COCOAPODS_INTEGRATE',
+            description:
+              '(Option removed from cocoapods) Integrate the Pods libraries into the Xcode project(s)',
+            deprecated: true,
+            is_string: false,
+            default_value: true
+          )
         ]
         # Please don't add a version parameter to the `cocoapods` action. If you need to specify a version when running
         # `cocoapods`, please start using a Gemfile and lock the version there
@@ -119,15 +157,15 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       def self.authors
-        ["KrauseFx", "tadpol", "birmacher", "Liquidsoul"]
+        %w[KrauseFx tadpol birmacher Liquidsoul]
       end
 
       def self.details
-        "If you use [CocoaPods](http://cocoapods.org) you can use the `cocoapods` integration to run `pod install` before building your app."
+        'If you use [CocoaPods](http://cocoapods.org) you can use the `cocoapods` integration to run `pod install` before building your app.'
       end
 
       def self.example_code

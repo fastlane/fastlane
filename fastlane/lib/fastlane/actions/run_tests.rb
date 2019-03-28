@@ -13,65 +13,78 @@ module Fastlane
         plist_files_before = []
 
         begin
-          destination = values[:destination] # save destination value which can be later overridden
+          destination = values[]
           Scan.config = values # we set this here to auto-detect missing values, which we need later on
           unless values[:derived_data_path].to_s.empty?
-            plist_files_before = test_summary_filenames(values[:derived_data_path])
+            plist_files_before =
+              test_summary_filenames(values[:derived_data_path])
           end
 
           values[:destination] = destination # restore destination value
           Scan::Manager.new.work(values)
 
           zip_build_products_path = Scan.cache[:zip_build_products_path]
-          Actions.lane_context[SharedValues::SCAN_ZIP_BUILD_PRODUCTS_PATH] = zip_build_products_path if zip_build_products_path
+          if zip_build_products_path
+            Actions.lane_context[SharedValues::SCAN_ZIP_BUILD_PRODUCTS_PATH] =
+              zip_build_products_path
+          end
 
           return true
-        rescue FastlaneCore::Interface::FastlaneBuildFailure => ex
+
           # Specifically catching FastlaneBuildFailure to prevent build/compile errors from being
           # silenced when :fail_build is set to false
           # :fail_build should only suppress testing failures
+        rescue FastlaneCore::Interface::FastlaneBuildFailure => ex
           raise ex
         rescue => ex
-          if values[:fail_build]
-            raise ex
-          end
+          raise ex if values[:fail_build]
         ensure
           unless values[:derived_data_path].to_s.empty?
-            Actions.lane_context[SharedValues::SCAN_DERIVED_DATA_PATH] = values[:derived_data_path]
-            plist_files_after = test_summary_filenames(values[:derived_data_path])
+            Actions.lane_context[SharedValues::SCAN_DERIVED_DATA_PATH] =
+              values[:derived_data_path]
+            plist_files_after =
+              test_summary_filenames(values[:derived_data_path])
             all_test_summaries = (plist_files_after - plist_files_before)
-            Actions.lane_context[SharedValues::SCAN_GENERATED_PLIST_FILES] = all_test_summaries
-            Actions.lane_context[SharedValues::SCAN_GENERATED_PLIST_FILE] = all_test_summaries.last
+            Actions.lane_context[SharedValues::SCAN_GENERATED_PLIST_FILES] =
+              all_test_summaries
+            Actions.lane_context[SharedValues::SCAN_GENERATED_PLIST_FILE] =
+              all_test_summaries.last
           end
         end
       end
 
       def self.description
-        "Easily run tests of your iOS app (via _scan_)"
+        'Easily run tests of your iOS app (via _scan_)'
       end
 
       def self.details
-        "More information: https://docs.fastlane.tools/actions/scan/"
+        'More information: https://docs.fastlane.tools/actions/scan/'
       end
 
       def self.author
-        "KrauseFx"
+        'KrauseFx'
       end
 
       def self.available_options
         require 'scan'
 
-        FastlaneCore::CommanderGenerator.new.generate(Scan::Options.available_options) + [
-          FastlaneCore::ConfigItem.new(key: :fail_build,
-                                       env_name: "SCAN_FAIL_BUILD",
-                                       description: "Should this step stop the build if the tests fail? Set this to false if you're using trainer",
-                                       is_string: false,
-                                       default_value: true)
-        ]
+        FastlaneCore::CommanderGenerator.new.generate(
+          Scan::Options.available_options
+        ) +
+          [
+            FastlaneCore::ConfigItem.new(
+              key: :fail_build,
+              env_name: 'SCAN_FAIL_BUILD',
+              description:
+                "Should this step stop the build if the tests fail? Set this to false if you're using trainer",
+              is_string: false,
+              default_value: true
+            )
+          ]
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       private_class_method
@@ -83,7 +96,10 @@ module Fastlane
         files += Dir["#{derived_data_path}/**/Logs/Test/*TestSummaries.plist"]
 
         # Xcode 10
-        files += Dir["#{derived_data_path}/**/Logs/Test/*.xcresult/TestSummaries.plist"]
+        files +=
+          Dir[
+            "#{derived_data_path}/**/Logs/Test/*.xcresult/TestSummaries.plist"
+          ]
 
         return files
       end

@@ -15,9 +15,7 @@ module Fastlane
         end
 
         # set default keychain
-        if set_default
-          commands << default_keychain(keychain_path)
-        end
+        commands << default_keychain(keychain_path) if set_default
 
         escaped_path = keychain_path.shellescape
         escaped_password = params[:password].shellescape
@@ -25,31 +23,51 @@ module Fastlane
         # Log the full path, useful for troubleshooting
         UI.message("Unlocking keychain at path: #{escaped_path}")
         # unlock given keychain and disable lock and timeout
-        commands << Fastlane::Actions.sh("security unlock-keychain -p #{escaped_password} #{escaped_path}", log: false)
-        commands << Fastlane::Actions.sh("security set-keychain-settings #{escaped_path}", log: false)
+        commands <<
+          Fastlane::Actions.sh(
+            "security unlock-keychain -p #{escaped_password} #{escaped_path}",
+            log: false
+          )
+        commands <<
+          Fastlane::Actions.sh(
+            "security set-keychain-settings #{escaped_path}",
+            log: false
+          )
         commands
       end
 
       def self.add_keychain_to_search_list(keychain_path)
-        keychains = Fastlane::Actions.sh("security list-keychains -d user", log: false).shellsplit
+        keychains =
+          Fastlane::Actions.sh('security list-keychains -d user', log: false)
+            .shellsplit
 
         # add the keychain to the keychain list
         unless keychains.include?(keychain_path)
           keychains << keychain_path
 
-          Fastlane::Actions.sh("security list-keychains -s #{keychains.shelljoin}", log: false)
+          Fastlane::Actions.sh(
+            "security list-keychains -s #{keychains.shelljoin}",
+            log: false
+          )
         end
       end
 
       def self.replace_keychain_in_search_list(keychain_path)
-        Actions.lane_context[Actions::SharedValues::ORIGINAL_DEFAULT_KEYCHAIN] = Fastlane::Actions.sh("security default-keychain", log: false).strip
+        Actions.lane_context[Actions::SharedValues::ORIGINAL_DEFAULT_KEYCHAIN] =
+          Fastlane::Actions.sh('security default-keychain', log: false).strip
         escaped_path = keychain_path.shellescape
-        Fastlane::Actions.sh("security list-keychains -s #{escaped_path}", log: false)
+        Fastlane::Actions.sh(
+          "security list-keychains -s #{escaped_path}",
+          log: false
+        )
       end
 
       def self.default_keychain(keychain_path)
         escaped_path = keychain_path.shellescape
-        Fastlane::Actions.sh("security default-keychain -s #{escaped_path}", log: false)
+        Fastlane::Actions.sh(
+          "security default-keychain -s #{escaped_path}",
+          log: false
+        )
       end
 
       #####################################################
@@ -57,44 +75,51 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Unlock a keychain"
+        'Unlock a keychain'
       end
 
       def self.details
         [
-          "Unlocks the given keychain file and adds it to the keychain search list.",
-          "Keychains can be replaced with `add_to_search_list: :replace`."
+          'Unlocks the given keychain file and adds it to the keychain search list.',
+          'Keychains can be replaced with `add_to_search_list: :replace`.'
         ].join("\n")
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :path,
-                                       env_name: "FL_UNLOCK_KEYCHAIN_PATH",
-                                       description: "Path to the keychain file",
-                                       default_value: "login",
-                                       optional: false),
-          FastlaneCore::ConfigItem.new(key: :password,
-                                       env_name: "FL_UNLOCK_KEYCHAIN_PASSWORD",
-                                       sensitive: true,
-                                       description: "Keychain password",
-                                       optional: false),
-          FastlaneCore::ConfigItem.new(key: :add_to_search_list,
-                                       env_name: "FL_UNLOCK_KEYCHAIN_ADD_TO_SEARCH_LIST",
-                                       description: "Add to keychain search list",
-                                       is_string: false,
-                                       default_value: true),
-          FastlaneCore::ConfigItem.new(key: :set_default,
-                                       env_name: "FL_UNLOCK_KEYCHAIN_SET_DEFAULT",
-                                       description: "Set as default keychain",
-                                       is_string: false,
-                                       default_value: false)
-
+          FastlaneCore::ConfigItem.new(
+            key: :path,
+            env_name: 'FL_UNLOCK_KEYCHAIN_PATH',
+            description: 'Path to the keychain file',
+            default_value: 'login',
+            optional: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :password,
+            env_name: 'FL_UNLOCK_KEYCHAIN_PASSWORD',
+            sensitive: true,
+            description: 'Keychain password',
+            optional: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :add_to_search_list,
+            env_name: 'FL_UNLOCK_KEYCHAIN_ADD_TO_SEARCH_LIST',
+            description: 'Add to keychain search list',
+            is_string: false,
+            default_value: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :set_default,
+            env_name: 'FL_UNLOCK_KEYCHAIN_SET_DEFAULT',
+            description: 'Set as default keychain',
+            is_string: false,
+            default_value: false
+          )
         ]
       end
 
       def self.authors
-        ["xfreebird"]
+        %w[xfreebird]
       end
 
       def self.is_supported?(platform)

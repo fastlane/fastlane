@@ -11,20 +11,18 @@ module Fastlane
 
         # if we have to set variables, do that now
         unless values_to_set.nil?
-          values_to_set.each do |key, value|
-            ENV[key] = value
-          end
+          values_to_set.each { |key, value| ENV[key] = value }
         end
 
         # finally, get the variable we requested
         return ENV[value_to_get] unless value_to_get.nil?
 
         # if no variable is requested, just return empty string
-        return ""
+        return ''
       end
 
       def self.author
-        "taquitos"
+        'taquitos'
       end
 
       def self.available_options

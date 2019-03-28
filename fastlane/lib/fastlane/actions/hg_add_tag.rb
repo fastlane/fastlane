@@ -14,20 +14,20 @@ module Fastlane
       end
 
       def self.description
-        "This will add a hg tag to the current branch"
+        'This will add a hg tag to the current branch'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :tag,
-                                       env_name: "FL_HG_TAG_TAG",
-                                       description: "Tag to create")
+          FastlaneCore::ConfigItem.new(
+            key: :tag, env_name: 'FL_HG_TAG_TAG', description: 'Tag to create'
+          )
         ]
       end
 
       def self.author
         # credits to lmirosevic for original git version
-        "sjrmanning"
+        'sjrmanning'
       end
 
       def self.is_supported?(platform)
@@ -35,9 +35,7 @@ module Fastlane
       end
 
       def self.example_code
-        [
-          'hg_add_tag(tag: "1.3")'
-        ]
+        ['hg_add_tag(tag: "1.3")']
       end
 
       def self.category

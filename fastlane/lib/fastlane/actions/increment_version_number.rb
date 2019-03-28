@@ -8,7 +8,7 @@ module Fastlane
       require 'shellwords'
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       def self.run(params)
@@ -17,107 +17,138 @@ module Fastlane
 
         folder = params[:xcodeproj] ? File.join(params[:xcodeproj], '..') : '.'
 
-        command_prefix = [
-          'cd',
-          File.expand_path(folder).shellescape,
-          '&&'
-        ].join(' ')
+        command_prefix =
+          ['cd', File.expand_path(folder).shellescape, '&&'].join(' ')
 
         begin
-          current_version = Actions
-                            .sh("#{command_prefix} agvtool what-marketing-version -terse1", log: FastlaneCore::Globals.verbose?)
-                            .split("\n")
-                            .last
-                            .strip
-        rescue
+          current_version =
+            Actions.sh(
+              "#{command_prefix} agvtool what-marketing-version -terse1",
+              log: FastlaneCore::Globals.verbose?
+            )
+              .split("\n")
+              .last
+              .strip
+        rescue StandardError
           current_version = ''
         end
 
         version_regex = /^\d+\.\d+\.\d+$/
         if params[:version_number]
-          UI.verbose("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ version_regex
+          unless current_version =~ version_regex
+            UI.verbose(
+              "Your current version (#{current_version}) does not respect the format A.B.C"
+            )
+          end
 
           # Specific version
           next_version_number = params[:version_number]
         else
-          UI.user_error!("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ version_regex
-          version_array = current_version.split(".").map(&:to_i)
+          unless current_version =~ version_regex
+            UI.user_error!(
+              "Your current version (#{current_version}) does not respect the format A.B.C"
+            )
+          end
+          version_array = current_version.split('.').map(&:to_i)
 
           case params[:bump_type]
-          when "patch"
+          when 'patch'
             version_array[2] = version_array[2] + 1
-            next_version_number = version_array.join(".")
-          when "minor"
+            next_version_number = version_array.join('.')
+          when 'minor'
             version_array[1] = version_array[1] + 1
             version_array[2] = version_array[2] = 0
-            next_version_number = version_array.join(".")
-          when "major"
+            next_version_number = version_array.join('.')
+          when 'major'
             version_array[0] = version_array[0] + 1
             version_array[1] = version_array[1] = 0
             version_array[1] = version_array[2] = 0
-            next_version_number = version_array.join(".")
-          when "specific_version"
+            next_version_number = version_array.join('.')
+          when 'specific_version'
             next_version_number = specific_version_number
           end
         end
 
-        command = [
-          command_prefix,
-          "agvtool new-marketing-version #{next_version_number.to_s.strip}"
-        ].join(' ')
+        command =
+          [
+            command_prefix,
+            "agvtool new-marketing-version #{next_version_number.to_s.strip}"
+          ].join(' ')
 
         if Helper.test?
           Actions.lane_context[SharedValues::VERSION_NUMBER] = command
         else
           Actions.sh(command)
-          Actions.lane_context[SharedValues::VERSION_NUMBER] = next_version_number
+          Actions.lane_context[SharedValues::VERSION_NUMBER] =
+            next_version_number
         end
 
         return Actions.lane_context[SharedValues::VERSION_NUMBER]
       rescue => ex
-        UI.error('Before being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html')
+        UI.error(
+          'Before being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html'
+        )
         raise ex
       end
 
       def self.description
-        "Increment the version number of your project"
+        'Increment the version number of your project'
       end
 
       def self.details
         [
-          "This action will increment the version number.",
+          'This action will increment the version number.',
           "You first have to set up your Xcode project, if you haven't done it already: [https://developer.apple.com/library/ios/qa/qa1827/_index.html](https://developer.apple.com/library/ios/qa/qa1827/_index.html)."
         ].join("\n")
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :bump_type,
-                                       env_name: "FL_VERSION_NUMBER_BUMP_TYPE",
-                                       description: "The type of this version bump. Available: patch, minor, major",
-                                       default_value: "patch",
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Available values are 'patch', 'minor' and 'major'") unless ['patch', 'minor', 'major'].include?(value)
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :version_number,
-                                       env_name: "FL_VERSION_NUMBER_VERSION_NUMBER",
-                                       description: "Change to a specific version. This will replace the bump type value",
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :xcodeproj,
-                                       env_name: "FL_VERSION_NUMBER_PROJECT",
-                                       description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
-                                         UI.user_error!("Could not find Xcode project") unless File.exist?(value)
-                                       end,
-                                       optional: true)
+          FastlaneCore::ConfigItem.new(
+            key: :bump_type,
+            env_name: 'FL_VERSION_NUMBER_BUMP_TYPE',
+            description:
+              'The type of this version bump. Available: patch, minor, major',
+            default_value: 'patch',
+            verify_block:
+              proc do |value|
+                unless %w[patch minor major].include?(value)
+                  UI.user_error!(
+                    "Available values are 'patch', 'minor' and 'major'"
+                  )
+                end
+              end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :version_number,
+            env_name: 'FL_VERSION_NUMBER_VERSION_NUMBER',
+            description:
+              'Change to a specific version. This will replace the bump type value',
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :xcodeproj,
+            env_name: 'FL_VERSION_NUMBER_PROJECT',
+            description:
+              'optional, you must specify the path to your main Xcode project if it is not in the project root directory',
+            verify_block:
+              proc do |value|
+                if value.end_with?('.xcworkspace')
+                  UI.user_error!(
+                    'Please pass the path to the project, not the workspace'
+                  )
+                end
+                unless File.exist?(value)
+                  UI.user_error!('Could not find Xcode project')
+                end
+              end,
+            optional: true
+          )
         ]
       end
 
       def self.output
-        [
-          ['VERSION_NUMBER', 'The new version number']
-        ]
+        [['VERSION_NUMBER', 'The new version number']]
       end
 
       def self.return_type
@@ -125,11 +156,11 @@ module Fastlane
       end
 
       def self.return_value
-        "The new version number"
+        'The new version number'
       end
 
       def self.author
-        "serluca"
+        'serluca'
       end
 
       def self.example_code

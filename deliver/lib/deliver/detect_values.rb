@@ -23,13 +23,16 @@ module Deliver
       return if options[:app_identifier]
 
       if options[:ipa]
-        identifier = FastlaneCore::IpaFileAnalyser.fetch_app_identifier(options[:ipa])
+        identifier =
+          FastlaneCore::IpaFileAnalyser.fetch_app_identifier(options[:ipa])
       elsif options[:pkg]
-        identifier = FastlaneCore::PkgFileAnalyser.fetch_app_identifier(options[:pkg])
+        identifier =
+          FastlaneCore::PkgFileAnalyser.fetch_app_identifier(options[:pkg])
       end
 
       options[:app_identifier] = identifier if identifier.to_s.length > 0
-      options[:app_identifier] ||= UI.input("The Bundle Identifier of your App: ")
+      options[:app_identifier] ||=
+        UI.input('The Bundle Identifier of your App: ')
     rescue => ex
       UI.error("#{ex.message}\n#{ex.backtrace.join('\n')}")
       UI.user_error!("Could not infer your App's Bundle Identifier")
@@ -38,16 +41,27 @@ module Deliver
     def find_app(options)
       search_by = options[:app_identifier]
       search_by = options[:app] if search_by.to_s.length == 0
-      app = Spaceship::Tunes::Application.find(search_by, mac: options[:platform] == "osx")
+      app =
+        Spaceship::Tunes::Application.find(
+          search_by,
+          mac: options[:platform] == 'osx'
+        )
       if app
         options[:app] = app
       else
-        UI.user_error!("Could not find app with app identifier '#{options[:app_identifier]}' in your App Store Connect account (#{options[:username]} - Team: #{Spaceship::Tunes.client.team_id})")
+        UI.user_error!(
+          "Could not find app with app identifier '#{options[
+            :app_identifier
+          ]}' in your App Store Connect account (#{options[
+            :username
+          ]} - Team: #{Spaceship::Tunes.client.team_id})"
+        )
       end
     end
 
     def find_folders(options)
-      containing = Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
+      containing =
+        Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
       options[:screenshots_path] ||= File.join(containing, 'screenshots')
       options[:metadata_path] ||= File.join(containing, 'metadata')
     end
@@ -61,9 +75,11 @@ module Deliver
       return if options[:app_version]
 
       if options[:ipa]
-        options[:app_version] ||= FastlaneCore::IpaFileAnalyser.fetch_app_version(options[:ipa])
+        options[:app_version] ||=
+          FastlaneCore::IpaFileAnalyser.fetch_app_version(options[:ipa])
       elsif options[:pkg]
-        options[:app_version] ||= FastlaneCore::PkgFileAnalyser.fetch_app_version(options[:pkg])
+        options[:app_version] ||=
+          FastlaneCore::PkgFileAnalyser.fetch_app_version(options[:pkg])
       end
     rescue => ex
       UI.error("#{ex.message}\n#{ex.backtrace.join('\n')}")
@@ -72,7 +88,8 @@ module Deliver
 
     def find_platform(options)
       if options[:ipa]
-        options[:platform] ||= FastlaneCore::IpaFileAnalyser.fetch_app_platform(options[:ipa])
+        options[:platform] ||=
+          FastlaneCore::IpaFileAnalyser.fetch_app_platform(options[:ipa])
       elsif options[:pkg]
         options[:platform] = 'osx'
       end
@@ -86,7 +103,10 @@ module Deliver
       diff = languages - all_languages
 
       unless diff.empty?
-        UI.user_error!("The following languages are invalid and cannot be activated: #{diff.join(',')}\n\nValid languages are: #{all_languages}")
+        UI.user_error!(
+          "The following languages are invalid and cannot be activated: #{diff
+            .join(',')}\n\nValid languages are: #{all_languages}"
+        )
       end
     end
   end

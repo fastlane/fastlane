@@ -22,9 +22,10 @@ class String
 
     omission = options[:omission] || '...'
     length_with_room_for_omission = truncate_at - omission.length
-    stop = \
+    stop =
       if options[:separator]
-        rindex(options[:separator], length_with_room_for_omission) || length_with_room_for_omission
+        rindex(options[:separator], length_with_room_for_omission) ||
+          length_with_room_for_omission
       else
         length_with_room_for_omission
       end

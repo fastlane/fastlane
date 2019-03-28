@@ -9,12 +9,16 @@ module Fastlane
         require 'screengrab'
 
         Screengrab.config = params
-        Screengrab.android_environment = Screengrab::AndroidEnvironment.new(params[:android_home],
-                                                                            params[:build_tools_version])
+        Screengrab.android_environment =
+          Screengrab::AndroidEnvironment.new(
+            params[:android_home],
+            params[:build_tools_version]
+          )
         Screengrab::DependencyChecker.check(Screengrab.android_environment)
         Screengrab::Runner.new.run
 
-        Actions.lane_context[SharedValues::SCREENGRAB_OUTPUT_DIRECTORY] = File.expand_path(params[:output_directory])
+        Actions.lane_context[SharedValues::SCREENGRAB_OUTPUT_DIRECTORY] =
+          File.expand_path(params[:output_directory])
 
         true
       end
@@ -29,7 +33,7 @@ module Fastlane
       end
 
       def self.author
-        ['asfalcone', 'i2amsam', 'mfurtak']
+        %w[asfalcone i2amsam mfurtak]
       end
 
       def self.is_supported?(platform)

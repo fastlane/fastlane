@@ -9,15 +9,16 @@ module Precheck
     end
 
     def self.env_name
-      "RULE_CUSTOM_TEXT"
+      'RULE_CUSTOM_TEXT'
     end
 
     def self.friendly_name
-      "No user-specified words are included"
+      'No user-specified words are included'
     end
 
     def self.description
-      "mentioning any of the user-specified words passed to #{self.key}(data: [words])"
+      "mentioning any of the user-specified words passed to #{self
+        .key}(data: [words])"
     end
 
     def needs_customization?

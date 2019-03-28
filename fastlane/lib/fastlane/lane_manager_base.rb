@@ -3,15 +3,13 @@ module Fastlane
   # Takes care of all common things like printing the lane description tables and loading .env files
   class LaneManagerBase
     def self.skip_docs?
-      Helper.test? || FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
+      Helper.test? || FastlaneCore::Env.truthy?('FASTLANE_SKIP_DOCS')
     end
 
     # All the finishing up that needs to be done
     def self.finish_fastlane(ff, duration, error, skip_message: false)
       # Sometimes we don't have a fastfile because we're using Fastfile.swift
-      unless ff.nil?
-        ff.runner.did_finish
-      end
+      ff.runner.did_finish unless ff.nil?
 
       # Finished with all the lanes
       Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
@@ -23,9 +21,13 @@ module Fastlane
         UI.error('fastlane finished with errors') unless skip_message
         raise error
       elsif duration > 5
-        UI.success("fastlane.tools just saved you #{duration} minutes! 🎉") unless skip_message
+        unless skip_message
+          UI.success("fastlane.tools just saved you #{duration} minutes! 🎉")
+        end
       else
-        UI.success('fastlane.tools finished successfully 🎉') unless skip_message
+        unless skip_message
+          UI.success('fastlane.tools finished successfully 🎉')
+        end
       end
     end
 
@@ -43,17 +45,19 @@ module Fastlane
         name = current[:name][0..60]
         name = name.red if is_error_step
         index = i + 1
-        index = "💥" if is_error_step
+        index = '💥' if is_error_step
         rows << [index, name, current[:time].to_i]
       end
 
-      puts("")
-      puts(Terminal::Table.new(
-             title: "fastlane summary".green,
-             headings: ["Step", "Action", "Time (in s)"],
-             rows: FastlaneCore::PrintTable.transform_output(rows)
-      ))
-      puts("")
+      puts('')
+      puts(
+        Terminal::Table.new(
+          title: 'fastlane summary'.green,
+          headings: ['Step', 'Action', 'Time (in s)'],
+          rows: FastlaneCore::PrintTable.transform_output(rows)
+        )
+      )
+      puts('')
     end
 
     def self.print_lane_context
@@ -66,15 +70,17 @@ module Fastlane
       end
 
       # Print a nice table unless in FastlaneCore::Globals.verbose? mode
-      rows = Actions.lane_context.collect do |key, content|
-        [key, content.to_s]
-      end
+      rows = Actions.lane_context.collect { |key, content| [key, content.to_s] }
 
       require 'terminal-table'
-      puts(Terminal::Table.new({
-        title: "Lane Context".yellow,
-        rows: FastlaneCore::PrintTable.transform_output(rows)
-      }))
+      puts(
+        Terminal::Table.new(
+          {
+            title: 'Lane Context'.yellow,
+            rows: FastlaneCore::PrintTable.transform_output(rows)
+          }
+        )
+      )
     end
 
     def self.print_error_line(ex)
@@ -83,7 +89,13 @@ module Fastlane
 
       line = error_line[1]
       UI.error("Error in your Fastfile at line #{line}")
-      UI.content_error(File.read(FastlaneCore::FastlaneFolder.fastfile_path, encoding: "utf-8"), line)
+      UI.content_error(
+        File.read(
+          FastlaneCore::FastlaneFolder.fastfile_path,
+          encoding: 'utf-8'
+        ),
+        line
+      )
     end
   end
 end

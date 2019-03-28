@@ -7,7 +7,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the `get_certificates` action"
+        'Alias for the `get_certificates` action'
       end
     end
   end

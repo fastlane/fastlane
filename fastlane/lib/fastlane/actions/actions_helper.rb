@@ -40,13 +40,13 @@ module Fastlane
     #   This might be nil, in which case the step is not printed out to the terminal
     def self.execute_action(step_name)
       start = Time.now # before the raise block, since `start` is required in the ensure block
-      UI.crash!("No block given") unless block_given?
+      UI.crash!('No block given') unless block_given?
 
       error = nil
       exc = nil
 
       begin
-        UI.header("Step: " + step_name) if step_name
+        UI.header('Step: ' + step_name) if step_name
         yield
       rescue => ex
         exc = ex
@@ -57,11 +57,7 @@ module Fastlane
       if step_name
         duration = Time.now - start
 
-        executed_actions << {
-          name: step_name,
-          error: error,
-          time: duration
-        }
+        executed_actions << { name: step_name, error: error, time: duration }
       end
 
       raise exc if exc
@@ -97,22 +93,21 @@ module Fastlane
 
     # Import all the helpers
     def self.load_helpers
-      Dir[File.expand_path('../helper/*.rb', File.dirname(__FILE__))].each do |file|
-        require file
-      end
+      Dir[File.expand_path('../helper/*.rb', File.dirname(__FILE__))]
+        .each { |file| require file }
     end
 
     def self.load_external_actions(path)
-      UI.user_error!("You need to pass a valid path") unless File.exist?(path)
+      UI.user_error!('You need to pass a valid path') unless File.exist?(path)
 
       Dir[File.expand_path('*.rb', path)].each do |file|
         begin
           require file
         rescue SyntaxError => ex
-          content = File.read(file, encoding: "utf-8")
-          ex.to_s.lines
-            .collect { |error| error.match(/#{file}:(\d+):(.*)/) }
-            .reject(&:nil?)
+          content = File.read(file, encoding: 'utf-8')
+          ex.to_s.lines.collect do |error|
+            error.match(/#{file}:(\d+):(.*)/)
+          end.reject(&:nil?)
             .each { |error| UI.content_error(content, error[1]) }
           UI.user_error!("Syntax error in #{File.basename(file)}")
           next
@@ -125,24 +120,36 @@ module Fastlane
           class_ref = Fastlane::Actions.const_get(class_name)
 
           if class_ref.respond_to?(:run)
-            UI.success("Successfully loaded custom action '#{file}'.") if FastlaneCore::Globals.verbose?
+            if FastlaneCore::Globals.verbose?
+              UI.success("Successfully loaded custom action '#{file}'.")
+            end
           else
             UI.error("Could not find method 'run' in class #{class_name}.")
-            UI.error('For more information, check out the docs: https://docs.fastlane.tools/')
-            UI.user_error!("Action '#{file_name}' is damaged!", show_github_issues: true)
+            UI.error(
+              'For more information, check out the docs: https://docs.fastlane.tools/'
+            )
+            UI.user_error!(
+              "Action '#{file_name}' is damaged!",
+              show_github_issues: true
+            )
           end
         rescue NameError
           # Action not found
           UI.error("Could not find '#{class_name}' class defined.")
-          UI.error('For more information, check out the docs: https://docs.fastlane.tools/')
-          UI.user_error!("Action '#{file_name}' is damaged!", show_github_issues: true)
+          UI.error(
+            'For more information, check out the docs: https://docs.fastlane.tools/'
+          )
+          UI.user_error!(
+            "Action '#{file_name}' is damaged!",
+            show_github_issues: true
+          )
         end
       end
       Actions.reset_aliases
     end
 
     def self.formerly_bundled_actions
-      ["xcake"]
+      %w[xcake]
     end
 
     # Returns a boolean indicating whether the class

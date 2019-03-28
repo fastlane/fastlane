@@ -8,9 +8,9 @@ module Spaceship
         def all
           members = client.team_members
           all_members = []
-          member = factory_member(members["members"], "member")
-          admins = factory_member(members["admins"], "admin")
-          agent  = factory_member(members["agent"], "agent")
+          member = factory_member(members['members'], 'member')
+          admins = factory_member(members['admins'], 'admin')
+          agent = factory_member(members['agent'], 'agent')
 
           all_members.concat(member)
           all_members.concat(admins)
@@ -20,7 +20,7 @@ module Spaceship
         end
 
         def invited
-          return factory_invite(client.team_invited["invites"])
+          return factory_invite(client.team_invited['invites'])
         end
 
         def factory_invite(invitees)
@@ -50,11 +50,7 @@ module Spaceship
         end
 
         def find(email)
-          all.each do |member|
-            if member.email_address == email
-              return member
-            end
-          end
+          all.each { |member| return member if member.email_address == email }
           return nil
         end
 

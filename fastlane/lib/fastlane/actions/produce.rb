@@ -7,7 +7,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the `create_app_online` action"
+        'Alias for the `create_app_online` action'
       end
     end
   end

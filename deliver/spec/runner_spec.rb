@@ -3,8 +3,12 @@ require 'deliver/runner'
 class MockSession
   def teams
     [
-      { 'contentProvider' => { 'contentProviderId' => 'abc', 'name' => 'A B C' } },
-      { 'contentProvider' => { 'contentProviderId' => 'def', 'name' => 'D E F' } }
+      {
+        'contentProvider' => { 'contentProviderId' => 'abc', 'name' => 'A B C' }
+      },
+      {
+        'contentProvider' => { 'contentProviderId' => 'def', 'name' => 'D E F' }
+      }
     ]
   end
 
@@ -15,10 +19,7 @@ end
 
 class MockTransporter
   def provider_ids
-    {
-      'A B C' => 'abc',
-      'D E F' => 'somelegacything'
-    }
+    { 'A B C' => 'abc', 'D E F' => 'somelegacything' }
   end
 end
 
@@ -33,6 +34,7 @@ describe Deliver::Runner do
 
   let(:options) do
     # A typical options hash expected from Deliver::DetectValues
+
     {
       username: 'bill@acme.com',
       ipa: 'ACME.ipa',
@@ -46,29 +48,43 @@ describe Deliver::Runner do
   describe :upload_binary do
     let(:transporter) { MockTransporter.new }
     before do
-      allow(FastlaneCore::ItunesTransporter).to receive(:new).and_return(transporter)
+      allow(FastlaneCore::ItunesTransporter).to receive(:new).and_return(
+                 transporter
+               )
     end
 
     describe 'with an IPA file for iOS' do
       it 'uploads the IPA for the iOS platform' do
-        expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate)
-          .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: '/tmp', platform: 'ios')
-          .and_return('path')
-        expect(transporter).to receive(:upload).with('YI8C2AS', 'path').and_return(true)
+        expect_any_instance_of(
+          FastlaneCore::IpaUploadPackageBuilder
+        ).to receive(:generate).with(
+                                    app_id: 'YI8C2AS',
+                                    ipa_path: 'ACME.ipa',
+                                    package_path: '/tmp',
+                                    platform: 'ios'
+                                  )
+                                    .and_return('path')
+        expect(transporter).to receive(:upload).with('YI8C2AS', 'path')
+                    .and_return(true)
         runner.upload_binary
       end
     end
 
     describe 'with an IPA file for tvOS' do
-      before do
-        options[:platform] = 'appletvos'
-      end
+      before { options[:platform] = 'appletvos' }
 
       it 'uploads the IPA for the tvOS platform' do
-        expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate)
-          .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: '/tmp', platform: 'appletvos')
-          .and_return('path')
-        expect(transporter).to receive(:upload).with('YI8C2AS', 'path').and_return(true)
+        expect_any_instance_of(
+          FastlaneCore::IpaUploadPackageBuilder
+        ).to receive(:generate).with(
+                                    app_id: 'YI8C2AS',
+                                    ipa_path: 'ACME.ipa',
+                                    package_path: '/tmp',
+                                    platform: 'appletvos'
+                                  )
+                                    .and_return('path')
+        expect(transporter).to receive(:upload).with('YI8C2AS', 'path')
+                    .and_return(true)
         runner.upload_binary
       end
     end
@@ -81,10 +97,17 @@ describe Deliver::Runner do
       end
 
       it 'uploads the PKG for the macOS platform' do
-        expect_any_instance_of(FastlaneCore::PkgUploadPackageBuilder).to receive(:generate)
-          .with(app_id: 'YI8C2AS', pkg_path: 'ACME.pkg', package_path: '/tmp', platform: 'osx')
-          .and_return('path')
-        expect(transporter).to receive(:upload).with('YI8C2AS', 'path').and_return(true)
+        expect_any_instance_of(
+          FastlaneCore::PkgUploadPackageBuilder
+        ).to receive(:generate).with(
+                                    app_id: 'YI8C2AS',
+                                    pkg_path: 'ACME.pkg',
+                                    package_path: '/tmp',
+                                    platform: 'osx'
+                                  )
+                                    .and_return('path')
+        expect(transporter).to receive(:upload).with('YI8C2AS', 'path')
+                    .and_return(true)
         runner.upload_binary
       end
     end

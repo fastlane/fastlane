@@ -1,8 +1,8 @@
 describe Fastlane do
   describe Fastlane::Action do
-    describe "No unused options" do
+    describe 'No unused options' do
       let(:all_exceptions) do
-        %w(
+        %w[
           pilot
           appstore
           cert
@@ -65,19 +65,26 @@ describe Fastlane do
           xcov
           create_app_on_managed_play_store
           download_from_play_store
-        )
+        ]
       end
 
       Fastlane::ActionsList.all_actions do |action, name|
         next unless action.available_options.kind_of?(Array)
-        next unless action.available_options.last.kind_of?(FastlaneCore::ConfigItem)
+        unless action.available_options.last.kind_of?(FastlaneCore::ConfigItem)
+          next
+        end
 
         it "No unused parameters in '#{name}'" do
           next if all_exceptions.include?(name)
-          content = File.read(File.join("fastlane", "lib", "fastlane", "actions", name + ".rb"))
+          content =
+            File.read(
+              File.join('fastlane', 'lib', 'fastlane', 'actions', name + '.rb')
+            )
           action.available_options.each do |option|
             unless content.include?("[:#{option.key}]")
-              UI.user_error!("Action '#{name}' doesn't use the option :#{option.key}")
+              UI.user_error!(
+                "Action '#{name}' doesn't use the option :#{option.key}"
+              )
             end
           end
         end

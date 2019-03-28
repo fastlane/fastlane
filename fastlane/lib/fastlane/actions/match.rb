@@ -7,7 +7,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the `sync_code_signing` action"
+        'Alias for the `sync_code_signing` action'
       end
     end
   end

@@ -3,7 +3,7 @@ module Fastlane
     class JazzyAction < Action
       def self.run(params)
         Actions.verify_gem!('jazzy')
-        command = "jazzy"
+        command = 'jazzy'
         command << " --config #{params[:config]}" if params[:config]
         Actions.sh(command)
       end
@@ -13,7 +13,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Generate docs using Jazzy"
+        'Generate docs using Jazzy'
       end
 
       def self.available_options
@@ -28,24 +28,20 @@ module Fastlane
         ]
       end
 
-      def self.output
-      end
+      def self.output; end
 
-      def self.return_value
-      end
+      def self.return_value; end
 
       def self.authors
-        ["KrauseFx"]
+        %w[KrauseFx]
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       def self.example_code
-        [
-          'jazzy'
-        ]
+        %w[jazzy]
       end
 
       def self.category

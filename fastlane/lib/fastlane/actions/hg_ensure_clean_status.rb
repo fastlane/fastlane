@@ -12,27 +12,32 @@ module Fastlane
           UI.success('Mercurial status is clean, all good! 😎')
           Actions.lane_context[SharedValues::HG_REPO_WAS_CLEAN_ON_START] = true
         else
-          UI.user_error!('Mercurial repository is dirty! Please ensure the repo is in a clean state by committing/stashing/discarding all changes first.')
+          UI.user_error!(
+            'Mercurial repository is dirty! Please ensure the repo is in a clean state by committing/stashing/discarding all changes first.'
+          )
         end
       end
 
       def self.description
-        "Raises an exception if there are uncommitted hg changes"
+        'Raises an exception if there are uncommitted hg changes'
       end
 
       def self.details
-        "Along the same lines as the [ensure_git_status_clean](https://docs.fastlane.tools/actions/ensure_git_status_clean/) action, this is a sanity check to ensure the working mercurial repo is clean. Especially useful to put at the beginning of your Fastfile in the `before_all` block."
+        'Along the same lines as the [ensure_git_status_clean](https://docs.fastlane.tools/actions/ensure_git_status_clean/) action, this is a sanity check to ensure the working mercurial repo is clean. Especially useful to put at the beginning of your Fastfile in the `before_all` block.'
       end
 
       def self.output
         [
-          ['HG_REPO_WAS_CLEAN_ON_START', 'Stores the fact that the hg repo was clean at some point']
+          [
+            'HG_REPO_WAS_CLEAN_ON_START',
+            'Stores the fact that the hg repo was clean at some point'
+          ]
         ]
       end
 
       def self.author
         # credits to lmirosevic for original git version
-        "sjrmanning"
+        'sjrmanning'
       end
 
       def self.is_supported?(platform)
@@ -40,9 +45,7 @@ module Fastlane
       end
 
       def self.example_code
-        [
-          'hg_ensure_clean_status'
-        ]
+        %w[hg_ensure_clean_status]
       end
 
       def self.category

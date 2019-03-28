@@ -2,12 +2,12 @@ module Fastlane
   module Actions
     class VerifyPodKeysAction < Action
       def self.run(params)
-        UI.message("Validating CocoaPods Keys")
+        UI.message('Validating CocoaPods Keys')
 
         options = plugin_options
-        target = options["target"] || ""
+        target = options['target'] || ''
 
-        options["keys"].each do |key|
+        options['keys'].each do |key|
           UI.message(" - #{key}")
           validate(key, target)
         end
@@ -15,26 +15,27 @@ module Fastlane
 
       def self.plugin_options
         require 'cocoapods-core'
-        podfile = Pod::Podfile.from_file("Podfile")
-        podfile.plugins["cocoapods-keys"]
+        podfile = Pod::Podfile.from_file('Podfile')
+        podfile.plugins['cocoapods-keys']
       end
 
       def self.validate(key, target)
         if value(key, target).length < 2
-          message = "Did not pass validation for key #{key}. " \
-            "Run `[bundle exec] pod keys get #{key} #{target}` to see what it is. " \
-            "It's likely this is running with empty/OSS keys."
+          message =
+            "Did not pass validation for key #{key}. " \
+              "Run `[bundle exec] pod keys get #{key} #{target}` to see what it is. " \
+              "It's likely this is running with empty/OSS keys."
           raise message
         end
       end
 
       def self.value(key, target)
         value = `pod keys get #{key} #{target}`
-        value.split("]").last.strip
+        value.split(']').last.strip
       end
 
       def self.author
-        "ashfurrow"
+        'ashfurrow'
       end
 
       #####################################################
@@ -42,7 +43,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Verifies all keys referenced from the Podfile are non-empty"
+        'Verifies all keys referenced from the Podfile are non-empty'
       end
 
       def self.details
@@ -50,13 +51,11 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       def self.example_code
-        [
-          'verify_pod_keys'
-        ]
+        %w[verify_pod_keys]
       end
 
       def self.category

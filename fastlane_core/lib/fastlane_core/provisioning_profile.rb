@@ -36,47 +36,49 @@ module FastlaneCore
 
       # @return [String] The UUID of the given provisioning profile
       def uuid(path, keychain_path = nil)
-        parse(path, keychain_path).fetch("UUID")
+        parse(path, keychain_path).fetch('UUID')
       end
 
       # @return [String] The Name of the given provisioning profile
       def name(path, keychain_path = nil)
-        parse(path, keychain_path).fetch("Name")
+        parse(path, keychain_path).fetch('Name')
       end
 
       def mac?(path, keychain_path = nil)
-        parse(path, keychain_path).fetch("Platform", []).include?('OSX')
+        parse(path, keychain_path).fetch('Platform', []).include?('OSX')
       end
 
       def profile_filename(path, keychain_path = nil)
         basename = uuid(path, keychain_path)
         if mac?(path, keychain_path)
-          basename + ".provisionprofile"
+          basename + '.provisionprofile'
         else
-          basename + ".mobileprovision"
+          basename + '.mobileprovision'
         end
       end
 
       def profiles_path
-        path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
+        path =
+          File.expand_path('~') + '/Library/MobileDevice/Provisioning Profiles/'
         # If the directory doesn't exist, create it first
-        unless File.directory?(path)
-          FileUtils.mkdir_p(path)
-        end
+        FileUtils.mkdir_p(path) unless File.directory?(path)
 
         return path
       end
 
       # Installs a provisioning profile for Xcode to use
       def install(path, keychain_path = nil)
-        UI.message("Installing provisioning profile...")
-        destination = File.join(profiles_path, profile_filename(path, keychain_path))
+        UI.message('Installing provisioning profile...')
+        destination =
+          File.join(profiles_path, profile_filename(path, keychain_path))
 
         if path != destination
           # copy to Xcode provisioning profile directory
           FileUtils.copy(path, destination)
           unless File.exist?(destination)
-            UI.user_error!("Failed installation of provisioning profile at location: '#{destination}'")
+            UI.user_error!(
+              "Failed installation of provisioning profile at location: '#{destination}'"
+            )
           end
         end
 
@@ -95,14 +97,34 @@ module FastlaneCore
             if keychain_path.nil?
               decoded = `security cms -D -i "#{path}" 2> #{err}`
             else
-              decoded = `security cms -D -i "#{path}" -k "#{keychain_path.shellescape}" 2> #{err}`
+              decoded =
+                `
+                  security cms -D -i "
+                  #{path}
+                  " -k "
+                  #{keychain_path.shellescape}
+                  " 2>
+                  #{err}
+                `
             end
           else
             # `security` only works on Mac, fallback to `openssl`
             # via https://stackoverflow.com/a/14379814/252627
-            decoded = `openssl smime -inform der -verify -noverify -in #{path} 2> #{err}`
+            decoded =
+              `
+                openssl smime -inform der -verify -noverify -in
+                #{path}
+                 2>
+                #{err}
+              `
           end
-          UI.error("Failure to decode #{path}. Exit: #{$?.exitstatus}: #{File.read(err)}") if $?.exitstatus != 0
+          if $?.exitstatus != 0
+            UI.error(
+              "Failure to decode #{path}. Exit: #{$?.exitstatus}: #{File.read(
+                err
+              )}"
+            )
+          end
           decoded
         end
       end

@@ -34,15 +34,19 @@ module Spaceship
         def factory(attrs)
           begin
             attrs['dateCreated'] = Time.at(attrs['dateCreated'] / 1000).utc
-          rescue NoMethodError
+
             # if attrs['dateCreated'] does not implement /
+          rescue NoMethodError
+
           rescue TypeError
             # if Time.at receives an invalid type
           end
           begin
             attrs['dateExpires'] = Time.at(attrs['dateExpires'] / 1000).utc
           rescue NoMethodError
+
           rescue TypeError
+
           end
           attrs['recipientRole'] = attrs['recipientRole'].downcase
           return self.new(attrs)

@@ -30,9 +30,7 @@ module Spaceship
 
       def roles
         parsed_roles = []
-        raw_data["roles"].each do |role|
-          parsed_roles << role["value"]["name"]
-        end
+        raw_data['roles'].each { |role| parsed_roles << role['value']['name'] }
         return parsed_roles
       end
 
@@ -45,26 +43,28 @@ module Spaceship
       end
 
       def preferred_currency
-        currency_base = raw_data["preferredCurrency"]["value"]
+        currency_base = raw_data['preferredCurrency']['value']
+
         return {
-          name:    currency_base["name"],
-          code:    currency_base["currencyCode"],
-          country: currency_base["countryName"],
-          country_code: currency_base["countryCode"]
+          name: currency_base['name'],
+          code: currency_base['currencyCode'],
+          country: currency_base['countryName'],
+          country_code: currency_base['countryCode']
         }
       end
 
       def selected_apps
         parsed_apps = []
         all_apps = Application.all
-        raw_data["userSoftwares"]["value"]["grantedSoftwareAdamIds"].each do |app_id|
+        raw_data['userSoftwares']['value']['grantedSoftwareAdamIds']
+          .each do |app_id|
           parsed_apps << all_apps.select { |app| app.apple_id == app_id }
         end
         return parsed_apps.flatten
       end
 
       def not_accepted_invitation
-        return true if raw_data["activationExpiry"]
+        return true if raw_data['activationExpiry']
         return false
       end
 

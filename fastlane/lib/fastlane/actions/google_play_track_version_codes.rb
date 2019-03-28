@@ -2,15 +2,15 @@ module Fastlane
   module Actions
     class GooglePlayTrackVersionCodesAction < Action
       # Supply::Options.available_options keys that apply to this action.
-      OPTIONS = [
-        :package_name,
-        :track,
-        :key,
-        :issuer,
-        :json_key,
-        :json_key_data,
-        :root_url,
-        :timeout
+      OPTIONS = %i[
+        package_name
+        track
+        key
+        issuer
+        json_key
+        json_key_data
+        root_url
+        timeout
       ]
 
       def self.run(params)
@@ -28,11 +28,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Retrieves version codes for a Google Play track"
+        'Retrieves version codes for a Google Play track'
       end
 
       def self.details
-        "More information: [https://docs.fastlane.tools/actions/supply/](https://docs.fastlane.tools/actions/supply/)"
+        'More information: [https://docs.fastlane.tools/actions/supply/](https://docs.fastlane.tools/actions/supply/)'
       end
 
       def self.available_options
@@ -44,15 +44,14 @@ module Fastlane
         end
       end
 
-      def self.output
-      end
+      def self.output; end
 
       def self.return_value
-        "Array of integers representing the version codes for the given Google Play track"
+        'Array of integers representing the version codes for the given Google Play track'
       end
 
       def self.authors
-        ["panthomakos"]
+        %w[panthomakos]
       end
 
       def self.is_supported?(platform)
@@ -60,9 +59,7 @@ module Fastlane
       end
 
       def self.example_code
-        [
-          'google_play_track_version_codes'
-        ]
+        %w[google_play_track_version_codes]
       end
 
       def self.category

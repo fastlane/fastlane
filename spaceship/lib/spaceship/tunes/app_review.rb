@@ -18,27 +18,31 @@ module Spaceship
       attr_reader :raw_developer_response
       attr_accessor :developer_response
 
-      attr_mapping({
-        'id' => :id,
-        'rating' => :rating,
-        'title' => :title,
-        'review' => :review,
-        'nickname' => :nickname,
-        'storeFront' => :store_front,
-        'appVersionString' => :app_version,
-        'lastModified' => :last_modified,
-        'helpfulViews' => :helpful_views,
-        'totalViews' => :total_views,
-        'edited' => :edited,
-        'developerResponse' => :raw_developer_response
-      })
+      attr_mapping(
+        {
+          'id' => :id,
+          'rating' => :rating,
+          'title' => :title,
+          'review' => :review,
+          'nickname' => :nickname,
+          'storeFront' => :store_front,
+          'appVersionString' => :app_version,
+          'lastModified' => :last_modified,
+          'helpfulViews' => :helpful_views,
+          'totalViews' => :total_views,
+          'edited' => :edited,
+          'developerResponse' => :raw_developer_response
+        }
+      )
       class << self
         # Create a new object based on a hash.
         # This is used to create a new object based on the server response.
         def factory(attrs)
           obj = self.new(attrs)
           response_attrs = {}
-          response_attrs = obj.raw_developer_response if obj.raw_developer_response
+          if obj.raw_developer_response
+            response_attrs = obj.raw_developer_response
+          end
           response_attrs[:application] = obj.application
           response_attrs[:review_id] = obj.id
           obj.developer_response = DeveloperResponse.factory(response_attrs)

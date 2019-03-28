@@ -40,8 +40,7 @@ module Fastlane
     # rubocop:enable Style/AccessorMethodName
 
     def ==(other)
-      @plugin_name == other.plugin_name &&
-        @author == other.author &&
+      @plugin_name == other.plugin_name && @author == other.author &&
         @email == other.email &&
         @summary == other.summary
     end

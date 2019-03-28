@@ -5,7 +5,7 @@ require_relative 'appfile_config'
 
 module CredentialsManager
   class AccountManager
-    DEFAULT_PREFIX = "deliver"
+    DEFAULT_PREFIX = 'deliver'
 
     # Is used for iTunes Transporter
     attr_reader :prefix
@@ -29,8 +29,8 @@ module CredentialsManager
 
     def user
       if default_prefix?
-        @user ||= ENV["FASTLANE_USER"]
-        @user ||= ENV["DELIVER_USER"]
+        @user ||= ENV['FASTLANE_USER']
+        @user ||= ENV['DELIVER_USER']
         @user ||= AppfileConfig.try_fetch_value(:apple_id)
       end
 
@@ -39,15 +39,13 @@ module CredentialsManager
     end
 
     def fetch_password_from_env
-      password = ENV["FASTLANE_PASSWORD"] || ENV["DELIVER_PASSWORD"]
+      password = ENV['FASTLANE_PASSWORD'] || ENV['DELIVER_PASSWORD']
       return password if password.to_s.length > 0
       return nil
     end
 
     def password(ask_if_missing: true)
-      if default_prefix?
-        @password ||= fetch_password_from_env
-      end
+      @password ||= fetch_password_from_env if default_prefix?
 
       unless @password
         item = Security::InternetPassword.find(server: server_name)
@@ -64,12 +62,12 @@ module CredentialsManager
       puts("The login credentials for '#{user}' seem to be wrong".red)
 
       if fetch_password_from_env
-        puts("The password was taken from the environment variable")
-        puts("Please make sure it is correct")
+        puts('The password was taken from the environment variable')
+        puts('Please make sure it is correct')
         return false
       end
 
-      if force || agree("Do you want to re-enter your password? (y/n)", true)
+      if force || agree('Do you want to re-enter your password? (y/n)', true)
         puts("Removing Keychain entry for user '#{user}'...".yellow) if mac?
         remove_from_keychain
         ask_for_login
@@ -99,52 +97,78 @@ module CredentialsManager
     # These variables are used by Xamarin Studio to authenticate Apple developers.
     def options
       hash = {}
-      hash[:p] = ENV["FASTLANE_PATH"] if ENV["FASTLANE_PATH"]
-      hash[:P] = ENV["FASTLANE_PORT"] if ENV["FASTLANE_PORT"]
-      hash[:r] = ENV["FASTLANE_PROTOCOL"] if ENV["FASTLANE_PROTOCOL"]
+      hash[:p] = ENV['FASTLANE_PATH'] if ENV['FASTLANE_PATH']
+      hash[:P] = ENV['FASTLANE_PORT'] if ENV['FASTLANE_PORT']
+      hash[:r] = ENV['FASTLANE_PROTOCOL'] if ENV['FASTLANE_PROTOCOL']
       hash.empty? ? nil : hash
     end
 
     private
 
     def ask_for_login
-      if ENV["FASTLANE_HIDE_LOGIN_INFORMATION"].to_s.length == 0
-        puts("-------------------------------------------------------------------------------------".green)
-        puts("Please provide your Apple Developer Program account credentials".green)
-        puts("The login information you enter will be stored in your macOS Keychain".green) if mac?
+      if ENV['FASTLANE_HIDE_LOGIN_INFORMATION'].to_s.length == 0
+        puts(
+          '-------------------------------------------------------------------------------------'
+            .green
+        )
+        puts(
+          'Please provide your Apple Developer Program account credentials'
+            .green
+        )
+        if mac?
+          puts(
+            'The login information you enter will be stored in your macOS Keychain'
+              .green
+          )
+        end
         if default_prefix?
           # We don't want to show this message, if we ask for the application specific password
           # which has a different prefix
-          puts("You can also pass the password using the `FASTLANE_PASSWORD` environment variable".green)
-          puts("See more information about it on GitHub: https://github.com/fastlane/fastlane/tree/master/credentials_manager".green) if mac?
+          puts(
+            'You can also pass the password using the `FASTLANE_PASSWORD` environment variable'
+              .green
+          )
+          if mac?
+            puts(
+              'See more information about it on GitHub: https://github.com/fastlane/fastlane/tree/master/credentials_manager'
+                .green
+            )
+          end
         end
-        puts("-------------------------------------------------------------------------------------".green)
+        puts(
+          '-------------------------------------------------------------------------------------'
+            .green
+        )
       end
 
       if @user.to_s.length == 0
-        raise "Missing username, and running in non-interactive shell" if $stdout.isatty == false
-        prompt_text = "Username"
+        if $stdout.isatty == false
+          raise 'Missing username, and running in non-interactive shell'
+        end
+        prompt_text = 'Username'
         prompt_text += " (#{@note})" if @note
-        prompt_text += ": "
+        prompt_text += ': '
         @user = ask(prompt_text) while @user.to_s.length == 0
         # Returning here since only the username was asked for. This method will be called again when a password is needed.
         return
       end
 
       while @password.to_s.length == 0
-        raise "Missing password for user #{@user}, and running in non-interactive shell" if $stdout.isatty == false
-        note = @note + " " if @note
-        @password = ask("Password (#{note}for #{@user}): ") { |q| q.echo = "*" }
+        if $stdout.isatty == false
+          raise "Missing password for user #{@user}, and running in non-interactive shell"
+        end
+        note = @note + ' ' if @note
+        @password = ask("Password (#{note}for #{@user}): ") { |q| q.echo = '*' }
       end
 
-      return true if ENV["FASTLANE_DONT_STORE_PASSWORD"]
+      return true if ENV['FASTLANE_DONT_STORE_PASSWORD']
       return true unless mac?
 
       # Now we store this information in the keychain
       if add_to_keychain
         return true
       else
-        puts("Could not store password in keychain".red)
+        puts('Could not store password in keychain'.red)
         return false
       end
     end

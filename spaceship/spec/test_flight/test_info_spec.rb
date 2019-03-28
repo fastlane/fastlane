@@ -2,39 +2,43 @@ require 'spec_helper'
 
 describe Spaceship::TestFlight::TestInfo do
   let(:test_info) do
-    Spaceship::TestFlight::TestInfo.new([
-                                          {
-                                            'locale' => 'en-US',
-                                            'description' => 'en-US description',
-                                            'feedbackEmail' => 'enUS@email.com',
-                                            'whatsNew' => 'US News',
-                                            'marketingUrl' => 'www.markingurl.com/en',
-                                            'privacyPolicyUrl' => 'www.privacypolicy.com/en'
-                                          },
-                                          {
-                                            'locale' => 'de-DE',
-                                            'description' => 'de-DE description',
-                                            'feedbackEmail' => 'deDE@email.com',
-                                            'whatsNew' => 'German News',
-                                            'marketingUrl' => 'www.markingurl.com/de',
-                                            'privacyPolicyUrl' => 'www.privacypolicy.com/de'
-                                          },
-                                          {
-                                            'locale' => 'de-AT',
-                                            'description' => 'de-AT description',
-                                            'feedbackEmail' => 'deAT@email.com',
-                                            'whatsNew' => 'Austrian News',
-                                            'marketingUrl' => 'www.markingurl.com/at',
-                                            'privacyPolicyUrl' => 'www.privacypolicy.com/at'
-                                          }
-                                        ])
+    Spaceship::TestFlight::TestInfo.new(
+      [
+        {
+          'locale' => 'en-US',
+          'description' => 'en-US description',
+          'feedbackEmail' => 'enUS@email.com',
+          'whatsNew' => 'US News',
+          'marketingUrl' => 'www.markingurl.com/en',
+          'privacyPolicyUrl' => 'www.privacypolicy.com/en'
+        },
+        {
+          'locale' => 'de-DE',
+          'description' => 'de-DE description',
+          'feedbackEmail' => 'deDE@email.com',
+          'whatsNew' => 'German News',
+          'marketingUrl' => 'www.markingurl.com/de',
+          'privacyPolicyUrl' => 'www.privacypolicy.com/de'
+        },
+        {
+          'locale' => 'de-AT',
+          'description' => 'de-AT description',
+          'feedbackEmail' => 'deAT@email.com',
+          'whatsNew' => 'Austrian News',
+          'marketingUrl' => 'www.markingurl.com/at',
+          'privacyPolicyUrl' => 'www.privacypolicy.com/at'
+        }
+      ]
+    )
   end
 
   let(:mock_client) { double('MockClient') }
 
   before do
     # Use a simple client for all data models
-    allow(Spaceship::TestFlight::Base).to receive(:client).and_return(mock_client)
+    allow(Spaceship::TestFlight::Base).to receive(:client).and_return(
+               mock_client
+             )
     allow(mock_client).to receive(:team_id).and_return('')
   end
 
@@ -48,7 +52,9 @@ describe Spaceship::TestFlight::TestInfo do
 
   it 'sets values to all locales' do
     test_info.whats_new = 'News!'
-    expect(test_info.raw_data.all? { |locale| locale['whatsNew'] == 'News!' }).to eq(true)
+    expect(
+      test_info.raw_data.all? { |locale| locale['whatsNew'] == 'News!' }
+    ).to eq(true)
   end
 
   it 'copies its contents' do

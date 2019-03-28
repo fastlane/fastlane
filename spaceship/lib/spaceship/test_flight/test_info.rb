@@ -7,7 +7,11 @@ module Spaceship::TestFlight
     # For now, when we set a value it sets the same value for all locales
     # When getting a value, we return the first locale values
 
-    attr_accessor :description, :feedback_email, :whats_new, :privacy_policy_url, :marketing_url
+    attr_accessor :description,
+                  :feedback_email,
+                  :whats_new,
+                  :privacy_policy_url,
+                  :marketing_url
 
     def description
       raw_data.first['description']

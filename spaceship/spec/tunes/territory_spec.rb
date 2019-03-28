@@ -3,20 +3,20 @@ describe Spaceship::Tunes::Territory do
 
   let(:client) { Spaceship::AppVersion.client }
 
-  describe "supported_territories" do
-    it "inspect works" do
+  describe 'supported_territories' do
+    it 'inspect works' do
       supported_territories = client.supported_territories
 
-      expect(supported_territories.inspect).to include("Tunes::Territory")
+      expect(supported_territories.inspect).to include('Tunes::Territory')
     end
 
-    it "correctly creates all territories" do
+    it 'correctly creates all territories' do
       supported_territories = client.supported_territories
 
       expect(supported_territories.length).to eq(155)
     end
 
-    it "correctly parses the territories" do
+    it 'correctly parses the territories' do
       territory_0 = client.supported_territories[0]
 
       expect(territory_0).not_to(be_nil)

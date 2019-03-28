@@ -10,11 +10,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Is the current run being executed on a CI system, like Jenkins or Travis"
+        'Is the current run being executed on a CI system, like Jenkins or Travis'
       end
 
       def self.details
-        "The return value of this method is true if fastlane is currently executed on Travis, Jenkins, Circle or a similar CI service"
+        'The return value of this method is true if fastlane is currently executed on Travis, Jenkins, Circle or a similar CI service'
       end
 
       def self.available_options
@@ -26,7 +26,7 @@ module Fastlane
       end
 
       def self.authors
-        ["KrauseFx"]
+        %w[KrauseFx]
       end
 
       def self.is_supported?(platform)
@@ -35,11 +35,11 @@ module Fastlane
 
       def self.example_code
         [
-          'if is_ci?
-            puts "I\'m a computer"
+          "if is_ci?
+            puts \"I'm a computer\"
           else
-            say "Hi Human!"
-          end'
+            say \"Hi Human!\"
+          end"
         ]
       end
 

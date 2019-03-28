@@ -9,14 +9,16 @@ module Snapshot
         # The order of the handling below is import
 
         if return_code == 65
-          UI.user_error!("Tests failed - check out the log above")
+          UI.user_error!('Tests failed - check out the log above')
         end
 
         case output
         when /com\.apple\.CoreSimulator\.SimError/
-          UI.important("The simulator failed to launch - retrying...")
+          UI.important('The simulator failed to launch - retrying...')
         when /is not configured for Running/
-          UI.user_error!("Scheme is not properly configured, make sure to check out the snapshot README")
+          UI.user_error!(
+            'Scheme is not properly configured, make sure to check out the snapshot README'
+          )
         end
       end
     end

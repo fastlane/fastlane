@@ -10,7 +10,7 @@ module Match
   module Storage
     # Store the code signing identities in on Google Cloud Storage
     class GoogleCloudStorage < Interface
-      DEFAULT_KEYS_FILE_NAME = "gc_keys.json"
+      DEFAULT_KEYS_FILE_NAME = 'gc_keys.json'
 
       # User provided values
       attr_reader :type
@@ -24,10 +24,16 @@ module Match
 
       def self.configure(params)
         if params[:git_url].to_s.length > 0
-          UI.important("Looks like you still define a `git_url` somewhere, even though")
-          UI.important("you use Google Cloud Storage. You can remove the `git_url`")
-          UI.important("from your Matchfile and Fastfile")
-          UI.message("The above is just a warning, fastlane will continue as usual now...")
+          UI.important(
+            'Looks like you still define a `git_url` somewhere, even though'
+          )
+          UI.important(
+            'you use Google Cloud Storage. You can remove the `git_url`'
+          )
+          UI.important('from your Matchfile and Fastfile')
+          UI.message(
+            'The above is just a warning, fastlane will continue as usual now...'
+          )
         end
 
         return self.new(
@@ -39,28 +45,45 @@ module Match
         )
       end
 
-      def initialize(type: nil,
-                     platform: nil,
-                     google_cloud_bucket_name: nil,
-                     google_cloud_keys_file: nil,
-                     google_cloud_project_id: nil)
+      def initialize(
+        type: nil,
+        platform: nil,
+        google_cloud_bucket_name: nil,
+        google_cloud_keys_file: nil,
+        google_cloud_project_id: nil
+      )
         @type = type if type
         @platform = platform if platform
-        @google_cloud_project_id = google_cloud_project_id if google_cloud_project_id
+        if google_cloud_project_id
+          @google_cloud_project_id = google_cloud_project_id
+        end
         @bucket_name = google_cloud_bucket_name
 
-        @google_cloud_keys_file = ensure_keys_file_exists(google_cloud_keys_file, google_cloud_project_id)
+        @google_cloud_keys_file =
+          ensure_keys_file_exists(
+            google_cloud_keys_file,
+            google_cloud_project_id
+          )
 
         if self.google_cloud_keys_file.to_s.length > 0
           # Extract the Project ID from the `JSON` file
           # so the user doesn't have to provide it manually
           keys_file_content = JSON.parse(File.read(self.google_cloud_keys_file))
-          if google_cloud_project_id.to_s.length > 0 && google_cloud_project_id != keys_file_content["project_id"]
-            UI.important("The google_cloud_keys_file's project ID ('#{keys_file_content['project_id']}') doesn't match the google_cloud_project_id ('#{google_cloud_project_id}'). This may be the wrong keys file.")
+          if google_cloud_project_id.to_s.length > 0 &&
+             google_cloud_project_id != keys_file_content['project_id']
+            UI.important(
+              "The google_cloud_keys_file's project ID ('#{keys_file_content[
+                'project_id'
+              ]}') doesn't match the google_cloud_project_id ('#{google_cloud_project_id}'). This may be the wrong keys file."
+            )
           end
-          @google_cloud_project_id = keys_file_content["project_id"]
+          @google_cloud_project_id = keys_file_content['project_id']
           if self.google_cloud_project_id.to_s.length == 0
-            UI.user_error!("Provided keys file on path #{File.expand_path(self.google_cloud_keys_file)} doesn't include required value for `project_id`")
+            UI.user_error!(
+              "Provided keys file on path #{File.expand_path(
+                self.google_cloud_keys_file
+              )} doesn't include required value for `project_id`"
+            )
           end
         end
 
@@ -68,14 +91,18 @@ module Match
         # If the JSON auth file is invalid, this line will
         # raise an exception
         begin
-          self.gc_storage = Google::Cloud::Storage.new(
-            credentials: self.google_cloud_keys_file,
-            project_id: self.google_cloud_project_id
-          )
+          self.gc_storage =
+            Google::Cloud::Storage.new(
+              credentials: self.google_cloud_keys_file,
+              project_id: self.google_cloud_project_id
+            )
         rescue => ex
           UI.error(ex)
           UI.verbose(ex.backtrace.join("\n"))
-          UI.user_error!("Couldn't log into your Google Cloud account using the provided JSON file at path '#{File.expand_path(self.google_cloud_keys_file)}'")
+          UI.user_error!(
+            "Couldn't log into your Google Cloud account using the provided JSON file at path '#{File
+              .expand_path(self.google_cloud_keys_file)}'"
+          )
         end
 
         ensure_bucket_is_selected
@@ -92,24 +119,33 @@ module Match
           file_path = current_file.name # e.g. "N8X438SEU2/certs/distribution/XD9G7QCACF.cer"
           download_path = File.join(self.working_directory, file_path)
 
-          FileUtils.mkdir_p(File.expand_path("..", download_path))
-          UI.verbose("Downloading file from Google Cloud Storage '#{file_path}' on bucket #{self.bucket_name}")
+          FileUtils.mkdir_p(File.expand_path('..', download_path))
+          UI.verbose(
+            "Downloading file from Google Cloud Storage '#{file_path}' on bucket #{self
+              .bucket_name}"
+          )
           current_file.download(download_path)
         end
-        UI.verbose("Successfully downloaded files from GCS to #{self.working_directory}")
+        UI.verbose(
+          "Successfully downloaded files from GCS to #{self.working_directory}"
+        )
       end
 
       def delete_files(files_to_delete: [], custom_message: nil)
         files_to_delete.each do |current_file|
-          target_path = current_file.gsub(self.working_directory + "/", "")
+          target_path = current_file.gsub(self.working_directory + '/', '')
           file = bucket.file(target_path)
-          UI.message("Deleting '#{target_path}' from Google Cloud Storage bucket '#{self.bucket_name}'...")
+          UI.message(
+            "Deleting '#{target_path}' from Google Cloud Storage bucket '#{self
+              .bucket_name}'..."
+          )
           file.delete
         end
       end
 
       def human_readable_description
-        "Google Cloud Bucket [#{self.google_cloud_project_id}/#{self.bucket_name}]"
+        "Google Cloud Bucket [#{self.google_cloud_project_id}/#{self
+          .bucket_name}]"
       end
 
       def upload_files(files_to_upload: [], custom_message: nil)
@@ -123,9 +159,9 @@ module Match
           # to
           #   "profiles/development/Development_me.mobileprovision"
           #
-
           # We also have to remove the trailing `/` as Google Cloud doesn't handle it nicely
-          target_path = current_file.gsub(self.working_directory + "/", "")
+          target_path =
+            current_file.gsub(self.working_directory + '/', '')
           UI.verbose("Uploading '#{target_path}' to Google Cloud Storage...")
           bucket.create_file(current_file, target_path)
         end
@@ -145,7 +181,10 @@ module Match
         @_bucket ||= self.gc_storage.bucket(self.bucket_name)
 
         if @_bucket.nil?
-          UI.user_error!("Couldn't find Google Cloud Storage bucket with name #{self.bucket_name} for the currently used account. Please make sure you have access")
+          UI.user_error!(
+            "Couldn't find Google Cloud Storage bucket with name #{self
+              .bucket_name} for the currently used account. Please make sure you have access"
+          )
         end
 
         return @_bucket
@@ -157,15 +196,20 @@ module Match
 
       # This method will make sure the keys file exists
       # If it's missing, it will help the user set things up
-      def ensure_keys_file_exists(google_cloud_keys_file, google_cloud_project_id)
+      def ensure_keys_file_exists(
+        google_cloud_keys_file, google_cloud_project_id
+      )
         if google_cloud_keys_file && File.exist?(google_cloud_keys_file)
           return google_cloud_keys_file
         end
 
         return DEFAULT_KEYS_FILE_NAME if File.exist?(DEFAULT_KEYS_FILE_NAME)
 
-        fastlane_folder_gc_keys_path = File.join(FastlaneCore::FastlaneFolder.path, DEFAULT_KEYS_FILE_NAME)
-        return fastlane_folder_gc_keys_path if File.exist?(fastlane_folder_gc_keys_path)
+        fastlane_folder_gc_keys_path =
+          File.join(FastlaneCore::FastlaneFolder.path, DEFAULT_KEYS_FILE_NAME)
+        if File.exist?(fastlane_folder_gc_keys_path)
+          return fastlane_folder_gc_keys_path
+        end
 
         if google_cloud_project_id.to_s.length > 0
           # Check to see if this system has application default keys installed.
@@ -180,60 +224,89 @@ module Match
           application_default_keys = nil
           begin
             application_default_keys = Google::Auth.get_application_default
-          rescue
+          rescue StandardError
             # This means no application default keys have been installed. That's perfectly OK,
             # we can continue and ask the user if they want to use a keys file.
           end
 
-          if application_default_keys && UI.confirm("Do you want to use this system's Google Cloud application default keys?")
+          if application_default_keys &&
+             UI.confirm(
+               "Do you want to use this system's Google Cloud application default keys?"
+             )
             return nil
           end
         end
 
         # User doesn't seem to have provided a keys file.
-        UI.message("Looks like you don't have a Google Cloud #{DEFAULT_KEYS_FILE_NAME.cyan} file")
-        UI.message("If you have one, make sure to put it into the '#{Dir.pwd}' directory and call it '#{DEFAULT_KEYS_FILE_NAME.cyan}'")
-        unless UI.confirm("Do you want fastlane to help you to create a #{DEFAULT_KEYS_FILE_NAME} file?")
-          UI.user_error!("Process stopped, run fastlane again to start things up again")
+        UI.message(
+          "Looks like you don't have a Google Cloud #{DEFAULT_KEYS_FILE_NAME
+            .cyan} file"
+        )
+        UI.message(
+          "If you have one, make sure to put it into the '#{Dir
+            .pwd}' directory and call it '#{DEFAULT_KEYS_FILE_NAME.cyan}'"
+        )
+        unless UI.confirm(
+               "Do you want fastlane to help you to create a #{DEFAULT_KEYS_FILE_NAME} file?"
+             )
+          UI.user_error!(
+            'Process stopped, run fastlane again to start things up again'
+          )
         end
 
-        UI.message("fastlane will help you create a keys file. First, open the following website")
-        UI.message("")
+        UI.message(
+          'fastlane will help you create a keys file. First, open the following website'
+        )
+        UI.message('')
         UI.message("\t\thttps://console.cloud.google.com".cyan)
-        UI.message("")
+        UI.message('')
         UI.input("Press enter once you're logged in")
 
-        UI.message("Now it's time to generate a new JSON auth file for fastlane to access Google Cloud")
-        UI.message("First, switch to the Google Cloud project you want to use.")
-        UI.message("If you don't have one yet, create a new one and switch to it")
-        UI.message("")
+        UI.message(
+          "Now it's time to generate a new JSON auth file for fastlane to access Google Cloud"
+        )
+        UI.message('First, switch to the Google Cloud project you want to use.')
+        UI.message(
+          "If you don't have one yet, create a new one and switch to it"
+        )
+        UI.message('')
         UI.message("\t\thttps://console.cloud.google.com/apis/credentials".cyan)
-        UI.message("")
-        UI.input("Ensure the right project is selected on top of the page and confirm with enter")
+        UI.message('')
+        UI.input(
+          'Ensure the right project is selected on top of the page and confirm with enter'
+        )
 
-        UI.message("Now create a new JSON auth file by clicking on")
-        UI.message("")
+        UI.message('Now create a new JSON auth file by clicking on')
+        UI.message('')
         UI.message("\t\t 1. Create credentials".cyan)
         UI.message("\t\t 2. Service account key".cyan)
         UI.message("\t\t 3. App Engine default service account".cyan)
         UI.message("\t\t 4. JSON".cyan)
         UI.message("\t\t 5. Create".cyan)
-        UI.message("")
-        UI.input("Confirm with enter once you created and download the JSON file")
+        UI.message('')
+        UI.input(
+          'Confirm with enter once you created and download the JSON file'
+        )
 
         UI.message("Copy the file to the current directory (#{Dir.pwd})")
         UI.message("and rename it to `#{DEFAULT_KEYS_FILE_NAME.cyan}`")
-        UI.message("")
-        UI.input("Confirm with enter")
+        UI.message('')
+        UI.input('Confirm with enter')
 
         until File.exist?(DEFAULT_KEYS_FILE_NAME)
-          UI.message("Make sure to place the file in '#{Dir.pwd.cyan}' and name it '#{DEFAULT_KEYS_FILE_NAME.cyan}'")
-          UI.input("Confirm with enter")
+          UI.message(
+            "Make sure to place the file in '#{Dir.pwd
+              .cyan}' and name it '#{DEFAULT_KEYS_FILE_NAME.cyan}'"
+          )
+          UI.input('Confirm with enter')
         end
 
-        UI.important("Please never add the #{DEFAULT_KEYS_FILE_NAME.cyan} file in version control.")
-        UI.important("Instead please add the file to your .gitignore")
-        UI.input("Confirm with enter")
+        UI.important(
+          "Please never add the #{DEFAULT_KEYS_FILE_NAME
+            .cyan} file in version control."
+        )
+        UI.important('Instead please add the file to your .gitignore')
+        UI.input('Confirm with enter')
 
         return DEFAULT_KEYS_FILE_NAME
       end
@@ -246,16 +319,31 @@ module Match
           # This can only happen after we went through auth of Google Cloud
           available_bucket_identifiers = self.gc_storage.buckets.collect(&:id)
           if available_bucket_identifiers.count > 0
-            @bucket_name = UI.select("What Google Cloud Storage bucket do you want to use? (you can define it using the `google_cloud_bucket_name` key)", available_bucket_identifiers)
+            @bucket_name =
+              UI.select(
+                'What Google Cloud Storage bucket do you want to use? (you can define it using the `google_cloud_bucket_name` key)',
+                available_bucket_identifiers
+              )
           else
-            UI.error("Looks like your Google Cloud account for the project ID '#{self.google_cloud_project_id}' doesn't")
-            UI.error("have any available storage buckets yet. Please visit the following URL")
-            UI.message("")
-            UI.message("\t\thttps://console.cloud.google.com/storage/browser".cyan)
-            UI.message("")
-            UI.message("and make sure to have the right project selected on top of the page")
-            UI.message("click on " + "Create Bucket".cyan + ", choose a name and confirm")
-            UI.message("")
+            UI.error(
+              "Looks like your Google Cloud account for the project ID '#{self
+                .google_cloud_project_id}' doesn't"
+            )
+            UI.error(
+              'have any available storage buckets yet. Please visit the following URL'
+            )
+            UI.message('')
+            UI.message(
+              "\t\thttps://console.cloud.google.com/storage/browser".cyan
+            )
+            UI.message('')
+            UI.message(
+              'and make sure to have the right project selected on top of the page'
+            )
+            UI.message(
+              'click on ' + 'Create Bucket'.cyan + ', choose a name and confirm'
+            )
+            UI.message('')
             UI.input("Once you're finished, please confirm with enter")
           end
         end

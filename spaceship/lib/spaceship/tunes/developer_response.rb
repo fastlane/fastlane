@@ -11,13 +11,15 @@ module Spaceship
       attr_accessor :application
       attr_accessor :review_id
 
-      attr_mapping({
-        'responseId' => :id,
-        'response' => :response,
-        'lastModified' => :last_modified,
-        'isHidden' => :hidden,
-        'pendingState' => :state
-      })
+      attr_mapping(
+        {
+          'responseId' => :id,
+          'response' => :response,
+          'lastModified' => :last_modified,
+          'isHidden' => :hidden,
+          'pendingState' => :state
+        }
+      )
     end
   end
 end

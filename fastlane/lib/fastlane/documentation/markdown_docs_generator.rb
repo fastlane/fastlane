@@ -17,44 +17,53 @@ module Fastlane
     def fill_built_in_actions
       self.categories = {}
 
-      Fastlane::Action::AVAILABLE_CATEGORIES.each { |a| self.categories[readable_category_name(a)] = {} }
+      Fastlane::Action::AVAILABLE_CATEGORIES.each do |a|
+        self.categories[readable_category_name(a)] = {}
+      end
 
       # Fill categories with all built-in actions
       ActionsList.all_actions do |action|
         readable = readable_category_name(action.category)
 
         if self.categories[readable].kind_of?(Hash)
-          self.categories[readable][number_of_launches_for_action(action.action_name)] = action
+          self.categories[readable][
+            number_of_launches_for_action(action.action_name)
+          ] =
+            action
         else
-          UI.error("Action '#{action.name}' doesn't contain category information... skipping")
+          UI.error(
+            "Action '#{action
+              .name}' doesn't contain category information... skipping"
+          )
         end
       end
     end
 
     def number_of_launches_for_action(action_name)
-      found = all_actions_from_enhancer.find { |c| c['action'] == action_name.to_s }
+      found =
+        all_actions_from_enhancer.find { |c| c['action'] == action_name.to_s }
 
-      return found["index"] if found
+      return found['index'] if found
       return 10_000 + rand # new actions that we've never tracked before will be shown at the bottom of the page, need `rand` to not overwrite them
     end
 
     def all_actions_from_enhancer
       require 'json'
-      @_launches ||= JSON.parse(File.read(File.join(Fastlane::ROOT, "assets/action_ranking.json"))) # root because we're in a temporary directory here
+      @_launches ||=
+        JSON.parse(
+          File.read(File.join(Fastlane::ROOT, 'assets/action_ranking.json'))
+        ) # root because we're in a temporary directory here
     end
 
     def actions_path
-      "lib/fastlane/actions/"
+      'lib/fastlane/actions/'
     end
 
     def where_is(klass)
       # Gets all source files for action
       methods = klass.methods(false).map { |m| klass.method(m) }
-      source_files = methods
-                     .map(&:source_location)
-                     .compact
-                     .map { |(file, line)| file }
-                     .uniq
+      source_files =
+        methods.map(&:source_location).compact.map { |(file, line)| file }.uniq
 
       # Return file or error if multiples
       if source_files.size == 1
@@ -70,7 +79,10 @@ module Fastlane
 
       path = File.join(Fastlane::ROOT, actions_path, filename)
       unless File.exist?(path)
-        UI.error("Action '#{action.name}' not found in root fastlane project... skipping")
+        UI.error(
+          "Action '#{action
+            .name}' not found in root fastlane project... skipping"
+        )
         UI.verbose("Action '#{action.name}' found at #{path}")
         return nil
       end
@@ -78,12 +90,17 @@ module Fastlane
     end
 
     def custom_action_docs_path
-      "lib/fastlane/actions/docs/"
+      'lib/fastlane/actions/docs/'
     end
 
     def load_custom_action_md(action)
       # check if there is a custom detail view in markdown available in the fastlane code base
-      custom_file_location = File.join(Fastlane::ROOT, custom_action_docs_path, "#{action.action_name}.md")
+      custom_file_location =
+        File.join(
+          Fastlane::ROOT,
+          custom_action_docs_path,
+          "#{action.action_name}.md"
+        )
       if File.exist?(custom_file_location)
         UI.verbose("Using custom md file for action #{action.action_name}")
         return File.read(custom_file_location)
@@ -93,11 +110,17 @@ module Fastlane
 
     def load_custom_action_md_erb(action)
       # check if there is a custom detail view as markdown ERB available in the fastlane code base
-      custom_file_location = File.join(Fastlane::ROOT, custom_action_docs_path, "#{action.action_name}.md.erb")
+      custom_file_location =
+        File.join(
+          Fastlane::ROOT,
+          custom_action_docs_path,
+          "#{action.action_name}.md.erb"
+        )
       if File.exist?(custom_file_location)
         UI.verbose("Using custom md.erb file for action #{action.action_name}")
 
-        result = ERB.new(File.read(custom_file_location), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
+        result =
+          ERB.new(File.read(custom_file_location), 0, '-').result(binding)
 
         return result
       end
@@ -111,9 +134,7 @@ module Fastlane
         @action = action
         @action_filename = filename_for_action(action)
 
-        unless @action_filename
-          next
-        end
+        next unless @action_filename
 
         @custom_content = load_custom_action_md(action)
 
@@ -121,7 +142,7 @@ module Fastlane
           @custom_content ||= load_custom_action_md(action.superclass)
         end
 
-        template = File.join(Fastlane::ROOT, "lib/assets/ActionDetails.md.erb")
+        template = File.join(Fastlane::ROOT, 'lib/assets/ActionDetails.md.erb')
         result = ERB.new(File.read(template), 0, '-').result(binding)
 
         action_mds[action.action_name] = result
@@ -133,23 +154,21 @@ module Fastlane
     def generate!(target_path: nil)
       require 'yaml'
       FileUtils.mkdir_p(target_path)
-      docs_dir = File.join(target_path, "docs")
+      docs_dir = File.join(target_path, 'docs')
 
       # Generate actions.md
-      template = File.join(Fastlane::ROOT, "lib/assets/Actions.md.erb")
-      result = ERB.new(File.read(template), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
-      File.write(File.join(docs_dir, "actions.md"), result)
+      template = File.join(Fastlane::ROOT, 'lib/assets/Actions.md.erb')
+      result = ERB.new(File.read(template), 0, '-').result(binding)
+      File.write(File.join(docs_dir, 'actions.md'), result)
 
       # Generate actions sub pages (e.g. actions/slather.md, actions/scan.md)
       all_actions_ref_yml = []
-      FileUtils.mkdir_p(File.join(docs_dir, "actions"))
+      FileUtils.mkdir_p(File.join(docs_dir, 'actions'))
       ActionsList.all_actions do |action|
         @action = action # to provide a reference in the .html.erb template
         @action_filename = filename_for_action(action)
 
-        unless @action_filename
-          next
-        end
+        next unless @action_filename
 
         # Make sure to always assign `@custom_content`, as we're in a loop and `@` is needed for the `erb`
         @custom_content = load_custom_action_md(action)
@@ -162,27 +181,39 @@ module Fastlane
           @custom_content ||= load_custom_action_md(action.superclass)
         end
 
-        template = File.join(Fastlane::ROOT, "lib/assets/ActionDetails.md.erb")
-        result = ERB.new(File.read(template), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
+        template = File.join(Fastlane::ROOT, 'lib/assets/ActionDetails.md.erb')
+        result = ERB.new(File.read(template), 0, '-').result(binding)
 
-        file_name = File.join("actions", "#{action.action_name}.md")
+        file_name = File.join('actions', "#{action.action_name}.md")
         File.write(File.join(docs_dir, file_name), result)
 
         all_actions_ref_yml << { action.action_name => file_name }
       end
 
       # Modify the mkdocs.yml to list all the actions
-      mkdocs_yml_path = File.join(target_path, "mkdocs.yml")
-      raise "Could not find mkdocs.yml in #{target_path}, make sure to point to the fastlane/docs repo" unless File.exist?(mkdocs_yml_path)
+      mkdocs_yml_path = File.join(target_path, 'mkdocs.yml')
+      unless File.exist?(mkdocs_yml_path)
+        raise "Could not find mkdocs.yml in #{target_path}, make sure to point to the fastlane/docs repo"
+      end
       mkdocs_yml = YAML.load_file(mkdocs_yml_path)
-      hidden_actions_array = mkdocs_yml["pages"].find { |p| !p["_Actions"].nil? }
-      hidden_actions_array["_Actions"] = all_actions_ref_yml
+      hidden_actions_array =
+        mkdocs_yml['pages'].find { |p| !p['_Actions'].nil? }
+      hidden_actions_array['_Actions'] = all_actions_ref_yml
       File.write(mkdocs_yml_path, mkdocs_yml.to_yaml)
 
       # Copy over the assets from the `actions/docs/assets` directory
-      Dir[File.join(custom_action_docs_path, "assets", "*")].each do |current_asset_path|
+      Dir[File.join(custom_action_docs_path, 'assets', '*')]
+        .each do |current_asset_path|
         UI.message("Copying asset #{current_asset_path}")
-        FileUtils.cp(current_asset_path, File.join(docs_dir, "img", "actions", File.basename(current_asset_path)))
+        FileUtils.cp(
+          current_asset_path,
+          File.join(
+            docs_dir,
+            'img',
+            'actions',
+            File.basename(current_asset_path)
+          )
+        )
       end
 
       UI.success("Generated new docs on path #{target_path}")
@@ -193,33 +224,33 @@ module Fastlane
     def readable_category_name(category_symbol)
       case category_symbol
       when :misc
-        "Misc"
+        'Misc'
       when :source_control
-        "Source Control"
+        'Source Control'
       when :notifications
-        "Notifications"
+        'Notifications'
       when :code_signing
-        "Code Signing"
+        'Code Signing'
       when :documentation
-        "Documentation"
+        'Documentation'
       when :testing
-        "Testing"
+        'Testing'
       when :building
-        "Building"
+        'Building'
       when :push
-        "Push"
+        'Push'
       when :screenshots
-        "Screenshots"
+        'Screenshots'
       when :project
-        "Project"
+        'Project'
       when :beta
-        "Beta"
+        'Beta'
       when :production
-        "Releasing your app"
+        'Releasing your app'
       when :app_store_connect
-        "App Store Connect"
+        'App Store Connect'
       when :deprecated
-        "Deprecated"
+        'Deprecated'
       else
         category_symbol.to_s.capitalize
       end

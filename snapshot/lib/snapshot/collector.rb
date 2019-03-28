@@ -7,10 +7,13 @@ module Snapshot
   # Responsible for collecting the generated screenshots and copying them over to the output directory
   class Collector
     # Returns true if it succeeds
-    def self.fetch_screenshots(output, dir_name, device_type, launch_arguments_index)
+    def self.fetch_screenshots(
+      output, dir_name, device_type, launch_arguments_index
+    )
       # Documentation about how this works in the project README
-      containing = File.join(TestCommandGenerator.derived_data_path, "Logs", "Test")
-      attachments_path = File.join(containing, "Attachments")
+      containing =
+        File.join(TestCommandGenerator.derived_data_path, 'Logs', 'Test')
+      attachments_path = File.join(containing, 'Attachments')
 
       language_folder = File.join(Snapshot.config[:output_directory], dir_name)
       FileUtils.mkdir_p(language_folder)
@@ -25,22 +28,27 @@ module Snapshot
         matches = output.scan(/snapshot: (.*)/)
       end
 
-      if to_store.count == 0 && matches.count == 0
-        return false
-      end
+      return false if to_store.count == 0 && matches.count == 0
 
       if matches.count != to_store.count
-        UI.error("Looks like the number of screenshots (#{to_store.count}) doesn't match the number of names (#{matches.count})")
+        UI.error(
+          "Looks like the number of screenshots (#{to_store
+            .count}) doesn't match the number of names (#{matches.count})"
+        )
       end
 
       matches.each_with_index do |current, index|
         name = current[0]
         filename = to_store[index]
 
-        device_name = device_type.delete(" ")
+        device_name = device_type.delete(' ')
 
-        components = [launch_arguments_index].delete_if { |a| a.to_s.length == 0 }
-        screenshot_name = device_name + "-" + name + "-" + Digest::MD5.hexdigest(components.join("-")) + ".png"
+        components =
+          [launch_arguments_index].delete_if { |a| a.to_s.length == 0 }
+        screenshot_name =
+          device_name + '-' + name + '-' +
+            Digest::MD5.hexdigest(components.join('-')) +
+            '.png'
         output_path = File.join(language_folder, screenshot_name)
 
         from_path = File.join(attachments_path, filename)
@@ -73,8 +81,8 @@ module Snapshot
     end
 
     def self.attachments(containing)
-      UI.message("Collecting screenshots...")
-      plist_path = Dir[File.join(containing, "*.plist")].last # we clean the folder before each run
+      UI.message('Collecting screenshots...')
+      plist_path = Dir[File.join(containing, '*.plist')].last # we clean the folder before each run
       return attachments_in_file(plist_path)
     end
 
@@ -84,12 +92,12 @@ module Snapshot
 
       to_store = [] # contains the names of all the attachments we want to use
 
-      report["TestableSummaries"].each do |summary|
-        (summary["Tests"] || []).each do |test|
-          (test["Subtests"] || []).each do |subtest|
-            (subtest["Subtests"] || []).each do |subtest2|
-              (subtest2["Subtests"] || []).each do |subtest3|
-                (subtest3["ActivitySummaries"] || []).each do |activity|
+      report['TestableSummaries'].each do |summary|
+        (summary['Tests'] || []).each do |test|
+          (test['Subtests'] || []).each do |subtest|
+            (subtest['Subtests'] || []).each do |subtest2|
+              (subtest2['Subtests'] || []).each do |subtest3|
+                (subtest3['ActivitySummaries'] || []).each do |activity|
                   check_activity(activity, to_store)
                 end
               end
@@ -109,30 +117,40 @@ module Snapshot
       # On OSX we look for type `Fn` key on keyboard, it shouldn't change anything for app
       # These are events that are not normally triggered by UI testing, making it easy for us to
       # locate where snapshot() was invoked.
-      ios_detected = activity["Title"] == "Set device orientation to Unknown"
-      tvos_detected = activity["Title"] == "Get number of matches for: Children matching type Browser"
-      osx_detected = activity["Title"] == "Type 'Fn' key (XCUIKeyboardKeySecondaryFn) with no modifiers"
+      ios_detected = activity['Title'] == 'Set device orientation to Unknown'
+      tvos_detected =
+        activity['Title'] ==
+          'Get number of matches for: Children matching type Browser'
+      osx_detected =
+        activity['Title'] ==
+          "Type 'Fn' key (XCUIKeyboardKeySecondaryFn) with no modifiers"
       if ios_detected || tvos_detected || osx_detected
         find_screenshot = find_screenshot(activity)
         to_store << find_screenshot
       end
 
-      (activity["SubActivities"] || []).each do |subactivity|
+      (activity['SubActivities'] || []).each do |subactivity|
         check_activity(subactivity, to_store)
       end
     end
 
     def self.find_screenshot(activity)
-      (activity["SubActivities"] || []).each do |subactivity|
-        # we are interested in `Synthesize event` part of event in subactivities
-        return find_screenshot(subactivity) if subactivity["Title"] == "Synthesize event"
+      (activity['SubActivities'] || []).each do |subactivity|
+        if subactivity['Title'] == 'Synthesize event'
+          return find_screenshot(
+            # we are interested in `Synthesize event` part of event in subactivities
+            subactivity
+          )
+        end
       end
 
-      if activity["Attachments"] && activity["Attachments"].last && activity["Attachments"].last["Filename"]
-        return activity["Attachments"].last["Filename"]
-      elsif activity["Attachments"]
-        return activity["Attachments"].last["FileName"]
-      else # Xcode 7.3 has stopped including 'Attachments', so we synthesize the filename manually
+      if activity['Attachments'] && activity['Attachments'].last &&
+         activity['Attachments'].last['Filename']
+        return activity['Attachments'].last['Filename']
+      elsif activity['Attachments']
+        return activity['Attachments'].last['FileName']
+      else
+        # Xcode 7.3 has stopped including 'Attachments', so we synthesize the filename manually
         return "Screenshot_#{activity['UUID']}.png"
       end
     end

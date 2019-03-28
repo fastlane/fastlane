@@ -62,38 +62,41 @@ module Spaceship
       attr_accessor :contains_odr
       attr_accessor :file_name
 
-      attr_mapping({
-        'appAdamId' => :app_id,
-        'providerId' => :provider_id,
-        'bundleId' => :bundle_id,
-        'trainVersion' => :train_version,
-        'buildVersion' => :build_version,
-        'betaReviewInfo' => :beta_review_info,
-        'exportCompliance' => :export_compliance,
-        'internalState' => :internal_state,
-        'externalState' => :external_state,
-        'testInfo' => :test_info,
-        'installCount' => :install_count,
-        'inviteCount' => :invite_count,
-        'crashCount' => :crash_count,
-        'autoNotifyEnabled' => :auto_notify_enabled,
-        'didNotify' => :did_notify,
-        'uploadDate' => :upload_date,
-        'id' => :id,
-        'dSYMUrl' => :dsym_url,
-        'buildSdk' => :build_sdk,
-        'includesSymbols' => :include_symbols,
-        'numberOfAssetPacks' => :number_of_asset_packs,
-        'containsODR' => :contains_odr,
-        'fileName' => :file_name
-      })
+      attr_mapping(
+        {
+          'appAdamId' => :app_id,
+          'providerId' => :provider_id,
+          'bundleId' => :bundle_id,
+          'trainVersion' => :train_version,
+          'buildVersion' => :build_version,
+          'betaReviewInfo' => :beta_review_info,
+          'exportCompliance' => :export_compliance,
+          'internalState' => :internal_state,
+          'externalState' => :external_state,
+          'testInfo' => :test_info,
+          'installCount' => :install_count,
+          'inviteCount' => :invite_count,
+          'crashCount' => :crash_count,
+          'autoNotifyEnabled' => :auto_notify_enabled,
+          'didNotify' => :did_notify,
+          'uploadDate' => :upload_date,
+          'id' => :id,
+          'dSYMUrl' => :dsym_url,
+          'buildSdk' => :build_sdk,
+          'includesSymbols' => :include_symbols,
+          'numberOfAssetPacks' => :number_of_asset_packs,
+          'containsODR' => :contains_odr,
+          'fileName' => :file_name
+        }
+      )
 
       BUILD_STATES = {
         processing: 'testflight.build.state.processing',
         active: 'testflight.build.state.testing.active',
         ready_to_submit: 'testflight.build.state.submit.ready',
         ready_to_test: 'testflight.build.state.testing.ready',
-        export_compliance_missing: 'testflight.build.state.export.compliance.missing',
+        export_compliance_missing:
+          'testflight.build.state.export.compliance.missing',
         review_rejected: 'testflight.build.state.review.rejected',
         approved: 'testflight.build.state.review.approved'
       }
@@ -107,23 +110,40 @@ module Spaceship
       end
 
       def self.all(app_id: nil, platform: nil, retry_count: 0)
-        trains = BuildTrains.all(app_id: app_id, platform: platform, retry_count: retry_count)
+        trains =
+          BuildTrains.all(
+            app_id: app_id, platform: platform, retry_count: retry_count
+          )
         trains.values.flatten
       end
 
-      def self.builds_for_train(app_id: nil, platform: nil, train_version: nil, retry_count: 3)
-        builds_data = client.get_builds_for_train(app_id: app_id, platform: platform, train_version: train_version, retry_count: retry_count)
+      def self.builds_for_train(
+        app_id: nil, platform: nil, train_version: nil, retry_count: 3
+      )
+        builds_data =
+          client.get_builds_for_train(
+            app_id: app_id,
+            platform: platform,
+            train_version: train_version,
+            retry_count: retry_count
+          )
         builds_data.map { |data| self.new(data) }
       end
 
       # Just the builds, as a flat array, that are still processing
       def self.all_processing_builds(app_id: nil, platform: nil, retry_count: 0)
-        all(app_id: app_id, platform: platform, retry_count: retry_count).find_all(&:processing?)
+        all(app_id: app_id, platform: platform, retry_count: retry_count)
+          .find_all(&:processing?)
       end
 
       # Just the builds, as a flat array, that are waiting for beta review
-      def self.all_waiting_for_review(app_id: nil, platform: nil, retry_count: 0)
-        all(app_id: app_id, platform: platform, retry_count: retry_count).select { |app| app.external_state == 'testflight.build.state.review.waiting' }
+      def self.all_waiting_for_review(
+        app_id: nil, platform: nil, retry_count: 0
+      )
+        all(app_id: app_id, platform: platform, retry_count: retry_count)
+          .select do |app|
+          app.external_state == 'testflight.build.state.review.waiting'
+        end
       end
 
       def self.latest(app_id: nil, platform: nil)
@@ -170,7 +190,8 @@ module Spaceship
       end
 
       def processed?
-        active? || ready_to_submit? || export_compliance_missing? || review_rejected?
+        active? || ready_to_submit? || export_compliance_missing? ||
+          review_rejected?
       end
 
       # Getting builds from BuildTrains only gets a partial Build object
@@ -206,7 +227,9 @@ module Spaceship
         client.put_build(app_id: app_id, build_id: id, build: self)
       end
 
-      def update_build_information!(description: nil, feedback_email: nil, whats_new: nil)
+      def update_build_information!(
+        description: nil, feedback_email: nil, whats_new: nil
+      )
         test_info.description = description if description
         test_info.feedback_email = feedback_email if feedback_email
         test_info.whats_new = whats_new if whats_new
@@ -218,7 +241,9 @@ module Spaceship
         return if approved?
 
         build = find_app_store_connect_build
-        Spaceship::ConnectAPI::Base.client.post_beta_app_review_submissions(build_id: build["id"])
+        Spaceship::ConnectAPI::Base.client.post_beta_app_review_submissions(
+          build_id: build['id']
+        )
       end
 
       def expire!
@@ -226,12 +251,22 @@ module Spaceship
       end
 
       def add_group!(group)
-        client.add_group_to_build(app_id: app_id, group_id: group.id, build_id: id)
+        client.add_group_to_build(
+          app_id: app_id, group_id: group.id, build_id: id
+        )
       end
 
       # Bridges the TestFlight::Build to the App Store Connect API build
       def find_app_store_connect_build
-        resp = Spaceship::ConnectAPI::Base.client.get_builds(filter: { expired: false, processingState: "PROCESSING,VALID", version: self.build_version, app: app_id })
+        resp =
+          Spaceship::ConnectAPI::Base.client.get_builds(
+            filter: {
+              expired: false,
+              processingState: 'PROCESSING,VALID',
+              version: self.build_version,
+              app: app_id
+            }
+          )
         resp.first
       end
     end

@@ -7,7 +7,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the `frame_screenshots` action"
+        'Alias for the `frame_screenshots` action'
       end
     end
   end

@@ -71,8 +71,13 @@ module Spaceship
         #   as either the App ID or the bundle identifier
         def find(identifier, mac: false)
           all.find do |app|
-            ((app.apple_id && app.apple_id.casecmp(identifier.to_s) == 0) || (app.bundle_id && app.bundle_id.casecmp(identifier.to_s) == 0)) &&
-              app.version_sets.any? { |v| (mac ? ["osx"] : ["ios", "appletvos"]).include?(v.platform) }
+            (
+              (app.apple_id && app.apple_id.casecmp(identifier.to_s) == 0) ||
+                (app.bundle_id && app.bundle_id.casecmp(identifier.to_s) == 0)
+            ) &&
+              app.version_sets.any? do |v|
+                (mac ? %w[osx] : %w[ios appletvos]).include?(v.platform)
+              end
           end
         end
 
@@ -91,16 +96,32 @@ module Spaceship
         # @param platform (String): Platform one of (ios,osx)
         #  should it be an ios or an osx app
 
-        def create!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil, itunes_connect_users: nil)
-          puts("The `version` parameter is deprecated. Use `ensure_version!` method instead") if version
-          client.create_application!(name: name,
-                         primary_language: primary_language,
-                                      sku: sku,
-                                bundle_id: bundle_id,
-                                bundle_id_suffix: bundle_id_suffix,
-                                company_name: company_name,
-                                    platform: platform,
-                                    itunes_connect_users: itunes_connect_users)
+        def create!(
+          name: nil,
+          primary_language: nil,
+          version: nil,
+          sku: nil,
+          bundle_id: nil,
+          bundle_id_suffix: nil,
+          company_name: nil,
+          platform: nil,
+          itunes_connect_users: nil
+        )
+          if version
+            puts(
+              'The `version` parameter is deprecated. Use `ensure_version!` method instead'
+            )
+          end
+          client.create_application!(
+            name: name,
+            primary_language: primary_language,
+            sku: sku,
+            bundle_id: bundle_id,
+            bundle_id_suffix: bundle_id_suffix,
+            company_name: company_name,
+            platform: platform,
+            itunes_connect_users: itunes_connect_users
+          )
         end
 
         def available_bundle_ids(platform: nil)
@@ -122,12 +143,22 @@ module Spaceship
       # @return (Spaceship::Tunes::AppVersion) Receive the version that is currently live on the
       #  App Store. You can't modify all values there, so be careful.
       def live_version(platform: nil)
-        Spaceship::Tunes::AppVersion.find(self, self.apple_id, true, platform: platform)
+        Spaceship::Tunes::AppVersion.find(
+          self,
+          self.apple_id,
+          true,
+          platform: platform
+        )
       end
 
       # @return (Spaceship::Tunes::AppVersion) Receive the version that can fully be edited
       def edit_version(platform: nil)
-        Spaceship::Tunes::AppVersion.find(self, self.apple_id, false, platform: platform)
+        Spaceship::Tunes::AppVersion.find(
+          self,
+          self.apple_id,
+          false,
+          platform: platform
+        )
       end
 
       # @return (Spaceship::Tunes::AppVersion) This will return the `edit_version` if available
@@ -138,7 +169,8 @@ module Spaceship
 
       # @return (String) An URL to this specific resource. You can enter this URL into your browser
       def url
-        "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.apple_id}"
+        "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self
+          .apple_id}"
       end
 
       def analytics
@@ -166,9 +198,7 @@ module Spaceship
 
       def platforms
         platforms = []
-        version_sets.each do |version_set|
-          platforms << version_set.platform
-        end
+        version_sets.each { |version_set| platforms << version_set.platform }
         platforms
       end
 
@@ -177,10 +207,11 @@ module Spaceship
           raise 'The application has no version sets and Spaceship does not know what to do here.'
         end
 
-        if self.version_sets.length == 1
-          version_sets[0].platform
-        end
-        platform = Spaceship::Tunes::AppVersionCommon.find_platform(raw_data['versionSets'])
+        version_sets[0].platform if self.version_sets.length == 1
+        platform =
+          Spaceship::Tunes::AppVersionCommon.find_platform(
+            raw_data['versionSets']
+          )
         platform['type']
       end
 
@@ -195,10 +226,14 @@ module Spaceship
 
         if self.version_sets.length == 1
           version_sets[0].platform
-        elsif self.platforms == %w(ios appletvos)
+        elsif self.platforms == %w[ios appletvos]
           'ios'
         end
-        Spaceship::Tunes::AppVersionCommon.find_platform(raw_data['versionSets'])['platformString']
+        Spaceship::Tunes::AppVersionCommon.find_platform(
+          raw_data['versionSets']
+        )[
+          'platformString'
+        ]
       end
 
       def details
@@ -225,10 +260,14 @@ module Spaceship
       # otherwise `edit_version` will return nil
       def create_version!(version_number, platform: nil)
         if edit_version(platform: platform)
-          raise "Cannot create a new version for this app as there already is an `edit_version` available"
+          raise 'Cannot create a new version for this app as there already is an `edit_version` available'
         end
 
-        client.create_version!(apple_id, version_number, platform.nil? ? 'ios' : platform)
+        client.create_version!(
+          apple_id,
+          version_number,
+          platform.nil? ? 'ios' : platform
+        )
 
         # Future: implemented -reload method
       end
@@ -254,9 +293,7 @@ module Spaceship
 
       def reject_version_if_possible!
         can_reject = edit_version.can_reject_version
-        if can_reject
-          client.reject!(apple_id, edit_version.version_id)
-        end
+        client.reject!(apple_id, edit_version.version_id) if can_reject
 
         return can_reject
       end
@@ -298,7 +335,9 @@ module Spaceship
       # TestFlight: A reference to all the build trains
       # @return [Hash] a hash, the version number and platform being the key
       def build_trains(platform: nil)
-        TestFlight::BuildTrains.all(app_id: self.apple_id, platform: platform || self.platform)
+        TestFlight::BuildTrains.all(
+          app_id: self.apple_id, platform: platform || self.platform
+        )
       end
 
       # The numbers of all build trains that were uploaded
@@ -312,18 +351,24 @@ module Spaceship
       # which might happen if you don't use TestFlight
       # This is used to receive dSYM files from Apple
       def all_builds_for_train(train: nil, platform: nil)
-        return TestFlight::Build.builds_for_train(app_id: self.apple_id, platform: platform || self.platform, train_version: train)
+        return TestFlight::Build.builds_for_train(
+          app_id: self.apple_id,
+          platform: platform || self.platform,
+          train_version: train
+        )
       end
 
       # @return [Array] This will return an array of *all* processing builds
       #   this include pre-processing or standard processing
       def all_processing_builds(platform: nil)
-        return TestFlight::Build.all_processing_builds(app_id: self.apple_id, platform: platform || self.platform)
+        return TestFlight::Build.all_processing_builds(
+          app_id: self.apple_id, platform: platform || self.platform
+        )
       end
 
       def tunes_all_build_trains(app_id: nil, platform: nil)
         resp = client.all_build_trains(app_id: apple_id, platform: platform)
-        trains = resp["trains"] or []
+        trains = resp['trains'] or []
         trains.map do |attrs|
           attrs['application'] = self
           Tunes::BuildTrain.factory(attrs)
@@ -331,8 +376,11 @@ module Spaceship
       end
 
       def tunes_all_builds_for_train(train: nil, platform: nil)
-        resp = client.all_builds_for_train(app_id: apple_id, train: train, platform: platform)
-        items = resp["items"] or []
+        resp =
+          client.all_builds_for_train(
+            app_id: apple_id, train: train, platform: platform
+          )
+        items = resp['items'] or []
         items.map do |attrs|
           attrs['apple_id'] = apple_id
           Tunes::Build.factory(attrs)
@@ -340,7 +388,13 @@ module Spaceship
       end
 
       def tunes_build_details(train: nil, build_number: nil, platform: nil)
-        resp = client.build_details(app_id: apple_id, train: train, build_number: build_number, platform: platform)
+        resp =
+          client.build_details(
+            app_id: apple_id,
+            train: train,
+            build_number: build_number,
+            platform: platform
+          )
         resp['apple_id'] = apple_id
         Tunes::BuildDetails.factory(resp)
       end
@@ -348,7 +402,10 @@ module Spaceship
       # Get all builds that are already processed for all build trains
       # You can either use the return value (array) or pass a block
       def builds(platform: nil)
-        all = TestFlight::Build.all(app_id: self.apple_id, platform: platform || self.platform)
+        all =
+          TestFlight::Build.all(
+            app_id: self.apple_id, platform: platform || self.platform
+          )
         return all unless block_given?
         all.each { |build| yield(build) }
       end
@@ -360,10 +417,14 @@ module Spaceship
       def create_submission(platform: nil)
         version = self.latest_version(platform: platform)
         if version.nil?
-          raise "Could not find a valid version to submit for review"
+          raise 'Could not find a valid version to submit for review'
         end
 
-        Spaceship::Tunes::AppSubmission.create(self, version, platform: platform)
+        Spaceship::Tunes::AppSubmission.create(
+          self,
+          version,
+          platform: platform
+        )
       end
 
       # Cancels all ongoing TestFlight beta submission for this application
@@ -371,7 +432,7 @@ module Spaceship
         self.builds do |build|
           begin
             build.cancel_beta_review!
-          rescue
+          rescue StandardError
             # We really don't care about any errors here
           end
         end
@@ -384,9 +445,7 @@ module Spaceship
 
       def release!
         version = self.edit_version
-        if version.nil?
-          raise "Could not find a valid version to release"
-        end
+        raise 'Could not find a valid version to release' if version.nil?
         version.release!
       end
 
@@ -396,9 +455,7 @@ module Spaceship
 
       def release_to_all_users!
         version = self.live_version
-        if version.nil?
-          raise "Could not find a valid version to release"
-        end
+        raise 'Could not find a valid version to release' if version.nil?
         version.release_to_all_users!
       end
 
@@ -407,10 +464,11 @@ module Spaceship
       #####################################################
       def setup
         super
-        @version_sets = (self.raw_data['versionSets'] || []).map do |attrs|
-          attrs[:application] = self
-          Tunes::VersionSet.factory(attrs)
-        end
+        @version_sets =
+          (self.raw_data['versionSets'] || []).map do |attrs|
+            attrs[:application] = self
+            Tunes::VersionSet.factory(attrs)
+          end
       end
 
       #####################################################
@@ -426,22 +484,20 @@ module Spaceship
       #####################################################
       def promocodes
         data = client.app_promocodes(app_id: self.apple_id)
-        data.map do |attrs|
-          Tunes::AppVersionPromocodes.factory(attrs)
-        end
+        data.map { |attrs| Tunes::AppVersionPromocodes.factory(attrs) }
       end
 
       def promocodes_history
         data = client.app_promocodes_history(app_id: self.apple_id)
-        data.map do |attrs|
-          Tunes::AppVersionGeneratedPromocodes.factory(attrs)
-        end
+        data.map { |attrs| Tunes::AppVersionGeneratedPromocodes.factory(attrs) }
       end
 
       # private to module
       def ensure_not_a_bundle
         # we only support applications
-        raise "We do not support BUNDLE types right now" if self.type == 'BUNDLE'
+        if self.type == 'BUNDLE'
+          raise 'We do not support BUNDLE types right now'
+        end
       end
     end
   end

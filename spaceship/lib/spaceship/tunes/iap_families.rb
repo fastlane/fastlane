@@ -29,15 +29,22 @@ module Spaceship
       def create!(name: nil, product_id: nil, reference_name: nil, versions: {})
         versions_array = []
         versions.each do |language_code, value|
-          versions_array << {
-                    value: {
-                      subscriptionName: { value: value[:subscription_name] },
-                      name: { value: value[:name] },
-                      localeCode: { value: language_code.to_s }
-                    }
-          }
+          versions_array <<
+            {
+              value: {
+                subscriptionName: { value: value[:subscription_name] },
+                name: { value: value[:name] },
+                localeCode: { value: language_code.to_s }
+              }
+            }
         end
-        client.create_iap_family(app_id: self.application.apple_id, name: name, product_id: product_id, reference_name: reference_name, versions: versions_array)
+        client.create_iap_family(
+          app_id: self.application.apple_id,
+          name: name,
+          product_id: product_id,
+          reference_name: reference_name,
+          versions: versions_array
+        )
       end
 
       # returns a list of all families

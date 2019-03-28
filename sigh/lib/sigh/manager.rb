@@ -19,7 +19,7 @@ module Sigh
       output = File.join(File.expand_path(Sigh.config[:output_path]), file_name)
       begin
         FileUtils.mv(path, output)
-      rescue
+      rescue StandardError
         # in case it already exists
       end
 
@@ -32,14 +32,16 @@ module Sigh
 
     def self.download_all(download_xcode_profiles: false)
       require 'sigh/download_all'
-      DownloadAll.new.download_all(download_xcode_profiles: download_xcode_profiles)
+      DownloadAll.new.download_all(
+        download_xcode_profiles: download_xcode_profiles
+      )
     end
 
     def self.install_profile(profile)
       uuid = FastlaneCore::ProvisioningProfile.uuid(profile)
       name = FastlaneCore::ProvisioningProfile.name(profile)
-      ENV["SIGH_UDID"] = ENV["SIGH_UUID"] = uuid if uuid
-      ENV["SIGH_NAME"] = name if name
+      ENV['SIGH_UDID'] = ENV['SIGH_UUID'] = uuid if uuid
+      ENV['SIGH_NAME'] = name if name
 
       FastlaneCore::ProvisioningProfile.install(profile)
     end

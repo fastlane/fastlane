@@ -32,9 +32,9 @@ module Spaceship
 
       def self.url
         {
-          index:  "ra/users/iap",
-          create: "ra/users/iap/add",
-          delete: "ra/users/iap/delete"
+          index: 'ra/users/iap',
+          create: 'ra/users/iap/add',
+          delete: 'ra/users/iap/delete'
         }
       end
 
@@ -42,15 +42,22 @@ module Spaceship
         client.sandbox_testers(self).map { |tester| self.new(tester) }
       end
 
-      def self.create!(email: nil, password: nil, first_name: 'Test', last_name: 'Test', country: 'US')
-        data = client.create_sandbox_tester!(
-          tester_class: self,
-          email: email,
-          password: password,
-          first_name: first_name,
-          last_name: last_name,
-          country: country
-        )
+      def self.create!(
+        email: nil,
+        password: nil,
+        first_name: 'Test',
+        last_name: 'Test',
+        country: 'US'
+      )
+        data =
+          client.create_sandbox_tester!(
+            tester_class: self,
+            email: email,
+            password: password,
+            first_name: first_name,
+            last_name: last_name,
+            country: country
+          )
         self.new(data)
       end
 

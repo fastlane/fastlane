@@ -3,9 +3,13 @@ module Fastlane
     class UploadSymbolsToSentryAction < Action
       def self.run(params)
         # Warning about usinging new plugin
-        UI.important("It's recommended to use the official Sentry Fastlane plugin")
-        UI.important("GitHub: https://github.com/getsentry/fastlane-plugin-sentry")
-        UI.important("Installation: fastlane add_plugin sentry")
+        UI.important(
+          "It's recommended to use the official Sentry Fastlane plugin"
+        )
+        UI.important(
+          'GitHub: https://github.com/getsentry/fastlane-plugin-sentry'
+        )
+        UI.important('Installation: fastlane add_plugin sentry')
 
         Actions.verify_gem!('rest-client')
         require 'rest-client'
@@ -26,9 +30,13 @@ module Fastlane
 
         # Will fail if none or both authentication methods are provided
         if !has_api_key && !has_auth_token
-          UI.user_error!("No API key or authentication token found for SentryAction given, pass using `api_key: 'key'` or `auth_token: 'token'`")
+          UI.user_error!(
+            "No API key or authentication token found for SentryAction given, pass using `api_key: 'key'` or `auth_token: 'token'`"
+          )
         elsif has_api_key && has_auth_token
-          UI.user_error!("Both API key and authentication token found for SentryAction given, please only give one")
+          UI.user_error!(
+            'Both API key and authentication token found for SentryAction given, please only give one'
+          )
         end
 
         # Url to post dSYMs to
@@ -37,16 +45,19 @@ module Fastlane
         if has_api_key
           resource = RestClient::Resource.new(url, api_key, '')
         else
-          resource = RestClient::Resource.new(url, headers: { Authorization: "Bearer #{auth_token}" })
+          resource =
+            RestClient::Resource.new(
+              url,
+              headers: { Authorization: "Bearer #{auth_token}" }
+            )
         end
 
         UI.message("Will upload dSYM(s) to #{url}")
 
         # Upload dsym(s)
         dsym_paths += [dsym_path]
-        uploaded_paths = dsym_paths.compact.map do |dsym|
-          upload_dsym(resource, dsym)
-        end
+        uploaded_paths =
+          dsym_paths.compact.map { |dsym| upload_dsym(resource, dsym) }
 
         # Return uplaoded dSYM paths
         uploaded_paths
@@ -58,7 +69,7 @@ module Fastlane
         UI.success('dSYM successfully uploaded to Sentry!')
 
         dsym
-      rescue
+      rescue StandardError
         UI.user_error!('Error while trying to upload dSYM to Sentry')
       end
 
@@ -67,7 +78,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Upload dSYM symbolication files to Sentry"
+        'Upload dSYM symbolication files to Sentry'
       end
 
       def self.details
@@ -76,62 +87,84 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :api_host,
-                                       env_name: "SENTRY_HOST",
-                                       description: "API host url for Sentry",
-                                       is_string: true,
-                                       default_value: "https://app.getsentry.com/api/0",
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :api_key,
-                                       env_name: "SENTRY_API_KEY",
-                                       description: "API key for Sentry",
-                                       sensitive: true,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :auth_token,
-                                       env_name: "SENTRY_AUTH_TOKEN",
-                                       description: "Authentication token for Sentry",
-                                       sensitive: true,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :org_slug,
-                                       env_name: "SENTRY_ORG_SLUG",
-                                       description: "Organization slug for Sentry project",
-                                       verify_block: proc do |value|
-                                         UI.user_error!("No organization slug for SentryAction given, pass using `org_slug: 'org'`") unless value && !value.empty?
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :project_slug,
-                                       env_name: "SENTRY_PROJECT_SLUG",
-                                       description: "Project slug for Sentry",
-                                       verify_block: proc do |value|
-                                         UI.user_error!("No project slug for SentryAction given, pass using `project_slug: 'project'`") unless value && !value.empty?
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :dsym_path,
-                                       env_name: "SENTRY_DSYM_PATH",
-                                       description: "Path to your symbols file. For iOS and Mac provide path to app.dSYM.zip",
-                                       default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
-                                       default_value_dynamic: true,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         # validation is done in the action
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :dsym_paths,
-                                       env_name: "SENTRY_DSYM_PATHS",
-                                       description: "Path to an array of your symbols file. For iOS and Mac provide path to app.dSYM.zip",
-                                       default_value: Actions.lane_context[SharedValues::DSYM_PATHS],
-                                       default_value_dynamic: true,
-                                       is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         # validation is done in the action
-                                       end)
+          FastlaneCore::ConfigItem.new(
+            key: :api_host,
+            env_name: 'SENTRY_HOST',
+            description: 'API host url for Sentry',
+            is_string: true,
+            default_value: 'https://app.getsentry.com/api/0',
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :api_key,
+            env_name: 'SENTRY_API_KEY',
+            description: 'API key for Sentry',
+            sensitive: true,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :auth_token,
+            env_name: 'SENTRY_AUTH_TOKEN',
+            description: 'Authentication token for Sentry',
+            sensitive: true,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :org_slug,
+            env_name: 'SENTRY_ORG_SLUG',
+            description: 'Organization slug for Sentry project',
+            verify_block:
+              proc do |value|
+                unless value && !value.empty?
+                  UI.user_error!(
+                    "No organization slug for SentryAction given, pass using `org_slug: 'org'`"
+                  )
+                end
+              end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :project_slug,
+            env_name: 'SENTRY_PROJECT_SLUG',
+            description: 'Project slug for Sentry',
+            verify_block:
+              proc do |value|
+                unless value && !value.empty?
+                  UI.user_error!(
+                    "No project slug for SentryAction given, pass using `project_slug: 'project'`"
+                  )
+                end
+              end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :dsym_path,
+            env_name: 'SENTRY_DSYM_PATH',
+            description:
+              'Path to your symbols file. For iOS and Mac provide path to app.dSYM.zip',
+            default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
+            default_value_dynamic: true,
+            optional: true,
+            verify_block: proc { |value|  }
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :dsym_paths,
+            env_name: 'SENTRY_DSYM_PATHS',
+            description:
+              'Path to an array of your symbols file. For iOS and Mac provide path to app.dSYM.zip',
+            default_value: Actions.lane_context[SharedValues::DSYM_PATHS],
+            default_value_dynamic: true,
+            is_string: false,
+            optional: true,
+            verify_block: proc { |value|  }
+          )
         ]
       end
 
       def self.return_value
-        "The uploaded dSYM path(s)"
+        'The uploaded dSYM path(s)'
       end
 
       def self.authors
-        ["joshdholtz"]
+        %w[joshdholtz]
       end
 
       def self.is_supported?(platform)
@@ -155,9 +188,9 @@ module Fastlane
 
       def self.deprecated_notes
         [
-          "Please use the `sentry` plugin instead.",
-          "Install using `fastlane add_plugin sentry`.",
-          "Replace `upload_symbols_to_sentry(...)` with `sentry_upload_dsym(...)`."
+          'Please use the `sentry` plugin instead.',
+          'Install using `fastlane add_plugin sentry`.',
+          'Replace `upload_symbols_to_sentry(...)` with `sentry_upload_dsym(...)`.'
         ].join("\n")
       end
     end

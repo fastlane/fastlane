@@ -4,22 +4,22 @@ module Spaceship
     #
     # As specified by Apple: https://developer.apple.com/library/content/documentation/LanguagesUtilities/Conceptual/iTunesConnectInAppPurchase_Guide/Chapters/CreatingInAppPurchaseProducts.html
     module IAPType
-      CONSUMABLE = "consumable"
-      NON_CONSUMABLE = "nonConsumable"
-      RECURRING = "recurring"
-      NON_RENEW_SUBSCRIPTION = "subscription"
+      CONSUMABLE = 'consumable'
+      NON_CONSUMABLE = 'nonConsumable'
+      RECURRING = 'recurring'
+      NON_RENEW_SUBSCRIPTION = 'subscription'
 
       # A product that is used once
-      READABLE_CONSUMABLE = "Consumable"
+      READABLE_CONSUMABLE = 'Consumable'
 
       # A product that is purchased once and does not expire or decrease with use.
-      READABLE_NON_CONSUMABLE = "Non-Consumable"
+      READABLE_NON_CONSUMABLE = 'Non-Consumable'
 
       # A product that allows users to purchase dynamic content for a set period (auto-rene).
-      READABLE_AUTO_RENEWABLE_SUBSCRIPTION = "Auto-Renewable Subscription"
+      READABLE_AUTO_RENEWABLE_SUBSCRIPTION = 'Auto-Renewable Subscription'
 
       # A product that allows users to purchase a service with a limited duration.
-      READABLE_NON_RENEWING_SUBSCRIPTION = "Non-Renewing Subscription"
+      READABLE_NON_RENEWING_SUBSCRIPTION = 'Non-Renewing Subscription'
 
       # Get the iap type matching based on a string (given by App Store Connect)
       def self.get_from_string(text)

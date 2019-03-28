@@ -1,4 +1,4 @@
-require "open3"
+require 'open3'
 
 module Fastlane
   module Actions
@@ -9,11 +9,23 @@ module Fastlane
     # @param log [Boolean] should fastlane print out the executed command
     # @param error_callback [Block] a callback invoked with the command output if there is a non-zero exit status
     def self.sh(*command, log: true, error_callback: nil, &b)
-      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, &b)
+      sh_control_output(
+        *command,
+        print_command: log,
+        print_command_output: log,
+        error_callback: error_callback,
+        &b
+      )
     end
 
     def self.sh_no_action(*command, log: true, error_callback: nil, &b)
-      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, &b)
+      sh_control_output(
+        *command,
+        print_command: log,
+        print_command_output: log,
+        error_callback: error_callback,
+        &b
+      )
     end
 
     # @param command The command to be executed (variadic)
@@ -25,7 +37,12 @@ module Fastlane
     # @yieldparam [String] result The complete output to stdout and stderr of the completed command
     # @yieldparam [String] cmd A shell command equivalent to the arguments passed
     # rubocop: disable Metrics/PerceivedComplexity
-    def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil)
+    def self.sh_control_output(
+      *command,
+      print_command: true,
+      print_command_output: true,
+      error_callback: nil
+    )
       print_command = print_command_output = true if $troubleshoot
       # Set the encoding first, the user might have set it wrong
       previous_encoding = [Encoding.default_external, Encoding.default_internal]
@@ -35,7 +52,9 @@ module Fastlane
       # Workaround to support previous Fastlane syntax.
       # This has some limitations. For example, it requires the caller to shell escape
       # everything because of usages like ["ls -la", "/tmp"] instead of ["ls", "-la", "/tmp"].
-      command = [command.first.join(" ")] if command.length == 1 && command.first.kind_of?(Array)
+      if command.length == 1 && command.first.kind_of?(Array)
+        command = [command.first.join(' ')]
+      end
 
       shell_command = shell_command_from_args(*command)
       UI.command(shell_command) if print_command
@@ -65,11 +84,14 @@ module Fastlane
         # with previous implementations of sh and... probably portable to all
         # relevant platforms.
         if exit_status.exitstatus != 0
-          message = if print_command
-                      "Exit status of command '#{shell_command}' was #{exit_status.exitstatus} instead of 0."
-                    else
-                      "Shell command exited with exit status #{exit_status.exitstatus} instead of 0."
-                    end
+          message =
+            if print_command
+              "Exit status of command '#{shell_command}' was #{exit_status
+                .exitstatus} instead of 0."
+            else
+              "Shell command exited with exit status #{exit_status
+                .exitstatus} instead of 0."
+            end
           message += "\n#{result}" if print_command_output
 
           if error_callback || block_given?
@@ -109,19 +131,22 @@ module Fastlane
     # @raise [ArgumentError] If no arguments passed
     # @return [String] A shell command representing the arguments passed in
     def self.shell_command_from_args(*args)
-      raise ArgumentError, "sh requires at least one argument" unless args.count > 0
+      unless args.count > 0
+        raise ArgumentError, 'sh requires at least one argument'
+      end
 
-      command = ""
+      command = ''
 
       # Optional initial environment Hash
       if args.first.kind_of?(Hash)
-        command = args.shift.map { |k, v| "#{k}=#{v.shellescape}" }.join(" ") + " "
+        command =
+          args.shift.map { |k, v| "#{k}=#{v.shellescape}" }.join(' ') + ' '
       end
 
       # Support [ "/usr/local/bin/foo", "foo" ], "-x", ...
       if args.first.kind_of?(Array)
-        command += args.shift.first.shellescape + " " + args.shelljoin
-        command.chomp!(" ")
+        command += args.shift.first.shellescape + ' ' + args.shelljoin
+        command.chomp!(' ')
       elsif args.count == 1 && args.first.kind_of?(String)
         command += args.first
       else

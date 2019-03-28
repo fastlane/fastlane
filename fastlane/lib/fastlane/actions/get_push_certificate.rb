@@ -22,15 +22,15 @@ module Fastlane
       end
 
       def self.description
-        "Ensure a valid push profile is active, creating a new one if needed (via _pem_)"
+        'Ensure a valid push profile is active, creating a new one if needed (via _pem_)'
       end
 
       def self.author
-        "KrauseFx"
+        'KrauseFx'
       end
 
       def self.details
-        sample = <<-SAMPLE.markdown_sample
+        sample = <<-SAMPLE
           ```ruby
           get_push_certificate(
             new_profile: proc do
@@ -39,10 +39,11 @@ module Fastlane
           )
           ```
         SAMPLE
+          .markdown_sample
 
         [
-          "Additionally to the available options, you can also specify a block that only gets executed if a new profile was created. You can use it to upload the new profile to your server.",
-          "Use it like this:".markdown_preserve_newlines,
+          'Additionally to the available options, you can also specify a block that only gets executed if a new profile was created. You can use it to upload the new profile to your server.',
+          'Use it like this:'.markdown_preserve_newlines,
           sample
         ].join("\n")
       end
@@ -52,10 +53,13 @@ module Fastlane
         require 'pem/options'
 
         @options = PEM::Options.available_options
-        @options << FastlaneCore::ConfigItem.new(key: :new_profile,
-                                     description: "Block that is called if there is a new profile",
-                                     optional: true,
-                                     is_string: false)
+        @options <<
+          FastlaneCore::ConfigItem.new(
+            key: :new_profile,
+            description: 'Block that is called if there is a new profile',
+            optional: true,
+            is_string: false
+          )
         @options
       end
 

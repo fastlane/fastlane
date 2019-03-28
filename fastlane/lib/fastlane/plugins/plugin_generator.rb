@@ -8,10 +8,12 @@ module Fastlane
   # The text between the percent signs will be used to invoke an accessor
   # method on the PluginInfo object to get the replacement value.
   class PluginGenerator
-    def initialize(ui:             PluginGeneratorUI.new,
-                   info_collector: PluginInfoCollector.new(ui),
-                   template_root:  File.join(File.dirname(__FILE__), 'template'),
-                   dest_root:      FileUtils.pwd)
+    def initialize(
+      ui: PluginGeneratorUI.new,
+      info_collector: PluginInfoCollector.new(ui),
+      template_root: File.join(File.dirname(__FILE__), 'template'),
+      dest_root: FileUtils.pwd
+    )
       @ui = ui
       @info_collector = info_collector
       @template_root = template_root
@@ -28,10 +30,15 @@ module Fastlane
         handle_template_path(template_path, plugin_info)
       end
 
-      @ui.success("\nYour plugin was successfully generated at #{plugin_info.gem_name}/ 🚀")
+      @ui.success(
+        "\nYour plugin was successfully generated at #{plugin_info
+          .gem_name}/ 🚀"
+      )
       @ui.success("\nTo get started with using this plugin, run")
       @ui.message("\n    fastlane add_plugin #{plugin_info.plugin_name}\n")
-      @ui.success("\nfrom a fastlane-enabled app project directory and provide the following as the path:")
+      @ui.success(
+        "\nfrom a fastlane-enabled app project directory and provide the following as the path:"
+      )
       @ui.message("\n    #{File.expand_path(plugin_info.gem_name)}\n\n")
     end
 
@@ -47,7 +54,8 @@ module Fastlane
 
     def derive_dest_path(template_path, plugin_info)
       relative_template_path = template_path.gsub(@template_root, '')
-      replaced_path = replace_path_variables(relative_template_path, plugin_info)
+      replaced_path =
+        replace_path_variables(relative_template_path, plugin_info)
 
       File.join(@dest_root, plugin_info.gem_name, replaced_path)
     end
@@ -57,7 +65,7 @@ module Fastlane
 
       if dest_path.end_with?('.erb')
         contents = ERB.new(contents).result(plugin_info.get_binding)
-        dest_path = dest_path[0...-4] # Remove the .erb suffix
+        dest_path = dest_path[]
       end
 
       File.write(dest_path, contents)

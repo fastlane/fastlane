@@ -14,8 +14,7 @@ module Fastlane
         require 'appium_lib' unless Helper.test?
 
         FastlaneCore::PrintTable.print_values(
-          config: params,
-          title: "Summary for Appium Action"
+          config: params, title: 'Summary for Appium Action'
         )
 
         if params[:invoke_appium_server]
@@ -52,7 +51,9 @@ module Fastlane
         end
 
         unless File.exist?(appium_path)
-          UI.user_error!("You have to install Appium using `npm install -g appium`")
+          UI.user_error!(
+            'You have to install Appium using `npm install -g appium`'
+          )
         end
 
         if appium_path.end_with?('.app')
@@ -68,7 +69,7 @@ module Fastlane
           break if `lsof -i:#{params[:port]}`.to_s.length != 0
 
           if count * 5 > INVOKE_TIMEOUT
-            UI.user_error!("Invoke Appium server timed out")
+            UI.user_error!('Invoke Appium server timed out')
           end
           sleep(5)
         end
@@ -84,18 +85,18 @@ module Fastlane
 
             appium_lib = params[:appium_lib] || {}
 
-            @driver = Appium::Driver.new(
-              caps: caps,
-              server_url: params[:host],
-              port: params[:port],
-              appium_lib: appium_lib
-            ).start_driver
+            @driver =
+              Appium::Driver.new(
+                caps: caps,
+                server_url: params[:host],
+                port: params[:port],
+                appium_lib: appium_lib
+              )
+                .start_driver
             Appium.promote_appium_methods(RSpec::Core::ExampleGroup)
           end
 
-          c.after(:each) do
-            @driver.quit unless @driver.nil?
-          end
+          c.after(:each) { @driver.quit unless @driver.nil? }
         end
       end
 
@@ -178,7 +179,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :android].include?(platform)
+        %i[ios android].include?(platform)
       end
 
       def self.category

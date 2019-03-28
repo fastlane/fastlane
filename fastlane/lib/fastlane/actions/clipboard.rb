@@ -18,19 +18,21 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Copies a given string into the clipboard. Works only on macOS"
+        'Copies a given string into the clipboard. Works only on macOS'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :value,
-                                       env_name: "FL_CLIPBOARD_VALUE",
-                                       description: "The string that should be copied into the clipboard")
+          FastlaneCore::ConfigItem.new(
+            key: :value,
+            env_name: 'FL_CLIPBOARD_VALUE',
+            description: 'The string that should be copied into the clipboard'
+          )
         ]
       end
 
       def self.authors
-        ["KrauseFx", "joshdholtz"]
+        %w[KrauseFx joshdholtz]
       end
 
       def self.is_supported?(platform)

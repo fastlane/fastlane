@@ -6,7 +6,7 @@ module Deliver
       app = options[:app]
       select_build(options)
 
-      UI.message("Submitting the app for review...")
+      UI.message('Submitting the app for review...')
       submission = app.create_submission(platform: options[:platform])
 
       # Set app submission information
@@ -26,33 +26,40 @@ module Deliver
       # Finalize app submission
       submission.complete!
 
-      UI.success("Successfully submitted the app for review!")
+      UI.success('Successfully submitted the app for review!')
     end
 
     def select_build(options)
       app = options[:app]
       v = app.edit_version(platform: options[:platform])
 
-      if options[:build_number] && options[:build_number] != "latest"
+      if options[:build_number] && options[:build_number] != 'latest'
         UI.message("Selecting existing build-number: #{options[:build_number]}")
-        build = v.candidate_builds.detect { |a| a.build_version == options[:build_number] }
+        build =
+          v.candidate_builds.detect do |a|
+            a.build_version == options[:build_number]
+          end
         unless build
-          UI.user_error!("Build number: #{options[:build_number]} does not exist")
+          UI.user_error!(
+            "Build number: #{options[:build_number]} does not exist"
+          )
         end
       else
-        UI.message("Selecting the latest build...")
+        UI.message('Selecting the latest build...')
         build = wait_for_build(app)
       end
-      UI.message("Selecting build #{build.train_version} (#{build.build_version})...")
+      UI.message(
+        "Selecting build #{build.train_version} (#{build.build_version})..."
+      )
 
       v.select_build(build)
       v.save!
 
-      UI.success("Successfully selected build")
+      UI.success('Successfully selected build')
     end
 
     def wait_for_build(app)
-      UI.user_error!("Could not find app with app identifier") unless app
+      UI.user_error!('Could not find app with app identifier') unless app
 
       start = Time.now
       build = nil
@@ -63,9 +70,11 @@ module Deliver
         # Issue https://github.com/fastlane/fastlane/issues/10411
         candidate_builds = app.latest_version.candidate_builds
         if (candidate_builds || []).count == 0
-          UI.message("Waiting for candidate builds to appear...")
+          UI.message('Waiting for candidate builds to appear...')
           if (Time.now - start) > (60 * 5)
-            UI.user_error!("Could not find any available candidate builds on App Store Connect to submit")
+            UI.user_error!(
+              'Could not find any available candidate builds on App Store Connect to submit'
+            )
           else
             sleep(30)
             next
@@ -76,21 +85,37 @@ module Deliver
         # Sometimes latest build will disappear and a different build would get selected
         # Only set build if no latest build found or if same build versions as previously fetched build
         # Issue: https://github.com/fastlane/fastlane/issues/10945
-        if build.nil? || (latest_build && latest_build.train_version == build.train_version && latest_build.build_version == build.build_version)
+        if build.nil? ||
+           (
+             latest_build &&
+               latest_build.train_version == build.train_version &&
+               latest_build.build_version == build.build_version
+           )
           build = latest_build
         end
 
         return build if build && build.processing == false
 
         if build
-          UI.message("Waiting App Store Connect processing for build #{build.train_version} (#{build.build_version})... this might take a while...")
+          UI.message(
+            "Waiting App Store Connect processing for build #{build
+              .train_version} (#{build
+              .build_version})... this might take a while..."
+          )
         else
-          UI.message("Waiting App Store Connect processing for build... this might take a while...")
+          UI.message(
+            'Waiting App Store Connect processing for build... this might take a while...'
+          )
         end
 
         if (Time.now - start) > (60 * 5)
-          UI.message("")
-          UI.message("You can tweet: \"App Store Connect #iosprocessingtime #{((Time.now - start) / 60).round} minutes\"")
+          UI.message('')
+          UI.message(
+            "You can tweet: \"App Store Connect #iosprocessingtime #{(
+              (Time.now - start) / 60
+            )
+              .round} minutes\""
+          )
         end
         sleep(30)
       end
@@ -99,14 +124,14 @@ module Deliver
 
     def find_build(candidate_builds)
       if (candidate_builds || []).count == 0
-        UI.user_error!("Could not find any available candidate builds on App Store Connect to submit")
+        UI.user_error!(
+          'Could not find any available candidate builds on App Store Connect to submit'
+        )
       end
 
       build = candidate_builds.first
       candidate_builds.each do |b|
-        if b.upload_date > build.upload_date
-          build = b
-        end
+        build = b if b.upload_date > build.upload_date
       end
 
       return build

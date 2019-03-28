@@ -19,20 +19,29 @@ module Fastlane
     # @param platform The name of the platform to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     def execute(lane, platform = nil, parameters = nil)
-      UI.crash!("No lane given") unless lane
+      UI.crash!('No lane given') unless lane
 
       self.current_lane = lane.to_sym
       self.current_platform = (platform ? platform.to_sym : nil)
 
       lane_obj = lanes.fetch(current_platform, {}).fetch(current_lane, nil)
 
-      UI.user_error!("Could not find lane '#{full_lane_name}'. Available lanes: #{available_lanes.join(', ')}") unless lane_obj
-      UI.user_error!("You can't call the private lane '#{lane}' directly") if lane_obj.is_private
+      unless lane_obj
+        UI.user_error!(
+          "Could not find lane '#{full_lane_name}'. Available lanes: #{available_lanes
+            .join(', ')}"
+        )
+      end
+      if lane_obj.is_private
+        UI.user_error!("You can't call the private lane '#{lane}' directly")
+      end
 
-      ENV["FASTLANE_LANE_NAME"] = current_lane.to_s
-      ENV["FASTLANE_PLATFORM_NAME"] = (current_platform ? current_platform.to_s : nil)
+      ENV['FASTLANE_LANE_NAME'] = current_lane.to_s
+      ENV['FASTLANE_PLATFORM_NAME'] =
+        (current_platform ? current_platform.to_s : nil)
 
-      Actions.lane_context[Actions::SharedValues::PLATFORM_NAME] = current_platform
+      Actions.lane_context[Actions::SharedValues::PLATFORM_NAME] =
+        current_platform
       Actions.lane_context[Actions::SharedValues::LANE_NAME] = full_lane_name
 
       UI.success("Driving the lane '#{full_lane_name}' 🚀")
@@ -41,17 +50,39 @@ module Fastlane
 
       path_to_use = FastlaneCore::FastlaneFolder.path || Dir.pwd
       parameters ||= {}
+
       begin
-        Dir.chdir(path_to_use) do # the file is located in the fastlane folder
-          execute_flow_block(before_all_blocks, current_platform, current_lane, parameters)
-          execute_flow_block(before_each_blocks, current_platform, current_lane, parameters)
+        Dir.chdir(path_to_use) do
+          # the file is located in the fastlane folder
+          execute_flow_block(
+            before_all_blocks,
+            current_platform,
+            current_lane,
+            parameters
+          )
+          execute_flow_block(
+            before_each_blocks,
+            current_platform,
+            current_lane,
+            parameters
+          )
 
           return_val = lane_obj.call(parameters) # by default no parameters
 
           # after blocks are only called if no exception was raised before
           # Call the platform specific after block and then the general one
-          execute_flow_block(after_each_blocks, current_platform, current_lane, parameters)
-          execute_flow_block(after_all_blocks, current_platform, current_lane, parameters)
+          execute_flow_block(
+            after_each_blocks,
+            current_platform,
+            current_lane,
+            parameters
+          )
+          execute_flow_block(
+            after_all_blocks,
+            current_platform,
+            current_lane,
+            parameters
+          )
         end
 
         return return_val
@@ -59,10 +90,14 @@ module Fastlane
         Dir.chdir(path_to_use) do
           # Provide error block exception without color code
           begin
-            error_blocks[current_platform].call(current_lane, ex, parameters) if current_platform && error_blocks[current_platform]
-            error_blocks[nil].call(current_lane, ex, parameters) if error_blocks[nil]
+            if current_platform && error_blocks[current_platform]
+              error_blocks[current_platform].call(current_lane, ex, parameters)
+            end
+            if error_blocks[nil]
+              error_blocks[nil].call(current_lane, ex, parameters)
+            end
           rescue => error_block_exception
-            UI.error("An error occurred while executing the `error` block:")
+            UI.error('An error occurred while executing the `error` block:')
             UI.error(error_block_exception.to_s)
             raise ex # raise the original error message
           end
@@ -80,7 +115,9 @@ module Fastlane
         next if filter_platform && filter_platform.to_s != platform.to_s # skip actions that don't match
 
         platform_lanes.each do |lane_name, lane|
-          all << [platform, lane_name].reject(&:nil?).join(' ') unless lane.is_private
+          unless lane.is_private
+            all << [platform, lane_name].reject(&:nil?).join(' ')
+          end
         end
       end
       all
@@ -94,7 +131,7 @@ module Fastlane
     # if a given action is available (either built-in or loaded from a plugin)
     # and is also being called from the fastlane docs generator
     def class_reference_from_action_name(method_sym)
-      method_str = method_sym.to_s.delete("?") # as a `?` could be at the end of the method name
+      method_str = method_sym.to_s.delete('?') # as a `?` could be at the end of the method name
       class_ref = Actions.action_class_ref(method_str)
 
       return class_ref if class_ref && class_ref.respond_to?(:run)
@@ -154,24 +191,39 @@ module Fastlane
       if class_ref
         if class_ref.respond_to?(:run)
           # Action is available, now execute it
-          return self.execute_action(method_sym, class_ref, arguments, custom_dir: custom_dir, from_action: from_action)
+          return self.execute_action(
+            method_sym,
+            class_ref,
+            arguments,
+            custom_dir: custom_dir, from_action: from_action
+          )
         else
-          UI.user_error!("Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.")
+          UI.user_error!(
+            "Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method."
+          )
         end
       end
 
       # No lane, no action, let's at least show the correct error message
-      if Fastlane.plugin_manager.plugin_is_added_as_dependency?(PluginManager.plugin_prefix + method_sym.to_s)
+      if Fastlane.plugin_manager.plugin_is_added_as_dependency?(
+         PluginManager.plugin_prefix + method_sym.to_s
+       )
         # That's a plugin, but for some reason we can't find it
-        UI.user_error!("Plugin '#{method_sym}' was not properly loaded, make sure to follow the plugin docs for troubleshooting: #{PluginManager::TROUBLESHOOTING_URL}")
+        UI.user_error!(
+          "Plugin '#{method_sym}' was not properly loaded, make sure to follow the plugin docs for troubleshooting: #{PluginManager::TROUBLESHOOTING_URL}"
+        )
       elsif Fastlane::Actions.formerly_bundled_actions.include?(method_sym.to_s)
         # This was a formerly bundled action which is now a plugin.
         UI.verbose(caller.join("\n"))
-        UI.user_error!("The action '#{method_sym}' is no longer bundled with fastlane. You can install it using `fastlane add_plugin #{method_sym}`")
+        UI.user_error!(
+          "The action '#{method_sym}' is no longer bundled with fastlane. You can install it using `fastlane add_plugin #{method_sym}`"
+        )
       else
         # So there is no plugin under that name, so just show the error message generated by the lane switch
         UI.verbose(caller.join("\n"))
-        UI.user_error!("Could not find action, lane or variable '#{method_sym}'. Check out the documentation for more details: https://docs.fastlane.tools/actions")
+        UI.user_error!(
+          "Could not find action, lane or variable '#{method_sym}'. Check out the documentation for more details: https://docs.fastlane.tools/actions"
+        )
       end
     end
 
@@ -179,8 +231,7 @@ module Fastlane
     # All the methods that are usually called on execution
     #
 
-    class LaneNotAvailableError < StandardError
-    end
+    class LaneNotAvailableError < StandardError; end
 
     def try_switch_to_lane(new_lane, parameters)
       block = lanes.fetch(current_platform, {}).fetch(new_lane, nil)
@@ -189,13 +240,20 @@ module Fastlane
         original_full = full_lane_name
         original_lane = current_lane
 
-        UI.user_error!("Parameters for a lane must always be a hash") unless (parameters.first || {}).kind_of?(Hash)
+        unless (parameters.first || {}).kind_of?(Hash)
+          UI.user_error!('Parameters for a lane must always be a hash')
+        end
 
-        execute_flow_block(before_each_blocks, current_platform, new_lane, parameters)
+        execute_flow_block(
+          before_each_blocks,
+          current_platform,
+          new_lane,
+          parameters
+        )
 
         pretty = [new_lane]
         pretty = [current_platform, new_lane] if current_platform
-        Actions.execute_action("Switch to #{pretty.join(' ')} lane") {} # log the action
+        Actions.execute_action("Switch to #{pretty.join(' ')} lane") {  } # log the action
         UI.message("Cruising over to lane '#{pretty.join(' ')}' 🚖")
 
         # Actually switch lane now
@@ -206,25 +264,33 @@ module Fastlane
 
         # after blocks are only called if no exception was raised before
         # Call the platform specific after block and then the general one
-        execute_flow_block(after_each_blocks, current_platform, new_lane, parameters)
+        execute_flow_block(
+          after_each_blocks,
+          current_platform,
+          new_lane,
+          parameters
+        )
 
         UI.message("Cruising back to lane '#{original_full}' 🚘")
         return result
       else
-        raise LaneNotAvailableError.new, "Lane not found"
+        raise LaneNotAvailableError.new, 'Lane not found'
       end
     end
 
-    def execute_action(method_sym, class_ref, arguments, custom_dir: nil, from_action: false)
+    def execute_action(
+      method_sym, class_ref, arguments, custom_dir: nil, from_action: false
+    )
       if custom_dir.nil?
-        custom_dir ||= "." if Helper.test?
-        custom_dir ||= ".."
+        custom_dir ||= '.' if Helper.test?
+        custom_dir ||= '..'
       end
 
       verify_supported_os(method_sym, class_ref)
 
       begin
-        Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
+        Dir.chdir(custom_dir) do
+          # go up from the fastlane folder, to the project folder
           # If another action is calling this action, we shouldn't show it in the summary
           # (see https://github.com/fastlane/fastlane/issues/4546)
 
@@ -240,13 +306,17 @@ module Fastlane
               # This action does not use the new action format
               # Just passing the arguments to this method
             else
-              UI.user_error!("You have to call the integration like `#{method_sym}(key: \"value\")`. Run `fastlane action #{method_sym}` for all available keys. Please check out the current documentation on GitHub.")
+              UI.user_error!(
+                "You have to call the integration like `#{method_sym}(key: \"value\")`. Run `fastlane action #{method_sym}` for all available keys. Please check out the current documentation on GitHub."
+              )
             end
 
             if Fastlane::Actions.is_deprecated?(class_ref)
-              puts("==========================================".deprecated)
+              puts('=========================================='.deprecated)
               puts("This action (#{method_sym}) is deprecated".deprecated)
-              puts(class_ref.deprecated_notes.to_s.remove_markdown.deprecated) if class_ref.deprecated_notes
+              if class_ref.deprecated_notes
+                puts(class_ref.deprecated_notes.to_s.remove_markdown.deprecated)
+              end
               puts("==========================================\n".deprecated)
             end
             class_ref.runner = self # needed to call another action form an action
@@ -258,12 +328,18 @@ module Fastlane
       rescue FastlaneCore::Interface::FastlaneCommonException => e # these are exceptions that we dont count as crashes
         raise e
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
-        action_completed(method_sym.to_s, status: FastlaneCore::ActionCompletionStatus::USER_ERROR, exception: e)
+        action_completed(
+          method_sym.to_s,
+          status: FastlaneCore::ActionCompletionStatus::USER_ERROR, exception: e
+        )
         raise e
       rescue Exception => e # rubocop:disable Lint/RescueException
         # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         # Catches all exceptions, since some plugins might use system exits to get out
-        action_completed(method_sym.to_s, status: FastlaneCore::ActionCompletionStatus::FAILED, exception: e)
+        action_completed(
+          method_sym.to_s,
+          status: FastlaneCore::ActionCompletionStatus::FAILED, exception: e
+        )
         raise e
       end
     end
@@ -278,7 +354,9 @@ module Fastlane
 
     def execute_flow_block(block, current_platform, lane, parameters)
       # Call the platform specific block and default back to the general one
-      block[current_platform].call(lane, parameters) if block[current_platform] && current_platform
+      if block[current_platform] && current_platform
+        block[current_platform].call(lane, parameters)
+      end
       block[nil].call(lane, parameters) if block[nil]
     end
 
@@ -288,7 +366,9 @@ module Fastlane
         platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
         if platform
           unless class_ref.is_supported?(platform)
-            UI.important("Action '#{name}' isn't known to support operating system '#{platform}'.")
+            UI.important(
+              "Action '#{name}' isn't known to support operating system '#{platform}'."
+            )
           end
         end
       end
@@ -318,21 +398,27 @@ module Fastlane
 
     def set_before_all(platform, block)
       unless before_all_blocks[platform].nil?
-        UI.error("You defined multiple `before_all` blocks in your `Fastfile`. The last one being set will be used.")
+        UI.error(
+          'You defined multiple `before_all` blocks in your `Fastfile`. The last one being set will be used.'
+        )
       end
       before_all_blocks[platform] = block
     end
 
     def set_after_all(platform, block)
       unless after_all_blocks[platform].nil?
-        UI.error("You defined multiple `after_all` blocks in your `Fastfile`. The last one being set will be used.")
+        UI.error(
+          'You defined multiple `after_all` blocks in your `Fastfile`. The last one being set will be used.'
+        )
       end
       after_all_blocks[platform] = block
     end
 
     def set_error(platform, block)
       unless error_blocks[platform].nil?
-        UI.error("You defined multiple `error` blocks in your `Fastfile`. The last one being set will be used.")
+        UI.error(
+          'You defined multiple `error` blocks in your `Fastfile`. The last one being set will be used.'
+        )
       end
       error_blocks[platform] = block
     end

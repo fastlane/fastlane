@@ -38,15 +38,19 @@ module Fastlane
         build_args = params_to_build_args(params)
 
         unless params[:scheme]
-          UI.important("You haven't specified a scheme. This might cause problems. If you can't see any output, please pass a `scheme`")
+          UI.important(
+            "You haven't specified a scheme. This might cause problems. If you can't see any output, please pass a `scheme`"
+          )
         end
 
         # If no dest directory given, default to current directory
         absolute_dest_directory ||= Dir.pwd
 
         if Helper.test?
-          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = File.join(absolute_dest_directory, 'test.ipa')
-          Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = File.join(absolute_dest_directory, 'test.app.dSYM.zip')
+          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] =
+            File.join(absolute_dest_directory, 'test.ipa')
+          Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] =
+            File.join(absolute_dest_directory, 'test.app.dSYM.zip')
           return build_args
         end
 
@@ -65,28 +69,30 @@ module Fastlane
           absolute_dsym_path = find_dsym_file(absolute_dest_directory)
 
           # Sets shared values to use after this action is performed
-          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = absolute_ipa_path
-          Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = absolute_dsym_path
+          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] =
+            absolute_ipa_path
+          Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] =
+            absolute_dsym_path
           ENV[SharedValues::IPA_OUTPUT_PATH.to_s] = absolute_ipa_path # for deliver
           ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] = absolute_dsym_path
 
           deprecation_warning
         rescue => ex
           [
-            "-------------------------------------------------------",
-            "Original Error:",
-            " => " + ex.to_s,
-            "A build error occurred. You are using legacy `shenzhen` for building",
-            "it is recommended to upgrade to _gym_: ",
-            "https://docs.fastlane.tools/actions/gym/",
+            '-------------------------------------------------------',
+            'Original Error:',
+            ' => ' + ex.to_s,
+            'A build error occurred. You are using legacy `shenzhen` for building',
+            'it is recommended to upgrade to _gym_: ',
+            'https://docs.fastlane.tools/actions/gym/',
             core_command,
-            "-------------------------------------------------------"
-          ].each do |txt|
-            UI.error(txt)
-          end
+            '-------------------------------------------------------'
+          ].each { |txt| UI.error(txt) }
 
           # Raise a custom exception, as the the normal one is useless for the user
-          UI.user_error!("A build error occurred, this is usually related to code signing. Take a look at the error above")
+          UI.user_error!(
+            'A build error occurred, this is usually related to code signing. Take a look at the error above'
+          )
         end
       end
 
@@ -113,83 +119,120 @@ module Fastlane
       end
 
       def self.fill_in_default_values(params)
-        embed = Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATH] || ENV["SIGH_PROFILE_PATH"]
+        embed =
+          Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATH] ||
+            ENV['SIGH_PROFILE_PATH']
         params[:embed] ||= embed if embed
         params
       end
 
       def self.find_ipa_file(dir)
         # Finds last modified .ipa in the destination directory
-        Dir[File.join(dir, '*.ipa')].sort { |a, b| File.mtime(b) <=> File.mtime(a) }.first
+        Dir[File.join(dir, '*.ipa')].sort do |a, b|
+          File.mtime(b) <=> File.mtime(a)
+        end.first
       end
 
       def self.find_dsym_file(dir)
         # Finds last modified .dSYM.zip in the destination directory
-        Dir[File.join(dir, '*.dSYM.zip')].sort { |a, b| File.mtime(b) <=> File.mtime(a) }.first
+        Dir[File.join(dir, '*.dSYM.zip')].sort do |a, b|
+          File.mtime(b) <=> File.mtime(a)
+        end.first
       end
 
       def self.description
-        "Easily build and sign your app using shenzhen"
+        'Easily build and sign your app using shenzhen'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :workspace,
-                                       env_name: "IPA_WORKSPACE",
-                                       description: "WORKSPACE Workspace (.xcworkspace) file to use to build app (automatically detected in current directory)",
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :project,
-                                       env_name: "IPA_PROJECT",
-                                       description: "Project (.xcodeproj) file to use to build app (automatically detected in current directory, overridden by --workspace option, if passed)",
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :configuration,
-                                       env_name: "IPA_CONFIGURATION",
-                                       description: "Configuration used to build",
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :scheme,
-                                       env_name: "IPA_SCHEME",
-                                       description: "Scheme used to build app",
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :clean,
-                                       env_name: "IPA_CLEAN",
-                                       description: "Clean project before building",
-                                       optional: true,
-                                       is_string: false),
-          FastlaneCore::ConfigItem.new(key: :archive,
-                                       env_name: "IPA_ARCHIVE",
-                                       description: "Archive project after building",
-                                       optional: true,
-                                       is_string: false),
-          FastlaneCore::ConfigItem.new(key: :destination,
-                                       env_name: "IPA_DESTINATION",
-                                       description: "Build destination. Defaults to current directory",
-                                       default_value_dynamic: true,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :embed,
-                                       env_name: "IPA_EMBED",
-                                       description: "Sign .ipa file with .mobileprovision",
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :identity,
-                                       env_name: "IPA_IDENTITY",
-                                       description: "Identity to be used along with --embed",
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :sdk,
-                                       env_name: "IPA_SDK",
-                                       description: "Use SDK as the name or path of the base SDK when building the project",
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :ipa,
-                                       env_name: "IPA_IPA",
-                                       description: "Specify the name of the .ipa file to generate (including file extension)",
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :xcconfig,
-                                       env_name: "IPA_XCCONFIG",
-                                       description: "Use an extra XCCONFIG file to build the app",
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :xcargs,
-                                       env_name: "IPA_XCARGS",
-                                       description: "Pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args",
-                                       optional: true,
-                                       type: :shell_string)
+          FastlaneCore::ConfigItem.new(
+            key: :workspace,
+            env_name: 'IPA_WORKSPACE',
+            description:
+              'WORKSPACE Workspace (.xcworkspace) file to use to build app (automatically detected in current directory)',
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :project,
+            env_name: 'IPA_PROJECT',
+            description:
+              'Project (.xcodeproj) file to use to build app (automatically detected in current directory, overridden by --workspace option, if passed)',
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :configuration,
+            env_name: 'IPA_CONFIGURATION',
+            description: 'Configuration used to build',
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :scheme,
+            env_name: 'IPA_SCHEME',
+            description: 'Scheme used to build app',
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :clean,
+            env_name: 'IPA_CLEAN',
+            description: 'Clean project before building',
+            optional: true,
+            is_string: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :archive,
+            env_name: 'IPA_ARCHIVE',
+            description: 'Archive project after building',
+            optional: true,
+            is_string: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :destination,
+            env_name: 'IPA_DESTINATION',
+            description: 'Build destination. Defaults to current directory',
+            default_value_dynamic: true,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :embed,
+            env_name: 'IPA_EMBED',
+            description: 'Sign .ipa file with .mobileprovision',
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :identity,
+            env_name: 'IPA_IDENTITY',
+            description: 'Identity to be used along with --embed',
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :sdk,
+            env_name: 'IPA_SDK',
+            description:
+              'Use SDK as the name or path of the base SDK when building the project',
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :ipa,
+            env_name: 'IPA_IPA',
+            description:
+              'Specify the name of the .ipa file to generate (including file extension)',
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :xcconfig,
+            env_name: 'IPA_XCCONFIG',
+            description: 'Use an extra XCCONFIG file to build the app',
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :xcargs,
+            env_name: 'IPA_XCARGS',
+            description:
+              'Pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args',
+            optional: true,
+            type: :shell_string
+          )
         ]
       end
 
@@ -201,7 +244,7 @@ module Fastlane
       end
 
       def self.author
-        "joshdholtz"
+        'joshdholtz'
       end
 
       def self.example_code
@@ -229,10 +272,10 @@ module Fastlane
 
       def self.deprecated_notes
         [
-          "You are using legacy `shenzhen` to build your app, which will be removed soon!",
-          "It is recommended to upgrade to _gym_.",
-          "To do so, just replace `ipa(...)` with `gym(...)` in your Fastfile.",
-          "To make code signing work, follow [https://docs.fastlane.tools/codesigning/xcode-project/](https://docs.fastlane.tools/codesigning/xcode-project/)."
+          'You are using legacy `shenzhen` to build your app, which will be removed soon!',
+          'It is recommended to upgrade to _gym_.',
+          'To do so, just replace `ipa(...)` with `gym(...)` in your Fastfile.',
+          'To make code signing work, follow [https://docs.fastlane.tools/codesigning/xcode-project/](https://docs.fastlane.tools/codesigning/xcode-project/).'
         ].join("\n")
       end
     end

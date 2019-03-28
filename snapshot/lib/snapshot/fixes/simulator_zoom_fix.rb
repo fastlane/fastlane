@@ -12,15 +12,24 @@ module Snapshot
         UI.message("Patching simulators '#{config_path}' to scale to 100%")
 
         FastlaneCore::DeviceManager.simulators.each do |simulator|
-          simulator_name = simulator.name.tr("\s", "-")
-          key = "SimulatorWindowLastScale-com.apple.CoreSimulator.SimDeviceType.#{simulator_name}"
+          simulator_name = simulator.name.tr("\s", '-')
+          key =
+            "SimulatorWindowLastScale-com.apple.CoreSimulator.SimDeviceType.#{simulator_name}"
 
-          Helper.backticks("defaults write '#{config_path}' '#{key}' '1.0'", print: FastlaneCore::Globals.verbose?)
+          Helper.backticks(
+            "defaults write '#{config_path}' '#{key}' '1.0'",
+            print: FastlaneCore::Globals.verbose?
+          )
         end
       end
 
       def self.config_path
-        File.join(File.expand_path("~"), "Library", "Preferences", "com.apple.iphonesimulator.plist")
+        File.join(
+          File.expand_path('~'),
+          'Library',
+          'Preferences',
+          'com.apple.iphonesimulator.plist'
+        )
       end
     end
   end

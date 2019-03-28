@@ -8,10 +8,21 @@ module FastlaneCore
     def self.path
       value ||= "./#{FOLDER_NAME}/" if File.directory?("./#{FOLDER_NAME}/")
       value ||= "./.#{FOLDER_NAME}/" if File.directory?("./.#{FOLDER_NAME}/") # hidden folder
-      value ||= "./" if File.basename(Dir.getwd) == FOLDER_NAME && File.exist?('Fastfile.swift') # inside the folder
-      value ||= "./" if File.basename(Dir.getwd) == ".#{FOLDER_NAME}" && File.exist?('Fastfile.swift') # inside the folder and hidden
-      value ||= "./" if File.basename(Dir.getwd) == FOLDER_NAME && File.exist?('Fastfile') # inside the folder
-      value ||= "./" if File.basename(Dir.getwd) == ".#{FOLDER_NAME}" && File.exist?('Fastfile') # inside the folder and hidden
+      if File.basename(Dir.getwd) == FOLDER_NAME &&
+         File.exist?('Fastfile.swift') # inside the folder
+        value ||= './'
+      end
+      if File.basename(Dir.getwd) == ".#{FOLDER_NAME}" &&
+         File.exist?('Fastfile.swift') # inside the folder and hidden
+        value ||= './'
+      end
+      if File.basename(Dir.getwd) == FOLDER_NAME && File.exist?('Fastfile') # inside the folder
+        value ||= './'
+      end
+      if File.basename(Dir.getwd) == ".#{FOLDER_NAME}" &&
+         File.exist?('Fastfile') # inside the folder and hidden
+        value ||= './'
+      end
       return value
     end
 
@@ -22,7 +33,7 @@ module FastlaneCore
 
     def self.swift?
       return false unless self.fastfile_path
-      return self.fastfile_path.downcase.end_with?(".swift")
+      return self.fastfile_path.downcase.end_with?('.swift')
     end
 
     def self.swift_folder_path
@@ -30,14 +41,16 @@ module FastlaneCore
     end
 
     def self.swift_runner_project_path
-      return File.join(self.swift_folder_path, 'FastlaneSwiftRunner', 'FastlaneSwiftRunner.xcodeproj')
+      return File.join(
+        self.swift_folder_path,
+        'FastlaneSwiftRunner',
+        'FastlaneSwiftRunner.xcodeproj'
+      )
     end
 
     def self.swift_runner_built?
       swift_runner_path = self.swift_runner_path
-      if swift_runner_path.nil?
-        return false
-      end
+      return false if swift_runner_path.nil?
 
       return File.exist?(swift_runner_path)
     end
@@ -64,7 +77,11 @@ module FastlaneCore
     def self.create_folder!(path = nil)
       path = File.join(path || '.', FOLDER_NAME)
       return if File.directory?(path) # directory is already there
-      UI.user_error!("Found a file called 'fastlane' at path '#{path}', please delete it") if File.exist?(path)
+      if File.exist?(path)
+        UI.user_error!(
+          "Found a file called 'fastlane' at path '#{path}', please delete it"
+        )
+      end
       FileUtils.mkdir_p(path)
       UI.success("Created new folder '#{path}'.")
     end

@@ -13,14 +13,32 @@ module Snapshot
         when /darwin9/
           `hwprefs cpu_count`.to_i
         when /darwin10/
-          (hwprefs_available? ? `hwprefs thread_count` : `sysctl -n hw.physicalcpu_max`).to_i
+          (
+            if hwprefs_available?
+              `hwprefs thread_count`
+            else
+              `sysctl -n hw.physicalcpu_max`
+            end
+          )
+            .to_i
         when /linux/
-          UI.user_error!("We detected that you are running snapshot on Linux, but snapshot is only supported on macOS")
+          UI.user_error!(
+            'We detected that you are running snapshot on Linux, but snapshot is only supported on macOS'
+          )
         when /freebsd/
-          UI.user_error!("We detected that you are running snapshot on FreeBSD, but snapshot is only supported on macOS")
+          UI.user_error!(
+            'We detected that you are running snapshot on FreeBSD, but snapshot is only supported on macOS'
+          )
         else
           if RbConfig::CONFIG['host_os'] =~ /darwin/
-            (hwprefs_available? ? `hwprefs thread_count` : `sysctl -n hw.physicalcpu_max`).to_i
+            (
+              if hwprefs_available?
+                `hwprefs thread_count`
+              else
+                `sysctl -n hw.physicalcpu_max`
+              end
+            )
+              .to_i
           else
             UI.crash!("Cannot find the machine's processor count.")
           end
@@ -33,9 +51,7 @@ module Snapshot
     # to avoid overloading your machine.
     def default_number_of_simultaneous_simulators
       cpu_count = CPUInspector.cpu_count
-      if cpu_count <= 2
-        return cpu_count
-      end
+      return cpu_count if cpu_count <= 2
 
       return cpu_count - 1
     end
@@ -59,15 +75,24 @@ module Snapshot
           if launcher_config.concurrent_simulators?
             all_devices = launcher_config.devices
             # We have to break up the concurrent simulators by device version too, otherwise there is an error (see #10969)
-            by_simulator_version = all_devices.group_by { |d| FastlaneCore::DeviceManager.latest_simulator_version_for_device(d) }.values
-            device_batches = by_simulator_version.flat_map { |a| a.each_slice(default_number_of_simultaneous_simulators).to_a }
+            by_simulator_version =
+              all_devices.group_by do |d|
+                FastlaneCore::DeviceManager.latest_simulator_version_for_device(
+                  d
+                )
+              end.values
+            device_batches =
+              by_simulator_version.flat_map do |a|
+                a.each_slice(default_number_of_simultaneous_simulators).to_a
+              end
           else
             # Put each device in it's own array to run tests one at a time
             device_batches = launcher_config.devices.map { |d| [d] }
           end
 
           device_batches.each do |devices|
-            languages_finished[language] = launch_simultaneously(devices, language, locale, launch_args)
+            languages_finished[language] =
+              launch_simultaneously(devices, language, locale, launch_args)
           end
         end
       end
@@ -79,95 +104,159 @@ module Snapshot
     def launch_simultaneously(devices, language, locale, launch_arguments)
       prepare_for_launch(devices, language, locale, launch_arguments)
 
-      add_media(devices, :photo, launcher_config.add_photos) if launcher_config.add_photos
-      add_media(devices, :video, launcher_config.add_videos) if launcher_config.add_videos
+      if launcher_config.add_photos
+        add_media(devices, :photo, launcher_config.add_photos)
+      end
+      if launcher_config.add_videos
+        add_media(devices, :video, launcher_config.add_videos)
+      end
 
-      command = TestCommandGenerator.generate(
-        devices: devices,
-        language: language,
-        locale: locale,
-        log_path: xcodebuild_log_path(language: language, locale: locale)
-      )
+      command =
+        TestCommandGenerator.generate(
+          devices: devices,
+          language: language,
+          locale: locale,
+          log_path: xcodebuild_log_path(language: language, locale: locale)
+        )
 
       UI.important("Running snapshot on: #{devices.join(', ')}")
 
-      execute(command: command, language: language, locale: locale, launch_args: launch_arguments, devices: devices)
+      execute(
+        command: command,
+        language: language,
+        locale: locale,
+        launch_args: launch_arguments,
+        devices: devices
+      )
 
-      return copy_screenshots(language: language, locale: locale, launch_args: launch_arguments)
+      return copy_screenshots(
+        language: language, locale: locale, launch_args: launch_arguments
+      )
     end
 
-    def execute(retries = 0, command: nil, language: nil, locale: nil, launch_args: nil, devices: nil)
+    def execute(
+      retries = 0,
+      command: nil,
+      language: nil,
+      locale: nil,
+      launch_args: nil,
+      devices: nil
+    )
       prefix_hash = [
         {
-          prefix: "Running Tests: ",
-          block: proc do |value|
-            value.include?("Touching")
-          end
+          prefix: 'Running Tests: ',
+          block: proc { |value| value.include?('Touching') }
         }
       ]
-      FastlaneCore::CommandExecutor.execute(command: command,
-                                          print_all: true,
-                                      print_command: true,
-                                             prefix: prefix_hash,
-                                            loading: "Loading...",
-                                              error: proc do |output, return_code|
-                                                self.collected_errors.concat(failed_devices.map do |device, messages|
-                                                  "#{device}: #{messages.join(', ')}"
-                                                end)
+      FastlaneCore::CommandExecutor.execute(
+        command: command,
+        print_all: true,
+        print_command: true,
+        prefix: prefix_hash,
+        loading: 'Loading...',
+        error:
+          proc do |output, return_code|
+            self.collected_errors.concat(
+              failed_devices.map do |device, messages|
+                "#{device}: #{messages.join(', ')}"
+              end
+            )
 
-                                                cleanup_after_failure(devices, language, locale, launch_args, return_code)
+            cleanup_after_failure(
+              devices,
+              language,
+              locale,
+              launch_args,
+              return_code
+            )
 
-                                                # no exception raised... that means we need to retry
-                                                UI.error("Caught error... #{return_code}")
+            # no exception raised... that means we need to retry
+            UI.error("Caught error... #{return_code}")
 
-                                                self.current_number_of_retries_due_to_failing_simulator += 1
-                                                if self.current_number_of_retries_due_to_failing_simulator < 20 && return_code != 65
-                                                  # If the return code is not 65, we should assume its a simulator failure and retry
-                                                  launch_simultaneously(devices, language, locale, launch_args)
-                                                elsif retries < launcher_config.number_of_retries
-                                                  # If there are retries remaining, run the tests again
-                                                  retry_tests(retries, command, language, locale, launch_args, devices)
-                                                else
-                                                  # It's important to raise an error, as we don't want to collect the screenshots
-                                                  UI.crash!("Too many errors... no more retries...") if launcher_config.stop_after_first_error
-                                                end
-                                              end)
+            self.current_number_of_retries_due_to_failing_simulator += 1
+            if self.current_number_of_retries_due_to_failing_simulator < 20 &&
+               return_code != 65
+              # If the return code is not 65, we should assume its a simulator failure and retry
+              launch_simultaneously(devices, language, locale, launch_args)
+            elsif retries < launcher_config.number_of_retries
+              # If there are retries remaining, run the tests again
+              retry_tests(
+                retries,
+                command,
+                language,
+                locale,
+                launch_args,
+                devices
+              )
+            else
+              # It's important to raise an error, as we don't want to collect the screenshots
+              if launcher_config.stop_after_first_error
+                UI.crash!('Too many errors... no more retries...')
+              end
+            end
+          end
+      )
     end
 
-    def cleanup_after_failure(devices, language, locale, launch_args, return_code)
-      copy_screenshots(language: language, locale: locale, launch_args: launch_args)
+    def cleanup_after_failure(
+      devices, language, locale, launch_args, return_code
+    )
+      copy_screenshots(
+        language: language, locale: locale, launch_args: launch_args
+      )
 
       UI.important("Tests failed while running on: #{devices.join(', ')}")
-      UI.important("For more detail about the test failures, check the logs here:")
+      UI.important(
+        'For more detail about the test failures, check the logs here:'
+      )
       UI.important(xcodebuild_log_path(language: language, locale: locale))
-      UI.important(" ")
-      UI.important("You can also find the test result data here:")
+      UI.important(' ')
+      UI.important('You can also find the test result data here:')
       UI.important(test_results_path)
-      UI.important(" ")
-      UI.important("You can find the incomplete screenshots here:")
+      UI.important(' ')
+      UI.important('You can find the incomplete screenshots here:')
       UI.important(SCREENSHOTS_DIR)
       UI.important(launcher_config.output_directory)
     end
 
     def retry_tests(retries, command, language, locale, launch_args, devices)
       UI.important("Retrying on devices: #{devices.join(', ')}")
-      UI.important("Number of retries remaining: #{launcher_config.number_of_retries - retries - 1}")
+      UI.important(
+        "Number of retries remaining: #{launcher_config.number_of_retries -
+          retries -
+          1}"
+      )
 
       # Make sure all needed directories exist for next retry
       # `copy_screenshots` in `cleanup_after_failure` can delete some needed directories
       # https://github.com/fastlane/fastlane/issues/10786
-      prepare_directories_for_launch(language: language, locale: locale, launch_arguments: launch_args)
+      prepare_directories_for_launch(
+        language: language, locale: locale, launch_arguments: launch_args
+      )
 
       # Clear errors so a successful retry isn't reported as an over failure
       self.collected_errors = []
 
-      execute(retries + 1, command: command, language: language, locale: locale, launch_args: launch_args, devices: devices)
+      execute(
+        retries + 1,
+        command: command,
+        language: language,
+        locale: locale,
+        launch_args: launch_args,
+        devices: devices
+      )
     end
 
     def copy_screenshots(language: nil, locale: nil, launch_args: nil)
-      raw_output = File.read(xcodebuild_log_path(language: language, locale: locale))
+      raw_output =
+        File.read(xcodebuild_log_path(language: language, locale: locale))
       dir_name = locale || language
-      return Collector.fetch_screenshots(raw_output, dir_name, '', launch_args.first)
+      return Collector.fetch_screenshots(
+        raw_output,
+        dir_name,
+        '',
+        launch_args.first
+      )
     end
 
     def test_results_path
@@ -187,10 +276,13 @@ module Snapshot
         summary = FastlaneCore::TestParser.new(plist)
         name = summary.data.first[:run_destination_name]
         if summary.data.first[:number_of_tests] == 0
-          hash[name] = ["No tests were executed"]
+          hash[name] = ['No tests were executed']
         else
           tests = Array(summary.data.first[:tests])
-          hash[name] = tests.map { |test| Array(test[:failures]).map { |failure| failure[:failure_message] } }.flatten
+          hash[name] =
+            tests.map do |test|
+              Array(test[:failures]).map { |failure| failure[:failure_message] }
+            end.flatten
         end
       end
     end
@@ -199,7 +291,9 @@ module Snapshot
       name_components = [Snapshot.project.app_name, Snapshot.config[:scheme]]
 
       if Snapshot.config[:namespace_log_files]
-        name_components << launcher_config.devices.join('-') if launcher_config.devices.count >= 1
+        if launcher_config.devices.count >= 1
+          name_components << launcher_config.devices.join('-')
+        end
         name_components << language if language
         name_components << locale if locale
       end

@@ -16,12 +16,14 @@ module Spaceship
       # @return (Integer) the date of the state
       attr_reader :date
 
-      attr_mapping({
-        'stateKey' => :state_key,
-        'userName' => :user_name,
-        'userEmail' => :user_email,
-        'date' => :date
-      })
+      attr_mapping(
+        {
+          'stateKey' => :state_key,
+          'userName' => :user_name,
+          'userEmail' => :user_email,
+          'date' => :date
+        }
+      )
     end
   end
 end

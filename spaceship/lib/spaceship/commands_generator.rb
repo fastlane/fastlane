@@ -20,15 +20,22 @@ module Spaceship
       program :description, Spaceship::DESCRIPTION
       program :help, 'Author', 'Felix Krause <spaceship@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/spaceship'
+      program :help,
+              'GitHub',
+              'https://github.com/fastlane/fastlane/tree/master/spaceship'
       program :help_formatter, :compact
 
-      global_option('-u', '--user USERNAME', 'Specify the Apple ID you want to log in with')
+      global_option(
+        '-u',
+        '--user USERNAME',
+        'Specify the Apple ID you want to log in with'
+      )
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
       command :playground do |c|
         c.syntax = 'fastlane spaceship playground'
-        c.description = 'Run an interactive shell that connects you to Apple web services'
+        c.description =
+          'Run an interactive shell that connects you to Apple web services'
 
         c.action do |args, options|
           Spaceship::Playground.new(username: options.user).run
@@ -37,7 +44,8 @@ module Spaceship
 
       command :spaceauth do |c|
         c.syntax = 'fastlane spaceship spaceauth'
-        c.description = 'Authentication helper for spaceship/fastlane to work with Apple 2-Step/2FA'
+        c.description =
+          'Authentication helper for spaceship/fastlane to work with Apple 2-Step/2FA'
 
         c.action do |args, options|
           Spaceship::SpaceauthRunner.new(username: options.user).run

@@ -61,9 +61,7 @@ module Spaceship
         # Find a specific Passbook ID based on the bundle_id
         # @return (Passbook) The passbook you're looking for. This is nil if the passbook can't be found.
         def find(bundle_id)
-          all.find do |passbook|
-            passbook.bundle_id == bundle_id
-          end
+          all.find { |passbook| passbook.bundle_id == bundle_id }
         end
       end
 

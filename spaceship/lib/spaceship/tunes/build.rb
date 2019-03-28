@@ -99,7 +99,6 @@ module Spaceship
         'valid' => :valid,
         'processing' => :processing,
         'processingState' => :processing_state,
-
         'installCount' => :install_count,
         'internalInstallCount' => :internal_install_count,
         'externalInstallCount' => :external_install_count,
@@ -122,10 +121,13 @@ module Spaceship
       end
 
       def details
-        response = client.build_details(app_id: self.apple_id,
-                                         train: self.train_version,
-                                  build_number: self.build_version,
-                                      platform: self.platform)
+        response =
+          client.build_details(
+            app_id: self.apple_id,
+            train: self.train_version,
+            build_number: self.build_version,
+            platform: self.platform
+          )
         response['apple_id'] = self.apple_id
         BuildDetails.factory(response)
       end
@@ -135,19 +137,22 @@ module Spaceship
         return self.build_train.application.apple_id
       end
 
-      def update_build_information!(whats_new: nil,
-                                    description: nil,
-                                    feedback_email: nil)
-        parameters = {
-          app_id: self.apple_id,
-          train: self.train_version,
-          build_number: self.build_version,
-          platform: self.platform
-        }.merge({
-          whats_new: whats_new,
-          description: description,
-          feedback_email: feedback_email
-        })
+      def update_build_information!(
+        whats_new: nil, description: nil, feedback_email: nil
+      )
+        parameters =
+          {
+            app_id: self.apple_id,
+            train: self.train_version,
+            build_number: self.build_version,
+            platform: self.platform
+          }.merge(
+            {
+              whats_new: whats_new,
+              description: description,
+              feedback_email: feedback_email
+            }
+          )
         client.update_build_information!(parameters)
       end
 
@@ -175,12 +180,13 @@ module Spaceship
       # Note that iTC will pull a lot of this information from previous builds or the app store information,
       # all of the required values must be set either in this hash or automatically for this to work
       def submit_for_beta_review!(metadata)
-        parameters = {
-          app_id: self.apple_id,
-          train: self.train_version,
-          build_number: self.build_version,
-          platform: self.platform
-        }.merge(metadata)
+        parameters =
+          {
+            app_id: self.apple_id,
+            train: self.train_version,
+            build_number: self.build_version,
+            platform: self.platform
+          }.merge(metadata)
 
         client.submit_testflight_build_for_review!(parameters)
 
@@ -191,13 +197,13 @@ module Spaceship
       # @examples:
       #   External, Internal, Inactive, Expired
       def testing_status
-        testing ||= "External" if self.external_testing_enabled
-        testing ||= "Internal" if self.internal_testing_enabled
+        testing ||= 'External' if self.external_testing_enabled
+        testing ||= 'Internal' if self.internal_testing_enabled
 
         if Time.at(self.internal_expiry_date / 1000) > Time.now
-          testing ||= "Inactive"
+          testing ||= 'Inactive'
         else
-          testing = "Expired"
+          testing = 'Expired'
         end
 
         return testing
@@ -205,10 +211,12 @@ module Spaceship
 
       # This will cancel the review process for this TestFlight build
       def cancel_beta_review!
-        client.remove_testflight_build_from_review!(app_id: self.apple_id,
-                                                     train: self.train_version,
-                                              build_number: self.build_version,
-                                                  platform: self.platform)
+        client.remove_testflight_build_from_review!(
+          app_id: self.apple_id,
+          train: self.train_version,
+          build_number: self.build_version,
+          platform: self.platform
+        )
       end
     end
   end

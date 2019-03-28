@@ -5,7 +5,7 @@ module Snapshot
   class TestCommandGeneratorBase
     class << self
       def prefix
-        ["set -o pipefail &&"]
+        ['set -o pipefail &&']
       end
 
       # Path to the project or workspace as parameter
@@ -14,18 +14,22 @@ module Snapshot
       def project_path_array
         proj = Snapshot.project.xcodebuild_parameters
         return proj if proj.count > 0
-        UI.user_error!("No project/workspace found")
+        UI.user_error!('No project/workspace found')
       end
 
       def options(language, locale)
         config = Snapshot.config
-        result_bundle_path = resolve_result_bundle_path(language, locale) if config[:result_bundle]
+        if config[:result_bundle]
+          result_bundle_path = resolve_result_bundle_path(language, locale)
+        end
 
         options = []
         options += project_path_array
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-derivedDataPath '#{derived_data_path}'"
-        options << "-resultBundlePath '#{result_bundle_path}'" if result_bundle_path
+        if result_bundle_path
+          options << "-resultBundlePath '#{result_bundle_path}'"
+        end
         options << config[:xcargs] if config[:xcargs]
         return options
       end
@@ -34,8 +38,11 @@ module Snapshot
         config = Snapshot.config
 
         build_settings = []
-        build_settings << "FASTLANE_SNAPSHOT=YES"
-        build_settings << "TEST_TARGET_NAME=#{config[:test_target_name].shellescape}" if config[:test_target_name]
+        build_settings << 'FASTLANE_SNAPSHOT=YES'
+        if config[:test_target_name]
+          build_settings <<
+            "TEST_TARGET_NAME=#{config[:test_target_name].shellescape}"
+        end
 
         return build_settings
       end
@@ -43,7 +50,7 @@ module Snapshot
       def actions
         actions = []
         if Snapshot.config[:test_without_building]
-          actions << "test-without-building"
+          actions << 'test-without-building'
         else
           actions << :clean if Snapshot.config[:clean]
           actions << :build # https://github.com/fastlane/fastlane/issues/2581
@@ -67,10 +74,12 @@ module Snapshot
         simulators = FastlaneCore::DeviceManager.simulators
         # Sort devices with matching names by OS version, largest first, so that we can
         # pick the device with the newest OS in case an exact OS match is not available
-        name_matches = simulators.find_all { |sim| sim.name.strip == device_name.strip }
-                                 .sort_by { |sim| Gem::Version.new(sim.os_version) }
-                                 .reverse
-        return name_matches.find { |sim| sim.os_version == os_version } || name_matches.first
+        name_matches =
+          simulators.find_all do |sim|
+            sim.name.strip == device_name.strip
+          end.sort_by { |sim| Gem::Version.new(sim.os_version) }.reverse
+        return name_matches.find { |sim| sim.os_version == os_version } ||
+          name_matches.first
       end
 
       def device_udid(device_name, os_version = Snapshot.config[:ios_version])
@@ -80,7 +89,11 @@ module Snapshot
       end
 
       def derived_data_path
-        Snapshot.cache[:derived_data_path] ||= (Snapshot.config[:derived_data_path] || Dir.mktmpdir("snapshot_derived"))
+        Snapshot.cache[:derived_data_path] ||=
+          (
+            Snapshot.config[:derived_data_path] ||
+              Dir.mktmpdir('snapshot_derived')
+          )
       end
 
       def resolve_result_bundle_path(language, locale)
@@ -88,10 +101,15 @@ module Snapshot
         language_key = locale || language
 
         unless Snapshot.cache[:result_bundle_path][language_key]
-          path = File.join(Snapshot.config[:output_directory], "test_output", language_key, Snapshot.config[:scheme]) + ".test_result"
-          if File.directory?(path)
-            FileUtils.remove_dir(path)
-          end
+          path =
+            File.join(
+              Snapshot.config[:output_directory],
+              'test_output',
+              language_key,
+              Snapshot.config[:scheme]
+            ) +
+              '.test_result'
+          FileUtils.remove_dir(path) if File.directory?(path)
           Snapshot.cache[:result_bundle_path][language_key] = path
         end
         return Snapshot.cache[:result_bundle_path][language_key]

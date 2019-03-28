@@ -11,14 +11,14 @@ module FastlaneCore
   class UpdateChecker
     def self.start_looking_for_update(gem_name)
       return if Helper.test?
-      return if FastlaneCore::Env.truthy?("FASTLANE_SKIP_UPDATE_CHECK")
+      return if FastlaneCore::Env.truthy?('FASTLANE_SKIP_UPDATE_CHECK')
 
       @start_time = Time.now
 
       Thread.new do
         begin
           server_results[gem_name] = fetch_latest(gem_name)
-        rescue
+        rescue StandardError
           # we don't want to show a stack trace if something goes wrong
         end
       end
@@ -34,7 +34,8 @@ module FastlaneCore
 
     def self.update_available?(gem_name, current_version)
       latest = server_results[gem_name]
-      return (latest and Gem::Version.new(latest) > Gem::Version.new(current_version))
+      return latest and
+        Gem::Version.new(latest) > Gem::Version.new(current_version)
     end
 
     def self.show_update_status(gem_name, current_version)
@@ -48,37 +49,59 @@ module FastlaneCore
     # appropriate message to the user
     def self.show_update_message(gem_name, current_version)
       available = server_results[gem_name]
-      puts("")
-      puts('#######################################################################')
+      puts('')
+      puts(
+        '#######################################################################'
+      )
       if available
-        puts("# #{gem_name} #{available} is available. You are on #{current_version}.")
+        puts(
+          "# #{gem_name} #{available} is available. You are on #{current_version}."
+        )
       else
-        puts("# An update for #{gem_name} is available. You are on #{current_version}.")
+        puts(
+          "# An update for #{gem_name} is available. You are on #{current_version}."
+        )
       end
-      puts("# You should use the latest version.")
-      puts("# Please update using `#{self.update_command(gem_name: gem_name)}`.")
+      puts('# You should use the latest version.')
+      puts(
+        "# Please update using `#{self.update_command(gem_name: gem_name)}`."
+      )
 
-      puts("# To see what's new, open https://github.com/fastlane/#{gem_name}/releases.") if FastlaneCore::Env.truthy?("FASTLANE_HIDE_CHANGELOG")
+      if FastlaneCore::Env.truthy?('FASTLANE_HIDE_CHANGELOG')
+        puts(
+          "# To see what's new, open https://github.com/fastlane/#{gem_name}/releases."
+        )
+      end
 
       if !Helper.bundler? && !Helper.contained_fastlane? && Random.rand(5) == 1
         # We want to show this message from time to time, if the user doesn't use bundler, nor bundled fastlane
-        puts('#######################################################################')
-        puts("# Run `sudo gem cleanup` from time to time to speed up fastlane")
+        puts(
+          '#######################################################################'
+        )
+        puts('# Run `sudo gem cleanup` from time to time to speed up fastlane')
       end
-      puts('#######################################################################')
-      Changelog.show_changes(gem_name, current_version, update_gem_command: UpdateChecker.update_command(gem_name: gem_name)) unless FastlaneCore::Env.truthy?("FASTLANE_HIDE_CHANGELOG")
+      puts(
+        '#######################################################################'
+      )
+      unless FastlaneCore::Env.truthy?('FASTLANE_HIDE_CHANGELOG')
+        Changelog.show_changes(
+          gem_name,
+          current_version,
+          update_gem_command: UpdateChecker.update_command(gem_name: gem_name)
+        )
+      end
 
       ensure_rubygems_source
     end
 
     # The command that the user should use to update their mac
-    def self.update_command(gem_name: "fastlane")
+    def self.update_command(gem_name: 'fastlane')
       if Helper.bundler?
         "bundle update #{gem_name.downcase}"
       elsif Helper.contained_fastlane? || Helper.homebrew?
-        "fastlane update_fastlane"
+        'fastlane update_fastlane'
       elsif Helper.mac_app?
-        "the Fabric app. Launch the app and navigate to the fastlane tab to get the most recent version."
+        'the Fabric app. Launch the app and navigate to the fastlane tab to get the most recent version.'
       else
         "sudo gem install #{gem_name.downcase}"
       end
@@ -90,16 +113,16 @@ module FastlaneCore
     # running the specified command
     def self.ensure_rubygems_source
       return if Helper.contained_fastlane?
-      return if `gem sources`.include?("https://rubygems.org")
-      puts("")
-      UI.error("RubyGems is not listed as your Gem source")
-      UI.error("You can run `gem sources` to see all your sources")
-      UI.error("Please run the following command to fix this:")
-      UI.command("gem sources --add https://rubygems.org")
+      return if `gem sources`.include?('https://rubygems.org')
+      puts('')
+      UI.error('RubyGems is not listed as your Gem source')
+      UI.error('You can run `gem sources` to see all your sources')
+      UI.error('Please run the following command to fix this:')
+      UI.command('gem sources --add https://rubygems.org')
     end
 
     def self.fetch_latest(gem_name)
-      JSON.parse(Excon.get(generate_fetch_url(gem_name)).body)["version"]
+      JSON.parse(Excon.get(generate_fetch_url(gem_name)).body)['version']
     end
 
     def self.generate_fetch_url(gem_name)

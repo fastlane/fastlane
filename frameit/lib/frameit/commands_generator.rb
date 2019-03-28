@@ -22,10 +22,13 @@ module Frameit
     def run
       program :name, 'frameit'
       program :version, Fastlane::VERSION
-      program :description, 'Quickly put your screenshots into the right device frames'
+      program :description,
+              'Quickly put your screenshots into the right device frames'
       program :help, 'Author', 'Felix Krause <frameit@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/frameit/'
+      program :help,
+              'Documentation',
+              'https://docs.fastlane.tools/actions/frameit/'
       program :help_formatter, :compact
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
@@ -34,9 +37,12 @@ module Frameit
 
       command :run do |c|
         c.syntax = 'fastlane frameit black'
-        c.description = "Adds a black frame around all screenshots"
+        c.description = 'Adds a black frame around all screenshots'
 
-        FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options, command: c)
+        FastlaneCore::CommanderGenerator.new.generate(
+          Frameit::Options.available_options,
+          command: c
+        )
 
         c.action do |args, options|
           load_config(options)
@@ -46,9 +52,12 @@ module Frameit
 
       command :silver do |c|
         c.syntax = 'fastlane frameit silver'
-        c.description = "Adds a silver frame around all screenshots"
+        c.description = 'Adds a silver frame around all screenshots'
 
-        FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options, command: c)
+        FastlaneCore::CommanderGenerator.new.generate(
+          Frameit::Options.available_options,
+          command: c
+        )
 
         c.action do |args, options|
           load_config(options)
@@ -58,9 +67,12 @@ module Frameit
 
       command :gold do |c|
         c.syntax = 'fastlane frameit gold'
-        c.description = "Adds a gold frame around all screenshots"
+        c.description = 'Adds a gold frame around all screenshots'
 
-        FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options, command: c)
+        FastlaneCore::CommanderGenerator.new.generate(
+          Frameit::Options.available_options,
+          command: c
+        )
 
         c.action do |args, options|
           load_config(options)
@@ -70,9 +82,12 @@ module Frameit
 
       command :rose_gold do |c|
         c.syntax = 'fastlane frameit rose_gold'
-        c.description = "Adds a rose gold frame around all screenshots"
+        c.description = 'Adds a rose gold frame around all screenshots'
 
-        FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options, command: c)
+        FastlaneCore::CommanderGenerator.new.generate(
+          Frameit::Options.available_options,
+          command: c
+        )
 
         c.action do |args, options|
           load_config(options)
@@ -82,7 +97,7 @@ module Frameit
 
       command :setup do |c|
         c.syntax = 'fastlane frameit setup'
-        c.description = "Downloads and sets up the latest device frames"
+        c.description = 'Downloads and sets up the latest device frames'
 
         c.action do |args, options|
           Frameit::FrameDownloader.new.download_frames
@@ -91,7 +106,7 @@ module Frameit
 
       command :download_frames do |c|
         c.syntax = 'fastlane frameit download_frames'
-        c.description = "Downloads and sets up the latest device frames"
+        c.description = 'Downloads and sets up the latest device frames'
 
         c.action do |args, options|
           Frameit::FrameDownloader.new.download_frames
@@ -108,7 +123,11 @@ module Frameit
     def load_config(options)
       o = options.__hash__.dup
       o.delete(:verbose)
-      Frameit.config = FastlaneCore::Configuration.create(Frameit::Options.available_options, o)
+      Frameit.config =
+        FastlaneCore::Configuration.create(
+          Frameit::Options.available_options,
+          o
+        )
     end
   end
 end

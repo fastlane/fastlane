@@ -18,15 +18,16 @@ module Spaceship
 
         # Converts the language short codes: (en-US, de-DE) to the iTC format (English_CA, Brazilian Portuguese)
         def from_standard_to_itc(from)
-          result = mapping.find { |a| a['locale'] == from || (a['alternatives'] || []).include?(from) }
+          result =
+            mapping.find do |a|
+              a['locale'] == from || (a['alternatives'] || []).include?(from)
+            end
           (result || {}).fetch('name', nil)
         end
 
         # Converts the language "UK English" (user facing) to "English_UK" (value)
         def from_itc_readable_to_itc(from)
-          readable_mapping.each do |key, value|
-            return key if value == from
-          end
+          readable_mapping.each { |key, value| return key if value == from }
           nil
         end
 
@@ -39,11 +40,31 @@ module Spaceship
 
         # Get the mapping JSON parsed
         def mapping
-          @languages ||= JSON.parse(File.read(File.join(Spaceship::ROOT, "lib", "assets", "languageMapping.json")))
+          @languages ||=
+            JSON.parse(
+              File.read(
+                File.join(
+                  Spaceship::ROOT,
+                  'lib',
+                  'assets',
+                  'languageMapping.json'
+                )
+              )
+            )
         end
 
         def readable_mapping
-          @readable ||= JSON.parse(File.read(File.join(Spaceship::ROOT, "lib", "assets", "languageMappingReadable.json")))
+          @readable ||=
+            JSON.parse(
+              File.read(
+                File.join(
+                  Spaceship::ROOT,
+                  'lib',
+                  'assets',
+                  'languageMappingReadable.json'
+                )
+              )
+            )
         end
       end
     end

@@ -15,43 +15,56 @@ describe Spaceship do
     end
 
     it '#select_team' do
-      expect(spaceship1.select_team).to eq("XXXXXXXXXX")
+      expect(spaceship1.select_team).to eq('XXXXXXXXXX')
     end
 
-    it "may have different teams" do
-      allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([
-                                                                                     { 'teamId' => 'XXXXXXXXXX', 'currentTeamMember' => { 'teamMemberId' => '' } },
-                                                                                     { 'teamId' => 'ABCDEF', 'currentTeamMember' => { 'teamMemberId' => '' } }
-                                                                                   ])
+    it 'may have different teams' do
+      allow_any_instance_of(Spaceship::PortalClient).to receive(:teams)
+                                 .and_return(
+                                 [
+                                   {
+                                     'teamId' => 'XXXXXXXXXX',
+                                     'currentTeamMember' => {
+                                       'teamMemberId' => ''
+                                     }
+                                   },
+                                   {
+                                     'teamId' => 'ABCDEF',
+                                     'currentTeamMember' => {
+                                       'teamMemberId' => ''
+                                     }
+                                   }
+                                 ]
+                               )
 
-      team_id = "ABCDEF"
+      team_id = 'ABCDEF'
       spaceship1.client.select_team(team_id: team_id)
 
       expect(spaceship1.client.team_id).to eq(team_id) # custom
-      expect(spaceship2.client.team_id).to eq("XXXXXXXXXX") # default
+      expect(spaceship2.client.team_id).to eq('XXXXXXXXXX') # default
     end
 
-    it "Device" do
+    it 'Device' do
       expect(spaceship1.device.all.count).to eq(4)
     end
 
-    it "DeviceDisabled" do
+    it 'DeviceDisabled' do
       expect(spaceship1.device.all(include_disabled: true).count).to eq(6)
     end
 
-    it "Certificate" do
+    it 'Certificate' do
       expect(spaceship1.certificate.all.count).to eq(3)
     end
 
-    it "ProvisioningProfile" do
+    it 'ProvisioningProfile' do
       expect(spaceship1.provisioning_profile.all.count).to eq(7)
     end
 
-    it "App" do
+    it 'App' do
       expect(spaceship1.app.all.count).to eq(5)
     end
 
-    context "With an uninitialized environment" do
+    context 'With an uninitialized environment' do
       before do
         Spaceship::App.set_client(nil)
         Spaceship::AppGroup.set_client(nil)
@@ -69,13 +82,25 @@ describe Spaceship do
         clean_launcher = Spaceship::Launcher.new
         clean_launcher.login(username, password)
 
-        expect(clean_launcher.client).to receive(:create_certificate!).with('BKLRAVXMGM', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA', false) do
-          JSON.parse(PortalStubbing.adp_read_fixture_file('certificateCreate.certRequest.json'))
+        expect(clean_launcher.client).to receive(:create_certificate!).with(
+                    'BKLRAVXMGM',
+                    /BEGIN CERTIFICATE REQUEST/,
+                    'B7JBD8LHAA',
+                    false
+                  ) do
+          JSON.parse(
+            PortalStubbing.adp_read_fixture_file(
+              'certificateCreate.certRequest.json'
+            )
+          )
         end
 
-        csr, pkey = Spaceship::Portal::Certificate.create_certificate_signing_request
+        csr, pkey =
+          Spaceship::Portal::Certificate.create_certificate_signing_request
         expect do
-          clean_launcher.certificate.development_push.create!(csr: csr, bundle_id: 'net.sunapps.151')
+          clean_launcher.certificate.development_push.create!(
+            csr: csr, bundle_id: 'net.sunapps.151'
+          )
         end.to_not(raise_error)
       end
     end

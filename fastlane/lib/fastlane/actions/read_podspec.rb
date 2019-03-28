@@ -24,43 +24,46 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Loads a CocoaPods spec as JSON"
+        'Loads a CocoaPods spec as JSON'
       end
 
       def self.details
         [
           "This can be used for only specifying a version string in your podspec - and during your release process you'd read it from the podspec by running `version = read_podspec['version']` at the beginning of your lane.",
-          "Loads the specified (or the first found) podspec in the folder as JSON, so that you can inspect its `version`, `files` etc.",
-          "This can be useful when basing your release process on the version string only stored in one place - in the podspec.",
+          'Loads the specified (or the first found) podspec in the folder as JSON, so that you can inspect its `version`, `files` etc.',
+          'This can be useful when basing your release process on the version string only stored in one place - in the podspec.',
           "As one of the first steps you'd read the podspec and its version and the rest of the workflow can use that version string (when e.g. creating a new git tag or a GitHub Release)."
         ].join("\n")
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :path,
-                                       env_name: "FL_READ_PODSPEC_PATH",
-                                       description: "Path to the podspec to be read",
-                                       default_value: Dir['*.podspec*'].first,
-                                       default_value_dynamic: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("File #{value} not found") unless File.exist?(value)
-                                       end)
+          FastlaneCore::ConfigItem.new(
+            key: :path,
+            env_name: 'FL_READ_PODSPEC_PATH',
+            description: 'Path to the podspec to be read',
+            default_value: Dir['*.podspec*'].first,
+            default_value_dynamic: true,
+            verify_block:
+              proc do |value|
+                unless File.exist?(value)
+                  UI.user_error!("File #{value} not found")
+                end
+              end
+          )
         ]
       end
 
       def self.output
-        [
-          ['READ_PODSPEC_JSON', 'Podspec JSON payload']
-        ]
+        [['READ_PODSPEC_JSON', 'Podspec JSON payload']]
       end
 
       def self.authors
-        ["czechboy0"]
+        %w[czechboy0]
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       def self.example_code
@@ -73,9 +76,7 @@ module Fastlane
       end
 
       def self.sample_return_value
-        {
-          'version' => 1.0
-        }
+        { 'version' => 1.0 }
       end
 
       def self.return_type

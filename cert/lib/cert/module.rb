@@ -10,5 +10,5 @@ module Cert
   UI = FastlaneCore::UI
   ROOT = Pathname.new(File.expand_path('../../..', __FILE__))
 
-  ENV['FASTLANE_TEAM_ID'] ||= ENV["CERT_TEAM_ID"]
+  ENV['FASTLANE_TEAM_ID'] ||= ENV['CERT_TEAM_ID']
 end

@@ -5,9 +5,7 @@ require 'json'
 module Fastlane
   class CommandParser
     def self.parse(json: nil)
-      if json.strip == "done"
-        return intercept_old_done_command
-      end
+      return intercept_old_done_command if json.strip == 'done'
 
       command_json = JSON.parse(json)
       command_type_json = command_json['commandType']

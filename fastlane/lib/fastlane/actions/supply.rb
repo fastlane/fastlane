@@ -7,7 +7,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the `upload_to_play_store` action"
+        'Alias for the `upload_to_play_store` action'
       end
     end
   end

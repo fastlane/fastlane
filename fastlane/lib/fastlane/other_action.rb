@@ -20,10 +20,12 @@ module Fastlane
       # Since we call an action from an action we need to go inside
       # the fastlane folder too
 
-      self.runner.trigger_action_by_name(method_sym,
-                                         FastlaneCore::FastlaneFolder.path,
-                                         true,
-                                         *arguments)
+      self.runner.trigger_action_by_name(
+        method_sym,
+        FastlaneCore::FastlaneFolder.path,
+        true,
+        *arguments
+      )
     end
   end
 end

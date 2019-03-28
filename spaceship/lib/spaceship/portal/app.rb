@@ -99,7 +99,13 @@ module Spaceship
             type = :explicit
           end
 
-          new_app = client.create_app!(type, name, bundle_id, mac: mac, enable_services: enable_services)
+          new_app =
+            client.create_app!(
+              type,
+              name,
+              bundle_id,
+              mac: mac, enable_services: enable_services
+            )
           self.new(new_app)
         end
 
@@ -107,7 +113,7 @@ module Spaceship
         # @param mac [Bool] Searches Mac apps if true
         # @return (App) The app you're looking for. This is nil if the app can't be found.
         def find(bundle_id, mac: false)
-          raise "`bundle_id` parameter must not be nil" if bundle_id.nil?
+          raise '`bundle_id` parameter must not be nil' if bundle_id.nil?
           all(mac: mac).find do |app|
             return app if app.bundle_id.casecmp(bundle_id) == 0
           end
@@ -117,17 +123,19 @@ module Spaceship
       def associated_groups
         return unless raw_data['associatedApplicationGroups']
 
-        @associated_groups ||= raw_data['associatedApplicationGroups'].map do |info|
-          Spaceship::Portal::AppGroup.new(info)
-        end
+        @associated_groups ||=
+          raw_data['associatedApplicationGroups'].map do |info|
+            Spaceship::Portal::AppGroup.new(info)
+          end
       end
 
       def associated_cloud_containers
         return unless raw_data['associatedCloudContainers']
 
-        @associated_cloud_containers ||= raw_data['associatedCloudContainers'].map do |info|
-          Spaceship::Portal::CloudContainer.new(info)
-        end
+        @associated_cloud_containers ||=
+          raw_data['associatedCloudContainers'].map do |info|
+            Spaceship::Portal::CloudContainer.new(info)
+          end
       end
 
       # Delete this App ID. This action will most likely fail if the App ID is already in the store
@@ -155,7 +163,7 @@ module Spaceship
       # Associate specific groups with this app
       # @return (App) The updated detailed app. This is nil if the app couldn't be found
       def associate_groups(groups)
-        raise "`associate_groups` not available for Mac apps" if mac?
+        raise '`associate_groups` not available for Mac apps' if mac?
         app = client.associate_groups_with_app(self, groups)
         self.class.factory(app)
       end
@@ -163,7 +171,7 @@ module Spaceship
       # Associate specific iCloud Containers with this app
       # @return (App) The updated detailed app. This is nil if the app couldn't be found.
       def associate_cloud_containers(containers)
-        raise "`associate_cloud_containers` not available for Mac apps" if mac?
+        raise '`associate_cloud_containers` not available for Mac apps' if mac?
         app = client.associate_cloud_containers_with_app(self, containers)
         self.class.factory(app)
       end
@@ -178,7 +186,7 @@ module Spaceship
       # Update a service for the app with given AppService object
       # @return (App) The updated detailed app. This is nil if the app couldn't be found
       def update_service(service)
-        raise "`update_service` not implemented for Mac apps" if mac?
+        raise '`update_service` not implemented for Mac apps' if mac?
         app = client.update_service_for_app(self, service)
         self.class.factory(app)
       end

@@ -11,9 +11,7 @@ end
 
 def with_global_key_values(global_store, hash)
   old_vals = global_store.select { |k, v| hash.include?(k) }
-  hash.each do |k, v|
-    global_store[k] = hash[k]
-  end
+  hash.each { |k, v| global_store[k] = hash[k] }
   yield
 ensure
   hash.each do |k, v|
@@ -40,5 +38,5 @@ end
 # Strips indentation by removing the amount of leading whitespace in the least indented non-empty line in the whole string
 #
 def strip_heredoc(str)
-  str.gsub(/^#{str.scan(/^[ \t]*(?=\S)/).min}/, "".freeze)
+  str.gsub(/^#{str.scan(/^[ \t]*(?=\S)/).min}/, ''.freeze)
 end

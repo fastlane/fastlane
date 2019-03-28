@@ -6,12 +6,14 @@ module Fastlane
     def self.output(path)
       puts(generate(path))
 
-      puts("Execute using `fastlane [lane_name]`".yellow)
+      puts('Execute using `fastlane [lane_name]`'.yellow)
     end
 
     def self.generate_swift_lanes(path)
       return unless (path || '').length > 0
-      UI.user_error!("Could not find Fastfile.swift at path '#{path}'") unless File.exist?(path)
+      unless File.exist?(path)
+        UI.user_error!("Could not find Fastfile.swift at path '#{path}'")
+      end
       path = File.expand_path(path)
       lane_content = File.read(path)
 
@@ -20,13 +22,21 @@ module Fastlane
 
       lane_content.split("\n").reject(&:empty?).each do |line|
         line.strip!
-        if line.start_with?("func") && (current_lane_name = self.lane_name_from_swift_line(potential_lane_line: line))
-          lanes_by_name[current_lane_name] = Fastlane::Lane.new(platform: nil, name: current_lane_name.to_sym, description: [])
-        elsif line.start_with?("desc")
-          lane_description = self.desc_entry_for_swift_lane(named: current_lane_name, potential_desc_line: line)
-          unless lane_description
-            next
-          end
+        if line.start_with?('func') &&
+           (
+             current_lane_name =
+               self.lane_name_from_swift_line(potential_lane_line: line)
+           )
+          lanes_by_name[current_lane_name] =
+            Fastlane::Lane.new(
+              platform: nil, name: current_lane_name.to_sym, description: []
+            )
+        elsif line.start_with?('desc')
+          lane_description =
+            self.desc_entry_for_swift_lane(
+              named: current_lane_name, potential_desc_line: line
+            )
+          next unless lane_description
 
           lanes_by_name[current_lane_name].description = [lane_description]
           current_lane_name = nil
@@ -34,31 +44,23 @@ module Fastlane
       end
       # "" because that will be interpreted as general platform
       # (we don't detect platform right now)
-      return { "" => lanes_by_name }
+      return { '' => lanes_by_name }
     end
 
     def self.desc_entry_for_swift_lane(named: nil, potential_desc_line: nil)
-      unless named
-        return nil
-      end
+      return nil unless named
 
       desc_match = SWIFT_DESC_REGEX.match(potential_desc_line)
-      unless desc_match
-        return nil
-      end
+      return nil unless desc_match
 
       return desc_match[1]
     end
 
     def self.lane_name_from_swift_line(potential_lane_line: nil)
       function_name_match = SWIFT_FUNCTION_REGEX.match(potential_lane_line)
-      unless function_name_match
-        return nil
-      end
+      return nil unless function_name_match
 
-      unless function_name_match[1].downcase.end_with?("lane")
-        return nil
-      end
+      return nil unless function_name_match[1].downcase.end_with?('lane')
 
       return function_name_match[1]
     end
@@ -72,7 +74,7 @@ module Fastlane
         lanes = ff.runner.lanes
       end
 
-      output = ""
+      output = ''
 
       all_keys = lanes.keys.reject(&:nil?)
       all_keys.unshift(nil) # because we want root elements on top. always! They have key nil
@@ -81,7 +83,7 @@ module Fastlane
         next if (lanes[platform] || []).count == 0
 
         plat_text = platform
-        plat_text = "general" if platform.to_s.empty?
+        plat_text = 'general' if platform.to_s.empty?
         output += "\n--------- #{plat_text}---------\n".yellow
 
         value = lanes[platform]

@@ -17,10 +17,7 @@ module Spaceship
       # @return (String)
       attr_accessor :platform
 
-      attr_mapping(
-        'type' => :type,
-        'platformString' => :platform
-      )
+      attr_mapping('type' => :type, 'platformString' => :platform)
     end
   end
 end

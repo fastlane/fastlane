@@ -4,7 +4,9 @@ module Fastlane
       def self.run(params)
         command = []
 
-        command << "bundle exec" if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
+        if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
+          command << 'bundle exec'
+        end
 
         if params[:repo]
           repo = params[:repo]
@@ -13,12 +15,10 @@ module Fastlane
           command << 'pod trunk push'
         end
 
-        if params[:path]
-          command << "'#{params[:path]}'"
-        end
+        command << "'#{params[:path]}'" if params[:path]
 
         if params[:sources]
-          sources = params[:sources].join(",")
+          sources = params[:sources].join(',')
           command << "--sources='#{sources}'"
         end
 
@@ -27,28 +27,18 @@ module Fastlane
           command << "--swift-version=#{swift_version}"
         end
 
-        if params[:allow_warnings]
-          command << "--allow-warnings"
-        end
+        command << '--allow-warnings' if params[:allow_warnings]
 
-        if params[:use_libraries]
-          command << "--use-libraries"
-        end
+        command << '--use-libraries' if params[:use_libraries]
 
-        if params[:skip_import_validation]
-          command << "--skip-import-validation"
-        end
+        command << '--skip-import-validation' if params[:skip_import_validation]
 
-        if params[:skip_tests]
-          command << "--skip-tests"
-        end
+        command << '--skip-tests' if params[:skip_tests]
 
-        if params[:verbose]
-          command << "--verbose"
-        end
+        command << '--verbose' if params[:verbose]
 
         result = Actions.sh(command.join(' '))
-        UI.success("Successfully pushed Podspec ⬆️ ")
+        UI.success('Successfully pushed Podspec ⬆️ ')
         return result
       end
 
@@ -57,58 +47,91 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Push a Podspec to Trunk or a private repository"
+        'Push a Podspec to Trunk or a private repository'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
-                                         description: "Use bundle exec when there is a Gemfile presented",
-                                         type: Boolean,
-                                         default_value: false),
-          FastlaneCore::ConfigItem.new(key: :path,
-                                       description: "The Podspec you want to push",
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
-                                         UI.user_error!("File must be a `.podspec` or `.podspec.json`") unless value.end_with?(".podspec", ".podspec.json")
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :repo,
-                                       description: "The repo you want to push. Pushes to Trunk by default",
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :allow_warnings,
-                                       description: "Allow warnings during pod push",
-                                       optional: true,
-                                       type: Boolean),
-          FastlaneCore::ConfigItem.new(key: :use_libraries,
-                                       description: "Allow lint to use static libraries to install the spec",
-                                       optional: true,
-                                       type: Boolean),
-          FastlaneCore::ConfigItem.new(key: :sources,
-                                       description: "The sources of repos you want the pod spec to lint with, separated by commas",
-                                       optional: true,
-                                       is_string: false,
-                                       type: Array,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Sources must be an array.") unless value.kind_of?(Array)
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :swift_version,
-                                       description: "The SWIFT_VERSION that should be used to lint the spec. This takes precedence over a .swift-version file",
-                                       optional: true,
-                                       is_string: true),
-          FastlaneCore::ConfigItem.new(key: :skip_import_validation,
-                                       description: "Lint skips validating that the pod can be imported",
-                                       optional: true,
-                                       type: Boolean),
-          FastlaneCore::ConfigItem.new(key: :skip_tests,
-                                       description: "Lint skips building and running tests during validation",
-                                       optional: true,
-                                       type: Boolean),
-          FastlaneCore::ConfigItem.new(key: :verbose,
-                                       description: "Show more debugging information",
-                                       optional: true,
-                                       type: Boolean,
-                                       default_value: false)
+          FastlaneCore::ConfigItem.new(
+            key: :use_bundle_exec,
+            description: 'Use bundle exec when there is a Gemfile presented',
+            type: Boolean,
+            default_value: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :path,
+            description: 'The Podspec you want to push',
+            optional: true,
+            verify_block:
+              proc do |value|
+                unless File.exist?(value)
+                  UI.user_error!("Couldn't find file at path '#{value}'")
+                end
+                unless value.end_with?('.podspec', '.podspec.json')
+                  UI.user_error!('File must be a `.podspec` or `.podspec.json`')
+                end
+              end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :repo,
+            description:
+              'The repo you want to push. Pushes to Trunk by default',
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :allow_warnings,
+            description: 'Allow warnings during pod push',
+            optional: true,
+            type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :use_libraries,
+            description:
+              'Allow lint to use static libraries to install the spec',
+            optional: true,
+            type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :sources,
+            description:
+              'The sources of repos you want the pod spec to lint with, separated by commas',
+            optional: true,
+            is_string: false,
+            type: Array,
+            verify_block:
+              proc do |value|
+                unless value.kind_of?(Array)
+                  UI.user_error!('Sources must be an array.')
+                end
+              end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :swift_version,
+            description:
+              'The SWIFT_VERSION that should be used to lint the spec. This takes precedence over a .swift-version file',
+            optional: true,
+            is_string: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :skip_import_validation,
+            description: 'Lint skips validating that the pod can be imported',
+            optional: true,
+            type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :skip_tests,
+            description:
+              'Lint skips building and running tests during validation',
+            optional: true,
+            type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :verbose,
+            description: 'Show more debugging information',
+            optional: true,
+            type: Boolean,
+            default_value: false
+          )
         ]
       end
 
@@ -117,11 +140,11 @@ module Fastlane
       end
 
       def self.authors
-        ["squarefrog"]
+        %w[squarefrog]
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       def self.example_code

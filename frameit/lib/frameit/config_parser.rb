@@ -17,7 +17,9 @@ module Frameit
         @data = JSON.parse(data)
       rescue => ex
         UI.error(ex.message)
-        UI.user_error!("Invalid JSON file at path '#{@path}'. Make sure it's a valid JSON file")
+        UI.user_error!(
+          "Invalid JSON file at path '#{@path}'. Make sure it's a valid JSON file"
+        )
       end
 
       self
@@ -51,10 +53,10 @@ module Frameit
             change_paths_to_absolutes!(current) if current.kind_of?(Hash) # recursive call
           end
         else
-          if ['font', 'background'].include?(key)
+          if %w[font background].include?(key) # where is the config file. We don't have a config file in tests
             # Change the paths to relative ones
             # `replace`: to change the content of the string, so it's actually stored
-            if @path # where is the config file. We don't have a config file in tests
+            if @path
               containing_folder = File.expand_path('..', @path)
               value.replace(File.join(containing_folder, value))
             end
@@ -66,44 +68,72 @@ module Frameit
     # Make sure the paths/colors are valid
     def validate_values(values)
       values.each do |key, value|
-        if value.kind_of?(Hash)
-          validate_values(value) # recursive call
-        else
-          validate_key(key, value)
-        end
+        value.kind_of?(Hash) ? validate_values(value) : validate_key(key, value) # recursive call
       end
     end
 
     def validate_key(key, value)
       case key
       when 'font'
-        UI.user_error!("Could not find font at path '#{File.expand_path(value)}'") unless File.exist?(value)
+        unless File.exist?(value)
+          UI.user_error!(
+            "Could not find font at path '#{File.expand_path(value)}'"
+          )
+        end
       when 'fonts'
-        UI.user_error!("`fonts` must be an array") unless value.kind_of?(Array)
+        UI.user_error!('`fonts` must be an array') unless value.kind_of?(Array)
 
         value.each do |current|
-          UI.user_error!("You must specify a font path") if current.fetch('font', '').length == 0
-          UI.user_error!("Could not find font at path '#{File.expand_path(current.fetch('font'))}'") unless File.exist?(current.fetch('font'))
-          UI.user_error!("`supported` must be an array") unless current.fetch('supported', []).kind_of?(Array)
+          if current.fetch('font', '').length == 0
+            UI.user_error!('You must specify a font path')
+          end
+          unless File.exist?(current.fetch('font'))
+            UI.user_error!(
+              "Could not find font at path '#{File.expand_path(
+                current.fetch('font')
+              )}'"
+            )
+          end
+          unless current.fetch('supported', []).kind_of?(Array)
+            UI.user_error!('`supported` must be an array')
+          end
         end
       when 'background'
-        UI.user_error!("Could not find background image at path '#{File.expand_path(value)}'") unless File.exist?(value)
+        unless File.exist?(value)
+          UI.user_error!(
+            "Could not find background image at path '#{File.expand_path(
+              value
+            )}'"
+          )
+        end
       when 'color'
-        UI.user_error!("Invalid color '#{value}'. Must be valid Hex #123123") unless value.include?("#")
+        unless value.include?('#')
+          UI.user_error!("Invalid color '#{value}'. Must be valid Hex #123123")
+        end
       when 'padding'
         unless integer_or_percentage(value) || value.split('x').length == 2
-          UI.user_error!("padding must be an integer, or pair of integers of format 'AxB', or a percentage of screen size")
+          UI.user_error!(
+            "padding must be an integer, or pair of integers of format 'AxB', or a percentage of screen size"
+          )
         end
       when 'title_min_height'
         unless integer_or_percentage(value)
-          UI.user_error!("padding must be an integer, or a percentage of screen size")
+          UI.user_error!(
+            'padding must be an integer, or a percentage of screen size'
+          )
         end
       when 'show_complete_frame', 'title_below_image'
-        UI.user_error!("'#{key}' must be a Boolean") unless [true, false].include?(value)
+        unless [true, false].include?(value)
+          UI.user_error!("'#{key}' must be a Boolean")
+        end
       when 'font_scale_factor'
-        UI.user_error!("font_scale_factor must be numeric") unless value.kind_of?(Numeric)
+        unless value.kind_of?(Numeric)
+          UI.user_error!('font_scale_factor must be numeric')
+        end
       when 'frame'
-        UI.user_error!("device must be BLACK, WHITE, GOLD, ROSE_GOLD") unless ["BLACK", "WHITE", "GOLD", "ROSE_GOLD"].include?(value)
+        unless %w[BLACK WHITE GOLD ROSE_GOLD].include?(value)
+          UI.user_error!('device must be BLACK, WHITE, GOLD, ROSE_GOLD')
+        end
       end
     end
 

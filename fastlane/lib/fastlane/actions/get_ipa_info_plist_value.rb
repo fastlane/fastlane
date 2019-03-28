@@ -1,7 +1,8 @@
 module Fastlane
   module Actions
     module SharedValues
-      GET_IPA_INFO_PLIST_VALUE_CUSTOM_VALUE = :GET_IPA_INFO_PLIST_VALUE_CUSTOM_VALUE
+      GET_IPA_INFO_PLIST_VALUE_CUSTOM_VALUE =
+        :GET_IPA_INFO_PLIST_VALUE_CUSTOM_VALUE
     end
 
     class GetIpaInfoPlistValueAction < Action
@@ -11,7 +12,10 @@ module Fastlane
         plist = FastlaneCore::IpaFileAnalyser.fetch_info_plist_file(ipa)
         value = plist[key]
 
-        Actions.lane_context[SharedValues::GET_IPA_INFO_PLIST_VALUE_CUSTOM_VALUE] = value
+        Actions.lane_context[
+          SharedValues::GET_IPA_INFO_PLIST_VALUE_CUSTOM_VALUE
+        ] =
+          value
 
         return value
       rescue => ex
@@ -24,31 +28,38 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Returns a value from Info.plist inside a .ipa file"
+        'Returns a value from Info.plist inside a .ipa file'
       end
 
       def self.details
-        "This is useful for introspecting Info.plist files for `.ipa` files that have already been built."
+        'This is useful for introspecting Info.plist files for `.ipa` files that have already been built.'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :key,
-                                       env_name: "FL_GET_IPA_INFO_PLIST_VALUE_KEY",
-                                       description: "Name of parameter",
-                                       optional: false),
-          FastlaneCore::ConfigItem.new(key: :ipa,
-                                       env_name: "FL_GET_IPA_INFO_PLIST_VALUE_IPA",
-                                       description: "Path to IPA",
-                                       is_string: true,
-                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
-                                       default_value_dynamic: true)
+          FastlaneCore::ConfigItem.new(
+            key: :key,
+            env_name: 'FL_GET_IPA_INFO_PLIST_VALUE_KEY',
+            description: 'Name of parameter',
+            optional: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :ipa,
+            env_name: 'FL_GET_IPA_INFO_PLIST_VALUE_IPA',
+            description: 'Path to IPA',
+            is_string: true,
+            default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+            default_value_dynamic: true
+          )
         ]
       end
 
       def self.output
         [
-          ['GET_IPA_INFO_PLIST_VALUE_CUSTOM_VALUE', 'The value of the last plist file that was parsed']
+          [
+            'GET_IPA_INFO_PLIST_VALUE_CUSTOM_VALUE',
+            'The value of the last plist file that was parsed'
+          ]
         ]
       end
 
@@ -57,17 +68,15 @@ module Fastlane
       end
 
       def self.authors
-        ["johnboiles"]
+        %w[johnboiles]
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       def self.example_code
-        [
-          'get_ipa_info_plist_value(ipa: "path.ipa", key: "KEY_YOU_READ")'
-        ]
+        ['get_ipa_info_plist_value(ipa: "path.ipa", key: "KEY_YOU_READ")']
       end
 
       def self.return_type

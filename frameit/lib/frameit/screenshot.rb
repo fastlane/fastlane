@@ -16,12 +16,16 @@ module Frameit
     # path: Path to screenshot
     # color: Color to use for the frame
     def initialize(path, color)
-      UI.user_error!("Couldn't find file at path '#{path}'") unless File.exist?(path)
+      unless File.exist?(path)
+        UI.user_error!("Couldn't find file at path '#{path}'")
+      end
       @color = color
       @path = path
       @size = FastImage.size(path)
 
-      @screen_size = ENV["FRAMEIT_FORCE_DEVICE_TYPE"] || Deliver::AppScreenshot.calculate_screen_size(path)
+      @screen_size =
+        ENV['FRAMEIT_FORCE_DEVICE_TYPE'] ||
+          Deliver::AppScreenshot.calculate_screen_size(path)
     end
 
     # Device name for a given screen size. Used to use the correct template
@@ -36,7 +40,11 @@ module Frameit
       when sizes::IOS_58
         return Frameit.config[:use_legacy_iphonex] ? 'iPhone X' : 'iPhone XS'
       when sizes::IOS_55
-        return Frameit.config[:use_legacy_iphone6s] ? 'iPhone 6s Plus' : 'iPhone 7 Plus'
+        return if Frameit.config[:use_legacy_iphone6s]
+          'iPhone 6s Plus'
+        else
+          'iPhone 7 Plus'
+        end
       when sizes::IOS_47
         return Frameit.config[:use_legacy_iphone6s] ? 'iPhone 6s' : 'iPhone 7'
       when sizes::IOS_40
@@ -50,17 +58,21 @@ module Frameit
       when sizes::MAC
         return 'MacBook'
       else
-        UI.error("Unknown device type for size #{@screen_size} for path '#{path}'")
+        UI.error(
+          "Unknown device type for size #{@screen_size} for path '#{path}'"
+        )
       end
       # rubocop:enable Require/MissingRequireStatement
     end
 
     def color
-      if !Frameit.config[:use_legacy_iphone6s] && @color == Frameit::Color::BLACK
-        if @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_47
-          return "Matte Black" # RIP space gray
+      if !Frameit.config[:use_legacy_iphone6s] &&
+         @color == Frameit::Color::BLACK
+        if @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 ||
+           @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_47
+          return
         elsif @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_61
-          return "Black"
+          return 'Black'
         end
       end
       return @color
@@ -68,7 +80,11 @@ module Frameit
 
     # Is the device a 3x device? (e.g. iPhone 6 Plus, iPhone X)
     def triple_density?
-      (screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || screen_size == Deliver::AppScreenshot::ScreenSize::IOS_58 || screen_size == Deliver::AppScreenshot::ScreenSize::IOS_65)
+      (
+        screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 ||
+          screen_size == Deliver::AppScreenshot::ScreenSize::IOS_58 ||
+          screen_size == Deliver::AppScreenshot::ScreenSize::IOS_65
+      )
     end
 
     # Super old devices (iPhone 4)
@@ -87,32 +103,36 @@ module Frameit
     end
 
     def frame_orientation
-      filename = File.basename(self.path, ".*")
+      filename = File.basename(self.path, '.*')
       block = Frameit.config[:force_orientation_block]
 
       unless block.nil?
         orientation = block.call(filename)
         valid = [:landscape_left, :landscape_right, :portrait, nil]
-        UI.user_error("orientation_block must return #{valid[0..-2].join(', ')} or nil") unless valid.include?(orientation)
+        unless valid.include?(orientation)
+          UI.user_error(
+            "orientation_block must return #{valid[0..-2].join(', ')} or nil"
+          )
+        end
       end
 
       puts("Forced orientation: #{orientation}") unless orientation.nil?
 
       return orientation unless orientation.nil?
       return :portrait if self.orientation_name == Orientation::PORTRAIT
-      return :landscape_right # Default landscape orientation
+      return
     end
 
     def portrait?
-      return (frame_orientation == :portrait)
+      return frame_orientation == :portrait
     end
 
     def landscape_left?
-      return (frame_orientation == :landscape_left)
+      return frame_orientation == :landscape_left
     end
 
     def landscape_right?
-      return (frame_orientation == :landscape_right)
+      return frame_orientation == :landscape_right
     end
 
     def landscape?

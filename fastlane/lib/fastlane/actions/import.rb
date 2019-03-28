@@ -10,25 +10,24 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Import another Fastfile to use its lanes"
+        'Import another Fastfile to use its lanes'
       end
 
       def self.details
         [
-          "This is useful if you have shared lanes across multiple apps and you want to store a Fastfile in a separate folder.",
-          "The path must be relative to the Fastfile this is called from."
+          'This is useful if you have shared lanes across multiple apps and you want to store a Fastfile in a separate folder.',
+          'The path must be relative to the Fastfile this is called from.'
         ].join("\n")
       end
 
-      def self.available_options
-      end
+      def self.available_options; end
 
       def self.output
         []
       end
 
       def self.authors
-        ["KrauseFx"]
+        %w[KrauseFx]
       end
 
       def self.is_supported?(platform)
@@ -36,9 +35,7 @@ module Fastlane
       end
 
       def self.example_code
-        [
-          'import("./path/to/other/Fastfile")'
-        ]
+        %w[import("./path/to/other/Fastfile")]
       end
 
       def self.category

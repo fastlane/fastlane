@@ -7,7 +7,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the `puts` action"
+        'Alias for the `puts` action'
       end
     end
   end

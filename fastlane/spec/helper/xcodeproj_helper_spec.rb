@@ -6,9 +6,12 @@ describe Fastlane::Actions do
     PATH = 'Project.xcodeproj'.freeze
     SECONDARY_PATH = 'Secondary/Project.xcodeproj'.freeze
     COCOAPODS_PATH = 'Pods/Pod.xcodeproj'.freeze
-    COCOAPODS_FRAMEWORK_EXAMPLE_PATH = 'Pods/Alamofire/Example/iOS Example.xcodeproj'.freeze
-    CARTHAGE_FRAMEWORK_PATH = 'Carthage/Checkouts/Alamofire/Alamofire.xcodeproj'.freeze
-    CARTHAGE_FRAMEWORK_EXAMPLE_PATH = 'Carthage/Checkouts/Alamofire/Example iOS Example.xcodeproj'.freeze
+    COCOAPODS_FRAMEWORK_EXAMPLE_PATH =
+      'Pods/Alamofire/Example/iOS Example.xcodeproj'.freeze
+    CARTHAGE_FRAMEWORK_PATH =
+      'Carthage/Checkouts/Alamofire/Alamofire.xcodeproj'.freeze
+    CARTHAGE_FRAMEWORK_EXAMPLE_PATH =
+      'Carthage/Checkouts/Alamofire/Example iOS Example.xcodeproj'.freeze
 
     let(:dir) { Dir.mktmpdir }
 
@@ -47,8 +50,6 @@ describe Fastlane::Actions do
       expect(paths).to contain_exactly(path, secondary_path)
     end
 
-    after do
-      FileUtils.rm_rf(dir)
-    end
+    after { FileUtils.rm_rf(dir) }
   end
 end

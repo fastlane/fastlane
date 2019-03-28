@@ -1,17 +1,24 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    describe "Push To Git Remote Action" do
-      it "works without passing any options" do
-        result = Fastlane::FastFile.new.parse("lane :test do
+    describe 'Push To Git Remote Action' do
+      it 'works without passing any options' do
+        result =
+          Fastlane::FastFile.new.parse(
+            'lane :test do
           push_to_git_remote
-        end").runner.execute(:test)
+        end'
+          )
+            .runner
+            .execute(:test)
 
-        expect(result).to include("git push origin")
-        expect(result).to include("--tags")
+        expect(result).to include('git push origin')
+        expect(result).to include('--tags')
       end
 
-      it "works with options specified" do
-        result = Fastlane::FastFile.new.parse("lane :test do
+      it 'works with options specified' do
+        result =
+          Fastlane::FastFile.new.parse(
+            "lane :test do
           push_to_git_remote(
             remote: 'origin',
             local_branch: 'develop',
@@ -19,9 +26,12 @@ describe Fastlane do
             force: true,
             tags: false
           )
-        end").runner.execute(:test)
+        end"
+          )
+            .runner
+            .execute(:test)
 
-        expect(result).to eq("git push origin develop:remote_branch --force")
+        expect(result).to eq('git push origin develop:remote_branch --force')
       end
     end
   end

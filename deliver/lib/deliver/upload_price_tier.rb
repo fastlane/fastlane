@@ -17,7 +17,11 @@ module Deliver
       end
 
       app.update_price_tier!(options[:price_tier])
-      UI.success("Successfully updated the pricing from #{old_price} to #{options[:price_tier]}")
+      UI.success(
+        "Successfully updated the pricing from #{old_price} to #{options[
+          :price_tier
+        ]}"
+      )
     end
   end
 end

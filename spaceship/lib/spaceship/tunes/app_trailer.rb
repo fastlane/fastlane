@@ -36,28 +36,28 @@ module Spaceship
       )
 
       def reset!(attrs = {})
-        update_raw_data!({
-          video_asset_token: nil,
-          picture_asset_token: nil,
-          descriptionXML: nil,
-          preview_frame_time_code: nil,
-          is_portrait: nil,
-          video_url: nil,
-          preview_image_url: nil,
-          full_sized_preview_image_url: nil,
-          content_type: nil,
-          video_status: nil,
-          device_type: nil,
-          language: nil
-         }.merge(attrs))
+        update_raw_data!(
+          {
+            video_asset_token: nil,
+            picture_asset_token: nil,
+            descriptionXML: nil,
+            preview_frame_time_code: nil,
+            is_portrait: nil,
+            video_url: nil,
+            preview_image_url: nil,
+            full_sized_preview_image_url: nil,
+            content_type: nil,
+            video_status: nil,
+            device_type: nil,
+            language: nil
+          }.merge(attrs)
+        )
       end
 
       private
 
       def update_raw_data!(hash)
-        hash.each do |k, v|
-          self.send("#{k}=", v)
-        end
+        hash.each { |k, v| self.send("#{k}=", v) }
       end
     end
   end

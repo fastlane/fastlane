@@ -16,7 +16,7 @@ module CredentialsManager
     end
 
     def self.default_path
-      ["./fastlane/Appfile", "./.fastlane/Appfile", "./Appfile"].each do |current|
+      %w[./fastlane/Appfile ./.fastlane/Appfile ./Appfile].each do |current|
         return current if File.exist?(current)
       end
       nil
@@ -24,7 +24,9 @@ module CredentialsManager
 
     def initialize(path = nil)
       if path
-        raise "Could not find Appfile at path '#{path}'".red unless File.exist?(File.expand_path(path))
+        unless File.exist?(File.expand_path(path))
+          raise "Could not find Appfile at path '#{path}'".red
+        end
       end
 
       path ||= self.class.default_path
@@ -32,21 +34,26 @@ module CredentialsManager
       if path && File.exist?(path) # it might not exist, we still want to use the default values
         full_path = File.expand_path(path)
         Dir.chdir(File.expand_path('..', path)) do
-          content = File.read(full_path, encoding: "utf-8")
+          content = File.read(full_path, encoding: 'utf-8')
 
           # From https://github.com/orta/danger/blob/master/lib/danger/danger_core/dangerfile.rb
-          if content.tr!('“”‘’‛', %(""'''))
-            puts("Your #{File.basename(path)} has had smart quotes sanitised. " \
-                 'To avoid issues in the future, you should not use ' \
-                 'TextEdit for editing it. If you are not using TextEdit, ' \
-                 'you should turn off smart quotes in your editor of choice.'.red)
+          if content.tr!('“”‘’‛', "\"\"'''")
+            puts(
+              "Your #{File.basename(path)} has had smart quotes sanitised. " \
+                'To avoid issues in the future, you should not use ' \
+                'TextEdit for editing it. If you are not using TextEdit, ' \
+                'you should turn off smart quotes in your editor of choice.'
+                .red
+            )
           end
 
           # rubocop:disable Security/Eval
           eval(content)
           # rubocop:enable Security/Eval
 
-          print_debug_information(path: full_path) if FastlaneCore::Globals.verbose?
+          if FastlaneCore::Globals.verbose?
+            print_debug_information(path: full_path)
+          end
         end
       end
 
@@ -65,7 +72,7 @@ module CredentialsManager
       self.data.each do |key, value|
         puts("- #{key.to_s.cyan}: '#{value.to_s.green}'")
       end
-      puts("-------")
+      puts('-------')
 
       self.class.already_printed_debug_information[self.data] = true
     end
@@ -75,7 +82,8 @@ module CredentialsManager
     end
 
     def fallback_to_default_values
-      data[:apple_id] ||= ENV["FASTLANE_USER"] || ENV["DELIVER_USER"] || ENV["DELIVER_USERNAME"]
+      data[:apple_id] ||=
+        ENV['FASTLANE_USER'] || ENV['DELIVER_USER'] || ENV['DELIVER_USERNAME']
     end
 
     def data
@@ -129,7 +137,7 @@ module CredentialsManager
     end
 
     def issuer(*args, &block)
-      puts("Appfile: DEPRECATED issuer: use json_key_file instead".red)
+      puts('Appfile: DEPRECATED issuer: use json_key_file instead'.red)
       setter(:issuer, *args, &block)
     end
 
@@ -138,7 +146,7 @@ module CredentialsManager
     end
 
     def keyfile(*args, &block)
-      puts("Appfile: DEPRECATED keyfile: use json_key_file instead".red)
+      puts('Appfile: DEPRECATED keyfile: use json_key_file instead'.red)
       setter(:keyfile, *args, &block)
     end
 
@@ -150,19 +158,20 @@ module CredentialsManager
     # Discussion If received lane name does not match the lane name available as environment variable, no changes will
     #             be applied.
     def for_lane(lane_name)
-      if lane_name.to_s.split(" ").count > 1
+      if lane_name.to_s.split(' ').count > 1
         # That's the legacy syntax 'platform name'
         puts("You use deprecated syntax '#{lane_name}' in your Appfile.".yellow)
-        puts("Please follow the Appfile guide: https://docs.fastlane.tools/advanced/#appfile".yellow)
-        platform, lane_name = lane_name.split(" ")
+        puts(
+          'Please follow the Appfile guide: https://docs.fastlane.tools/advanced/#appfile'
+            .yellow
+        )
+        platform, lane_name = lane_name.split(' ')
 
-        return unless platform == ENV["FASTLANE_PLATFORM_NAME"]
+        return unless platform == ENV['FASTLANE_PLATFORM_NAME']
         # the lane name will be verified below
       end
 
-      if ENV["FASTLANE_LANE_NAME"] == lane_name.to_s
-        yield
-      end
+      yield if ENV['FASTLANE_LANE_NAME'] == lane_name.to_s
     end
 
     # Override Appfile configuration for a specific platform.
@@ -173,9 +182,7 @@ module CredentialsManager
     # Discussion If received platform name does not match the platform name available as environment variable, no changes will
     #             be applied.
     def for_platform(platform_name)
-      if ENV["FASTLANE_PLATFORM_NAME"] == platform_name.to_s
-        yield
-      end
+      yield if ENV['FASTLANE_PLATFORM_NAME'] == platform_name.to_s
     end
 
     private

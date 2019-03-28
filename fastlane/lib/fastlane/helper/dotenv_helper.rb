@@ -14,7 +14,7 @@ module Fastlane
       def self.find_dotenv_directory
         path = FastlaneCore::FastlaneFolder.path
         search_paths = [path]
-        search_paths << path + "/.." unless path.nil?
+        search_paths << path + '/..' unless path.nil?
         search_paths.compact!
         search_paths.find do |dir|
           Dir.glob(File.join(dir, '*.env*'), File::FNM_DOTMATCH).count > 0
@@ -33,10 +33,13 @@ module Fastlane
 
         return unless env_cl_param
 
-        Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::ENVIRONMENT] = env_cl_param
+        Fastlane::Actions.lane_context[
+          Fastlane::Actions::SharedValues::ENVIRONMENT
+        ] =
+          env_cl_param
 
         # multiple envs?
-        envs = env_cl_param.split(",")
+        envs = env_cl_param.split(',')
 
         # Loads .env file for the environment(s) passed in through options
         envs.each do |env|

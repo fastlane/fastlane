@@ -2,12 +2,12 @@ module Fastlane
   module Actions
     class DebugAction < Action
       def self.run(params)
-        puts("Lane Context".green)
+        puts('Lane Context'.green)
         puts(Actions.lane_context)
       end
 
       def self.description
-        "Print out an overview of the lane context values"
+        'Print out an overview of the lane context values'
       end
 
       def self.is_supported?(platform)
@@ -15,9 +15,7 @@ module Fastlane
       end
 
       def self.example_code
-        [
-          'debug'
-        ]
+        %w[debug]
       end
 
       def self.category
@@ -25,7 +23,7 @@ module Fastlane
       end
 
       def self.author
-        "KrauseFx"
+        'KrauseFx'
       end
     end
   end

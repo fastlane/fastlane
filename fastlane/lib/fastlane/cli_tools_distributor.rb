@@ -13,17 +13,22 @@ module Fastlane
       end
 
       def running_init_command?
-        ARGV.include?("init")
+        ARGV.include?('init')
       end
 
       def utf8_locale?
-        (ENV['LANG'] || "").end_with?("UTF-8", "utf8") || (ENV['LC_ALL'] || "").end_with?("UTF-8", "utf8") || (FastlaneCore::CommandExecutor.which('locale') && `locale charmap`.strip == "UTF-8")
+        (ENV['LANG'] || '').end_with?('UTF-8', 'utf8') ||
+          (ENV['LC_ALL'] || '').end_with?('UTF-8', 'utf8') ||
+          (
+            FastlaneCore::CommandExecutor.which('locale') &&
+              `locale charmap`.strip == 'UTF-8'
+          )
       end
 
       def take_off
         before_import_time = Time.now
 
-        if !ENV["FASTLANE_DISABLE_ANIMATION"]
+        if !ENV['FASTLANE_DISABLE_ANIMATION']
           # Usually in the fastlane code base we use
           #
           #   Helper.show_loading_indicator
@@ -32,26 +37,30 @@ module Fastlane
           #
           # but in this case we haven't required FastlaneCore yet
           # so we'll have to access the raw API for now
-          require "tty-spinner"
-          require_fastlane_spinner = TTY::Spinner.new("[:spinner] 🚀 ", format: :dots)
+          require 'tty-spinner'
+          require_fastlane_spinner =
+            TTY::Spinner.new('[:spinner] 🚀 ', format: :dots)
           require_fastlane_spinner.auto_spin
 
           # this might take a long time if there is no Gemfile :(
           # That's why we show the loading indicator here also
-          require "fastlane"
+          require 'fastlane'
 
           require_fastlane_spinner.success
         else
-          require "fastlane"
+          require 'fastlane'
         end
         # We want to avoid printing output other than the version number if we are running `fastlane -v`
         unless running_version_command? || running_init_command?
-          print_bundle_exec_warning(is_slow: (Time.now - before_import_time > 3))
+          print_bundle_exec_warning(
+            is_slow: (Time.now - before_import_time > 3)
+          )
         end
 
         # Try to check UTF-8 with `locale`, fallback to environment variables
         unless utf8_locale?
-          warn = "WARNING: fastlane requires your locale to be set to UTF-8. To learn more go to https://docs.fastlane.tools/getting-started/ios/setup/#set-up-environment-variables"
+          warn =
+            'WARNING: fastlane requires your locale to be set to UTF-8. To learn more go to https://docs.fastlane.tools/getting-started/ios/setup/#set-up-environment-variables'
           UI.error(warn)
           at_exit do
             # Repeat warning here so users hopefully see it
@@ -69,14 +78,17 @@ module Fastlane
         FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
 
         # Disabling colors if environment variable set
-        require 'fastlane_core/ui/disable_colors' if FastlaneCore::Helper.colors_disabled?
+        if FastlaneCore::Helper.colors_disabled?
+          require 'fastlane_core/ui/disable_colors'
+        end
 
-        ARGV.unshift("spaceship") if ARGV.first == "spaceauth"
+        ARGV.unshift('spaceship') if ARGV.first == 'spaceauth'
         tool_name = ARGV.first ? ARGV.first.downcase : nil
 
         tool_name = process_emojis(tool_name)
 
-        if tool_name && Fastlane::TOOLS.include?(tool_name.to_sym) && !available_lanes.include?(tool_name.to_sym)
+        if tool_name && Fastlane::TOOLS.include?(tool_name.to_sym) &&
+           !available_lanes.include?(tool_name.to_sym)
           # Triggering a specific tool
           # This happens when the users uses things like
           #
@@ -92,15 +104,19 @@ module Fastlane
 
             # Import the CommandsGenerator class, which is used to parse
             # the user input
-            require File.join(tool_name, "commands_generator")
+            require File.join(tool_name, 'commands_generator')
 
             # Call the tool's CommandsGenerator class and let it do its thing
-            commands_generator = Object.const_get(tool_name.fastlane_module)::CommandsGenerator
+            commands_generator =
+              Object.const_get(tool_name.fastlane_module)::CommandsGenerator
           rescue LoadError
             # This will only happen if the tool we call here, doesn't provide
             # a CommandsGenerator class yet
             # When we launch this feature, this should never be the case
-            abort("#{tool_name} can't be called via `fastlane #{tool_name}`, run '#{tool_name}' directly instead".red)
+            abort(
+              "#{tool_name} can't be called via `fastlane #{tool_name}`, run '#{tool_name}' directly instead"
+                .red
+            )
           end
 
           # Some of the tools use other actions so need to load all
@@ -109,26 +125,26 @@ module Fastlane
           Fastlane.load_actions
 
           commands_generator.start
-        elsif tool_name == "fastlane-credentials"
+        elsif tool_name == 'fastlane-credentials'
           require 'credentials_manager'
           ARGV.shift
           CredentialsManager::CLI.new.run
         else
           # Triggering fastlane to call a lane
-          require "fastlane/commands_generator"
+          require 'fastlane/commands_generator'
           Fastlane::CommandsGenerator.start
         end
       ensure
-        FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+        FastlaneCore::UpdateChecker.show_update_status(
+          'fastlane',
+          Fastlane::VERSION
+        )
       end
 
       # Since fastlane also supports the rocket and biceps emoji as executable
       # we need to map those to the appropriate tools
       def process_emojis(tool_name)
-        return {
-          "🚀" => "fastlane",
-          "💪" => "gym"
-        }[tool_name] || tool_name
+        return { '🚀' => 'fastlane', '💪' => 'gym' }[tool_name] || tool_name
       end
 
       def print_bundle_exec_warning(is_slow: false)
@@ -141,31 +157,41 @@ module Fastlane
           # The user has a Gemfile, but forgot to use `bundle exec`
           # Let's tell the user how to use `bundle exec`
           # We show this warning no matter if the command is slow or not
-          UI.important("fastlane detected a Gemfile in the current directory")
+          UI.important('fastlane detected a Gemfile in the current directory')
           UI.important("however it seems like you don't use `bundle exec`")
-          UI.important("to launch fastlane faster, please use")
-          UI.message("")
+          UI.important('to launch fastlane faster, please use')
+          UI.message('')
           UI.command "bundle exec fastlane #{ARGV.join(' ')}"
-          UI.message("")
+          UI.message('')
         elsif is_slow
           # fastlane is slow and there is no Gemfile
           # Let's tell the user how to use `gem cleanup` and how to
           # start using a Gemfile
-          UI.important("Seems like launching fastlane takes a while - please run")
-          UI.message("")
-          UI.command "[sudo] gem cleanup"
-          UI.message("")
-          UI.important("to uninstall outdated gems and make fastlane launch faster")
-          UI.important("Alternatively it's recommended to start using a Gemfile to lock your dependencies")
-          UI.important("To get started with a Gemfile, run")
-          UI.message("")
-          UI.command "bundle init"
+          UI.important(
+            'Seems like launching fastlane takes a while - please run'
+          )
+          UI.message('')
+          UI.command '[sudo] gem cleanup'
+          UI.message('')
+          UI.important(
+            'to uninstall outdated gems and make fastlane launch faster'
+          )
+          UI.important(
+            "Alternatively it's recommended to start using a Gemfile to lock your dependencies"
+          )
+          UI.important('To get started with a Gemfile, run')
+          UI.message('')
+          UI.command 'bundle init'
           UI.command "echo 'gem \"fastlane\"' >> Gemfile"
-          UI.command "bundle install"
-          UI.message("")
-          UI.important("After creating the Gemfile and Gemfile.lock, commit those files into version control")
+          UI.command 'bundle install'
+          UI.message('')
+          UI.important(
+            'After creating the Gemfile and Gemfile.lock, commit those files into version control'
+          )
         end
-        UI.important("Get started using a Gemfile for fastlane https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile")
+        UI.important(
+          'Get started using a Gemfile for fastlane https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile'
+        )
       end
 
       # Returns an array of symbols for the available lanes for the Fastfile
@@ -177,8 +203,13 @@ module Fastlane
       def available_lanes
         fastfile_path = FastlaneCore::FastlaneFolder.fastfile_path
         return [] if fastfile_path.nil?
-        output = `cat #{fastfile_path.shellescape} | grep \"^\s*lane \:\" | awk -F ':' '{print $2}' | awk -F ' ' '{print $1}'`
-        return output.strip.split(" ").collect(&:to_sym)
+        output =
+          `
+            cat
+            #{fastfile_path.shellescape}
+             | grep \"^\s*lane \:\" | awk -F ':' '{print $2}' | awk -F ' ' '{print $1}'
+          `
+        return output.strip.split(' ').collect(&:to_sym)
       end
     end
   end

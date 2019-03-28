@@ -1,6 +1,6 @@
 module Fastlane
   class ErbTemplateHelper
-    require "erb"
+    require 'erb'
     def self.load(template_name)
       path = "#{Fastlane::ROOT}/lib/assets/#{template_name}.erb"
       load_from_path(path)

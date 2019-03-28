@@ -20,50 +20,42 @@ module Fastlane
       when :hash
         return process_value_as_hash_of_strings(return_value: return_value)
       else
-        UI.verbose("Unknown return type defined: #{return_value_type} for value: #{return_value}")
+        UI.verbose(
+          "Unknown return type defined: #{return_value_type} for value: #{return_value}"
+        )
         return process_value_as_string(return_value: return_value)
       end
     end
 
     def process_value_as_string(return_value: nil)
-      if return_value.nil?
-        return_value = ""
-      end
+      return_value = '' if return_value.nil?
 
       return_value
     end
 
     def process_value_as_array_of_strings(return_value: nil)
-      if return_value.nil?
-        return_value = []
-      end
+      return_value = [] if return_value.nil?
 
       # quirks_mode shouldn't be required for real objects
       return JSON.generate(return_value)
     end
 
     def process_value_as_hash_of_strings(return_value: nil)
-      if return_value.nil?
-        return_value = {}
-      end
+      return_value = {} if return_value.nil?
 
       # quirks_mode shouldn't be required for real objects
       return JSON.generate(return_value)
     end
 
     def process_value_as_bool(return_value: nil)
-      if return_value.nil?
-        return_value = false
-      end
+      return_value = false if return_value.nil?
 
       # quirks_mode because sometimes the built-in library is used for some folks and that needs quirks_mode: true
       return JSON.generate(return_value.to_s, quirks_mode: true)
     end
 
     def process_value_as_int(return_value: nil)
-      if return_value.nil?
-        return_value = 0
-      end
+      return_value = 0 if return_value.nil?
 
       # quirks_mode because sometimes the built-in library is used for some folks and that needs quirks_mode: true
       return JSON.generate(return_value.to_s, quirks_mode: true)

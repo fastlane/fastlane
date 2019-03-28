@@ -25,13 +25,17 @@ module Deliver
     def setup_deliver(file_path, data, deliver_path, options)
       File.write(file_path, data)
 
-      screenshots_path = options[:screenshots_path] || File.join(deliver_path, 'screenshots')
+      screenshots_path =
+        options[:screenshots_path] || File.join(deliver_path, 'screenshots')
       unless options[:skip_screenshots]
         download_screenshots(screenshots_path, options)
 
         # Add a README to the screenshots folder
         FileUtils.mkdir_p(screenshots_path) # just in case the fetching didn't work
-        File.write(File.join(screenshots_path, 'README.txt'), File.read("#{Deliver::ROOT}/lib/assets/ScreenshotsHelp"))
+        File.write(
+          File.join(screenshots_path, 'README.txt'),
+          File.read("#{Deliver::ROOT}/lib/assets/ScreenshotsHelp")
+        )
       end
 
       UI.success("Successfully created new Deliverfile at path '#{file_path}'")
@@ -41,7 +45,8 @@ module Deliver
     # and screenshots folders
     def generate_deliver_file(deliver_path, options)
       v = options[:app].latest_version
-      metadata_path = options[:metadata_path] || File.join(deliver_path, 'metadata')
+      metadata_path =
+        options[:metadata_path] || File.join(deliver_path, 'metadata')
       generate_metadata_files(v, metadata_path)
 
       # Generate the final Deliverfile here
@@ -60,7 +65,11 @@ module Deliver
       app_details = v.application.details
 
       # All the localised metadata
-      (UploadMetadata::LOCALISED_VERSION_VALUES + UploadMetadata::LOCALISED_APP_VALUES).each do |key|
+      (
+        UploadMetadata::LOCALISED_VERSION_VALUES +
+          UploadMetadata::LOCALISED_APP_VALUES
+      )
+        .each do |key|
         v.description.languages.each do |language|
           if UploadMetadata::LOCALISED_VERSION_VALUES.include?(key)
             content = v.send(key)[language].to_s
@@ -76,7 +85,11 @@ module Deliver
       end
 
       # All non-localised metadata
-      (UploadMetadata::NON_LOCALISED_VERSION_VALUES + UploadMetadata::NON_LOCALISED_APP_VALUES).each do |key|
+      (
+        UploadMetadata::NON_LOCALISED_VERSION_VALUES +
+          UploadMetadata::NON_LOCALISED_APP_VALUES
+      )
+        .each do |key|
         if UploadMetadata::NON_LOCALISED_VERSION_VALUES.include?(key)
           content = v.send(key).to_s
         else
@@ -89,10 +102,15 @@ module Deliver
       end
 
       # Trade Representative Contact Information
-      UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.each do |key, option_name|
+      UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES
+        .each do |key, option_name|
         content = v.send(key).to_s
         content << "\n"
-        base_dir = File.join(path, UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR)
+        base_dir =
+          File.join(
+            path,
+            UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR
+          )
         FileUtils.mkdir_p(base_dir)
         resulting_path = File.join(base_dir, "#{option_name}.txt")
         File.write(resulting_path, content)
@@ -110,20 +128,21 @@ module Deliver
         UI.message("Writing to '#{resulting_path}'")
       end
 
-      UI.success("Successfully created new configuration files.")
+      UI.success('Successfully created new configuration files.')
 
       # get App icon + watch icon
       if v.large_app_icon.asset_token
         app_icon_extension = File.extname(v.large_app_icon.url)
         app_icon_path = File.join(path, "app_icon#{app_icon_extension}")
         File.write(app_icon_path, open(v.large_app_icon.url).read)
-        UI.success("Successfully downloaded large app icon")
+        UI.success('Successfully downloaded large app icon')
       end
       if v.watch_app_icon.asset_token
         watch_app_icon_extension = File.extname(v.watch_app_icon.url)
-        watch_icon_path = File.join(path, "watch_icon#{watch_app_icon_extension}")
+        watch_icon_path =
+          File.join(path, "watch_icon#{watch_app_icon_extension}")
         File.write(watch_icon_path, open(v.watch_app_icon.url).read)
-        UI.success("Successfully downloaded watch icon")
+        UI.success('Successfully downloaded watch icon')
       end
     end
 

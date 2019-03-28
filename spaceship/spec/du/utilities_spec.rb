@@ -13,11 +13,15 @@ describe Spaceship::Utilities do
     end
 
     it 'recognizes the .geojson extension' do
-      expect(Spaceship::Utilities.content_type('blah.geojson')).to eq('application/json')
+      expect(Spaceship::Utilities.content_type('blah.geojson')).to eq(
+                  'application/json'
+                )
     end
 
     it 'recognizes the .mov extension' do
-      expect(Spaceship::Utilities.content_type('blah.mov')).to eq('video/quicktime')
+      expect(Spaceship::Utilities.content_type('blah.mov')).to eq(
+                  'video/quicktime'
+                )
     end
 
     it 'recognizes the .m4v extension' do
@@ -29,7 +33,9 @@ describe Spaceship::Utilities do
     end
 
     it 'raises an exception for unknown extensions' do
-      expect { Spaceship::Utilities.content_type('blah.unknown') }.to raise_error("Unknown content-type for file blah.unknown")
+      expect do
+        Spaceship::Utilities.content_type('blah.unknown')
+      end.to raise_error('Unknown content-type for file blah.unknown')
     end
   end
 end

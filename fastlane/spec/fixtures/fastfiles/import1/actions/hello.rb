@@ -7,24 +7,24 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :param1,
-                                       optional: false,
-                                       type: String,
-                                       default_value: "",
-                                       description: "Param1")
+          FastlaneCore::ConfigItem.new(
+            key: :param1,
+            optional: false,
+            type: String,
+            default_value: '',
+            description: 'Param1'
+          )
         ]
       end
 
       def self.output
-        [
-        ]
+        []
       end
 
-      def self.return_value
-      end
+      def self.return_value; end
 
       def self.authors
-        ["lacostej"]
+        %w[lacostej]
       end
 
       def self.is_supported?(platform)

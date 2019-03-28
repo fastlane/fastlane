@@ -8,8 +8,14 @@ module Fastlane
 
     class SetGithubReleaseAction < Action
       def self.run(params)
-        UI.important("Creating release of #{params[:repository_name]} on tag \"#{params[:tag_name]}\" with name \"#{params[:name]}\".")
-        UI.important("Will also upload assets #{params[:upload_assets]}.") if params[:upload_assets]
+        UI.important(
+          "Creating release of #{params[:repository_name]} on tag \"#{params[
+            :tag_name
+          ]}\" with name \"#{params[:name]}\"."
+        )
+        if params[:upload_assets]
+          UI.important("Will also upload assets #{params[:upload_assets]}.")
+        end
 
         repo_name = params[:repository_name]
         api_token = params[:api_token]
@@ -32,34 +38,48 @@ module Fastlane
           path: "repos/#{repo_name}/releases",
           body: payload,
           error_handlers: {
-            422 => proc do |result|
-              UI.error(result[:body])
-              UI.error("Release on tag #{tag_name} already exists!")
-              return nil
-            end,
-            404 => proc do |result|
-              UI.error(result[:body])
-              UI.user_error!("Repository #{repo_name} cannot be found, please double check its name and that you provided a valid API token (GITHUB_API_TOKEN)")
-            end,
-            401 => proc do |result|
-              UI.error(result[:body])
-              UI.user_error!("You are not authorized to access #{repo_name}, please make sure you provided a valid API token (GITHUB_API_TOKEN)")
-            end,
-            '*' => proc do |result|
-              UI.error("GitHub responded with #{result[:status]}:#{result[:body]}")
-              return nil
-            end
+            422 =>
+              proc do |result|
+                UI.error(result[:body])
+                UI.error("Release on tag #{tag_name} already exists!")
+                return nil
+              end,
+            404 =>
+              proc do |result|
+                UI.error(result[:body])
+                UI.user_error!(
+                  "Repository #{repo_name} cannot be found, please double check its name and that you provided a valid API token (GITHUB_API_TOKEN)"
+                )
+              end,
+            401 =>
+              proc do |result|
+                UI.error(result[:body])
+                UI.user_error!(
+                  "You are not authorized to access #{repo_name}, please make sure you provided a valid API token (GITHUB_API_TOKEN)"
+                )
+              end,
+            '*' =>
+              proc do |result|
+                UI.error(
+                  "GitHub responded with #{result[:status]}:#{result[:body]}"
+                )
+                return nil
+              end
           }
         ) do |result|
           json = result[:json]
           html_url = json['html_url']
           release_id = json['id']
 
-          UI.success("Successfully created release at tag \"#{tag_name}\" on GitHub")
+          UI.success(
+            "Successfully created release at tag \"#{tag_name}\" on GitHub"
+          )
           UI.important("See release at \"#{html_url}\"")
 
-          Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_HTML_LINK] = html_url
-          Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_RELEASE_ID] = release_id
+          Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_HTML_LINK] =
+            html_url
+          Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_RELEASE_ID] =
+            release_id
           Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_JSON] = json
 
           assets = params[:upload_assets]
@@ -74,14 +94,24 @@ module Fastlane
               http_method: 'GET',
               path: "repos/#{repo_name}/releases/#{release_id}",
               error_handlers: {
-                '*' => proc do |get_result|
-                  UI.error("GitHub responded with #{get_result[:status]}:#{get_result[:body]}")
-                  UI.user_error!("Failed to fetch the newly created release, but it *has been created* successfully.")
-                end
+                '*' =>
+                  proc do |get_result|
+                    UI.error(
+                      "GitHub responded with #{get_result[
+                        :status
+                      ]}:#{get_result[:body]}"
+                    )
+                    UI.user_error!(
+                      'Failed to fetch the newly created release, but it *has been created* successfully.'
+                    )
+                  end
               }
             ) do |get_result|
-              Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_JSON] = get_result[:json]
-              UI.success("Successfully uploaded assets #{assets} to release \"#{html_url}\"")
+              Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_JSON] =
+                get_result[:json]
+              UI.success(
+                "Successfully uploaded assets #{assets} to release \"#{html_url}\""
+              )
               return get_result[:json]
             end
           else
@@ -101,12 +131,20 @@ module Fastlane
         absolute_path = File.absolute_path(asset_path)
 
         # check that the asset even exists
-        UI.user_error!("Asset #{absolute_path} doesn't exist") unless File.exist?(absolute_path)
+        unless File.exist?(absolute_path)
+          UI.user_error!("Asset #{absolute_path} doesn't exist")
+        end
 
         if File.directory?(absolute_path)
           Dir.mktmpdir do |dir|
             tmpzip = File.join(dir, File.basename(absolute_path) + '.zip')
-            sh("cd \"#{File.dirname(absolute_path)}\"; zip -r --symlinks \"#{tmpzip}\" \"#{File.basename(absolute_path)}\" 2>&1 >/dev/null")
+            sh(
+              "cd \"#{File.dirname(
+                absolute_path
+              )}\"; zip -r --symlinks \"#{tmpzip}\" \"#{File.basename(
+                absolute_path
+              )}\" 2>&1 >/dev/null"
+            )
             self.upload_file(tmpzip, upload_url_template, api_token)
           end
         else
@@ -117,7 +155,8 @@ module Fastlane
       def self.upload_file(file, url_template, api_token)
         require 'addressable/template'
         file_name = File.basename(file)
-        expanded_url = Addressable::Template.new(url_template).expand(name: file_name).to_s
+        expanded_url =
+          Addressable::Template.new(url_template).expand(name: file_name).to_s
         headers = { 'Content-Type' => 'application/zip' } # works for all binary files
         UI.important("Uploading #{file_name}")
         GithubApiAction.run(
@@ -127,14 +166,15 @@ module Fastlane
           url: expanded_url,
           raw_body: File.read(file),
           error_handlers: {
-            '*' => proc do |result|
-              UI.error("GitHub responded with #{result[:status]}:#{result[:body]}")
-              UI.user_error!("Failed to upload asset #{file_name} to GitHub.")
-            end
+            '*' =>
+              proc do |result|
+                UI.error(
+                  "GitHub responded with #{result[:status]}:#{result[:body]}"
+                )
+                UI.user_error!("Failed to upload asset #{file_name} to GitHub.")
+              end
           }
-        ) do |result|
-          UI.success("Successfully uploaded #{file_name}.")
-        end
+        ) { |result| UI.success("Successfully uploaded #{file_name}.") }
       end
 
       #####################################################
@@ -142,7 +182,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "This will create a new release on GitHub and upload assets for it"
+        'This will create a new release on GitHub and upload assets for it'
       end
 
       def self.details
@@ -155,87 +195,132 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :repository_name,
-                                       env_name: "FL_SET_GITHUB_RELEASE_REPOSITORY_NAME",
-                                       description: "The path to your repo, e.g. 'fastlane/fastlane'",
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please only pass the path, e.g. 'fastlane/fastlane'") if value.include?("github.com")
-                                         UI.user_error!("Please only pass the path, e.g. 'fastlane/fastlane'") if value.split('/').count != 2
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :server_url,
-                                       env_name: "FL_GITHUB_RELEASE_SERVER_URL",
-                                       description: "The server url. e.g. 'https://your.internal.github.host/api/v3' (Default: 'https://api.github.com')",
-                                       default_value: "https://api.github.com",
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please include the protocol in the server url, e.g. https://your.github.server/api/v3") unless value.include?("//")
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :api_token,
-                                       env_name: "FL_GITHUB_RELEASE_API_TOKEN",
-                                       description: "Personal API Token for GitHub - generate one at https://github.com/settings/tokens",
-                                       sensitive: true,
-                                       code_gen_sensitive: true,
-                                       is_string: true,
-                                       default_value: ENV["GITHUB_API_TOKEN"],
-                                       default_value_dynamic: true,
-                                       optional: false),
-          FastlaneCore::ConfigItem.new(key: :tag_name,
-                                       env_name: "FL_SET_GITHUB_RELEASE_TAG_NAME",
-                                       description: "Pass in the tag name",
-                                       is_string: true,
-                                       optional: false),
-          FastlaneCore::ConfigItem.new(key: :name,
-                                       env_name: "FL_SET_GITHUB_RELEASE_NAME",
-                                       description: "Name of this release",
-                                       is_string: true,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :commitish,
-                                       env_name: "FL_SET_GITHUB_RELEASE_COMMITISH",
-                                       description: "Specifies the commitish value that determines where the Git tag is created from. Can be any branch or commit SHA. Unused if the Git tag already exists. Default: the repository's default branch (usually master)",
-                                       is_string: true,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :description,
-                                       env_name: "FL_SET_GITHUB_RELEASE_DESCRIPTION",
-                                       description: "Description of this release",
-                                       is_string: true,
-                                       optional: true,
-                                       default_value: Actions.lane_context[SharedValues::FL_CHANGELOG],
-                                       default_value_dynamic: true),
-          FastlaneCore::ConfigItem.new(key: :is_draft,
-                                       env_name: "FL_SET_GITHUB_RELEASE_IS_DRAFT",
-                                       description: "Whether the release should be marked as draft",
-                                       optional: true,
-                                       default_value: false,
-                                       is_string: false),
-          FastlaneCore::ConfigItem.new(key: :is_prerelease,
-                                       env_name: "FL_SET_GITHUB_RELEASE_IS_PRERELEASE",
-                                       description: "Whether the release should be marked as prerelease",
-                                       optional: true,
-                                       default_value: false,
-                                       is_string: false),
-          FastlaneCore::ConfigItem.new(key: :upload_assets,
-                                       env_name: "FL_SET_GITHUB_RELEASE_UPLOAD_ASSETS",
-                                       description: "Path to assets to be uploaded with the release",
-                                       optional: true,
-                                       is_string: false,
-                                       type: Array,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("upload_assets must be an Array of paths to assets") unless value.kind_of?(Array)
-                                       end)
+          FastlaneCore::ConfigItem.new(
+            key: :repository_name,
+            env_name: 'FL_SET_GITHUB_RELEASE_REPOSITORY_NAME',
+            description: "The path to your repo, e.g. 'fastlane/fastlane'",
+            verify_block:
+              proc do |value|
+                if value.include?('github.com')
+                  UI.user_error!(
+                    "Please only pass the path, e.g. 'fastlane/fastlane'"
+                  )
+                end
+                if value.split('/').count != 2
+                  UI.user_error!(
+                    "Please only pass the path, e.g. 'fastlane/fastlane'"
+                  )
+                end
+              end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :server_url,
+            env_name: 'FL_GITHUB_RELEASE_SERVER_URL',
+            description:
+              "The server url. e.g. 'https://your.internal.github.host/api/v3' (Default: 'https://api.github.com')",
+            default_value: 'https://api.github.com',
+            optional: true,
+            verify_block:
+              proc do |value|
+                unless value.include?('//')
+                  UI.user_error!(
+                    'Please include the protocol in the server url, e.g. https://your.github.server/api/v3'
+                  )
+                end
+              end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :api_token,
+            env_name: 'FL_GITHUB_RELEASE_API_TOKEN',
+            description:
+              'Personal API Token for GitHub - generate one at https://github.com/settings/tokens',
+            sensitive: true,
+            code_gen_sensitive: true,
+            is_string: true,
+            default_value: ENV['GITHUB_API_TOKEN'],
+            default_value_dynamic: true,
+            optional: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :tag_name,
+            env_name: 'FL_SET_GITHUB_RELEASE_TAG_NAME',
+            description: 'Pass in the tag name',
+            is_string: true,
+            optional: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :name,
+            env_name: 'FL_SET_GITHUB_RELEASE_NAME',
+            description: 'Name of this release',
+            is_string: true,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :commitish,
+            env_name: 'FL_SET_GITHUB_RELEASE_COMMITISH',
+            description:
+              "Specifies the commitish value that determines where the Git tag is created from. Can be any branch or commit SHA. Unused if the Git tag already exists. Default: the repository's default branch (usually master)",
+            is_string: true,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :description,
+            env_name: 'FL_SET_GITHUB_RELEASE_DESCRIPTION',
+            description: 'Description of this release',
+            is_string: true,
+            optional: true,
+            default_value: Actions.lane_context[SharedValues::FL_CHANGELOG],
+            default_value_dynamic: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :is_draft,
+            env_name: 'FL_SET_GITHUB_RELEASE_IS_DRAFT',
+            description: 'Whether the release should be marked as draft',
+            optional: true,
+            default_value: false,
+            is_string: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :is_prerelease,
+            env_name: 'FL_SET_GITHUB_RELEASE_IS_PRERELEASE',
+            description: 'Whether the release should be marked as prerelease',
+            optional: true,
+            default_value: false,
+            is_string: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :upload_assets,
+            env_name: 'FL_SET_GITHUB_RELEASE_UPLOAD_ASSETS',
+            description: 'Path to assets to be uploaded with the release',
+            optional: true,
+            is_string: false,
+            type: Array,
+            verify_block:
+              proc do |value|
+                unless value.kind_of?(Array)
+                  UI.user_error!(
+                    'upload_assets must be an Array of paths to assets'
+                  )
+                end
+              end
+          )
         ]
       end
 
       def self.output
         [
           ['SET_GITHUB_RELEASE_HTML_LINK', 'Link to your created release'],
-          ['SET_GITHUB_RELEASE_RELEASE_ID', 'Release id (useful for subsequent editing)'],
+          [
+            'SET_GITHUB_RELEASE_RELEASE_ID',
+            'Release id (useful for subsequent editing)'
+          ],
           ['SET_GITHUB_RELEASE_JSON', 'The whole release JSON object']
         ]
       end
 
       def self.return_value
         [
-          "A hash containing all relevant information of this release",
+          'A hash containing all relevant information of this release',
           "Access things like 'html_url', 'tag_name', 'name', 'body'"
         ].join("\n")
       end
@@ -245,7 +330,7 @@ module Fastlane
       end
 
       def self.authors
-        ["czechboy0", "tommeier"]
+        %w[czechboy0 tommeier]
       end
 
       def self.is_supported?(platform)

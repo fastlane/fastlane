@@ -5,7 +5,9 @@ module Fastlane
         Actions.verify_gem!('cocoapods-keys')
         cmd = []
 
-        cmd << ['bundle exec'] if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
+        if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
+          cmd << ['bundle exec']
+        end
         cmd << ['pod keys set']
 
         cmd << ["\"#{params[:key].shellescape}\""]
@@ -16,7 +18,7 @@ module Fastlane
       end
 
       def self.author
-        "marcelofabri"
+        'marcelofabri'
       end
 
       #####################################################
@@ -24,40 +26,48 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Sets a value for a key with cocoapods-keys"
+        'Sets a value for a key with cocoapods-keys'
       end
 
       def self.details
-        "Adds a key to [cocoapods-keys](https://github.com/orta/cocoapods-keys)"
+        'Adds a key to [cocoapods-keys](https://github.com/orta/cocoapods-keys)'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
-                                       env_name: "FL_SET_POD_KEY_USE_BUNDLE_EXEC",
-                                       description: "Use bundle exec when there is a Gemfile presented",
-                                       is_string: false,
-                                       default_value: true),
-          FastlaneCore::ConfigItem.new(key: :key,
-                                       env_name: "FL_SET_POD_KEY_ITEM_KEY",
-                                       description: "The key to be saved with cocoapods-keys",
-                                       is_string: true,
-                                       optional: false),
-          FastlaneCore::ConfigItem.new(key: :value,
-                                       env_name: "FL_SET_POD_KEY_ITEM_VALUE",
-                                       description: "The value to be saved with cocoapods-keys",
-                                       is_string: true,
-                                       optional: false),
-          FastlaneCore::ConfigItem.new(key: :project,
-                                       env_name: "FL_SET_POD_KEY_PROJECT",
-                                       description: "The project name",
-                                       is_string: true,
-                                       optional: true)
+          FastlaneCore::ConfigItem.new(
+            key: :use_bundle_exec,
+            env_name: 'FL_SET_POD_KEY_USE_BUNDLE_EXEC',
+            description: 'Use bundle exec when there is a Gemfile presented',
+            is_string: false,
+            default_value: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :key,
+            env_name: 'FL_SET_POD_KEY_ITEM_KEY',
+            description: 'The key to be saved with cocoapods-keys',
+            is_string: true,
+            optional: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :value,
+            env_name: 'FL_SET_POD_KEY_ITEM_VALUE',
+            description: 'The value to be saved with cocoapods-keys',
+            is_string: true,
+            optional: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :project,
+            env_name: 'FL_SET_POD_KEY_PROJECT',
+            description: 'The project name',
+            is_string: true,
+            optional: true
+          )
         ]
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       def self.example_code

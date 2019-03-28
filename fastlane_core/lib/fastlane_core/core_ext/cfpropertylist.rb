@@ -1,8 +1,8 @@
 # To be used instead of require "cfpropertylist". Restores extensions from
 # Plist overwritten by CFPropertyList.
 
-require "cfpropertylist"
-require "plist"
+require 'cfpropertylist'
+require 'plist'
 
 # Brute-force solution to conflict between #to_plist introduced by
 # CFPropertyList and plist. Remove the method added by CFPropertyList
@@ -17,7 +17,8 @@ require "plist"
       c.send(:alias_method, :to_binary_plist, :to_plist)
       c.send(:remove_method, :to_plist)
     rescue NameError
+
     end
   end
-  c.module_eval("include Plist::Emit")
+  c.module_eval('include Plist::Emit')
 end

@@ -6,7 +6,7 @@ module Spaceship
       attr_accessor :original_array # reference to original array
 
       def initialize(identifier, ref)
-        raise "ref is nil" if ref.nil?
+        raise 'ref is nil' if ref.nil?
 
         self.identifier = identifier.to_s
         self.original_array = ref
@@ -25,10 +25,11 @@ module Spaceship
       end
 
       def get_lang(lang)
-        result = self.original_array.find do |current|
-          lang = lang.to_s
-          current['language'] == lang or current['localeCode'] == lang # Apple being consistent
-        end
+        result =
+          self.original_array.find do |current|
+            lang = lang.to_s
+            current['language'] == lang or current['localeCode'] == lang # Apple being consistent
+          end
         return result if result
 
         raise "Language '#{lang}' is not activated / available for this app version."
@@ -36,7 +37,9 @@ module Spaceship
 
       # @return (Array) An array containing all languages that are already available
       def keys
-        return self.original_array.map { |current| current['language'] ||= current['localeCode'] } # Apple being consistent
+        return self.original_array.map do |current|
+          current['language'] ||= current['localeCode']
+        end # Apple being consistent
       end
 
       # @return (Array) An array containing all languages that are already available
@@ -46,9 +49,14 @@ module Spaceship
       end
 
       def inspect
-        result = ""
+        result = ''
         self.original_array.collect do |current|
-          result += "#{current['language'] ||= current['localeCode']}: #{current.fetch(identifier, {}).fetch('value')}\n"
+          result +=
+            "#{current['language'] ||= current['localeCode']}: #{current.fetch(
+              identifier,
+              {}
+            )
+              .fetch('value')}\n"
         end
         result
       end

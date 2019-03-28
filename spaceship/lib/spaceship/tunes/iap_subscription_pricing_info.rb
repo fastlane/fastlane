@@ -31,15 +31,15 @@ module Spaceship
       attr_accessor :f_wholesale_price2
 
       attr_mapping(
-        "countryCode" => :country_code,
-        "currencySymbol" => :currency_symbol,
-        "currencyCode" => :currency_code,
-        "wholesalePrice" => :wholesale_price,
-        "wholesalePrice2" => :wholesale_price2,
-        "retailPrice" => :retail_price,
-        "fRetailPrice" => :f_retail_price,
-        "fWholesalePrice" => :f_wholesale_price,
-        "fWholesalePrice2" => :f_wholesale_price2
+        'countryCode' => :country_code,
+        'currencySymbol' => :currency_symbol,
+        'currencyCode' => :currency_code,
+        'wholesalePrice' => :wholesale_price,
+        'wholesalePrice2' => :wholesale_price2,
+        'retailPrice' => :retail_price,
+        'fRetailPrice' => :f_retail_price,
+        'fWholesalePrice' => :f_wholesale_price,
+        'fWholesalePrice2' => :f_wholesale_price2
       )
     end
   end

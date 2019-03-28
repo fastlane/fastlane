@@ -13,7 +13,9 @@ describe Spaceship::Base do
     end
 
     it 'can set a client and return itself' do
-      expect(Spaceship::PortalBase.set_client(client)).to eq(Spaceship::PortalBase)
+      expect(Spaceship::PortalBase.set_client(client)).to eq(
+                  Spaceship::PortalBase
+                )
     end
 
     describe 'instantiation from an attribute hash' do
@@ -23,11 +25,13 @@ describe Spaceship::Base do
           attr_accessor :nested_attr_name
           attr_accessor :is_live
 
-          attr_mapping({
-            'someAttributeName' => :some_attr_name,
-            'nestedAttribute.name.value' => :nested_attr_name,
-            'isLiveString' => :is_live
-          })
+          attr_mapping(
+            {
+              'someAttributeName' => :some_attr_name,
+              'nestedAttribute.name.value' => :nested_attr_name,
+              'isLiveString' => :is_live
+            }
+          )
 
           def is_live
             super == 'true'
@@ -47,7 +51,10 @@ describe Spaceship::Base do
       end
 
       it 'can map nested attributes' do
-        inst = test_class.new({ 'nestedAttribute' => { 'name' => { 'value' => 'a value' } } })
+        inst =
+          test_class.new(
+            { 'nestedAttribute' => { 'name' => { 'value' => 'a value' } } }
+          )
         expect(inst.nested_attr_name).to eq('a value')
       end
 
@@ -59,8 +66,7 @@ describe Spaceship::Base do
 
     it 'can constantize subclasses by calling a method on the parent class' do
       class Developer < Spaceship::PortalBase
-        class RubyDeveloper < Developer
-        end
+        class RubyDeveloper < Developer; end
       end
 
       expect(Developer.ruby_developer).to eq(Developer::RubyDeveloper)

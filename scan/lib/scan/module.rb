@@ -19,7 +19,7 @@ module Scan
     end
 
     def scanfile_name
-      "Scanfile"
+      'Scanfile'
     end
   end
 
@@ -28,5 +28,5 @@ module Scan
   Boolean = Fastlane::Boolean
   ROOT = Pathname.new(File.expand_path('../../..', __FILE__))
 
-  DESCRIPTION = "The easiest way to run tests of your iOS and Mac app"
+  DESCRIPTION = 'The easiest way to run tests of your iOS and Mac app'
 end

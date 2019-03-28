@@ -7,7 +7,13 @@ module FastlaneCore
       # This method prints out all the user inputs in a nice table. Useful to summarize the run
       # You can pass an array to `hide_keys` if you don't want certain elements to show up (symbols or strings)
       # You can pass an array to `mask_keys` if you want to mask certain elements (symbols or strings)
-      def print_values(config: nil, title: nil, hide_keys: [], mask_keys: [], transform: :newline)
+      def print_values(
+        config: nil,
+        title: nil,
+        hide_keys: [],
+        mask_keys: [],
+        transform: :newline
+      )
         require 'terminal-table'
 
         options = {}
@@ -15,16 +21,20 @@ module FastlaneCore
           if config.kind_of?(FastlaneCore::Configuration)
             # find sensitive options and mask them by default
             config.available_options.each do |config_item|
-              if config_item.sensitive
-                mask_keys << config_item.key.to_s
-              end
+              mask_keys << config_item.key.to_s if config_item.sensitive
             end
             options = config.values(ask: false)
           else
             options = config
           end
         end
-        rows = self.collect_rows(options: options, hide_keys: hide_keys.map(&:to_s), mask_keys: mask_keys.map(&:to_s), prefix: '')
+        rows =
+          self.collect_rows(
+            options: options,
+            hide_keys: hide_keys.map(&:to_s),
+            mask_keys: mask_keys.map(&:to_s),
+            prefix: ''
+          )
 
         params = {}
 
@@ -36,18 +46,20 @@ module FastlaneCore
 
         params[:title] = title.green if title
 
-        puts("")
+        puts('')
         puts(Terminal::Table.new(params))
-        puts("")
+        puts('')
 
         return params
       end
 
       def colorize_array(array, colors)
-        value = ""
-        array.each do  |l|
+        value = ''
+        array.each do |l|
           colored_line = l
-          colored_line = "#{colors.first}#{l}#{colors.last}" if colors.length > 0
+          if colors.length > 0
+            colored_line = "#{colors.first}#{l}#{colors.last}"
+          end
           value << colored_line
           value << "\n"
         end
@@ -55,10 +67,8 @@ module FastlaneCore
       end
 
       def should_transform?
-        if FastlaneCore::Helper.ci? || FastlaneCore::Helper.test?
-          return false
-        end
-        return !FastlaneCore::Env.truthy?("FL_SKIP_TABLE_TRANSFORM")
+        return false if FastlaneCore::Helper.ci? || FastlaneCore::Helper.test?
+        return !FastlaneCore::Env.truthy?('FL_SKIP_TABLE_TRANSFORM')
       end
 
       def transform_row(column, transform, max_value_length)
@@ -69,14 +79,15 @@ module FastlaneCore
 
         if transform == :truncate_middle
           return value.middle_truncate(max_value_length)
-        elsif transform == :newline
+
           # remove all fixed newlines as it may mess up the output
-          value.gsub!("\n", " ") if value.kind_of?(String)
+        elsif transform == :newline
+          value.gsub!("\n", ' ') if value.kind_of?(String)
           if value.length >= max_value_length
             colors = value.scan(/\e\[.*?m/)
             colors.each { |color| value.gsub!(color, '') }
             lines = value.wordwrap(max_value_length)
-            return  colorize_array(lines, colors)
+            return colorize_array(lines, colors)
           end
         elsif transform
           UI.user_error!("Unknown transform value '#{transform}'")
@@ -100,26 +111,37 @@ module FastlaneCore
 
         max_value_length = (max_length / col_count) - 1
 
-        return_array = rows.map do |row|
-          row.map do |column|
-            transform_row(column, transform, max_value_length)
+        return_array =
+          rows.map do |row|
+            row.map do |column|
+              transform_row(column, transform, max_value_length)
+            end
           end
-        end
         return return_array
       end
 
-      def collect_rows(options: nil, hide_keys: [], mask_keys: [], prefix: '', mask: '********')
+      def collect_rows(
+        options: nil, hide_keys: [], mask_keys: [], prefix: '', mask: '********'
+      )
         rows = []
 
         options.each do |key, value|
           prefixed_key = "#{prefix}#{key}"
           next if value.nil?
-          next if value.to_s == ""
+          next if value.to_s == ''
           next if hide_keys.include?(prefixed_key)
           value = mask if mask_keys.include?(prefixed_key)
 
           if value.respond_to?(:key)
-            rows.concat(self.collect_rows(options: value, hide_keys: hide_keys, mask_keys: mask_keys, prefix: "#{prefix}#{key}.", mask: mask))
+            rows.concat(
+              self.collect_rows(
+                options: value,
+                hide_keys: hide_keys,
+                mask_keys: mask_keys,
+                prefix: "#{prefix}#{key}.",
+                mask: mask
+              )
+            )
           else
             rows << [prefixed_key, value]
           end

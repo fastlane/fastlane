@@ -18,7 +18,8 @@ module PEM
     def run
       program :name, 'pem'
       program :version, Fastlane::VERSION
-      program :description, 'CLI for \'PEM\' - Automatically generate and renew your push notification profiles'
+      program :description,
+              "CLI for 'PEM' - Automatically generate and renew your push notification profiles"
       program :help, 'Author', 'Felix Krause <pem@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'Documentation', 'https://docs.fastlane.tools/actions/pem/'
@@ -28,12 +29,20 @@ module PEM
 
       command :renew do |c|
         c.syntax = 'fastlane pem renew'
-        c.description = 'Renews the certificate (in case it expired) and shows the path to the generated pem file'
+        c.description =
+          'Renews the certificate (in case it expired) and shows the path to the generated pem file'
 
-        FastlaneCore::CommanderGenerator.new.generate(PEM::Options.available_options, command: c)
+        FastlaneCore::CommanderGenerator.new.generate(
+          PEM::Options.available_options,
+          command: c
+        )
 
         c.action do |args, options|
-          PEM.config = FastlaneCore::Configuration.create(PEM::Options.available_options, options.__hash__)
+          PEM.config =
+            FastlaneCore::Configuration.create(
+              PEM::Options.available_options,
+              options.__hash__
+            )
           PEM::Manager.start
         end
       end

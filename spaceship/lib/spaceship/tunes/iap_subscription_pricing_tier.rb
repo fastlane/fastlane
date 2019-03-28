@@ -12,13 +12,13 @@ module Spaceship
       # @return ([Spaceship::Tunes::IAPSubscriptionPricingInfo]) A list of all prices for the respective countries
       attr_accessor :pricing_info
 
-      attr_mapping(
-        "tierStem" => :tier_stem,
-        "tierName" => :tier_name
-      )
+      attr_mapping('tierStem' => :tier_stem, 'tierName' => :tier_name)
 
       def pricing_info
-        @pricing_info ||= raw_data['pricingInfo'].map { |info| IAPSubscriptionPricingInfo.new(info) }
+        @pricing_info ||=
+          raw_data['pricingInfo'].map do |info|
+            IAPSubscriptionPricingInfo.new(info)
+          end
       end
     end
   end

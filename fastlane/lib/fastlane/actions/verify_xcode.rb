@@ -2,12 +2,15 @@ require 'shellwords'
 
 module Fastlane
   module Actions
-    module SharedValues
-    end
+    module SharedValues; end
 
     class VerifyXcodeAction < Action
       def self.run(params)
-        UI.message("Verifying your Xcode installation at path '#{params[:xcode_path]}'...")
+        UI.message(
+          "Verifying your Xcode installation at path '#{params[
+            :xcode_path
+          ]}'..."
+        )
 
         # Check 1/2
         verify_codesign(params)
@@ -20,60 +23,85 @@ module Fastlane
       end
 
       def self.verify_codesign(params)
-        UI.message("Verifying Xcode was signed by Apple Inc.")
+        UI.message('Verifying Xcode was signed by Apple Inc.')
 
-        codesign_output = Actions.sh("codesign --display --verbose=4 #{params[:xcode_path].shellescape}")
+        codesign_output =
+          Actions.sh(
+            "codesign --display --verbose=4 #{params[:xcode_path].shellescape}"
+          )
 
         # If the returned codesign info contains all entries for any one of these sets, we'll consider it valid
         accepted_codesign_detail_sets = [
-          [ # Found on App Store installed Xcode installations
-            "Identifier=com.apple.dt.Xcode",
-            "Authority=Apple Mac OS Application Signing",
-            "Authority=Apple Worldwide Developer Relations Certification Authority",
-            "Authority=Apple Root CA",
-            "TeamIdentifier=59GAB85EFG"
+          [
+            # Found on App Store installed Xcode installations
+            'Identifier=com.apple.dt.Xcode',
+            'Authority=Apple Mac OS Application Signing',
+            'Authority=Apple Worldwide Developer Relations Certification Authority',
+            'Authority=Apple Root CA',
+            'TeamIdentifier=59GAB85EFG'
           ],
-          [ # Found on Xcode installations (pre-Xcode 8) downloaded from developer.apple.com
-            "Identifier=com.apple.dt.Xcode",
-            "Authority=Software Signing",
-            "Authority=Apple Code Signing Certification Authority",
-            "Authority=Apple Root CA",
-            "TeamIdentifier=not set"
+          [
+            # Found on Xcode installations (pre-Xcode 8) downloaded from developer.apple.com
+            'Identifier=com.apple.dt.Xcode',
+            'Authority=Software Signing',
+            'Authority=Apple Code Signing Certification Authority',
+            'Authority=Apple Root CA',
+            'TeamIdentifier=not set'
           ],
-          [ # Found on Xcode installations (post-Xcode 8) downloaded from developer.apple.com
-            "Identifier=com.apple.dt.Xcode",
-            "Authority=Software Signing",
-            "Authority=Apple Code Signing Certification Authority",
-            "Authority=Apple Root CA",
-            "TeamIdentifier=59GAB85EFG"
+          [
+            # Found on Xcode installations (post-Xcode 8) downloaded from developer.apple.com
+            'Identifier=com.apple.dt.Xcode',
+            'Authority=Software Signing',
+            'Authority=Apple Code Signing Certification Authority',
+            'Authority=Apple Root CA',
+            'TeamIdentifier=59GAB85EFG'
           ]
         ]
 
         # Map the accepted details sets into an equal number of sets collecting the details for which
         # the output of codesign did not have matches
-        missing_details_sets = accepted_codesign_detail_sets.map do |accepted_details_set|
-          accepted_details_set.reject { |detail| codesign_output.include?(detail) }
-        end
+        missing_details_sets =
+          accepted_codesign_detail_sets.map do |accepted_details_set|
+            accepted_details_set.reject do |detail|
+              codesign_output.include?(detail)
+            end
+          end
 
         # If any of the sets is empty, it means that all details were matched, and the check is successful
-        show_and_raise_error(nil, params[:xcode_path]) unless missing_details_sets.any?(&:empty?)
+        unless missing_details_sets.any?(&:empty?)
+          show_and_raise_error(nil, params[:xcode_path])
+        end
 
-        UI.success("Successfully verified the code signature ✅")
+        UI.success('Successfully verified the code signature ✅')
       end
 
       def self.verify_gatekeeper(params)
-        UI.message("Verifying Xcode using GateKeeper...")
-        UI.message("This will take up to a few minutes, now is a great time to go for a coffee ☕...")
+        UI.message('Verifying Xcode using GateKeeper...')
+        UI.message(
+          'This will take up to a few minutes, now is a great time to go for a coffee ☕...'
+        )
 
-        command = "/usr/sbin/spctl --assess --verbose #{params[:xcode_path].shellescape}"
-        must_includes = ['accepted']
+        command =
+          "/usr/sbin/spctl --assess --verbose #{params[:xcode_path]
+            .shellescape}"
+        must_includes = %w[accepted]
 
-        output = verify(command: command, must_includes: must_includes, params: params)
+        output =
+          verify(command: command, must_includes: must_includes, params: params)
 
-        if output.include?("source=Mac App Store") || output.include?("source=Apple") || output.include?("source=Apple System")
-          UI.success("Successfully verified Xcode installation at path '#{params[:xcode_path]}' 🎧")
+        if output.include?('source=Mac App Store') ||
+           output.include?('source=Apple') ||
+           output.include?('source=Apple System')
+          UI.success(
+            "Successfully verified Xcode installation at path '#{params[
+              :xcode_path
+            ]}' 🎧"
+          )
         else
-          show_and_raise_error("Invalid Download Source of Xcode: #{output}", params[:xcode_path])
+          show_and_raise_error(
+            "Invalid Download Source of Xcode: #{output}",
+            params[:xcode_path]
+          )
         end
       end
 
@@ -94,13 +122,17 @@ module Fastlane
       end
 
       def self.show_and_raise_error(error, xcode_path)
-        UI.error("Attention: Your Xcode Installation could not be verified.")
-        UI.error("If you believe that your Xcode is valid, please submit an issue on GitHub")
+        UI.error('Attention: Your Xcode Installation could not be verified.')
+        UI.error(
+          'If you believe that your Xcode is valid, please submit an issue on GitHub'
+        )
         if error
           UI.error("The following information couldn't be found:")
           UI.error(error)
         end
-        UI.user_error!("The Xcode installation at path '#{xcode_path}' could not be verified.")
+        UI.user_error!(
+          "The Xcode installation at path '#{xcode_path}' could not be verified."
+        )
       end
 
       #####################################################
@@ -108,7 +140,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Verifies that the Xcode installation is properly signed by Apple"
+        'Verifies that the Xcode installation is properly signed by Apple'
       end
 
       def self.details
@@ -117,31 +149,34 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :xcode_path,
-                                       env_name: "FL_VERIFY_XCODE_XCODE_PATH",
-                                       description: "The path to the Xcode installation to test",
-                                       code_gen_sensitive: true,
-                                       default_value: File.expand_path('../../', FastlaneCore::Helper.xcode_path),
-                                       default_value_dynamic: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Couldn't find Xcode at path '#{value}'") unless File.exist?(value)
-                                       end)
+          FastlaneCore::ConfigItem.new(
+            key: :xcode_path,
+            env_name: 'FL_VERIFY_XCODE_XCODE_PATH',
+            description: 'The path to the Xcode installation to test',
+            code_gen_sensitive: true,
+            default_value:
+              File.expand_path('../../', FastlaneCore::Helper.xcode_path),
+            default_value_dynamic: true,
+            verify_block:
+              proc do |value|
+                unless File.exist?(value)
+                  UI.user_error!("Couldn't find Xcode at path '#{value}'")
+                end
+              end
+          )
         ]
       end
 
       def self.authors
-        ["KrauseFx"]
+        %w[KrauseFx]
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       def self.example_code
-        [
-          'verify_xcode',
-          'verify_xcode(xcode_path: "/Applications/Xcode.app")'
-        ]
+        ['verify_xcode', 'verify_xcode(xcode_path: "/Applications/Xcode.app")']
       end
 
       def self.category

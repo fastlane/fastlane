@@ -26,15 +26,11 @@ module FastlaneCore
         # We added type: Hash to code generation, but Ruby's OptionParser doesn't like that
         # so we need to switch that to something that is supported, luckily, we have an `is_string`
         # property and if that is false, we'll default to nil
-        if type == Hash
-          type = option.is_string ? String : nil
-        end
+        type = option.is_string ? String : nil if type == Hash
 
         # Boolean is a fastlane thing, it's either TrueClass, or FalseClass, but we won't know
         # that until runtime, so nil is the best we get
-        if type == Fastlane::Boolean
-          type = nil
-        end
+        type = nil if type == Fastlane::Boolean
 
         # This is an important bit of trickery to solve the boolean option situation.
         #
@@ -67,7 +63,9 @@ module FastlaneCore
         long_switch = "--#{option.key} #{value_appendix}"
 
         description = option.description
-        description += " (#{option.env_name})" unless option.env_name.to_s.empty?
+        unless option.env_name.to_s.empty?
+          description += " (#{option.env_name})"
+        end
 
         # We compact this array here to remove the short_switch variable if it is nil.
         # Passing a nil value to global_option has been shown to create problems with
@@ -78,7 +76,12 @@ module FastlaneCore
         # If we don't have a data type for this option, we tell it to act like a String.
         # This allows us to get a reasonable value for boolean options that can be
         # automatically coerced or otherwise handled by the ConfigItem for others.
-        args = [short_switch, long_switch, (type || String), description].compact
+        args = [
+          short_switch,
+          long_switch,
+          (type || String),
+          description
+        ].compact
 
         if command
           command.option(*args)
@@ -92,10 +95,20 @@ module FastlaneCore
     def validate_short_switch(used_switches, short_switch, key)
       return if short_switch.nil?
 
-      UI.user_error!("Short option #{short_switch} already taken for key #{key}") if used_switches.include?(short_switch)
-      UI.user_error!("-v is already used for the version (key #{key})") if short_switch == "-v"
-      UI.user_error!("-h is already used for the help screen (key #{key})") if short_switch == "-h"
-      UI.user_error!("-t is already used for the trace screen (key #{key})") if short_switch == "-t"
+      if used_switches.include?(short_switch)
+        UI.user_error!(
+          "Short option #{short_switch} already taken for key #{key}"
+        )
+      end
+      if short_switch == '-v'
+        UI.user_error!("-v is already used for the version (key #{key})")
+      end
+      if short_switch == '-h'
+        UI.user_error!("-h is already used for the help screen (key #{key})")
+      end
+      if short_switch == '-t'
+        UI.user_error!("-t is already used for the trace screen (key #{key})")
+      end
 
       used_switches << short_switch
     end

@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         path = params[:path]
         FileUtils.cp(path, "#{path}.back", { preserve: true })
-        UI.message("Successfully created a backup 💾")
+        UI.message('Successfully created a backup 💾')
       end
 
       def self.description
@@ -16,21 +16,21 @@ module Fastlane
       end
 
       def self.author
-        "gin0606"
+        'gin0606'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :path,
-                                       description: "Path to the file you want to backup",
-                                       optional: false)
+          FastlaneCore::ConfigItem.new(
+            key: :path,
+            description: 'Path to the file you want to backup',
+            optional: false
+          )
         ]
       end
 
       def self.example_code
-        [
-          'backup_file(path: "/path/to/file")'
-        ]
+        ['backup_file(path: "/path/to/file")']
       end
 
       def self.category

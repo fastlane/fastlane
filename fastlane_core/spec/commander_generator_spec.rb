@@ -4,18 +4,24 @@ describe FastlaneCore do
       describe '' do
         it 'should not return `true` for String options with no short flag' do
           config_items = [
-            FastlaneCore::ConfigItem.new(key: :long_option_only_string,
-                                 description: "desc",
-                                   is_string: true,
-                               default_value: "blah",
-                                    optional: true),
-            FastlaneCore::ConfigItem.new(key: :bool,
-                                 description: "desc",
-                               default_value: false,
-                                   is_string: false)
+            FastlaneCore::ConfigItem.new(
+              key: :long_option_only_string,
+              description: 'desc',
+              is_string: true,
+              default_value: 'blah',
+              optional: true
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :bool,
+              description: 'desc',
+              default_value: false,
+              is_string: false
+            )
           ]
 
-          stub_commander_runner_args(['--long_option_only_string', 'value', '--bool', 'false'])
+          stub_commander_runner_args(
+            %w[--long_option_only_string value --bool false]
+          )
 
           program = TestCommanderProgram.run(config_items)
 
@@ -27,43 +33,54 @@ describe FastlaneCore do
       describe 'pass-through arguments' do
         it 'captures those that are not command names or flags' do
           # 'test' is the command name set up by TestCommanderProgram
-          stub_commander_runner_args(['test', 'other', '-b'])
+          stub_commander_runner_args(%w[test other -b])
 
-          program = TestCommanderProgram.run([
-                                               FastlaneCore::ConfigItem.new(key: :boolean_1,
-                                                                   short_option: '-b',
-                                                                    description: 'Boolean 1',
-                                                                      is_string: false)
-                                             ])
+          program =
+            TestCommanderProgram.run(
+              [
+                FastlaneCore::ConfigItem.new(
+                  key: :boolean_1,
+                  short_option: '-b',
+                  description: 'Boolean 1',
+                  is_string: false
+                )
+              ]
+            )
 
-          expect(program.args).to eq(['other'])
+          expect(program.args).to eq(%w[other])
         end
       end
 
       describe 'String flags' do
         let(:config_items) do
           [
-            FastlaneCore::ConfigItem.new(key: :string_1,
-                                short_option: '-s',
-                                 description: 'String 1',
-                                   is_string: true)
+            FastlaneCore::ConfigItem.new(
+              key: :string_1,
+              short_option: '-s',
+              description: 'String 1',
+              is_string: true
+            )
           ]
         end
 
         it 'raises MissingArgument for short flags with missing values' do
-          stub_commander_runner_args(['-s'])
+          stub_commander_runner_args(%w[-s])
 
-          expect { TestCommanderProgram.run(config_items) }.to raise_error(OptionParser::MissingArgument)
+          expect { TestCommanderProgram.run(config_items) }.to raise_error(
+                      OptionParser::MissingArgument
+                    )
         end
 
         it 'raises MissingArgument for long flags with missing values' do
-          stub_commander_runner_args(['--string_1'])
+          stub_commander_runner_args(%w[--string_1])
 
-          expect { TestCommanderProgram.run(config_items) }.to raise_error(OptionParser::MissingArgument)
+          expect { TestCommanderProgram.run(config_items) }.to raise_error(
+                      OptionParser::MissingArgument
+                    )
         end
 
         it 'captures the provided value for short flags' do
-          stub_commander_runner_args(['-s', 'value'])
+          stub_commander_runner_args(%w[-s value])
 
           program = TestCommanderProgram.run(config_items)
 
@@ -71,7 +88,7 @@ describe FastlaneCore do
         end
 
         it 'captures the provided value for long flags' do
-          stub_commander_runner_args(['--string_1', 'value'])
+          stub_commander_runner_args(%w[--string_1 value])
 
           program = TestCommanderProgram.run(config_items)
 
@@ -82,23 +99,29 @@ describe FastlaneCore do
       describe ':shell_string flags' do
         let(:config_items) do
           [
-            FastlaneCore::ConfigItem.new(key: :shell_string_1,
-                                short_option: '-s',
-                                 description: 'Shell String 1',
-                                        type: :shell_string)
+            FastlaneCore::ConfigItem.new(
+              key: :shell_string_1,
+              short_option: '-s',
+              description: 'Shell String 1',
+              type: :shell_string
+            )
           ]
         end
 
         it 'raises MissingArgument for short flags with missing values' do
-          stub_commander_runner_args(['-s'])
+          stub_commander_runner_args(%w[-s])
 
-          expect { TestCommanderProgram.run(config_items) }.to raise_error(OptionParser::MissingArgument)
+          expect { TestCommanderProgram.run(config_items) }.to raise_error(
+                      OptionParser::MissingArgument
+                    )
         end
 
         it 'raises MissingArgument for long flags with missing values' do
-          stub_commander_runner_args(['--shell_string_1'])
+          stub_commander_runner_args(%w[--shell_string_1])
 
-          expect { TestCommanderProgram.run(config_items) }.to raise_error(OptionParser::MissingArgument)
+          expect { TestCommanderProgram.run(config_items) }.to raise_error(
+                      OptionParser::MissingArgument
+                    )
         end
 
         it 'captures the provided value for short flags' do
@@ -121,28 +144,34 @@ describe FastlaneCore do
       describe 'Integer flags' do
         let(:config_items) do
           [
-            FastlaneCore::ConfigItem.new(key: :integer_1,
-                                short_option: '-i',
-                                 description: 'Integer 1',
-                                   is_string: false,
-                                        type: Integer)
+            FastlaneCore::ConfigItem.new(
+              key: :integer_1,
+              short_option: '-i',
+              description: 'Integer 1',
+              is_string: false,
+              type: Integer
+            )
           ]
         end
 
         it 'raises MissingArgument for short flags with missing values' do
-          stub_commander_runner_args(['-i'])
+          stub_commander_runner_args(%w[-i])
 
-          expect { TestCommanderProgram.run(config_items) }.to raise_error(OptionParser::MissingArgument)
+          expect { TestCommanderProgram.run(config_items) }.to raise_error(
+                      OptionParser::MissingArgument
+                    )
         end
 
         it 'raises MissingArgument for long flags with missing values' do
-          stub_commander_runner_args(['--integer_1'])
+          stub_commander_runner_args(%w[--integer_1])
 
-          expect { TestCommanderProgram.run(config_items) }.to raise_error(OptionParser::MissingArgument)
+          expect { TestCommanderProgram.run(config_items) }.to raise_error(
+                      OptionParser::MissingArgument
+                    )
         end
 
         it 'captures the provided value for short flags' do
-          stub_commander_runner_args(['-i', '123'])
+          stub_commander_runner_args(%w[-i 123])
 
           program = TestCommanderProgram.run(config_items)
 
@@ -150,7 +179,7 @@ describe FastlaneCore do
         end
 
         it 'captures the provided value for long flags' do
-          stub_commander_runner_args(['--integer_1', '123'])
+          stub_commander_runner_args(%w[--integer_1 123])
 
           program = TestCommanderProgram.run(config_items)
 
@@ -161,28 +190,34 @@ describe FastlaneCore do
       describe 'Float flags' do
         let(:config_items) do
           [
-            FastlaneCore::ConfigItem.new(key: :float_1,
-                                short_option: '-f',
-                                 description: 'Float 1',
-                                   is_string: false,
-                                        type: Float)
+            FastlaneCore::ConfigItem.new(
+              key: :float_1,
+              short_option: '-f',
+              description: 'Float 1',
+              is_string: false,
+              type: Float
+            )
           ]
         end
 
         it 'raises MissingArgument for short flags with missing values' do
-          stub_commander_runner_args(['-f'])
+          stub_commander_runner_args(%w[-f])
 
-          expect { TestCommanderProgram.run(config_items) }.to raise_error(OptionParser::MissingArgument)
+          expect { TestCommanderProgram.run(config_items) }.to raise_error(
+                      OptionParser::MissingArgument
+                    )
         end
 
         it 'raises MissingArgument for long flags with missing values' do
-          stub_commander_runner_args(['--float_1'])
+          stub_commander_runner_args(%w[--float_1])
 
-          expect { TestCommanderProgram.run(config_items) }.to raise_error(OptionParser::MissingArgument)
+          expect { TestCommanderProgram.run(config_items) }.to raise_error(
+                      OptionParser::MissingArgument
+                    )
         end
 
         it 'captures the provided value for short flags' do
-          stub_commander_runner_args(['-f', '1.23'])
+          stub_commander_runner_args(%w[-f 1.23])
 
           program = TestCommanderProgram.run(config_items)
 
@@ -190,7 +225,7 @@ describe FastlaneCore do
         end
 
         it 'captures the provided value for long flags' do
-          stub_commander_runner_args(['--float_1', '1.23'])
+          stub_commander_runner_args(%w[--float_1 1.23])
 
           program = TestCommanderProgram.run(config_items)
 
@@ -201,15 +236,17 @@ describe FastlaneCore do
       describe 'Boolean flags' do
         let(:config_items) do
           [
-            FastlaneCore::ConfigItem.new(key: :boolean_1,
-                                short_option: '-a',
-                                 description: 'Boolean 1',
-                                   is_string: false)
+            FastlaneCore::ConfigItem.new(
+              key: :boolean_1,
+              short_option: '-a',
+              description: 'Boolean 1',
+              is_string: false
+            )
           ]
         end
 
         it 'treats short flags with no data type as booleans with true values' do
-          stub_commander_runner_args(['-a'])
+          stub_commander_runner_args(%w[-a])
 
           program = TestCommanderProgram.run(config_items)
 
@@ -217,7 +254,7 @@ describe FastlaneCore do
         end
 
         it 'treats long flags with no data type as booleans with true values' do
-          stub_commander_runner_args(['--boolean_1'])
+          stub_commander_runner_args(%w[--boolean_1])
 
           program = TestCommanderProgram.run(config_items)
 
@@ -225,7 +262,7 @@ describe FastlaneCore do
         end
 
         it 'treats short flags with no data type as booleans and captures true values' do
-          stub_commander_runner_args(['-a', 'true'])
+          stub_commander_runner_args(%w[-a true])
 
           program = TestCommanderProgram.run(config_items)
 
@@ -235,7 +272,7 @@ describe FastlaneCore do
         end
 
         it 'treats long flags with no data type as booleans and captures true values' do
-          stub_commander_runner_args(['--boolean_1', 'true'])
+          stub_commander_runner_args(%w[--boolean_1 true])
 
           program = TestCommanderProgram.run(config_items)
 
@@ -245,7 +282,7 @@ describe FastlaneCore do
         end
 
         it 'treats short flags with no data type as booleans and captures false values' do
-          stub_commander_runner_args(['-a', 'false'])
+          stub_commander_runner_args(%w[-a false])
 
           program = TestCommanderProgram.run(config_items)
 
@@ -255,7 +292,7 @@ describe FastlaneCore do
         end
 
         it 'treats long flags with no data type as booleans and captures false values' do
-          stub_commander_runner_args(['--boolean_1', 'false'])
+          stub_commander_runner_args(%w[--boolean_1 false])
 
           program = TestCommanderProgram.run(config_items)
 
@@ -268,96 +305,118 @@ describe FastlaneCore do
       describe 'Array flags' do
         let(:config_items) do
           [
-            FastlaneCore::ConfigItem.new(key: :array_1,
-                                short_option: '-a',
-                                 description: 'Array 1',
-                                   is_string: false,
-                                        type: Array)
+            FastlaneCore::ConfigItem.new(
+              key: :array_1,
+              short_option: '-a',
+              description: 'Array 1',
+              is_string: false,
+              type: Array
+            )
           ]
         end
 
         it 'raises MissingArgument for short flags with missing values' do
-          stub_commander_runner_args(['-a'])
+          stub_commander_runner_args(%w[-a])
 
-          expect { TestCommanderProgram.run(config_items) }.to raise_error(OptionParser::MissingArgument)
+          expect { TestCommanderProgram.run(config_items) }.to raise_error(
+                      OptionParser::MissingArgument
+                    )
         end
 
         it 'raises MissingArgument for long flags with missing values' do
-          stub_commander_runner_args(['--array_1'])
+          stub_commander_runner_args(%w[--array_1])
 
-          expect { TestCommanderProgram.run(config_items) }.to raise_error(OptionParser::MissingArgument)
+          expect { TestCommanderProgram.run(config_items) }.to raise_error(
+                      OptionParser::MissingArgument
+                    )
         end
 
         it 'captures the provided value for short flags' do
-          stub_commander_runner_args(['-a', 'a,b,c'])
+          stub_commander_runner_args(%w[-a a,b,c])
 
           program = TestCommanderProgram.run(config_items)
 
-          expect(program.options[:array_1]).to eq(%w(a b c))
+          expect(program.options[:array_1]).to eq(%w[a b c])
         end
 
         it 'captures the provided value for long flags' do
-          stub_commander_runner_args(['--array_1', 'a,b,c'])
+          stub_commander_runner_args(%w[--array_1 a,b,c])
 
           program = TestCommanderProgram.run(config_items)
 
-          expect(program.options[:array_1]).to eq(%w(a b c))
+          expect(program.options[:array_1]).to eq(%w[a b c])
         end
       end
 
       describe 'Multiple flags' do
         let(:config_items) do
           [
-            FastlaneCore::ConfigItem.new(key: :string_1,
-                                short_option: '-s',
-                                 description: 'String 1',
-                                   is_string: true),
-            FastlaneCore::ConfigItem.new(key: :array_1,
-                                short_option: '-a',
-                                 description: 'Array 1',
-                                   is_string: false,
-                                        type: Array),
-            FastlaneCore::ConfigItem.new(key: :integer_1,
-                                short_option: '-i',
-                                 description: 'Integer 1',
-                                   is_string: false,
-                                        type: Integer),
-            FastlaneCore::ConfigItem.new(key: :float_1,
-                                short_option: '-f',
-                                 description: 'Float 1',
-                                   is_string: false,
-                                        type: Float),
-            FastlaneCore::ConfigItem.new(key: :boolean_1,
-                                short_option: '-b',
-                                 description: 'Boolean 1',
-                                   is_string: false)
+            FastlaneCore::ConfigItem.new(
+              key: :string_1,
+              short_option: '-s',
+              description: 'String 1',
+              is_string: true
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :array_1,
+              short_option: '-a',
+              description: 'Array 1',
+              is_string: false,
+              type: Array
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :integer_1,
+              short_option: '-i',
+              description: 'Integer 1',
+              is_string: false,
+              type: Integer
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :float_1,
+              short_option: '-f',
+              description: 'Float 1',
+              is_string: false,
+              type: Float
+            ),
+            FastlaneCore::ConfigItem.new(
+              key: :boolean_1,
+              short_option: '-b',
+              description: 'Boolean 1',
+              is_string: false
+            )
           ]
         end
 
         it 'raises MissingArgument for short flags with missing values' do
-          stub_commander_runner_args(['-b', '-s'])
+          stub_commander_runner_args(%w[-b -s])
 
-          expect { TestCommanderProgram.run(config_items) }.to raise_error(OptionParser::MissingArgument)
+          expect { TestCommanderProgram.run(config_items) }.to raise_error(
+                      OptionParser::MissingArgument
+                    )
         end
 
         it 'raises MissingArgument for long flags with missing values' do
-          stub_commander_runner_args(['--boolean_1', '--string_1'])
+          stub_commander_runner_args(%w[--boolean_1 --string_1])
 
-          expect { TestCommanderProgram.run(config_items) }.to raise_error(OptionParser::MissingArgument)
+          expect { TestCommanderProgram.run(config_items) }.to raise_error(
+                      OptionParser::MissingArgument
+                    )
         end
 
         it 'captures the provided values for short flags' do
-          stub_commander_runner_args(['-b', '-a', 'a,b,c', '-s', 'value'])
+          stub_commander_runner_args(%w[-b -a a,b,c -s value])
 
           program = TestCommanderProgram.run(config_items)
 
           expect(program.options[:boolean_1]).to be(true)
           expect(program.options[:string_1]).to eq('value')
-          expect(program.options[:array_1]).to eq(%w(a b c))
+          expect(program.options[:array_1]).to eq(%w[a b c])
         end
 
         it 'captures the provided values for long flags' do
-          stub_commander_runner_args(['--float_1', '1.23', '--boolean_1', 'false', '--integer_1', '123'])
+          stub_commander_runner_args(
+            %w[--float_1 1.23 --boolean_1 false --integer_1 123]
+          )
 
           program = TestCommanderProgram.run(config_items)
 
@@ -369,7 +428,7 @@ describe FastlaneCore do
         end
 
         it 'captures the provided values for mixed flags' do
-          stub_commander_runner_args(['-f', '1.23', '-b', '--integer_1', '123'])
+          stub_commander_runner_args(%w[-f 1.23 -b --integer_1 123])
 
           program = TestCommanderProgram.run(config_items)
 

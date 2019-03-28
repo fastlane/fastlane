@@ -2,9 +2,12 @@ require 'fastlane/documentation/docs_generator'
 
 describe Fastlane do
   describe Fastlane::DocsGenerator do
-    it "generates new markdown docs" do
-      output_path = "/tmp/documentation.md"
-      ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileGrouped')
+    it 'generates new markdown docs' do
+      output_path = '/tmp/documentation.md'
+      ff =
+        Fastlane::FastFile.new(
+          './fastlane/spec/fixtures/fastfiles/FastfileGrouped'
+        )
       Fastlane::DocsGenerator.run(ff, output_path)
 
       output = File.read(output_path)
@@ -21,9 +24,12 @@ describe Fastlane do
       expect(output).to include('https://fastlane.tools')
     end
 
-    it "generates new markdown docs but skips empty platforms" do
-      output_path = "/tmp/documentation.md"
-      ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfilePlatformDocumentation')
+    it 'generates new markdown docs but skips empty platforms' do
+      output_path = '/tmp/documentation.md'
+      ff =
+        Fastlane::FastFile.new(
+          './fastlane/spec/fixtures/fastfiles/FastfilePlatformDocumentation'
+        )
       Fastlane::DocsGenerator.run(ff, output_path)
 
       output = File.read(output_path)

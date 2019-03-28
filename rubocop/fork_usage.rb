@@ -3,7 +3,9 @@ require 'rubocop'
 module RuboCop
   module CrossPlatform
     class ForkUsage < RuboCop::Cop::Cop
-      MSG = "Using `fork`, which does not work on all platforms. Wrap in `if Process.respond_to?(:fork)` to silence.".freeze
+      MSG =
+        'Using `fork`, which does not work on all platforms. Wrap in `if Process.respond_to?(:fork)` to silence.'
+          .freeze
 
       def_node_matcher :bad_fork, <<-PATTERN
         (send _ :fork)

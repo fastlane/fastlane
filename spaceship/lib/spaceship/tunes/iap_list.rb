@@ -29,47 +29,56 @@ module Spaceship
       attr_accessor :is_required
       attr_accessor :can_delete_addon
 
-      attr_mapping({
-        'adamId' => :purchase_id,
-        'referenceName' => :reference_name,
-        'familyReferenceName' => :family_reference_name,
-        'vendorId' => :product_id,
-        'durationDays' => :duration_days,
-        'versions' => :versions,
-        'purpleSoftwareAdamIds' => :purple_apple_id,
-        'lastModifiedDate' => :last_modified_date,
-        'isNewsSubscription' => :is_news_subscription,
-        'numberOfCodes' => :number_of_codes,
-        'maximumNumberOfCodes' => :maximum_number_of_codes,
-        'appMaximumNumberOfCodes' => :app_maximum_number_of_codes,
-        'isEditable' => :is_editable,
-        'isRequired' => :is_required,
-        'canDeleteAddOn' => :can_delete_addon
-      })
+      attr_mapping(
+        {
+          'adamId' => :purchase_id,
+          'referenceName' => :reference_name,
+          'familyReferenceName' => :family_reference_name,
+          'vendorId' => :product_id,
+          'durationDays' => :duration_days,
+          'versions' => :versions,
+          'purpleSoftwareAdamIds' => :purple_apple_id,
+          'lastModifiedDate' => :last_modified_date,
+          'isNewsSubscription' => :is_news_subscription,
+          'numberOfCodes' => :number_of_codes,
+          'maximumNumberOfCodes' => :maximum_number_of_codes,
+          'appMaximumNumberOfCodes' => :app_maximum_number_of_codes,
+          'isEditable' => :is_editable,
+          'isRequired' => :is_required,
+          'canDeleteAddOn' => :can_delete_addon
+        }
+      )
 
       def type
-        Tunes::IAPType.get_from_string(raw_data["addOnType"])
+        Tunes::IAPType.get_from_string(raw_data['addOnType'])
       end
 
       def status
-        Tunes::IAPStatus.get_from_string(raw_data["iTunesConnectStatus"])
+        Tunes::IAPStatus.get_from_string(raw_data['iTunesConnectStatus'])
       end
 
       def edit
-        attrs = client.load_iap(app_id: application.apple_id, purchase_id: self.purchase_id)
+        attrs =
+          client.load_iap(
+            app_id: application.apple_id, purchase_id: self.purchase_id
+          )
         attrs[:application] = application
 
-        if attrs["addOnType"] == Spaceship::Tunes::IAPType::RECURRING
-          raw_pricing_data = client.load_recurring_iap_pricing(app_id: application.apple_id,
-                                                               purchase_id: self.purchase_id)
-          attrs["pricingData"] = raw_pricing_data
+        if attrs['addOnType'] == Spaceship::Tunes::IAPType::RECURRING
+          raw_pricing_data =
+            client.load_recurring_iap_pricing(
+              app_id: application.apple_id, purchase_id: self.purchase_id
+            )
+          attrs['pricingData'] = raw_pricing_data
         end
 
         Tunes::IAPDetail.new(attrs)
       end
 
       def delete!
-        client.delete_iap!(app_id: application.apple_id, purchase_id: self.purchase_id)
+        client.delete_iap!(
+          app_id: application.apple_id, purchase_id: self.purchase_id
+        )
       end
     end
   end

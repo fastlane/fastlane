@@ -22,22 +22,28 @@ module Fastlane
         Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] ||= []
         Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] << path
 
-        uuid = ENV["SIGH_UUID"] || ENV["SIGH_UDID"] # the UUID of the profile
-        name = ENV["SIGH_NAME"] # the name of the profile
-        Actions.lane_context[SharedValues::SIGH_UUID] = Actions.lane_context[SharedValues::SIGH_UDID] = uuid if uuid
-        Actions.lane_context[SharedValues::SIGH_NAME] = Actions.lane_context[SharedValues::SIGH_NAME] = name if name
+        uuid = ENV['SIGH_UUID'] || ENV[]
+        name = ENV[]
+        if uuid
+          Actions.lane_context[SharedValues::SIGH_UUID] =
+            Actions.lane_context[SharedValues::SIGH_UDID] = uuid
+        end
+        if name
+          Actions.lane_context[SharedValues::SIGH_NAME] =
+            Actions.lane_context[SharedValues::SIGH_NAME] = name
+        end
 
-        set_profile_type(values, ENV["SIGH_PROFILE_ENTERPRISE"])
+        set_profile_type(values, ENV['SIGH_PROFILE_ENTERPRISE'])
 
         return uuid # returs uuid of profile
       end
 
       def self.set_profile_type(values, enterprise)
-        profile_type = "app-store"
-        profile_type = "ad-hoc" if values[:adhoc]
-        profile_type = "development" if values[:development]
-        profile_type = "developer-id" if values[:developer_id]
-        profile_type = "enterprise" if enterprise
+        profile_type = 'app-store'
+        profile_type = 'ad-hoc' if values[:adhoc]
+        profile_type = 'development' if values[:development]
+        profile_type = 'developer-id' if values[:developer_id]
+        profile_type = 'enterprise' if enterprise
 
         UI.message("Setting Provisioning Profile type to '#{profile_type}'")
 
@@ -45,15 +51,15 @@ module Fastlane
       end
 
       def self.description
-        "Generates a provisioning profile, saving it in the current folder (via _sigh_)"
+        'Generates a provisioning profile, saving it in the current folder (via _sigh_)'
       end
 
       def self.author
-        "KrauseFx"
+        'KrauseFx'
       end
 
       def self.return_value
-        "The UUID of the profile sigh just fetched/generated"
+        'The UUID of the profile sigh just fetched/generated'
       end
 
       def self.details
@@ -66,7 +72,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       def self.example_code

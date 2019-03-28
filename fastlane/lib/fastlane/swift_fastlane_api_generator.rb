@@ -6,7 +6,9 @@ module Fastlane
     attr_accessor :swift_protocol
     attr_accessor :command_line_tool_name
 
-    def initialize(command_line_tool_name: nil, swift_class: nil, swift_protocol: nil)
+    def initialize(
+      command_line_tool_name: nil, swift_class: nil, swift_protocol: nil
+    )
       self.command_line_tool_name = command_line_tool_name
       self.swift_class = swift_class
       self.swift_protocol = swift_protocol
@@ -14,14 +16,14 @@ module Fastlane
   end
 
   class SwiftFastlaneAPIGenerator
-    DEFAULT_API_VERSION_STRING = "0.9.1"
+    DEFAULT_API_VERSION_STRING = '0.9.1'
     attr_accessor :tools_option_files
     attr_accessor :actions_not_supported
     attr_accessor :action_options_to_ignore
     attr_accessor :target_output_path
     attr_accessor :generated_paths # stores all file names of generated files (as they are generated)
 
-    def initialize(target_output_path: "swift")
+    def initialize(target_output_path: 'swift')
       @target_output_path = File.expand_path(target_output_path)
       @generated_paths = []
       require 'fastlane'
@@ -31,22 +33,24 @@ module Fastlane
       # this is important because we need to generate the proper api for these by creating a protocol
       # with default implementation we can use in the Fastlane.swift API if people want to use
       # <Toolname>file.swift files.
-      self.tools_option_files = TOOL_CONFIG_FILES.map { |config_file| config_file.downcase.chomp("file") }.to_set
+      self.tools_option_files =
+        TOOL_CONFIG_FILES.map do |config_file|
+          config_file.downcase.chomp('file')
+        end.to_set
 
-      self.actions_not_supported = ["import", "import_from_git"].to_set
+      self.actions_not_supported = %w[import import_from_git].to_set
 
       self.action_options_to_ignore = {
-
-        "precheck" => [
-          "negative_apple_sentiment",
-          "placeholder_text",
-          "other_platforms",
-          "future_functionality",
-          "test_words",
-          "curse_words",
-          "custom_text",
-          "copyright_date",
-          "unreachable_urls"
+        'precheck' => %w[
+          negative_apple_sentiment
+          placeholder_text
+          other_platforms
+          future_functionality
+          test_words
+          curse_words
+          custom_text
+          copyright_date
+          unreachable_urls
         ].to_set
       }
     end
@@ -54,7 +58,7 @@ module Fastlane
     def generate_swift
       self.generated_paths = [] # reset generated paths in case we're called multiple times
       file_content = []
-      file_content << "import Foundation"
+      file_content << 'import Foundation'
 
       tool_details = []
       ActionsList.all_actions do |action|
@@ -62,67 +66,83 @@ module Fastlane
 
         swift_function = process_action(action: action)
         if defined?(swift_function.class_name)
-          tool_details << SwiftToolDetail.new(
-            command_line_tool_name: action.action_name,
-            swift_class: swift_function.class_name,
-            swift_protocol: swift_function.protocol_name
-          )
+          tool_details <<
+            SwiftToolDetail.new(
+              command_line_tool_name: action.action_name,
+              swift_class: swift_function.class_name,
+              swift_protocol: swift_function.protocol_name
+            )
         end
-        unless swift_function
-          next
-        end
+        next unless swift_function
 
         file_content << swift_function.swift_code
       end
-      file_content << "" # newline because we're adding an extension
-      file_content << "// These are all the parsing functions needed to transform our data into the expected types"
+      file_content << '' # newline because we're adding an extension
+      file_content <<
+        '// These are all the parsing functions needed to transform our data into the expected types'
       file_content << generate_lanefile_parsing_functions
 
-      tool_objects = generate_lanefile_tool_objects(classes: tool_details.map(&:swift_class))
+      tool_objects =
+        generate_lanefile_tool_objects(classes: tool_details.map(&:swift_class))
       file_content << tool_objects
       new_file_content = file_content.join("\n")
 
-      fastlane_swift_api_path = File.join(@target_output_path, "Fastlane.swift")
+      fastlane_swift_api_path = File.join(@target_output_path, 'Fastlane.swift')
       old_file_content = File.read(fastlane_swift_api_path)
 
       # compare old file content to potential new file content
-      api_version = determine_api_version(new_file_content: new_file_content, old_file_content: old_file_content)
+      api_version =
+        determine_api_version(
+          new_file_content: new_file_content, old_file_content: old_file_content
+        )
       old_api_version = find_api_version_string(content: old_file_content)
 
       # if there is a change, we need to write out the new file
       if api_version != old_api_version
-        new_file_content.concat(autogen_version_warning_text(api_version: api_version))
+        new_file_content.concat(
+          autogen_version_warning_text(api_version: api_version)
+        )
 
         File.write(fastlane_swift_api_path, new_file_content)
         UI.success(fastlane_swift_api_path)
         self.generated_paths << fastlane_swift_api_path
       end
 
-      default_implementations_path = generate_default_implementations(tool_details: tool_details)
+      default_implementations_path =
+        generate_default_implementations(tool_details: tool_details)
 
       # we might not have any changes, like if it's a hotpatch
-      self.generated_paths += default_implementations_path if default_implementations_path.length > 0
+      if default_implementations_path.length > 0
+        self.generated_paths += default_implementations_path
+      end
 
       return self.generated_paths
     end
 
-    def write_lanefile(lanefile_implementation_opening: nil, class_name: nil, tool_name: nil)
+    def write_lanefile(
+      lanefile_implementation_opening: nil, class_name: nil, tool_name: nil
+    )
       disclaimer = []
-      disclaimer << "// This class is automatically included in FastlaneRunner during build"
-      disclaimer << ""
-      disclaimer << "// This autogenerated file will be overwritten or replaced during build time, or when you initialize `#{tool_name}`"
+      disclaimer <<
+        '// This class is automatically included in FastlaneRunner during build'
+      disclaimer << ''
+      disclaimer <<
+        "// This autogenerated file will be overwritten or replaced during build time, or when you initialize `#{tool_name}`"
       disclaimer << lanefile_implementation_opening
-      disclaimer << "// If you want to enable `#{tool_name}`, run `fastlane #{tool_name} init`"
-      disclaimer << "// After, this file will be replaced with a custom implementation that contains values you supplied"
-      disclaimer << "// during the `init` process, and you won't see this message"
-      disclaimer << "}"
-      disclaimer << ""
-      disclaimer << ""
-      disclaimer << ""
-      disclaimer << ""
-      disclaimer << ""
+      disclaimer <<
+        "// If you want to enable `#{tool_name}`, run `fastlane #{tool_name} init`"
+      disclaimer <<
+        '// After, this file will be replaced with a custom implementation that contains values you supplied'
+      disclaimer <<
+        "// during the `init` process, and you won't see this message"
+      disclaimer << '}'
+      disclaimer << ''
+      disclaimer << ''
+      disclaimer << ''
+      disclaimer << ''
+      disclaimer << ''
       disclaimer << "// Generated with fastlane #{Fastlane::VERSION}"
-      disclaimer << ""
+      disclaimer << ''
 
       file_content = disclaimer.join("\n")
 
@@ -136,27 +156,32 @@ module Fastlane
       files_generated = []
       tool_details.each do |tool_detail|
         header = []
-        header << "//"
-        header << "//  ** NOTE **"
-        header << "//  This file is provided by fastlane and WILL be overwritten in future updates"
-        header << "//  If you want to add extra functionality to this project, create a new file in a"
+        header << '//'
+        header << '//  ** NOTE **'
+        header <<
+          '//  This file is provided by fastlane and WILL be overwritten in future updates'
+        header <<
+          '//  If you want to add extra functionality to this project, create a new file in a'
         header << "//  new group so that it won't be marked for upgrade"
-        header << "//"
-        header << ""
-        header << "class #{tool_detail.swift_class}: #{tool_detail.swift_protocol} {"
+        header << '//'
+        header << ''
+        header <<
+          "class #{tool_detail.swift_class}: #{tool_detail.swift_protocol} {"
         lanefile_implementation_opening = header.join("\n")
 
-        files_generated << write_lanefile(
-          lanefile_implementation_opening: lanefile_implementation_opening,
-          class_name: tool_detail.swift_class,
-          tool_name: tool_detail.command_line_tool_name
-        )
+        files_generated <<
+          write_lanefile(
+            lanefile_implementation_opening: lanefile_implementation_opening,
+            class_name: tool_detail.swift_class,
+            tool_name: tool_detail.command_line_tool_name
+          )
       end
       return files_generated
     end
 
     def generate_lanefile_parsing_functions
-      parsing_functions = 'func parseArray(fromString: String, function: String = #function) -> [String] {
+      parsing_functions =
+        'func parseArray(fromString: String, function: String = #function) -> [String] {
   verbose(message: "parsing an Array from data: \(fromString), from function: \(function)")
   let potentialArray: String
   if fromString.count < 2 {
@@ -203,19 +228,20 @@ func parseInt(fromString: String, function: String = #function) -> Int {
     end
 
     def generate_lanefile_tool_objects(classes: nil)
-      objects = classes.map do |filename|
-        "let #{filename.downcase}: #{filename} = #{filename}()"
-      end
+      objects =
+        classes.map do |filename|
+          "let #{filename.downcase}: #{filename} = #{filename}()"
+        end
       return objects
     end
 
     def autogen_version_warning_text(api_version: nil)
       warning_text_array = []
-      warning_text_array << ""
+      warning_text_array << ''
       warning_text_array << "// Please don't remove the lines below"
-      warning_text_array << "// They are used to detect outdated files"
+      warning_text_array << '// They are used to detect outdated files'
       warning_text_array << "// FastlaneRunnerAPIVersion [#{api_version}]"
-      warning_text_array << ""
+      warning_text_array << ''
       return warning_text_array.join("\n")
     end
 
@@ -230,7 +256,8 @@ func parseInt(fromString: String, function: String = #function) -> Int {
         return increment_api_version_string(api_version_string: old_api_version)
       end
 
-      relevant_old_file_content = old_file_content[0..(new_file_content.length - 1)]
+      relevant_old_file_content =
+        old_file_content[0..(new_file_content.length - 1)]
 
       if relevant_old_file_content == new_file_content
         # no changes at all, just return the same old api version string
@@ -246,8 +273,10 @@ func parseInt(fromString: String, function: String = #function) -> Int {
     end
 
     # expects format to be "X.Y.Z" where each value is a number
-    def increment_api_version_string(api_version_string: nil, increment_by: :patch)
-      versions = api_version_string.split(".")
+    def increment_api_version_string(
+      api_version_string: nil, increment_by: :patch
+    )
+      versions = api_version_string.split('.')
       major = versions[0].to_i
       minor = versions[1].to_i
       patch = versions[2].to_i
@@ -264,7 +293,7 @@ func parseInt(fromString: String, function: String = #function) -> Int {
         patch = 0
       end
 
-      new_version_string = [major, minor, patch].join(".")
+      new_version_string = [major, minor, patch].join('.')
       return new_version_string
     end
 
@@ -284,32 +313,35 @@ func parseInt(fromString: String, function: String = #function) -> Int {
 
       protocol_content_array << "protocol #{protocol_name}: class {"
       protocol_content_array += tool_swift_function.swift_vars
-      protocol_content_array << "}"
-      protocol_content_array << ""
+      protocol_content_array << '}'
+      protocol_content_array << ''
 
       protocol_content_array << "extension #{protocol_name} {"
-      protocol_content_array += tool_swift_function.swift_default_implementations
-      protocol_content_array << "}"
-      protocol_content_array << ""
+      protocol_content_array +=
+        tool_swift_function.swift_default_implementations
+      protocol_content_array << '}'
+      protocol_content_array << ''
       new_file_content = protocol_content_array.join("\n")
 
       target_path = File.join(@target_output_path, "#{protocol_name}.swift")
 
-      old_file_content = ""
+      old_file_content = ''
       # we might have a new file here, unlikely, but possible
-      if File.exist?(target_path)
-        old_file_content = File.read(target_path)
-      end
+      old_file_content = File.read(target_path) if File.exist?(target_path)
 
       # compare old file content to potential new file content
-      api_version = determine_api_version(new_file_content: new_file_content, old_file_content: old_file_content)
+      api_version =
+        determine_api_version(
+          new_file_content: new_file_content, old_file_content: old_file_content
+        )
       old_api_version = find_api_version_string(content: old_file_content)
 
       # we don't need to write this file out because the file versions are exactly the same
       return nil if api_version == old_api_version
 
       # use api_version to generate the disclaimer
-      api_version_disclaimer = autogen_version_warning_text(api_version: api_version)
+      api_version_disclaimer =
+        autogen_version_warning_text(api_version: api_version)
       new_file_content.concat(api_version_disclaimer)
 
       target_path = File.join(@target_output_path, "#{protocol_name}.swift")
@@ -321,9 +353,7 @@ func parseInt(fromString: String, function: String = #function) -> Int {
 
     def ignore_param?(function_name: nil, param_name: nil)
       option_set = @action_options_to_ignore[function_name.to_s]
-      unless option_set
-        return false
-      end
+      return false unless option_set
 
       return option_set.include?(param_name.to_s)
     end
@@ -355,17 +385,21 @@ func parseInt(fromString: String, function: String = #function) -> Int {
       action_return_type = action.return_type
 
       if self.tools_option_files.include?(action_name.to_s.downcase)
-        tool_swift_function = ToolSwiftFunction.new(
-          action_name: action_name,
-          keys: keys,
-          key_descriptions: key_descriptions,
-          key_default_values: key_default_values,
-          key_optionality_values: key_optionality_values,
-          key_type_overrides: key_type_overrides,
-          return_type: action_return_type
-        )
-        generated_protocol_file_path = generate_tool_protocol(tool_swift_function: tool_swift_function)
-        self.generated_paths << generated_protocol_file_path unless generated_protocol_file_path.nil?
+        tool_swift_function =
+          ToolSwiftFunction.new(
+            action_name: action_name,
+            keys: keys,
+            key_descriptions: key_descriptions,
+            key_default_values: key_default_values,
+            key_optionality_values: key_optionality_values,
+            key_type_overrides: key_type_overrides,
+            return_type: action_return_type
+          )
+        generated_protocol_file_path =
+          generate_tool_protocol(tool_swift_function: tool_swift_function)
+        unless generated_protocol_file_path.nil?
+          self.generated_paths << generated_protocol_file_path
+        end
         return tool_swift_function
       else
         return SwiftFunction.new(

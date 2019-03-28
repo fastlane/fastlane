@@ -1,4 +1,4 @@
-require "digest/md5"
+require 'digest/md5'
 
 require_relative 'globals'
 require_relative 'ui/ui'
@@ -7,7 +7,7 @@ require_relative 'module'
 module FastlaneCore
   # Builds a package for the binary ready to be uploaded with the iTunes Transporter
   class IpaUploadPackageBuilder
-    METADATA_FILE_NAME = "metadata.xml"
+    METADATA_FILE_NAME = 'metadata.xml'
 
     attr_accessor :package_path
 
@@ -20,17 +20,23 @@ module FastlaneCore
       @data = {
         apple_id: app_id,
         file_size: File.size(ipa_path),
-        ipa_path: File.basename(ipa_path), # this is only the base name as the ipa is inside the package
-        md5: Digest::MD5.file(ipa_path).hexdigest,
-        archive_type: "bundle",
-        platform: (platform || "ios") # pass "appletvos" for Apple TV's IPA
+        ipa_path: File.basename(ipa_path),
+        md5:
+          # this is only the base name as the ipa is inside the package
+          Digest::MD5
+            .file(ipa_path)
+            .hexdigest,
+        archive_type: 'bundle',
+        platform: (platform || 'ios') # pass "appletvos" for Apple TV's IPA
       }
 
-      xml_path = File.join(FastlaneCore::ROOT, "lib/assets/XMLTemplate.xml.erb")
-      xml = ERB.new(File.read(xml_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
+      xml_path = File.join(FastlaneCore::ROOT, 'lib/assets/XMLTemplate.xml.erb')
+      xml = ERB.new(File.read(xml_path)).result(binding)
 
       File.write(File.join(self.package_path, METADATA_FILE_NAME), xml)
-      UI.success("Wrote XML data to '#{self.package_path}'") if FastlaneCore::Globals.verbose?
+      if FastlaneCore::Globals.verbose?
+        UI.success("Wrote XML data to '#{self.package_path}'")
+      end
 
       return package_path
     end

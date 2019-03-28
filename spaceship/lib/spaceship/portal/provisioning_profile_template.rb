@@ -39,14 +39,16 @@ module Spaceship
       #   ["com.apple.smoot.subscriptionservice"]
       attr_accessor :entitlements
 
-      attr_mapping({
-        'description' => :template_description,
-        'purposeDescription' => :purpose_description,
-        'purposeDisplayName' => :purpose_display_name,
-        'purposeName' => :purpose_name,
-        'version' => :version,
-        'entitlements' => :entitlements
-      })
+      attr_mapping(
+        {
+          'description' => :template_description,
+          'purposeDescription' => :purpose_description,
+          'purposeDisplayName' => :purpose_display_name,
+          'purposeName' => :purpose_name,
+          'version' => :version,
+          'entitlements' => :entitlements
+        }
+      )
     end
   end
 end

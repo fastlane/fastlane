@@ -45,7 +45,9 @@ module Screengrab
 
       return nil unless build_tools_dir && File.directory?(build_tools_dir)
 
-      return File.join(build_tools_dir, build_tools_version) if build_tools_version
+      if build_tools_version
+        return File.join(build_tools_dir, build_tools_version)
+      end
 
       version = select_build_tools_version(build_tools_dir)
 
@@ -54,24 +56,31 @@ module Screengrab
 
     def select_build_tools_version(build_tools_dir)
       # Collect the sub-directories of the build_tools_dir, rejecting any that start with '.' to remove . and ..
-      dir_names = Dir.entries(build_tools_dir).select { |e| !e.start_with?('.') && File.directory?(File.join(build_tools_dir, e)) }
+      dir_names =
+        Dir.entries(build_tools_dir).select do |e|
+          !e.start_with?('.') && File.directory?(File.join(build_tools_dir, e))
+        end
 
       # Collect a sorted array of Version objects from the directory names, handling the possibility that some
       # entries may not be valid version names
-      versions = dir_names.map do |d|
-        begin
-          Gem::Version.new(d)
-        rescue
-          nil
-        end
-      end.reject(&:nil?).sort
+      versions =
+        dir_names.map do |d|
+          begin
+            Gem::Version.new(d)
+          rescue StandardError
+            nil
+          end
+        end.reject(&:nil?)
+          .sort
 
       # We'll take the last entry (highest version number) as the directory name we want
       versions.last.to_s
     end
 
     def find_adb(platform_tools_path)
-      return FastlaneCore::CommandExecutor.which('adb') unless platform_tools_path
+      unless platform_tools_path
+        return FastlaneCore::CommandExecutor.which('adb')
+      end
 
       adb_path = File.join(platform_tools_path, 'adb')
       return executable_command?(adb_path) ? adb_path : nil

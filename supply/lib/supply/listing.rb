@@ -22,11 +22,13 @@ module Supply
 
     # Updates the listing in the current edit
     def save
-      @google_api.update_listing_for_language(language: language,
-                                              title: title,
-                                              short_description: short_description,
-                                              full_description: full_description,
-                                              video: video)
+      @google_api.update_listing_for_language(
+        language: language,
+        title: title,
+        short_description: short_description,
+        full_description: full_description,
+        video: video
+      )
     end
   end
 end

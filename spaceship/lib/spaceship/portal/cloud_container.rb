@@ -64,9 +64,7 @@ module Spaceship
         # Find a specific iCloud Container identifier
         # @return (CloudContainer) The iCloud Container you're looking for. This is nil if the container can't be found.
         def find(identifier)
-          all.find do |container|
-            container.identifier == identifier
-          end
+          all.find { |container| container.identifier == identifier }
         end
       end
     end

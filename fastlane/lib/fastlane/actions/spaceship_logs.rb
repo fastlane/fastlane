@@ -9,25 +9,28 @@ module Fastlane
         copy_to_clipboard = params[:copy_to_clipboard]
 
         # Get log files
-        files = Dir.glob("/tmp/spaceship*.log").sort_by { |f| File.mtime(f) }.reverse
+        files =
+          Dir.glob('/tmp/spaceship*.log').sort_by { |f| File.mtime(f) }.reverse
 
         if files.size == 0
-          UI.message("No Spaceship log files found")
+          UI.message('No Spaceship log files found')
           return []
         end
 
         # Filter to latest
-        if latest
-          files = [files.first]
-        end
+        files = [files.first] if latest
 
         # Print contents
         if print_contents
           files.each do |file|
             data = File.read(file)
-            puts("-----------------------------------------------------------------------------------")
+            puts(
+              '-----------------------------------------------------------------------------------'
+            )
             puts(" Spaceship Log Content - #{file}")
-            puts("-----------------------------------------------------------------------------------")
+            puts(
+              '-----------------------------------------------------------------------------------'
+            )
             puts(data)
             puts("\n")
           end
@@ -35,12 +38,14 @@ module Fastlane
 
         # Print paths
         if print_paths
-          puts("-----------------------------------------------------------------------------------")
-          puts(" Spaceship Log Paths")
-          puts("-----------------------------------------------------------------------------------")
-          files.each do |file|
-            puts(file)
-          end
+          puts(
+            '-----------------------------------------------------------------------------------'
+          )
+          puts(' Spaceship Log Paths')
+          puts(
+            '-----------------------------------------------------------------------------------'
+          )
+          files.each { |file| puts(file) }
           puts("\n")
         end
 
@@ -48,9 +53,7 @@ module Fastlane
         if copy_to_path
           require 'fileutils'
           FileUtils.mkdir_p(copy_to_path)
-          files.each do |file|
-            FileUtils.cp(file, copy_to_path)
-          end
+          files.each { |file| FileUtils.cp(file, copy_to_path) }
         end
 
         # Copy contents to clipboard
@@ -63,30 +66,44 @@ module Fastlane
       end
 
       def self.description
-        "Find, print, and copy Spaceship logs"
+        'Find, print, and copy Spaceship logs'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :latest,
-                                       description: "Finds only the latest Spaceshop log file if set to true, otherwise returns all",
-                                       default_value: true,
-                                       type: Boolean),
-          FastlaneCore::ConfigItem.new(key: :print_contents,
-                                       description: "Prints the contents of the found Spaceship log file(s)",
-                                       default_value: false,
-                                       type: Boolean),
-          FastlaneCore::ConfigItem.new(key: :print_paths,
-                                       description: "Prints the paths of the found Spaceship log file(s)",
-                                       default_value: false,
-                                       type: Boolean),
-          FastlaneCore::ConfigItem.new(key: :copy_to_path,
-                                       description: "Copies the found Spaceship log file(s) to a directory",
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :copy_to_clipboard,
-                                       description: "Copies the contents of the found Spaceship log file(s) to the clipboard",
-                                       default_value: false,
-                                       type: Boolean)
+          FastlaneCore::ConfigItem.new(
+            key: :latest,
+            description:
+              'Finds only the latest Spaceshop log file if set to true, otherwise returns all',
+            default_value: true,
+            type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :print_contents,
+            description:
+              'Prints the contents of the found Spaceship log file(s)',
+            default_value: false,
+            type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :print_paths,
+            description: 'Prints the paths of the found Spaceship log file(s)',
+            default_value: false,
+            type: Boolean
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :copy_to_path,
+            description:
+              'Copies the found Spaceship log file(s) to a directory',
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :copy_to_clipboard,
+            description:
+              'Copies the contents of the found Spaceship log file(s) to the clipboard',
+            default_value: false,
+            type: Boolean
+          )
         ]
       end
 
@@ -120,7 +137,7 @@ module Fastlane
       end
 
       def self.return_value
-        "The array of Spaceship logs"
+        'The array of Spaceship logs'
       end
 
       def self.return_type
@@ -128,7 +145,7 @@ module Fastlane
       end
 
       def self.author
-        "joshdholtz"
+        'joshdholtz'
       end
     end
   end

@@ -13,33 +13,58 @@ module Produce
 
     def enable(options, _args)
       unless app
-        UI.message("[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist")
+        UI.message(
+          "[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist"
+        )
         return
       end
 
       UI.success("[DevCenter] App found '#{app.name}'")
-      UI.message("Enabling services")
+      UI.message('Enabling services')
       enabled = update(true, app, options)
       UI.success("Done! Enabled #{enabled} services.")
     end
 
     def disable(options, _args)
       unless app
-        UI.message("[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist")
+        UI.message(
+          "[DevCenter] App '#{Produce.config[:app_identifier]}' does not exist"
+        )
         return
       end
 
       UI.success("[DevCenter] App found '#{app.name}'")
-      UI.message("Disabling services")
+      UI.message('Disabling services')
       disabled = update(false, app, options)
       UI.success("Done! Disabled #{disabled} services.")
     end
 
     def valid_services_for(options)
-      allowed_keys = [:access_wifi, :app_group, :apple_pay, :associated_domains, :auto_fill_credential, :data_protection, :game_center, :healthkit, :homekit,
-                      :hotspot, :icloud, :in_app_purchase, :inter_app_audio, :multipath, :network_extension,
-                      :nfc_tag_reading, :personal_vpn, :passbook, :push_notification, :sirikit, :vpn_conf,
-                      :wallet, :wireless_conf]
+      allowed_keys = %i[
+        access_wifi
+        app_group
+        apple_pay
+        associated_domains
+        auto_fill_credential
+        data_protection
+        game_center
+        healthkit
+        homekit
+        hotspot
+        icloud
+        in_app_purchase
+        inter_app_audio
+        multipath
+        network_extension
+        nfc_tag_reading
+        personal_vpn
+        passbook
+        push_notification
+        sirikit
+        vpn_conf
+        wallet
+        wireless_conf
+      ]
       options.__hash__.select { |key, value| allowed_keys.include?(key) }
     end
 
@@ -101,14 +126,21 @@ module Produce
 
         if on
           case options.data_protection
-          when "complete"
+          when 'complete'
             app.update_service(Spaceship.app_service.data_protection.complete)
-          when "unlessopen"
-            app.update_service(Spaceship.app_service.data_protection.unless_open)
-          when "untilfirstauth"
-            app.update_service(Spaceship.app_service.data_protection.until_first_auth)
+          when 'unlessopen'
+            app.update_service(
+              Spaceship.app_service.data_protection.unless_open
+            )
+          when 'untilfirstauth'
+            app.update_service(
+              Spaceship.app_service.data_protection.until_first_auth
+            )
           else
-            UI.user_error!("Unknown service '#{options.data_protection}'. Valid values: 'complete', 'unlessopen', 'untilfirstauth'")
+            UI.user_error!(
+              "Unknown service '#{options
+                .data_protection}'. Valid values: 'complete', 'unlessopen', 'untilfirstauth'"
+            )
           end
         else
           app.update_service(Spaceship.app_service.data_protection.off)
@@ -170,14 +202,19 @@ module Produce
 
         if on
           case options.icloud
-          when "legacy"
+          when 'legacy'
             app.update_service(Spaceship.app_service.cloud.on)
-            app.update_service(Spaceship.app_service.cloud_kit.xcode5_compatible)
-          when "cloudkit"
+            app.update_service(
+              Spaceship.app_service.cloud_kit.xcode5_compatible
+            )
+          when 'cloudkit'
             app.update_service(Spaceship.app_service.cloud.on)
             app.update_service(Spaceship.app_service.cloud_kit.cloud_kit)
           else
-            UI.user_error!("Unknown service '#{options.icloud}'. Valid values: 'legacy', 'cloudkit'")
+            UI.user_error!(
+              "Unknown service '#{options
+                .icloud}'. Valid values: 'legacy', 'cloudkit'"
+            )
           end
         else
           app.update_service(Spaceship.app_service.cloud.off)
@@ -305,7 +342,7 @@ module Produce
       UI.message("Starting login with user '#{Produce.config[:username]}'")
       Spaceship.login(Produce.config[:username], nil)
       Spaceship.select_team
-      UI.message("Successfully logged in")
+      UI.message('Successfully logged in')
 
       @app ||= Spaceship.app.find(Produce.config[:app_identifier].to_s)
     end

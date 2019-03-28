@@ -17,8 +17,15 @@ module Spaceship::TestFlight
       trains = {}
 
       data.each do |train_version|
-        builds_data = client.get_builds_for_train(app_id: app_id, platform: platform, train_version: train_version, retry_count: retry_count)
-        trains[train_version] = builds_data.map { |attrs| Spaceship::TestFlight::Build.new(attrs) }
+        builds_data =
+          client.get_builds_for_train(
+            app_id: app_id,
+            platform: platform,
+            train_version: train_version,
+            retry_count: retry_count
+          )
+        trains[train_version] =
+          builds_data.map { |attrs| Spaceship::TestFlight::Build.new(attrs) }
       end
 
       self.new(trains)

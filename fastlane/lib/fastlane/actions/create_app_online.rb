@@ -22,14 +22,14 @@ module Fastlane
       end
 
       def self.description
-        "Creates the given application on iTC and the Dev Portal (via _produce_)"
+        'Creates the given application on iTC and the Dev Portal (via _produce_)'
       end
 
       def self.details
         [
-          "Create new apps on App Store Connect and Apple Developer Portal via _produce_.",
-          "If the app already exists, `create_app_online` will not do anything.",
-          "For more information about _produce_, visit its documentation page: [https://docs.fastlane.tools/actions/produce/](https://docs.fastlane.tools/actions/produce/)."
+          'Create new apps on App Store Connect and Apple Developer Portal via _produce_.',
+          'If the app already exists, `create_app_online` will not do anything.',
+          'For more information about _produce_, visit its documentation page: [https://docs.fastlane.tools/actions/produce/](https://docs.fastlane.tools/actions/produce/).'
         ].join("\n")
       end
 
@@ -40,12 +40,15 @@ module Fastlane
 
       def self.output
         [
-          ['PRODUCE_APPLE_ID', 'The Apple ID of the newly created app. You probably need it for `deliver`']
+          [
+            'PRODUCE_APPLE_ID',
+            'The Apple ID of the newly created app. You probably need it for `deliver`'
+          ]
         ]
       end
 
       def self.author
-        "KrauseFx"
+        'KrauseFx'
       end
 
       def self.is_supported?(platform)

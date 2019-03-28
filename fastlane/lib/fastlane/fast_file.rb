@@ -1,4 +1,4 @@
-require "rubygems/requirement"
+require 'rubygems/requirement'
 
 module Fastlane
   class FastFile
@@ -14,22 +14,28 @@ module Fastlane
     # @return The runner which can be executed to trigger the given actions
     def initialize(path = nil)
       return unless (path || '').length > 0
-      UI.user_error!("Could not find Fastfile at path '#{path}'") unless File.exist?(path)
+      unless File.exist?(path)
+        UI.user_error!("Could not find Fastfile at path '#{path}'")
+      end
       @path = File.expand_path(path)
-      content = File.read(path, encoding: "utf-8")
+      content = File.read(path, encoding: 'utf-8')
 
       # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
-      if content.tr!('“”‘’‛', %(""'''))
-        UI.error("Your #{File.basename(path)} has had smart quotes sanitised. " \
-                'To avoid issues in the future, you should not use ' \
-                'TextEdit for editing it. If you are not using TextEdit, ' \
-                'you should turn off smart quotes in your editor of choice.')
+      if content.tr!('“”‘’‛', "\"\"'''")
+        UI.error(
+          "Your #{File.basename(path)} has had smart quotes sanitised. " \
+            'To avoid issues in the future, you should not use ' \
+            'TextEdit for editing it. If you are not using TextEdit, ' \
+            'you should turn off smart quotes in your editor of choice.'
+        )
       end
 
       content.scan(/^\s*require (.*)/).each do |current|
         gem_name = current.last
-        next if gem_name.include?(".") # these are local gems
-        UI.important("You have required a gem, if this is a third party gem, please use `fastlane_require #{gem_name}` to ensure the gem is installed locally.")
+        next if gem_name.include?('.') # these are local gems
+        UI.important(
+          "You have required a gem, if this is a third party gem, please use `fastlane_require #{gem_name}` to ensure the gem is installed locally."
+        )
       end
 
       parse(content, @path)
@@ -42,9 +48,15 @@ module Fastlane
     def parse(data, path = nil)
       @runner ||= Runner.new
 
-      Dir.chdir(FastlaneCore::FastlaneFolder.path || Dir.pwd) do # context: fastlane subfolder
+      Dir.chdir(FastlaneCore::FastlaneFolder.path || Dir.pwd) do
+        # context: fastlane subfolder
         # create nice path that we want to print in case of some problem
-        relative_path = path.nil? ? '(eval)' : Pathname.new(path).relative_path_from(Pathname.new(Dir.pwd)).to_s
+        relative_path =
+          if path.nil?
+            '(eval)'
+          else
+            Pathname.new(path).relative_path_from(Pathname.new(Dir.pwd)).to_s
+          end
 
         begin
           # We have to use #get_binding method, because some test files defines method called `path` (for example SwitcherFastfile)
@@ -60,7 +72,9 @@ module Fastlane
           if match
             line = match[1]
             UI.content_error(data, line)
-            UI.user_error!("Syntax error in your Fastfile on line #{line}: #{ex}")
+            UI.user_error!(
+              "Syntax error in your Fastfile on line #{line}: #{ex}"
+            )
           else
             UI.user_error!("Syntax error in your Fastfile: #{ex}")
           end
@@ -76,39 +90,64 @@ module Fastlane
 
     # User defines a new lane
     def lane(lane_name, &block)
-      UI.user_error!("You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.") unless block
+      unless block
+        UI.user_error!(
+          "You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub."
+        )
+      end
 
-      self.runner.add_lane(Lane.new(platform: self.current_platform,
-                                       block: block,
-                                 description: desc_collection,
-                                        name: lane_name,
-                                  is_private: false))
+      self.runner.add_lane(
+        Lane.new(
+          platform: self.current_platform,
+          block: block,
+          description: desc_collection,
+          name: lane_name,
+          is_private: false
+        )
+      )
 
       @desc_collection = nil # reset the collected description again for the next lane
     end
 
     # User defines a new private lane, which can't be called from the CLI
     def private_lane(lane_name, &block)
-      UI.user_error!("You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.") unless block
+      unless block
+        UI.user_error!(
+          "You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub."
+        )
+      end
 
-      self.runner.add_lane(Lane.new(platform: self.current_platform,
-                                       block: block,
-                                 description: desc_collection,
-                                        name: lane_name,
-                                  is_private: true))
+      self.runner.add_lane(
+        Lane.new(
+          platform: self.current_platform,
+          block: block,
+          description: desc_collection,
+          name: lane_name,
+          is_private: true
+        )
+      )
 
       @desc_collection = nil # reset the collected description again for the next lane
     end
 
     # User defines a lane that can overwrite existing lanes. Useful when importing a Fastfile
     def override_lane(lane_name, &block)
-      UI.user_error!("You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.") unless block
+      unless block
+        UI.user_error!(
+          "You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub."
+        )
+      end
 
-      self.runner.add_lane(Lane.new(platform: self.current_platform,
-                                       block: block,
-                                 description: desc_collection,
-                                        name: lane_name,
-                                  is_private: false), true)
+      self.runner.add_lane(
+        Lane.new(
+          platform: self.current_platform,
+          block: block,
+          description: desc_collection,
+          name: lane_name,
+          is_private: false
+        ),
+        true
+      )
 
       @desc_collection = nil # reset the collected description again for the next lane
     end
@@ -169,9 +208,13 @@ module Fastlane
         # The user ran `fastlane update`, instead of `fastlane update_fastlane`
         # We're gonna be nice and understand what the user is trying to do
         require 'fastlane/one_off'
-        Fastlane::OneOff.run(action: "update_fastlane", parameters: {})
+        Fastlane::OneOff.run(action: 'update_fastlane', parameters: {})
       else
-        UI.user_error!("Could not find '#{key}'. Available lanes: #{self.runner.available_lanes.join(', ')}")
+        UI.user_error!(
+          "Could not find '#{key}'. Available lanes: #{self.runner
+            .available_lanes
+            .join(', ')}"
+        )
       end
     end
 
@@ -187,9 +230,14 @@ module Fastlane
     end
 
     def self.sh(*command, log: true, error_callback: nil, &b)
-      command_header = log ? Actions.shell_command_from_args(*command) : "shell command"
+      command_header =
+        log ? Actions.shell_command_from_args(*command) : 'shell command'
       Actions.execute_action(command_header) do
-        Actions.sh_no_action(*command, log: log, error_callback: error_callback, &b)
+        Actions.sh_no_action(
+          *command,
+          log: log, error_callback: error_callback,
+          &b
+        )
       end
     end
 
@@ -202,32 +250,43 @@ module Fastlane
     end
 
     def fastlane_require(gem_name)
-      FastlaneRequire.install_gem_if_needed(gem_name: gem_name, require_gem: true)
+      FastlaneRequire.install_gem_if_needed(
+        gem_name: gem_name, require_gem: true
+      )
     end
 
     def generated_fastfile_id(id)
-      UI.important("The `generated_fastfile_id` action was deprecated, you can remove the line from your `Fastfile`")
+      UI.important(
+        'The `generated_fastfile_id` action was deprecated, you can remove the line from your `Fastfile`'
+      )
     end
 
     def import(path = nil)
-      UI.user_error!("Please pass a path to the `import` action") unless path
+      UI.user_error!('Please pass a path to the `import` action') unless path
 
-      path = path.dup.gsub("~", Dir.home)
+      path = path.dup.gsub('~', Dir.home)
       unless Pathname.new(path).absolute? # unless an absolute path
         path = File.join(File.expand_path('..', @path), path)
       end
 
-      UI.user_error!("Could not find Fastfile at path '#{path}'") unless File.exist?(path)
+      unless File.exist?(path)
+        UI.user_error!("Could not find Fastfile at path '#{path}'")
+      end
 
       # First check if there are local actions to import in the same directory as the Fastfile
-      actions_path = File.join(File.expand_path("..", path), 'actions')
-      Fastlane::Actions.load_external_actions(actions_path) if File.directory?(actions_path)
+      actions_path = File.join(File.expand_path('..', path), 'actions')
+      if File.directory?(actions_path)
+        Fastlane::Actions.load_external_actions(actions_path)
+      end
 
       action_launched('import')
 
       return_value = parse(File.read(path), path)
 
-      action_completed('import', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+      action_completed(
+        'import',
+        status: FastlaneCore::ActionCompletionStatus::SUCCESS
+      )
 
       return return_value
     end
@@ -236,8 +295,12 @@ module Fastlane
     # @param branch [String] The branch to checkout in the repository
     # @param path [String] The path to the Fastfile
     # @param version [String, Array] Version requirement for repo tags
-    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil)
-      UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
+    def import_from_git(
+      url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil
+    )
+      if url.to_s.length == 0
+        UI.user_error!('Please pass a path to the `import_from_git` action')
+      end
 
       Actions.execute_action('import_from_git') do
         require 'tmpdir'
@@ -245,41 +308,58 @@ module Fastlane
         action_launched('import_from_git')
 
         # Checkout the repo
-        repo_name = url.split("/").last
+        repo_name = url.split('/').last
         checkout_param = branch
 
-        Dir.mktmpdir("fl_clone") do |tmp_path|
+        Dir.mktmpdir('fl_clone') do |tmp_path|
           clone_folder = File.join(tmp_path, repo_name)
 
           branch_option = "--branch #{branch}" if branch != 'HEAD'
 
-          UI.message("Cloning remote git repo...")
+          UI.message('Cloning remote git repo...')
           Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
-            Actions.sh("git clone #{url.shellescape} #{clone_folder.shellescape} --depth 1 -n #{branch_option}")
+            Actions.sh(
+              "git clone #{url.shellescape} #{clone_folder
+                .shellescape} --depth 1 -n #{branch_option}"
+            )
           end
 
           unless version.nil?
             req = Gem::Requirement.new(version)
             all_tags = fetch_remote_tags(folder: clone_folder)
-            checkout_param = all_tags.select { |t| req =~ FastlaneCore::TagVersion.new(t) }.last
-            UI.user_error!("No tag found matching #{version.inspect}") if checkout_param.nil?
+            checkout_param =
+              all_tags.select do |t|
+                req =~ FastlaneCore::TagVersion.new(t)
+              end.last
+            if checkout_param.nil?
+              UI.user_error!("No tag found matching #{version.inspect}")
+            end
           end
 
-          Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{path.shellescape}")
+          Actions.sh(
+            "cd #{clone_folder.shellescape} && git checkout #{checkout_param
+              .shellescape} #{path.shellescape}"
+          )
 
           # We also want to check out all the local actions of this fastlane setup
           containing = path.split(File::SEPARATOR)[0..-2]
-          containing = "." if containing.count == 0
-          actions_folder = File.join(containing, "actions")
+          containing = '.' if containing.count == 0
+          actions_folder = File.join(containing, 'actions')
           begin
-            Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{actions_folder.shellescape}")
-          rescue
+            Actions.sh(
+              "cd #{clone_folder.shellescape} && git checkout #{checkout_param
+                .shellescape} #{actions_folder.shellescape}"
+            )
+          rescue StandardError
             # We don't care about a failure here, as local actions are optional
           end
 
           return_value = import(File.join(clone_folder, path))
 
-          action_completed('import_from_git', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+          action_completed(
+            'import_from_git',
+            status: FastlaneCore::ActionCompletionStatus::SUCCESS
+          )
 
           return return_value
         end
@@ -291,7 +371,7 @@ module Fastlane
     #####################################################
 
     def fetch_remote_tags(folder: nil)
-      UI.message("Fetching remote git tags...")
+      UI.message('Fetching remote git tags...')
       Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
         Actions.sh("cd #{folder.shellescape} && git fetch --all --tags -q")
       end
@@ -301,9 +381,10 @@ module Fastlane
       git_tags = git_tags_string.split("\n")
 
       # Sort tags based on their version number
-      return git_tags
-             .select { |tag| FastlaneCore::TagVersion.correct?(tag) }
-             .sort_by { |tag| FastlaneCore::TagVersion.new(tag) }
+
+      return git_tags.select do |tag|
+        FastlaneCore::TagVersion.correct?(tag)
+      end.sort_by { |tag| FastlaneCore::TagVersion.new(tag) }
     end
 
     #####################################################
@@ -325,7 +406,10 @@ module Fastlane
 
       action_launched('puts')
       return_value = Fastlane::Actions::PutsAction.run([value])
-      action_completed('puts', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+      action_completed(
+        'puts',
+        status: FastlaneCore::ActionCompletionStatus::SUCCESS
+      )
       return return_value
     end
 
@@ -335,17 +419,25 @@ module Fastlane
     end
 
     def action_launched(action_name)
-      action_launch_context = FastlaneCore::ActionLaunchContext.context_for_action_name(action_name,
-                                                                                        fastlane_client_language: :ruby,
-                                                                                        args: ARGV)
-      FastlaneCore.session.action_launched(launch_context: action_launch_context)
+      action_launch_context =
+        FastlaneCore::ActionLaunchContext.context_for_action_name(
+          action_name,
+          fastlane_client_language: :ruby, args: ARGV
+        )
+      FastlaneCore.session.action_launched(
+        launch_context: action_launch_context
+      )
     end
 
     def action_completed(action_name, status: nil)
-      completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name,
-                                                                                         args: ARGV,
-                                                                                         status: status)
-      FastlaneCore.session.action_completed(completion_context: completion_context)
+      completion_context =
+        FastlaneCore::ActionCompletionContext.context_for_action_name(
+          action_name,
+          args: ARGV, status: status
+        )
+      FastlaneCore.session.action_completed(
+        completion_context: completion_context
+      )
     end
   end
 end

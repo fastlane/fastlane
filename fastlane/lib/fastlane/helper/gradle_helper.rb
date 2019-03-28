@@ -26,10 +26,21 @@ module Fastlane
       end
 
       # Run a certain action
-      def trigger(task: nil, flags: nil, serial: nil, print_command: true, print_command_output: true)
-        android_serial = (serial != "") ? "ANDROID_SERIAL=#{serial}" : nil
-        command = [android_serial, escaped_gradle_path, task, flags].compact.join(" ")
-        Action.sh(command, print_command: print_command, print_command_output: print_command_output)
+      def trigger(
+        task: nil,
+        flags: nil,
+        serial: nil,
+        print_command: true,
+        print_command_output: true
+      )
+        android_serial = (serial != '') ? "ANDROID_SERIAL=#{serial}" : nil
+        command =
+          [android_serial, escaped_gradle_path, task, flags].compact.join(' ')
+        Action.sh(
+          command,
+          print_command: print_command,
+          print_command_output: print_command_output
+        )
       end
 
       def task_available?(task)
@@ -47,11 +58,13 @@ module Fastlane
       def load_all_tasks
         self.tasks = []
 
-        command = [escaped_gradle_path, "tasks", "--console=plain"].join(" ")
-        output = Action.sh(command, print_command: false, print_command_output: false)
+        command = [escaped_gradle_path, 'tasks', '--console=plain'].join(' ')
+        output =
+          Action.sh(command, print_command: false, print_command_output: false)
         output.split("\n").each do |line|
           if (result = line.match(/(\w+)\s\-\s([\w\s]+)/))
-            self.tasks << GradleTask.new(title: result[1], description: result[2])
+            self.tasks <<
+              GradleTask.new(title: result[1], description: result[2])
           end
         end
 

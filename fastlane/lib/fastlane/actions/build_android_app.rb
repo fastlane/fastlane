@@ -7,7 +7,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the `gradle` action"
+        'Alias for the `gradle` action'
       end
     end
   end

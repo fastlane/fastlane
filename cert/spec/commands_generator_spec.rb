@@ -7,10 +7,10 @@ describe Cert::CommandsGenerator do
     runner
   end
 
-  describe ":create option handling" do
-    it "can use the username short flag from tool options" do
+  describe ':create option handling' do
+    it 'can use the username short flag from tool options' do
       # leaving out the command name defaults to 'create'
-      stub_commander_runner_args(['-u', 'me@it.com'])
+      stub_commander_runner_args(%w[-u me@it.com])
 
       # launch takes no params, but we want to expect the call and prevent
       # actual execution of the method
@@ -21,9 +21,9 @@ describe Cert::CommandsGenerator do
       expect(Cert.config[:username]).to eq('me@it.com')
     end
 
-    it "can use the platform flag from tool options" do
+    it 'can use the platform flag from tool options' do
       # leaving out the command name defaults to 'create'
-      stub_commander_runner_args(['--platform', 'macos'])
+      stub_commander_runner_args(%w[--platform macos])
 
       # launch takes no params, but we want to expect the call and prevent
       # actual execution of the method
@@ -35,9 +35,9 @@ describe Cert::CommandsGenerator do
     end
   end
 
-  describe ":revoke_expired option handling" do
-    it "can use the development flag from tool options" do
-      stub_commander_runner_args(['revoke_expired', '--development', 'true'])
+  describe ':revoke_expired option handling' do
+    it 'can use the development flag from tool options' do
+      stub_commander_runner_args(%w[revoke_expired --development true])
 
       # revoke_expired_certs! takes no params, but we want to expect the call
       # and prevent actual execution of the method
@@ -48,8 +48,8 @@ describe Cert::CommandsGenerator do
       expect(Cert.config[:development]).to be(true)
     end
 
-    it "can use the output_path short flag from tool options" do
-      stub_commander_runner_args(['revoke_expired', '-o', 'output/path'])
+    it 'can use the output_path short flag from tool options' do
+      stub_commander_runner_args(%w[revoke_expired -o output/path])
 
       # revoke_expired_certs! takes no params, but we want to expect the call
       # and prevent actual execution of the method
@@ -61,9 +61,9 @@ describe Cert::CommandsGenerator do
     end
   end
 
-  describe ":filename option handling" do
-    it "can use the filename flag from tool options" do
-      stub_commander_runner_args(['-q', 'cert_name'])
+  describe ':filename option handling' do
+    it 'can use the filename flag from tool options' do
+      stub_commander_runner_args(%w[-q cert_name])
 
       # launch takes no params, but we want to expect the call and prevent
       # actual execution of the method

@@ -1,13 +1,11 @@
 describe Spaceship::TunesClient do
-  describe "Random Server Failures" do
+  describe 'Random Server Failures' do
     # let(:mock_client) { double('MockClient') }
-    before do
-      Spaceship::Tunes.login
-    end
+    before { Spaceship::Tunes.login }
     let(:client) { Spaceship::Application.client }
     let(:app) { Spaceship::Application.all.first }
 
-    describe "#build_trains failing" do
+    describe '#build_trains failing' do
       # it "automatically re-tries the request when getting a ITC.response.error.OPERATION_FAILED when receive build trains" do
       #   # Ensuring the fix for https://github.com/fastlane/fastlane/issues/6419
 

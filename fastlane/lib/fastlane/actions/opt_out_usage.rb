@@ -2,24 +2,24 @@ module Fastlane
   module Actions
     class OptOutUsageAction < Action
       def self.run(params)
-        ENV['FASTLANE_OPT_OUT_USAGE'] = "YES"
-        UI.message("Disabled upload of used actions")
+        ENV['FASTLANE_OPT_OUT_USAGE'] = 'YES'
+        UI.message('Disabled upload of used actions')
       end
 
       def self.description
-        "This will stop uploading the information which actions were run"
+        'This will stop uploading the information which actions were run'
       end
 
       def self.details
         [
-          "By default, _fastlane_ will track what actions are being used. No personal/sensitive information is recorded.",
-          "Learn more at [https://docs.fastlane.tools/#metrics](https://docs.fastlane.tools/#metrics).",
-          "Add `opt_out_usage` at the top of your Fastfile to disable metrics collection."
+          'By default, _fastlane_ will track what actions are being used. No personal/sensitive information is recorded.',
+          'Learn more at [https://docs.fastlane.tools/#metrics](https://docs.fastlane.tools/#metrics).',
+          'Add `opt_out_usage` at the top of your Fastfile to disable metrics collection.'
         ].join("\n")
       end
 
       def self.author
-        "KrauseFx"
+        'KrauseFx'
       end
 
       def self.is_supported?(platform)
@@ -27,9 +27,7 @@ module Fastlane
       end
 
       def self.example_code
-        [
-          'opt_out_usage # add this to the top of your Fastfile'
-        ]
+        ['opt_out_usage # add this to the top of your Fastfile']
       end
 
       def self.category

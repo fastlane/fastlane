@@ -18,21 +18,23 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Prints out the given text"
+        'Prints out the given text'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :message,
-                                       env_name: "FL_PUTS_MESSAGE",
-                                       description: "Message to be printed out",
-                                       optional: true,
-                                       is_string: true)
+          FastlaneCore::ConfigItem.new(
+            key: :message,
+            env_name: 'FL_PUTS_MESSAGE',
+            description: 'Message to be printed out',
+            optional: true,
+            is_string: true
+          )
         ]
       end
 
       def self.authors
-        ["KrauseFx"]
+        %w[KrauseFx]
       end
 
       def self.is_supported?(platform)
@@ -40,13 +42,14 @@ module Fastlane
       end
 
       def self.alias_used(action_alias, params)
-        if !params.kind_of?(FastlaneCore::Configuration) || params[:message].nil?
+        if !params.kind_of?(FastlaneCore::Configuration) ||
+           params[:message].nil?
           UI.important("#{action_alias} called, please use 'puts' instead!")
         end
       end
 
       def self.aliases
-        ["println", "echo"]
+        %w[println echo]
       end
 
       # We don't want to show this as step
@@ -55,9 +58,7 @@ module Fastlane
       end
 
       def self.example_code
-        [
-          'puts "Hi there"'
-        ]
+        ['puts "Hi there"']
       end
 
       def self.category

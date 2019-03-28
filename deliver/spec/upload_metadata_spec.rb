@@ -7,16 +7,19 @@ describe Deliver::UploadMetadata do
 
   describe '#load_from_filesystem' do
     context 'with review information' do
-      let(:options) { { metadata_path: tmpdir, app_review_information: app_review_information } }
+      let(:options) do
+        {
+          metadata_path: tmpdir, app_review_information: app_review_information
+        }
+      end
 
       def create_metadata(path, text)
-        File.open(File.join(path), 'w') do |f|
-          f.write(text)
-        end
+        File.open(File.join(path), 'w') { |f| f.write(text) }
       end
 
       before do
         base_dir = FileUtils.mkdir_p(File.join(tmpdir, 'review_information'))
+
         {
           first_name: 'Alice',
           last_name: 'Smith',
@@ -36,11 +39,19 @@ describe Deliver::UploadMetadata do
           uploader.load_from_filesystem(options)
           expect(options[:app_review_information][:first_name]).to eql('Alice')
           expect(options[:app_review_information][:last_name]).to eql('Smith')
-          expect(options[:app_review_information][:phone_number]).to eql('+819012345678')
-          expect(options[:app_review_information][:email_address]).to eql('deliver@example.com')
+          expect(options[:app_review_information][:phone_number]).to eql(
+                      '+819012345678'
+                    )
+          expect(options[:app_review_information][:email_address]).to eql(
+                      'deliver@example.com'
+                    )
           expect(options[:app_review_information][:demo_user]).to eql('user')
-          expect(options[:app_review_information][:demo_password]).to eql('password')
-          expect(options[:app_review_information][:notes]).to eql('This is a note from file')
+          expect(options[:app_review_information][:demo_password]).to eql(
+                      'password'
+                    )
+          expect(options[:app_review_information][:notes]).to eql(
+                      'This is a note from file'
+                    )
         end
       end
 
@@ -50,23 +61,31 @@ describe Deliver::UploadMetadata do
           uploader.load_from_filesystem(options)
           expect(options[:app_review_information][:first_name]).to eql('Alice')
           expect(options[:app_review_information][:last_name]).to eql('Smith')
-          expect(options[:app_review_information][:phone_number]).to eql('+819012345678')
-          expect(options[:app_review_information][:email_address]).to eql('deliver@example.com')
+          expect(options[:app_review_information][:phone_number]).to eql(
+                      '+819012345678'
+                    )
+          expect(options[:app_review_information][:email_address]).to eql(
+                      'deliver@example.com'
+                    )
           expect(options[:app_review_information][:demo_user]).to eql('user')
-          expect(options[:app_review_information][:demo_password]).to eql('password')
-          expect(options[:app_review_information][:notes]).to eql('This is a note from option')
+          expect(options[:app_review_information][:demo_password]).to eql(
+                      'password'
+                    )
+          expect(options[:app_review_information][:notes]).to eql(
+                      'This is a note from option'
+                    )
         end
       end
 
-      after do
-        FileUtils.remove_entry_secure(tmpdir)
-      end
+      after { FileUtils.remove_entry_secure(tmpdir) }
     end
   end
 
-  describe "#set_review_information" do
-    let(:options) { { metadata_path: tmpdir, app_review_information: app_review_information } }
-    let(:version) { double("version") }
+  describe '#set_review_information' do
+    let(:options) do
+      { metadata_path: tmpdir, app_review_information: app_review_information }
+    end
+    let(:version) { double('version') }
 
     before do
       allow(version).to receive(:review_first_name=)
@@ -77,64 +96,88 @@ describe Deliver::UploadMetadata do
       allow(version).to receive(:review_demo_password=)
       allow(version).to receive(:review_notes=)
       allow(version).to receive(:review_user_needed=)
-      allow(version).to receive(:review_demo_user).and_return(app_review_information[:demo_user])
-      allow(version).to receive(:review_demo_password).and_return(app_review_information[:demo_password])
+      allow(version).to receive(:review_demo_user).and_return(
+                 app_review_information[:demo_user]
+               )
+      allow(version).to receive(:review_demo_password).and_return(
+                 app_review_information[:demo_password]
+               )
     end
 
-    context "with review_information" do
+    context 'with review_information' do
       let(:app_review_information) do
-        { first_name: "Alice",
-          last_name: "Smith",
-          phone_number: "+819012345678",
-          email_address: "deliver@example.com",
-          demo_user: "user",
-          demo_password: "password",
-          notes: "This is a note" }
+        {
+          first_name: 'Alice',
+          last_name: 'Smith',
+          phone_number: '+819012345678',
+          email_address: 'deliver@example.com',
+          demo_user: 'user',
+          demo_password: 'password',
+          notes: 'This is a note'
+        }
       end
 
-      it "set review information" do
-        uploader.send("set_review_information", version, options)
-        expect(version).to have_received(:review_first_name=).with(app_review_information[:first_name])
-        expect(version).to have_received(:review_last_name=).with(app_review_information[:last_name])
-        expect(version).to have_received(:review_phone_number=).with(app_review_information[:phone_number])
-        expect(version).to have_received(:review_email=).with(app_review_information[:email_address])
-        expect(version).to have_received(:review_demo_user=).with(app_review_information[:demo_user])
-        expect(version).to have_received(:review_demo_password=).with(app_review_information[:demo_password])
-        expect(version).to have_received(:review_notes=).with(app_review_information[:notes])
+      it 'set review information' do
+        uploader.send('set_review_information', version, options)
+        expect(version).to have_received(:review_first_name=).with(
+                    app_review_information[:first_name]
+                  )
+        expect(version).to have_received(:review_last_name=).with(
+                    app_review_information[:last_name]
+                  )
+        expect(version).to have_received(:review_phone_number=).with(
+                    app_review_information[:phone_number]
+                  )
+        expect(version).to have_received(:review_email=).with(
+                    app_review_information[:email_address]
+                  )
+        expect(version).to have_received(:review_demo_user=).with(
+                    app_review_information[:demo_user]
+                  )
+        expect(version).to have_received(:review_demo_password=).with(
+                    app_review_information[:demo_password]
+                  )
+        expect(version).to have_received(:review_notes=).with(
+                    app_review_information[:notes]
+                  )
       end
     end
 
-    context "with demo_user and demo_password" do
-      context "with string" do
-        let(:app_review_information) { { demo_user: "user", demo_password: "password" } }
+    context 'with demo_user and demo_password' do
+      context 'with string' do
+        let(:app_review_information) do
+          { demo_user: 'user', demo_password: 'password' }
+        end
 
-        it "review_user_needed is true" do
-          uploader.send("set_review_information", version, options)
+        it 'review_user_needed is true' do
+          uploader.send('set_review_information', version, options)
           expect(version).to have_received(:review_user_needed=).with(true)
         end
       end
 
-      context "with empty string" do
-        let(:app_review_information) { { demo_user: "", demo_password: "" } }
+      context 'with empty string' do
+        let(:app_review_information) { { demo_user: '', demo_password: '' } }
 
-        it "review_user_needed is false" do
-          uploader.send("set_review_information", version, options)
+        it 'review_user_needed is false' do
+          uploader.send('set_review_information', version, options)
           expect(version).to have_received(:review_user_needed=).with(false)
         end
       end
 
-      context "with newline" do
-        let(:app_review_information) { { demo_user: "\n", demo_password: "\n" } }
+      context 'with newline' do
+        let(:app_review_information) do
+          { demo_user: "\n", demo_password: "\n" }
+        end
 
-        it "review_user_needed is false" do
-          uploader.send("set_review_information", version, options)
+        it 'review_user_needed is false' do
+          uploader.send('set_review_information', version, options)
           expect(version).to have_received(:review_user_needed=).with(false)
         end
       end
     end
   end
 
-  context "with metadata" do
+  context 'with metadata' do
     let(:app) { double('app') }
     let(:version) { double('version') }
     let(:details) { double('details') }
@@ -156,41 +199,41 @@ describe Deliver::UploadMetadata do
       allow(details).to receive(:send).and_return(details_info)
     end
 
-    context "normal metadata" do
-      it "saves metadata" do
+    context 'normal metadata' do
+      it 'saves metadata' do
         options = {
-            app: app,
-            details: details,
-            name: { "en-US" => "App name" },
-            description: { "en-US" => "App description" }
+          app: app,
+          details: details,
+          name: { 'en-US' => 'App name' },
+          description: { 'en-US' => 'App description' }
         }
         uploader.upload(options)
-        expect(version_info).to eql({ "en-US" => "App description" })
-        expect(details_info).to eql({ "en-US" => "App name" })
+        expect(version_info).to eql({ 'en-US' => 'App description' })
+        expect(details_info).to eql({ 'en-US' => 'App name' })
         expect(version).to have_received(:save!)
         expect(details).to have_received(:save!)
       end
     end
 
-    context "individual metadata items" do
-      it "saves individual metadata items" do
+    context 'individual metadata items' do
+      it 'saves individual metadata items' do
         options = {
-            app: app,
-            details: details,
-            name: { "en-US" => "App name" },
-            description: { "en-US" => "App description" },
-            individual_metadata_items: [:name, :description]
+          app: app,
+          details: details,
+          name: { 'en-US' => 'App name' },
+          description: { 'en-US' => 'App description' },
+          individual_metadata_items: %i[name description]
         }
         uploader.upload(options)
-        expect(version_info).to eql({ "en-US" => "App description" })
-        expect(details_info).to eql({ "en-US" => "App name" })
+        expect(version_info).to eql({ 'en-US' => 'App description' })
+        expect(details_info).to eql({ 'en-US' => 'App name' })
         expect(version).to have_received(:save!)
         expect(details).to have_received(:save!)
       end
     end
   end
 
-  context "with auto_release_date" do
+  context 'with auto_release_date' do
     let(:app) { double('app') }
     let(:version) { double('version') }
     let(:details) { double('details') }
@@ -206,7 +249,7 @@ describe Deliver::UploadMetadata do
       allow(details).to receive(:save!)
     end
     context 'with date' do
-      it "auto_release_date is called" do
+      it 'auto_release_date is called' do
         options = { auto_release_date: 2, app: app }
         uploader.upload(options)
         expect(version).to have_received(:auto_release_date=).with(2)
@@ -214,7 +257,7 @@ describe Deliver::UploadMetadata do
     end
 
     context 'without date' do
-      it "auto_release_date is not called" do
+      it 'auto_release_date is not called' do
         options = { app: app }
         uploader.upload(options)
         expect(version).to_not(have_received(:auto_release_date=).with(2))
@@ -222,7 +265,7 @@ describe Deliver::UploadMetadata do
     end
   end
 
-  context "with phased_release" do
+  context 'with phased_release' do
     let(:app) { double('app') }
     let(:version) { double('version') }
     let(:details) { double('details') }
@@ -239,28 +282,34 @@ describe Deliver::UploadMetadata do
     end
 
     context 'with true' do
-      it "toggle_phased_release is called" do
+      it 'toggle_phased_release is called' do
         uploader.upload(phased_release: true, app: app)
-        expect(version).to have_received(:toggle_phased_release).with(enabled: true)
+        expect(version).to have_received(:toggle_phased_release).with(
+                    enabled: true
+                  )
       end
     end
 
     context 'with false' do
-      it "toggle_phased_release is called" do
+      it 'toggle_phased_release is called' do
         uploader.upload(phased_release: false, app: app)
-        expect(version).to have_received(:toggle_phased_release).with(enabled: false)
+        expect(version).to have_received(:toggle_phased_release).with(
+                    enabled: false
+                  )
       end
     end
 
     context 'without value' do
-      it "toggle_phased_release is not called" do
+      it 'toggle_phased_release is not called' do
         uploader.upload(app: app)
-        expect(version).not_to(have_received(:toggle_phased_release).with(enabled: false))
+        expect(version).not_to(
+          have_received(:toggle_phased_release).with(enabled: false)
+        )
       end
     end
   end
 
-  context "with reset_ratings" do
+  context 'with reset_ratings' do
     let(:app) { double('app') }
     let(:version) { double('version') }
     let(:details) { double('details') }
@@ -277,34 +326,32 @@ describe Deliver::UploadMetadata do
     end
 
     context 'with true' do
-      it "ratings_reset is called" do
+      it 'ratings_reset is called' do
         uploader.upload(reset_ratings: true, app: app)
         expect(version).to have_received(:ratings_reset=).with(true)
       end
     end
 
     context 'with false' do
-      it "ratings_reset is called" do
+      it 'ratings_reset is called' do
         uploader.upload(reset_ratings: false, app: app)
         expect(version).to have_received(:ratings_reset=).with(false)
       end
     end
 
     context 'without value' do
-      it "ratings_reset is not called" do
+      it 'ratings_reset is not called' do
         uploader.upload(app: app)
         expect(version).not_to(have_received(:ratings_reset=).with(false))
       end
     end
   end
 
-  describe "#languages" do
+  describe '#languages' do
     let(:options) { { metadata_path: tmpdir } }
 
     def create_metadata(path, text)
-      File.open(File.join(path), 'w') do |f|
-        f.write(text)
-      end
+      File.open(File.join(path), 'w') { |f| f.write(text) }
     end
 
     def create_filesystem_language(name)
@@ -312,7 +359,7 @@ describe Deliver::UploadMetadata do
       FileUtils.mkdir_p("#{tmpdir}/#{name}")
     end
 
-    context "detected languages with only file system" do
+    context 'detected languages with only file system' do
       it "languages are 'de-DE', 'el', 'en-US'" do
         options[:languages] = []
 
@@ -323,40 +370,39 @@ describe Deliver::UploadMetadata do
         uploader.load_from_filesystem(options)
         languages = uploader.detect_languages(options)
 
-        expect(languages.sort).to eql(['de-DE', 'el', 'en-US'])
+        expect(languages.sort).to eql(%w[de-DE el en-US])
       end
     end
 
-    context "detected languages with only config options" do
+    context 'detected languages with only config options' do
       it "languages are 'en-AU', 'en-CA', 'en-GB'" do
-        options[:languages] = ['en-AU', 'en-CA', 'en-GB']
+        options[:languages] = %w[en-AU en-CA en-GB]
 
         uploader.load_from_filesystem(options)
         languages = uploader.detect_languages(options)
 
-        expect(languages.sort).to eql(['en-AU', 'en-CA', 'en-GB'])
+        expect(languages.sort).to eql(%w[en-AU en-CA en-GB])
       end
     end
 
-    context "detected languages with only release notes" do
+    context 'detected languages with only release notes' do
       it "languages are 'default', 'es-MX'" do
         options[:languages] = []
 
         options[:release_notes] = {
-          'default' => 'something',
-          'es-MX' => 'something else'
+          'default' => 'something', 'es-MX' => 'something else'
         }
 
         uploader.load_from_filesystem(options)
         languages = uploader.detect_languages(options)
 
-        expect(languages.sort).to eql(['default', 'es-MX'])
+        expect(languages.sort).to eql(%w[default es-MX])
       end
     end
 
-    context "detected languages with both file system and config options and release notes" do
+    context 'detected languages with both file system and config options and release notes' do
       it "languages are 'de-DE', 'default', 'el', 'en-AU', 'en-CA', 'en-GB', 'en-US', 'es-MX'" do
-        options[:languages] = ['en-AU', 'en-CA', 'en-GB']
+        options[:languages] = %w[en-AU en-CA en-GB]
         options[:release_notes] = {
           'default' => 'something',
           'en-US' => 'something else',
@@ -370,13 +416,15 @@ describe Deliver::UploadMetadata do
         uploader.load_from_filesystem(options)
         languages = uploader.detect_languages(options)
 
-        expect(languages.sort).to eql(['de-DE', 'default', 'el', 'en-AU', 'en-CA', 'en-GB', 'en-US', 'es-MX'])
+        expect(languages.sort).to eql(
+                    %w[de-DE default el en-AU en-CA en-GB en-US es-MX]
+                  )
       end
     end
 
-    context "with localized version values for release notes" do
-      it "default value set for unspecified languages" do
-        options[:languages] = ['en-AU', 'en-CA', 'en-GB']
+    context 'with localized version values for release notes' do
+      it 'default value set for unspecified languages' do
+        options[:languages] = %w[en-AU en-CA en-GB]
         options[:release_notes] = {
           'default' => 'something',
           'en-US' => 'something else',
@@ -390,13 +438,13 @@ describe Deliver::UploadMetadata do
         uploader.load_from_filesystem(options)
         uploader.assign_defaults(options)
 
-        expect(options[:release_notes]["en-US"]).to eql('something else')
-        expect(options[:release_notes]["es-MX"]).to eql('something else else')
-        expect(options[:release_notes]["en-AU"]).to eql('something')
-        expect(options[:release_notes]["en-CA"]).to eql('something')
-        expect(options[:release_notes]["en-GB"]).to eql('something')
-        expect(options[:release_notes]["de-DE"]).to eql('something')
-        expect(options[:release_notes]["el"]).to eql('something')
+        expect(options[:release_notes]['en-US']).to eql('something else')
+        expect(options[:release_notes]['es-MX']).to eql('something else else')
+        expect(options[:release_notes]['en-AU']).to eql('something')
+        expect(options[:release_notes]['en-CA']).to eql('something')
+        expect(options[:release_notes]['en-GB']).to eql('something')
+        expect(options[:release_notes]['de-DE']).to eql('something')
+        expect(options[:release_notes]['el']).to eql('something')
       end
     end
   end

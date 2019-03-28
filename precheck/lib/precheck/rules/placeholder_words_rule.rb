@@ -7,24 +7,24 @@ module Precheck
     end
 
     def self.env_name
-      "RULE_PLACEHOLDER_TEXT_THINGS"
+      'RULE_PLACEHOLDER_TEXT_THINGS'
     end
 
     def self.friendly_name
-      "No placeholder text"
+      'No placeholder text'
     end
 
     def self.description
-      "using placeholder text (e.g.:\"lorem ipsum\", \"text here\", etc...)"
+      'using placeholder text (e.g.:\"lorem ipsum\", \"text here\", etc...)'
     end
 
     def lowercased_words_to_look_for
       [
-        "hipster ipsum",
-        "bacon ipsum",
-        "lorem ipsum",
-        "placeholder",
-        "text here"
+        'hipster ipsum',
+        'bacon ipsum',
+        'lorem ipsum',
+        'placeholder',
+        'text here'
       ].map(&:downcase)
     end
   end

@@ -65,7 +65,7 @@ module Spaceship
 
       def latest_installed_date
         return nil unless latest_install_info
-        latest_installed_date_value = latest_install_info["latestInstalledDate"]
+        latest_installed_date_value = latest_install_info['latestInstalledDate']
         return nil unless latest_installed_date_value
 
         return latest_installed_date_value.to_i
@@ -74,7 +74,7 @@ module Spaceship
       def pretty_install_date
         return nil unless latest_installed_date
 
-        Time.at((latest_installed_date / 1000)).strftime("%Y-%m-%d %H:%M")
+        Time.at((latest_installed_date / 1000)).strftime('%Y-%m-%d %H:%M')
       end
 
       # @return (Array) Returns all beta testers available for this account
@@ -84,7 +84,8 @@ module Spaceship
 
       # *DEPRECATED: Use `Spaceship::TestFlight::Tester.search` method instead*
       def self.find(app_id: nil, email: nil)
-        testers = self.search(app_id: app_id, text: email, is_email_exact_match: true)
+        testers =
+          self.search(app_id: app_id, text: email, is_email_exact_match: true)
         return testers.first
       end
 
@@ -97,27 +98,36 @@ module Spaceship
       # @param text (String) (required): Value used to filter the tester, case insensitive
       def self.search(app_id: nil, text: nil, is_email_exact_match: false)
         text = text.strip
-        testers_matching_text = client.search_for_tester_in_app(app_id: app_id, text: text).map { |data| self.new(data) }
+        testers_matching_text =
+          client.search_for_tester_in_app(app_id: app_id, text: text)
+            .map { |data| self.new(data) }
         testers_matching_text ||= []
         if is_email_exact_match
           text = text.downcase
-          testers_matching_text = testers_matching_text.select do |tester|
-            tester.email.downcase == text
-          end
+          testers_matching_text =
+            testers_matching_text.select do |tester|
+              tester.email.downcase == text
+            end
         end
 
         return testers_matching_text
       end
 
       def self.remove_testers_from_testflight(app_id: nil, tester_ids: nil)
-        client.remove_testers_from_testflight(app_id: app_id, tester_ids: tester_ids)
+        client.remove_testers_from_testflight(
+          app_id: app_id, tester_ids: tester_ids
+        )
       end
 
-      def self.create_app_level_tester(app_id: nil, first_name: nil, last_name: nil, email: nil)
-        client.create_app_level_tester(app_id: app_id,
-                                       first_name: first_name,
-                                       last_name: last_name,
-                                       email: email)
+      def self.create_app_level_tester(
+        app_id: nil, first_name: nil, last_name: nil, email: nil
+      )
+        client.create_app_level_tester(
+          app_id: app_id,
+          first_name: first_name,
+          last_name: last_name,
+          email: email
+        )
       end
 
       def remove_from_app!(app_id: nil)
@@ -125,11 +135,15 @@ module Spaceship
       end
 
       def remove_from_testflight!(app_id: nil)
-        client.remove_testers_from_testflight(app_id: app_id, tester_ids: [self.tester_id])
+        client.remove_testers_from_testflight(
+          app_id: app_id, tester_ids: [self.tester_id]
+        )
       end
 
       def resend_invite(app_id: nil)
-        client.resend_invite_to_external_tester(app_id: app_id, tester_id: self.tester_id)
+        client.resend_invite_to_external_tester(
+          app_id: app_id, tester_id: self.tester_id
+        )
       end
     end
   end

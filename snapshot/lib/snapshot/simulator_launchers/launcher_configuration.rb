@@ -43,7 +43,7 @@ module Snapshot
       launch_arguments = Array(snapshot_config[:launch_arguments])
       # if more than 1 set of arguments, use a tuple with an index
       if launch_arguments.count == 0
-        @launch_args_set = [[""]]
+        @launch_args_set = [['']]
       elsif launch_arguments.count == 1
         @launch_args_set = [launch_arguments]
       else

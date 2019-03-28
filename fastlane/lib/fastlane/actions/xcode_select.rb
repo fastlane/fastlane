@@ -23,18 +23,24 @@ module Fastlane
         xcode_path = (params || []).first
 
         # Verify that a param was passed in
-        UI.user_error!("Path to Xcode application required (e.g. `xcode_select(\"/Applications/Xcode.app\")`)") unless xcode_path.to_s.length > 0
+        unless xcode_path.to_s.length > 0
+          UI.user_error!(
+            'Path to Xcode application required (e.g. `xcode_select(\"/Applications/Xcode.app\")`)'
+          )
+        end
 
         # Verify that a path to a directory was passed in
-        UI.user_error!("Path '#{xcode_path}' doesn't exist") unless Dir.exist?(xcode_path)
+        unless Dir.exist?(xcode_path)
+          UI.user_error!("Path '#{xcode_path}' doesn't exist")
+        end
 
         UI.message("Setting Xcode version to #{xcode_path} for all build steps")
 
-        ENV["DEVELOPER_DIR"] = File.join(xcode_path, "/Contents/Developer")
+        ENV['DEVELOPER_DIR'] = File.join(xcode_path, '/Contents/Developer')
       end
 
       def self.description
-        "Change the xcode-path to use. Useful for beta versions of Xcode"
+        'Change the xcode-path to use. Useful for beta versions of Xcode'
       end
 
       def self.details
@@ -42,17 +48,15 @@ module Fastlane
       end
 
       def self.author
-        "dtrenz"
+        'dtrenz'
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       def self.example_code
-        [
-          'xcode_select("/Applications/Xcode-8.3.2.app")'
-        ]
+        %w[xcode_select("/Applications/Xcode-8.3.2.app")]
       end
 
       def self.category

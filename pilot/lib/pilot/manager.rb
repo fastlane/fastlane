@@ -17,12 +17,15 @@ module Pilot
     end
 
     def login
-      config[:username] ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+      config[:username] ||=
+        CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
       UI.message("Login to App Store Connect (#{config[:username]})")
       Spaceship::Tunes.login(config[:username])
-      Spaceship::Tunes.select_team(team_id: config[:team_id], team_name: config[:team_name])
-      UI.message("Login successful")
+      Spaceship::Tunes.select_team(
+        team_id: config[:team_id], team_name: config[:team_name]
+      )
+      UI.message('Login successful')
     end
 
     # The app object we're currently using
@@ -31,7 +34,11 @@ module Pilot
 
       @app ||= Spaceship::Tunes::Application.find(@apple_id)
       unless @app
-        UI.user_error!("Could not find app with #{(config[:apple_id] || config[:app_identifier])}")
+        UI.user_error!(
+          "Could not find app with #{(
+            config[:apple_id] || config[:app_identifier]
+          )}"
+        )
       end
       return @app
     end
@@ -48,18 +55,28 @@ module Pilot
 
       if config[:app_identifier]
         @app ||= Spaceship::Tunes::Application.find(config[:app_identifier])
-        UI.user_error!("Couldn't find app '#{config[:app_identifier]}' on the account of '#{config[:username]}' on App Store Connect") unless @app
+        unless @app
+          UI.user_error!(
+            "Couldn't find app '#{config[
+              :app_identifier
+            ]}' on the account of '#{config[:username]}' on App Store Connect"
+          )
+        end
         app_id ||= @app.apple_id
       end
 
-      app_id ||= UI.input("Could not automatically find the app ID, please enter it here (e.g. 956814360): ")
+      app_id ||=
+        UI.input(
+          'Could not automatically find the app ID, please enter it here (e.g. 956814360): '
+        )
 
       return app_id
     end
 
     def fetch_app_identifier
       result = config[:app_identifier]
-      result ||= FastlaneCore::IpaFileAnalyser.fetch_app_identifier(config[:ipa])
+      result ||=
+        FastlaneCore::IpaFileAnalyser.fetch_app_identifier(config[:ipa])
       result ||= UI.input("Please enter the app's bundle identifier: ")
       UI.verbose("App identifier (#{result})")
       return result
@@ -67,10 +84,16 @@ module Pilot
 
     def fetch_app_platform(required: true)
       result = config[:app_platform]
-      result ||= FastlaneCore::IpaFileAnalyser.fetch_app_platform(config[:ipa]) if config[:ipa]
+      if config[:ipa]
+        result ||=
+          FastlaneCore::IpaFileAnalyser.fetch_app_platform(config[:ipa])
+      end
       if required
-        result ||= UI.input("Please enter the app's platform (appletvos, ios, osx): ")
-        UI.user_error!("App Platform must be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include?(result)
+        result ||=
+          UI.input("Please enter the app's platform (appletvos, ios, osx): ")
+        unless %w[ios appletvos osx].include?(result)
+          UI.user_error!('App Platform must be ios, appletvos, or osx')
+        end
         UI.verbose("App Platform (#{result})")
       end
       return result

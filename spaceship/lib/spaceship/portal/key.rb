@@ -13,19 +13,19 @@ module Spaceship
       attr_accessor :id
       attr_accessor :name
 
-      attr_mapping({
-        'keyId' => :id,
-        'keyName' => :name,
-        'services' => :services,
-        'canDownload' => :can_download,
-        'canRevoke' => :can_revoke
-      })
+      attr_mapping(
+        {
+          'keyId' => :id,
+          'keyName' => :name,
+          'services' => :services,
+          'canDownload' => :can_download,
+          'canRevoke' => :can_revoke
+        }
+      )
 
       def self.all
         keys = client.list_keys
-        keys.map do |key|
-          new(key)
-        end
+        keys.map { |key| new(key) }
       end
 
       def self.find(id)
@@ -64,9 +64,7 @@ module Spaceship
       end
 
       def service_configs_for(service_id)
-        if (service = find_service(service_id))
-          service['configurations']
-        end
+        service['configurations'] if (service = find_service(service_id))
       end
 
       def has_apns?
@@ -88,9 +86,7 @@ module Spaceship
       private
 
       def find_service(service_id)
-        services.find do |service|
-          service['id'] == service_id
-        end
+        services.find { |service| service['id'] == service_id }
       end
 
       def has_service?(service_id)

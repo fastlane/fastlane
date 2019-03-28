@@ -10,22 +10,32 @@ module Fastlane
           require 'produce/service'
           services = params[:services]
 
-          enabled_services = services.select { |_k, v| v == true || v.to_s == 'on' }.map { |k, v| [k, 'on'] }.to_h
-          disabled_services = services.reject { |_k, v| v == true || v.to_s == 'on' }.map { |k, v| [k, 'off'] }.to_h
+          enabled_services =
+            services.select do |_k, v|
+              v == true || v.to_s == 'on'
+            end.map { |k, v| [k, 'on'] }.to_h
+          disabled_services =
+            services.reject do |_k, v|
+              v == true || v.to_s == 'on'
+            end.map { |k, v| [k, 'off'] }.to_h
 
           enabled_services_object = self.service_object
           enabled_services.each do |k, v|
             enabled_services_object.__hash__[k] = true
             enabled_services_object.send("#{k}=", v)
           end
-          Produce::Service.enable(enabled_services_object, nil) unless enabled_services.empty?
+          unless enabled_services.empty?
+            Produce::Service.enable(enabled_services_object, nil)
+          end
 
           disabled_services_object = self.service_object
           disabled_services.each do |k, v|
             disabled_services_object.__hash__[k] = true
             disabled_services_object.send("#{k}=", v)
           end
-          Produce::Service.disable(disabled_services_object, nil) unless disabled_services.empty?
+          unless disabled_services.empty?
+            Produce::Service.disable(disabled_services_object, nil)
+          end
         end
       end
 
@@ -42,36 +52,36 @@ module Fastlane
 
       def self.services_mapping
         {
-            access_wifi: 'access_wifi',
-            app_group: 'app_group',
-            apple_pay: 'apple_pay',
-            associated_domains: 'associated_domains',
-            auto_fill_credential: 'auto_fill_credential',
-            data_protection: 'data_protection',
-            game_center: 'game_center',
-            health_kit: 'healthkit',
-            home_kit: 'homekit',
-            hotspot: 'hotspot',
-            icloud: 'icloud',
-            in_app_purchase: 'in_app_purchase',
-            inter_app_audio: 'inter_app_audio',
-            multipath: 'multipath',
-            network_extension: 'network_extension',
-            nfc_tag_reading: 'nfc_tag_reading',
-            personal_vpn: 'personal_vpn',
-            passbook: 'passbook',
-            push_notification: 'push_notification',
-            siri_kit: 'sirikit',
-            vpn_configuration: 'vpn_conf',
-            wallet: 'wallet',
-            wireless_accessory: 'wireless_conf'
+          access_wifi: 'access_wifi',
+          app_group: 'app_group',
+          apple_pay: 'apple_pay',
+          associated_domains: 'associated_domains',
+          auto_fill_credential: 'auto_fill_credential',
+          data_protection: 'data_protection',
+          game_center: 'game_center',
+          health_kit: 'healthkit',
+          home_kit: 'homekit',
+          hotspot: 'hotspot',
+          icloud: 'icloud',
+          in_app_purchase: 'in_app_purchase',
+          inter_app_audio: 'inter_app_audio',
+          multipath: 'multipath',
+          network_extension: 'network_extension',
+          nfc_tag_reading: 'nfc_tag_reading',
+          personal_vpn: 'personal_vpn',
+          passbook: 'passbook',
+          push_notification: 'push_notification',
+          siri_kit: 'sirikit',
+          vpn_configuration: 'vpn_conf',
+          wallet: 'wallet',
+          wireless_accessory: 'wireless_conf'
         }
       end
 
       def self.allowed_services_description
         return Produce::DeveloperCenter::ALLOWED_SERVICES.map do |k, v|
           "#{k}: (#{v.join('|')})(:on|:off)(true|false)"
-        end.join(", ")
+        end.join(', ')
       end
 
       def self.description
@@ -80,69 +90,96 @@ module Fastlane
 
       def self.details
         [
-          "The options are the same as `:enable_services` in the [produce action](https://docs.fastlane.tools/actions/produce/#parameters_1)"
+          'The options are the same as `:enable_services` in the [produce action](https://docs.fastlane.tools/actions/produce/#parameters_1)'
         ].join("\n")
       end
 
       def self.available_options
         require 'produce'
-        user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
+        user =
+          CredentialsManager::AppfileConfig.try_fetch_value(
+            :apple_dev_portal_id
+          )
         user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+
         [
-          FastlaneCore::ConfigItem.new(key: :username,
-                                       short_option: "-u",
-                                       env_name: "PRODUCE_USERNAME",
-                                       description: "Your Apple ID Username",
-                                       default_value: user,
-                                       default_value_dynamic: true),
-          FastlaneCore::ConfigItem.new(key: :app_identifier,
-                                       env_name: "PRODUCE_APP_IDENTIFIER",
-                                       short_option: "-a",
-                                       description: "App Identifier (Bundle ID, e.g. com.krausefx.app)",
-                                       code_gen_sensitive: true,
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
-                                       default_value_dynamic: true),
-          FastlaneCore::ConfigItem.new(key: :services,
-                                       display_in_shell: false,
-                                       env_name: "PRODUCE_ENABLE_SERVICES",
-                                       description: "Array with Spaceship App Services (e.g. #{allowed_services_description})",
-                                       is_string: false,
-                                       type: Hash,
-                                       default_value: {},
-                                       verify_block: proc do |value|
-                                         allowed_keys = Produce::DeveloperCenter::ALLOWED_SERVICES.keys
-                                         UI.user_error!("enable_services has to be of type Hash") unless value.kind_of?(Hash)
-                                         value.each do |key, v|
-                                           UI.user_error!("The key: '#{key}' is not supported in `enable_services' - following keys are available: [#{allowed_keys.join(',')}]") unless allowed_keys.include?(key.to_sym)
-                                         end
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :team_id,
-                                       short_option: "-b",
-                                       env_name: "PRODUCE_TEAM_ID",
-                                       description: "The ID of your Developer Portal team if you're in multiple teams",
-                                       optional: true,
-                                       code_gen_sensitive: true,
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
-                                       default_value_dynamic: true,
-                                       verify_block: proc do |value|
-                                         ENV["FASTLANE_TEAM_ID"] = value.to_s
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :team_name,
-                                       short_option: "-l",
-                                       env_name: "PRODUCE_TEAM_NAME",
-                                       description: "The name of your Developer Portal team if you're in multiple teams",
-                                       optional: true,
-                                       code_gen_sensitive: true,
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
-                                       default_value_dynamic: true,
-                                       verify_block: proc do |value|
-                                         ENV["FASTLANE_TEAM_NAME"] = value.to_s
-                                       end)
+          FastlaneCore::ConfigItem.new(
+            key: :username,
+            short_option: '-u',
+            env_name: 'PRODUCE_USERNAME',
+            description: 'Your Apple ID Username',
+            default_value: user,
+            default_value_dynamic: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :app_identifier,
+            env_name: 'PRODUCE_APP_IDENTIFIER',
+            short_option: '-a',
+            description: 'App Identifier (Bundle ID, e.g. com.krausefx.app)',
+            code_gen_sensitive: true,
+            default_value:
+              CredentialsManager::AppfileConfig.try_fetch_value(
+                :app_identifier
+              ),
+            default_value_dynamic: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :services,
+            display_in_shell: false,
+            env_name: 'PRODUCE_ENABLE_SERVICES',
+            description:
+              "Array with Spaceship App Services (e.g. #{allowed_services_description})",
+            is_string: false,
+            type: Hash,
+            default_value: {},
+            verify_block:
+              proc do |value|
+                allowed_keys = Produce::DeveloperCenter::ALLOWED_SERVICES.keys
+                unless value.kind_of?(Hash)
+                  UI.user_error!('enable_services has to be of type Hash')
+                end
+                value.each do |key, v|
+                  unless allowed_keys.include?(key.to_sym)
+                    UI.user_error!(
+                      "The key: '#{key}' is not supported in `enable_services' - following keys are available: [#{allowed_keys
+                        .join(',')}]"
+                    )
+                  end
+                end
+              end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :team_id,
+            short_option: '-b',
+            env_name: 'PRODUCE_TEAM_ID',
+            description:
+              "The ID of your Developer Portal team if you're in multiple teams",
+            optional: true,
+            code_gen_sensitive: true,
+            default_value:
+              CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+            default_value_dynamic: true,
+            verify_block: proc { |value| ENV['FASTLANE_TEAM_ID'] = value.to_s }
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :team_name,
+            short_option: '-l',
+            env_name: 'PRODUCE_TEAM_NAME',
+            description:
+              "The name of your Developer Portal team if you're in multiple teams",
+            optional: true,
+            code_gen_sensitive: true,
+            default_value:
+              CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+            default_value_dynamic: true,
+            verify_block:
+              proc { |value| ENV['FASTLANE_TEAM_NAME'] = value.to_s }
+          )
         ]
       end
 
       def self.author
-        "bhimsenpadalkar"
+        'bhimsenpadalkar'
       end
 
       def self.is_supported?(platform)

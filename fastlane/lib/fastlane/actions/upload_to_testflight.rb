@@ -21,20 +21,22 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Upload new binary to App Store Connect for TestFlight beta testing (via _pilot_)"
+        'Upload new binary to App Store Connect for TestFlight beta testing (via _pilot_)'
       end
 
       def self.details
         [
-          "More details can be found on https://docs.fastlane.tools/actions/pilot/.",
-          "This integration will only do the TestFlight upload."
+          'More details can be found on https://docs.fastlane.tools/actions/pilot/.',
+          'This integration will only do the TestFlight upload.'
         ].join("\n")
       end
 
       def self.available_options
-        require "pilot"
-        require "pilot/options"
-        FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options)
+        require 'pilot'
+        require 'pilot/options'
+        FastlaneCore::CommanderGenerator.new.generate(
+          Pilot::Options.available_options
+        )
       end
 
       def self.example_code
@@ -96,11 +98,11 @@ module Fastlane
       end
 
       def self.authors
-        ["KrauseFx"]
+        %w[KrauseFx]
       end
 
       def self.is_supported?(platform)
-        [:ios].include?(platform)
+        %i[ios].include?(platform)
       end
     end
   end

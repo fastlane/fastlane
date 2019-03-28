@@ -16,11 +16,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Download metadata and binaries from Google Play (via _supply_)"
+        'Download metadata and binaries from Google Play (via _supply_)'
       end
 
       def self.details
-        "More information: https://docs.fastlane.tools/actions/download_from_play_store/"
+        'More information: https://docs.fastlane.tools/actions/download_from_play_store/'
       end
 
       def self.available_options
@@ -29,18 +29,27 @@ module Fastlane
         options = Supply::Options.available_options.clone
 
         # remove all the unnecessary (for this action) options
-        options_to_keep = [:package_name, :metadata_path, :json_key, :json_key_data, :root_url, :timeout, :key, :issuer]
-        options.delete_if { |option| options_to_keep.include?(option.key) == false }
+        options_to_keep = %i[
+          package_name
+          metadata_path
+          json_key
+          json_key_data
+          root_url
+          timeout
+          key
+          issuer
+        ]
+        options.delete_if do |option|
+          options_to_keep.include?(option.key) == false
+        end
       end
 
-      def self.output
-      end
+      def self.output; end
 
-      def self.return_value
-      end
+      def self.return_value; end
 
       def self.authors
-        ["janpio"]
+        %w[janpio]
       end
 
       def self.is_supported?(platform)
@@ -48,9 +57,7 @@ module Fastlane
       end
 
       def self.example_code
-        [
-          'download_from_play_store'
-        ]
+        %w[download_from_play_store]
       end
 
       def self.category

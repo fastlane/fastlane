@@ -15,30 +15,38 @@ module Fastlane
       end
 
       def self.description
-        "Adds device frames around all screenshots (via _frameit_)"
+        'Adds device frames around all screenshots (via _frameit_)'
       end
 
       def self.details
         [
-          "Uses [frameit](https://docs.fastlane.tools/actions/frameit/) to prepare perfect screenshots for the App Store, your website, QA or emails.",
-          "You can add background and titles to the framed screenshots as well."
+          'Uses [frameit](https://docs.fastlane.tools/actions/frameit/) to prepare perfect screenshots for the App Store, your website, QA or emails.',
+          'You can add background and titles to the framed screenshots as well.'
         ].join("\n")
       end
 
       def self.available_options
-        require "frameit"
-        require "frameit/options"
-        FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options) + [
-          FastlaneCore::ConfigItem.new(key: :path,
-                                       env_name: "FRAMEIT_SCREENSHOTS_PATH",
-                                       description: "The path to the directory containing the screenshots",
-                                       default_value: Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] || FastlaneCore::FastlaneFolder.path,
-                                       default_value_dynamic: true)
-        ]
+        require 'frameit'
+        require 'frameit/options'
+        FastlaneCore::CommanderGenerator.new.generate(
+          Frameit::Options.available_options
+        ) +
+          [
+            FastlaneCore::ConfigItem.new(
+              key: :path,
+              env_name: 'FRAMEIT_SCREENSHOTS_PATH',
+              description:
+                'The path to the directory containing the screenshots',
+              default_value:
+                Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] ||
+                  FastlaneCore::FastlaneFolder.path,
+              default_value_dynamic: true
+            )
+          ]
       end
 
       def self.author
-        "KrauseFx"
+        'KrauseFx'
       end
 
       def self.example_code
@@ -56,7 +64,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
     end
   end

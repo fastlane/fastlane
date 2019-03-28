@@ -4,40 +4,56 @@ require 'open-uri'
 module Deliver
   class DownloadScreenshots
     def self.run(options, path)
-      UI.message("Downloading all existing screenshots...")
+      UI.message('Downloading all existing screenshots...')
       download(options, path)
-      UI.success("Successfully downloaded all existing screenshots")
+      UI.success('Successfully downloaded all existing screenshots')
     rescue => ex
       UI.error(ex)
-      UI.error("Couldn't download already existing screenshots from App Store Connect.")
+      UI.error(
+        "Couldn't download already existing screenshots from App Store Connect."
+      )
     end
 
     def self.download(options, folder_path)
-      v = options[:use_live_version] ? options[:app].live_version : options[:app].latest_version
+      v =
+        if options[:use_live_version]
+          options[:app].live_version
+        else
+          options[:app].latest_version
+        end
 
       v.screenshots.each do |language, screenshots|
         screenshots.each do |screenshot|
-          file_name = [screenshot.sort_order, screenshot.device_type, screenshot.sort_order].join("_")
+          file_name =
+            [
+              screenshot.sort_order,
+              screenshot.device_type,
+              screenshot.sort_order
+            ].join('_')
           original_file_extension = File.basename(screenshot.original_file_name)
-          file_name += "." + original_file_extension
+          file_name += '.' + original_file_extension
 
-          UI.message("Downloading existing screenshot '#{file_name}' for language '#{language}'")
+          UI.message(
+            "Downloading existing screenshot '#{file_name}' for language '#{language}'"
+          )
 
           # If the screen shot is for an appleTV we need to store it in a way that we'll know it's an appleTV
           # screen shot later as the screen size is the same as an iPhone 6 Plus in landscape.
-          if screenshot.device_type == "appleTV"
-            containing_folder = File.join(folder_path, "appleTV", screenshot.language)
+          if screenshot.device_type == 'appleTV'
+            containing_folder =
+              File.join(folder_path, 'appleTV', screenshot.language)
           else
             containing_folder = File.join(folder_path, screenshot.language)
           end
 
           if screenshot.is_imessage
-            containing_folder = File.join(folder_path, "iMessage", screenshot.language)
+            containing_folder =
+              File.join(folder_path, 'iMessage', screenshot.language)
           end
 
           begin
             FileUtils.mkdir_p(containing_folder)
-          rescue
+          rescue StandardError
             # if it's already there
           end
           path = File.join(containing_folder, file_name)

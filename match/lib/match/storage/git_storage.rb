@@ -32,15 +32,17 @@ module Match
         )
       end
 
-      def initialize(type: nil,
-                     platform: nil,
-                     git_url: nil,
-                     shallow_clone: nil,
-                     skip_docs: false,
-                     branch: "master",
-                     git_full_name: nil,
-                     git_user_email: nil,
-                     clone_branch_directly: false)
+      def initialize(
+        type: nil,
+        platform: nil,
+        git_url: nil,
+        shallow_clone: nil,
+        skip_docs: false,
+        branch: 'master',
+        git_full_name: nil,
+        git_user_email: nil,
+        clone_branch_directly: false
+      )
         self.git_url = git_url
         self.shallow_clone = shallow_clone
         self.skip_docs = skip_docs
@@ -60,42 +62,60 @@ module Match
         # No existing working directory, creating a new one now
         self.working_directory = Dir.mktmpdir
 
-        command = "git clone #{self.git_url.shellescape} #{self.working_directory.shellescape}"
+        command =
+          "git clone #{self.git_url.shellescape} #{self.working_directory
+            .shellescape}"
         if self.shallow_clone
-          command << " --depth 1 --no-single-branch"
+          command << ' --depth 1 --no-single-branch'
         elsif self.clone_branch_directly
           command += " -b #{self.branch.shellescape} --single-branch"
         end
 
-        UI.message("Cloning remote git repo...")
+        UI.message('Cloning remote git repo...')
         if self.branch && !self.clone_branch_directly
-          UI.message("If cloning the repo takes too long, you can use the `clone_branch_directly` option in match.")
+          UI.message(
+            'If cloning the repo takes too long, you can use the `clone_branch_directly` option in match.'
+          )
         end
 
         begin
           # GIT_TERMINAL_PROMPT will fail the `git clone` command if user credentials are missing
           Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
-            FastlaneCore::CommandExecutor.execute(command: command,
-                                                print_all: FastlaneCore::Globals.verbose?,
-                                            print_command: FastlaneCore::Globals.verbose?)
+            FastlaneCore::CommandExecutor.execute(
+              command: command,
+              print_all: FastlaneCore::Globals.verbose?,
+              print_command: FastlaneCore::Globals.verbose?
+            )
           end
-        rescue
-          UI.error("Error cloning certificates repo, please make sure you have read access to the repository you want to use")
+        rescue StandardError
+          UI.error(
+            'Error cloning certificates repo, please make sure you have read access to the repository you want to use'
+          )
           if self.branch && self.clone_branch_directly
-            UI.error("You passed '#{self.branch}' as branch in combination with the `clone_branch_directly` flag. Please remove `clone_branch_directly` flag on the first run for _match_ to create the branch.")
+            UI.error(
+              "You passed '#{self
+                .branch}' as branch in combination with the `clone_branch_directly` flag. Please remove `clone_branch_directly` flag on the first run for _match_ to create the branch."
+            )
           end
-          UI.error("Run the following command manually to make sure you're properly authenticated:")
+          UI.error(
+            "Run the following command manually to make sure you're properly authenticated:"
+          )
           UI.command(command)
-          UI.user_error!("Error cloning certificates git repo, please make sure you have access to the repository - see instructions above")
+          UI.user_error!(
+            'Error cloning certificates git repo, please make sure you have access to the repository - see instructions above'
+          )
         end
 
         add_user_config(self.git_full_name, self.git_user_email)
 
         unless File.directory?(self.working_directory)
-          UI.user_error!("Error cloning repo, make sure you have access to it '#{self.git_url}'")
+          UI.user_error!(
+            "Error cloning repo, make sure you have access to it '#{self
+              .git_url}'"
+          )
         end
 
-        checkout_branch unless self.branch == "master"
+        checkout_branch unless self.branch == 'master'
       end
 
       def human_readable_description
@@ -105,13 +125,14 @@ module Match
       def delete_files(files_to_delete: [], custom_message: nil)
         # No specific list given, e.g. this happens on `fastlane match nuke`
         # We just want to run `git add -A` to commit everything
-        git_push(commands: ["git add -A"], commit_message: custom_message)
+        git_push(commands: ['git add -A'], commit_message: custom_message)
       end
 
       def upload_files(files_to_upload: [], custom_message: nil)
-        commands = files_to_upload.map do |current_file|
-          "git add #{current_file.shellescape}"
-        end
+        commands =
+          files_to_upload.map do |current_file|
+            "git add #{current_file.shellescape}"
+          end
 
         git_push(commands: commands, commit_message: custom_message)
       end
@@ -119,17 +140,19 @@ module Match
       # Generate the commit message based on the user's parameters
       def generate_commit_message
         [
-          "[fastlane]",
-          "Updated",
+          '[fastlane]',
+          'Updated',
           self.type,
-          "and platform",
+          'and platform',
           self.platform
-        ].join(" ")
+        ].join(' ')
       end
 
       def generate_matchfile_content
-        UI.important("Please create a new, private git repository to store the certificates and profiles there")
-        url = UI.input("URL of the Git Repo: ")
+        UI.important(
+          'Please create a new, private git repository to store the certificates and profiles there'
+        )
+        url = UI.input('URL of the Git Repo: ')
 
         return "git_url(\"#{url}\")"
       end
@@ -148,16 +171,18 @@ module Match
           # If a new branch is being created, we create it as an 'orphan' to not inherit changes from the master branch.
           commands << "git checkout --orphan #{self.branch.shellescape}"
           # We also need to reset the working directory to not transfer any uncommitted changes to the new branch.
-          commands << "git reset --hard"
+          commands << 'git reset --hard'
         end
 
         UI.message("Checking out branch #{self.branch}...")
 
         Dir.chdir(self.working_directory) do
           commands.each do |command|
-            FastlaneCore::CommandExecutor.execute(command: command,
-                                                  print_all: FastlaneCore::Globals.verbose?,
-                                                  print_command: FastlaneCore::Globals.verbose?)
+            FastlaneCore::CommandExecutor.execute(
+              command: command,
+              print_all: FastlaneCore::Globals.verbose?,
+              print_command: FastlaneCore::Globals.verbose?
+            )
           end
         end
       end
@@ -166,28 +191,39 @@ module Match
       def branch_exists?(branch)
         return unless self.working_directory
 
-        result = Dir.chdir(self.working_directory) do
-          FastlaneCore::CommandExecutor.execute(command: "git --no-pager branch --list origin/#{branch.shellescape} --no-color -r",
-                                                print_all: FastlaneCore::Globals.verbose?,
-                                                print_command: FastlaneCore::Globals.verbose?)
-        end
+        result =
+          Dir.chdir(self.working_directory) do
+            FastlaneCore::CommandExecutor.execute(
+              command:
+                "git --no-pager branch --list origin/#{branch
+                  .shellescape} --no-color -r",
+              print_all: FastlaneCore::Globals.verbose?,
+              print_command: FastlaneCore::Globals.verbose?
+            )
+          end
         return !result.empty?
       end
 
       def add_user_config(user_name, user_email)
         # Add git config if needed
         commands = []
-        commands << "git config user.name \"#{user_name}\"" unless user_name.nil?
-        commands << "git config user.email \"#{user_email}\"" unless user_email.nil?
+        unless user_name.nil?
+          commands << "git config user.name \"#{user_name}\""
+        end
+        unless user_email.nil?
+          commands << "git config user.email \"#{user_email}\""
+        end
 
         return if commands.empty?
 
-        UI.message("Add git user config to local git repo...")
+        UI.message('Add git user config to local git repo...')
         Dir.chdir(self.working_directory) do
           commands.each do |command|
-            FastlaneCore::CommandExecutor.execute(command: command,
-                                                  print_all: FastlaneCore::Globals.verbose?,
-                                                  print_command: FastlaneCore::Globals.verbose?)
+            FastlaneCore::CommandExecutor.execute(
+              command: command,
+              print_all: FastlaneCore::Globals.verbose?,
+              print_command: FastlaneCore::Globals.verbose?
+            )
           end
         end
       end
@@ -197,12 +233,14 @@ module Match
         commands << "git commit -m #{commit_message.shellescape}"
         commands << "git push origin #{self.branch.shellescape}"
 
-        UI.message("Pushing changes to remote git repo...")
+        UI.message('Pushing changes to remote git repo...')
         Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
           commands.each do |command|
-            FastlaneCore::CommandExecutor.execute(command: command,
-                                                print_all: FastlaneCore::Globals.verbose?,
-                                            print_command: FastlaneCore::Globals.verbose?)
+            FastlaneCore::CommandExecutor.execute(
+              command: command,
+              print_all: FastlaneCore::Globals.verbose?,
+              print_command: FastlaneCore::Globals.verbose?
+            )
           end
         end
       rescue => ex

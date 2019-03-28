@@ -49,8 +49,10 @@ module Spaceship
         def factory(attrs)
           begin
             attrs['dateJoined'] = Time.parse(attrs['dateJoined'])
-          rescue TypeError
+
             # Raised if we start getting integer timestamps
+          rescue TypeError
+
           rescue ArgumentError
             # Raised if the string's format can't be parsed
           end

@@ -10,7 +10,12 @@ module Fastlane
 
         skip_git_hooks = params[:skip_git_hooks] ? '--no-verify' : ''
 
-        result = Actions.sh("git commit -m #{params[:message].shellescape} #{paths} #{skip_git_hooks}".strip)
+        result =
+          Actions.sh(
+            "git commit -m #{params[:message]
+              .shellescape} #{paths} #{skip_git_hooks}"
+              .strip
+          )
         UI.success("Successfully committed \"#{params[:path]}\" 💾.")
         return result
       end
@@ -20,32 +25,36 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Directly commit the given file with the given message"
+        'Directly commit the given file with the given message'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :path,
-                                       description: "The file you want to commit",
-                                       is_string: false),
-          FastlaneCore::ConfigItem.new(key: :message,
-                                       description: "The commit message that should be used"),
-          FastlaneCore::ConfigItem.new(key: :skip_git_hooks,
-                                       description: "Set to true to pass --no-verify to git",
-                                       type: Boolean,
-                                       optional: true)
+          FastlaneCore::ConfigItem.new(
+            key: :path,
+            description: 'The file you want to commit',
+            is_string: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :message, description: 'The commit message that should be used'
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :skip_git_hooks,
+            description: 'Set to true to pass --no-verify to git',
+            type: Boolean,
+            optional: true
+          )
         ]
       end
 
-      def self.output
-      end
+      def self.output; end
 
       def self.return_value
         nil
       end
 
       def self.authors
-        ["KrauseFx"]
+        %w[KrauseFx]
       end
 
       def self.is_supported?(platform)

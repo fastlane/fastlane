@@ -50,8 +50,14 @@ module Spaceship
         # @param app_id (String) The unique Apple ID of this app
         def all(application, app_id, platform: nil)
           trains = []
-          trains += client.build_trains(app_id, 'internal', platform: platform)['trains']
-          trains += client.build_trains(app_id, 'external', platform: platform)['trains']
+          trains +=
+            client.build_trains(app_id, 'internal', platform: platform)[
+              'trains'
+            ]
+          trains +=
+            client.build_trains(app_id, 'external', platform: platform)[
+              'trains'
+            ]
 
           result = {}
           trains.each do |attrs|
@@ -69,45 +75,56 @@ module Spaceship
       def setup
         super
 
-        @builds = (self.raw_data['builds'] || []).collect do |attrs|
-          attrs[:build_train] = self
-          Tunes::Build.factory(attrs)
-        end
+        @builds =
+          (self.raw_data['builds'] || []).collect do |attrs|
+            attrs[:build_train] = self
+            Tunes::Build.factory(attrs)
+          end
 
-        @invalid_builds = @builds.select do |build|
-          build.processing_state == 'processingFailed' || build.processing_state == 'invalidBinary'
-        end
+        @invalid_builds =
+          @builds.select do |build|
+            build.processing_state == 'processingFailed' ||
+              build.processing_state == 'invalidBinary'
+          end
 
         # This step may not be necessary anymore - it seems as if every processing build will be caught by the
         # @builds.each below, but not every processing build makes it to buildsInProcessing, so this is redundant
-        @processing_builds = (self.raw_data['buildsInProcessing'] || []).collect do |attrs|
-          attrs[:build_train] = self
-          Tunes::Build.factory(attrs)
-        end
+        @processing_builds =
+          (self.raw_data['buildsInProcessing'] || []).collect do |attrs|
+            attrs[:build_train] = self
+            Tunes::Build.factory(attrs)
+          end
 
         # since buildsInProcessing appears empty, fallback to also including processing state from @builds
         @builds.each do |build|
-          # What combination of attributes constitutes which state is pretty complicated. The table below summarizes
-          # what I've observed, but there's no reason to believe there aren't more states I just haven't seen yet.
-          # The column headers are qualitative states of a given build, and the first column is the observed attributes
-          # of that build.
-          # NOTE: Some of the builds in the build_trains.json fixture do not follow these rules. I don't know if that is
-          # because those examples are older, and the iTC API has changed, or if their format is still a possibility.
-          # The second part of the OR clause in the line below exists so that those suspicious examples continue to be
-          # accepted for unit tests.
-          # +---------------------+-------------------+-------------------+-----------------+--------------------+---------+
-          # |                     | just after upload | normal processing | invalid binary  | processing failed  | success |
-          # +---------------------+-------------------+-------------------+-----------------+--------------------+---------+
-          # |  build.processing = | true              | true              | true            | true               | false   |
-          # |       build.valid = | false             | true              | false           | true               | true    |
-          # | .processing_state = | "processing"      | "processing"      | "invalidBinary" | "processingFailed" | nil     |
-          # +---------------------+-------------------+-------------------+-----------------+--------------------+---------+
-          if build.processing_state == 'processing' || (build.processing && build.processing_state != 'invalidBinary' && build.processing_state != 'processingFailed')
+          if # What combination of attributes constitutes which state is pretty complicated. The table below summarizes
+           # what I've observed, but there's no reason to believe there aren't more states I just haven't seen yet.
+           # The column headers are qualitative states of a given build, and the first column is the observed attributes
+           # of that build.
+           # NOTE: Some of the builds in the build_trains.json fixture do not follow these rules. I don't know if that is
+           # because those examples are older, and the iTC API has changed, or if their format is still a possibility.
+           # The second part of the OR clause in the line below exists so that those suspicious examples continue to be
+           # accepted for unit tests.
+           # +---------------------+-------------------+-------------------+-----------------+--------------------+---------+
+           # |                     | just after upload | normal processing | invalid binary  | processing failed  | success |
+           # +---------------------+-------------------+-------------------+-----------------+--------------------+---------+
+           # |  build.processing = | true              | true              | true            | true               | false   |
+           # |       build.valid = | false             | true              | false           | true               | true    |
+           # | .processing_state = | "processing"      | "processing"      | "invalidBinary" | "processingFailed" | nil     |
+           # +---------------------+-------------------+-------------------+-----------------+--------------------+---------+
+           build
+             .processing_state ==
+             'processing' ||
+             (
+               build.processing && build.processing_state != 'invalidBinary' &&
+                 build.processing_state != 'processingFailed'
+             )
             @processing_builds << build
           end
         end
 
-        self.version_set = self.application.version_set_for_platform(self.platform)
+        self.version_set =
+          self.application.version_set_for_platform(self.platform)
       end
 
       # @return (Spaceship::Tunes::Build) The latest build for this train, sorted by upload time.
@@ -121,20 +138,26 @@ module Spaceship
         platform = build ? build.platform : self.application.platform
         testing_key = "#{testing_type}Testing"
 
-        data = client.build_trains(self.application.apple_id, testing_type, platform: platform)
+        data =
+          client.build_trains(
+            self.application.apple_id,
+            testing_type,
+            platform: platform
+          )
 
         # Delete the irrelevant trains and update the relevant one to enable testing
         data['trains'].delete_if do |train|
           if train['versionString'] != version_string
             true
+
+            # also update the builds
           else
             train[testing_key]['value'] = new_value
 
-            # also update the builds
             train['builds'].delete_if do |b|
               if b[testing_key].nil?
                 true
-              elsif build && b["buildVersion"] == build.build_version
+              elsif build && b['buildVersion'] == build.build_version
                 b[testing_key]['value'] = new_value
                 false
               elsif b[testing_key]['value'] == true
@@ -150,21 +173,28 @@ module Spaceship
         end
 
         begin
-          result = client.update_build_trains!(application.apple_id, testing_type, data)
+          result =
+            client.update_build_trains!(
+              application.apple_id,
+              testing_type,
+              data
+            )
         rescue Spaceship::Tunes::Error => ex
-          if ex.to_s.include?("You must provide an answer for this question")
+          if ex.to_s.include?('You must provide an answer for this question')
             # This is a very common error message that's raised by TestFlight
             # We want to show a nicer error message with instructions on how
             # to resolve the underlying issue
             # https://github.com/fastlane/fastlane/issues/1873
             # https://github.com/fastlane/fastlane/issues/4002
-            error_message = [""] # to have a nice new-line in the beginning
-            error_message << "TestFlight requires you to provide the answer to the encryption question"
-            error_message << "to provide the reply, please add the following to your Info.plist file"
-            error_message << ""
-            error_message << "<key>ITSAppUsesNonExemptEncryption</key><false/>"
-            error_message << ""
-            error_message << "Afterwards re-build your app and try again"
+            error_message = [''] # to have a nice new-line in the beginning
+            error_message <<
+              'TestFlight requires you to provide the answer to the encryption question'
+            error_message <<
+              'to provide the reply, please add the following to your Info.plist file'
+            error_message << ''
+            error_message << '<key>ITSAppUsesNonExemptEncryption</key><false/>'
+            error_message << ''
+            error_message << 'Afterwards re-build your app and try again'
             error_message << "App Store Connect reported: '#{ex}'"
             raise error_message.join("\n")
           else

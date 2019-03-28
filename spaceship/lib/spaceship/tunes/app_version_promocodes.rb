@@ -13,15 +13,17 @@ module Spaceship
       attr_reader :maximum_number_of_codes
       attr_reader :contract_file_name
 
-      attr_mapping({
-        'id' => :app_id,
-        'appName' => :app_name,
-        'version' => :version,
-        'platform' => :platform,
-        'numberOfCodes' => :number_of_codes,
-        'maximumNumberOfCodes' => :maximum_number_of_codes,
-        'contractFileName' => :contract_file_name
-      })
+      attr_mapping(
+        {
+          'id' => :app_id,
+          'appName' => :app_name,
+          'version' => :version,
+          'platform' => :platform,
+          'numberOfCodes' => :number_of_codes,
+          'maximumNumberOfCodes' => :maximum_number_of_codes,
+          'contractFileName' => :contract_file_name
+        }
+      )
     end
   end
 end

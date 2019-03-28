@@ -13,16 +13,18 @@ module Spaceship::TestFlight
 
     attr_accessor :app_id
 
-    attr_mapping({
-      'id' => :id,
-      'name' => :name,
-      'isInternalGroup' => :is_internal_group,
-      'appAdamId' => :app_id,
-      'isDefaultExternalGroup' => :is_default_external_group,
-      'providerId' => :provider_id,
-      'active' => :is_active,
-      'created' => :created
-    })
+    attr_mapping(
+      {
+        'id' => :id,
+        'name' => :name,
+        'isInternalGroup' => :is_internal_group,
+        'appAdamId' => :app_id,
+        'isDefaultExternalGroup' => :is_default_external_group,
+        'providerId' => :provider_id,
+        'active' => :is_active,
+        'created' => :created
+      }
+    )
 
     def self.create!(app_id: nil, group_name: nil)
       group = self.find(app_id: app_id, group_name: group_name)
@@ -69,28 +71,38 @@ module Spaceship::TestFlight
     def add_tester!(tester)
       # This post request creates an account-level tester and then makes it available to the app, or just makes
       # it available to the app if it already exists
-      client.create_app_level_tester(app_id: self.app_id,
-                                 first_name: tester.first_name,
-                                  last_name: tester.last_name,
-                                      email: tester.email)
+      client.create_app_level_tester(
+        app_id: self.app_id,
+        first_name: tester.first_name,
+        last_name: tester.last_name,
+        email: tester.email
+      )
       # This put request adds the tester to the group
-      client.post_tester_to_group(group_id: self.id,
-                                     email: tester.email,
-                                first_name: tester.first_name,
-                                 last_name: tester.last_name,
-                                    app_id: self.app_id)
+      client.post_tester_to_group(
+        group_id: self.id,
+        email: tester.email,
+        first_name: tester.first_name,
+        last_name: tester.last_name,
+        app_id: self.app_id
+      )
     end
 
     def remove_tester!(tester)
-      client.delete_tester_from_group(group_id: self.id, tester_id: tester.tester_id, app_id: self.app_id)
+      client.delete_tester_from_group(
+        group_id: self.id, tester_id: tester.tester_id, app_id: self.app_id
+      )
     end
 
     def self.add_tester_to_groups!(tester: nil, app: nil, groups: nil)
-      self.perform_for_groups_in_app(app: app, groups: groups) { |group| group.add_tester!(tester) }
+      self.perform_for_groups_in_app(app: app, groups: groups) do |group|
+        group.add_tester!(tester)
+      end
     end
 
     def self.remove_tester_from_groups!(tester: nil, app: nil, groups: nil)
-      self.perform_for_groups_in_app(app: app, groups: groups) { |group| group.remove_tester!(tester) }
+      self.perform_for_groups_in_app(app: app, groups: groups) do |group|
+        group.remove_tester!(tester)
+      end
     end
 
     def default_external_group?
@@ -114,15 +126,19 @@ module Spaceship::TestFlight
       if groups.nil?
         default_external_group = app.default_external_group
         if default_external_group.nil?
-          raise "The app #{app.name} does not have a default external group. Please make sure to pass group names to the `:groups` option."
+          raise "The app #{app
+                  .name} does not have a default external group. Please make sure to pass group names to the `:groups` option."
         end
         test_flight_groups = [default_external_group]
       else
-        test_flight_groups = self.filter_groups(app_id: app.apple_id) do |group|
-          groups.include?(group.name)
-        end
+        test_flight_groups =
+          self.filter_groups(app_id: app.apple_id) do |group|
+            groups.include?(group.name)
+          end
 
-        raise "There are no groups available matching the names passed to the `:groups` option." if test_flight_groups.empty?
+        if test_flight_groups.empty?
+          raise 'There are no groups available matching the names passed to the `:groups` option.'
+        end
       end
 
       test_flight_groups.each(&block)

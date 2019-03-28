@@ -16,8 +16,18 @@ module FastlaneCore
         return FastlaneCore::Env.truthy?(feature.env_var)
       end
 
-      def register_class_method(klass: nil, symbol: nil, disabled_symbol: nil, enabled_symbol: nil, env_var: nil)
-        return if klass.nil? || symbol.nil? || disabled_symbol.nil? || enabled_symbol.nil? || env_var.nil?
+      def register_class_method(
+        klass: nil,
+        symbol: nil,
+        disabled_symbol: nil,
+        enabled_symbol: nil,
+        env_var: nil
+      )
+        if klass.nil? || symbol.nil? || disabled_symbol.nil? ||
+           enabled_symbol.nil? ||
+           env_var.nil?
+          return
+        end
         klass.define_singleton_method(symbol) do |*args|
           if Feature.enabled?(env_var)
             klass.send(enabled_symbol, *args)
@@ -27,8 +37,18 @@ module FastlaneCore
         end
       end
 
-      def register_instance_method(klass: nil, symbol: nil, disabled_symbol: nil, enabled_symbol: nil, env_var: nil)
-        return if klass.nil? || symbol.nil? || disabled_symbol.nil? || enabled_symbol.nil? || env_var.nil?
+      def register_instance_method(
+        klass: nil,
+        symbol: nil,
+        disabled_symbol: nil,
+        enabled_symbol: nil,
+        env_var: nil
+      )
+        if klass.nil? || symbol.nil? || disabled_symbol.nil? ||
+           enabled_symbol.nil? ||
+           env_var.nil?
+          return
+        end
         klass.send(:define_method, symbol.to_s) do |*args|
           if Feature.enabled?(env_var)
             send(enabled_symbol, *args)
@@ -43,7 +63,7 @@ module FastlaneCore
 
     attr_reader :env_var, :description
     def initialize(env_var: nil, description: nil)
-      raise "Invalid Feature" if env_var.nil? || description.nil?
+      raise 'Invalid Feature' if env_var.nil? || description.nil?
       @env_var = env_var
       @description = description
     end

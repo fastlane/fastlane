@@ -45,35 +45,36 @@ module Spaceship
         #
         # Note: A better solution for this in the future might be to improve how
         # Base::DataHash sets values for paths that don't exist
-        obj = self.new(
-          'preOrder' => {
-            'clearedForPreOrder' => {
-              'value' => false
-            },
-            'appAvailableDate' => {
-              'value' => nil
+        obj =
+          self.new(
+            'preOrder' => {
+              'clearedForPreOrder' => { 'value' => false },
+              'appAvailableDate' => { 'value' => nil }
             }
-          }
-        )
+          )
 
         # Detect if the territories attribute is an array of Strings and convert to Territories
         obj.territories =
           if territories[0].kind_of?(String)
-            territories.map { |territory| Spaceship::Tunes::Territory.from_code(territory) }
+            territories.map do |territory|
+              Spaceship::Tunes::Territory.from_code(territory)
+            end
           else
             territories
           end
-        obj.include_future_territories = params.fetch(:include_future_territories, true)
+        obj.include_future_territories =
+          params.fetch(:include_future_territories, true)
         obj.cleared_for_preorder = params.fetch(:cleared_for_preorder, false)
         obj.app_available_date = params.fetch(:app_available_date, nil)
-        obj.b2b_unavailable =  params.fetch(:b2b_unavailable, false)
-        obj.b2b_app_enabled =  params.fetch(:b2b_app_enabled, false)
+        obj.b2b_unavailable = params.fetch(:b2b_unavailable, false)
+        obj.b2b_app_enabled = params.fetch(:b2b_app_enabled, false)
         obj.educational_discount = params.fetch(:educational_discount, true)
         return obj
       end
 
       def territories
-        @territories ||= raw_data['countries'].map { |info| Territory.new(info) }
+        @territories ||=
+          raw_data['countries'].map { |info| Territory.new(info) }
       end
 
       def b2b_users
@@ -85,7 +86,11 @@ module Spaceship
       end
 
       def educational_discount
-        @educational_discount.nil? ? raw_data['educationalDiscount'] : @educational_discount
+        if @educational_discount.nil?
+          raw_data['educationalDiscount']
+        else
+          @educational_discount
+        end
       end
 
       def cleared_for_preorder
@@ -95,7 +100,7 @@ module Spaceship
       # Sets `b2b_app_enabled` to true and `educational_discount` to false
       # Requires users to be added with `add_b2b_users` otherwise `update_availability` will error
       def enable_b2b_app!
-        raise "Not possible to enable b2b on this app" if b2b_unavailable
+        raise 'Not possible to enable b2b on this app' if b2b_unavailable
         @b2b_app_enabled = true
         # need to set the educational discount to false
         @educational_discount = false
@@ -104,14 +109,18 @@ module Spaceship
 
       # Adds users for b2b enabled apps
       def add_b2b_users(user_list = [])
-        raise "Cannot add b2b users if b2b is not enabled" unless b2b_app_enabled
+        unless b2b_app_enabled
+          raise 'Cannot add b2b users if b2b is not enabled'
+        end
         @b2b_users = user_list.map { |user| B2bUser.from_username(user) }
         return self
       end
 
       # Updates users for b2b enabled apps
       def update_b2b_users(user_list = [])
-        raise "Cannot add b2b users if b2b is not enabled" unless b2b_app_enabled
+        unless b2b_app_enabled
+          raise 'Cannot add b2b users if b2b is not enabled'
+        end
 
         added_users = b2b_users.map(&:ds_username)
 
@@ -121,9 +130,16 @@ module Spaceship
         users_to_add = user_list.reject { |user| added_users.include?(user) }
         users_to_remove = added_users.reject { |user| user_list.include?(user) }
 
-        @b2b_users = b2b_users.reject { |user| users_to_remove.include?(user.ds_username) }
-        @b2b_users.concat(users_to_add.map { |user| B2bUser.from_username(user) })
-        @b2b_users.concat(users_to_remove.map { |user| B2bUser.from_username(user, is_add_type: false) })
+        @b2b_users =
+          b2b_users.reject { |user| users_to_remove.include?(user.ds_username) }
+        @b2b_users.concat(
+          users_to_add.map { |user| B2bUser.from_username(user) }
+        )
+        @b2b_users.concat(
+          users_to_remove.map do |user|
+            B2bUser.from_username(user, is_add_type: false)
+          end
+        )
 
         return self
       end

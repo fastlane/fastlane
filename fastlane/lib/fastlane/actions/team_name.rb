@@ -1,27 +1,30 @@
 module Fastlane
   module Actions
-    module SharedValues
-    end
+    module SharedValues; end
 
     class TeamNameAction < Action
       def self.run(params)
         params = nil unless params.kind_of?(Array)
         team = (params || []).first
-        UI.user_error!("Please pass your Team Name (e.g. team_name 'Felix Krause')") unless team.to_s.length > 0
+        unless team.to_s.length > 0
+          UI.user_error!(
+            "Please pass your Team Name (e.g. team_name 'Felix Krause')"
+          )
+        end
 
         UI.message("Setting Team Name to '#{team}' for all build steps")
 
-        [:FASTLANE_TEAM_NAME, :PRODUCE_TEAM_NAME].each do |current|
+        %i[FASTLANE_TEAM_NAME PRODUCE_TEAM_NAME].each do |current|
           ENV[current.to_s] = team
         end
       end
 
       def self.description
-        "Set a team to use by its name"
+        'Set a team to use by its name'
       end
 
       def self.author
-        "KrauseFx"
+        'KrauseFx'
       end
 
       def self.is_supported?(platform)
@@ -29,9 +32,7 @@ module Fastlane
       end
 
       def self.example_code
-        [
-          'team_name("Felix Krause")'
-        ]
+        ['team_name("Felix Krause")']
       end
 
       def self.category

@@ -7,7 +7,7 @@ module Gym
     class << self
       def generate
         parts = prefix
-        parts << "xcodebuild"
+        parts << 'xcodebuild'
         parts += options
         parts += buildactions
         parts += setting
@@ -17,7 +17,7 @@ module Gym
       end
 
       def prefix
-        ["set -o pipefail &&"]
+        ['set -o pipefail &&']
       end
 
       # Path to the project or workspace as parameter
@@ -26,7 +26,7 @@ module Gym
       def project_path_array
         proj = Gym.project.xcodebuild_parameters
         return proj if proj.count > 0
-        UI.user_error!("No project/workspace found")
+        UI.user_error!('No project/workspace found')
       end
 
       def options
@@ -36,12 +36,23 @@ module Gym
         options += project_path_array
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
         options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
-        options << "-destination '#{config[:destination]}'" if config[:destination]
-        options << "-archivePath #{archive_path.shellescape}" unless config[:skip_archive]
-        options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
-        options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
+        if config[:destination]
+          options << "-destination '#{config[:destination]}'"
+        end
+        unless config[:skip_archive]
+          options << "-archivePath #{archive_path.shellescape}"
+        end
+        if config[:derived_data_path]
+          options << "-derivedDataPath '#{config[:derived_data_path]}'"
+        end
+        if config[:result_bundle]
+          options << "-resultBundlePath '#{result_bundle_path}'"
+        end
         options << config[:xcargs] if config[:xcargs]
-        options << "OTHER_SWIFT_FLAGS=\"-Xfrontend -debug-time-function-bodies\"" if config[:analyze_build_time]
+        if config[:analyze_build_time]
+          options <<
+            'OTHER_SWIFT_FLAGS=\"-Xfrontend -debug-time-function-bodies\"'
+        end
 
         options
       end
@@ -58,7 +69,11 @@ module Gym
 
       def setting
         setting = []
-        setting << "CODE_SIGN_IDENTITY=#{Gym.config[:codesigning_identity].shellescape}" if Gym.config[:codesigning_identity]
+        if Gym.config[:codesigning_identity]
+          setting <<
+            "CODE_SIGN_IDENTITY=#{Gym.config[:codesigning_identity]
+              .shellescape}"
+        end
         setting
       end
 
@@ -67,33 +82,37 @@ module Gym
         pipe << "| tee #{xcodebuild_log_path.shellescape}"
         unless Gym.config[:disable_xcpretty]
           formatter = Gym.config[:xcpretty_formatter]
-          pipe << "| xcpretty"
-          pipe << " --test" if Gym.config[:xcpretty_test_format]
-          pipe << " --no-color" if Helper.colors_disabled?
-          pipe << " --formatter " if formatter
+          pipe << '| xcpretty'
+          pipe << ' --test' if Gym.config[:xcpretty_test_format]
+          pipe << ' --no-color' if Helper.colors_disabled?
+          pipe << ' --formatter ' if formatter
           pipe << formatter if formatter
-          pipe << "--utf" if Gym.config[:xcpretty_utf]
+          pipe << '--utf' if Gym.config[:xcpretty_utf]
           report_output_junit = Gym.config[:xcpretty_report_junit]
           report_output_html = Gym.config[:xcpretty_report_html]
           report_output_json = Gym.config[:xcpretty_report_json]
           if report_output_junit
-            pipe << " --report junit --output "
+            pipe << ' --report junit --output '
             pipe << report_output_junit.shellescape
           elsif report_output_html
-            pipe << " --report html --output "
+            pipe << ' --report html --output '
             pipe << report_output_html.shellescape
           elsif report_output_json
-            pipe << " --report json-compilation-database --output "
+            pipe << ' --report json-compilation-database --output '
             pipe << report_output_json.shellescape
           end
         end
-        pipe << "> /dev/null" if Gym.config[:suppress_xcode_output]
+        pipe << '> /dev/null' if Gym.config[:suppress_xcode_output]
         pipe
       end
 
       def post_build
         commands = []
-        commands << %{grep -E '^[0-9.]+ms' #{xcodebuild_log_path.shellescape} | grep -vE '^0\.[0-9]' | sort -nr > culprits.txt} if Gym.config[:analyze_build_time]
+        if Gym.config[:analyze_build_time]
+          commands <<
+            "grep -E '^[0-9.]+ms' #{xcodebuild_log_path
+              .shellescape} | grep -vE '^0\.[0-9]' | sort -nr > culprits.txt"
+        end
         commands
       end
 
@@ -117,22 +136,26 @@ module Gym
       def archive_path
         Gym.cache[:archive_path] ||= Gym.config[:archive_path]
         unless Gym.cache[:archive_path]
-          file_name = [Gym.config[:output_name], Time.now.strftime("%F %H.%M.%S")] # e.g. 2015-08-07 14.49.12
-          Gym.cache[:archive_path] = File.join(build_path, file_name.join(" ") + ".xcarchive")
+          file_name = [
+            Gym.config[:output_name],
+            Time.now.strftime('%F %H.%M.%S')
+          ] # e.g. 2015-08-07 14.49.12
+          Gym.cache[:archive_path] =
+            File.join(build_path, file_name.join(' ') + '.xcarchive')
         end
 
-        if File.extname(Gym.cache[:archive_path]) != ".xcarchive"
-          Gym.cache[:archive_path] += ".xcarchive"
+        if File.extname(Gym.cache[:archive_path]) != '.xcarchive'
+          Gym.cache[:archive_path] += '.xcarchive'
         end
         return Gym.cache[:archive_path]
       end
 
       def result_bundle_path
         unless Gym.cache[:result_bundle_path]
-          path = File.join(Gym.config[:output_directory], Gym.config[:output_name]) + ".result"
-          if File.directory?(path)
-            FileUtils.remove_dir(path)
-          end
+          path =
+            File.join(Gym.config[:output_directory], Gym.config[:output_name]) +
+              '.result'
+          FileUtils.remove_dir(path) if File.directory?(path)
           Gym.cache[:result_bundle_path] = path
         end
         return Gym.cache[:result_bundle_path]

@@ -72,18 +72,20 @@ module Spaceship
       # @return (Bool) Whether or not the certificate can be downloaded
       attr_accessor :can_download
 
-      attr_mapping({
-        'certificateId' => :id,
-        'name' => :name,
-        'statusString' => :status,
-        'dateCreated' => :created,
-        'expirationDate' => :expires,
-        'ownerType' => :owner_type,
-        'ownerName' => :owner_name,
-        'ownerId' => :owner_id,
-        'certificateTypeDisplayId' => :type_display_id,
-        'canDownload' => :can_download
-      })
+      attr_mapping(
+        {
+          'certificateId' => :id,
+          'name' => :name,
+          'statusString' => :status,
+          'dateCreated' => :created,
+          'expirationDate' => :expires,
+          'ownerType' => :owner_type,
+          'ownerName' => :owner_name,
+          'ownerId' => :owner_id,
+          'certificateTypeDisplayId' => :type_display_id,
+          'canDownload' => :can_download
+        }
+      )
 
       #####################################################
       # Certs are not associated with apps
@@ -153,41 +155,41 @@ module Spaceship
       class MacProductionPush < PushCertificate; end
 
       IOS_CERTIFICATE_TYPE_IDS = {
-        "5QPB9NHCEI" => Development,
-        "R58UK2EWSO" => Production,
-        "9RQEK7MSXA" => InHouse,
-        "LA30L5BJEU" => Certificate,
-        "BKLRAVXMGM" => DevelopmentPush,
-        "UPV3DW712I" => ProductionPush,
-        "Y3B2F3TYSI" => Passbook,
-        "3T2ZP62QW8" => WebsitePush,
-        "E5D663CMZW" => VoipPush,
-        "4APLUP237T" => ApplePay,
-        "MD8Q2VRT6A" => ApplePayMerchantIdentity
+        '5QPB9NHCEI' => Development,
+        'R58UK2EWSO' => Production,
+        '9RQEK7MSXA' => InHouse,
+        'LA30L5BJEU' => Certificate,
+        'BKLRAVXMGM' => DevelopmentPush,
+        'UPV3DW712I' => ProductionPush,
+        'Y3B2F3TYSI' => Passbook,
+        '3T2ZP62QW8' => WebsitePush,
+        'E5D663CMZW' => VoipPush,
+        '4APLUP237T' => ApplePay,
+        'MD8Q2VRT6A' => ApplePayMerchantIdentity
       }
 
-      OLDER_IOS_CERTIFICATE_TYPES = [
-        # those are also sent by the browser, but not sure what they represent
-        "T44PTHVNID",
-        "DZQUP8189Y",
-        "FGQUP4785Z",
-        "S5WE21TULA",
-        "3BQKVH9I2X", # ProductionPush,
-        "FUOY7LWJET"
+      OLDER_IOS_CERTIFICATE_TYPES = %w[
+        T44PTHVNID
+        DZQUP8189Y
+        FGQUP4785Z
+        S5WE21TULA
+        3BQKVH9I2X
+        FUOY7LWJET
       ]
 
       MAC_CERTIFICATE_TYPE_IDS = {
-        "749Y1QAGU7" => MacDevelopment,
-        "HXZEUKP0FP" => MacAppDistribution,
-        "2PQI8IDXNH" => MacInstallerDistribution,
-        "OYVN2GW35E" => DeveloperIdInstaller,
-        "W0EURJRMC5" => DeveloperIdApplication,
-        "CDZ7EMXIZ1" => MacProductionPush,
-        "HQ4KP3I34R" => MacDevelopmentPush,
-        "DIVN2GW3XT" => DeveloperIdApplication
+        '749Y1QAGU7' => MacDevelopment,
+        'HXZEUKP0FP' => MacAppDistribution,
+        '2PQI8IDXNH' => MacInstallerDistribution,
+        'OYVN2GW35E' => DeveloperIdInstaller,
+        'W0EURJRMC5' => DeveloperIdApplication,
+        'CDZ7EMXIZ1' => MacProductionPush,
+        'HQ4KP3I34R' => MacDevelopmentPush,
+        'DIVN2GW3XT' => DeveloperIdApplication
       }
 
-      CERTIFICATE_TYPE_IDS = IOS_CERTIFICATE_TYPE_IDS.merge(MAC_CERTIFICATE_TYPE_IDS)
+      CERTIFICATE_TYPE_IDS =
+        IOS_CERTIFICATE_TYPE_IDS.merge(MAC_CERTIFICATE_TYPE_IDS)
 
       # Class methods
       class << self
@@ -203,9 +205,8 @@ module Spaceship
           key = OpenSSL::PKey::RSA.new(2048)
           csr = OpenSSL::X509::Request.new
           csr.version = 0
-          csr.subject = OpenSSL::X509::Name.new([
-                                                  ['CN', 'PEM', OpenSSL::ASN1::UTF8STRING]
-                                                ])
+          csr.subject =
+            OpenSSL::X509::Name.new([['CN', 'PEM', OpenSSL::ASN1::UTF8STRING]])
           csr.public_key = key.public_key
           csr.sign(key, OpenSSL::Digest::SHA1.new)
           return [csr, key]
@@ -241,8 +242,22 @@ module Spaceship
 
           # Parse the dates
           # rubocop:disable Style/RescueModifier
-          attrs['expirationDate'] = (Time.parse(attrs['expirationDate']) rescue attrs['expirationDate'])
-          attrs['dateCreated'] = (Time.parse(attrs['dateCreated']) rescue attrs['dateCreated'])
+          attrs['expirationDate'] =
+            (
+              begin
+                Time.parse(attrs['expirationDate'])
+              rescue StandardError
+                attrs['expirationDate']
+              end
+            )
+          attrs['dateCreated'] =
+            (
+              begin
+                Time.parse(attrs['dateCreated'])
+              rescue StandardError
+                attrs['dateCreated']
+              end
+            )
           # rubocop:enable Style/RescueModifier
 
           # Here we go
@@ -266,17 +281,13 @@ module Spaceship
             mac = MAC_CERTIFICATE_TYPE_IDS.values.include?(self)
           end
 
-          client.certificates(types, mac: mac).map do |cert|
-            factory(cert)
-          end
+          client.certificates(types, mac: mac).map { |cert| factory(cert) }
         end
 
         # @param mac [Bool] Searches Mac certificates if true
         # @return (Certificate) Find a certificate based on the ID of the certificate.
         def find(certificate_id, mac: false)
-          all(mac: mac).find do |c|
-            c.id == certificate_id
-          end
+          all(mac: mac).find { |c| c.id == certificate_id }
         end
 
         # Generate a new certificate based on a code certificate signing request
@@ -309,7 +320,8 @@ module Spaceship
           # if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
           response = client.create_certificate!(type, csr.to_pem, app_id, mac)
           # munge the response to make it work for the factory
-          response['certificateTypeDisplayId'] = response['certificateType']['certificateTypeDisplayId']
+          response['certificateTypeDisplayId'] =
+            response['certificateType']['certificateTypeDisplayId']
           self.new(response)
         end
 

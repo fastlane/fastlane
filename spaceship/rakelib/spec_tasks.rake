@@ -1,13 +1,12 @@
-
-if defined? RSpec # otherwise fails on non-live environments
-  SPEC_REQUIRES = ["--require spec_helper"].freeze
+if defined?(RSpec) # otherwise fails on non-live environments
+  SPEC_REQUIRES = ['--require spec_helper'].freeze
   INTEGRATION_REQUIRES = [
-    "--require ./integration/example_matcher.rb",
-    "--require ./integration/integration_helper.rb"
+    '--require ./integration/example_matcher.rb',
+    '--require ./integration/integration_helper.rb'
   ].freeze
 
   task(:spec).clear
-  desc("Run all specs and all the integration tests")
+  desc('Run all specs and all the integration tests')
   RSpec::Core::RakeTask.new(:spec) do |t|
     t.rspec_opts = (SPEC_REQUIRES + INTEGRATION_REQUIRES).join(' ')
     t.pattern = './{spec,integration}/**/*_spec.rb'
@@ -20,7 +19,7 @@ if defined? RSpec # otherwise fails on non-live environments
       t.pattern = './integration/**/*_spec.rb'
     end
 
-    desc("Run the specs that used mocked responses")
+    desc('Run the specs that used mocked responses')
     RSpec::Core::RakeTask.new(:spec) do |t|
       t.rspec_opts = SPEC_REQUIRES.join(' ')
       t.pattern = './spec/**/*_spec.rb'

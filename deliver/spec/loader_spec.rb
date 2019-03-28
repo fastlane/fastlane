@@ -31,7 +31,8 @@ describe Deliver::Loader do
 
     expect(@folders.size).not_to(eq(0))
     expected_languages = @languages[1..-1].map(&:downcase).sort
-    actual_languages = @folders.map { |f| File.basename(f) }.map(&:downcase).sort
+    actual_languages =
+      @folders.map { |f| File.basename(f) }.map(&:downcase).sort
     expect(actual_languages).to eq(expected_languages)
   end
 
@@ -41,9 +42,12 @@ describe Deliver::Loader do
     FileUtils.mkdir(File.join(@root, 'unrelated-dir'))
     expect do
       @folders = Deliver::Loader.language_folders(@root, false)
-    end.to raise_error(FastlaneCore::Interface::FastlaneError, "Unsupported directory name(s) for screenshots/metadata in '#{@root}': unrelated-dir" \
-                                                               "\nValid directory names are: #{allowed_directory_names}" \
-                                                               "\n\nEnable 'ignore_language_directory_validation' to prevent this validation from happening")
+    end.to raise_error(
+                FastlaneCore::Interface::FastlaneError,
+                "Unsupported directory name(s) for screenshots/metadata in '#{@root}': unrelated-dir" \
+                  "\nValid directory names are: #{allowed_directory_names}" \
+                  "\n\nEnable 'ignore_language_directory_validation' to prevent this validation from happening"
+              )
   end
 
   it 'allows but ignores the special "fonts" directory used by frameit"' do

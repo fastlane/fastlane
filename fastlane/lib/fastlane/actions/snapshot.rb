@@ -7,7 +7,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the `capture_ios_screenshots` action"
+        'Alias for the `capture_ios_screenshots` action'
       end
     end
   end

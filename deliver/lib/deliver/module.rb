@@ -3,6 +3,7 @@ require 'fastlane_core/ui/ui'
 
 module Deliver
   class << self
+
   end
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
@@ -12,5 +13,6 @@ module Deliver
   # resources that code needs to locate locally
   ROOT = Pathname.new(File.expand_path('../../..', __FILE__))
 
-  DESCRIPTION = 'Upload screenshots, metadata and your app to the App Store using a single command'
+  DESCRIPTION =
+    'Upload screenshots, metadata and your app to the App Store using a single command'
 end

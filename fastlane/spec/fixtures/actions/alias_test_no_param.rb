@@ -7,19 +7,18 @@ module Fastlane
       end
 
       def self.alias_used(action_alias, params)
-        @global_test = "modified"
+        @global_test = 'modified'
       end
 
       def self.aliases
-        ["somealias_no_param"]
+        %w[somealias_no_param]
       end
 
       def self.is_supported?(platform)
         true
       end
 
-      def self.available_options
-      end
+      def self.available_options; end
     end
   end
 end

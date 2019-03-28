@@ -8,7 +8,8 @@ module FastlaneCore
       def caused_by_calling_ui_method?(method_name: nil)
         return false if backtrace.nil? || backtrace[0].nil? || method_name.nil?
         first_frame = backtrace[0]
-        if first_frame.include?(method_name) && first_frame.include?('interface.rb')
+        if first_frame.include?(method_name) &&
+           first_frame.include?('interface.rb')
           true
         else
           false

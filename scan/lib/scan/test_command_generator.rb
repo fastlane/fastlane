@@ -5,7 +5,7 @@ module Scan
   class TestCommandGenerator
     def generate
       parts = prefix
-      parts << "env NSUnbufferedIO=YES xcodebuild"
+      parts << 'env NSUnbufferedIO=YES xcodebuild'
       parts += options
       parts += actions
       parts += suffix
@@ -15,7 +15,7 @@ module Scan
     end
 
     def prefix
-      ["set -o pipefail &&"]
+      ['set -o pipefail &&']
     end
 
     # Path to the project or workspace as parameter
@@ -24,7 +24,7 @@ module Scan
     def project_path_array
       proj = Scan.project.xcodebuild_parameters
       return proj if proj.count > 0
-      UI.user_error!("No project/workspace found")
+      UI.user_error!('No project/workspace found')
     end
 
     def options
@@ -35,20 +35,50 @@ module Scan
       options << "-sdk '#{config[:sdk]}'" if config[:sdk]
       options << destination # generated in `detect_values`
       options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
-      options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
-      options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
-      options << "-maximum-concurrent-test-simulator-destinations #{config[:max_concurrent_simulators]}" if config[:max_concurrent_simulators]
-      options << "-disable-concurrent-testing" if config[:disable_concurrent_testing]
-      options << "-enableCodeCoverage #{config[:code_coverage] ? 'YES' : 'NO'}" unless config[:code_coverage].nil?
-      options << "-enableAddressSanitizer #{config[:address_sanitizer] ? 'YES' : 'NO'}" unless config[:address_sanitizer].nil?
-      options << "-enableThreadSanitizer #{config[:thread_sanitizer] ? 'YES' : 'NO'}" unless config[:thread_sanitizer].nil?
+      if config[:derived_data_path]
+        options << "-derivedDataPath '#{config[:derived_data_path]}'"
+      end
+      if config[:result_bundle]
+        options << "-resultBundlePath '#{result_bundle_path}'"
+      end
+      if config[:max_concurrent_simulators]
+        options <<
+          "-maximum-concurrent-test-simulator-destinations #{config[
+            :max_concurrent_simulators
+          ]}"
+      end
+      if config[:disable_concurrent_testing]
+        options << '-disable-concurrent-testing'
+      end
+      unless config[:code_coverage].nil?
+        options <<
+          "-enableCodeCoverage #{config[:code_coverage] ? 'YES' : 'NO'}"
+      end
+      unless config[:address_sanitizer].nil?
+        options <<
+          "-enableAddressSanitizer #{config[:address_sanitizer] ? 'YES' : 'NO'}"
+      end
+      unless config[:thread_sanitizer].nil?
+        options <<
+          "-enableThreadSanitizer #{config[:thread_sanitizer] ? 'YES' : 'NO'}"
+      end
       options << "-xctestrun '#{config[:xctestrun]}'" if config[:xctestrun]
       options << config[:xcargs] if config[:xcargs]
 
       # detect_values will ensure that these values are present as Arrays if
       # they are present at all
-      options += config[:only_testing].map { |test_id| "-only-testing:#{test_id.shellescape}" } if config[:only_testing]
-      options += config[:skip_testing].map { |test_id| "-skip-testing:#{test_id.shellescape}" } if config[:skip_testing]
+      if config[:only_testing]
+        options +=
+          config[:only_testing].map do |test_id|
+            "-only-testing:#{test_id.shellescape}"
+          end
+      end
+      if config[:skip_testing]
+        options +=
+          config[:skip_testing].map do |test_id|
+            "-skip-testing:#{test_id.shellescape}"
+          end
+      end
 
       options
     end
@@ -60,9 +90,9 @@ module Scan
       actions << :clean if config[:clean]
 
       if config[:build_for_testing]
-        actions << "build-for-testing"
+        actions << 'build-for-testing'
       elsif config[:test_without_building] || config[:xctestrun]
-        actions << "test-without-building"
+        actions << 'test-without-building'
       else
         actions << :build unless config[:skip_build]
         actions << :test
@@ -79,43 +109,42 @@ module Scan
     def pipe
       pipe = ["| tee '#{xcodebuild_log_path}'"]
 
-      if Scan.config[:output_style] == 'raw'
-        return pipe
-      end
+      return pipe if Scan.config[:output_style] == 'raw'
 
       formatter = []
       if (custom_formatter = Scan.config[:formatter])
-        if custom_formatter.end_with?(".rb")
+        if custom_formatter.end_with?('.rb')
           formatter << "-f '#{custom_formatter}'"
         else
           formatter << "-f `#{custom_formatter}`"
         end
-      elsif FastlaneCore::Env.truthy?("TRAVIS")
-        formatter << "-f `xcpretty-travis-formatter`"
-        UI.success("Automatically switched to Travis formatter")
+      elsif FastlaneCore::Env.truthy?('TRAVIS')
+        formatter << '-f `xcpretty-travis-formatter`'
+        UI.success('Automatically switched to Travis formatter')
       end
 
-      if Helper.colors_disabled?
-        formatter << "--no-color"
-      end
+      formatter << '--no-color' if Helper.colors_disabled?
 
-      if Scan.config[:output_style] == 'basic'
-        formatter << "--no-utf"
-      end
+      formatter << '--no-utf' if Scan.config[:output_style] == 'basic'
 
-      if Scan.config[:output_style] == 'rspec'
-        formatter << "--test"
-      end
+      formatter << '--test' if Scan.config[:output_style] == 'rspec'
 
-      @reporter_options_generator = XCPrettyReporterOptionsGenerator.new(Scan.config[:open_report],
-                                                                         Scan.config[:output_types],
-                                                                         Scan.config[:output_files] || Scan.config[:custom_report_file_name],
-                                                                         Scan.config[:output_directory],
-                                                                         Scan.config[:use_clang_report_name],
-                                                                         Scan.config[:xcpretty_args])
+      @reporter_options_generator =
+        XCPrettyReporterOptionsGenerator.new(
+          Scan.config[:open_report],
+          Scan.config[:output_types],
+          Scan.config[:output_files] || Scan.config[:custom_report_file_name],
+          Scan.config[:output_directory],
+          Scan.config[:use_clang_report_name],
+          Scan.config[:xcpretty_args]
+        )
       reporter_options = @reporter_options_generator.generate_reporter_options
-      reporter_xcpretty_args = @reporter_options_generator.generate_xcpretty_args_options
-      return pipe << "| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')} #{reporter_xcpretty_args}"
+      reporter_xcpretty_args =
+        @reporter_options_generator.generate_xcpretty_args_options
+      return pipe <<
+        "| xcpretty #{formatter.join(' ')} #{reporter_options.join(
+          ' '
+        )} #{reporter_xcpretty_args}"
     end
 
     # Store the raw file
@@ -130,7 +159,10 @@ module Scan
     # Generate destination parameters
     def destination
       unless Scan.cache[:destination]
-        Scan.cache[:destination] = [*Scan.config[:destination]].map { |dst| "-destination '#{dst}'" }.join(' ')
+        Scan.cache[:destination] =
+          [*Scan.config[:destination]].map do |dst|
+            "-destination '#{dst}'"
+          end.join(' ')
       end
       Scan.cache[:destination]
     end
@@ -138,9 +170,10 @@ module Scan
     # The path to set the Derived Data to
     def build_path
       unless Scan.cache[:build_path]
-        day = Time.now.strftime("%F") # e.g. 2015-08-07
+        day = Time.now.strftime('%F') # e.g. 2015-08-07
 
-        Scan.cache[:build_path] = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}/")
+        Scan.cache[:build_path] =
+          File.expand_path("~/Library/Developer/Xcode/Archives/#{day}/")
         FileUtils.mkdir_p(Scan.cache[:build_path])
       end
       Scan.cache[:build_path]
@@ -148,10 +181,10 @@ module Scan
 
     def result_bundle_path
       unless Scan.cache[:result_bundle_path]
-        path = File.join(Scan.config[:output_directory], Scan.config[:scheme]) + ".test_result"
-        if File.directory?(path)
-          FileUtils.remove_dir(path)
-        end
+        path =
+          File.join(Scan.config[:output_directory], Scan.config[:scheme]) +
+            '.test_result'
+        FileUtils.remove_dir(path) if File.directory?(path)
         Scan.cache[:result_bundle_path] = path
       end
       return Scan.cache[:result_bundle_path]

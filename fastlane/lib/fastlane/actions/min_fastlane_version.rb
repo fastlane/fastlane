@@ -1,7 +1,6 @@
 module Fastlane
   module Actions
-    module SharedValues
-    end
+    module SharedValues; end
 
     class MinFastlaneVersionAction < Action
       def self.run(params)
@@ -9,39 +8,47 @@ module Fastlane
         value = (params || []).first
         defined_version = Gem::Version.new(value) if value
 
-        UI.user_error!("Please pass minimum fastlane version as parameter to min_fastlane_version") unless defined_version
+        unless defined_version
+          UI.user_error!(
+            'Please pass minimum fastlane version as parameter to min_fastlane_version'
+          )
+        end
 
         if Gem::Version.new(Fastlane::VERSION) < defined_version
-          FastlaneCore::UpdateChecker.show_update_message('fastlane', Fastlane::VERSION)
-          error_message = "The Fastfile requires a fastlane version of >= #{defined_version}. You are on #{Fastlane::VERSION}."
+          FastlaneCore::UpdateChecker.show_update_message(
+            'fastlane',
+            Fastlane::VERSION
+          )
+          error_message =
+            "The Fastfile requires a fastlane version of >= #{defined_version}. You are on #{Fastlane::VERSION}."
           UI.user_error!(error_message)
         end
 
-        UI.message("Your fastlane version #{Fastlane::VERSION} matches the minimum requirement of #{defined_version}  ✅")
+        UI.message(
+          "Your fastlane version #{Fastlane::VERSION} matches the minimum requirement of #{defined_version}  ✅"
+        )
       end
 
       def self.step_text
-        "Verifying fastlane version"
+        'Verifying fastlane version'
       end
 
       def self.author
-        "KrauseFx"
+        'KrauseFx'
       end
 
       def self.description
-        "Verifies the minimum fastlane version required"
+        'Verifies the minimum fastlane version required'
       end
 
       def self.example_code
-        [
-          'min_fastlane_version("1.50.0")'
-        ]
+        %w[min_fastlane_version("1.50.0")]
       end
 
       def self.details
         [
-          "Add this to your `Fastfile` to require a certain version of _fastlane_.",
-          "Use it if you use an action that just recently came out and you need it."
+          'Add this to your `Fastfile` to require a certain version of _fastlane_.',
+          'Use it if you use an action that just recently came out and you need it.'
         ].join("\n")
       end
 

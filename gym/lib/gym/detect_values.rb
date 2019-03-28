@@ -19,8 +19,8 @@ module Gym
       Gym.project = FastlaneCore::Project.new(config)
 
       # Go into the project's folder, as there might be a Gymfile there
-      project_path = File.expand_path("..", Gym.project.path)
-      unless File.expand_path(".") == project_path
+      project_path = File.expand_path('..', Gym.project.path)
+      unless File.expand_path('.') == project_path
         Dir.chdir(project_path) do
           config.load_configuration_file(Gym.gymfile_name)
         end
@@ -40,19 +40,21 @@ module Gym
 
       # Make sure the output name is valid and remove a trailing `.ipa` extension
       # as it will be added by gym for free
-      config[:output_name].gsub!(".ipa", "")
-      config[:output_name].gsub!(File::SEPARATOR, "_")
+      config[:output_name].gsub!('.ipa', '')
+      config[:output_name].gsub!(File::SEPARATOR, '_')
 
       return config
     end
 
     def self.archive_path_from_local_xcode_preferences
-      day = Time.now.strftime("%F") # e.g. 2015-08-07
-      archive_path = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}/")
+      day = Time.now.strftime('%F') # e.g. 2015-08-07
+      archive_path =
+        File.expand_path("~/Library/Developer/Xcode/Archives/#{day}/")
 
       return archive_path unless has_xcode_preferences_plist?
 
-      custom_archive_path = xcode_preferences_dictionary['IDECustomDistributionArchivesLocation']
+      custom_archive_path =
+        xcode_preferences_dictionary['IDECustomDistributionArchivesLocation']
       return archive_path if custom_archive_path.to_s.length == 0
 
       return File.join(custom_archive_path, day)
@@ -66,7 +68,7 @@ module Gym
     end
 
     def self.xcode_preference_plist_path
-      File.expand_path("~/Library/Preferences/com.apple.dt.Xcode.plist")
+      File.expand_path('~/Library/Preferences/com.apple.dt.Xcode.plist')
     end
 
     def self.xcode_preferences_dictionary(path = xcode_preference_plist_path)
@@ -77,12 +79,16 @@ module Gym
     # each target of your app
     def self.detect_selected_provisioning_profiles
       Gym.config[:export_options] ||= {}
-      hash_to_use = (Gym.config[:export_options][:provisioningProfiles] || {}).dup || {} # dup so we can show the original values in `verbose` mode
+      hash_to_use =
+        (Gym.config[:export_options][:provisioningProfiles] || {}).dup || {} # dup so we can show the original values in `verbose` mode
 
       unless Gym.config[:skip_profile_detection]
         mapping_object = CodeSigningMapping.new(project: Gym.project)
-        hash_to_use = mapping_object.merge_profile_mapping(primary_mapping: hash_to_use,
-                                                           export_method: Gym.config[:export_method])
+        hash_to_use =
+          mapping_object.merge_profile_mapping(
+            primary_mapping: hash_to_use,
+            export_method: Gym.config[:export_method]
+          )
       end
 
       return if hash_to_use.count == 0 # We don't want to set a mapping if we don't have one
@@ -91,10 +97,14 @@ module Gym
     rescue => ex
       # We don't want to fail the build if the automatic detection doesn't work
       # especially since the mapping is optional for pre Xcode 9 setups
-      if Helper.xcode_at_least?("9.0")
-        UI.error("Couldn't automatically detect the provisioning profile mapping")
-        UI.error("Since Xcode 9 you need to provide an explicit mapping of what")
-        UI.error("provisioning profile to use for each target of your app")
+      if Helper.xcode_at_least?('9.0')
+        UI.error(
+          "Couldn't automatically detect the provisioning profile mapping"
+        )
+        UI.error(
+          'Since Xcode 9 you need to provide an explicit mapping of what'
+        )
+        UI.error('provisioning profile to use for each target of your app')
         UI.error(ex)
         UI.verbose(ex.backtrace.join("\n"))
       end
@@ -105,19 +115,20 @@ module Gym
     end
 
     def self.min_xcode8?
-      Helper.xcode_at_least?("8.0")
+      Helper.xcode_at_least?('8.0')
     end
 
     # Is it an iOS device or a Mac?
     def self.detect_platform
       return if Gym.config[:destination]
-      platform = if Gym.project.mac?
-                   min_xcode8? ? "macOS" : "OS X"
-                 elsif Gym.project.tvos?
-                   "tvOS"
-                 else
-                   "iOS"
-                 end
+      platform =
+        if Gym.project.mac?
+          min_xcode8? ? 'macOS' : 'OS X'
+        elsif Gym.project.tvos?
+          'tvOS'
+        else
+          'iOS'
+        end
 
       Gym.config[:destination] = "generic/platform=#{platform}"
     end
@@ -131,7 +142,9 @@ module Gym
       if config[:configuration]
         # Verify the configuration is available
         unless configurations.include?(config[:configuration])
-          UI.error("Couldn't find specified configuration '#{config[:configuration]}'.")
+          UI.error(
+            "Couldn't find specified configuration '#{config[:configuration]}'."
+          )
           config[:configuration] = nil
         end
       end
@@ -142,29 +155,45 @@ module Gym
       return unless Gym.config[:toolchain]
 
       # Convert the aliases to the full string to make it easier for the user #justfastlanethings
-      if Gym.config[:toolchain].to_s == "swift_2_3"
-        Gym.config[:toolchain] = "com.apple.dt.toolchain.Swift_2_3"
+      if Gym.config[:toolchain].to_s == 'swift_2_3'
+        Gym.config[:toolchain] = 'com.apple.dt.toolchain.Swift_2_3'
       end
     end
 
     def self.ensure_export_options_is_hash
-      return if Gym.config[:export_options].nil? || Gym.config[:export_options].kind_of?(Hash)
+      if Gym.config[:export_options].nil? ||
+         Gym.config[:export_options].kind_of?(Hash)
+        return
+      end
 
       # Reads options from file
       plist_file_path = Gym.config[:export_options]
-      UI.user_error!("Couldn't find plist file at path #{File.expand_path(plist_file_path)}") unless File.exist?(plist_file_path)
+      unless File.exist?(plist_file_path)
+        UI.user_error!(
+          "Couldn't find plist file at path #{File.expand_path(
+            plist_file_path
+          )}"
+        )
+      end
       hash = Plist.parse_xml(plist_file_path)
-      UI.user_error!("Couldn't read provided plist at path #{File.expand_path(plist_file_path)}") if hash.nil?
+      if hash.nil?
+        UI.user_error!(
+          "Couldn't read provided plist at path #{File.expand_path(
+            plist_file_path
+          )}"
+        )
+      end
       # Convert keys to symbols
       Gym.config[:export_options] = keys_to_symbols(hash)
     end
 
     def self.keys_to_symbols(hash)
       # Convert keys to symbols
-      hash = hash.each_with_object({}) do |(k, v), memo|
-        memo[k.b.to_s.to_sym] = v
-        memo
-      end
+      hash =
+        hash.each_with_object({}) do |(k, v), memo|
+          memo[k.b.to_s.to_sym] = v
+          memo
+        end
       hash
     end
   end

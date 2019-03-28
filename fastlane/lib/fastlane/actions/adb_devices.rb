@@ -1,7 +1,6 @@
 module Fastlane
   module Actions
-    module SharedValues
-    end
+    module SharedValues; end
 
     class AdbDevicesAction < Action
       def self.run(params)
@@ -15,26 +14,28 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Get an array of Connected android device serials"
+        'Get an array of Connected android device serials'
       end
 
       def self.details
-        "Fetches device list via adb, e.g. run an adb command on all connected devices."
+        'Fetches device list via adb, e.g. run an adb command on all connected devices.'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :adb_path,
-                                       env_name: "FL_ADB_PATH",
-                                       description: "The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT environment variable is set)",
-                                       is_string: true,
-                                       optional: true,
-                                       default_value: "adb")
+          FastlaneCore::ConfigItem.new(
+            key: :adb_path,
+            env_name: 'FL_ADB_PATH',
+            description:
+              'The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT environment variable is set)',
+            is_string: true,
+            optional: true,
+            default_value: 'adb'
+          )
         ]
       end
 
-      def self.output
-      end
+      def self.output; end
 
       def self.example_code
         [
@@ -56,11 +57,11 @@ module Fastlane
       end
 
       def self.return_value
-        "Returns an array of all currently connected android devices"
+        'Returns an array of all currently connected android devices'
       end
 
       def self.authors
-        ["hjanuschka"]
+        %w[hjanuschka]
       end
 
       def self.is_supported?(platform)

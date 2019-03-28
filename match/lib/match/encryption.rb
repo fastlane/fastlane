@@ -5,31 +5,41 @@ module Match
   module Encryption
     class << self
       def backends
-        @backends ||= {
-          "git" => lambda { |params|
-            # OpenSSL is storage agnostic so this maps git_url
-            # to keychain_name for the name of the keychain entry
-            params[:keychain_name] = params[:git_url]
-            return Encryption::OpenSSL.configure(params)
-          },
-          "google_cloud" => lambda { |params|
-            return nil
+        @backends ||=
+          {
+            'git' =>
+              lambda do |params|
+                # OpenSSL is storage agnostic so this maps git_url
+                # to keychain_name for the name of the keychain entry
+                params[
+                  :keychain_name
+                ] =
+                  params[:git_url]
+                return Encryption::OpenSSL.configure(params)
+              end,
+            'google_cloud' => lambda { |params| return nil }
           }
-        }
       end
 
       def register_backend(type: nil, encryption_class: nil, &configurator)
-        UI.user_error!("No type specified for encryption backend") if type.nil?
+        UI.user_error!('No type specified for encryption backend') if type.nil?
 
         normalized_name = type.to_s
-        UI.message("Replacing Match::Encryption backend for type '#{normalized_name}'") if backends.include?(normalized_name)
+        if backends.include?(normalized_name)
+          UI.message(
+            "Replacing Match::Encryption backend for type '#{normalized_name}'"
+          )
+        end
 
         if configurator
           @backends[normalized_name] = configurator
         elsif encryption_class
-          @backends[normalized_name] = ->(params) { return encryption_class.configure(params) }
+          @backends[normalized_name] =
+            ->(params) { return encryption_class.configure(params) }
         else
-          UI.user_error!("Specify either a `encryption_class` or a configuration block when registering a encryption backend")
+          UI.user_error!(
+            'Specify either a `encryption_class` or a configuration block when registering a encryption backend'
+          )
         end
       end
 
@@ -38,7 +48,9 @@ module Match
         configurator = backends[storage_mode.to_s]
         return configurator.call(params) if configurator
 
-        UI.user_error!("No encryption backend for storage mode '#{storage_mode}'")
+        UI.user_error!(
+          "No encryption backend for storage mode '#{storage_mode}'"
+        )
       end
     end
   end

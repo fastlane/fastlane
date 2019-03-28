@@ -6,14 +6,10 @@ module MockAPI
     set :dump_errors, true
     set :show_exceptions, false
 
-    before do
-      content_type(:json)
-    end
+    before { content_type(:json) }
 
     after do
-      if response.body.kind_of?(Hash)
-        response.body = JSON.dump(response.body)
-      end
+      response.body = JSON.dump(response.body) if response.body.kind_of?(Hash)
     end
 
     not_found do
@@ -22,7 +18,8 @@ module MockAPI
       <<-HTML
         <html>
           <body>
-            #{request.request_method} : #{request.url}
+            #{request.request_method} : #{request
+        .url}
             HTTP ERROR: 404
           </body>
         </html>

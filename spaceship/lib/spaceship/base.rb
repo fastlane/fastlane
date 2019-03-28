@@ -37,7 +37,9 @@ module Spaceship
       alias [] get
 
       def set(keys, value)
-        raise "'keys' must be an array, got #{keys.class} instead" unless keys.kind_of?(Array)
+        unless keys.kind_of?(Array)
+          raise "'keys' must be an array, got #{keys.class} instead"
+        end
         last = keys.pop
         ref = lookup(keys) || @hash
         ref[last] = value
@@ -49,11 +51,7 @@ module Spaceship
 
       def lookup(keys)
         head, *tail = *keys
-        if tail.empty?
-          @hash[head]
-        else
-          DataHash.new(@hash[head]).lookup(tail)
-        end
+        tail.empty? ? @hash[head] : DataHash.new(@hash[head]).lookup(tail)
       end
 
       def each(&block)
@@ -78,7 +76,7 @@ module Spaceship
       # The client used to make requests.
       # @return (Spaceship::Client) Defaults to the singleton
       def client
-        raise "`client` must be implemented in subclasses"
+        raise '`client` must be implemented in subclasses'
       end
 
       ##
@@ -102,9 +100,7 @@ module Spaceship
             getter = dest.to_sym
             setter = "#{dest}=".to_sym
 
-            define_method(getter) do
-              raw_data.get(*source.split('.'))
-            end
+            define_method(getter) { raw_data.get(*source.split('.')) }
 
             define_method(setter) do |value|
               self.raw_data ||= DataHash.new({})
@@ -141,10 +137,12 @@ module Spaceship
             begin
               remove_method(getter) if public_instance_methods.include?(getter)
             rescue NameError
+
             end
             begin
               remove_method(setter) if public_instance_methods.include?(setter)
             rescue NameError
+
             end
           end
           include(mapping_module(@attr_mapping))
@@ -152,7 +150,9 @@ module Spaceship
           begin
             @attr_mapping ||= ancestors[1].attr_mapping
           rescue NoMethodError
+
           rescue NameError
+
           end
         end
         return @attr_mapping
@@ -274,7 +274,7 @@ module Spaceship
       if thread[:inspected_objects].include?(self)
         # already inspected objects have a default value,
         # let's follow Ruby's convention for circular references
-        value = "#<Object ...>"
+        value = '#<Object ...>'
       else
         thread[:inspected_objects].add(self)
         begin

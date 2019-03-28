@@ -1,4 +1,4 @@
-require "fastlane/actions/min_fastlane_version"
+require 'fastlane/actions/min_fastlane_version'
 
 module Fastlane
   module Actions
@@ -8,7 +8,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the `min_fastlane_version` action"
+        'Alias for the `min_fastlane_version` action'
       end
     end
   end

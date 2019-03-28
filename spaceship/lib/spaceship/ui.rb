@@ -1,8 +1,6 @@
-paths = Dir[File.expand_path("**/ui/*.rb", File.dirname(__FILE__))]
-raise "Could not find UI classes to import" unless paths.count > 0
-paths.each do |file|
-  require file
-end
+paths = Dir[File.expand_path('**/ui/*.rb', File.dirname(__FILE__))]
+raise 'Could not find UI classes to import' unless paths.count > 0
+paths.each { |file| require file }
 
 module Spaceship
   class Client

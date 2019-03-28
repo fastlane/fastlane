@@ -7,7 +7,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the `build_ios_app` action"
+        'Alias for the `build_ios_app` action'
       end
     end
   end

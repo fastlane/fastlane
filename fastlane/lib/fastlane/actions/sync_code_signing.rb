@@ -8,7 +8,7 @@ module Fastlane
       def self.run(params)
         require 'match'
 
-        params.load_configuration_file("Matchfile")
+        params.load_configuration_file('Matchfile')
         Match::Runner.new.run(params)
 
         define_profile_type(params)
@@ -16,10 +16,10 @@ module Fastlane
       end
 
       def self.define_profile_type(params)
-        profile_type = "app-store"
-        profile_type = "ad-hoc" if params[:type] == 'adhoc'
-        profile_type = "development" if params[:type] == 'development'
-        profile_type = "enterprise" if params[:type] == 'enterprise'
+        profile_type = 'app-store'
+        profile_type = 'ad-hoc' if params[:type] == 'adhoc'
+        profile_type = 'development' if params[:type] == 'development'
+        profile_type = 'enterprise' if params[:type] == 'enterprise'
 
         UI.message("Setting Provisioning Profile type to '#{profile_type}'")
 
@@ -35,19 +35,27 @@ module Fastlane
       #   }
       #
       def self.define_provisioning_profile_mapping(params)
-        mapping = Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING] || {}
+        mapping =
+          Actions.lane_context[
+            SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING
+          ] ||
+            {}
 
         # Array (...) to make sure it's an Array, Ruby is magic, try this
         #   Array(1)      # => [1]
         #   Array([1, 2]) # => [1, 2]
         Array(params[:app_identifier]).each do |app_identifier|
-          env_variable_name = Match::Utils.environment_variable_name_profile_name(app_identifier: app_identifier,
-                                                                                            type: Match.profile_type_sym(params[:type]),
-                                                                                        platform: params[:platform])
+          env_variable_name =
+            Match::Utils.environment_variable_name_profile_name(
+              app_identifier: app_identifier,
+              type: Match.profile_type_sym(params[:type]),
+              platform: params[:platform]
+            )
           mapping[app_identifier] = ENV[env_variable_name]
         end
 
-        Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING] = mapping
+        Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING] =
+          mapping
       end
 
       #####################################################
@@ -55,11 +63,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Easily sync your certificates and profiles across your team (via _match_)"
+        'Easily sync your certificates and profiles across your team (via _match_)'
       end
 
       def self.details
-        "More information: https://docs.fastlane.tools/actions/match/"
+        'More information: https://docs.fastlane.tools/actions/match/'
       end
 
       def self.available_options
@@ -71,11 +79,10 @@ module Fastlane
         []
       end
 
-      def self.return_value
-      end
+      def self.return_value; end
 
       def self.authors
-        ["KrauseFx"]
+        %w[KrauseFx]
       end
 
       def self.is_supported?(platform)

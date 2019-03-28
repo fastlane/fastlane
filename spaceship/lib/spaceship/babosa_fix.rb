@@ -13,7 +13,7 @@ class BabosaFix
   def apply
     unicode_removed = false
 
-    if defined? Unicode
+    if defined?(Unicode)
       orig_unicode = Unicode
       Object.send(:remove_const, :Unicode)
       unicode_removed = true
@@ -21,9 +21,7 @@ class BabosaFix
 
     require 'babosa'
 
-    if unicode_removed
-      Object.send(:const_set, :Unicode, orig_unicode)
-    end
+    Object.send(:const_set, :Unicode, orig_unicode) if unicode_removed
   end
 end
 

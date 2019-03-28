@@ -10,7 +10,11 @@ module Supply
       if version_codes.empty?
         UI.important("No version codes found in track '#{track}'")
       else
-        UI.success("Found '#{version_codes.join(', ')}' version codes in track '#{track}'")
+        UI.success(
+          "Found '#{version_codes.join(
+            ', '
+          )}' version codes in track '#{track}'"
+        )
       end
 
       version_codes

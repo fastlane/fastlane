@@ -4,8 +4,12 @@ module Frameit
   # This class will parse the .string files
   class StringsParser
     def self.parse(path)
-      UI.user_error!("Couldn't find strings file at path '#{path}'") unless File.exist?(path)
-      UI.user_error!("Must be .strings file, only got '#{path}'") unless path.end_with?(".strings")
+      unless File.exist?(path)
+        UI.user_error!("Couldn't find strings file at path '#{path}'")
+      end
+      unless path.end_with?('.strings')
+        UI.user_error!("Must be .strings file, only got '#{path}'")
+      end
 
       result = {}
 
@@ -33,14 +37,17 @@ module Frameit
       end
 
       if result.empty?
-        UI.error("Empty parsing result for #{path}. Please make sure the file is valid and UTF16 Big-endian encoded")
+        UI.error(
+          "Empty parsing result for #{path}. Please make sure the file is valid and UTF16 Big-endian encoded"
+        )
       end
 
       result
     end
 
     def self.encoding_type(path)
-      Helper.backticks("file --mime-encoding #{path.shellescape}", print: false).downcase
+      Helper.backticks("file --mime-encoding #{path.shellescape}", print: false)
+        .downcase
     end
   end
 end

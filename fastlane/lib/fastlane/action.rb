@@ -3,31 +3,24 @@ require 'forwardable'
 
 module Fastlane
   class Action
-    AVAILABLE_CATEGORIES = [
-      :testing,
-      :building,
-      :screenshots,
-      :project,
-      :code_signing,
-      :documentation,
-      :beta,
-      :push,
-      :production,
-      :source_control,
-      :notifications,
-      :app_store_connect,
-      :misc,
-      :deprecated # This should be the last item
+    AVAILABLE_CATEGORIES = %i[
+      testing
+      building
+      screenshots
+      project
+      code_signing
+      documentation
+      beta
+      push
+      production
+      source_control
+      notifications
+      app_store_connect
+      misc
+      deprecated
     ]
 
-    RETURN_TYPES = [
-      :string,
-      :array_of_strings,
-      :hash_of_strings,
-      :hash,
-      :bool,
-      :int
-    ]
+    RETURN_TYPES = %i[string array_of_strings hash_of_strings hash bool int]
 
     class << self
       attr_accessor :runner
@@ -38,16 +31,15 @@ module Fastlane
       def_delegator(Actions, :sh_control_output, :sh)
     end
 
-    def self.run(params)
-    end
+    def self.run(params); end
 
     # Implement in subclasses
     def self.description
-      "No description provided".red
+      'No description provided'.red
     end
 
-    def self.details
-      nil # this is your chance to provide a more detailed description of this action
+    def self.details # this is your chance to provide a more detailed description of this action
+      nil
     end
 
     def self.available_options
@@ -100,7 +92,9 @@ module Fastlane
       #
       #  [:ios, :mac].include?(platform)
       #
-      UI.crash!("Implementing `is_supported?` for all actions is mandatory. Please update #{self}")
+      UI.crash!(
+        "Implementing `is_supported?` for all actions is mandatory. Please update #{self}"
+      )
     end
 
     # Returns an array of string of sample usage of this action
@@ -131,7 +125,9 @@ module Fastlane
     # Allows the user to call an action from an action
     def self.method_missing(method_sym, *arguments, &_block)
       UI.error("Unknown method '#{method_sym}'")
-      UI.user_error!("To call another action from an action use `other_action.#{method_sym}` instead")
+      UI.user_error!(
+        "To call another action from an action use `other_action.#{method_sym}` instead"
+      )
     end
 
     # When shelling out from the actoin, should we use `bundle exec`?
@@ -166,8 +162,8 @@ class String
 
   def markdown_list(is_first = false)
     self.markdown_clean_heredoc!
-    self.gsub!(/^/, "- ") # add list dashes
-    self.prepend(">") unless is_first # the empty line that will be added breaks the quote
+    self.gsub!(/^/, '- ') # add list dashes
+    self.prepend('>') unless is_first # the empty line that will be added breaks the quote
     self.markdown_details(is_first)
   end
 
@@ -185,14 +181,14 @@ class String
   def dedent!
     first_line_indent = self.match(/^\s*/)[0]
 
-    self.gsub!(/^#{first_line_indent}/, "")
+    self.gsub!(/^#{first_line_indent}/, '')
   end
 
   def remove_markdown
-    string = self.gsub(/^>/, "") # remove Markdown quotes
+    string = self.gsub(/^>/, '') # remove Markdown quotes
     string = string.gsub(/\[http[^\]]+\]\(([^)]+)\)/, '\1 🔗') # remove Markdown links
     string = string.gsub(/\[([^\]]+)\]\(([^\)]+)\)/, '"\1" (\2 🔗)') # remove Markdown links with custom text
-    string = string.gsub("|", "") # remove new line preserve markers
+    string = string.gsub('|', '') # remove new line preserve markers
     return string
   end
 end

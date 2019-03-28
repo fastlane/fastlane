@@ -9,20 +9,28 @@ module Fastlane
 
     # Called just as the investigation has begun.
     def inspector_started_query(query, inspector)
-      puts("")
-      puts("Looking for related GitHub issues on #{inspector.repo_owner}/#{inspector.repo_name}...")
+      puts('')
+      puts(
+        "Looking for related GitHub issues on #{inspector
+          .repo_owner}/#{inspector.repo_name}..."
+      )
       puts("Search query: #{query}") if FastlaneCore::Globals.verbose?
-      puts("")
+      puts('')
     end
 
     # Called once the inspector has received a report with more than one issue.
     def inspector_successfully_received_report(report, inspector)
-      report.issues[0..(NUMBER_OF_ISSUES_INLINE - 1)].each { |issue| print_issue_full(issue) }
+      report.issues[0..(NUMBER_OF_ISSUES_INLINE - 1)].each do |issue|
+        print_issue_full(issue)
+      end
 
       if report.issues.count > NUMBER_OF_ISSUES_INLINE
-        report.url.sub!('\'', '%27')
-        puts("and #{report.total_results - NUMBER_OF_ISSUES_INLINE} more at: #{report.url}")
-        puts("")
+        report.url.sub!("'", '%27')
+        puts(
+          "and #{report.total_results -
+            NUMBER_OF_ISSUES_INLINE} more at: #{report.url}"
+        )
+        puts('')
       end
 
       print_open_link_hint
@@ -30,15 +38,25 @@ module Fastlane
 
     # Called once the report has been received, but when there are no issues found.
     def inspector_received_empty_report(report, inspector)
-      puts("Found no similar issues. To create a new issue, please visit:")
-      puts("https://github.com/#{inspector.repo_owner}/#{inspector.repo_name}/issues/new")
-      puts("Run `fastlane env` to append the fastlane environment to your issue")
+      puts('Found no similar issues. To create a new issue, please visit:')
+      puts(
+        "https://github.com/#{inspector.repo_owner}/#{inspector
+          .repo_name}/issues/new"
+      )
+      puts(
+        'Run `fastlane env` to append the fastlane environment to your issue'
+      )
     end
 
     # Called when there have been networking issues in creating the report.
     def inspector_could_not_create_report(error, query, inspector)
-      puts("Could not access the GitHub API, you may have better luck via the website.")
-      puts("https://github.com/#{inspector.repo_owner}/#{inspector.repo_name}/search?q=#{query}&type=Issues&utf8=✓")
+      puts(
+        'Could not access the GitHub API, you may have better luck via the website.'
+      )
+      puts(
+        "https://github.com/#{inspector.repo_owner}/#{inspector
+          .repo_name}/search?q=#{query}&type=Issues&utf8=✓"
+      )
       puts("Error: #{error.name}")
     end
 
@@ -51,12 +69,16 @@ module Fastlane
       puts("➡️  #{issue.title.yellow}")
       puts("    #{issue.html_url} [#{status}] #{issue.comments} 💬")
       puts("    #{Time.parse(issue.updated_at).to_pretty}")
-      puts("")
+      puts('')
     end
 
     def print_open_link_hint(newline = false)
-      puts("") if newline
-      puts("🔗  You can ⌘ + double-click on links to open them directly in your browser.") if FastlaneCore::Helper.mac?
+      puts('') if newline
+      if FastlaneCore::Helper.mac?
+        puts(
+          '🔗  You can ⌘ + double-click on links to open them directly in your browser.'
+        )
+      end
     end
   end
 end

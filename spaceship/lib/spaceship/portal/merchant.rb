@@ -64,9 +64,7 @@ module Spaceship
         # @param mac [Bool] Searches Mac merchants if true
         # @return (Merchant) The Merchant you're looking for. This is nil if the merchant can't be found.
         def find(bundle_id, mac: false)
-          all(mac: mac).find do |merchant|
-            merchant.bundle_id == bundle_id
-          end
+          all(mac: mac).find { |merchant| merchant.bundle_id == bundle_id }
         end
       end
 

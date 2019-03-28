@@ -6,7 +6,9 @@ module Fastlane
 
         # check if it's installed
         if gem_installed?(gem_name)
-          UI.success("gem '#{gem_name}' is already installed") if FastlaneCore::Globals.verbose?
+          if FastlaneCore::Globals.verbose?
+            UI.success("gem '#{gem_name}' is already installed")
+          end
           require gem_require_name if require_gem
           return true
         end
@@ -14,20 +16,30 @@ module Fastlane
         if Helper.bundler?
           # User uses bundler, we don't want to install gems on the fly here
           # Instead tell the user how to add it to their Gemfile
-          UI.important("Missing gem '#{gem_name}', please add the following to your local Gemfile:")
-          UI.important("")
+          UI.important(
+            "Missing gem '#{gem_name}', please add the following to your local Gemfile:"
+          )
+          UI.important('')
           UI.command_output("gem \"#{gem_name}\"")
-          UI.important("")
-          UI.user_error!("Add 'gem \"#{gem_name}\"' to your Gemfile and restart fastlane") unless Helper.test?
+          UI.important('')
+          unless Helper.test?
+            UI.user_error!(
+              "Add 'gem \"#{gem_name}\"' to your Gemfile and restart fastlane"
+            )
+          end
         end
 
-        require "rubygems/command_manager"
+        require 'rubygems/command_manager'
         installer = Gem::CommandManager.instance[:install]
 
         UI.important("Installing Ruby gem '#{gem_name}'...")
 
         spec_name = self.find_gem_name(gem_name)
-        UI.important("Found gem \"#{spec_name}\" instead of the required name \"#{gem_name}\"") if spec_name != gem_name
+        if spec_name != gem_name
+          UI.important(
+            "Found gem \"#{spec_name}\" instead of the required name \"#{gem_name}\""
+          )
+        end
 
         return if Helper.test?
 
@@ -39,21 +51,29 @@ module Fastlane
       end
 
       def gem_installed?(name, req = Gem::Requirement.default)
-        installed = Gem::Specification.any? { |s| s.name == name and req =~ s.version }
+        installed =
+          Gem::Specification.any? { |s| s.name == name and req =~ s.version }
         return true if installed
 
         # In special cases a gem is already preinstalled, e.g. YAML.
         # To find out we try to load a gem with that name in a child process
         # (so we don't actually load anything we don't want to load)
         # See https://github.com/fastlane/fastlane/issues/6951
-        require_tester = <<-RB.gsub(/^ */, '')
+        require_tester =
+          <<-RB
           begin
             require ARGV.first
           rescue LoadError
             exit(1)
           end
         RB
-        system(RbConfig.ruby, "-e", require_tester.lines.map(&:chomp).join("; "), name)
+            .gsub(/^ */, '')
+        system(
+          RbConfig.ruby,
+          '-e',
+          require_tester.lines.map(&:chomp).join('; '),
+          name
+        )
         return $?.success?
       end
 
@@ -66,7 +86,9 @@ module Fastlane
 
       def format_gem_require_name(gem_name)
         # from "fastlane-plugin-xcversion" to "fastlane/plugin/xcversion"
-        gem_name = gem_name.tr("-", "/") if gem_name.start_with?("fastlane-plugin-")
+        if gem_name.start_with?('fastlane-plugin-')
+          gem_name = gem_name.tr('-', '/')
+        end
 
         return gem_name
       end

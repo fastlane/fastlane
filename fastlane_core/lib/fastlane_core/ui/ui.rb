@@ -11,8 +11,13 @@ module FastlaneCore
       def method_missing(method_sym, *args, &_block)
         # not using `responds` because we don't care about methods like .to_s and so on
         require_relative 'interface'
-        interface_methods = FastlaneCore::Interface.instance_methods - Object.instance_methods
-        UI.user_error!("Unknown method '#{method_sym}', supported #{interface_methods}") unless interface_methods.include?(method_sym)
+        interface_methods =
+          FastlaneCore::Interface.instance_methods - Object.instance_methods
+        unless interface_methods.include?(method_sym)
+          UI.user_error!(
+            "Unknown method '#{method_sym}', supported #{interface_methods}"
+          )
+        end
 
         self.ui_object.send(method_sym, *args)
       end

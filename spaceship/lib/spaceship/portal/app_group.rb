@@ -56,9 +56,7 @@ module Spaceship
         # Find a specific App Group group_id
         # @return (AppGroup) The app group you're looking for. This is nil if the app group can't be found.
         def find(group_id)
-          all.find do |group|
-            group.group_id == group_id
-          end
+          all.find { |group| group.group_id == group_id }
         end
       end
 

@@ -17,7 +17,9 @@ module Spaceship
 
         # md5 from original. keeping track of md5s allows to skip previously uploaded in deliver
         content_md5 = Spaceship::Utilities.md5digest(path)
-        path = remove_alpha_channel(path) if File.extname(path).casecmp('.png').zero?
+        if File.extname(path).casecmp('.png').zero?
+          path = remove_alpha_channel(path)
+        end
 
         content_type = Utilities.content_type(path)
         self.new(
@@ -36,8 +38,8 @@ module Spaceship
         path = "/tmp/#{Digest::MD5.hexdigest(original)}.png"
         FileUtils.copy(original, path)
         if mac? # sips is only available on macOS
-          `sips -s format bmp '#{path}' &> /dev/null` # &> /dev/null since there is warning because of the extension
-          `sips -s format png '#{path}'`
+          `sips -s format bmp '#{path}' &> /dev/null`
+          `sips -s format png '#{path}'` # &> /dev/null since there is warning because of the extension
         end
         return path
       end
@@ -50,9 +52,7 @@ module Spaceship
     private
 
     def initialize(args)
-      args.each do |k, v|
-        instance_variable_set("@#{k}", v) unless v.nil?
-      end
+      args.each { |k, v| instance_variable_set("@#{k}", v) unless v.nil? }
     end
   end
 end

@@ -25,20 +25,24 @@ module FastlaneCore
 
     # @param config [FastlaneCore::Configuration] is used to gather required information about the configuration
     # @param path [String] The path to the configuration file to use
-    def initialize(config, path, block_for_missing, skip_printing_values = false)
+    def initialize(
+      config, path, block_for_missing, skip_printing_values = false
+    )
       self.available_keys = config.all_keys
       self.configfile_path = path
       self.options = {}
 
       @block_for_missing = block_for_missing
-      content = File.read(path, encoding: "utf-8")
+      content = File.read(path, encoding: 'utf-8')
 
       # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
-      if content.tr!('“”‘’‛', %(""'''))
-        UI.error("Your #{File.basename(path)} has had smart quotes sanitised. " \
-                  'To avoid issues in the future, you should not use ' \
-                  'TextEdit for editing it. If you are not using TextEdit, ' \
-                  'you should turn off smart quotes in your editor of choice.')
+      if content.tr!('“”‘’‛', "\"\"'''")
+        UI.error(
+          "Your #{File.basename(path)} has had smart quotes sanitised. " \
+            'To avoid issues in the future, you should not use ' \
+            'TextEdit for editing it. If you are not using TextEdit, ' \
+            'you should turn off smart quotes in your editor of choice.'
+        )
       end
 
       begin
@@ -51,15 +55,20 @@ module FastlaneCore
         line = ex.to_s.match(/\(eval\):(\d+)/)[1]
         UI.error("Error in your #{File.basename(path)} at line #{line}")
         UI.content_error(content, line)
-        UI.user_error!("Syntax error in your configuration file '#{path}' on line #{line}: #{ex}")
+        UI.user_error!(
+          "Syntax error in your configuration file '#{path}' on line #{line}: #{ex}"
+        )
       rescue => ex
-        raise ExceptionWhileParsingError.new(ex, self.options), "Error while parsing config file at #{path}"
+        raise ExceptionWhileParsingError.new(ex, self.options),
+              "Error while parsing config file at #{path}"
       end
     end
 
     def print_resulting_config_values
       require 'terminal-table'
-      UI.success("Successfully loaded '#{File.expand_path(self.configfile_path)}' 📄")
+      UI.success(
+        "Successfully loaded '#{File.expand_path(self.configfile_path)}' 📄"
+      )
 
       # Show message when self.modified_values is empty
       if self.modified_values.empty?
@@ -67,14 +76,19 @@ module FastlaneCore
         return
       end
 
-      rows = self.modified_values.collect do |key, value|
-        [key, value] if value.to_s.length > 0
-      end.compact
+      rows =
+        self.modified_values.collect do |key, value|
+          [key, value] if value.to_s.length > 0
+        end.compact
 
-      puts("")
-      puts(Terminal::Table.new(rows: FastlaneCore::PrintTable.transform_output(rows),
-                              title: "Detected Values from '#{self.configfile_path}'"))
-      puts("")
+      puts('')
+      puts(
+        Terminal::Table.new(
+          rows: FastlaneCore::PrintTable.transform_output(rows),
+          title: "Detected Values from '#{self.configfile_path}'"
+        )
+      )
+      puts('')
     end
 
     # This is used to display only the values that have changed in the summary table
@@ -87,7 +101,6 @@ module FastlaneCore
       return if self.options.key?(method_sym)
 
       if self.available_keys.include?(method_sym)
-
         value = arguments.first
         value = yield if value.nil? && block_given?
 
@@ -102,9 +115,10 @@ module FastlaneCore
             # So we tell the user that they can provide a value
             warning = ["In the config file '#{self.configfile_path}'"]
             warning << "you have the line #{method_sym}, but didn't provide"
-            warning << "any value. Make sure to append a value right after the"
-            warning << "option name. Make sure to check the docs for more information"
-            UI.important(warning.join(" "))
+            warning << 'any value. Make sure to append a value right after the'
+            warning <<
+              'option name. Make sure to check the docs for more information'
+            UI.important(warning.join(' '))
           end
           return
         end
@@ -123,10 +137,11 @@ module FastlaneCore
           # deal with it (boolean values can't be from env variables anyway)
         end
         self.options[method_sym] = value
-      else
+
         # We can't set this value, maybe the tool using this configuration system has its own
         # way of handling this block, as this might be a special block (e.g. ipa block) that's only
         # executed on demand
+      else
         if @block_for_missing
           @block_for_missing.call(method_sym, arguments, block)
         else
@@ -143,10 +158,8 @@ module FastlaneCore
     # @yield Block to run for overriding configuration values.
     #
     def for_lane(lane_name)
-      if ENV["FASTLANE_LANE_NAME"] == lane_name.to_s
-        with_a_clean_config_merged_when_complete do
-          yield
-        end
+      if ENV['FASTLANE_LANE_NAME'] == lane_name.to_s
+        with_a_clean_config_merged_when_complete { yield }
       end
     end
 
@@ -158,10 +171,8 @@ module FastlaneCore
     # @yield Block to run for overriding configuration values.
     #
     def for_platform(platform_name)
-      if ENV["FASTLANE_PLATFORM_NAME"] == platform_name.to_s
-        with_a_clean_config_merged_when_complete do
-          yield
-        end
+      if ENV['FASTLANE_PLATFORM_NAME'] == platform_name.to_s
+        with_a_clean_config_merged_when_complete { yield }
       end
     end
 

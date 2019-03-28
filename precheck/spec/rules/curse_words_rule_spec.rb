@@ -4,15 +4,27 @@ module Precheck
   describe Precheck do
     describe Precheck::CurseWordsRule do
       let(:rule) { CurseWordsRule.new }
-      let(:happy_item) { TextItemToCheck.new("tacos are really delicious, seriously, I can't even", :description, "description") }
-      let(:curse_item) { TextItemToCheck.new("please excuse the use of 'shit' in this description", :description, "description") }
+      let(:happy_item) do
+        TextItemToCheck.new(
+          "tacos are really delicious, seriously, I can't even",
+          :description,
+          'description'
+        )
+      end
+      let(:curse_item) do
+        TextItemToCheck.new(
+          "please excuse the use of 'shit' in this description",
+          :description,
+          'description'
+        )
+      end
 
-      it "passes for non-curse item" do
+      it 'passes for non-curse item' do
         result = rule.check_item(happy_item)
         expect(result.status).to eq(VALIDATION_STATES[:passed])
       end
 
-      it "fails for curse word" do
+      it 'fails for curse word' do
         result = rule.check_item(curse_item)
         expect(result.status).to eq(VALIDATION_STATES[:failed])
       end

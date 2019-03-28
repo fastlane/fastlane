@@ -87,46 +87,62 @@ module FastlaneCore
     # @param sensitive (Boolean) Set if the variable is sensitive, such as a password or API token, to prevent echoing when prompted for the parameter
     # @param display_in_shell (Boolean) Set if the variable can be used from shell
     # rubocop:disable Metrics/ParameterLists
-    def initialize(key: nil,
-                   env_name: nil,
-                   description: nil,
-                   short_option: nil,
-                   default_value: nil,
-                   default_value_dynamic: false,
-                   verify_block: nil,
-                   is_string: true,
-                   type: nil,
-                   skip_type_validation: false,
-                   optional: nil,
-                   conflicting_options: nil,
-                   conflict_block: nil,
-                   deprecated: nil,
-                   sensitive: nil,
-                   code_gen_sensitive: false,
-                   code_gen_default_value: nil,
-                   display_in_shell: true)
-      UI.user_error!("key must be a symbol") unless key.kind_of?(Symbol)
-      UI.user_error!("env_name must be a String") unless (env_name || '').kind_of?(String)
+    def initialize(
+      key: nil,
+      env_name: nil,
+      description: nil,
+      short_option: nil,
+      default_value: nil,
+      default_value_dynamic: false,
+      verify_block: nil,
+      is_string: true,
+      type: nil,
+      skip_type_validation: false,
+      optional: nil,
+      conflicting_options: nil,
+      conflict_block: nil,
+      deprecated: nil,
+      sensitive: nil,
+      code_gen_sensitive: false,
+      code_gen_default_value: nil,
+      display_in_shell: true
+    )
+      UI.user_error!('key must be a symbol') unless key.kind_of?(Symbol)
+      unless (env_name || '').kind_of?(String)
+        UI.user_error!('env_name must be a String')
+      end
 
       if short_option
-        UI.user_error!("short_option for key :#{key} must of type String") unless short_option.kind_of?(String)
-        UI.user_error!("short_option for key :#{key} must be a string of length 1") unless short_option.delete('-').length == 1
+        unless short_option.kind_of?(String)
+          UI.user_error!("short_option for key :#{key} must of type String")
+        end
+        unless short_option.delete('-').length == 1
+          UI.user_error!(
+            "short_option for key :#{key} must be a string of length 1"
+          )
+        end
       end
 
       if description
-        UI.user_error!("Do not let descriptions end with a '.', since it's used for user inputs as well for key :#{key}") if description[-1] == '.'
+        if description[-1] == '.'
+          UI.user_error!(
+            "Do not let descriptions end with a '.', since it's used for user inputs as well for key :#{key}"
+          )
+        end
       end
 
       if conflicting_options
         conflicting_options.each do |conflicting_option_key|
-          UI.user_error!("Conflicting option key must be a symbol") unless conflicting_option_key.kind_of?(Symbol)
+          unless conflicting_option_key.kind_of?(Symbol)
+            UI.user_error!('Conflicting option key must be a symbol')
+          end
         end
       end
 
       if deprecated
         # deprecated options are automatically optional
         optional = true if optional.nil?
-        UI.crash!("Deprecated option must be optional") unless optional
+        UI.crash!('Deprecated option must be optional') unless optional
 
         # deprecated options are marked deprecated in their description
         description = deprecated_description(description, deprecated)
@@ -170,10 +186,7 @@ module FastlaneCore
       end
 
       if @code_gen_default_value.nil?
-        unless @code_gen_sensitive
-
-          @code_gen_default_value = @default_value
-        end
+        @code_gen_default_value = @default_value unless @code_gen_sensitive
       end
     end
 
@@ -182,23 +195,26 @@ module FastlaneCore
     end
 
     def ensure_generic_type_passes_validation(value)
-      if @skip_type_validation
-        return
-      end
+      return if @skip_type_validation
 
-      if data_type != :string_callback && data_type && !value.kind_of?(data_type)
-        UI.user_error!("'#{self.key}' value must be a #{data_type}! Found #{value.class} instead.")
+      if data_type != :string_callback && data_type &&
+         !value.kind_of?(data_type)
+        UI.user_error!(
+          "'#{self.key}' value must be a #{data_type}! Found #{value
+            .class} instead."
+        )
       end
     end
 
     def ensure_boolean_type_passes_validation(value)
-      if @skip_type_validation
-        return
-      end
+      return if @skip_type_validation
 
       # We need to explicity test against Fastlane::Boolean, TrueClass/FalseClass
       if value.class != FalseClass && value.class != TrueClass
-        UI.user_error!("'#{self.key}' value must be either `true` or `false`! Found #{value.class} instead.")
+        UI.user_error!(
+          "'#{self.key}' value must be either `true` or `false`! Found #{value
+            .class} instead."
+        )
       end
     end
 
@@ -233,19 +249,24 @@ module FastlaneCore
 
       if data_type == Array
         return value.split(',') if value.kind_of?(String)
+
+        # Special treatment if the user specified true, false or YES, NO
+        # There is no boolean type, so we just do it here
       elsif data_type == Integer
         return value.to_i if value.to_i.to_s == value.to_s
       elsif data_type == Float
         return value.to_f if value.to_f.to_s == value.to_s
       elsif allow_shell_conversion
         return value.shelljoin if value.kind_of?(Array)
-        return value.map { |k, v| "#{k.to_s.shellescape}=#{v.shellescape}" }.join(' ') if value.kind_of?(Hash)
+        if value.kind_of?(Hash)
+          return value.map do |k, v|
+            "#{k.to_s.shellescape}=#{v.shellescape}"
+          end.join(' ')
+        end
       elsif data_type != String
-        # Special treatment if the user specified true, false or YES, NO
-        # There is no boolean type, so we just do it here
-        if %w(YES yes true TRUE).include?(value)
+        if %w[YES yes true TRUE].include?(value)
           return true
-        elsif %w(NO no false FALSE).include?(value)
+        elsif %w[NO no false FALSE].include?(value)
           return false
         end
       end
@@ -275,17 +296,17 @@ module FastlaneCore
     end
 
     def to_s
-      [@key, @description].join(": ")
+      [@key, @description].join(': ')
     end
 
     def deprecated_description(initial_description, deprecated)
       has_description = !initial_description.to_s.empty?
 
-      description = "**DEPRECATED!**"
+      description = '**DEPRECATED!**'
 
       if deprecated.kind_of?(String)
         description << " #{deprecated}"
-        description << " -" if has_description
+        description << ' -' if has_description
       end
 
       description << " #{initial_description}" if has_description
@@ -294,18 +315,24 @@ module FastlaneCore
     end
 
     def doc_default_value
-      return "[*](#parameters-legend-dynamic)" if self.default_value_dynamic
-      return "" if self.default_value.nil?
-      return "`''`" if self.default_value.instance_of?(String) && self.default_value.empty?
-      return "`:#{self.default_value}`" if self.default_value.instance_of?(Symbol)
+      return '[*](#parameters-legend-dynamic)' if self.default_value_dynamic
+      return '' if self.default_value.nil?
+      if self.default_value.instance_of?(String) && self.default_value.empty?
+        return "`''`"
+      end
+      if self.default_value.instance_of?(Symbol)
+        return "`:#{self.default_value}`"
+      end
 
       "`#{self.default_value}`"
     end
 
     def help_default_value
       return "#{self.default_value} *".strip if self.default_value_dynamic
-      return "" if self.default_value.nil?
-      return "''" if self.default_value.instance_of?(String) && self.default_value.empty?
+      return '' if self.default_value.nil?
+      if self.default_value.instance_of?(String) && self.default_value.empty?
+        return "''"
+      end
       return ":#{self.default_value}" if self.default_value.instance_of?(Symbol)
 
       self.default_value

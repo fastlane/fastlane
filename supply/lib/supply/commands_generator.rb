@@ -1,6 +1,6 @@
-require "commander"
-require "fastlane_core"
-require "supply"
+require 'commander'
+require 'fastlane_core'
+require 'supply'
 
 HighLine.track_eof = false
 
@@ -18,7 +18,9 @@ module Supply
       program :description, Supply::DESCRIPTION
       program :help, 'Author', 'Felix Krause <supply@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/supply/'
+      program :help,
+              'Documentation',
+              'https://docs.fastlane.tools/actions/supply/'
       program :help_formatter, :compact
 
       always_trace!
@@ -29,10 +31,17 @@ module Supply
         c.syntax = 'fastlane supply'
         c.description = 'Run a deploy process'
 
-        FastlaneCore::CommanderGenerator.new.generate(Supply::Options.available_options, command: c)
+        FastlaneCore::CommanderGenerator.new.generate(
+          Supply::Options.available_options,
+          command: c
+        )
 
         c.action do |args, options|
-          Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, options.__hash__)
+          Supply.config =
+            FastlaneCore::Configuration.create(
+              Supply::Options.available_options,
+              options.__hash__
+            )
           load_supplyfile
 
           Supply::Uploader.new.perform_upload
@@ -43,11 +52,18 @@ module Supply
         c.syntax = 'fastlane supply init'
         c.description = 'Sets up supply for you'
 
-        FastlaneCore::CommanderGenerator.new.generate(Supply::Options.available_options, command: c)
+        FastlaneCore::CommanderGenerator.new.generate(
+          Supply::Options.available_options,
+          command: c
+        )
 
         c.action do |args, options|
           require 'supply/setup'
-          Supply.config = FastlaneCore::Configuration.create(Supply::Options.available_options, options.__hash__)
+          Supply.config =
+            FastlaneCore::Configuration.create(
+              Supply::Options.available_options,
+              options.__hash__
+            )
           load_supplyfile
 
           Supply::Setup.new.perform_download

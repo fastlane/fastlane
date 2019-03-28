@@ -3,35 +3,46 @@ module Fastlane
     class PluginScoresAction < Action
       def self.run(params)
         require_relative '../helper/plugin_scores_helper.rb'
-        require "erb"
+        require 'erb'
 
-        plugins = fetch_plugins(params[:cache_path]).sort_by { |v| v.data[:overall_score] }.reverse
+        plugins =
+          fetch_plugins(params[:cache_path]).sort_by do |v|
+            v.data[:overall_score]
+          end.reverse
 
-        result = "<!--\nAuto generated, please only modify https://github.com/fastlane/fastlane/blob/master/fastlane/actions/plugin_scores.rb\n-->\n"
+        result =
+          "<!--\nAuto generated, please only modify https://github.com/fastlane/fastlane/blob/master/fastlane/actions/plugin_scores.rb\n-->\n"
         result += "{!docs/includes/setup-fastlane-header.md!}\n"
         result += "# Available Plugins\n\n\n"
-        result += plugins.collect do |current_plugin|
-          @plugin = current_plugin
-          result = ERB.new(File.read(params[:template_path]), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
-        end.join("\n")
+        result +=
+          plugins.collect do |current_plugin|
+            @plugin = current_plugin
+            result =
+              ERB.new(File.read(params[:template_path]), 0, '-').result(binding)
+          end.join("\n")
 
-        File.write(File.join("docs", params[:output_path]), result)
+        File.write(File.join('docs', params[:output_path]), result)
       end
 
       def self.fetch_plugins(cache_path)
         page = 1
         plugins = []
         loop do
-          url = "https://rubygems.org/api/v1/search.json?query=fastlane-plugin-&page=#{page}"
+          url =
+            "https://rubygems.org/api/v1/search.json?query=fastlane-plugin-&page=#{page}"
           puts("RubyGems API Request: #{url}")
           results = JSON.parse(open(url).read)
           break if results.count == 0
 
-          plugins += results.collect do |current|
-            next if self.hidden_plugins.include?(current['name'])
+          plugins +=
+            results.collect do |current|
+              next if self.hidden_plugins.include?(current['name'])
 
-            Fastlane::Helper::PluginScoresHelper::FastlanePluginScore.new(current, cache_path)
-          end.compact
+              Fastlane::Helper::PluginScoresHelper::FastlanePluginScore.new(
+                current,
+                cache_path
+              )
+            end.compact
 
           page += 1
         end
@@ -49,7 +60,7 @@ module Fastlane
       end
 
       def self.authors
-        ["KrauseFx"]
+        %w[KrauseFx]
       end
 
       def self.is_supported?(platform)
@@ -62,9 +73,7 @@ module Fastlane
 
       # Those are plugins that are now part of fastlane core actions, so we don't want to show them in the directory
       def self.hidden_plugins
-        [
-          "fastlane-plugin-update_project_codesigning"
-        ]
+        %w[fastlane-plugin-update_project_codesigning]
       end
     end
   end

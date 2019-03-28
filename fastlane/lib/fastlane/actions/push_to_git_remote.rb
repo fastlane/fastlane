@@ -4,7 +4,9 @@ module Fastlane
     class PushToGitRemoteAction < Action
       def self.run(params)
         local_branch = params[:local_branch]
-        local_branch ||= Actions.git_branch.gsub(%r{#{params[:remote]}\/}, '') if Actions.git_branch
+        if Actions.git_branch
+          local_branch ||= Actions.git_branch.gsub(%r{#{params[:remote]}\/}, '')
+        end
         local_branch ||= 'master'
 
         remote_branch = params[:remote_branch] || local_branch
@@ -38,50 +40,66 @@ module Fastlane
       end
 
       def self.description
-        "Push local changes to the remote branch"
+        'Push local changes to the remote branch'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :local_branch,
-                                       env_name: "FL_GIT_PUSH_LOCAL_BRANCH",
-                                       description: "The local branch to push from. Defaults to the current branch",
-                                       default_value_dynamic: true,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :remote_branch,
-                                       env_name: "FL_GIT_PUSH_REMOTE_BRANCH",
-                                       description: "The remote branch to push to. Defaults to the local branch",
-                                       default_value_dynamic: true,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :force,
-                                       env_name: "FL_PUSH_GIT_FORCE",
-                                       description: "Force push to remote",
-                                       type: Boolean,
-                                       default_value: false),
-          FastlaneCore::ConfigItem.new(key: :force_with_lease,
-                                       env_name: "FL_PUSH_GIT_FORCE_WITH_LEASE",
-                                       description: "Force push with lease to remote",
-                                       type: Boolean,
-                                       default_value: false),
-          FastlaneCore::ConfigItem.new(key: :tags,
-                                       env_name: "FL_PUSH_GIT_TAGS",
-                                       description: "Whether tags are pushed to remote",
-                                       type: Boolean,
-                                       default_value: true),
-          FastlaneCore::ConfigItem.new(key: :remote,
-                                       env_name: "FL_GIT_PUSH_REMOTE",
-                                       description: "The remote to push to",
-                                       default_value: 'origin'),
-          FastlaneCore::ConfigItem.new(key: :no_verify,
-                                       env_name: "FL_GIT_PUSH_USE_NO_VERIFY",
-                                       description: "Whether or not to use --no-verify",
-                                       type: Boolean,
-                                       default_value: false)
+          FastlaneCore::ConfigItem.new(
+            key: :local_branch,
+            env_name: 'FL_GIT_PUSH_LOCAL_BRANCH',
+            description:
+              'The local branch to push from. Defaults to the current branch',
+            default_value_dynamic: true,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :remote_branch,
+            env_name: 'FL_GIT_PUSH_REMOTE_BRANCH',
+            description:
+              'The remote branch to push to. Defaults to the local branch',
+            default_value_dynamic: true,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :force,
+            env_name: 'FL_PUSH_GIT_FORCE',
+            description: 'Force push to remote',
+            type: Boolean,
+            default_value: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :force_with_lease,
+            env_name: 'FL_PUSH_GIT_FORCE_WITH_LEASE',
+            description: 'Force push with lease to remote',
+            type: Boolean,
+            default_value: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :tags,
+            env_name: 'FL_PUSH_GIT_TAGS',
+            description: 'Whether tags are pushed to remote',
+            type: Boolean,
+            default_value: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :remote,
+            env_name: 'FL_GIT_PUSH_REMOTE',
+            description: 'The remote to push to',
+            default_value: 'origin'
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :no_verify,
+            env_name: 'FL_GIT_PUSH_USE_NO_VERIFY',
+            description: 'Whether or not to use --no-verify',
+            type: Boolean,
+            default_value: false
+          )
         ]
       end
 
       def self.author
-        "lmirosevic"
+        'lmirosevic'
       end
 
       def self.details

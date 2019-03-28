@@ -16,13 +16,13 @@ module Frameit
   # Defaults to latest, might be a time stamp if defined in the Framefile.json
   def self.frames_version
     return @frames_version if @frames_version
-    @frames_version = "latest"
+    @frames_version = 'latest'
 
-    config_files = Dir["./**/Framefile.json"]
+    config_files = Dir['./**/Framefile.json']
     if config_files.count > 0
       config = ConfigParser.new.load(config_files.first)
-      if config.data["device_frame_version"].to_s.length > 0
-        @frames_version = config.data["device_frame_version"]
+      if config.data['device_frame_version'].to_s.length > 0
+        @frames_version = config.data['device_frame_version']
       end
     end
 
@@ -35,7 +35,10 @@ end
 # rubocop:disable all
 class ::Hash
   def fastlane_deep_merge(second)
-    merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
+    merger =
+      proc do |key, v1, v2|
+        Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2
+      end
     self.merge(second, &merger)
   end
 end

@@ -1,14 +1,21 @@
 module Supply
   class Uploader
     def perform_upload
-      FastlaneCore::PrintTable.print_values(config: Supply.config, hide_keys: [:issuer], mask_keys: [:json_key_data], title: "Summary for supply #{Fastlane::VERSION}")
+      FastlaneCore::PrintTable.print_values(
+        config: Supply.config,
+        hide_keys: %i[issuer],
+        mask_keys: %i[json_key_data],
+        title: "Summary for supply #{Fastlane::VERSION}"
+      )
 
       client.begin_edit(package_name: Supply.config[:package_name])
 
       verify_config!
 
       if metadata_path
-        UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
+        unless File.directory?(metadata_path)
+          UI.user_error!("Could not find folder #{metadata_path}")
+        end
 
         all_languages.each do |language|
           next if language.start_with?('.') # e.g. . or .. or hidden folders
@@ -16,19 +23,31 @@ module Supply
 
           listing = client.listing_for_language(language)
 
-          upload_metadata(language, listing) unless Supply.config[:skip_upload_metadata]
+          unless Supply.config[:skip_upload_metadata]
+            upload_metadata(language, listing)
+          end
           upload_images(language) unless Supply.config[:skip_upload_images]
-          upload_screenshots(language) unless Supply.config[:skip_upload_screenshots]
-          upload_changelogs(language) unless Supply.config[:skip_upload_metadata]
+          unless Supply.config[:skip_upload_screenshots]
+            upload_screenshots(language)
+          end
+          unless Supply.config[:skip_upload_metadata]
+            upload_changelogs(language)
+          end
         end
       end
 
       apk_version_codes = []
-      apk_version_codes.concat(upload_apks) unless Supply.config[:skip_upload_apk]
-      apk_version_codes.concat(upload_bundles) unless Supply.config[:skip_upload_aab]
+      unless Supply.config[:skip_upload_apk]
+        apk_version_codes.concat(upload_apks)
+      end
+      unless Supply.config[:skip_upload_aab]
+        apk_version_codes.concat(upload_bundles)
+      end
       upload_mapping(apk_version_codes)
 
-      apk_version_codes.concat(Supply.config[:version_codes_to_retain]) if Supply.config[:version_codes_to_retain]
+      if Supply.config[:version_codes_to_retain]
+        apk_version_codes.concat(Supply.config[:version_codes_to_retain])
+      end
 
       # Only update tracks if we have version codes
       # Updating a track with empty version codes can completely clear out a track
@@ -37,28 +56,37 @@ module Supply
       promote_track if Supply.config[:track_promote_to]
 
       if Supply.config[:validate_only]
-        UI.message("Validating all changes with Google Play...")
+        UI.message('Validating all changes with Google Play...')
         client.validate_current_edit!
-        UI.success("Successfully validated the upload to Google Play")
+        UI.success('Successfully validated the upload to Google Play')
       else
-        UI.message("Uploading all changes to Google Play...")
+        UI.message('Uploading all changes to Google Play...')
         client.commit_current_edit!
-        UI.success("Successfully finished the upload to Google Play")
+        UI.success('Successfully finished the upload to Google Play')
       end
     end
 
     def verify_config!
-      unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths] || Supply.config[:aab] || Supply.config[:aab_paths] || (Supply.config[:track] && Supply.config[:track_promote_to])
-        UI.user_error!("No local metadata, apks, aab, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
+      unless metadata_path || Supply.config[:apk] ||
+             Supply.config[:apk_paths] ||
+             Supply.config[:aab] ||
+             Supply.config[:aab_paths] ||
+             (Supply.config[:track] && Supply.config[:track_promote_to])
+        UI.user_error!(
+          'No local metadata, apks, aab, or track to promote were found, make sure to run `fastlane supply init` to setup supply'
+        )
       end
 
       # Can't upload both at apk and aab at same time
       # Need to error out users when there both apks and aabs are detected
-      apk_paths = [Supply.config[:apk], Supply.config[:apk_paths]].flatten.compact
+      apk_paths = [Supply.config[:apk], Supply.config[:apk_paths]].flatten
+        .compact
       could_upload_apk = !apk_paths.empty? && !Supply.config[:skip_upload_apk]
       could_upload_aab = Supply.config[:aab] && !Supply.config[:skip_upload_aab]
       if could_upload_apk && could_upload_aab
-        UI.user_error!("Cannot provide both apk(s) and aab - use `skip_upload_apk`, `skip_upload_aab`, or  make sure to remove any existing .apk or .aab files that are no longer needed")
+        UI.user_error!(
+          'Cannot provide both apk(s) and aab - use `skip_upload_apk`, `skip_upload_aab`, or  make sure to remove any existing .apk or .aab files that are no longer needed'
+        )
       end
     end
 
@@ -66,8 +94,14 @@ module Supply
       version_codes = client.track_version_codes(Supply.config[:track])
       # the actual value passed for the rollout argument does not matter because it will be ignored by the Google Play API
       # but it has to be between 0.0 and 1.0 to pass the validity check. So we are passing the default value 0.1
-      client.update_track(Supply.config[:track], 0.1, nil) if Supply.config[:deactivate_on_promote]
-      client.update_track(Supply.config[:track_promote_to], Supply.config[:rollout] || 0.1, version_codes)
+      if Supply.config[:deactivate_on_promote]
+        client.update_track(Supply.config[:track], 0.1, nil)
+      end
+      client.update_track(
+        Supply.config[:track_promote_to],
+        Supply.config[:rollout] || 0.1,
+        version_codes
+      )
     end
 
     def upload_changelogs(language)
@@ -80,10 +114,23 @@ module Supply
     end
 
     def upload_changelog(language, version_code)
-      path = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME, "#{version_code}.txt")
+      path =
+        File.join(
+          metadata_path,
+          language,
+          Supply::CHANGELOGS_FOLDER_NAME,
+          "#{version_code}.txt"
+        )
       if File.exist?(path)
-        UI.message("Updating changelog for code version '#{version_code}' and language '#{language}'...")
-        apk_listing = ApkListing.new(File.read(path, encoding: 'UTF-8'), language, version_code)
+        UI.message(
+          "Updating changelog for code version '#{version_code}' and language '#{language}'..."
+        )
+        apk_listing =
+          ApkListing.new(
+            File.read(path, encoding: 'UTF-8'),
+            language,
+            version_code
+          )
         client.update_apk_listing_for_language(apk_listing)
       end
     end
@@ -91,7 +138,9 @@ module Supply
     def upload_metadata(language, listing)
       Supply::AVAILABLE_METADATA_FIELDS.each do |key|
         path = File.join(metadata_path, language, "#{key}.txt")
-        listing.send("#{key}=".to_sym, File.read(path, encoding: 'UTF-8')) if File.exist?(path)
+        if File.exist?(path)
+          listing.send("#{key}=".to_sym, File.read(path, encoding: 'UTF-8'))
+        end
       end
       begin
         listing.save
@@ -103,36 +152,58 @@ module Supply
 
     def upload_images(language)
       Supply::IMAGES_TYPES.each do |image_type|
-        search = File.join(metadata_path, language, Supply::IMAGES_FOLDER_NAME, image_type) + ".#{IMAGE_FILE_EXTENSIONS}"
+        search =
+          File.join(
+            metadata_path,
+            language,
+            Supply::IMAGES_FOLDER_NAME,
+            image_type
+          ) +
+            ".#{IMAGE_FILE_EXTENSIONS}"
         path = Dir.glob(search, File::FNM_CASEFOLD).last
         next unless path
 
         UI.message("Uploading image file #{path}...")
-        client.upload_image(image_path: File.expand_path(path),
-                            image_type: image_type,
-                              language: language)
+        client.upload_image(
+          image_path: File.expand_path(path),
+          image_type: image_type,
+          language: language
+        )
       end
     end
 
     def upload_screenshots(language)
       Supply::SCREENSHOT_TYPES.each do |screenshot_type|
-        search = File.join(metadata_path, language, Supply::IMAGES_FOLDER_NAME, screenshot_type, "*.#{IMAGE_FILE_EXTENSIONS}")
+        search =
+          File.join(
+            metadata_path,
+            language,
+            Supply::IMAGES_FOLDER_NAME,
+            screenshot_type,
+            "*.#{IMAGE_FILE_EXTENSIONS}"
+          )
         paths = Dir.glob(search, File::FNM_CASEFOLD)
         next unless paths.count > 0
 
-        client.clear_screenshots(image_type: screenshot_type, language: language)
+        client.clear_screenshots(
+          image_type: screenshot_type, language: language
+        )
 
         paths.sort.each do |path|
           UI.message("Uploading screenshot #{path}...")
-          client.upload_image(image_path: File.expand_path(path),
-                              image_type: screenshot_type,
-                                language: language)
+          client.upload_image(
+            image_path: File.expand_path(path),
+            image_type: screenshot_type,
+            language: language
+          )
         end
       end
     end
 
     def upload_apks
-      apk_paths = [Supply.config[:apk]] unless (apk_paths = Supply.config[:apk_paths])
+      unless (apk_paths = Supply.config[:apk_paths])
+        apk_paths = [Supply.config[:apk]]
+      end
       apk_paths.compact!
 
       apk_version_codes = []
@@ -145,16 +216,18 @@ module Supply
     end
 
     def upload_mapping(apk_version_codes)
-      mapping_paths = [Supply.config[:mapping]] unless (mapping_paths = Supply.config[:mapping_paths])
+      unless (mapping_paths = Supply.config[:mapping_paths])
+        mapping_paths = [Supply.config[:mapping]]
+      end
       mapping_paths.zip(apk_version_codes).each do |mapping_path, version_code|
-        if mapping_path
-          client.upload_mapping(mapping_path, version_code)
-        end
+        client.upload_mapping(mapping_path, version_code) if mapping_path
       end
     end
 
     def upload_bundles
-      aab_paths = [Supply.config[:aab]] unless (aab_paths = Supply.config[:aab_paths])
+      unless (aab_paths = Supply.config[:aab_paths])
+        aab_paths = [Supply.config[:aab]]
+      end
       return [] unless aab_paths
       aab_paths.compact!
 
@@ -184,18 +257,24 @@ module Supply
         apk_version_code = client.upload_apk(apk_path)
         UI.user_error!("Could not upload #{apk_path}") unless apk_version_code
 
-        if Supply.config[:obb_main_references_version] && Supply.config[:obb_main_file_size]
-          update_obb(apk_version_code,
-                     'main',
-                     Supply.config[:obb_main_references_version],
-                     Supply.config[:obb_main_file_size])
+        if Supply.config[:obb_main_references_version] &&
+           Supply.config[:obb_main_file_size]
+          update_obb(
+            apk_version_code,
+            'main',
+            Supply.config[:obb_main_references_version],
+            Supply.config[:obb_main_file_size]
+          )
         end
 
-        if Supply.config[:obb_patch_references_version] && Supply.config[:obb_patch_file_size]
-          update_obb(apk_version_code,
-                     'patch',
-                     Supply.config[:obb_patch_references_version],
-                     Supply.config[:obb_patch_file_size])
+        if Supply.config[:obb_patch_references_version] &&
+           Supply.config[:obb_patch_file_size]
+          update_obb(
+            apk_version_code,
+            'patch',
+            Supply.config[:obb_patch_references_version],
+            Supply.config[:obb_patch_file_size]
+          )
         end
 
         upload_obbs(apk_path, apk_version_code)
@@ -207,25 +286,39 @@ module Supply
           end
         end
       else
-        UI.message("No apk file found, you can pass the path to your apk using the `apk` option")
+        UI.message(
+          'No apk file found, you can pass the path to your apk using the `apk` option'
+        )
       end
       apk_version_code
     end
 
-    def update_obb(apk_version_code, expansion_file_type, references_version, file_size)
-      UI.message("Updating '#{expansion_file_type}' expansion file from version '#{references_version}'...")
-      client.update_obb(apk_version_code,
-                        expansion_file_type,
-                        references_version,
-                        file_size)
+    def update_obb(
+      apk_version_code, expansion_file_type, references_version, file_size
+    )
+      UI.message(
+        "Updating '#{expansion_file_type}' expansion file from version '#{references_version}'..."
+      )
+      client.update_obb(
+        apk_version_code,
+        expansion_file_type,
+        references_version,
+        file_size
+      )
     end
 
     def update_track(apk_version_codes)
       UI.message("Updating track '#{Supply.config[:track]}'...")
-      check_superseded_tracks(apk_version_codes) if Supply.config[:check_superseded_tracks]
+      if Supply.config[:check_superseded_tracks]
+        check_superseded_tracks(apk_version_codes)
+      end
 
-      if Supply.config[:track].eql?("rollout")
-        client.update_track(Supply.config[:track], Supply.config[:rollout] || 0.1, apk_version_codes)
+      if Supply.config[:track].eql?('rollout')
+        client.update_track(
+          Supply.config[:track],
+          Supply.config[:rollout] || 0.1,
+          apk_version_codes
+        )
       else
         client.update_track(Supply.config[:track], 1.0, apk_version_codes)
       end
@@ -235,17 +328,22 @@ module Supply
     #  - Lesser than the greatest of any later (i.e. production) track
     #  - Or lesser than the currently being uploaded if it's in an earlier (i.e. alpha) track
     def check_superseded_tracks(apk_version_codes)
-      UI.message("Checking superseded tracks, uploading '#{apk_version_codes}' to '#{Supply.config[:track]}'...")
+      UI.message(
+        "Checking superseded tracks, uploading '#{apk_version_codes}' to '#{Supply
+          .config[
+          :track
+        ]}'..."
+      )
       max_apk_version_code = apk_version_codes.max
       max_tracks_version_code = nil
 
-      tracks = ["production", "rollout", "beta", "alpha", "internal"]
+      tracks = %w[production rollout beta alpha internal]
       config_track_index = tracks.index(Supply.config[:track])
 
       # Custom "closed" tracks are now allowed (https://support.google.com/googleplay/android-developer/answer/3131213)
       # Custom tracks have an equal level with alpha (alpha is considered a closed track as well)
       # If a track index is not found, we will assume is a custom track so an alpha index is given
-      config_track_index = tracks.index("alpha") unless config_track_index
+      config_track_index = tracks.index('alpha') unless config_track_index
 
       tracks.each_index do |track_index|
         track = tracks[track_index]
@@ -259,25 +357,30 @@ module Supply
           max_tracks_version_code = track_version_codes.max
         end
 
-        removed_version_codes = track_version_codes.take_while do |v|
-          v < max_tracks_version_code || (v < max_apk_version_code && track_index > config_track_index)
-        end
+        removed_version_codes =
+          track_version_codes.take_while do |v|
+            v < max_tracks_version_code ||
+              (v < max_apk_version_code && track_index > config_track_index)
+          end
 
         next if removed_version_codes.empty?
 
         keep_version_codes = track_version_codes - removed_version_codes
-        max_tracks_version_code = keep_version_codes[0] unless keep_version_codes.empty?
+        unless keep_version_codes.empty?
+          max_tracks_version_code = keep_version_codes[0]
+        end
         client.update_track(track, 1.0, keep_version_codes)
-        UI.message("Superseded track '#{track}', removed '#{removed_version_codes}'")
+        UI.message(
+          "Superseded track '#{track}', removed '#{removed_version_codes}'"
+        )
       end
     end
 
     # returns only language directories from metadata_path
     def all_languages
-      Dir.entries(metadata_path)
-         .select { |f| File.directory?(File.join(metadata_path, f)) }
-         .reject { |f| f.start_with?('.') }
-         .sort { |x, y| x <=> y }
+      Dir.entries(metadata_path).select do |f|
+        File.directory?(File.join(metadata_path, f))
+      end.reject { |f| f.start_with?('.') }.sort { |x, y| x <=> y }
     end
 
     def client
@@ -293,7 +396,7 @@ module Supply
     # more than one of either of them.
     def upload_obbs(apk_path, apk_version_code)
       expansion_paths = find_obbs(apk_path)
-      ['main', 'patch'].each do |type|
+      %w[main patch].each do |type|
         if expansion_paths[type]
           upload_obb(expansion_paths[type], type, apk_version_code)
         end
@@ -312,8 +415,12 @@ module Supply
         type = obb_expansion_file_type(path)
         next unless type
         if expansion_paths[type]
-          UI.important("Can only upload one '#{type}' apk expansion. Skipping obb upload entirely.")
-          UI.important("If you'd like this to work differently, please submit an issue.")
+          UI.important(
+            "Can only upload one '#{type}' apk expansion. Skipping obb upload entirely."
+          )
+          UI.important(
+            "If you'd like this to work differently, please submit an issue."
+          )
           return {}
         end
         expansion_paths[type] = path
@@ -323,13 +430,15 @@ module Supply
 
     def upload_obb(obb_path, expansion_file_type, apk_version_code)
       UI.message("Uploading obb file #{obb_path}...")
-      client.upload_obb(obb_file_path: obb_path,
-                        apk_version_code: apk_version_code,
-                        expansion_file_type: expansion_file_type)
+      client.upload_obb(
+        obb_file_path: obb_path,
+        apk_version_code: apk_version_code,
+        expansion_file_type: expansion_file_type
+      )
     end
 
     def obb_expansion_file_type(obb_file_path)
-      filename = File.basename(obb_file_path, ".obb")
+      filename = File.basename(obb_file_path, '.obb')
       if filename.include?('main')
         'main'
       elsif filename.include?('patch')

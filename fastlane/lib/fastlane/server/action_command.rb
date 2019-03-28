@@ -37,19 +37,15 @@ module Fastlane
       @command_id = json['commandID']
 
       args_json = json['args'] ||= []
-      @args = args_json.map do |arg|
-        Argument.new(json: arg)
-      end
+      @args = args_json.map { |arg| Argument.new(json: arg) }
     end
 
     def cancel_signal?
-      return @command_id == "cancelFastlaneRun"
+      return @command_id == 'cancelFastlaneRun'
     end
 
     def target_class
-      unless class_name
-        return nil
-      end
+      return nil unless class_name
 
       return Fastlane::Actions.const_get(class_name)
     end

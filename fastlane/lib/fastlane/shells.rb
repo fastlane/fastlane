@@ -1,6 +1,3 @@
 module Fastlane
-  SHELLS = [
-    :bash,
-    :zsh
-  ]
+  SHELLS = %i[bash zsh]
 end

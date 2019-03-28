@@ -1,10 +1,8 @@
 describe FastlaneCore do
   describe FastlaneCore::CommandExecutor do
-    describe "execute" do
+    describe 'execute' do
       it 'executes a simple command successfully' do
-        unless FastlaneCore::Helper.windows?
-          expect(Process).to receive(:wait)
-        end
+        expect(Process).to receive(:wait) unless FastlaneCore::Helper.windows?
 
         result = FastlaneCore::CommandExecutor.execute(command: 'echo foo')
 
@@ -40,16 +38,18 @@ describe FastlaneCore do
       end
     end
 
-    describe "which" do
+    describe 'which' do
       require 'tempfile'
 
-      it "does not find commands which are not on the PATH" do
-        expect(FastlaneCore::CommandExecutor.which('not_a_real_command')).to be_nil
+      it 'does not find commands which are not on the PATH' do
+        expect(
+          FastlaneCore::CommandExecutor.which('not_a_real_command')
+        ).to be_nil
       end
 
-      it "finds commands without extensions which are on the PATH" do
+      it 'finds commands without extensions which are on the PATH' do
         Tempfile.open('foobarbaz') do |f|
-          File.chmod(0777, f)
+          File.chmod(0o777, f)
 
           temp_dir = File.dirname(f)
           temp_cmd = File.basename(f)
@@ -60,9 +60,9 @@ describe FastlaneCore do
         end
       end
 
-      it "finds commands with known extensions which are on the PATH" do
-        Tempfile.open(['foobarbaz', '.exe']) do |f|
-          File.chmod(0777, f)
+      it 'finds commands with known extensions which are on the PATH' do
+        Tempfile.open(%w[foobarbaz .exe]) do |f|
+          File.chmod(0o777, f)
 
           temp_dir = File.dirname(f)
           temp_cmd = File.basename(f, '.exe')
@@ -73,9 +73,9 @@ describe FastlaneCore do
         end
       end
 
-      it "does not find commands with unknown extensions which are on the PATH" do
-        Tempfile.open(['foobarbaz', '.exe']) do |f|
-          File.chmod(0777, f)
+      it 'does not find commands with unknown extensions which are on the PATH' do
+        Tempfile.open(%w[foobarbaz .exe]) do |f|
+          File.chmod(0o777, f)
 
           temp_dir = File.dirname(f)
           temp_cmd = File.basename(f, '.exe')

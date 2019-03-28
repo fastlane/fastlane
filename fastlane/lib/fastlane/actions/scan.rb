@@ -7,7 +7,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the `run_tests` action"
+        'Alias for the `run_tests` action'
       end
     end
   end

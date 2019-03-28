@@ -2,15 +2,15 @@ module Fastlane
   module Actions
     class AliasShortTestAction < Action
       def self.run(params)
-        UI.important(params.join(","))
+        UI.important(params.join(','))
       end
 
       def self.alias_used(action_alias, params)
-        params.replace("modified")
+        params.replace('modified')
       end
 
       def self.aliases
-        ["someshortalias"]
+        %w[someshortalias]
       end
 
       def self.is_supported?(platform)

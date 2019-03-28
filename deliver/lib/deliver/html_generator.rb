@@ -10,25 +10,35 @@ module Deliver
     def run(options, screenshots)
       begin
         # Use fastlane folder or default to current directory
-        fastlane_path = FastlaneCore::FastlaneFolder.path || "."
+        fastlane_path = FastlaneCore::FastlaneFolder.path || '.'
         html_path = self.render(options, screenshots, fastlane_path)
       rescue => ex
         UI.error(ex.inspect)
         UI.error(ex.backtrace.join("\n"))
-        okay = UI.input("Could not render HTML preview. Do you still want to continue?")
+        okay =
+          UI.input(
+            'Could not render HTML preview. Do you still want to continue?'
+          )
         return if okay
-        UI.crash!("Could not render HTML page")
+        UI.crash!('Could not render HTML page')
       end
-      UI.important("Verifying the upload via the HTML file can be disabled by either adding")
-      UI.important("`force true` to your Deliverfile or using `fastlane deliver --force`")
+      UI.important(
+        'Verifying the upload via the HTML file can be disabled by either adding'
+      )
+      UI.important(
+        '`force true` to your Deliverfile or using `fastlane deliver --force`'
+      )
 
       system("open '#{html_path}'")
-      okay = UI.confirm("Does the Preview on path '#{html_path}' look okay for you?")
+      okay =
+        UI.confirm("Does the Preview on path '#{html_path}' look okay for you?")
 
       if okay
-        UI.success("HTML file confirmed...") # print this to give feedback to the user immediately
+        UI.success('HTML file confirmed...') # print this to give feedback to the user immediately
       else
-        UI.user_error!("Did not upload the metadata, because the HTML file was rejected by the user")
+        UI.user_error!(
+          'Did not upload the metadata, because the HTML file was rejected by the user'
+        )
       end
     end
 
@@ -47,16 +57,18 @@ module Deliver
       @options = options
       @export_path = export_path
 
-      @app_name = (options[:name]['en-US'] || options[:name].values.first) if options[:name]
+      if options[:name]
+        @app_name = (options[:name]['en-US'] || options[:name].values.first)
+      end
       @app_name ||= options[:app].name
 
       @languages = options[:description].keys if options[:description]
       @languages ||= options[:app].latest_version.description.languages
 
-      html_path = File.join(Deliver::ROOT, "lib/assets/summary.html.erb")
-      html = ERB.new(File.read(html_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
+      html_path = File.join(Deliver::ROOT, 'lib/assets/summary.html.erb')
+      html = ERB.new(File.read(html_path)).result(binding)
 
-      export_path = File.join(export_path, "Preview.html")
+      export_path = File.join(export_path, 'Preview.html')
       File.write(export_path, html)
 
       return export_path

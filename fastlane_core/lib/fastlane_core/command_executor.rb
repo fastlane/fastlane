@@ -36,34 +36,45 @@ module FastlaneCore
       # @param loading [String] A loading string that is shown before the first output
       # @param suppress_output [Boolean] Should we print the command's output?
       # @return [String] All the output as string
-      def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil, suppress_output: false)
+      def execute(
+        command: nil,
+        print_all: false,
+        print_command: true,
+        error: nil,
+        prefix: nil,
+        loading: nil,
+        suppress_output: false
+      )
         print_all = true if FastlaneCore::Globals.verbose?
         prefix ||= {}
 
         output = []
-        command = command.join(" ") if command.kind_of?(Array)
+        command = command.join(' ') if command.kind_of?(Array)
         UI.command(command) if print_command
 
-        if print_all && loading # this is only used to show the "Loading text"...
-          UI.command_output(loading)
-        end
+        UI.command_output(loading) if print_all && loading # this is only used to show the "Loading text"...
 
         begin
-          status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
-            command_stdout.each do |l|
-              line = l.strip # strip so that \n gets removed
-              output << line
+          status =
+            FastlaneCore::FastlanePty.spawn(
+              command
+            ) do |command_stdout, command_stdin, pid|
+              command_stdout.each do |l|
+                line = l.strip # strip so that \n gets removed
+                output << line
 
-              next unless print_all
+                next unless print_all
 
-              # Prefix the current line with a string
-              prefix.each do |element|
-                line = element[:prefix] + line if element[:block] && element[:block].call(line)
+                # Prefix the current line with a string
+                prefix.each do |element|
+                  if element[:block] && element[:block].call(line)
+                    line = element[:prefix] + line
+                  end
+                end
+
+                UI.command_output(line) unless suppress_output
               end
-
-              UI.command_output(line) unless suppress_output
             end
-          end
         rescue => ex
           # FastlanePty adds exit_status on to StandardError so every error will have a status code
           status = ex.exit_status

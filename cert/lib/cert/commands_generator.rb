@@ -19,10 +19,13 @@ module Cert
     def run
       program :name, 'cert'
       program :version, Fastlane::VERSION
-      program :description, 'CLI for \'cert\' - Create new iOS code signing certificates'
+      program :description,
+              "CLI for 'cert' - Create new iOS code signing certificates"
       program :help, 'Author', 'Felix Krause <cert@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/cert/'
+      program :help,
+              'Documentation',
+              'https://docs.fastlane.tools/actions/cert/'
       program :help_formatter, :compact
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
@@ -31,10 +34,17 @@ module Cert
         c.syntax = 'fastlane cert create'
         c.description = 'Create new iOS code signing certificates'
 
-        FastlaneCore::CommanderGenerator.new.generate(Cert::Options.available_options, command: c)
+        FastlaneCore::CommanderGenerator.new.generate(
+          Cert::Options.available_options,
+          command: c
+        )
 
         c.action do |args, options|
-          Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options.__hash__)
+          Cert.config =
+            FastlaneCore::Configuration.create(
+              Cert::Options.available_options,
+              options.__hash__
+            )
           Cert::Runner.new.launch
         end
       end
@@ -43,10 +53,17 @@ module Cert
         c.syntax = 'fastlane cert revoke_expired'
         c.description = 'Revoke expired iOS code signing certificates'
 
-        FastlaneCore::CommanderGenerator.new.generate(Cert::Options.available_options, command: c)
+        FastlaneCore::CommanderGenerator.new.generate(
+          Cert::Options.available_options,
+          command: c
+        )
 
         c.action do |args, options|
-          Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options.__hash__)
+          Cert.config =
+            FastlaneCore::Configuration.create(
+              Cert::Options.available_options,
+              options.__hash__
+            )
           Cert::Runner.new.revoke_expired_certs!
         end
       end

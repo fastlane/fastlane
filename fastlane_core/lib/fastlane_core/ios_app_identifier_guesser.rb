@@ -10,7 +10,7 @@ module FastlaneCore
       def guess_app_identifier_from_args(args)
         # args example: ["-a", "com.krausefx.app", "--team_id", "5AA97AAHK2"]
         args.each_with_index do |current, index|
-          next unless current == "-a" || current == "--app_identifier"
+          next unless current == '-a' || current == '--app_identifier'
           # argument names are followed by argument values in the args array;
           # use [index + 1] to find the package name (range check the array
           # to avoid array bounds errors)
@@ -20,8 +20,19 @@ module FastlaneCore
       end
 
       def guess_app_identifier_from_environment
-        ["FASTLANE", "DELIVER", "PILOT", "PRODUCE", "PEM", "SIGH", "SNAPSHOT", "MATCH"].each do |current|
-          return ENV["#{current}_APP_IDENTIFIER"] if FastlaneCore::Env.truthy?("#{current}_APP_IDENTIFIER")
+        %w[
+          FASTLANE
+          DELIVER
+          PILOT
+          PRODUCE
+          PEM
+          SIGH
+          SNAPSHOT
+          MATCH
+        ].each do |current|
+          if FastlaneCore::Env.truthy?("#{current}_APP_IDENTIFIER")
+            return ENV["#{current}_APP_IDENTIFIER"]
+          end
         end
         nil
       end
@@ -34,21 +45,26 @@ module FastlaneCore
         # we only care about the app_identifier item in the configuration file, so
         # build an options array & Configuration with just that one key and it will
         # be fetched if it is present in the config file
-        genericfile_options = [FastlaneCore::ConfigItem.new(key: :app_identifier)]
+        genericfile_options = [
+          FastlaneCore::ConfigItem.new(key: :app_identifier)
+        ]
         options = FastlaneCore::Configuration.create(genericfile_options, {})
         # pass the empty proc to disable options validation, otherwise this will fail
         # when the other (non-app_identifier) keys are encountered in the config file;
         # 3rd parameter "true" disables the printout of the contents of the
         # configuration file, which is noisy and confusing in this case
-        options.load_configuration_file(file_name, proc {}, true)
+        options.load_configuration_file(file_name, proc {  }, true)
         return options.fetch(:app_identifier, ask: false)
-      rescue
+      rescue StandardError
         # any option/file error here should just be treated as identifier not found
         nil
       end
 
       def fetch_app_identifier_from_swift_file(file_name)
-        swift_config_file_path = FastlaneCore::Configuration.find_configuration_file_path(config_file_name: file_name)
+        swift_config_file_path =
+          FastlaneCore::Configuration.find_configuration_file_path(
+            config_file_name: file_name
+          )
         return nil if swift_config_file_path.nil?
 
         # Deliverfile.swift, Snapfile.swift, Appfile.swift all look like:
@@ -67,7 +83,7 @@ module FastlaneCore
           return application_id if application_id
         end
         return nil
-      rescue
+      rescue StandardError
         # any option/file error here should just be treated as identifier not found
         return nil
       end
@@ -81,14 +97,19 @@ module FastlaneCore
       end
 
       def guess_app_identifier_from_config_files
-        ["Deliverfile", "Gymfile", "Snapfile", "Matchfile"].each do |current|
+        %w[Deliverfile Gymfile Snapfile Matchfile].each do |current|
           app_identifier = self.fetch_app_identifier_from_ruby_file(current)
           return app_identifier if app_identifier
         end
 
         # if we're swifty, let's look there
         # this isn't the same list as above
-        ["Deliverfile.swift", "Snapfile.swift", "Appfile.swift", "Matchfile.swift"].each do |current|
+        %w[
+          Deliverfile.swift
+          Snapfile.swift
+          Appfile.swift
+          Matchfile.swift
+        ].each do |current|
           app_identifier = self.fetch_app_identifier_from_swift_file(current)
           return app_identifier if app_identifier
         end

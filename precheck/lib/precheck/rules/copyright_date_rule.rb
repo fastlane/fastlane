@@ -7,15 +7,15 @@ module Precheck
     end
 
     def self.env_name
-      "RULE_COPYRIGHT_DATE"
+      'RULE_COPYRIGHT_DATE'
     end
 
     def self.friendly_name
-      "Incorrect, or missing copyright date"
+      'Incorrect, or missing copyright date'
     end
 
     def self.description
-      "using a copyright date that is any different from this current year, or missing a date"
+      'using a copyright date that is any different from this current year, or missing a date'
     end
 
     def pass_if_empty?
@@ -23,7 +23,7 @@ module Precheck
     end
 
     def supported_fields_symbol_set
-      [:copyright].to_set
+      %i[copyright].to_set
     end
 
     def word_search_type

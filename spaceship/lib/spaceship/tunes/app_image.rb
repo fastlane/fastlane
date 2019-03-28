@@ -4,7 +4,7 @@ module Spaceship
   module Tunes
     # Represents an image hosted on App Store Connect. Used for icons, screenshots, etc
     class AppImage < TunesBase
-      HOST_URL = "https://is1-ssl.mzstatic.com/image/thumb"
+      HOST_URL = 'https://is1-ssl.mzstatic.com/image/thumb'
 
       attr_accessor :asset_token
 
@@ -26,10 +26,7 @@ module Spaceship
       def reset!(attrs = {})
         update_raw_data!(
           {
-            asset_token: nil,
-            original_file_name: nil,
-            sort_order: nil,
-            url: nil
+            asset_token: nil, original_file_name: nil, sort_order: nil, url: nil
           }.merge(attrs)
         )
       end
@@ -42,9 +39,7 @@ module Spaceship
       private
 
       def update_raw_data!(hash)
-        hash.each do |k, v|
-          self.send("#{k}=", v)
-        end
+        hash.each { |k, v| self.send("#{k}=", v) }
       end
     end
   end

@@ -52,13 +52,16 @@ module Spaceship
     end
 
     def preferred_error_info
-      return nil unless @error_info.kind_of?(Hash) && @error_info['resultString']
+      unless @error_info.kind_of?(Hash) && @error_info['resultString']
+        return nil
+      end
 
       [
-        "Apple provided the following error info:",
+        'Apple provided the following error info:',
         @error_info['resultString'],
         @error_info['userString']
-      ].compact.uniq # sometimes 'resultString' and 'userString' are the same value
+      ].compact
+        .uniq # sometimes 'resultString' and 'userString' are the same value
     end
   end
 

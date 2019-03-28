@@ -7,7 +7,9 @@ require_relative 'manager'
 module Pilot
   class TesterExporter < Manager
     def export_testers(options)
-      UI.user_error!("Export file path is required") unless options[:testers_file_path]
+      unless options[:testers_file_path]
+        UI.user_error!('Export file path is required')
+      end
 
       start(options)
       require 'csv'
@@ -23,16 +25,33 @@ module Pilot
 
       file = config[:testers_file_path]
 
-      CSV.open(file, "w") do |csv|
-        csv << ['First', 'Last', 'Email', 'Groups', 'Installed Version', 'Install Date']
+      CSV.open(file, 'w') do |csv|
+        csv <<
+          [
+            'First',
+            'Last',
+            'Email',
+            'Groups',
+            'Installed Version',
+            'Install Date'
+          ]
 
         testers.each do |tester|
-          group_names = tester.groups.join(";") || ""
+          group_names = tester.groups.join(';') || ''
           latest_install_info = tester.latest_install_info
-          install_version = latest_install_info["latestInstalledShortVersion"] || ""
-          pretty_date = tester.pretty_install_date || ""
+          install_version =
+            latest_install_info['latestInstalledShortVersion'] || ''
+          pretty_date = tester.pretty_install_date || ''
 
-          csv << [tester.first_name, tester.last_name, tester.email, group_names, install_version, pretty_date]
+          csv <<
+            [
+              tester.first_name,
+              tester.last_name,
+              tester.email,
+              group_names,
+              install_version,
+              pretty_date
+            ]
         end
 
         UI.success("Successfully exported CSV to #{file}")

@@ -27,35 +27,44 @@ module Match
 
       FileUtils.mkdir_p(params[:output_path]) if params[:output_path]
 
-      FastlaneCore::PrintTable.print_values(config: params,
-                                             title: "Summary for match #{Fastlane::VERSION}")
+      FastlaneCore::PrintTable.print_values(
+        config: params, title: "Summary for match #{Fastlane::VERSION}"
+      )
 
       update_optional_values_depending_on_storage_type(params)
 
       self.storage_mode = params[:storage_mode]
 
       # Choose the right storage and encryption implementations
-      storage = Storage.for_mode(params[:storage_mode], {
-        git_url: params[:git_url],
-        shallow_clone: params[:shallow_clone],
-        skip_docs: params[:skip_docs],
-        git_branch: params[:git_branch],
-        git_full_name: params[:git_full_name],
-        git_user_email: params[:git_user_email],
-        clone_branch_directly: params[:clone_branch_directly],
-        type: params[:type].to_s,
-        platform: params[:platform].to_s,
-        google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
-        google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
-        google_cloud_project_id: params[:google_cloud_project_id].to_s
-      })
+      storage =
+        Storage.for_mode(
+          params[:storage_mode],
+          {
+            git_url: params[:git_url],
+            shallow_clone: params[:shallow_clone],
+            skip_docs: params[:skip_docs],
+            git_branch: params[:git_branch],
+            git_full_name: params[:git_full_name],
+            git_user_email: params[:git_user_email],
+            clone_branch_directly: params[:clone_branch_directly],
+            type: params[:type].to_s,
+            platform: params[:platform].to_s,
+            google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
+            google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
+            google_cloud_project_id: params[:google_cloud_project_id].to_s
+          }
+        )
       storage.download
 
       # Init the encryption only after the `storage.download` was called to have the right working directory
-      encryption = Encryption.for_storage_mode(params[:storage_mode], {
-        git_url: params[:git_url],
-        working_directory: storage.working_directory
-      })
+      encryption =
+        Encryption.for_storage_mode(
+          params[:storage_mode],
+          {
+            git_url: params[:git_url],
+            working_directory: storage.working_directory
+          }
+        )
       encryption.decrypt_files if encryption
 
       if params[:readonly]
@@ -63,11 +72,18 @@ module Match
         # see `prefixed_working_directory` comments for more details
         self.currently_used_team_id = params[:team_id]
       else
-        self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name])
+        self.spaceship =
+          SpaceshipEnsure.new(
+            params[:username],
+            params[:team_id],
+            params[:team_name]
+          )
         self.currently_used_team_id = self.spaceship.team_id
 
-        if params[:type] == "enterprise" && !Spaceship.client.in_house?
-          UI.user_error!("You defined the profile type 'enterprise', but your Apple account doesn't support In-House profiles")
+        if params[:type] == 'enterprise' && !Spaceship.client.in_house?
+          UI.user_error!(
+            "You defined the profile type 'enterprise', but your Apple account doesn't support In-House profiles"
+          )
         end
       end
 
@@ -84,21 +100,34 @@ module Match
       # Verify the App ID (as we don't want 'match' to fail at a later point)
       if spaceship
         app_identifiers.each do |app_identifier|
-          spaceship.bundle_identifier_exists(username: params[:username], app_identifier: app_identifier)
+          spaceship.bundle_identifier_exists(
+            username: params[:username], app_identifier: app_identifier
+          )
         end
       end
 
       # Certificate
-      cert_id = fetch_certificate(params: params, working_directory: storage.working_directory)
-      spaceship.certificate_exists(username: params[:username], certificate_id: cert_id) if spaceship
+      cert_id =
+        fetch_certificate(
+          params: params, working_directory: storage.working_directory
+        )
+      if spaceship
+        spaceship.certificate_exists(
+          username: params[:username], certificate_id: cert_id
+        )
+      end
 
       # Provisioning Profiles
       app_identifiers.each do |app_identifier|
         loop do
-          break if fetch_provisioning_profile(params: params,
-                                      certificate_id: cert_id,
-                                      app_identifier: app_identifier,
-                                   working_directory: storage.working_directory)
+          if fetch_provisioning_profile(
+             params: params,
+             certificate_id: cert_id,
+             app_identifier: app_identifier,
+             working_directory: storage.working_directory
+           )
+            break
+          end
         end
       end
 
@@ -109,15 +138,30 @@ module Match
 
       # Print a summary table for each app_identifier
       app_identifiers.each do |app_identifier|
-        TablePrinter.print_summary(app_identifier: app_identifier, type: params[:type], platform: params[:platform])
+        TablePrinter.print_summary(
+          app_identifier: app_identifier,
+          type: params[:type],
+          platform: params[:platform]
+        )
       end
 
-      UI.success("All required keys, certificates and provisioning profiles are installed 🙌".green)
-    rescue Spaceship::Client::UnexpectedResponse, Spaceship::Client::InvalidUserCredentialsError, Spaceship::Client::NoUserCredentialsError => ex
-      UI.error("An error occurred while verifying your certificates and profiles with the Apple Developer Portal.")
-      UI.error("If you already have your certificates stored in git, you can run `fastlane match` in readonly mode")
-      UI.error("to just install the certificates and profiles without accessing the Dev Portal.")
-      UI.error("To do so, just pass `readonly: true` to your match call.")
+      UI.success(
+        'All required keys, certificates and provisioning profiles are installed 🙌'
+          .green
+      )
+    rescue Spaceship::Client::UnexpectedResponse,
+           Spaceship::Client::InvalidUserCredentialsError,
+           Spaceship::Client::NoUserCredentialsError => ex
+      UI.error(
+        'An error occurred while verifying your certificates and profiles with the Apple Developer Portal.'
+      )
+      UI.error(
+        'If you already have your certificates stored in git, you can run `fastlane match` in readonly mode'
+      )
+      UI.error(
+        'to just install the certificates and profiles without accessing the Dev Portal.'
+      )
+      UI.error('To do so, just pass `readonly: true` to your match call.')
       raise ex
     ensure
       storage.clear_changes if storage
@@ -125,9 +169,9 @@ module Match
 
     # Used when creating a new certificate or profile
     def prefixed_working_directory(working_directory)
-      if self.storage_mode == "git"
+      if self.storage_mode == 'git'
         return working_directory
-      elsif self.storage_mode == "google_cloud"
+      elsif self.storage_mode == 'google_cloud'
         # We fall back to "*", which means certificates and profiles
         # from all teams that use this bucket would be installed. This is not ideal, but
         # unless the user provides a `team_id`, we can't know which one to use
@@ -136,19 +180,21 @@ module Match
         if @_folder_prefix.nil?
           # We use a `@_folder_prefix` variable, to keep state between multiple calls of this
           # method, as the value won't change. This way the warning is only printed once
-          UI.important("Looks like you run `match` in `readonly` mode, and didn't provide a `team_id`. This will still work, however it is recommended to provide a `team_id` in your Appfile or Matchfile")
-          @_folder_prefix = "*"
+          UI.important(
+            "Looks like you run `match` in `readonly` mode, and didn't provide a `team_id`. This will still work, however it is recommended to provide a `team_id` in your Appfile or Matchfile"
+          )
+          @_folder_prefix = '*'
         end
         return File.join(working_directory, @_folder_prefix)
       else
-        UI.crash!("No implementation for `prefixed_working_directory`")
+        UI.crash!('No implementation for `prefixed_working_directory`')
       end
     end
 
     # Be smart about optional values here
     # Depending on the storage mode, different values are required
     def update_optional_values_depending_on_storage_type(params)
-      if params[:storage_mode] != "git"
+      if params[:storage_mode] != 'git'
         params.option_for_key(:git_url).optional = true
       end
     end
@@ -156,46 +202,100 @@ module Match
     def fetch_certificate(params: nil, working_directory: nil)
       cert_type = Match.cert_type_sym(params[:type])
 
-      certs = Dir[File.join(prefixed_working_directory(working_directory), "certs", cert_type.to_s, "*.cer")]
-      keys = Dir[File.join(prefixed_working_directory(working_directory), "certs", cert_type.to_s, "*.p12")]
+      certs =
+        Dir[
+          File.join(
+            prefixed_working_directory(working_directory),
+            'certs',
+            cert_type.to_s,
+            '*.cer'
+          )
+        ]
+      keys =
+        Dir[
+          File.join(
+            prefixed_working_directory(working_directory),
+            'certs',
+            cert_type.to_s,
+            '*.p12'
+          )
+        ]
 
       if certs.count == 0 || keys.count == 0
-        UI.important("Couldn't find a valid code signing identity for #{cert_type}... creating one for you now")
-        UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
-        cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory(working_directory))
-        private_key_path = cert_path.gsub(".cer", ".p12")
+        UI.important(
+          "Couldn't find a valid code signing identity for #{cert_type}... creating one for you now"
+        )
+        if params[:readonly]
+          UI.crash!(
+            'No code signing identity found and can not create a new one because you enabled `readonly`'
+          )
+        end
+        cert_path =
+          Generator.generate_certificate(
+            params,
+            cert_type,
+            prefixed_working_directory(working_directory)
+          )
+        private_key_path = cert_path.gsub('.cer', '.p12')
 
         self.files_to_commit << cert_path
         self.files_to_commit << private_key_path
+
+        # Check validity of certificate
       else
         cert_path = certs.last
 
-        # Check validity of certificate
         if Utils.is_cert_valid?(cert_path)
           UI.verbose("Your certificate '#{File.basename(cert_path)}' is valid")
         else
-          UI.user_error!("Your certificate '#{File.basename(cert_path)}' is not valid, please check end date and renew it if necessary")
+          UI.user_error!(
+            "Your certificate '#{File.basename(
+              cert_path
+            )}' is not valid, please check end date and renew it if necessary"
+          )
         end
 
         if Helper.mac?
-          UI.message("Installing certificate...")
+          UI.message('Installing certificate...')
 
           # Only looking for cert in "custom" (non login.keychain) keychain
           # Doing this for backwards compatability
-          keychain_name = params[:keychain_name] == "login.keychain" ? nil : params[:keychain_name]
+          keychain_name =
+            if params[:keychain_name] == 'login.keychain'
+              nil
+            else
+              params[:keychain_name]
+            end
 
-          if FastlaneCore::CertChecker.installed?(cert_path, in_keychain: keychain_name)
-            UI.verbose("Certificate '#{File.basename(cert_path)}' is already installed on this machine")
+          if FastlaneCore::CertChecker.installed?(
+             cert_path,
+             in_keychain: keychain_name
+           )
+            UI.verbose(
+              "Certificate '#{File.basename(
+                cert_path
+              )}' is already installed on this machine"
+            )
           else
-            Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
+            Utils.import(
+              cert_path,
+              params[:keychain_name],
+              password: params[:keychain_password]
+            )
           end
 
           # Import the private key
           # there seems to be no good way to check if it's already installed - so just install it
           # Key will only be added to the partition list if it isn't already installed
-          Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
+          Utils.import(
+            keys.last,
+            params[:keychain_name],
+            password: params[:keychain_password]
+          )
         else
-          UI.message("Skipping installation of certificate as it would not work on this operating system.")
+          UI.message(
+            'Skipping installation of certificate as it would not work on this operating system.'
+          )
         end
 
         if params[:output_path]
@@ -208,23 +308,34 @@ module Match
         TablePrinter.print_certificate_info(cert_info: info)
       end
 
-      return File.basename(cert_path).gsub(".cer", "") # Certificate ID
+      return File.basename(cert_path).gsub('.cer', '') # Certificate ID
     end
 
     # @return [String] The UUID of the provisioning profile so we can verify it with the Apple Developer Portal
-    def fetch_provisioning_profile(params: nil, certificate_id: nil, app_identifier: nil, working_directory: nil)
+    def fetch_provisioning_profile(
+      params: nil,
+      certificate_id: nil,
+      app_identifier: nil,
+      working_directory: nil
+    )
       prov_type = Match.profile_type_sym(params[:type])
 
       names = [Match::Generator.profile_type_name(prov_type), app_identifier]
-      if params[:platform].to_s != :ios.to_s
-        names.push(params[:platform])
-      end
+      names.push(params[:platform]) if params[:platform].to_s != :ios.to_s
 
-      profile_name = names.join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
-      base_dir = File.join(prefixed_working_directory(working_directory), "profiles", prov_type.to_s)
+      profile_name = names.join('_').gsub('*', '\*') # this is important, as it shouldn't be a wildcard
+      base_dir =
+        File.join(
+          prefixed_working_directory(working_directory),
+          'profiles',
+          prov_type.to_s
+        )
       profiles = Dir[File.join(base_dir, "#{profile_name}.mobileprovision")]
       if Helper.mac?
-        keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
+        unless params[:keychain_name].nil?
+          keychain_path =
+            FastlaneCore::Helper.keychain_path(params[:keychain_name])
+        end
       end
 
       # Install the provisioning profiles
@@ -232,73 +343,111 @@ module Match
 
       if params[:force_for_new_devices] && !params[:readonly]
         if prov_type != :appstore
-          params[:force] = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym) unless params[:force]
+          unless params[:force]
+            params[:force] =
+              device_count_different?(
+                profile: profile,
+                keychain_path: keychain_path,
+                platform: params[:platform].to_sym
+              )
+          end
         else
           # App Store provisioning profiles don't contain device identifiers and
           # thus shouldn't be renewed if the device count has changed.
-          UI.important("Warning: `force_for_new_devices` is set but is ignored for App Store provisioning profiles.")
-          UI.important("You can safely stop specifying `force_for_new_devices` when running Match for type 'appstore'.")
+          UI.important(
+            'Warning: `force_for_new_devices` is set but is ignored for App Store provisioning profiles.'
+          )
+          UI.important(
+            "You can safely stop specifying `force_for_new_devices` when running Match for type 'appstore'."
+          )
         end
       end
 
       if profile.nil? || params[:force]
         if params[:readonly]
-          UI.error("No matching provisioning profiles found for '#{profile_name}'")
-          UI.error("A new one cannot be created because you enabled `readonly`")
+          UI.error(
+            "No matching provisioning profiles found for '#{profile_name}'"
+          )
+          UI.error('A new one cannot be created because you enabled `readonly`')
           if Dir.exist?(base_dir) # folder for `prov_type` does not exist on first match use for that type
-            all_profiles = Dir.entries(base_dir).reject { |f| f.start_with?(".") }
-            UI.error("Provisioning profiles in your repo for type `#{prov_type}`:")
+            all_profiles =
+              Dir.entries(base_dir).reject { |f| f.start_with?('.') }
+            UI.error(
+              "Provisioning profiles in your repo for type `#{prov_type}`:"
+            )
             all_profiles.each { |p| UI.error("- '#{p}'") }
           end
-          UI.error("If you are certain that a profile should exist, double-check the recent changes to your match repository")
-          UI.user_error!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`. Check the output above for more information.")
+          UI.error(
+            'If you are certain that a profile should exist, double-check the recent changes to your match repository'
+          )
+          UI.user_error!(
+            'No matching provisioning profiles found and can not create a new one because you enabled `readonly`. Check the output above for more information.'
+          )
         end
-        profile = Generator.generate_provisioning_profile(params: params,
-                                                       prov_type: prov_type,
-                                                  certificate_id: certificate_id,
-                                                  app_identifier: app_identifier,
-                                               working_directory: prefixed_working_directory(working_directory))
+        profile =
+          Generator.generate_provisioning_profile(
+            params: params,
+            prov_type: prov_type,
+            certificate_id: certificate_id,
+            app_identifier: app_identifier,
+            working_directory: prefixed_working_directory(working_directory)
+          )
         self.files_to_commit << profile
       end
 
       if Helper.mac?
-        installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
+        installed_profile =
+          FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
       end
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
-      uuid = parsed["UUID"]
+      uuid = parsed['UUID']
 
-      if params[:output_path]
-        FileUtils.cp(profile, params[:output_path])
-      end
+      FileUtils.cp(profile, params[:output_path]) if params[:output_path]
 
-      if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
+      if spaceship &&
+         !spaceship.profile_exists(username: params[:username], uuid: uuid)
         # This profile is invalid, let's remove the local file and generate a new one
         File.delete(profile)
         # This method will be called again, no need to modify `files_to_commit`
         return nil
       end
 
-      Utils.fill_environment(Utils.environment_variable_name(app_identifier: app_identifier,
-                                                                       type: prov_type,
-                                                                   platform: params[:platform]),
-
-                             uuid)
+      Utils.fill_environment(
+        Utils.environment_variable_name(
+          app_identifier: app_identifier,
+          type: prov_type,
+          platform: params[:platform]
+        ),
+        uuid
+      )
 
       # TeamIdentifier is returned as an array, but we're not sure why there could be more than one
-      Utils.fill_environment(Utils.environment_variable_name_team_id(app_identifier: app_identifier,
-                                                                               type: prov_type,
-                                                                           platform: params[:platform]),
-                             parsed["TeamIdentifier"].first)
+      Utils.fill_environment(
+        Utils.environment_variable_name_team_id(
+          app_identifier: app_identifier,
+          type: prov_type,
+          platform: params[:platform]
+        ),
+        parsed['TeamIdentifier'].first
+      )
 
-      Utils.fill_environment(Utils.environment_variable_name_profile_name(app_identifier: app_identifier,
-                                                                                    type: prov_type,
-                                                                                platform: params[:platform]),
-                             parsed["Name"])
+      Utils.fill_environment(
+        Utils.environment_variable_name_profile_name(
+          app_identifier: app_identifier,
+          type: prov_type,
+          platform: params[:platform]
+        ),
+        parsed['Name']
+      )
 
-      Utils.fill_environment(Utils.environment_variable_name_profile_path(app_identifier: app_identifier,
-                                                                                    type: prov_type,
-                                                                                platform: params[:platform]),
-                             installed_profile)
+      Utils.fill_environment(
+        Utils.environment_variable_name_profile_path(
+          app_identifier: app_identifier,
+          type: prov_type,
+          platform: params[:platform]
+        ),
+        installed_profile
+      )
 
       return uuid
     end
@@ -307,8 +456,9 @@ module Match
       return false unless profile
 
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
-      uuid = parsed["UUID"]
-      portal_profile = Spaceship.provisioning_profile.all.detect { |i| i.uuid == uuid }
+      uuid = parsed['UUID']
+      portal_profile =
+        Spaceship.provisioning_profile.all.detect { |i| i.uuid == uuid }
 
       if portal_profile
         profile_device_count = portal_profile.devices.count

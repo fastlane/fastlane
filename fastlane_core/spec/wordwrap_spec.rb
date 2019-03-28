@@ -2,7 +2,9 @@ require 'fastlane_core/string_filters'
 
 describe WordWrap do
   context 'wordwrapping will return an array of strings' do
-    let(:test_string) { 'some big long string with lots of characters i think there should be more than eighty carachters here!' }
+    let(:test_string) do
+      'some big long string with lots of characters i think there should be more than eighty carachters here!'
+    end
 
     it 'will return an empty array if the length is zero' do
       result = test_string.wordwrap(0)

@@ -18,30 +18,34 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :name,
-                                       env_name: "FL_CLEAN_COCOAPODS_CACHE_DEVELOPMENT",
-                                       description: "Pod name to be removed from cache",
-                                       optional: true,
-                                       is_string: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("You must specify pod name which should be removed from cache") if value.to_s.empty?
-                                       end)
+          FastlaneCore::ConfigItem.new(
+            key: :name,
+            env_name: 'FL_CLEAN_COCOAPODS_CACHE_DEVELOPMENT',
+            description: 'Pod name to be removed from cache',
+            optional: true,
+            is_string: true,
+            verify_block:
+              proc do |value|
+                if value.to_s.empty?
+                  UI.user_error!(
+                    'You must specify pod name which should be removed from cache'
+                  )
+                end
+              end
+          )
         ]
       end
 
       def self.authors
-        ["alexmx"]
+        %w[alexmx]
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       def self.example_code
-        [
-          'clean_cocoapods_cache',
-          'clean_cocoapods_cache(name: "CACHED_POD")'
-        ]
+        ['clean_cocoapods_cache', 'clean_cocoapods_cache(name: "CACHED_POD")']
       end
 
       def self.category

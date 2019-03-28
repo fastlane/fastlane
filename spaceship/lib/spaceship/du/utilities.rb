@@ -1,5 +1,5 @@
 require 'fastimage'
-require "English"
+require 'English'
 
 module Spaceship
   # Set of utility methods useful to work with media files
@@ -23,8 +23,8 @@ module Spaceship
     # Supports all video and images required by DU-UTC right now
     # @param path (String) the path to the file
     def resolution(path)
-      return FastImage.size(path) if content_type(path).start_with?("image")
-      return video_resolution(path) if content_type(path).start_with?("video")
+      return FastImage.size(path) if content_type(path).start_with?('image')
+      return video_resolution(path) if content_type(path).start_with?('video')
       raise "Cannot find resolution of file #{path}"
     end
 
@@ -44,12 +44,15 @@ module Spaceship
     def grab_video_preview(video_path, timestamp, dimensions)
       width, height = dimensions
       require 'tempfile'
-      tmp = Tempfile.new(['video_preview', ".jpg"])
+      tmp = Tempfile.new(%w[video_preview .jpg])
       file = tmp.path
-      command = "ffmpeg -y -i \"#{video_path}\" -s #{width}x#{height} -ss \"#{timestamp}\" -vframes 1 \"#{file}\" 2>&1 >/dev/null"
+      command =
+        "ffmpeg -y -i \"#{video_path}\" -s #{width}x#{height} -ss \"#{timestamp}\" -vframes 1 \"#{file}\" 2>&1 >/dev/null"
       # puts "COMMAND: #{command}"
       `#{command}`
-      raise "Failed to grab screenshot at #{timestamp} from #{video_path} (using #{command})" unless $CHILD_STATUS.to_i == 0
+      unless $CHILD_STATUS.to_i == 0
+        raise "Failed to grab screenshot at #{timestamp} from #{video_path} (using #{command})"
+      end
       tmp
     end
 
@@ -62,12 +65,16 @@ module Spaceship
       output = `#{command}`
       # Note: ffmpeg exits with 1 if no output specified
       # raise "Failed to find video information from #{video_path} (using #{command})" unless $CHILD_STATUS.to_i == 0
-      output = output.force_encoding("BINARY")
+      output = output.force_encoding('BINARY')
       video_infos = output.split("\n").select { |l| l =~ /Stream.*Video/ }
-      raise "Unable to find Stream Video information from ffmpeg output of #{command}" if video_infos.count == 0
+      if video_infos.count == 0
+        raise "Unable to find Stream Video information from ffmpeg output of #{command}"
+      end
       video_info = video_infos[0]
       res = video_info.match(/.* ([0-9]+)x([0-9]+).*/)
-      raise "Unable to parse resolution information from #{video_info}" if res.size < 3
+      if res.size < 3
+        raise "Unable to parse resolution information from #{video_info}"
+      end
       [res[1].to_i, res[2].to_i]
     end
 
@@ -76,6 +83,11 @@ module Spaceship
       Digest::MD5.hexdigest(File.read(file_path))
     end
 
-    module_function :content_type, :grab_video_preview, :portrait?, :resolution, :video_resolution, :md5digest
+    module_function :content_type,
+                    :grab_video_preview,
+                    :portrait?,
+                    :resolution,
+                    :video_resolution,
+                    :md5digest
   end
 end

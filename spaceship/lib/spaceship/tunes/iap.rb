@@ -60,30 +60,34 @@ module Spaceship
       #    currency: "EUR",
       #    tier: 2
       #  }
-      def create!(type: "consumable",
-                  versions: nil,
-                  reference_name: nil,
-                  product_id: nil,
-                  cleared_for_sale: true,
-                  review_notes: nil,
-                  review_screenshot: nil,
-                  pricing_intervals: nil,
-                  family_id: nil,
-                  subscription_free_trial: nil,
-                  subscription_duration: nil,
-                  subscription_price_target: nil)
-        client.create_iap!(app_id: self.application.apple_id,
-                           type: type,
-                           versions: versions,
-                           reference_name: reference_name,
-                           product_id: product_id,
-                           cleared_for_sale: cleared_for_sale,
-                           review_notes: review_notes,
-                           review_screenshot: review_screenshot,
-                           pricing_intervals: pricing_intervals,
-                           family_id: family_id,
-                           subscription_duration: subscription_duration,
-                           subscription_free_trial: subscription_free_trial)
+      def create!(
+        type: 'consumable',
+        versions: nil,
+        reference_name: nil,
+        product_id: nil,
+        cleared_for_sale: true,
+        review_notes: nil,
+        review_screenshot: nil,
+        pricing_intervals: nil,
+        family_id: nil,
+        subscription_free_trial: nil,
+        subscription_duration: nil,
+        subscription_price_target: nil
+      )
+        client.create_iap!(
+          app_id: self.application.apple_id,
+          type: type,
+          versions: versions,
+          reference_name: reference_name,
+          product_id: product_id,
+          cleared_for_sale: cleared_for_sale,
+          review_notes: review_notes,
+          review_screenshot: review_screenshot,
+          pricing_intervals: pricing_intervals,
+          family_id: family_id,
+          subscription_duration: subscription_duration,
+          subscription_free_trial: subscription_free_trial
+        )
 
         # Update pricing for a recurring subscription.
         if type == Spaceship::Tunes::IAPType::RECURRING &&
@@ -94,12 +98,17 @@ module Spaceship
           # exception is raised.
           product = find_product_with_retries(product_id, 6)
           raw_pricing_intervals =
-            client.transform_to_raw_pricing_intervals(application.apple_id,
-                                                      product.purchase_id, pricing_intervals,
-                                                      subscription_price_target)
-          client.update_recurring_iap_pricing!(app_id: self.application.apple_id,
-                                               purchase_id: product.purchase_id,
-                                               pricing_intervals: raw_pricing_intervals)
+            client.transform_to_raw_pricing_intervals(
+              application.apple_id,
+              product.purchase_id,
+              pricing_intervals,
+              subscription_price_target
+            )
+          client.update_recurring_iap_pricing!(
+            app_id: self.application.apple_id,
+            purchase_id: product.purchase_id,
+            pricing_intervals: raw_pricing_intervals
+          )
         end
       end
 
@@ -107,9 +116,7 @@ module Spaceship
       # @param product_id (String) Product Id
       def find(product_id)
         all.each do |product|
-          if product.product_id == product_id
-            return product
-          end
+          return product if product.product_id == product_id
         end
         return nil
       end
@@ -124,7 +131,7 @@ module Spaceship
           attrs = product
           attrs[:application] = self.application
           loaded_iap = Tunes::IAPList.factory(attrs)
-          next if loaded_iap.status == "deleted" && !include_deleted
+          next if loaded_iap.status == 'deleted' && !include_deleted
           return_iaps << loaded_iap
         end
         return_iaps
@@ -137,8 +144,9 @@ module Spaceship
         product = nil
         until product
           if try_number > max_tries
-            raise PotentialServerError.new, "Failed to find the product with id=#{product_id}. "\
-            "This can be caused either by a server error or due to the removal of the product."
+            raise PotentialServerError.new,
+                  "Failed to find the product with id=#{product_id}. " \
+                    'This can be caused either by a server error or due to the removal of the product.'
           end
           product = find(product_id)
           try_number += 1

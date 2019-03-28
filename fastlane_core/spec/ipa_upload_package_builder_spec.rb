@@ -6,7 +6,9 @@ describe FastlaneCore do
     let(:unique_path) { uploader.unique_ipa_path(path) }
 
     let(:ipa_with_spaces) { 'iOS App With Spaces' }
-    let(:path_with_spaces) { File.expand_path("../fixtures/ipas/#{ipa_with_spaces}.ipa", __FILE__) }
+    let(:path_with_spaces) do
+      File.expand_path("../fixtures/ipas/#{ipa_with_spaces}.ipa", __FILE__)
+    end
     let(:unique_path_with_spaces) { uploader.unique_ipa_path(path_with_spaces) }
 
     def special_chars?(string)
@@ -15,12 +17,41 @@ describe FastlaneCore do
 
     context 'special_chars?' do
       it 'returns false for and zero special characters and emoji' do
-        is_valid = special_chars?("something_IPA_1234567890.ipa")
+        is_valid = special_chars?('something_IPA_1234567890.ipa')
         expect(is_valid).to be(false)
       end
 
       it 'returns true for all special characters' do
-        special_chars = %w[! @ # $ % ^ & * ( ) + = [ ] " ' ; : < > ? / \ | { } , ~ `]
+        special_chars = %w[
+          !
+          @
+          #
+          $
+          %
+          ^
+          &
+          *
+          (
+          )
+          +
+          =
+          [
+          ]
+          "
+          '
+          ;
+          :
+          <
+          >
+          ?
+          /
+          \ |
+          {
+          }
+          ,
+          ~
+          `
+        ]
 
         special_chars.each do |c|
           is_valid = special_chars?("something_#{c}.ipa")
@@ -29,7 +60,7 @@ describe FastlaneCore do
       end
 
       it 'returns true for emoji' do
-        is_valid = special_chars?("something_😝_🚀.ipa")
+        is_valid = special_chars?('something_😝_🚀.ipa')
         expect(is_valid).to be(true)
       end
     end

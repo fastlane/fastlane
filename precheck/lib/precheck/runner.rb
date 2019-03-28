@@ -14,44 +14,57 @@ module Precheck
     def run
       Precheck.config.load_configuration_file(Precheck.precheckfile_name)
 
-      FastlaneCore::PrintTable.print_values(config: Precheck.config,
-                                         hide_keys: [:output_path],
-                                             title: "Summary for precheck #{Fastlane::VERSION}")
+      FastlaneCore::PrintTable.print_values(
+        config: Precheck.config,
+        hide_keys: %i[output_path],
+        title: "Summary for precheck #{Fastlane::VERSION}"
+      )
 
       unless Spaceship::Tunes.client
         UI.message("Starting login with user '#{Precheck.config[:username]}'")
         Spaceship::Tunes.login(Precheck.config[:username])
         Spaceship::Tunes.select_team
 
-        UI.message("Successfully logged in")
+        UI.message('Successfully logged in')
       end
 
-      UI.message("Checking app for precheck rule violations")
+      UI.message('Checking app for precheck rule violations')
 
       ensure_app_exists!
 
-      processor_result = check_for_rule_violations(app: app, app_version: latest_app_version)
+      processor_result =
+        check_for_rule_violations(app: app, app_version: latest_app_version)
 
       if processor_result.items_not_checked?
         print_items_not_checked(processor_result: processor_result)
       end
 
       if processor_result.has_errors_or_warnings?
-        summary_table = build_potential_problems_table(processor_result: processor_result)
+        summary_table =
+          build_potential_problems_table(processor_result: processor_result)
         puts(summary_table)
       end
 
       if processor_result.should_trigger_user_error?
-        UI.user_error!("precheck 👮‍♀️ 👮  found one or more potential problems that must be addressed before submitting to review")
+        UI.user_error!(
+          'precheck 👮‍♀️ 👮  found one or more potential problems that must be addressed before submitting to review'
+        )
         return false
       end
 
       if processor_result.has_errors_or_warnings?
-        UI.important("precheck 👮‍♀️ 👮  found one or more potential metadata problems, but this won't prevent fastlane from completing 👍".yellow)
+        UI.important(
+          "precheck 👮‍♀️ 👮  found one or more potential metadata problems, but this won't prevent fastlane from completing 👍"
+            .yellow
+        )
       end
 
-      if !processor_result.has_errors_or_warnings? && !processor_result.items_not_checked?
-        UI.message("precheck 👮‍♀️ 👮  finished without detecting any potential problems 🛫".green)
+      if !processor_result.has_errors_or_warnings? &&
+         !processor_result.items_not_checked?
+        UI.message(
+          'precheck 👮‍♀️ 👮  finished without detecting any potential problems 🛫'
+            .green
+        )
       end
 
       return true
@@ -59,7 +72,12 @@ module Precheck
 
     def print_items_not_checked(processor_result: nil)
       names = processor_result.items_not_checked.map(&:friendly_name)
-      UI.message("😶  Metadata fields not checked by any rule: #{names.join(', ')}".yellow) if names.length > 0
+      if names.length > 0
+        UI.message(
+          "😶  Metadata fields not checked by any rule: #{names.join(', ')}"
+            .yellow
+        )
+      end
     end
 
     def build_potential_problems_table(processor_result: nil)
@@ -70,38 +88,40 @@ module Precheck
 
       warning_results.each do |rule, results|
         results.each do |result|
-          rows << [result.item.friendly_name, result.rule_return.failure_data.yellow]
+          rows <<
+            [result.item.friendly_name, result.rule_return.failure_data.yellow]
         end
       end
 
       error_results.each do |rule, results|
         results.each do |result|
-          rows << [result.item.friendly_name, result.rule_return.failure_data.red]
+          rows <<
+            [result.item.friendly_name, result.rule_return.failure_data.red]
         end
       end
 
       if rows.length == 0
         return nil
       else
-        title_text = "Potential problems"
+        title_text = 'Potential problems'
         if error_results.length > 0
           title_text = title_text.red
         else
           title_text = title_text.yellow
         end
+
         return Terminal::Table.new(
           title: title_text,
-          headings: ["Field", "Failure reason"],
+          headings: ['Field', 'Failure reason'],
           rows: FastlaneCore::PrintTable.transform_output(rows)
-        ).to_s
+        )
+          .to_s
       end
     end
 
     def check_for_rule_violations(app: nil, app_version: nil)
       Precheck::RuleProcessor.process_app_and_version(
-        app: app,
-        app_version: app_version,
-        rules: Precheck::Options.rules
+        app: app, app_version: app_version, rules: Precheck::Options.rules
       )
     end
 
@@ -112,38 +132,37 @@ module Precheck
       end
 
       return Terminal::Table.new(
-        title: "Failed rules".red,
-        headings: ["Name", "App metadata field: (language code)"],
+        title: 'Failed rules'.red,
+        headings: ['Name', 'App metadata field: (language code)'],
         rows: FastlaneCore::PrintTable.transform_output(rows)
-      ).to_s
+      )
+        .to_s
     end
 
     def rendered_rules_checked_table(rules_checked: nil)
       rows = []
-      rules_checked.each do |rule|
-        rows << [rule.key, rule.description]
-      end
+      rules_checked.each { |rule| rows << [rule.key, rule.description] }
 
       return Terminal::Table.new(
-        title: "Enabled rules".green,
-        headings: ["Name", "Description"],
+        title: 'Enabled rules'.green,
+        headings: %w[Name Description],
         rows: FastlaneCore::PrintTable.transform_output(rows)
-      ).to_s
+      )
+        .to_s
     end
 
     def rendered_skipped_rules_table(skipped_rules: nil)
       return nil if skipped_rules.empty?
 
       rows = []
-      skipped_rules.each do |rule|
-        rows << [rule.key, rule.description]
-      end
+      skipped_rules.each { |rule| rows << [rule.key, rule.description] }
 
       return Terminal::Table.new(
-        title: "Skipped rules".yellow,
-        headings: ["Name", "Description"],
+        title: 'Skipped rules'.yellow,
+        headings: %w[Name Description],
         rows: FastlaneCore::PrintTable.transform_output(rows)
-      ).to_s
+      )
+        .to_s
     end
 
     def build_items_not_checked_table(items_not_checked: nil)
@@ -153,10 +172,11 @@ module Precheck
       end
 
       return Terminal::Table.new(
-        title: "Not analyzed".yellow,
-        headings: ["Name", "Friendly name"],
+        title: 'Not analyzed'.yellow,
+        headings: ['Name', 'Friendly name'],
         rows: FastlaneCore::PrintTable.transform_output(rows)
-      ).to_s
+      )
+        .to_s
     end
 
     def app
@@ -170,7 +190,11 @@ module Precheck
     # Makes sure the current App ID exists. If not, it will show an appropriate error message
     def ensure_app_exists!
       return if app
-      UI.user_error!("Could not find app with App Identifier '#{Precheck.config[:app_identifier]}'")
+      UI.user_error!(
+        "Could not find app with App Identifier '#{Precheck.config[
+          :app_identifier
+        ]}'"
+      )
     end
   end
 end

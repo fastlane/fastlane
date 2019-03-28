@@ -13,13 +13,14 @@ module Fastlane
         Snapshot::DependencyChecker.check_simulators
         Snapshot::Runner.new.work
 
-        Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] = File.expand_path(params[:output_directory]) # absolute URL
+        Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] =
+          File.expand_path(params[:output_directory]) # absolute URL
 
         true
       end
 
       def self.description
-        "Generate new localized screenshots on multiple devices (via _snapshot_)"
+        'Generate new localized screenshots on multiple devices (via _snapshot_)'
       end
 
       def self.available_options
@@ -29,11 +30,11 @@ module Fastlane
       end
 
       def self.author
-        "KrauseFx"
+        'KrauseFx'
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       def self.example_code

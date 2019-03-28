@@ -4,34 +4,46 @@ module Deliver
   # upload description, rating, etc.
   class UploadMetadata
     # All the localised values attached to the version
-    LOCALISED_VERSION_VALUES = [:description, :keywords, :release_notes, :support_url, :marketing_url, :promotional_text]
+    LOCALISED_VERSION_VALUES = %i[
+      description
+      keywords
+      release_notes
+      support_url
+      marketing_url
+      promotional_text
+    ]
 
     # Everything attached to the version but not being localised
-    NON_LOCALISED_VERSION_VALUES = [:copyright]
+    NON_LOCALISED_VERSION_VALUES = %i[copyright]
 
     # Localised app details values
-    LOCALISED_APP_VALUES = [:name, :subtitle, :privacy_url]
+    LOCALISED_APP_VALUES = %i[name subtitle privacy_url]
 
     # Non localized app details values
-    NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category,
-                                :primary_first_sub_category, :primary_second_sub_category,
-                                :secondary_first_sub_category, :secondary_second_sub_category]
+    NON_LOCALISED_APP_VALUES = %i[
+      primary_category
+      secondary_category
+      primary_first_sub_category
+      primary_second_sub_category
+      secondary_first_sub_category
+      secondary_second_sub_category
+    ]
 
     # Trade Representative Contact Information values
     TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES = {
-        trade_representative_trade_name: :trade_name,
-        trade_representative_first_name: :first_name,
-        trade_representative_last_name: :last_name,
-        trade_representative_address_line_1: :address_line1,
-        trade_representative_address_line_2: :address_line2,
-        trade_representative_address_line_3: :address_line3,
-        trade_representative_city_name: :city_name,
-        trade_representative_state: :state,
-        trade_representative_country: :country,
-        trade_representative_postal_code: :postal_code,
-        trade_representative_phone_number: :phone_number,
-        trade_representative_email: :email_address,
-        trade_representative_is_displayed_on_app_store: :is_displayed_on_app_store
+      trade_representative_trade_name: :trade_name,
+      trade_representative_first_name: :first_name,
+      trade_representative_last_name: :last_name,
+      trade_representative_address_line_1: :address_line1,
+      trade_representative_address_line_2: :address_line2,
+      trade_representative_address_line_3: :address_line3,
+      trade_representative_city_name: :city_name,
+      trade_representative_state: :state,
+      trade_representative_country: :country,
+      trade_representative_postal_code: :postal_code,
+      trade_representative_phone_number: :phone_number,
+      trade_representative_email: :email_address,
+      trade_representative_is_displayed_on_app_store: :is_displayed_on_app_store
     }
 
     # Review information values
@@ -46,18 +58,29 @@ module Deliver
     }
 
     # Localized app details values, that are editable in live state
-    LOCALISED_LIVE_VALUES = [:description, :release_notes, :support_url, :marketing_url, :promotional_text, :privacy_url]
+    LOCALISED_LIVE_VALUES = %i[
+      description
+      release_notes
+      support_url
+      marketing_url
+      promotional_text
+      privacy_url
+    ]
 
     # Non localized app details values, that are editable in live state
-    NON_LOCALISED_LIVE_VALUES = [:copyright]
+    NON_LOCALISED_LIVE_VALUES = %i[copyright]
 
     # Directory name it contains trade representative contact information
-    TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR = "trade_representative_contact_information"
+    TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR =
+      'trade_representative_contact_information'
 
     # Directory name it contains review information
-    REVIEW_INFORMATION_DIR = "review_information"
+    REVIEW_INFORMATION_DIR = 'review_information'
 
-    ALL_META_SUB_DIRS = [TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR, REVIEW_INFORMATION_DIR]
+    ALL_META_SUB_DIRS = [
+      TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR,
+      REVIEW_INFORMATION_DIR
+    ]
 
     # rubocop:disable Metrics/PerceivedComplexity
 
@@ -81,7 +104,9 @@ module Deliver
         non_localised_options = NON_LOCALISED_LIVE_VALUES
 
         if v.nil?
-          UI.message("Couldn't find live version, editing the current version on App Store Connect instead")
+          UI.message(
+            "Couldn't find live version, editing the current version on App Store Connect instead"
+          )
           v = app.edit_version(platform: options[:platform])
           # we don't want to update the localised_options and non_localised_options
           # as we also check for `options[:edit_live]` at other areas in the code
@@ -91,7 +116,8 @@ module Deliver
       else
         v = app.edit_version(platform: options[:platform])
         localised_options = (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES)
-        non_localised_options = (NON_LOCALISED_VERSION_VALUES + NON_LOCALISED_APP_VALUES)
+        non_localised_options =
+          (NON_LOCALISED_VERSION_VALUES + NON_LOCALISED_APP_VALUES)
       end
 
       individual = options[:individual_metadata_items] || []
@@ -100,7 +126,9 @@ module Deliver
         next unless current
 
         unless current.kind_of?(Hash)
-          UI.error("Error with provided '#{key}'. Must be a hash, the key being the language.")
+          UI.error(
+            "Error with provided '#{key}'. Must be a hash, the key being the language."
+          )
           next
         end
 
@@ -110,8 +138,12 @@ module Deliver
           if individual.include?(key.to_s)
             upload_individual_item(app, v, language, key, strip_value)
           else
-            v.send(key)[language] = strip_value if LOCALISED_VERSION_VALUES.include?(key)
-            details.send(key)[language] = strip_value if LOCALISED_APP_VALUES.include?(key)
+            if LOCALISED_VERSION_VALUES.include?(key)
+              v.send(key)[language] = strip_value
+            end
+            if LOCALISED_APP_VALUES.include?(key)
+              details.send(key)[language] = strip_value
+            end
           end
         end
       end
@@ -120,30 +152,39 @@ module Deliver
         current = options[key].to_s.strip
         next unless current.to_s.length > 0
         v.send("#{key}=", current) if NON_LOCALISED_VERSION_VALUES.include?(key)
-        details.send("#{key}=", current) if NON_LOCALISED_APP_VALUES.include?(key)
+        if NON_LOCALISED_APP_VALUES.include?(key)
+          details.send("#{key}=", current)
+        end
       end
 
       v.release_on_approval = options[:automatic_release]
-      v.auto_release_date = options[:auto_release_date] unless options[:auto_release_date].nil?
-      v.toggle_phased_release(enabled: !!options[:phased_release]) unless options[:phased_release].nil?
+      unless options[:auto_release_date].nil?
+        v.auto_release_date = options[:auto_release_date]
+      end
+      unless options[:phased_release].nil?
+        v.toggle_phased_release(enabled: !!options[:phased_release])
+      end
 
       set_trade_representative_contact_information(v, options)
       set_review_information(v, options)
       set_app_rating(v, options)
       v.ratings_reset = options[:reset_ratings]
 
-      Helper.show_loading_indicator("Uploading metadata to App Store Connect")
+      Helper.show_loading_indicator('Uploading metadata to App Store Connect')
       v.save!
       Helper.hide_loading_indicator
       begin
         details.save!
-        UI.success("Successfully uploaded set of metadata to App Store Connect")
+        UI.success('Successfully uploaded set of metadata to App Store Connect')
       rescue Spaceship::TunesClient::ITunesConnectError => e
         # This makes sure that we log invalid app names as user errors
         # If another string needs to be checked here we should
         # figure out a more generic way to handle these cases.
-        if e.message.include?('App Name cannot be longer than 50 characters') || e.message.include?('The app name you entered is already being used')
-          UI.error("Error in app name.  Try using 'individual_metadata_items' to identify the problem language.")
+        if e.message.include?('App Name cannot be longer than 50 characters') ||
+           e.message.include?('The app name you entered is already being used')
+          UI.error(
+            "Error in app name.  Try using 'individual_metadata_items' to identify the problem language."
+          )
           UI.user_error!(e.message)
         else
           raise e
@@ -154,14 +195,20 @@ module Deliver
     # Uploads metadata individually by language to help identify exactly which items have issues
     def upload_individual_item(app, version, language, key, value)
       details = app.details
-      version.send(key)[language] = value if LOCALISED_VERSION_VALUES.include?(key)
+      if LOCALISED_VERSION_VALUES.include?(key)
+        version.send(key)[language] = value
+      end
       details.send(key)[language] = value if LOCALISED_APP_VALUES.include?(key)
-      Helper.show_loading_indicator("Uploading #{language} #{key} to App Store Connect")
+      Helper.show_loading_indicator(
+        "Uploading #{language} #{key} to App Store Connect"
+      )
       version.save!
       Helper.hide_loading_indicator
       begin
         details.save!
-        UI.success("Successfully uploaded #{language} #{key} to App Store Connect")
+        UI.success(
+          "Successfully uploaded #{language} #{key} to App Store Connect"
+        )
       rescue Spaceship::TunesClient::ITunesConnectError => e
         UI.error("Error in #{language} #{key}: \n#{value}")
         UI.error(e.message) # Don't use user_error to allow all values to get checked
@@ -183,26 +230,31 @@ module Deliver
         current = options[key]
         next unless current && current.kind_of?(Hash)
         current.each do |language, value|
-          enabled_languages << language unless enabled_languages.include?(language)
+          unless enabled_languages.include?(language)
+            enabled_languages << language
+          end
         end
       end
 
       # Check folder list (an empty folder signifies a language is required)
       ignore_validation = options[:ignore_language_directory_validation]
-      Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
+      Loader.language_folders(options[:metadata_path], ignore_validation)
+        .each do |lang_folder|
         next unless File.directory?(lang_folder) # We don't want to read txt as they are non localised
         language = File.basename(lang_folder)
-        enabled_languages << language unless enabled_languages.include?(language)
+        unless enabled_languages.include?(language)
+          enabled_languages << language
+        end
       end
 
-      return unless enabled_languages.include?("default")
-      UI.message("Detected languages: " + enabled_languages.to_s)
+      return unless enabled_languages.include?('default')
+      UI.message('Detected languages: ' + enabled_languages.to_s)
 
       (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
         current = options[key]
         next unless current && current.kind_of?(Hash)
 
-        default = current["default"]
+        default = current['default']
         next if default.nil?
 
         enabled_languages.each do |language|
@@ -211,7 +263,7 @@ module Deliver
 
           current[language] = default
         end
-        current.delete("default")
+        current.delete('default')
       end
     end
 
@@ -224,23 +276,26 @@ module Deliver
         current = options[key]
         next unless current && current.kind_of?(Hash)
         current.each do |language, value|
-          enabled_languages << language unless enabled_languages.include?(language)
+          unless enabled_languages.include?(language)
+            enabled_languages << language
+          end
         end
       end
 
       # Check folder list (an empty folder signifies a language is required)
       ignore_validation = options[:ignore_language_directory_validation]
-      Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
+      Loader.language_folders(options[:metadata_path], ignore_validation)
+        .each do |lang_folder|
         next unless File.directory?(lang_folder) # We don't want to read txt as they are non localised
 
         language = File.basename(lang_folder)
-        enabled_languages << language unless enabled_languages.include?(language)
+        unless enabled_languages.include?(language)
+          enabled_languages << language
+        end
       end
 
       # Mapping to strings because :default symbol can be passed in
-      enabled_languages
-        .map(&:to_s)
-        .uniq
+      enabled_languages.map(&:to_s).uniq
     end
 
     # Makes sure all languages we need are actually created
@@ -251,7 +306,12 @@ module Deliver
       # We only care about languages from user provided values
       # as the other languages are on iTC already anyway
       v = options[:app].edit_version(platform: options[:platform])
-      UI.user_error!("Could not find a version to edit for app '#{options[:app].name}', the app metadata is read-only currently") unless v
+      unless v
+        UI.user_error!(
+          "Could not find a version to edit for app '#{options[:app]
+            .name}', the app metadata is read-only currently"
+        )
+      end
 
       enabled_languages = options[:languages] || []
       LOCALISED_VERSION_VALUES.each do |key|
@@ -259,21 +319,24 @@ module Deliver
         next unless current && current.kind_of?(Hash)
         current.each do |language, value|
           language = language.to_s
-          enabled_languages << language unless enabled_languages.include?(language)
+          unless enabled_languages.include?(language)
+            enabled_languages << language
+          end
         end
       end
 
       # Reject "default" language from getting enabled
       # because "default" is not an iTC language
-      enabled_languages = enabled_languages.reject do |lang|
-        lang == "default"
-      end.uniq
+      enabled_languages =
+        enabled_languages.reject { |lang| lang == 'default' }.uniq
 
       if enabled_languages.count > 0
         v.create_languages(enabled_languages)
-        lng_text = "language"
-        lng_text += "s" if enabled_languages.count != 1
-        Helper.show_loading_indicator("Activating #{lng_text} #{enabled_languages.join(', ')}...")
+        lng_text = 'language'
+        lng_text += 's' if enabled_languages.count != 1
+        Helper.show_loading_indicator(
+          "Activating #{lng_text} #{enabled_languages.join(', ')}..."
+        )
         v.save!
         Helper.hide_loading_indicator
       end
@@ -286,7 +349,8 @@ module Deliver
 
       # Load localised data
       ignore_validation = options[:ignore_language_directory_validation]
-      Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
+      Loader.language_folders(options[:metadata_path], ignore_validation)
+        .each do |lang_folder|
         language = File.basename(lang_folder)
         (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
           path = File.join(lang_folder, "#{key}.txt")
@@ -309,19 +373,35 @@ module Deliver
 
       # Load trade representative contact information
       options[:trade_representative_contact_information] ||= {}
-      TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.values.each do |option_name|
-        path = File.join(options[:metadata_path], TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR, "#{option_name}.txt")
+      TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.values
+        .each do |option_name|
+        path =
+          File.join(
+            options[:metadata_path],
+            TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR,
+            "#{option_name}.txt"
+          )
         next unless File.exist?(path)
-        next if options[:trade_representative_contact_information][option_name].to_s.length > 0
+        if options[:trade_representative_contact_information][option_name].to_s
+           .length >
+           0
+          next
+        end
 
         UI.message("Loading '#{path}'...")
-        options[:trade_representative_contact_information][option_name] ||= File.read(path)
+        options[:trade_representative_contact_information][option_name] ||=
+          File.read(path)
       end
 
       # Load review information
       options[:app_review_information] ||= {}
       REVIEW_INFORMATION_VALUES.values.each do |option_name|
-        path = File.join(options[:metadata_path], REVIEW_INFORMATION_DIR, "#{option_name}.txt")
+        path =
+          File.join(
+            options[:metadata_path],
+            REVIEW_INFORMATION_DIR,
+            "#{option_name}.txt"
+          )
         next unless File.exist?(path)
         next if options[:app_review_information][option_name].to_s.length > 0
 
@@ -349,9 +429,15 @@ module Deliver
     def set_trade_representative_contact_information(v, options)
       return unless options[:trade_representative_contact_information]
       info = options[:trade_representative_contact_information]
-      UI.user_error!("`trade_representative_contact_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
+      unless info.kind_of?(Hash)
+        UI.user_error!(
+          '`trade_representative_contact_information` must be a hash',
+          show_github_issues: true
+        )
+      end
 
-      TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.each do |key, option_name|
+      TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES
+        .each do |key, option_name|
         v.send("#{key}=", info[option_name].to_s.chomp) if info[option_name]
       end
     end
@@ -359,12 +445,20 @@ module Deliver
     def set_review_information(v, options)
       return unless options[:app_review_information]
       info = options[:app_review_information]
-      UI.user_error!("`app_review_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
+      unless info.kind_of?(Hash)
+        UI.user_error!(
+          '`app_review_information` must be a hash',
+          show_github_issues: true
+        )
+      end
 
       REVIEW_INFORMATION_VALUES.each do |key, option_name|
         v.send("#{key}=", info[option_name].to_s.chomp) if info[option_name]
       end
-      v.review_user_needed = (v.review_demo_user.to_s.chomp + v.review_demo_password.to_s.chomp).length > 0
+      v.review_user_needed =
+        (v.review_demo_user.to_s.chomp + v.review_demo_password.to_s.chomp)
+          .length >
+          0
     end
 
     def set_app_rating(v, options)
@@ -375,7 +469,11 @@ module Deliver
         json = JSON.parse(File.read(options[:app_rating_config_path]))
       rescue => ex
         UI.error(ex.to_s)
-        UI.user_error!("Error parsing JSON file at path '#{options[:app_rating_config_path]}'")
+        UI.user_error!(
+          "Error parsing JSON file at path '#{options[
+            :app_rating_config_path
+          ]}'"
+        )
       end
       UI.message("Setting the app's age rating...")
       v.update_rating(json)

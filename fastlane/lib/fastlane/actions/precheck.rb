@@ -7,7 +7,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Alias for the `check_app_store_metadata` action"
+        'Alias for the `check_app_store_metadata` action'
       end
     end
   end

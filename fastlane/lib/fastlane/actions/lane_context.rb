@@ -10,13 +10,13 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Access lane context values"
+        'Access lane context values'
       end
 
       def self.details
         [
-          "Access the fastlane lane context values.",
-          "More information about how the lane context works: [https://docs.fastlane.tools/advanced/#lane-context](https://docs.fastlane.tools/advanced/#lane-context)."
+          'Access the fastlane lane context values.',
+          'More information about how the lane context works: [https://docs.fastlane.tools/advanced/#lane-context](https://docs.fastlane.tools/advanced/#lane-context).'
         ].join("\n")
       end
 
@@ -33,7 +33,7 @@ module Fastlane
       end
 
       def self.authors
-        ["KrauseFx"]
+        %w[KrauseFx]
       end
 
       def self.is_supported?(platform)
@@ -46,9 +46,9 @@ module Fastlane
       end
 
       def self.example_code
-        [
-          'lane_context[SharedValues::BUILD_NUMBER]',
-          'lane_context[SharedValues::IPA_OUTPUT_PATH]'
+        %w[
+          lane_context[SharedValues::BUILD_NUMBER]
+          lane_context[SharedValues::IPA_OUTPUT_PATH]
         ]
       end
 

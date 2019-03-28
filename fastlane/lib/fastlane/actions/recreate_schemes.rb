@@ -11,31 +11,29 @@ module Fastlane
       end
 
       def self.description
-        "Recreate not shared Xcode project schemes"
+        'Recreate not shared Xcode project schemes'
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(
             key: :project,
-            env_name: "XCODE_PROJECT",
-            description: "The Xcode project"
+            env_name: 'XCODE_PROJECT',
+            description: 'The Xcode project'
           )
         ]
       end
 
       def self.authors
-        "jerolimov"
+        'jerolimov'
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       def self.example_code
-        [
-          'recreate_schemes(project: "./path/to/MyApp.xcodeproj")'
-        ]
+        ['recreate_schemes(project: "./path/to/MyApp.xcodeproj")']
       end
 
       def self.category

@@ -13,7 +13,8 @@ module Fastlane
         name = params[:name]
         udid = params[:udid]
 
-        credentials = CredentialsManager::AccountManager.new(user: params[:username])
+        credentials =
+          CredentialsManager::AccountManager.new(user: params[:username])
         Spaceship.login(credentials.user, credentials.password)
         Spaceship.select_team
 
@@ -21,66 +22,82 @@ module Fastlane
           Spaceship::Device.create!(name: name, udid: udid)
         rescue => ex
           UI.error(ex.to_s)
-          UI.crash!("Failed to register new device (name: #{name}, UDID: #{udid})")
+          UI.crash!(
+            "Failed to register new device (name: #{name}, UDID: #{udid})"
+          )
         end
 
-        UI.success("Successfully registered new device")
+        UI.success('Successfully registered new device')
         return udid
       end
 
       def self.description
-        "Registers a new device to the Apple Dev Portal"
+        'Registers a new device to the Apple Dev Portal'
       end
 
       def self.available_options
-        user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
+        user =
+          CredentialsManager::AppfileConfig.try_fetch_value(
+            :apple_dev_portal_id
+          )
         user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
         [
-          FastlaneCore::ConfigItem.new(key: :name,
-                                       env_name: "FL_REGISTER_DEVICE_NAME",
-                                       description: "Provide the name of the device to register as"),
-          FastlaneCore::ConfigItem.new(key: :udid,
-                                       env_name: "FL_REGISTER_DEVICE_UDID",
-                                       description: "Provide the UDID of the device to register as"),
-          FastlaneCore::ConfigItem.new(key: :team_id,
-                                     env_name: "REGISTER_DEVICE_TEAM_ID",
-                                     code_gen_sensitive: true,
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
-                                       default_value_dynamic: true,
-                                     description: "The ID of your Developer Portal team if you're in multiple teams",
-                                     optional: true,
-                                     verify_block: proc do |value|
-                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
-                                     end),
-          FastlaneCore::ConfigItem.new(key: :team_name,
-                                       env_name: "REGISTER_DEVICE_TEAM_NAME",
-                                       description: "The name of your Developer Portal team if you're in multiple teams",
-                                       optional: true,
-                                       code_gen_sensitive: true,
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
-                                       default_value_dynamic: true,
-                                       verify_block: proc do |value|
-                                         ENV["FASTLANE_TEAM_NAME"] = value.to_s
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :username,
-                                       env_name: "DELIVER_USER",
-                                       description: "Optional: Your Apple ID",
-                                       default_value: user,
-                                       default_value_dynamic: true)
+          FastlaneCore::ConfigItem.new(
+            key: :name,
+            env_name: 'FL_REGISTER_DEVICE_NAME',
+            description: 'Provide the name of the device to register as'
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :udid,
+            env_name: 'FL_REGISTER_DEVICE_UDID',
+            description: 'Provide the UDID of the device to register as'
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :team_id,
+            env_name: 'REGISTER_DEVICE_TEAM_ID',
+            code_gen_sensitive: true,
+            default_value:
+              CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+            default_value_dynamic: true,
+            description:
+              "The ID of your Developer Portal team if you're in multiple teams",
+            optional: true,
+            verify_block: proc { |value| ENV['FASTLANE_TEAM_ID'] = value.to_s }
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :team_name,
+            env_name: 'REGISTER_DEVICE_TEAM_NAME',
+            description:
+              "The name of your Developer Portal team if you're in multiple teams",
+            optional: true,
+            code_gen_sensitive: true,
+            default_value:
+              CredentialsManager::AppfileConfig.try_fetch_value(:team_name),
+            default_value_dynamic: true,
+            verify_block:
+              proc { |value| ENV['FASTLANE_TEAM_NAME'] = value.to_s }
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :username,
+            env_name: 'DELIVER_USER',
+            description: 'Optional: Your Apple ID',
+            default_value: user,
+            default_value_dynamic: true
+          )
         ]
       end
 
       def self.details
         [
-          "This will register an iOS device with the Developer Portal so that you can include it in your provisioning profiles.",
-          "This is an optimistic action, in that it will only ever add a device to the member center. If the device has already been registered within the member center, it will be left alone in the member center.",
-          "The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `:username` option."
+          'This will register an iOS device with the Developer Portal so that you can include it in your provisioning profiles.',
+          'This is an optimistic action, in that it will only ever add a device to the member center. If the device has already been registered within the member center, it will be left alone in the member center.',
+          'The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `:username` option.'
         ].join("\n")
       end
 
       def self.author
-        "pvinis"
+        'pvinis'
       end
 
       def self.example_code

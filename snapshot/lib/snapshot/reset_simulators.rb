@@ -8,15 +8,24 @@ module Snapshot
       # !! Warning: This script will remove all your existing simulators !!
       # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      sure = true if FastlaneCore::Env.truthy?("SNAPSHOT_FORCE_DELETE") || force
+      sure = true if FastlaneCore::Env.truthy?('SNAPSHOT_FORCE_DELETE') || force
       begin
-        sure = UI.confirm("Are you sure? All your simulators will be DELETED and new ones will be created! (You can use `SNAPSHOT_FORCE_DELETE` to skip this confirmation)") unless sure
+        unless sure
+          sure =
+            UI.confirm(
+              'Are you sure? All your simulators will be DELETED and new ones will be created! (You can use `SNAPSHOT_FORCE_DELETE` to skip this confirmation)'
+            )
+        end
       rescue => e
-        UI.user_error!("Please make sure to pass the `--force` option to reset simulators when running in non-interactive mode") unless UI.interactive?
+        unless UI.interactive?
+          UI.user_error!(
+            'Please make sure to pass the `--force` option to reset simulators when running in non-interactive mode'
+          )
+        end
         raise e
       end
 
-      UI.abort_with_message!("User cancelled action") unless sure
+      UI.abort_with_message!('User cancelled action') unless sure
 
       if ios_versions
         ios_versions.each do |version|
@@ -54,9 +63,9 @@ module Snapshot
       # iPhone 5s (com.apple.CoreSimulator.SimDeviceType.iPhone-5s)
       # iPhone 6 (com.apple.CoreSimulator.SimDeviceType.iPhone-6)
       all_device_types.each do |device_type|
-        if device_type.join(' ').include?("Watch")
+        if device_type.join(' ').include?('Watch')
           create(device_type, watch_versions_ids, 'watchOS')
-        elsif device_type.join(' ').include?("TV")
+        elsif device_type.join(' ').include?('TV')
           create(device_type, tv_version_ids, 'tvOS')
         else
           create(device_type, ios_versions_ids)
@@ -68,19 +77,30 @@ module Snapshot
 
     def self.create(device_type, os_versions, os_name = 'iOS')
       os_versions.each do |os_version|
-        puts("Creating #{device_type[0]} for #{os_name} version #{os_version[0]}")
-        command = "xcrun simctl create '#{device_type[0]}' #{device_type[1]} #{os_version[1]}"
+        puts(
+          "Creating #{device_type[0]} for #{os_name} version #{os_version[0]}"
+        )
+        command =
+          "xcrun simctl create '#{device_type[0]}' #{device_type[
+            1
+          ]} #{os_version[1]}"
         UI.command(command) if FastlaneCore::Globals.verbose?
         `#{command}`
       end
     end
 
     def self.filter_runtimes(all_runtimes, os = 'iOS', versions = [])
-      all_runtimes.select { |v, id| v[/^#{os}/] }.select { |v, id| v[/#{versions.join("|")}$/] }.uniq
+      all_runtimes.select { |v, id| v[/^#{os}/] }.select do |v, id|
+        v[/#{versions.join('|')}$/]
+      end.uniq
     end
 
     def self.devices
-      all_devices = Helper.backticks('xcrun simctl list devices', print: FastlaneCore::Globals.verbose?)
+      all_devices =
+        Helper.backticks(
+          'xcrun simctl list devices',
+          print: FastlaneCore::Globals.verbose?
+        )
       # == Devices ==
       # -- iOS 9.0 --
       #   iPhone 4s (32246EBC-33B0-47F9-B7BB-5C23C550DF29) (Shutdown)
@@ -89,15 +109,20 @@ module Snapshot
       # -- Unavailable: com.apple.CoreSimulator.SimRuntime.iOS-8-4 --
       #   iPhone 4s (FE9D6F85-1C51-4FE6-8597-FCAB5286B869) (Shutdown) (unavailable, runtime profile not found)
 
-      result = all_devices.lines.map do |line|
-        (line.match(/\s+(.+?)\s\(([\w\-]+)\).*/) || []).to_a
-      end
+      result =
+        all_devices.lines.map do |line|
+          (line.match(/\s+(.+?)\s\(([\w\-]+)\).*/) || []).to_a
+        end
 
       result.select { |parsed| parsed.length == 3 } # we don't care about those headers
     end
 
     def self.runtimes
-      Helper.backticks('xcrun simctl list runtimes', print: FastlaneCore::Globals.verbose?).scan(/(.*)\s\(\d.*(com\.apple[^)\s]*)/)
+      Helper.backticks(
+        'xcrun simctl list runtimes',
+        print: FastlaneCore::Globals.verbose?
+      )
+        .scan(/(.*)\s\(\d.*(com\.apple[^)\s]*)/)
     end
 
     def self.make_phone_watch_pair
@@ -105,18 +130,23 @@ module Snapshot
       watches = []
       devices.each do |device|
         full_line, name, id = device
-        phones << id if name.start_with?('iPhone 6') && device_line_usable?(full_line)
+        if name.start_with?('iPhone 6') && device_line_usable?(full_line)
+          phones << id
+        end
         watches << id if name.end_with?('mm') && device_line_usable?(full_line)
       end
 
       if phones.any? && watches.any?
         puts("Creating device pair of #{phones.last} and #{watches.last}")
-        Helper.backticks("xcrun simctl pair #{watches.last} #{phones.last}", print: FastlaneCore::Globals.verbose?)
+        Helper.backticks(
+          "xcrun simctl pair #{watches.last} #{phones.last}",
+          print: FastlaneCore::Globals.verbose?
+        )
       end
     end
 
     def self.device_line_usable?(line)
-      !line.include?("unavailable")
+      !line.include?('unavailable')
     end
   end
 end

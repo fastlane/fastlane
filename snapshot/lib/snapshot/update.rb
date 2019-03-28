@@ -6,23 +6,35 @@ module Snapshot
   class Update
     # @return [Array] A list of helper files (usually just one)
     def self.find_helper
-      paths = Dir["./**/SnapshotHelper.swift"] + Dir["./**/SnapshotHelperXcode8.swift"]
+      paths =
+        Dir['./**/SnapshotHelper.swift'] +
+          Dir['./**/SnapshotHelperXcode8.swift']
       # exclude assets in gym
-      paths.reject { |p| p.include?("snapshot/lib/assets/") }
+      paths.reject { |p| p.include?('snapshot/lib/assets/') }
     end
 
     def update
       paths = self.class.find_helper
-      UI.user_error!("Couldn't find any SnapshotHelper files in current directory") if paths.count == 0
+      if paths.count == 0
+        UI.user_error!(
+          "Couldn't find any SnapshotHelper files in current directory"
+        )
+      end
 
-      UI.message("Found the following SnapshotHelper:")
+      UI.message('Found the following SnapshotHelper:')
       paths.each { |p| UI.message("\t#{p}") }
-      UI.important("Are you sure you want to automatically update the helpers listed above?")
-      UI.message("This will overwrite all its content with the latest code.")
-      UI.message("The underlying API will not change. You can always migrate manually by looking at")
-      UI.message("https://github.com/fastlane/fastlane/blob/master/snapshot/lib/assets/SnapshotHelper.swift")
+      UI.important(
+        'Are you sure you want to automatically update the helpers listed above?'
+      )
+      UI.message('This will overwrite all its content with the latest code.')
+      UI.message(
+        'The underlying API will not change. You can always migrate manually by looking at'
+      )
+      UI.message(
+        'https://github.com/fastlane/fastlane/blob/master/snapshot/lib/assets/SnapshotHelper.swift'
+      )
 
-      return 1 unless UI.confirm("Overwrite configuration files?")
+      return 1 unless UI.confirm('Overwrite configuration files?')
 
       paths.each do |path|
         UI.message("Updating '#{path}'...")
@@ -30,7 +42,7 @@ module Snapshot
         File.write(path, File.read(input_path))
       end
 
-      UI.success("Successfully updated helper files")
+      UI.success('Successfully updated helper files')
     end
   end
 end

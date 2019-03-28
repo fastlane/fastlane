@@ -7,16 +7,19 @@ module FastlaneCore
     class << self
       # Project discovery
       def detect_projects(config)
-        if config[:workspace].to_s.length > 0 && config[:project].to_s.length > 0
-          UI.user_error!("You can only pass either a workspace or a project path, not both")
+        if config[:workspace].to_s.length > 0 &&
+           config[:project].to_s.length > 0
+          UI.user_error!(
+            'You can only pass either a workspace or a project path, not both'
+          )
         end
 
         return if config[:project].to_s.length > 0
 
         if config[:workspace].to_s.length == 0
-          workspace = Dir["./*.xcworkspace"]
+          workspace = Dir['./*.xcworkspace']
           if workspace.count > 1
-            puts("Select Workspace: ")
+            puts('Select Workspace: ')
             config[:workspace] = choose(*workspace)
           elsif !workspace.first.nil?
             config[:workspace] = workspace.first
@@ -25,10 +28,11 @@ module FastlaneCore
 
         return if config[:workspace].to_s.length > 0
 
-        if config[:workspace].to_s.length == 0 && config[:project].to_s.length == 0
-          project = Dir["./*.xcodeproj"]
+        if config[:workspace].to_s.length == 0 &&
+           config[:project].to_s.length == 0
+          project = Dir['./*.xcodeproj']
           if project.count > 1
-            puts("Select Project: ")
+            puts('Select Project: ')
             config[:project] = choose(*project)
           elsif !project.first.nil?
             config[:project] = project.first
@@ -42,19 +46,24 @@ module FastlaneCore
 
       def select_project(config)
         loop do
-          path = UI.input("Couldn't automatically detect the project file, please provide a path: ")
+          path =
+            UI.input(
+              "Couldn't automatically detect the project file, please provide a path: "
+            )
           if File.directory?(path)
-            if path.end_with?(".xcworkspace")
+            if path.end_with?('.xcworkspace')
               config[:workspace] = path
               break
-            elsif path.end_with?(".xcodeproj")
+            elsif path.end_with?('.xcodeproj')
               config[:project] = path
               break
             else
-              UI.error("Path must end with either .xcworkspace or .xcodeproj")
+              UI.error('Path must end with either .xcworkspace or .xcodeproj')
             end
           else
-            UI.error("Couldn't find project at path '#{File.expand_path(path)}'")
+            UI.error(
+              "Couldn't find project at path '#{File.expand_path(path)}'"
+            )
           end
         end
       end
@@ -76,7 +85,9 @@ module FastlaneCore
     # Gets rid of annoying plugin info warnings.
     attr_accessor :xcodebuild_suppress_stderr
 
-    def initialize(options, xcodebuild_list_silent: false, xcodebuild_suppress_stderr: false)
+    def initialize(
+      options, xcodebuild_list_silent: false, xcodebuild_suppress_stderr: false
+    )
       self.options = options
       self.path = File.expand_path(options[:workspace] || options[:project])
       self.is_workspace = (options[:workspace].to_s.length > 0)
@@ -94,9 +105,9 @@ module FastlaneCore
 
     def project_name
       if is_workspace
-        return File.basename(options[:workspace], ".xcworkspace")
+        return File.basename(options[:workspace], '.xcworkspace')
       else
-        return File.basename(options[:project], ".xcodeproj")
+        return File.basename(options[:project], '.xcodeproj')
       end
     end
 
@@ -116,13 +127,14 @@ module FastlaneCore
 
     # Get all available schemes in an array
     def schemes
-      @schemes ||= if workspace?
-                     workspace.schemes.reject do |k, v|
-                       v.include?("Pods/Pods.xcodeproj")
-                     end.keys
-                   else
-                     Xcodeproj::Project.schemes(path)
-                   end
+      @schemes ||=
+        if workspace?
+          workspace.schemes.reject do |k, v|
+            v.include?('Pods/Pods.xcodeproj')
+          end.keys
+        else
+          Xcodeproj::Project.schemes(path)
+        end
     end
 
     # Let the user select a scheme
@@ -131,7 +143,11 @@ module FastlaneCore
       if options[:scheme].to_s.length > 0
         # Verify the scheme is available
         unless schemes.include?(options[:scheme].to_s)
-          UI.error("Couldn't find specified scheme '#{options[:scheme]}'. Please make sure that the scheme is shared, see https://developer.apple.com/library/content/documentation/IDEs/Conceptual/xcode_guide-continuous_integration/ConfigureBots.html#//apple_ref/doc/uid/TP40013292-CH9-SW3")
+          UI.error(
+            "Couldn't find specified scheme '#{options[
+              :scheme
+            ]}'. Please make sure that the scheme is shared, see https://developer.apple.com/library/content/documentation/IDEs/Conceptual/xcode_guide-continuous_integration/ConfigureBots.html#//apple_ref/doc/uid/TP40013292-CH9-SW3"
+          )
           options[:scheme] = nil
         end
       end
@@ -143,7 +159,10 @@ module FastlaneCore
       elsif schemes.count > 1
         preferred = nil
         if preferred_to_include
-          preferred = schemes.find_all { |a| a.downcase.include?(preferred_to_include.downcase) }
+          preferred =
+            schemes.find_all do |a|
+              a.downcase.include?(preferred_to_include.downcase)
+            end
         end
 
         if preferred_to_include && preferred.count == 1
@@ -153,60 +172,68 @@ module FastlaneCore
           options[:scheme] = project_name
         elsif Helper.ci?
           UI.error("Multiple schemes found but you haven't specified one.")
-          UI.error("Since this is a CI, please pass one using the `scheme` option")
+          UI.error(
+            'Since this is a CI, please pass one using the `scheme` option'
+          )
           show_scheme_shared_information
-          UI.user_error!("Multiple schemes found")
+          UI.user_error!('Multiple schemes found')
         else
-          puts("Select Scheme: ")
+          puts('Select Scheme: ')
           options[:scheme] = choose(*schemes)
         end
       else
         show_scheme_shared_information
 
-        UI.user_error!("No Schemes found")
+        UI.user_error!('No Schemes found')
       end
     end
 
     def show_scheme_shared_information
-      UI.error("Couldn't find any schemes in this project, make sure that the scheme is shared if you are using a workspace")
-      UI.error("Open Xcode, click on `Manage Schemes` and check the `Shared` box for the schemes you want to use")
-      UI.error("Afterwards make sure to commit the changes into version control")
+      UI.error(
+        "Couldn't find any schemes in this project, make sure that the scheme is shared if you are using a workspace"
+      )
+      UI.error(
+        'Open Xcode, click on `Manage Schemes` and check the `Shared` box for the schemes you want to use'
+      )
+      UI.error(
+        'Afterwards make sure to commit the changes into version control'
+      )
     end
 
     # Get all available configurations in an array
     def configurations
-      @configurations ||= if workspace?
-                            workspace
-                              .file_references
-                              .map(&:path)
-                              .reject { |p| p.include?("Pods/Pods.xcodeproj") }
-                              .map do |p|
-                                # To maintain backwards compatibility, we
-                                # silently ignore non-existent projects from
-                                # workspaces.
-                                begin
-                                  Xcodeproj::Project.open(p).build_configurations
-                                rescue
-                                  []
-                                end
-                              end
-                              .flatten
-                              .compact
-                              .map(&:name)
-                          else
-                            project.build_configurations.map(&:name)
-                          end
+      @configurations ||=
+        if workspace?
+          workspace.file_references.map(&:path).reject do |p|
+            p.include?('Pods/Pods.xcodeproj')
+          end.map do |p|
+            begin
+              # To maintain backwards compatibility, we
+              # silently ignore non-existent projects from
+              # workspaces.
+              Xcodeproj::Project
+                .open(p)
+                .build_configurations
+            rescue StandardError
+              []
+            end
+          end.flatten
+            .compact
+            .map(&:name)
+        else
+          project.build_configurations.map(&:name)
+        end
     end
 
     # Returns bundle_id and sets the scheme for xcrun
     def default_app_identifier
-      default_build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")
+      default_build_settings(key: 'PRODUCT_BUNDLE_IDENTIFIER')
     end
 
     # Returns app name and sets the scheme for xcrun
     def default_app_name
       if is_workspace
-        return default_build_settings(key: "PRODUCT_NAME")
+        return default_build_settings(key: 'PRODUCT_NAME')
       else
         return app_name
       end
@@ -215,18 +242,24 @@ module FastlaneCore
     def app_name
       # WRAPPER_NAME: Example.app
       # WRAPPER_SUFFIX: .app
-      name = build_settings(key: "WRAPPER_NAME")
+      name = build_settings(key: 'WRAPPER_NAME')
 
-      return name.gsub(build_settings(key: "WRAPPER_SUFFIX"), "") if name
-      return "App" # default value
+      return name.gsub(build_settings(key: 'WRAPPER_SUFFIX'), '') if name
+      return
     end
 
     def dynamic_library?
-      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.library.dynamic")
+      (
+        build_settings(key: 'PRODUCT_TYPE') ==
+          'com.apple.product-type.library.dynamic'
+      )
     end
 
     def static_library?
-      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.library.static")
+      (
+        build_settings(key: 'PRODUCT_TYPE') ==
+          'com.apple.product-type.library.static'
+      )
     end
 
     def library?
@@ -234,15 +267,24 @@ module FastlaneCore
     end
 
     def framework?
-      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.framework")
+      (
+        build_settings(key: 'PRODUCT_TYPE') ==
+          'com.apple.product-type.framework'
+      )
     end
 
     def application?
-      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.application")
+      (
+        build_settings(key: 'PRODUCT_TYPE') ==
+          'com.apple.product-type.application'
+      )
     end
 
     def ios_library?
-      ((static_library? or dynamic_library?) && build_settings(key: "PLATFORM_NAME") == "iphoneos")
+      (
+        (static_library? or dynamic_library?) &&
+          build_settings(key: 'PLATFORM_NAME') == 'iphoneos'
+      )
     end
 
     def ios_tvos_app?
@@ -250,11 +292,11 @@ module FastlaneCore
     end
 
     def ios_framework?
-      (framework? && build_settings(key: "PLATFORM_NAME") == "iphoneos")
+      (framework? && build_settings(key: 'PLATFORM_NAME') == 'iphoneos')
     end
 
     def ios_app?
-      (application? && build_settings(key: "PLATFORM_NAME") == "iphoneos")
+      (application? && build_settings(key: 'PLATFORM_NAME') == 'iphoneos')
     end
 
     def produces_archive?
@@ -262,19 +304,22 @@ module FastlaneCore
     end
 
     def mac_app?
-      (application? && build_settings(key: "PLATFORM_NAME") == "macosx")
+      (application? && build_settings(key: 'PLATFORM_NAME') == 'macosx')
     end
 
     def mac_library?
-      ((dynamic_library? or static_library?) && build_settings(key: "PLATFORM_NAME") == "macosx")
+      (
+        (dynamic_library? or static_library?) &&
+          build_settings(key: 'PLATFORM_NAME') == 'macosx'
+      )
     end
 
     def mac_framework?
-      (framework? && build_settings(key: "PLATFORM_NAME") == "macosx")
+      (framework? && build_settings(key: 'PLATFORM_NAME') == 'macosx')
     end
 
     def command_line_tool?
-      (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.tool")
+      (build_settings(key: 'PRODUCT_TYPE') == 'com.apple.product-type.tool')
     end
 
     def mac?
@@ -290,28 +335,41 @@ module FastlaneCore
     end
 
     def supported_platforms
-      supported_platforms = build_settings(key: "SUPPORTED_PLATFORMS")
+      supported_platforms = build_settings(key: 'SUPPORTED_PLATFORMS')
       if supported_platforms.nil?
-        UI.important("Could not read the \"SUPPORTED_PLATFORMS\" build setting, assuming that the project supports iOS only.")
-        return [:iOS]
+        UI.important(
+          'Could not read the \"SUPPORTED_PLATFORMS\" build setting, assuming that the project supports iOS only.'
+        )
+        return %i[iOS]
       end
       supported_platforms.split.map do |platform|
         case platform
-        when "macosx" then :macOS
-        when "iphonesimulator", "iphoneos" then :iOS
-        when "watchsimulator", "watchos" then :watchOS
-        when "appletvsimulator", "appletvos" then :tvOS
+        when 'macosx'
+          :macOS
+        when 'iphonesimulator', 'iphoneos'
+          :iOS
+        when 'watchsimulator', 'watchos'
+          :watchOS
+        when 'appletvsimulator', 'appletvos'
+          :tvOS
         end
-      end.uniq.compact
+      end.uniq
+        .compact
     end
 
     def xcodebuild_parameters
       proj = []
-      proj << "-workspace #{options[:workspace].shellescape}" if options[:workspace]
+      if options[:workspace]
+        proj << "-workspace #{options[:workspace].shellescape}"
+      end
       proj << "-scheme #{options[:scheme].shellescape}" if options[:scheme]
       proj << "-project #{options[:project].shellescape}" if options[:project]
-      proj << "-configuration #{options[:configuration].shellescape}" if options[:configuration]
-      proj << "-xcconfig #{options[:xcconfig].shellescape}" if options[:xcconfig]
+      if options[:configuration]
+        proj << "-configuration #{options[:configuration].shellescape}"
+      end
+      if options[:xcconfig]
+        proj << "-xcconfig #{options[:xcconfig].shellescape}"
+      end
 
       return proj
     end
@@ -327,11 +385,15 @@ module FastlaneCore
       # This xcodebuild bug is fixed in Xcode 8.3 so 'clean' it's not necessary anymore
       # See: https://github.com/fastlane/fastlane/pull/5626
       if FastlaneCore::Helper.xcode_at_least?('8.3')
-        command = "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}"
+        command =
+          "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}"
       else
-        command = "xcodebuild clean -showBuildSettings #{xcodebuild_parameters.join(' ')}"
+        command =
+          "xcodebuild clean -showBuildSettings #{xcodebuild_parameters.join(
+            ' '
+          )}"
       end
-      command += " 2> /dev/null" if xcodebuild_suppress_stderr
+      command += ' 2> /dev/null' if xcodebuild_suppress_stderr
       command
     end
 
@@ -342,7 +404,10 @@ module FastlaneCore
       unless @build_settings
         if is_workspace
           if schemes.count == 0
-            UI.user_error!("Could not find any schemes for Xcode workspace at path '#{self.path}'. Please make sure that the schemes you want to use are marked as `Shared` from Xcode.")
+            UI.user_error!(
+              "Could not find any schemes for Xcode workspace at path '#{self
+                .path}'. Please make sure that the schemes you want to use are marked as `Shared` from Xcode."
+            )
           end
           options[:scheme] ||= schemes.first
         end
@@ -353,24 +418,38 @@ module FastlaneCore
         begin
           timeout = FastlaneCore::Project.xcode_build_settings_timeout
           retries = FastlaneCore::Project.xcode_build_settings_retries
-          @build_settings = FastlaneCore::Project.run_command(command, timeout: timeout, retries: retries, print: !self.xcodebuild_list_silent)
+          @build_settings =
+            FastlaneCore::Project.run_command(
+              command,
+              timeout: timeout,
+              retries: retries,
+              print: !self.xcodebuild_list_silent
+            )
           if @build_settings.empty?
-            UI.error("Could not read build settings. Make sure that the scheme \"#{options[:scheme]}\" is configured for running by going to Product → Scheme → Edit Scheme…, selecting the \"Build\" section, checking the \"Run\" checkbox and closing the scheme window.")
+            UI.error(
+              "Could not read build settings. Make sure that the scheme \"#{options[
+                :scheme
+              ]}\" is configured for running by going to Product → Scheme → Edit Scheme…, selecting the \"Build\" section, checking the \"Run\" checkbox and closing the scheme window."
+            )
           end
         rescue Timeout::Error
-          raise FastlaneCore::Interface::FastlaneDependencyCausedException.new, "xcodebuild -showBuildSettings timed out after #{retries + 1} retries with a base timeout of #{timeout}." \
-            " You can override the base timeout value with the environment variable FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT," \
-            " and the number of retries with the environment variable FASTLANE_XCODEBUILD_SETTINGS_RETRIES ".red
+          raise FastlaneCore::Interface::FastlaneDependencyCausedException.new,
+                "xcodebuild -showBuildSettings timed out after #{retries +
+                  1} retries with a base timeout of #{timeout}." \
+                  ' You can override the base timeout value with the environment variable FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT,' \
+                  ' and the number of retries with the environment variable FASTLANE_XCODEBUILD_SETTINGS_RETRIES '
+                  .red
         end
       end
 
       begin
-        result = @build_settings.split("\n").find do |c|
-          sp = c.split(" = ")
-          next if sp.length == 0
-          sp.first.strip == key
-        end
-        return result.split(" = ").last
+        result =
+          @build_settings.split("\n").find do |c|
+            sp = c.split(' = ')
+            next if sp.length == 0
+            sp.first.strip == key
+          end
+        return result.split(' = ').last
       rescue => ex
         return nil if optional # an optional value, we really don't care if something goes wrong
 
@@ -426,8 +505,11 @@ module FastlaneCore
         # Try harder on each iteration
         next_timeout = try_timeout * 2
 
-        message = "Command timed out after #{try_timeout} seconds on try #{try} of #{total_tries}"
-        message += ", trying again with a #{next_timeout} second timeout..." unless try_limit_reached
+        message =
+          "Command timed out after #{try_timeout} seconds on try #{try} of #{total_tries}"
+        unless try_limit_reached
+          message += ", trying again with a #{next_timeout} second timeout..."
+        end
 
         UI.important(message)
 
@@ -453,15 +535,21 @@ module FastlaneCore
         # * handle different types (group:, container: etc.) of file references and their paths
         # for details see https://github.com/CocoaPods/Xcodeproj/blob/e0287156d426ba588c9234bb2a4c824149889860/lib/xcodeproj/workspace/file_reference.rb```
 
-        workspace_dir_path = File.expand_path("..", self.path)
-        file_references_paths = workspace.file_references.map { |fr| fr.absolute_path(workspace_dir_path) }
-        @_project_paths = file_references_paths.select do |current_match|
-          # Xcode workspaces can contain loose files now, so let's filter non-xcodeproj files.
-          current_match.end_with?(".xcodeproj")
-        end.reject do |current_match|
-          # We're not interested in a `Pods` project, as it doesn't contain any relevant information about code signing
-          current_match.end_with?("Pods/Pods.xcodeproj")
-        end
+        workspace_dir_path = File.expand_path('..', self.path)
+        file_references_paths =
+          workspace.file_references.map do |fr|
+            fr.absolute_path(workspace_dir_path)
+          end
+        @_project_paths =
+          file_references_paths.select do |current_match|
+            # Xcode workspaces can contain loose files now, so let's filter non-xcodeproj files.
+            current_match
+              .end_with?('.xcodeproj')
+          end.reject do |current_match|
+            # We're not interested in a `Pods` project, as it doesn't contain any relevant information about code signing
+            current_match
+              .end_with?('Pods/Pods.xcodeproj')
+          end
 
         return @_project_paths
       else
@@ -475,7 +563,7 @@ module FastlaneCore
     # If scheme not specified, do we want the scheme
     # matching project name?
     def automated_scheme_selection?
-      FastlaneCore::Env.truthy?("AUTOMATED_SCHEME_SELECTION")
+      FastlaneCore::Env.truthy?('AUTOMATED_SCHEME_SELECTION')
     end
   end
 end

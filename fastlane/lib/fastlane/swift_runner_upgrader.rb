@@ -23,23 +23,33 @@ module Fastlane
     attr_accessor :target_swift_code_file_folder_path # location in filesystem where all swift files should exist when we're done
     attr_accessor :source_swift_code_file_folder_path # source location of where we're copying file from during the upgrade process
 
-    RELATIVE_SOURCE_FILE_PATH = "../"
+    RELATIVE_SOURCE_FILE_PATH = '../'
 
     def initialize
-      @source_swift_code_file_folder_path = File.expand_path(File.join(Fastlane::ROOT, "/swift"))
-      @target_swift_code_file_folder_path = FastlaneCore::FastlaneFolder.swift_folder_path
+      @source_swift_code_file_folder_path =
+        File.expand_path(File.join(Fastlane::ROOT, '/swift'))
+      @target_swift_code_file_folder_path =
+        FastlaneCore::FastlaneFolder.swift_folder_path
 
-      manifest_file = File.join(@source_swift_code_file_folder_path, "/upgrade_manifest.json")
+      manifest_file =
+        File.join(@source_swift_code_file_folder_path, '/upgrade_manifest.json')
       UI.success("loading manifest: #{manifest_file}")
       @manifest_hash = JSON.parse(File.read(manifest_file))
       @manifest_groups = @manifest_hash.values.uniq
 
-      runner_project_path = FastlaneCore::FastlaneFolder.swift_runner_project_path
+      runner_project_path =
+        FastlaneCore::FastlaneFolder.swift_runner_project_path
       @target_project = Xcodeproj::Project.open(runner_project_path)
 
-      @root_group = @target_project.groups.select { |group| group.name == "Fastlane Runner" }.first
+      @root_group =
+        @target_project.groups.select do |group|
+          group.name == 'Fastlane Runner'
+        end.first
 
-      @fastlane_runner_target = @target_project.targets.select { |target| target.name == "FastlaneRunner" }.first
+      @fastlane_runner_target =
+        @target_project.targets.select do |target|
+          target.name == 'FastlaneRunner'
+        end.first
     end
 
     def upgrade_if_needed!(dry_run: false)
@@ -47,9 +57,15 @@ module Fastlane
       upgraded = upgrade_files!(dry_run: dry_run) || upgraded
       upgraded = add_new_files_to_groups! || upgraded
 
-      UI.verbose("FastlaneRunner project has been updated and can be written back to disk") if upgraded
+      if upgraded
+        UI.verbose(
+          'FastlaneRunner project has been updated and can be written back to disk'
+        )
+      end
       unless dry_run
-        UI.verbose("FastlaneRunner project changes have been stored") if upgraded
+        if upgraded
+          UI.verbose('FastlaneRunner project changes have been stored')
+        end
         target_project.save if upgraded
       end
 
@@ -59,7 +75,9 @@ module Fastlane
     def upgrade_files!(dry_run: false)
       upgraded_anything = false
       self.manifest_hash.each do |filename, group|
-        upgraded_anything = copy_file_if_needed!(filename: filename, dry_run: dry_run) || upgraded_anything
+        upgraded_anything =
+          copy_file_if_needed!(filename: filename, dry_run: dry_run) ||
+            upgraded_anything
       end
       return upgraded_anything
     end
@@ -67,7 +85,8 @@ module Fastlane
     def find_missing_groups
       missing_groups = []
 
-      existing_group_names_set = @root_group.groups.map { |group| group.name.downcase }.to_set
+      existing_group_names_set =
+        @root_group.groups.map { |group| group.name.downcase }.to_set
       self.manifest_groups.each do |group_name|
         unless existing_group_names_set.include?(group_name.downcase)
           missing_groups << group_name
@@ -81,8 +100,10 @@ module Fastlane
       # looking for something like: FastlaneRunnerAPIVersion [0.9.1]
       regex_to_use = API_VERSION_REGEX
 
-      source = File.join(self.source_swift_code_file_folder_path, "/#{filename}")
-      target = File.join(self.target_swift_code_file_folder_path, "/#{filename}")
+      source =
+        File.join(self.source_swift_code_file_folder_path, "/#{filename}")
+      target =
+        File.join(self.target_swift_code_file_folder_path, "/#{filename}")
 
       # target doesn't have the file yet, so ya, I'd say it needs to be updated
       return true unless File.exist?(target)
@@ -94,11 +115,15 @@ module Fastlane
       target_version = target_file_content.match(regex_to_use)[1]
       file_versions_are_different = bundled_version != target_version
 
-      UI.verbose("#{filename} FastlaneRunnerAPIVersion (bundled/target): #{bundled_version}/#{target_version}")
+      UI.verbose(
+        "#{filename} FastlaneRunnerAPIVersion (bundled/target): #{bundled_version}/#{target_version}"
+      )
       files_are_different = source_file_content != target_file_content
 
       if files_are_different && !file_versions_are_different
-        UI.verbose("File versions are the same, but the two files are not equal, so that's a problem, setting needs update to 'true'")
+        UI.verbose(
+          "File versions are the same, but the two files are not equal, so that's a problem, setting needs update to 'true'"
+        )
       end
 
       needs_update = file_versions_are_different || files_are_different
@@ -119,8 +144,10 @@ module Fastlane
         return false
       end
 
-      source = File.join(self.source_swift_code_file_folder_path, "/#{filename}")
-      target = File.join(self.target_swift_code_file_folder_path, "/#{filename}")
+      source =
+        File.join(self.source_swift_code_file_folder_path, "/#{filename}")
+      target =
+        File.join(self.target_swift_code_file_folder_path, "/#{filename}")
 
       FileUtils.cp(source, target)
       UI.verbose("Copied #{source} to #{target}")
@@ -147,24 +174,27 @@ module Fastlane
       # iterate through the groups and collect all the swift files in each
       @root_group.groups.each do |group|
         # current group's filenames
-        existing_group_files_set = group.files
-                                        .select { |file| !file.name.nil? && file.name.end_with?(".swift") }
-                                        .map(&:name)
-                                        .to_set
+        existing_group_files_set =
+          group.files.select do |file|
+            !file.name.nil? && file.name.end_with?('.swift')
+          end.map(&:name)
+            .to_set
 
         group_name = group.name.downcase
         manifest_group_filenames = inverted_hash[group_name]
 
         # compare the current group files to what the manifest says should minially be there
         manifest_group_filenames.each do |filename|
-          # current group is missing a file from the manifest, need to add it
           next if existing_group_files_set.include?(filename)
 
           UI.verbose("Adding new file #{filename} to group: `#{group.name}`")
-          new_file_reference = group.new_file("#{RELATIVE_SOURCE_FILE_PATH}#{filename}")
+          new_file_reference =
+            group.new_file("#{RELATIVE_SOURCE_FILE_PATH}#{filename}")
 
           # add references to the target, and make sure they are added to the build phase to
-          self.fastlane_runner_target.source_build_phase.add_file_reference(new_file_reference)
+          self.fastlane_runner_target.source_build_phase.add_file_reference(
+            new_file_reference
+          )
 
           updated_project = true
         end
@@ -178,7 +208,9 @@ module Fastlane
     def add_missing_groups_and_files!(dry_run: false)
       missing_groups = self.find_missing_groups.to_set
       unless missing_groups.length > 0
-        UI.verbose("No missing groups found, so we don't need to worry about adding new groups")
+        UI.verbose(
+          "No missing groups found, so we don't need to worry about adding new groups"
+        )
         return false
       end
 
@@ -193,10 +225,13 @@ module Fastlane
         self.manifest_hash.each do |filename, group|
           next unless group.casecmp(missing_group_name.downcase).zero?
           # assumes this is a new file, we don't handle moving files between groups
-          new_file_reference = new_group.new_file("#{RELATIVE_SOURCE_FILE_PATH}#{filename}")
+          new_file_reference =
+            new_group.new_file("#{RELATIVE_SOURCE_FILE_PATH}#{filename}")
 
           # add references to the target, and make sure they are added to the build phase to
-          self.fastlane_runner_target.source_build_phase.add_file_reference(new_file_reference)
+          self.fastlane_runner_target.source_build_phase.add_file_reference(
+            new_file_reference
+          )
         end
       end
 

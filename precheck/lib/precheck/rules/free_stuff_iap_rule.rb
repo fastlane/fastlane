@@ -7,25 +7,23 @@ module Precheck
     end
 
     def self.env_name
-      "RULE_FREE_STUFF_IN_IAP"
+      'RULE_FREE_STUFF_IN_IAP'
     end
 
     def self.friendly_name
-      "No words indicating your IAP is free"
+      'No words indicating your IAP is free'
     end
 
     def self.description
-      "using text indicating that your IAP is free"
+      'using text indicating that your IAP is free'
     end
 
     def supported_fields_symbol_set
-      [:in_app_purchase].to_set
+      %i[in_app_purchase].to_set
     end
 
     def lowercased_words_to_look_for
-      [
-        "free"
-      ].map(&:downcase)
+      %w[free].map(&:downcase)
     end
   end
 end

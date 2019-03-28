@@ -10,17 +10,19 @@ class B2bUserSpec
     let(:b2b_user) do
       Spaceship::Tunes::B2bUser.new(
         'value' => {
-            'dsUsername' => "b2b1@abc.com",
-            'delete' => false,
-            'add' => false,
-            'company' => 'b2b1'
+          'dsUsername' => 'b2b1@abc.com',
+          'delete' => false,
+          'add' => false,
+          'company' => 'b2b1'
         },
-        "isEditable" => true,
-        "isRequired" => false
+        'isEditable' => true,
+        'isRequired' => false
       )
     end
     before do
-      allow(Spaceship::Tunes::TunesBase).to receive(:client).and_return(mock_client)
+      allow(Spaceship::Tunes::TunesBase).to receive(:client).and_return(
+                 mock_client
+               )
       allow(mock_client).to receive(:team_id).and_return('')
     end
 
@@ -35,21 +37,30 @@ class B2bUserSpec
 
     describe 'from_username' do
       it 'creates correct object to add' do
-        b2b_user_created = Spaceship::Tunes::B2bUser.from_username("b2b2@def.com")
+        b2b_user_created =
+          Spaceship::Tunes::B2bUser.from_username('b2b2@def.com')
         expect(b2b_user_created.add).to eq(true)
         expect(b2b_user_created.delete).to eq(false)
         expect(b2b_user_created.ds_username).to eq('b2b2@def.com')
       end
 
       it 'creates correct object to add with explicit input' do
-        b2b_user_created = Spaceship::Tunes::B2bUser.from_username("b2b2@def.com", is_add_type: true)
+        b2b_user_created =
+          Spaceship::Tunes::B2bUser.from_username(
+            'b2b2@def.com',
+            is_add_type: true
+          )
         expect(b2b_user_created.add).to eq(true)
         expect(b2b_user_created.delete).to eq(false)
         expect(b2b_user_created.ds_username).to eq('b2b2@def.com')
       end
 
       it 'creates correct object to remove' do
-        b2b_user_created = Spaceship::Tunes::B2bUser.from_username("b2b2@def.com", is_add_type: false)
+        b2b_user_created =
+          Spaceship::Tunes::B2bUser.from_username(
+            'b2b2@def.com',
+            is_add_type: false
+          )
         expect(b2b_user_created.add).to eq(false)
         expect(b2b_user_created.delete).to eq(true)
         expect(b2b_user_created.ds_username).to eq('b2b2@def.com')

@@ -11,7 +11,7 @@ module Fastlane
       @table = []
       rows = @doc.split(/\r?\n/)
       rows.each do |row|
-        row_array = row.split("|")
+        row_array = row.split('|')
         row_array.each(&:strip!)
         @table.push(row_array)
       end
@@ -37,7 +37,7 @@ module Fastlane
     end
 
     def separator(length)
-      "".ljust(length, '-')
+      ''.ljust(length, '-')
     end
 
     def header_separator_row
@@ -49,11 +49,13 @@ module Fastlane
     end
 
     def to_md
-      output = ""
+      output = ''
       t = table.clone
       t.insert(1, header_separator_row) if @header
       t.each_with_index do |row, index|
-        row.map!.with_index { |cell_row, index_row| pad(cell_row, column_width(index_row)) }
+        row.map!.with_index do |cell_row, index_row|
+          pad(cell_row, column_width(index_row))
+        end
         output += "#{row.join(' | ').lstrip} |\n"
       end
       output

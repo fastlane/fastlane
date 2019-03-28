@@ -21,7 +21,7 @@ module Spaceship::TestFlight
     end
 
     def test_info=(value)
-      raw_data.set(['details'], value.raw_data)
+      raw_data.set(%w[details], value.raw_data)
     end
 
     def beta_review_info
@@ -29,7 +29,7 @@ module Spaceship::TestFlight
     end
 
     def beta_review_info=(value)
-      raw_data.set(['betaReviewInfo'], value.raw_data)
+      raw_data.set(%w[betaReviewInfo], value.raw_data)
     end
 
     # saves the changes to the App Test Info object to TestFlight

@@ -2,7 +2,7 @@ describe FastlaneCore do
   describe FastlaneCore::PkgFileAnalyser do
     let(:path) { File.expand_path("../fixtures/pkgs/#{pkg}.pkg", __FILE__) }
 
-    context "with a normal path" do
+    context 'with a normal path' do
       let(:pkg) { 'MacAppOnly' }
 
       describe '::fetch_app_identifier', requires_xar: true do
@@ -15,7 +15,7 @@ describe FastlaneCore do
       end
     end
 
-    context "with a path containing spaces" do
+    context 'with a path containing spaces' do
       let(:pkg) { 'Spaces in Path' }
 
       describe '::fetch_app_identifier', requires_xar: true do

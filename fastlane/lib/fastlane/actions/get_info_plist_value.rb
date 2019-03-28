@@ -6,7 +6,7 @@ module Fastlane
 
     class GetInfoPlistValueAction < Action
       def self.run(params)
-        require "plist"
+        require 'plist'
 
         begin
           path = File.expand_path(params[:path])
@@ -14,7 +14,10 @@ module Fastlane
           plist = File.open(path) { |f| Plist.parse_xml(f) }
 
           value = plist[params[:key]]
-          Actions.lane_context[SharedValues::GET_INFO_PLIST_VALUE_CUSTOM_VALUE] = value
+          Actions.lane_context[
+            SharedValues::GET_INFO_PLIST_VALUE_CUSTOM_VALUE
+          ] =
+            value
 
           return value
         rescue => ex
@@ -23,41 +26,51 @@ module Fastlane
       end
 
       def self.description
-        "Returns value from Info.plist of your project as native Ruby data structures"
+        'Returns value from Info.plist of your project as native Ruby data structures'
       end
 
       def self.details
-        "Get a value from a plist file, which can be used to fetch the app identifier and more information about your app"
+        'Get a value from a plist file, which can be used to fetch the app identifier and more information about your app'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :key,
-                                       env_name: "FL_GET_INFO_PLIST_PARAM_NAME",
-                                       description: "Name of parameter",
-                                       optional: false),
-          FastlaneCore::ConfigItem.new(key: :path,
-                                       env_name: "FL_GET_INFO_PLIST_PATH",
-                                       description: "Path to plist file you want to read",
-                                       optional: false,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Couldn't find plist file at path '#{value}'") unless File.exist?(value)
-                                       end)
+          FastlaneCore::ConfigItem.new(
+            key: :key,
+            env_name: 'FL_GET_INFO_PLIST_PARAM_NAME',
+            description: 'Name of parameter',
+            optional: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :path,
+            env_name: 'FL_GET_INFO_PLIST_PATH',
+            description: 'Path to plist file you want to read',
+            optional: false,
+            verify_block:
+              proc do |value|
+                unless File.exist?(value)
+                  UI.user_error!("Couldn't find plist file at path '#{value}'")
+                end
+              end
+          )
         ]
       end
 
       def self.output
         [
-          ['GET_INFO_PLIST_VALUE_CUSTOM_VALUE', 'The value of the last plist file that was parsed']
+          [
+            'GET_INFO_PLIST_VALUE_CUSTOM_VALUE',
+            'The value of the last plist file that was parsed'
+          ]
         ]
       end
 
       def self.authors
-        ["kohtenko"]
+        %w[kohtenko]
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       def self.example_code

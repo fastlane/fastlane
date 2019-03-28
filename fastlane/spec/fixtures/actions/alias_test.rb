@@ -6,11 +6,11 @@ module Fastlane
       end
 
       def self.alias_used(action_alias, params)
-        params[:example] = "modified"
+        params[:example] = 'modified'
       end
 
       def self.aliases
-        ["somealias"]
+        %w[somealias]
       end
 
       def self.is_supported?(platform)
@@ -19,18 +19,22 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :example,
-                                     short_option: "-e",
-                                     description: "Example Param",
-                                     optional: true,
-                                     default_value: "Test String",
-                                     is_string: true),
-          FastlaneCore::ConfigItem.new(key: :example_two,
-                                     short_option: "-t",
-                                     description: "Example Param",
-                                     optional: true,
-                                     default_value: "Test String",
-                                     is_string: true)
+          FastlaneCore::ConfigItem.new(
+            key: :example,
+            short_option: '-e',
+            description: 'Example Param',
+            optional: true,
+            default_value: 'Test String',
+            is_string: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :example_two,
+            short_option: '-t',
+            description: 'Example Param',
+            optional: true,
+            default_value: 'Test String',
+            is_string: true
+          )
         ]
       end
     end

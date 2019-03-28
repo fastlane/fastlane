@@ -16,17 +16,19 @@ module Fastlane
       attr_accessor :devices
 
       def initialize(adb_path: nil)
-        android_home = ENV['ANDROID_HOME'] || ENV['ANDROID_SDK_ROOT'] || ENV['ANDROID_SDK']
-        if (adb_path.nil? || adb_path == "adb") && android_home
-          adb_path = File.join(android_home, "platform-tools", "adb")
+        android_home =
+          ENV['ANDROID_HOME'] || ENV['ANDROID_SDK_ROOT'] || ENV['ANDROID_SDK']
+        if (adb_path.nil? || adb_path == 'adb') && android_home
+          adb_path = File.join(android_home, 'platform-tools', 'adb')
         end
         self.adb_path = adb_path
       end
 
       # Run a certain action
       def trigger(command: nil, serial: nil)
-        android_serial = serial != "" ? "ANDROID_SERIAL=#{serial}" : nil
-        command = [android_serial, adb_path.shellescape, command].join(" ").strip
+        android_serial = serial != '' ? "ANDROID_SERIAL=#{serial}" : nil
+        command =
+          [android_serial, adb_path.shellescape, command].join(' ').strip
         Action.sh(command)
       end
 
@@ -38,7 +40,7 @@ module Fastlane
       def load_all_devices
         self.devices = []
 
-        command = [adb_path.shellescape, "devices"].join(" ")
+        command = [adb_path.shellescape, 'devices'].join(' ')
         output = Actions.sh(command, log: false)
         output.split("\n").each do |line|
           if (result = line.match(/(.*)\tdevice$/))

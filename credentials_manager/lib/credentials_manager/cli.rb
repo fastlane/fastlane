@@ -26,7 +26,9 @@ module CredentialsManager
 
           add(username, password)
 
-          puts("Credential #{username}:#{'*' * password.length} added to keychain.")
+          puts(
+            "Credential #{username}:#{'*' * password.length} added to keychain."
+          )
         end
       end
 
@@ -51,17 +53,14 @@ module CredentialsManager
 
     # Add entry to Apple Keychain using AccountManager
     def add(username, password)
-      CredentialsManager::AccountManager.new(
-        user: username,
-        password: password
-      ).add_to_keychain
+      CredentialsManager::AccountManager.new(user: username, password: password)
+        .add_to_keychain
     end
 
     # Remove entry from Apple Keychain using AccountManager
     def remove(username)
-      CredentialsManager::AccountManager.new(
-        user: username
-      ).remove_from_keychain
+      CredentialsManager::AccountManager.new(user: username)
+        .remove_from_keychain
     end
   end
 end

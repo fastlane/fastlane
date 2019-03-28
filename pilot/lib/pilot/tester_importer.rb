@@ -5,7 +5,9 @@ require_relative 'tester_manager'
 module Pilot
   class TesterImporter < Manager
     def import_testers(options)
-      UI.user_error!("Import file path is required") unless options[:testers_file_path]
+      unless options[:testers_file_path]
+        UI.user_error!('Import file path is required')
+      end
 
       start(options)
 
@@ -17,7 +19,7 @@ module Pilot
 
       groups = options[:groups]
 
-      CSV.foreach(file, "r") do |row|
+      CSV.foreach(file, 'r') do |row|
         first_name, last_name, email, testing_groups = row
 
         unless email
@@ -25,7 +27,7 @@ module Pilot
           next
         end
 
-        unless email.index("@")
+        unless email.index('@')
           UI.error("No email found in row: #{row}")
           next
         end
@@ -35,9 +37,7 @@ module Pilot
         config[:last_name] = last_name
         config[:email] = email
         config[:groups] = groups
-        if testing_groups
-          config[:groups] = testing_groups.split(";")
-        end
+        config[:groups] = testing_groups.split(';') if testing_groups
 
         begin
           tester_manager.add_tester(config)
@@ -47,7 +47,9 @@ module Pilot
         end
       end
 
-      UI.success("Successfully imported #{imported_tester_count} testers from #{file}")
+      UI.success(
+        "Successfully imported #{imported_tester_count} testers from #{file}"
+      )
     end
   end
 end

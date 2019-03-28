@@ -2,14 +2,15 @@ module Fastlane
   module Actions
     class EnsureNoDebugCodeAction < Action
       def self.run(params)
-        command = "grep -RE '#{params[:text]}' '#{File.absolute_path(params[:path])}'"
+        command =
+          "grep -RE '#{params[:text]}' '#{File.absolute_path(params[:path])}'"
 
         extensions = []
         extensions << params[:extension] unless params[:extension].nil?
 
         if params[:extensions]
           params[:extensions].each do |extension|
-            extension.delete!('.') if extension.include?(".")
+            extension.delete!('.') if extension.include?('.')
             extensions << extension
           end
         end
@@ -38,12 +39,14 @@ module Fastlane
         #   ./Gemfile.lock:    my_word (0.10.1)
 
         found = []
-        results.split("\n").each do |current_raw|
-          found << current_raw.strip
-        end
+        results.split("\n").each { |current_raw| found << current_raw.strip }
 
-        UI.user_error!("Found debug code '#{params[:text]}': \n\n#{found.join("\n")}") if found.count > 0
-        UI.message("No debug code found in code base 🐛")
+        if found.count > 0
+          UI.user_error!(
+            "Found debug code '#{params[:text]}': \n\n#{found.join("\n")}"
+          )
+        end
+        UI.message('No debug code found in code base 🐛')
       end
 
       #####################################################
@@ -51,51 +54,69 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Ensures the given text is nowhere in the code base"
+        'Ensures the given text is nowhere in the code base'
       end
 
       def self.details
         [
           "You don't want any debug code to slip into production.",
-          "This can be used to check if there is any debug code still in your codebase or if you have things like `// TO DO` or similar."
+          'This can be used to check if there is any debug code still in your codebase or if you have things like `// TO DO` or similar.'
         ].join("\n")
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :text,
-                                       env_name: "FL_ENSURE_NO_DEBUG_CODE_TEXT",
-                                       description: "The text that must not be in the code base"),
-          FastlaneCore::ConfigItem.new(key: :path,
-                                       env_name: "FL_ENSURE_NO_DEBUG_CODE_PATH",
-                                       description: "The directory containing all the source files",
-                                       default_value: ".",
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Couldn't find the folder at '#{File.absolute_path(value)}'") unless File.directory?(value)
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :extension,
-                                       env_name: "FL_ENSURE_NO_DEBUG_CODE_EXTENSION",
-                                       description: "The extension that should be searched for",
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         value.delete!('.') if value.include?(".")
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :extensions,
-                                       env_name: "FL_ENSURE_NO_DEBUG_CODE_EXTENSIONS",
-                                       description: "An array of file extensions that should be searched for",
-                                       optional: true,
-                                       is_string: false),
-          FastlaneCore::ConfigItem.new(key: :exclude,
-                                       env_name: "FL_ENSURE_NO_DEBUG_CODE_EXCLUDE",
-                                       description: "Exclude a certain pattern from the search",
-                                       optional: true,
-                                       is_string: true),
-          FastlaneCore::ConfigItem.new(key: :exclude_dirs,
-                                       env_name: "FL_ENSURE_NO_DEBUG_CODE_EXCLUDE_DIRS",
-                                       description: "An array of dirs that should not be included in the search",
-                                       optional: true,
-                                       type: Array,
-                                       is_string: false)
+          FastlaneCore::ConfigItem.new(
+            key: :text,
+            env_name: 'FL_ENSURE_NO_DEBUG_CODE_TEXT',
+            description: 'The text that must not be in the code base'
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :path,
+            env_name: 'FL_ENSURE_NO_DEBUG_CODE_PATH',
+            description: 'The directory containing all the source files',
+            default_value: '.',
+            verify_block:
+              proc do |value|
+                unless File.directory?(value)
+                  UI.user_error!(
+                    "Couldn't find the folder at '#{File.absolute_path(value)}'"
+                  )
+                end
+              end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :extension,
+            env_name: 'FL_ENSURE_NO_DEBUG_CODE_EXTENSION',
+            description: 'The extension that should be searched for',
+            optional: true,
+            verify_block:
+              proc { |value| value.delete!('.') if value.include?('.') }
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :extensions,
+            env_name: 'FL_ENSURE_NO_DEBUG_CODE_EXTENSIONS',
+            description:
+              'An array of file extensions that should be searched for',
+            optional: true,
+            is_string: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :exclude,
+            env_name: 'FL_ENSURE_NO_DEBUG_CODE_EXCLUDE',
+            description: 'Exclude a certain pattern from the search',
+            optional: true,
+            is_string: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :exclude_dirs,
+            env_name: 'FL_ENSURE_NO_DEBUG_CODE_EXCLUDE_DIRS',
+            description:
+              'An array of dirs that should not be included in the search',
+            optional: true,
+            type: Array,
+            is_string: false
+          )
         ]
       end
 
@@ -104,7 +125,7 @@ module Fastlane
       end
 
       def self.authors
-        ["KrauseFx"]
+        %w[KrauseFx]
       end
 
       def self.example_code

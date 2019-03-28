@@ -43,22 +43,25 @@ module Spaceship
       #   'tvOS'   - Apple TV
       attr_accessor :device_type
 
-      attr_mapping({
-        'deviceId' => :id,
-        'name' => :name,
-        'deviceNumber' => :udid,
-        'devicePlatform' => :platform,
-        'status' => :status,
-        'deviceClass' => :device_type,
-        'model' => :model
-      })
+      attr_mapping(
+        {
+          'deviceId' => :id,
+          'name' => :name,
+          'deviceNumber' => :udid,
+          'devicePlatform' => :platform,
+          'status' => :status,
+          'deviceClass' => :device_type,
+          'model' => :model
+        }
+      )
 
       class << self
         # @param mac [Bool] Fetches Mac devices if true
         # @param include_disabled [Bool] Whether to include disable devices. false by default.
         # @return (Array) Returns all devices registered for this account
         def all(mac: false, include_disabled: false)
-          client.devices(mac: mac, include_disabled: include_disabled).map { |device| self.factory(device) }
+          client.devices(mac: mac, include_disabled: include_disabled)
+            .map { |device| self.factory(device) }
         end
 
         # @return (Array) Returns all Apple TVs registered for this account
@@ -78,7 +81,9 @@ module Spaceship
 
         # @return (Array) Returns all iPhones registered for this account
         def all_iphones
-          client.devices_by_class('iphone').map { |device| self.factory(device) }
+          client.devices_by_class('iphone').map do |device|
+            self.factory(device)
+          end
         end
 
         # @return (Array) Returns all iPods registered for this account
@@ -93,14 +98,14 @@ module Spaceship
 
         # @return (Array) Returns all devices that can be used for iOS profiles (all devices except TVs)
         def all_ios_profile_devices
-          all.reject { |device| device.device_type == "tvOS" }
+          all.reject { |device| device.device_type == 'tvOS' }
         end
 
         # @return (Array) Returns all devices matching the provided profile_type
         def all_for_profile_type(profile_type)
-          if profile_type.include?("tvOS")
+          if profile_type.include?('tvOS')
             Spaceship::Portal::Device.all_apple_tvs
-          elsif profile_type.include?("Mac")
+          elsif profile_type.include?('Mac')
             Spaceship::Portal::Device.all_macs
           else
             Spaceship::Portal::Device.all_ios_profile_devices
@@ -145,10 +150,13 @@ module Spaceship
         def create!(name: nil, udid: nil, mac: false)
           # Check whether the user has passed in a UDID and a name
           unless udid && name
-            raise "You cannot create a device without a device_id (UDID) and name"
+            raise 'You cannot create a device without a device_id (UDID) and name'
           end
 
-          raise "Device name must be 50 characters or less. \"#{name}\" has a #{name.length} character length." if name.length > 50
+          if name.length > 50
+            raise "Device name must be 50 characters or less. \"#{name}\" has a #{name
+                    .length} character length."
+          end
 
           # Find the device by UDID, raise an exception if it already exists
           existing = self.find_by_udid(udid, mac: mac)
@@ -163,17 +171,22 @@ module Spaceship
       end
 
       def enabled?
-        return self.status == "c"
+        return self.status == 'c'
       end
 
       def disabled?
-        return self.status == "r"
+        return self.status == 'r'
       end
 
       # Enable current device.
       def enable!
         unless enabled?
-          attr = client.enable_device!(self.id, self.udid, mac: self.platform == 'mac')
+          attr =
+            client.enable_device!(
+              self.id,
+              self.udid,
+              mac: self.platform == 'mac'
+            )
           initialize(attr)
         end
       end
@@ -181,9 +194,13 @@ module Spaceship
       # Disable current device. This will invalidate all provisioning profiles that use this device.
       def disable!
         if enabled?
-          client.disable_device!(self.id, self.udid, mac: self.platform == 'mac')
+          client.disable_device!(
+            self.id,
+            self.udid,
+            mac: self.platform == 'mac'
+          )
           # disable request doesn't return device json, so we assume that the new status is "r" if response succeeded
-          self.status = "r"
+          self.status = 'r'
         end
       end
     end

@@ -1,7 +1,7 @@
 describe Spaceship do
   before { Spaceship.login }
 
-  it "#select_team" do
+  it '#select_team' do
     expect(Spaceship.select_team).to eq('XXXXXXXXXX')
   end
 
@@ -9,23 +9,23 @@ describe Spaceship do
     expect(Spaceship.client).to be_instance_of(Spaceship::PortalClient)
   end
 
-  it "Device" do
+  it 'Device' do
     expect(Spaceship.device.all.count).to eq(4)
   end
 
-  it "Certificate" do
+  it 'Certificate' do
     expect(Spaceship.certificate.all.count).to eq(3)
   end
 
-  it "ProvisioningProfile" do
+  it 'ProvisioningProfile' do
     expect(Spaceship.provisioning_profile.all.count).to eq(7)
   end
 
-  it "App" do
+  it 'App' do
     expect(Spaceship.app.all.count).to eq(5)
   end
 
-  it "App Group" do
+  it 'App Group' do
     expect(Spaceship.app_group.all.count).to eq(2)
   end
 

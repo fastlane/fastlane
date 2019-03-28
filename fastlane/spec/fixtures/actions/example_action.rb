@@ -3,7 +3,7 @@ module Fastlane
     class ExampleActionAction < Action
       def self.run(params)
         tmp = Dir.mktmpdir
-        tmp_path = File.join(tmp, "example_action.txt")
+        tmp_path = File.join(tmp, 'example_action.txt')
         File.write(tmp_path, Time.now.to_i)
       end
 
@@ -11,8 +11,7 @@ module Fastlane
         true
       end
 
-      def self.available_options
-      end
+      def self.available_options; end
     end
   end
 end

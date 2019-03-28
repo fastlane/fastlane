@@ -8,7 +8,7 @@ module Snapshot
 
     # @param (String) The path in which the screenshots are located in
     def run(path)
-      UI.verbose("Rotating the screenshots (if necessary)")
+      UI.verbose('Rotating the screenshots (if necessary)')
       rotate(path)
     end
 
@@ -17,11 +17,11 @@ module Snapshot
         UI.verbose("Rotating '#{file}'")
 
         command = nil
-        if file.end_with?("landscapeleft.png")
+        if file.end_with?('landscapeleft.png')
           command = "sips -r -90 '#{file}'"
-        elsif file.end_with?("landscaperight.png")
+        elsif file.end_with?('landscaperight.png')
           command = "sips -r 90 '#{file}'"
-        elsif file.end_with?("portrait_upsidedown.png")
+        elsif file.end_with?('portrait_upsidedown.png')
           command = "sips -r 180 '#{file}'"
         end
 
@@ -29,7 +29,9 @@ module Snapshot
         next unless command
 
         # Rotate
-        FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: false)
+        FastlaneCore::CommandExecutor.execute(
+          command: command, print_all: false, print_command: false
+        )
       end
     end
   end

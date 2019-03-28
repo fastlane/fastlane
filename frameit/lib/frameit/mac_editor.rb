@@ -10,22 +10,23 @@ module Frameit
     end
 
     def put_device_into_background(background)
-      self.top_space_above_device = offset['titleHeight'] # needed for centering the title
+      self.top_space_above_device = offset[]
 
-      @image = background.composite(image, "png") do |c|
-        c.compose("Over")
-        c.geometry(offset['offset'])
-      end
+      @image =
+        background.composite(image, 'png') do |c|
+          c.compose('Over')
+          c.geometry(offset['offset'])
+        end
 
       return image
     end
 
-    def load_frame
-      nil # Macs don't need frames - backgrounds only
+    def load_frame # Macs don't need frames - backgrounds only
+      nil
     end
 
-    def is_complex_framing_mode?
-      true # Mac screenshots always need a background
+    def is_complex_framing_mode? # Mac screenshots always need a background
+      true
     end
 
     def generate_background

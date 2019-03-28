@@ -11,7 +11,7 @@ module FastlaneCore
 
     attr_accessor :package_path
 
-    def generate(app_id: nil, pkg_path: nil, package_path: nil, platform: "osx")
+    def generate(app_id: nil, pkg_path: nil, package_path: nil, platform: 'osx')
       self.package_path = File.join(package_path, "#{app_id}.itmsp")
       FileUtils.rm_rf(self.package_path) if File.directory?(self.package_path)
       FileUtils.mkdir_p(self.package_path)
@@ -20,17 +20,22 @@ module FastlaneCore
       @data = {
         apple_id: app_id,
         file_size: File.size(pkg_path),
-        ipa_path: File.basename(pkg_path), # this is only the base name as the ipa is inside the package
-        md5: Digest::MD5.hexdigest(File.read(pkg_path)),
+        ipa_path: File.basename(pkg_path),
+        md5:
+          # this is only the base name as the ipa is inside the package
+          Digest::MD5
+            .hexdigest(File.read(pkg_path)),
         archive_type: 'product-archive',
         platform: platform
       }
 
       xml_path = File.join(FastlaneCore::ROOT, 'lib/assets/XMLTemplate.xml.erb')
-      xml = ERB.new(File.read(xml_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
+      xml = ERB.new(File.read(xml_path)).result(binding)
 
       File.write(File.join(self.package_path, METADATA_FILE_NAME), xml)
-      UI.success("Wrote XML data to '#{self.package_path}'") if FastlaneCore::Globals.verbose?
+      if FastlaneCore::Globals.verbose?
+        UI.success("Wrote XML data to '#{self.package_path}'")
+      end
 
       package_path
     end

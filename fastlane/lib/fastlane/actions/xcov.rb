@@ -9,18 +9,18 @@ module Fastlane
       end
 
       def self.description
-        "Nice code coverage reports without hassle"
+        'Nice code coverage reports without hassle'
       end
 
       def self.details
         [
-          "Create nice code coverage reports and post coverage summaries on Slack *(xcov gem is required)*.",
-          "More information: [https://github.com/nakiostudio/xcov](https://github.com/nakiostudio/xcov)."
+          'Create nice code coverage reports and post coverage summaries on Slack *(xcov gem is required)*.',
+          'More information: [https://github.com/nakiostudio/xcov](https://github.com/nakiostudio/xcov).'
         ].join("\n")
       end
 
       def self.author
-        "nakiostudio"
+        'nakiostudio'
       end
 
       def self.available_options
@@ -45,7 +45,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        %i[ios mac].include?(platform)
       end
 
       def self.example_code

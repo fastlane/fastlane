@@ -8,17 +8,29 @@ module Fastlane
     # @param env Dot Env Information
     # @param A custom Fastfile path, this is used by fastlane.ci
     # rubocop:disable Metrics/PerceivedComplexity
-    def self.cruise_lane(platform, lane, parameters = nil, env = nil, fastfile_path = nil)
-      UI.user_error!("lane must be a string") unless lane.kind_of?(String) || lane.nil?
-      UI.user_error!("platform must be a string") unless platform.kind_of?(String) || platform.nil?
-      UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) || parameters.nil?
+    def self.cruise_lane(
+      platform, lane, parameters = nil, env = nil, fastfile_path = nil
+    )
+      unless lane.kind_of?(String) || lane.nil?
+        UI.user_error!('lane must be a string')
+      end
+      unless platform.kind_of?(String) || platform.nil?
+        UI.user_error!('platform must be a string')
+      end
+      unless parameters.kind_of?(Hash) || parameters.nil?
+        UI.user_error!('parameters must be a hash')
+      end
 
-      ff = Fastlane::FastFile.new(fastfile_path || FastlaneCore::FastlaneFolder.fastfile_path)
+      ff =
+        Fastlane::FastFile.new(
+          fastfile_path || FastlaneCore::FastlaneFolder.fastfile_path
+        )
 
       is_platform = false
       begin
         is_platform = ff.is_platform_block?(lane)
-      rescue # rescue, because this raises an exception if it can't be found at all
+      rescue StandardError
+
       end
 
       unless is_platform
@@ -27,7 +39,8 @@ module Fastlane
 
         # Make sure that's not a lane without a platform
         unless ff.runner.available_lanes.include?(lane)
-          platform ||= Actions.lane_context[Actions::SharedValues::DEFAULT_PLATFORM]
+          platform ||=
+            Actions.lane_context[Actions::SharedValues::DEFAULT_PLATFORM]
         end
       end
 
@@ -46,7 +59,7 @@ module Fastlane
       # and not return to the original working directory
       # https://github.com/CocoaPods/Xcodeproj/issues/426
       # Setting this environment variable causes xcodeproj to work around the problem
-      ENV["FORK_XCODE_WRITING"] = "true" unless platform == 'android'
+      ENV['FORK_XCODE_WRITING'] = 'true' unless platform == 'android'
 
       Fastlane::Helper::DotenvHelper.load_dot_env(env)
 
@@ -80,7 +93,7 @@ module Fastlane
     # rubocop:enable Metrics/PerceivedComplexity
 
     def self.skip_docs?
-      Helper.test? || FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
+      Helper.test? || FastlaneCore::Env.truthy?('FASTLANE_SKIP_DOCS')
     end
 
     # Lane chooser if user didn't provide a lane
@@ -91,38 +104,45 @@ module Fastlane
       # nil is the key for lanes that are not under a specific platform
       lane_platforms = [nil] + Fastlane::SupportedPlatforms.all
       lane_platforms.each do |p|
-        available += ff.runner.lanes[p].to_a.reject { |lane| lane.last.is_private }
+        available +=
+          ff.runner.lanes[p].to_a.reject { |lane| lane.last.is_private }
       end
 
       if available.empty?
-        UI.user_error!("It looks like you don't have any lanes to run just yet. Check out how to get started here: https://github.com/fastlane/fastlane 🚀")
+        UI.user_error!(
+          "It looks like you don't have any lanes to run just yet. Check out how to get started here: https://github.com/fastlane/fastlane 🚀"
+        )
       end
 
       rows = []
       available.each_with_index do |lane, index|
-        rows << [index + 1, lane.last.pretty_name, lane.last.description.join("\n")]
+        rows <<
+          [index + 1, lane.last.pretty_name, lane.last.description.join("\n")]
       end
 
-      rows << [0, "cancel", "No selection, exit fastlane!"]
+      rows << [0, 'cancel', 'No selection, exit fastlane!']
 
       require 'terminal-table'
 
-      table = Terminal::Table.new(
-        title: "Available lanes to run",
-        headings: ['Number', 'Lane Name', 'Description'],
-        rows: FastlaneCore::PrintTable.transform_output(rows)
-      )
+      table =
+        Terminal::Table.new(
+          title: 'Available lanes to run',
+          headings: ['Number', 'Lane Name', 'Description'],
+          rows: FastlaneCore::PrintTable.transform_output(rows)
+        )
 
       UI.message("Welcome to fastlane! Here's what your app is setup to do:")
 
       puts(table)
 
-      i = UI.input("Which number would you like run?")
+      i = UI.input('Which number would you like run?')
 
       i = i.to_i - 1
       if i >= 0 && available[i]
         selection = available[i].last.pretty_name
-        UI.important("Running lane `#{selection}`. Next time you can do this by directly typing `fastlane #{selection}` 🚀.")
+        UI.important(
+          "Running lane `#{selection}`. Next time you can do this by directly typing `fastlane #{selection}` 🚀."
+        )
         platform = selection.split(' ')[0]
         lane_name = selection.split(' ')[1]
 
@@ -133,7 +153,9 @@ module Fastlane
 
         return platform, lane_name # yeah
       else
-        UI.user_error!("Run `fastlane` the next time you need to build, test or release your app 🚀")
+        UI.user_error!(
+          'Run `fastlane` the next time you need to build, test or release your app 🚀'
+        )
       end
     end
   end

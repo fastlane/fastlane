@@ -2,7 +2,8 @@ module Fastlane
   module Actions
     class RocketAction < Action
       def self.run(params)
-        puts("
+        puts(
+          "
         ____
        /    \\
       |      |
@@ -36,8 +37,9 @@ module Fastlane
          ##
          ##
          ##
-         ")
-        return "🚀"
+         "
+        )
+        return '🚀'
       end
 
       #####################################################
@@ -45,20 +47,19 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Outputs ascii-art for a rocket 🚀"
+        'Outputs ascii-art for a rocket 🚀'
       end
 
       def self.details
-        "Print an ascii Rocket :rocket:. Useful after using _crashlytics_ or _pilot_ to indicate that your new build has been shipped to outer-space."
+        'Print an ascii Rocket :rocket:. Useful after using _crashlytics_ or _pilot_ to indicate that your new build has been shipped to outer-space.'
       end
 
       def self.available_options
-        [
-        ]
+        []
       end
 
       def self.authors
-        ["JaviSoto", "radex"]
+        %w[JaviSoto radex]
       end
 
       def self.is_supported?(platform)
@@ -66,9 +67,7 @@ module Fastlane
       end
 
       def self.example_code
-        [
-          'rocket'
-        ]
+        %w[rocket]
       end
 
       def self.return_type

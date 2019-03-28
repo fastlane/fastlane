@@ -1,7 +1,6 @@
 module Fastlane
   module Actions
-    module SharedValues
-    end
+    module SharedValues; end
 
     class CheckAppStoreMetadataAction < Action
       def self.run(config)
@@ -15,7 +14,7 @@ module Fastlane
       end
 
       def self.details
-        "More information: https://fastlane.tools/precheck"
+        'More information: https://fastlane.tools/precheck'
       end
 
       def self.available_options
@@ -24,11 +23,11 @@ module Fastlane
       end
 
       def self.return_value
-        return "true if precheck passes, else, false"
+        return 'true if precheck passes, else, false'
       end
 
       def self.authors
-        ["taquitos"]
+        %w[taquitos]
       end
 
       def self.is_supported?(platform)

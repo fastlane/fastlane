@@ -17,11 +17,13 @@ module Spaceship
       # @return ([Spaceship::Tunes::AppVersionStatesHistory]) the array of version states
       attr_reader :items
 
-      attr_mapping({
-        'versionString' => :version_string,
-        'versionId' => :version_id,
-        'items' => :items
-      })
+      attr_mapping(
+        {
+          'versionString' => :version_string,
+          'versionId' => :version_id,
+          'items' => :items
+        }
+      )
 
       # Returns an array of all builds that can be sent to review
       def items
@@ -38,13 +40,18 @@ module Spaceship
       private
 
       def map_items(items)
-        items.map do |attrs|
-          Tunes::AppVersionStatesHistory.factory(attrs)
-        end
+        items.map { |attrs| Tunes::AppVersionStatesHistory.factory(attrs) }
       end
 
       def fetch_items
-        items = client.version_states_history(application.apple_id, application.platform, version_id)['items']
+        items =
+          client.version_states_history(
+            application.apple_id,
+            application.platform,
+            version_id
+          )[
+            'items'
+          ]
         map_items(items)
       end
     end

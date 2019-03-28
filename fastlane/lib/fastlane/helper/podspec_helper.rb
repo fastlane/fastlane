@@ -13,7 +13,9 @@ module Fastlane
         @version_regex = /^(?<begin>[^#]*#{variable_prefix}#{version_var_name}\s*=\s*['"])(?<value>(?<major>[0-9]+)(\.(?<minor>[0-9]+))?(\.(?<patch>[0-9]+))?(?<appendix>(\.[0-9]+)*)?(-(?<prerelease>(.+)))?)(?<end>['"])/i
 
         return unless (path || '').length > 0
-        UI.user_error!("Could not find podspec file at path '#{path}'") unless File.exist?(path)
+        unless File.exist?(path)
+          UI.user_error!("Could not find podspec file at path '#{path}'")
+        end
 
         @path = File.expand_path(path)
         podspec_content = File.read(path)
@@ -24,12 +26,20 @@ module Fastlane
       def parse(podspec_content)
         @podspec_content = podspec_content
         @version_match = @version_regex.match(@podspec_content)
-        UI.user_error!("Could not find version in podspec content '#{@podspec_content}'") if @version_match.nil?
+        if @version_match.nil?
+          UI.user_error!(
+            "Could not find version in podspec content '#{@podspec_content}'"
+          )
+        end
         @version_value = @version_match[:value]
       end
 
       def bump_version(bump_type)
-        UI.user_error!("Do not support bump of 'appendix', please use `update_version_appendix(appendix)` instead") if bump_type == 'appendix'
+        if bump_type == 'appendix'
+          UI.user_error!(
+            "Do not support bump of 'appendix', please use `update_version_appendix(appendix)` instead"
+          )
+        end
 
         major = version_match[:major].to_i
         minor = version_match[:minor].to_i || 0
@@ -54,7 +64,9 @@ module Fastlane
         new_appendix = appendix || @version_value[:appendix]
         return if new_appendix.nil?
 
-        new_appendix = new_appendix.sub(".", "") if new_appendix.start_with?(".")
+        if new_appendix.start_with?('.')
+          new_appendix = new_appendix.sub('.', '')
+        end
         major = version_match[:major].to_i
         minor = version_match[:minor].to_i || 0
         patch = version_match[:patch].to_i || 0
@@ -64,9 +76,15 @@ module Fastlane
 
       def update_podspec(version = nil)
         new_version = version || @version_value
-        updated_podspec_content = @podspec_content.gsub(@version_regex, "#{@version_match[:begin]}#{new_version}#{@version_match[:end]}")
+        updated_podspec_content =
+          @podspec_content.gsub(
+            @version_regex,
+            "#{@version_match[:begin]}#{new_version}#{@version_match[:end]}"
+          )
 
-        File.open(@path, "w") { |file| file.puts(updated_podspec_content) } unless Helper.test?
+        unless Helper.test?
+          File.open(@path, 'w') { |file| file.puts(updated_podspec_content) }
+        end
 
         updated_podspec_content
       end

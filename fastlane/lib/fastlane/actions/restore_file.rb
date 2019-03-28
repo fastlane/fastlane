@@ -4,10 +4,12 @@ module Fastlane
       def self.run(params)
         path = params[:path]
         backup_path = "#{path}.back"
-        UI.user_error!("Could not find file '#{backup_path}'") unless File.exist?(backup_path)
+        unless File.exist?(backup_path)
+          UI.user_error!("Could not find file '#{backup_path}'")
+        end
         FileUtils.cp(backup_path, path, { preserve: true })
         FileUtils.rm(backup_path)
-        UI.message("Successfully restored backup 📤")
+        UI.message('Successfully restored backup 📤')
       end
 
       def self.description
@@ -19,21 +21,21 @@ module Fastlane
       end
 
       def self.author
-        "gin0606"
+        'gin0606'
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :path,
-                                       description: "Original file name you want to restore",
-                                       optional: false)
+          FastlaneCore::ConfigItem.new(
+            key: :path,
+            description: 'Original file name you want to restore',
+            optional: false
+          )
         ]
       end
 
       def self.example_code
-        [
-          'restore_file(path: "/path/to/file")'
-        ]
+        ['restore_file(path: "/path/to/file")']
       end
 
       def self.category

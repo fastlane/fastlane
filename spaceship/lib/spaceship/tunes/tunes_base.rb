@@ -6,9 +6,8 @@ module Spaceship
       class << self
         def client
           (
-            @client or
-            Spaceship::Tunes.client or
-            raise "Please login using `Spaceship::Tunes.login('user', 'password')`"
+            @client or Spaceship::Tunes.client or
+              raise "Please login using `Spaceship::Tunes.login('user', 'password')`"
           )
         end
       end

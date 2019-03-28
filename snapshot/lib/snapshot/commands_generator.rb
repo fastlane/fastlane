@@ -17,13 +17,18 @@ module Snapshot
     def run
       program :name, 'snapshot'
       program :version, Fastlane::VERSION
-      program :description, 'CLI for \'snapshot\' - Automate taking localized screenshots of your iOS app on every device'
+      program :description,
+              "CLI for 'snapshot' - Automate taking localized screenshots of your iOS app on every device"
       program :help, 'Author', 'Felix Krause <snapshot@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/snapshot/'
+      program :help,
+              'Documentation',
+              'https://docs.fastlane.tools/actions/snapshot/'
       program :help_formatter, :compact
 
-      global_option('--verbose', 'Shows a more verbose output') { FastlaneCore::Globals.verbose = true }
+      global_option('--verbose', 'Shows a more verbose output') do
+        FastlaneCore::Globals.verbose = true
+      end
 
       always_trace!
 
@@ -31,7 +36,10 @@ module Snapshot
         c.syntax = 'fastlane snapshot'
         c.description = 'Take new screenshots based on the Snapfile.'
 
-        FastlaneCore::CommanderGenerator.new.generate(Snapshot::Options.available_options, command: c)
+        FastlaneCore::CommanderGenerator.new.generate(
+          Snapshot::Options.available_options,
+          command: c
+        )
 
         c.action do |args, options|
           load_config(options)
@@ -43,19 +51,25 @@ module Snapshot
 
       command :init do |c|
         c.syntax = 'fastlane snapshot init'
-        c.description = "Creates a new Snapfile in the current directory"
+        c.description = 'Creates a new Snapfile in the current directory'
 
         c.action do |args, options|
           require 'snapshot/setup'
-          path = Snapshot::Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
-          is_swift_fastfile = args.include?("swift")
+          path =
+            if Snapshot::Helper.fastlane_enabled?
+              FastlaneCore::FastlaneFolder.path
+            else
+              '.'
+            end
+          is_swift_fastfile = args.include?('swift')
           Snapshot::Setup.create(path, is_swift_fastfile: is_swift_fastfile)
         end
       end
 
       command :update do |c|
         c.syntax = 'fastlane snapshot update'
-        c.description = "Updates your SnapshotHelper.swift to the latest version"
+        c.description =
+          'Updates your SnapshotHelper.swift to the latest version'
 
         c.action do |args, options|
           require 'snapshot/update'
@@ -65,8 +79,14 @@ module Snapshot
 
       command :reset_simulators do |c|
         c.syntax = 'fastlane snapshot reset_simulators'
-        c.description = "This will remove all your existing simulators and re-create new ones"
-        c.option('-i', '--ios_version String', String, 'The comma separated list of iOS Versions you want to use')
+        c.description =
+          'This will remove all your existing simulators and re-create new ones'
+        c.option(
+          '-i',
+          '--ios_version String',
+          String,
+          'The comma separated list of iOS Versions you want to use'
+        )
         c.option('--force', 'Disables confirmation prompts')
 
         c.action do |args, options|
@@ -80,16 +100,20 @@ module Snapshot
 
       command :clear_derived_data do |c|
         c.syntax = 'fastlane snapshot clear_derived_data -f path'
-        c.description = "Clear the directory where build products and other derived data will go"
+        c.description =
+          'Clear the directory where build products and other derived data will go'
 
-        FastlaneCore::CommanderGenerator.new.generate(Snapshot::Options.available_options, command: c)
+        FastlaneCore::CommanderGenerator.new.generate(
+          Snapshot::Options.available_options,
+          command: c
+        )
 
         c.action do |args, options|
           load_config(options)
           derived_data_path = Snapshot.config[:derived_data_path]
 
           if !derived_data_path
-            Snapshot::UI.user_error!("No derived_data_path")
+            Snapshot::UI.user_error!('No derived_data_path')
           elsif !Dir.exist?(derived_data_path)
             Snapshot::UI.important("Path #{derived_data_path} does not exist")
           else
@@ -109,7 +133,11 @@ module Snapshot
     def load_config(options)
       o = options.__hash__.dup
       o.delete(:verbose)
-      Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, o)
+      Snapshot.config =
+        FastlaneCore::Configuration.create(
+          Snapshot::Options.available_options,
+          o
+        )
     end
   end
 end

@@ -5,16 +5,10 @@ module MockAPI
     set :dump_errors, true
     set :show_exceptions, false
 
-    before do
-      if request.post?
-        content_type(:json)
-      end
-    end
+    before { content_type(:json) if request.post? }
 
     after do
-      if response.body.kind_of?(Hash)
-        response.body = JSON.dump(response.body)
-      end
+      response.body = JSON.dump(response.body) if response.body.kind_of?(Hash)
     end
   end
 end

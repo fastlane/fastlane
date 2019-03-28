@@ -1,20 +1,21 @@
 module Fastlane
   module Actions
-    module SharedValues
-    end
+    module SharedValues; end
 
     class UpdatePlistAction < Action
       def self.run(params)
         require 'xcodeproj'
 
         if params[:plist_path].nil?
-          UI.user_error!("You must specify a plist path")
+          UI.user_error!('You must specify a plist path')
         end
 
         # Read existing plist file
         plist_path = params[:plist_path]
 
-        UI.user_error!("Couldn't find plist file at path '#{plist_path}'") unless File.exist?(plist_path)
+        unless File.exist?(plist_path)
+          UI.user_error!("Couldn't find plist file at path '#{plist_path}'")
+        end
         plist = Xcodeproj::Plist.read_from_path(plist_path)
 
         params[:block].call(plist) if params[:block]
@@ -31,7 +32,7 @@ module Fastlane
       #####################################################
 
       def self.is_supported?(platform)
-        [:ios].include?(platform)
+        %i[ios].include?(platform)
       end
 
       def self.description
@@ -39,20 +40,22 @@ module Fastlane
       end
 
       def self.details
-        "This action allows you to modify any `plist` file."
+        'This action allows you to modify any `plist` file.'
       end
 
       def self.available_options
         [
-
-          FastlaneCore::ConfigItem.new(key: :plist_path,
-                                       env_name: "FL_UPDATE_PLIST_PATH",
-                                       description: "Path to plist file",
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :block,
-                                       is_string: false,
-                                       description: 'A block to process plist with custom logic')
-
+          FastlaneCore::ConfigItem.new(
+            key: :plist_path,
+            env_name: 'FL_UPDATE_PLIST_PATH',
+            description: 'Path to plist file',
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :block,
+            is_string: false,
+            description: 'A block to process plist with custom logic'
+          )
         ]
       end
 
