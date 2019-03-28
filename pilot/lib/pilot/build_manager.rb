@@ -159,12 +159,18 @@ module Pilot
     end
 
     def self.truncate_changelog(changelog)
+      # Apple documentation on "What's New in this Version" field, the one used for changelog
+      # https://help.apple.com/app-store-connect/?lang=en#/devf29afbb74
       max_changelog_bytesize = 4000
       if changelog && changelog.bytesize > max_changelog_bytesize
         original_bytesize = changelog.bytesize
         bottom_message = "..."
-        changelog = "#{changelog.mb_chars.limit(max_changelog_bytesize - bottom_message.bytesize)}#{bottom_message}"
-        UI.important("Changelog has been truncated since it exceeds Apple's #{max_changelog_bytesize} byte limit. It currently contains #{original_bytesize} bytes.")
+        truncated_bytes = changelog.bytes[0...max_changelog_bytesize - bottom_message.length]
+        # We convert the bytes back to a string, which can contained invalid bytes that
+        # do not form a character
+        unscrubbed_truncated_string = truncated_bytes.pack("C*").force_encoding("UTF-8")
+        changelog = "#{unscrubbed_truncated_string.scrub('')}#{bottom_message}"
+        UI.important("Changelog has been truncated since it exceeds Apple's #{max_changelog_bytesize} character limit. It currently contains #{original_bytesize} characters.")
       end
       changelog
     end

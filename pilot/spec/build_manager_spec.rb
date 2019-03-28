@@ -1,6 +1,3 @@
-require 'active_support'
-require 'active_support/core_ext'
-
 describe "Build Manager" do
   describe ".truncate_changelog" do
     it "Truncates Changelog if it exceeds character size" do
