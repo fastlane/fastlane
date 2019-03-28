@@ -113,7 +113,7 @@ module Fastlane
             force: true,              # optional, default: false
             force_with_lease: true,   # optional, default: false
             tags: false,              # optional, default: true
-            no_verify: true           # optional, default: false
+            no_verify: true,           # optional, default: false
             set_upstream: true        # optional, default: false
           )'
         ]
