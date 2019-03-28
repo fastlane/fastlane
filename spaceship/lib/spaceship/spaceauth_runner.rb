@@ -66,9 +66,7 @@ module Spaceship
           Open3.popen3('pbcopy') { |input, _, _| input << yaml }
           puts("Successfully copied text into your clipboard 🎨".green)
         end
-      end
-
-      unless @output.nil?
+      else
         puts("Writing session token to file #{@output}")
         File.write(@output, yaml)
       end
