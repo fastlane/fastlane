@@ -18,8 +18,8 @@ import XCTest
 var deviceLanguage = ""
 var locale = ""
 
-func setupSnapshot(_ app: XCUIApplication) {
-    Snapshot.setupSnapshot(app)
+func setupSnapshot(_ app: XCUIApplication, animationsEnabled: Bool = true) {
+    Snapshot.setupSnapshot(app, animationsEnabled: animationsEnabled)
 }
 
 func snapshot(_ name: String, waitForLoadingIndicator: Bool) {
@@ -63,14 +63,16 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
 @objcMembers
 open class Snapshot: NSObject {
     static var app: XCUIApplication?
+    static var animationsEnabled = true
     static var cacheDirectory: URL?
     static var screenshotsDirectory: URL? {
         return cacheDirectory?.appendingPathComponent("screenshots", isDirectory: true)
     }
 
-    open class func setupSnapshot(_ app: XCUIApplication) {
+    open class func setupSnapshot(_ app: XCUIApplication, animationsEnabled: Bool = true) {
         
         Snapshot.app = app
+        Snapshot.animationsEnabled = animationsEnabled
 
         do {
             let cacheDir = try pathPrefix()
@@ -153,7 +155,9 @@ open class Snapshot: NSObject {
 
         print("snapshot: \(name)") // more information about this, check out https://docs.fastlane.tools/actions/snapshot/#how-does-it-work
 
-        sleep(1) // Waiting for the animation to be finished (kind of)
+        if Snapshot.animationsEnabled {
+            sleep(1) // Waiting for the animation to be finished (kind of)
+        }
 
         #if os(OSX)
             guard let app = self.app else {
@@ -291,4 +295,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.14]
+// SnapshotHelperVersion [1.15]
