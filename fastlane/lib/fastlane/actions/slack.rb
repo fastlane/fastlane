@@ -18,11 +18,19 @@ module Fastlane
         message
       end
 
+      def self.unescape_newline(text)
+        text = text.gsub('\n', "\n")
+        text
+      end
+
       def self.run(options)
         require 'slack-notifier'
 
         options[:message] = self.trim_message(options[:message].to_s || '')
+        options[:message] = self.unescape_newline(options[:message])
         options[:message] = Slack::Notifier::Util::LinkFormatter.format(options[:message])
+
+        options[:pretext] = self.unescape_newline(options[:pretext]) unless options[:pretext].nil?
 
         if options[:channel].to_s.length > 0
           channel = options[:channel]
