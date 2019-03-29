@@ -10,6 +10,27 @@ describe Fastlane do
         expect(Fastlane::Actions::SlackAction.trim_message(long_text).length).to eq(7000)
       end
 
+      it "unescapes newlines on message and pretext arguments" do
+        escaped_message = 'Custom\nMessage'
+        escaped_pretext = 'this\nis\na\npretext'
+        unescaped_message = "Custom\nMessage"
+        unescaped_pretext = "this\nis\na\npretext"
+        lane_name = "lane_name"
+
+        Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME] = lane_name
+
+        require 'fastlane/actions/slack'
+        arguments = Fastlane::ConfigurationHelper.parse(Fastlane::Actions::SlackAction, {
+          message: escaped_message,
+          pretext: escaped_pretext
+        })
+
+        _, attachments = Fastlane::Actions::SlackAction.run(arguments)
+
+        expect(attachments[:text]).to eq(unescaped_message)
+        expect(attachments[:pretext]).to eq(unescaped_pretext)
+      end
+
       it "works so perfect, like Slack does" do
         channel = "#myChannel"
         message = "Custom Message"
