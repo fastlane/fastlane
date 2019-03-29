@@ -642,7 +642,7 @@ module Spaceship
       def upload_review_attachment!(review_attachment_path)
         raise 'cannot upload review attachment for live edition.' if self.is_live?
 
-        unless review_attachment_path && review_attachment_path.size > 0
+        if !(review_attachment_path || review_attachment_path.size > 0)
           @review_attachment_file.reset!
           return
         end
