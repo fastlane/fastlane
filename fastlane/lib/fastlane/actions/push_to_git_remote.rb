@@ -29,7 +29,7 @@ module Fastlane
         # optionally add the no-verify component
         command << '--no-verify' if params[:no_verify]
 
-        # optionally add the no-verify component
+        # optionally add the set-upstream component
         command << '--set-upstream' if params[:set_upstream]
 
         # execute our command
