@@ -10,8 +10,23 @@ module Fastlane
 
         skip_git_hooks = params[:skip_git_hooks] ? '--no-verify' : ''
 
-        result = Actions.sh("git commit -m #{params[:message].shellescape} #{paths} #{skip_git_hooks}".strip)
-        UI.success("Successfully committed \"#{params[:path]}\" 💾.")
+        command = "git commit -m #{params[:message].shellescape} #{paths} #{skip_git_hooks}".strip
+        nothing_to_commit = false
+
+        if params[:allow_nothing_to_commit]
+          result = Actions.sh(
+            command,
+            log: FastlaneCore::Globals.verbose?,
+            error_callback: lambda { |_|
+              nothing_to_commit = true
+              UI.success("Nothing to commit, working tree clean ✅.")
+            }
+          )
+        else
+          result = Actions.sh(command)
+        end
+
+        UI.success("Successfully committed \"#{params[:path]}\" 💾.") unless nothing_to_commit
         return result
       end
 
@@ -32,6 +47,10 @@ module Fastlane
                                        description: "The commit message that should be used"),
           FastlaneCore::ConfigItem.new(key: :skip_git_hooks,
                                        description: "Set to true to pass --no-verify to git",
+                                       type: Boolean,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :allow_nothing_to_commit,
+                                       description: "Set to true to allow commit without any git changes",
                                        type: Boolean,
                                        optional: true)
         ]
