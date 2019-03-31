@@ -83,6 +83,16 @@ describe Fastlane do
 
         expect(result).to eq("git push origin master:master --tags --no-verify")
       end
+
+      it "runs git push with set_upstream:true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            push_to_git_remote(
+              set_upstream: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("git push origin master:master --tags --set-upstream")
+      end
     end
   end
 end
