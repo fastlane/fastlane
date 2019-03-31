@@ -54,7 +54,7 @@ describe FastlaneCore do
           temp_dir = File.dirname(f)
           temp_cmd = File.basename(f)
 
-          with_env_values('PATH' => temp_dir) do
+          FastlaneSpec::Env.with_env_values('PATH' => temp_dir) do
             expect(FastlaneCore::CommandExecutor.which(temp_cmd)).to eq(f.path)
           end
         end
@@ -67,7 +67,7 @@ describe FastlaneCore do
           temp_dir = File.dirname(f)
           temp_cmd = File.basename(f, '.exe')
 
-          with_env_values('PATH' => temp_dir, 'PATHEXT' => '.exe') do
+          FastlaneSpec::Env.with_env_values('PATH' => temp_dir, 'PATHEXT' => '.exe') do
             expect(FastlaneCore::CommandExecutor.which(temp_cmd)).to eq(f.path)
           end
         end
@@ -80,7 +80,7 @@ describe FastlaneCore do
           temp_dir = File.dirname(f)
           temp_cmd = File.basename(f, '.exe')
 
-          with_env_values('PATH' => temp_dir, 'PATHEXT' => '') do
+          FastlaneSpec::Env.with_env_values('PATH' => temp_dir, 'PATHEXT' => '') do
             expect(FastlaneCore::CommandExecutor.which(temp_cmd)).to be_nil
           end
         end
