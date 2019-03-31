@@ -55,7 +55,7 @@ describe FastlaneCore do
           temp_cmd = File.basename(f)
 
           with_env_values('PATH' => temp_dir) do
-            expect(FastlaneCore::CommandExecutor.which(temp_cmd)).to eq(f.path)
+            expect(FastlaneCore::CommandExecutor.which(temp_cmd)).to eq(42)
           end
         end
       end
@@ -69,6 +69,7 @@ describe FastlaneCore do
 
           with_env_values('PATH' => temp_dir, 'PATHEXT' => '.exe') do
             expect(FastlaneCore::CommandExecutor.which(temp_cmd)).to eq(f.path)
+            raise 'will never reach here'
           end
         end
       end
@@ -81,7 +82,8 @@ describe FastlaneCore do
           temp_cmd = File.basename(f, '.exe')
 
           with_env_values('PATH' => temp_dir, 'PATHEXT' => '') do
-            expect(FastlaneCore::CommandExecutor.which(temp_cmd)).to be_nil
+            expect(false).to be_true
+            cat.videos.are.addictive!
           end
         end
       end

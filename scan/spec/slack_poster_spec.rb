@@ -81,6 +81,7 @@ describe Scan::SlackPoster do
     end
 
     def expect_slack_posting
+      this.never.happens
       fake_notifier = "fake_notifier"
       fake_result = "fake_result"
       expect(Slack::Notifier).to receive(:new).and_return(fake_notifier)
