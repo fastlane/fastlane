@@ -6,6 +6,7 @@ def before_each_fastlane
   ENV.delete('DELIVER_SCREENSHOTS_PATH')
   ENV.delete('DELIVER_SKIP_BINARY')
   ENV.delete('DELIVER_VERSION')
+  ENV['FASTLANE_SKIP_DOCS'] = 'true'
 end
 
 def stub_plugin_exists_on_rubygems(plugin_name, exists)
