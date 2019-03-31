@@ -14,18 +14,12 @@ module Fastlane
         nothing_to_commit = false
 
         if params[:allow_nothing_to_commit]
-          result = Actions.sh(
-            command,
-            log: FastlaneCore::Globals.verbose?,
-            error_callback: lambda { |_|
-              nothing_to_commit = true
-              UI.success("Nothing to commit, working tree clean ✅.")
-            }
-          )
-        else
-          result = Actions.sh(command)
+          repo_clean = Actions.sh("git status --porcelain").empty?
+          UI.success("Nothing to commit, working tree clean ✅.") if repo_clean
+          return if repo_clean
         end
 
+        result = Actions.sh(command)
         UI.success("Successfully committed \"#{params[:path]}\" 💾.") unless nothing_to_commit
         return result
       end
