@@ -349,6 +349,12 @@ if ProcessInfo().arguments.contains("SKIP_ANIMATIONS") {
 }
 ```
 
+This requires you to pass the launch argument like so:
+
+```ruby
+snapshot(launch_arguments: ["SKIP_ANIMATIONS"])
+```
+
 By default, _snapshot_ will wait for a short time for the animations to finish.
 If you're skipping the animations, this is wait time is unnecessary and can be skipped:
 
