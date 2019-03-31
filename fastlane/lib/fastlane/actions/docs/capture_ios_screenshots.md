@@ -336,3 +336,22 @@ When the app dies directly after the application is launched there might be 2 pr
 ## Determine language
 
 To detect the currently used localization in your tests, access the `deviceLanguage` variable from `SnapshotHelper.swift`.
+
+## Speed up snapshots
+
+A lot of time in UI tests is spent waiting for animations.
+
+You can disable `UIView` animations in your app to make the tests faster:
+
+```swift
+if ProcessInfo().arguments.contains("SKIP_ANIMATIONS") {
+    UIView.setAnimationsEnabled(false)
+}
+```
+
+By default, `snapshot` will wait for a short time for the animations to finish.
+If you're skipping the animations, this is wait time is unnecessary and can be skipped:
+
+```swift
+setupSnapshot(app, waitForAnimations: false)
+```
