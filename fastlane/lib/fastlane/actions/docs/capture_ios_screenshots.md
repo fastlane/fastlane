@@ -349,7 +349,7 @@ if ProcessInfo().arguments.contains("SKIP_ANIMATIONS") {
 }
 ```
 
-By default, `snapshot` will wait for a short time for the animations to finish.
+By default, _snapshot_ will wait for a short time for the animations to finish.
 If you're skipping the animations, this is wait time is unnecessary and can be skipped:
 
 ```swift
