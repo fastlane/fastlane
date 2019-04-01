@@ -117,4 +117,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('fakefs', '~> 0.8.1')
   spec.add_development_dependency('sinatra', '~> 1.4.8')
   spec.add_development_dependency('xcov', '~> 1.4.1') # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
+  spec.add_development_dependency('climate_control', '~> 0.2.0')
 end

@@ -148,8 +148,9 @@ module FastlaneSpec
     # Executes the provided block after adjusting the ENV to have the
     # provided keys and values set as defined in hash. After the block
     # completes, restores the ENV to its previous state.
+    require "climate_control"
     def self.with_env_values(hash, &block)
-      with_global_key_values(ENV, hash, &block)
+      ClimateControl.modify(hash, &block)
     end
 
     def self.with_action_context_values(hash, &block)
