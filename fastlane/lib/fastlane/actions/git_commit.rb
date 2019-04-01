@@ -10,17 +10,15 @@ module Fastlane
 
         skip_git_hooks = params[:skip_git_hooks] ? '--no-verify' : ''
 
-        command = "git commit -m #{params[:message].shellescape} #{paths} #{skip_git_hooks}".strip
-        nothing_to_commit = false
-
         if params[:allow_nothing_to_commit]
           repo_clean = Actions.sh("git status --porcelain").empty?
           UI.success("Nothing to commit, working tree clean ✅.") if repo_clean
           return if repo_clean
         end
 
+        command = "git commit -m #{params[:message].shellescape} #{paths} #{skip_git_hooks}".strip
         result = Actions.sh(command)
-        UI.success("Successfully committed \"#{params[:path]}\" 💾.") unless nothing_to_commit
+        UI.success("Successfully committed \"#{params[:path]}\" 💾.")
         return result
       end
 
