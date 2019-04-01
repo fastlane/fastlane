@@ -158,14 +158,15 @@ module FastlaneSpec
 
     def self.with_global_key_values(global_store, hash)
       old_vals = global_store.select { |k, v| hash.include?(k) }
-      hash.each do |k, v|
-        global_store[k] = hash[k]
-      end
+      hash.each { |k, v| global_store[k] = v }
       yield
     ensure
       hash.each do |k, v|
-        global_store.delete(k) unless old_vals.include?(k)
-        global_store[k] = old_vals[k]
+        if old_vals.include?(k)
+          global_store[k] = old_vals[k]
+        else
+          global_store.delete(k)
+        end
       end
     end
   end
