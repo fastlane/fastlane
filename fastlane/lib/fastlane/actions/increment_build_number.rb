@@ -30,8 +30,8 @@ module Fastlane
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
         # Attention: This is NOT the version number - but the build number
 
-        agv_enabled = system([command_prefix, 'agvtool what-version', command_suffix].join(' '))
-        raise "Apple Generic Versioning is not enabled." unless agv_enabled || params[:build_number]
+        agv_disabled = !system([command_prefix, 'agvtool what-version', command_suffix].join(' '))
+        raise "Apple Generic Versioning is not enabled." if agv_disabled && params[:build_number].nil?
 
         command = [
           command_prefix,
@@ -47,7 +47,8 @@ module Fastlane
         end
 
         # Store the new number in the shared hash
-        build_number = params[:build_number] ? params[:build_number].to_s.strip : Actions.sh("#{command_prefix} agvtool what-version", log: false).split("\n").last.strip
+        build_number = params[:build_number].to_s.strip
+        build_number = Actions.sh("#{command_prefix} agvtool what-version", log: false).split("\n").last.strip if build_number.to_s == ""
 
         return Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
       rescue
