@@ -113,7 +113,6 @@ describe Deliver::SubmitForReview do
         end
       end
 
-
       context 'has candidates and one build with a leading zero in the train version' do
         let(:fake_app) { make_fake_app }
         let(:fake_builds) do
@@ -144,7 +143,6 @@ describe Deliver::SubmitForReview do
           expect(review_submitter.wait_for_build(fake_app, "1.02.3")).to eq(only_build)
         end
       end
-
     end
   end
 end
