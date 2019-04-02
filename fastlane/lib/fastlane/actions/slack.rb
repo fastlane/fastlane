@@ -26,6 +26,8 @@ module Fastlane
         options[:message] = self.trim_message(options[:message].to_s || '')
         options[:message] = Slack::Notifier::Util::LinkFormatter.format(options[:message])
 
+        options[:pretext] = (options[:pretext].gsub('\n', "\n")) unless options[:pretext].nil?
+
         if options[:channel].to_s.length > 0
           channel = options[:channel]
           channel = ('#' + options[:channel]) unless ['#', '@'].include?(channel[0]) # send message to channel by default
