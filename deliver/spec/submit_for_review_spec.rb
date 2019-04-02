@@ -49,28 +49,36 @@ describe Deliver::SubmitForReview do
     describe :wait_for_build do
       context 'no candidates' do
         let(:fake_app) { make_fake_app }
-        let(:fake_version) { make_fake_version }
         let(:time_now) { Time.now }
+        let(:fake_version) {
+          fake_version = make_fake_version
+          fake_version[:app_version] = "1.2.3"
+        }
+
         # Stub Time.now to return current time on first call and 6 minutes later on second
         before { allow(Time).to receive(:now).and_return(time_now, (time_now + 60 * 6)) }
         it 'throws a UI error' do
           allow(fake_app).to receive(:latest_version).and_return(fake_version)
           allow(fake_version).to receive(:candidate_builds).and_return([])
           expect do
-            review_submitter.wait_for_build(fake_app)
+            review_submitter.wait_for_build(fake_app, "1.2.3")
           end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not find any available candidate builds on App Store Connect to submit")
         end
       end
 
       context 'has candidates and one build' do
         let(:fake_app) { make_fake_app }
-        let(:fake_version) { make_fake_version }
         let(:fake_builds) { make_fake_builds(1) }
+        let(:fake_version) {
+          fake_version = make_fake_version
+          fake_version[:app_version] = "1.2.3"
+        }
+
         it 'finds the one build' do
           allow(fake_app).to receive(:latest_version).and_return(fake_version)
           allow(fake_version).to receive(:candidate_builds).and_return(fake_builds)
           only_build = fake_builds.first
-          expect(review_submitter.wait_for_build(fake_app)).to eq(only_build)
+          expect(review_submitter.wait_for_build(fake_app, "1.2.3")).to eq(only_build)
         end
       end
     end
