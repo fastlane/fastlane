@@ -50,10 +50,10 @@ describe Deliver::SubmitForReview do
       context 'no candidates' do
         let(:fake_app) { make_fake_app }
         let(:time_now) { Time.now }
-        let(:fake_version) {
+        let(:fake_version) do
           fake_version = make_fake_version
           fake_version[:app_version] = "1.2.3"
-        }
+        end
 
         # Stub Time.now to return current time on first call and 6 minutes later on second
         before { allow(Time).to receive(:now).and_return(time_now, (time_now + 60 * 6)) }
@@ -69,10 +69,10 @@ describe Deliver::SubmitForReview do
       context 'has candidates and one build' do
         let(:fake_app) { make_fake_app }
         let(:fake_builds) { make_fake_builds(1) }
-        let(:fake_version) {
+        let(:fake_version) do
           fake_version = make_fake_version
           fake_version[:app_version] = "1.2.3"
-        }
+        end
 
         it 'finds the one build' do
           allow(fake_app).to receive(:latest_version).and_return(fake_version)
@@ -81,6 +81,70 @@ describe Deliver::SubmitForReview do
           expect(review_submitter.wait_for_build(fake_app, "1.2.3")).to eq(only_build)
         end
       end
+
+      context 'has candidates and one build, but no app version' do
+        let(:fake_app) { make_fake_app }
+        let(:fake_builds) do
+          builds = make_fake_builds(1)
+          builds[0][:train_version] = "1.2.3"
+          builds[0][:build_version] = "1"
+          builds[0][:processing] = false
+          return builds
+        end
+        let(:fake_builds_with_processed_build) do
+          builds = make_fake_builds(1)
+          builds[0][:train_version] = "1.2.3"
+          builds[0][:build_version] = "1"
+          builds[0][:processing] = true
+          return builds
+        end
+        let(:fake_version) do
+          fake_version = make_fake_version
+          fake_version[:app_version] = "1.02.3"
+          return fake_version
+        end
+
+        it 'finds the one build when no app version is provided' do
+          allow(fake_app).to receive(:latest_version).and_return(fake_version)
+          allow(fake_version).to receive(:candidate_builds).and_return(fake_builds, fake_builds_with_processed_build)
+          only_build = fake_builds.first
+          allow(review_submitter).to receive(:sleep)
+          expect(review_submitter.wait_for_build(fake_app, nil)).to eq(only_build)
+        end
+      end
+
+
+      context 'has candidates and one build with a leading zero in the train version' do
+        let(:fake_app) { make_fake_app }
+        let(:fake_builds) do
+          builds = make_fake_builds(1)
+          builds[0][:train_version] = "1.02.3"
+          builds[0][:build_version] = "1"
+          builds[0][:processing] = false
+          return builds
+        end
+        let(:fake_builds_with_trimmed_zero) do
+          builds = make_fake_builds(1)
+          builds[0][:train_version] = "1.2.3"
+          builds[0][:build_version] = "1"
+          builds[0][:processing] = true
+          return builds
+        end
+        let(:fake_version) do
+          fake_version = make_fake_version
+          fake_version[:app_version] = "1.02.3"
+          return fake_version
+        end
+
+        it 'does not find the one build until the candidate is corrected' do
+          allow(fake_app).to receive(:latest_version).and_return(fake_version)
+          allow(fake_version).to receive(:candidate_builds).and_return(fake_builds_with_trimmed_zero, fake_builds)
+          only_build = fake_builds.first
+          allow(review_submitter).to receive(:sleep)
+          expect(review_submitter.wait_for_build(fake_app, "1.02.3")).to eq(only_build)
+        end
+      end
+
     end
   end
 end
