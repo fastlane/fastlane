@@ -14,10 +14,25 @@ module Spaceship::TestFlight
 
     def self.all(app_id: nil, platform: nil, retry_count: 3)
       client = Spaceship::ConnectAPI::Base.client
-      builds_resp = client.get_builds(filter: { app: app_id}, sort: "-uploadedDate", includes: "buildBetaDetail,betaBuildMetrics,preReleaseVersion,app", only_data: false)
 
-      builds = builds_resp["data"]
-      included = builds_resp["included"]
+      builds = []
+      included = []
+      cursor = nil
+
+      loop do 
+        builds_resp = client.get_builds(filter: { app: app_id}, limit: 100, sort: "uploadedDate", includes: "buildBetaDetail,betaBuildMetrics,preReleaseVersion,app", cursor: cursor, only_data: false)
+        builds += builds_resp["data"]
+        included += builds_resp["included"]
+        
+        next_page = builds_resp["links"]["next"]
+        break if next_page.nil?
+
+        uri = URI.parse(next_page)
+        params = CGI.parse(uri.query)
+        cursor = params["cursor"].first
+
+        break if cursor.nil?
+      end
 
       # Load with all of the data
       builds.map do |build|
@@ -27,8 +42,10 @@ module Spaceship::TestFlight
         r = build["relationships"]["preReleaseVersion"]["data"]
         build["preReleaseVersion"] = included.find { |h| h["type"] == r["type"] && h["id"] == r["id"] }
 
-        r = build["relationships"]["betaBuildMetrics"]["data"][0]
-        build["betaBuildMetrics"] = included.find { |h| h["type"] == r["type"] && h["id"] == r["id"] }
+        if build["relationships"]["betaBuildMetrics"]["data"]
+          r = build["relationships"]["betaBuildMetrics"]["data"][0]
+          build["betaBuildMetrics"] = included.find { |h| h["type"] == r["type"] && h["id"] == r["id"] }
+        end
 
         build
       end
@@ -40,11 +57,23 @@ module Spaceship::TestFlight
         h['buildVersion'] = build["attributes"]["version"]
         h['uploadDate'] = build["attributes"]["uploadedDate"]
 
+        processing_state = build["attributes"]["processingState"]
+        if "VALID" == processing_state
+          h['externalState'] = Spaceship::TestFlight::Build::BUILD_STATES[:active]
+        elsif "PROCESSING" == processing_state
+          h['externalState'] = Spaceship::TestFlight::Build::BUILD_STATES[:processing]
+        end
+
         h['appAdamId'] = build["app"]["id"]
         h['bundleId'] = build["app"]["attributes"]["bundleId"]
 
         h['trainVersion'] = build["preReleaseVersion"]["attributes"]["version"]
-        h['installCount'] = build["betaBuildMetrics"]["attributes"]["installCount"]
+
+        if build["betaBuildMetrics"]
+          h['installCount'] = build["betaBuildMetrics"]["attributes"]["installCount"]
+        else
+          h['installCount'] = 0
+        end
 
         h
       end
@@ -52,7 +81,8 @@ module Spaceship::TestFlight
       trains = {}
       train_builds.each do |build|
         train_version = build["trainVersion"]
-        trains[train_version] = Spaceship::TestFlight::Build.new(build)
+        trains[train_version] ||= []
+        trains[train_version] << Spaceship::TestFlight::Build.new(build)
       end
 
       self.new(trains)

@@ -108,23 +108,9 @@ module Pilot
       end
 
       platform = fetch_app_platform(required: false)
-
-      client = Spaceship::ConnectAPI::Base.client
-      builds_resp = client.get_builds(filter: { app: app.apple_id, processingState: "VALID,PROCESSING" }, sort: "-uploadedDate", includes: "buildBetaDetail,betaBuildMetrics,preReleaseVersion", only_data: false)
-      builds = builds_resp["data"]
-      included = builds_resp["included"]
-
-      builds.map do |build|
-        r = build["relationships"]["preReleaseVersion"]["data"]
-        build["preReleaseVersion"] = included.find { |h| h["type"] == r["type"] && h["id"] == r["id"] }
-
-        r = build["relationships"]["betaBuildMetrics"]["data"][0]
-        build["betaBuildMetrics"] = included.find { |h| h["type"] == r["type"] && h["id"] == r["id"] }
-
-        build
-      end
-
+      builds = app.all_processing_builds(platform: platform) + app.builds(platform: platform)
       # sort by upload_date
+      builds.sort! { |a, b| a.upload_date <=> b.upload_date }
       rows = builds.collect { |build| describe_build(build) }
 
       puts(Terminal::Table.new(
@@ -199,9 +185,10 @@ module Pilot
     private
 
     def describe_build(build)
-      row = [build["preReleaseVersion"]["attributes"]["version"],
-             build["attributes"]["version"],
-             build["betaBuildMetrics"]["attributes"]["installCount"]]
+      puts "build: #{build.upload_date}"
+      row = [build.train_version,
+             build.build_version,
+             build.install_count]
 
       return row
     end

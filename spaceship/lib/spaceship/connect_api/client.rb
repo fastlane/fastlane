@@ -18,21 +18,22 @@ module Spaceship
         'https://appstoreconnect.apple.com/iris/v1/'
       end
 
-      def build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+      def build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: cursor)
         params = {}
 
         params[:filter] = filter if filter && !filter.empty?
         params[:include] = includes if includes
         params[:limit] = limit if limit
         params[:sort] = sort if sort
+        params[:cursor] = cursor if cursor
 
         return params
       end
 
-      def get_beta_app_review_detail(filter: {}, includes: nil, limit: nil, sort: nil, only_data: true)
+      def get_beta_app_review_detail(filter: {}, includes: nil, limit: nil, sort: nil, cursor: nil, only_data: true)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaAppReviewDetails?filter[app]=<app_id>
-        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
 
         response = request(:get, "betaAppReviewDetails") do |req|
           req.options.params_encoder = Faraday::NestedParamsEncoder
@@ -62,10 +63,10 @@ module Spaceship
         handle_response(response, only_data: only_data)
       end
 
-      def get_beta_app_localizations(filter: {}, includes: nil, limit: nil, sort: nil, only_data: true)
+      def get_beta_app_localizations(filter: {}, includes: nil, limit: nil, sort: nil, cursor: nil, only_data: true)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaAppLocalizations?filter[app]=<app_id>
-        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
 
         response = request(:get, "betaAppLocalizations") do |req|
           req.options.params_encoder = Faraday::NestedParamsEncoder
@@ -74,11 +75,11 @@ module Spaceship
         handle_response(response, only_data: only_data)
       end
 
-      def get_beta_build_localizations(filter: {}, includes: nil, limit: nil, sort: nil, only_data: true)
+      def get_beta_build_localizations(filter: {}, includes: nil, limit: nil, sort: nil, cursor: nil, only_data: true)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations?filter[build]=<build_id>
         path = "betaBuildLocalizations"
-        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
 
         response = request(:get, path) do |req|
           req.options.params_encoder = Faraday::NestedParamsEncoder
@@ -185,10 +186,10 @@ module Spaceship
         handle_response(response, only_data: only_data)
       end
 
-      def get_build_beta_details(filter: {}, includes: nil, limit: nil, sort: nil, only_data: true)
+      def get_build_beta_details(filter: {}, includes: nil, limit: nil, sort: nil, cursor: nil, only_data: true)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/buildBetaDetails
-        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
 
         response = request(:get, "buildBetaDetails") do |req|
           req.options.params_encoder = Faraday::NestedParamsEncoder
@@ -218,10 +219,10 @@ module Spaceship
         handle_response(response, only_data: only_data)
       end
 
-      def get_builds(filter: {}, includes: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate", only_data: true)
+      def get_builds(filter: {}, includes: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate", cursor: nil, only_data: true)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/builds
-        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
 
         response = request(:get, "builds") do |req|
           req.options.params_encoder = Faraday::NestedParamsEncoder
