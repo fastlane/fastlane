@@ -128,6 +128,10 @@ module Spaceship
 
       def self.latest(app_id: nil, platform: nil)
         all(app_id: app_id, platform: platform).sort_by(&:upload_date).last
+        #client = Spaceship::ConnectAPI::Base.client
+        #resp = client.get_builds(filter: { app: app_id }, sort: "-uploadedDate", limit: 1)
+        #puts "resp: #{resp}"
+        #raise "ugh"
       end
 
       # reload the raw_data resource for this build.

@@ -29,7 +29,7 @@ module Spaceship
         return params
       end
 
-      def get_beta_app_review_detail(filter: {}, includes: nil, limit: nil, sort: nil)
+      def get_beta_app_review_detail(filter: {}, includes: nil, limit: nil, sort: nil, only_data: true)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaAppReviewDetails?filter[app]=<app_id>
         params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
@@ -38,10 +38,10 @@ module Spaceship
           req.options.params_encoder = Faraday::NestedParamsEncoder
           req.params = params
         end
-        handle_response(response)
+        handle_response(response, only_data: only_data)
       end
 
-      def patch_beta_app_review_detail(app_id: nil, attributes: {})
+      def patch_beta_app_review_detail(app_id: nil, attributes: {}, only_data: true)
         # PATCH
         # https://appstoreconnect.apple.com/iris/v1/apps/<app_id>/betaAppReviewDetails
         path = "betaAppReviewDetails/#{app_id}"
@@ -59,10 +59,10 @@ module Spaceship
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
-        handle_response(response)
+        handle_response(response, only_data: only_data)
       end
 
-      def get_beta_app_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
+      def get_beta_app_localizations(filter: {}, includes: nil, limit: nil, sort: nil, only_data: true)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaAppLocalizations?filter[app]=<app_id>
         params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
@@ -71,10 +71,10 @@ module Spaceship
           req.options.params_encoder = Faraday::NestedParamsEncoder
           req.params = params
         end
-        handle_response(response)
+        handle_response(response, only_data: only_data)
       end
 
-      def get_beta_build_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
+      def get_beta_build_localizations(filter: {}, includes: nil, limit: nil, sort: nil, only_data: true)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations?filter[build]=<build_id>
         path = "betaBuildLocalizations"
@@ -84,10 +84,10 @@ module Spaceship
           req.options.params_encoder = Faraday::NestedParamsEncoder
           req.params = params
         end
-        handle_response(response)
+        handle_response(response, only_data: only_data)
       end
 
-      def post_beta_app_localizations(app_id: nil, attributes: {})
+      def post_beta_app_localizations(app_id: nil, attributes: {}, only_data: true)
         # POST
         # https://appstoreconnect.apple.com/iris/v1/betaAppLocalizations
         path = "betaAppLocalizations"
@@ -112,10 +112,10 @@ module Spaceship
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
-        handle_response(response)
+        handle_response(response, only_data: only_data)
       end
 
-      def patch_beta_app_localizations(localization_id: nil, attributes: {})
+      def patch_beta_app_localizations(localization_id: nil, attributes: {}, only_data: true)
         # PATCH
         # https://appstoreconnect.apple.com/iris/v1/apps/<app_id>/betaAppLocalizations/<localization_id>
         path = "betaAppLocalizations/#{localization_id}"
@@ -133,10 +133,10 @@ module Spaceship
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
-        handle_response(response)
+        handle_response(response, only_data: only_data)
       end
 
-      def post_beta_build_localizations(build_id: nil, attributes: {})
+      def post_beta_build_localizations(build_id: nil, attributes: {}, only_data: true)
         # POST
         # https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations
         path = "betaBuildLocalizations"
@@ -161,10 +161,10 @@ module Spaceship
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
-        handle_response(response)
+        handle_response(response, only_data: only_data)
       end
 
-      def patch_beta_build_localizations(localization_id: nil, feedbackEmail: nil, attributes: {})
+      def patch_beta_build_localizations(localization_id: nil, feedbackEmail: nil, attributes: {}, only_data: true)
         # PATCH
         # https://appstoreconnect.apple.com/iris/v1/apps/<app_id>/betaBuildLocalizations
         path = "betaBuildLocalizations/#{localization_id}"
@@ -182,10 +182,10 @@ module Spaceship
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
-        handle_response(response)
+        handle_response(response, only_data: only_data)
       end
 
-      def get_build_beta_details(filter: {}, includes: nil, limit: nil, sort: nil)
+      def get_build_beta_details(filter: {}, includes: nil, limit: nil, sort: nil, only_data: true)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/buildBetaDetails
         params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
@@ -194,10 +194,10 @@ module Spaceship
           req.options.params_encoder = Faraday::NestedParamsEncoder
           req.params = params
         end
-        handle_response(response)
+        handle_response(response, only_data: only_data)
       end
 
-      def patch_build_beta_details(build_beta_details_id: nil, attributes: {})
+      def patch_build_beta_details(build_beta_details_id: nil, attributes: {}, only_data: true)
         # PATCH
         # https://appstoreconnect.apple.com/iris/v1/buildBetaDetails/<build_beta_details_id>
         path = "buildBetaDetails/#{build_beta_details_id}"
@@ -215,10 +215,10 @@ module Spaceship
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
-        handle_response(response)
+        handle_response(response, only_data: only_data)
       end
 
-      def get_builds(filter: {}, includes: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate")
+      def get_builds(filter: {}, includes: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate", only_data: true)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/builds
         params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
@@ -227,10 +227,10 @@ module Spaceship
           req.options.params_encoder = Faraday::NestedParamsEncoder
           req.params = params
         end
-        handle_response(response)
+        handle_response(response, only_data: only_data)
       end
 
-      def patch_builds(build_id: nil, attributes: {})
+      def patch_builds(build_id: nil, attributes: {}, only_data: true)
         # PATCH
         # https://appstoreconnect.apple.com/iris/v1/builds/<build_id>
         path = "builds/#{build_id}"
@@ -248,10 +248,10 @@ module Spaceship
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
-        handle_response(response)
+        handle_response(response, only_data: only_data)
       end
 
-      def post_beta_app_review_submissions(build_id: nil)
+      def post_beta_app_review_submissions(build_id: nil, only_data: true)
         # POST
         # https://appstoreconnect.apple.com/iris/v1/betaAppReviewSubmissions
 
@@ -274,12 +274,12 @@ module Spaceship
           req.body = body.to_json
           req.headers['Content-Type'] = 'application/json'
         end
-        handle_response(response)
+        handle_response(response, only_data: only_data)
       end
 
       protected
 
-      def handle_response(response)
+      def handle_response(response, only_data: true)
         if (200...300).cover?(response.status) && (response.body.nil? || response.body.empty?)
           return
         end
@@ -296,7 +296,7 @@ module Spaceship
 
         raise UnexpectedResponse, "Temporary App Store Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
 
-        return response.body['data'] if response.body['data']
+        return response.body['data'] if response.body['data'] && only_data
 
         return response.body
       end
