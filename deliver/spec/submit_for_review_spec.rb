@@ -17,7 +17,11 @@ describe Deliver::SubmitForReview do
   end
 
   def make_fake_version
-    return OpenStruct.new({})
+    fake_version = OpenStruct.new({
+      app_version: "1.2.3"
+    })
+
+    return fake_version
   end
 
   describe :find_build do
@@ -49,11 +53,8 @@ describe Deliver::SubmitForReview do
     describe :wait_for_build do
       context 'no candidates' do
         let(:fake_app) { make_fake_app }
+        let(:fake_version) { make_fake_version }
         let(:time_now) { Time.now }
-        let(:fake_version) do
-          fake_version = make_fake_version
-          fake_version[:app_version] = "1.2.3"
-        end
 
         # Stub Time.now to return current time on first call and 6 minutes later on second
         before { allow(Time).to receive(:now).and_return(time_now, (time_now + 60 * 6)) }
@@ -68,11 +69,8 @@ describe Deliver::SubmitForReview do
 
       context 'has candidates and one build' do
         let(:fake_app) { make_fake_app }
+        let(:fake_version) { make_fake_version }
         let(:fake_builds) { make_fake_builds(1) }
-        let(:fake_version) do
-          fake_version = make_fake_version
-          fake_version[:app_version] = "1.2.3"
-        end
 
         it 'finds the one build' do
           allow(fake_app).to receive(:latest_version).and_return(fake_version)
