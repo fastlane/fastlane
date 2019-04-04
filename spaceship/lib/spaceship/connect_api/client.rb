@@ -219,6 +219,18 @@ module Spaceship
         handle_response(response, only_data: only_data)
       end
 
+      def get_build_deliveries(filter: {}, includes: nil, limit: 10, sort: nil, cursor: nil, only_data: true)
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/buildDeliveries
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
+
+        response = request(:get, "buildDeliveries") do |req|
+          req.options.params_encoder = Faraday::NestedParamsEncoder
+          req.params = params
+        end
+        handle_response(response, only_data: only_data)
+      end
+
       def get_builds(filter: {}, includes: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate", cursor: nil, only_data: true)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/builds
