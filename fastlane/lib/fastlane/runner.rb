@@ -226,9 +226,12 @@ module Fastlane
       begin
         Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
           # If another action is calling this action, we shouldn't show it in the summary
-          # (see https://github.com/fastlane/fastlane/issues/4546)
 
-          action_name = from_action ? nil : class_ref.step_text
+          unless from_action
+            args = arguments.kind_of?(Array) && arguments.first.kind_of?(Hash) ? arguments.first : {}
+            action_name = args[:step_name] || class_ref.step_text
+            args.delete(:step_name)
+          end
           Actions.execute_action(action_name) do
             # arguments is an array by default, containing an hash with the actual parameters
             # Since we usually just need the passed hash, we'll just use the first object if there is only one
