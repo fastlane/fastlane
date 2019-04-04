@@ -185,7 +185,6 @@ module Pilot
     private
 
     def describe_build(build)
-      puts "build: #{build.upload_date}"
       row = [build.train_version,
              build.build_version,
              build.install_count]
