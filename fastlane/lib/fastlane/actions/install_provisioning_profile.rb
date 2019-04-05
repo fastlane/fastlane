@@ -38,7 +38,7 @@ module Fastlane
                               verify_block: proc do |value|
                                 absolute_path = File.expand_path(value)
                                 unless File.exist?(absolute_path)
-                                  UI.user_error!("Failed installation of provisioning profile from file at path: '#{value}'")
+                                  UI.user_error!("Could not find provisioning profile at path: '#{value}'")
                                 end
                               end)
         ]
