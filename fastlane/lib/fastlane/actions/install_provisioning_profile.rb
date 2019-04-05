@@ -4,13 +4,8 @@ module Fastlane
   module Actions
     class InstallProvisioningProfileAction < Action
       def self.run(params)
-        profile_path = params[:provisioning_profile_path]
-        absolute_profile_path = File.expand_path(profile_path)
-        if File.exist?(absolute_profile_path)
-          FastlaneCore::ProvisioningProfile.install(absolute_profile_path)
-        else
-          UI.user_error!("Failed installation of provisioning profile from file at path: '#{profile_path}'")
-        end
+        absolute_path = File.expand_path(params[:provisioning_profile_path])
+        FastlaneCore::ProvisioningProfile.install(absolute_path)
       end
 
       def self.description
@@ -39,7 +34,13 @@ module Fastlane
                                   env_name: "FL_INSTALL_PROVISIONING_PROFILE_PATH",
                                description: "Path to provisioning profile",
                                   optional: false,
-                                      type: String)
+                                      type: String,
+                              verify_block: proc do |value|
+                                absolute_path = File.expand_path(value)
+                                unless File.exist?(absolute_path)
+                                  UI.user_error!("Failed installation of provisioning profile from file at path: '#{value}'")
+                                end
+                              end)
         ]
       end
 
