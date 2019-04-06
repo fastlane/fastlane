@@ -58,7 +58,7 @@ module Fastlane
         Gem.path.any? { |gem_path| File.expand_path(path).start_with?(gem_path) }
       end
       ios_projects.delete_if { |path| path.match("fastlane/swift/FastlaneSwiftRunner/FastlaneSwiftRunner.xcodeproj") }
-      android_projects = Dir["**/*.gradle"]
+      android_projects = Dir["**/*.gradle"] + Dir["**/*.gradle.kts"]
 
       spinner.success
 

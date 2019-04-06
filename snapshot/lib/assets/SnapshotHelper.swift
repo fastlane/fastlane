@@ -18,8 +18,8 @@ import XCTest
 var deviceLanguage = ""
 var locale = ""
 
-func setupSnapshot(_ app: XCUIApplication) {
-    Snapshot.setupSnapshot(app)
+func setupSnapshot(_ app: XCUIApplication, waitForAnimations: Bool = true) {
+    Snapshot.setupSnapshot(app, waitForAnimations: waitForAnimations)
 }
 
 func snapshot(_ name: String, waitForLoadingIndicator: Bool) {
@@ -63,14 +63,16 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
 @objcMembers
 open class Snapshot: NSObject {
     static var app: XCUIApplication?
+    static var waitForAnimations = true
     static var cacheDirectory: URL?
     static var screenshotsDirectory: URL? {
         return cacheDirectory?.appendingPathComponent("screenshots", isDirectory: true)
     }
 
-    open class func setupSnapshot(_ app: XCUIApplication) {
+    open class func setupSnapshot(_ app: XCUIApplication, waitForAnimations: Bool = true) {
         
         Snapshot.app = app
+        Snapshot.waitForAnimations = waitForAnimations
 
         do {
             let cacheDir = try pathPrefix()
@@ -115,7 +117,7 @@ open class Snapshot: NSObject {
             print("Couldn't detect/set locale...")
         }
         
-        if locale.isEmpty {
+        if locale.isEmpty && !deviceLanguage.isEmpty {
             locale = Locale(identifier: deviceLanguage).identifier
         }
         
@@ -153,10 +155,17 @@ open class Snapshot: NSObject {
 
         print("snapshot: \(name)") // more information about this, check out https://docs.fastlane.tools/actions/snapshot/#how-does-it-work
 
-        sleep(1) // Waiting for the animation to be finished (kind of)
+        if Snapshot.waitForAnimations {
+            sleep(1) // Waiting for the animation to be finished (kind of)
+        }
 
         #if os(OSX)
-            XCUIApplication().typeKey(XCUIKeyboardKeySecondaryFn, modifierFlags: [])
+            guard let app = self.app else {
+                print("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
+                return
+            }
+
+            app.typeKey(XCUIKeyboardKeySecondaryFn, modifierFlags: [])
         #else
             
             guard let app = self.app else {
@@ -182,7 +191,12 @@ open class Snapshot: NSObject {
             return
         #endif
 
-        let networkLoadingIndicator = XCUIApplication().otherElements.deviceStatusBars.networkLoadingIndicators.element
+        guard let app = self.app else {
+            print("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
+            return
+        }
+
+        let networkLoadingIndicator = app.otherElements.deviceStatusBars.networkLoadingIndicators.element
         let networkLoadingIndicatorDisappeared = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: networkLoadingIndicator)
         _ = XCTWaiter.wait(for: [networkLoadingIndicatorDisappeared], timeout: timeout)
     }
@@ -257,7 +271,11 @@ private extension XCUIElementQuery {
     }
 
     var deviceStatusBars: XCUIElementQuery {
-        let deviceWidth = XCUIApplication().windows.firstMatch.frame.width
+        guard let app = Snapshot.app else {
+            fatalError("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
+        }
+
+        let deviceWidth = app.windows.firstMatch.frame.width
 
         let isStatusBar = NSPredicate { (evaluatedObject, _) in
             guard let element = evaluatedObject as? XCUIElementAttributes else { return false }
@@ -277,4 +295,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.13]
+// SnapshotHelperVersion [1.15]

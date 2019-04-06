@@ -219,7 +219,8 @@ module FastlaneCore
       value = if @values.key?(key) && !@values[key].nil?
                 @values[key]
               elsif option.env_name && !ENV[option.env_name].nil?
-                ENV[option.env_name].dup
+                # verify! before using (see https://github.com/fastlane/fastlane/issues/14449)
+                ENV[option.env_name].dup if option.verify!(option.auto_convert_value(ENV[option.env_name]))
               elsif self.config_file_options.key?(key)
                 self.config_file_options[key]
               else

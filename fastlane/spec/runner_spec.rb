@@ -20,6 +20,17 @@ describe Fastlane do
       it "doesn't show private lanes" do
         expect(@ff.runner.available_lanes).to_not(include('android such_private'))
       end
+      describe "step_name override" do
+        it "handle overriding of step_name" do
+          allow(Fastlane::Actions).to receive(:execute_action).with('Let it Frame')
+          @ff.runner.execute_action(:frameit, Fastlane::Actions::FrameitAction, [{ step_name: "Let it Frame" }])
+        end
+        it "rely on step_text when no step_name given" do
+          allow(Fastlane::Actions).to receive(:execute_action).with('frameit')
+
+          @ff.runner.execute_action(:frameit, Fastlane::Actions::FrameitAction, [{}])
+        end
+      end
     end
   end
 end

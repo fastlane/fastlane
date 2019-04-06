@@ -205,8 +205,6 @@ module Match
                                             print_command: FastlaneCore::Globals.verbose?)
           end
         end
-
-        self.clear_changes
       rescue => ex
         UI.error("Couldn't commit or push changes back to git...")
         UI.error(ex)

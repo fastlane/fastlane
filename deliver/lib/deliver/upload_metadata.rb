@@ -130,7 +130,7 @@ module Deliver
       set_trade_representative_contact_information(v, options)
       set_review_information(v, options)
       set_app_rating(v, options)
-      v.ratings_reset = options[:reset_ratings]
+      v.ratings_reset = options[:reset_ratings] unless options[:reset_ratings].nil?
 
       set_review_attachment_file(v, options)
 

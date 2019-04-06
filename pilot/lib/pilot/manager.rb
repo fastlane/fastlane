@@ -21,7 +21,7 @@ module Pilot
 
       UI.message("Login to App Store Connect (#{config[:username]})")
       Spaceship::Tunes.login(config[:username])
-      Spaceship::Tunes.select_team
+      Spaceship::Tunes.select_team(team_id: config[:team_id], team_name: config[:team_name])
       UI.message("Login successful")
     end
 
