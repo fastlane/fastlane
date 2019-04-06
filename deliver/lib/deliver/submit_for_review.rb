@@ -74,7 +74,7 @@ module Deliver
         end
 
         latest_build = find_build(candidate_builds)
-        latest_build_matches = (latest_build && latest_build.train_version == app_version && latest_build.build_version == build.build_version)
+        latest_build_matches = (latest_build&.train_version == app_version && latest_build&.build_version == build&.build_version)
         # Sometimes latest build will disappear and a different build would get selected
         # Only set build if no latest build found or if same build versions as previously fetched build
         # Issue: https://github.com/fastlane/fastlane/issues/10945
