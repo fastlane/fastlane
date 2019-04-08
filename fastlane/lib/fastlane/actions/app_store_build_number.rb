@@ -32,34 +32,27 @@ module Fastlane
           UI.user_error!("Could not find a live-version of #{params[:app_identifier]} on iTC") unless app.live_version
           build_nr = app.live_version.current_build_number
         else
+          client = Spaceship::ConnectAPI::Base.client
+
           version_number = params[:version]
           unless version_number
-            # Automatically fetch the latest version in testflight
-            begin
-              train_numbers = app.all_build_train_numbers(platform: platform)
-              testflight_version = self.order_versions(train_numbers).last
-            rescue
-              testflight_version = params[:version]
-            end
+            version = client.get_pre_release_versions(filter: { app: app.apple_id }, sort:"-version", limit: 1).first
+            version_number = version["attributes"]["version"]
+          end
 
-            if testflight_version
-              version_number = testflight_version
-            else
-              version_number = UI.input("You have to specify a new version number, as there are multiple to choose from")
-            end
-
+          unless version_number
+            version_number = UI.input("You have to specify a new version number, as there are multiple to choose from")
           end
 
           UI.message("Fetching the latest build number for version #{version_number}")
+          
+          build = client.get_builds(filter: { app: app.apple_id, "preReleaseVersion.version": version_number}, sort:"-uploadedDate", limit: 1).first
+          if build
+            build_nr = build["attributes"]["version"]
+            build_nr
+          end
 
-          begin
-            build_numbers = app.all_builds_for_train(train: version_number, platform: platform).map(&:build_version)
-            build_nr = self.order_versions(build_numbers).last
-            if build_nr.nil? && params[:initial_build_number]
-              UI.message("Could not find a build on iTC. Using supplied 'initial_build_number' option")
-              build_nr = params[:initial_build_number]
-            end
-          rescue
+          unless build_nr
             UI.user_error!("Could not find a build on iTC - and 'initial_build_number' option is not set") unless params[:initial_build_number]
             build_nr = params[:initial_build_number]
           end

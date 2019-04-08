@@ -290,6 +290,18 @@ module Spaceship
         handle_response(response, only_data: only_data)
       end
 
+      def get_pre_release_versions(filter: {}, includes: nil, limit: 40, sort: nil, cursor: nil, only_data: true)
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/preReleaseVersions
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
+
+        response = request(:get, "preReleaseVersions") do |req|
+          req.options.params_encoder = Faraday::NestedParamsEncoder
+          req.params = params
+        end
+        handle_response(response, only_data: only_data)
+      end
+
       def get_beta_groups(filter: {}, includes: nil, limit: 40, sort: nil, cursor: nil, only_data: true)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaGroups
