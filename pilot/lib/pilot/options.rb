@@ -241,6 +241,7 @@ module Pilot
                                      end),
         FastlaneCore::ConfigItem.new(key: :wait_for_uploaded_build,
                                      env_name: "PILOT_WAIT_FOR_UPLOADED_BUILD",
+                                     deprecated: "No longer needed with the user of App Store Connect API",
                                      description: "Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used",
                                      is_string: false,
                                      default_value: false),

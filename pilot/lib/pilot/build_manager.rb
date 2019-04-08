@@ -58,10 +58,10 @@ module Pilot
       platform = fetch_app_platform
       app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
       app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
-      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, train_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval], strict_build_watch: config[:wait_for_uploaded_build])
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, train_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval])
 
       unless latest_build.train_version == app_version && latest_build.build_version == app_build
-        UI.important("Uploaded app #{app_version} - #{app_build}, but received build #{latest_build.train_version} - #{latest_build.build_version}. If you want to wait for uploaded build to be finished processing, use the `wait_for_uploaded_build` option")
+        UI.important("Uploaded app #{app_version} - #{app_build}, but received build #{latest_build.train_version} - #{latest_build.build_version}.")
       end
 
       return latest_build

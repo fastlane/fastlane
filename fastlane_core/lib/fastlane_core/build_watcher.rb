@@ -7,16 +7,8 @@ module FastlaneCore
     class << self
       # @return The build we waited for. This method will always return a build
       def wait_for_build_processing_to_be_complete(app_id: nil, platform: nil, train_version: nil, build_version: nil, poll_interval: 10, strict_build_watch: false)
-        unless strict_build_watch
-          # First, find the train and build version we want to watch for
-          watched_build = watching_build(app_id: app_id, platform: platform)
-          UI.crash!("Could not find a build for app: #{app_id} on platform: #{platform}") if watched_build.nil?
-
-          unless watched_build.train_version == train_version && watched_build.build_version == build_version
-            UI.important("Started watching build #{watched_build.train_version} - #{watched_build.build_version} but expected #{train_version} - #{build_version}")
-          end
-          train_version = watched_build.train_version
-          build_version = watched_build.build_version
+        if strict_build_watch
+          UI.deprecated(":strict_build_watch is no longer a used argument on FastlaneCore::BuildWatcher.")
         end
 
         loop do
