@@ -18,7 +18,7 @@ module Spaceship
         'https://appstoreconnect.apple.com/iris/v1/'
       end
 
-      def build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: cursor)
+      def build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: nil)
         params = {}
 
         params[:filter] = filter if filter && !filter.empty?
@@ -288,6 +288,39 @@ module Spaceship
           req.headers['Content-Type'] = 'application/json'
         end
         handle_response(response, only_data: only_data)
+      end
+
+      def get_beta_groups(filter: {}, includes: nil, limit: 40, sort: nil, cursor: nil, only_data: true)
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/betaGroups
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
+
+        response = request(:get, "betaGroups") do |req|
+          req.options.params_encoder = Faraday::NestedParamsEncoder
+          req.params = params
+        end
+        handle_response(response, only_data: only_data)
+      end
+
+      def add_beta_groups_to_build(build_id: nil, beta_group_ids: [])
+        # POST
+        # https://appstoreconnect.apple.com/iris/v1/builds/<build_id>/relationships/betaGroups
+
+        body = {
+          data: beta_group_ids.map do |id|
+            {
+              type: "betaGroups",
+              id: id
+            }
+          end
+        }
+
+        response = request(:post) do |req|
+          req.url("builds/#{build_id}/relationships/betaGroups")
+          req.body = body.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_response(response)
       end
 
       protected

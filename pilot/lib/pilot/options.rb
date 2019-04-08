@@ -141,6 +141,7 @@ module Pilot
                                      default_value: false,
                                      type: Boolean),
         FastlaneCore::ConfigItem.new(key: :distribute_external,
+                                     deprecated: "This no longer does anything by itself. Use :groups to distribute externally",
                                      is_string: false,
                                      env_name: "PILOT_DISTRIBUTE_EXTERNAL",
                                      description: "Should the build be distributed to external testers?",

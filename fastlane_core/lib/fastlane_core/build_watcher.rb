@@ -44,12 +44,15 @@ module FastlaneCore
       def matching_build(watched_train_version: nil, watched_build_version: nil, app_id: nil, platform: nil)
         client = Spaceship::ConnectAPI::Base.client
         build_deliveries = client.get_build_deliveries(filter: { app: app_id, cfBundleVersion: watched_build_version}, limit: 1)
+        build_delivery = build_deliveries.first
 
         # Actually only show processed builds
-        matched_builds = Spaceship::TestFlight::Build.all(app_id: app_id, platform: platform)
-        matched_build = matched_builds.find { |build| build.build_version.to_s == watched_build_version.to_s }
+        unless build_delivery
+          matched_builds = Spaceship::TestFlight::Build.all(app_id: app_id, platform: platform)
+          matched_build = matched_builds.find { |build| build.build_version.to_s == watched_build_version.to_s }
+        end
 
-        return matched_build, build_deliveries.first
+        return matched_build, build_delivery
       end
 
       def report_status(build: nil, build_delivery: nil)

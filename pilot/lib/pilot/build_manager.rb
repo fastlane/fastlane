@@ -16,7 +16,7 @@ module Pilot
 
       UI.user_error!("No ipa file given") unless config[:ipa]
 
-      if options[:changelog].nil? && options[:distribute_external] == true
+      if options[:changelog].nil? && !options[:groups].empty?
         if UI.interactive?
           options[:changelog] = UI.input("No changelog provided for new build. You can provide a changelog using the `changelog` option. For now, please provide a changelog here:")
         else
@@ -97,7 +97,7 @@ module Pilot
         end
       end
       distribute_build(build, options)
-      type = options[:distribute_external] ? 'External' : 'Internal'
+      type = !options[:groups].empty? ? 'External' : 'Internal'
       UI.success("Successfully distributed build to #{type} testers 🚀")
     end
 
@@ -237,7 +237,7 @@ module Pilot
       # This is where we could add a check to see if encryption is required and has been updated
       set_export_compliance_if_needed(uploaded_build, options)
 
-      if options[:groups] || options[:distribute_external]
+      if options[:groups]
         begin
           uploaded_build.submit_for_testflight_review!
         rescue => ex
@@ -251,21 +251,17 @@ module Pilot
       end
 
       if options[:groups]
-        groups = Spaceship::TestFlight::Group.filter_groups(app_id: uploaded_build.app_id) do |group|
-          options[:groups].include?(group.name)
+        client = Spaceship::ConnectAPI::Base.client
+        beta_group_ids = client.get_beta_groups.select do |group|
+          options[:groups].include?(group["attributes"]["name"])
+        end.map do |group|
+          group["id"]
         end
-        groups.each do |group|
-          uploaded_build.add_group!(group)
-        end
-      end
 
-      if options[:distribute_external]
-        external_group = Spaceship::TestFlight::Group.default_external_group(app_id: uploaded_build.app_id)
-        uploaded_build.add_group!(external_group) unless external_group.nil?
+        build = uploaded_build.find_app_store_connect_build
+        build_id = build["id"]
 
-        if external_group.nil? && options[:groups].nil?
-          UI.user_error!("You must specify at least one group using the `:groups` option to distribute externally")
-        end
+        client.add_beta_groups_to_build(build_id: build_id, beta_group_ids: beta_group_ids)
       end
 
       true
