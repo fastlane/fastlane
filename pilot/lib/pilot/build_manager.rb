@@ -16,7 +16,7 @@ module Pilot
 
       UI.user_error!("No ipa file given") unless config[:ipa]
 
-      if options[:changelog].nil? && !options[:groups].empty?
+      if options[:changelog].nil? && !options[:groups].nil?
         if UI.interactive?
           options[:changelog] = UI.input("No changelog provided for new build. You can provide a changelog using the `changelog` option. For now, please provide a changelog here:")
         else
@@ -97,7 +97,7 @@ module Pilot
         end
       end
       distribute_build(build, options)
-      type = !options[:groups].empty? ? 'External' : 'Internal'
+      type = !options[:groups].nil? ? 'External' : 'Internal'
       UI.success("Successfully distributed build to #{type} testers 🚀")
     end
 
