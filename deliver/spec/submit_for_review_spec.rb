@@ -84,7 +84,7 @@ describe Deliver::SubmitForReview do
           build = double('fake_build')
           allow(build).to receive(:train_version).and_return("1.2.3")
           allow(build).to receive(:build_version).and_return(1)
-          allow(build).to receive(:upload_date).and_return(1554754590)
+          allow(build).to receive(:upload_date).and_return(1_554_754_590)
           expect(build).to receive(:processing).and_return(true)
           return [build]
         end
@@ -92,7 +92,7 @@ describe Deliver::SubmitForReview do
           build = double('fake_build')
           allow(build).to receive(:train_version).and_return("1.2.3")
           allow(build).to receive(:build_version).and_return(1)
-          allow(build).to receive(:upload_date).and_return(1554754590)
+          allow(build).to receive(:upload_date).and_return(1_554_754_590)
           expect(build).to receive(:processing).and_return(false)
           return [build]
         end
@@ -117,7 +117,7 @@ describe Deliver::SubmitForReview do
           build = double('fake_build')
           expect(build).to receive(:train_version).and_return("1.02.3")
           allow(build).to receive(:build_version).and_return(1)
-          allow(build).to receive(:upload_date).and_return(1554754590)
+          allow(build).to receive(:upload_date).and_return(1_554_754_590)
           allow(build).to receive(:processing).and_return(false)
           return [build]
         end
@@ -125,7 +125,7 @@ describe Deliver::SubmitForReview do
           build = double('fake_build_with_trimmed_zero')
           expect(build).to receive(:train_version).and_return("1.2.3")
           allow(build).to receive(:build_version).and_return(1)
-          allow(build).to receive(:upload_date).and_return(1554754590)
+          allow(build).to receive(:upload_date).and_return(1_554_754_590)
           allow(build).to receive(:processing).and_return(true)
           return [build]
         end
