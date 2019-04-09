@@ -78,7 +78,7 @@ module Deliver
         # if the app version isn't present in the hash (could happen if we are waiting for submission, but didn't provide
         # it explicitly and no ipa was passed to grab it from), then fall back to the best guess, which is the train_version
         # of the most recently uploaded build
-        app_version = app_version || latest_build.train_version
+        app_version ||= latest_build.train_version
 
         # Sometimes latest build will disappear and a different build would get selected
         # Only set build if no latest build found or if same build versions as previously fetched build
