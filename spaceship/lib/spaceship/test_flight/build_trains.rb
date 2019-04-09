@@ -20,7 +20,7 @@ module Spaceship::TestFlight
       cursor = nil
 
       loop do
-        builds_resp = client.get_builds(filter: { app: app_id, processingState: "VALID,PROCESSING,FAILED,INVALID" }, limit: 100, sort: "uploadedDate", includes: "buildBetaDetail,betaBuildMetrics,preReleaseVersion,app", cursor: cursor, only_data: false)
+        builds_resp = client.get_builds(filter: { app: app_id, processingState: "VALID,PROCESSING,FAILED,INVALID" }, limit: 100, sort: "uploadedDate", includes: "preReleaseVersion,app", cursor: cursor, only_data: false)
         builds += builds_resp["data"]
         included += (builds_resp["included"] || [])
 
@@ -41,11 +41,6 @@ module Spaceship::TestFlight
 
         r = build["relationships"]["preReleaseVersion"]["data"]
         build["preReleaseVersion"] = included.find { |h| h["type"] == r["type"] && h["id"] == r["id"] }
-
-        if build["relationships"]["betaBuildMetrics"]["data"]
-          r = build["relationships"]["betaBuildMetrics"]["data"][0]
-          build["betaBuildMetrics"] = included.find { |h| h["type"] == r["type"] && h["id"] == r["id"] }
-        end
 
         build
       end
@@ -68,12 +63,6 @@ module Spaceship::TestFlight
         h['bundleId'] = build["app"]["attributes"]["bundleId"]
 
         h['trainVersion'] = build["preReleaseVersion"]["attributes"]["version"]
-
-        if build["betaBuildMetrics"]
-          h['installCount'] = build["betaBuildMetrics"]["attributes"]["installCount"]
-        else
-          h['installCount'] = 0
-        end
 
         h
       end
