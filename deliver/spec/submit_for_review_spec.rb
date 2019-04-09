@@ -13,13 +13,13 @@ describe Deliver::SubmitForReview do
   end
 
   def make_fake_app
-    return OpenStruct.new({})
+    OpenStruct.new({})
   end
 
   def make_fake_version
     fake_version = double('fake_version')
     allow(fake_version).to receive(:[]).with(:app_version).and_return("1.2.3")
-    return fake_version
+    fake_version
   end
 
   describe :find_build do
@@ -86,7 +86,7 @@ describe Deliver::SubmitForReview do
           allow(build).to receive(:build_version).and_return(1)
           allow(build).to receive(:upload_date).and_return(1_554_754_590)
           expect(build).to receive(:processing).and_return(true)
-          return [build]
+          [build]
         end
         let(:fake_builds_with_processed_build) do
           build = double('fake_build')
@@ -94,12 +94,12 @@ describe Deliver::SubmitForReview do
           allow(build).to receive(:build_version).and_return(1)
           allow(build).to receive(:upload_date).and_return(1_554_754_590)
           expect(build).to receive(:processing).and_return(false)
-          return [build]
+          [build]
         end
         let(:fake_version) do
           fake_version = double('fake_version')
           allow(fake_version).to receive(:app_version).and_return(nil)
-          return fake_version
+          fake_version
         end
 
         it 'finds the one build when no app version is provided' do
@@ -119,7 +119,7 @@ describe Deliver::SubmitForReview do
           allow(build).to receive(:build_version).and_return(1)
           allow(build).to receive(:upload_date).and_return(1_554_754_590)
           allow(build).to receive(:processing).and_return(false)
-          return [build]
+          [build]
         end
         let(:fake_builds_with_trimmed_zero) do
           build = double('fake_build_with_trimmed_zero')
@@ -127,12 +127,12 @@ describe Deliver::SubmitForReview do
           allow(build).to receive(:build_version).and_return(1)
           allow(build).to receive(:upload_date).and_return(1_554_754_590)
           allow(build).to receive(:processing).and_return(true)
-          return [build]
+          [build]
         end
         let(:fake_version) do
           fake_version = double('fake_version')
           allow(fake_version).to receive(:[]).with(:app_version).and_return("1.02.3")
-          return fake_version
+          fake_version
         end
 
         it 'does not find the one build until the candidate is corrected' do

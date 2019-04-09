@@ -29,7 +29,7 @@ module Deliver
       UI.success("Successfully submitted the app for review!")
     end
 
-    def select_build(options)
+    private def select_build(options)
       app = options[:app]
       app_version = options[:app_version]
       v = app.edit_version(platform: options[:platform])
