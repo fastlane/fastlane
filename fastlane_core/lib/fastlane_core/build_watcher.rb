@@ -27,13 +27,6 @@ module FastlaneCore
 
       private
 
-      def watching_build(app_id: nil, platform: nil)
-        processing_builds = Spaceship::TestFlight::Build.all_processing_builds(app_id: app_id, platform: platform, retry_count: 2)
-
-        watched_build = processing_builds.sort_by(&:upload_date).last
-        watched_build || Spaceship::TestFlight::Build.latest(app_id: app_id, platform: platform)
-      end
-
       def matching_build(watched_train_version: nil, watched_build_version: nil, app_id: nil, platform: nil)
         # Get build deliveries (newly uploaded processing builds)
         client = Spaceship::ConnectAPI::Base.client
