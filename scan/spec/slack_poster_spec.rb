@@ -11,7 +11,7 @@ describe Scan::SlackPoster do
             project: './scan/examples/standard/app.xcodeproj'
           })
 
-          expect(Slack::Notifier).not_to(receive(:new))
+          expect(Fastlane::Actions::SlackAction).not_to(receive(:run))
 
           Scan::SlackPoster.new.run({ tests: 0, failures: 0 })
         end
@@ -28,7 +28,7 @@ describe Scan::SlackPoster do
             skip_slack: true
           })
 
-          expect(Slack::Notifier).not_to(receive(:new))
+          expect(Fastlane::Actions::SlackAction).not_to(receive(:run))
 
           Scan::SlackPoster.new.run({ tests: 0, failures: 0 })
         end
@@ -43,7 +43,7 @@ describe Scan::SlackPoster do
             skip_slack: true
           })
 
-          expect(Slack::Notifier).not_to(receive(:new))
+          expect(Fastlane::Actions::SlackAction).not_to(receive(:run))
 
           Scan::SlackPoster.new.run({ tests: 0, failures: 0 })
         end
@@ -57,7 +57,7 @@ describe Scan::SlackPoster do
             project: './scan/examples/standard/app.xcodeproj'
           })
 
-          expect(Slack::Notifier).not_to(receive(:new))
+          expect(Fastlane::Actions::SlackAction).not_to(receive(:run))
 
           Scan::SlackPoster.new.run({ tests: 0, failures: 0 })
         end
@@ -73,7 +73,7 @@ describe Scan::SlackPoster do
             slack_url: ''
           })
 
-          expect(Slack::Notifier).not_to(receive(:new))
+          expect(Fastlane::Actions::SlackAction).not_to(receive(:run))
 
           Scan::SlackPoster.new.run({ tests: 0, failures: 0 })
         end
@@ -81,11 +81,29 @@ describe Scan::SlackPoster do
     end
 
     def expect_slack_posting
-      fake_notifier = "fake_notifier"
-      fake_result = "fake_result"
-      expect(Slack::Notifier).to receive(:new).and_return(fake_notifier)
-      expect(fake_notifier).to receive(:ping).and_return([fake_result])
-      expect(fake_result).to receive(:code).and_return(200)
+      expect(Fastlane::Actions::SlackAction).to receive(:run).with(
+        hash_including({
+          message: a_string_matching(' Tests:'),
+          channel: nil,
+          slack_url: 'https://slack/hook/url',
+          username: 'fastlane',
+          icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
+          attachment_properties: {
+            fields: [
+              {
+                title: 'Test Failures',
+                value: '0',
+                short: true
+              },
+              {
+                title: 'Successful Tests',
+                value: '0',
+                short: true
+              }
+            ]
+          }
+        })
+      )
     end
 
     describe "with slack_url option set to a URL value" do
