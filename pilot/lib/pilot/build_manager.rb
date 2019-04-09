@@ -121,6 +121,9 @@ module Pilot
     end
 
     def update_beta_app_meta(options, build)
+      # App Store Connect API build id
+      build_id = build.find_app_store_connect_build["id"]
+
       # Setting account required wth AppStore Connect API
       update_review_detail(build.app_id, { demo_account_required: options[:demo_account_required] })
 
@@ -143,17 +146,17 @@ module Pilot
       end
 
       if should_update_localized_build_information?(options)
-        update_localized_build_review(build, options[:localized_build_info])
+        update_localized_build_review(build_id, options[:localized_build_info])
       elsif should_update_build_information?(options)
         begin
-          update_localized_build_review(build, {}, default_info: { whats_new: options[:changelog] })
+          update_localized_build_review(build_id, {}, default_info: { whats_new: options[:changelog] })
           UI.success("Successfully set the changelog for build")
         rescue => ex
           UI.user_error!("Could not set changelog: #{ex}")
         end
       end
 
-      update_build_beta_details(build, {
+      update_build_beta_details(build_id, {
         auto_notify_enabled: options[:notify_external_testers]
       })
     end
@@ -357,10 +360,7 @@ module Pilot
       end
     end
 
-    def update_localized_build_review(build, info_by_lang, default_info: nil)
-      resp = Spaceship::ConnectAPI::Base.client.get_builds(filter: { expired: false, processingState: "PROCESSING,VALID", version: build.build_version })
-      build_id = resp.first["id"]
-
+    def update_localized_build_review(build_id, info_by_lang, default_info: nil)
       info_by_lang = info_by_lang.collect { |k, v| [k.to_sym, v] }.to_h
 
       if default_info
@@ -405,12 +405,8 @@ module Pilot
       end
     end
 
-    def update_build_beta_details(build, info)
+    def update_build_beta_details(build_id, info)
       client = Spaceship::ConnectAPI::Base.client
-
-      build = build.find_app_store_connect_build
-      build_id = build["id"]
-
       resp = client.get_build_beta_details(filter: { build: build_id })
       build_beta_details_id = resp.first["id"]
 

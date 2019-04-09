@@ -51,11 +51,13 @@ module Fastlane
           if build
             build_nr = build["attributes"]["version"]
             build_nr
+          else
+            UI.error("Could not find a build number for version #{version_number} on App Store Connect") 
           end
 
           # Show error and set initial build number
           unless build_nr
-            UI.user_error!("Could not find a build on iTC - and 'initial_build_number' option is not set") unless params[:initial_build_number]
+            UI.user_error!("Could not find a build on App Store Connect - and 'initial_build_number' option is not set") unless params[:initial_build_number]
             build_nr = params[:initial_build_number]
           end
         end
