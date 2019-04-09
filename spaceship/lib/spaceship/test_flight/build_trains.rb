@@ -19,11 +19,11 @@ module Spaceship::TestFlight
       included = []
       cursor = nil
 
-      loop do 
-        builds_resp = client.get_builds(filter: { app: app_id, processingState: "VALID,PROCESSING,FAILED,INVALID"}, limit: 100, sort: "uploadedDate", includes: "buildBetaDetail,betaBuildMetrics,preReleaseVersion,app", cursor: cursor, only_data: false)
+      loop do
+        builds_resp = client.get_builds(filter: { app: app_id, processingState: "VALID,PROCESSING,FAILED,INVALID" }, limit: 100, sort: "uploadedDate", includes: "buildBetaDetail,betaBuildMetrics,preReleaseVersion,app", cursor: cursor, only_data: false)
         builds += builds_resp["data"]
         included += (builds_resp["included"] || [])
-        
+
         next_page = builds_resp["links"]["next"]
         break if next_page.nil?
 
@@ -58,9 +58,9 @@ module Spaceship::TestFlight
         h['uploadDate'] = build["attributes"]["uploadedDate"]
 
         processing_state = build["attributes"]["processingState"]
-        if "VALID" == processing_state
+        if processing_state == "VALID"
           h['externalState'] = Spaceship::TestFlight::Build::BUILD_STATES[:active]
-        elsif "PROCESSING" == processing_state
+        elsif processing_state == "PROCESSING"
           h['externalState'] = Spaceship::TestFlight::Build::BUILD_STATES[:processing]
         end
 

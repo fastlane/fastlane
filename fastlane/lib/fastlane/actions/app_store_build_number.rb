@@ -24,8 +24,6 @@ module Fastlane
         Spaceship::Tunes.select_team
         UI.message("Login successful")
 
-        platform = params[:platform]
-
         app = Spaceship::Tunes::Application.find(params[:app_identifier])
         if params[:live]
           UI.message("Fetching the latest build number for live-version")
@@ -37,7 +35,7 @@ module Fastlane
           # Get version number from latest pre-release if no version number given
           version_number = params[:version]
           unless version_number
-            version = client.get_pre_release_versions(filter: { app: app.apple_id }, sort:"-version", limit: 1).first
+            version = client.get_pre_release_versions(filter: { app: app.apple_id }, sort: "-version", limit: 1).first
             version_number = version["attributes"]["version"]
           end
 
@@ -47,9 +45,9 @@ module Fastlane
           end
 
           UI.message("Fetching the latest build number for version #{version_number}")
-         
-          # Get latest build for version number 
-          build = client.get_builds(filter: { app: app.apple_id, "preReleaseVersion.version": version_number}, sort:"-uploadedDate", limit: 1).first
+
+          # Get latest build for version number
+          build = client.get_builds(filter: { app: app.apple_id, "preReleaseVersion.version" => version_number }, sort: "-uploadedDate", limit: 1).first
           if build
             build_nr = build["attributes"]["version"]
             build_nr

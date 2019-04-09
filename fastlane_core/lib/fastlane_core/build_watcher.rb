@@ -30,7 +30,7 @@ module FastlaneCore
       def matching_build(watched_train_version: nil, watched_build_version: nil, app_id: nil, platform: nil)
         # Get build deliveries (newly uploaded processing builds)
         client = Spaceship::ConnectAPI::Base.client
-        build_deliveries = client.get_build_deliveries(filter: { app: app_id, cfBundleVersion: watched_build_version}, limit: 1)
+        build_deliveries = client.get_build_deliveries(filter: { app: app_id, cfBundleVersion: watched_build_version }, limit: 1)
         build_delivery = build_deliveries.first
 
         # Get processed builds when no longer in build deliveries
@@ -44,7 +44,7 @@ module FastlaneCore
 
       def report_status(build: nil, build_delivery: nil)
         if build_delivery
-          UI.message("Waiting for App Store Connect to finish processing the new build (#{build_delivery["attributes"]["cfBundleShortVersionString"]} - #{build_delivery["attributes"]["cfBundleVersion"]})")
+          UI.message("Waiting for App Store Connect to finish processing the new build (#{build_delivery['attributes']['cfBundleShortVersionString']} - #{build_delivery['attributes']['cfBundleVersion']})")
         elsif build && !build.processed?
           UI.message("Waiting for App Store Connect to finish processing the new build (#{build.train_version} - #{build.build_version})")
         elsif build && build.processed?

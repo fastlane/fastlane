@@ -348,7 +348,7 @@ describe Spaceship::ConnectAPI::Client do
     context 'patch_builds' do
       let(:path) { "builds" }
       let(:build_id) { "123" }
-      let(:attributes) { {name: "some_name"} }
+      let(:attributes) { { name: "some_name" } }
       let(:body) do
         {
           data: {
@@ -439,7 +439,7 @@ describe Spaceship::ConnectAPI::Client do
     context 'add_beta_groups_to_build' do
       let(:path) { "builds" }
       let(:build_id) { "123" }
-      let(:beta_group_ids) { ["123","456"] }
+      let(:beta_group_ids) { ["123", "456"] }
       let(:body) do
         {
           data: beta_group_ids.map do |id|
@@ -459,6 +459,5 @@ describe Spaceship::ConnectAPI::Client do
         client.add_beta_groups_to_build(build_id: build_id, beta_group_ids: beta_group_ids)
       end
     end
-
   end
 end
