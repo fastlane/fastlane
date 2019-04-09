@@ -22,7 +22,7 @@ module Spaceship::TestFlight
       loop do 
         builds_resp = client.get_builds(filter: { app: app_id, processingState: "VALID,PROCESSING,FAILED,INVALID"}, limit: 100, sort: "uploadedDate", includes: "buildBetaDetail,betaBuildMetrics,preReleaseVersion,app", cursor: cursor, only_data: false)
         builds += builds_resp["data"]
-        included += builds_resp["included"]
+        included += (builds_resp["included"] || [])
         
         next_page = builds_resp["links"]["next"]
         break if next_page.nil?
