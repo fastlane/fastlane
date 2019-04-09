@@ -36,7 +36,7 @@ module FastlaneCore
         # Get processed builds when no longer in build deliveries
         unless build_delivery
           matched_builds = Spaceship::TestFlight::Build.all(app_id: app_id, platform: platform)
-          matched_build = matched_builds.find { |build| build.train_version.to_s == watched_train_version.to_s &&  build.build_version.to_s == watched_build_version.to_s }
+          matched_build = matched_builds.find { |build| build.train_version.to_s == watched_train_version.to_s && build.build_version.to_s == watched_build_version.to_s }
         end
 
         return matched_build, build_delivery

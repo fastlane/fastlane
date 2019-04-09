@@ -187,7 +187,7 @@ describe "Build Manager" do
         # Receive 3: finding build for submitting for review
         # Receive 3: finding build for adding beta groups
         expect(mock_base_api_client).to receive(:get_builds).with({
-          filter: { expired: false, processingState: "PROCESSING,VALID", version: ready_to_submit_mock_build.build_version, app: ready_to_submit_mock_build.app_id }
+          filter: { expired: false, processingState: "PROCESSING,VALID", version: ready_to_submit_mock_build.build_version, "preReleaseVersion.version" => ready_to_submit_mock_build.train_version, app: ready_to_submit_mock_build.app_id }
         }).and_return(builds).exactly(4).times
 
         # Demo account
