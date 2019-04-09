@@ -34,24 +34,28 @@ module Fastlane
         else
           client = Spaceship::ConnectAPI::Base.client
 
+          # Get version number from latest pre-release if no version number given
           version_number = params[:version]
           unless version_number
             version = client.get_pre_release_versions(filter: { app: app.apple_id }, sort:"-version", limit: 1).first
             version_number = version["attributes"]["version"]
           end
 
+          # Ask for version number if couldn't fine one
           unless version_number
             version_number = UI.input("You have to specify a new version number, as there are multiple to choose from")
           end
 
           UI.message("Fetching the latest build number for version #{version_number}")
-          
+         
+          # Get latest build for version number 
           build = client.get_builds(filter: { app: app.apple_id, "preReleaseVersion.version": version_number}, sort:"-uploadedDate", limit: 1).first
           if build
             build_nr = build["attributes"]["version"]
             build_nr
           end
 
+          # Show error and set initial build number
           unless build_nr
             UI.user_error!("Could not find a build on iTC - and 'initial_build_number' option is not set") unless params[:initial_build_number]
             build_nr = params[:initial_build_number]
