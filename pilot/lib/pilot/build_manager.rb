@@ -16,7 +16,7 @@ module Pilot
 
       UI.user_error!("No ipa file given") unless config[:ipa]
 
-      if options[:changelog].nil? && !options[:groups].nil?
+      if options[:changelog].nil? && options[:distribute_external] == true
         if UI.interactive?
           options[:changelog] = UI.input("No changelog provided for new build. You can provide a changelog using the `changelog` option. For now, please provide a changelog here:")
         else
@@ -97,7 +97,7 @@ module Pilot
         end
       end
       distribute_build(build, options)
-      type = !options[:groups].nil? ? 'External' : 'Internal'
+      type = options[:distribute_external] ? 'External' : 'Internal'
       UI.success("Successfully distributed build to #{type} testers 🚀")
     end
 
@@ -237,7 +237,7 @@ module Pilot
       # This is where we could add a check to see if encryption is required and has been updated
       set_export_compliance_if_needed(uploaded_build, options)
 
-      if options[:groups]
+      if options[:groups] || options[:distribute_external]
         begin
           uploaded_build.submit_for_testflight_review!
         rescue => ex
@@ -258,10 +258,18 @@ module Pilot
           group["id"]
         end
 
-        build = uploaded_build.find_app_store_connect_build
-        build_id = build["id"]
+        unless beta_group_ids.empty?
+          build = uploaded_build.find_app_store_connect_build
+          build_id = build["id"]
 
-        client.add_beta_groups_to_build(build_id: build_id, beta_group_ids: beta_group_ids)
+          client.add_beta_groups_to_build(build_id: build_id, beta_group_ids: beta_group_ids)
+        end
+      end
+
+      if options[:distribute_external] && options[:groups].nil?
+        # Legacy Spaceship::TestFlight API used to have a `default_external_group` that would automatically
+        # get selected but this no longer exists with Spaceship::ConnectAPI
+        UI.user_error!("You must specify at least one group using the `:groups` option to distribute externally")
       end
 
       true
