@@ -221,7 +221,9 @@ describe "Build Manager" do
         expect(FastlaneCore::UI).to receive(:success).with("Successfully set the beta_app_feedback_email and/or beta_app_description")
 
         # Get beta group
-        expect(mock_base_api_client).to receive(:get_beta_groups).and_return(mock_api_client_beta_groups)
+        expect(mock_base_api_client).to receive(:get_beta_groups).with({
+          filter: { app: ready_to_submit_mock_build.app_id }
+        }).and_return(mock_api_client_beta_groups)
 
         # Add beta group
         expect(mock_base_api_client).to receive(:add_beta_groups_to_build)
