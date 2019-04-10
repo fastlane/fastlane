@@ -65,6 +65,7 @@ describe "Build Manager" do
         apple_id: 'mock_apple_id',
         app_identifier: 'mock_app_id',
         distribute_external: true,
+        groups: ["Blue Man Group"],
         skip_submission: false
       }
     end
@@ -91,6 +92,12 @@ describe "Build Manager" do
         { "id" => "432", "attributes" => { "locale" => "en-gb" } }
       ]
     end
+    let(:mock_api_client_beta_groups) do
+      [
+        { "id" => "987", "attributes" => { "name" => "Blue Man Group" } },
+        { "id" => "654", "attributes" => { "name" => "Green Eggs and Ham" } }
+      ]
+    end
 
     describe "distribute failures" do
       before(:each) do
@@ -110,6 +117,8 @@ describe "Build Manager" do
         allow(mock_base_api_client).to receive(:patch_beta_app_localizations)
         allow(mock_base_api_client).to receive(:post_beta_app_localizations)
         allow(mock_base_api_client).to receive(:patch_build_beta_details)
+        allow(mock_base_api_client).to receive(:get_beta_groups).and_return(mock_api_client_beta_groups)
+        allow(mock_base_api_client).to receive(:add_beta_groups_to_build)
       end
 
       it "doesnt recover if there is a 504 and the build is not approved" do
@@ -146,6 +155,7 @@ describe "Build Manager" do
           apple_id: 'mock_apple_id',
           app_identifier: 'mock_app_id',
           distribute_external: true,
+          groups: ["Blue Man Group"],
           skip_submission: false,
           demo_account_required: true,
           notify_external_testers: true,
@@ -175,9 +185,10 @@ describe "Build Manager" do
         # Receive 1: finding build for patching review information
         # Receive 2: finding build for patching uses non-exempt encryption
         # Receive 3: finding build for submitting for review
+        # Receive 3: finding build for adding beta groups
         expect(mock_base_api_client).to receive(:get_builds).with({
-          filter: { expired: false, processingState: "PROCESSING,VALID", version: ready_to_submit_mock_build.build_version, app: ready_to_submit_mock_build.app_id }
-        }).and_return(builds).exactly(3).times
+          filter: { expired: false, processingState: "PROCESSING,VALID", version: ready_to_submit_mock_build.build_version, "preReleaseVersion.version" => ready_to_submit_mock_build.train_version, app: ready_to_submit_mock_build.app_id }
+        }).and_return(builds).exactly(4).times
 
         # Demo account
         expect(mock_base_api_client).to receive(:patch_beta_app_review_detail).with({
@@ -208,6 +219,14 @@ describe "Build Manager" do
           })
         end
         expect(FastlaneCore::UI).to receive(:success).with("Successfully set the beta_app_feedback_email and/or beta_app_description")
+
+        # Get beta group
+        expect(mock_base_api_client).to receive(:get_beta_groups).with({
+          filter: { app: ready_to_submit_mock_build.app_id }
+        }).and_return(mock_api_client_beta_groups)
+
+        # Add beta group
+        expect(mock_base_api_client).to receive(:add_beta_groups_to_build)
 
         expect(FastlaneCore::UI).to receive(:message).with(/Distributing new build to testers/)
         expect(mock_base_api_client).to receive(:patch_builds).with({
