@@ -321,7 +321,7 @@ describe Spaceship::Client do
         response = subject.fetch_program_license_agreement_messages
 
         # The method should make a GET request to this URL:
-        expect(a_request(:get, 'https://olympus.itunes.apple.com/v1/contractMessages')).to have_been_made
+        expect(a_request(:get, 'https://appstoreconnect.apple.com/olympus/v1/contractMessages')).to have_been_made
 
         # The method should just return the "message" key's value(s) in an array.
 
