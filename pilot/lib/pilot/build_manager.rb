@@ -255,7 +255,7 @@ module Pilot
 
       if options[:groups]
         client = Spaceship::ConnectAPI::Base.client
-        beta_group_ids = client.get_beta_groups(filter: { app_id: uploaded_build.app_id }).select do |group|
+        beta_group_ids = client.get_beta_groups(filter: { app: uploaded_build.app_id }).select do |group|
           options[:groups].include?(group["attributes"]["name"])
         end.map do |group|
           group["id"]
