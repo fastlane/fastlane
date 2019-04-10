@@ -161,6 +161,7 @@ module Pilot
     def self.truncate_changelog(changelog)
       # Apple documentation on "What's New in this Version" field, the one used for changelog
       # https://help.apple.com/app-store-connect/?lang=en#/devf29afbb74
+      #
       # The documentation specifies the limit is 4000 characters but for multibyte
       # characters the limit seems to be actually 4000 bytes
       max_changelog_bytesize = 4000
