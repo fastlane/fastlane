@@ -82,7 +82,7 @@ module Supply
 
             File.binwrite(file_path, Net::HTTP.get(URI.parse(url)))
 
-            UI.message("\tDownloaded - #{path}")
+            UI.message("\tDownloaded - #{file_path}")
 
             image_counter += 1
           end
