@@ -231,7 +231,7 @@ module Spaceship
         handle_response(response)
       end
 
-      def get_builds(filter: {}, includes: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate", cursor: nil, only_data: true)
+      def get_builds(filter: {}, includes: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate", cursor: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/builds
         params = build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
@@ -240,7 +240,7 @@ module Spaceship
           req.options.params_encoder = Faraday::NestedParamsEncoder
           req.params = params
         end
-        handle_response(response, only_data: only_data)
+        handle_response(response)
       end
 
       def patch_builds(build_id: nil, attributes: {})
@@ -337,7 +337,7 @@ module Spaceship
 
       protected
 
-      def handle_response(response, only_data: true)
+      def handle_response(response)
         if (200...300).cover?(response.status) && (response.body.nil? || response.body.empty?)
           return
         end
@@ -353,8 +353,6 @@ module Spaceship
         raise UnexpectedResponse, handle_errors(response) if response.body['errors']
 
         raise UnexpectedResponse, "Temporary App Store Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
-
-        return response.body['data'] if response.body['data'] && only_data
 
         return response.body
       end
