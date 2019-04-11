@@ -21,6 +21,13 @@ module Spaceship
         end
       end
 
+      #
+      # Example:
+      # { "minOsVersion" => "min_os_version" }
+      #
+      # Creates attr_write and attr_reader for :min_os_version
+      # Creates alias for :minOsVersion to :min_os_version
+      #
       def attr_mapping(attr_map)
         attr_map.each do |key, value|
           # Actual
@@ -37,6 +44,7 @@ module Spaceship
           key_reader = key.to_sym
           key_writer = "#{key}=".to_sym
 
+          # Alias the API response name to attribute name
           alias_method key_reader, reader
           alias_method key_writer, writer
         end
@@ -90,10 +98,11 @@ module Spaceship
         type_class = find_class(model_data)
         raise "No type class found for #{model_data["type"]}" unless type_class
 
-
+        # Get id and attributes needed for inflating
         id = model_data["id"]
         attributes = model_data["attributes"]
 
+        # Instantiate object and inflate relationships
         type_instance = type_class.new(id, attributes)
         type_instance = inflate_model_relationships(type_instance, model_data, included)
 
@@ -101,8 +110,13 @@ module Spaceship
       end
 
       def self.inflate_model_relationships(type_instance, model_data, included)
+        # Relationship attributes to set
         attributes = {}
 
+        # 1. Iterate over relations
+        # 2. Find id and type
+        # 3. Find matching id and type in included
+        # 4. Inflate matching data and set in attributes
         relationships = model_data["relationships"] || []
         relationships.each do |key, value|
           value_data = value["data"]
