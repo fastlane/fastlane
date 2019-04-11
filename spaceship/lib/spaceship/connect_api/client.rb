@@ -264,6 +264,18 @@ module Spaceship
         handle_response(response)
       end
 
+      def get_beta_app_review_submission(filter: {}, includes: nil, limit: 10, sort: nil, cursor: nil)
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/betaAppReviewSubmissions
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
+
+        response = request(:get, "betaAppReviewSubmissions") do |req|
+          req.options.params_encoder = Faraday::NestedParamsEncoder
+          req.params = params
+        end
+        handle_response(response)
+      end
+
       def post_beta_app_review_submissions(build_id: nil)
         # POST
         # https://appstoreconnect.apple.com/iris/v1/betaAppReviewSubmissions
