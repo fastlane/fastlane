@@ -335,6 +335,35 @@ module Spaceship
         handle_response(response)
       end
 
+      def post_create_beta_tester(attributes: {})
+        # POST
+        # https://api.appstoreconnect.apple.com/v1/betaTesters
+        path = "betaTesters"
+
+        body = {
+          data: {
+            attributes: attributes,
+            type: "betaTesters"
+          }
+        }
+
+        response = request(:post) do |req|
+          req.url(path)
+          req.body = body.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_response(response)
+      end
+
+      def delete_beta_tester(tester_id: nil)
+        # DELETE
+        # https://api.appstoreconnect.apple.com/v1/betaTesters/<tester_id>
+        path = "betaTesters/#{tester_id}"
+
+        response = request(:delete, path)
+        handle_response(response)
+      end
+
       protected
 
       def handle_response(response, only_data: true)
