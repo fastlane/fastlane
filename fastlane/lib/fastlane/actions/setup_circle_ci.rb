@@ -2,26 +2,7 @@ module Fastlane
   module Actions
     class SetupCircleCiAction < Action
       def self.run(params)
-        unless Helper::CI.should_run?(force: params[:force])
-          UI.message("Not running on CI, skipping `setup_circle_ci`")
-          return
-        end
-
-        Helper::CI.setup_keychain
-        setup_output_paths(params)
-      end
-
-      def self.setup_output_paths(params)
-        unless ENV["FL_OUTPUT_DIR"]
-          UI.message("Skipping Log Path setup as FL_OUTPUT_DIR is unset")
-          return
-        end
-
-        root = Pathname.new(ENV["FL_OUTPUT_DIR"])
-        ENV["SCAN_OUTPUT_DIRECTORY"] = (root + "scan").to_s
-        ENV["GYM_OUTPUT_DIRECTORY"] = (root + "gym").to_s
-        ENV["FL_BUILDLOG_PATH"] = (root + "buildlogs").to_s
-        ENV["SCAN_INCLUDE_SIMULATOR_LOGS"] = true.to_s
+        other_action.setup_ci(provider: "circleci", force: params[:force])
       end
 
       #####################################################

@@ -1,5 +1,5 @@
 describe Fastlane do
-  describe Fastlane::Helper::CI do
+  describe Fastlane::Actions::SetupCiAction do
     describe "#should_run" do
       context "when running on CI" do
         before do
@@ -59,6 +59,27 @@ describe Fastlane do
           described_class.setup_keychain
           expect(ENV["MATCH_READONLY"]).to eql("true")
         end
+      end
+    end
+
+    describe "#setup_output_paths" do
+      before do
+        stub_const("ENV", { "FL_OUTPUT_DIR" => "/dev/null" })
+      end
+
+      it "sets the SCAN_OUTPUT_DIRECTORY" do
+        described_class.setup_output_paths
+        expect(ENV["SCAN_OUTPUT_DIRECTORY"]).to eql("/dev/null/scan")
+      end
+
+      it "sets the GYM_OUTPUT_DIRECTORY" do
+        described_class.setup_output_paths
+        expect(ENV["GYM_OUTPUT_DIRECTORY"]).to eql("/dev/null/gym")
+      end
+
+      it "sets the FL_BUILDLOG_PATH" do
+        described_class.setup_output_paths
+        expect(ENV["FL_BUILDLOG_PATH"]).to eql("/dev/null/buildlogs")
       end
     end
   end

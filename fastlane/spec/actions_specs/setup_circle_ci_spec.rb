@@ -1,32 +1,11 @@
 describe Fastlane do
   describe Fastlane::Actions::SetupCircleCiAction do
-    describe "#setup_output_paths" do
-      before do
-        stub_const("ENV", { "FL_OUTPUT_DIR" => "/dev/null" })
-      end
-
-      it "sets the SCAN_OUTPUT_DIRECTORY" do
-        described_class.setup_output_paths(nil)
-        expect(ENV["SCAN_OUTPUT_DIRECTORY"]).to eql("/dev/null/scan")
-      end
-
-      it "sets the GYM_OUTPUT_DIRECTORY" do
-        described_class.setup_output_paths(nil)
-        expect(ENV["GYM_OUTPUT_DIRECTORY"]).to eql("/dev/null/gym")
-      end
-
-      it "sets the FL_BUILDLOG_PATH" do
-        described_class.setup_output_paths(nil)
-        expect(ENV["FL_BUILDLOG_PATH"]).to eql("/dev/null/buildlogs")
-      end
-    end
-
     describe "Setup CircleCi Integration" do
       let(:tmp_keychain_name) { "fastlane_tmp_keychain" }
       it "doesn't work outside CI" do
         stub_const("ENV", {})
 
-        expect(UI).to receive(:message).with("Not running on CI, skipping `setup_circle_ci`")
+        expect(UI).to receive(:message).with("Not running on CI, skipping CI setup")
 
         Fastlane::FastFile.new.parse("lane :test do
           setup_circle_ci

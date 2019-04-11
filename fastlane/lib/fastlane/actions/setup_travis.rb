@@ -2,14 +2,7 @@ module Fastlane
   module Actions
     class SetupTravisAction < Action
       def self.run(params)
-        # Stop if not executed by CI
-        unless Helper::CI.should_run?(force: params[:force])
-          UI.message("Currently not running on CI system, skipping travis setup")
-          return
-        end
-
-        # Create a temporary keychain
-        Helper::CI.setup_keychain
+        other_action.setup_ci(provider: "travis", force: params[:force])
       end
 
       #####################################################
