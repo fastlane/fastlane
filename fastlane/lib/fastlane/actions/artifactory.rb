@@ -148,7 +148,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :read_timeout,
                                        env_name: "FL_ARTIFACTORY_READ_TIMEOUT",
                                        description: "Read timeout",
-                                       default_value: 120,
+                                       default_value: nil,
                                        optional: true)
         ]
       end
