@@ -85,12 +85,12 @@ module Fastlane
                                          UI.user_error!("Sources must be an array.") unless value.kind_of?(Array)
                                        end),
           FastlaneCore::ConfigItem.new(key: :include_podspecs,
-                                       description: "A Glob of additional ancillary podspecs which are used for linting via :path",
+                                       description: "A Glob of additional ancillary podspecs which are used for linting via :path (available since cocoapods >= 1.7)",
                                        optional: true,
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :external_podspecs,
                                        description: "A Glob of additional ancillary podspecs which are used for linting via :podspec. If there"\
-                                         " are --include-podspecs, then these are removed from them",
+                                         " are --include-podspecs, then these are removed from them (available since cocoapods >= 1.7)",
                                        optional: true,
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :swift_version,
