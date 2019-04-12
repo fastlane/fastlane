@@ -31,6 +31,8 @@ module Deliver
       IOS_IPAD_11 = "iOS-iPad-11"
       # iPad Pro
       IOS_IPAD_PRO = "iOS-iPad-Pro"
+      # iPad Pro (12.9-inch) (3rd generation)
+      IOS_IPAD_PRO129_3RD = "iOS-iPad-Pro-12.9-3rd-gen"
 
       # iPhone 5 iMessage
       IOS_40_MESSAGES = "iOS-4-in-messages"
@@ -53,6 +55,8 @@ module Deliver
       IOS_IPAD_11_MESSAGES = "iOS-11-messages"
       # iPad Pro iMessage
       IOS_IPAD_PRO_MESSAGES = "iOS-iPad-Pro-messages"
+      # iPad Pro (12.9-inch) (3rd generation) iMessage
+      IOS_IPAD_PRO129_3RD_MESSAGES = "iOS-iPad-Pro-12.9-3rd-gen-messages"
 
       # Apple Watch
       IOS_APPLE_WATCH = "iOS-Apple-Watch"
@@ -90,8 +94,6 @@ module Deliver
 
     # The iTC API requires a different notation for the device
     def device_type
-      # This list does not include iPad Pro 12.9-inch (3rd generation)
-      # because it has same resoluation as IOS_IPAD_PRO and will clobber
       matching = {
         ScreenSize::IOS_35 => "iphone35",
         ScreenSize::IOS_40 => "iphone4",
@@ -103,6 +105,7 @@ module Deliver
         ScreenSize::IOS_IPAD_10_5 => "ipad105",
         ScreenSize::IOS_IPAD_11 => "ipadPro11",
         ScreenSize::IOS_IPAD_PRO => "ipadPro",
+        ScreenSize::IOS_IPAD_PRO129_3RD => "ipadPro129",
         ScreenSize::IOS_40_MESSAGES => "iphone4",
         ScreenSize::IOS_47_MESSAGES => "iphone6", # also 7 & 8
         ScreenSize::IOS_55_MESSAGES => "iphone6Plus", # also 7 Plus & 8 Plus
@@ -110,6 +113,7 @@ module Deliver
         ScreenSize::IOS_65_MESSAGES => "iphone65",
         ScreenSize::IOS_IPAD_MESSAGES => "ipad",
         ScreenSize::IOS_IPAD_PRO_MESSAGES => "ipadPro",
+        ScreenSize::IOS_IPAD_PRO129_3RD_MESSAGES => "ipadPro129",
         ScreenSize::IOS_IPAD_10_5_MESSAGES => "ipad105",
         ScreenSize::IOS_IPAD_11_MESSAGES => "ipadPro11",
         ScreenSize::MAC => "desktop",
@@ -122,8 +126,6 @@ module Deliver
 
     # Nice name
     def formatted_name
-      # This list does not include iPad Pro 12.9-inch (3rd generation)
-      # because it has same resoluation as IOS_IPAD_PRO and will clobber
       matching = {
         ScreenSize::IOS_35 => "iPhone 4",
         ScreenSize::IOS_40 => "iPhone 5",
@@ -136,6 +138,7 @@ module Deliver
         ScreenSize::IOS_IPAD_10_5 => "iPad 10.5",
         ScreenSize::IOS_IPAD_11 => "iPad 11",
         ScreenSize::IOS_IPAD_PRO => "iPad Pro",
+        ScreenSize::IOS_IPAD_PRO129_3RD => "iPad Pro (12.9-inch) (3rd generation)",
         ScreenSize::IOS_40_MESSAGES => "iPhone 5 (iMessage)",
         ScreenSize::IOS_47_MESSAGES => "iPhone 6 (iMessage)", # also 7 & 8
         ScreenSize::IOS_55_MESSAGES => "iPhone 6 Plus (iMessage)", # also 7 Plus & 8 Plus
@@ -144,6 +147,7 @@ module Deliver
         ScreenSize::IOS_65_MESSAGES => "iPhone XS Max (iMessage)",
         ScreenSize::IOS_IPAD_MESSAGES => "iPad (iMessage)",
         ScreenSize::IOS_IPAD_PRO_MESSAGES => "iPad Pro (iMessage)",
+        ScreenSize::IOS_IPAD_PRO129_3RD_MESSAGES => "iPad Pro (12.9-inch) (3rd generation) (iMessage)",
         ScreenSize::IOS_IPAD_10_5_MESSAGES => "iPad 10.5 (iMessage)",
         ScreenSize::IOS_IPAD_11_MESSAGES => "iPad 11 (iMessage)",
         ScreenSize::MAC => "Mac",
@@ -170,12 +174,15 @@ module Deliver
         ScreenSize::IOS_65_MESSAGES,
         ScreenSize::IOS_IPAD_MESSAGES,
         ScreenSize::IOS_IPAD_PRO_MESSAGES,
+        ScreenSize::IOS_IPAD_PRO129_3RD_MESSAGES,
         ScreenSize::IOS_IPAD_10_5_MESSAGES,
         ScreenSize::IOS_IPAD_11_MESSAGES
       ].include?(self.screen_size)
     end
 
     def self.device_messages
+      # This list does not include iPad Pro 12.9-inch (3rd generation)
+      # because it has same resoluation as IOS_IPAD_PRO and will clobber
       return {
         ScreenSize::IOS_65_MESSAGES => [
           [1242, 2688]
@@ -225,6 +232,8 @@ module Deliver
 
     # reference: https://help.apple.com/app-store-connect/#/devd274dd925
     def self.devices
+      # This list does not include iPad Pro 12.9-inch (3rd generation)
+      # because it has same resoluation as IOS_IPAD_PRO and will clobber
       return {
         ScreenSize::IOS_65 => [
           [1242, 2688]
@@ -293,13 +302,27 @@ module Deliver
       }
     end
 
+    def self.resolve_ipadpro_conflict_if_needed(device_type, file_name)
+      is_3rd_gen = file_name.include? "(3rd generation)"
+      if is_3rd_gen
+        if device_type == ScreenSize::IOS_IPAD_PRO
+          return ScreenSize::IOS_IPAD_PRO129_3RD
+        elsif device_type == ScreenSize::IOS_IPAD_PRO_MESSAGES
+          return ScreenSize::IOS_IPAD_PRO129_3RD_MESSAGES
+        end
+      end
+      return device_type
+    end
+
     def self.calculate_screen_size(path)
       size = FastImage.size(path)
 
       UI.user_error!("Could not find or parse file at path '#{path}'") if size.nil? || size.count == 0
 
       # Walk up two directories and test if we need to handle a platform that doesn't support landscape
-      path_component = Pathname.new(path).each_filename.to_a[-3]
+      path_filenames = Pathname.new(path).each_filename.to_a
+      path_component = path_filenames[-3]
+      file_name = path_filenames.to_a[-1]
       if path_component.eql?("appleTV")
         skip_landscape = true
       end
@@ -311,12 +334,12 @@ module Deliver
         array.each do |resolution|
           if skip_landscape
             if size[0] == (resolution[0]) && size[1] == (resolution[1]) # portrait
-              return device_type
+              return resolve_ipadpro_conflict_if_needed(device_type, file_name)
             end
           else
             if (size[0] == (resolution[0]) && size[1] == (resolution[1])) || # portrait
                (size[1] == (resolution[0]) && size[0] == (resolution[1])) # landscape
-              return device_type
+              return resolve_ipadpro_conflict_if_needed(device_type, file_name)
             end
           end
         end
