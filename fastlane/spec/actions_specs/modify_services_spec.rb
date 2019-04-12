@@ -8,7 +8,8 @@ describe Fastlane do
         expect(Produce::Service).to receive(:enable) do |options, args|
           expect(options.push_notification).to eq('on')
           expect(options.wallet).to eq('on')
-          expect(options.data_protection).to eq('on')
+          expect(options.hotspot).to eq('on')
+          expect(options.data_protection).to eq('complete')
         end
         expect(Produce::Service).to receive(:disable) do |options, args|
           expect(options.associated_domains).to eq('off')
@@ -24,7 +25,8 @@ describe Fastlane do
                 associated_domains: 'off',
                 wallet: :on,
                 apple_pay: :off,
-                data_protection: true,
+                data_protection: 'complete',
+                hotspot: true,
                 multipath: false
             })
         end").runner.execute(:test)
