@@ -3,6 +3,7 @@ module Snapshot
     # both
     attr_accessor :languages
     attr_accessor :devices
+    attr_accessor :configuration
     attr_accessor :add_photos
     attr_accessor :add_videos
     attr_accessor :clean
@@ -27,6 +28,9 @@ module Snapshot
     def initialize(snapshot_config: nil)
       @languages = snapshot_config[:languages]
       @devices = snapshot_config[:devices]
+      @configuration = {
+        snapshot_method_screen: snapshot_config[:method_screen] || false
+      }
       @add_photos = snapshot_config[:add_photos]
       @add_videos = snapshot_config[:add_videos]
       @clean = snapshot_config[:clean]
