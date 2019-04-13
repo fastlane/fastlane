@@ -98,15 +98,15 @@ module Spaceship
     end
 
     def picture_type_map
-      Spaceship::Tunes::DeviceMediaDefinition.all_definitions.map { |k, v| [k, v.picture_type] }.to_h
+      Spaceship::Tunes::DisplayFamily.all_families.map { |k, v| [k, v.picture_type] }.to_h
     end
 
     def messages_picture_type_map
-      Spaceship::Tunes::DeviceMediaDefinition.all_definitions.select { |k, v| v.messages_supported? }.map { |k, v| [k, v.messages_picture_type] }.to_h
+      Spaceship::Tunes::DisplayFamily.all_families.select { |k, v| v.messages_supported? }.map { |k, v| [k, v.messages_picture_type] }.to_h
     end
 
     def device_resolution_map
-      Spaceship::Tunes::DeviceMediaDefinition.all_definitions.map { |k, v| [k, v.screenshot_resolutions] }.to_h
+      Spaceship::Tunes::DisplayFamily.all_families.map { |k, v| [k, v.screenshot_resolutions] }.to_h
     end
 
     def screenshot_picture_type(device, is_messages)

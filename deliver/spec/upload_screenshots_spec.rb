@@ -15,7 +15,7 @@ describe Deliver::UploadScreenshots do
     end
 
     before do
-      FakeFS::FileSystem.clone(File.join(Spaceship::ROOT, "lib", "assets", "deviceMediaDefinitions.json"))
+      FakeFS::FileSystem.clone(File.join(Spaceship::ROOT, "lib", "assets", "displayFamilies.json"))
       allow(FastImage).to receive(:size) do |path|
         path.match(/{([0-9]+)x([0-9]+)}/).captures.map(&:to_i)
       end

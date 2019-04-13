@@ -62,10 +62,10 @@ describe Spaceship::DUClient, :du do
   end
 
   # These tests were created when we migrated the mappings from several files
-  # to `spaceship/lib/assets/deviceMediaDefinitions.json`.
+  # to `spaceship/lib/assets/displayFamilies.json`.
   # They make sure our logic to parse that file works as expected.
   describe "mapping migrations" do
-    it "matches the picture_type_map prior to using DeviceMediaDefinition" do
+    it "matches the picture_type_map prior to using DisplayFamily" do
       expect(subject.send(:picture_type_map).sort).to eq({
         ipad:         "MZPFT.SortedTabletScreenShot",
         ipad105:      "MZPFT.SortedJ207ScreenShot",
@@ -85,7 +85,7 @@ describe Spaceship::DUClient, :du do
       }.sort)
     end
 
-    it "matches the messages_picture_type_map prior to using DeviceMediaDefinition" do
+    it "matches the messages_picture_type_map prior to using DisplayFamily" do
       expect(subject.send(:messages_picture_type_map).sort).to eq({
         ipad:         "MZPFT.SortedTabletMessagesScreenShot",
         ipad105:      "MZPFT.SortedJ207MessagesScreenShot",
@@ -100,7 +100,7 @@ describe Spaceship::DUClient, :du do
       }.sort)
     end
 
-    it "matches the device_resolution_map prior to using DeviceMediaDefinition" do
+    it "matches the device_resolution_map prior to using DisplayFamily" do
       device_resolution_map = subject.send(:device_resolution_map)
       old_device_resolution_map = {
         watch:        [[312, 390]],
