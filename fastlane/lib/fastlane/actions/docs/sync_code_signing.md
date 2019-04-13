@@ -310,7 +310,7 @@ gym
 
 ##### Registering new devices
 
-By using _match_, you'll save a lot of time every time you add new device to your Ad Hoc or Development profiles. Use _match_ in combination with the [`register_devices`](https://docs.fastlane.tools/actions#register_devices) action.
+By using _match_, you'll save a lot of time every time you add new device to your Ad Hoc or Development profiles. Use _match_ in combination with the [`register_devices`](https://docs.fastlane.tools/actions/register_devices/) action.
 
 ```ruby
 lane :beta do
