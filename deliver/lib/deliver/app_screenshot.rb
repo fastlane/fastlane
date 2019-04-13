@@ -32,7 +32,7 @@ module Deliver
       # iPad Pro
       IOS_IPAD_PRO = "iOS-iPad-Pro"
       # iPad Pro (12.9-inch) (3rd generation)
-      IOS_IPAD_PRO129_3RD = "iOS-iPad-Pro-12.9-3rd-gen"
+      IOS_IPAD_PRO_12_9 = "iOS-iPad-Pro-12.9-3rd-gen"
 
       # iPhone 5 iMessage
       IOS_40_MESSAGES = "iOS-4-in-messages"
@@ -56,7 +56,7 @@ module Deliver
       # iPad Pro iMessage
       IOS_IPAD_PRO_MESSAGES = "iOS-iPad-Pro-messages"
       # iPad Pro (12.9-inch) (3rd generation) iMessage
-      IOS_IPAD_PRO129_3RD_MESSAGES = "iOS-iPad-Pro-12.9-3rd-gen-messages"
+      IOS_IPAD_PRO_12_9_MESSAGES = "iOS-iPad-Pro-12.9-3rd-gen-messages"
 
       # Apple Watch
       IOS_APPLE_WATCH = "iOS-Apple-Watch"
@@ -105,7 +105,7 @@ module Deliver
         ScreenSize::IOS_IPAD_10_5 => "ipad105",
         ScreenSize::IOS_IPAD_11 => "ipadPro11",
         ScreenSize::IOS_IPAD_PRO => "ipadPro",
-        ScreenSize::IOS_IPAD_PRO129_3RD => "ipadPro129",
+        ScreenSize::IOS_IPAD_PRO_12_9 => "ipadPro129",
         ScreenSize::IOS_40_MESSAGES => "iphone4",
         ScreenSize::IOS_47_MESSAGES => "iphone6", # also 7 & 8
         ScreenSize::IOS_55_MESSAGES => "iphone6Plus", # also 7 Plus & 8 Plus
@@ -113,7 +113,7 @@ module Deliver
         ScreenSize::IOS_65_MESSAGES => "iphone65",
         ScreenSize::IOS_IPAD_MESSAGES => "ipad",
         ScreenSize::IOS_IPAD_PRO_MESSAGES => "ipadPro",
-        ScreenSize::IOS_IPAD_PRO129_3RD_MESSAGES => "ipadPro129",
+        ScreenSize::IOS_IPAD_PRO_12_9_MESSAGES => "ipadPro129",
         ScreenSize::IOS_IPAD_10_5_MESSAGES => "ipad105",
         ScreenSize::IOS_IPAD_11_MESSAGES => "ipadPro11",
         ScreenSize::MAC => "desktop",
@@ -138,7 +138,7 @@ module Deliver
         ScreenSize::IOS_IPAD_10_5 => "iPad 10.5",
         ScreenSize::IOS_IPAD_11 => "iPad 11",
         ScreenSize::IOS_IPAD_PRO => "iPad Pro",
-        ScreenSize::IOS_IPAD_PRO129_3RD => "iPad Pro (12.9-inch) (3rd generation)",
+        ScreenSize::IOS_IPAD_PRO_12_9 => "iPad Pro (12.9-inch) (3rd generation)",
         ScreenSize::IOS_40_MESSAGES => "iPhone 5 (iMessage)",
         ScreenSize::IOS_47_MESSAGES => "iPhone 6 (iMessage)", # also 7 & 8
         ScreenSize::IOS_55_MESSAGES => "iPhone 6 Plus (iMessage)", # also 7 Plus & 8 Plus
@@ -147,7 +147,7 @@ module Deliver
         ScreenSize::IOS_65_MESSAGES => "iPhone XS Max (iMessage)",
         ScreenSize::IOS_IPAD_MESSAGES => "iPad (iMessage)",
         ScreenSize::IOS_IPAD_PRO_MESSAGES => "iPad Pro (iMessage)",
-        ScreenSize::IOS_IPAD_PRO129_3RD_MESSAGES => "iPad Pro (12.9-inch) (3rd generation) (iMessage)",
+        ScreenSize::IOS_IPAD_PRO_12_9_MESSAGES => "iPad Pro (12.9-inch) (3rd generation) (iMessage)",
         ScreenSize::IOS_IPAD_10_5_MESSAGES => "iPad 10.5 (iMessage)",
         ScreenSize::IOS_IPAD_11_MESSAGES => "iPad 11 (iMessage)",
         ScreenSize::MAC => "Mac",
@@ -174,7 +174,7 @@ module Deliver
         ScreenSize::IOS_65_MESSAGES,
         ScreenSize::IOS_IPAD_MESSAGES,
         ScreenSize::IOS_IPAD_PRO_MESSAGES,
-        ScreenSize::IOS_IPAD_PRO129_3RD_MESSAGES,
+        ScreenSize::IOS_IPAD_PRO_12_9_MESSAGES,
         ScreenSize::IOS_IPAD_10_5_MESSAGES,
         ScreenSize::IOS_IPAD_11_MESSAGES
       ].include?(self.screen_size)
@@ -306,9 +306,9 @@ module Deliver
       is_3rd_gen = filename.include?("(3rd generation)")
       if is_3rd_gen
         if device_type == ScreenSize::IOS_IPAD_PRO
-          return ScreenSize::IOS_IPAD_PRO129_3RD
+          return ScreenSize::IOS_IPAD_PRO_12_9
         elsif device_type == ScreenSize::IOS_IPAD_PRO_MESSAGES
-          return ScreenSize::IOS_IPAD_PRO129_3RD_MESSAGES
+          return ScreenSize::IOS_IPAD_PRO_12_9_MESSAGES
         end
       end
       device_type
