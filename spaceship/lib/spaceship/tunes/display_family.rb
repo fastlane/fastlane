@@ -2,6 +2,12 @@ require_relative "../module"
 
 module Spaceship
   module Tunes
+    # A definition of differnet styled displays used by devices
+    # that App Store Connect supports storing screenshots.
+    # Display styles often only vary based on screen resolution
+    # however other aspects of a displays physical apperance are
+    # also factored (i.e if the home indicator is provided via
+    # a hardware button or a software interface).
     class DisplayFamily
       # The display family name from the App Store Connect API that
       # is used to assign `Spaceship::Tunes::AppScreenshot` objects
