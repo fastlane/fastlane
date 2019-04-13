@@ -45,7 +45,7 @@ module Fastlane
             build_number = latest_candidate_build.build_version
           end
         else
-          FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, train_version: version, build_version: build_number, poll_interval: 30, strict_build_watch: true)
+          FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, train_version: version, build_version: build_number, poll_interval: 30)
         end
 
         # Make sure output_directory has a slash on the end
