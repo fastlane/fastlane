@@ -302,8 +302,8 @@ module Deliver
       }
     end
 
-    def self.resolve_ipadpro_conflict_if_needed(device_type, file_name)
-      is_3rd_gen = file_name.include?("(3rd generation)")
+    def self.resolve_ipadpro_conflict_if_needed(device_type, filename)
+      is_3rd_gen = filename.include?("(3rd generation)")
       if is_3rd_gen
         if device_type == ScreenSize::IOS_IPAD_PRO
           return ScreenSize::IOS_IPAD_PRO129_3RD
@@ -311,7 +311,7 @@ module Deliver
           return ScreenSize::IOS_IPAD_PRO129_3RD_MESSAGES
         end
       end
-      return device_type
+      device_type
     end
 
     def self.calculate_screen_size(path)
@@ -322,7 +322,7 @@ module Deliver
       # Walk up two directories and test if we need to handle a platform that doesn't support landscape
       path_filenames = Pathname.new(path).each_filename.to_a
       path_component = path_filenames[-3]
-      file_name = path_filenames.to_a[-1]
+      filename = path_filenames.to_a[-1]
       if path_component.eql?("appleTV")
         skip_landscape = true
       end
@@ -334,12 +334,12 @@ module Deliver
         array.each do |resolution|
           if skip_landscape
             if size[0] == (resolution[0]) && size[1] == (resolution[1]) # portrait
-              return resolve_ipadpro_conflict_if_needed(device_type, file_name)
+              return resolve_ipadpro_conflict_if_needed(device_type, filename)
             end
           else
             if (size[0] == (resolution[0]) && size[1] == (resolution[1])) || # portrait
                (size[1] == (resolution[0]) && size[0] == (resolution[1])) # landscape
-              return resolve_ipadpro_conflict_if_needed(device_type, file_name)
+              return resolve_ipadpro_conflict_if_needed(device_type, filename)
             end
           end
         end
