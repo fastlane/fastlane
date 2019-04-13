@@ -3,8 +3,9 @@ require_relative "../module"
 module Spaceship
   module Tunes
     class DeviceMediaDefinition
-      # An identifier that identifies unique device types that can
-      # be supplied as app screenshots in App Store Connect.
+      # The display family name from the App Store Connect API that
+      # is used to assign `Spaceship::Tunes::AppScreenshot` objects
+      # to the correct display families
       attr_accessor :device_type
 
       # The user friendly name of this defintion as seen in the Media
@@ -17,17 +18,20 @@ module Spaceship
 
       # An array of supported screen resolutions (in pixels) that are
       # supported for the associated device.
-      # https://help.apple.com/app-store-connect/#/devd274dd925
+      #
+      # Source: https://help.apple.com/app-store-connect/#/devd274dd925
       attr_accessor :screenshot_resolutions
 
       # An internal identifier for the same device definition used
-      # in the DUClient. You can find this by uploading an image in
-      # App Store Connect using your browser and then look for the
+      # in the DUClient.
+      #
+      # Source: You can find this by uploading an image in App Store
+      # Connect using your browser and then look for the
       # X-Apple-Upload-Validation-RuleSets value in the uploads
       # request headers.
       attr_accessor :picture_type
 
-      # Similar to `picture_type`, but for iMessage screnshots.
+      # Similar to `picture_type`, but for iMessage screenshots.
       attr_accessor :messages_picture_type
 
       # Identifies if the device definition supports iMessage screenshots.

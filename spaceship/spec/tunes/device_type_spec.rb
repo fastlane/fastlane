@@ -5,11 +5,13 @@ describe Spaceship::Tunes::DeviceType do
     end
 
     it "should return an array of string device types" do
-      expect(Spaceship::Tunes::DeviceType.types.first).to be_a(String)
+      Spaceship::Tunes::DeviceType.types.each do |identifier|
+        expect(identifier).to be_a(String)
+      end
     end
 
-    it "should contain old identifiers" do
-      old_identifiers = [
+    it "should contain all old identifiers" do
+      old_types = [
         # iPhone
         'iphone35',
         'iphone4',
@@ -36,7 +38,7 @@ describe Spaceship::Tunes::DeviceType do
         'desktop'
       ]
 
-      old_identifiers.each do |identifier|
+      old_types.each do |identifier|
         expect(Spaceship::Tunes::DeviceType.types).to include(identifier)
       end
     end
