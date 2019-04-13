@@ -24,47 +24,50 @@ module Fastlane
         Spaceship::Tunes.select_team
         UI.message("Login successful")
 
-        platform = params[:platform]
-
         app = Spaceship::Tunes::Application.find(params[:app_identifier])
         if params[:live]
           UI.message("Fetching the latest build number for live-version")
           UI.user_error!("Could not find a live-version of #{params[:app_identifier]} on iTC") unless app.live_version
           build_nr = app.live_version.current_build_number
+
+          UI.message("Latest upload for live-version #{app.live_version.version} is build: #{build_nr}")
         else
           version_number = params[:version]
-          unless version_number
-            # Automatically fetch the latest version in testflight
-            begin
-              train_numbers = app.all_build_train_numbers(platform: platform)
-              testflight_version = self.order_versions(train_numbers).last
-            rescue
-              testflight_version = params[:version]
-            end
 
-            if testflight_version
-              version_number = testflight_version
-            else
-              version_number = UI.input("You have to specify a new version number, as there are multiple to choose from")
-            end
+          # Filter on app (and version is specified)
+          filter = { app: app.apple_id }
+          filter["version"] = version_number if version_number
 
+          # Get version number from latest pre-release if no version number given
+          client = Spaceship::ConnectAPI::Base.client
+          version = client.get_pre_release_versions(filter: filter, sort: "-version", limit: 1).first
+          unless version
+            UI.user_error!("Could not find a build number for version #{version_number}")
           end
+
+          # Need pre_release_version_id for filtering build numbers
+          pre_release_version_id = version["id"]
+          version_number = version["attributes"]["version"]
 
           UI.message("Fetching the latest build number for version #{version_number}")
 
-          begin
-            build_numbers = app.all_builds_for_train(train: version_number, platform: platform).map(&:build_version)
-            build_nr = self.order_versions(build_numbers).last
-            if build_nr.nil? && params[:initial_build_number]
-              UI.message("Could not find a build on iTC. Using supplied 'initial_build_number' option")
-              build_nr = params[:initial_build_number]
-            end
-          rescue
-            UI.user_error!("Could not find a build on iTC - and 'initial_build_number' option is not set") unless params[:initial_build_number]
+          # Get latest build for version number
+          build = client.get_builds(filter: { app: app.apple_id, "preReleaseVersion" => pre_release_version_id }, sort: "-uploadedDate", limit: 1).first
+          if build
+            build_nr = build["attributes"]["version"]
+            build_nr
+          else
+            UI.important("Could not find a build number for version #{version_number} on App Store Connect")
+          end
+
+          # Show error and set initial build number
+          unless build_nr
+            UI.user_error!("Could not find a build on App Store Connect - and 'initial_build_number' option is not set") unless params[:initial_build_number]
             build_nr = params[:initial_build_number]
           end
+
+          UI.message("Latest upload for version #{version_number} is build: #{build_nr}")
         end
-        UI.message("Latest upload for version #{version_number} is build: #{build_nr}")
 
         build_nr
       end

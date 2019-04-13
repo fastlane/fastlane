@@ -58,10 +58,10 @@ module Pilot
       platform = fetch_app_platform
       app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
       app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
-      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, train_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval], strict_build_watch: config[:wait_for_uploaded_build])
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.apple_id, platform: platform, train_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval])
 
       unless latest_build.train_version == app_version && latest_build.build_version == app_build
-        UI.important("Uploaded app #{app_version} - #{app_build}, but received build #{latest_build.train_version} - #{latest_build.build_version}. If you want to wait for uploaded build to be finished processing, use the `wait_for_uploaded_build` option")
+        UI.important("Uploaded app #{app_version} - #{app_build}, but received build #{latest_build.train_version} - #{latest_build.build_version}.")
       end
 
       return latest_build
@@ -121,6 +121,9 @@ module Pilot
     end
 
     def update_beta_app_meta(options, build)
+      # App Store Connect API build id
+      build_id = build.find_app_store_connect_build["id"]
+
       # Setting account required wth AppStore Connect API
       update_review_detail(build.app_id, { demo_account_required: options[:demo_account_required] })
 
@@ -143,17 +146,17 @@ module Pilot
       end
 
       if should_update_localized_build_information?(options)
-        update_localized_build_review(build, options[:localized_build_info])
+        update_localized_build_review(build_id, options[:localized_build_info])
       elsif should_update_build_information?(options)
         begin
-          update_localized_build_review(build, {}, default_info: { whats_new: options[:changelog] })
+          update_localized_build_review(build_id, {}, default_info: { whats_new: options[:changelog] })
           UI.success("Successfully set the changelog for build")
         rescue => ex
           UI.user_error!("Could not set changelog: #{ex}")
         end
       end
 
-      update_build_beta_details(build, {
+      update_build_beta_details(build_id, {
         auto_notify_enabled: options[:notify_external_testers]
       })
     end
@@ -251,21 +254,25 @@ module Pilot
       end
 
       if options[:groups]
-        groups = Spaceship::TestFlight::Group.filter_groups(app_id: uploaded_build.app_id) do |group|
-          options[:groups].include?(group.name)
+        client = Spaceship::ConnectAPI::Base.client
+        beta_group_ids = client.get_beta_groups(filter: { app: uploaded_build.app_id }).select do |group|
+          options[:groups].include?(group["attributes"]["name"])
+        end.map do |group|
+          group["id"]
         end
-        groups.each do |group|
-          uploaded_build.add_group!(group)
+
+        unless beta_group_ids.empty?
+          build = uploaded_build.find_app_store_connect_build
+          build_id = build["id"]
+
+          client.add_beta_groups_to_build(build_id: build_id, beta_group_ids: beta_group_ids)
         end
       end
 
-      if options[:distribute_external]
-        external_group = Spaceship::TestFlight::Group.default_external_group(app_id: uploaded_build.app_id)
-        uploaded_build.add_group!(external_group) unless external_group.nil?
-
-        if external_group.nil? && options[:groups].nil?
-          UI.user_error!("You must specify at least one group using the `:groups` option to distribute externally")
-        end
+      if options[:distribute_external] && options[:groups].nil?
+        # Legacy Spaceship::TestFlight API used to have a `default_external_group` that would automatically
+        # get selected but this no longer exists with Spaceship::ConnectAPI
+        UI.user_error!("You must specify at least one group using the `:groups` option to distribute externally")
       end
 
       true
@@ -353,10 +360,7 @@ module Pilot
       end
     end
 
-    def update_localized_build_review(build, info_by_lang, default_info: nil)
-      resp = Spaceship::ConnectAPI::Base.client.get_builds(filter: { expired: false, processingState: "PROCESSING,VALID", version: build.build_version })
-      build_id = resp.first["id"]
-
+    def update_localized_build_review(build_id, info_by_lang, default_info: nil)
       info_by_lang = info_by_lang.collect { |k, v| [k.to_sym, v] }.to_h
 
       if default_info
@@ -401,12 +405,8 @@ module Pilot
       end
     end
 
-    def update_build_beta_details(build, info)
+    def update_build_beta_details(build_id, info)
       client = Spaceship::ConnectAPI::Base.client
-
-      build = build.find_app_store_connect_build
-      build_id = build["id"]
-
       resp = client.get_build_beta_details(filter: { build: build_id })
       build_beta_details_id = resp.first["id"]
 

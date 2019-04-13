@@ -137,7 +137,7 @@ All [fastlane tools](https://fastlane.tools) that communicate with Apple's web s
 
 Overview of the used API endpoints
 
-- `https://idmsa.apple.com`: 
+- `https://idmsa.apple.com`:
   - Used to authenticate to get a valid session
 - `https://developerservices2.apple.com`:
   - Get a list of all available provisioning profiles
@@ -157,6 +157,8 @@ Overview of the used API endpoints
   - Managing app metadata
 - `https://du-itc.appstoreconnect.apple.com`:
   - Upload icons, screenshots, trailers ...
+- `https://is[1-9]-ssl.mzstatic.com`:
+  - Download app screenshots from App Store Connect
 
 _spaceship_ uses all those API points to offer this seamless experience.
 
