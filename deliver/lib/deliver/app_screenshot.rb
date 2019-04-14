@@ -178,24 +178,30 @@ module Deliver
     def self.device_messages
       return {
         ScreenSize::IOS_65_MESSAGES => [
-          [1242, 2688]
+          [1242, 2688],
+          [2688, 1242]
         ],
         ScreenSize::IOS_61_MESSAGES => [
-          [828, 1792]
+          [828, 1792],
+          [1792, 828]
         ],
         ScreenSize::IOS_58_MESSAGES => [
-          [1125, 2436]
+          [1125, 2436],
+          [2436, 1125]
         ],
         ScreenSize::IOS_55_MESSAGES => [
-          [1242, 2208]
+          [1242, 2208],
+          [2208, 1242]
         ],
         ScreenSize::IOS_47_MESSAGES => [
-          [750, 1334]
+          [750, 1334],
+          [1334, 750]
         ],
         ScreenSize::IOS_40_MESSAGES => [
-          [640, 1136],
           [640, 1096],
-          [1136, 600] # landscape status bar is smaller
+          [640, 1136],
+          [1136, 600],
+          [1136, 640]
         ],
         ScreenSize::IOS_IPAD_MESSAGES => [
           [1024, 748],
@@ -226,29 +232,36 @@ module Deliver
     def self.devices
       return {
         ScreenSize::IOS_65 => [
-          [1242, 2688]
+          [1242, 2688],
+          [2688, 1242]
         ],
         ScreenSize::IOS_61 => [
-          [828, 1792]
+          [828, 1792],
+          [1792, 828]
         ],
         ScreenSize::IOS_58 => [
-          [1125, 2436]
+          [1125, 2436],
+          [2436, 1125]
         ],
         ScreenSize::IOS_55 => [
-          [1242, 2208]
+          [1242, 2208],
+          [2208, 1242]
         ],
         ScreenSize::IOS_47 => [
-          [750, 1334]
+          [750, 1334],
+          [1334, 750]
         ],
         ScreenSize::IOS_40 => [
-          [640, 1136],
           [640, 1096],
-          [1136, 600] # landscape without status bar
+          [640, 1136],
+          [1136, 600],
+          [1136, 640]
         ],
         ScreenSize::IOS_35 => [
-          [640, 960],
           [640, 920],
-          [960, 600] # landscape without status bar
+          [640, 960],
+          [960, 600],
+          [960, 640]
         ],
         ScreenSize::IOS_IPAD => [ # 9.7 inch
           [1024, 748],
@@ -296,26 +309,14 @@ module Deliver
 
       UI.user_error!("Could not find or parse file at path '#{path}'") if size.nil? || size.count == 0
 
-      # Walk up two directories and test if we need to handle a platform that doesn't support landscape
-      path_component = Pathname.new(path).each_filename.to_a[-3]
-      if path_component.eql?("appleTV")
-        skip_landscape = true
-      end
-
       # iMessage screenshots have same resolution as app screenshots so we need to distinguish them
+      path_component = Pathname.new(path).each_filename.to_a[-3]
       devices = path_component.eql?("iMessage") ? self.device_messages : self.devices
 
       devices.each do |device_type, array|
         array.each do |resolution|
-          if skip_landscape
-            if size[0] == (resolution[0]) && size[1] == (resolution[1]) # portrait
-              return device_type
-            end
-          else
-            if (size[0] == (resolution[0]) && size[1] == (resolution[1])) || # portrait
-               (size[1] == (resolution[0]) && size[0] == (resolution[1])) # landscape
-              return device_type
-            end
+          if size[0] == (resolution[0]) && size[1] == (resolution[1])
+            return device_type
           end
         end
       end
