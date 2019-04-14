@@ -212,7 +212,7 @@ module Deliver
           [1668, 2224],
           [2224, 1668]
         ],
-        ScreenSize::IOS_IPAD_11 => [
+        ScreenSize::IOS_IPAD_11_MESSAGES => [
           [1668, 2388],
           [2388, 1668]
         ],
