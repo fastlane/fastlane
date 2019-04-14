@@ -187,7 +187,6 @@ module Deliver
           [1125, 2436]
         ],
         ScreenSize::IOS_55_MESSAGES => [
-          [1080, 1920],
           [1242, 2208]
         ],
         ScreenSize::IOS_47_MESSAGES => [
@@ -236,7 +235,6 @@ module Deliver
           [1125, 2436]
         ],
         ScreenSize::IOS_55 => [
-          [1080, 1920],
           [1242, 2208]
         ],
         ScreenSize::IOS_47 => [
