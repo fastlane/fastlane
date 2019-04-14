@@ -1,7 +1,5 @@
 require 'deliver/app_screenshot'
 
-# Ensure that screenshots correctly map to the following:
-# https://help.apple.com/app-store-connect/#/devd274dd925
 describe Deliver::AppScreenshot do
   def screen_size_from(path)
     path.match(/{([0-9]+)x([0-9]+)}/).captures.map(&:to_i)
@@ -15,6 +13,8 @@ describe Deliver::AppScreenshot do
 
   ScreenSize = Deliver::AppScreenshot::ScreenSize
 
+  # Ensure that screenshots correctly map based on the following:
+  # https://help.apple.com/app-store-connect/#/devd274dd925
   describe "#calculate_screen_size" do
     def expect_screen_size_from_file(file)
       expect(Deliver::AppScreenshot.calculate_screen_size(file))
@@ -255,7 +255,7 @@ describe Deliver::AppScreenshot do
       expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_55_MESSAGES).device_type).to eq("iphone6Plus")
     end
 
-    it "should return nil for 6.1 inch displays" do
+    it "should return nil for 6.1 inch displays (iPhone XR)" do
       expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_61).device_type).to be_nil
     end
 
