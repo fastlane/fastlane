@@ -2,7 +2,7 @@ require_relative "../module"
 
 module Spaceship
   module Tunes
-    # A definition of differnet styled displays used by devices
+    # A definition of different styled displays used by devices
     # that App Store Connect supports storing screenshots.
     # Display styles often only vary based on screen resolution
     # however other aspects of a displays physical apperance are
