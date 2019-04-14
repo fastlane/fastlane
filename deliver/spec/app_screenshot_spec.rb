@@ -13,6 +13,8 @@ describe Deliver::AppScreenshot do
     end
   end
 
+  ScreenSize = Deliver::AppScreenshot::ScreenSize
+
   describe "#calculate_screen_size" do
     def expect_screen_size_from_file(file)
       expect(Deliver::AppScreenshot.calculate_screen_size(file))
@@ -20,135 +22,135 @@ describe Deliver::AppScreenshot do
 
     describe "valid screen sizes" do
       it "should calculate all 6.5 inch iPhone resolutions" do
-        expect_screen_size_from_file("iPhoneXSMax-Portrait{1242x2688}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_65)
-        expect_screen_size_from_file("iPhoneXSMax-Landscape{2688x1242}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_65)
+        expect_screen_size_from_file("iPhoneXSMax-Portrait{1242x2688}.jpg").to eq(ScreenSize::IOS_65)
+        expect_screen_size_from_file("iPhoneXSMax-Landscape{2688x1242}.jpg").to eq(ScreenSize::IOS_65)
       end
 
       it "should calculate all 5.8 inch iPhone resolutions" do
-        expect_screen_size_from_file("iPhoneXS-Portrait{1125x2436}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_58)
-        expect_screen_size_from_file("iPhoneXS-Landscape{2436x1125}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_58)
+        expect_screen_size_from_file("iPhoneXS-Portrait{1125x2436}.jpg").to eq(ScreenSize::IOS_58)
+        expect_screen_size_from_file("iPhoneXS-Landscape{2436x1125}.jpg").to eq(ScreenSize::IOS_58)
       end
 
       it "should calculate all 5.5 inch iPhone resolutions" do
-        expect_screen_size_from_file("iPhone8Plus-Portrait{1242x2208}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_55)
-        expect_screen_size_from_file("iPhone8Plus-Landscape{2208x1242}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_55)
+        expect_screen_size_from_file("iPhone8Plus-Portrait{1242x2208}.jpg").to eq(ScreenSize::IOS_55)
+        expect_screen_size_from_file("iPhone8Plus-Landscape{2208x1242}.jpg").to eq(ScreenSize::IOS_55)
       end
 
       it "should calculate all 4.7 inch iPhone resolutions" do
-        expect_screen_size_from_file("iPhone8-Portrait{750x1334}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_47)
-        expect_screen_size_from_file("iPhone8-Landscape{1334x750}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_47)
+        expect_screen_size_from_file("iPhone8-Portrait{750x1334}.jpg").to eq(ScreenSize::IOS_47)
+        expect_screen_size_from_file("iPhone8-Landscape{1334x750}.jpg").to eq(ScreenSize::IOS_47)
       end
 
       it "should calculate all 4 inch iPhone resolutions" do
-        expect_screen_size_from_file("iPhoneSE-Portrait{640x1136}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_40)
-        expect_screen_size_from_file("iPhoneSE-Landscape{1136x640}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_40)
-        expect_screen_size_from_file("iPhoneSE-Portrait-NoStatusBar{640x1096}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_40)
-        expect_screen_size_from_file("iPhoneSE-Landscape-NoStatusBar{1136x600}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_40)
+        expect_screen_size_from_file("iPhoneSE-Portrait{640x1136}.jpg").to eq(ScreenSize::IOS_40)
+        expect_screen_size_from_file("iPhoneSE-Landscape{1136x640}.jpg").to eq(ScreenSize::IOS_40)
+        expect_screen_size_from_file("iPhoneSE-Portrait-NoStatusBar{640x1096}.jpg").to eq(ScreenSize::IOS_40)
+        expect_screen_size_from_file("iPhoneSE-Landscape-NoStatusBar{1136x600}.jpg").to eq(ScreenSize::IOS_40)
       end
 
       it "should calculate all 3.5 inch iPhone resolutions" do
-        expect_screen_size_from_file("iPhone4S-Portrait{640x960}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_35)
-        expect_screen_size_from_file("iPhone4S-Landscape{960x640}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_35)
-        expect_screen_size_from_file("iPhone4S-Portrait-NoStatusBar{640x920}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_35)
-        expect_screen_size_from_file("iPhone4S-Landscape-NoStatusBar{960x600}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_35)
+        expect_screen_size_from_file("iPhone4S-Portrait{640x960}.jpg").to eq(ScreenSize::IOS_35)
+        expect_screen_size_from_file("iPhone4S-Landscape{960x640}.jpg").to eq(ScreenSize::IOS_35)
+        expect_screen_size_from_file("iPhone4S-Portrait-NoStatusBar{640x920}.jpg").to eq(ScreenSize::IOS_35)
+        expect_screen_size_from_file("iPhone4S-Landscape-NoStatusBar{960x600}.jpg").to eq(ScreenSize::IOS_35)
       end
 
       it "should calculate all 12.9 inch iPad resolutions" do
-        expect_screen_size_from_file("iPad-Portrait-12_9Inch{2048x2732}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO)
-        expect_screen_size_from_file("iPad-Landscape-12_9Inch{2732x2048}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO)
+        expect_screen_size_from_file("iPad-Portrait-12_9Inch{2048x2732}.jpg").to eq(ScreenSize::IOS_IPAD_PRO)
+        expect_screen_size_from_file("iPad-Landscape-12_9Inch{2732x2048}.jpg").to eq(ScreenSize::IOS_IPAD_PRO)
       end
 
       it "should calculate all 11 inch iPad resolutions" do
-        expect_screen_size_from_file("iPad-Portrait-11Inch{1668x2388}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_11)
-        expect_screen_size_from_file("iPad-Landscape-11Inch{2388x1668}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_11)
+        expect_screen_size_from_file("iPad-Portrait-11Inch{1668x2388}.jpg").to eq(ScreenSize::IOS_IPAD_11)
+        expect_screen_size_from_file("iPad-Landscape-11Inch{2388x1668}.jpg").to eq(ScreenSize::IOS_IPAD_11)
       end
 
       it "should calculate all 10.5 inch iPad resolutions" do
-        expect_screen_size_from_file("iPad-Portrait-10_5Inch{1668x2224}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_10_5)
-        expect_screen_size_from_file("iPad-Landscape-10_5Inch{2224x1668}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_10_5)
+        expect_screen_size_from_file("iPad-Portrait-10_5Inch{1668x2224}.jpg").to eq(ScreenSize::IOS_IPAD_10_5)
+        expect_screen_size_from_file("iPad-Landscape-10_5Inch{2224x1668}.jpg").to eq(ScreenSize::IOS_IPAD_10_5)
       end
 
       it "should calculate all 9.7 inch iPad resolutions" do
-        expect_screen_size_from_file("iPad-Portrait-9_7Inch-Retina{1536x2048}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD)
-        expect_screen_size_from_file("iPad-Landscape-9_7Inch-Retina{2048x1536}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD)
-        expect_screen_size_from_file("iPad-Portrait-9_7Inch-Retina-NoStatusBar{1536x2008}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD)
-        expect_screen_size_from_file("iPad-Landscape-9_7Inch-Retina-NoStatusBar{2048x1496}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD)
-        expect_screen_size_from_file("iPad-Portrait-9_7Inch-{768x1024}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD)
-        expect_screen_size_from_file("iPad-Landscape-9_7Inch-{1024x768}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD)
-        expect_screen_size_from_file("iPad-Portrait-9_7Inch-NoStatusBar{768x1004}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD)
-        expect_screen_size_from_file("iPad-Landscape-9_7Inch-NoStatusBar{1024x748}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD)
+        expect_screen_size_from_file("iPad-Portrait-9_7Inch-Retina{1536x2048}.jpg").to eq(ScreenSize::IOS_IPAD)
+        expect_screen_size_from_file("iPad-Landscape-9_7Inch-Retina{2048x1536}.jpg").to eq(ScreenSize::IOS_IPAD)
+        expect_screen_size_from_file("iPad-Portrait-9_7Inch-Retina-NoStatusBar{1536x2008}.jpg").to eq(ScreenSize::IOS_IPAD)
+        expect_screen_size_from_file("iPad-Landscape-9_7Inch-Retina-NoStatusBar{2048x1496}.jpg").to eq(ScreenSize::IOS_IPAD)
+        expect_screen_size_from_file("iPad-Portrait-9_7Inch-{768x1024}.jpg").to eq(ScreenSize::IOS_IPAD)
+        expect_screen_size_from_file("iPad-Landscape-9_7Inch-{1024x768}.jpg").to eq(ScreenSize::IOS_IPAD)
+        expect_screen_size_from_file("iPad-Portrait-9_7Inch-NoStatusBar{768x1004}.jpg").to eq(ScreenSize::IOS_IPAD)
+        expect_screen_size_from_file("iPad-Landscape-9_7Inch-NoStatusBar{1024x748}.jpg").to eq(ScreenSize::IOS_IPAD)
       end
 
       it "should calculate all supported Mac resolutions" do
-        expect_screen_size_from_file("Mac{1280x800}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::MAC)
-        expect_screen_size_from_file("Mac{1440x900}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::MAC)
-        expect_screen_size_from_file("Mac{2560x1600}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::MAC)
-        expect_screen_size_from_file("Mac{2880x1800}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::MAC)
+        expect_screen_size_from_file("Mac{1280x800}.jpg").to eq(ScreenSize::MAC)
+        expect_screen_size_from_file("Mac{1440x900}.jpg").to eq(ScreenSize::MAC)
+        expect_screen_size_from_file("Mac{2560x1600}.jpg").to eq(ScreenSize::MAC)
+        expect_screen_size_from_file("Mac{2880x1800}.jpg").to eq(ScreenSize::MAC)
       end
 
       it "should calculate all supported Apple TV resolutions" do
-        expect_screen_size_from_file("AppleTV{1920x1080}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::APPLE_TV)
-        expect_screen_size_from_file("AppleTV-4K{3840x2160}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::APPLE_TV)
+        expect_screen_size_from_file("AppleTV{1920x1080}.jpg").to eq(ScreenSize::APPLE_TV)
+        expect_screen_size_from_file("AppleTV-4K{3840x2160}.jpg").to eq(ScreenSize::APPLE_TV)
       end
 
       it "should calculate all supported Apple Watch resolutions" do
-        expect_screen_size_from_file("AppleWatch-Series3{312x390}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_APPLE_WATCH)
-        expect_screen_size_from_file("AppleWatch-Series4{368x448}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_APPLE_WATCH_SERIES4)
+        expect_screen_size_from_file("AppleWatch-Series3{312x390}.jpg").to eq(ScreenSize::IOS_APPLE_WATCH)
+        expect_screen_size_from_file("AppleWatch-Series4{368x448}.jpg").to eq(ScreenSize::IOS_APPLE_WATCH_SERIES4)
       end
     end
 
     describe "valid iMessage app screen sizes" do
       it "should calculate all 6.5 inch iPhone resolutions" do
-        expect_screen_size_from_file("iMessage/en-GB/iPhoneXSMax-Portrait{1242x2688}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_65_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPhoneXSMax-Landscape{2688x1242}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_65_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPhoneXSMax-Portrait{1242x2688}.jpg").to eq(ScreenSize::IOS_65_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPhoneXSMax-Landscape{2688x1242}.jpg").to eq(ScreenSize::IOS_65_MESSAGES)
       end
 
       it "should calculate all 5.8 inch iPhone resolutions" do
-        expect_screen_size_from_file("iMessage/en-GB/iPhoneXS-Portrait{1125x2436}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_58_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPhoneXS-Landscape{2436x1125}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_58_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPhoneXS-Portrait{1125x2436}.jpg").to eq(ScreenSize::IOS_58_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPhoneXS-Landscape{2436x1125}.jpg").to eq(ScreenSize::IOS_58_MESSAGES)
       end
 
       it "should calculate all 5.5 inch iPhone resolutions" do
-        expect_screen_size_from_file("iMessage/en-GB/iPhone8Plus-Portrait{1242x2208}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_55_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPhone8Plus-Landscape{2208x1242}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_55_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPhone8Plus-Portrait{1242x2208}.jpg").to eq(ScreenSize::IOS_55_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPhone8Plus-Landscape{2208x1242}.jpg").to eq(ScreenSize::IOS_55_MESSAGES)
       end
 
       it "should calculate all 4.7 inch iPhone resolutions" do
-        expect_screen_size_from_file("iMessage/en-GB/iPhone8-Portrait{750x1334}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_47_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPhone8-Landscape{1334x750}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_47_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPhone8-Portrait{750x1334}.jpg").to eq(ScreenSize::IOS_47_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPhone8-Landscape{1334x750}.jpg").to eq(ScreenSize::IOS_47_MESSAGES)
       end
 
       it "should calculate all 4 inch iPhone resolutions" do
-        expect_screen_size_from_file("iMessage/en-GB/iPhoneSE-Portrait{640x1136}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_40_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPhoneSE-Landscape{1136x640}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_40_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPhoneSE-Portrait-NoStatusBar{640x1096}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_40_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPhoneSE-Landscape-NoStatusBar{1136x600}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_40_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPhoneSE-Portrait{640x1136}.jpg").to eq(ScreenSize::IOS_40_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPhoneSE-Landscape{1136x640}.jpg").to eq(ScreenSize::IOS_40_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPhoneSE-Portrait-NoStatusBar{640x1096}.jpg").to eq(ScreenSize::IOS_40_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPhoneSE-Landscape-NoStatusBar{1136x600}.jpg").to eq(ScreenSize::IOS_40_MESSAGES)
       end
 
       it "should calculate all 12.9 inch iPad resolutions" do
-        expect_screen_size_from_file("iMessage/en-GB/iPad-Portrait-12_9Inch{2048x2732}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPad-Landscape-12_9Inch{2732x2048}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPad-Portrait-12_9Inch{2048x2732}.jpg").to eq(ScreenSize::IOS_IPAD_PRO_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPad-Landscape-12_9Inch{2732x2048}.jpg").to eq(ScreenSize::IOS_IPAD_PRO_MESSAGES)
       end
 
       it "should calculate all 11 inch iPad resolutions" do
-        expect_screen_size_from_file("iMessage/en-GB/iPad-Portrait-11Inch{1668x2388}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_11_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPad-Landscape-11Inch{2388x1668}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_11_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPad-Portrait-11Inch{1668x2388}.jpg").to eq(ScreenSize::IOS_IPAD_11_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPad-Landscape-11Inch{2388x1668}.jpg").to eq(ScreenSize::IOS_IPAD_11_MESSAGES)
       end
 
       it "should calculate all 10.5 inch iPad resolutions" do
-        expect_screen_size_from_file("iMessage/en-GB/iPad-Portrait-10_5Inch{1668x2224}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_10_5_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPad-Landscape-10_5Inch{2224x1668}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_10_5_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPad-Portrait-10_5Inch{1668x2224}.jpg").to eq(ScreenSize::IOS_IPAD_10_5_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPad-Landscape-10_5Inch{2224x1668}.jpg").to eq(ScreenSize::IOS_IPAD_10_5_MESSAGES)
       end
 
       it "should calculate all 9.7 inch iPad resolutions" do
-        expect_screen_size_from_file("iMessage/en-GB/iPad-Portrait-9_7Inch-Retina{1536x2048}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPad-Landscape-9_7Inch-Retina{2048x1536}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPad-Portrait-9_7Inch-Retina-NoStatusBar{1536x2008}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPad-Landscape-9_7Inch-Retina-NoStatusBar{2048x1496}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPad-Portrait-9_7Inch-{768x1024}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPad-Landscape-9_7Inch-{1024x768}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPad-Portrait-9_7Inch-NoStatusBar{768x1004}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_MESSAGES)
-        expect_screen_size_from_file("iMessage/en-GB/iPad-Landscape-9_7Inch-NoStatusBar{1024x748}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPad-Portrait-9_7Inch-Retina{1536x2048}.jpg").to eq(ScreenSize::IOS_IPAD_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPad-Landscape-9_7Inch-Retina{2048x1536}.jpg").to eq(ScreenSize::IOS_IPAD_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPad-Portrait-9_7Inch-Retina-NoStatusBar{1536x2008}.jpg").to eq(ScreenSize::IOS_IPAD_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPad-Landscape-9_7Inch-Retina-NoStatusBar{2048x1496}.jpg").to eq(ScreenSize::IOS_IPAD_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPad-Portrait-9_7Inch-{768x1024}.jpg").to eq(ScreenSize::IOS_IPAD_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPad-Landscape-9_7Inch-{1024x768}.jpg").to eq(ScreenSize::IOS_IPAD_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPad-Portrait-9_7Inch-NoStatusBar{768x1004}.jpg").to eq(ScreenSize::IOS_IPAD_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPad-Landscape-9_7Inch-NoStatusBar{1024x748}.jpg").to eq(ScreenSize::IOS_IPAD_MESSAGES)
       end
     end
 
