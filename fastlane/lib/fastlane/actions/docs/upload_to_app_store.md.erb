@@ -704,7 +704,11 @@ You can do the same with folders
 
 In this case, default values for keywords, urls, name and release notes are used in all localizations, but each language has a fully localized description
 
+## iPad Pro 12.9-inch 2nd and 3rd generation ambiguity resolution
 
+From March 20, 2019 Apple App Store [requires](https://developer.apple.com/news/?id=03202019a) 2nd and 3rd generation iPad [screenshots](https://help.apple.com/app-store-connect/#/devd274dd925).
+
+Ambiguity arise as Fastlane checks for screenshot size to identify the device. To solve this issue 3rd generation screenshots must contain `(3rd generation)` part in the name of screenshot.
 
 ## Automatically create screenshots
 
