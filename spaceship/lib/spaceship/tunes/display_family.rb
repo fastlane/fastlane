@@ -14,8 +14,9 @@ module Spaceship
       # to the correct display families via its `device_type` property.
       attr_accessor :name
 
-      # The user friendly name of this defintion as seen in the Media
-      # Manager in App Store Connect.
+      # The user friendly name of this defintion.
+      #
+      # Source: Media Manager in App Store Connect.
       attr_accessor :friendly_name
 
       # The user friendly category for this defintion (i.e iPhone,
