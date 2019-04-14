@@ -1,5 +1,5 @@
 require_relative '../client'
-require_relative '../tunes/device_type'
+require_relative '../tunes/display_family'
 require_relative 'utilities'
 
 module Spaceship
