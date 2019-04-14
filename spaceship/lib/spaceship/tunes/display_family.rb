@@ -46,12 +46,23 @@ module Spaceship
         true unless messages_picture_type.nil?
       end
 
-      def self.for_name(name)
-        all_families[name]
+      # Finds a DisplayFamily definition.
+      #
+      # @param name (Symbol) The name of the display family being searched for.
+      # @return DisplayFamily object matching the given name.
+      def self.find(name)
+        lookup[name]
       end
 
-      def self.all_families
-        @all_families ||= JSON.parse(File.read(File.join(Spaceship::ROOT, "lib", "assets", "displayFamilies.json"))).map { |data| [data["name"].to_sym, DisplayFamily.new(data)] }.to_h
+      # All DisplayFamily types currently supported by App Store Connect.
+      def self.all
+        lookup.values
+      end
+
+      private
+
+      def self.lookup
+        @lookup||= JSON.parse(File.read(File.join(Spaceship::ROOT, "lib", "assets", "displayFamilies.json"))).map { |data| [data["name"].to_sym, DisplayFamily.new(data)] }.to_h
       end
 
       def initialize(data)

@@ -5,7 +5,8 @@ module Spaceship
     # identifiers of devices that App Store Connect accepts screenshots for
     class DeviceType
       def self.types
-        return DisplayFamily.all_families.keys.map(&:to_s)
+        UI.deprecated("Spaceship::Tunes::DeviceType has been deprecated. Use the new Spaceship::Tunes::DisplayFamily class instead")
+        return DisplayFamily.all.map(&:name)
       end
 
       def self.exists?(type)
