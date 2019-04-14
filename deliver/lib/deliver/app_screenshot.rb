@@ -313,12 +313,8 @@ module Deliver
       path_component = Pathname.new(path).each_filename.to_a[-3]
       devices = path_component.eql?("iMessage") ? self.device_messages : self.devices
 
-      devices.each do |device_type, array|
-        array.each do |resolution|
-          if size[0] == (resolution[0]) && size[1] == (resolution[1])
-            return device_type
-          end
-        end
+      devices.each do |screen_size, resolutions|
+        return screen_size if resolutions.include?(size)
       end
 
       UI.user_error!("Unsupported screen size #{size} for path '#{path}'")
