@@ -10,8 +10,9 @@ module Spaceship
     # a hardware button or a software interface).
     class DisplayFamily
       # The display family name from the App Store Connect API that
-      # is used to assign `Spaceship::Tunes::AppScreenshot` objects
-      # to the correct display families via its `device_type` property.
+      # is used when uploading or listing screenshots. This value is
+      # then assigned to the
+      # Spaceship::Tunes::AppScreenshot#device_type attribute.
       attr_accessor :name
 
       # The user friendly name of this defintion.
@@ -59,11 +60,13 @@ module Spaceship
         lookup.values
       end
 
-      private
+      private_class_method
 
       def self.lookup
-        @lookup||= JSON.parse(File.read(File.join(Spaceship::ROOT, "lib", "assets", "displayFamilies.json"))).map { |data| [data["name"].to_sym, DisplayFamily.new(data)] }.to_h
+        @lookup ||= JSON.parse(File.read(File.join(Spaceship::ROOT, "lib", "assets", "displayFamilies.json"))).map { |data| [data["name"].to_sym, DisplayFamily.new(data)] }.to_h
       end
+
+      private
 
       def initialize(data)
         @name = data["name"]

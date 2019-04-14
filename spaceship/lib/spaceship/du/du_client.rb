@@ -102,7 +102,7 @@ module Spaceship
     end
 
     def messages_picture_type_map
-      Spaceship::Tunes::DisplayFamily.all.select { |v| v.messages_supported? }.map { |v| [v.name.to_sym, v.messages_picture_type] }.to_h
+      Spaceship::Tunes::DisplayFamily.all.select(&:messages_supported?).map { |v| [v.name.to_sym, v.messages_picture_type] }.to_h
     end
 
     def device_resolution_map
