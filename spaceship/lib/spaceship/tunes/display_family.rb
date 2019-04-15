@@ -63,7 +63,9 @@ module Spaceship
       private_class_method
 
       def self.lookup
-        @lookup ||= JSON.parse(File.read(File.join(Spaceship::ROOT, "lib", "assets", "displayFamilies.json"))).map { |data| [data["name"].to_sym, DisplayFamily.new(data)] }.to_h
+        return @lookup if defined?(@lookup)
+        display_families = JSON.parse(File.read(File.join(Spaceship::ROOT, "lib", "assets", "displayFamilies.json")))
+        @lookup ||= display_families.map { |data| [data["name"].to_sym, DisplayFamily.new(data)] }.to_h
       end
 
       private
