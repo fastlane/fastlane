@@ -8,7 +8,7 @@ import android.util.Log;
 import java.lang.reflect.Method;
 import java.util.Locale;
 
-public class LocaleUtil {
+public final class LocaleUtil {
 
     private static final String TAG =  LocaleUtil.class.getSimpleName();
 
@@ -17,6 +17,8 @@ public class LocaleUtil {
             Log.w(TAG, "Skipping setting device locale to null");
             return;
         }
+
+        Locale.setDefault(locale);
 
         try {
             Class amnClass = Class.forName("android.app.ActivityManagerNative");
