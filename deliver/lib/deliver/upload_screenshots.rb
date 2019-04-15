@@ -43,7 +43,7 @@ module Deliver
         Helper.show_loading_indicator("Activating #{lng_text} #{enabled_languages.join(', ')}...")
         v.save!
         # This refreshes the app version from iTC after enabling a localization
-        v = app.edit_version
+        v = app.edit_version(platform: options[:platform])
         Helper.hide_loading_indicator
       end
 
