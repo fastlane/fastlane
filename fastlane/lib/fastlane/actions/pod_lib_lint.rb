@@ -100,7 +100,7 @@ module Fastlane
                                        description: "Lint skips checks that would require to download and build the spec",
                                        type: Boolean,
                                        default_value: false,
-                                       env_name: "FL_POD_LIB_LINT_QUICK"),
+                                       env_name: "FL_POD_LIB_LINT_QUICK")
         ]
       end
 
