@@ -33,25 +33,31 @@ module Fastlane
           current_version = ''
         end
 
-        version_regex = /^\d+\.\d+\.\d+$/
+        version_regex = /^\d+(\.\d+){0,2}$/
+        version_format_error = "Your current version (#{current_version}) does not respect the format A or A.B or A.B.C"
+        version_token_error = "Can't increment version"
+        
         if params[:version_number]
-          UI.verbose("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ version_regex
+          UI.verbose(version_format_error) unless current_version =~ version_regex
 
           # Specific version
           next_version_number = params[:version_number]
         else
-          UI.user_error!("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ version_regex
+          UI.user_error!(version_format_error) unless current_version =~ version_regex
           version_array = current_version.split(".").map(&:to_i)
 
           case params[:bump_type]
           when "patch"
+            UI.user_error!(version_token_error) if version_array.count < 3
             version_array[2] = version_array[2] + 1
             next_version_number = version_array.join(".")
           when "minor"
+            UI.user_error!(version_token_error) if version_array.count < 2
             version_array[1] = version_array[1] + 1
             version_array[2] = version_array[2] = 0
             next_version_number = version_array.join(".")
           when "major"
+            UI.user_error!(version_token_error) if version_array.count == 0
             version_array[0] = version_array[0] + 1
             version_array[1] = version_array[1] = 0
             version_array[1] = version_array[2] = 0
