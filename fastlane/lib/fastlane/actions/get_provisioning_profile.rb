@@ -3,7 +3,6 @@ module Fastlane
     module SharedValues
       SIGH_PROFILE_PATH = :SIGH_PROFILE_PATH
       SIGH_PROFILE_PATHS = :SIGH_PROFILE_PATHS
-      SIGH_UDID = :SIGH_UDID # deprecated
       SIGH_UUID = :SIGH_UUID
       SIGH_NAME = :SIGH_NAME
       SIGH_PROFILE_TYPE = :SIGH_PROFILE_TYPE
@@ -22,6 +21,7 @@ module Fastlane
         Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] ||= []
         Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] << path
 
+        # SharedValues::SIGH_UDID is deprecated
         uuid = ENV["SIGH_UUID"] || ENV["SIGH_UDID"] # the UUID of the profile
         name = ENV["SIGH_NAME"] # the name of the profile
         Actions.lane_context[SharedValues::SIGH_UUID] = Actions.lane_context[SharedValues::SIGH_UDID] = uuid if uuid
@@ -50,6 +50,16 @@ module Fastlane
 
       def self.author
         "KrauseFx"
+      end
+
+      def self.output
+        [
+          ['SIGH_PROFILE_PATH', 'A path in which export certificates, key and profile'],
+          ['SIGH_PROFILE_PATHS', 'Paths in which export certificates, key and profile'],
+          ['SIGH_UUID', 'UUID (Universally Unique IDentifier)'],
+          ['SIGH_NAME', 'The name of the profile'],
+          ['SIGH_PROFILE_TYPE', 'The profile type, can be appstore, adhoc, development, enterprise']
+        ]
       end
 
       def self.return_value

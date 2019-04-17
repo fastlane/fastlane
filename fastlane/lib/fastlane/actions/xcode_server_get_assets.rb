@@ -1,5 +1,6 @@
 module Fastlane
   module Actions
+    # rubocop:disable Lint/MissingKeysOnSharedArea
     module SharedValues
       XCODE_SERVER_GET_ASSETS_PATH = :XCODE_SERVER_GET_ASSETS_PATH
       XCODE_SERVER_GET_ASSETS_ARCHIVE_PATH = :XCODE_SERVER_GET_ASSETS_ARCHIVE_PATH

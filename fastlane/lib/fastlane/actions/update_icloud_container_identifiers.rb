@@ -69,7 +69,9 @@ module Fastlane
       end
 
       def self.output
-        ['UPDATE_ICLOUD_CONTAINER_IDENTIFIERS', 'The new iCloud Container Identifiers']
+        [
+          ['UPDATE_ICLOUD_CONTAINER_IDENTIFIERS', 'The new iCloud Container Identifiers']
+        ]
       end
 
       def self.authors

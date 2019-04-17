@@ -28,6 +28,12 @@ module Fastlane
         Screengrab::Options.available_options
       end
 
+      def self.output
+        [
+          ['SCREENGRAB_OUTPUT_DIRECTORY', 'The path to the output directory']
+        ]
+      end
+
       def self.author
         ['asfalcone', 'i2amsam', 'mfurtak']
       end
