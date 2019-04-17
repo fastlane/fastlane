@@ -335,6 +335,54 @@ module Spaceship
         handle_response(response)
       end
 
+      def get_beta_testers(filter: {}, includes: nil, limit: 40, sort: nil)
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/betaTesters
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+
+        response = request(:get, "betaTesters") do |req|
+          req.options.params_encoder = Faraday::NestedParamsEncoder
+          req.params = params
+        end
+        handle_response(response)
+      end
+
+      def post_bulk_beta_tester_assignments(beta_group_id: nil, emails: [])
+        # POST
+        # https://appstoreconnect.apple.com/iris/v1/bulkBetaTesterAssignments
+
+        body = {
+          data: {
+            attributes: {
+              betaTesters: emails.map do |email|
+                {
+                  email: email,
+                  errors: [],
+                  firstName: "",
+                  lastName: ""
+                }
+              end
+            },
+            relationships: {
+              betaGroup: {
+                data: {
+                  id: beta_group_id,
+                  type: "betaGroups"
+                }
+              } 
+            },
+            type: "bulkBetaTesterAssignments"
+          }
+        }
+
+        response = request(:post) do |req|
+          req.url("bulkBetaTesterAssignments")
+          req.body = body.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_response(response)
+      end
+
       protected
 
       def handle_response(response, only_data: true)
