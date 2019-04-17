@@ -32,7 +32,7 @@ module Fastlane
         rescue
           current_version = ''
         end
-        
+
         if params[:version_number]
           UI.verbose(version_format_error(current_version)) unless current_version =~ version_regex
 
@@ -80,15 +80,15 @@ module Fastlane
         UI.error('Before being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html')
         raise ex
       end
-      
+
       def self.version_regex
         /^\d+(\.\d+){0,2}$/
       end
-      
+
       def self.version_format_error(version)
         "Your current version (#{version}) does not respect the format A or A.B or A.B.C"
       end
-      
+
       def self.version_token_error
         "Can't increment version"
       end

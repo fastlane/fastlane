@@ -1,6 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    describe "Increment Version Number Integration" do        
+    describe "Increment Version Number Integration" do
       it "increments all targets' patch version number from 1.0.0 to 1.0.1" do
         expect(Fastlane::Actions).to receive(:sh)
           .with(/agvtool what-marketing-version/, any_args)
@@ -12,7 +12,7 @@ describe Fastlane do
 
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version 1.0.1/)
       end
-      
+
       ["1.0", "10"].each do |version|
         it "raises an exception when trying to increment patch version number for #{version}" do
           expect(Fastlane::Actions).to receive(:sh)
@@ -27,7 +27,7 @@ describe Fastlane do
           end.to raise_error("Can't increment version")
         end
       end
-      
+
       {
         "1.0.0" => "1.1.0",
         "10.13" => "10.14"
@@ -40,24 +40,24 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             increment_version_number(bump_type: 'minor')
           end").runner.execute(:test)
-      
+
           expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version #{to_version}/)
         end
       end
-      
+
       it "raises an exception when trying to increment minor version number for 12" do
         expect(Fastlane::Actions).to receive(:sh)
           .with(/agvtool what-marketing-version/, any_args)
           .once
           .and_return("12")
-      
+
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             increment_version_number(bump_type: 'minor')
           end").runner.execute(:test)
         end.to raise_error("Can't increment version")
       end
-      
+
       {
         "1.0.0" => "2.0.0",
         "10.13" => "11.0",
@@ -71,37 +71,37 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             increment_version_number(bump_type: 'major')
           end").runner.execute(:test)
-      
+
           expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version #{to_version}/)
         end
       end
-      
+
       ["1.4.3", "1.0", "10"].each do |version|
         it "pass a custom version number #{version}" do
           result = Fastlane::FastFile.new.parse("lane :test do
             increment_version_number(version_number: \"#{version}\")
           end").runner.execute(:test)
-        
+
           expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version #{version}/)
         end
       end
-      
+
       it "prefers a custom version number over a boring version bump" do
         Fastlane::FastFile.new.parse("lane :test do
           increment_version_number(version_number: '1.77.3', bump_type: 'major')
         end").runner.execute(:test)
-      
+
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version 1.77.3/)
       end
-      
+
       it "automatically removes new lines from the version number" do
         Fastlane::FastFile.new.parse("lane :test do
           increment_version_number(version_number: '1.77.3\n', bump_type: 'major')
         end").runner.execute(:test)
-      
+
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to end_with("&& agvtool new-marketing-version 1.77.3")
       end
-      
+
       it "returns the new version as return value" do
         expect(Fastlane::Actions).to receive(:sh)
           .with(/agvtool what-marketing-version/, any_args)
@@ -110,10 +110,10 @@ describe Fastlane do
         result = Fastlane::FastFile.new.parse("lane :test do
           increment_version_number(bump_type: 'major')
         end").runner.execute(:test)
-      
+
         expect(result).to eq(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER])
       end
-      
+
       it "raises an exception when xcode project path wasn't found" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -121,7 +121,7 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_error("Could not find Xcode project")
       end
-      
+
       it "raises an exception when user passes workspace" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -129,7 +129,7 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_error("Please pass the path to the project, not the workspace")
       end
-      
+
       ["A", "1.2.3.4"].each do |version|
         it "raises an exception when unable to calculate new version for #{version}" do
           expect(Fastlane::Actions).to receive(:sh)
