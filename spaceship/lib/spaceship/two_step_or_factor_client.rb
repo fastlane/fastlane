@@ -123,10 +123,13 @@ module Spaceship
       code_length = security_code["length"]
 
       puts("")
-      if ENV["SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER"]
+      2fa_sms_default_phone_number = ENV["SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER"]
+      if 2fa_sms_default_phone_number
+        raise Tunes::Error.new, "Environment variable SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER is set, but empty." if 2fa_sms_default_phone_number.empty?
+
         puts("Environment variable `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER` is set, automatically requesting 2FA token via SMS to that number")
-        puts("SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER = #{ENV['SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER']}")
-        phone_number = ENV["SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER"]
+        puts("SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER = #{2fa_sms_default_phone_number}")
+        phone_number = 2fa_sms_default_phone_number
         phone_id = phone_id_from_number(response.body["trustedPhoneNumbers"], phone_number)
         code_type = 'phone'
         body = request_two_factor_code_from_phone(phone_id, phone_number, code_length)
