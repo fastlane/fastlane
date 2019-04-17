@@ -62,7 +62,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Setup the keychain and match to work with CircleCI"
+        "Setup the keychain and match to work with CI"
       end
 
       def self.details
@@ -74,7 +74,7 @@ module Fastlane
 
         [
           list,
-          "This action helps with CircleCI integration. Add this to the top of your Fastfile if you use CircleCI."
+          "This action helps with CI integration. Add this to the top of your Fastfile if you use CI."
         ].join("\n")
       end
 
@@ -82,7 +82,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_SETUP_CI_FORCE",
-                                       description: "Force setup, even if not executed by CircleCI",
+                                       description: "Force setup, even if not executed by CI",
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :provider,
