@@ -12,6 +12,8 @@ module Fastlane
         command << "--allow-warnings" if params[:allow_warnings]
         command << "--sources='#{params[:sources].join(',')}'" if params[:sources]
         command << "--subspec='#{params[:subspec]}'" if params[:subspec]
+        command << "--include-podspecs='#{params[:include_podspecs]}'" if params[:include_podspecs]
+        command << "--external-podspecs='#{params[:external_podspecs]}'" if params[:external_podspecs]
         command << "--swift-version=#{params[:swift_version]}" if params[:swift_version]
         command << "--use-libraries" if params[:use_libraries]
         command << "--use-modular-headers" if params[:use_modular_headers]
@@ -71,6 +73,17 @@ module Fastlane
                                        type: String,
                                        optional: true,
                                        env_name: "FL_POD_LIB_LINT_SUBSPEC"),
+          FastlaneCore::ConfigItem.new(key: :include_podspecs,
+                                       description: "A Glob of additional ancillary podspecs which are used for linting via :path (available since cocoapods >= 1.7)",
+                                       type: String,
+                                       optional: true,
+                                       env_name: "FL_POD_LIB_LINT_INCLUDE_PODSPECS"),
+          FastlaneCore::ConfigItem.new(key: :external_podspecs,
+                                       description: "A Glob of additional ancillary podspecs which are used for linting via :podspec. If there"\
+                                         " are --include-podspecs, then these are removed from them (available since cocoapods >= 1.7)",
+                                       type: String,
+                                       optional: true,
+                                       env_name: "FL_POD_LIB_LINT_EXTERNAL_PODSPECS"),
           FastlaneCore::ConfigItem.new(key: :swift_version,
                                        description: "The SWIFT_VERSION that should be used to lint the spec. This takes precedence over a .swift-version file",
                                        type: String,
