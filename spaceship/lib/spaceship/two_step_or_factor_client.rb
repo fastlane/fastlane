@@ -130,13 +130,17 @@ module Spaceship
 
         puts("Environment variable `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER` is set, automatically requesting 2FA token via SMS to that number")
         puts("SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER = #{env_2fa_sms_default_phone_number}")
+        puts("")
         phone_number = env_2fa_sms_default_phone_number
         phone_id = phone_id_from_number(response.body["trustedPhoneNumbers"], phone_number)
         code_type = 'phone'
         body = request_two_factor_code_from_phone(phone_id, phone_number, code_length)
       else
         puts("(Input `sms` to escape this prompt and select a trusted phone number to send the code as a text message)")
+        puts("")
         puts("(You can also set the environment variable `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER` to automate this)")
+        puts("(Read more at: https://github.com/fastlane/fastlane/blob/master/spaceship/docs/Authentication.md#auto-select-sms-via-spaceship-2fa-sms-default-phone-number)")
+        puts("")
         code_type = 'trusteddevice'
         code = ask_for_2fa_code("Please enter the #{code_length} digit code:")
         body = { "securityCode" => { "code" => code.to_s } }.to_json
