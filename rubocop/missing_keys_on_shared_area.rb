@@ -6,6 +6,10 @@ module RuboCop
       MISSING_KEYS_MSG = "There are missing keys on the shared area. Check constants provided in 'SharedValues' or keys provided in 'output' method in the action's code".freeze
       MISSING_OUTPUT_METHOD_MSG = "There are declared keys on the shared area 'SharedValues', but 'output' method has not been found".freeze
 
+      def_node_search :extract_const_assignment, <<-PATTERN
+        (casgn nil? $_ ...)
+      PATTERN
+
       attr_writer :shared_values_constants
       def shared_values_constants
         @shared_values_constants ||= []
@@ -16,20 +20,8 @@ module RuboCop
         return unless name.source == 'SharedValues'
         return if body.nil?
 
-        body.children.compact.each do |child|
-          next unless child.respond_to?('casgn_type?')
-
-          if child.or_asgn_type? # Multiple constant values
-            lhs, _value = *child
-            _scope, const_name = *lhs
-          else # Single constant value
-            _scope, const_name, _value = *child
-            self.shared_values_constants << const_name.to_s if const_name
-          end
-
-          _scope, const_name, _value = *body unless const_name
-          self.shared_values_constants << const_name.to_s if const_name
-        end
+        consts = extract_const_assignment(node)
+        consts.each { |const| self.shared_values_constants << const.to_s }
       end
 
       def on_defs(node)
@@ -54,7 +46,10 @@ module RuboCop
       end
 
       def on_class(node)
-        name, _superclass, body = *node
+        name, superclass, body = *node
+        return unless superclass
+        return unless superclass.loc.name.source == 'Action'
+
         add_offense(node, :expression, MISSING_OUTPUT_METHOD_MSG) if body.nil? && self.shared_values_constants.any?
         return if body.nil?
 
