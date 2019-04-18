@@ -1,23 +1,29 @@
 # Authentication with spaceship
 
-As spaceship talks to Apple's APIs, most requests need to be authenticated.
+As spaceship talks to Apple's APIs, most requests need to be authenticated with your Apple ID that you use to log in to https://developer.apple.com/. You start the login with a simple call to `Spaceship.login`.
 
 ## Credentials
 
-username + password
-API token not supported yet as API access is not generally available, we are still using older APIs
+The `Spaceship.login` method accepts `username` and `password` as parameters or will ask for them interactively if not provided. It will also try to retrieve them via [`CredentialsManager`](https://github.com/fastlane/fastlane/tree/master/credentials_manager), which supports environment variables `FASTLANE_USER` and `FASTLANE_PASSWORD` .
 
-## 2FA + 2SV
+Login with API tokens is not supported yet as API access is not generally available. Spaceship is also still using only older APIs that do not need API tokens for authentication yet.
 
-pushed security codes
-SMS to trusted phone numbers via `sms`
+## Two-factor Authentication
 
-### Avoid via additional Account
+If your Apple ID has Two-factor Authentication enabled spaceship will also ask you for the security code that was pushed to your devices after succesfully entering username and password.
 
-best way to avoid is create an additional account with required rights
-not always possible for e.g. individual accounts, as Developer Portal can't create teams
+If you can not access any of your trusted devices, or just prefer it, you can also switch to the SMS based flow by entering `sms` at this prompt. spaceship will then present you with a selection of your trusted phone numbers, and after choosing you can enter the security code you were sent by SMS.
+
+Spaceship also supports legacy [Two-step verification](https://support.apple.com/en-us/HT204152) that is still active for some Apple IDs.
+
+### Avoid 2FA via additional account
+
+If you want to avoid dealing with the required interaction of using a Two-factor Authentication enabled account (for example because you want to use spaceship on an automated or CI system that does not support interaction), you have to create an additional account with the required rights.
+
+Note that Apple does not always allow in all situations. For example for individual accounts (vs. company accounts), it is not possible to create team member accounts for the Developer Portal (where you create app IDs, certificates etc).
 
 ### Auto-select SMS via `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER`
 
-If you _always_ want your security sent via SMS to a specific trusted phone number ...
+If you _always_ want your security sent via SMS to a specific trusted phone number you can set the `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER` environment variable to that phone number. The phone number should be specified in the same format as it is displayed in your [Apple ID console](https://appleid.apple.com/) under `TRUSTED PHONE NUMBERS`, e.g. `+49 162 2850123`, `+1-123-456-7866` or similar. Do not leave off the country code or add or remove any numbers, otherwise fastlane will not be able to match the masked value from Apple's API and select the correct number.
+
 
