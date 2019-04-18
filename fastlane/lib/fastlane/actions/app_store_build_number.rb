@@ -21,7 +21,7 @@ module Fastlane
       def self.get_build_number(params)
         UI.message("Login to App Store Connect (#{params[:username]})")
         Spaceship::Tunes.login(params[:username])
-        Spaceship::Tunes.select_team(team_id: params[:team_id])
+        Spaceship::Tunes.select_team(team_id: params[:team_id], team_name: params[:team_name])
         UI.message("Login successful")
 
         app = Spaceship::Tunes::Application.find(params[:app_identifier])
