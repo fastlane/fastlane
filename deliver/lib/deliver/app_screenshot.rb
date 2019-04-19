@@ -185,25 +185,30 @@ module Deliver
       # because it has same resoluation as IOS_IPAD_PRO and will clobber
       return {
         ScreenSize::IOS_65_MESSAGES => [
-          [1242, 2688]
+          [1242, 2688],
+          [2688, 1242]
         ],
         ScreenSize::IOS_61_MESSAGES => [
-          [828, 1792]
+          [828, 1792],
+          [1792, 828]
         ],
         ScreenSize::IOS_58_MESSAGES => [
-          [1125, 2436]
+          [1125, 2436],
+          [2436, 1125]
         ],
         ScreenSize::IOS_55_MESSAGES => [
-          [1080, 1920],
-          [1242, 2208]
+          [1242, 2208],
+          [2208, 1242]
         ],
         ScreenSize::IOS_47_MESSAGES => [
-          [750, 1334]
+          [750, 1334],
+          [1334, 750]
         ],
         ScreenSize::IOS_40_MESSAGES => [
-          [640, 1136],
           [640, 1096],
-          [1136, 600] # landscape status bar is smaller
+          [640, 1136],
+          [1136, 600],
+          [1136, 640]
         ],
         ScreenSize::IOS_IPAD_MESSAGES => [
           [1024, 748],
@@ -219,7 +224,7 @@ module Deliver
           [1668, 2224],
           [2224, 1668]
         ],
-        ScreenSize::IOS_IPAD_11 => [
+        ScreenSize::IOS_IPAD_11_MESSAGES => [
           [1668, 2388],
           [2388, 1668]
         ],
@@ -236,30 +241,36 @@ module Deliver
       # because it has same resoluation as IOS_IPAD_PRO and will clobber
       return {
         ScreenSize::IOS_65 => [
-          [1242, 2688]
+          [1242, 2688],
+          [2688, 1242]
         ],
         ScreenSize::IOS_61 => [
-          [828, 1792]
+          [828, 1792],
+          [1792, 828]
         ],
         ScreenSize::IOS_58 => [
-          [1125, 2436]
+          [1125, 2436],
+          [2436, 1125]
         ],
         ScreenSize::IOS_55 => [
-          [1080, 1920],
-          [1242, 2208]
+          [1242, 2208],
+          [2208, 1242]
         ],
         ScreenSize::IOS_47 => [
-          [750, 1334]
+          [750, 1334],
+          [1334, 750]
         ],
         ScreenSize::IOS_40 => [
-          [640, 1136],
           [640, 1096],
-          [1136, 600] # landscape without status bar
+          [640, 1136],
+          [1136, 600],
+          [1136, 640]
         ],
         ScreenSize::IOS_35 => [
-          [640, 960],
           [640, 920],
-          [960, 600] # landscape without status bar
+          [640, 960],
+          [960, 600],
+          [960, 640]
         ],
         ScreenSize::IOS_IPAD => [ # 9.7 inch
           [1024, 748],
@@ -302,16 +313,16 @@ module Deliver
       }
     end
 
-    def self.resolve_ipadpro_conflict_if_needed(device_type, filename)
+    def self.resolve_ipadpro_conflict_if_needed(screen_size, filename)
       is_3rd_gen = filename.include?("(3rd generation)")
       if is_3rd_gen
-        if device_type == ScreenSize::IOS_IPAD_PRO
+        if screen_size == ScreenSize::IOS_IPAD_PRO
           return ScreenSize::IOS_IPAD_PRO_12_9
-        elsif device_type == ScreenSize::IOS_IPAD_PRO_MESSAGES
+        elsif screen_size == ScreenSize::IOS_IPAD_PRO_MESSAGES
           return ScreenSize::IOS_IPAD_PRO_12_9_MESSAGES
         end
       end
-      device_type
+      screen_size
     end
 
     def self.calculate_screen_size(path)
@@ -319,29 +330,15 @@ module Deliver
 
       UI.user_error!("Could not find or parse file at path '#{path}'") if size.nil? || size.count == 0
 
-      # Walk up two directories and test if we need to handle a platform that doesn't support landscape
+      # iMessage screenshots have same resolution as app screenshots so we need to distinguish them
       path_filenames = Pathname.new(path).each_filename.to_a
       path_component = path_filenames[-3]
       filename = path_filenames.to_a[-1]
-      if path_component.eql?("appleTV")
-        skip_landscape = true
-      end
-
-      # iMessage screenshots have same resolution as app screenshots so we need to distinguish them
       devices = path_component.eql?("iMessage") ? self.device_messages : self.devices
 
-      devices.each do |device_type, array|
-        array.each do |resolution|
-          if skip_landscape
-            if size[0] == (resolution[0]) && size[1] == (resolution[1]) # portrait
-              return resolve_ipadpro_conflict_if_needed(device_type, filename)
-            end
-          else
-            if (size[0] == (resolution[0]) && size[1] == (resolution[1])) || # portrait
-               (size[1] == (resolution[0]) && size[0] == (resolution[1])) # landscape
-              return resolve_ipadpro_conflict_if_needed(device_type, filename)
-            end
-          end
+      devices.each do |screen_size, resolutions|
+        if resolutions.include?(size)
+          return resolve_ipadpro_conflict_if_needed(screen_size, filename) 
         end
       end
 
