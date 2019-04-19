@@ -49,9 +49,10 @@ module Spaceship
 
       # Finds a DisplayFamily definition.
       #
-      # @param name (Symbol) The name of the display family being searched for.
+      # @param name (Symbol|String) The name of the display family being searched for.
       # @return DisplayFamily object matching the given name.
       def self.find(name)
+        name = name.to_sym if name.kind_of?(String)
         lookup[name]
       end
 

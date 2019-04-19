@@ -692,7 +692,7 @@ module Spaceship
       end
 
       def container_data_for_language_and_device(data_field, language, device)
-        raise "#{device} isn't a valid device name" if DisplayFamily.find(device.to_sym).nil?
+        raise "#{device} isn't a valid device name" unless DisplayFamily.find(device)
 
         languages = raw_data_details.select { |d| d["language"] == language }
         # IDEA: better error for non existing language
