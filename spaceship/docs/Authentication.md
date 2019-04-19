@@ -1,4 +1,4 @@
-# Authentication with spaceship
+# Authentication with _spaceship_
 
 As _spaceship_ talks to Apple's APIs, most requests need to be authenticated with your Apple ID that you use to log in to https://developer.apple.com/. You start the login with a simple call to `Spaceship.login`.
 
