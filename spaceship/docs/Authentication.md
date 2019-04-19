@@ -24,6 +24,6 @@ Note that Apple does not always allow in all situations. For example for individ
 
 ### Auto-select SMS via `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER`
 
-If you _always_ want your security sent via SMS to a specific trusted phone number you can set the `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER` environment variable to that phone number. The phone number should be specified in the same format as it is displayed in your [Apple ID console](https://appleid.apple.com/) under `TRUSTED PHONE NUMBERS`, e.g. `+49 162 2850123`, `+1-123-456-7866` or similar. Do not leave off the country code or add or remove any numbers, otherwise fastlane will not be able to match the masked value from Apple's API and select the correct number.
+If you _always_ want your security sent via SMS to a specific trusted phone number you can set the `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER` environment variable to that phone number. The phone number should be specified in the same format as it is displayed in your [Apple ID console](https://appleid.apple.com/) under `TRUSTED PHONE NUMBERS`, e.g. `+49 123 4567890`, `+1-555-123-4567` or similar. Do not leave off the country code or add or remove any numbers, otherwise fastlane will not be able to match the masked value from Apple's API and select the correct number.
 
 
