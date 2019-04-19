@@ -3,7 +3,7 @@ require 'rubocop'
 module RuboCop
   module Lint
     class MissingKeysOnSharedArea < RuboCop::Cop::Cop
-      MISSING_KEYS_MSG = "There are missing keys on the shared area. Check constants provided in 'SharedValues' or keys provided in 'output' method in the action's code".freeze
+      MISSING_KEYS_MSG = "Found %<key>s in 'SharedValues' but not in 'output' method. Keys in the 'output' method: %<list>s".freeze
       MISSING_OUTPUT_METHOD_MSG = "There are declared keys on the shared area 'SharedValues', but 'output' method has not been found".freeze
 
       def_node_search :extract_const_assignment, <<-PATTERN
@@ -31,18 +31,18 @@ module RuboCop
         return unless method_name.to_s == 'output'
 
         if body.nil?
-          add_offense(node, :expression, MISSING_KEYS_MSG)
+          add_offense(node, :expression, format(MISSING_KEYS_MSG, key: self.shared_values_constants.join(', '), list: []))
           return
         end
 
         unless body.array_type?
-          add_offense(node, :expression, MISSING_KEYS_MSG)
+          add_offense(node, :expression, format(MISSING_KEYS_MSG, key: self.shared_values_constants.join(', '), list: []))
           return
         end
 
         children = body.children.select(&:array_type?)
         keys = children.map { |child| child.children.first.source.to_s.gsub(/\s|"|'/, '') }
-        add_offense(node, :expression, MISSING_KEYS_MSG) unless self.shared_values_constants.to_set == keys.to_set
+        add_offense(node, :expression, format(MISSING_KEYS_MSG, key: self.shared_values_constants.join(', '), list: keys.join(', '))) unless self.shared_values_constants.to_set == keys.to_set
       end
 
       def on_class(node)
