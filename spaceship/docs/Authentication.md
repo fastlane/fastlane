@@ -18,7 +18,7 @@ _spaceship_ also supports legacy [Two-step verification](https://support.apple.c
 
 ### Avoid 2FA via additional account
 
-If you want to avoid dealing with the required interaction of using a Two-factor Authentication enabled account (for example because you want to use spaceship on an automated or CI system that does not support interaction), you have to create an additional account with the required rights.
+If you want to avoid dealing with the required interaction of using a Two-factor Authentication enabled account (for example because you want to use _spaceship_ on an automated or CI system that does not support interaction), you have to create an additional account with the required rights.
 
 Note that Apple does not always allow in all situations. For example for individual accounts (vs. company accounts), it is not possible to create team member accounts for the Developer Portal (where you create app IDs, certificates etc).
 
