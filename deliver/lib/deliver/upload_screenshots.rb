@@ -88,7 +88,7 @@ module Deliver
       screenshots = []
       extensions = '{png,jpg,jpeg}'
 
-      available_languages = Spaceship::Tunes.client.available_languages.each_with_object({}) do |lang, lang_hash|
+      available_languages = UploadScreenshots.available_languages.each_with_object({}) do |lang, lang_hash|
         lang_hash[lang.downcase] = lang
       end
 
@@ -145,6 +145,15 @@ module Deliver
       end
 
       return screenshots
+    end
+
+    # helper method so Spaceship::Tunes.client.available_languages is easier to test
+    def self.available_languages
+      if Helper.test?
+        FastlaneCore::Languages::ALL_LANGUAGES
+      else
+        Spaceship::Tunes.client.available_languages
+      end
     end
   end
 end

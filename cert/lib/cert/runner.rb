@@ -153,7 +153,7 @@ module Cert
       # Create a new certificate signing request
       csr, pkey = Spaceship.certificate.create_certificate_signing_request
 
-      # Use the signing request to create a new distribution certificate
+      # Use the signing request to create a new (development|distribution) certificate
       begin
         certificate = certificate_type.create!(csr: csr)
       rescue => ex
