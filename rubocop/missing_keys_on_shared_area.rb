@@ -10,6 +10,10 @@ module RuboCop
         (casgn nil? $_ ...)
       PATTERN
 
+      def_node_matcher :find_output_method, <<-PATTERN
+        (defs (self) :output ...)
+      PATTERN
+
       attr_writer :shared_values_constants
       def shared_values_constants
         @shared_values_constants ||= []
@@ -26,19 +30,11 @@ module RuboCop
 
       def on_defs(node)
         return if self.shared_values_constants.empty?
+        return unless find_output_method(node)
 
-        _definee, method_name, _args, body = *node
-        return unless method_name.to_s == 'output'
-
-        if body.nil?
-          add_offense(node, :expression, format(MISSING_KEYS_MSG, key: self.shared_values_constants.join(', '), list: []))
-          return
-        end
-
-        unless body.array_type?
-          add_offense(node, :expression, format(MISSING_KEYS_MSG, key: self.shared_values_constants.join(', '), list: []))
-          return
-        end
+        _definee, _method_name, _args, body = *node
+        return add_offense(node, :expression, format(MISSING_KEYS_MSG, key: self.shared_values_constants.join(', '), list: [])) if body.nil?
+        return add_offense(node, :expression, format(MISSING_KEYS_MSG, key: self.shared_values_constants.join(', '), list: [])) unless body.array_type?
 
         children = body.children.select(&:array_type?)
         keys = children.map { |child| child.children.first.source.to_s.gsub(/\s|"|'/, '') }
