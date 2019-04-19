@@ -314,7 +314,10 @@ module Deliver
     end
 
     def self.resolve_ipadpro_conflict_if_needed(screen_size, filename)
-      is_3rd_gen = filename.include?("(3rd generation)")
+      is_3rd_gen = [
+        "(3rd generation)", # default simulator name has this
+        "ipadPro129" # downloaded screenshots name has this
+      ].any? { |key| filename.include?(key) }
       if is_3rd_gen
         if screen_size == ScreenSize::IOS_IPAD_PRO
           return ScreenSize::IOS_IPAD_PRO_12_9
@@ -331,14 +334,13 @@ module Deliver
       UI.user_error!("Could not find or parse file at path '#{path}'") if size.nil? || size.count == 0
 
       # iMessage screenshots have same resolution as app screenshots so we need to distinguish them
-      path_filenames = Pathname.new(path).each_filename.to_a
-      path_component = path_filenames[-3]
-      filename = path_filenames.to_a[-1]
+      path_component = Pathname.new(path).each_filename.to_a[-3]
       devices = path_component.eql?("iMessage") ? self.device_messages : self.devices
 
       devices.each do |screen_size, resolutions|
         if resolutions.include?(size)
-          return resolve_ipadpro_conflict_if_needed(screen_size, filename) 
+          filename = Pathname.new(path).basename.to_s
+          return resolve_ipadpro_conflict_if_needed(screen_size, filename)
         end
       end
 
