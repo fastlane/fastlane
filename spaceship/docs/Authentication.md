@@ -6,7 +6,7 @@ As _spaceship_ talks to Apple's APIs, most requests need to be authenticated wit
 
 The `Spaceship.login` method accepts `username` and `password` as parameters or will ask for them interactively if not provided. It will also try to retrieve them via [`CredentialsManager`](https://github.com/fastlane/fastlane/tree/master/credentials_manager), which supports environment variables `FASTLANE_USER` and `FASTLANE_PASSWORD` .
 
-Login with API tokens is not supported yet as API access is not generally available. Spaceship is also still using only older APIs that do not need API tokens for authentication yet.
+Login with API tokens is not supported yet as API access is not generally available. `Spaceship::Tunes` and `Spaceship::TestFlight` are also still using only older APIs that do not need API tokens for authentication yet.
 
 ## Two-factor Authentication
 
