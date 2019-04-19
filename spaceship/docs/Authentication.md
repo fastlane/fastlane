@@ -10,7 +10,7 @@ Login with API tokens is not supported yet as API access is not generally availa
 
 ## Two-factor Authentication
 
-If your Apple ID has Two-factor Authentication enabled spaceship will also ask you for the security code that was pushed to your devices after succesfully entering username and password.
+If your developer Apple ID has [Two-factor Authentication enabled](https://developer.apple.com/support/account/authentication/) _spaceship_ will also ask you for the security code that was pushed to your devices after successfully entering username and password.
 
 If you can not access any of your trusted devices, or just prefer it, you can also switch to the SMS based flow by entering `sms` at this prompt. _spaceship_ will then present you with a selection of your trusted phone numbers, and after choosing you can enter the security code you were sent by SMS.
 
