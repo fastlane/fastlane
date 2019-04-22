@@ -77,6 +77,22 @@ describe Fastlane do
         expect(result).to eq("bundle exec pod lib lint fastlane")
       end
 
+      it "generates the correct pod lib lint command with subspec parameter" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_lib_lint(subspec: 'test-subspec')
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod lib lint --subspec='test-subspec'")
+      end
+
+      it "generates the correct pod lib lint command with use_modular_headers parameter" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_lib_lint(use_modular_headers: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod lib lint --use-modular-headers")
+      end
+
       it "generates the correct pod lib lint command with include_podspecs parameter" do
         result = Fastlane::FastFile.new.parse("lane :test do
           pod_lib_lint(include_podspecs: '**/*.podspec')
