@@ -61,8 +61,9 @@ module Fastlane
           # Show error and set initial build number
           if build_nr
             UI.message("Latest upload for version #{version_number} is build: #{build_nr}")
+          elsif params[:initial_build_number].nil?
+            UI.user_error!("Could not find a build on App Store Connect - and 'initial_build_number' option is not set")
           else
-            UI.user_error!("Could not find a build on App Store Connect - and 'initial_build_number' option is not set") unless params[:initial_build_number]
             build_nr = params[:initial_build_number]
             UI.message("Using initial build number of #{build_nr} for version #{version_number}")
           end
