@@ -56,7 +56,7 @@ module Deliver
       # iPad Pro iMessage
       IOS_IPAD_PRO_MESSAGES = "iOS-iPad-Pro-messages"
       # iPad Pro (12.9-inch) (3rd generation) iMessage
-      IOS_IPAD_PRO_12_9_MESSAGES = "iOS-iPad-Pro-12.9-3rd-gen-messages"
+      IOS_IPAD_PRO_12_9_MESSAGES = "iOS-iPad-Pro-12.9-messages"
 
       # Apple Watch
       IOS_APPLE_WATCH = "iOS-Apple-Watch"
