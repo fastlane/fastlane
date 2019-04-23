@@ -11,7 +11,7 @@ module Fastlane
           services = params[:services]
 
           enabled_services = services.select { |_k, v| v == true || v.to_s != 'off' }.map { |k, v| [k, v == true || v.to_s == 'on' ? 'on' : v] }.to_h
-          disabled_services = services.reject { |_k, v| v == true || v.to_s == 'on' }.map { |k, v| [k, 'off'] }.to_h
+          disabled_services = services.select { |_k, v| v == false || v.to_s == 'off' }.map { |k, v| [k, 'off'] }.to_h
 
           enabled_services_object = self.service_object
           enabled_services.each do |k, v|
