@@ -18,7 +18,7 @@ module Fastlane
           UI.error("Could not establish a connection to Google Play Store with this json key file.")
           UI.error("#{e.message}\n#{e.backtrace.join("\n")}") if FastlaneCore::Globals.verbose?
         end
-        
+
       end
 
       def self.description
