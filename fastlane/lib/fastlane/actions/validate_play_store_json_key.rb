@@ -10,14 +10,19 @@ module Fastlane
           title: "Summary for validate_play_store_json_key"
         )
 
-        client = Supply::Client.make_from_config(params: params)
-
-        FastlaneCore::UI.success("Successfully established connection to Google Play.")
-        FastlaneCore::UI.verbose("client: " + client.inspect)
+        begin
+          client = Supply::Client.make_from_config(params: params)
+          FastlaneCore::UI.success("Successfully established connection to Google Play Store.")
+          FastlaneCore::UI.verbose("client: " + client.inspect)
+        rescue => e
+          UI.error("Could not establish a connection to Google Play Store with this json key file.")
+          UI.error("#{e.message}\n#{e.backtrace.join("\n")}") if FastlaneCore::Globals.verbose?
+        end
+        
       end
 
       def self.description
-        "Validate that the Play Store `json_key` works"
+        "Validate that the Google Play Store `json_key` works"
       end
 
       def self.authors
@@ -29,7 +34,7 @@ module Fastlane
       end
 
       def self.details
-        "Use this action to test and validate your json key file used to connect and authenticate with the Google Play API"
+        "Use this action to test and validate your private key json key file used to connect and authenticate with the Google Play API"
       end
 
       def self.example_code
