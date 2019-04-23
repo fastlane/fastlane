@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "SwiftLint" do
-      let(:swiftlint_gem_version) { Gem::Version.new('0.9.2') }
+      let(:swiftlint_gem_version) { Gem::Version.new('0.11.0') }
       let(:output_file) { "swiftlint.result.json" }
       let(:config_file) { ".swiftlint-ci.yml" }
 
@@ -295,7 +295,31 @@ describe Fastlane do
           result = Fastlane::FastFile.new.parse("lane :test do
             swiftlint(
               mode: :autocorrect,
-              format: false
+              format: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint autocorrect --format")
+        end
+
+        it "omits the switch if mode is :lint" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :lint,
+              format: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint")
+        end
+
+        it "omits the switch if swiftlint version is too low" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.10.0'))
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :autocorrect,
+              format: true
             )
           end").runner.execute(:test)
 
@@ -308,11 +332,11 @@ describe Fastlane do
           result = Fastlane::FastFile.new.parse("lane :test do
             swiftlint(
               mode: :autocorrect,
-              format: true
+              format: false
             )
           end").runner.execute(:test)
 
-          expect(result).to eq("swiftlint autocorrect --format")
+          expect(result).to eq("swiftlint autocorrect")
         end
       end
     end
