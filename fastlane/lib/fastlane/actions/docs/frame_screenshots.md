@@ -237,7 +237,7 @@ frameit(
   path: "./fastlane/screenshots",
   force_orientation_block: proc do |filename|
     case filename
-      when "iPad Pro (12.9-inch)-01LoginScreen" 
+      when "iPad Pro (12.9-inch)-01LoginScreen"
         :landscape_right
       when "iPhone 6 Plus-01LoginScreen"
         :portrait
@@ -301,6 +301,10 @@ Check out the [MindNode example project](https://github.com/fastlane/examples/tr
 ## Generate localized screenshots
 
 Check out [_snapshot_](https://docs.fastlane.tools/actions/snapshot/) to automatically generate screenshots using ```UI Automation```.
+
+## Resume framing
+
+Framing screenshots is a slow operation. In case you need to resume framing, or just frame a couple updated screenshots again, you can rely on the `--resume` flag. Only screenshots which have not been framed yet – or for which there isn't an up-to-date framed image – will be framed. This feature uses the file modification dates and will reframe screenshots if the screenshot is newer than the framed file.
 
 ## Upload screenshots
 
