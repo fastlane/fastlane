@@ -32,7 +32,7 @@ module Deliver
       # iPad Pro
       IOS_IPAD_PRO = "iOS-iPad-Pro"
       # iPad Pro (12.9-inch) (3rd generation)
-      IOS_IPAD_PRO_12_9 = "iOS-iPad-Pro-12.9-3rd-gen"
+      IOS_IPAD_PRO_12_9 = "iOS-iPad-Pro-12.9"
 
       # iPhone 5 iMessage
       IOS_40_MESSAGES = "iOS-4-in-messages"
@@ -56,7 +56,7 @@ module Deliver
       # iPad Pro iMessage
       IOS_IPAD_PRO_MESSAGES = "iOS-iPad-Pro-messages"
       # iPad Pro (12.9-inch) (3rd generation) iMessage
-      IOS_IPAD_PRO_12_9_MESSAGES = "iOS-iPad-Pro-12.9-3rd-gen-messages"
+      IOS_IPAD_PRO_12_9_MESSAGES = "iOS-iPad-Pro-12.9-messages"
 
       # Apple Watch
       IOS_APPLE_WATCH = "iOS-Apple-Watch"
@@ -315,7 +315,7 @@ module Deliver
 
     def self.resolve_ipadpro_conflict_if_needed(screen_size, filename)
       is_3rd_gen = [
-        "(3rd generation)", # default simulator name has this
+        "iPad Pro (12.9-inch) (3rd generation)", # default simulator name has this
         "ipadPro129" # downloaded screenshots name has this
       ].any? { |key| filename.include?(key) }
       if is_3rd_gen
