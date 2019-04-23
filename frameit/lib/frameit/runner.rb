@@ -37,6 +37,12 @@ module Frameit
 
           begin
             screenshot = Screenshot.new(full_path, color)
+
+            if !screenshot.outdated? && Frameit.config[:resume]
+              UI.message("Skipping framing of screenshot #{screenshot.path} because its framed file seems up-to-date.")
+              next
+            end
+
             if screenshot.mac?
               editor = MacEditor.new(screenshot)
             else
