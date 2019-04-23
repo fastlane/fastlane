@@ -289,6 +289,32 @@ describe Fastlane do
           expect(result).to eq("swiftlint lint")
         end
       end
+
+      context "when specify format option" do
+        it "adds format option" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :autocorrect,
+              format: false
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint autocorrect")
+        end
+      end
+
+      context "when specify false for format option" do
+        it "doesn't add format option" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :autocorrect,
+              format: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint autocorrect --format")
+        end
+      end
     end
   end
 end
