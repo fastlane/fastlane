@@ -128,25 +128,7 @@ jobs:
   "Lint Source Code":
     docker:
       - image: circleci/ruby:2.3
-    steps:
-      - checkout
-
-      - restore_cache:
-          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
-      - run:
-          name: Setup Build
-          command: |
-            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-      - save_cache:
-          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
-          paths:
-            - .bundle
-
-      - run: bundle exec fastlane lint_source
-
-  "Run module import tests":
-    docker:
-      - image: circleci/ruby:2.3
+    shell: /bin/bash --login -eo pipefail
     steps:
       - checkout
 
