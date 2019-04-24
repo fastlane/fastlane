@@ -1,1 +1,1 @@
-require 'producing_error'
+require 'spaceship'
