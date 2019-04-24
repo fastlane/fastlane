@@ -1,8 +1,8 @@
 #!/bin/sh
 
-set -o nounset
-set -o errexit
-set -o xtrace
+# set -o nounset
+# set -o errexit
+# set -o xtrace
 
 # installing fastlane gem
 gem build fastlane.gemspec
