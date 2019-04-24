@@ -49,7 +49,7 @@ module Fastlane
             UI.message("Fetching the latest build number for version #{version_number}")
 
             # Get latest build for version number
-            build = client.get_builds(filter: { app: app.apple_id, "preReleaseVersion" => pre_release_version_id }, sort: "-uploadedDate", limit: 1).first
+            build = client.get_builds(filter: { app: app.apple_id, "preReleaseVersion" => pre_release_version_id }, sort: "-version", limit: 1).first
             if build
               build_nr = build["attributes"]["version"]
               build_nr
