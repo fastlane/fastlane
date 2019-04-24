@@ -42,29 +42,29 @@ module RuboCop
       end
 
       def on_class(node)
-        name, superclass, body = *node
+        _name, superclass, body = *node
         return unless superclass
         return unless superclass.loc.name.source == 'Action'
 
         add_offense(node, :expression, MISSING_OUTPUT_METHOD_MSG) if body.nil? && self.shared_values_constants.any?
         return if body.nil?
 
-        check(name, body)
+        has_output_method?(body)
       end
 
-      def check(_name, node)
+      def has_output_method?(node)
         return if node.nil?
         return if self.shared_values_constants.empty?
 
         if node.defs_type? # A single method
-          add_offense(node, :expression, MISSING_OUTPUT_METHOD_MSG) unless contains_output?(node)
+          add_offense(node, :expression, MISSING_OUTPUT_METHOD_MSG) unless output_method?(node)
         elsif node.begin_type? # Multiple methods
-          outputs = node.each_child_node(:defs).select { |n| contains_output?(n) }
+          outputs = node.each_child_node(:defs).select { |n| output_method?(n) }
           add_offense(node, :expression, MISSING_OUTPUT_METHOD_MSG) if outputs.empty?
         end
       end
 
-      def contains_output?(node)
+      def output_method?(node)
         _definee, method_name, _args, _body = *node
         method_name.to_s == 'output'
       end
