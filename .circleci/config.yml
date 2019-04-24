@@ -144,6 +144,25 @@ jobs:
 
       - run: bundle exec fastlane lint_source
 
+  "Run module import tests":
+    docker:
+      - image: circleci/ruby:2.3
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
+      - run:
+          name: Setup Build
+          command: |
+            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+      - save_cache:
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
+          paths:
+            - .bundle
+
+      - run: ./test_modules/run_tests.sh
+
 workflows:
   version: 2
   build:
