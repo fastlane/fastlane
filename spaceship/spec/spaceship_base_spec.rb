@@ -55,6 +55,13 @@ describe Spaceship::Base do
         inst = test_class.new({ 'isLiveString' => 'true' })
         expect(inst.is_live).to eq(true)
       end
+
+      it 'helps troubleshoot json conversion issues' do
+        inst = test_class.new({ 'someAttributeName' => "iPhone\xAE" })
+        expect do
+          inst.raw_data.to_json
+        end.to raise_error(JSON::GeneratorError)
+      end
     end
 
     it 'can constantize subclasses by calling a method on the parent class' do
