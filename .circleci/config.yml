@@ -143,7 +143,7 @@ jobs:
           paths:
             - .bundle
 
-      - run: ./test_modules/run_tests.sh
+      - run: /bin/bash ./test_modules/run_tests.sh
 
 workflows:
   version: 2
