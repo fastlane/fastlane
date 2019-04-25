@@ -1,1 +1,1 @@
-require 'scan'
+require 'spaceship'
