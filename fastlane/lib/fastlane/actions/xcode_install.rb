@@ -71,7 +71,7 @@ module Fastlane
 
       def self.output
         [
-          ['XCODE_INSTALL_XCODE_PATH', 'The path to the installed Xcode']
+          ['XCODE_INSTALL_XCODE_PATH', 'The path to the newly installed Xcode']
         ]
       end
 

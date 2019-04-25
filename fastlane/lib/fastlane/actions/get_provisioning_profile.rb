@@ -55,9 +55,9 @@ module Fastlane
       # rubocop:disable Lint/MissingKeysOnSharedArea
       def self.output
         [
-          ['SIGH_PROFILE_PATH', 'A path in which export certificates, key and profile'],
-          ['SIGH_PROFILE_PATHS', 'Paths in which export certificates, key and profile'],
-          ['SIGH_UUID', 'UUID (Universally Unique IDentifier)'],
+          ['SIGH_PROFILE_PATH', 'A path in which certificates, key and profile are exported'],
+          ['SIGH_PROFILE_PATHS', 'Paths in which certificates, key and profile are exported'],
+          ['SIGH_UUID', 'UUID (Universally Unique IDentifier) of an application on a device'],
           ['SIGH_NAME', 'The name of the profile'],
           ['SIGH_PROFILE_TYPE', 'The profile type, can be appstore, adhoc, development, enterprise']
         ]
