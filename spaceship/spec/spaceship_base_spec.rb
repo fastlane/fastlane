@@ -59,7 +59,9 @@ describe Spaceship::Base do
       it 'helps troubleshoot json conversion issues' do
         inst = test_class.new({ 'someAttributeName' => "iPhone\xAE" })
         expect do
-          inst.raw_data.to_json
+          with_verbose(true) do
+            inst.raw_data.to_json
+          end
         end.to raise_error(JSON::GeneratorError)
       end
     end
