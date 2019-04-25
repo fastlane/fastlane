@@ -92,6 +92,13 @@ module Fastlane
         "More information: https://fastlane.tools/gym"
       end
 
+      def self.output
+        [
+          ['IPA_OUTPUT_PATH', 'The path to the newly generated ipa file'],
+          ['DSYM_OUTPUT_PATH', 'The path to the dSYM files']
+        ]
+      end
+
       def self.return_value
         "The absolute path to the generated ipa file"
       end

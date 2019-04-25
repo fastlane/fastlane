@@ -42,6 +42,13 @@ module Fastlane
         Cert::Options.available_options
       end
 
+      def self.output
+        [
+          ['CERT_FILE_PATH', 'The path to the certificate'],
+          ['CERT_CERTIFICATE_ID', 'The id of the certificate']
+        ]
+      end
+
       def self.author
         "KrauseFx"
       end

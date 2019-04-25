@@ -1,9 +1,5 @@
 module Fastlane
   module Actions
-    module SharedValues
-      SLATHER_CUSTOM_VALUE = :SLATHER_CUSTOM_VALUE
-    end
-
     class SlatherAction < Action
       # https://github.com/SlatherOrg/slather/blob/v2.4.2/lib/slather/command/coverage_command.rb
       ARGS_MAP = {

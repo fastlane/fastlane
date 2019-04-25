@@ -70,6 +70,15 @@ module Fastlane
         ]
       end
 
+      def self.output
+        [
+          ['SCAN_DERIVED_DATA_PATH', 'The path to the derived data'],
+          ['SCAN_GENERATED_PLIST_FILE', 'The generated plist file'],
+          ['SCAN_GENERATED_PLIST_FILES', 'The generated plist files'],
+          ['SCAN_ZIP_BUILD_PRODUCTS_PATH', 'The path to the zipped build products']
+        ]
+      end
+
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
       end
