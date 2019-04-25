@@ -3250,7 +3250,7 @@ func slather(buildDirectory: String? = nil,
              verbose: Bool? = nil,
              useBundleExec: Bool = false,
              binaryBasename: Bool = false,
-             binaryFile: Bool = false,
+             binaryFile: String?,
              arch: String? = nil,
              sourceFiles: Bool = false,
              decimals: Bool = false) {
