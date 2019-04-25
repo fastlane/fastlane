@@ -155,7 +155,15 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
+      - run:
+          name: Setup Build
+          command: |
+            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+      - save_cache:
+          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
+          paths:
+            - .bundle
 
       - run: /bin/bash ./test_modules/run_tests.sh
 
