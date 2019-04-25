@@ -1,9 +1,5 @@
 module Fastlane
   module Actions
-    module SharedValues
-      ENSURE_XCODE_VERSION_CUSTOM_VALUE = :ENSURE_XCODE_VERSION_CUSTOM_VALUE
-    end
-
     class EnsureXcodeVersionAction < Action
       def self.run(params)
         Actions.verify_gem!('xcode-install')

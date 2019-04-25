@@ -141,6 +141,12 @@ module Fastlane
         "Creates a 'Version Bump' commit. Run after `increment_build_number`"
       end
 
+      def self.output
+        [
+          ['MODIFIED_FILES', 'The list of paths of modified files']
+        ]
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :message,

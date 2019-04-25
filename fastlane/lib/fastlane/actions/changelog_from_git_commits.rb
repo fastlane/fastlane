@@ -68,7 +68,9 @@ module Fastlane
       end
 
       def self.output
-        ['FL_CHANGELOG', 'The changelog String generated from the collected Git commit messages']
+        [
+          ['FL_CHANGELOG', 'The changelog string generated from the collected git commit messages']
+        ]
       end
 
       def self.available_options

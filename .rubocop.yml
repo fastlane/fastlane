@@ -1,6 +1,7 @@
 require:
   - rubocop/require_tools
   - ./rubocop/fork_usage.rb
+  - ./rubocop/missing_keys_on_shared_area.rb
 
 Style/MultipleComparison:
   Enabled: false
