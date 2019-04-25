@@ -10,10 +10,7 @@ GEM_FILE=$(eval echo $BUILD_LOG | sed 's/.*File: //')
 gem install $GEM_FILE
 
 # running tests
-TEST_FILES=(
-  "test_modules/test_spaceship.rb"
-  "test_modules/test_scan.rb"
-)
+TEST_FILES=( "test_modules/test_spaceship.rb" "test_modules/test_scan.rb" )
 for TEST_FILE in ${TEST_FILES[*]} 
 do
   ruby $TEST_FILE
