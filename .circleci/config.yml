@@ -128,7 +128,6 @@ jobs:
   "Lint Source Code":
     docker:
       - image: circleci/ruby:2.3
-    shell: /bin/bash --login -eo pipefail
     steps:
       - checkout
 
@@ -143,6 +142,21 @@ jobs:
           paths:
             - .bundle
 
+      - run: bundle exec fastlane lint_source
+
+  "Execute modules load up tests":
+    environment:
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+    docker:
+      - image: circleci/ruby:2.3
+    shell: /bin/bash --login -eo pipefail
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+
       - run: /bin/bash ./test_modules/run_tests.sh
 
 workflows:
@@ -153,3 +167,4 @@ workflows:
       - "Execute tests on Ubuntu"
       - "Validate Documentation"
       - "Lint Source Code"
+      - "Execute modules load up tests"
