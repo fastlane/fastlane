@@ -1,5 +1,6 @@
 require 'spaceship/connect_api/client'
 require 'spaceship/connect_api/base'
+require 'spaceship/connect_api/token'
 
 require 'spaceship/connect_api/models/model'
 require 'spaceship/connect_api/models/app'
