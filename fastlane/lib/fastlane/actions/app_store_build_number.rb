@@ -48,14 +48,14 @@ module Fastlane
 
             UI.message("Fetching the latest build number for version #{version_number}")
 
-            # Get latest build for version number
-            build = client.get_builds(filter: { app: app.apple_id, "preReleaseVersion" => pre_release_version_id }, sort: "-uploadedDate", limit: 1).first
-            if build
-              build_nr = build["attributes"]["version"]
-              build_nr
-            else
-              UI.important("Could not find a build number for version #{version_number} on App Store Connect")
+            # Get latest build number for version number
+
+            builds = client.get_builds(filter: { "preReleaseVersion" => pre_release_version_id, expired: false, processingState: "PROCESSING,VALID" }, limit: 200, includes: "preReleaseVersion")
+            if builds.count == 0
+              builds = client.get_builds(filter: { "preReleaseVersion" => pre_release_version_id, expired: true, processingState: "PROCESSING,VALID" }, limit: 200, includes: "preReleaseVersion")
             end
+            build_nr = (builds.max_by { |k| k["attributes"]["version"].to_i }["attributes"]["version"]).to_i
+            UI.important("Could not find a build number for version #{version_number} on App Store Connect") unless build_nr
           end
 
           # Show error and set initial build number
