@@ -49,7 +49,7 @@ module Fastlane
             UI.message("Fetching the latest build number for version #{version_number}")
 
             # Get latest build number for version number
-
+            # Check all non-expired builds, if none exists, then check expired builds
             builds = client.get_builds(filter: { "preReleaseVersion" => pre_release_version_id, expired: false, processingState: "PROCESSING,VALID" }, limit: 200, includes: "preReleaseVersion")
             if builds.count == 0
               builds = client.get_builds(filter: { "preReleaseVersion" => pre_release_version_id, expired: true, processingState: "PROCESSING,VALID" }, limit: 200, includes: "preReleaseVersion")
