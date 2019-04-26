@@ -92,6 +92,7 @@ module Fastlane
                                        description: 'Fail on warnings? (true/false)',
                                        default_value: false,
                                        is_string: false,
+                                       type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :files,
                                        description: 'List of files to process',
@@ -102,6 +103,7 @@ module Fastlane
                                                     don't fail the build (true/false)",
                                        default_value: false,
                                        is_string: false,
+                                       type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :reporter,
                                        description: 'Choose output reporter',
@@ -111,16 +113,18 @@ module Fastlane
                                        description: "Don't print status logs like 'Linting <file>' & 'Done linting'",
                                        default_value: false,
                                        is_string: false,
+                                       type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :executable,
                                        description: "Path to the `swiftlint` executable on your machine",
                                        is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :format,
-                                        description: "Format code when mode is :autocorrect",
-                                        default_value: false,
-                                        is_string: false,
-                                        optional: true)
+                                       description: "Format code when mode is :autocorrect",
+                                       default_value: false,
+                                       is_string: false,
+                                       type: Boolean,
+                                       optional: true)
         ]
       end
 
