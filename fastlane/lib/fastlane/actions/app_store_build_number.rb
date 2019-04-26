@@ -25,6 +25,7 @@ module Fastlane
         UI.message("Login successful")
 
         app = Spaceship::Tunes::Application.find(params[:app_identifier])
+        UI.user_error!("Could not find the app : #{params[:app_identifier]} on iTC") unless app
         if params[:live]
           UI.message("Fetching the latest build number for live-version")
           UI.user_error!("Could not find a live-version of #{params[:app_identifier]} on iTC") unless app.live_version
