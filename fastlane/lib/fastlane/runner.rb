@@ -238,6 +238,9 @@ module Fastlane
             if arguments.count == 0
               arguments = ConfigurationHelper.parse(class_ref, {}) # no parameters => empty hash
             elsif arguments.count == 1 && arguments.first.kind_of?(Hash)
+              if arguments.first[:binary_file] == false || arguments.first[:binary_file] == true
+                arguments.first.delete(:binary_file)
+              end
               arguments = ConfigurationHelper.parse(class_ref, arguments.first) # Correct configuration passed
             elsif !class_ref.available_options
               # This action does not use the new action format
