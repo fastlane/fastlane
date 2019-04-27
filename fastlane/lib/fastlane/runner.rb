@@ -238,12 +238,6 @@ module Fastlane
             if arguments.count == 0
               arguments = ConfigurationHelper.parse(class_ref, {}) # no parameters => empty hash
             elsif arguments.count == 1 && arguments.first.kind_of?(Hash)
-              # Backwards compatability - slather.binary_file changed from Boolean to string
-              # If still passing a Boolean, remove the key from the hash
-              if action_name == "slather" && (arguments.first[:binary_file] == false || arguments.first[:binary_file] == true)
-                arguments.first.delete(:binary_file)
-                UI.message("The binary_file provided is of type Boolean and has changed to a type of string. Parameter removed.")
-              end
               arguments = ConfigurationHelper.parse(class_ref, arguments.first) # Correct configuration passed
             elsif !class_ref.available_options
               # This action does not use the new action format
