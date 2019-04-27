@@ -81,12 +81,11 @@ module Fastlane
           params[:binary_file] = nil
         end
 
-        # :binary_file validation was skipped for backwards compatibility with Boolean. If a 
+        # :binary_file validation was skipped for backwards compatibility with Boolean. If a
         # Boolean was passed in, it has now been removed. Revalidate :binary_file
         binary_file_options = available_options.find { |a| a.key == :binary_file }
         binary_file_options.skip_type_validation = false
         binary_file_options.verify!(params[:binary_file])
-
       end
 
       def self.build_command(params)
@@ -268,7 +267,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :binary_file,
                                        env_name: "FL_SLATHER_BINARY_FILE",
                                        description: "Binary file name to be used for code coverage",
-                                       skip_type_validation: true,    # skipping validation for backwards compatibility with Boolean type
+                                       skip_type_validation: true, # skipping validation for backwards compatibility with Boolean type
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :arch,
                                        env_name: "FL_SLATHER_ARCH",
