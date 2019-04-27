@@ -156,6 +156,7 @@ jobs:
 
       - run:
           name: Setup Build
+          # Build gem from fastlane.gemspec and install locally
           command: |
             gem install $(echo $(gem build fastlane.gemspec) | sed 's/.*File: //')
 

@@ -1,16 +1,19 @@
 #!/bin/sh
 
 # running tests
-TEST_FILES=(
-  "test_modules/test_spaceship.rb"
-  "test_modules/test_scan.rb"
+TEST_MODULES=(
+  "spaceship"
+  "scan"
 )
 EXIT_CODE=0
-for TEST_FILE in ${TEST_FILES[*]} 
+for TEST_MODULE in ${TEST_MODULES[*]}
 do
-  ruby $TEST_FILE
-  if [ $? -ne 0 ]
+  echo "Executing $TEST_MODULE module load up test"
+  ruby -e "require '$TEST_MODULE'"
+  if [ $? -eq 0 ]
   then
+    echo "Succeed."
+  else
     EXIT_CODE=2
   fi
 done
