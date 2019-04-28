@@ -3,7 +3,7 @@ require_relative 'tunes_client'
 require_relative 'app_trailer'
 require_relative 'app_screenshot'
 require_relative 'app_image'
-require_relative 'device_type'
+require_relative 'display_family'
 require_relative 'app_version_generated_promocodes'
 require_relative 'language_item'
 require_relative 'transit_app_file'
@@ -747,7 +747,7 @@ module Spaceship
       end
 
       def container_data_for_language_and_device(data_field, language, device)
-        raise "#{device} isn't a valid device name" unless DeviceType.exists?(device)
+        raise "#{device} isn't a valid device name" unless DisplayFamily.find(device)
 
         languages = raw_data_details.select { |d| d["language"] == language }
         # IDEA: better error for non existing language

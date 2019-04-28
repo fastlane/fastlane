@@ -275,6 +275,7 @@ func appstore(username: String,
               promotionalText: [String : Any]? = nil,
               releaseNotes: String? = nil,
               privacyUrl: String? = nil,
+              appleTvPrivacyPolicy: String? = nil,
               supportUrl: String? = nil,
               marketingUrl: String? = nil,
               languages: [String]? = nil,
@@ -333,6 +334,7 @@ func appstore(username: String,
                                                                                           RubyCommand.Argument(name: "promotional_text", value: promotionalText),
                                                                                           RubyCommand.Argument(name: "release_notes", value: releaseNotes),
                                                                                           RubyCommand.Argument(name: "privacy_url", value: privacyUrl),
+                                                                                          RubyCommand.Argument(name: "apple_tv_privacy_policy", value: appleTvPrivacyPolicy),
                                                                                           RubyCommand.Argument(name: "support_url", value: supportUrl),
                                                                                           RubyCommand.Argument(name: "marketing_url", value: marketingUrl),
                                                                                           RubyCommand.Argument(name: "languages", value: languages),
@@ -361,7 +363,8 @@ func artifactory(file: String,
                  proxyUsername: String? = nil,
                  proxyPassword: String? = nil,
                  proxyAddress: String? = nil,
-                 proxyPort: String? = nil) {
+                 proxyPort: String? = nil,
+                 readTimeout: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "artifactory", className: nil, args: [RubyCommand.Argument(name: "file", value: file),
                                                                                              RubyCommand.Argument(name: "repo", value: repo),
                                                                                              RubyCommand.Argument(name: "repo_path", value: repoPath),
@@ -374,7 +377,8 @@ func artifactory(file: String,
                                                                                              RubyCommand.Argument(name: "proxy_username", value: proxyUsername),
                                                                                              RubyCommand.Argument(name: "proxy_password", value: proxyPassword),
                                                                                              RubyCommand.Argument(name: "proxy_address", value: proxyAddress),
-                                                                                             RubyCommand.Argument(name: "proxy_port", value: proxyPort)])
+                                                                                             RubyCommand.Argument(name: "proxy_port", value: proxyPort),
+                                                                                             RubyCommand.Argument(name: "read_timeout", value: readTimeout)])
   _ = runner.executeCommand(command)
 }
 func automaticCodeSigning(path: String,
@@ -1271,6 +1275,7 @@ func deliver(username: String = deliverfile.username,
              promotionalText: [String : Any]? = deliverfile.promotionalText,
              releaseNotes: String? = deliverfile.releaseNotes,
              privacyUrl: String? = deliverfile.privacyUrl,
+             appleTvPrivacyPolicy: String? = deliverfile.appleTvPrivacyPolicy,
              supportUrl: String? = deliverfile.supportUrl,
              marketingUrl: String? = deliverfile.marketingUrl,
              languages: [String]? = deliverfile.languages,
@@ -1329,6 +1334,7 @@ func deliver(username: String = deliverfile.username,
                                                                                          RubyCommand.Argument(name: "promotional_text", value: promotionalText),
                                                                                          RubyCommand.Argument(name: "release_notes", value: releaseNotes),
                                                                                          RubyCommand.Argument(name: "privacy_url", value: privacyUrl),
+                                                                                         RubyCommand.Argument(name: "apple_tv_privacy_policy", value: appleTvPrivacyPolicy),
                                                                                          RubyCommand.Argument(name: "support_url", value: supportUrl),
                                                                                          RubyCommand.Argument(name: "marketing_url", value: marketingUrl),
                                                                                          RubyCommand.Argument(name: "languages", value: languages),
@@ -1386,7 +1392,7 @@ func downloadDsyms(username: String,
   _ = runner.executeCommand(command)
 }
 func downloadFromPlayStore(packageName: String,
-                           metadataPath: String? = nil,
+                           metadataPath: String = "./metadata",
                            key: String? = nil,
                            issuer: String? = nil,
                            jsonKey: String? = nil,
@@ -1681,10 +1687,12 @@ func gitAdd(path: String? = nil,
 }
 func gitCommit(path: String,
                message: String,
-               skipGitHooks: Bool? = nil) {
+               skipGitHooks: Bool? = nil,
+               allowNothingToCommit: Bool? = nil) {
   let command = RubyCommand(commandID: "", methodName: "git_commit", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
                                                                                             RubyCommand.Argument(name: "message", value: message),
-                                                                                            RubyCommand.Argument(name: "skip_git_hooks", value: skipGitHooks)])
+                                                                                            RubyCommand.Argument(name: "skip_git_hooks", value: skipGitHooks),
+                                                                                            RubyCommand.Argument(name: "allow_nothing_to_commit", value: allowNothingToCommit)])
   _ = runner.executeCommand(command)
 }
 func gitPull(onlyTags: Bool = false) {
@@ -2449,11 +2457,15 @@ func pluginScores(outputPath: String,
 }
 func podLibLint(useBundleExec: Bool = true,
                 podspec: String? = nil,
-                verbose: String? = nil,
-                allowWarnings: String? = nil,
+                verbose: Bool? = nil,
+                allowWarnings: Bool? = nil,
                 sources: [String]? = nil,
+                subspec: String? = nil,
+                includePodspecs: String? = nil,
+                externalPodspecs: String? = nil,
                 swiftVersion: String? = nil,
                 useLibraries: Bool = false,
+                useModularHeaders: Bool = false,
                 failFast: Bool = false,
                 `private`: Bool = false,
                 quick: Bool = false) {
@@ -2462,8 +2474,12 @@ func podLibLint(useBundleExec: Bool = true,
                                                                                               RubyCommand.Argument(name: "verbose", value: verbose),
                                                                                               RubyCommand.Argument(name: "allow_warnings", value: allowWarnings),
                                                                                               RubyCommand.Argument(name: "sources", value: sources),
+                                                                                              RubyCommand.Argument(name: "subspec", value: subspec),
+                                                                                              RubyCommand.Argument(name: "include_podspecs", value: includePodspecs),
+                                                                                              RubyCommand.Argument(name: "external_podspecs", value: externalPodspecs),
                                                                                               RubyCommand.Argument(name: "swift_version", value: swiftVersion),
                                                                                               RubyCommand.Argument(name: "use_libraries", value: useLibraries),
+                                                                                              RubyCommand.Argument(name: "use_modular_headers", value: useModularHeaders),
                                                                                               RubyCommand.Argument(name: "fail_fast", value: failFast),
                                                                                               RubyCommand.Argument(name: "private", value: `private`),
                                                                                               RubyCommand.Argument(name: "quick", value: quick)])
@@ -2591,14 +2607,16 @@ func pushToGitRemote(localBranch: String? = nil,
                      forceWithLease: Bool = false,
                      tags: Bool = true,
                      remote: String = "origin",
-                     noVerify: Bool = false) {
+                     noVerify: Bool = false,
+                     setUpstream: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "push_to_git_remote", className: nil, args: [RubyCommand.Argument(name: "local_branch", value: localBranch),
                                                                                                     RubyCommand.Argument(name: "remote_branch", value: remoteBranch),
                                                                                                     RubyCommand.Argument(name: "force", value: force),
                                                                                                     RubyCommand.Argument(name: "force_with_lease", value: forceWithLease),
                                                                                                     RubyCommand.Argument(name: "tags", value: tags),
                                                                                                     RubyCommand.Argument(name: "remote", value: remote),
-                                                                                                    RubyCommand.Argument(name: "no_verify", value: noVerify)])
+                                                                                                    RubyCommand.Argument(name: "no_verify", value: noVerify),
+                                                                                                    RubyCommand.Argument(name: "set_upstream", value: setUpstream)])
   _ = runner.executeCommand(command)
 }
 func puts(message: String? = nil) {
@@ -3344,7 +3362,8 @@ func sonar(projectConfigurationPath: String? = nil,
            sourceEncoding: String? = nil,
            sonarRunnerArgs: String? = nil,
            sonarLogin: String? = nil,
-           sonarUrl: String? = nil) {
+           sonarUrl: String? = nil,
+           branchName: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "sonar", className: nil, args: [RubyCommand.Argument(name: "project_configuration_path", value: projectConfigurationPath),
                                                                                        RubyCommand.Argument(name: "project_key", value: projectKey),
                                                                                        RubyCommand.Argument(name: "project_name", value: projectName),
@@ -3354,7 +3373,8 @@ func sonar(projectConfigurationPath: String? = nil,
                                                                                        RubyCommand.Argument(name: "source_encoding", value: sourceEncoding),
                                                                                        RubyCommand.Argument(name: "sonar_runner_args", value: sonarRunnerArgs),
                                                                                        RubyCommand.Argument(name: "sonar_login", value: sonarLogin),
-                                                                                       RubyCommand.Argument(name: "sonar_url", value: sonarUrl)])
+                                                                                       RubyCommand.Argument(name: "sonar_url", value: sonarUrl),
+                                                                                       RubyCommand.Argument(name: "branch_name", value: branchName)])
   _ = runner.executeCommand(command)
 }
 func spaceshipLogs(latest: Bool = true,
@@ -3422,7 +3442,7 @@ func ssh(username: String,
 func supply(packageName: String,
             track: String = "production",
             rollout: String? = nil,
-            metadataPath: String? = nil,
+            metadataPath: String = "./metadata",
             key: String? = nil,
             issuer: String? = nil,
             jsonKey: String? = nil,
@@ -3881,6 +3901,7 @@ func uploadToAppStore(username: String,
                       promotionalText: [String : Any]? = nil,
                       releaseNotes: String? = nil,
                       privacyUrl: String? = nil,
+                      appleTvPrivacyPolicy: String? = nil,
                       supportUrl: String? = nil,
                       marketingUrl: String? = nil,
                       languages: [String]? = nil,
@@ -3939,6 +3960,7 @@ func uploadToAppStore(username: String,
                                                                                                      RubyCommand.Argument(name: "promotional_text", value: promotionalText),
                                                                                                      RubyCommand.Argument(name: "release_notes", value: releaseNotes),
                                                                                                      RubyCommand.Argument(name: "privacy_url", value: privacyUrl),
+                                                                                                     RubyCommand.Argument(name: "apple_tv_privacy_policy", value: appleTvPrivacyPolicy),
                                                                                                      RubyCommand.Argument(name: "support_url", value: supportUrl),
                                                                                                      RubyCommand.Argument(name: "marketing_url", value: marketingUrl),
                                                                                                      RubyCommand.Argument(name: "languages", value: languages),
@@ -3950,7 +3972,7 @@ func uploadToAppStore(username: String,
 func uploadToPlayStore(packageName: String,
                        track: String = "production",
                        rollout: String? = nil,
-                       metadataPath: String? = nil,
+                       metadataPath: String = "./metadata",
                        key: String? = nil,
                        issuer: String? = nil,
                        jsonKey: String? = nil,
@@ -4301,4 +4323,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.44]
+// FastlaneRunnerAPIVersion [0.9.47]
