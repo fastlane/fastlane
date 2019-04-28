@@ -718,7 +718,7 @@ module Spaceship
       end
 
       def setup_review_attachment_file
-        review_attachment_file = raw_data["attachmentFiles"]["value"]
+        review_attachment_file = raw_data["appReviewInfo"]["attachmentFiles"]["value"]
         @review_attachment_file = nil
         @review_attachment_file = Tunes::AppReviewAttachment.factory(review_attachment_file)
       end
