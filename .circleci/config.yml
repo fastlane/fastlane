@@ -3,7 +3,7 @@ version: 2
 jobs:
   "Execute tests on macOS":
     macos:
-      xcode: "9.0.0"
+      xcode: "9.0.1"
     environment:
       CIRCLE_TEST_REPORTS: ~/test-reports
       LC_ALL: en_US.UTF-8
