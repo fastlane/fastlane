@@ -68,6 +68,12 @@ module Fastlane
         "This will create a new pull request on GitHub"
       end
 
+      def self.output
+        [
+          ['CREATE_PULL_REQUEST_HTML_URL', 'The HTML URL to the created pull request']
+        ]
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :api_token,

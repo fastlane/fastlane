@@ -1,0 +1,181 @@
+[
+  {
+    "name": "ipad",
+    "friendly_name": "9.7-inch Display",
+    "friendly_category_name": "iPad",
+    "screenshot_resolutions": [
+      [1536, 2008],
+      [1536, 2048],
+      [2048, 1496],
+      [2048, 1536],
+      [768, 1004],
+      [768, 1024],
+      [1024, 748],
+      [1024, 768]
+    ],
+    "picture_type": "MZPFT.SortedTabletScreenShot",
+    "messages_picture_type": "MZPFT.SortedTabletMessagesScreenShot"
+  },
+  {
+    "name": "ipad105",
+    "friendly_name": "10.5-inch Display",
+    "friendly_category_name": "iPad",
+    "screenshot_resolutions": [
+      [1668, 2224],
+      [2224, 1668]
+    ],
+    "picture_type": "MZPFT.SortedJ207ScreenShot",
+    "messages_picture_type": "MZPFT.SortedJ207MessagesScreenShot"
+  },
+  {
+    "name": "ipadPro",
+    "friendly_name": "iPad Pro (2nd Generation) 12.9-inch Display",
+    "friendly_category_name": "iPad",
+    "screenshot_resolutions": [
+      [2048, 2732],
+      [2732, 2048]
+    ],
+    "picture_type": "MZPFT.SortedJ99ScreenShot",
+    "messages_picture_type": "MZPFT.SortedJ99MessagesScreenShot"
+  },
+  {
+    "name": "ipadPro11",
+    "friendly_name": "11-inch Display",
+    "friendly_category_name": "iPad",
+    "screenshot_resolutions": [
+      [1668, 2388],
+      [2388, 1668]
+    ],
+    "picture_type": "MZPFT.SortedJ317ScreenShot",
+    "messages_picture_type": "MZPFT.SortedJ317MessagesScreenShot"
+  },
+  {
+    "name": "ipadPro129",
+    "friendly_name": "iPad Pro (3rd Generation) 12.9-inch Display",
+    "friendly_category_name": "iPad",
+    "screenshot_resolutions": [
+      [2048, 2732],
+      [2732, 2048]
+    ],
+    "picture_type": "MZPFT.SortedJ320ScreenShot",
+    "messages_picture_type": "MZPFT.SortedJ320MessagesScreenShot"
+  },
+
+  {
+    "name": "iphone35",
+    "friendly_name": "3.5-inch Display",
+    "friendly_category_name": "iPhone",
+    "screenshot_resolutions": [
+      [640, 920],
+      [640, 960],
+      [960, 600],
+      [960, 640]
+    ],
+    "picture_type": "MZPFT.SortedScreenShot",
+    "messages_picture_type": null
+  },
+  {
+    "name": "iphone4",
+    "friendly_name": "4-inch Display",
+    "friendly_category_name": "iPhone",
+    "screenshot_resolutions": [
+      [640, 1096],
+      [640, 1136],
+      [1136, 600],
+      [1136, 640]
+    ],
+    "picture_type": "MZPFT.SortedN41ScreenShot",
+    "messages_picture_type": "MZPFT.SortedN41MessagesScreenShot"
+  },
+  {
+    "name": "iphone6",
+    "friendly_name": "4.7-inch Display",
+    "friendly_category_name": "iPhone",
+    "screenshot_resolutions": [
+      [750, 1334],
+      [1334, 750]
+    ],
+    "picture_type": "MZPFT.SortedN61ScreenShot",
+    "messages_picture_type": "MZPFT.SortedN61MessagesScreenShot"
+  },
+  {
+    "name": "iphone6Plus",
+    "friendly_name": "5.5-inch Display",
+    "friendly_category_name": "iPhone",
+    "screenshot_resolutions": [
+      [1242, 2208],
+      [2208, 1242]
+    ],
+    "picture_type": "MZPFT.SortedN56ScreenShot",
+    "messages_picture_type": "MZPFT.SortedN56MessagesScreenShot"
+  },
+  {
+    "name": "iphone58",
+    "friendly_name": "5.8-inch Display",
+    "friendly_category_name": "iPhone",
+    "screenshot_resolutions": [
+      [1125, 2436],
+      [2436, 1125]
+    ],
+    "picture_type": "MZPFT.SortedD22ScreenShot",
+    "messages_picture_type": "MZPFT.SortedD22MessagesScreenShot"
+  },
+  {
+    "name": "iphone65",
+    "friendly_name": "6.5-inch Display",
+    "friendly_category_name": "iPhone",
+    "screenshot_resolutions": [
+      [1242, 2688],
+      [2688, 1242]
+    ],
+    "picture_type": "MZPFT.SortedD33ScreenShot",
+    "messages_picture_type": "MZPFT.SortedD33MessagesScreenShot"
+  },
+
+  {
+    "name": "watch",
+    "friendly_name": "Series 3",
+    "friendly_category_name": "Apple Watch",
+    "screenshot_resolutions": [
+      [312, 390]
+    ],
+    "picture_type": "MZPFT.SortedN27ScreenShot",
+    "messages_picture_type": null
+  },
+  {
+    "name": "watchSeries4",
+    "friendly_name": "Series 4",
+    "friendly_category_name": "Apple Watch",
+    "screenshot_resolutions": [
+      [368, 448]
+    ],
+    "picture_type": "MZPFT.SortedN131ScreenShot",
+    "messages_picture_type": null
+  },
+
+  {
+    "name": "appleTV",
+    "friendly_name": "Apple TV",
+    "friendly_category_name": "Apple TV",
+    "screenshot_resolutions": [
+      [1920, 1080],
+      [3840, 2160]
+    ],
+    "picture_type": "MZPFT.SortedATVScreenShot",
+    "messages_picture_type": null
+  },
+
+  {
+    "name": "desktop",
+    "friendly_name": "Mac",
+    "friendly_category_name": "Desktop",
+    "screenshot_resolutions": [
+      [1280, 800],
+      [1440, 900],
+      [2560, 1600],
+      [2880, 1800]
+    ],
+    "picture_type": "MZPFT.SortedDesktopScreenShot",
+    "messages_picture_type": null
+  }
+]

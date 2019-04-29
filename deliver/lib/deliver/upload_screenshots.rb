@@ -1,5 +1,4 @@
 require 'spaceship/tunes/tunes'
-require 'spaceship/tunes/device_type'
 
 require_relative 'app_screenshot'
 require_relative 'module'
@@ -43,7 +42,7 @@ module Deliver
         Helper.show_loading_indicator("Activating #{lng_text} #{enabled_languages.join(', ')}...")
         v.save!
         # This refreshes the app version from iTC after enabling a localization
-        v = app.edit_version
+        v = app.edit_version(platform: options[:platform])
         Helper.hide_loading_indicator
       end
 
@@ -134,7 +133,7 @@ module Deliver
       # to have it in there for frameit support
       unaccepted_device_shown = false
       screenshots.select! do |screenshot|
-        exists = Spaceship::Tunes::DeviceType.exists?(screenshot.device_type)
+        exists = !screenshot.device_type.nil?
         unless exists
           UI.important("Unaccepted device screenshots are detected! 🚫 Screenshot file will be skipped. 🏃") unless unaccepted_device_shown
           unaccepted_device_shown = true
