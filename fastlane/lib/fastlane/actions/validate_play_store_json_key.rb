@@ -28,10 +28,6 @@ module Fastlane
         ["janpio"]
       end
 
-      def self.return_value
-        # If your method provides a return value, you can describe here what it does
-      end
-
       def self.details
         "Use this action to test and validate your private key json key file used to connect and authenticate with the Google Play API"
       end
