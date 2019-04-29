@@ -2,8 +2,23 @@
 
 # running tests
 TEST_MODULES=(
-  "spaceship"
+  "cert"
+  "credentials_manager"
+  "deliver"
+  "fastlane"
+  "fastlane_core"
+  "frameit"
+  "gym"
+  "match"
+  "pem"
+  "pilot"
+  "precheck"
+  "produce"
   "scan"
+  "screengrab"
+  "snapshot"
+  "spaceship"
+  "supply"
 )
 EXIT_CODE=0
 for TEST_MODULE in ${TEST_MODULES[*]}
