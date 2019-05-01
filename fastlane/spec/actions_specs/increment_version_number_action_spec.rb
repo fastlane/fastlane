@@ -14,7 +14,7 @@ describe Fastlane do
       end
 
       ["1.0", "10"].each do |version|
-        it "raises an exception when trying to increment patch version number for #{version}" do
+        it "raises an exception when trying to increment patch version number for #{version} (which has no patch number)" do
           expect(Fastlane::Actions).to receive(:sh)
             .with(/agvtool what-marketing-version/, any_args)
             .once
