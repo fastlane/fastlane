@@ -130,7 +130,7 @@ describe Fastlane do
         end.to raise_error("Please pass the path to the project, not the workspace")
       end
 
-      ["A", "1.2.3.4"].each do |version|
+      ["A", "1.2.3.4", "1.2.3-pre"].each do |version|
         it "raises an exception when unable to calculate new version for #{version} (which does not match any of the supported schemes)" do
           expect(Fastlane::Actions).to receive(:sh)
             .with(/agvtool what-marketing-version/, any_args)
