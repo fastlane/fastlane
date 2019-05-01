@@ -77,7 +77,7 @@ describe Fastlane do
       end
 
       ["1.4.3", "1.0", "10"].each do |version|
-        it "pass a custom version number #{version}" do
+        it "passes a custom version number #{version}" do
           result = Fastlane::FastFile.new.parse("lane :test do
             increment_version_number(version_number: \"#{version}\")
           end").runner.execute(:test)
