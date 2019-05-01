@@ -32,7 +32,7 @@ describe Fastlane do
         "1.0.0" => "1.1.0",
         "10.13" => "10.14"
       }.each do |from_version, to_version|
-        it "increments all targets minor version number from #{from_version} to #{to_version}" do
+        it "increments all targets' minor version number from #{from_version} to #{to_version}" do
           expect(Fastlane::Actions).to receive(:sh)
             .with(/agvtool what-marketing-version/, any_args)
             .once
