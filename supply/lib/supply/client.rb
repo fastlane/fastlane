@@ -79,7 +79,11 @@ module Supply
     def call_google_api
       yield if block_given?
     rescue Google::Apis::Error => e
-      error = JSON.parse(e.body) rescue nil
+      error = begin
+                JSON.parse(e.body)
+              rescue
+                nil
+              end
 
       if error
         message = error["error"] && error["error"]["message"]
