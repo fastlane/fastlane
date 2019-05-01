@@ -45,7 +45,7 @@ describe Fastlane do
         end
       end
 
-      it "raises an exception when trying to increment minor version number for 12" do
+      it "raises an exception when trying to increment minor version number for 12 (which has no minor number)" do
         expect(Fastlane::Actions).to receive(:sh)
           .with(/agvtool what-marketing-version/, any_args)
           .once
