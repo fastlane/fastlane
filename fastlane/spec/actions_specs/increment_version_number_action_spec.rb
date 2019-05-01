@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Increment Version Number Integration" do
-      it "increments all targets' patch version number from 1.0.0 to 1.0.1" do
+      it "increments all targets' patch version number (from 1.0.0 to 1.0.1)" do
         expect(Fastlane::Actions).to receive(:sh)
           .with(/agvtool what-marketing-version/, any_args)
           .once
