@@ -1,4 +1,5 @@
 require_relative '../client'
+require_relative 'token'
 
 module Spaceship
   module ConnectAPI
@@ -15,7 +16,7 @@ module Spaceship
       # Each request method should make only one request. For more high-level logic, put code in the data models.
 
       def self.hostname
-        'https://appstoreconnect.apple.com/iris/v1/'
+        'https://api.appstoreconnect.apple.com/v1/'
       end
 
       def build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: nil)
@@ -347,7 +348,24 @@ module Spaceship
         handle_response(response)
       end
 
+      def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
+        headers['Authorization'] = "Bearer #{token.text}"
+        super
+      end
+
       protected
+
+      def token
+        if @token.nil? || @token.expired?
+          @token = Token.new(
+            key_id: ENV["SPACESHIP_CONNECT_KEY_ID"],
+            issuer_id: ENV["SPACESHIP_CONNECT_ISSUER_ID"],
+            key: OpenSSL::PKey::EC.new(File.read(ENV["SPACESHIP_CONNECT_KEY_FILE"]))
+          )
+        end
+
+        @token
+      end
 
       def handle_response(response)
         if (200...300).cover?(response.status) && (response.body.nil? || response.body.empty?)
