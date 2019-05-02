@@ -27,16 +27,23 @@ module FastlaneCore
 
       private
 
+      # Remove leading zeros ( https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html#//apple_ref/doc/uid/20001431-102364 )
+      def remove_version_leading_zeros(version: nil)
+        return version.instance_of?(String) ? version.split('.').map { |s| s.to_i.to_s }.join('.') : version
+      end
+
       def matching_build(watched_train_version: nil, watched_build_version: nil, app_id: nil, platform: nil)
         # Get build deliveries (newly uploaded processing builds)
         client = Spaceship::ConnectAPI::Base.client
-        build_deliveries = client.get_build_deliveries(filter: { app: app_id, cfBundleShortVersionString: watched_train_version, cfBundleVersion: watched_build_version }, limit: 1)
+        truncated_watched_train_version = remove_version_leading_zeros(version: watched_train_version)
+        truncated_watched_build_version = remove_version_leading_zeros(version: watched_build_version)
+        build_deliveries = client.get_build_deliveries(filter: { app: app_id, cfBundleShortVersionString: truncated_watched_train_version, cfBundleVersion: truncated_watched_build_version }, limit: 1)
         build_delivery = build_deliveries.first
 
         # Get processed builds when no longer in build deliveries
         unless build_delivery
           matched_builds = Spaceship::TestFlight::Build.all(app_id: app_id, platform: platform)
-          matched_build = matched_builds.find { |build| build.train_version.to_s == watched_train_version.to_s && build.build_version.to_s == watched_build_version.to_s }
+          matched_build = matched_builds.find { |build| build.train_version.to_s == truncated_watched_train_version.to_s && build.build_version.to_s == truncated_watched_build_version.to_s }
         end
 
         return matched_build, build_delivery
