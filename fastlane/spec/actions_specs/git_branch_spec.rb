@@ -2,7 +2,7 @@ describe Fastlane::Actions::GitBranchAction do
   describe "CI set ENV values" do
     Fastlane::Actions::SharedValues::GIT_BRANCH_ENV_VARS.each do |env_var|
       it "can control the output of the action with #{env_var}" do
-        with_env_values(env_var => "#{env_var}-branch-name") do
+        FastlaneSpec::Env.with_env_values(env_var => "#{env_var}-branch-name") do
           result = Fastlane::FastFile.new.parse("lane :test do
             git_branch
           end").runner.execute(:test)
