@@ -327,6 +327,7 @@ describe Fastlane do
 
         it "omits format option if swiftlint does not support it" do
           allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.10.0'))
+          expect(FastlaneCore::UI).to receive(:important).with(/Your version of swiftlint \(0.10.0\) does not support/)
 
           result = Fastlane::FastFile.new.parse("lane :test do
             swiftlint(
