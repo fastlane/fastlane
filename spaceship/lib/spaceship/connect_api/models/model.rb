@@ -117,13 +117,14 @@ module Spaceship
         attributes = model_data["attributes"]
 
         # Instantiate object and inflate relationships
+        relationships = model_data["relationships"] || []
         type_instance = type_class.new(id, attributes)
-        type_instance = inflate_model_relationships(type_instance, model_data, included)
+        type_instance = inflate_model_relationships(type_instance, relationships, included)
 
         return type_instance
       end
 
-      def self.inflate_model_relationships(type_instance, model_data, included)
+      def self.inflate_model_relationships(type_instance, relationships, included)
         # Relationship attributes to set
         attributes = {}
 
@@ -131,7 +132,6 @@ module Spaceship
         # 2. Find id and type
         # 3. Find matching id and type in included
         # 4. Inflate matching data and set in attributes
-        relationships = model_data["relationships"] || []
         relationships.each do |key, value|
           value_data = value["data"]
           next unless value_data
