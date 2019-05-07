@@ -120,6 +120,16 @@ describe FastlaneCore::BuildWatcher do
       expect(found_build).to eq(ready_build)
     end
 
+    it 'returns a ready to submit build with train_version and build_version truncated' do
+      expect(mock_base_api_client).to receive(:get_build_deliveries).and_return([])
+      expect(Spaceship::TestFlight::Build).to receive(:all).and_return([ready_build])
+
+      expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.train_version} - #{ready_build.build_version}")
+      found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '01.00', build_version: '01')
+
+      expect(found_build).to eq(ready_build)
+    end
+
     #    it 'returns a export-compliance-missing build' do
     #      expect(Spaceship::TestFlight::Build).to receive(:all_processing_builds).and_return([])
     #      expect(Spaceship::TestFlight::Build).to receive(:latest).and_return(export_compliance_required_build)

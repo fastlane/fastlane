@@ -15,26 +15,26 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Kohki Miki",
+  spec.authors       = ["Jimmy Dee",
+                        "Kohki Miki",
                         "Iulian Onofrei",
+                        "Matthew Ellis",
+                        "Luka Mirosevic",
+                        "Fumiya Nakamura",
+                        "Felix Krause",
+                        "Stefan Natchev",
+                        "Aaron Brager",
+                        "Olivier Halligon",
+                        "Joshua Liebowitz",
+                        "Josh Holtz",
+                        "Helmut Januschka",
+                        "Andrew McBurney",
+                        "Maksym Grebenets",
                         "Manu Wallner",
                         "Danielle Tomlinson",
-                        "Aaron Brager",
-                        "Jérôme Lacoste",
-                        "Maksym Grebenets",
-                        "Helmut Januschka",
-                        "Felix Krause",
-                        "Fumiya Nakamura",
-                        "Stefan Natchev",
-                        "Jorge Revuelta H",
-                        "Matthew Ellis",
                         "Jan Piotrowski",
-                        "Andrew McBurney",
-                        "Josh Holtz",
-                        "Luka Mirosevic",
-                        "Joshua Liebowitz",
-                        "Jimmy Dee",
-                        "Olivier Halligon"]
+                        "Jorge Revuelta H",
+                        "Jérôme Lacoste"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -117,4 +117,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('fakefs', '~> 0.8.1')
   spec.add_development_dependency('sinatra', '~> 1.4.8')
   spec.add_development_dependency('xcov', '~> 1.4.1') # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
+  spec.add_development_dependency('climate_control', '~> 0.2.0')
 end

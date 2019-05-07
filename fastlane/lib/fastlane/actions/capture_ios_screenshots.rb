@@ -28,6 +28,12 @@ module Fastlane
         Snapshot::Options.available_options
       end
 
+      def self.output
+        [
+          ['SNAPSHOT_SCREENSHOTS_PATH', 'The path to the screenshots']
+        ]
+      end
+
       def self.author
         "KrauseFx"
       end

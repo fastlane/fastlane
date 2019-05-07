@@ -288,7 +288,7 @@ module Pilot
         client = Spaceship::ConnectAPI::Base.client
         client.patch_builds(build_id: build["id"], attributes: attributes)
 
-        UI.important("Export comlpiance has been set to '#{uses_non_exempt_encryption}'. Need to wait for build to finishing processing again...")
+        UI.important("Export compliance has been set to '#{uses_non_exempt_encryption}'. Need to wait for build to finishing processing again...")
         UI.important("Set 'ITSAppUsesNonExemptEncryption' in the 'Info.plist' to skip this step and speed up the submission")
         wait_for_build_processing_to_be_complete
       end

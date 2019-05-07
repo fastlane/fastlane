@@ -21,10 +21,11 @@ module Fastlane
       def self.get_build_number(params)
         UI.message("Login to App Store Connect (#{params[:username]})")
         Spaceship::Tunes.login(params[:username])
-        Spaceship::Tunes.select_team
+        Spaceship::Tunes.select_team(team_id: params[:team_id], team_name: params[:team_name])
         UI.message("Login successful")
 
         app = Spaceship::Tunes::Application.find(params[:app_identifier])
+        UI.user_error!("Could not find an app on App Store Connect with app_identifier: #{params[:app_identifier]}") unless app
         if params[:live]
           UI.message("Fetching the latest build number for live-version")
           UI.user_error!("Could not find a live-version of #{params[:app_identifier]} on iTC") unless app.live_version
@@ -41,32 +42,33 @@ module Fastlane
           # Get version number from latest pre-release if no version number given
           client = Spaceship::ConnectAPI::Base.client
           version = client.get_pre_release_versions(filter: filter, sort: "-version", limit: 1).first
-          unless version
-            UI.user_error!("Could not find a build number for version #{version_number}")
-          end
+          if version
+            # Need pre_release_version_id for filtering build numbers
+            pre_release_version_id = version["id"]
+            version_number = version["attributes"]["version"]
 
-          # Need pre_release_version_id for filtering build numbers
-          pre_release_version_id = version["id"]
-          version_number = version["attributes"]["version"]
+            UI.message("Fetching the latest build number for version #{version_number}")
 
-          UI.message("Fetching the latest build number for version #{version_number}")
-
-          # Get latest build for version number
-          build = client.get_builds(filter: { app: app.apple_id, "preReleaseVersion" => pre_release_version_id }, sort: "-uploadedDate", limit: 1).first
-          if build
-            build_nr = build["attributes"]["version"]
-            build_nr
-          else
-            UI.important("Could not find a build number for version #{version_number} on App Store Connect")
+            # Get latest build for version number
+            build = client.get_builds(filter: { app: app.apple_id, "preReleaseVersion" => pre_release_version_id }, sort: "-version", limit: 1).first
+            if build
+              build_nr = build["attributes"]["version"]
+              build_nr
+            else
+              UI.important("Could not find a build number for version #{version_number} on App Store Connect")
+            end
           end
 
           # Show error and set initial build number
-          unless build_nr
-            UI.user_error!("Could not find a build on App Store Connect - and 'initial_build_number' option is not set") unless params[:initial_build_number]
+          if build_nr
+            UI.message("Latest upload for version #{version_number} is build: #{build_nr}")
+          elsif params[:initial_build_number].nil?
+            UI.user_error!("Could not find a build on App Store Connect - and 'initial_build_number' option is not set")
+          else
             build_nr = params[:initial_build_number]
+            UI.message("Using initial build number of #{build_nr} for version #{version_number}")
           end
 
-          UI.message("Latest upload for version #{version_number} is build: #{build_nr}")
         end
 
         build_nr

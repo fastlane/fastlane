@@ -3,7 +3,7 @@ version: 2
 jobs:
   "Execute tests on macOS":
     macos:
-      xcode: "9.0.0"
+      xcode: "9.0.1"
     environment:
       CIRCLE_TEST_REPORTS: ~/test-reports
       LC_ALL: en_US.UTF-8
@@ -144,6 +144,24 @@ jobs:
 
       - run: bundle exec fastlane lint_source
 
+  "Execute modules load up tests":
+    environment:
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+    docker:
+      - image: circleci/ruby:2.3
+    shell: /bin/bash --login -eo pipefail
+    steps:
+      - checkout
+
+      - run:
+          name: Setup Build
+          # Build gem from fastlane.gemspec and install locally
+          command: |
+            gem install $(echo $(gem build fastlane.gemspec) | sed 's/.*File: //')
+
+      - run: /bin/bash ./test_modules/run_tests.sh
+
 workflows:
   version: 2
   build:
@@ -152,3 +170,4 @@ workflows:
       - "Execute tests on Ubuntu"
       - "Validate Documentation"
       - "Lint Source Code"
+      - "Execute modules load up tests"
