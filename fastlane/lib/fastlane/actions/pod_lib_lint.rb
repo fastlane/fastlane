@@ -1,6 +1,8 @@
 module Fastlane
   module Actions
     class PodLibLintAction < Action
+
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         command = []
 
