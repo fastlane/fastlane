@@ -1,0 +1,49 @@
+{
+    "data" : [ {
+      "type" : "betaBuildLocalizations",
+      "id" : "123456789",
+      "attributes" : {
+        "whatsNew" : "so many en-us things2",
+        "locale" : "en-US"
+      },
+      "relationships" : {
+        "build" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations/123456789/relationships/build",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations/123456789/build"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations/123456789"
+      }
+    }, {
+      "type" : "betaBuildLocalizations",
+      "id" : "987654321",
+      "attributes" : {
+        "whatsNew" : "so many en-gb things",
+        "locale" : "en-GB"
+      },
+      "relationships" : {
+        "build" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations/987654321/relationships/build",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations/987654321/build"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations/987654321"
+      }
+    } ],
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations?limit=2&filter%5Bbuild%5D=595b7d93-ac35-459d-bf42-43aef99d28b5",
+      "next" : "https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations?cursor=Ag.AJIICpY&limit=2&filter%5Bbuild%5D=595b7d93-ac35-459d-bf42-43aef99d28b5"
+    },
+    "meta" : {
+      "paging" : {
+        "total" : 4,
+        "limit" : 2
+      }
+    }
+  }

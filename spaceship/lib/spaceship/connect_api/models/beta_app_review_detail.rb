@@ -17,7 +17,7 @@ module Spaceship
         "contactLastName" => "contact_last_name",
         "contactPhone" => "contact_phone",
         "contactEmail" => "contact_email",
-        "demoAccountName" => "demo_accont_name",
+        "demoAccountName" => "demo_account_name",
         "demoAccountPassword" => "demo_account_password",
         "demoAccountRequired" => "demo_account_required",
         "notes" => "notes"
