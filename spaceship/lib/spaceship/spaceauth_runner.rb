@@ -18,13 +18,15 @@ module Spaceship
         Spaceship::Tunes.login(@username)
         puts("Successfully logged in to App Store Connect".green)
         puts("")
-      rescue
+      rescue => ex
         puts("Could not login to App Store Connect".red)
         puts("Please check your credentials and try again.".yellow)
         puts("This could be an issue with App Store Connect,".yellow)
         puts("Please try unsetting the FASTLANE_SESSION environment variable".yellow)
         puts("(if it is set) and re-run `fastlane spaceauth`".yellow)
-        raise "Problem connecting to App Store Connect"
+        puts("")
+        puts("Execption type: #{ex.class}")
+        raise ex
       end
 
       itc_cookie_content = Spaceship::Tunes.client.store_cookie
@@ -44,7 +46,7 @@ module Spaceship
 
       # We remove all the un-needed cookies
       cookies.select! do |cookie|
-        cookie.name.start_with?("myacinfo") || cookie.name == 'dqsid'
+        cookie.name.start_with?("myacinfo") || cookie.name == "dqsid" || cookie.name.start_with?("DES")
       end
 
       yaml = cookies.to_yaml.gsub("\n", "\\n")

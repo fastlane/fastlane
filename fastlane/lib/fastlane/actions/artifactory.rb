@@ -37,7 +37,7 @@ module Fastlane
       end
 
       def self.connect_to_artifactory(params)
-        config_keys = [:endpoint, :username, :password, :ssl_pem_file, :ssl_verify, :proxy_username, :proxy_password, :proxy_address, :proxy_port]
+        config_keys = [:endpoint, :username, :password, :ssl_pem_file, :ssl_verify, :proxy_username, :proxy_password, :proxy_address, :proxy_port, :read_timeout]
         config = params.values.select do |key|
           config_keys.include?(key)
         end
@@ -143,6 +143,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :proxy_port,
                                        env_name: "FL_ARTIFACTORY_PROXY_PORT",
                                        description: "Proxy port",
+                                       default_value: nil,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :read_timeout,
+                                       env_name: "FL_ARTIFACTORY_READ_TIMEOUT",
+                                       description: "Read timeout",
                                        default_value: nil,
                                        optional: true)
         ]

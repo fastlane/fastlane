@@ -45,7 +45,7 @@ describe Fastlane do
         end
 
         it "hides sensitive parameters" do
-          with_verbose(true) do
+          FastlaneSpec::Env.with_verbose(true) do
             expect(UI).to receive(:verbose) do |message|
               expect(message).to_not(include('PEANUTS'))
               expect(message).to_not(include('MAJOR_KEY'))
@@ -92,7 +92,7 @@ describe Fastlane do
           end
 
           it "hides sensitive parameters" do
-            with_verbose(true) do
+            FastlaneSpec::Env.with_verbose(true) do
               expect(UI).to receive(:verbose).with(/crashlytics_path/).once
               expect(UI).to receive(:verbose) do |message|
                 expect(message).to_not(include('PEANUTS'))

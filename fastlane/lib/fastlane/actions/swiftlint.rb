@@ -18,6 +18,7 @@ module Fastlane
         command << " --config #{params[:config_file].shellescape}" if params[:config_file]
         command << " --reporter #{params[:reporter]}" if params[:reporter]
         command << supported_option_switch(params, :quiet, "0.9.0", true)
+        command << supported_option_switch(params, :format, "0.11.0", true) if params[:mode] == :autocorrect
 
         if params[:files]
           if version < Gem::Version.new('0.5.1')
@@ -91,6 +92,7 @@ module Fastlane
                                        description: 'Fail on warnings? (true/false)',
                                        default_value: false,
                                        is_string: false,
+                                       type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :files,
                                        description: 'List of files to process',
@@ -101,6 +103,7 @@ module Fastlane
                                                     don't fail the build (true/false)",
                                        default_value: false,
                                        is_string: false,
+                                       type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :reporter,
                                        description: 'Choose output reporter',
@@ -110,10 +113,17 @@ module Fastlane
                                        description: "Don't print status logs like 'Linting <file>' & 'Done linting'",
                                        default_value: false,
                                        is_string: false,
+                                       type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :executable,
                                        description: "Path to the `swiftlint` executable on your machine",
                                        is_string: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :format,
+                                       description: "Format code when mode is :autocorrect",
+                                       default_value: false,
+                                       is_string: false,
+                                       type: Boolean,
                                        optional: true)
         ]
       end

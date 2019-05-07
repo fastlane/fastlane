@@ -130,14 +130,14 @@ module Gym
             target.build_configuration_list.build_configurations.each do |build_configuration|
               current = build_configuration.build_settings
               next if test_target?(current)
-              sdkroot = build_configuration.resolve_build_setting("SDKROOT")
+              sdkroot = build_configuration.resolve_build_setting("SDKROOT", target)
               next unless same_platform?(sdkroot)
               next unless specified_configuration == build_configuration.name
 
-              bundle_identifier = build_configuration.resolve_build_setting("PRODUCT_BUNDLE_IDENTIFIER")
+              bundle_identifier = build_configuration.resolve_build_setting("PRODUCT_BUNDLE_IDENTIFIER", target)
               next unless bundle_identifier
-              provisioning_profile_specifier = build_configuration.resolve_build_setting("PROVISIONING_PROFILE_SPECIFIER")
-              provisioning_profile_uuid = build_configuration.resolve_build_setting("PROVISIONING_PROFILE")
+              provisioning_profile_specifier = build_configuration.resolve_build_setting("PROVISIONING_PROFILE_SPECIFIER", target)
+              provisioning_profile_uuid = build_configuration.resolve_build_setting("PROVISIONING_PROFILE", target)
 
               has_profile_specifier = provisioning_profile_specifier.to_s.length > 0
               has_profile_uuid = provisioning_profile_uuid.to_s.length > 0

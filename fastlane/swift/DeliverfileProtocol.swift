@@ -51,6 +51,7 @@ protocol DeliverfileProtocol: class {
   var promotionalText: [String : Any]? { get }
   var releaseNotes: String? { get }
   var privacyUrl: String? { get }
+  var appleTvPrivacyPolicy: String? { get }
   var supportUrl: String? { get }
   var marketingUrl: String? { get }
   var languages: [String]? { get }
@@ -112,6 +113,7 @@ extension DeliverfileProtocol {
   var promotionalText: [String : Any]? { return nil }
   var releaseNotes: String? { return nil }
   var privacyUrl: String? { return nil }
+  var appleTvPrivacyPolicy: String? { return nil }
   var supportUrl: String? { return nil }
   var marketingUrl: String? { return nil }
   var languages: [String]? { return nil }
@@ -122,4 +124,4 @@ extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.6]
+// FastlaneRunnerAPIVersion [0.9.7]

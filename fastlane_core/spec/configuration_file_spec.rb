@@ -70,7 +70,7 @@ describe FastlaneCore do
       it "supports modifying of frozen strings too" do
         # Test that a value can be modified (this isn't the case by default if it's set via ENV)
         app_identifier = "com.krausefx.yolo"
-        with_env_values('SOMETHING_RANDOM_APP_IDENTIFIER' => app_identifier) do
+        FastlaneSpec::Env.with_env_values('SOMETHING_RANDOM_APP_IDENTIFIER' => app_identifier) do
           config = FastlaneCore::Configuration.create(options, {})
           config.load_configuration_file('ConfigFileEnv')
           expect(config[:app_identifier]).to eq(app_identifier)
@@ -82,7 +82,7 @@ describe FastlaneCore do
       it "supports modifying of frozen strings that are returned via blocks too" do
         # Test that a value can be modified (this isn't the case by default if it's set via ENV)
         ios_version = "9.1"
-        with_env_values('SOMETHING_RANDOM_IOS_VERSION' => ios_version) do
+        FastlaneSpec::Env.with_env_values('SOMETHING_RANDOM_IOS_VERSION' => ios_version) do
           config = FastlaneCore::Configuration.create(options, {})
           config.load_configuration_file('ConfigFileEnv')
           expect(config[:ios_version]).to eq(ios_version)
@@ -163,7 +163,7 @@ describe FastlaneCore do
         end
 
         it "reads global keys when platform and lane dont match" do
-          with_env_values('FASTLANE_PLATFORM_NAME' => 'osx', 'FASTLANE_LANE_NAME' => 'debug') do
+          FastlaneSpec::Env.with_env_values('FASTLANE_PLATFORM_NAME' => 'osx', 'FASTLANE_LANE_NAME' => 'debug') do
             config = FastlaneCore::Configuration.create(options, {})
             config.load_configuration_file('ConfigFileForLane')
 
@@ -172,7 +172,7 @@ describe FastlaneCore do
         end
 
         it "reads lane setting when platform doesn't match or no for_platform" do
-          with_env_values('FASTLANE_PLATFORM_NAME' => 'osx', 'FASTLANE_LANE_NAME' => 'enterprise') do
+          FastlaneSpec::Env.with_env_values('FASTLANE_PLATFORM_NAME' => 'osx', 'FASTLANE_LANE_NAME' => 'enterprise') do
             config = FastlaneCore::Configuration.create(options, {})
             config.load_configuration_file('ConfigFileForLane')
 
@@ -181,7 +181,7 @@ describe FastlaneCore do
         end
 
         it "reads platform setting when lane doesn't match or no for_lane" do
-          with_env_values('FASTLANE_PLATFORM_NAME' => 'ios', 'FASTLANE_LANE_NAME' => 'debug') do
+          FastlaneSpec::Env.with_env_values('FASTLANE_PLATFORM_NAME' => 'ios', 'FASTLANE_LANE_NAME' => 'debug') do
             config = FastlaneCore::Configuration.create(options, {})
             config.load_configuration_file('ConfigFileForLane')
 
@@ -190,7 +190,7 @@ describe FastlaneCore do
         end
 
         it "reads platform and lane setting" do
-          with_env_values('FASTLANE_PLATFORM_NAME' => 'ios', 'FASTLANE_LANE_NAME' => 'release') do
+          FastlaneSpec::Env.with_env_values('FASTLANE_PLATFORM_NAME' => 'ios', 'FASTLANE_LANE_NAME' => 'release') do
             config = FastlaneCore::Configuration.create(options, {})
             config.load_configuration_file('ConfigFileForLane')
 
@@ -199,7 +199,7 @@ describe FastlaneCore do
         end
 
         it "allows exceptions in blocks to escape but the configuration is still intact" do
-          with_env_values('FASTLANE_PLATFORM_NAME' => 'ios', 'FASTLANE_LANE_NAME' => 'explode') do
+          FastlaneSpec::Env.with_env_values('FASTLANE_PLATFORM_NAME' => 'ios', 'FASTLANE_LANE_NAME' => 'explode') do
             config = FastlaneCore::Configuration.create(options, {})
 
             expect { config.load_configuration_file('ConfigFileForLane') }.to raise_error("oh noes!")

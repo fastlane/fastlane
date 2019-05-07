@@ -19,7 +19,9 @@ module Fastlane
                                         output_path: File.join(tmp_path, "Result.zip"))
 
         other_action.appetize(path: zipped_bundle,
-                               api_token: params[:api_token])
+                              api_token: params[:api_token],
+                              public_key: params[:public_key],
+                              note: params[:note])
 
         public_key = Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY]
         UI.success("Generated Public Key: #{Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY]}")
@@ -61,7 +63,20 @@ module Fastlane
                                        env_name: "APPETIZE_API_TOKEN",
                                        description: "Appetize.io API Token",
                                        sensitive: true,
-                                       is_string: true)
+                                       is_string: true),
+          FastlaneCore::ConfigItem.new(key: :public_key,
+                                       description: "If not provided, a new app will be created. If provided, the existing build will be overwritten",
+                                       is_string: true,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         if value.start_with?("private_")
+                                           UI.user_error!("You provided a private key to appetize, please provide the public key")
+                                         end
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :note,
+                                       description: "Notes you wish to add to the uploaded app",
+                                       is_string: true,
+                                       optional: true)
         ]
       end
 

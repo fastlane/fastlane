@@ -305,6 +305,26 @@ describe Spaceship::ConnectAPI::Client do
       end
     end
 
+    context 'get_build_deliveries' do
+      let(:path) { "buildDeliveries" }
+      let(:version) { "189" }
+      let(:default_params) { { limit: 10 } }
+
+      it 'succeeds' do
+        params = {}
+        req_mock = test_request_params(path, params.merge(default_params))
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
+        client.get_build_deliveries
+      end
+
+      it 'succeeds with filter' do
+        params = { filter: { version: version } }
+        req_mock = test_request_params(path, params.merge(default_params))
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
+        client.get_build_deliveries(params)
+      end
+    end
+
     context 'get_builds' do
       let(:path) { "builds" }
       let(:build_id) { "123" }
@@ -322,6 +342,29 @@ describe Spaceship::ConnectAPI::Client do
         req_mock = test_request_params(path, params.merge(default_params))
         expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
         client.get_builds(params)
+      end
+    end
+
+    context 'patch_builds' do
+      let(:path) { "builds" }
+      let(:build_id) { "123" }
+      let(:attributes) { { name: "some_name" } }
+      let(:body) do
+        {
+          data: {
+            attributes: attributes,
+            id: build_id,
+            type: "builds"
+          }
+        }
+      end
+
+      it 'succeeds' do
+        url = "#{path}/#{build_id}"
+        req_mock = test_request_body(url, body)
+
+        expect(client).to receive(:request).with(:patch).and_yield(req_mock)
+        client.patch_builds(build_id: build_id, attributes: attributes)
       end
     end
 
@@ -350,6 +393,70 @@ describe Spaceship::ConnectAPI::Client do
 
         expect(client).to receive(:request).with(:post).and_yield(req_mock)
         client.post_beta_app_review_submissions(build_id: build_id)
+      end
+    end
+
+    context 'get_pre_release_versions' do
+      let(:path) { "preReleaseVersions" }
+      let(:version) { "189" }
+      let(:default_params) { { limit: 40 } }
+
+      it 'succeeds' do
+        params = {}
+        req_mock = test_request_params(path, params.merge(default_params))
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
+        client.get_pre_release_versions
+      end
+
+      it 'succeeds with filter' do
+        params = { filter: { version: version } }
+        req_mock = test_request_params(path, params.merge(default_params))
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
+        client.get_pre_release_versions(params)
+      end
+    end
+
+    context 'get_beta_groups' do
+      let(:path) { "betaGroups" }
+      let(:name) { "sir group a lot" }
+      let(:default_params) { { limit: 40 } }
+
+      it 'succeeds' do
+        params = {}
+        req_mock = test_request_params(path, params.merge(default_params))
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
+        client.get_beta_groups
+      end
+
+      it 'succeeds with filter' do
+        params = { filter: { name: name } }
+        req_mock = test_request_params(path, params.merge(default_params))
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
+        client.get_beta_groups(params)
+      end
+    end
+
+    context 'add_beta_groups_to_build' do
+      let(:path) { "builds" }
+      let(:build_id) { "123" }
+      let(:beta_group_ids) { ["123", "456"] }
+      let(:body) do
+        {
+          data: beta_group_ids.map do |id|
+            {
+              type: "betaGroups",
+              id: id
+            }
+          end
+        }
+      end
+
+      it 'succeeds' do
+        url = "#{path}/#{build_id}/relationships/betaGroups"
+        req_mock = test_request_body(url, body)
+
+        expect(client).to receive(:request).with(:post).and_yield(req_mock)
+        client.add_beta_groups_to_build(build_id: build_id, beta_group_ids: beta_group_ids)
       end
     end
   end

@@ -89,7 +89,8 @@ module Frameit
     def horizontal_frame_padding
       padding = self.config['padding']
       if padding.kind_of?(String) && padding.split('x').length == 2
-        padding = padding.split('x')[0].to_i
+        padding = padding.split('x')[0]
+        padding = padding.to_i unless padding.end_with?('%')
       end
       return scale_padding(padding)
     end
@@ -99,7 +100,8 @@ module Frameit
       padding = self.config['padding']
 
       if padding.kind_of?(String) && padding.split('x').length == 2
-        padding = padding.split('x')[1].to_i
+        padding = padding.split('x')[1]
+        padding = padding.to_i unless padding.end_with?('%')
       end
       return scale_padding(padding)
     end
