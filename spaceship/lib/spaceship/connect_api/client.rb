@@ -68,12 +68,11 @@ module Spaceship
 
         next_url = next_url(resp)
 
-        loop do
+        until next_url.nil?
           resp = get(next_url)
           responses << resp
 
           next_url = next_url(resp)
-          break if next_url.nil?
         end
 
         return responses
@@ -83,6 +82,17 @@ module Spaceship
         resp || {}
         links = resp["links"] || {}
         return links["next"]
+      end
+
+      #
+      # apps
+      #
+
+      def get_apps(filter: {}, includes: nil, limit: nil, sort: nil)
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/apps
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        get("apps", params)
       end
 
       #

@@ -78,6 +78,25 @@ describe Spaceship::ConnectAPI::Client do
       return req_mock
     end
 
+    context 'get_apps' do
+      let(:path) { "apps" }
+      let(:bundle_id) { "com.bundle.id" }
+
+      it 'succeeds' do
+        params = {}
+        req_mock = test_request_params(path, params)
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
+        client.get_apps
+      end
+
+      it 'succeeds with filter' do
+        params = { filter: { bundleId: bundle_id } }
+        req_mock = test_request_params(path, params)
+        expect(client).to receive(:request).with(:get, path).and_yield(req_mock)
+        client.get_apps(filter: { bundleId: bundle_id })
+      end
+    end
+
     context 'get_beta_app_review_detail' do
       let(:path) { "betaAppReviewDetails" }
       let(:app_id) { "123" }

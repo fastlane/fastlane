@@ -1,3 +1,5 @@
+require_relative '../base'
+
 module Spaceship
   module ConnectAPI
     module Model
@@ -19,6 +21,10 @@ module Spaceship
 
           model_or_models
         end
+
+        def client
+          return Spaceship::ConnectAPI::Base.client
+        end
       end
 
       attr_accessor :id
@@ -33,6 +39,10 @@ module Spaceship
           method = "#{key}=".to_sym
           self.send(method, value) if self.respond_to?(method)
         end
+      end
+
+      def client
+        return Spaceship::ConnectAPI::Base.client
       end
 
       #
