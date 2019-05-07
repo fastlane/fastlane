@@ -20,6 +20,11 @@ module Fastlane
         command << "--fail-fast" if params[:fail_fast]
         command << "--private" if params[:private]
         command << "--quick" if params[:quick]
+        command << "--no-clean" if params[:no_clean]
+        command << "--no-subspecs" if params[:no_subspecs]
+        command << "--platforms=#{params[:platforms]}" if params[:platforms]
+        command << "--skip-import-validation" if params[:skip_import_validation]
+        command << "--skip-tests" if params[:skip_tests]
 
         result = Actions.sh(command.join(' '))
         UI.success("Pod lib lint Successfully ⬆️ ")
@@ -113,7 +118,32 @@ module Fastlane
                                        description: "Lint skips checks that would require to download and build the spec",
                                        type: Boolean,
                                        default_value: false,
-                                       env_name: "FL_POD_LIB_LINT_QUICK")
+                                       env_name: "FL_POD_LIB_LINT_QUICK"),
+          FastlaneCore::ConfigItem.new(key: :no_clean,
+                                       description: "Lint leaves the build directory intact for inspection",
+                                       type: Boolean,
+                                       default_value: false,
+                                       env_name: "FL_POD_LIB_LINT_NO_CLEAN"),
+          FastlaneCore::ConfigItem.new(key: :no_subspecs,
+                                       description: "Lint skips validation of subspecs",
+                                       type: Boolean,
+                                       default_value: false,
+                                       env_name: "FL_POD_LIB_LINT_NO_SUBSPECS"),
+          FastlaneCore::ConfigItem.new(key: :platforms,
+                                       description: "Lint against specific platforms (defaults to all platforms supported by "\
+                                          "the podspec). Multiple platforms must be comma-delimited",
+                                       optional: true,
+                                       env_name: "FL_POD_LIB_LINT_PLATFORMS"),
+          FastlaneCore::ConfigItem.new(key: :skip_import_validation,
+                                       description: "Lint skips validating that the pod can be imported",
+                                       type: Boolean,
+                                       default_value: false,
+                                       env_name: "FL_POD_LIB_LINT_SKIP_IMPORT_VALIDATION"),
+          FastlaneCore::ConfigItem.new(key: :skip_tests,
+                                       description: "Lint skips building and running tests during validation",
+                                       type: Boolean,
+                                       default_value: false,
+                                       env_name: "FL_POD_LIB_LINT_SKIP_TESTS")
         ]
       end
 
