@@ -8,13 +8,15 @@ module Spaceship
       attr_accessor :sku
       attr_accessor :primary_locale
       attr_accessor :removed
+      attr_accessor :is_aag
 
       self.attr_mapping({
         "name" => "name",
         "bundleId" => "bundle_id",
         "sku" => "sku",
         "primaryLocale" => "primary_locale",
-        "removed" => "removed"
+        "removed" => "removed",
+        "isAAG" => "is_aag"
       })
 
       def self.type

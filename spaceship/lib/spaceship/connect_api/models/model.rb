@@ -5,6 +5,20 @@ module Spaceship
         Spaceship::ConnectAPI::Models.types ||= []
         Spaceship::ConnectAPI::Models.types << base
         base.extend(Spaceship::ConnectAPI::Model)
+        base.extend(Spaceship::ConnectAPI::Model::ClassMethods)
+      end
+
+      module ClassMethods
+        def parse(json)
+          model_or_models = Models.parse(json)
+          models = [model_or_models].flatten
+          
+          models.each do |model|
+            raise "#{model} is not of type #{self}" unless model.is_a?(self)
+          end
+
+          model_or_models
+        end
       end
 
       attr_accessor :id
@@ -64,13 +78,13 @@ module Spaceship
         included = json["included"] || []
 
         if data.is_a?(Hash)
-          inflate_model(model_data, included)
+          inflate_model(data, included)
         elsif data.is_a?(Array)
           return data.map do |model_data|
             inflate_model(model_data, included)
           end
         else
-          puts "something else"
+          raise "'data' is neither a hash nor an array"
         end
       end
 
