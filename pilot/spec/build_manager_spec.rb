@@ -244,7 +244,7 @@ describe "Build Manager" do
   end
 
   describe "#upload" do
-    describe "spaceship login (via Manager.login)" do
+    describe "uses Manager.login (which does spaceship login)" do
       let(:fake_build_manager) { Pilot::BuildManager.new }
       let(:upload_options) do
         {
@@ -266,12 +266,12 @@ describe "Build Manager" do
         allow(FastlaneCore::ItunesTransporter).to receive(:new).and_return(fake_itunestransporter)
       end
 
-      it "is not executed when skip_waiting_for_build_processing and apple_id are set" do
+      it "NOT when skip_waiting_for_build_processing and apple_id are set" do
         fake_build_manager.upload(upload_options)
       end
 
-      it "is executed when skip_waiting_for_build_processing and apple_id are not set" do
-        # clean options
+      it "when skip_waiting_for_build_processing and apple_id are not set" do
+        # remove options that make login unnecessary
         upload_options.delete(:apple_id)
         upload_options.delete(:skip_waiting_for_build_processing)
 
