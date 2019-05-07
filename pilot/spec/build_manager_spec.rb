@@ -268,6 +268,9 @@ describe "Build Manager" do
 
       it "NOT when skip_waiting_for_build_processing and apple_id are set" do
         fake_build_manager.upload(upload_options)
+
+        # should not execute Manager.login (which does spaceship login)
+        expect(fake_build_manager).not_to receive(:login)
       end
 
       it "when skip_waiting_for_build_processing and apple_id are not set" do
@@ -275,18 +278,19 @@ describe "Build Manager" do
         upload_options.delete(:apple_id)
         upload_options.delete(:skip_waiting_for_build_processing)
 
-        # allow the spaceship login method this time
-        allow(fake_build_manager).to receive(:login)
+        # allow Manager.login method this time
+        expect(fake_build_manager).to receive(:login).at_least(:once)
+
+        # other stuff required to let `upload` work:
+
+        allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_identifier).and_return("com.fastlane")
+        allow(fake_build_manager).to receive(:fetch_apple_id).and_return(123)
+        allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_version)
+        allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_build)
 
         fake_app = double
         allow(fake_app).to receive(:apple_id).and_return(123)
         allow(fake_build_manager).to receive(:app).and_return(fake_app)
-
-        allow(Spaceship::Tunes::Application).to receive(:find).and_return(fake_app)
-
-        allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_identifier).and_return("com.fastlane")
-        allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_version)
-        allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_build)
 
         fake_build = double
         allow(fake_build).to receive(:train_version)
