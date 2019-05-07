@@ -27,7 +27,7 @@ describe Spaceship::ConnectAPI::Build do
       expect(model.icon_asset_token).to eq({
         "templateUrl" => "https://is3-ssl.mzstatic.com/image/thumb/Purple/v4/97/f3/8a/97f38a96-38df-b4a0-8e93-cbb7c1f5ecd8/Icon-83.5@2x.png.png/{w}x{h}bb.{f}",
         "width" => 167,
-        "height" => 167 
+        "height" => 167
       })
       expect(model.processing_state).to eq("VALID")
       expect(model.uses_non_exempt_encryption).to eq(false)

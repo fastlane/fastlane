@@ -1,3 +1,4 @@
+require_relative './model'
 module Spaceship
   module ConnectAPI
     class BuildDelivery
@@ -12,7 +13,7 @@ module Spaceship
         "cfBundleVersion" => "cf_build_version",
         "cfBundleShortVersionString" => "cf_build_short_version_string",
         "platform" => "platform",
-        "uploadedDate" => "uploaded_date",
+        "uploadedDate" => "uploaded_date"
       })
 
       def self.type

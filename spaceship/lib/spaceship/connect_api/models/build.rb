@@ -1,3 +1,4 @@
+require_relative './model'
 module Spaceship
   module ConnectAPI
     class Build
@@ -26,7 +27,7 @@ module Spaceship
         "processingState" => "processing_state",
         "usesNonExemptEncryption" => "uses_non_exempt_encryption",
         "qcState" => "qc_state",
-        
+
         "preReleaseVersion" => "pre_release_version",
         "app" => "app"
       })

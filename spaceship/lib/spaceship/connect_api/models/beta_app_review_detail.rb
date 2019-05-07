@@ -1,3 +1,4 @@
+require_relative './model'
 module Spaceship
   module ConnectAPI
     class BetaAppReviewDetail

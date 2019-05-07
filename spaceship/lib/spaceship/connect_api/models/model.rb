@@ -12,9 +12,9 @@ module Spaceship
         def parse(json)
           model_or_models = Models.parse(json)
           models = [model_or_models].flatten
-          
+
           models.each do |model|
-            raise "#{model} is not of type #{self}" unless model.is_a?(self)
+            raise "#{model} is not of type #{self}" unless model.kind_of?(self)
           end
 
           model_or_models
@@ -25,10 +25,10 @@ module Spaceship
 
       def initialize(id, attributes)
         self.id = id
-        set_attributes(attributes)
+        update_attributes(attributes)
       end
 
-      def set_attributes(attributes)
+      def update_attributes(attributes)
         attributes.each do |key, value|
           method = "#{key}=".to_sym
           self.send(method, value) if self.respond_to?(method)
@@ -53,14 +53,14 @@ module Spaceship
 
           send(:attr_reader, value) unless has_reader
           send(:attr_writer, value) unless has_writer
-          
+
           # Alias
           key_reader = key.to_sym
           key_writer = "#{key}=".to_sym
 
           # Alias the API response name to attribute name
-          alias_method key_reader, reader
-          alias_method key_writer, writer
+          alias_method(key_reader, reader)
+          alias_method(key_writer, writer)
         end
       end
     end
@@ -77,9 +77,9 @@ module Spaceship
 
         included = json["included"] || []
 
-        if data.is_a?(Hash)
+        if data.kind_of?(Hash)
           inflate_model(data, included)
-        elsif data.is_a?(Array)
+        elsif data.kind_of?(Array)
           return data.map do |model_data|
             inflate_model(model_data, included)
           end
@@ -93,7 +93,7 @@ module Spaceship
         @types_cache ||= {}
 
         # Find class in cache
-        type_string = model_data["type"] 
+        type_string = model_data["type"]
         type_class = @types_cache[type_string]
         return type_class if type_class
 
@@ -110,7 +110,7 @@ module Spaceship
       def self.inflate_model(model_data, included)
         # Find class
         type_class = find_class(model_data)
-        raise "No type class found for #{model_data["type"]}" unless type_class
+        raise "No type class found for #{model_data['type']}" unless type_class
 
         # Get id and attributes needed for inflating
         id = model_data["id"]
@@ -134,19 +134,18 @@ module Spaceship
         relationships = model_data["relationships"] || []
         relationships.each do |key, value|
           value_data = value["data"]
-          if value_data
-            id = value_data["id"]
-            type = value_data["type"]
+          next unless value_data
+          id = value_data["id"]
+          type = value_data["type"]
 
-            relationship_data = included.find do |included_data|
-              id == included_data["id"] && type == included_data["type"]
-            end
-
-            attributes[key] = inflate_model(relationship_data, included)
+          relationship_data = included.find do |included_data|
+            id == included_data["id"] && type == included_data["type"]
           end
+
+          attributes[key] = inflate_model(relationship_data, included)
         end
 
-        type_instance.set_attributes(attributes)
+        type_instance.update_attributes(attributes)
 
         return type_instance
       end
