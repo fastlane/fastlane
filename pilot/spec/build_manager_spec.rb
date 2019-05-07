@@ -267,10 +267,10 @@ describe "Build Manager" do
       end
 
       it "NOT when skip_waiting_for_build_processing and apple_id are set" do
-        fake_build_manager.upload(upload_options)
-
         # should not execute Manager.login (which does spaceship login)
         expect(fake_build_manager).not_to(receive(:login))
+
+        fake_build_manager.upload(upload_options)
       end
 
       it "when skip_waiting_for_build_processing and apple_id are not set" do
