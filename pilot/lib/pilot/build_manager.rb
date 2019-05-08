@@ -11,8 +11,9 @@ module Pilot
   class BuildManager < Manager
     def upload(options)
       # Only need to login before upload if no apple_id was given
-      should_login = options[:apple_id].nil?
-      start(options, should_login: should_login)
+      # 'login' will be deferred until before waiting for build processing
+      should_login_in_start = options[:apple_id].nil?
+      start(options, should_login: should_login_in_start)
 
       options[:changelog] = self.class.sanitize_changelog(options[:changelog]) if options[:changelog]
 
@@ -51,7 +52,8 @@ module Pilot
         return
       end
 
-      login_if_not_logged_in
+      # Calling login again here is needed if login was not called during 'start'
+      login unless should_login_in_start
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
       latest_build = wait_for_build_processing_to_be_complete
@@ -190,10 +192,6 @@ module Pilot
     end
 
     private
-
-    def login_if_not_logged_in
-      login unless Spaceship::Tunes.client
-    end
 
     def describe_build(build)
       row = [build.train_version,
