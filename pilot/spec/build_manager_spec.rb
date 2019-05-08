@@ -11,6 +11,7 @@ describe "Build Manager" do
       expect(changelog).to eq("1234")
     end
   end
+
   describe ".sanitize_changelog" do
     it "removes emoji" do
       changelog = "I'm 🦇B🏧an!"
@@ -24,7 +25,8 @@ describe "Build Manager" do
       expect(changelog).to eq(File.read("./pilot/spec/fixtures/build_manager/changelog_long_truncated"))
     end
   end
-  describe "distribute submits the build for review" do
+
+  describe "#distribute submits the build for review" do
     let(:mock_base_client) { "fake testflight base client" }
     let(:mock_base_api_client) { "fake api base client" }
     let(:fake_build_manager) { Pilot::BuildManager.new }
@@ -237,6 +239,67 @@ describe "Build Manager" do
         expect(FastlaneCore::UI).to receive(:success).with(/Successfully distributed build to/)
 
         fake_build_manager.distribute(options, build: ready_to_submit_mock_build)
+      end
+    end
+  end
+
+  describe "#upload" do
+    describe "uses Manager.login (which does spaceship login)" do
+      let(:fake_build_manager) { Pilot::BuildManager.new }
+      let(:upload_options) do
+        {
+          apple_id: 'mock_apple_id',
+          skip_waiting_for_build_processing: true,
+          ipa: 'foo'
+        }
+      end
+
+      before(:each) do
+        allow(fake_build_manager).to receive(:fetch_app_platform).and_return('ios')
+
+        fake_ipauploadpackagebuilder = double
+        allow(fake_ipauploadpackagebuilder).to receive(:generate).and_return(true)
+        allow(FastlaneCore::IpaUploadPackageBuilder).to receive(:new).and_return(fake_ipauploadpackagebuilder)
+
+        fake_itunestransporter = double
+        allow(fake_itunestransporter).to receive(:upload).and_return(true)
+        allow(FastlaneCore::ItunesTransporter).to receive(:new).and_return(fake_itunestransporter)
+      end
+
+      it "NOT when skip_waiting_for_build_processing and apple_id are set" do
+        # should not execute Manager.login (which does spaceship login)
+        expect(fake_build_manager).not_to(receive(:login))
+
+        fake_build_manager.upload(upload_options)
+      end
+
+      it "when skip_waiting_for_build_processing and apple_id are not set" do
+        # remove options that make login unnecessary
+        upload_options.delete(:apple_id)
+        upload_options.delete(:skip_waiting_for_build_processing)
+
+        # allow Manager.login method this time
+        expect(fake_build_manager).to receive(:login).at_least(:once)
+
+        # other stuff required to let `upload` work:
+
+        allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_identifier).and_return("com.fastlane")
+        allow(fake_build_manager).to receive(:fetch_apple_id).and_return(123)
+        allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_version)
+        allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_build)
+
+        fake_app = double
+        allow(fake_app).to receive(:apple_id).and_return(123)
+        allow(fake_build_manager).to receive(:app).and_return(fake_app)
+
+        fake_build = double
+        allow(fake_build).to receive(:train_version)
+        allow(fake_build).to receive(:build_version)
+        allow(FastlaneCore::BuildWatcher).to receive(:wait_for_build_processing_to_be_complete).and_return(fake_build)
+
+        allow(fake_build_manager).to receive(:distribute)
+
+        fake_build_manager.upload(upload_options)
       end
     end
   end
