@@ -4,16 +4,16 @@ module Fastlane
   module Actions
     class InstallProvisioningProfileAction < Action
       def self.run(params)
-        absolute_path = File.expand_path(params[:provisioning_profile_path])
+        absolute_path = File.expand_path(params[:path])
         FastlaneCore::ProvisioningProfile.install(absolute_path)
       end
 
       def self.description
-        "Install provisioning profile from inputfile"
+        "Install provisioning profile from path"
       end
 
       def self.details
-        "Install provisioning profile from inputfile for current user"
+        "Install provisioning profile from path for current user"
       end
 
       def self.authors
@@ -30,7 +30,7 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :provisioning_profile_path,
+          FastlaneCore::ConfigItem.new(key: :path,
                                   env_name: "FL_INSTALL_PROVISIONING_PROFILE_PATH",
                                description: "Path to provisioning profile",
                                   optional: false,
@@ -50,7 +50,7 @@ module Fastlane
 
       def self.example_code
         [
-          'install_provisioning_profile(provisioning_profile_path: "profiles/profile.mobileprovision")'
+          'install_provisioning_profile(path: "profiles/profile.mobileprovision")'
         ]
       end
     end
