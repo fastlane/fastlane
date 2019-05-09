@@ -87,8 +87,11 @@ module Fastlane
         UI.message("Uploading '#{path}'...")
         command = []
         command << File.expand_path(params[:binary_path]).shellescape
-        command << "-gsp #{params[:gsp_path].shellescape}" if params[:gsp_path]
-        command << "-a #{params[:api_token]}" if params[:api_token] && !params[:gsp_path]
+        if params[:gsp_path]
+          command << "-gsp #{params[:gsp_path].shellescape}"
+        elsif params[:api_token]
+          command << "-a #{params[:api_token]}"
+        end
         command << "-p #{params[:platform] == 'appletvos' ? 'tvos' : params[:platform]}"
         command << File.expand_path(path).shellescape
         begin
