@@ -713,8 +713,13 @@ module Spaceship
         language_details = raw_data_details.each do |current_language|
           language_details = (current_language["displayFamilies"] || {})["value"]
           (language_details || []).each do |device_language_details|
+            # Do not enable scaling if a screenshot already exists
             next if device_language_details["screenshots"].nil?
             next if device_language_details["screenshots"]["value"].count > 0
+
+            # Do not enable scaling if a trailer already exists
+            next if device_language_details["trailers"].nil?
+            next if device_language_details["trailers"]["value"].count > 0
 
             # The current row includes screenshots for all device types
             # so we need to enable scaling for both iOS and watchOS apps
