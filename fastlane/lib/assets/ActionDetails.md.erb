@@ -51,6 +51,21 @@ Key | Description | Default
 
 <hr />
 
+<% if action.output && action.output.kind_of?(Array) && action.output.length > 0 %>
+
+## Outputs
+
+Shared Area Key | Description 
+----------------|-------------
+<%- (action.output || []).each do |array_item| -%>
+  <%- next unless array_item.kind_of?(Array) -%>
+  <%- next if array_item.length != 2 -%>
+  `<%= array_item[0] %>` | <%= array_item[1] %>
+<%- end %>
+<% end %><%# End of action.output... %>
+
+<hr />
+
 ## Documentation
 
 To show the documentation in your terminal, run
