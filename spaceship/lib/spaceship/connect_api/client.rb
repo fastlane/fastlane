@@ -25,6 +25,8 @@ module Spaceship
       def build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: nil)
         params = {}
 
+        filter = filter.delete_if { |k, v| v.nil? }
+
         params[:filter] = filter if filter && !filter.empty?
         params[:include] = includes if includes
         params[:limit] = limit if limit

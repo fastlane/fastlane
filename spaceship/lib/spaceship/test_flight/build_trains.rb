@@ -20,7 +20,7 @@ module Spaceship::TestFlight
       cursor = nil
 
       loop do
-        builds_resp = client.get_builds(filter: { app: app_id, processingState: "VALID,PROCESSING,FAILED,INVALID" }, limit: 100, sort: "uploadedDate", includes: "preReleaseVersion,app", cursor: cursor, only_data: false)
+        builds_resp = client.get_builds(filter: { app: app_id, processingState: "VALID,PROCESSING,FAILED,INVALID" }, limit: 100, sort: "uploadedDate", includes: "preReleaseVersion,app", cursor: cursor)
         builds += builds_resp["data"]
         included += (builds_resp["included"] || [])
 
