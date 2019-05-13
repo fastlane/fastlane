@@ -708,7 +708,7 @@ module Spaceship
       end
 
       def setup_screenshots
-        # Enable Scaling for all screen sizes that don't have at least one screenshot
+        # Enable Scaling for all screen sizes that don't have at least one screenshot or at least one trailer (app_preview)
         # We automatically disable scaling once we upload at least one screenshot
         language_details = raw_data_details.each do |current_language|
           language_details = (current_language["displayFamilies"] || {})["value"]
