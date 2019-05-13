@@ -29,7 +29,9 @@ module Fastlane
           configuration: '--configuration',
           workspace: '--workspace',
           binary_file: '--binary-file',
+          binary_files: '--binary-file',
           binary_basename: '--binary-basename',
+          binary_basenames: '--binary-basename',
           arch: '--arch',
           source_files: '--source-files',
           decimals: '--decimals'
@@ -259,12 +261,44 @@ module Fastlane
                                        env_name: "FL_SLATHER_BINARY_BASENAME",
                                        description: "Basename of the binary file, this should match the name of your bundle excluding its extension (i.e. YourApp [for YourApp.app bundle])",
                                        is_string: false,
-                                       default_value: false),
+                                       optional: true,
+                                       conflicting_options: [:binary_basenames],
+                                       verify_block: proc do |value|
+                                         if value.kind_of?(Array)
+                                           UI.deprecated(":binary_basename will only accept a String in the future. Please migrate over to using :binary_basenames")
+                                         end
+                                       end,
+                                       conflict_block: proc do |value|
+                                         UI.user_error!("You can't use 'binary_basename' and 'binary_basenames' options in one run")
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :binary_basenames,
+                                       env_name: "FL_SLATHER_BINARY_BASENAMES",
+                                       description: "Basenames of the binary files, this should match the name of your bundle excluding its extension (i.e. YourApp [for YourApp.app bundle])",
+                                       optional: true,
+                                       type: Array,
+                                       conflicting_options: [:binary_basename],
+                                       conflict_block: proc do |value|
+                                         UI.user_error!("You can't use 'binary_basename' and 'binary_basenames' options in one run")
+                                       end),
           FastlaneCore::ConfigItem.new(key: :binary_file,
                                        env_name: "FL_SLATHER_BINARY_FILE",
-                                       description: "Binary file name to be used for code coverage",
+                                       description: "Binary file against the which the coverage will be run",
                                        skip_type_validation: true, # skipping validation for backwards compatibility with Boolean type
-                                       optional: true),
+                                       type: String,
+                                       optional: true,
+                                       conflicting_options: [:binary_files],
+                                       conflict_block: proc do |value|
+                                         UI.user_error!("You can't use 'binary_file' and 'binary_files' options in one run")
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :binary_files,
+                                       env_name: "FL_SLATHER_BINARY_FILES",
+                                       description: "Binary files against the which the coverage will be run",
+                                       optional: true,
+                                       type: Array,
+                                       conflicting_options: [:binary_file],
+                                       conflict_block: proc do |value|
+                                         UI.user_error!("You can't use 'binary_file' and 'binary_files' options in one run")
+                                       end),
           FastlaneCore::ConfigItem.new(key: :arch,
                                        env_name: "FL_SLATHER_ARCH",
                                        description: "Specify which architecture the binary file is in. Needed for universal binaries",

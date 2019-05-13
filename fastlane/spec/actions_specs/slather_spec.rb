@@ -189,19 +189,116 @@ describe Fastlane do
         expect(result).to eq(expected)
       end
 
-      it "works with when binary_file is set to true or false" do
-        possible_values = ["true", "false"]
-        expected = "slather coverage foo.xcodeproj".gsub(/\s+/, ' ')
+      describe ":binary_file and :binary_files" do
+        it "works with when binary_file is set to true or false" do
+          possible_values = ["true", "false"]
+          expected = "slather coverage foo.xcodeproj".gsub(/\s+/, ' ')
 
-        possible_values.each do |value|
+          possible_values.each do |value|
+            result = Fastlane::FastFile.new.parse("lane :test do
+              slather({
+                binary_file: #{value},
+                proj: 'foo.xcodeproj'
+              })
+            end").runner.execute(:test)
+
+            expect(result).to eq(expected)
+          end
+        end
+
+        it "works with when binary_files is set" do
+          value = ["file1.txt", "file2.txt"]
+
+          expected_values = value.map { |v| "--binary-file #{v}" }.join(' ')
+          expected = "slather coverage #{expected_values} foo.xcodeproj".gsub(/\s+/, ' ')
+
           result = Fastlane::FastFile.new.parse("lane :test do
             slather({
-              binary_file: #{value},
+              binary_files: #{value},
               proj: 'foo.xcodeproj'
             })
           end").runner.execute(:test)
 
           expect(result).to eq(expected)
+        end
+
+        it "raises an error with conflicting options" do
+          message = "You can't use 'binary_file' and 'binary_files' options in one run"
+
+          expect do
+            result = Fastlane::FastFile.new.parse("lane :test do
+              slather({
+                binary_file: 'file',
+                binary_files: ['file'],
+                proj: 'foo.xcodeproj'
+              })
+            end").runner.execute(:test)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, message)
+        end
+      end
+
+      describe ":binary_basename and :binary_basenames" do
+        it "works with when binary_basename is set as String" do
+          value = "file1.txt"
+
+          expected = "slather coverage --binary-basename file1.txt foo.xcodeproj".gsub(/\s+/, ' ')
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            slather({
+              binary_basename: '#{value}',
+              proj: 'foo.xcodeproj'
+            })
+          end").runner.execute(:test)
+
+          expect(result).to eq(expected)
+        end
+
+        it "works with when binary_basename is set as Array" do
+          value = ["file1.txt", "file2.txt"]
+
+          expected_values = value.map { |v| "--binary-basename #{v}" }.join(' ')
+          expected = "slather coverage #{expected_values} foo.xcodeproj".gsub(/\s+/, ' ')
+
+          expect(Fastlane::UI).to receive(:deprecated).with(":binary_basename will only accept a String in the future. Please migrate over to using :binary_basenames")
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            slather({
+              binary_basename: #{value},
+              proj: 'foo.xcodeproj'
+            })
+          end").runner.execute(:test)
+
+          expect(result).to eq(expected)
+        end
+
+        it "works with when binary_basenames is set" do
+          value = ["file1.txt", "file2.txt"]
+
+          expected_values = value.map { |v| "--binary-basename #{v}" }.join(' ')
+          expected = "slather coverage #{expected_values} foo.xcodeproj".gsub(/\s+/, ' ')
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            slather({
+              binary_basenames: '#{value.join(',')}',
+              proj: 'foo.xcodeproj'
+            })
+          end").runner.execute(:test)
+
+          expect(result).to eq(expected)
+        end
+
+        it "raises an error with conflicting options" do
+          message = "You can't use 'binary_basename' and 'binary_basenames' options in one run"
+
+          expect do
+            result = Fastlane::FastFile.new.parse("lane :test do
+              slather({
+                binary_basename: 'file',
+                binary_basenames: ['file'],
+                proj: 'foo.xcodeproj'
+              })
+            end").runner.execute(:test)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, message)
         end
       end
 
