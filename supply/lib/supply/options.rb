@@ -18,7 +18,7 @@ module Supply
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",
                                      description: "The track of the application to use. The default available tracks are: #{default_tracks.join(', ')}",
-                                     default_value: 'production'),
+                                     default_value: 'internal'),
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
                                      description: "The percentage of the user fraction when uploading to the rollout track",
