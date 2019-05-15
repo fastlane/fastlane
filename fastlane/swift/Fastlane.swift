@@ -2017,6 +2017,10 @@ func installOnDevice(extra: String? = nil,
                                                                                                    RubyCommand.Argument(name: "ipa", value: ipa)])
   _ = runner.executeCommand(command)
 }
+func installProvisioningProfile(path: String) {
+  let command = RubyCommand(commandID: "", methodName: "install_provisioning_profile", className: nil, args: [RubyCommand.Argument(name: "path", value: path)])
+  _ = runner.executeCommand(command)
+}
 func installXcodePlugin(url: String,
                         github: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "install_xcode_plugin", className: nil, args: [RubyCommand.Argument(name: "url", value: url),
@@ -2474,7 +2478,12 @@ func podLibLint(useBundleExec: Bool = true,
                 useModularHeaders: Bool = false,
                 failFast: Bool = false,
                 `private`: Bool = false,
-                quick: Bool = false) {
+                quick: Bool = false,
+                noClean: Bool = false,
+                noSubspecs: Bool = false,
+                platforms: String? = nil,
+                skipImportValidation: Bool = false,
+                skipTests: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "pod_lib_lint", className: nil, args: [RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec),
                                                                                               RubyCommand.Argument(name: "podspec", value: podspec),
                                                                                               RubyCommand.Argument(name: "verbose", value: verbose),
@@ -2488,7 +2497,12 @@ func podLibLint(useBundleExec: Bool = true,
                                                                                               RubyCommand.Argument(name: "use_modular_headers", value: useModularHeaders),
                                                                                               RubyCommand.Argument(name: "fail_fast", value: failFast),
                                                                                               RubyCommand.Argument(name: "private", value: `private`),
-                                                                                              RubyCommand.Argument(name: "quick", value: quick)])
+                                                                                              RubyCommand.Argument(name: "quick", value: quick),
+                                                                                              RubyCommand.Argument(name: "no_clean", value: noClean),
+                                                                                              RubyCommand.Argument(name: "no_subspecs", value: noSubspecs),
+                                                                                              RubyCommand.Argument(name: "platforms", value: platforms),
+                                                                                              RubyCommand.Argument(name: "skip_import_validation", value: skipImportValidation),
+                                                                                              RubyCommand.Argument(name: "skip_tests", value: skipTests)])
   _ = runner.executeCommand(command)
 }
 func podPush(useBundleExec: Bool = false,
@@ -4237,7 +4251,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode-10.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-10.2.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -4347,4 +4361,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.48]
+// FastlaneRunnerAPIVersion [0.9.49]
