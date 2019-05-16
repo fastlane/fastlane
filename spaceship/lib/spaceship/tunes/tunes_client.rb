@@ -261,6 +261,11 @@ module Spaceship
       parse_response(r, 'data')
     end
 
+    def bundle_details(app_id)
+      r = request(:get, "ra/appbundles/metadetail/#{app_id}")
+      parse_response(r, 'data')
+    end
+
     def update_app_details!(app_id, data)
       r = request(:post) do |req|
         req.url("ra/apps/#{app_id}/details")
@@ -1191,6 +1196,12 @@ module Spaceship
     def load_iap(app_id: nil, purchase_id: nil)
       r = request(:get, "ra/apps/#{app_id}/iaps/#{purchase_id}")
       parse_response(r, 'data')
+    end
+
+    # Submit the In-App-Purchase for review
+    def submit_iap!(app_id: nil, purchase_id: nil)
+      r = request(:post, "ra/apps/#{app_id}/iaps/#{purchase_id}/submission")
+      handle_itc_response(r)
     end
 
     # Loads the full In-App-Purchases-Family

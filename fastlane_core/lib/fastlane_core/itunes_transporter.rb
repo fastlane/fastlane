@@ -31,7 +31,10 @@ module FastlaneCore
     private_constant :ERROR_REGEX, :WARNING_REGEX, :OUTPUT_REGEX, :RETURN_VALUE_REGEX, :SKIP_ERRORS
 
     def execute(command, hide_output)
-      return command if Helper.test?
+      if Helper.test?
+        yield(nil) if block_given?
+        return command
+      end
 
       @errors = []
       @errors_to_show = []
@@ -88,6 +91,7 @@ module FastlaneCore
         UI.important("Although errors occurred during execution of iTMSTransporter, it returned success status.")
       end
 
+      yield(@all_lines) if block_given?
       return exit_status.zero?
     end
 
@@ -190,6 +194,15 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
+    def build_provider_ids_command(username, password)
+      [
+        '"' + Helper.transporter_path + '"',
+        '-m provider',
+        "-u \"#{username}\"",
+        "-p #{shell_escaped_password(password)}"
+      ].compact.join(' ')
+    end
+
     def handle_error(password)
       # rubocop:disable Style/CaseEquality
       # rubocop:disable Style/YodaCondition
@@ -275,6 +288,24 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
+    def build_provider_ids_command(username, password)
+      [
+        Helper.transporter_java_executable_path.shellescape,
+        "-Djava.ext.dirs=#{Helper.transporter_java_ext_dir.shellescape}",
+        '-XX:NewSize=2m',
+        '-Xms32m',
+        '-Xmx1024m',
+        '-Xms1024m',
+        '-Djava.awt.headless=true',
+        '-Dsun.net.http.retryPost=false',
+        java_code_option,
+        '-m provider',
+        "-u #{username.shellescape}",
+        "-p #{password.shellescape}",
+        '2>&1' # cause stderr to be written to stdout
+      ].compact.join(' ')
+    end
+
     def java_code_option
       if Helper.mac? && Helper.xcode_at_least?(9)
         return "-jar #{Helper.transporter_java_jar_path.shellescape}"
@@ -302,6 +333,8 @@ module FastlaneCore
   end
 
   class ItunesTransporter
+    # Matches a line in the provider table: "12  Initech Systems Inc     LG89CQY559"
+    PROVIDER_REGEX = /^\d+\s{2,}.+\s{2,}[^\s]+$/
     TWO_STEP_HOST_PREFIX = "deliver.appspecific"
 
     # This will be called from the Deliverfile, and disables the logging of the transporter output
@@ -410,6 +443,21 @@ module FastlaneCore
       @transporter_executor.displayable_errors
     end
 
+    def provider_ids
+      command = @transporter_executor.build_provider_ids_command(@user, @password)
+      UI.verbose(@transporter_executor.build_provider_ids_command(@user, 'YourPassword'))
+      lines = []
+      begin
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?) { |xs| lines = xs }
+        return result if Helper.test?
+      rescue TransporterRequiresApplicationSpecificPasswordError => ex
+        handle_two_step_failure(ex)
+        return provider_ids
+      end
+
+      lines.map { |line| provider_pair(line) }.compact.to_h
+    end
+
     private
 
     TWO_FACTOR_ENV_VARIABLE = "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"
@@ -470,6 +518,12 @@ module FastlaneCore
 
     def handle_error(password)
       @transporter_executor.handle_error(password)
+    end
+
+    def provider_pair(line)
+      line = line.strip
+      return nil unless line =~ PROVIDER_REGEX
+      line.split(/\s{2,}/).drop(1)
     end
   end
 end

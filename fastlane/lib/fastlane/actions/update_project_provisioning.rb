@@ -79,7 +79,7 @@ module Fastlane
         project.save
 
         # complete
-        UI.success("Successfully updated project settings in '#{params[:xcodeproj]}'")
+        UI.success("Successfully updated project settings in '#{folder}'")
       end
 
       def self.description

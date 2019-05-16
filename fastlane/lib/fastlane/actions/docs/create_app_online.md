@@ -236,9 +236,11 @@ lane :release do
     # Optional
     # App services can be enabled during app creation
     enable_services: {
+      access_wifi: "on",             # Valid values: "on", "off"
       app_group: "on",               # Valid values: "on", "off"
       apple_pay: "on",               # Valid values: "on", "off"
       associated_domains: "on",      # Valid values: "on", "off"
+      auto_fill_credential: "on",    # Valid values: "on", "off"
       data_protection: "complete",   # Valid values: "complete", "unlessopen", "untilfirstauth",
       game_center: "on",             # Valid values: "on", "off"
       health_kit: "on",              # Valid values: "on", "off"
@@ -249,7 +251,7 @@ lane :release do
       inter_app_audio: "on",         # Valid values: "on", "off"
       passbook: "on",                # Valid values: "on", "off"
       multipath: "on",               # Valid values: "on", "off"
-      network_extensions: "on",      # Valid values: "on", "off"
+      network_extension: "on",       # Valid values: "on", "off"
       nfc_tag_reading: "on",         # Valid values: "on", "off"
       personal_vpn: "on",            # Valid values: "on", "off"
       passbook: "on",                # Valid values: "on", "off" (deprecated)

@@ -438,8 +438,33 @@ describe FastlaneCore do
                                           type: Float,
                           skip_type_validation: true,
                                    description: "Description")
-
           expect(c.valid?('a string')).to eq(true)
+        end
+
+        it "fails verification for a improper value set as an environment variable" do
+          c = FastlaneCore::ConfigItem.new(key: :test_key,
+                                    env_name: "TEST_KEY",
+                                 description: "A test key",
+                                verify_block: proc do |value|
+                                  UI.user_error!("Invalid value") unless value.start_with?('a')
+                                end)
+          expect do
+            @config = FastlaneCore::Configuration.create([c], {})
+            ENV["TEST_KEY"] = "does_not_start_with_a"
+            @config[:test_key]
+          end.to raise_error("Invalid value")
+        end
+
+        it "passes verification for a proper value set as an environment variable" do
+          c = FastlaneCore::ConfigItem.new(key: :test_key,
+                                    env_name: "TEST_KEY",
+                                 description: "A test key",
+                                verify_block: proc do |value|
+                                  UI.user_error!("Invalid value") unless value.start_with?('a')
+                                end)
+          @config = FastlaneCore::Configuration.create([c], {})
+          ENV["TEST_KEY"] = "a_good_value"
+          expect(@config[:test_key]).to eq('a_good_value')
         end
       end
 

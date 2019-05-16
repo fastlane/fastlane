@@ -68,7 +68,9 @@ module Fastlane
       end
 
       def self.output
-        []
+        [
+          ['MATCH_PROVISIONING_PROFILE_MAPPING', 'The match provisioning profile mapping']
+        ]
       end
 
       def self.return_value

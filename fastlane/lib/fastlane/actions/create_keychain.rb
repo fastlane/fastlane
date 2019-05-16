@@ -72,6 +72,12 @@ module Fastlane
         "Create a new Keychain"
       end
 
+      def self.output
+        [
+          ['ORIGINAL_DEFAULT_KEYCHAIN', 'The path to the default keychain']
+        ]
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :name,

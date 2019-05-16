@@ -14,17 +14,18 @@ module Fastlane
         plist = Plist.parse_xml(info_plist_path)
 
         # Check if current app identifier product bundle identifier
-        if plist['CFBundleIdentifier'] == "$(#{identifier_key})"
+        app_id_equals_bundle_id = %W($(#{identifier_key}) ${#{identifier_key}}).include?(plist['CFBundleIdentifier'])
+        if app_id_equals_bundle_id
           # Load .xcodeproj
           project_path = params[:xcodeproj]
           project = Xcodeproj::Project.open(project_path)
 
           # Fetch the build configuration objects
           configs = project.objects.select { |obj| obj.isa == 'XCBuildConfiguration' && !obj.build_settings[identifier_key].nil? }
-          UI.user_error!("Info plist uses $(#{identifier_key}), but xcodeproj does not") unless configs.count > 0
+          UI.user_error!("Info plist uses #{identifier_key}, but xcodeproj does not") if configs.empty?
 
           configs = configs.select { |obj| resolve_path(obj.build_settings[info_plist_key], params[:xcodeproj]) == info_plist_path }
-          UI.user_error!("Xcodeproj doesn't have configuration with info plist #{params[:plist_path]}.") unless configs.count > 0
+          UI.user_error!("Xcodeproj doesn't have configuration with info plist #{params[:plist_path]}.") if configs.empty?
 
           # For each of the build configurations, set app identifier
           configs.each do |c|

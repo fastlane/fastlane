@@ -15,6 +15,14 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :certificate_path,
+                                       description: "Path to certificate",
+                                       optional: false),
+          FastlaneCore::ConfigItem.new(key: :certificate_password,
+                                       description: "Certificate password",
+                                       sensitive: true,
+                                       default_value: "",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :keychain_name,
                                        env_name: "KEYCHAIN_NAME",
                                        description: "Keychain the items should be imported to",
@@ -27,14 +35,6 @@ module Fastlane
                                        env_name: "FL_IMPORT_CERT_KEYCHAIN_PASSWORD",
                                        description: "The password for the keychain. Note that for the login keychain this is your user's password",
                                        sensitive: true,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :certificate_path,
-                                       description: "Path to certificate",
-                                       optional: false),
-          FastlaneCore::ConfigItem.new(key: :certificate_password,
-                                       description: "Certificate password",
-                                       sensitive: true,
-                                       default_value: "",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :log_output,
                                        description: "If output should be logged to the console",
@@ -53,7 +53,7 @@ module Fastlane
       end
 
       def self.details
-        "Import certificates into the current default keychain. Use `create_keychain` to create a new keychain."
+        "Import certificates (and private keys) into the current default keychain. Use the `create_keychain` action to create a new keychain."
       end
 
       def self.example_code
@@ -62,6 +62,9 @@ module Fastlane
           'import_certificate(
             certificate_path: "certs/dist.p12",
             certificate_password: ENV["CERTIFICATE_PASSWORD"] || "default"
+          )',
+          'import_certificate(
+            certificate_path: "certs/development.cer"
           )'
         ]
       end
