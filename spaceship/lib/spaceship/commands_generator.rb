@@ -24,6 +24,7 @@ module Spaceship
       program :help_formatter, :compact
 
       global_option('-u', '--user USERNAME', 'Specify the Apple ID you want to log in with')
+      global_option('--verbose') { FastlaneCore::Globals.verbose = true }
 
       command :playground do |c|
         c.syntax = 'fastlane spaceship playground'

@@ -183,7 +183,7 @@ module Fastlane
       end
 
       def self.description
-        "Upload a new build to [HockeyApp](https://hockeyapp.net/)"
+        "Refer to [App Center](https://github.com/Microsoft/fastlane-plugin-appcenter/)"
       end
 
       def self.available_options
@@ -356,6 +356,9 @@ module Fastlane
 
       def self.details
         [
+          "HockeyApp will be no longer supported and will be transitioned into App Center on November 16, 2019.",
+          "Please migrate over to [App Center](https://github.com/Microsoft/fastlane-plugin-appcenter/)",
+          "",
           "Symbols will also be uploaded automatically if a `app.dSYM.zip` file is found next to `app.ipa`. In case it is located in a different place you can specify the path explicitly in the `:dsym` parameter.",
           "More information about the available options can be found in the [HockeyApp Docs](http://support.hockeyapp.net/kb/api/api-versions#upload-version)."
         ].join("\n")
@@ -376,12 +379,26 @@ module Fastlane
             bundle_version: "1.0.2.145",
             ipa: "./my.msi",
             notes: "Changelog"
+          )',
+          '# You can bypass the CDN if you are uploading to Hockey and receive an SSL error (which can happen on corporate firewalls)
+          hockey(
+            api_token: "...",
+            ipa: "./app.ipa",
+            notes: "Changelog",
+            bypass_cdn: true
           )'
         ]
       end
 
       def self.category
-        :beta
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        [
+          "HockeyApp will be no longer supported and will be transitioned into App Center on November 16, 2019.",
+          "Please migrate over to [App Center](https://github.com/Microsoft/fastlane-plugin-appcenter/)"
+        ].join("\n")
       end
     end
     # rubocop:enable Metrics/ClassLength

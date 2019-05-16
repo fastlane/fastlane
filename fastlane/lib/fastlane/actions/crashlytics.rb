@@ -6,24 +6,31 @@ module Fastlane
         params[:emails] = params[:emails].join(",") if params[:emails].kind_of?(Array)
 
         params.values # to validate all inputs before looking for the ipa/apk
+        tempfiles = []
 
         # We need to store notes in a file, because the crashlytics CLI (iOS) says so
         if params[:notes]
           UI.error("Overwriting :notes_path, because you specified :notes") if params[:notes_path]
 
-          params[:notes_path] = Helper::CrashlyticsHelper.write_to_tempfile(params[:notes], 'changelog').path
+          changelog = Helper::CrashlyticsHelper.write_to_tempfile(params[:notes], 'changelog')
+          tempfiles << changelog
+          params[:notes_path] = changelog.path
         elsif Actions.lane_context[SharedValues::FL_CHANGELOG] && !params[:notes_path]
           UI.message("Sending FL_CHANGELOG as release notes to Beta by Crashlytics")
 
-          params[:notes_path] = Helper::CrashlyticsHelper.write_to_tempfile(
+          changelog = Helper::CrashlyticsHelper.write_to_tempfile(
             Actions.lane_context[SharedValues::FL_CHANGELOG], 'changelog'
-          ).path
+          )
+          tempfiles << changelog
+          params[:notes_path] = changelog.path
         end
 
         if params[:ipa_path]
           command = Helper::CrashlyticsHelper.generate_ios_command(params)
         elsif params[:apk_path]
-          command = Helper::CrashlyticsHelper.generate_android_command(params)
+          android_manifest = Helper::CrashlyticsHelper.generate_android_manifest_tempfile
+          tempfiles << android_manifest
+          command = Helper::CrashlyticsHelper.generate_android_command(params, android_manifest.path)
         else
           UI.user_error!("You have to either pass an ipa or an apk file to the Crashlytics action")
         end
@@ -49,6 +56,7 @@ module Fastlane
           error_callback: error_callback
         )
 
+        tempfiles.each(&:unlink)
         return command if Helper.test?
 
         UI.verbose(sanitizer.call(result)) if FastlaneCore::Globals.verbose?
@@ -162,15 +170,24 @@ module Fastlane
       def self.details
         [
           "Additionally, you can specify `notes`, `emails`, `groups` and `notifications`.",
-          "Distributing to Groups: When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog by clicking the 'Manage Groups' button."
+          "Distributing to Groups: When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog by clicking the 'Manage Groups' button.",
+          "This action uses the `submit` binary provided by the Crashlytics framework. If the binary is not found in its usual path, you'll need to specify the path manually by using the `crashlytics_path` option."
         ].join("\n")
       end
 
       def self.example_code
         [
           'crashlytics',
-          'crashlytics(
-            crashlytics_path: "./Pods/Crashlytics/", # path to your Crashlytics submit binary.
+          '# If you installed Crashlytics via CocoaPods
+          crashlytics(
+            crashlytics_path: "./Pods/Crashlytics/submit", # path to your Crashlytics submit binary.
+            api_token: "...",
+            build_secret: "...",
+            ipa_path: "./app.ipa"
+          )',
+          '# If you installed Crashlytics via Carthage for iOS platform
+          crashlytics(
+            crashlytics_path: "./Carthage/Build/iOS/Crashlytics.framework/submit", # path to your Crashlytics submit binary.
             api_token: "...",
             build_secret: "...",
             ipa_path: "./app.ipa"

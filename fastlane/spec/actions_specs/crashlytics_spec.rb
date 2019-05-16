@@ -12,6 +12,11 @@ describe Fastlane do
       describe "Android" do
         describe "Valid parameters" do
           it "works with valid parameters" do
+            android_manifest = double(path: 'manifest')
+            expect(Fastlane::Helper::CrashlyticsHelper).to receive(:generate_android_manifest_tempfile)
+              .once
+              .and_return(android_manifest)
+            expect(android_manifest).to receive(:unlink).once
             command = Fastlane::FastFile.new.parse('lane :test do
               crashlytics(
                 crashlytics_path: "./fastlane/spec/fixtures/actions/crashlytics/submit",
@@ -28,24 +33,19 @@ describe Fastlane do
              "-androidRes .",
              "-apiKey api_token",
              "-apiSecret build_secret",
-             "-uploadDist '",
-             "-betaDistributionReleaseNotesFilePath '",
-             "-betaDistributionEmails 'email1@krausefx.com,email2@krausefx.com'",
-             "-betaDistributionGroupAliases 'testgroup'",
+             "-uploadDist ",
+             "-androidManifest #{File.expand_path('manifest')}",
+             "-betaDistributionReleaseNotesFilePath ",
+             "-betaDistributionEmails email1@krausefx.com,email2@krausefx.com",
+             "-betaDistributionGroupAliases testgroup",
              "-betaDistributionNotifications true"].each do |to_be|
               expect(command.join(" ")).to include(to_be)
             end
-
-            # These 2 parameters are temporary
-            # "-androidManifest '/var/folders/dh/6sxzb7_n37nb8s8pbbk_wc0c0000gn/T/xml20151005-29563-m97zs2'",
-            # "-betaDistributionReleaseNotesFilePath '/var/folders/dh/6sxzb7_n37nb8s8pbbk_wc0c0000gn/T/changelog20151005-29563-1o3uf3m'",
-            expect(command.join(" ")).to include("-betaDistributionReleaseNotesFilePath")
-            expect(command.join(" ")).to include("-androidManifest")
           end
         end
 
         it "hides sensitive parameters" do
-          with_verbose(true) do
+          FastlaneSpec::Env.with_verbose(true) do
             expect(UI).to receive(:verbose) do |message|
               expect(message).to_not(include('PEANUTS'))
               expect(message).to_not(include('MAJOR_KEY'))
@@ -92,7 +92,7 @@ describe Fastlane do
           end
 
           it "hides sensitive parameters" do
-            with_verbose(true) do
+            FastlaneSpec::Env.with_verbose(true) do
               expect(UI).to receive(:verbose).with(/crashlytics_path/).once
               expect(UI).to receive(:verbose) do |message|
                 expect(message).to_not(include('PEANUTS'))

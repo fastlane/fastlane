@@ -136,7 +136,8 @@ module Spaceship
         if self.content_rights_has_rights.nil? || self.content_rights_contains_third_party_content.nil?
           raw_data_clone.set(["contentRights"], nil)
         end
-        raw_data_clone.delete("version")
+        raw_data_clone.delete(:version)
+        raw_data_clone.delete(:application)
 
         # Check whether the application makes use of IDFA or not
         # and automatically set the mandatory limitsTracking value in the request JSON accordingly.

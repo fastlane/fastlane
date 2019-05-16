@@ -1,4 +1,5 @@
 describe Spaceship::Tunes::IAPSubscriptionPricingTier do
+  before { TunesStubbing.itc_stub_iap }
   before { Spaceship::Tunes.login }
 
   let(:client)        { Spaceship::AppVersion.client }

@@ -2,7 +2,7 @@ require_relative 'tunes_client'
 require_relative 'app_trailer'
 require_relative 'app_screenshot'
 require_relative 'app_image'
-require_relative 'device_type'
+require_relative 'display_family'
 require_relative 'app_version_generated_promocodes'
 require_relative 'language_item'
 require_relative 'transit_app_file'
@@ -567,7 +567,10 @@ module Spaceship
           else
             # IDEA: optimization, we could avoid fetching the screenshot if the timestamp hasn't changed
             video_preview_resolution = video_preview_resolution_for(device, trailer_path)
-            video_preview_path = Utilities.grab_video_preview(trailer_path, timestamp, video_preview_resolution)
+
+            # Keep a reference of the video_preview here to avoid Ruby getting rid of the Tempfile in the meanwhile
+            video_preview = Utilities.grab_video_preview(trailer_path, timestamp, video_preview_resolution)
+            video_preview_path = video_preview.path
           end
           video_preview_file = UploadFile.from_path(video_preview_path)
           video_preview_data = client.upload_trailer_preview(self, video_preview_file, device)
@@ -622,6 +625,10 @@ module Spaceship
 
       def release!
         client.release!(self.application.apple_id, self.version_id)
+      end
+
+      def release_to_all_users!
+        client.release_to_all_users!(self.application.apple_id, self.version_id)
       end
 
       #####################################################
@@ -685,7 +692,7 @@ module Spaceship
       end
 
       def container_data_for_language_and_device(data_field, language, device)
-        raise "#{device} isn't a valid device name" unless DeviceType.exists?(device)
+        raise "#{device} isn't a valid device name" unless DisplayFamily.find(device)
 
         languages = raw_data_details.select { |d| d["language"] == language }
         # IDEA: better error for non existing language

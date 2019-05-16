@@ -15,9 +15,11 @@ describe Spaceship::Client do
 
   class TestResponse
     attr_accessor :body
+    attr_accessor :status
 
-    def initialize(body = nil)
+    def initialize(body = nil, status = 200)
       @body = body
+      @status = status
     end
   end
 
@@ -40,8 +42,18 @@ describe Spaceship::Client do
   end
 
   describe 'detect_most_common_errors_and_raise_exceptions' do
-    it "raises Spaceship::InsufficientPermissions for Forbidden" do
+    # this test is strange, the `error` has a typo "InsufficentPermissions" and is not really relevant
+    it "raises Spaceship::InsufficientPermissions for InsufficentPermissions" do
       body = JSON.generate({ messages: { error: "InsufficentPermissions" } })
+      stub_client_request(Spaceship::InsufficientPermissions, 6, 200, body)
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::InsufficientPermissions)
+    end
+
+    it "raises Spaceship::InsufficientPermissions for Forbidden" do
+      body = JSON.generate({ messages: { error: "Forbidden" } })
       stub_client_request(Spaceship::InsufficientPermissions, 6, 200, body)
 
       expect do
@@ -88,6 +100,7 @@ describe Spaceship::Client do
       Faraday::Error::TimeoutError,
       Faraday::Error::ConnectionFailed,
       Faraday::ParsingError,
+      Spaceship::BadGatewayError,
       Spaceship::InternalServerError,
       Spaceship::GatewayTimeoutError
     ].each do |thrown|
@@ -112,6 +125,43 @@ describe Spaceship::Client do
       expect do
         subject.req_home
       end.to raise_error(Spaceship::Client::AppleTimeoutError)
+    end
+
+    it "raises BadGatewayError when response contains 'Bad Gateway'" do
+      body = <<BODY
+      <!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body {
+            font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
+            font-size: 15px;
+            font-weight: 200;
+            line-height: 20px;
+            color: #4c4c4c;
+            text-align: center;
+        }
+
+        .section {
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+<div class="section">
+    <h1>&#63743;</h1>
+
+    <h3>Bad Gateway</h3>
+    <p>Correlation Key: XXXXXXXXXXXXXXXXXXXX</p>
+</div>
+</body>
+</html>
+BODY
+      stub_client_retry_auth(502, 1, 200, body)
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::Client::BadGatewayError)
     end
 
     it "successfully retries request after logging in again when UnauthorizedAccess Error raised" do

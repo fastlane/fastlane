@@ -16,11 +16,23 @@ module Match
     attr_accessor :files_to_commit
     attr_accessor :spaceship
 
+    attr_accessor :storage_mode
+
+    # The Team ID that was fetched
+    # This will always be `nil` in readonly mode
+    attr_accessor :currently_used_team_id
+
     def run(params)
       self.files_to_commit = []
 
+      FileUtils.mkdir_p(params[:output_path]) if params[:output_path]
+
       FastlaneCore::PrintTable.print_values(config: params,
                                              title: "Summary for match #{Fastlane::VERSION}")
+
+      update_optional_values_depending_on_storage_type(params)
+
+      self.storage_mode = params[:storage_mode]
 
       # Choose the right storage and encryption implementations
       storage = Storage.for_mode(params[:storage_mode], {
@@ -32,7 +44,10 @@ module Match
         git_user_email: params[:git_user_email],
         clone_branch_directly: params[:clone_branch_directly],
         type: params[:type].to_s,
-        platform: params[:platform].to_s
+        platform: params[:platform].to_s,
+        google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
+        google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
+        google_cloud_project_id: params[:google_cloud_project_id].to_s
       })
       storage.download
 
@@ -41,10 +56,16 @@ module Match
         git_url: params[:git_url],
         working_directory: storage.working_directory
       })
-      encryption.decrypt_files
+      encryption.decrypt_files if encryption
 
-      unless params[:readonly]
+      if params[:readonly]
+        # In readonly mode, we still want to see if the user provided a team_id
+        # see `prefixed_working_directory` comments for more details
+        self.currently_used_team_id = params[:team_id]
+      else
         self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name])
+        self.currently_used_team_id = self.spaceship.team_id
+
         if params[:type] == "enterprise" && !Spaceship.client.in_house?
           UI.user_error!("You defined the profile type 'enterprise', but your Apple account doesn't support In-House profiles")
         end
@@ -81,13 +102,8 @@ module Match
         end
       end
 
-      # Done
       if self.files_to_commit.count > 0 && !params[:readonly]
-        Dir.chdir(storage.working_directory) do
-          return if `git status`.include?("nothing to commit")
-        end
-
-        encryption.encrypt_files
+        encryption.encrypt_files if encryption
         storage.save_changes!(files_to_commit: self.files_to_commit)
       end
 
@@ -107,37 +123,85 @@ module Match
       storage.clear_changes if storage
     end
 
+    # Used when creating a new certificate or profile
+    def prefixed_working_directory(working_directory)
+      if self.storage_mode == "git"
+        return working_directory
+      elsif self.storage_mode == "google_cloud"
+        # We fall back to "*", which means certificates and profiles
+        # from all teams that use this bucket would be installed. This is not ideal, but
+        # unless the user provides a `team_id`, we can't know which one to use
+        # This only happens if `readonly` is activated, and no `team_id` was provided
+        @_folder_prefix ||= self.currently_used_team_id
+        if @_folder_prefix.nil?
+          # We use a `@_folder_prefix` variable, to keep state between multiple calls of this
+          # method, as the value won't change. This way the warning is only printed once
+          UI.important("Looks like you run `match` in `readonly` mode, and didn't provide a `team_id`. This will still work, however it is recommended to provide a `team_id` in your Appfile or Matchfile")
+          @_folder_prefix = "*"
+        end
+        return File.join(working_directory, @_folder_prefix)
+      else
+        UI.crash!("No implementation for `prefixed_working_directory`")
+      end
+    end
+
+    # Be smart about optional values here
+    # Depending on the storage mode, different values are required
+    def update_optional_values_depending_on_storage_type(params)
+      if params[:storage_mode] != "git"
+        params.option_for_key(:git_url).optional = true
+      end
+    end
+
     def fetch_certificate(params: nil, working_directory: nil)
       cert_type = Match.cert_type_sym(params[:type])
 
-      certs = Dir[File.join(working_directory, "certs", cert_type.to_s, "*.cer")]
-      keys = Dir[File.join(working_directory, "certs", cert_type.to_s, "*.p12")]
+      certs = Dir[File.join(prefixed_working_directory(working_directory), "certs", cert_type.to_s, "*.cer")]
+      keys = Dir[File.join(prefixed_working_directory(working_directory), "certs", cert_type.to_s, "*.p12")]
 
       if certs.count == 0 || keys.count == 0
-        UI.important("Couldn't find a valid code signing identity in the git repo for #{cert_type}... creating one for you now")
+        UI.important("Couldn't find a valid code signing identity for #{cert_type}... creating one for you now")
         UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
-        cert_path = Generator.generate_certificate(params, cert_type, working_directory)
+        cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory(working_directory))
         private_key_path = cert_path.gsub(".cer", ".p12")
 
         self.files_to_commit << cert_path
         self.files_to_commit << private_key_path
       else
         cert_path = certs.last
-        UI.message("Installing certificate...")
 
-        # Only looking for cert in "custom" (non login.keychain) keychain
-        # Doing this for backwards compatability
-        keychain_name = params[:keychain_name] == "login.keychain" ? nil : params[:keychain_name]
-
-        if FastlaneCore::CertChecker.installed?(cert_path, in_keychain: keychain_name)
-          UI.verbose("Certificate '#{File.basename(cert_path)}' is already installed on this machine")
+        # Check validity of certificate
+        if Utils.is_cert_valid?(cert_path)
+          UI.verbose("Your certificate '#{File.basename(cert_path)}' is valid")
         else
-          Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
+          UI.user_error!("Your certificate '#{File.basename(cert_path)}' is not valid, please check end date and renew it if necessary")
         end
 
-        # Import the private key
-        # there seems to be no good way to check if it's already installed - so just install it
-        Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
+        if Helper.mac?
+          UI.message("Installing certificate...")
+
+          # Only looking for cert in "custom" (non login.keychain) keychain
+          # Doing this for backwards compatability
+          keychain_name = params[:keychain_name] == "login.keychain" ? nil : params[:keychain_name]
+
+          if FastlaneCore::CertChecker.installed?(cert_path, in_keychain: keychain_name)
+            UI.verbose("Certificate '#{File.basename(cert_path)}' is already installed on this machine")
+          else
+            Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
+          end
+
+          # Import the private key
+          # there seems to be no good way to check if it's already installed - so just install it
+          # Key will only be added to the partition list if it isn't already installed
+          Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
+        else
+          UI.message("Skipping installation of certificate as it would not work on this operating system.")
+        end
+
+        if params[:output_path]
+          FileUtils.cp(cert_path, params[:output_path])
+          FileUtils.cp(keys.last, params[:output_path])
+        end
 
         # Get and print info of certificate
         info = Utils.get_cert_info(cert_path)
@@ -157,16 +221,18 @@ module Match
       end
 
       profile_name = names.join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
-      base_dir = File.join(working_directory, "profiles", prov_type.to_s)
+      base_dir = File.join(prefixed_working_directory(working_directory), "profiles", prov_type.to_s)
       profiles = Dir[File.join(base_dir, "#{profile_name}.mobileprovision")]
-      keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
+      if Helper.mac?
+        keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
+      end
 
       # Install the provisioning profiles
       profile = profiles.last
 
       if params[:force_for_new_devices] && !params[:readonly]
         if prov_type != :appstore
-          params[:force] = device_count_different?(profile: profile, keychain_path: keychain_path) unless params[:force]
+          params[:force] = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym) unless params[:force]
         else
           # App Store provisioning profiles don't contain device identifiers and
           # thus shouldn't be renewed if the device count has changed.
@@ -177,11 +243,13 @@ module Match
 
       if profile.nil? || params[:force]
         if params[:readonly]
-          all_profiles = Dir.entries(base_dir).reject { |f| f.start_with?(".") }
           UI.error("No matching provisioning profiles found for '#{profile_name}'")
           UI.error("A new one cannot be created because you enabled `readonly`")
-          UI.error("Provisioning profiles in your repo for type `#{prov_type}`:")
-          all_profiles.each { |p| UI.error("- '#{p}'") }
+          if Dir.exist?(base_dir) # folder for `prov_type` does not exist on first match use for that type
+            all_profiles = Dir.entries(base_dir).reject { |f| f.start_with?(".") }
+            UI.error("Provisioning profiles in your repo for type `#{prov_type}`:")
+            all_profiles.each { |p| UI.error("- '#{p}'") }
+          end
           UI.error("If you are certain that a profile should exist, double-check the recent changes to your match repository")
           UI.user_error!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`. Check the output above for more information.")
         end
@@ -189,13 +257,19 @@ module Match
                                                        prov_type: prov_type,
                                                   certificate_id: certificate_id,
                                                   app_identifier: app_identifier,
-                                               working_directory: working_directory)
+                                               working_directory: prefixed_working_directory(working_directory))
         self.files_to_commit << profile
       end
 
-      installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
+      if Helper.mac?
+        installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
+      end
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       uuid = parsed["UUID"]
+
+      if params[:output_path]
+        FileUtils.cp(profile, params[:output_path])
+      end
 
       if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
         # This profile is invalid, let's remove the local file and generate a new one
@@ -229,7 +303,7 @@ module Match
       return uuid
     end
 
-    def device_count_different?(profile: nil, keychain_path: nil)
+    def device_count_different?(profile: nil, keychain_path: nil, platform: nil)
       return false unless profile
 
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
@@ -238,7 +312,19 @@ module Match
 
       if portal_profile
         profile_device_count = portal_profile.devices.count
-        portal_device_count = Spaceship.device.all.count
+
+        portal_device_count =
+          case platform
+          when :ios
+            Spaceship.device.all_ios_profile_devices.count
+          when :tvos
+            Spaceship.device.all_apple_tvs.count
+          when :mac
+            Spaceship.device.all_macs.count
+          else
+            Spaceship.device.all.count
+          end
+
         return portal_device_count != profile_device_count
       end
       return false

@@ -15,7 +15,9 @@ module Fastlane
         # We want the last 7000 characters, instead of the first 7000, as the error is at the bottom
         start_index = [message.length - 7000, 0].max
         message = message[start_index..-1]
-        message
+        # We want line breaks to be shown on slack output so we replace
+        # input non-interpreted line break with interpreted line break
+        message.gsub('\n', "\n")
       end
 
       def self.run(options)
@@ -23,6 +25,8 @@ module Fastlane
 
         options[:message] = self.trim_message(options[:message].to_s || '')
         options[:message] = Slack::Notifier::Util::LinkFormatter.format(options[:message])
+
+        options[:pretext] = options[:pretext].gsub('\n', "\n") unless options[:pretext].nil?
 
         if options[:channel].to_s.length > 0
           channel = options[:channel]
@@ -156,7 +160,7 @@ module Fastlane
               "Built by" => "Jenkins",
             },
             default_payloads: [:git_branch, :git_author], # Optional, lets you specify a whitelist of default payloads to include. Pass an empty array to suppress all the default payloads.
-                                                          # Don\'t add this key, or pass nil, if you want all the default payloads. The available default payloads are: `lane`, `test_result`, `git_branch`, `git_author`, `last_git_commit_message`, `last_git_commit_hash`.
+                                                          # Don\'t add this key, or pass nil, if you want all the default payloads. The available default payloads are: `lane`, `test_result`, `git_branch`, `git_author`, `last_git_commit`, `last_git_commit_hash`.
             attachment_properties: { # Optional, lets you specify any other properties available for attachments in the slack API (see https://api.slack.com/docs/attachments).
                                      # This hash is deep merged with the existing properties set using the other properties above. This allows your own fields properties to be appended to the existing fields that were created using the `payload` property for instance.
               thumb_url: "http://example.com/path/to/thumb.png",
@@ -184,7 +188,7 @@ module Fastlane
 
       def self.generate_slack_attachments(options)
         color = (options[:success] ? 'good' : 'danger')
-        should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].join(" ").include?(payload_name.to_s) }
+        should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].map(&:to_sym).include?(payload_name.to_sym) }
 
         slack_attachment = {
           fallback: options[:message],

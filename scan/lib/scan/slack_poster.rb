@@ -1,3 +1,6 @@
+require 'fastlane/action'
+require 'fastlane/actions/slack'
+
 require_relative 'module'
 
 module Scan
@@ -12,56 +15,46 @@ module Scan
         channel = ('#' + channel) unless ['#', '@'].include?(channel[0]) # send message to channel by default
       end
 
-      require 'slack-notifier'
-      notifier = Slack::Notifier.new(Scan.config[:slack_url]) do
-        defaults(channel: channel,
-                username: 'fastlane')
-      end
+      username = Scan.config[:slack_use_webhook_configured_username_and_icon] ? nil : Scan.config[:slack_username]
+      icon_url = Scan.config[:slack_use_webhook_configured_username_and_icon] ? nil : Scan.config[:slack_icon_url]
+      fields = []
 
-      attachments = []
-
-      if Scan.config[:slack_message]
-        attachments << {
-          text: Scan.config[:slack_message].to_s,
-          color: "good"
+      if results[:build_errors]
+        fields << {
+          title: 'Build Errors',
+          value: results[:build_errors].to_s,
+          short: true
         }
       end
 
-      attachments << {
-        text: "Build Errors: #{results[:build_errors] || 0}",
-        color: results[:build_errors].to_i > 0 ? "danger" : "good",
-        short: true
-      }
-
       if results[:failures]
-        attachments << {
-          text: "Test Failures: #{results[:failures]}",
-          color: results[:failures].to_i > 0 ? "danger" : "good",
+        fields << {
+          title: 'Test Failures',
+          value: results[:failures].to_s,
           short: true
         }
       end
 
       if results[:tests] && results[:failures]
-        attachments << {
-          text: "Successful Tests: #{results[:tests] - results[:failures]}",
-          color: "good",
+        fields << {
+          title: 'Successful Tests',
+          value: (results[:tests] - results[:failures]).to_s,
           short: true
         }
       end
 
-      result = notifier.ping("#{Scan.project.app_name} Tests:",
-                             icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
-                             attachments: attachments)
-      result = result.first
-
-      if result.code.to_i == 200
-        UI.success('Successfully sent Slack notification')
-      elsif result.code.to_i == 404
-        UI.error("The Slack URL you provided could not be reached (404)")
-      else
-        UI.error("The Slack notification could not be sent:")
-        UI.error(result.to_s)
-      end
+      Fastlane::Actions::SlackAction.run({
+        message: "#{Scan.project.app_name} Tests:\n#{Scan.config[:slack_message]}",
+        channel: channel,
+        slack_url: Scan.config[:slack_url].to_s,
+        success: results[:build_errors].to_i == 0 && results[:failures].to_i == 0,
+        username: username,
+        icon_url: icon_url,
+        payload: {},
+        attachment_properties: {
+          fields: fields
+        }
+      })
     end
   end
 end

@@ -29,8 +29,9 @@ module Deliver
       UI.success("Successfully submitted the app for review!")
     end
 
-    def select_build(options)
+    private def select_build(options)
       app = options[:app]
+      app_version = options[:app_version]
       v = app.edit_version(platform: options[:platform])
 
       if options[:build_number] && options[:build_number] != "latest"
@@ -41,9 +42,9 @@ module Deliver
         end
       else
         UI.message("Selecting the latest build...")
-        build = wait_for_build(app)
+        build = wait_for_build(app, app_version)
       end
-      UI.message("Selecting build #{build.train_version} (#{build.build_version})...")
+      UI.message("Selecting build #{app_version} (#{build.build_version})...")
 
       v.select_build(build)
       v.save!
@@ -51,7 +52,7 @@ module Deliver
       UI.success("Successfully selected build")
     end
 
-    def wait_for_build(app)
+    def wait_for_build(app, app_version)
       UI.user_error!("Could not find app with app identifier") unless app
 
       start = Time.now
@@ -73,17 +74,23 @@ module Deliver
         end
 
         latest_build = find_build(candidate_builds)
+
+        # if the app version isn't present in the hash (could happen if we are waiting for submission, but didn't provide
+        # it explicitly and no ipa was passed to grab it from), then fall back to the best guess, which is the train_version
+        # of the most recently uploaded build
+        app_version ||= latest_build.train_version
+
         # Sometimes latest build will disappear and a different build would get selected
         # Only set build if no latest build found or if same build versions as previously fetched build
         # Issue: https://github.com/fastlane/fastlane/issues/10945
-        if build.nil? || (latest_build && latest_build.train_version == build.train_version && latest_build.build_version == build.build_version)
+        if build.nil? || (latest_build && latest_build.build_version == build.build_version && latest_build.train_version == app_version)
           build = latest_build
         end
 
         return build if build && build.processing == false
 
         if build
-          UI.message("Waiting App Store Connect processing for build #{build.train_version} (#{build.build_version})... this might take a while...")
+          UI.message("Waiting App Store Connect processing for build #{app_version} (#{build.build_version})... this might take a while...")
         else
           UI.message("Waiting App Store Connect processing for build... this might take a while...")
         end

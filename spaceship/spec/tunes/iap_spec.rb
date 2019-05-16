@@ -1,4 +1,5 @@
 describe Spaceship::Tunes::IAP do
+  before { TunesStubbing.itc_stub_iap }
   before { Spaceship::Tunes.login }
   let(:client) { Spaceship::Tunes.client }
   let(:app) { Spaceship::Application.all.first }
