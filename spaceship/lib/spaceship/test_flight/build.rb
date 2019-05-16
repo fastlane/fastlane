@@ -6,6 +6,8 @@ require_relative 'export_compliance'
 require_relative 'beta_review_info'
 require_relative 'build_trains'
 
+require_relative '../connect_api/base'
+
 module Spaceship
   module TestFlight
     class Build < Base
@@ -214,7 +216,11 @@ module Spaceship
       def submit_for_testflight_review!
         return if ready_to_test?
         return if approved?
-        client.post_for_testflight_review(app_id: app_id, build_id: id, build: self)
+
+        resp = Spaceship::ConnectAPI::Base.client.get_builds(filter: { expired: false, processingState: "PROCESSING,VALID", version: self.build_version })
+        build = resp.first
+
+        Spaceship::ConnectAPI::Base.client.post_for_testflight_review(build_id: build["id"])
       end
 
       def expire!

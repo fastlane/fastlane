@@ -1,16 +1,18 @@
 require 'commander'
 
 require 'fastlane_core/configuration/configuration'
-require_relative 'module'
 
 require_relative 'nuke'
 require_relative 'change_password'
 require_relative 'setup'
 require_relative 'runner'
 require_relative 'options'
+require_relative 'migrate'
 
 require_relative 'storage'
 require_relative 'encryption'
+
+require_relative 'module'
 
 HighLine.track_eof = false
 
@@ -125,8 +127,19 @@ module Match
             git_url: params[:git_url],
             working_directory: storage.working_directory
           })
-          encryption.decrypt_files
+          encryption.decrypt_files if encryption
           UI.success("Repo is at: '#{storage.working_directory}'")
+        end
+      end
+
+      command :migrate do |c|
+        c.syntax = "fastlane match migrate"
+        c.description = "Migrate from one storage backend to another one"
+
+        FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options, command: c)
+
+        c.action do |args, options|
+          Match::Migrate.new.migrate(args, options)
         end
       end
 

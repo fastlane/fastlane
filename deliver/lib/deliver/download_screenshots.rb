@@ -1,4 +1,5 @@
 require_relative 'module'
+require 'open-uri'
 
 module Deliver
   class DownloadScreenshots

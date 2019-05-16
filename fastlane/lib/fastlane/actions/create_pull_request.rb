@@ -33,9 +33,31 @@ module Fastlane
           html_url = json['html_url']
           UI.success("Successfully created pull request ##{number}. You can see it at '#{html_url}'")
 
+          # Add labels to pull request
+          add_labels(params, number) if params[:labels]
+
           Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_HTML_URL] = html_url
           return html_url
         end
+      end
+
+      def self.add_labels(params, number)
+        payload = {
+          'labels' => params[:labels]
+        }
+        GithubApiAction.run(
+          server_url: params[:api_url],
+          api_token: params[:api_token],
+          http_method: 'PATCH',
+          path: "repos/#{params[:repo]}/issues/#{number}",
+          body: payload,
+          error_handlers: {
+            '*' => proc do |result|
+              UI.error("GitHub responded with #{result[:status]}: #{result[:body]}")
+              return nil
+            end
+          }
+        )
       end
 
       #####################################################
@@ -72,6 +94,11 @@ module Fastlane
                                        description: "The contents of the pull request",
                                        is_string: true,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :labels,
+                                       env_name: "GITHUB_PULL_REQUEST_LABELS",
+                                       description: "The labels for the pull request",
+                                       type: Array,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :head,
                                        env_name: "GITHUB_PULL_REQUEST_HEAD",
                                        description: "The name of the branch where your changes are implemented (defaults to the current branch name)",
@@ -105,7 +132,7 @@ module Fastlane
       end
 
       def self.return_value
-        "The parsed JSON when successful"
+        "The pull request URL when successful"
       end
 
       def self.example_code

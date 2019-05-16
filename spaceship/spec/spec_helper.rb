@@ -58,6 +58,7 @@ def before_each_spaceship
   TunesStubbing.itc_stub_candiate_builds
   TunesStubbing.itc_stub_pricing_tiers
   TunesStubbing.itc_stub_release_to_store
+  TunesStubbing.itc_stub_release_to_all_users
   TunesStubbing.itc_stub_promocodes
   TunesStubbing.itc_stub_generate_promocodes
   TunesStubbing.itc_stub_promocodes_history
