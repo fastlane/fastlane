@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Environment;
+import android.support.test.InstrumentationRegistry;
 import android.util.Log;
 
 import java.io.BufferedOutputStream;
@@ -26,6 +27,7 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
     protected static final String EXTENSION = ".png";
     private static final int FULL_QUALITY = 100;
     private static final String SCREENGRAB_DIR_NAME = "screengrab";
+    private static final String APPEND_TIMESTAMP_CONFIG_KEY = "appendTimestamp";
 
     private final Context appContext;
 
@@ -58,7 +60,9 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
     }
 
     protected File getScreenshotFile(File screenshotDirectory, String screenshotName) {
-        String screenshotFileName = screenshotName + NAME_SEPARATOR + System.currentTimeMillis() + EXTENSION;
+        String screenshotFileName = screenshotName
+                + (shouldAppendTimestamp() ? (NAME_SEPARATOR + System.currentTimeMillis()) : "")
+                + EXTENSION;
         return new File(screenshotDirectory, screenshotFileName);
     }
 
@@ -123,5 +127,9 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
             throw new IOException("Unable to create output dir: " + dir.getAbsolutePath());
         }
         Chmod.chmodPlusRWX(dir);
+    }
+
+    private static boolean shouldAppendTimestamp() {
+        return Boolean.parseBoolean(InstrumentationRegistry.getArguments().getString(APPEND_TIMESTAMP_CONFIG_KEY));
     }
 }
