@@ -31,11 +31,8 @@ module Spaceship
       #
 
       def self.find(bundle_id)
-        return client.page do
-          client.get_apps(filter: { bundleId: bundle_id })
-        end.map do |resp|
-          Spaceship::ConnectAPI::App.parse(resp)
-        end.flatten.find do |app|
+        resps = client.get_apps(filter: { bundleId: bundle_id }).all_pages
+        return resps.map(&:models).flatten.find do |app|
           app.bundle_id == bundle_id
         end
       end
@@ -48,11 +45,8 @@ module Spaceship
         filter ||= {}
         filter[:app] = id
 
-        return client.page do
-          client.get_builds(filter: filter, includes: includes, limit: limit, sort: sort)
-        end.map do |resp|
-          Spaceship::ConnectAPI::Build.parse(resp)
-        end.flatten
+        resps = client.get_builds(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.map(&:models).flatten
       end
     end
   end

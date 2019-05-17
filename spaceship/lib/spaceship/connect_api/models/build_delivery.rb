@@ -21,14 +21,11 @@ module Spaceship
       end
 
       def self.all(app_id: nil, version: nil, build_number: nil)
-        return client.page do
-          client.get_build_deliveries(
-            filter: { app: app_id, cfBundleShortVersionString: version, cfBundleVersion: build_number },
-            limit: 1
-          )
-        end.map do |resp|
-          Spaceship::ConnectAPI::BuildDelivery.parse(resp)
-        end.flatten
+        resps = client.get_build_deliveries(
+          filter: { app: app_id, cfBundleShortVersionString: version, cfBundleVersion: build_number },
+          limit: 1
+        ).all_pages
+        return resps.map(&:models).flatten
       end
     end
   end

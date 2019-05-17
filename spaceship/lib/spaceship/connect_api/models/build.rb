@@ -79,15 +79,12 @@ module Spaceship
       #
 
       def self.all(app_id: nil, version: nil, build_number: nil, includes: nil)
-        return client.page do
-          client.get_builds(
-            filter: { app: app_id, "preReleaseVersion.version" => version, version: build_number },
-            includes: includes,
-            limit: 30
-          )
-        end.map do |resp|
-          Spaceship::ConnectAPI::Build.parse(resp)
-        end.flatten
+        resps = client.get_builds(
+          filter: { app: app_id, "preReleaseVersion.version" => version, version: build_number },
+          includes: includes,
+          limit: 30
+        ).all_pages
+        return resps.map(&:models).flatten
       end
     end
   end

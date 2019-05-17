@@ -62,30 +62,6 @@ module Spaceship
         handle_response(response)
       end
 
-      def page(&block)
-        responses = []
-
-        resp = yield
-        responses << resp
-
-        next_url = next_url(resp)
-
-        until next_url.nil?
-          resp = get(next_url)
-          responses << resp
-
-          next_url = next_url(resp)
-        end
-
-        return responses
-      end
-
-      def next_url(resp)
-        resp || {}
-        links = resp["links"] || {}
-        return links["next"]
-      end
-
       #
       # apps
       #
@@ -379,7 +355,7 @@ module Spaceship
 
         raise UnexpectedResponse, "Temporary App Store Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
 
-        return response.body
+        return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status)
       end
 
       def handle_errors(response)
