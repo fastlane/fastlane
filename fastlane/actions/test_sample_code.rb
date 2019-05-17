@@ -63,11 +63,9 @@ module Fastlane
               next
             end
 
-            if config_item.data_type == Fastlane::Boolean
-              config_item.ensure_boolean_type_passes_validation(value)
-            else
-              config_item.ensure_generic_type_passes_validation(value)
-            end
+            # Setting verify_block to nil because not needed
+            config_item.verify_block = nil
+            config_item.valid?(value)
           end
         else
           UI.verbose("Legacy parameter technique for action '#{method_sym}'")
