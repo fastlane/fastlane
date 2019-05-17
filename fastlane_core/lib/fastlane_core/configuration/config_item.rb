@@ -79,6 +79,7 @@ module FastlaneCore
     #   You have to raise a specific exception if something goes wrong. Append .red after the string
     # @param is_string *DEPRECATED: Use `type` instead* (Boolean) is that parameter a string? Defaults to true. If it's true, the type string will be verified.
     # @param type (Class) the data type of this config item. Takes precedence over `is_string`. Use `:shell_string` to allow types `String`, `Hash` and `Array` that will be converted to shell-escaped strings
+    # @param type (Array) the data types of this config item. Takes precedence over `is_string`. Use `:shell_string` to allow types `String`, `Hash` and `Array` that will be converted to shell-escaped strings
     # @param skip_type_validation (Boolean) is false by default. If set to true, type of the parameter will not be validated.
     # @param optional (Boolean) is false by default. If set to true, also string values will not be asked to the user
     # @param conflicting_options ([]) array of conflicting option keys(@param key). This allows to resolve conflicts intelligently
@@ -87,6 +88,7 @@ module FastlaneCore
     # @param sensitive (Boolean) Set if the variable is sensitive, such as a password or API token, to prevent echoing when prompted for the parameter
     # @param display_in_shell (Boolean) Set if the variable can be used from shell
     # rubocop:disable Metrics/ParameterLists
+    # rubocop:disable Metrics/PerceivedComplexity
     def initialize(key: nil,
                    env_name: nil,
                    description: nil,
@@ -96,6 +98,7 @@ module FastlaneCore
                    verify_block: nil,
                    is_string: true,
                    type: nil,
+                   types: nil,
                    skip_type_validation: false,
                    optional: nil,
                    conflicting_options: nil,
@@ -143,8 +146,14 @@ module FastlaneCore
       @default_value_dynamic = default_value_dynamic
       @verify_block = verify_block
       @is_string = is_string
-      @data_type = type
-      @data_type = String if type == :shell_string
+
+      if type
+        @data_types = [type]
+        @data_types = [String] if type == :shell_string
+      else
+        @data_types = types
+      end
+
       @optional = optional
       @conflicting_options = conflicting_options
       @conflict_block = conflict_block
@@ -159,12 +168,13 @@ module FastlaneCore
 
       update_code_gen_default_value_if_able!
     end
+    # rubocop:enable Metrics/PerceivedComplexity
     # rubocop:enable Metrics/ParameterLists
 
     # if code_gen_default_value is nil, use the default value if it isn't a `code_gen_sensitive` value
     def update_code_gen_default_value_if_able!
       # we don't support default values for procs
-      if @data_type == :string_callback
+      if has_data_type?(:string_callback)
         @code_gen_default_value = nil
         return
       end
@@ -181,13 +191,24 @@ module FastlaneCore
       valid?(value)
     end
 
+    def has_data_type?(type)
+      return false if data_types.nil?
+      return data_types.include?(type)
+    end
+
+    def value_is_data_type?(value)
+      found_type = data_types.find { |type| value.kind_of?(type) }
+      return !found_type.nil?
+    end
+
     def ensure_generic_type_passes_validation(value)
       if @skip_type_validation
         return
       end
 
-      if data_type != :string_callback && data_type && !value.kind_of?(data_type)
-        UI.user_error!("'#{self.key}' value must be a #{data_type}! Found #{value.class} instead.")
+      if data_types && !has_data_type?(:string_callback) && !value_is_data_type?(value)
+        types_message = data_types.join(', ')
+        UI.user_error!("'#{self.key}' value must be a #{types_message}! Found #{value.class} instead.")
       end
     end
 
@@ -209,7 +230,7 @@ module FastlaneCore
       return true if value.nil?
 
       # Verify that value is the type that we're expecting, if we are expecting a type
-      if data_type == Fastlane::Boolean
+      if has_data_type?(Fastlane::Boolean)
         ensure_boolean_type_passes_validation(value)
       else
         ensure_generic_type_passes_validation(value)
@@ -231,16 +252,16 @@ module FastlaneCore
     def auto_convert_value(value)
       return nil if value.nil?
 
-      if data_type == Array
+      if has_data_type?(Array)
         return value.split(',') if value.kind_of?(String)
-      elsif data_type == Integer
+      elsif has_data_type?(Integer)
         return value.to_i if value.to_i.to_s == value.to_s
-      elsif data_type == Float
+      elsif has_data_type?(Float)
         return value.to_f if value.to_f.to_s == value.to_s
       elsif allow_shell_conversion
         return value.shelljoin if value.kind_of?(Array)
         return value.map { |k, v| "#{k.to_s.shellescape}=#{v.shellescape}" }.join(' ') if value.kind_of?(Hash)
-      elsif data_type != String
+      elsif !has_data_type?(String)
         # Special treatment if the user specified true, false or YES, NO
         # There is no boolean type, so we just do it here
         if %w(YES yes true TRUE).include?(value)
@@ -254,24 +275,24 @@ module FastlaneCore
     end
 
     # Determines the defined data type of this ConfigItem
-    def data_type
-      if @data_type.kind_of?(Symbol)
+    def data_types
+      if @data_types && @data_types.first == [Symbol]
         nil
-      elsif @data_type
-        @data_type
+      elsif @data_types
+        @data_types
       else
-        (@is_string ? String : nil)
+        (@is_string ? [String] : nil)
       end
     end
 
     # Replaces the attr_accessor, but maintains the same interface
     def string?
-      data_type == String
+      data_types && data_types.size == 1 && data_types.first == String
     end
 
     # it's preferred to use self.string? In most cases, except in commander_generator.rb, cause... reasons
     def is_string
-      return @is_string
+      return string?
     end
 
     def to_s

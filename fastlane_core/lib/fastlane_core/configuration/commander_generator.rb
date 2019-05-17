@@ -21,7 +21,8 @@ module FastlaneCore
         key = option.key
         validate_short_switch(used_switches, short_switch, key)
 
-        type = option.data_type
+        # Going to use the first data type for generation
+        type = (option.data_types || []).first
 
         # We added type: Hash to code generation, but Ruby's OptionParser doesn't like that
         # so we need to switch that to something that is supported, luckily, we have an `is_string`

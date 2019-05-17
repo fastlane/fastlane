@@ -107,13 +107,13 @@ describe FastlaneCore do
         end
       end
 
-      describe "data_type" do
+      describe "data_types" do
         it "sets the data type correctly if `is_string` is not set but type is specified" do
           config_item = FastlaneCore::ConfigItem.new(key: :foo,
                                                      description: 'foo',
                                                      type: Array)
 
-          expect(config_item.data_type).to eq(Array)
+          expect(config_item.data_types).to include(Array)
         end
 
         it "sets the data type correctly if `is_string` is set but the type is specified" do
@@ -122,7 +122,7 @@ describe FastlaneCore do
                                                      is_string: true,
                                                      type: Array)
 
-          expect(config_item.data_type).to eq(Array)
+          expect(config_item.data_types).to include(Array)
         end
 
         it "sets the data type correctly if `is_string` is set but the type is not specified" do
@@ -130,7 +130,7 @@ describe FastlaneCore do
                                                      description: 'foo',
                                                      is_string: true)
 
-          expect(config_item.data_type).to eq(String)
+          expect(config_item.data_types).to include(String)
         end
       end
 
