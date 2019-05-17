@@ -718,7 +718,7 @@ module Spaceship
       data["preOrder"]["clearedForPreOrder"] = { "value" => cleared_for_preorder, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
       data["preOrder"]["appAvailableDate"] = { "value" => app_available_date, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
       data["b2bUsers"] = availability.b2b_app_enabled ? availability.b2b_users.map { |user| { "value" => { "add" => user.add, "delete" => user.delete, "dsUsername" => user.ds_username } } } : []
-
+      data["b2bOrganizations"] = availability.b2b_app_enabled ? availability.b2b_organizations.map { |org| { "value" => { "type" => org.type, "depCustomerId" => org.dep_customer_id, "organizationId" => org.dep_organization_id, "name" => org.name } } } : []
       # send the changes back to Apple
       r = request(:post) do |req|
         req.url("ra/apps/#{app_id}/pricing/intervals")
