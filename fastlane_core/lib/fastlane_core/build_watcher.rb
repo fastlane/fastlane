@@ -52,7 +52,7 @@ module FastlaneCore
         build_delivery = build_deliveries.first
 
         # Get processed builds when no longer in build deliveries
-        unless build_delivery
+        if build_delivery.nil?
           matched_builds = Spaceship::ConnectAPI::Build.all(
             app_id: app_id,
             version: watched_app_version,

@@ -1,7 +1,9 @@
+require_relative './base'
+require_relative './models/model'
+
 module Spaceship
   module ConnectAPI
     class Response
-
       attr_reader :body
       attr_reader :status
 

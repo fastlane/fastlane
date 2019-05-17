@@ -1,4 +1,5 @@
 require_relative '../client'
+require_relative './response'
 
 module Spaceship
   module ConnectAPI
@@ -25,7 +26,7 @@ module Spaceship
       def build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: nil)
         params = {}
 
-        filter = filter.delete_if { |k, v| v.nil? }
+        filter = filter.delete_if { |k, v| v.nil? } if filter
 
         params[:filter] = filter if filter && !filter.empty?
         params[:include] = includes if includes
