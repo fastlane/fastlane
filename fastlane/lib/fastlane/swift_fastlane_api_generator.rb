@@ -341,15 +341,16 @@ func parseInt(fromString: String, function: String = #function) -> Int {
       if options.kind_of?(Array)
         options.each do |current|
           next unless current.kind_of?(FastlaneCore::ConfigItem)
-
-          if ignore_param?(function_name: action_name, param_name: current.key)
-            next
+          (current.data_types || []).each do |data_type|
+            if ignore_param?(function_name: action_name, param_name: current.key)
+              next
+            end
+            keys << current.key.to_s
+            key_descriptions << current.description
+            key_default_values << current.code_gen_default_value
+            key_optionality_values << current.optional
+            key_type_overrides << data_type
           end
-          keys << current.key.to_s
-          key_descriptions << current.description
-          key_default_values << current.code_gen_default_value
-          key_optionality_values << current.optional
-          key_type_overrides << current.data_type
         end
       end
       action_return_type = action.return_type

@@ -78,7 +78,7 @@ module Fastlane
       elsif type_override == Boolean
         return "Bool"
       elsif type_override == :string_callback
-        return "((String) -> Void)"
+        return "@escaping ((String) -> Void)"
       else
         return default_type
       end
