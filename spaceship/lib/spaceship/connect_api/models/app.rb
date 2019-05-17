@@ -32,7 +32,7 @@ module Spaceship
 
       def self.find(bundle_id)
         resps = client.get_apps(filter: { bundleId: bundle_id }).all_pages
-        return resps.map(&:models).flatten.find do |app|
+        return resps.map(&:to_models).flatten.find do |app|
           app.bundle_id == bundle_id
         end
       end
@@ -46,7 +46,7 @@ module Spaceship
         filter[:app] = id
 
         resps = client.get_builds(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.map(&:models).flatten
+        return resps.map(&:to_models).flatten
       end
     end
   end

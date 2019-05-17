@@ -25,7 +25,7 @@ module Spaceship
           filter: { app: app_id, cfBundleShortVersionString: version, cfBundleVersion: build_number },
           limit: 1
         ).all_pages
-        return resps.map(&:models).flatten
+        return resps.map(&:to_models).flatten
       end
     end
   end

@@ -84,7 +84,7 @@ module Spaceship
           includes: includes,
           limit: 30
         ).all_pages
-        return resps.map(&:models).flatten
+        return resps.map(&:to_models).flatten
       end
     end
   end
