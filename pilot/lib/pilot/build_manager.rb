@@ -88,12 +88,12 @@ module Pilot
 
       return if config[:skip_submission]
       if options[:reject_build_waiting_for_review]
-        waiting_for_review_build = Spaceship::TestFlight::Build.all_waiting_for_review(app_id: build.app_id, platform: fetch_app_platform).first
+        waiting_for_review_build = build.app.builds(filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW" }, includes: "betaAppReviewSubmission,preReleaseVersion").first
         unless waiting_for_review_build.nil?
-          UI.important("Another build is already in review. Going to expire that build and submit the new one.")
-          UI.important("Expiring build: #{waiting_for_review_build.train_version} - #{waiting_for_review_build.build_version}")
-          waiting_for_review_build.expire!
-          UI.success("Expired previous build: #{waiting_for_review_build.train_version} - #{waiting_for_review_build.build_version}")
+          UI.important("Another build is already in review. Going to remove that build and submit the new one.")
+          UI.important("Deleting beta app review submission for build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
+          waiting_for_review_build.beta_app_review_submission.delete!
+          UI.success("Deleted beta app review submission for previous build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
         end
       end
       distribute_build(build, options)

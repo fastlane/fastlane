@@ -63,6 +63,14 @@ module Spaceship
         handle_response(response)
       end
 
+      def delete(url_or_path, params = nil)
+        response = request(:delete, url_or_path) do |req|
+          req.options.params_encoder = Faraday::NestedParamsEncoder
+          req.params = params if params
+        end
+        handle_response(response)
+      end
+
       #
       # apps
       #
@@ -297,6 +305,13 @@ module Spaceship
         }
 
         post(path, body)
+      end
+
+      def delete_beta_app_review_submission(beta_app_review_submission_id: nil)
+        # DELETE
+        # https://appstoreconnect.apple.com/iris/v1/betaAppReviewSubmissions/<beta_app_review_submission_id>
+        params = build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: nil)
+        delete("betaAppReviewSubmissions/#{beta_app_review_submission_id}", params)
       end
 
       #

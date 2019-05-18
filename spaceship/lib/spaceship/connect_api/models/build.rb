@@ -16,7 +16,8 @@ module Spaceship
       attr_accessor :qc_state
 
       attr_accessor :app
-      attr_accessor :buil_beta_detail
+      attr_accessor :beta_app_review_submission
+      attr_accessor :build_beta_detail
       attr_accessor :pre_release_version
 
       attr_mapping({
@@ -31,6 +32,7 @@ module Spaceship
         "qcState" => "qc_state", # Undocumented in API docs as of 2019-05-18 
 
         "app" => "app",
+        "betaAppReviewSubmission" => "beta_app_review_submission",
         "buildBetaDetail" => "build_beta_detail",
         "preReleaseVersion" => "pre_release_version"
       })
