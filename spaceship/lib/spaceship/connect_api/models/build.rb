@@ -15,8 +15,9 @@ module Spaceship
       attr_accessor :uses_non_exempt_encryption
       attr_accessor :qc_state
 
-      attr_accessor :pre_release_version
       attr_accessor :app
+      attr_accessor :buil_beta_detail
+      attr_accessor :pre_release_version
 
       attr_mapping({
         "version" => "version",
@@ -27,11 +28,28 @@ module Spaceship
         "iconAssetToken" => "icon_asset_token",
         "processingState" => "processing_state",
         "usesNonExemptEncryption" => "uses_non_exempt_encryption",
-        "qcState" => "qc_state",
+        "qcState" => "qc_state", # Undocumented in API docs as of 2019-05-18 
 
-        "preReleaseVersion" => "pre_release_version",
-        "app" => "app"
+        "app" => "app",
+        "buildBetaDetail" => "build_beta_detail",
+        "preReleaseVersion" => "pre_release_version"
       })
+
+      module ProcessingState
+        PROCESSING = "PROCESSING"
+        FAILED = "FAILED"
+        INVALID = "INVALID"
+        VALID = "VALID"
+      end
+
+      # Undocumented in API docs as of 2019-05-18
+      # They have been populated based on API response observation
+      module QCState
+        BETA_INTERNAL_TESTING = "BETA_INTERNAL_TESTING"
+        BETA_WAITING = "BETA_WAITING"
+        BETA_APPROVED = "BETA_APPROVED"
+        BETA_REJECT_COMPLETE = "BETA_REJECT_COMPLETE"
+      end
 
       def self.type
         return "builds"
@@ -57,7 +75,11 @@ module Spaceship
       end
 
       def processed?
-        return processing_state == "VALID"
+        return processing_state == ProcessingState::VALID
+      end
+
+      def ready_for_beta_submission?
+        return [QCState::BETA_INTERNAL_TESTING, QCState::BETA_REJECT_COMPLETE].include?(qc_state)
       end
 
       # This is here temporarily until the removal of Spaceship::TestFlight
@@ -78,13 +100,44 @@ module Spaceship
       # API
       #
 
-      def self.all(app_id: nil, version: nil, build_number: nil, includes: nil)
+      def self.all(app_id: nil, version: nil, build_number: nil, includes: "app,buildBetaDetail,preReleaseVersion", sort: "-uploadedDate", limit: 30)
         resps = client.get_builds(
           filter: { app: app_id, "preReleaseVersion.version" => version, version: build_number },
           includes: includes,
-          limit: 30
+          sort: sort,
+          limit: limit,
         ).all_pages
         return resps.map(&:to_models).flatten
+      end
+
+      def add_beta_groups(beta_groups: nil)
+        beta_groups ||= []
+        beta_group_ids = beta_groups.map(&:id)
+        return client.add_beta_groups_to_build(build_id: id, beta_group_ids: beta_group_ids)
+      end
+
+      def beta_build_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
+        resps = client.get_beta_build_localizations(
+          filter: { build: id },
+          includes: includes,
+          sort: sort,
+          limit: limit,
+        ).all_pages
+        return resps.map(&:to_models).flatten
+      end
+
+      def build_beta_details(filter: {}, includes: nil, limit: nil, sort: nil)
+        resps = client.get_build_beta_details(
+          filter: { build: id },
+          includes: includes,
+          sort: sort,
+          limit: limit,
+        ).all_pages
+        return resps.map(&:to_models).flatten
+      end
+
+      def post_beta_app_review_submission
+        return client.post_beta_app_review_submissions(build_id: id)
       end
     end
   end

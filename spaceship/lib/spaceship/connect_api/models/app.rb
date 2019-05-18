@@ -48,6 +48,23 @@ module Spaceship
         resps = client.get_builds(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.map(&:to_models).flatten
       end
+
+
+      def beta_app_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
+        filter ||= {}
+        filter[:app] = id
+
+        resps = client.get_beta_app_localizations(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.map(&:to_models).flatten
+      end
+
+      def beta_groups(filter: {}, includes: nil, limit: nil, sort: nil)
+        filter ||= {}
+        filter[:app] = id
+
+        resps = client.get_beta_groups(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.map(&:to_models).flatten
+      end
     end
   end
 end
