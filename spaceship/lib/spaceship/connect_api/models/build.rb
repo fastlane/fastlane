@@ -29,7 +29,7 @@ module Spaceship
         "iconAssetToken" => "icon_asset_token",
         "processingState" => "processing_state",
         "usesNonExemptEncryption" => "uses_non_exempt_encryption",
-        "qcState" => "qc_state", # Undocumented in API docs as of 2019-05-18 
+        "qcState" => "qc_state", # Undocumented in API docs as of 2019-05-18
 
         "app" => "app",
         "betaAppReviewSubmission" => "beta_app_review_submission",
@@ -107,7 +107,7 @@ module Spaceship
           filter: { app: app_id, "preReleaseVersion.version" => version, version: build_number },
           includes: includes,
           sort: sort,
-          limit: limit,
+          limit: limit
         ).all_pages
         return resps.map(&:to_models).flatten
       end
@@ -123,7 +123,7 @@ module Spaceship
           filter: { build: id },
           includes: includes,
           sort: sort,
-          limit: limit,
+          limit: limit
         ).all_pages
         return resps.map(&:to_models).flatten
       end
@@ -133,7 +133,7 @@ module Spaceship
           filter: { build: id },
           includes: includes,
           sort: sort,
-          limit: limit,
+          limit: limit
         ).all_pages
         return resps.map(&:to_models).flatten
       end

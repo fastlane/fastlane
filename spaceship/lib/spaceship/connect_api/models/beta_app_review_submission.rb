@@ -17,7 +17,7 @@ module Spaceship
       #
       # API
       #
-      
+
       def delete!
         return client.delete_beta_app_review_submission(beta_app_review_submission_id: id)
       end

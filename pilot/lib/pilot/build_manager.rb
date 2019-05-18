@@ -311,8 +311,6 @@ module Pilot
         localizations_by_lang[key] = nil
       end
 
-      app_id = build.app.id
-
       # Validate locales exist
       localizations = app.beta_app_localizations
       localizations.each do |localization|

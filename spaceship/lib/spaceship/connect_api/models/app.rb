@@ -49,7 +49,6 @@ module Spaceship
         return resps.map(&:to_models).flatten
       end
 
-
       def beta_app_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
         filter ||= {}
         filter[:app] = id
