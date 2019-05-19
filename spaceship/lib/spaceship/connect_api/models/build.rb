@@ -29,7 +29,6 @@ module Spaceship
         "iconAssetToken" => "icon_asset_token",
         "processingState" => "processing_state",
         "usesNonExemptEncryption" => "uses_non_exempt_encryption",
-        "qcState" => "qc_state", # Undocumented in API docs as of 2019-05-18
 
         "app" => "app",
         "betaAppReviewSubmission" => "beta_app_review_submission",
@@ -37,20 +36,13 @@ module Spaceship
         "preReleaseVersion" => "pre_release_version"
       })
 
+      ESSENTIAL_INCLUDES = "app,buildBetaDetail,preReleaseVersion"
+
       module ProcessingState
         PROCESSING = "PROCESSING"
         FAILED = "FAILED"
         INVALID = "INVALID"
         VALID = "VALID"
-      end
-
-      # Undocumented in API docs as of 2019-05-18
-      # They have been populated based on API response observation
-      module QCState
-        BETA_INTERNAL_TESTING = "BETA_INTERNAL_TESTING"
-        BETA_WAITING = "BETA_WAITING"
-        BETA_APPROVED = "BETA_APPROVED"
-        BETA_REJECT_COMPLETE = "BETA_REJECT_COMPLETE"
       end
 
       def self.type
@@ -81,7 +73,8 @@ module Spaceship
       end
 
       def ready_for_beta_submission?
-        return [QCState::BETA_INTERNAL_TESTING, QCState::BETA_REJECT_COMPLETE].include?(qc_state)
+        raise "No build_beat_detail included" unless build_beta_detail
+        return build_beta_detail.ready_for_beta_submission?
       end
 
       # This is here temporarily until the removal of Spaceship::TestFlight
@@ -102,7 +95,7 @@ module Spaceship
       # API
       #
 
-      def self.all(app_id: nil, version: nil, build_number: nil, includes: "app,buildBetaDetail,preReleaseVersion", sort: "-uploadedDate", limit: 30)
+      def self.all(app_id: nil, version: nil, build_number: nil, includes: ESSENTIAL_INCLUDES, sort: "-uploadedDate", limit: 30)
         resps = client.get_builds(
           filter: { app: app_id, "preReleaseVersion.version" => version, version: build_number },
           includes: includes,
@@ -112,13 +105,17 @@ module Spaceship
         return resps.map(&:to_models).flatten
       end
 
+      def self.get(build_id: nil, includes: ESSENTIAL_INCLUDES)
+        return client.get_build(build_id: build_id, includes: includes).first
+      end
+
       def add_beta_groups(beta_groups: nil)
         beta_groups ||= []
         beta_group_ids = beta_groups.map(&:id)
         return client.add_beta_groups_to_build(build_id: id, beta_group_ids: beta_group_ids)
       end
 
-      def beta_build_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
+      def get_beta_build_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
         resps = client.get_beta_build_localizations(
           filter: { build: id },
           includes: includes,
@@ -128,7 +125,7 @@ module Spaceship
         return resps.map(&:to_models).flatten
       end
 
-      def build_beta_details(filter: {}, includes: nil, limit: nil, sort: nil)
+      def get_build_beta_details(filter: {}, includes: nil, limit: nil, sort: nil)
         resps = client.get_build_beta_details(
           filter: { build: id },
           includes: includes,

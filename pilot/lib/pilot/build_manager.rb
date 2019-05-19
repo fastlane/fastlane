@@ -73,7 +73,18 @@ module Pilot
         config[:app_identifier] = UI.input("App Identifier: ")
       end
 
+      # Get latest uploaded build if no build specified
       build ||= Spaceship::ConnectAPI::Build.all(app_id: app.id, sort: "-uploadedDate", limit: 1).first
+
+      # Verify the build has all the includes that we need
+      # and fetch a new build if not
+      if build && (!build.app || !build.build_beta_detail || !build.pre_release_version)
+        UI.important("Build did include information for app, build beta detail and pre release version")
+        UI.important("Fetching a new build with all the information needed")
+        build = Spaceship::ConnectAPI::Build.get(build_id: build.id)
+      end
+
+      # Error out if no build
       if build.nil?
         UI.user_error!("No build to distribute!")
       end
@@ -88,7 +99,7 @@ module Pilot
 
       return if config[:skip_submission]
       if options[:reject_build_waiting_for_review]
-        waiting_for_review_build = build.app.builds(filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW" }, includes: "betaAppReviewSubmission,preReleaseVersion").first
+        waiting_for_review_build = build.app.get_builds(filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW" }, includes: "betaAppReviewSubmission,preReleaseVersion").first
         unless waiting_for_review_build.nil?
           UI.important("Another build is already in review. Going to remove that build and submit the new one.")
           UI.important("Deleting beta app review submission for build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
@@ -247,7 +258,7 @@ module Pilot
 
       if options[:groups]
         app = uploaded_build.app
-        beta_groups = app.beta_groups.select do |group|
+        beta_groups = app.get_beta_groups.select do |group|
           options[:groups].include?(group.name)
         end
 
@@ -312,7 +323,7 @@ module Pilot
       end
 
       # Validate locales exist
-      localizations = app.beta_app_localizations
+      localizations = app.get_beta_app_localizations
       localizations.each do |localization|
         localizations_by_lang[localization.locale.to_sym] = localization
       end
@@ -359,7 +370,7 @@ module Pilot
       end
 
       # Validate locales exist
-      localizations = build.beta_build_localizations
+      localizations = build.get_beta_build_localizations
       localizations.each do |localization|
         localizations_by_lang[localization.locale.to_sym] = localization
       end
@@ -387,8 +398,7 @@ module Pilot
     end
 
     def update_build_beta_details(build, info)
-      build_beta_details = build.build_beta_details
-      build_beta_detail = build_beta_details.first
+      build_beta_detail = build.build_beta_detail
 
       attributes = {}
       attributes[:autoNotifyEnabled] = info[:auto_notify_enabled] if info.key?(:auto_notify_enabled)

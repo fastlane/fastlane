@@ -41,7 +41,7 @@ module Spaceship
       # Builds
       #
 
-      def builds(filter: {}, includes: nil, limit: nil, sort: nil)
+      def get_builds(filter: {}, includes: nil, limit: nil, sort: nil)
         filter ||= {}
         filter[:app] = id
 
@@ -49,7 +49,7 @@ module Spaceship
         return resps.map(&:to_models).flatten
       end
 
-      def beta_app_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
+      def get_beta_app_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
         filter ||= {}
         filter[:app] = id
 
@@ -57,7 +57,7 @@ module Spaceship
         return resps.map(&:to_models).flatten
       end
 
-      def beta_groups(filter: {}, includes: nil, limit: nil, sort: nil)
+      def get_beta_groups(filter: {}, includes: nil, limit: nil, sort: nil)
         filter ||= {}
         filter[:app] = id
 

@@ -259,6 +259,13 @@ module Spaceship
         get("builds", params)
       end
 
+      def get_build(build_id: nil, includes: nil)
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/builds/<build_id>?
+        params = build_params(filter: nil, includes: includes, limit: nil, sort: nil, cursor: nil)
+        get("builds/#{build_id}", params)
+      end
+
       def patch_builds(build_id: nil, attributes: {})
         # PATCH
         # https://appstoreconnect.apple.com/iris/v1/builds/<build_id>

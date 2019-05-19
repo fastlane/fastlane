@@ -18,7 +18,7 @@ module Spaceship
         IN_EXPORT_COMPLIANCE_REVIEW = "IN_EXPORT_COMPLIANCE_REVIEW"
       end
 
-      module ExternalStates
+      module ExternalState
         PROCESSING = "PROCESSING"
         PROCESSING_EXCEPTION = "PROCESSING_EXCEPTION"
         MISSING_EXPORT_COMPLIANCE = "MISSING_EXPORT_COMPLIANCE"
@@ -42,6 +42,14 @@ module Spaceship
 
       def self.type
         return "buildBetaDetails"
+      end
+
+      #
+      # Helpers
+      #
+
+      def ready_for_beta_submission?
+        return external_build_state == ExternalState::READY_FOR_BETA_SUBMISSION
       end
     end
   end
