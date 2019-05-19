@@ -49,6 +49,14 @@ module Spaceship
         return resps.map(&:to_models).flatten
       end
 
+      def get_build_deliveries(filter: {}, includes: nil, limit: nil, sort: nil)
+        filter ||= {}
+        filter[:app] = id
+
+        resps = client.get_build_deliveries(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.map(&:to_models).flatten
+      end
+
       def get_beta_app_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
         filter ||= {}
         filter[:app] = id

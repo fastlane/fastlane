@@ -118,16 +118,36 @@ module Pilot
         config[:app_identifier] = UI.input("App Identifier: ")
       end
 
-      platform = fetch_app_platform(required: false)
-      builds = app.all_processing_builds(platform: platform) + app.builds(platform: platform)
-      # sort by upload_date
-      builds.sort! { |a, b| a.upload_date <=> b.upload_date }
-      rows = builds.collect { |build| describe_build(build) }
+      # Get processing builds
+      build_deliveries = app.get_build_deliveries.map do |build_delivery|
+        [
+          build_delivery.cf_build_short_version_string,
+          build_delivery.cf_build_version
+        ]
+      end
+
+      # Get processed builds
+      builds = app.get_builds(includes: "betaBuildMetrics,preReleaseVersion", sort: "-uploadedDate").map do |build|
+        [
+          build.app_version,
+          build.version,
+          build.beta_build_metrics.map(&:install_count).reduce(:+)
+        ]
+      end
+
+      # Only show table if there are any build deliveries
+      unless build_deliveries.empty?
+        puts(Terminal::Table.new(
+               title: "#{app.name} Processing Builds".green,
+               headings: ["Version #", "Build #"],
+               rows: FastlaneCore::PrintTable.transform_output(build_deliveries)
+        ))
+      end
 
       puts(Terminal::Table.new(
              title: "#{app.name} Builds".green,
              headings: ["Version #", "Build #", "Installs"],
-             rows: FastlaneCore::PrintTable.transform_output(rows)
+             rows: FastlaneCore::PrintTable.transform_output(builds)
       ))
     end
 
