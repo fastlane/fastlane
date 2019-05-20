@@ -314,6 +314,69 @@ module Spaceship
         handle_response(response)
       end
 
+      def create_beta_group(app_id: nil, group_name: nil)
+        # POST
+        # https://appstoreconnect.apple.com/iris/v1/betaGroups
+        body = {
+                data: { 
+                type: "betaGroups",
+                attributes: {
+                  name: group_name
+                },
+                relationships:{
+                  app:{
+                    data:{
+                      type:"apps",
+                      id: app_id
+                    }
+                  }
+                }
+              }
+            }
+
+        response = request(:post, "betaGroups") do |req|
+          req.body = body.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_response(response)
+      end
+
+      def add_testers_to_group(tester_emails: nil, group_id: nil)
+        # POST
+        # https://appstoreconnect.apple.com/iris/v1/bulkBetaTesterAssignments
+        body = {
+          data: {
+            type: "bulkBetaTesterAssignments",
+            attributes: {
+              betaTesters: tester_emails.map do |email|
+                {
+                  id: nil,
+                  email: email,
+                  firstName: "",
+                  lastName: "",
+                  assignmentResult: nil,
+                  errors: []
+                }
+              end
+            },
+            relationships: {
+              betaGroup: {
+                data: {
+                  type: "betaGroups",
+                  id: group_id
+                }
+              }
+            }
+          }
+        }
+
+        response = request(:post, "bulkBetaTesterAssignments") do |req|
+          req.body = body.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_response(response)
+      end
+
       def add_beta_groups_to_build(build_id: nil, beta_group_ids: [])
         # POST
         # https://appstoreconnect.apple.com/iris/v1/builds/<build_id>/relationships/betaGroups
