@@ -75,20 +75,12 @@ module Scan
                                      env_name: 'SCAN_FORCE_QUIT_SIMULATOR',
                                      description: "Enabling this option will automatically killall Simulator processes before the run",
                                      default_value: false,
-                                     type: Boolean,
-                                     conflicting_options: [:reinstall_app],
-                                     conflict_block: proc do |value|
-                                       UI.user_error!("You can't use 'force_quit_simulator' and 'reinstall_app' options in one run, the simulator will not be running to uninstall the app")
-                                     end),
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :reset_simulator,
                                      env_name: 'SCAN_RESET_SIMULATOR',
                                      description: "Enabling this option will automatically erase the simulator before running the application",
                                      default_value: false,
-                                     type: Boolean,
-                                     conflicting_options: [:reinstall_app],
-                                     conflict_block: proc do |value|
-                                       UI.user_error!("You can't use 'reinstall_app' and 'reset_simulator' options in one run, the reset will uninstall the app too")
-                                     end),
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :prelaunch_simulator,
                                      env_name: 'SCAN_PRELAUNCH_SIMULATOR',
                                      description: "Enabling this option will launch the first simulator prior to calling any xcodebuild command",
@@ -99,11 +91,7 @@ module Scan
                                      env_name: 'SCAN_REINSTALL_APP',
                                      description: "Enabling this option will automatically uninstall the application before running it",
                                      default_value: false,
-                                     type: Boolean,
-                                     conflicting_options: [:reset_simulator],
-                                     conflict_block: proc do |value|
-                                       UI.user_error!("You can't use 'reinstall_app' and 'reset_simulator' options in one run, the reset will uninstall the app too")
-                                     end),
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      env_name: 'SCAN_APP_IDENTIFIER',
                                      optional: true,
