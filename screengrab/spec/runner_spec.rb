@@ -36,7 +36,7 @@ describe Screengrab::Runner do
       end
       it 'sets custom launch_arguments' do
         expect(mock_executor).to receive(:execute)
-          .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e username hjanuschka -e build_type x500 \\\n/"))
+          .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp false \\\n-e username hjanuschka -e build_type x500 \\\n/"))
         @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, config[:launch_arguments])
       end
     end
