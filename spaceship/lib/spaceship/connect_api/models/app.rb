@@ -38,6 +38,18 @@ module Spaceship
       end
 
       #
+      # Beta Testers
+      #
+
+      def get_beta_testers(filter: {}, includes: nil, limit: nil, sort: nil)
+        filter ||= {}
+        filter[:apps] = id
+
+        resps = client.get_beta_testers(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.map(&:to_models).flatten
+      end
+
+      #
       # Builds
       #
 

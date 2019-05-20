@@ -63,14 +63,16 @@ module Spaceship
         handle_response(response)
       end
 
-      def delete(url_or_path, params = nil)
+      def delete(url_or_path, params = nil, body = nil)
         response = request(:delete, url_or_path) do |req|
           req.options.params_encoder = Faraday::NestedParamsEncoder
           req.params = params if params
+          req.body = body.to_json if body
+          req.headers['Content-Type'] = 'application/json' if body
         end
         handle_response(response)
       end
-
+      
       #
       # apps
       #
@@ -319,7 +321,7 @@ module Spaceship
         # https://appstoreconnect.apple.com/iris/v1/betaAppReviewSubmissions/<beta_app_review_submission_id>
         params = build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: nil)
         delete("betaAppReviewSubmissions/#{beta_app_review_submission_id}", params)
-      end
+end
 
       #
       # preReleaseVersions
@@ -330,6 +332,60 @@ module Spaceship
         # https://appstoreconnect.apple.com/iris/v1/preReleaseVersions
         params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
         get("preReleaseVersions", params)
+      end
+
+      #
+      # users
+      #
+
+      def get_users(filter: {}, includes: nil, limit: 40, sort: nil)
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/users
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        get("users", params)
+      end
+
+      #
+      # betaTesters
+      #
+
+      def get_beta_testers(filter: {}, includes: nil, limit: 40, sort: nil)
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/betaTesters
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        get("betaTesters", params)
+      end
+
+      def delete_beta_tester_from_apps(beta_tester_id: nil, app_ids: [])
+        # DELETE
+        # https://appstoreconnect.apple.com/iris/v1/betaTesters/<beta_tester_id>/relationships/apps
+        path = "betaTesters/#{beta_tester_id}/relationships/apps"
+        body = {
+          data: app_ids.map do |id|
+            {
+              type: "apps",
+              id: id
+            }
+          end
+        }
+
+        delete(path, nil, body)
+      end
+
+      def delete_beta_tester_from_beta_groups(beta_tester_id: nil, beta_group_ids: [])
+        # DELETE
+        # https://appstoreconnect.apple.com/iris/v1/betaTesters/<beta_tester_id>/relationships/betaGroups
+        path = "betaTesters/#{beta_tester_id}/relationships/betaGroups"
+        body = {
+          data: beta_group_ids.map do |id|
+            {
+              type: "betaGroups",
+              id: id
+            }
+          end
+        }
+
+        delete(path, nil, body)
       end
 
       #
@@ -357,6 +413,36 @@ module Spaceship
         }
 
         post(path, body)
+      end
+
+      # beta_testers - [{email: "", firstName: "", lastName: ""}]
+      def post_bulk_beta_tester_assignments(beta_group_id: nil, beta_testers: nil)
+        # POST
+        # https://appstoreconnect.apple.com/iris/v1/bulkBetaTesterAssignments
+        beta_testers || []
+
+        beta_testers.map do |tester|
+          tester[:errors] = []
+        end
+
+        body = {
+          data: {
+            attributes: {
+              betaTesters: beta_testers
+            },
+            relationships: {
+              betaGroup: {
+                data: {
+                  id: beta_group_id,
+                  type: "betaGroups"
+                }
+              } 
+            },
+            type: "bulkBetaTesterAssignments"
+          }
+        }
+
+        post("bulkBetaTesterAssignments", body)
       end
 
       protected

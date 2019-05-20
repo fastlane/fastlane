@@ -27,6 +27,15 @@ module Spaceship
       def self.type
         return "betaGroups"
       end
+
+      #
+      # API
+      #
+      
+      # beta_testers - [{email: "", firstName: "", lastName: ""}]
+      def post_bulk_beta_tester_assignments(beta_testers: nil)
+        return client.post_bulk_beta_tester_assignments(beta_group_id: id, beta_testers: beta_testers)
+      end
     end
   end
 end
