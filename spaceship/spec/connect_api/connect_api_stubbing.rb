@@ -20,7 +20,7 @@ class ConnectAPIStubbing
       stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?filter%5BbundleId%5D=com.joshholtz.FastlaneTest").
         to_return(status: 200, body: read_fixture_file('apps.json'), headers: { 'Content-Type' => 'application/json' })
 
-        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps/123456789").
+      stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps/123456789").
         to_return(status: 200, body: read_fixture_file('app.json'), headers: { 'Content-Type' => 'application/json' })
     end
 

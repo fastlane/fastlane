@@ -417,7 +417,7 @@ describe Spaceship::ConnectAPI::Client do
 
     context 'get_pre_release_versions' do
       let(:path) { "preReleaseVersions" }
-      let(:version) { "186"}
+      let(:version) { "186" }
       let(:default_params) { {} }
 
       it 'succeeds' do

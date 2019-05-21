@@ -23,6 +23,9 @@ module Pilot
         }
         group.post_bulk_beta_tester_assignments(beta_testers: [user])
       end
+
+      group_names = groups_param.join(';')
+      UI.success("Successfully added tester #{config[:email]} to app #{app.name} in group(s) #{group_names}")
     end
 
     def find_tester(options)
@@ -50,7 +53,7 @@ module Pilot
         # otherwise remove the tester from the groups specified.
         if config[:groups].nil?
           tester.delete_from_apps(apps: [app])
-          UI.success("Successfully removed tester, #{tester.email}, from app: #{app.name}")
+          UI.success("Successfully removed tester #{tester.email} from app: #{app.name}")
         else
           groups = tester.beta_groups.select do |group|
             config[:groups].include?(group.name)
@@ -82,10 +85,12 @@ module Pilot
     def find_app(apple_id: nil, app_identifier: nil)
       if app_identifier
         app = Spaceship::ConnectAPI::App.find(app_identifier)
-        UI.user_error!("Could not find an app by #{app_filter}") unless app
+        UI.user_error!("Could not find an app by #{app_identifier}") unless app
         return app
       elsif apple_id
-
+        app = Spaceship::ConnectAPI::App.get(app_id: apple_id)
+        UI.user_error!("Could not find an app by #{apple_id}") unless app
+        return app
       else
         UI.user_error!("You must include an `app_identifier` to `list_testers`")
       end
@@ -100,35 +105,6 @@ module Pilot
       end
 
       return tester
-    end
-
-    def find_current_user
-      current_user_email = Spaceship::Tunes.client.user_email
-      current_user_apple_id = Spaceship::Tunes.client.user
-
-      current_user = Spaceship::Tunes::Members.find(current_user_email)
-      unless current_user
-        UI.user_error!("Unable to find a member for AppleID: #{current_user_apple_id}, email: #{current_user_email}")
-      end
-      return current_user
-    end
-
-    def create_tester(email: nil, first_name: nil, last_name: nil, app: nil)
-      current_user = find_current_user
-      if current_user.admin? || current_user.app_manager?
-        Spaceship::TestFlight::Tester.create_app_level_tester(app_id: app.apple_id,
-                                                          first_name: first_name || '',
-                                                           last_name: last_name || '',
-                                                               email: email)
-
-        UI.success("Successfully added tester: #{email} to app: #{app.name}")
-        return Spaceship::TestFlight::Tester.find(app_id: app.apple_id, email: email)
-      else
-        UI.user_error!("Current account doesn't have permission to create a tester")
-      end
-    rescue => ex
-      UI.error("Could not create tester #{email}")
-      raise ex
     end
 
     def list_testers_by_app(app)
