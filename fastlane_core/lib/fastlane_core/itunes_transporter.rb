@@ -37,7 +37,6 @@ module FastlaneCore
       end
 
       @errors = []
-      @errors_to_show = []
       @warnings = []
       @all_lines = []
 
