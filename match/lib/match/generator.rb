@@ -15,6 +15,7 @@ module Match
         force: true, # we don't need a certificate without its private key, we only care about a new certificate
         username: params[:username],
         team_id: params[:team_id],
+        team_name: params[:team_name],
         keychain_path: FastlaneCore::Helper.keychain_path(params[:keychain_name]),
         keychain_password: params[:keychain_password]
       })
@@ -63,6 +64,7 @@ module Match
         provisioning_name: profile_name,
         ignore_profiles_with_different_name: true,
         team_id: params[:team_id],
+        team_name: params[:team_name],
         template_name: params[:template_name]
       }
 

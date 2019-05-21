@@ -134,6 +134,62 @@ describe Deliver::UploadMetadata do
     end
   end
 
+  context "with metadata" do
+    let(:app) { double('app') }
+    let(:version) { double('version') }
+    let(:details) { double('details') }
+    let(:version_info) { {} }
+    let(:details_info) { {} }
+
+    before do
+      allow(uploader).to receive(:verify_available_languages!)
+      allow(version).to receive(:save!)
+      allow(version).to receive(:release_on_approval=)
+      allow(version).to receive(:toggle_phased_release)
+      allow(version).to receive(:auto_release_date=)
+      allow(version).to receive(:ratings_reset=)
+      allow(version).to receive(:description)
+      allow(version).to receive(:send).and_return(version_info)
+      allow(app).to receive(:edit_version).and_return(version)
+      allow(app).to receive(:details).and_return(details)
+      allow(details).to receive(:save!)
+      allow(details).to receive(:send).and_return(details_info)
+    end
+
+    context "normal metadata" do
+      it "saves metadata" do
+        options = {
+            app: app,
+            details: details,
+            name: { "en-US" => "App name" },
+            description: { "en-US" => "App description" }
+        }
+        uploader.upload(options)
+        expect(version_info).to eql({ "en-US" => "App description" })
+        expect(details_info).to eql({ "en-US" => "App name" })
+        expect(version).to have_received(:save!)
+        expect(details).to have_received(:save!)
+      end
+    end
+
+    context "individual metadata items" do
+      it "saves individual metadata items" do
+        options = {
+            app: app,
+            details: details,
+            name: { "en-US" => "App name" },
+            description: { "en-US" => "App description" },
+            individual_metadata_items: [:name, :description]
+        }
+        uploader.upload(options)
+        expect(version_info).to eql({ "en-US" => "App description" })
+        expect(details_info).to eql({ "en-US" => "App name" })
+        expect(version).to have_received(:save!)
+        expect(details).to have_received(:save!)
+      end
+    end
+  end
+
   context "with auto_release_date" do
     let(:app) { double('app') }
     let(:version) { double('version') }
@@ -144,6 +200,7 @@ describe Deliver::UploadMetadata do
       allow(version).to receive(:release_on_approval=)
       allow(version).to receive(:toggle_phased_release)
       allow(version).to receive(:auto_release_date=)
+      allow(version).to receive(:ratings_reset=)
       allow(app).to receive(:edit_version).and_return(version)
       allow(app).to receive(:details).and_return(details)
       allow(details).to receive(:save!)
@@ -175,6 +232,7 @@ describe Deliver::UploadMetadata do
       allow(version).to receive(:release_on_approval=)
       allow(version).to receive(:toggle_phased_release)
       allow(version).to receive(:auto_release_date=)
+      allow(version).to receive(:ratings_reset=)
       allow(app).to receive(:edit_version).and_return(version)
       allow(app).to receive(:details).and_return(details)
       allow(details).to receive(:save!)
@@ -198,6 +256,44 @@ describe Deliver::UploadMetadata do
       it "toggle_phased_release is not called" do
         uploader.upload(app: app)
         expect(version).not_to(have_received(:toggle_phased_release).with(enabled: false))
+      end
+    end
+  end
+
+  context "with reset_ratings" do
+    let(:app) { double('app') }
+    let(:version) { double('version') }
+    let(:details) { double('details') }
+    before do
+      allow(uploader).to receive(:verify_available_languages!)
+      allow(version).to receive(:save!)
+      allow(version).to receive(:release_on_approval=)
+      allow(version).to receive(:toggle_phased_release)
+      allow(version).to receive(:auto_release_date)
+      allow(version).to receive(:ratings_reset=)
+      allow(app).to receive(:edit_version).and_return(version)
+      allow(app).to receive(:details).and_return(details)
+      allow(details).to receive(:save!)
+    end
+
+    context 'with true' do
+      it "ratings_reset is called" do
+        uploader.upload(reset_ratings: true, app: app)
+        expect(version).to have_received(:ratings_reset=).with(true)
+      end
+    end
+
+    context 'with false' do
+      it "ratings_reset is called" do
+        uploader.upload(reset_ratings: false, app: app)
+        expect(version).to have_received(:ratings_reset=).with(false)
+      end
+    end
+
+    context 'without value' do
+      it "ratings_reset is not called" do
+        uploader.upload(app: app)
+        expect(version).not_to(have_received(:ratings_reset=).with(false))
       end
     end
   end

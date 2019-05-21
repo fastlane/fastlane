@@ -266,6 +266,16 @@ phased_release(true)
 phased_release(false)
 ```
 
+##### reset_ratings
+
+Reset your app's summary rating for all territories. If set to `true`, it will reset rating when this version is released. Default behavior is to keep existing rating.
+
+```ruby-skip-tests
+reset_ratings(true)
+# or
+reset_ratings(false)
+```
+
 ##### app_rating_config_path
 You can set the app age ratings using _deliver_. You'll have to create and store a `JSON` configuration file. Copy the [template](https://github.com/fastlane/fastlane/blob/master/deliver/assets/example_rating_config.json) to your project folder and pass the path to the `JSON` file using the `app_rating_config_path` option.
 
@@ -694,7 +704,11 @@ You can do the same with folders
 
 In this case, default values for keywords, urls, name and release notes are used in all localizations, but each language has a fully localized description
 
+## Uploading screenshots for "iPad Pro (12.9-inch) (3rd generation)"
 
+[Starting March 20, 2019 Apple's App Store](https://developer.apple.com/news/?id=03202019a) requires 12.9-inch iPad Pro (3rd generation) screenshots additionally to the iPad Pro 2nd generation [screenshots](https://help.apple.com/app-store-connect/#/devd274dd925). As fastlane historically uses the screenshot dimensions to determine the "display family" of a screenshot, this poses a problem as both use the same dimensions and are recognized as the same device family.
+
+To solve this a screenshot of a 12.9-inch iPad Pro (3rd generation) must contain either the string `iPad Pro (12.9-inch) (3rd generation)` or `ipadPro129` (Apple's internal naming of the display family for the 3rd generation iPad Pro) in its filename to be assigned the correct display family and to be uploaded to the correct screenshot slot in your app's metadata.
 
 ## Automatically create screenshots
 
@@ -733,3 +747,6 @@ App Store Connect has a limit of 150 binary uploads per day.
 
 ## Editing the `Deliverfile`
 Change syntax highlighting to *Ruby*.
+
+## Provider Short Name
+If you are on multiple App Store Connect teams, _deliver_ needs a provider short name to know where to upload your binary. _deliver_ will try to use the long name of the selected team to detect the provider short name. To override the detected value with an explicit one, use the `itc_provider` option.

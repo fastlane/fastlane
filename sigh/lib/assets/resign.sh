@@ -63,6 +63,12 @@
 # new features November 2018
 # 1. only create the archived-expanded-entitlements.xcent file if the version of Xcode < 9.3 as Xcode 10 does not create it.
 #
+# new features January 2019
+# 1. fixed bug where the com.apple.icloud-container-environment entitlement was being assigned an incorrect value
+#
+# new features March 2019
+# 1. two more fixes for only creating the archived-expanded-entitlements.xcent file if the version of Xcode < 9.3 as Xcode 10 does not create it.
+#
 
 # Logging functions
 
@@ -586,7 +592,10 @@ function resign {
 
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and entitlements: $ENTITLEMENTS"
-        cp -f "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
+        if [[ "${XCODE_VERSION/.*/}" -lt 10 ]]; then
+            log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
+            cp -f "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
+        fi
         /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
         checkStatus
     elif  [[ -n "${USE_APP_ENTITLEMENTS}" ]]; then
@@ -648,6 +657,8 @@ function resign {
             "com.apple.developer.homekit" \
             # If actually used by the App, this value will be set in its entitlements
             "com.apple.developer.healthkit" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.healthkit.access" \
             # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
             "com.apple.developer.in-app-payments" \
             # If actually used by the App, this value will be set in its entitlements
@@ -706,6 +717,7 @@ function resign {
             "com.apple.developer.associated-domains" \
             "com.apple.developer.default-data-protection" \
             "com.apple.developer.healthkit" \
+            "com.apple.developer.healthkit.access" \
             "com.apple.developer.homekit" \
             "com.apple.developer.icloud-container-environment" \
             "com.apple.developer.icloud-container-identifiers" \
@@ -743,7 +755,19 @@ function resign {
                 # This value is set by Xcode during export (manually selected for Development and AdHoc, automatically set to Production for Store)
                 # Would need an additional dedicated option to specify the iCloud environment to be used (Development or Production)
                 # For now, we assume Production is to be used when signing with a Distribution certificate, Development if not
-                if [[ "$CERTIFICATE" =~ "Distribution:" ]]; then
+                local certificate_name=$CERTIFICATE
+                local sha1_pattern='[0-9A-F]{40}'
+
+                if [[ "$CERTIFICATE" =~ $sha1_pattern ]]; then
+                    log "Certificate $CERTIFICATE matches a SHA1 pattern"
+                    local certificate_matches="$( security find-identity -v -p codesigning | grep -m 1 "$CERTIFICATE" )"
+                    if [ -n "$certificate_matches" ]; then
+                        certificate_name="$( sed -E s/[^\"]+\"\([^\"]+\)\".*/\\1/ <<< $certificate_matches )"
+                        log "Certificate name: $certificate_name"
+                    fi
+                fi
+
+                if [[ "$certificate_name" =~ "Distribution:" ]]; then
                     ICLOUD_ENV="Production"
                 else
                     ICLOUD_ENV="Development"
@@ -798,7 +822,10 @@ function resign {
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and patched entitlements:"
         log "$(cat "$PATCHED_ENTITLEMENTS")"
-        cp -f "$PATCHED_ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
+        if [[ "${XCODE_VERSION/.*/}" -lt 10 ]]; then
+            log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
+            cp -f "$PATCHED_ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
+        fi
         /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
         checkStatus
     else

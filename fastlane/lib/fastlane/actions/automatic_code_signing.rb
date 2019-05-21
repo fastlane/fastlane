@@ -17,8 +17,17 @@ module Fastlane
         end
 
         target_dictionary = project.targets.map { |f| { name: f.name, uuid: f.uuid, build_configuration_list: f.build_configuration_list } }
+        target_attributes = project.root_object.attributes["TargetAttributes"]
         changed_targets = []
-        project.root_object.attributes["TargetAttributes"].each do |target, sett|
+
+        # make sure TargetAttributes exist for all targets
+        target_dictionary.each do |props|
+          unless target_attributes.key?(props[:uuid])
+            target_attributes[props[:uuid]] = {}
+          end
+        end
+
+        target_attributes.each do |target, sett|
           found_target = target_dictionary.detect { |h| h[:uuid] == target }
           if params[:targets]
             # get target name

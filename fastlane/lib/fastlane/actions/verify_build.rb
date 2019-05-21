@@ -2,9 +2,6 @@ require 'plist'
 
 module Fastlane
   module Actions
-    module SharedValues
-      VERIFY_BUILD_CUSTOM_VALUE = :VERIFY_BUILD_CUSTOM_VALUE
-    end
     class VerifyBuildAction < Action
       def self.run(params)
         Dir.mktmpdir do |dir|

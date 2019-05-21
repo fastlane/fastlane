@@ -124,15 +124,51 @@ module FastlaneSpec
       copy = ARGV.dup
       ARGV.clear
       ARGV.concat(argv)
-      if block_given?
-        begin
-          yield
-        ensure
-          ARGV.clear
-          ARGV.concat(copy)
-        end
+      begin
+        # Do not check for "block_given?". This method is useless without a
+        # block, and must fail if used like that.
+        yield
+      ensure
+        ARGV.clear
+        ARGV.concat(copy)
       end
     end
     # rubocop:enable Style/MethodName
+
+    def self.with_verbose(verbose)
+      orig_verbose = FastlaneCore::Globals.verbose?
+      FastlaneCore::Globals.verbose = verbose
+      # Do not check for "block_given?". This method is useless without a
+      # block, and must fail if used like that.
+      yield
+    ensure
+      FastlaneCore::Globals.verbose = orig_verbose
+    end
+
+    # Executes the provided block after adjusting the ENV to have the
+    # provided keys and values set as defined in hash. After the block
+    # completes, restores the ENV to its previous state.
+    require "climate_control"
+    def self.with_env_values(hash, &block)
+      ClimateControl.modify(hash, &block)
+    end
+
+    def self.with_action_context_values(hash, &block)
+      with_global_key_values(Fastlane::Actions.lane_context, hash, &block)
+    end
+
+    def self.with_global_key_values(global_store, hash)
+      old_vals = global_store.select { |k, v| hash.include?(k) }
+      hash.each { |k, v| global_store[k] = v }
+      yield
+    ensure
+      hash.each do |k, v|
+        if old_vals.include?(k)
+          global_store[k] = old_vals[k]
+        else
+          global_store.delete(k)
+        end
+      end
+    end
   end
 end

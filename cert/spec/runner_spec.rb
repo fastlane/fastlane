@@ -16,14 +16,20 @@ describe Cert do
       allow(Spaceship.client).to receive(:in_house?).and_return(false)
       allow(Spaceship.certificate.production).to receive(:all).and_return([certificate])
 
-      allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(true)
+      certificate_path = "#{Dir.pwd}/cert_id.cer"
+      keychain_path = Dir.pwd.to_s
+      expect(FastlaneCore::CertChecker).to receive(:installed?)
+        .with(certificate_path, in_keychain: keychain_path)
+        .twice
+        .and_return(true)
 
       options = { keychain_path: "." }
       Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options)
 
       Cert::Runner.new.launch
       expect(ENV["CER_CERTIFICATE_ID"]).to eq("cert_id")
-      expect(ENV["CER_FILE_PATH"]).to eq("#{Dir.pwd}/cert_id.cer")
+      expect(ENV["CER_FILE_PATH"]).to eq(certificate_path)
+      expect(ENV["CER_KEYCHAIN_PATH"]).to eq(keychain_path)
       File.delete(ENV["CER_FILE_PATH"])
     end
 
@@ -95,7 +101,7 @@ describe Cert do
       end
 
       let(:generate) do
-        options = { output_path: temp, filename: filename }
+        options = { output_path: temp, filename: filename, keychain_path: "." }
         Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options)
         Cert::Runner.new.launch
       end

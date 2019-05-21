@@ -197,7 +197,7 @@ class PortalStubbing
       stub_request(:get, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/downloadCertificateContent.action?certificateId=XC5PH8DAAA&teamId=XXXXXXXXXX&type=R58UK2EAAA").
         to_return(status: 200, body: adp_read_binary_fixture_file('aps_development.cer')) # note: binary!
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/submitCertificateRequest.action").
-        with(body: { "appIdId" => "2HNR359G63", "csrContent" => adp_read_fixture_file('certificateSigningRequest.certSigningRequest'), "type" => "BKLRAVXMGM", "teamId" => "XXXXXXXXXX" }).
+        with(body: { "appIdId" => "2HNR359G63", "specialIdentifierDisplayId" => "2HNR359G63", "csrContent" => adp_read_fixture_file('certificateSigningRequest.certSigningRequest'), "type" => "BKLRAVXMGM", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('submitCertificateRequest.action.json'), headers: { 'Content-Type' => 'application/json' })
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/revokeCertificate.action").
         with(body: { "certificateId" => "XC5PH8DAAA", "teamId" => "XXXXXXXXXX", "type" => "R58UK2EAAA" }).
@@ -337,6 +337,11 @@ class PortalStubbing
     def adp_stub_download_provisioning_profile_failure
       stub_request(:get, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/downloadProfileContent?provisioningProfileId=PP00000001&teamId=XXXXXXXXXX").
         to_return(status: 404, body: adp_read_fixture_file('download_certificate_failure.html'))
+    end
+
+    def adp_stub_fetch_program_license_agreement_messages
+      stub_request(:get, 'https://appstoreconnect.apple.com/olympus/v1/contractMessages').
+        to_return(status: 200, body: adp_read_fixture_file('program_license_agreement_messages.json'), headers: { 'Content-Type' => 'application/json' })
     end
   end
 end

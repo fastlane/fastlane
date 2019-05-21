@@ -123,6 +123,10 @@ module Match
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find keys file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                      end),
+        FastlaneCore::ConfigItem.new(key: :google_cloud_project_id,
+                                     env_name: "MATCH_GOOGLE_CLOUD_PROJECT_ID",
+                                     description: "ID of the Google Cloud project to use for authentication",
+                                     optional: true),
 
         # Keychain
         FastlaneCore::ConfigItem.new(key: :keychain_name,
@@ -174,6 +178,10 @@ module Match
                                      description: "The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. \"Apple Pay Pass Suppression Development\")",
                                      optional: true,
                                      default_value: nil),
+        FastlaneCore::ConfigItem.new(key: :output_path,
+                                     env_name: "MATCH_OUTPUT_PATH",
+                                     description: "Path in which to export certificates, key and profile",
+                                     optional: true),
 
         # other
         FastlaneCore::ConfigItem.new(key: :verbose,

@@ -2,7 +2,7 @@ describe Screengrab do
   describe Screengrab::AndroidEnvironment do
     describe "with an empty ANDROID_HOME and an empty PATH" do
       it "finds no useful values" do
-        with_env_values('PATH' => 'screengrab/spec/fixtures/empty_home_empty_path/path') do
+        FastlaneSpec::Env.with_env_values('PATH' => 'screengrab/spec/fixtures/empty_home_empty_path/path') do
           android_env = Screengrab::AndroidEnvironment.new('screengrab/spec/fixtures/empty_home_empty_path/android_home', nil)
 
           expect(android_env.android_home).to eq('screengrab/spec/fixtures/empty_home_empty_path/android_home')
@@ -17,7 +17,7 @@ describe Screengrab do
 
     describe "with an empty ANDROID_HOME and a complete PATH" do
       it "finds commands on the PATH" do
-        with_env_values('PATH' => 'screengrab/spec/fixtures/empty_home_complete_path/path') do
+        FastlaneSpec::Env.with_env_values('PATH' => 'screengrab/spec/fixtures/empty_home_complete_path/path') do
           android_env = Screengrab::AndroidEnvironment.new('screengrab/spec/fixtures/empty_home_complete_path/android_home', nil)
 
           expect(android_env.android_home).to eq('screengrab/spec/fixtures/empty_home_complete_path/android_home')
@@ -32,7 +32,7 @@ describe Screengrab do
 
     describe "with a complete ANDROID_HOME and a complete PATH and no build tools version specified" do
       it "finds adb in platform-tools and aapt in the highest version build tools dir" do
-        with_env_values('PATH' => 'screengrab/spec/fixtures/complete_home_complete_path/path') do
+        FastlaneSpec::Env.with_env_values('PATH' => 'screengrab/spec/fixtures/complete_home_complete_path/path') do
           android_env = Screengrab::AndroidEnvironment.new('screengrab/spec/fixtures/complete_home_complete_path/android_home', nil)
 
           expect(android_env.android_home).to eq('screengrab/spec/fixtures/complete_home_complete_path/android_home')
@@ -47,7 +47,7 @@ describe Screengrab do
 
     describe "with a complete ANDROID_HOME and a complete PATH and a build tools version specified" do
       it "finds adb in platform-tools and aapt in the specified version build tools dir" do
-        with_env_values('PATH' => 'screengrab/spec/fixtures/complete_home_complete_path/path') do
+        FastlaneSpec::Env.with_env_values('PATH' => 'screengrab/spec/fixtures/complete_home_complete_path/path') do
           android_env = Screengrab::AndroidEnvironment.new('screengrab/spec/fixtures/complete_home_complete_path/android_home', '23.0.1')
 
           expect(android_env.android_home).to eq('screengrab/spec/fixtures/complete_home_complete_path/android_home')

@@ -3,6 +3,7 @@ require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Scan
+  # rubocop:disable Metrics/ClassLength
   class Options
     def self.verify_type(item_name, acceptable_types, value)
       type_ok = [Array, String].any? { |type| value.kind_of?(type) }
@@ -129,6 +130,7 @@ module Scan
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :code_coverage,
+                                     env_name: "SCAN_CODE_COVERAGE",
                                      description: "Should code coverage be generated? (Xcode 7 and up)",
                                      is_string: false,
                                      type: Boolean,
@@ -322,14 +324,34 @@ module Scan
                                      env_name: "SCAN_SLACK_MESSAGE",
                                      description: "The message included with each message posted to slack",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :slack_use_webhook_configured_username_and_icon,
+                                     env_name: "SCAN_SLACK_USE_WEBHOOK_CONFIGURED_USERNAME_AND_ICON",
+                                     description: "Use webhook's default username and icon settings? (true/false)",
+                                     default_value: false,
+                                     type: Boolean,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :slack_username,
+                                     env_name: "SCAN_SLACK_USERNAME",
+                                     description: "Overrides the webhook's username property if slack_use_webhook_configured_username_and_icon is false",
+                                     default_value: "fastlane",
+                                     is_string: true,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :slack_icon_url,
+                                     env_name: "SCAN_SLACK_ICON_URL",
+                                     description: "Overrides the webhook's image property if slack_use_webhook_configured_username_and_icon is false",
+                                     default_value: "https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png",
+                                     is_string: true,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_slack,
+                                     env_name: "SCAN_SKIP_SLACK",
                                      description: "Don't publish to slack, even when an URL is given",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :slack_only_on_failure,
-                                    description: "Only post on Slack if the tests fail",
-                                    is_string: false,
-                                    default_value: false),
+                                     env_name: "SCAN_SLACK_ONLY_ON_FAILURE",
+                                     description: "Only post on Slack if the tests fail",
+                                     is_string: false,
+                                     default_value: false),
 
         # misc
         FastlaneCore::ConfigItem.new(key: :destination,
@@ -349,4 +371,5 @@ module Scan
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

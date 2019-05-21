@@ -35,6 +35,14 @@ module Fastlane
           command << "--use-libraries"
         end
 
+        if params[:skip_import_validation]
+          command << "--skip-import-validation"
+        end
+
+        if params[:skip_tests]
+          command << "--skip-tests"
+        end
+
         if params[:verbose]
           command << "--verbose"
         end
@@ -56,7 +64,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
                                          description: "Use bundle exec when there is a Gemfile presented",
-                                         is_string: false,
+                                         type: Boolean,
                                          default_value: false),
           FastlaneCore::ConfigItem.new(key: :path,
                                        description: "The Podspec you want to push",
@@ -71,11 +79,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :allow_warnings,
                                        description: "Allow warnings during pod push",
                                        optional: true,
-                                       is_string: false),
+                                       type: Boolean),
           FastlaneCore::ConfigItem.new(key: :use_libraries,
                                        description: "Allow lint to use static libraries to install the spec",
                                        optional: true,
-                                       is_string: false),
+                                       type: Boolean),
           FastlaneCore::ConfigItem.new(key: :sources,
                                        description: "The sources of repos you want the pod spec to lint with, separated by commas",
                                        optional: true,
@@ -88,10 +96,18 @@ module Fastlane
                                        description: "The SWIFT_VERSION that should be used to lint the spec. This takes precedence over a .swift-version file",
                                        optional: true,
                                        is_string: true),
+          FastlaneCore::ConfigItem.new(key: :skip_import_validation,
+                                       description: "Lint skips validating that the pod can be imported",
+                                       optional: true,
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :skip_tests,
+                                       description: "Lint skips building and running tests during validation",
+                                       optional: true,
+                                       type: Boolean),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        description: "Show more debugging information",
                                        optional: true,
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false)
         ]
       end

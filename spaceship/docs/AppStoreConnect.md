@@ -11,6 +11,7 @@
   * [Submit app for App Store Review](#submit-app-for-app-store-review)
   * [Testers](#testers)
   * [App ratings & reviews](#app-ratings--reviews)
+  * [App Analytics](#app-analytics)
 - [License](#license)
 
 ## Usage
@@ -219,20 +220,15 @@ To clarify:
 A build train contains all builds for a give `version number` (e.g. `0.9.21`). Within the build train you have *n* builds, each having a different `build number` (e.g. `99993`).
 
 ```ruby
+# Access all build trains for an app
+app.all_build_train_numbers   # => ["0.9.21"]
+
 # Access the build train via the version number
 train = app.build_trains["0.9.21"]
 
-train.version_string          # => "0.9.21"
-train.external_testing_enabled         # => false, as external testing is enabled for 0.9.20
-
 # Access all builds for a given train
-train.builds.count            # => 1
-build = train.builds.first
-
-# Enable beta testing for a build train
-# This will put the latest build into beta testing mode
-# and turning off beta testing for all other build trains
-train.update_testing_status!(true, 'external')
+train.count            # => 1
+build = train.first
 ```
 
 ### Builds
@@ -244,29 +240,13 @@ build.train_version           # => "0.9.21" (the version number)
 build.install_count           # => 1
 build.crash_count             # => 0
 
-build.testing_status          # => "Internal" or "External" or "Expired" or "Inactive"
+build.internal_state          # => testflight.build.state.testing.ready
+build.external_state          # => testflight.build.state.submit.ready
 ```
 
-You can even submit a build for external beta review
+You can even submit a build for external beta review (after you have set all necessary metadata - see above)
 ```ruby
-parameters = {
-  changelog: "Awesome new features",
-  description: "Why would I want to provide that?",
-  feedback_email: "contact@company.com",
-  marketing_url: "http://marketing.com",
-  first_name: "Felix",
-  last_name: "Krause",
-  review_email: "contact@company.com",
-  phone_number: "0123456789",
-  significant_change: false,
-
-  # Optional Metadata:
-  privacy_policy_url: nil,
-  review_user_name: nil,
-  review_password: nil,
-  encryption: false
-}
-build.submit_for_beta_review!(parameters)
+build.submit_for_testflight_review!
 ```
 
 ### Processing builds
@@ -354,6 +334,46 @@ average_rating = app.ratings(storefront: "US").average_rating
 # Get reviews for a given store front
 reviews = ratings.reviews("US") # => Array of hashes representing review data
 
+```
+
+### App Analytics
+
+```ruby
+# Start app analytics
+analytics = app.analytics                # => Spaceship::Tunes::AppAnalytics
+
+# Get all the different metrics from App Analytics
+# By default covering the last 7 days
+
+# Get app units
+units = analytics.app_units              # => Array of dates representing raw data for each day
+
+# Get app store page views
+views = analytics.app_views              # => Array of dates representing raw data for each day
+
+# Get impressions metrics
+impressions = analytics.app_impressions  # => Array of dates representing raw data for each day
+
+# Get app sales
+sales = analytics.app_sales              # => Array of dates representing raw data for each day
+
+# Get paying users
+users = analytics.paying_users           # => Array of dates representing raw data for each day
+
+# Get in app purchases
+iap = analytics.app_in_app_purchases     # => Array of dates representing raw data for each day
+
+# Get app installs
+installs = analytics.app_installs        # => Array of dates representing raw data for each day
+
+# Get app sessions
+sessions = analytics.app_sessions        # => Array of dates representing raw data for each day
+
+# Get active devices
+devices = analytics.app_active_devices   # => Array of dates representing raw data for each day
+
+# Get crashes
+crashes = analytics.app_crashes          # => Array of dates representing raw data for each day
 ```
 
 ## License
