@@ -43,7 +43,7 @@ module Spaceship
       end
 
       def self.find(email: nil, includes: nil)
-        return all(filter: {email: email}, includes: includes)
+        return all(filter: { email: email }, includes: includes)
       end
     end
   end

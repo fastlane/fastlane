@@ -30,11 +30,19 @@ module Spaceship
       # Apps
       #
 
+      def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
+        resps = client.get_apps(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.map(&:to_models).flatten
+      end
+
       def self.find(bundle_id)
-        resps = client.get_apps(filter: { bundleId: bundle_id }).all_pages
-        return resps.map(&:to_models).flatten.find do |app|
+        return all(filter: { bundleId: bundle_id }).find do |app|
           app.bundle_id == bundle_id
         end
+      end
+
+      def self.get(app_id: nil, includes: nil)
+        return client.get_app(app_id: app_id, includes: includes).first
       end
 
       #

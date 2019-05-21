@@ -39,7 +39,7 @@ module Spaceship
       end
 
       def self.find(email: nil, includes: nil)
-        return all(filter: {email: email}, includes: includes).first
+        return all(filter: { email: email }, includes: includes).first
       end
 
       def delete_from_apps(apps: nil)

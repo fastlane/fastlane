@@ -72,7 +72,7 @@ module Spaceship
         end
         handle_response(response)
       end
-      
+
       #
       # apps
       #
@@ -82,6 +82,13 @@ module Spaceship
         # https://appstoreconnect.apple.com/iris/v1/apps
         params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
         get("apps", params)
+      end
+
+      def get_app(app_id: nil, includes: nil)
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/apps/<app_id>
+        params = build_params(filter: nil, includes: includes, limit: nil, sort: nil)
+        get("apps/#{app_id}", params)
       end
 
       #
@@ -167,7 +174,7 @@ module Spaceship
 
       def get_beta_build_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
         # GET
-        # https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations?filter[build]=<build_id>
+        # https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations
         path = "betaBuildLocalizations"
         params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
         get(path, params)
@@ -243,7 +250,7 @@ module Spaceship
       # buildDeliveries
       #
 
-      def get_build_deliveries(filter: {}, includes: nil, limit: 10, sort: nil)
+      def get_build_deliveries(filter: {}, includes: nil, limit: nil, sort: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/buildDeliveries
         params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
@@ -288,7 +295,7 @@ module Spaceship
       # betaAppReviewSubmissions
       #
 
-      def get_beta_app_review_submission(filter: {}, includes: nil, limit: 10, sort: nil, cursor: nil)
+      def get_beta_app_review_submissions(filter: {}, includes: nil, limit: nil, sort: nil, cursor: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaAppReviewSubmissions
         params = build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
@@ -321,13 +328,13 @@ module Spaceship
         # https://appstoreconnect.apple.com/iris/v1/betaAppReviewSubmissions/<beta_app_review_submission_id>
         params = build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: nil)
         delete("betaAppReviewSubmissions/#{beta_app_review_submission_id}", params)
-end
+      end
 
       #
       # preReleaseVersions
       #
 
-      def get_pre_release_versions(filter: {}, includes: nil, limit: 40, sort: nil)
+      def get_pre_release_versions(filter: {}, includes: nil, limit: nil, sort: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/preReleaseVersions
         params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
@@ -392,7 +399,7 @@ end
       # betaGroups
       #
 
-      def get_beta_groups(filter: {}, includes: nil, limit: 40, sort: nil)
+      def get_beta_groups(filter: {}, includes: nil, limit: nil, sort: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaGroups
         params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
@@ -436,7 +443,7 @@ end
                   id: beta_group_id,
                   type: "betaGroups"
                 }
-              } 
+              }
             },
             type: "bulkBetaTesterAssignments"
           }

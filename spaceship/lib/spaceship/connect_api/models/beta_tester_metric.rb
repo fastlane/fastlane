@@ -34,7 +34,7 @@ module Spaceship
       #
       # Helpers
       #
-      
+
       def installed?
         return beta_tester_state == BetaTesterState::INSTALLED
       end

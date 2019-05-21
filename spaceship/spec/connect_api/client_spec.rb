@@ -327,7 +327,7 @@ describe Spaceship::ConnectAPI::Client do
     context 'get_build_deliveries' do
       let(:path) { "buildDeliveries" }
       let(:version) { "189" }
-      let(:default_params) { { limit: 10 } }
+      let(:default_params) { {} }
 
       it 'succeeds' do
         params = {}
@@ -417,8 +417,8 @@ describe Spaceship::ConnectAPI::Client do
 
     context 'get_pre_release_versions' do
       let(:path) { "preReleaseVersions" }
-      let(:version) { "189" }
-      let(:default_params) { { limit: 40 } }
+      let(:version) { "186"}
+      let(:default_params) { {} }
 
       it 'succeeds' do
         params = {}
@@ -438,7 +438,7 @@ describe Spaceship::ConnectAPI::Client do
     context 'get_beta_groups' do
       let(:path) { "betaGroups" }
       let(:name) { "sir group a lot" }
-      let(:default_params) { { limit: 40 } }
+      let(:default_params) { {} }
 
       it 'succeeds' do
         params = {}

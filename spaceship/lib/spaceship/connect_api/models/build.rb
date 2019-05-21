@@ -13,7 +13,6 @@ module Spaceship
       attr_accessor :icon_asset_token
       attr_accessor :processing_state
       attr_accessor :uses_non_exempt_encryption
-      attr_accessor :qc_state
 
       attr_accessor :app
       attr_accessor :beta_app_review_submission

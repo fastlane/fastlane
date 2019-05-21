@@ -13,13 +13,13 @@ module Pilot
       groups_param = config[:groups]
       UI.user_error!("You must provide 1 or more groups (with the `:groups` option)") unless groups_param
 
-      beta_groups = app.get_beta_groups.select do |group|
+      app.get_beta_groups.select do |group|
         groups_param.include?(group.name)
       end.each do |group|
         user = {
           email: config[:email],
           firstName: config[:first_name],
-          lastName: config[:last_name],
+          lastName: config[:last_name]
         }
         group.post_bulk_beta_tester_assignments(beta_testers: [user])
       end
@@ -93,7 +93,7 @@ module Pilot
     end
 
     def find_app_tester(email: nil, app: nil)
-      tester = app.get_beta_testers(filter: {email: email}, includes: "apps,betaTesterMetrics,betaGroups").first
+      tester = app.get_beta_testers(filter: { email: email }, includes: "apps,betaTesterMetrics,betaGroups").first
 
       if tester
         UI.success("Found existing tester #{email}")
