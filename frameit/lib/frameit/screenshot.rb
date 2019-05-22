@@ -48,7 +48,7 @@ module Frameit
       when sizes::IOS_IPAD_PRO
         return 'iPad Pro'
       when sizes::IOS_IPAD_PRO_12_9
-        return 'iPad Pro 3rd Generation'
+        return 'iPad Pro (12.9-inch) (3rd generation)'
       when sizes::MAC
         return 'MacBook'
       else
