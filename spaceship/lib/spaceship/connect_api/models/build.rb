@@ -70,7 +70,7 @@ module Spaceship
       end
 
       def processed?
-        return processing_state == ProcessingState::VALID
+        return processing_state != ProcessingState::PROCESSING
       end
 
       def ready_for_beta_submission?

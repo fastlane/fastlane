@@ -20,25 +20,4 @@ describe Spaceship::ConnectAPI::BuildBetaDetail do
       expect(model.external_build_state).to eq("READY_FOR_BETA_SUBMISSION")
     end
   end
-
-  describe 'parses response' do
-    let(:wrong_response_object) do
-      JSON.parse(File.read('./spaceship/spec/connect_api/fixtures/beta_app_localization.json'))
-    end
-    let(:wrong_response_array) do
-      JSON.parse(File.read('./spaceship/spec/connect_api/fixtures/beta_app_localizations.json'))
-    end
-
-    it 'fails with wrong type object' do
-      expect do
-        Spaceship::ConnectAPI::BuildBetaDetail.parse(wrong_response_object)
-      end.to raise_error(/not of type/)
-    end
-
-    it 'fails with wrong type array of objects' do
-      expect do
-        Spaceship::ConnectAPI::BuildBetaDetail.parse(wrong_response_array)
-      end.to raise_error(/not of type/)
-    end
-  end
 end

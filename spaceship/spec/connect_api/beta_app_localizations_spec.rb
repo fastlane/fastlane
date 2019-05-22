@@ -23,25 +23,4 @@ describe Spaceship::ConnectAPI::BetaAppLocalization do
       expect(model.locale).to eq("en-US")
     end
   end
-
-  describe 'parses response' do
-    let(:wrong_response_object) do
-      JSON.parse(File.read('./spaceship/spec/connect_api/fixtures/app.json'))
-    end
-    let(:wrong_response_array) do
-      JSON.parse(File.read('./spaceship/spec/connect_api/fixtures/apps.json'))
-    end
-
-    it 'fails with wrong type object' do
-      expect do
-        Spaceship::ConnectAPI::BetaAppLocalization.parse(wrong_response_object)
-      end.to raise_error(/not of type/)
-    end
-
-    it 'fails with wrong type array of objects' do
-      expect do
-        Spaceship::ConnectAPI::BetaAppLocalization.parse(wrong_response_array)
-      end.to raise_error(/not of type/)
-    end
-  end
 end

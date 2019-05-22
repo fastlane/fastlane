@@ -43,25 +43,4 @@ describe Spaceship::ConnectAPI::App do
       expect(model.bundle_id).to eq("com.joshholtz.FastlaneTest")
     end
   end
-
-  describe 'parses response' do
-    let(:wrong_response_object) do
-      JSON.parse(File.read('./spaceship/spec/connect_api/fixtures/beta_app_localization.json'))
-    end
-    let(:wrong_response_array) do
-      JSON.parse(File.read('./spaceship/spec/connect_api/fixtures/beta_app_localizations.json'))
-    end
-
-    it 'fails with wrong type object' do
-      expect do
-        Spaceship::ConnectAPI::App.parse(wrong_response_object)
-      end.to raise_error(/not of type/)
-    end
-
-    it 'fails with wrong type array of objects' do
-      expect do
-        Spaceship::ConnectAPI::App.parse(wrong_response_array)
-      end.to raise_error(/not of type/)
-    end
-  end
 end

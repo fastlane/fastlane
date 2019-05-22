@@ -11,17 +11,6 @@ module Spaceship
       end
 
       module ClassMethods
-        def parse(json)
-          model_or_models = Models.parse(json)
-          models = [model_or_models].flatten
-
-          models.each do |model|
-            raise "#{model} is not of type #{self}" unless model.kind_of?(self)
-          end
-
-          model_or_models
-        end
-
         def client
           return Spaceship::ConnectAPI::Base.client
         end
