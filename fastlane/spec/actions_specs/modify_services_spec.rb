@@ -15,6 +15,7 @@ describe Fastlane do
           expect(options.associated_domains).to eq('off')
           expect(options.apple_pay).to eq('off')
           expect(options.multipath).to eq('off')
+          expect(options.data_protection).to be_nil
         end
         Fastlane::FastFile.new.parse("lane :test do
             modify_services(
