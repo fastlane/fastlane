@@ -1,5 +1,25 @@
 describe Supply do
   describe Supply::Client do
+    let(:service_account_file) { File.read(fixture_file("sample-service-account.json")) }
+    before do
+      stub_request(:post, "https://www.googleapis.com/oauth2/v4/token").
+        to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
+      stub_request(:post, "https://www.googleapis.com/androidpublisher/v2/applications/test-app/edits").
+        to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
+    end
+
+    it "displays error messages from the API" do
+      stub_request(:post, "https://www.googleapis.com/upload/androidpublisher/v2/applications/test-app/edits//listings/en-US/icon").
+        to_return(status: 403, body: '{"error":{"message":"Ensure project settings are enabled."}}', headers: { 'Content-Type' => 'application/json' })
+
+      expect(UI).to receive(:user_error!).with("Google Api Error: Invalid request - Ensure project settings are enabled.")
+      client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
+      client.begin_edit(package_name: 'test-app')
+      client.upload_image(image_path: fixture_file("playstore-icon.png"),
+                          image_type: "icon",
+                            language: "en-US")
+    end
+
     describe "AndroidPublisher" do
       let(:subject) { Androidpublisher::AndroidPublisherService.new }
 

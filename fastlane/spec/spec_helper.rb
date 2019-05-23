@@ -1,5 +1,3 @@
-require 'shellwords'
-
 Fastlane.load_actions
 
 def before_each_fastlane
@@ -8,14 +6,6 @@ def before_each_fastlane
   ENV.delete('DELIVER_SCREENSHOTS_PATH')
   ENV.delete('DELIVER_SKIP_BINARY')
   ENV.delete('DELIVER_VERSION')
-end
-
-def with_verbose(verbose)
-  orig_verbose = FastlaneCore::Globals.verbose?
-  FastlaneCore::Globals.verbose = verbose
-  yield if block_given?
-ensure
-  FastlaneCore::Globals.verbose = orig_verbose
 end
 
 def stub_plugin_exists_on_rubygems(plugin_name, exists)

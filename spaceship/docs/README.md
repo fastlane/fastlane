@@ -10,3 +10,4 @@
 - [About spaceship's architecture](Architecture.md)
 - [Debugging spaceship](Debugging.md)
 - [Testing spaceship](TestFlightTesting.md)
+- [Authentication](Authentication.md)

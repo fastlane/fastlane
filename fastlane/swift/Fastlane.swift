@@ -441,10 +441,14 @@ func badge(dark: String? = nil,
 }
 func buildAndUploadToAppetize(xcodebuild: [String : Any] = [:],
                               scheme: String? = nil,
-                              apiToken: String) {
+                              apiToken: String,
+                              publicKey: String? = nil,
+                              note: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "build_and_upload_to_appetize", className: nil, args: [RubyCommand.Argument(name: "xcodebuild", value: xcodebuild),
                                                                                                               RubyCommand.Argument(name: "scheme", value: scheme),
-                                                                                                              RubyCommand.Argument(name: "api_token", value: apiToken)])
+                                                                                                              RubyCommand.Argument(name: "api_token", value: apiToken),
+                                                                                                              RubyCommand.Argument(name: "public_key", value: publicKey),
+                                                                                                              RubyCommand.Argument(name: "note", value: note)])
   _ = runner.executeCommand(command)
 }
 func buildAndroidApp(task: String,
@@ -1176,7 +1180,8 @@ func createPullRequest(apiToken: String,
                        labels: [String]? = nil,
                        head: String? = nil,
                        base: String = "master",
-                       apiUrl: String = "https://api.github.com") {
+                       apiUrl: String = "https://api.github.com",
+                       assignees: [String]? = nil) {
   let command = RubyCommand(commandID: "", methodName: "create_pull_request", className: nil, args: [RubyCommand.Argument(name: "api_token", value: apiToken),
                                                                                                      RubyCommand.Argument(name: "repo", value: repo),
                                                                                                      RubyCommand.Argument(name: "title", value: title),
@@ -1184,7 +1189,8 @@ func createPullRequest(apiToken: String,
                                                                                                      RubyCommand.Argument(name: "labels", value: labels),
                                                                                                      RubyCommand.Argument(name: "head", value: head),
                                                                                                      RubyCommand.Argument(name: "base", value: base),
-                                                                                                     RubyCommand.Argument(name: "api_url", value: apiUrl)])
+                                                                                                     RubyCommand.Argument(name: "api_url", value: apiUrl),
+                                                                                                     RubyCommand.Argument(name: "assignees", value: assignees)])
   _ = runner.executeCommand(command)
 }
 func danger(useBundleExec: Bool = true,
@@ -1392,7 +1398,7 @@ func downloadDsyms(username: String,
   _ = runner.executeCommand(command)
 }
 func downloadFromPlayStore(packageName: String,
-                           metadataPath: String? = nil,
+                           metadataPath: String = "./metadata",
                            key: String? = nil,
                            issuer: String? = nil,
                            jsonKey: String? = nil,
@@ -2011,6 +2017,10 @@ func installOnDevice(extra: String? = nil,
                                                                                                    RubyCommand.Argument(name: "ipa", value: ipa)])
   _ = runner.executeCommand(command)
 }
+func installProvisioningProfile(path: String) {
+  let command = RubyCommand(commandID: "", methodName: "install_provisioning_profile", className: nil, args: [RubyCommand.Argument(name: "path", value: path)])
+  _ = runner.executeCommand(command)
+}
 func installXcodePlugin(url: String,
                         github: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "install_xcode_plugin", className: nil, args: [RubyCommand.Argument(name: "url", value: url),
@@ -2468,7 +2478,12 @@ func podLibLint(useBundleExec: Bool = true,
                 useModularHeaders: Bool = false,
                 failFast: Bool = false,
                 `private`: Bool = false,
-                quick: Bool = false) {
+                quick: Bool = false,
+                noClean: Bool = false,
+                noSubspecs: Bool = false,
+                platforms: String? = nil,
+                skipImportValidation: Bool = false,
+                skipTests: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "pod_lib_lint", className: nil, args: [RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec),
                                                                                               RubyCommand.Argument(name: "podspec", value: podspec),
                                                                                               RubyCommand.Argument(name: "verbose", value: verbose),
@@ -2482,7 +2497,12 @@ func podLibLint(useBundleExec: Bool = true,
                                                                                               RubyCommand.Argument(name: "use_modular_headers", value: useModularHeaders),
                                                                                               RubyCommand.Argument(name: "fail_fast", value: failFast),
                                                                                               RubyCommand.Argument(name: "private", value: `private`),
-                                                                                              RubyCommand.Argument(name: "quick", value: quick)])
+                                                                                              RubyCommand.Argument(name: "quick", value: quick),
+                                                                                              RubyCommand.Argument(name: "no_clean", value: noClean),
+                                                                                              RubyCommand.Argument(name: "no_subspecs", value: noSubspecs),
+                                                                                              RubyCommand.Argument(name: "platforms", value: platforms),
+                                                                                              RubyCommand.Argument(name: "skip_import_validation", value: skipImportValidation),
+                                                                                              RubyCommand.Argument(name: "skip_tests", value: skipTests)])
   _ = runner.executeCommand(command)
 }
 func podPush(useBundleExec: Bool = false,
@@ -3093,6 +3113,12 @@ func setPodKey(useBundleExec: Bool = true,
                                                                                              RubyCommand.Argument(name: "project", value: project)])
   _ = runner.executeCommand(command)
 }
+func setupCi(force: Bool = false,
+             provider: Bool = false) {
+  let command = RubyCommand(commandID: "", methodName: "setup_ci", className: nil, args: [RubyCommand.Argument(name: "force", value: force),
+                                                                                          RubyCommand.Argument(name: "provider", value: provider)])
+  _ = runner.executeCommand(command)
+}
 func setupCircleCi(force: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "setup_circle_ci", className: nil, args: [RubyCommand.Argument(name: "force", value: force)])
   _ = runner.executeCommand(command)
@@ -3250,7 +3276,7 @@ func slather(buildDirectory: String? = nil,
              verbose: Bool? = nil,
              useBundleExec: Bool = false,
              binaryBasename: Bool = false,
-             binaryFile: Bool = false,
+             binaryFile: String? = nil,
              arch: String? = nil,
              sourceFiles: Bool = false,
              decimals: Bool = false) {
@@ -3442,7 +3468,7 @@ func ssh(username: String,
 func supply(packageName: String,
             track: String = "production",
             rollout: String? = nil,
-            metadataPath: String? = nil,
+            metadataPath: String = "./metadata",
             key: String? = nil,
             issuer: String? = nil,
             jsonKey: String? = nil,
@@ -3510,7 +3536,8 @@ func swiftlint(mode: String = "lint",
                ignoreExitStatus: Bool = false,
                reporter: String? = nil,
                quiet: Bool = false,
-               executable: String? = nil) {
+               executable: String? = nil,
+               format: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "swiftlint", className: nil, args: [RubyCommand.Argument(name: "mode", value: mode),
                                                                                            RubyCommand.Argument(name: "path", value: path),
                                                                                            RubyCommand.Argument(name: "output_file", value: outputFile),
@@ -3520,7 +3547,8 @@ func swiftlint(mode: String = "lint",
                                                                                            RubyCommand.Argument(name: "ignore_exit_status", value: ignoreExitStatus),
                                                                                            RubyCommand.Argument(name: "reporter", value: reporter),
                                                                                            RubyCommand.Argument(name: "quiet", value: quiet),
-                                                                                           RubyCommand.Argument(name: "executable", value: executable)])
+                                                                                           RubyCommand.Argument(name: "executable", value: executable),
+                                                                                           RubyCommand.Argument(name: "format", value: format)])
   _ = runner.executeCommand(command)
 }
 func syncCodeSigning(type: String = "development",
@@ -3972,7 +4000,7 @@ func uploadToAppStore(username: String,
 func uploadToPlayStore(packageName: String,
                        track: String = "production",
                        rollout: String? = nil,
-                       metadataPath: String? = nil,
+                       metadataPath: String = "./metadata",
                        key: String? = nil,
                        issuer: String? = nil,
                        jsonKey: String? = nil,
@@ -4091,6 +4119,16 @@ func uploadToTestflight(username: String,
                                                                                                       RubyCommand.Argument(name: "wait_processing_interval", value: waitProcessingInterval),
                                                                                                       RubyCommand.Argument(name: "wait_for_uploaded_build", value: waitForUploadedBuild),
                                                                                                       RubyCommand.Argument(name: "reject_build_waiting_for_review", value: rejectBuildWaitingForReview)])
+  _ = runner.executeCommand(command)
+}
+func validatePlayStoreJsonKey(jsonKey: String? = nil,
+                              jsonKeyData: String? = nil,
+                              rootUrl: String? = nil,
+                              timeout: Int = 300) {
+  let command = RubyCommand(commandID: "", methodName: "validate_play_store_json_key", className: nil, args: [RubyCommand.Argument(name: "json_key", value: jsonKey),
+                                                                                                              RubyCommand.Argument(name: "json_key_data", value: jsonKeyData),
+                                                                                                              RubyCommand.Argument(name: "root_url", value: rootUrl),
+                                                                                                              RubyCommand.Argument(name: "timeout", value: timeout)])
   _ = runner.executeCommand(command)
 }
 func verifyBuild(provisioningType: String? = nil,
@@ -4213,7 +4251,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode-10.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-10.2.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -4323,4 +4361,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.46]
+// FastlaneRunnerAPIVersion [0.9.49]

@@ -41,7 +41,7 @@ module Deliver
             # if it's already there
           end
           path = File.join(containing_folder, file_name)
-          File.write(path, open(screenshot.url).read)
+          File.binwrite(path, open(screenshot.url).read)
         end
       end
     end

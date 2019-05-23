@@ -489,7 +489,7 @@ Key | Editable While Live | Directory | Filename
 ## Reference
 
 <details>
-<summary>View all available categories, languages, etc.</summary>
+<summary>View all available categories, etc.</summary>
 
 ### Available Categories
 
@@ -591,37 +591,6 @@ You can always prefix the category using `MZGenre.` (e.g. `MZGenre.Book`). _deli
 - `MZGenre.Apps.Stickers.Places`
 - `MZGenre.Apps.Stickers.Sports`
 
-### Available Languages
-
-- `da`
-- `de-DE`
-- `el`
-- `en-AU`
-- `en-CA`
-- `en-GB`
-- `en-US`
-- `es-ES`
-- `es-MX`
-- `fi`
-- `fr-CA`
-- `fr-FR`
-- `id`
-- `it`
-- `ja`
-- `ko`
-- `ms`
-- `nl-NL`
-- `no`
-- `pt-BR`
-- `pt-PT`
-- `ru`
-- `sv`
-- `th`
-- `tr`
-- `vi`
-- `zh-Hans`
-- `zh-Hant`
-
 ### Available age rating groups
 
 #### Non Boolean
@@ -708,7 +677,7 @@ In this case, default values for keywords, urls, name and release notes are used
 
 [Starting March 20, 2019 Apple's App Store](https://developer.apple.com/news/?id=03202019a) requires 12.9-inch iPad Pro (3rd generation) screenshots additionally to the iPad Pro 2nd generation [screenshots](https://help.apple.com/app-store-connect/#/devd274dd925). As fastlane historically uses the screenshot dimensions to determine the "display family" of a screenshot, this poses a problem as both use the same dimensions and are recognized as the same device family.
 
-To solve this a screenshot of a 12.9-inch iPad Pro (3rd generation) must contain either the string `(3rd generation)` or `ipadPro129` (Apple's internal naming of the display family for the 3rd generation iPad Pro) in its filename to be assigned the correct display family and to be uploaded to the correct screenshot slot in your app's metadata.
+To solve this a screenshot of a 12.9-inch iPad Pro (3rd generation) must contain either the string `iPad Pro (12.9-inch) (3rd generation)` or `ipadPro129` (Apple's internal naming of the display family for the 3rd generation iPad Pro) in its filename to be assigned the correct display family and to be uploaded to the correct screenshot slot in your app's metadata.
 
 ## Automatically create screenshots
 

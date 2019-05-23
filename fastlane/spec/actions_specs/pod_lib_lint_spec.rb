@@ -108,6 +108,46 @@ describe Fastlane do
 
         expect(result).to eq("bundle exec pod lib lint --external-podspecs='**/*.podspec'")
       end
+
+      it "generates the correct pod lib lint command with no_clean parameter" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_lib_lint(no_clean: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod lib lint --no-clean")
+      end
+
+      it "generates the correct pod lib lint command with no_subspecs parameter" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_lib_lint(no_subspecs: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod lib lint --no-subspecs")
+      end
+
+      it "generates the correct pod lib lint command with platforms parameter" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_lib_lint(platforms: 'ios,macos')
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod lib lint --platforms=ios,macos")
+      end
+
+      it "generates the correct pod lib lint command with skip_import_validation parameter" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_lib_lint(skip_import_validation: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod lib lint --skip-import-validation")
+      end
+
+      it "generates the correct pod lib lint command with skip_tests parameter" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_lib_lint(skip_tests: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod lib lint --skip-tests")
+      end
     end
   end
 end
