@@ -261,6 +261,17 @@ module Spaceship
       end
 
       #
+      # betaBuildMetrics
+      #
+
+      def get_beta_build_metrics(filter: {}, includes: nil, limit: nil, sort: nil)
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/betaBuildMetrics
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        get("betaBuildMetrics", params)
+      end
+
+      #
       # betaGroups
       #
 
@@ -358,6 +369,17 @@ module Spaceship
         }
 
         delete(path, nil, body)
+      end
+
+      #
+      # betaTesterMetrics
+      #
+
+      def get_beta_tester_metrics(filter: {}, includes: nil, limit: nil, sort: nil)
+        # GET
+        # https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics
+        params = build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        get("betaTesterMetrics", params)
       end
 
       #

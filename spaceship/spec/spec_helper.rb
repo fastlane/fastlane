@@ -70,11 +70,15 @@ def before_each_spaceship
   ConnectAPIStubbing.stub_beta_app_review_details
   ConnectAPIStubbing.stub_beta_app_review_submissions
   ConnectAPIStubbing.stub_beta_build_localizations
+  ConnectAPIStubbing.stub_beta_build_metrics
   ConnectAPIStubbing.stub_beta_groups
+  ConnectAPIStubbing.stub_beta_testers
+  ConnectAPIStubbing.stub_beta_tester_metrics
   ConnectAPIStubbing.stub_build_beta_details
   ConnectAPIStubbing.stub_build_deliveries
   ConnectAPIStubbing.stub_builds
   ConnectAPIStubbing.stub_pre_release_versions
+  ConnectAPIStubbing.stub_users
 end
 
 def after_each_spaceship

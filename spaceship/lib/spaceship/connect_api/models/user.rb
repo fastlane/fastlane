@@ -31,7 +31,7 @@ module Spaceship
       })
 
       def self.type
-        return "user"
+        return "users"
       end
 
       #

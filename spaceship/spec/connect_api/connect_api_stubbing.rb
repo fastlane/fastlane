@@ -44,9 +44,24 @@ class ConnectAPIStubbing
         to_return(status: 200, body: read_fixture_file('beta_build_localizations.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
+    def stub_beta_build_metrics
+      stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/betaBuildMetrics").
+        to_return(status: 200, body: read_fixture_file('beta_build_metrics.json'), headers: { 'Content-Type' => 'application/json' })
+    end
+
     def stub_beta_groups
       stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/betaGroups").
         to_return(status: 200, body: read_fixture_file('beta_groups.json'), headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def stub_beta_testers
+      stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/betaTesters").
+        to_return(status: 200, body: read_fixture_file('beta_testers.json'), headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def stub_beta_tester_metrics
+      stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics").
+        to_return(status: 200, body: read_fixture_file('beta_tester_metrics.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
     def stub_build_beta_details
@@ -67,6 +82,11 @@ class ConnectAPIStubbing
     def stub_pre_release_versions
       stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions").
         to_return(status: 200, body: read_fixture_file('pre_release_versions.json'), headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def stub_users
+      stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/users").
+        to_return(status: 200, body: read_fixture_file('users.json'), headers: { 'Content-Type' => 'application/json' })
     end
   end
 end
