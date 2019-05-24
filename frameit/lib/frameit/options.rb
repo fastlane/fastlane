@@ -70,6 +70,11 @@ module Frameit
                                      env_name: "FRAMEIT_DEBUG_MODE",
                                      description: "Output debug information in framed screenshots",
                                      default_value: false,
+                                     type: Boolean),
+        FastlaneCore::ConfigItem.new(key: :resume,
+                                     env_name: "FRAMEIT_RESUME",
+                                     description: "Resume frameit instead of reprocessing all screenshots",
+                                     default_value: false,
                                      type: Boolean)
       ]
     end

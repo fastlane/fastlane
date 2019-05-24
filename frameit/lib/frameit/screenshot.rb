@@ -119,6 +119,17 @@ module Frameit
       return self.landscape_left? || self.landscape_right
     end
 
+    def output_path
+      path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
+    end
+
+    # If the framed screenshot was generated *before* the screenshot file,
+    # then we must be outdated.
+    def outdated?
+      return true unless File.exist?(output_path)
+      return File.mtime(path) > File.mtime(output_path)
+    end
+
     def to_s
       self.path
     end
