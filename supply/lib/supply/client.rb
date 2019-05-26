@@ -120,7 +120,7 @@ module Supply
           private_key: key.to_s,
           client_email: params[:issuer]
         }
-        service_account_json = StringIO.new(MultiJson.dump(cred_json))
+        service_account_json = StringIO.new(JSON.dump(cred_json))
         service_account_json
       else
         UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
