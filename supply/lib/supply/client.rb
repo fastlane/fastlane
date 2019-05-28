@@ -78,8 +78,20 @@ module Supply
 
     def call_google_api
       yield if block_given?
-    rescue Google::Apis::ClientError => e
-      UI.user_error!("Google Api Error: #{e.message}")
+    rescue Google::Apis::Error => e
+      error = begin
+                JSON.parse(e.body)
+              rescue
+                nil
+              end
+
+      if error
+        message = error["error"] && error["error"]["message"]
+      else
+        message = e.body
+      end
+
+      UI.user_error!("Google Api Error: #{e.message} - #{message}")
     end
   end
 
@@ -108,7 +120,7 @@ module Supply
           private_key: key.to_s,
           client_email: params[:issuer]
         }
-        service_account_json = StringIO.new(MultiJson.dump(cred_json))
+        service_account_json = StringIO.new(JSON.dump(cred_json))
         service_account_json
       else
         UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
@@ -353,6 +365,23 @@ module Supply
           apk_listing.apk_version_code,
           apk_listing.language,
           apk_listing_object
+        )
+      end
+    end
+
+    def update_obb(apk_version_code, expansion_file_type, references_version, file_size)
+      ensure_active_edit!
+
+      call_google_api do
+        client.update_expansion_file(
+          current_package_name,
+          current_edit.id,
+          apk_version_code,
+          expansion_file_type,
+          Google::Apis::AndroidpublisherV2::ExpansionFile.new(
+            references_version: references_version,
+            file_size: file_size
+          )
         )
       end
     end

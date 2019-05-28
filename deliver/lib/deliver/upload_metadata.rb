@@ -10,7 +10,7 @@ module Deliver
     NON_LOCALISED_VERSION_VALUES = [:copyright]
 
     # Localised app details values
-    LOCALISED_APP_VALUES = [:name, :subtitle, :privacy_url]
+    LOCALISED_APP_VALUES = [:name, :subtitle, :privacy_url, :apple_tv_privacy_policy]
 
     # Non localized app details values
     NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category,
@@ -130,6 +130,7 @@ module Deliver
       set_trade_representative_contact_information(v, options)
       set_review_information(v, options)
       set_app_rating(v, options)
+      v.ratings_reset = options[:reset_ratings] unless options[:reset_ratings].nil?
 
       Helper.show_loading_indicator("Uploading metadata to App Store Connect")
       v.save!

@@ -103,8 +103,8 @@ module FastlaneCore
     # returns the Xcodeproj::Workspace or nil if it is a project
     def workspace
       return nil unless workspace?
+
       @workspace ||= Xcodeproj::Workspace.new_from_xcworkspace(path)
-      @workspace.load_schemes(path)
       @workspace
     end
 

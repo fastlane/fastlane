@@ -3,36 +3,49 @@ module Fastlane
     GIT_MERGE_COMMIT_FILTERING_OPTIONS = [:include_merges, :exclude_merges, :only_include_merges].freeze
 
     def self.git_log_between(pretty_format, from, to, merge_commit_filtering, date_format = nil, ancestry_path)
-      command = ['git log']
-      command << "--pretty=\"#{pretty_format}\""
-      command << "--date=\"#{date_format}\"" if date_format
+      command = %w(git log)
+      command << "--pretty=#{pretty_format}"
+      command << "--date=#{date_format}" if date_format
       command << '--ancestry-path' if ancestry_path
-      command << "#{from.shellescape}...#{to.shellescape}"
+      command << "#{from}...#{to}"
       command << git_log_merge_commit_filtering_option(merge_commit_filtering)
-      Actions.sh(command.compact.join(' '), log: false).chomp
+      # "*command" syntax expands "command" array into variable arguments, which
+      # will then be individually shell-escaped by Actions.sh.
+      Actions.sh(*command.compact, log: false).chomp
     rescue
       nil
     end
 
     def self.git_log_last_commits(pretty_format, commit_count, merge_commit_filtering, date_format = nil, ancestry_path)
-      command = ['git log']
-      command << "--pretty=\"#{pretty_format}\""
-      command << "--date=\"#{date_format}\"" if date_format
+      command = %w(git log)
+      command << "--pretty=#{pretty_format}"
+      command << "--date=#{date_format}" if date_format
       command << '--ancestry-path' if ancestry_path
-      command << "-n #{commit_count}"
+      command << '-n' << commit_count.to_s
       command << git_log_merge_commit_filtering_option(merge_commit_filtering)
-      Actions.sh(command.compact.join(' '), log: false).chomp
+      Actions.sh(*command.compact, log: false).chomp
+    rescue
+      nil
+    end
+
+    def self.last_git_tag_hash(tag_match_pattern = nil)
+      tag_pattern_param = tag_match_pattern ? "=#{tag_match_pattern}" : ''
+      Actions.sh('git', 'rev-list', "--tags#{tag_pattern_param}", '--max-count=1').chomp
     rescue
       nil
     end
 
     def self.last_git_tag_name(match_lightweight = true, tag_match_pattern = nil)
-      tag_pattern_param = tag_match_pattern ? "=#{tag_match_pattern.shellescape}" : ''
+      hash = last_git_tag_hash(tag_match_pattern)
+      # If hash is nil (command fails), "git describe" command below will still
+      # run and provide some output, although it's definitely not going to be
+      # anything reasonably expected. Bail out early.
+      return unless hash
 
-      command = ['git describe']
+      command = %w(git describe)
       command << '--tags' if match_lightweight
-      command << "`git rev-list --tags#{tag_pattern_param} --max-count=1`"
-      Actions.sh(command.compact.join(' '), log: false).chomp
+      command << hash
+      Actions.sh(*command.compact, log: false).chomp
     rescue
       nil
     end
@@ -52,10 +65,10 @@ module Fastlane
     # Gets the last git commit information formatted into a String by the provided
     # pretty format String. See the git-log documentation for valid format placeholders
     def self.last_git_commit_formatted_with(pretty_format, date_format = nil)
-      command = ['git log -1']
-      command << "--pretty=\"#{pretty_format}\""
-      command << "--date=\"#{date_format}\"" if date_format
-      Actions.sh(command.compact.join(' '), log: false).chomp
+      command = %w(git log -1)
+      command << "--pretty=#{pretty_format}"
+      command << "--date=#{date_format}" if date_format
+      Actions.sh(*command.compact, log: false).chomp
     rescue
       nil
     end

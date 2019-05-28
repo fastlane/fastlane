@@ -66,6 +66,9 @@
 # new features January 2019
 # 1. fixed bug where the com.apple.icloud-container-environment entitlement was being assigned an incorrect value
 #
+# new features March 2019
+# 1. two more fixes for only creating the archived-expanded-entitlements.xcent file if the version of Xcode < 9.3 as Xcode 10 does not create it.
+#
 
 # Logging functions
 
@@ -589,7 +592,10 @@ function resign {
 
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and entitlements: $ENTITLEMENTS"
-        cp -f "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
+        if [[ "${XCODE_VERSION/.*/}" -lt 10 ]]; then
+            log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
+            cp -f "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
+        fi
         /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
         checkStatus
     elif  [[ -n "${USE_APP_ENTITLEMENTS}" ]]; then
@@ -816,7 +822,10 @@ function resign {
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and patched entitlements:"
         log "$(cat "$PATCHED_ENTITLEMENTS")"
-        cp -f "$PATCHED_ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
+        if [[ "${XCODE_VERSION/.*/}" -lt 10 ]]; then
+            log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
+            cp -f "$PATCHED_ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
+        fi
         /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
         checkStatus
     else

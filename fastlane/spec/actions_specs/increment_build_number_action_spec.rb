@@ -32,11 +32,6 @@ describe Fastlane do
             .once
             .and_return("")
 
-          expect(Fastlane::Actions).to receive(:sh)
-            .with(/agvtool what[-]version/, log: false)
-            .once
-            .and_return("Current version of project Test is:\n24")
-
           result = Fastlane::FastFile.new.parse("lane :test do
             increment_build_number(build_number: 24, xcodeproj: '.xcproject')
           end").runner.execute(:test)
@@ -48,11 +43,6 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:sh)
             .with(/agvtool new[-]version [-]all 24 && cd [-]/)
             .and_return("Something\n$(SRCROOT)/Test/Info.plist")
-
-          expect(Fastlane::Actions).to receive(:sh)
-            .with(/agvtool what[-]version/, log: false)
-            .once
-            .and_return("Current version of project Test is:\n24")
 
           expect(UI).to receive(:error).with('Cannot set build number with plist path containing $(SRCROOT)')
           expect(UI).to receive(:error).with('Please remove $(SRCROOT) in your Xcode target build settings')
@@ -78,11 +68,6 @@ describe Fastlane do
             .once
             .and_return("")
 
-          expect(Fastlane::Actions).to receive(:sh)
-            .with(/agvtool what[-]version/, log: false)
-            .once
-            .and_return("Current version of project Test is:\n24")
-
           result = Fastlane::FastFile.new.parse("lane :test do
             increment_build_number(build_number: '24\n', xcodeproj: '.xcproject')
           end").runner.execute(:test)
@@ -102,6 +87,20 @@ describe Fastlane do
               increment_build_number(xcodeproj: '.xcproject')
             end").runner.execute(:test)
           end.to raise_error(/Apple Generic Versioning is not enabled./)
+        end
+
+        it "pass a custom build number to the tool" do
+          expect(Fastlane::Actions).to receive(:sh)
+            .with(/agvtool new[-]version [-]all 21 && cd [-]/)
+            .once
+            .and_return("")
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            increment_build_number(build_number: 21, xcodeproj: '.xcproject')
+          end").runner.execute(:test)
+
+          expect(result).to eq('21')
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER]).to eq('21')
         end
       end
     end

@@ -42,10 +42,10 @@ describe Spaceship::TestFlight::BuildTrains do
 
   context '.all' do
     it 'returns versions and builds' do
-      build_trains = Spaceship::TestFlight::BuildTrains.all(app_id: 'some-app-id', platform: 'ios')
-      expect(build_trains['1.0'].size).to eq(1)
-      expect(build_trains['1.1'].size).to eq(2)
-      expect(build_trains.values.flatten.size).to eq(3)
+      #      build_trains = Spaceship::TestFlight::BuildTrains.all(app_id: 'some-app-id', platform: 'ios')
+      #      expect(build_trains['1.0'].size).to eq(1)
+      #      expect(build_trains['1.1'].size).to eq(2)
+      #      expect(build_trains.values.flatten.size).to eq(3)
     end
   end
 end

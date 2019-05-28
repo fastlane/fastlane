@@ -38,8 +38,8 @@ module Spaceship
             'ipad' => [1024, 768],
             'ipad105' => [2224, 1668],
             'ipadPro' => [2732, 2048],
-            'iPadPro11' => [2388, 1668],
-            'iPadPro129' => [2732, 2048]
+            'ipadPro11' => [2388, 1668],
+            'ipadPro129' => [2732, 2048]
         }
 
         r = resolutions[device]
@@ -258,6 +258,11 @@ module Spaceship
 
     def app_details(app_id)
       r = request(:get, "ra/apps/#{app_id}/details")
+      parse_response(r, 'data')
+    end
+
+    def bundle_details(app_id)
+      r = request(:get, "ra/appbundles/metadetail/#{app_id}")
       parse_response(r, 'data')
     end
 

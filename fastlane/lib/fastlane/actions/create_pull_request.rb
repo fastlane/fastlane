@@ -36,6 +36,9 @@ module Fastlane
           # Add labels to pull request
           add_labels(params, number) if params[:labels]
 
+          # Add assignees to pull request
+          add_assignees(params, number) if params[:assignees]
+
           Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_HTML_URL] = html_url
           return html_url
         end
@@ -60,12 +63,37 @@ module Fastlane
         )
       end
 
+      def self.add_assignees(params, number)
+        payload = {
+          'assignees' => params[:assignees]
+        }
+        GithubApiAction.run(
+          server_url: params[:api_url],
+          api_token: params[:api_token],
+          http_method: 'POST',
+          path: "repos/#{params[:repo]}/issues/#{number}/assignees",
+          body: payload,
+          error_handlers: {
+            '*' => proc do |result|
+              UI.error("GitHub responded with #{result[:status]}: #{result[:body]}")
+              return nil
+            end
+          }
+        )
+      end
+
       #####################################################
       # @!group Documentation
       #####################################################
 
       def self.description
         "This will create a new pull request on GitHub"
+      end
+
+      def self.output
+        [
+          ['CREATE_PULL_REQUEST_HTML_URL', 'The HTML URL to the created pull request']
+        ]
       end
 
       def self.available_options
@@ -119,12 +147,17 @@ module Fastlane
                                        is_string: true,
                                        code_gen_default_value: 'https://api.github.com',
                                        default_value: 'https://api.github.com',
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :assignees,
+                                       env_name: "GITHUB_PULL_REQUEST_ASSIGNEES",
+                                       description: "The assignees for the pull request",
+                                       type: Array,
                                        optional: true)
         ]
       end
 
       def self.author
-        ["seei", "tommeier"]
+        ["seei", "tommeier", "marumemomo"]
       end
 
       def self.is_supported?(platform)

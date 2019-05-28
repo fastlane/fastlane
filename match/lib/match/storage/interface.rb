@@ -76,6 +76,7 @@ module Match
             UI.user_error!("Neither `files_to_commit` nor `files_to_delete` were provided to the `save_changes!` method call")
           end
         end
+        self.clear_changes
       end
 
       def upload_files(files_to_upload: [], custom_message: nil)

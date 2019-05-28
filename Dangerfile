@@ -31,3 +31,12 @@ if File.exist?(file_path)
 else
   puts("Couldn't find any test artifacts in path #{file_path}")
 end
+
+# PRs being made on a branch from a different owner should warn to allow maintainers access to modify
+head_owner = github.pr_json["head"]["repo"]["owner"]["login"]
+base_owner = github.pr_json["base"]["repo"]["owner"]["login"]
+if !github.pr_json["maintainer_can_modify"] && head_owner != base_owner
+  warn("If you would allow the maintainers access to make changes to your branch that would be 💯 " \
+    "This allows maintainers to help move pull requests through quicker if there are any changes that they can help with 😊 " \
+    "See more info at https://help.github.com/en/articles/allowing-changes-to-a-pull-request-branch-created-from-a-fork")
+end

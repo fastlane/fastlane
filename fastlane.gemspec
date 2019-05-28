@@ -15,26 +15,26 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Jérôme Lacoste",
-                        "Stefan Natchev",
-                        "Kohki Miki",
-                        "Aaron Brager",
-                        "Felix Krause",
-                        "Andrew McBurney",
-                        "Jimmy Dee",
-                        "Jan Piotrowski",
-                        "Matthew Ellis",
-                        "Joshua Liebowitz",
-                        "Josh Holtz",
-                        "Maksym Grebenets",
-                        "Luka Mirosevic",
-                        "Fumiya Nakamura",
-                        "Manu Wallner",
-                        "Iulian Onofrei",
+  spec.authors       = ["Helmut Januschka",
                         "Olivier Halligon",
-                        "Helmut Januschka",
+                        "Danielle Tomlinson",
+                        "Joshua Liebowitz",
+                        "Andrew McBurney",
+                        "Stefan Natchev",
+                        "Jérôme Lacoste",
+                        "Felix Krause",
+                        "Fumiya Nakamura",
+                        "Aaron Brager",
+                        "Jan Piotrowski",
+                        "Iulian Onofrei",
+                        "Manu Wallner",
+                        "Matthew Ellis",
+                        "Maksym Grebenets",
                         "Jorge Revuelta H",
-                        "Danielle Tomlinson"]
+                        "Luka Mirosevic",
+                        "Kohki Miki",
+                        "Josh Holtz",
+                        "Jimmy Dee"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -55,9 +55,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = Dir["*/lib"]
 
   spec.add_dependency('slack-notifier', '>= 2.0.0', '< 3.0.0') # Slack notifications
-  spec.add_dependency('xcodeproj', '>= 1.6.0', '< 2.0.0') # Modify Xcode projects
+  spec.add_dependency('xcodeproj', '>= 1.8.1', '< 2.0.0') # Modify Xcode projects
   spec.add_dependency('xcpretty', '~> 0.3.0') # prettify xcodebuild output
-  spec.add_dependency('terminal-notifier', '>= 1.6.2', '< 2.0.0') # macOS notifications
+  spec.add_dependency('terminal-notifier', '>= 2.0.0', '< 3.0.0') # macOS notifications
   spec.add_dependency('terminal-table', '>= 1.4.5', '< 2.0.0') # Actions documentation
   spec.add_dependency('plist', '>= 3.1.0', '< 4.0.0') # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency('CFPropertyList', '>= 2.3', '< 4.0.0') # Needed to be able to read binary plist format
@@ -81,7 +81,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency('highline', '>= 1.7.2', '< 2.0.0') # user inputs (e.g. passwords)
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
   spec.add_dependency('mini_magick', '~> 4.5.1') # To open, edit and export PSD files
-  spec.add_dependency('multi_json') # Because sometimes it's just not installed
   spec.add_dependency('multi_xml', '~> 0.5')
   spec.add_dependency('rubyzip', '>= 1.2.2', '< 2.0.0') # fix swift/ipa in gym
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
@@ -117,4 +116,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('fakefs', '~> 0.8.1')
   spec.add_development_dependency('sinatra', '~> 1.4.8')
   spec.add_development_dependency('xcov', '~> 1.4.1') # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
+  spec.add_development_dependency('climate_control', '~> 0.2.0')
 end
