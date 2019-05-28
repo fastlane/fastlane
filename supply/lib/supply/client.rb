@@ -311,15 +311,12 @@ module Supply
       ensure_active_edit!
 
       track_version_codes = apk_version_code.kind_of?(Array) ? apk_version_code : [apk_version_code]
-
-      # This change happend on 2018-04-24
-      # rollout cannot be sent on any other track besides "rollout"
-      # https://github.com/fastlane/fastlane/issues/12372
-      rollout = nil unless track == "rollout"
+      staged_release = (track == "rollout" && rollout < 1.0)
 
       track_body = Androidpublisher::Track.new({
         track: track,
-        user_fraction: rollout,
+        user_fraction: staged_release ? rollout : nil,
+        status: staged_release ? "inProgress" : "completed",
         version_codes: track_version_codes
       })
 
