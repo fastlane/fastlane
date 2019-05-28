@@ -60,6 +60,11 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
     }
 }
 
+enum ScreenshotMethod {
+    case window
+    case screen
+}
+
 @objcMembers
 open class Snapshot: NSObject {
     static var app: XCUIApplication?
@@ -68,6 +73,7 @@ open class Snapshot: NSObject {
     static var screenshotsDirectory: URL? {
         return cacheDirectory?.appendingPathComponent("screenshots", isDirectory: true)
     }
+    static var screenshotMethod: ScreenshotMethod = .window
 
     open class func setupSnapshot(_ app: XCUIApplication, waitForAnimations: Bool = true) {
         
@@ -80,6 +86,7 @@ open class Snapshot: NSObject {
             setLanguage(app)
             setLocale(app)
             setLaunchArguments(app)
+            setConfiguration()
         } catch let error {
             print(error)
         }
@@ -148,6 +155,24 @@ open class Snapshot: NSObject {
         }
     }
 
+    class func setConfiguration() {
+        guard let cacheDirectory = self.cacheDirectory else {
+            print("CacheDirectory is not set - probably running on a physical device?")
+            return
+        }
+
+        let path = cacheDirectory.appendingPathComponent("configuration.json")
+        do {
+            let config = try JSONSerialization.jsonObject(with: Data(contentsOf: path), options: [])
+            let configDict = config as? [String: Any]
+            if (configDict?["snapshot_method_screen"] as? Bool) == true {
+                screenshotMethod = .screen
+            }
+        } catch {
+            print("Couldn't detect/set configuration...")
+        }
+    }
+
     open class func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20) {
         if timeout > 0 {
             waitForLoadingIndicatorToDisappear(within: timeout)
@@ -167,14 +192,20 @@ open class Snapshot: NSObject {
 
             app.typeKey(XCUIKeyboardKeySecondaryFn, modifierFlags: [])
         #else
-            
-            guard let app = self.app else {
-                print("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
-                return
+            let screenshot: XCUIScreenshot
+            switch screenshotMethod {
+            case .window:
+                guard let app = self.app else {
+                    print("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
+                    return
+                }
+
+                let window = app.windows.firstMatch
+                screenshot = window.screenshot()
+            case .screen:
+                screenshot = XCUIScreen.main.screenshot()
             }
-            
-            let window = app.windows.firstMatch
-            let screenshot = window.screenshot()
+
             guard let simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
             let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
             do {
@@ -295,4 +326,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.15]
+// SnapshotHelperVersion [1.16]

@@ -216,6 +216,11 @@ module Snapshot
                                      env_name: "SNAPSHOT_EXECUTE_CONCURRENT_SIMULATORS",
                                      description: "Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9",
                                      default_value: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :method_screen,
+                                     env_name: "SNAPSHOT_METHOD_SCREEN",
+                                     description: "Should snapshot take screenshots of the screen instead of window",
+                                     default_value: false,
                                      is_string: false)
       ]
     end

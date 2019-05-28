@@ -1,4 +1,5 @@
 require 'plist'
+require 'json'
 
 require_relative '../module'
 require_relative '../test_command_generator'
@@ -43,6 +44,7 @@ module Snapshot
       File.write(File.join(CACHE_DIR, "language.txt"), language)
       File.write(File.join(CACHE_DIR, "locale.txt"), locale || "")
       File.write(File.join(CACHE_DIR, "snapshot-launch_arguments.txt"), launch_arguments.last)
+      File.write(File.join(CACHE_DIR, "configuration.json"), launcher_config.configuration.to_json)
     end
 
     def prepare_simulators_for_launch(device_types, language: nil, locale: nil)
