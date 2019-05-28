@@ -120,39 +120,6 @@ describe "Build Manager" do
       ]
     end
 
-    #    describe "distribute failures" do
-    #      before(:each) do
-    #        # default client mocks setup
-    #        allow(fake_build_manager).to receive(:login)
-    #        allow(Spaceship::TestFlight::Base).to receive(:client).and_return(mock_base_client)
-    #        allow(mock_base_client).to receive(:team_id).and_return('')
-    #
-    #        allow(Spaceship::ConnectAPI::Build).to receive(:all).and_return([ready_to_submit_mock_build])
-    #
-    ##        allow(Spaceship::ConnectAPI::Base).to receive(:client).and_return(mock_base_api_client)
-    ##        allow(mock_base_api_client).to receive(:get_builds).and_return(mock_api_client_builds)
-    #        allow(mock_base_api_client).to receive(:patch_beta_app_review_detail).and_return(mock_api_client_builds)
-    ##        allow(mock_base_api_client).to receive(:get_build_beta_details).and_return(mock_api_client_build_beta_details)
-    ##        allow(mock_base_api_client).to receive(:get_beta_app_localizations).and_return(mock_api_client_beta_app_localizations)
-    #        allow(mock_base_api_client).to receive(:patch_beta_app_localizations)
-    #        allow(mock_base_api_client).to receive(:post_beta_app_localizations)
-    #        allow(mock_base_api_client).to receive(:patch_build_beta_details)
-    ##        allow(mock_base_api_client).to receive(:get_beta_groups).and_return(mock_api_client_beta_groups)
-    ##        allow(mock_base_api_client).to receive(:add_beta_groups_to_build)
-    #      end
-    #
-    #      it "throws if there is a different error than 504" do
-    #        allow(mock_base_api_client).to receive(:post_beta_app_review_submissions).and_raise(Spaceship::Client::InternalServerError, "Server error got 500")
-    #        expect { fake_build_manager.distribute(distribute_options, build: ready_to_submit_mock_build) }.to raise_error(Spaceship::Client::InternalServerError, "Server error got 500")
-    #      end
-    #
-    #      it "doesnt try to recover if no 504" do
-    #        allow(mock_base_api_client).to receive(:post_beta_app_review_submissions) # pretend it worked.
-    #        expect(FastlaneCore::UI).not_to(receive(:message).with('Submitting the build for review timed out, trying to recover.'))
-    #        fake_build_manager.distribute(distribute_options, build: ready_to_submit_mock_build)
-    #      end
-    #    end
-
     describe "distribute success" do
       let(:distribute_options_non_localized) do
         {
