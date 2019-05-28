@@ -129,7 +129,8 @@ module Gym
 
       def result_bundle_path
         unless Gym.cache[:result_bundle_path]
-          path = File.join(Gym.config[:output_directory], Gym.config[:output_name]) + ".result"
+          path = Gym.config[:result_bundle_path]
+          path ||= File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".result")
           if File.directory?(path)
             FileUtils.remove_dir(path)
           end
