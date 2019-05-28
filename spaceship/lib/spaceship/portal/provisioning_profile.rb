@@ -548,12 +548,6 @@ module Spaceship
 
         @template ||= ProvisioningProfileTemplate.factory(profile_details['template'])
       end
-
-      # @return (String) The name of the template (as displayed in Dev Portal)
-      #   or nil if provisioning profile doesn't have a template
-      def template_name
-        is_template_profile ? template.purpose_display_name : nil
-      end
     end
   end
 end
