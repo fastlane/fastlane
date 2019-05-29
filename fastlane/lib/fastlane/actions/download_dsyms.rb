@@ -53,7 +53,7 @@ module Fastlane
 
         # Write a nice message
         message = []
-        message << "Looking for dSYM files for #{params[:app_identifier]}"
+        message << "Looking for dSYM files for '#{params[:app_identifier]}' on platform #{platform}"
         message << "v#{version}" if version
         message << "(#{build_number})" if build_number
         UI.message(message.join(" "))
