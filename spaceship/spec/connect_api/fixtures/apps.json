@@ -177,8 +177,7 @@
       }
     } ],
     "links" : {
-      "self" : "https://appstoreconnect.apple.com/iris/v1/apps?limit=2",
-      "next" : "https://appstoreconnect.apple.com/iris/v1/apps?cursor=AoJ45Nu4yOkCKTk3NDA1NTA3Nw%3D%3D.ANPCCyA&limit=2"
+      "self" : "https://appstoreconnect.apple.com/iris/v1/apps?limit=2"
     },
     "meta" : {
       "paging" : {

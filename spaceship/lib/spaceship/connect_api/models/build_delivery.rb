@@ -20,6 +20,10 @@ module Spaceship
         return "buildDeliveries"
       end
 
+      #
+      # API
+      #
+
       def self.all(app_id: nil, version: nil, build_number: nil)
         resps = client.get_build_deliveries(
           filter: { app: app_id, cfBundleShortVersionString: version, cfBundleVersion: build_number },
