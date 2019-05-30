@@ -10,10 +10,10 @@ require_relative 'module'
 
 module Pilot
   class Manager
-    def start(options)
+    def start(options, should_login: true)
       return if @config # to not login multiple times
       @config = options
-      login
+      login if should_login
     end
 
     def login
@@ -43,6 +43,7 @@ module Pilot
     ################
 
     def fetch_app_id
+      @app_id ||= config[:apple_id]
       return @app_id if @app_id
       config[:app_identifier] = fetch_app_identifier
 
@@ -52,9 +53,9 @@ module Pilot
         app_id ||= @app.id
       end
 
-      app_id ||= UI.input("Could not automatically find the app ID, please enter it here (e.g. 956814360): ")
+      apple_id ||= UI.input("Could not automatically find the app ID, please enter it here (e.g. 956814360): ")
 
-      return app_id
+      return apple_id
     end
 
     def fetch_app_identifier
