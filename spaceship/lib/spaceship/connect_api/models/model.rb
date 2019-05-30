@@ -11,17 +11,6 @@ module Spaceship
       end
 
       module ClassMethods
-        def parse(json)
-          model_or_models = Models.parse(json)
-          models = [model_or_models].flatten
-
-          models.each do |model|
-            raise "#{model} is not of type #{self}" unless model.kind_of?(self)
-          end
-
-          model_or_models
-        end
-
         def client
           return Spaceship::ConnectAPI::Base.client
         end
@@ -138,21 +127,33 @@ module Spaceship
         # Relationship attributes to set
         attributes = {}
 
-        # 1. Iterate over relations
+        # 1. Iterate over relationships
         # 2. Find id and type
         # 3. Find matching id and type in included
         # 4. Inflate matching data and set in attributes
         relationships.each do |key, value|
-          value_data = value["data"]
-          next unless value_data
-          id = value_data["id"]
-          type = value_data["type"]
+          # Validate data exists
+          value_data_or_datas = value["data"]
+          next unless value_data_or_datas
 
-          relationship_data = included.find do |included_data|
-            id == included_data["id"] && type == included_data["type"]
+          # Map an included data object
+          map_data = lambda do |value_data|
+            id = value_data["id"]
+            type = value_data["type"]
+
+            relationship_data = included.find do |included_data|
+              id == included_data["id"] && type == included_data["type"]
+            end
+
+            inflate_model(relationship_data, included)
           end
 
-          attributes[key] = inflate_model(relationship_data, included)
+          # Map a hash or an array of data
+          if value_data_or_datas.kind_of?(Hash)
+            attributes[key] = map_data.call(value_data_or_datas)
+          elsif value_data_or_datas.kind_of?(Array)
+            attributes[key] = value_data_or_datas.map(&map_data)
+          end
         end
 
         type_instance.update_attributes(attributes)

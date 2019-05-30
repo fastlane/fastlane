@@ -4,13 +4,13 @@
       "id" : "123456789",
       "attributes" : {
         "name" : "App Store Connect Users",
-        "createdDate" : "2018-03-13T23:03:24Z",
-        "isInternalGroup" : true,
-        "publicLinkEnabled" : null,
-        "publicLinkId" : null,
-        "publicLinkLimitEnabled" : null,
-        "publicLinkLimit" : null,
-        "publicLink" : null
+        "createdDate" : "2018-04-15T18:13:40Z",
+        "isInternalGroup" : false,
+        "publicLinkEnabled" : true,
+        "publicLinkId" : "abcd1234",
+        "publicLinkLimitEnabled" : true,
+        "publicLinkLimit" : 10,
+        "publicLink" : "https://testflight.apple.com/join/abcd1234"
       },
       "relationships" : {
         "app" : {
