@@ -128,7 +128,7 @@ module Pilot
 
     def update_beta_app_meta(options, build)
       # App Store Connect API build id
-      build_id = build.find_app_store_connect_build["id"]
+      build_id = build.id
 
       # Setting account required wth AppStore Connect API
       update_review_detail(build.app_id, { demo_account_required: options[:demo_account_required] })
@@ -269,8 +269,7 @@ module Pilot
         end
 
         unless beta_group_ids.empty?
-          build = uploaded_build.find_app_store_connect_build
-          build_id = build["id"]
+          build_id = uploaded_build.id
 
           client.add_beta_groups_to_build(build_id: build_id, beta_group_ids: beta_group_ids)
         end
