@@ -19,12 +19,12 @@ module Spaceship::TestFlight
       included = []
       cursor = nil
 
-      preReleasePlatform = case platform
-      when "appletvos"
-        "TV_OS"
-      else
-        "IOS"
-      end
+      prerelease_platform = case platform
+                            when "appletvos"
+                              "TV_OS"
+                            else
+                              "IOS"
+                            end
 
       loop do
         builds_resp = client.get_builds(filter: { app: app_id, processingState: "VALID,PROCESSING,FAILED,INVALID" }, limit: 100, sort: "uploadedDate", includes: "preReleaseVersion,app", cursor: cursor, only_data: false)
@@ -73,7 +73,7 @@ module Spaceship::TestFlight
         h['trainVersion'] = build["preReleaseVersion"]["attributes"]["version"]
         h['platform'] = build["preReleaseVersion"]["attributes"]["platform"]
 
-        if h['platform'] != preReleasePlatform
+        if h['platform'] != prerelease_platform
           nil
         else
           h
