@@ -44,14 +44,15 @@ module Pilot
         app = Spaceship::ConnectAPI::App.find(app_identifier)
         UI.user_error!("Could not find an app by #{app_identifier}") unless app
         return app
-      elsif apple_id
+      end
+
+      if apple_id
         app = Spaceship::ConnectAPI::App.get(app_id: apple_id)
         UI.user_error!("Could not find an app by #{apple_id}") unless app
         return app
-      else
-        UI.user_error!("You must include an `app_identifier` to `list_testers`")
       end
-      nil
+
+      UI.user_error!("You must include an `app_identifier` to `list_testers`")
     end
   end
 end

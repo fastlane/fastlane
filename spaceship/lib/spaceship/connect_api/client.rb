@@ -2,6 +2,7 @@ require_relative '../client'
 require_relative './response'
 
 module Spaceship
+  # rubocop:disable Metrics/ClassLength
   module ConnectAPI
     class Client < Spaceship::Client
       ##
@@ -546,4 +547,5 @@ module Spaceship
       end
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

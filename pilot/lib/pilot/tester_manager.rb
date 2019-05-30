@@ -14,8 +14,7 @@ module Pilot
       UI.user_error!("You must provide 1 or more groups (with the `:groups` option)") unless groups_param
 
       app.get_beta_groups.select do |group|
-        groups_param.include?(group.name)
-      end.each do |group|
+        next unless groups_param.include?(group.name)
         user = {
           email: config[:email],
           firstName: config[:first_name],
@@ -87,14 +86,15 @@ module Pilot
         app = Spaceship::ConnectAPI::App.find(app_identifier)
         UI.user_error!("Could not find an app by #{app_identifier}") unless app
         return app
-      elsif apple_id
+      end
+
+      if apple_id
         app = Spaceship::ConnectAPI::App.get(app_id: apple_id)
         UI.user_error!("Could not find an app by #{apple_id}") unless app
         return app
-      else
-        UI.user_error!("You must include an `app_identifier` to `list_testers`")
       end
-      nil
+
+      UI.user_error!("You must include an `app_identifier` to `list_testers`")
     end
 
     def find_app_tester(email: nil, app: nil)
