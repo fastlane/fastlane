@@ -59,6 +59,7 @@ module Spaceship::TestFlight
           h['externalState'] = Spaceship::TestFlight::Build::BUILD_STATES[:processing]
         end
 
+        h['id'] = build["id"]
         h['appAdamId'] = build["app"]["id"]
         h['bundleId'] = build["app"]["attributes"]["bundleId"]
 

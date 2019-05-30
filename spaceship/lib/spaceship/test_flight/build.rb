@@ -217,8 +217,7 @@ module Spaceship
         return if ready_to_test?
         return if approved?
 
-        build = find_app_store_connect_build
-        Spaceship::ConnectAPI::Base.client.post_beta_app_review_submissions(build_id: build["id"])
+        Spaceship::ConnectAPI::Base.client.post_beta_app_review_submissions(build_id: id)
       end
 
       def expire!
