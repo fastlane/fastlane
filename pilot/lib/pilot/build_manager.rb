@@ -27,18 +27,18 @@ module Pilot
         end
       end
 
-      UI.success("Ready to upload new build to TestFlight (App: #{fetch_apple_id})...")
+      UI.success("Ready to upload new build to TestFlight (App: #{fetch_app_id})...")
 
       dir = Dir.mktmpdir
 
       platform = fetch_app_platform
-      package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: fetch_apple_id,
+      package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: fetch_app_id,
                                                                       ipa_path: options[:ipa],
                                                                   package_path: dir,
                                                                       platform: platform)
 
       transporter = transporter_for_selected_team(options)
-      result = transporter.upload(fetch_apple_id, package_path)
+      result = transporter.upload(fetch_app_id, package_path)
 
       unless result
         UI.user_error!("Error uploading ipa file, for more information see above")

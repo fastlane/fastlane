@@ -50,7 +50,7 @@ module Pilot
       if config[:app_identifier]
         @app ||= Spaceship::ConnectAPI::App.find(config[:app_identifier])
         UI.user_error!("Couldn't find app '#{config[:app_identifier]}' on the account of '#{config[:username]}' on App Store Connect") unless @app
-        app_id ||= @app.id
+        @app_id ||= @app.id
       end
 
       apple_id ||= UI.input("Could not automatically find the app ID, please enter it here (e.g. 956814360): ")

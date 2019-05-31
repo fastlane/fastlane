@@ -300,17 +300,17 @@ describe "Build Manager" do
         # other stuff required to let `upload` work:
 
         allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_identifier).and_return("com.fastlane")
-        allow(fake_build_manager).to receive(:fetch_apple_id).and_return(123)
+        allow(fake_build_manager).to receive(:fetch_app_id).and_return(123)
         allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_version)
         allow(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_build)
 
         fake_app = double
-        allow(fake_app).to receive(:apple_id).and_return(123)
+        allow(fake_app).to receive(:id).and_return(123)
         allow(fake_build_manager).to receive(:app).and_return(fake_app)
 
         fake_build = double
-        allow(fake_build).to receive(:train_version)
-        allow(fake_build).to receive(:build_version)
+        allow(fake_build).to receive(:app_version)
+        allow(fake_build).to receive(:version)
         allow(FastlaneCore::BuildWatcher).to receive(:wait_for_build_processing_to_be_complete).and_return(fake_build)
 
         allow(fake_build_manager).to receive(:distribute)
