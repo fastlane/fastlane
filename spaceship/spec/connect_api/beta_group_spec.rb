@@ -14,7 +14,7 @@ describe Spaceship::ConnectAPI::BetaGroup do
 
       model = response.first
       expect(model.id).to eq("123456789")
-      expect(model.name).to eq("App Store Connect Users")
+      expect(model.name).to eq("App Store Connect Users")
       expect(model.created_date).to eq("2018-04-15T18:13:40Z")
       expect(model.is_internal_group).to eq(false)
       expect(model.public_link_enabled).to eq(true)

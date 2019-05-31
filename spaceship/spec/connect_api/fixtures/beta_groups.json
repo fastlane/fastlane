@@ -3,7 +3,7 @@
       "type" : "betaGroups",
       "id" : "123456789",
       "attributes" : {
-        "name" : "App Store Connect Users",
+        "name" : "App Store Connect Users",
         "createdDate" : "2018-04-15T18:13:40Z",
         "isInternalGroup" : false,
         "publicLinkEnabled" : true,
