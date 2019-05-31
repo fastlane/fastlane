@@ -157,7 +157,7 @@ describe "Build Manager" do
         options = distribute_options_non_localized
 
         # Expect App.find to be called from within Pilot::Manager
-        expect(Spaceship::ConnectAPI::App).to receive(:find).and_return(app)
+        expect(Spaceship::ConnectAPI::App).to receive(:get).and_return(app)
 
         # Expect a beta app review detail to be patched
         expect(mock_base_client).to receive(:patch_beta_app_review_detail).with({
