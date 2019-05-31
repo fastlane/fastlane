@@ -29,7 +29,7 @@ module Pilot
     def app
       @app_id ||= fetch_app_id
 
-      @app ||= Spaceship::ConnectAPI::App.find(@app_id)
+      @app ||= Spaceship::ConnectAPI::App.get(app_id: @app_id)
       unless @app
         UI.user_error!("Could not find app with #{(config[:apple_id] || config[:app_identifier])}")
       end
@@ -53,9 +53,9 @@ module Pilot
         @app_id ||= @app.id
       end
 
-      apple_id ||= UI.input("Could not automatically find the app ID, please enter it here (e.g. 956814360): ")
+      @app_id ||= UI.input("Could not automatically find the app ID, please enter it here (e.g. 956814360): ")
 
-      return apple_id
+      return @app_id
     end
 
     def fetch_app_identifier
