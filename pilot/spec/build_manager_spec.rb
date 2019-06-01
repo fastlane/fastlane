@@ -26,6 +26,34 @@ describe "Build Manager" do
     end
   end
 
+  describe ".has_changelog_or_whats_new?" do
+    let(:fake_build_manager) { Pilot::BuildManager.new }
+    let(:no_options) { {} }
+    let(:changelog) { { changelog: "Sup" } }
+    let(:whats_new_symbol) { { localized_build_info: { 'en-us' => { whats_new: 'Sup' } } } }
+    let(:whats_new_string) { { localized_build_info: { 'en-us' => { 'whats_new' => 'Sup' } } } }
+
+    it "returns false for no changelog or whats_new" do
+      has = fake_build_manager.has_changelog_or_whats_new?(no_options)
+      expect(has).to eq(false)
+    end
+
+    it "returns true for changelog" do
+      has = fake_build_manager.has_changelog_or_whats_new?(changelog)
+      expect(has).to eq(true)
+    end
+
+    it "returns true for whats_new with symbol" do
+      has = fake_build_manager.has_changelog_or_whats_new?(whats_new_symbol)
+      expect(has).to eq(true)
+    end
+
+    it "returns true for whats_new with string" do
+      has = fake_build_manager.has_changelog_or_whats_new?(whats_new_string)
+      expect(has).to eq(true)
+    end
+  end
+
   describe "distribute submits the build for review" do
     let(:mock_base_client) { "fake api base client" }
     let(:fake_build_manager) { Pilot::BuildManager.new }

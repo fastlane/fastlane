@@ -8,6 +8,7 @@ require 'fastlane_core/ipa_upload_package_builder'
 require_relative 'manager'
 
 module Pilot
+  # rubocop:disable Metrics/ClassLength
   class BuildManager < Manager
     def upload(options)
       # Only need to login before upload if no apple_id was given
@@ -15,17 +16,9 @@ module Pilot
       should_login_in_start = options[:apple_id].nil?
       start(options, should_login: should_login_in_start)
 
-      options[:changelog] = self.class.sanitize_changelog(options[:changelog]) if options[:changelog]
-
       UI.user_error!("No ipa file given") unless config[:ipa]
 
-      if options[:changelog].nil? && options[:distribute_external] == true
-        if UI.interactive?
-          options[:changelog] = UI.input("No changelog provided for new build. You can provide a changelog using the `changelog` option. For now, please provide a changelog here:")
-        else
-          UI.user_error!("No changelog provided for new build. Please either disable `distribute_external` or provide a changelog using the `changelog` option")
-        end
-      end
+      check_for_changelog_or_whats_new!(options)
 
       UI.success("Ready to upload new build to TestFlight (App: #{fetch_app_id})...")
 
@@ -58,6 +51,33 @@ module Pilot
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
       latest_build = wait_for_build_processing_to_be_complete
       distribute(options, build: latest_build)
+    end
+
+    def has_changelog_or_whats_new?(options)
+      # Look for legacy :changelog option
+      has_changelog = !options[:changelog].nil?
+
+      # Look for :whats_new in :localized_build_info
+      unless has_changelog
+        infos_by_lang = options[:localized_build_info] || []
+        infos_by_lang.each do |k, v|
+          next if has_changelog
+          v ||= {}
+          has_changelog = v.key?(:whats_new) || v.key?('whats_new')
+        end
+      end
+
+      return has_changelog
+    end
+
+    def check_for_changelog_or_whats_new!(options)
+      if !has_changelog_or_whats_new?(options) && options[:distribute_external] == true
+        if UI.interactive?
+          options[:changelog] = UI.input("No changelog provided for new build. You can provide a changelog using the `changelog` option. For now, please provide a changelog here:")
+        else
+          UI.user_error!("No changelog provided for new build. Please either disable `distribute_external` or provide a changelog using the `changelog` option")
+        end
+      end
     end
 
     def wait_for_build_processing_to_be_complete
@@ -413,7 +433,7 @@ module Pilot
 
     def update_localized_build_review_for_lang(build, localization, locale, info)
       attributes = {}
-      attributes[:whatsNew] = info[:whats_new] if info.key?(:whats_new)
+      attributes[:whatsNew] = self.class.sanitize_changelog(info[:whats_new]) if info.key?(:whats_new)
 
       client = Spaceship::ConnectAPI::Base.client
       if localization
@@ -434,4 +454,5 @@ module Pilot
       client.patch_build_beta_details(build_beta_details_id: build_beta_detail.id, attributes: attributes)
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
