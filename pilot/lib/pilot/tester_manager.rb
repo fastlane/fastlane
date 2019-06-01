@@ -7,35 +7,30 @@ module Pilot
   class TesterManager < Manager
     def add_tester(options)
       start(options)
-      app = find_app(app_filter: config[:apple_id] || config[:app_identifier])
+      app = find_app(apple_id: config[:apple_id], app_identifier: config[:app_identifier])
       UI.user_error!("You must provide either a Apple ID for the app (with the `:apple_id` option) or app identifier (with the `:app_identifier` option)") unless app
 
       groups_param = config[:groups]
       UI.user_error!("You must provide 1 or more groups (with the `:groups` option)") unless groups_param
 
-      tester = find_app_tester(email: config[:email], app: app)
-      tester ||= create_tester(
-        email: config[:email],
-        first_name: config[:first_name],
-        last_name: config[:last_name],
-        app: app
-      )
-      begin
-        # Groups are now required
-        groups = Spaceship::TestFlight::Group.add_tester_to_groups!(tester: tester, app: app, groups: config[:groups])
-        group_names = groups.map(&:name).join(", ")
-        UI.success("Successfully added tester to group(s): #{group_names} in app: #{app.name}")
-      rescue => ex
-        UI.error("Could not add #{tester.email} to app: #{app.name}")
-        raise ex
+      app.get_beta_groups.select do |group|
+        next unless groups_param.include?(group.name)
+        user = {
+          email: config[:email],
+          firstName: config[:first_name],
+          lastName: config[:last_name]
+        }
+        group.post_bulk_beta_tester_assignments(beta_testers: [user])
       end
+
+      group_names = groups_param.join(';')
+      UI.success("Successfully added tester #{config[:email]} to app #{app.name} in group(s) #{group_names}")
     end
 
     def find_tester(options)
       start(options)
 
-      app_filter = (config[:apple_id] || config[:app_identifier])
-      app = find_app(app_filter: app_filter)
+      app = find_app(apple_id: config[:apple_id], app_identifier: config[:app_identifier])
 
       tester = find_app_tester(email: config[:email], app: app)
       UI.user_error!("Tester #{config[:email]} not found") unless tester
@@ -47,35 +42,24 @@ module Pilot
     def remove_tester(options)
       start(options)
 
-      app_filter = (config[:apple_id] || config[:app_identifier])
-      app = find_app(app_filter: app_filter)
+      app = find_app(apple_id: config[:apple_id], app_identifier: config[:app_identifier])
 
       tester = find_app_tester(email: config[:email], app: app)
       UI.user_error!("Tester #{config[:email]} not found") unless tester
-
-      unless app
-        tester.delete!
-        UI.success("Successfully removed tester #{tester.email} from Users and Roles")
-        return
-      end
 
       begin
         # If no groups are passed to options, remove the tester from the app-level,
         # otherwise remove the tester from the groups specified.
         if config[:groups].nil?
-          test_flight_testers = Spaceship::TestFlight::Tester.search(app_id: app.apple_id, text: tester.email, is_email_exact_match: true)
-
-          if test_flight_testers.length > 1
-            UI.user_error!("Could not remove #{tester.email} from app: #{app.name}, reason: too many matches: #{test_flight_testers}")
-          elsif test_flight_testers.length == 0
-            UI.user_error!("Could not remove #{tester.email} from app: #{app.name}, reason: unable to find tester on app")
-          end
-          test_flight_tester = test_flight_testers.first
-          test_flight_tester.remove_from_app!(app_id: app.apple_id)
-          UI.success("Successfully removed tester, #{test_flight_tester.email}, from app: #{app.name}")
+          tester.delete_from_apps(apps: [app])
+          UI.success("Successfully removed tester #{tester.email} from app: #{app.name}")
         else
-          groups = Spaceship::TestFlight::Group.remove_tester_from_groups!(tester: tester, app: app, groups: config[:groups])
-          group_names = groups.map(&:name).join(", ")
+          groups = tester.beta_groups.select do |group|
+            config[:groups].include?(group.name)
+          end
+          tester.delete_from_beta_groups(beta_groups: groups)
+
+          group_names = groups.map(&:name)
           UI.success("Successfully removed tester #{tester.email} from app #{app.name} in group(s) #{group_names}")
         end
       rescue => ex
@@ -87,9 +71,9 @@ module Pilot
     def list_testers(options)
       start(options)
 
-      app_filter = (config[:apple_id] || config[:app_identifier])
-      if app_filter
-        list_testers_by_app(app_filter)
+      app = find_app(apple_id: config[:apple_id], app_identifier: config[:app_identifier])
+      if app
+        list_testers_by_app(app)
       else
         UI.user_error!("You must include an `app_identifier` to `list_testers`")
       end
@@ -97,30 +81,24 @@ module Pilot
 
     private
 
-    def find_app(app_filter: nil)
-      if app_filter
-        app = Spaceship::Tunes::Application.find(app_filter)
-        UI.user_error!("Could not find an app by #{app_filter}") unless app
+    def find_app(apple_id: nil, app_identifier: nil)
+      if app_identifier
+        app = Spaceship::ConnectAPI::App.find(app_identifier)
+        UI.user_error!("Could not find an app by #{app_identifier}") unless app
         return app
       end
-      nil
+
+      if apple_id
+        app = Spaceship::ConnectAPI::App.get(app_id: apple_id)
+        UI.user_error!("Could not find an app by #{apple_id}") unless app
+        return app
+      end
+
+      UI.user_error!("You must include an `app_identifier` to `list_testers`")
     end
 
     def find_app_tester(email: nil, app: nil)
-      current_user = find_current_user
-      app_apple_id = app.nil? ? nil : app.apple_id
-
-      if current_user.admin?
-        tester = Spaceship::TestFlight::Tester.find(app_id: app_apple_id, email: email)
-      elsif current_user.app_manager?
-        unless app_apple_id
-          UI.user_error!("Account #{current_user.email_address} is only an 'App Manager' and therefore you must also define what app this tester (#{email}) should be added to")
-        end
-        tester = Spaceship::TestFlight::Tester.find(app_id: app_apple_id, email: email)
-      else
-        UI.user_error!("Account #{current_user.email_address} doesn't have a role that is allowed to administer app testers, current roles: #{current_user.roles}")
-        tester = nil
-      end
+      tester = app.get_beta_testers(filter: { email: email }, includes: "apps,betaTesterMetrics,betaGroups").first
 
       if tester
         UI.success("Found existing tester #{email}")
@@ -129,46 +107,16 @@ module Pilot
       return tester
     end
 
-    def find_current_user
-      current_user_email = Spaceship::Tunes.client.user_email
-      current_user_apple_id = Spaceship::Tunes.client.user
+    def list_testers_by_app(app)
+      testers = app.get_beta_testers(includes: "apps,betaTesterMetrics,betaGroups")
 
-      current_user = Spaceship::Tunes::Members.find(current_user_email)
-      unless current_user
-        UI.user_error!("Unable to find a member for AppleID: #{current_user_apple_id}, email: #{current_user_email}")
-      end
-      return current_user
-    end
-
-    def create_tester(email: nil, first_name: nil, last_name: nil, app: nil)
-      current_user = find_current_user
-      if current_user.admin? || current_user.app_manager?
-        Spaceship::TestFlight::Tester.create_app_level_tester(app_id: app.apple_id,
-                                                          first_name: first_name || '',
-                                                           last_name: last_name || '',
-                                                               email: email)
-
-        UI.success("Successfully added tester: #{email} to app: #{app.name}")
-        return Spaceship::TestFlight::Tester.find(app_id: app.apple_id, email: email)
-      else
-        UI.user_error!("Current account doesn't have permission to create a tester")
-      end
-    rescue => ex
-      UI.error("Could not create tester #{email}")
-      raise ex
-    end
-
-    def list_testers_by_app(app_filter)
-      app = Spaceship::Tunes::Application.find(app_filter)
-      UI.user_error!("Couldn't find app with '#{app_filter}'") unless app
-      testers = Spaceship::TestFlight::Tester.all(app_id: app.apple_id)
       list_by_app(testers, "All Testers")
     end
 
     def list_by_app(all_testers, title)
       headers = ["First", "Last", "Email", "Groups"]
       list(all_testers, "#{title} (#{all_testers.count})", headers) do |tester|
-        tester_groups = tester.groups.nil? ? nil : tester.groups.join(";")
+        tester_groups = tester.beta_groups.nil? ? nil : tester.beta_groups.map(&:name).join(";")
         [
           tester.first_name,
           tester.last_name,
@@ -200,13 +148,15 @@ module Pilot
       rows << ["Last name", tester.last_name]
       rows << ["Email", tester.email]
 
-      if tester.groups.to_s.length > 0
-        rows << ["Groups", tester.groups.join(";")]
+      if tester.beta_groups
+        rows << ["Groups", tester.beta_groups.map(&:name).join(";")]
       end
 
-      if tester.latest_installed_date
-        rows << ["Latest Version", "#{tester.latest_install_info['latestInstalledShortVersion']} (#{tester.latest_install_info['latestInstalledVersion']})"]
-        rows << ["Latest Install Date", tester.pretty_install_date]
+      metric = (tester.beta_tester_metrics || []).first
+      if metric.installed?
+        rows << ["Latest Version", "#{metric.installed_cf_bundle_short_version_string} (#{metric.installed_cf_bundle_version})"]
+        rows << ["Latest Install Date", metric.installed_cf_bundle_version]
+        rows << ["Installed", metric.installed?]
       end
 
       puts(Terminal::Table.new(

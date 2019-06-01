@@ -1,0 +1,61 @@
+{
+    "data" : [ {
+      "type" : "preReleaseVersions",
+      "id" : "123456789",
+      "attributes" : {
+        "version" : "3.3.3",
+        "platform" : "IOS"
+      },
+      "relationships" : {
+        "builds" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions/123456789/relationships/builds",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions/123456789/builds"
+          }
+        },
+        "app" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions/123456789/relationships/app",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions/123456789/app"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions/123456789"
+      }
+    }, {
+      "type" : "preReleaseVersions",
+      "id" : "987654321",
+      "attributes" : {
+        "version" : "3.0.0",
+        "platform" : "IOS"
+      },
+      "relationships" : {
+        "builds" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions/987654321/relationships/builds",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions/987654321/builds"
+          }
+        },
+        "app" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions/987654321/relationships/app",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions/987654321/app"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions/987654321"
+      }
+    } ],
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions?limit=2",
+      "next" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions?cursor=Ag.a_gJDw&limit=2"
+    },
+    "meta" : {
+      "paging" : {
+        "total" : 57,
+        "limit" : 2
+      }
+    }
+  }
