@@ -173,8 +173,7 @@ open class Snapshot: NSObject {
                 return
             }
 
-            let window = app.windows.firstMatch
-            let screenshot = window.screenshot()
+            let screenshot = XCUIScreen.main.screenshot()
             guard let simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
             let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
             do {
