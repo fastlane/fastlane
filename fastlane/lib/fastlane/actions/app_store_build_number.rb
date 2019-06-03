@@ -32,36 +32,42 @@ module Fastlane
           build_nr = app.live_version.current_build_number
 
           UI.message("Latest upload for live-version #{app.live_version.version} is build: #{build_nr}")
+
+          return build_nr
         else
           version_number = params[:version]
 
-          # Get version number from latest pre-release if no version number given
-          if version_number
-            UI.message("Fetching the latest build number for version #{version_number}")
+          # Used for determining how to display the optional version number
+          version_number_message = version_number.nil? ? "any version" : "version #{version_number}"
 
-            # Get latest build for version number
-            client = Spaceship::ConnectAPI::Base.client
-            build = client.get_builds(filter: { app: app.apple_id, "preReleaseVersion.version" => version_number }, sort: "-version", limit: 1).first
-            if build
-              build_nr = build.version
-            else
-              UI.important("Could not find a build number for version #{version_number} on App Store Connect")
-            end
+          # Create filter for get_builds with optional version number
+          filter = { app: app.apple_id }
+          if version_number
+            filter["preReleaseVersion.version"] = version_number
           end
 
-          # Show error and set initial build number
-          if build_nr
-            UI.message("Latest upload for version #{version_number} is build: #{build_nr}")
-          elsif params[:initial_build_number].nil?
+          UI.message("Fetching the latest build number for #{version_number_message}")
+
+          # Get latest build for optional version number and return build number if found
+          client = Spaceship::ConnectAPI::Base.client
+          build = client.get_builds(filter: filter, sort: "-version", includes: "preReleaseVersion", limit: 1).first
+          if build
+            build_nr = build.version
+            UI.message("Latest upload for version #{build.app_version} is build: #{build_nr}")
+            return build_nr
+          end
+
+          # Let user know that build couldn't be found
+          UI.important("Could not find a build for #{version_number_message} on App Store Connect")
+
+          if params[:initial_build_number].nil?
             UI.user_error!("Could not find a build on App Store Connect - and 'initial_build_number' option is not set")
           else
             build_nr = params[:initial_build_number]
-            UI.message("Using initial build number of #{build_nr} for version #{version_number}")
+            UI.message("Using initial build number of #{build_nr}")
+            return build_nr
           end
-
         end
-
-        build_nr
       end
 
       def self.order_versions(versions)
