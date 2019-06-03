@@ -37,13 +37,13 @@ module Fastlane
         else
           version_number = params[:version]
 
-          # Used for determining how to display the optional version number
-          version_number_message = version_number.nil? ? "any version" : "version #{version_number}"
-
           # Create filter for get_builds with optional version number
           filter = { app: app.apple_id }
           if version_number
             filter["preReleaseVersion.version"] = version_number
+            version_number_message = "version #{version_number}"
+          else
+            version_number_message = "any version"
           end
 
           UI.message("Fetching the latest build number for #{version_number_message}")
