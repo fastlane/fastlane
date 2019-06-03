@@ -10,7 +10,7 @@ module FastlaneCore
       def wait_for_build_processing_to_be_complete(app_id: nil, platform: nil, train_version: nil, app_version: nil, build_version: nil, poll_interval: 10, strict_build_watch: false, return_spaceship_testflight_build: true)
         # Warn about train_version being removed in the future
         if train_version
-          UI.deprecated(":train_version is no longer a used argument on FastlaneCore::BuildWatcher. Please use :app_verion instead.")
+          UI.deprecated(":train_version is no longer a used argument on FastlaneCore::BuildWatcher. Please use :app_version instead.")
         end
         app_version = train_version
 
