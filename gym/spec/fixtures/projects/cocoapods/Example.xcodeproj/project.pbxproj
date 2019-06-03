@@ -724,7 +724,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = family.wwdc.app;
 				PRODUCT_NAME = "$(TARGET_NAME)ProductName";
-				PROVISIONING_PROFILE_SPECIFIER = "match AppStore family.wwdc.app";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development family.wwdc.app";
 			};
 			name = Debug;
 		};
@@ -897,7 +897,7 @@
 				INFOPLIST_FILE = ExampleWatchOS/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = family.wwdc.app.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "match AppStore family.wwdc.app.watchkitapp";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development family.wwdc.app.watchkitapp";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -966,7 +966,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = family.wwdc.app.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
-				PROVISIONING_PROFILE_SPECIFIER = "match AppStore family.wwdc.app.watchkitappextension";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development family.wwdc.app.watchkitappextension";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;

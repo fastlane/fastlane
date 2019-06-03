@@ -187,4 +187,12 @@ class String
 
     self.gsub!(/^#{first_line_indent}/, "")
   end
+
+  def remove_markdown
+    string = self.gsub(/^>/, "") # remove Markdown quotes
+    string = string.gsub(/\[http[^\]]+\]\(([^)]+)\)/, '\1 🔗') # remove Markdown links
+    string = string.gsub(/\[([^\]]+)\]\(([^\)]+)\)/, '"\1" (\2 🔗)') # remove Markdown links with custom text
+    string = string.gsub("|", "") # remove new line preserve markers
+    return string
+  end
 end

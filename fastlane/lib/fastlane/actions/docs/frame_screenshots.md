@@ -87,7 +87,7 @@ To download the latest frames
 fastlane frameit download_frames
 ```
 
-When using _frameit_ without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store.
+Note: When using _frameit_ without titles on top, the screenshots will have the full resolution, which means they can't be uploaded to the App Store directly. They are supposed to be used for websites, print media and emails. Check out the section below to use the screenshots for the App Store.
 
 ## Advanced Usage (optional)
 
@@ -100,7 +100,7 @@ A working example can be found in the [fastlane examples](https://github.com/fas
 ### `Framefile.json`
 
 The Framefile allows to define general and screenshot specific information.
-It has the following JSON structure:
+It has the following general JSON structure:
 
 ```json
 {
@@ -120,7 +120,7 @@ The general parameters are defined in the `default` key and can be:
 
 | Key | Description | Default value |
 |-----|-------------|---------------|
-| `background` | The background that should be used for the framed screenshot. Specify the (relative) path to the image file (e.g. *.jpg). This parameter is mandatory. | NA |
+| `background` | The background that should be used for the framed screenshot. Specify the (relative) path to the image file (e.g. `*.jpg`). This parameter is mandatory. | NA |
 | `keyword` | An object that contains up to 3 keys to describe the optional keyword. See [table](#keyword-and-title-parameters) below. | NA |
 | `title` | An object that contains up to 3 keys to describe the mandatory title. See [table](#keyword-and-title-parameters) below. | NA |
 | `stack_title` | Specifies whether _frameit_ should display the keyword above the title when both keyword and title are defined. If it is false, the title and keyword will be displayed side by side when both keyword and title are defined. | `false` |
@@ -129,6 +129,8 @@ The general parameters are defined in the `default` key and can be:
 | `padding` | The content of the framed screenshot will be resized to match the specified `padding` around all edges. The vertical padding is also applied between the text and the top or bottom (depending on `title_below_image`) of the device frame. <p> There are 3 different options of specyfying the padding: <p> 1. Default: An integer value that defines both horizontal and vertical padding in pixels. <br> 2. A string that defines (different) padding values in pixels for horizontal and vertical padding. The syntax is `"<horizontal>x<vertical>"`, e.g. `"30x60"`. <br> 3. A string that defines (different) padding values in percentage for horizontal and vertical padding. The syntax is `"<horizontal>%x<vertical>%"`, e.g. `"5%x10%"`. <br> **Note:** The percentage is calculated from the smallest image dimension (height or width). <p> A combination of option 2 and 3 is possible, e.g. `"5%x40"`. | `50` |
 | `interline_spacing` | Specifies whether _frameit_ should add or subtract this many pixels between the individual lines of text. This only applies to a multi-line `title` and/or `keyword` to expand or squash together the individual lines of text. | `0` |
 | `font_scale_factor` | Specifies whether _frameit_ should increase or decrease the font size of the text. | `0.1` |
+| `frame` | Overrides the color of the frame to be used. (Valid values are `BLACK, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
+| `title_min_height` | Specifies a height always reserved for the title. Value can be a percentage of the height or an absolute value. The device will be placed below (or above) this area. Convenient to ensure the device top (or bottom) will be consistently placed at the same height on the different screenshots. | NA |
 
 ### Specific parameters
 
@@ -140,6 +142,7 @@ These are defined in the `data` key. This is an array with the following keys fo
 | `filter` | This is mandatory to link the individual configuration to the screenshot, based on part of the file name. <p>Example:<br>If a screenshot is named `iPhone 8-Brainstorming.png` you can use value `Brainstorming` for `filter`.  If there are more than one `filter` matching an entry, they will all be applied in order (which means that the last one has the highest precedence). All other keys from that array element will only be applied on this specific screenshot. |
 | `keyword` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
 | `title` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
+| `frame` | Overrides the color of the frame to be used. (Valid values are `BLACK, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
 
 ### <a name="keyword-and-title-parameters"></a>Framefile `keyword` and `title` parameters
 
@@ -168,7 +171,8 @@ The `keyword` and `title` parameters are both used in `default` and `data`. They
     "padding": 50,
     "show_complete_frame": false,
     "stack_title" : false,
-    "title_below_image": true
+    "title_below_image": true,
+    "frame": "WHITE"
   },
 
   "data": [
@@ -182,7 +186,8 @@ The `keyword` and `title` parameters are both used in `default` and `data`. They
       "filter": "Organizing",
       "keyword": {
         "color": "#feb909"
-      }
+      },
+      "frame": "ROSE_GOLD"
     },
     {
       "filter": "Sharing",
@@ -214,6 +219,48 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 
 - These `.strings` files **MUST** be utf-8 (UTF-8) or utf-16 encoded (UTF-16 BE with BOM). They also must begin with an empty line. If you are having trouble see [issue #1740](https://github.com/fastlane/fastlane/issues/1740)
 - You **MUST** provide a background if you want titles. _frameit_ will not add the tiles if a background is not specified.
+
+### Screenshot orientation
+
+By default _frameit_ adds a frame to your screenshot based on an orientation you took it. For a portrait (vertical orientation) it is going to add portrait frame and for a landscape (horizontal orientation) - landscape left (= [Home button on the left side](https://developer.apple.com/documentation/uikit/uiinterfaceorientation/landscapeleft)).
+
+One way to override the default behavior is editing the file name by adding `force_landscaperight` to the end.
+
+### `force_orientation_block`
+
+If the default behavior doesn't fit your needs and you don't want or can't rename your screenshots, you can customize _frameit_'s orientation behavior by setting a `force_orientation_block` parameter. The valid values are: `:landscape_left` (home button on the left side), `:landscape_right` (home button on the right side), `:portrait` (home button on the bottom), `nil` (home button on the right side).
+
+### Examples
+
+```ruby
+# It matches the filename to the framed device orientation
+frameit(
+  path: "./fastlane/screenshots",
+  force_orientation_block: proc do |filename|
+    case filename
+      when "iPad Pro (12.9-inch)-01LoginScreen"
+        :landscape_right
+      when "iPhone 6 Plus-01LoginScreen"
+        :portrait
+      # and so on
+    end
+  end
+)
+```
+
+```ruby
+# It frames the screenshots in landscape right whenever the filename contains `landscape` word
+frameit(
+  silver: true,
+  path: "./fastlane/screenshots",
+  force_orientation_block: proc do |filename|
+    f = filename.downcase
+    if f.include?("landscape")
+      :landscape_right
+    end
+  end
+)
+```
 
 # Mac
 
@@ -256,17 +303,13 @@ Check out the [MindNode example project](https://github.com/fastlane/examples/tr
 
 Check out [_snapshot_](https://docs.fastlane.tools/actions/snapshot/) to automatically generate screenshots using ```UI Automation```.
 
+## Resume framing
+
+Framing screenshots is a slow operation. In case you need to resume framing, or just frame a couple updated screenshots again, you can rely on the `--resume` flag. Only screenshots which have not been framed yet – or for which there isn't an up-to-date framed image – will be framed. This feature uses the file modification dates and will reframe screenshots if the screenshot is newer than the framed file.
+
 ## Upload screenshots
 
 Use [_deliver_](https://docs.fastlane.tools/actions/deliver/) to upload iOS screenshots to App Store Connect, or [_supply_](https://docs.fastlane.tools/actions/supply/) to upload Android screenshots to Play Store completely automatically 🚀
-
-## Alternative location to store device_frames
-
-Device frames can also be stored in a ```./fastlane/screenshots/devices_frames``` directory if you prefer rather than in the ```~/.frameit/device_frames``` directory. If doing so please be aware that Apple's images are copyrighted and should not be redistributed as part of a repository so you may want to include them in your .gitignore file.
-
-## White background of frames
-
-Some stock images provided by Apple still have a white background instead of a transparent one. You'll have to edit the Photoshop file to remove the white background, delete the generated `.png` file and run `fastlane frameit` again.
 
 ## Use a clean status bar
 

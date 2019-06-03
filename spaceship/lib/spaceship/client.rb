@@ -221,7 +221,7 @@ module Spaceship
         end
 
         if ENV["DEBUG"]
-          puts("To run _spaceship_ through a local proxy, use SPACESHIP_DEBUG")
+          puts("To run spaceship through a local proxy, use SPACESHIP_DEBUG")
         end
       end
     end
@@ -394,7 +394,7 @@ module Spaceship
     end
 
     # This method is used for both the Apple Dev Portal and App Store Connect
-    # This will also handle 2 step verification
+    # This will also handle 2 step verification and 2 factor authentication
     #
     # It is called in `send_login_request` of sub classes (which the method `login`, above, transferred over to via `do_login`)
     def send_shared_login_request(user, password)
@@ -513,8 +513,9 @@ module Spaceship
     end
 
     # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
+    # Update (29th March 2019) olympus migrates to new appstoreconnect API
     def fetch_olympus_session
-      response = request(:get, "https://olympus.itunes.apple.com/v1/session")
+      response = request(:get, "https://appstoreconnect.apple.com/olympus/v1/session")
       body = response.body
       if body
         body = JSON.parse(body) if body.kind_of?(String)
@@ -543,7 +544,7 @@ module Spaceship
       # Fixes issue https://github.com/fastlane/fastlane/issues/13281
       # Even though we are using https://appstoreconnect.apple.com, the service key needs to still use a
       # hostname through itunesconnect.apple.com
-      response = request(:get, "https://olympus.itunes.apple.com/v1/app/config?hostname=itunesconnect.apple.com")
+      response = request(:get, "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com")
       @service_key = response.body["authServiceKey"].to_s
 
       raise "Service key is empty" if @service_key.length == 0
@@ -593,6 +594,22 @@ module Spaceship
     # (if exists)
     def self.spaceship_session_env
       ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
+    end
+
+    # Get contract messages from App Store Connect's "olympus" endpoint
+    def fetch_program_license_agreement_messages
+      all_messages = []
+
+      messages_request = request(:get, "https://appstoreconnect.apple.com/olympus/v1/contractMessages")
+      body = messages_request.body
+      if body
+        body = JSON.parse(body) if body.kind_of?(String)
+        body.map do |messages|
+          all_messages.push(messages["message"])
+        end
+      end
+
+      return all_messages
     end
 
     #####################################################
@@ -799,11 +816,19 @@ module Spaceship
       if block_given?
         obj = Object.new
         class << obj
-          attr_accessor :body, :headers, :params, :url
+          attr_accessor :body, :headers, :params, :url, :options
           # rubocop: disable Style/TrivialAccessors
           # the block calls `url` (not `url=`) so need to define `url` method
           def url(url)
             @url = url
+          end
+
+          def options
+            options_obj = Object.new
+            class << options_obj
+              attr_accessor :params_encoder
+            end
+            options_obj
           end
           # rubocop: enable Style/TrivialAccessors
         end

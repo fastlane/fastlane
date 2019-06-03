@@ -1,9 +1,32 @@
 require 'deliver/runner'
 
+class MockSession
+  def teams
+    [
+      { 'contentProvider' => { 'contentProviderId' => 'abc', 'name' => 'A B C' } },
+      { 'contentProvider' => { 'contentProviderId' => 'def', 'name' => 'D E F' } }
+    ]
+  end
+
+  def team_id
+    'abc'
+  end
+end
+
+class MockTransporter
+  def provider_ids
+    {
+      'A B C' => 'abc',
+      'D E F' => 'somelegacything'
+    }
+  end
+end
+
 describe Deliver::Runner do
   let(:runner) do
     allow(Spaceship::Tunes).to receive(:login).and_return(true)
     allow(Spaceship::Tunes).to receive(:select_team).and_return(true)
+    allow(Spaceship::Tunes).to receive(:client).and_return(MockSession.new)
     allow_any_instance_of(Deliver::DetectValues).to receive(:run!) { |opt| opt }
     Deliver::Runner.new(options)
   end
@@ -21,7 +44,7 @@ describe Deliver::Runner do
   end
 
   describe :upload_binary do
-    let(:transporter) { double }
+    let(:transporter) { MockTransporter.new }
     before do
       allow(FastlaneCore::ItunesTransporter).to receive(:new).and_return(transporter)
     end

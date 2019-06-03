@@ -20,8 +20,8 @@ describe Fastlane do
         allow(File).to receive(:file?).with(keychain_path).and_return(true)
         allow(File).to receive(:exist?).and_return(false)
         expect(File).to receive(:exist?).with(cert_name).and_return(true)
+        allow(Open3).to receive(:popen3).with(expected_command)
         allow(Open3).to receive(:popen3).with(allowed_command)
-        expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: false)
 
         Fastlane::FastFile.new.parse("lane :test do
           import_certificate ({
@@ -47,8 +47,8 @@ describe Fastlane do
         allow(File).to receive(:file?).with(keychain_path).and_return(true)
         allow(File).to receive(:exist?).and_return(false)
         expect(File).to receive(:exist?).with(cert_name).and_return(true)
-        expect(Open3).to receive(:popen3).with(expected_set_key_partition_list_command)
-        expect(FastlaneCore::Helper).to receive(:backticks).with(expected_security_import_command, print: false)
+        allow(Open3).to receive(:popen3).with(expected_security_import_command)
+        allow(Open3).to receive(:popen3).with(expected_set_key_partition_list_command)
 
         Fastlane::FastFile.new.parse("lane :test do
           import_certificate ({
@@ -75,8 +75,8 @@ describe Fastlane do
         allow(File).to receive(:file?).with(keychain_path).and_return(true)
         allow(File).to receive(:exist?).and_return(false)
         expect(File).to receive(:exist?).with(cert_name).and_return(true)
+        allow(Open3).to receive(:popen3).with(expected_command)
         allow(Open3).to receive(:popen3).with(allowed_command)
-        expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: true)
 
         Fastlane::FastFile.new.parse("lane :test do
           import_certificate ({

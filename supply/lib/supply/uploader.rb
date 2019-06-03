@@ -162,7 +162,16 @@ module Supply
 
       aab_paths.each do |aab_path|
         UI.message("Preparing aab at path '#{aab_path}' for upload...")
-        aab_version_codes.push(client.upload_bundle(aab_path))
+        bundle_version_code = client.upload_bundle(aab_path)
+
+        if metadata_path
+          all_languages.each do |language|
+            next if language.start_with?('.') # e.g. . or .. or hidden folders
+            upload_changelog(language, bundle_version_code)
+          end
+        end
+
+        aab_version_codes.push(bundle_version_code)
       end
 
       return aab_version_codes
@@ -184,6 +193,20 @@ module Supply
         apk_version_code = client.upload_apk(apk_path)
         UI.user_error!("Could not upload #{apk_path}") unless apk_version_code
 
+        if Supply.config[:obb_main_references_version] && Supply.config[:obb_main_file_size]
+          update_obb(apk_version_code,
+                     'main',
+                     Supply.config[:obb_main_references_version],
+                     Supply.config[:obb_main_file_size])
+        end
+
+        if Supply.config[:obb_patch_references_version] && Supply.config[:obb_patch_file_size]
+          update_obb(apk_version_code,
+                     'patch',
+                     Supply.config[:obb_patch_references_version],
+                     Supply.config[:obb_patch_file_size])
+        end
+
         upload_obbs(apk_path, apk_version_code)
 
         if metadata_path
@@ -196,6 +219,14 @@ module Supply
         UI.message("No apk file found, you can pass the path to your apk using the `apk` option")
       end
       apk_version_code
+    end
+
+    def update_obb(apk_version_code, expansion_file_type, references_version, file_size)
+      UI.message("Updating '#{expansion_file_type}' expansion file from version '#{references_version}'...")
+      client.update_obb(apk_version_code,
+                        expansion_file_type,
+                        references_version,
+                        file_size)
     end
 
     def update_track(apk_version_codes)

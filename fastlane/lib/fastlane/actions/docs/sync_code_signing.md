@@ -6,7 +6,7 @@
 
 A new approach to iOS code signing: Share one code signing identity across your development team to simplify your codesigning setup and prevent code signing issues.
 
-_match_ is the implementation of the https://codesigning.guide concept. _match_ creates all required certificates & provisioning profiles and stores them in a separate git repository. Every team member with access to the repo can use those credentials for code signing. _match_ also automatically repairs broken and expired credentials. It's the easiest way to share signing credentials across teams
+_match_ is the implementation of the [https://codesigning.guide concept](https://codesigning.guide). _match_ creates all required certificates & provisioning profiles and stores them in a separate git repository. Every team member with access to the repo can use those credentials for code signing. _match_ also automatically repairs broken and expired credentials. It's the easiest way to share signing credentials across teams
 
 [More information on how to get started with codesigning](https://docs.fastlane.tools/codesigning/getting-started/)
 
@@ -24,7 +24,7 @@ _match_ is the implementation of the https://codesigning.guide concept. _match_ 
 
 ## Why match?
 
-Before starting to use _match_, make sure to read the [codesigning.guide](https://codesigning.guide)
+Before starting to use _match_, make sure to read the [codesigning.guide](https://codesigning.guide):
 
 > When deploying an app to the App Store, beta testing service or even installing it on a device, most development teams have separate code signing identities for every member. This results in dozens of profiles including a lot of duplicates.
 
@@ -33,6 +33,8 @@ Before starting to use _match_, make sure to read the [codesigning.guide](https:
 **A new approach**
 
 > Share one code signing identity across your development team to simplify your setup and prevent code signing issues. What if there was a central place where your code signing identity and profiles are kept, so anyone in the team can access them during the build process?
+
+For more information about the concept, visit [codesigning.guide](https://codesigning.guide).
 
 ### Why not let Xcode handle all this?
 
@@ -58,15 +60,12 @@ Before starting to use _match_, make sure to read the [codesigning.guide](https:
 👥  | Support for multiple Apple accounts and multiple teams
 ✨ | Tightly integrated with [_fastlane_](https://fastlane.tools) to work seamlessly with [_gym_](https://docs.fastlane.tools/actions/gym/) and other build tools
 
-For more information about the concept, visit [codesigning.guide](https://codesigning.guide).
-
 ## Usage
 
 ### Setup
 
-1. Create a **new, private Git repo** (e.g. on [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)) and name it something like `certificates`. **Important:** Make sure the repository is set to *private*.
-2. Optional: Create a **new, shared Apple Developer Portal account**, something like `office@company.com` that will be shared across your team from now on (for more information visit [codesigning.guide](https://codesigning.guide))
-3. Run the following in your project folder to start using _match_:
+1. Optional: Create a **new, shared Apple Developer Portal account**, something like `office@company.com`, that will be shared across your team from now on (for more information visit [codesigning.guide](https://codesigning.guide))
+1. Run the following in your project folder to start using _match_:
 
 ```no-highlight
 fastlane match init
@@ -74,13 +73,13 @@ fastlane match init
 
 <img src="/img/actions/match_init.gif" width="550" />
 
-You'll be asked if you want to store your code signing identities inside a Git repo, or on Google Cloud.
+You'll be asked if you want to store your code signing identities inside a **Git repo**, or on **Google Cloud**.
 
 #### Git Storage
 
 Use Git Storage to store all code signing identities in a private git repo, owned and operated by you. The files will be encrypted using OpenSSL.
 
-First, enter the URL to your Git repo. This can be either a `https://` or a `git` URL. (If your machine is currently using SSH to authenticate with GitHub, you'll want to use a `git` URL, otherwise you may see an authentication error when you attempt to use match.) `fastlane match init` won't read or modify your certificates or profiles yet, and also won't validate your git URL.
+First, enter the URL to your private (!) Git repo (You can create one for free on e.g. [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)). The URL you enter can be either a `https://` or a `git` URL. (If your machine is currently using SSH to authenticate with GitHub, you'll want to use a `git` URL, otherwise you may see an authentication error when you attempt to use match.) `fastlane match init` won't read or modify your certificates or profiles yet, and also won't validate your git URL.
 
 This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder).
 
@@ -106,6 +105,8 @@ google_cloud_bucket_name("major-key-certificates")
 ```
 
 ### Multiple teams
+
+_match_ can store the codesigning files for multiple development teams:
 
 #### Git Storage
 
@@ -136,7 +137,8 @@ fastlane match development
 
 <img src="/img/actions/match_appstore_small.gif" width="550" />
 
-This will create a new certificate and provisioning profile (if required) and store them in your selected storage. If you previously ran _match_ it will automatically install the existing profiles from storage.
+This will create a new certificate and provisioning profile (if required) and store them in your selected storage.  
+If you previously ran _match_ with the configured storage it will automatically install the existing profiles from your storage.
 
 The provisioning profiles are installed in `~/Library/MobileDevice/Provisioning Profiles` while the certificates and private keys are installed in your Keychain.
 
@@ -154,7 +156,9 @@ fastlane action match
 
 #### Handle multiple targets
 
-If you have several targets with different bundle identifiers, supply them as a comma-separated list to:
+_match_ can use the same one Git repository or Google Cloud Storage for all bundle identifiers.
+
+If you have several targets with different bundle identifiers, supply them as a comma-separated list:
 
 ```no-highlight
 fastlane match appstore -a tools.fastlane.app,tools.fastlane.app.watchkitapp
@@ -164,11 +168,11 @@ You can make this even easier using [_fastlane_](https://fastlane.tools) by crea
 
 ```ruby
 lane :certificates do
-  match(app_identifier: ["com.krausefx.app1", "com.krausefx.app2", "com.krausefx.app3"])
+  match(app_identifier: ["tools.fastlane.app", "tools.fastlane.app.watchkitapp"])
 end
 ```
 
-Then all your team has to do is `fastlane certificates` and keys, certs and profiles for all targets will be synced.
+Then all your team has to do is run `fastlane certificates` and the keys, certificates and profiles for all targets will be synced.
 
 #### Handle multiple apps per developer/distribution certificate
 
@@ -189,25 +193,48 @@ _match_ will reuse certificates and will create separate provisioning profiles f
 
 When running _match_ for the first time on a new machine, it will ask you for the passphrase for the Git repository. This is an additional layer of security: each of the files will be encrypted using `openssl`. Make sure to remember the password, as you'll need it when you run match on a different machine.
 
-To set the passphrase to decrypt your profiles using an environment variable, use `MATCH_PASSWORD`.
+To set the passphrase to decrypt your profiles using an environment variable (and avoid the prompt) use `MATCH_PASSWORD`.
 
 #### Migrate from Git Repo to Google Cloud
 
-If you're already using a Git Repo, but would like to switch to using Google Cloud Storage, just run the following command to automatically migrate all your existing code signing identities and provisioning profiles
+If you're already using a Git Repo, but would like to switch to using Google Cloud Storage, run the following command to automatically migrate all your existing code signing identities and provisioning profiles
 
 ```no-highlight
 fastlane match migrate
 ```
 
-After a successful migration you can safely delete your git repo.
+After a successful migration you can safely delete your Git repo.
 
-#### Google Cloud `gc_keys.json`
+#### Google Cloud access control
 
 *Google Cloud Storage only*
 
-When running `fastlane match init` the first time, the setup process will help you create your `gc_keys.json` file. This file contains the auth credentials needed to access your Google Cloud storage bucket. Make sure to keep that file secret and never add it to version control.
+There are two cases for reading and writing certificates stored in a Google Cloud storage bucket:
 
-We recommend adding `gc_keys.json` to your `.gitignore` and manually add the file to all your work machines. Every developer should create their own `gc_keys.json` file, which will give the admin full control over who has read/write access to the given Storage bucket. At the same time it allows your team to revoke a single key if a file gets compromised.
+1. Continuous integration jobs. These will authenticate to your Google Cloud project via a service account, and use a `gc_keys.json` file as credentials.
+1. Developers on a local workstation. In this case, you should choose whether everyone on your team will create their own `gc_keys.json` file, or whether you want to manage access to the bucket directly using your developers' Google accounts.
+
+When running `fastlane match init` the first time, the setup process will give you the option to create your `gc_keys.json` file. This file contains the auth credentials needed to access your Google Cloud storage bucket. Make sure to keep that file secret and never add it to version control. We recommend adding `gc_keys.json` to your `.gitignore`
+
+##### Managing developer access via keys
+If you want to manage developer access to your certificates via authentication keys, every developer should create their own `gc_keys.json` and add the file to all their work machines. This will give the admin full control over who has read/write access to the given Storage bucket. At the same time it allows your team to revoke a single key if a file gets compromised.
+
+##### Managing developer acess via Google accounts
+If your developers already have Google accounts and access to your Google Cloud project, you can also manage access to the storage bucket via [Cloud Identity and Access Management (IAM)](https://cloud.google.com/storage/docs/access-control/iam). Just [set up](https://cloud.google.com/storage/docs/access-control/lists) individual developer accounts or an entire Google Group containing your team as readers and writers on your storage bucket.
+
+You can then specify the Google Cloud project id containing your storage bucket in your `Matchfile`:
+
+```ruby-skip-tests
+storage_mode("google_cloud")
+google_cloud_bucket_name("my-app-certificates")
+google_cloud_project_id("my-app-project")
+```
+
+This lets developers on your team use [Application Default Credentials](https://cloud.google.com/docs/authentication/production) when accessing your storage bucket. After installing the [Google Cloud SDK](https://cloud.google.com/sdk/), they only need to run the following command once:
+```no-highlight
+gcloud auth application-default login
+```
+... and log in with their Google account. Then, when they run `fastlane match`, _match_ will use these credentials to read from and write to the storage bucket.
 
 #### New machine
 
@@ -283,7 +310,7 @@ gym
 
 ##### Registering new devices
 
-By using _match_, you'll save a lot of time every time you add new device to your Ad Hoc or Development profiles. Use _match_ in combination with the [`register_devices`](https://docs.fastlane.tools/actions#register_devices) action.
+By using _match_, you'll save a lot of time every time you add new device to your Ad Hoc or Development profiles. Use _match_ in combination with the [`register_devices`](https://docs.fastlane.tools/actions/register_devices/) action.
 
 ```ruby
 lane :beta do
@@ -301,16 +328,6 @@ If you're not using _fastlane_, you can also use the `force_for_new_devices` opt
 ```no-highlight
 fastlane match adhoc --force_for_new_devices
 ```
-
-##### Multiple Targets
-
-If your app has multiple targets (e.g. Today Widget or watchOS Extension)
-
-```ruby
-match(app_identifier: ["tools.fastlane.app", "tools.fastlane.app.today_widget"], type: "appstore")
-```
-
-_match_ can use the same one Git repository or Google Cloud Storage for all bundle identifiers.
 
 ##### Templates (aka: custom entitlements)
 

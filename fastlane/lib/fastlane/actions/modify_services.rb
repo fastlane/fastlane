@@ -4,16 +4,14 @@ module Fastlane
       def self.run(params)
         require 'produce'
 
-        return if Helper.test?
-
         Produce.config = params
 
         Dir.chdir(FastlaneCore::FastlaneFolder.path || Dir.pwd) do
           require 'produce/service'
           services = params[:services]
 
-          enabled_services = services.reject { |k, v| v == 'off' }
-          disabled_services = services.select { |k, v| v == 'off' }
+          enabled_services = services.select { |_k, v| v == true || (v != false && v.to_s != 'off') }.map { |k, v| [k, v == true || v.to_s == 'on' ? 'on' : v] }.to_h
+          disabled_services = services.select { |_k, v| v == false || v.to_s == 'off' }.map { |k, v| [k, 'off'] }.to_h
 
           enabled_services_object = self.service_object
           enabled_services.each do |k, v|
@@ -44,6 +42,7 @@ module Fastlane
 
       def self.services_mapping
         {
+            access_wifi: 'access_wifi',
             app_group: 'app_group',
             apple_pay: 'apple_pay',
             associated_domains: 'associated_domains',
@@ -71,7 +70,7 @@ module Fastlane
 
       def self.allowed_services_description
         return Produce::DeveloperCenter::ALLOWED_SERVICES.map do |k, v|
-          "#{k}: (#{v.join('|')})"
+          "#{k}: (#{v.join('|')})(:on|:off)(true|false)"
         end.join(", ")
       end
 
@@ -157,9 +156,12 @@ module Fastlane
             app_identifier: "com.someorg.app",
             services: {
               push_notification: "on",
-              associated_domains: "off"
-            }
-          )'
+              associated_domains: "off",
+              wallet: :on,
+              apple_pay: :off,
+              data_protection: true,
+              multipath: false
+            })'
         ]
       end
 

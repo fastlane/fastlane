@@ -1,13 +1,16 @@
+require_relative "display_family"
+
 module Spaceship
   module Tunes
+    # identifiers of devices that App Store Connect accepts screenshots for
     class DeviceType
-      @types = ['iphone35', 'iphone4', 'iphone6', 'iphone6Plus', 'iphone58', 'iphone65', 'ipad', 'ipad105', 'ipadPro', 'ipadPro11', 'ipadPro129', 'watch', 'watchSeries4', 'appleTV', 'desktop']
-      class << self
-        attr_accessor :types
+      def self.types
+        warn("Spaceship::Tunes::DeviceType has been deprecated, use Spaceship::Tunes::DisplayFamily instead. (https://github.com/fastlane/fastlane/pull/14574).")
+        return DisplayFamily.all.map(&:name)
+      end
 
-        def exists?(type)
-          types.include?(type)
-        end
+      def self.exists?(type)
+        types.include?(type)
       end
     end
   end

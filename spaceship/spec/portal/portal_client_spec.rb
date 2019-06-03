@@ -312,6 +312,34 @@ describe Spaceship::Client do
         expect(response.first.keys).to include('certificateId', 'certificateType', 'certificate')
       end
     end
+
+    describe '#fetch_program_license_agreement_messages' do
+      it 'makes a request to fetch all Program License Agreement warnings from Olympus' do
+        # Stub the GET request that the method will make
+        PortalStubbing.adp_stub_fetch_program_license_agreement_messages
+
+        response = subject.fetch_program_license_agreement_messages
+
+        # The method should make a GET request to this URL:
+        expect(a_request(:get, 'https://appstoreconnect.apple.com/olympus/v1/contractMessages')).to have_been_made
+
+        # The method should just return the "message" key's value(s) in an array.
+
+        expected_first_message = "<b>Review the updated Paid Applications \
+Schedule.</b><br />In order to update your existing apps, create \
+new in-app purchases, and submit new apps to the App Store, the \
+user with the Legal role (Team Agent) must review and accept the \
+Paid Applications Schedule (Schedule 2 to the Apple Developer \
+Program License Agreement) in the Agreements, Tax, and Banking \
+module.<br /><br /> To accept this agreement, they must have \
+already accepted the latest version of the Apple Developer \
+Program License Agreement in their <a href=\"\
+http://developer.apple.com/membercenter/index.action\">account on \
+the developer website<a/>.<br />"
+
+        expect(response.first).to eq(expected_first_message)
+      end
+    end
   end
 
   describe 'keys api' do

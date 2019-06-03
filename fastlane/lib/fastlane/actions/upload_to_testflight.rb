@@ -47,6 +47,46 @@ module Fastlane
             username: "felix@krausefx.com",
             app_identifier: "com.krausefx.app",
             itc_provider: "abcde12345" # pass a specific value to the iTMSTransporter -itc_provider option
+          )',
+          'upload_to_testflight(
+            beta_app_feedback_email: "email@email.com",
+            beta_app_description: "This is a description of my app",
+            demo_account_required: true,
+            notify_external_testers: false,
+            changelog: "This is my changelog of things that have changed in a log"
+          )',
+          'upload_to_testflight(
+            beta_app_review_info: {
+              contact_email: "email@email.com",
+              contact_first_name: "Connect",
+              contact_last_name: "API",
+              contact_phone: "5558675309",
+              demo_account_name: "demo@email.com",
+              demo_account_password: "connectapi",
+              notes: "this is review note for the reviewer <3 thank you for reviewing"
+            },
+            localized_app_info: {
+              "default": {
+                feedback_email: "default@email.com",
+                marketing_url: "https://example.com/marketing-defafult",
+                privacy_policy_url: "https://example.com/privacy-defafult",
+                description: "Default description",
+              },
+              "en-GB": {
+                feedback_email: "en-gb@email.com",
+                marketing_url: "https://example.com/marketing-en-gb",
+                privacy_policy_url: "https://example.com/privacy-en-gb",
+                description: "en-gb description",
+              }
+            },
+            localized_build_info: {
+              "default": {
+                whats_new: "Default changelog",
+              },
+              "en-GB": {
+                whats_new: "en-gb changelog",
+              }
+            }
           )'
         ]
       end

@@ -254,7 +254,9 @@ module Fastlane
           branch_option = "--branch #{branch}" if branch != 'HEAD'
 
           UI.message("Cloning remote git repo...")
-          Actions.sh("GIT_TERMINAL_PROMPT=0 git clone '#{url}' '#{clone_folder}' --depth 1 -n #{branch_option}")
+          Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
+            Actions.sh("git clone #{url.shellescape} #{clone_folder.shellescape} --depth 1 -n #{branch_option}")
+          end
 
           unless version.nil?
             req = Gem::Requirement.new(version)
@@ -263,14 +265,14 @@ module Fastlane
             UI.user_error!("No tag found matching #{version.inspect}") if checkout_param.nil?
           end
 
-          Actions.sh("cd '#{clone_folder}' && git checkout #{checkout_param} '#{path}'")
+          Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{path.shellescape}")
 
           # We also want to check out all the local actions of this fastlane setup
           containing = path.split(File::SEPARATOR)[0..-2]
           containing = "." if containing.count == 0
           actions_folder = File.join(containing, "actions")
           begin
-            Actions.sh("cd '#{clone_folder}' && git checkout #{checkout_param} '#{actions_folder}'")
+            Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{actions_folder.shellescape}")
           rescue
             # We don't care about a failure here, as local actions are optional
           end
@@ -290,10 +292,12 @@ module Fastlane
 
     def fetch_remote_tags(folder: nil)
       UI.message("Fetching remote git tags...")
-      Actions.sh("cd '#{folder}' && GIT_TERMINAL_PROMPT=0 git fetch --all --tags -q")
+      Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
+        Actions.sh("cd #{folder.shellescape} && git fetch --all --tags -q")
+      end
 
       # Fetch all possible tags
-      git_tags_string = Actions.sh("cd '#{folder}' && git tag -l")
+      git_tags_string = Actions.sh("cd #{folder.shellescape} && git tag -l")
       git_tags = git_tags_string.split("\n")
 
       # Sort tags based on their version number

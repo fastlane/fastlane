@@ -47,6 +47,8 @@ module Frameit
         return 'iPad Air 2'
       when sizes::IOS_IPAD_PRO
         return 'iPad Pro'
+      when sizes::IOS_IPAD_PRO_12_9
+        return 'iPad Pro (12.9-inch) (3rd generation)'
       when sizes::MAC
         return 'MacBook'
       else
@@ -59,8 +61,6 @@ module Frameit
       if !Frameit.config[:use_legacy_iphone6s] && @color == Frameit::Color::BLACK
         if @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_47
           return "Matte Black" # RIP space gray
-        elsif @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_61
-          return "Black"
         end
       end
       return @color
@@ -119,17 +119,19 @@ module Frameit
       return self.landscape_left? || self.landscape_right
     end
 
-    def to_s
-      self.path
+    def output_path
+      path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
     end
 
-    # Add the device frame, this will also call the method that adds the background + title
-    def frame!
-      if self.mac?
-        MacEditor.new.frame!(self)
-      else
-        Editor.new.frame!(self)
-      end
+    # If the framed screenshot was generated *before* the screenshot file,
+    # then we must be outdated.
+    def outdated?
+      return true unless File.exist?(output_path)
+      return File.mtime(path) > File.mtime(output_path)
+    end
+
+    def to_s
+      self.path
     end
   end
 end

@@ -50,7 +50,7 @@ describe FastlaneCore do
       end
 
       it "reports undefined features as not enabled, even if the environment variable is set" do
-        with_env_values('TEST_ENV_VAR_NOT_REGISTERED' => '1') do
+        FastlaneSpec::Env.with_env_values('TEST_ENV_VAR_NOT_REGISTERED' => '1') do
           expect(FastlaneCore::Feature.enabled?('TEST_ENV_VAR_NOT_REGISTERED')).to be_falsey
         end
       end
@@ -60,13 +60,13 @@ describe FastlaneCore do
       end
 
       it "reports features for disabled environment variables as disabled" do
-        with_env_values('TEST_ENV_VAR_FOR_ENABLED_TESTS' => '0') do
+        FastlaneSpec::Env.with_env_values('TEST_ENV_VAR_FOR_ENABLED_TESTS' => '0') do
           expect(FastlaneCore::Feature.enabled?('TEST_ENV_VAR_FOR_ENABLED_TESTS')).to be_falsey
         end
       end
 
       it "reports features for environment variables as enabled" do
-        with_env_values('TEST_ENV_VAR_FOR_ENABLED_TESTS' => '1') do
+        FastlaneSpec::Env.with_env_values('TEST_ENV_VAR_FOR_ENABLED_TESTS' => '1') do
           expect(FastlaneCore::Feature.enabled?('TEST_ENV_VAR_FOR_ENABLED_TESTS')).to be_truthy
         end
       end
@@ -78,7 +78,7 @@ describe FastlaneCore do
       end
 
       it "Calls disabled class method with disabled environment variable" do
-        with_env_values('TEST_ENV_VAR_FOR_METHOD_TESTS' => '0') do
+        FastlaneSpec::Env.with_env_values('TEST_ENV_VAR_FOR_METHOD_TESTS' => '0') do
           FastlaneCore::Feature.register_class_method(klass: FeatureHelper,
                                                      symbol: :test_method,
                                             disabled_symbol: :disabled_class_method,
@@ -92,7 +92,7 @@ describe FastlaneCore do
       end
 
       it "Calls enabled class method with enabled environment variable" do
-        with_env_values('TEST_ENV_VAR_FOR_METHOD_TESTS' => '1') do
+        FastlaneSpec::Env.with_env_values('TEST_ENV_VAR_FOR_METHOD_TESTS' => '1') do
           FastlaneCore::Feature.register_class_method(klass: FeatureHelper,
                                                      symbol: :test_method,
                                             disabled_symbol: :disabled_class_method,
@@ -106,7 +106,7 @@ describe FastlaneCore do
       end
 
       it "Calls disabled instance method with disabled environment variable" do
-        with_env_values('TEST_ENV_VAR_FOR_METHOD_TESTS' => '0') do
+        FastlaneSpec::Env.with_env_values('TEST_ENV_VAR_FOR_METHOD_TESTS' => '0') do
           instance = FeatureHelper.new
           FastlaneCore::Feature.register_instance_method(klass: FeatureHelper,
                                                         symbol: :test_method,
@@ -121,7 +121,7 @@ describe FastlaneCore do
       end
 
       it "Calls enabled instance method with enabled environment variable" do
-        with_env_values('TEST_ENV_VAR_FOR_METHOD_TESTS' => '1') do
+        FastlaneSpec::Env.with_env_values('TEST_ENV_VAR_FOR_METHOD_TESTS' => '1') do
           instance = FeatureHelper.new
           FastlaneCore::Feature.register_instance_method(klass: FeatureHelper,
                                                         symbol: :test_method,
