@@ -23,4 +23,5 @@ module Screengrab
   Boolean = Fastlane::Boolean
   ROOT = Pathname.new(File.expand_path('../../..', __FILE__))
   DESCRIPTION = "Automated localized screenshots of your Android app on every device".freeze
+  Boolean = Fastlane::Boolean
 end
