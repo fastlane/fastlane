@@ -1,6 +1,6 @@
-describe Spaceship::ConnectAPI::BetaTester do
+describe Spaceship::ConnectAPI::TestFlight::BetaTester do
   before { Spaceship::Tunes.login }
-  let(:client) { Spaceship::ConnectAPI::Base.client }
+  let(:client) { Spaceship::ConnectAPI::TestFlight::Base.client }
 
   describe '#client' do
     it '#get_beta_testers' do
@@ -9,7 +9,7 @@ describe Spaceship::ConnectAPI::BetaTester do
 
       expect(response.count).to eq(2)
       response.each do |model|
-        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::BetaTester)
+        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::TestFlight::BetaTester)
       end
 
       model = response.first

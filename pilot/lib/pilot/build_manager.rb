@@ -100,14 +100,14 @@ module Pilot
       end
 
       # Get latest uploaded build if no build specified
-      build ||= Spaceship::ConnectAPI::Build.all(app_id: app.id, sort: "-uploadedDate", limit: 1).first
+      build ||= Spaceship::ConnectAPI::TestFlight::Build.all(app_id: app.id, sort: "-uploadedDate", limit: 1).first
 
       # Verify the build has all the includes that we need
       # and fetch a new build if not
       if build && (!build.app || !build.build_beta_detail || !build.pre_release_version)
         UI.important("Build did include information for app, build beta detail and pre release version")
         UI.important("Fetching a new build with all the information needed")
-        build = Spaceship::ConnectAPI::Build.get(build_id: build.id)
+        build = Spaceship::ConnectAPI::TestFlight::Build.get(build_id: build.id)
       end
 
       # Error out if no build
@@ -328,7 +328,7 @@ module Pilot
         uses_non_exempt_encryption = options[:uses_non_exempt_encryption]
         attributes = { usesNonExemptEncryption: uses_non_exempt_encryption }
 
-        client = Spaceship::ConnectAPI::Base.client
+        client = Spaceship::ConnectAPI::TestFlight.client
         client.patch_builds(build_id: uploaded_build.id, attributes: attributes)
 
         UI.important("Export compliance has been set to '#{uses_non_exempt_encryption}'. Need to wait for build to finishing processing again...")
@@ -350,7 +350,7 @@ module Pilot
       attributes[:demoAccountRequired] = info[:demo_account_required] if info.key?(:demo_account_required)
       attributes[:notes] = info[:notes] if info.key?(:notes)
 
-      client = Spaceship::ConnectAPI::Base.client
+      client = Spaceship::ConnectAPI::TestFlight.client
       client.patch_beta_app_review_detail(app_id: build.app.id, attributes: attributes)
     end
 
@@ -392,7 +392,7 @@ module Pilot
       attributes[:tvOsPrivacyPolicy] = info[:tv_os_privacy_policy_url] if info.key?(:tv_os_privacy_policy_url)
       attributes[:description] = info[:description] if info.key?(:description)
 
-      client = Spaceship::ConnectAPI::Base.client
+      client = Spaceship::ConnectAPI::TestFlight.client
       if localization
         client.patch_beta_app_localizations(localization_id: localization.id, attributes: attributes)
       else
@@ -435,7 +435,7 @@ module Pilot
       attributes = {}
       attributes[:whatsNew] = self.class.sanitize_changelog(info[:whats_new]) if info.key?(:whats_new)
 
-      client = Spaceship::ConnectAPI::Base.client
+      client = Spaceship::ConnectAPI::TestFlight.client
       if localization
         client.patch_beta_build_localizations(localization_id: localization.id, attributes: attributes)
       else
@@ -450,7 +450,7 @@ module Pilot
       attributes = {}
       attributes[:autoNotifyEnabled] = info[:auto_notify_enabled] if info.key?(:auto_notify_enabled)
 
-      client = Spaceship::ConnectAPI::Base.client
+      client = Spaceship::ConnectAPI::TestFlight.client
       client.patch_build_beta_details(build_beta_details_id: build_beta_detail.id, attributes: attributes)
     end
   end

@@ -1,6 +1,6 @@
-describe Spaceship::ConnectAPI::PreReleaseVersion do
+describe Spaceship::ConnectAPI::TestFlight::PreReleaseVersion do
   before { Spaceship::Tunes.login }
-  let(:client) { Spaceship::ConnectAPI::Base.client }
+  let(:client) { Spaceship::ConnectAPI::TestFlight::Base.client }
 
   describe '#client' do
     it '#get_pre_release_versions' do
@@ -9,7 +9,7 @@ describe Spaceship::ConnectAPI::PreReleaseVersion do
 
       expect(response.count).to eq(2)
       response.each do |model|
-        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::PreReleaseVersion)
+        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::TestFlight::PreReleaseVersion)
       end
 
       model = response.first

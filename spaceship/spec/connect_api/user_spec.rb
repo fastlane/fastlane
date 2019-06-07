@@ -1,6 +1,6 @@
-describe Spaceship::ConnectAPI::User do
+describe Spaceship::ConnectAPI::TestFlight::User do
   before { Spaceship::Tunes.login }
-  let(:client) { Spaceship::ConnectAPI::Base.client }
+  let(:client) { Spaceship::ConnectAPI::TestFlight::Base.client }
 
   describe '#client' do
     it '#get_users' do
@@ -9,7 +9,7 @@ describe Spaceship::ConnectAPI::User do
 
       expect(response.count).to eq(2)
       response.each do |model|
-        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::User)
+        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::TestFlight::User)
       end
 
       model = response.first
