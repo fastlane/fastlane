@@ -13,7 +13,7 @@ module Spaceship::TestFlight
     # See `Spaceship::TestFlight::Build#reload`
 
     def self.all(app_id: nil, platform: nil, retry_count: 3)
-      client = Spaceship::ConnectAPI::Base.client
+      client = Spaceship::ConnectAPI::TestFlight.client
 
       builds = []
       included = []

@@ -1,6 +1,6 @@
-describe Spaceship::ConnectAPI::BetaAppLocalization do
+describe Spaceship::ConnectAPI::TestFlight::BetaAppLocalization do
   before { Spaceship::Tunes.login }
-  let(:client) { Spaceship::ConnectAPI::Base.client }
+  let(:client) { Spaceship::ConnectAPI::TestFlight::Base.client }
 
   describe '#client' do
     it 'succeeds with object' do
@@ -9,7 +9,7 @@ describe Spaceship::ConnectAPI::BetaAppLocalization do
       expect(response).to be_an_instance_of(Spaceship::ConnectAPI::Response)
       expect(response.count).to eq(1)
       response.each do |model|
-        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::BetaAppLocalization)
+        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::TestFlight::BetaAppLocalization)
       end
 
       model = response.first

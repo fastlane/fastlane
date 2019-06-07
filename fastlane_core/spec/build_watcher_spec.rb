@@ -110,7 +110,7 @@ describe FastlaneCore::BuildWatcher do
     let(:mock_base_api_client) { "fake api base client" }
 
     before(:each) do
-      allow(Spaceship::ConnectAPI::Base).to receive(:client).and_return(mock_base_api_client)
+      allow(Spaceship::ConnectAPI::TestFlight::Base).to receive(:client).and_return(mock_base_api_client)
     end
 
     #    it 'returns an already-active build' do
@@ -124,8 +124,8 @@ describe FastlaneCore::BuildWatcher do
     #    end
 
     it 'returns a ready to submit build' do
-      expect(Spaceship::ConnectAPI::BuildDelivery).to receive(:all).and_return([])
-      expect(Spaceship::ConnectAPI::Build).to receive(:all).and_return([ready_build])
+      expect(Spaceship::ConnectAPI::TestFlight::BuildDelivery).to receive(:all).and_return([])
+      expect(Spaceship::ConnectAPI::TestFlight::Build).to receive(:all).and_return([ready_build])
 
       expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version}")
       found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '1.0', build_version: '1', return_spaceship_testflight_build: false)
@@ -134,8 +134,8 @@ describe FastlaneCore::BuildWatcher do
     end
 
     it 'returns a ready to submit build with train_version and build_version truncated' do
-      expect(Spaceship::ConnectAPI::BuildDelivery).to receive(:all).and_return([])
-      expect(Spaceship::ConnectAPI::Build).to receive(:all).and_return([ready_build])
+      expect(Spaceship::ConnectAPI::TestFlight::BuildDelivery).to receive(:all).and_return([])
+      expect(Spaceship::ConnectAPI::TestFlight::Build).to receive(:all).and_return([ready_build])
 
       expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version}")
       found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '01.00', build_version: '01', return_spaceship_testflight_build: false)
@@ -166,10 +166,10 @@ describe FastlaneCore::BuildWatcher do
     #    end
 
     it 'waits when a build is still processing' do
-      expect(Spaceship::ConnectAPI::BuildDelivery).to receive(:all).and_return([build_delivery])
+      expect(Spaceship::ConnectAPI::TestFlight::BuildDelivery).to receive(:all).and_return([build_delivery])
       expect(FastlaneCore::BuildWatcher).to receive(:sleep)
-      expect(Spaceship::ConnectAPI::BuildDelivery).to receive(:all).and_return([])
-      expect(Spaceship::ConnectAPI::Build).to receive(:all).and_return([ready_build])
+      expect(Spaceship::ConnectAPI::TestFlight::BuildDelivery).to receive(:all).and_return([])
+      expect(Spaceship::ConnectAPI::TestFlight::Build).to receive(:all).and_return([ready_build])
 
       expect(UI).to receive(:message).with("Waiting for App Store Connect to finish processing the new build (1.0 - 1)")
       expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version}")
@@ -179,11 +179,11 @@ describe FastlaneCore::BuildWatcher do
     end
 
     it 'waits when the build disappears' do
-      expect(Spaceship::ConnectAPI::BuildDelivery).to receive(:all).and_return([])
-      expect(Spaceship::ConnectAPI::Build).to receive(:all).and_return([])
+      expect(Spaceship::ConnectAPI::TestFlight::BuildDelivery).to receive(:all).and_return([])
+      expect(Spaceship::ConnectAPI::TestFlight::Build).to receive(:all).and_return([])
       expect(FastlaneCore::BuildWatcher).to receive(:sleep)
-      expect(Spaceship::ConnectAPI::BuildDelivery).to receive(:all).and_return([])
-      expect(Spaceship::ConnectAPI::Build).to receive(:all).and_return([ready_build])
+      expect(Spaceship::ConnectAPI::TestFlight::BuildDelivery).to receive(:all).and_return([])
+      expect(Spaceship::ConnectAPI::TestFlight::Build).to receive(:all).and_return([ready_build])
 
       expect(UI).to receive(:message).with("Build doesn't show up in the build list anymore, waiting for it to appear again (check your email for processing issues if this continues)")
       expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version}")
@@ -206,8 +206,8 @@ describe FastlaneCore::BuildWatcher do
     #    end
 
     it 'watches the latest build when no builds are processing' do
-      expect(Spaceship::ConnectAPI::BuildDelivery).to receive(:all).and_return([])
-      expect(Spaceship::ConnectAPI::Build).to receive(:all).and_return([ready_build])
+      expect(Spaceship::ConnectAPI::TestFlight::BuildDelivery).to receive(:all).and_return([])
+      expect(Spaceship::ConnectAPI::TestFlight::Build).to receive(:all).and_return([ready_build])
 
       expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version}")
       found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '1.0', build_version: '1', return_spaceship_testflight_build: false)
@@ -224,10 +224,10 @@ describe FastlaneCore::BuildWatcher do
     #    end
 
     it 'sleeps 10 seconds by default' do
-      expect(Spaceship::ConnectAPI::BuildDelivery).to receive(:all).and_return([build_delivery])
+      expect(Spaceship::ConnectAPI::TestFlight::BuildDelivery).to receive(:all).and_return([build_delivery])
       expect(FastlaneCore::BuildWatcher).to receive(:sleep).with(10)
-      expect(Spaceship::ConnectAPI::BuildDelivery).to receive(:all).and_return([])
-      expect(Spaceship::ConnectAPI::Build).to receive(:all).and_return([ready_build])
+      expect(Spaceship::ConnectAPI::TestFlight::BuildDelivery).to receive(:all).and_return([])
+      expect(Spaceship::ConnectAPI::TestFlight::Build).to receive(:all).and_return([ready_build])
 
       allow(UI).to receive(:message)
       allow(UI).to receive(:success)
@@ -235,10 +235,10 @@ describe FastlaneCore::BuildWatcher do
     end
 
     it 'sleeps for the amount of time specified in poll_interval' do
-      expect(Spaceship::ConnectAPI::BuildDelivery).to receive(:all).and_return([build_delivery])
+      expect(Spaceship::ConnectAPI::TestFlight::BuildDelivery).to receive(:all).and_return([build_delivery])
       expect(FastlaneCore::BuildWatcher).to receive(:sleep).with(123)
-      expect(Spaceship::ConnectAPI::BuildDelivery).to receive(:all).and_return([])
-      expect(Spaceship::ConnectAPI::Build).to receive(:all).and_return([ready_build])
+      expect(Spaceship::ConnectAPI::TestFlight::BuildDelivery).to receive(:all).and_return([])
+      expect(Spaceship::ConnectAPI::TestFlight::Build).to receive(:all).and_return([ready_build])
 
       allow(UI).to receive(:message)
       allow(UI).to receive(:success)

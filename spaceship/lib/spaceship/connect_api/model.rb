@@ -1,4 +1,5 @@
 require_relative '../base'
+require_relative './testflight/base'
 
 module Spaceship
   module ConnectAPI
@@ -11,8 +12,8 @@ module Spaceship
       end
 
       module ClassMethods
-        def client
-          return Spaceship::ConnectAPI::Base.client
+        def testflight_client
+          return Spaceship::ConnectAPI::TestFlight::Base.client
         end
       end
 
@@ -30,8 +31,8 @@ module Spaceship
         end
       end
 
-      def client
-        return Spaceship::ConnectAPI::Base.client
+      def testflight_client
+        return Spaceship::ConnectAPI::TestFlight::Base.client
       end
 
       #
