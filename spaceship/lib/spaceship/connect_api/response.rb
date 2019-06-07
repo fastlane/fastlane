@@ -1,5 +1,4 @@
-require_relative './base'
-require_relative './models/model'
+require_relative './model'
 
 module Spaceship
   module ConnectAPI
@@ -7,14 +6,12 @@ module Spaceship
       include Enumerable
       attr_reader :body
       attr_reader :status
+      attr_reader :client
 
-      def initialize(body: nil, status: nil)
+      def initialize(body: nil, status: nil, client: nil)
         @body = body
         @status = status
-      end
-
-      def client
-        return Spaceship::ConnectAPI::Base.client
+        @client = client
       end
 
       def next_url

@@ -59,25 +59,25 @@ describe "Build Manager" do
     let(:fake_build_manager) { Pilot::BuildManager.new }
 
     let(:app) do
-      Spaceship::ConnectAPI::App.new("123-123-123-123", {
+      Spaceship::ConnectAPI::TestFlight::App.new("123-123-123-123", {
         name: "Mock App"
       })
     end
     let(:pre_release_version) do
-      Spaceship::ConnectAPI::PreReleaseVersion.new("123-123-123-123", {
+      Spaceship::ConnectAPI::TestFlight::PreReleaseVersion.new("123-123-123-123", {
         version: "1.0"
       })
     end
     let(:app_localizations) do
       [
-        Spaceship::ConnectAPI::BetaAppLocalization.new("234", {
+        Spaceship::ConnectAPI::TestFlight::BetaAppLocalization.new("234", {
           feedbackEmail: 'email@email.com',
           marketingUrl: 'https://url.com',
           privacyPolicyUrl: 'https://url.com',
           description: 'desc desc desc',
           locale: 'en-us'
         }),
-        Spaceship::ConnectAPI::BetaAppLocalization.new("432", {
+        Spaceship::ConnectAPI::TestFlight::BetaAppLocalization.new("432", {
           feedbackEmail: 'email@email.com',
           marketingUrl: 'https://url.com',
           privacyPolicyUrl: 'https://url.com',
@@ -88,36 +88,36 @@ describe "Build Manager" do
     end
     let(:build_localizations) do
       [
-        Spaceship::ConnectAPI::BetaBuildLocalization.new("234", {
+        Spaceship::ConnectAPI::TestFlight::BetaBuildLocalization.new("234", {
           whatsNew: 'some more words',
           locale: 'en-us'
         }),
-        Spaceship::ConnectAPI::BetaBuildLocalization.new("432", {
+        Spaceship::ConnectAPI::TestFlight::BetaBuildLocalization.new("432", {
           whatsNew: 'some words',
           locale: 'en-gb'
         })
       ]
     end
     let(:build_beta_detail) do
-      Spaceship::ConnectAPI::BuildBetaDetail.new("321", {
-        external_build_state: Spaceship::ConnectAPI::BuildBetaDetail::ExternalState::READY_FOR_BETA_SUBMISSION
+      Spaceship::ConnectAPI::TestFlight::BuildBetaDetail.new("321", {
+        external_build_state: Spaceship::ConnectAPI::TestFlight::BuildBetaDetail::ExternalState::READY_FOR_BETA_SUBMISSION
       })
     end
     let(:beta_groups) do
       [
-        Spaceship::ConnectAPI::BetaGroup.new("987", {
+        Spaceship::ConnectAPI::TestFlight::BetaGroup.new("987", {
           name: "Blue Man Group"
         }),
-        Spaceship::ConnectAPI::BetaGroup.new("654", {
+        Spaceship::ConnectAPI::TestFlight::BetaGroup.new("654", {
           name: "Green Eggs and Ham"
         })
       ]
     end
     let(:ready_to_submit_mock_build) do
-      Spaceship::ConnectAPI::Build.new("123", {
+      Spaceship::ConnectAPI::TestFlight::Build.new("123", {
         version: '',
         uploadedDate: '',
-        processingState: Spaceship::ConnectAPI::Build::ProcessingState::VALID,
+        processingState: Spaceship::ConnectAPI::TestFlight::Build::ProcessingState::VALID,
         usesNonExemptEncryption: nil
       })
     end
@@ -172,7 +172,7 @@ describe "Build Manager" do
         allow(mock_base_client).to receive(:team_id).and_return('')
 
         allow(mock_base_client).to receive(:post_beta_app_review_submissions) # pretend it worked.
-        allow(Spaceship::ConnectAPI::Base).to receive(:client).and_return(mock_base_client)
+        allow(Spaceship::ConnectAPI::TestFlight::Base).to receive(:client).and_return(mock_base_client)
 
         # Allow build to return app, buidl_beta_detail, and pre_release_version
         # These are models that are expected to usually be included in the build passed into distribute
@@ -185,7 +185,7 @@ describe "Build Manager" do
         options = distribute_options_non_localized
 
         # Expect App.find to be called from within Pilot::Manager
-        expect(Spaceship::ConnectAPI::App).to receive(:get).and_return(app)
+        expect(Spaceship::ConnectAPI::TestFlight::App).to receive(:get).and_return(app)
 
         # Expect a beta app review detail to be patched
         expect(mock_base_client).to receive(:patch_beta_app_review_detail).with({

@@ -1,6 +1,6 @@
-describe Spaceship::ConnectAPI::App do
+describe Spaceship::ConnectAPI::TestFlight::App do
   before { Spaceship::Tunes.login }
-  let(:client) { Spaceship::ConnectAPI::Base.client }
+  let(:client) { Spaceship::ConnectAPI::TestFlight::Base.client }
 
   describe '#client' do
     it '#get_apps' do
@@ -9,7 +9,7 @@ describe Spaceship::ConnectAPI::App do
 
       expect(response.count).to eq(2)
       response.each do |model|
-        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::App)
+        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::TestFlight::App)
       end
 
       model = response.first
@@ -28,7 +28,7 @@ describe Spaceship::ConnectAPI::App do
 
       expect(response.count).to eq(1)
       response.each do |model|
-        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::App)
+        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::TestFlight::App)
       end
 
       model = response.first
@@ -39,7 +39,7 @@ describe Spaceship::ConnectAPI::App do
 
   describe "App object" do
     it 'finds app by bundle id' do
-      model = Spaceship::ConnectAPI::App.find("com.joshholtz.FastlaneTest")
+      model = Spaceship::ConnectAPI::TestFlight::App.find("com.joshholtz.FastlaneTest")
       expect(model.bundle_id).to eq("com.joshholtz.FastlaneTest")
     end
   end

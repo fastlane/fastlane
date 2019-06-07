@@ -1,6 +1,6 @@
-describe Spaceship::ConnectAPI::BetaBuildMetric do
+describe Spaceship::ConnectAPI::TestFlight::BetaBuildMetric do
   before { Spaceship::Tunes.login }
-  let(:client) { Spaceship::ConnectAPI::Base.client }
+  let(:client) { Spaceship::ConnectAPI::TestFlight::Base.client }
 
   describe '#client' do
     it '#get_beta_build_metrics' do
@@ -9,7 +9,7 @@ describe Spaceship::ConnectAPI::BetaBuildMetric do
 
       expect(response.count).to eq(1)
       response.each do |model|
-        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::BetaBuildMetric)
+        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::TestFlight::BetaBuildMetric)
       end
 
       model = response.first

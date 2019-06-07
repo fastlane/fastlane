@@ -29,7 +29,7 @@ module Pilot
     def app
       @app_id ||= fetch_app_id
 
-      @app ||= Spaceship::ConnectAPI::App.get(app_id: @app_id)
+      @app ||= Spaceship::ConnectAPI::TestFlight::App.get(app_id: @app_id)
       unless @app
         UI.user_error!("Could not find app with #{(config[:apple_id] || config[:app_identifier])}")
       end
@@ -48,7 +48,7 @@ module Pilot
       config[:app_identifier] = fetch_app_identifier
 
       if config[:app_identifier]
-        @app ||= Spaceship::ConnectAPI::App.find(config[:app_identifier])
+        @app ||= Spaceship::ConnectAPI::TestFlight::App.find(config[:app_identifier])
         UI.user_error!("Couldn't find app '#{config[:app_identifier]}' on the account of '#{config[:username]}' on App Store Connect") unless @app
         @app_id ||= @app.id
       end

@@ -1,6 +1,6 @@
-describe Spaceship::ConnectAPI::Client do
-  let(:client) { Spaceship::ConnectAPI::Base.client }
-  let(:hostname) { Spaceship::ConnectAPI::Client.hostname }
+describe Spaceship::ConnectAPI::TestFlight::Client do
+  let(:client) { Spaceship::ConnectAPI::TestFlight.client }
+  let(:hostname) { Spaceship::ConnectAPI::TestFlight::Client.hostname }
   let(:username) { 'spaceship@krausefx.com' }
   let(:password) { 'so_secret' }
 
