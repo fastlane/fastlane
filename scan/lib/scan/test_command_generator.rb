@@ -15,7 +15,22 @@ module Scan
     end
 
     def prefix
-      ["set -o pipefail &&"]
+      config = Scan.config
+
+      if config[:sonar_build_wrapper].to_s.length > 0 && config[:sonar_build_wrapper_output].to_s.length == 0
+        UI.user_error!("Cannot use sonar_build_wrapper option without a sonar_build_wrapper_output.")
+      end
+
+      if config[:sonar_build_wrapper_output].to_s.length > 0 && config[:sonar_build_wrapper].to_s.length == 0
+        UI.user_error!("Cannot use sonar_build_wrapper_output option without a sonar_build_wrapper.")
+      end
+
+      options = []
+      options << config[:sonar_build_wrapper].shellescape.to_s if config[:sonar_build_wrapper]
+      options << "--out-dir #{config[:sonar_build_wrapper_output].shellescape}" if config[:sonar_build_wrapper_output]
+      options << "set -o pipefail &&"
+
+      options
     end
 
     # Path to the project or workspace as parameter

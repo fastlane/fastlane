@@ -580,5 +580,57 @@ describe Scan do
         end.to raise_error("'device' value must be a String! Found Array instead.")
       end
     end
+
+    describe "sonar_build_wrapper and sonar_build_wrapper-output" do
+      before do
+        options = { project: "./scan/examples/standard/app.xcodeproj" }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      end
+
+      it "raises an error if `sonar_build_wrapper` was given but `sonar_build_wrapper_output` was missing" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(".")
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            scan(
+              project: './scan/examples/standard/app.xcodeproj',
+              sonar_build_wrapper: 'build-wrapper-macosx-x86-64',
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Cannot use sonar_build_wrapper option without a sonar_build_wrapper_output.")
+      end
+
+      it "raises an error if `sonar_build_wrapper_output` was given but `sonar_build_wrapper` was missing" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(".")
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            scan(
+              project: './scan/examples/standard/app.xcodeproj',
+              sonar_build_wrapper_output: 'bw_output',
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Cannot use sonar_build_wrapper_output option without a sonar_build_wrapper.")
+      end
+
+      it "uses SonarCFamily for Objective-C wrapper" do
+        expect do
+          options = {
+            project: "./scan/examples/standard/app.xcodeproj",
+            sonar_build_wrapper: "build-wrapper-macosx-x86-64",
+            sonar_build_wrapper_output: "bw_output"
+          }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+          result = @test_command_generator.generate
+          expect(result).to start_with([
+                                         "build-wrapper-macosx-x86-64",
+                                         "--out-dir bw_output",
+                                         "set -o pipefail &&",
+                                         "env NSUnbufferedIO=YES xcodebuild",
+                                         "-scheme app",
+                                         "-project ./scan/examples/standard/app.xcodeproj"
+                                       ])
+        end
+      end
+    end
   end
 end
