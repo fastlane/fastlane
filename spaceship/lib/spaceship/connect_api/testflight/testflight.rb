@@ -14,7 +14,6 @@ require 'spaceship/connect_api/testflight/models/build'
 require 'spaceship/connect_api/testflight/models/build_delivery'
 require 'spaceship/connect_api/testflight/models/build_beta_detail'
 require 'spaceship/connect_api/testflight/models/pre_release_version'
-require 'spaceship/connect_api/testflight/models/user'
 
 module Spaceship
   module ConnectAPI
