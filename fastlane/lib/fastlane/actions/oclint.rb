@@ -80,6 +80,8 @@ module Fastlane
         oclint_args << "-enable-global-analysis" if params[:enable_global_analysis]
         oclint_args << "-allow-duplicated-violations" if params[:allow_duplicated_violations]
         oclint_args << "-p #{compile_commands_dir.shellescape}"
+        
+        oclint_args << "-extra-arg=#{params[:extra_arg]}" if params[:extra_arg]
 
         command = [
           command_prefix,
@@ -250,6 +252,7 @@ module Fastlane
             enable_clang_static_analyzer: true,   # Enable Clang Static Analyzer, and integrate results into OCLint report
             enable_global_analysis: true,         # Compile every source, and analyze across global contexts (depends on number of source files, could results in high memory load)
             allow_duplicated_violations: true     # Allow duplicated violations in the OCLint report
+            extra_arg: "-Wno-everything"          # Additional argument to append to the compiler command line
           )'
         ]
       end
