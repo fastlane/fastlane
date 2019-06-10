@@ -82,7 +82,7 @@ module Fastlane
         oclint_args << "-p #{compile_commands_dir.shellescape}"
         
         oclint_args << "-extra-arg=#{params[:extra_arg]}" if params[:extra_arg]
-
+        
         command = [
           command_prefix,
           oclint_path,
