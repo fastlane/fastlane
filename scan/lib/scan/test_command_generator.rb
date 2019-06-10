@@ -5,7 +5,7 @@ module Scan
   class TestCommandGenerator
     def generate
       parts = prefix
-      parts << "env NSUnbufferedIO=YES xcodebuild"
+      parts << "xcodebuild"
       parts += options
       parts += actions
       parts += suffix
@@ -26,9 +26,9 @@ module Scan
       end
 
       options = []
+      options << "set -o pipefail && env NSUnbufferedIO=YES"
       options << config[:sonar_build_wrapper].shellescape.to_s if config[:sonar_build_wrapper]
       options << "--out-dir #{config[:sonar_build_wrapper_output].shellescape}" if config[:sonar_build_wrapper_output]
-      options << "set -o pipefail &&"
 
       options
     end
