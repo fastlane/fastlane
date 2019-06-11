@@ -80,9 +80,9 @@ module Fastlane
         oclint_args << "-enable-global-analysis" if params[:enable_global_analysis]
         oclint_args << "-allow-duplicated-violations" if params[:allow_duplicated_violations]
         oclint_args << "-p #{compile_commands_dir.shellescape}"
-        
+
         oclint_args << "-extra-arg=#{params[:extra_arg]}" if params[:extra_arg]
-        
+
         command = [
           command_prefix,
           oclint_path,
