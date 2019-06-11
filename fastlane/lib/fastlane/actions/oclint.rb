@@ -207,6 +207,11 @@ module Fastlane
                                        description: "Allow duplicated violations in the OCLint report",
                                        is_string: false,
                                        default_value: false)
+          FastlaneCore::ConfigItem.new(key: :extra_arg,
+                                       env_name: 'FL_OCLINT_EXTRA_ARG',
+                                       description: 'Additional argument to append to the compiler command line',
+                                       default_value: '',
+                                       optional: true),
         ]
       end
       # rubocop:enable Metrics/PerceivedComplexity
