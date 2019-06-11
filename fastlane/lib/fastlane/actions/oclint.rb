@@ -210,7 +210,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :extra_arg,
                                        env_name: 'FL_OCLINT_EXTRA_ARG',
                                        description: 'Additional argument to append to the compiler command line',
-                                       default_value: '',
                                        optional: true)
         ]
       end
