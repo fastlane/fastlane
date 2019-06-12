@@ -1,7 +1,7 @@
 require 'spaceship/connect_api/users/client'
 
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     module Users
       #
       # users

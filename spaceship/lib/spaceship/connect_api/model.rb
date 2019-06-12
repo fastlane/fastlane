@@ -1,5 +1,5 @@
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     module Model
       def self.included(base)
         Spaceship::ConnectAPI::Models.types ||= []

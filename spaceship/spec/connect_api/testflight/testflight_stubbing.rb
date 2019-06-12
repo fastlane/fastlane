@@ -1,4 +1,4 @@
-module ConnectAPIStubbing
+class ConnectAPIStubbing
   class TestFlight
     class << self
       def read_fixture_file(filename)

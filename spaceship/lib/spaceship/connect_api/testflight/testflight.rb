@@ -1,7 +1,7 @@
 require 'spaceship/connect_api/testflight/client'
 
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     module TestFlight
       #
       # apps

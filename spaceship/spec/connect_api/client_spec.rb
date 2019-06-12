@@ -77,7 +77,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
     before(:each) do
       allow(client).to receive(:handle_response)
       module Spaceship
-        module ConnectAPI
+        class ConnectAPI
           module TestFlight
             class Client
               include Spaceship::ConnectAPI::TestFlight

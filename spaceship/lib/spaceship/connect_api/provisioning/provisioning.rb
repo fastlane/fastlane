@@ -1,7 +1,7 @@
 require 'spaceship/connect_api/provisioning/client'
 
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     module Provisioning
       #
       # bundleIds

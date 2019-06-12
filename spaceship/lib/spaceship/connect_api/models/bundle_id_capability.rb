@@ -1,6 +1,6 @@
 require_relative '../model'
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     class BundleIdCapability
       include Spaceship::ConnectAPI::Model
 

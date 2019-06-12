@@ -2,7 +2,7 @@ require_relative '../client'
 require_relative '../../portal/portal_client'
 
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     module Provisioning
       class Client < Spaceship::ConnectAPI::Client
         def self.instance

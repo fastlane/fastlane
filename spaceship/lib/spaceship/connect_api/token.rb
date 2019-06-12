@@ -8,7 +8,7 @@ require 'openssl'
 # openssl ec -in key.pem -pubout -out public_key.pem -aes256
 
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     class Token
       # maximum expiration supported by AppStore (20 minutes)
       MAX_TOKEN_DURATION = 1200

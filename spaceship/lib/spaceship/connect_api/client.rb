@@ -2,7 +2,7 @@ require_relative '../client'
 require_relative './response'
 
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     class Client < Spaceship::Client
       attr_accessor :token
 

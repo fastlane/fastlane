@@ -1,7 +1,7 @@
 require_relative './model'
 
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     class Response
       include Enumerable
       attr_reader :body

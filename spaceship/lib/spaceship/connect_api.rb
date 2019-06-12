@@ -28,29 +28,19 @@ require 'spaceship/connect_api/models/build_beta_detail'
 require 'spaceship/connect_api/models/pre_release_version'
 
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
+    extend Spaceship::ConnectAPI::Provisioning
+    extend Spaceship::ConnectAPI::TestFlight
+    extend Spaceship::ConnectAPI::Users
+
     @token = nil
 
-    def self.token=(token)
-      @token = token
+    class << self
+      attr_writer(:token)
     end
 
-    def self.token
-      @token
-    end
-
-    def self.method_missing(method_sym, *arguments, &block)
-      if MethodCollector.respond_to?(method_sym)
-        MethodCollector.send(method_sym, *arguments, &block)
-      else
-        super
-      end
-    end
-
-    class MethodCollector
-      extend Spaceship::ConnectAPI::Provisioning
-      extend Spaceship::ConnectAPI::TestFlight
-      extend Spaceship::ConnectAPI::Users
+    class << self
+      attr_reader :token
     end
   end
 end

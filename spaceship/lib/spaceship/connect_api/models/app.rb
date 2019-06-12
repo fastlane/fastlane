@@ -2,7 +2,7 @@ require_relative '../model'
 require_relative './build'
 
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     class App
       include Spaceship::ConnectAPI::Model
 
