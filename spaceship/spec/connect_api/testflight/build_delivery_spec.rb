@@ -1,15 +1,14 @@
-describe Spaceship::ConnectAPI::TestFlight::BuildDelivery do
+describe Spaceship::ConnectAPI::BuildDelivery do
   before { Spaceship::Tunes.login }
-  let(:client) { Spaceship::ConnectAPI::TestFlight::Base.client }
 
-  describe '#client' do
+  describe '#Spaceship::ConnectAPI' do
     it '#get_build_deliveries' do
-      response = client.get_build_deliveries
+      response = Spaceship::ConnectAPI.get_build_deliveries
       expect(response).to be_an_instance_of(Spaceship::ConnectAPI::Response)
 
       expect(response.count).to eq(1)
       response.each do |model|
-        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::TestFlight::BuildDelivery)
+        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::BuildDelivery)
       end
 
       model = response.first

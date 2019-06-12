@@ -5,20 +5,20 @@ describe Pilot::TesterManager do
     let(:tester_manager) { Pilot::TesterManager.new }
 
     let(:custom_tester_group) do
-      Spaceship::ConnectAPI::TestFlight::BetaGroup.new("1", {
+      Spaceship::ConnectAPI::BetaGroup.new("1", {
         name: "Test Group"
       })
     end
 
     let(:app_context_testers) do
       [
-        Spaceship::ConnectAPI::TestFlight::BetaTester.new("1", {
+        Spaceship::ConnectAPI::BetaTester.new("1", {
           firstName: 'First',
           lastName: 'Last',
           email: 'my@email.addr',
           betaGroups: [custom_tester_group]
         }),
-        Spaceship::ConnectAPI::TestFlight::BetaTester.new("2", {
+        Spaceship::ConnectAPI::BetaTester.new("2", {
           firstName: 'Fabricio',
           lastName: 'Devtoolio',
           email: 'fabric-devtools@gmail.com',
@@ -34,7 +34,7 @@ describe Pilot::TesterManager do
     end
 
     let(:fake_tester) do
-      Spaceship::ConnectAPI::TestFlight::BetaTester.new("1", {
+      Spaceship::ConnectAPI::BetaTester.new("1", {
         firstName: 'fake',
         lastName: 'tester',
         email: 'fabric-devtools@gmail.com+fake@gmail.com'
@@ -77,8 +77,8 @@ describe Pilot::TesterManager do
     before(:each) do
       allow(fake_app).to receive(:apple_id).and_return("com.whatever")
       allow(fake_app).to receive(:name).and_return(fake_app_name)
-      allow(Spaceship::ConnectAPI::TestFlight::App).to receive(:get).and_return(fake_app)
-      allow(Spaceship::ConnectAPI::TestFlight::App).to receive(:find).and_return(fake_app)
+      allow(Spaceship::ConnectAPI::App).to receive(:get).and_return(fake_app)
+      allow(Spaceship::ConnectAPI::App).to receive(:find).and_return(fake_app)
       allow(Spaceship::Tunes).to receive(:client).and_return(fake_client)
 
       allow(tester_manager).to receive(:login) # prevent attempting to log in with iTC

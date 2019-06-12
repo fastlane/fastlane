@@ -1,6 +1,3 @@
-require_relative './testflight/base'
-require_relative './users/base'
-
 module Spaceship
   module ConnectAPI
     module Model
@@ -8,17 +5,6 @@ module Spaceship
         Spaceship::ConnectAPI::Models.types ||= []
         Spaceship::ConnectAPI::Models.types << base
         base.extend(Spaceship::ConnectAPI::Model)
-        base.extend(Spaceship::ConnectAPI::Model::ClassMethods)
-      end
-
-      module ClassMethods
-        def testflight_client
-          return Spaceship::ConnectAPI::TestFlight.client
-        end
-
-        def users_client
-          return Spaceship::ConnectAPI::Users.client
-        end
       end
 
       attr_accessor :id
@@ -33,14 +19,6 @@ module Spaceship
           method = "#{key}=".to_sym
           self.send(method, value) if self.respond_to?(method)
         end
-      end
-
-      def testflight_client
-        return Spaceship::ConnectAPI::TestFlight.client
-      end
-
-      def users_client
-        return Spaceship::ConnectAPI::Users.client
       end
 
       #

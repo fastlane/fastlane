@@ -1,5 +1,5 @@
 describe Spaceship::ConnectAPI::TestFlight::Client do
-  let(:client) { Spaceship::ConnectAPI::TestFlight.client }
+  let(:client) { Spaceship::ConnectAPI::TestFlight::Client.instance }
   let(:hostname) { Spaceship::ConnectAPI::TestFlight::Client.hostname }
   let(:username) { 'spaceship@krausefx.com' }
   let(:password) { 'so_secret' }
@@ -76,11 +76,23 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
   context 'sends api request' do
     before(:each) do
       allow(client).to receive(:handle_response)
+      module Spaceship
+        module ConnectAPI
+          module TestFlight
+            class Client
+              include Spaceship::ConnectAPI::TestFlight
+            end
+          end
+        end
+      end
     end
 
     def test_request_params(url, params)
       req_mock = double
       options_mock = double
+
+      allow(req_mock).to receive(:headers).and_return({})
+
       expect(req_mock).to receive(:url).with(url)
       expect(req_mock).to receive(:params=).with(params)
       expect(req_mock).to receive(:options).and_return(options_mock)

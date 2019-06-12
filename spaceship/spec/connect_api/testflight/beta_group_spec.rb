@@ -1,15 +1,14 @@
-describe Spaceship::ConnectAPI::TestFlight::BetaGroup do
+describe Spaceship::ConnectAPI::BetaGroup do
   before { Spaceship::Tunes.login }
-  let(:client) { Spaceship::ConnectAPI::TestFlight::Base.client }
 
-  describe '#client' do
+  describe '#Spaceship::ConnectAPI' do
     it '#get_beta_groups' do
-      response = client.get_beta_groups
+      response = Spaceship::ConnectAPI.get_beta_groups
       expect(response).to be_an_instance_of(Spaceship::ConnectAPI::Response)
 
       expect(response.count).to eq(3)
       response.each do |model|
-        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::TestFlight::BetaGroup)
+        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::BetaGroup)
       end
 
       model = response.first

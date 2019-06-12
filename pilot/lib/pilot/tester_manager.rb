@@ -83,13 +83,13 @@ module Pilot
 
     def find_app(apple_id: nil, app_identifier: nil)
       if app_identifier
-        app = Spaceship::ConnectAPI::TestFlight::App.find(app_identifier)
+        app = Spaceship::ConnectAPI::App.find(app_identifier)
         UI.user_error!("Could not find an app by #{app_identifier}") unless app
         return app
       end
 
       if apple_id
-        app = Spaceship::ConnectAPI::TestFlight::App.get(app_id: apple_id)
+        app = Spaceship::ConnectAPI::App.get(app_id: apple_id)
         UI.user_error!("Could not find an app by #{apple_id}") unless app
         return app
       end

@@ -1,15 +1,14 @@
-describe Spaceship::ConnectAPI::TestFlight::BetaAppLocalization do
+describe Spaceship::ConnectAPI::BetaAppLocalization do
   before { Spaceship::Tunes.login }
-  let(:client) { Spaceship::ConnectAPI::TestFlight::Base.client }
 
-  describe '#client' do
+  describe '#Spaceship::ConnectAPI' do
     it 'succeeds with object' do
-      response = client.get_beta_app_localizations
+      response = Spaceship::ConnectAPI.get_beta_app_localizations
 
       expect(response).to be_an_instance_of(Spaceship::ConnectAPI::Response)
       expect(response.count).to eq(1)
       response.each do |model|
-        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::TestFlight::BetaAppLocalization)
+        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::BetaAppLocalization)
       end
 
       model = response.first

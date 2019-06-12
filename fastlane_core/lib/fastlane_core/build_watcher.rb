@@ -47,12 +47,12 @@ module FastlaneCore
         watched_app_version = remove_version_leading_zeros(version: watched_app_version)
         watched_build_version = remove_version_leading_zeros(version: watched_build_version)
 
-        build_deliveries = Spaceship::ConnectAPI::TestFlight::BuildDelivery.all(app_id: app_id, version: watched_app_version, build_number: watched_build_version)
+        build_deliveries = Spaceship::ConnectAPI::BuildDelivery.all(app_id: app_id, version: watched_app_version, build_number: watched_build_version)
         build_delivery = build_deliveries.first
 
         # Get processed builds when no longer in build deliveries
         if build_delivery.nil?
-          matched_builds = Spaceship::ConnectAPI::TestFlight::Build.all(
+          matched_builds = Spaceship::ConnectAPI::Build.all(
             app_id: app_id,
             version: watched_app_version,
             build_number: watched_build_version,
