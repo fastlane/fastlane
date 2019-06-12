@@ -4,8 +4,10 @@ module Scan
   # Responsible for building the fully working xcodebuild command
   class TestCommandGenerator
     def generate
+      Scan.config[:xcodebuild_command] ||= "env NSUnbufferedIO=YES xcodebuild"
+
       parts = prefix
-      parts << "xcodebuild"
+      parts << Scan.config[:xcodebuild_command]
       parts += options
       parts += actions
       parts += suffix
@@ -15,22 +17,7 @@ module Scan
     end
 
     def prefix
-      config = Scan.config
-
-      if config[:sonar_build_wrapper].to_s.length > 0 && config[:sonar_build_wrapper_output].to_s.length == 0
-        UI.user_error!("Cannot use sonar_build_wrapper option without a sonar_build_wrapper_output.")
-      end
-
-      if config[:sonar_build_wrapper_output].to_s.length > 0 && config[:sonar_build_wrapper].to_s.length == 0
-        UI.user_error!("Cannot use sonar_build_wrapper_output option without a sonar_build_wrapper.")
-      end
-
-      options = []
-      options << "set -o pipefail && env NSUnbufferedIO=YES"
-      options << config[:sonar_build_wrapper].shellescape.to_s if config[:sonar_build_wrapper]
-      options << "--out-dir #{config[:sonar_build_wrapper_output].shellescape}" if config[:sonar_build_wrapper_output]
-
-      options
+      ["set -o pipefail &&"]
     end
 
     # Path to the project or workspace as parameter

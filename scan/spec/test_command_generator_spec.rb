@@ -106,8 +106,8 @@ describe Scan do
 
         result = @test_command_generator.generate
         expect(result).to start_with([
-                                       "set -o pipefail && env NSUnbufferedIO=YES",
-                                       "xcodebuild",
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
                                        "-scheme app",
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-sdk '9.0'",
@@ -129,8 +129,8 @@ describe Scan do
 
       result = @test_command_generator.generate
       expect(result).to start_with([
-                                     "set -o pipefail && env NSUnbufferedIO=YES",
-                                     "xcodebuild",
+                                     "set -o pipefail &&",
+                                     "env NSUnbufferedIO=YES xcodebuild",
                                      "-scheme app",
                                      "-project ./scan/examples/standard/app.xcodeproj",
                                      "-sdk '9.0'",
@@ -169,8 +169,8 @@ describe Scan do
 
         result = @test_command_generator.generate
         expect(result).to start_with([
-                                       "set -o pipefail && env NSUnbufferedIO=YES",
-                                       "xcodebuild",
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
                                        "-scheme app",
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
@@ -215,8 +215,8 @@ describe Scan do
 
         result = @test_command_generator.generate
         expect(result).to start_with([
-                                       "set -o pipefail && env NSUnbufferedIO=YES",
-                                       "xcodebuild",
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
                                        "-scheme app",
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
@@ -300,8 +300,8 @@ describe Scan do
 
         result = @test_command_generator.generate
         expect(result).to start_with([
-                                       "set -o pipefail && env NSUnbufferedIO=YES",
-                                       "xcodebuild",
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
                                        "-scheme app",
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
@@ -324,8 +324,8 @@ describe Scan do
         result = @test_command_generator.generate
 
         expect(result).to start_with([
-                                       "set -o pipefail && env NSUnbufferedIO=YES",
-                                       "xcodebuild",
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
                                        "-scheme app",
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
@@ -347,8 +347,8 @@ describe Scan do
         result = @test_command_generator.generate
 
         expect(result).to start_with([
-                                       "set -o pipefail && env NSUnbufferedIO=YES",
-                                       "xcodebuild",
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
                                        "-scheme app",
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
@@ -369,8 +369,8 @@ describe Scan do
         result = @test_command_generator.generate
 
         expect(result).to start_with([
-                                       "set -o pipefail && env NSUnbufferedIO=YES",
-                                       "xcodebuild",
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
                                        "-scheme app",
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
@@ -392,8 +392,8 @@ describe Scan do
         result = @test_command_generator.generate
 
         expect(result).to start_with([
-                                       "set -o pipefail && env NSUnbufferedIO=YES",
-                                       "xcodebuild",
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
                                        "-scheme app",
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
@@ -411,8 +411,8 @@ describe Scan do
 
       result = @test_command_generator.generate
       expect(result).to start_with([
-                                     "set -o pipefail && env NSUnbufferedIO=YES",
-                                     "xcodebuild",
+                                     "set -o pipefail &&",
+                                     "env NSUnbufferedIO=YES xcodebuild",
                                      "-scheme app",
                                      "-project ./scan/examples/standard/app.xcodeproj",
                                      # expect the single highest versioned iOS simulator device available with matching name
@@ -444,8 +444,8 @@ describe Scan do
         Scan.config[:build_for_testing] = true
         result = @test_command_generator.generate
         expect(result).to start_with([
-                                       "set -o pipefail && env NSUnbufferedIO=YES",
-                                       "xcodebuild",
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
                                        "-scheme app",
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
@@ -458,8 +458,8 @@ describe Scan do
         Scan.config[:test_without_building] = true
         result = @test_command_generator.generate
         expect(result).to start_with([
-                                       "set -o pipefail && env NSUnbufferedIO=YES",
-                                       "xcodebuild",
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
                                        "-scheme app",
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
@@ -485,8 +485,8 @@ describe Scan do
         Scan.config[:xctestrun] = "/folder/mytests.xctestrun"
         result = @test_command_generator.generate
         expect(result).to start_with([
-                                       "set -o pipefail && env NSUnbufferedIO=YES",
-                                       "xcodebuild",
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
                                        "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
                                        "-destination 'platform=iOS Simulator,name=iPad Air 2,OS=9.2'",
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
@@ -506,8 +506,8 @@ describe Scan do
 
         result = @test_command_generator.generate
         expect(result).to start_with([
-                                       "set -o pipefail && env NSUnbufferedIO=YES",
-                                       "xcodebuild",
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
                                        "-scheme app",
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
@@ -527,8 +527,8 @@ describe Scan do
 
         result = @test_command_generator.generate
         expect(result).to start_with([
-                                       "set -o pipefail && env NSUnbufferedIO=YES",
-                                       "xcodebuild",
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
                                        "-scheme app",
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=70E1E92F-A292-4980-BC3C-7770C5EEFCFD' " \
@@ -548,8 +548,8 @@ describe Scan do
 
         result = @test_command_generator.generate
         expect(result).to start_with([
-                                       "set -o pipefail && env NSUnbufferedIO=YES",
-                                       "xcodebuild",
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
                                        "-scheme app",
                                        "-project ./scan/examples/standard/app.xcodeproj",
                                        "-destination 'platform=iOS Simulator,id=9905A018-9DC9-4DD8-BA14-B0B000CC8622'",
@@ -581,49 +581,21 @@ describe Scan do
       end
     end
 
-    describe "sonar_build_wrapper and sonar_build_wrapper-output" do
-      it "raises an error if `sonar_build_wrapper` was given but `sonar_build_wrapper_output` was missing" do
-        expect do
-          options = {
-            project: "./scan/examples/standard/app.xcodeproj",
-            sonar_build_wrapper: "build-wrapper-macosx-x86-64"
-          }
-          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+    describe "Custom xcodebuild_command example" do
+      it "uses xcodebuild_command" do
+        options = {
+          project: "./scan/examples/standard/app.xcodeproj",
+          xcodebuild_command: "env NSUnbufferedIO=YES /usr/local/bin/build-wrapper-macosx-x86 --out-dir ./build/bw_output xcodebuild"
+        }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-          @test_command_generator.generate
-        end.to raise_error("Cannot use sonar_build_wrapper option without a sonar_build_wrapper_output.")
-      end
-
-      it "raises an error if `sonar_build_wrapper_output` was given but `sonar_build_wrapper` was missing" do
-        expect do
-          options = {
-            project: "./scan/examples/standard/app.xcodeproj",
-            sonar_build_wrapper_output: "bw_output"
-          }
-          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-          @test_command_generator.generate
-        end.to raise_error("Cannot use sonar_build_wrapper_output option without a sonar_build_wrapper.")
-      end
-
-      it "uses SonarCFamily for Objective-C wrapper" do
-        expect do
-          options = {
-            project: "./scan/examples/standard/app.xcodeproj",
-            sonar_build_wrapper: "build-wrapper-macosx-x86-64",
-            sonar_build_wrapper_output: "bw_output"
-          }
-          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-
-          result = @test_command_generator.generate
-          expect(result).to start_with([
-                                         "set -o pipefail && env NSUnbufferedIO=YES",
-                                         "build-wrapper-macosx-x86-64",
-                                         "--out-dir bw_output",
-                                         "xcodebuild",
-                                         "-scheme app",
-                                         "-project ./scan/examples/standard/app.xcodeproj"
-                                       ])
-        end
+        result = @test_command_generator.generate
+        expect(result).to start_with([
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES /usr/local/bin/build-wrapper-macosx-x86 --out-dir ./build/bw_output xcodebuild",
+                                       "-scheme app",
+                                       "-project ./scan/examples/standard/app.xcodeproj"
+                                     ])
       end
     end
   end

@@ -376,14 +376,9 @@ module Scan
                                      conflicting_options: [:output_files],
                                      optional: true,
                                      is_string: true),
-        FastlaneCore::ConfigItem.new(key: :sonar_build_wrapper,
-                                      env_name: "GYM_SONAR_BUILD_WRAPPER",
-                                       description: "The path to the SonarQube build-wrapper executable",
-                                       type: String,
-                                       optional: true),
-        FastlaneCore::ConfigItem.new(key: :sonar_build_wrapper_output,
-                                    env_name: "GYM_SONAR_BUILD_WRAPPER_OUTPUT",
-                                    description: "The path to place the output from SonarQube's build-wrapper, requires a sonar build wrapper",
+        FastlaneCore::ConfigItem.new(key: :xcodebuild_command,
+                                    env_name: "GYM_XCODE_BUILD_COMMAND",
+                                    description: "Allows for override of the default `xcodebuild` command",
                                     type: String,
                                     optional: true)
 
