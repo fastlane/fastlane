@@ -4,8 +4,6 @@ module Scan
   # Responsible for building the fully working xcodebuild command
   class TestCommandGenerator
     def generate
-      Scan.config[:xcodebuild_command] ||= "env NSUnbufferedIO=YES xcodebuild"
-
       parts = prefix
       parts << Scan.config[:xcodebuild_command]
       parts += options

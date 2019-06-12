@@ -380,7 +380,8 @@ module Scan
                                     env_name: "GYM_XCODE_BUILD_COMMAND",
                                     description: "Allows for override of the default `xcodebuild` command",
                                     type: String,
-                                    optional: true)
+                                    optional: true,
+                                    default_value: "env NSUnbufferedIO=YES xcodebuild")
 
       ]
     end
