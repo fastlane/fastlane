@@ -582,7 +582,7 @@ describe Scan do
     end
 
     describe "Custom xcodebuild_command example" do
-      it "uses xcodebuild_command" do
+      it "uses xcodebuild_command", requires_xcodebuild: true do
         options = {
           project: "./scan/examples/standard/app.xcodeproj",
           xcodebuild_command: "env NSUnbufferedIO=YES /usr/local/bin/build-wrapper-macosx-x86 --out-dir ./build/bw_output xcodebuild"
