@@ -1,5 +1,9 @@
 module Fastlane
   module Actions
+    module SharedValues
+      BUILD_NUMBER ||= :BUILD_NUMBER
+    end
+
     class GetBuildNumberAction < Action
       require 'shellwords'
 

@@ -1,6 +1,11 @@
 # rubocop:disable Lint/AssignmentInCondition
 module Fastlane
   module Actions
+    module SharedValues
+      IPA_OUTPUT_PATH ||= :IPA_OUTPUT_PATH
+      DSYM_OUTPUT_PATH ||= :DSYM_OUTPUT_PATH
+    end
+
     ARGS_MAP = {
       workspace: '-w',
       project: '-p',

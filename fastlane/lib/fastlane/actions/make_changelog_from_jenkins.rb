@@ -1,5 +1,9 @@
 module Fastlane
   module Actions
+    module SharedValues
+      FL_CHANGELOG ||= :FL_CHANGELOG
+    end
+
     class MakeChangelogFromJenkinsAction < Action
       def self.run(params)
         require 'json'
