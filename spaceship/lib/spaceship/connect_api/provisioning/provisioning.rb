@@ -8,8 +8,8 @@ module Spaceship
       #
 
       def get_bundle_ids(filter: {}, includes: nil, limit: nil, sort: nil)
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        client.get("bundleIds", params)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("bundleIds", params)
       end
 
       #
@@ -17,8 +17,8 @@ module Spaceship
       #
 
       def get_certificates(filter: {}, includes: nil, limit: nil, sort: nil)
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        client.get("certificates", params)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("certificates", params)
       end
 
       #
@@ -26,8 +26,8 @@ module Spaceship
       #
 
       def get_devices(filter: {}, includes: nil, limit: nil, sort: nil)
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        client.get("devices", params)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("devices", params)
       end
 
       #
@@ -35,14 +35,8 @@ module Spaceship
       #
 
       def get_profiles(filter: {}, includes: nil, limit: nil, sort: nil)
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        client.get("profiles", params)
-      end
-
-      private
-
-      def client
-        Spaceship::ConnectAPI::Provisioning::Client.instance
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("profiles", params)
       end
     end
   end

@@ -17,6 +17,18 @@ module Spaceship
       attr_reader :issuer_id
       attr_reader :text
 
+      def self.create(key_id: nil, issuer_id: nil, filepath: nil)
+        key_id ||= ENV['SPACESHIP_CONNECT_API_KEY_ID']
+        issuer_id ||= ENV['SPACESHIP_CONNECT_API_ISSUER_ID']
+        filepath ||= ENV['SPACESHIP_CONNECT_API_KEY_FILEPATH']
+
+        self.new(
+          key_id: key_id,
+          issuer_id: issuer_id,
+          key: OpenSSL::PKey::EC.new(File.read(filepath))
+        )
+      end
+
       def initialize(key_id: nil, issuer_id: nil, key: nil)
         @expiration = Time.now + MAX_TOKEN_DURATION
         @key_id = key_id

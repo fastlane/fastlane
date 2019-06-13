@@ -10,15 +10,15 @@ module Spaceship
       def get_apps(filter: {}, includes: nil, limit: nil, sort: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/apps
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        client.get("apps", params)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("apps", params)
       end
 
       def get_app(app_id: nil, includes: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/apps/<app_id>
-        params = client.build_params(filter: nil, includes: includes, limit: nil, sort: nil)
-        client.get("apps/#{app_id}", params)
+        params = Client.instance.build_params(filter: nil, includes: includes, limit: nil, sort: nil)
+        Client.instance.get("apps/#{app_id}", params)
       end
 
       #
@@ -28,8 +28,8 @@ module Spaceship
       def get_beta_app_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaAppLocalizations?filter[app]=<app_id>
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        client.get("betaAppLocalizations", params)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("betaAppLocalizations", params)
       end
 
       def post_beta_app_localizations(app_id: nil, attributes: {})
@@ -52,7 +52,7 @@ module Spaceship
           }
         }
 
-        client.post(path, body)
+        Client.instance.post(path, body)
       end
 
       def patch_beta_app_localizations(localization_id: nil, attributes: {})
@@ -68,7 +68,7 @@ module Spaceship
           }
         }
 
-        client.patch(path, body)
+        Client.instance.patch(path, body)
       end
 
       #
@@ -78,8 +78,8 @@ module Spaceship
       def get_beta_app_review_detail(filter: {}, includes: nil, limit: nil, sort: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaAppReviewDetails?filter[app]=<app_id>
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        client.get("betaAppReviewDetails", params)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("betaAppReviewDetails", params)
       end
 
       def patch_beta_app_review_detail(app_id: nil, attributes: {})
@@ -95,7 +95,7 @@ module Spaceship
           }
         }
 
-        client.patch(path, body)
+        Client.instance.patch(path, body)
       end
 
       #
@@ -105,8 +105,8 @@ module Spaceship
       def get_beta_app_review_submissions(filter: {}, includes: nil, limit: nil, sort: nil, cursor: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaAppReviewSubmissions
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
-        client.get("betaAppReviewSubmissions", params)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
+        Client.instance.get("betaAppReviewSubmissions", params)
       end
 
       def post_beta_app_review_submissions(build_id: nil)
@@ -127,14 +127,14 @@ module Spaceship
           }
         }
 
-        client.post(path, body)
+        Client.instance.post(path, body)
       end
 
       def delete_beta_app_review_submission(beta_app_review_submission_id: nil)
         # DELETE
         # https://appstoreconnect.apple.com/iris/v1/betaAppReviewSubmissions/<beta_app_review_submission_id>
-        params = client.build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: nil)
-        client.delete("betaAppReviewSubmissions/#{beta_app_review_submission_id}", params)
+        params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: nil)
+        Client.instance.delete("betaAppReviewSubmissions/#{beta_app_review_submission_id}", params)
       end
 
       #
@@ -145,8 +145,8 @@ module Spaceship
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations
         path = "betaBuildLocalizations"
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        client.get(path, params)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get(path, params)
       end
 
       def post_beta_build_localizations(build_id: nil, attributes: {})
@@ -169,7 +169,7 @@ module Spaceship
           }
         }
 
-        client.post(path, body)
+        Client.instance.post(path, body)
       end
 
       def patch_beta_build_localizations(localization_id: nil, feedbackEmail: nil, attributes: {})
@@ -185,7 +185,7 @@ module Spaceship
           }
         }
 
-        client.patch(path, body)
+        Client.instance.patch(path, body)
       end
 
       #
@@ -195,8 +195,8 @@ module Spaceship
       def get_beta_build_metrics(filter: {}, includes: nil, limit: nil, sort: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaBuildMetrics
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        client.get("betaBuildMetrics", params)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("betaBuildMetrics", params)
       end
 
       #
@@ -206,8 +206,8 @@ module Spaceship
       def get_beta_groups(filter: {}, includes: nil, limit: nil, sort: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaGroups
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        client.get("betaGroups", params)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("betaGroups", params)
       end
 
       def add_beta_groups_to_build(build_id: nil, beta_group_ids: [])
@@ -223,7 +223,7 @@ module Spaceship
           end
         }
 
-        client.post(path, body)
+        Client.instance.post(path, body)
       end
 
       #
@@ -233,8 +233,8 @@ module Spaceship
       def get_beta_testers(filter: {}, includes: nil, limit: nil, sort: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaTesters
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        client.get("betaTesters", params)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("betaTesters", params)
       end
 
       # beta_testers - [{email: "", firstName: "", lastName: ""}]
@@ -264,7 +264,7 @@ module Spaceship
           }
         }
 
-        client.post("bulkBetaTesterAssignments", body)
+        Client.instance.post("bulkBetaTesterAssignments", body)
       end
 
       def delete_beta_tester_from_apps(beta_tester_id: nil, app_ids: [])
@@ -306,8 +306,8 @@ module Spaceship
       def get_beta_tester_metrics(filter: {}, includes: nil, limit: nil, sort: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        client.get("betaTesterMetrics", params)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("betaTesterMetrics", params)
       end
 
       #
@@ -317,15 +317,15 @@ module Spaceship
       def get_builds(filter: {}, includes: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate", cursor: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/builds
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
-        client.get("builds", params)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
+        Client.instance.get("builds", params)
       end
 
       def get_build(build_id: nil, includes: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/builds/<build_id>?
-        params = client.build_params(filter: nil, includes: includes, limit: nil, sort: nil, cursor: nil)
-        client.get("builds/#{build_id}", params)
+        params = Client.instance.build_params(filter: nil, includes: includes, limit: nil, sort: nil, cursor: nil)
+        Client.instance.get("builds/#{build_id}", params)
       end
 
       def patch_builds(build_id: nil, attributes: {})
@@ -341,7 +341,7 @@ module Spaceship
           }
         }
 
-        client.patch(path, body)
+        Client.instance.patch(path, body)
       end
 
       #
@@ -351,8 +351,8 @@ module Spaceship
       def get_build_beta_details(filter: {}, includes: nil, limit: nil, sort: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/buildBetaDetails
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        client.get("buildBetaDetails", params)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("buildBetaDetails", params)
       end
 
       def patch_build_beta_details(build_beta_details_id: nil, attributes: {})
@@ -368,7 +368,7 @@ module Spaceship
           }
         }
 
-        client.patch(path, body)
+        Client.instance.patch(path, body)
       end
 
       #
@@ -378,8 +378,8 @@ module Spaceship
       def get_build_deliveries(filter: {}, includes: nil, limit: nil, sort: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/buildDeliveries
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        client.get("buildDeliveries", params)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("buildDeliveries", params)
       end
 
       #
@@ -389,25 +389,8 @@ module Spaceship
       def get_pre_release_versions(filter: {}, includes: nil, limit: nil, sort: nil)
         # GET
         # https://appstoreconnect.apple.com/iris/v1/preReleaseVersions
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        client.get("preReleaseVersions", params)
-      end
-
-      #
-      # users
-      #
-
-      def get_users(filter: {}, includes: nil, limit: nil, sort: nil)
-        # GET
-        # https://appstoreconnect.apple.com/iris/v1/users
-        params = client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        client.get("users", params)
-      end
-
-      private
-
-      def client
-        return Spaceship::ConnectAPI::TestFlight::Client.instance
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("preReleaseVersions", params)
       end
     end
   end
