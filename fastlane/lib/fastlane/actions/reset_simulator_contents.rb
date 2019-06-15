@@ -41,10 +41,10 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :ios,
-                                       short_option: "-i",
+          FastlaneCore::ConfigItem.new(key: :version,
+                                       short_option: "-v",
                                        env_name: "FASTLANE_RESET_SIMULATOR_VERSIONS",
-                                       description: "Which versions of Simulators you want to reset content and settings, this does not remove/recreate the simulators",
+                                       description: "Which OS versions of Simulators you want to reset content and settings, this does not remove/recreate the simulators",
                                        is_string: false,
                                        optional: true,
                                        type: Array)
