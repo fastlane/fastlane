@@ -2,12 +2,12 @@ module Fastlane
   module Actions
     class ResetSimulatorContentsAction < Action
       def self.run(params)
-        ios_versions = params[:ios]
+        os_versions = params[:version]
 
         if Helper.xcode_at_least?("9")
-          reset_xcode9_and_higher(ios_versions)
+          reset_xcode9_and_higher(os_versions)
         else
-          reset_up_to_xcode8(ios_versions)
+          reset_up_to_xcode8(os_versions)
         end
       end
 
