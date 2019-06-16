@@ -157,7 +157,7 @@ class TunesStubbing
       # Receiving app version
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/versions/813314674").
         to_return(status: 200, body: itc_read_fixture_file('app_review_attachment.json'), headers: { 'Content-Type' => 'application/json' })
-     end
+    end
 
     def itc_stub_app_submissions
       # Start app submission
