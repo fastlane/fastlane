@@ -14,7 +14,7 @@ module Fastlane
           os_versions.each do |os_version|
             reset_all_by_version(os_version)
           end
-        else 
+        else
           reset_all
         end
 
