@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "SwiftLint" do
-      let(:swiftlint_gem_version) { Gem::Version.new('0.9.2') }
+      let(:swiftlint_gem_version) { Gem::Version.new('0.11.0') }
       let(:output_file) { "swiftlint.result.json" }
       let(:config_file) { ".swiftlint-ci.yml" }
 
@@ -28,6 +28,18 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(result).to eq("swiftlint lint --strict")
+        end
+
+        it "omits strict option if swiftlint does not support it" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.9.1'))
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              strict: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint")
         end
 
         it "adds strict option for custom executable" do
@@ -265,7 +277,7 @@ describe Fastlane do
           expect(result).to eq("swiftlint lint --quiet")
         end
 
-        it "omits the switch if swiftlint version is too low" do
+        it "omits quiet option if swiftlint does not support it" do
           allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.8.0'))
 
           result = Fastlane::FastFile.new.parse("lane :test do
@@ -287,6 +299,57 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(result).to eq("swiftlint lint")
+        end
+      end
+
+      context "when specify format option" do
+        it "adds format option" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :autocorrect,
+              format: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint autocorrect --format")
+        end
+
+        it "omits format option if mode is :lint" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :lint,
+              format: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint")
+        end
+
+        it "omits format option if swiftlint does not support it" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.10.0'))
+          expect(FastlaneCore::UI).to receive(:important).with(/Your version of swiftlint \(0.10.0\) does not support/)
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :autocorrect,
+              format: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint autocorrect")
+        end
+      end
+
+      context "when specify false for format option" do
+        it "doesn't add format option" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :autocorrect,
+              format: false
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint autocorrect")
         end
       end
     end

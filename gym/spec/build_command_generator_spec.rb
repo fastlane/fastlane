@@ -196,6 +196,51 @@ describe Gym do
       end
     end
 
+    describe "Result Bundle Path Example" do
+      it "uses the correct build command with the example project", requires_xcodebuild: true do
+        log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
+
+        options = { project: "./gym/examples/standard/Example.xcodeproj", scheme: 'Example', result_bundle: true,
+          result_bundle_path: "result_bundle" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::BuildCommandGenerator.generate
+        expect(result).to eq([
+                               "set -o pipefail &&",
+                               "xcodebuild",
+                               "-scheme Example",
+                               "-project ./gym/examples/standard/Example.xcodeproj",
+                               "-destination 'generic/platform=iOS'",
+                               "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                               "-resultBundlePath 'result_bundle'",
+                               :archive,
+                               "| tee #{log_path.shellescape}",
+                               "| xcpretty"
+                             ])
+      end
+
+      it "does not use result_bundle_path if result_bundle is false", requires_xcodebuild: true do
+        log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
+
+        options = { project: "./gym/examples/standard/Example.xcodeproj", scheme: 'Example', result_bundle: false,
+          result_bundle_path: "result_bundle" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::BuildCommandGenerator.generate
+        expect(result).to eq([
+                               "set -o pipefail &&",
+                               "xcodebuild",
+                               "-scheme Example",
+                               "-project ./gym/examples/standard/Example.xcodeproj",
+                               "-destination 'generic/platform=iOS'",
+                               "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                               :archive,
+                               "| tee #{log_path.shellescape}",
+                               "| xcpretty"
+                             ])
+      end
+    end
+
     describe "Analyze Build Time Example" do
       before do
         @log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")

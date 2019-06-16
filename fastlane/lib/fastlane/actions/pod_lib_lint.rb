@@ -1,6 +1,7 @@
 module Fastlane
   module Actions
     class PodLibLintAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         command = []
 
@@ -20,6 +21,11 @@ module Fastlane
         command << "--fail-fast" if params[:fail_fast]
         command << "--private" if params[:private]
         command << "--quick" if params[:quick]
+        command << "--no-clean" if params[:no_clean]
+        command << "--no-subspecs" if params[:no_subspecs]
+        command << "--platforms=#{params[:platforms]}" if params[:platforms]
+        command << "--skip-import-validation" if params[:skip_import_validation]
+        command << "--skip-tests" if params[:skip_tests]
 
         result = Actions.sh(command.join(' '))
         UI.success("Pod lib lint Successfully ⬆️ ")
@@ -95,7 +101,7 @@ module Fastlane
                                        default_value: false,
                                        env_name: "FL_POD_LIB_LINT_USE_LIBRARIES"),
           FastlaneCore::ConfigItem.new(key: :use_modular_headers,
-                                       description: "Lint using modular libraries",
+                                       description: "Lint using modular libraries (available since cocoapods >= 1.6)",
                                        type: Boolean,
                                        default_value: false,
                                        env_name: "FL_POD_LIB_LINT_USE_MODULAR_HEADERS"),
@@ -113,7 +119,32 @@ module Fastlane
                                        description: "Lint skips checks that would require to download and build the spec",
                                        type: Boolean,
                                        default_value: false,
-                                       env_name: "FL_POD_LIB_LINT_QUICK")
+                                       env_name: "FL_POD_LIB_LINT_QUICK"),
+          FastlaneCore::ConfigItem.new(key: :no_clean,
+                                       description: "Lint leaves the build directory intact for inspection",
+                                       type: Boolean,
+                                       default_value: false,
+                                       env_name: "FL_POD_LIB_LINT_NO_CLEAN"),
+          FastlaneCore::ConfigItem.new(key: :no_subspecs,
+                                       description: "Lint skips validation of subspecs",
+                                       type: Boolean,
+                                       default_value: false,
+                                       env_name: "FL_POD_LIB_LINT_NO_SUBSPECS"),
+          FastlaneCore::ConfigItem.new(key: :platforms,
+                                       description: "Lint against specific platforms (defaults to all platforms supported by "\
+                                          "the podspec). Multiple platforms must be comma-delimited (available since cocoapods >= 1.6)",
+                                       optional: true,
+                                       env_name: "FL_POD_LIB_LINT_PLATFORMS"),
+          FastlaneCore::ConfigItem.new(key: :skip_import_validation,
+                                       description: "Lint skips validating that the pod can be imported (available since cocoapods >= 1.3)",
+                                       type: Boolean,
+                                       default_value: false,
+                                       env_name: "FL_POD_LIB_LINT_SKIP_IMPORT_VALIDATION"),
+          FastlaneCore::ConfigItem.new(key: :skip_tests,
+                                       description: "Lint skips building and running tests during validation (available since cocoapods >= 1.3)",
+                                       type: Boolean,
+                                       default_value: false,
+                                       env_name: "FL_POD_LIB_LINT_SKIP_TESTS")
         ]
       end
 
