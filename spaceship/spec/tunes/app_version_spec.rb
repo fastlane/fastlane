@@ -747,4 +747,19 @@ describe Spaceship::AppVersion, all: true do
       end
     end
   end
+
+  describe "Validate attachment file" do
+    before { Spaceship::Tunes.login }
+    let(:client) { Spaceship::AppVersion.client }
+    let(:app) { Spaceship::Application.all.first }
+    describe "successfully loads and parses the app version and attachment" do
+      it "contains the right information" do
+        TunesStubbing.itc_stub_app_attachment
+        v = app.edit_version(platform: 'ios')
+        expect(v.review_attachment_file.original_file_name).to eq("attachment.txt")
+        expect(v.review_attachment_file.asset_token).to eq("test/v4/02/88/4d/02884d3d-92ea-5e6a-2a7b-b19da39f73a6/attachment.txt")
+        expect(v.review_attachment_file.url).to eq("https://iosapps-ssl.itunes.apple.com/itunes-assets/test/v4/02/88/4d/02884d3d-92ea-5e6a-2a7b-b19da39f73a6/attachment.txt")
+      end
+    end
+  end
 end
