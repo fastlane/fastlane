@@ -177,8 +177,15 @@ open class Snapshot: NSObject {
             let screenshot = window.screenshot()
             guard let simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
             let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
+        
             do {
+                var isDirectory: ObjCBool = false
+                if !FileManager.default.fileExists(atPath: screenshotsDir.path, isDirectory: &isDirectory) || !isDirectory.boolValue {
+                    try FileManager.default.createDirectory(at: screenshotsDir, withIntermediateDirectories: true, attributes: nil)
+                }
+
                 try screenshot.pngRepresentation.write(to: path)
+                
             } catch let error {
                 NSLog("Problem writing screenshot: \(name) to \(path)")
                 NSLog(error.localizedDescription)
