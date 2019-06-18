@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class ResetSimulatorContentsAction < Action
       def self.run(params)
-        os_versions = params[:os_versions]
+        os_versions = params[:os_versions] || params[:ios]
 
         reset_simulators(os_versions)
       end
@@ -39,9 +39,19 @@ module Fastlane
 
       def self.available_options
         [
+          FastlaneCore::ConfigItem.new(key: :ios,
+                                       deprecated: "Use `:os_versions` instead",
+                                       short_option: "-i",
+                                       env_name: "FASTLANE_RESET_SIMULATOR_VERSIONS",
+                                       description: "Which OS versions of Simulators you want to reset content and settings, this does not remove/recreate the simulators",
+                                       is_string: false,
+                                       optional: true,
+                                       type: Array,
+                                       default_value: ENV["FASTLANE_RESET_SIMULATOR_OS_VERSIONS"],
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :os_versions,
                                        short_option: "-v",
-                                       env_name: "FASTLANE_RESET_SIMULATOR_VERSIONS",
+                                       env_name: "FASTLANE_RESET_SIMULATOR_OS_VERSIONS",
                                        description: "Which OS versions of Simulators you want to reset content and settings, this does not remove/recreate the simulators",
                                        is_string: false,
                                        optional: true,
