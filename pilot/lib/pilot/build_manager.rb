@@ -370,7 +370,7 @@ module Pilot
       end
 
       # Validate locales exist
-      localizations = app.get_beta_app_localizations
+      localizations = build.get_beta_app_localizations
       localizations.each do |localization|
         localizations_by_lang[localization.locale.to_sym] = localization
       end
@@ -380,11 +380,11 @@ module Pilot
         info = info_by_lang[lang_code]
 
         info = default_info unless info
-        update_localized_app_review_for_lang(app, localization, lang_code, info) if info
+        update_localized_app_review_for_lang(build, localization, lang_code, info) if info
       end
     end
 
-    def update_localized_app_review_for_lang(app, localization, locale, info)
+    def update_localized_app_review_for_lang(build, localization, locale, info)
       attributes = {}
       attributes[:feedbackEmail] = info[:feedback_email] if info.key?(:feedback_email)
       attributes[:marketingUrl] = info[:marketing_url] if info.key?(:marketing_url)
@@ -397,7 +397,7 @@ module Pilot
         client.patch_beta_app_localizations(localization_id: localization.id, attributes: attributes)
       else
         attributes[:locale] = locale if locale
-        client.post_beta_app_localizations(app_id: app.id, attributes: attributes)
+        client.post_beta_app_localizations(app_id: build.app_id, attributes: attributes)
       end
     end
 
