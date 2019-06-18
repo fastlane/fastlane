@@ -370,7 +370,7 @@ module Pilot
       end
 
       # Validate locales exist
-      localizations = build.get_beta_app_localizations
+      localizations = build.app.get_beta_app_localizations
       localizations.each do |localization|
         localizations_by_lang[localization.locale.to_sym] = localization
       end
