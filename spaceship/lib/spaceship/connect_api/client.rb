@@ -10,7 +10,7 @@ module Spaceship
       # @!group Client Init
       #####################################################
 
-      # Instantiates a client with a JWT token.
+      # Instantiates a client with cookie session or a JWT token.
       def initialize(cookie: nil, current_team_id: nil, token: nil)
         if token.nil?
           super(cookie: cookie, current_team_id: current_team_id)
@@ -159,18 +159,6 @@ module Spaceship
       end
 
       private
-
-      # used to assert all of the named parameters are supplied values
-      #
-      # @raises NameError if the values are nil
-      def assert_required_params(method_name, binding)
-        parameter_names = method(method_name).parameters.map { |_, v| v }
-        parameter_names.each do |name|
-          if local_variable_get(binding, name).nil?
-            raise NameError, "`#{name}' is a required parameter"
-          end
-        end
-      end
 
       def local_variable_get(binding, name)
         if binding.respond_to?(:local_variable_get)

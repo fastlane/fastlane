@@ -33,6 +33,8 @@ module Spaceship
         #
 
         def get(url_or_path, params = nil)
+          # The App Store Connect API is only available in a web session through a
+          # a proxy server where GET requests are actually sent as a POST
           return get_as_post(url_or_path, params) if web_session?
 
           super(url_or_path, params)
