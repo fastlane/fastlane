@@ -2,8 +2,8 @@
 module Fastlane
   module Actions
     module SharedValues
-      IPA_OUTPUT_PATH ||= :IPA_OUTPUT_PATH
-      DSYM_OUTPUT_PATH ||= :DSYM_OUTPUT_PATH
+      IPA_OUTPUT_PATH ||= :IPA_OUTPUT_PATH # originally defined in BuildIosAppAction
+      DSYM_OUTPUT_PATH ||= :DSYM_OUTPUT_PATH # originally defined in BuildIosAppAction
     end
 
     ARGS_MAP = {

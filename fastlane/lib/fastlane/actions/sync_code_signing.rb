@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     module SharedValues
       MATCH_PROVISIONING_PROFILE_MAPPING = :MATCH_PROVISIONING_PROFILE_MAPPING
-      SIGH_PROFILE_TYPE ||= :SIGH_PROFILE_TYPE
+      SIGH_PROFILE_TYPE ||= :SIGH_PROFILE_TYPE # originally defined in GetProvisioningProfileAction
     end
 
     class SyncCodeSigningAction < Action
