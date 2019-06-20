@@ -9,11 +9,15 @@ module Spaceship
       attr_accessor :seed_id
       attr_accessor :platform
 
+      attr_accessor :bundle_id_capabilities
+
       attr_mapping({
         "identifier" => "identifier",
         "name" => "name",
         "seedId" => "seed_id",
-        "platform" => "platform"
+        "platform" => "platform",
+
+        "bundleIdCapabilities" => 'bundle_id_capabilities'
       })
 
       module Platform
@@ -32,6 +36,10 @@ module Spaceship
       def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
         resps = Spaceship::ConnectAPI.get_bundle_ids(filter: filter, includes: includes).all_pages
         return resps.map(&:to_models).flatten
+      end
+
+      def self.get(bundle_id_id: nil, includes: nil)
+        return Spaceship::ConnectAPI.get_bundle_id(bundle_id_id: bundle_id_id, includes: includes).first
       end
     end
   end

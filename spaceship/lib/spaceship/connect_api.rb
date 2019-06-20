@@ -6,6 +6,7 @@ require 'spaceship/connect_api/provisioning/provisioning'
 require 'spaceship/connect_api/testflight/testflight'
 require 'spaceship/connect_api/users/users'
 
+require 'spaceship/connect_api/models/bundle_id_capability'
 require 'spaceship/connect_api/models/bundle_id'
 require 'spaceship/connect_api/models/certificate'
 require 'spaceship/connect_api/models/device'

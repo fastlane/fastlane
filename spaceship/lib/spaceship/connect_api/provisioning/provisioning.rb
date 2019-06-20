@@ -12,6 +12,11 @@ module Spaceship
         Client.instance.get("bundleIds", params)
       end
 
+      def get_bundle_id(bundle_id_id: {}, includes: nil)
+        params = Client.instance.build_params(filter: nil, includes: includes, limit: nil, sort: nil)
+        Client.instance.get("bundleIds/#{bundle_id_id}", params)
+      end
+
       #
       # certificates
       #
