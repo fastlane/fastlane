@@ -49,8 +49,7 @@ module Fastlane
           UI.message("Fetching the latest build number for #{version_number_message}")
 
           # Get latest build for optional version number and return build number if found
-          client = Spaceship::ConnectAPI::TestFlight.client
-          build = client.get_builds(filter: filter, sort: "-version", includes: "preReleaseVersion", limit: 1).first
+          build = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-version", includes: "preReleaseVersion", limit: 1).first
           if build
             build_nr = build.version
             UI.message("Latest upload for version #{build.app_version} is build: #{build_nr}")
