@@ -79,7 +79,7 @@ module Fastlane
     def self.print_error_line(ex)
       error_line = ex.backtrace
       return if error_line.empty?
-      
+
       error_line = error_line[0].match("Fastfile:(\\d+):")
       return unless error_line
 
