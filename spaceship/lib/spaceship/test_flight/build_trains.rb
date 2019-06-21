@@ -21,10 +21,10 @@ module Spaceship::TestFlight
 
       loop do
         builds_resp = client.get_builds(filter: { app: app_id, processingState: "VALID,PROCESSING,FAILED,INVALID" }, limit: 100, sort: "uploadedDate", includes: "preReleaseVersion,app", cursor: cursor)
-        builds += builds_resp["data"]
-        included += (builds_resp["included"] || [])
+        builds += builds_resp.body["data"]
+        included += (builds_resp.body["included"] || [])
 
-        next_page = builds_resp["links"]["next"]
+        next_page = builds_resp.body["links"]["next"]
         break if next_page.nil?
 
         uri = URI.parse(next_page)
