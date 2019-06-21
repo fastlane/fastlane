@@ -15,26 +15,26 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Helmut Januschka",
-                        "Olivier Halligon",
-                        "Danielle Tomlinson",
-                        "Joshua Liebowitz",
-                        "Andrew McBurney",
+  spec.authors       = ["Joshua Liebowitz",
                         "Stefan Natchev",
-                        "Jérôme Lacoste",
+                        "Andrew McBurney",
                         "Felix Krause",
-                        "Fumiya Nakamura",
-                        "Aaron Brager",
-                        "Jan Piotrowski",
-                        "Iulian Onofrei",
-                        "Manu Wallner",
-                        "Matthew Ellis",
-                        "Maksym Grebenets",
                         "Jorge Revuelta H",
-                        "Luka Mirosevic",
-                        "Kohki Miki",
+                        "Manu Wallner",
                         "Josh Holtz",
-                        "Jimmy Dee"]
+                        "Matthew Ellis",
+                        "Luka Mirosevic",
+                        "Iulian Onofrei",
+                        "Jimmy Dee",
+                        "Danielle Tomlinson",
+                        "Kohki Miki",
+                        "Maksym Grebenets",
+                        "Jan Piotrowski",
+                        "Aaron Brager",
+                        "Fumiya Nakamura",
+                        "Jérôme Lacoste",
+                        "Helmut Januschka",
+                        "Olivier Halligon"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -90,6 +90,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('faraday', '~> 0.9') # Used for deploygate, hockey and testfairy actions
   spec.add_dependency('faraday_middleware', '~> 0.9') # same as faraday
   spec.add_dependency('simctl', '~> 1.6.3') # Used for querying and interacting with iOS simulators
+  spec.add_dependency('jwt', '~> 2.1.0') # Used for generating authentication tokens for AppStore connect api
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.

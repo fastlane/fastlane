@@ -13,7 +13,7 @@ module Spaceship::TestFlight
     # See `Spaceship::TestFlight::Build#reload`
 
     def self.all(app_id: nil, platform: nil, retry_count: 3)
-      client = Spaceship::ConnectAPI::Base.client
+      client = Spaceship::ConnectAPI::TestFlight.client
 
       builds = []
       included = []
@@ -27,7 +27,7 @@ module Spaceship::TestFlight
                             end
 
       loop do
-        builds_resp = client.get_builds(filter: { app: app_id, processingState: "VALID,PROCESSING,FAILED,INVALID" }, limit: 100, sort: "uploadedDate", includes: "preReleaseVersion,app", cursor: cursor, only_data: false)
+        builds_resp = client.get_builds(filter: { app: app_id, processingState: "VALID,PROCESSING,FAILED,INVALID" }, limit: 100, sort: "uploadedDate", includes: "preReleaseVersion,app", cursor: cursor)
         builds += builds_resp["data"]
         included += (builds_resp["included"] || [])
 

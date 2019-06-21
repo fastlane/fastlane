@@ -324,6 +324,10 @@ module Deliver
                                      optional: true,
                                      is_string: false,
                                      type: Hash),
+        FastlaneCore::ConfigItem.new(key: :app_review_attachment_file,
+                                     description: "Metadata: Path to the app review attachment file",
+                                     optional: true,
+                                     is_string: true),
         # Localised
         FastlaneCore::ConfigItem.new(key: :description,
                                      description: "Metadata: The localised app description",
